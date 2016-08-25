@@ -1,0 +1,5 @@
+node_modules
+*.log
+lib
+coverage
+mobx-state-tree.umd.js

@@ -1,0 +1,53 @@
+{
+  "name": "mobx-state-tree",
+  "version": "0.0.1",
+  "description": "Opinionated state container for MobX powered applications",
+  "main": "lib/mobx-state-tree.js",
+  "typings": "lib/mobx-state-tree.d.ts",
+  "scripts": {
+    "build": "tsc -p src && npm run webpack",
+    "webpack": "webpack -p",
+    "test": "npm run build && tape test/*.js | faucet",
+    "prepublish": "npm run build && npm run build-docs",
+    "test-travis": "npm run build && istanbul cover tape test/*.js",
+    "coverage": "npm run build && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
+    "build-docs": "npm run build && documentation readme lib/mobx-state-tree.js --github --section API"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobxjs/mobx-state-tree.git"
+  },
+  "author": "Michel Weststrate",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mobxjs/mobx-state-tree/issues"
+  },
+  "files": [
+    "lib/",
+    "mobx-state-tree.umd.js"
+  ],
+  "devDependencies": {
+    "coveralls": "^2.11.4",
+    "documentation": "^4.0.0-beta9",
+    "faucet": "0.0.1",
+    "istanbul": "^0.3.21",
+    "mobx": "^2.4.4",
+    "tape": "^4.2.2",
+    "tslint": "^3.15.1",
+    "typescript": "^2.0.0",
+    "webpack": "^1.13.1"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "mobx": "^2.4.4"
+  },
+  "keywords": [
+    "mobx",
+    "mobx-state-tree",
+    "promise",
+    "reactive",
+    "frp",
+    "functional-reactive-programming",
+    "state management"
+  ]
+}
