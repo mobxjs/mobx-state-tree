@@ -1,13 +1,14 @@
 import {
-    action, isObservableObject, isObservableMap, isObservableArray,
+    action, isObservableMap, isObservableArray,
     intercept, observe, computed
 } from "mobx"
 import {INode} from "./inode"
 import {
-    isPlainObject, invariant, escapeString, unescapeString, fail,
+    isPlainObject, invariant, fail, extend,
     addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
 } from "./utils"
-import {ITypeHandler, getTypeHandler} from "./type-handlers"
+import {ITypeHandler, getTypeHandler} from "./types/type-handlers"
+import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
 
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
@@ -19,7 +20,7 @@ export class Node<T> implements INode<T> {
     typeHandler: ITypeHandler
     private interceptDisposer: IDisposer
     private snapshotSubscribers: ((snapshot) => void)[] = [];
-    private patchSubscribers: ((patches: JsonPatch[]) => void)[] = [];
+    private patchSubscribers: ((patches: IJsonPatch[]) => void)[] = [];
 
     constructor(initialState: T) {
         addHiddenFinalProp(initialState, "$treenode", this)
@@ -43,7 +44,7 @@ export class Node<T> implements INode<T> {
      * Returnes (escaped) path representation as string
      */
     public get path(): string {
-        return this.isRoot ? "/" : this._path.map(escapeString).join("/")
+        return this.isRoot ? "/" : joinJsonPath(this._path)
     }
 
     public get pathParts(): string[] {
@@ -54,7 +55,7 @@ export class Node<T> implements INode<T> {
         return this._parent === null
     }
 
-    public get parent(): Node<any> {
+    public get parent() {
         return this._parent
     }
 
@@ -67,11 +68,19 @@ export class Node<T> implements INode<T> {
         return this.typeHandler.deserialize(this.state, snapshot)
     }
 
-    @action public applyPatch(patch: JsonPatch) {
-        this.typeHandler.applyPatch(this.state, patch)
+    @action public applyPatch(patch: IJsonPatch) {
+        const path = splitJsonPath(patch.path)
+        // TODO: extract resolve method
+        let current: Node<any> = this
+        for (let i = 0; i < path.length -1; i++) {
+            current = current.typeHandler.getChild(current.state, path[i])
+            invariant(!!current, `Could not apply patch for '${patch.path}' within '${this.path}', path of the patch does not resolve`)
+        }
+        this.typeHandler.applyPatch(current.state, path[path.length - 1], patch)
     }
 
     public intercept(handler: (change) => any): IDisposer {
+        // TODO: don't fire normal mobx intercept handler, instead use middle ware mechanism, make sure to buble up..
         // make sure own intercept handler is always last!
         this.interceptDisposer()
         const res = intercept(this.state, handler)
@@ -83,18 +92,32 @@ export class Node<T> implements INode<T> {
         return registerEventHandler(this.snapshotSubscribers, onChange)
     }
 
-    public patchStream(onPatch: (patches: JsonPatch[]) => void): IDisposer {
+    public patchStream(onPatch: (patches: IJsonPatch[]) => void): IDisposer {
         return registerEventHandler(this.patchSubscribers, onPatch)
     }
 
-    @action setParent(newParent: Node<T> | null, subpath = null) {
+    emitPatch(patch: IJsonPatch, source: Node<T>, distance = 0) {
+        if (this.patchSubscribers.length) {
+            let localizedPatch;
+            if (distance === 0)
+                localizedPatch = patch
+            else
+                localizedPatch = extend({}, patch, {
+                    path: joinJsonPath(source.pathParts.slice(-distance)) + patch.path
+                })
+        }
+        if (this.parent)
+            this.parent.emitPatch(patch, source, distance + 1)
+    }
+
+    @action setParent(newParent: Node<T> | null, subpath: string | null = null) {
         invariant(!this._parent || !newParent, "object cannot be contained in a state tree twice")
         invariant(!!newParent === !!subpath, "if a parent is set, path must be provide (and vice versa)")
         this._parent = newParent
-        if (!newParent)
-            this._path = []
+        if (newParent instanceof Node)
+            this._path = newParent.pathParts.concat(subpath!)
         else
-            this._path = newParent.pathParts.concat(subpath)
+            this._path = []
         this.updatePathOfChildren()
     }
 
@@ -127,7 +150,7 @@ export function getNode<T>(value): Node<T> {
     if (hasNode(value))
         return value.$treenode
     else
-        fail("element has no Node")
+        return fail("element has no Node")
 
 }
 
@@ -137,7 +160,11 @@ export function getPath(thing): string {
 
 export function getParent(thing): any {
     const node = getNode(thing)
-    return node.isRoot ? null : node.parent.state
+    return node.parent ? node.parent.state : null
+}
+
+export function resolve() {
+    // TODO: see apply json patch
 }
 
 export function prepareChild(parent: Node<any>, subpath: string, child: any) {

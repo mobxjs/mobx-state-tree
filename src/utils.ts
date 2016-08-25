@@ -3,12 +3,22 @@ declare const global: any;
 export type IDisposer = () => void;
 
 export function fail(message = "Illegal state"): never {
-    return invariant(false, message)
+    invariant(false, message)
+    throw "!"
 }
 
 export function invariant(cond: boolean, message = "Illegal state") {
     if (!cond)
         throw new Error("[mobx-state-tree] " + message);
+}
+
+export function extend(a, ...b: any[]) {
+    for (let i = 0; i < b.length; i++) {
+        const current = b[i]
+        for (let key in current)
+            a[key] = current[key]
+    }
+    return a
 }
 
 export function isPlainObject(value) {
@@ -26,20 +36,6 @@ export function isSerializable(value) {
     return typeof value !== "function"
 }
 
-/**
- * escape slashes and backslashes
- */
-export function escapeString(str: string) {
-    return str.replace(/\\/g, "\\\\").replace(/\//g, "\\\/")
-}
-
-/**
- * unescape slashes and backslashes
- */
-export function unescapeString(str: string) {
-    return str.replace(/\\\//g, "//").replace(/\\\\/g, "\\")
-}
-
 export function addHiddenFinalProp(object: any, propName: string, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: false,
@@ -49,7 +45,7 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
     })
 }
 
-export function registerEventHandler(handlers: [], handler): IDisposer {
+export function registerEventHandler(handlers: Function[], handler: Function): IDisposer {
     handlers.push(handler)
     return () => {
         const idx = handlers.indexOf(handler)

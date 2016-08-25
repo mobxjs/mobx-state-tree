@@ -1,12 +1,5 @@
-import {
-    action, isObservableObject, isObservableMap, isObservableArray,
-    intercept, observe, computed
-} from "mobx"
-import {
-    isPlainObject, invariant, escapeString, unescapeString, fail,
-    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
-} from "./utils"
-import {ITypeHandler, getTypeHandler} from "./type-handlers"
+import {IJsonPatch} from "./json-patch"
+import {IDisposer} from "./utils"
 
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
@@ -15,11 +8,11 @@ export interface INode<T> {
     path: string
     pathParts: string[]
     isRoot: boolean
-    parent: INode<any>
+    parent: INode<any> | null
     snapshot: any
     restoreSnapshot(snapshot: any): void
-    applyPatch(patch: JsonPatch): void
+    applyPatch(patch: IJsonPatch): void
     intercept(handler: (change) => any): IDisposer
     subscribe(onChange: (snapshot) => void): IDisposer
-    patchStream(onPatch: (patches: JsonPatch[]) => void): IDisposer
+    patchStream(onPatch: (patches: IJsonPatch[]) => void): IDisposer
 }
