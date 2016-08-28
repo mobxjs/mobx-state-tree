@@ -29,6 +29,7 @@ export function isPlainObject(value) {
 }
 
 export function isMutable(value) {
+    // TODO: not, date, regex, ..what more?
     return value !== null && typeof value === "object"
 }
 

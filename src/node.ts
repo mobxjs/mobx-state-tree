@@ -1,6 +1,6 @@
 import {
     action, isObservableMap, isObservableArray,
-    intercept, observe, computed
+    intercept, observe, computed, reaction
 } from "mobx"
 import {INode} from "./inode"
 import {
@@ -31,6 +31,10 @@ export class Node<T> implements INode<T> {
         // need dispose anywhere? should not be needed strictly speaking
         this.interceptDisposer = intercept(this.state, this.typeHandler.interceptor)
         observe(this.state, this.typeHandler.observer)
+
+        reaction(() => this.snapshot, snapshot => {
+            this.snapshotSubscribers.forEach(f => f(snapshot))
+        })
     }
 
     public get state(): T {
@@ -44,7 +48,7 @@ export class Node<T> implements INode<T> {
      * Returnes (escaped) path representation as string
      */
     public get path(): string {
-        return this.isRoot ? "/" : joinJsonPath(this._path)
+        return joinJsonPath(this._path)
     }
 
     public get pathParts(): string[] {
@@ -61,11 +65,11 @@ export class Node<T> implements INode<T> {
 
     @computed public get snapshot() {
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
-        return this.typeHandler.serialize(this.state)
+        return this.typeHandler.serialize(this._state)
     }
 
     @action public restoreSnapshot(snapshot) {
-        return this.typeHandler.deserialize(this.state, snapshot)
+        return this.typeHandler.deserialize(this._state, snapshot)
     }
 
     @action public applyPatch(patch: IJsonPatch) {
@@ -92,6 +96,7 @@ export class Node<T> implements INode<T> {
         return registerEventHandler(this.snapshotSubscribers, onChange)
     }
 
+    // TODO: alias as Symbol.observable?
     public patchStream(onPatch: (patches: IJsonPatch[]) => void): IDisposer {
         return registerEventHandler(this.patchSubscribers, onPatch)
     }
@@ -105,6 +110,7 @@ export class Node<T> implements INode<T> {
                 localizedPatch = extend({}, patch, {
                     path: joinJsonPath(source.pathParts.slice(-distance)) + patch.path
                 })
+            this.patchSubscribers.forEach(f => f(localizedPatch))
         }
         if (this.parent)
             this.parent.emitPatch(patch, source, distance + 1)

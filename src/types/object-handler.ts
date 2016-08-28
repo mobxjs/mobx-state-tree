@@ -31,7 +31,7 @@ export const plainObjectHandler: ITypeHandler = {
 
     deserialize: (state: any, snapshot) => {
         for (let key in snapshot) if (key !== "$treetype")
-            applySnapshotToObject(state, key, snapshot)
+            applySnapshotToObject(state, key, snapshot[key])
     },
 
     isDeserializableFrom: (snapshot) => {
@@ -82,11 +82,9 @@ export const plainObjectHandler: ITypeHandler = {
 
 function applySnapshotToObject(target, key, snapshot) {
     const current = target[key]
-    const next = snapshot[key]
     // prefer updating existing compatible nodes
-    if (hasNode(current) && asNode(current).typeHandler.isDeserializableFrom(next))
-        current.restoreSnapshot(next)
-    // cleanup is handled by
+    if (hasNode(current) && asNode(current).typeHandler.isDeserializableFrom(snapshot))
+        current.restoreSnapshot(snapshot)
     else
-        target[key] = snapshotToValue(snapshot[key])
+        target[key] = snapshotToValue(snapshot)
 }

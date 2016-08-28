@@ -1,4 +1,7 @@
 
+// https://tools.ietf.org/html/rfc6902
+// http://jsonpatch.com/
+
 export interface IJsonPatch {
     op: "replace" | "add" | "remove"
     path: string
