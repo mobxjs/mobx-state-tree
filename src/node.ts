@@ -23,11 +23,16 @@ export class Node<T> implements INode<T> {
     private patchSubscribers: ((patches: IJsonPatch[]) => void)[] = [];
 
     // TODO: fix type
-    constructor(initialState: T) {
+    constructor(initialState: T, parent: Node<any> | null, subpath: string | null) {
+        invariant((parent === null) === (subpath === null))
         console.log("creating node for  "+ JSON.stringify(initialState))
         addHiddenFinalProp(initialState, "$treenode", this)
         this.nodeType = determineNodeType(initialState)
         this.typeHandler = getTypeHandler(this.nodeType)
+        if (parent !== null && subpath !== null) {
+            this._parent = parent
+            this._path = parent.pathParts.concat(subpath)
+        }
 
         runInAction(() => {
             this._state = this.typeHandler.initialize(this, initialState)
@@ -74,7 +79,7 @@ export class Node<T> implements INode<T> {
     }
 
     @action public restoreSnapshot(snapshot) {
-        return this.typeHandler.deserialize(this._state, snapshot)
+        return this.typeHandler.deserialize(this, snapshot)
     }
 
     @action public applyPatch(patch: IJsonPatch) {
@@ -85,7 +90,7 @@ export class Node<T> implements INode<T> {
             current = current.typeHandler.getChild(current.state, path[i])
             invariant(!!current, `Could not apply patch for '${patch.path}' within '${this.path}', path of the patch does not resolve`)
         }
-        this.typeHandler.applyPatch(current.state, path[path.length - 1], patch)
+        this.typeHandler.applyPatch(current, path[path.length - 1], patch)
     }
 
     public intercept(handler: (change) => any): IDisposer {
@@ -148,12 +153,15 @@ export function hasNode<T>(value): value is { $treenode: Node<T> } {
     return value && value.$treenode
 }
 
-export function asNode<T>(value): Node<T> {
+export function asNode<T>(value, parent: Node<any> | null = null, subpath: string | null = null): Node<T> {
     invariant(isMutable(value), "asNode is only eligable for mutable types")
     if (hasNode(value)) {
-        return value.$treenode
+        const node = value.$treenode
+        invariant(parent === node.parent, "expected parents to be equal")
+        invariant((node.isRoot && subpath === null) || (node.pathParts[node.pathParts.length - 1] === subpath), "expected subpath to equal " + subpath)
+        return node
     } else {
-        const node = new Node(value)
+        const node = new Node(value, parent, subpath)
         return node
     }
 }
@@ -166,7 +174,7 @@ export function asNode<T>(value): Node<T> {
 export function maybeNode<T, R>(value: T, asNodeCb: (node: Node<T>, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
     // TODO: maybeNode might be quite inefficient runtime wise, might be factored out
     if (isMutable(value)) {
-        const n = asNode<T>(value)
+        const n = getNode<T>(value)
         return asNodeCb(n, n.state)
     } else if (asPrimitiveCb) {
         return asPrimitiveCb(value)
@@ -206,8 +214,7 @@ export function resolve() {
 export function prepareChild<T>(parent: Node<any>, subpath: string, child: T): T {
     if (!isMutable(child))
         return child
-    const node = asNode<T>(child)
-    node.setParent(parent, subpath)
+    const node = asNode<T>(child, parent, subpath)
     return node.state // value might be converted!
 }
 

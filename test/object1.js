@@ -115,7 +115,7 @@ test("structural sharing", t => {
     state.c = 6
     state.c = { x: 1}
     state.a.b = 4
-    $.asNode(state).applyPatch({ op: "replace", path: "/a", value: "3"})
+    $.asNode(state).applyPatch({ op: "replace", path: "/a", value: 3})
     t.ok(s[0].a === s[1].a)
     t.ok(s[2].c === s[3].c)
     t.ok(s[3].c === s[4].c)

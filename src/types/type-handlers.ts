@@ -50,12 +50,12 @@ export function valueToSnapshot(thing) {
     return thing
 }
 
-export function snapshotToValue(thing) {
+export function snapshotToValue(parent: Node<any>, subpart: string, thing) {
     if (!thing || typeof thing !== "object")
         return thing
     const type: string | undefined = thing.$treetype
     if (type === undefined) {
-        const node = new Node(thing)
+        const node = asNode(thing, parent, subpart)
         return node.state
     }
     if (type === "Date")

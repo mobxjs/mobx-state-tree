@@ -1,5 +1,5 @@
 import {isObservableObject, observable, IObjectChange, IObjectWillChange} from "mobx"
-import {NodeType, hasNode, getNode, maybeNode, initializeNode, prepareChild, asNode, getPath} from "../node"
+import {Node, NodeType, hasNode, getNode, maybeNode, initializeNode, prepareChild, asNode, getPath} from "../node"
 import {invariant, isMutable, isSerializable, fail} from "../utils"
 import {ITypeHandler, snapshotToValue, valueToSnapshot} from "./type-handlers"
 import {escapeJsonPath, unescapeJsonPath} from "../json-patch"
@@ -9,7 +9,7 @@ export const plainObjectHandler: ITypeHandler = {
         // make observable (probably already is)
         const res = isObservableObject(value) ? value : observable(value)
         for (let key in res)
-            res[key] = maybeNode(res[key], childNode => childNode.setParent(node, key))
+            res[key] = prepareChild(node, key, res[key])
         return res
     },
 
@@ -29,9 +29,9 @@ export const plainObjectHandler: ITypeHandler = {
         return res
     },
 
-    deserialize: (state: any, snapshot) => {
+    deserialize: (node: Node<any>, snapshot) => {
         for (let key in snapshot) if (key !== "$treetype")
-            applySnapshotToObject(state, key, snapshot[key])
+            applySnapshotToObject(node, key, snapshot[key])
     },
 
     isDeserializableFrom: (snapshot) => {
@@ -44,10 +44,8 @@ export const plainObjectHandler: ITypeHandler = {
         if (newValue === change.oldValue)
             return null
         maybeNode(change.oldValue, adm => adm.setParent(null))
-        maybeNode(newValue, () => {
-            const parent = getNode(change.object)
-            change.newValue = prepareChild(parent, change.name, newValue)
-        })
+        const parent = getNode(change.object)
+        change.newValue = prepareChild(parent, change.name, newValue)
         return change
     },
 
@@ -67,23 +65,23 @@ export const plainObjectHandler: ITypeHandler = {
         }
     },
 
-    applyPatch: (state, key, patch) => {
+    applyPatch: (node: Node<any>, key, patch) => {
         // works for both replace and add, remove is not a case in mobx-state-tree ATM
         invariant(patch.op === "replace" || patch.op === "add")
-        applySnapshotToObject(state, key, patch.value)
+        applySnapshotToObject(node, key, patch.value)
     },
 
     getChild: (state, name) => {
         // TODO: better error handling
-        return asNode(state[name])
+        return getNode(state[name])
     }
 }
 
-function applySnapshotToObject(target, key, snapshot) {
-    const current = target[key]
+function applySnapshotToObject(node: Node<any>, key, snapshot) {
+    const current = node.state[key]
     // prefer updating existing compatible nodes
-    if (hasNode(current) && asNode(current).typeHandler.isDeserializableFrom(snapshot))
+    if (hasNode(current) && getNode(current).typeHandler.isDeserializableFrom(snapshot))
         current.restoreSnapshot(snapshot)
     else
-        target[key] = snapshotToValue(snapshot)
+        node.state[key] = snapshotToValue(node, key, snapshot)
 }
