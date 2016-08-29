@@ -1,10 +1,11 @@
+import {isObservableArray, isObservableMap} from "mobx"
 import {Node, NodeType, getNode, asNode} from "../node"
-import {isMutable} from "../utils"
+import {isMutable, invariant, isPlainObject} from "../utils"
 
 import {plainObjectHandler} from "./object-handler"
 
 export interface ITypeHandler {
-    initialize(initialState: any): any
+    initialize(target: Node<any>, initialState: any): any
     updatePathOfChildren(state: any, parentPath: string[]): void
     interceptor<T>(change: T): T | null
     observer<T>(change: T): void
@@ -13,6 +14,21 @@ export interface ITypeHandler {
     isDeserializableFrom(snapshot): boolean
     applyPatch(state, key, patch): void
     getChild(state, key): Node<any>
+}
+
+
+export function determineNodeType(value): NodeType {
+    invariant(!!value, "Cannot convert a falsy value to a state tree")
+    invariant(typeof value === "object", "State trees can only be created from objects")
+    invariant(!(value instanceof Node))
+    // TODO: check if not a Map! or auto convert map?
+    if (Array.isArray(value) || isObservableArray(value))
+        return NodeType.Array
+    if (isPlainObject(value))
+        return NodeType.PlainObject
+    if (isObservableMap(value))
+        return NodeType.Map
+    return NodeType.ComplexObject
 }
 
 export function getTypeHandler(nodeType: NodeType): ITypeHandler {
@@ -39,8 +55,7 @@ export function snapshotToValue(thing) {
         return thing
     const type: string | undefined = thing.$treetype
     if (type === undefined) {
-        const node = asNode(Array.isArray(thing) ? [] : {})
-        node.restoreSnapshot(thing)
+        const node = new Node(thing)
         return node.state
     }
     if (type === "Date")

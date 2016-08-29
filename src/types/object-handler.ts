@@ -1,21 +1,21 @@
 import {isObservableObject, observable, IObjectChange, IObjectWillChange} from "mobx"
-import {NodeType, hasNode, getNode, prepareChild, asNode, getPath} from "../node"
+import {NodeType, hasNode, getNode, maybeNode, initializeNode, prepareChild, asNode, getPath} from "../node"
 import {invariant, isMutable, isSerializable, fail} from "../utils"
 import {ITypeHandler, snapshotToValue, valueToSnapshot} from "./type-handlers"
 import {escapeJsonPath, unescapeJsonPath} from "../json-patch"
 
 export const plainObjectHandler: ITypeHandler = {
-    initialize: value => {
-        return isObservableObject(value) ? value : observable(value)
+    initialize: (node, value) => {
+        // make observable (probably already is)
+        const res = isObservableObject(value) ? value : observable(value)
+        for (let key in res)
+            res[key] = maybeNode(res[key], childNode => childNode.setParent(node, key))
+        return res
     },
 
     updatePathOfChildren: (state, parentPath: string[]) => {
-        for (let key in state) {
-            const value = state[key]
-            if (hasNode(value)) {
-                value.$treenode.updatePath(parentPath.concat[key])
-            }
-        }
+        for (let key in state)
+            maybeNode(state[key], node => node.updatePath(parentPath.concat(key)))
     },
 
     serialize: (state) => {
@@ -40,15 +40,14 @@ export const plainObjectHandler: ITypeHandler = {
     },
 
     interceptor: (change: IObjectChange) => {
-        const newValue = {change}
+        const {newValue} = change
         if (newValue === change.oldValue)
             return null
-        if (isMutable(newValue))
-            return change
-        const parent = getNode(change.object)
-        if (isMutable(change.oldValue))
-            getNode(change.oldValue)!.setParent(null)
-        prepareChild(parent, change.name, newValue)
+        maybeNode(change.oldValue, adm => adm.setParent(null))
+        maybeNode(newValue, () => {
+            const parent = getNode(change.object)
+            change.newValue = prepareChild(parent, change.name, newValue)
+        })
         return change
     },
 

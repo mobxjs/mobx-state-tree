@@ -1,13 +1,13 @@
 import {
     action, isObservableMap, isObservableArray,
-    intercept, observe, computed, reaction
+    intercept, observe, computed, reaction, runInAction
 } from "mobx"
 import {INode} from "./inode"
 import {
     isPlainObject, invariant, fail, extend,
     addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
 } from "./utils"
-import {ITypeHandler, getTypeHandler} from "./types/type-handlers"
+import {ITypeHandler, getTypeHandler, determineNodeType} from "./types/type-handlers"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
 
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
@@ -22,19 +22,24 @@ export class Node<T> implements INode<T> {
     private snapshotSubscribers: ((snapshot) => void)[] = [];
     private patchSubscribers: ((patches: IJsonPatch[]) => void)[] = [];
 
+    // TODO: fix type
     constructor(initialState: T) {
+        console.log("creating node for  "+ JSON.stringify(initialState))
         addHiddenFinalProp(initialState, "$treenode", this)
         this.nodeType = determineNodeType(initialState)
         this.typeHandler = getTypeHandler(this.nodeType)
-        this._state = this.typeHandler.initialize(initialState)
 
-        // need dispose anywhere? should not be needed strictly speaking
+        runInAction(() => {
+            this._state = this.typeHandler.initialize(this, initialState)
+        })
+
         this.interceptDisposer = intercept(this.state, this.typeHandler.interceptor)
         observe(this.state, this.typeHandler.observer)
 
         reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
+        // dispose reaction, observe, intercept somewhere?
     }
 
     public get state(): T {
@@ -116,7 +121,7 @@ export class Node<T> implements INode<T> {
             this.parent.emitPatch(patch, source, distance + 1)
     }
 
-    @action setParent(newParent: Node<T> | null, subpath: string | null = null) {
+    @action setParent(newParent: Node<T> | null, subpath: string | null = null): Node<T> {
         invariant(!this._parent || !newParent, "object cannot be contained in a state tree twice")
         invariant(!!newParent === !!subpath, "if a parent is set, path must be provide (and vice versa)")
         this._parent = newParent
@@ -125,15 +130,16 @@ export class Node<T> implements INode<T> {
         else
             this._path = []
         this.updatePathOfChildren()
+        return this
     }
 
     protected updatePathOfChildren() {
+        console.log("updated path to " + this.path)
         this.typeHandler.updatePathOfChildren(this._state, this._path)
     }
 
-    protected updateSubPath(newSubPath: string) {
-        invariant(!this.isRoot, "cannot update sub path of root")
-        this._path[this._path.length - 1] = newSubPath
+    updatePath(newPath: string[]) {
+        this._path = newPath
         this.updatePathOfChildren()
     }
 }
@@ -150,6 +156,30 @@ export function asNode<T>(value): Node<T> {
         const node = new Node(value)
         return node
     }
+}
+
+/**
+ * Tries to convert a value to a TreeNode. If possible or already done,
+ * the first callback is invoked, otherwise the second.
+ * The result of this function is the return value of the callbacks
+ */
+export function maybeNode<T, R>(value: T, asNodeCb: (node: Node<T>, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
+    // TODO: maybeNode might be quite inefficient runtime wise, might be factored out
+    if (isMutable(value)) {
+        const n = asNode<T>(value)
+        return asNodeCb(n, n.state)
+    } else if (asPrimitiveCb) {
+        return asPrimitiveCb(value)
+    } else {
+        return value as any as R
+    }
+}
+
+/**
+ * Initialized tree administration if applicable
+ */
+export function initializeNode<T>(value: T): T {
+    return maybeNode(value, (_, x) => x, x => x)
 }
 
 export function getNode<T>(value): Node<T> {
@@ -173,21 +203,11 @@ export function resolve() {
     // TODO: see apply json patch
 }
 
-export function prepareChild(parent: Node<any>, subpath: string, child: any) {
+export function prepareChild<T>(parent: Node<any>, subpath: string, child: T): T {
     if (!isMutable(child))
-        return
-    const node = asNode(child)
+        return child
+    const node = asNode<T>(child)
     node.setParent(parent, subpath)
+    return node.state // value might be converted!
 }
 
-function determineNodeType(value): NodeType {
-    invariant(!!value, "Cannot convert a falsy value to a state tree")
-    invariant(typeof value === "object", "State trees can only be created from objects")
-    if (Array.isArray(value) || isObservableArray(value))
-        return NodeType.Array
-    if (isPlainObject(value))
-        return NodeType.PlainObject
-    if (isObservableMap(value))
-        return NodeType.Map
-    return NodeType.ComplexObject
-}
