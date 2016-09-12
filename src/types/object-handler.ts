@@ -41,9 +41,10 @@ export const plainObjectHandler: ITypeHandler = {
 
     interceptor: (change: IObjectChange) => {
         const {newValue} = change
-        if (newValue === change.oldValue)
+        const oldValue = change.object[change.name]
+        if (newValue === oldValue)
             return null
-        maybeNode(change.oldValue, adm => adm.setParent(null))
+        maybeNode(oldValue, adm => adm.setParent(null))
         const parent = getNode(change.object)
         change.newValue = prepareChild(parent, change.name, newValue)
         return change

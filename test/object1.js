@@ -123,3 +123,110 @@ test("structural sharing", t => {
 
     t.end()
 })
+
+test("add node to tree", t => {
+    const parent = { a : null }
+    const child = { b: 2 }
+    const $parent = $.asNode(parent)
+    const $child = $.asNode(child)
+
+    const patches = []
+    const snapshots = []
+    $parent.subscribe(s => snapshots.push(s))
+    $child.subscribe(s => snapshots.push(s))
+    $parent.patchStream(p => patches.push(p))
+    $child.patchStream(p => patches.push(p))
+
+    t.equal($parent.isRoot, true)
+    t.equal($child.isRoot, true)
+    parent.a = child
+    t.equal($child.isRoot, false)
+    t.equal($parent.path, "/")
+    t.equal($child.path, "/a")
+
+    child.b = 3
+
+    // detach
+    parent.a = null
+    t.equal($child.isRoot, true)
+    t.equal($child.path, "/")
+
+    child.b = 4
+
+    t.deepEqual(patches, [
+        { op: 'replace', path: '/a', value: { b: 2 } },
+        { op: 'replace', path: '/b', value: 3 },
+        { op: 'replace', path: '/a/b', value: 3 },
+        { op: 'replace', path: '/a', value: null },
+        { op: 'replace', path: '/b', value: 4 }
+    ])
+    t.deepEqual(snapshots, [
+        { a: { b: 2 } },
+        { b: 3 },
+        { a: { b: 3 } },
+        { a: null },
+        { b: 4 }
+    ])
+
+    t.end()
+})
+
+test("cannot add tree to node twice", t => {
+    const parent = { a: null, b: null }
+    const child = { c: null }
+    $.asNode(parent)
+
+    parent.a = child
+    t.throws(() => parent.b = child, /A node cannot exists twice in the state tree. Failed to add object to path '\/b', it exists already at '\/a'/)
+    t.end()
+})
+
+test("cannot add tree to itself", t => {
+    const child = { c: null }
+    $.asNode(child)
+
+    t.throws(() => {
+        child.c = child
+    }, /Cycle detected/) // Todo: better error might be nice...
+    t.end()
+})
+
+
+test("cannot add tree deeple to itself", t => {
+    const child = { c: null }
+    $.asNode(child)
+
+    const parent = {
+        a: child
+    }
+    $.asNode(parent)
+
+
+    t.throws(() => {
+        child.c = parent
+    }, /Cycle detected/) // Todo: better error might be nice...
+    t.end()
+})
+
+test("subpath is updated correctly", t => {
+    const child = { a: { b: 3 }}
+    const $child = $.asNode(child)
+    const parent = { c: null }
+    const $parent = $.asNode(parent)
+
+    t.equal($child.isRoot, true)
+    t.equal($child.path, "/")
+    t.equal($.getPath(child.a), "/a")
+
+    parent.c = child
+    t.equal($child.isRoot, false)
+    t.equal($child.path, "/c")
+    t.equal($.getPath(child.a), "/c/a")
+
+    parent.c = null
+    t.equal($child.isRoot, true)
+    t.equal($child.path, "/")
+    t.equal($.getPath(child.a), "/a")
+
+    t.end()
+})

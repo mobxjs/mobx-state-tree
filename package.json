@@ -11,8 +11,8 @@
     "test": "npm run quick-build && tape test/*.js | faucet",
     "prepublish": "npm run build && npm run build-docs",
     "test-travis": "npm run build && istanbul cover tape test/*.js",
-    "coverage": "npm run build && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
-    "build-docs": "npm run build && documentation readme lib/mobx-state-tree.js --github --section API"
+    "coverage": "npm run quick-build && istanbul cover tape test/*.js",
+    "build-docs": "npm run quick-build && documentation readme lib/mobx-state-tree.js --github --section API"
   },
   "repository": {
     "type": "git",

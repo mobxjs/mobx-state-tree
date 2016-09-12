@@ -127,7 +127,9 @@ export class Node<T> implements INode<T> {
     }
 
     @action setParent(newParent: Node<T> | null, subpath: string | null = null): Node<T> {
-        invariant(!this._parent || !newParent, "object cannot be contained in a state tree twice")
+        if (this._parent && newParent) {
+            invariant(false, `A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
+        }
         invariant(!!newParent === !!subpath, "if a parent is set, path must be provide (and vice versa)")
         this._parent = newParent
         if (newParent instanceof Node)
@@ -144,6 +146,7 @@ export class Node<T> implements INode<T> {
     }
 
     updatePath(newPath: string[]) {
+        // TODO: combine with setParent?
         this._path = newPath
         this.updatePathOfChildren()
     }
@@ -212,9 +215,14 @@ export function resolve() {
 }
 
 export function prepareChild<T>(parent: Node<any>, subpath: string, child: T): T {
-    if (!isMutable(child))
+    if (!isMutable(child)) {
         return child
-    const node = asNode<T>(child, parent, subpath)
-    return node.state // value might be converted!
+    } else if (hasNode(child)) {
+        const node = getNode<T>(child)
+        node.setParent(parent, subpath)
+        return node.state
+    } else {
+        const node = asNode<T>(child, parent, subpath)
+        return node.state // value might be converted!
+    }
 }
-
