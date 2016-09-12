@@ -187,12 +187,12 @@ test("cannot add tree to itself", t => {
 
     t.throws(() => {
         child.c = child
-    }, /Cycle detected/) // Todo: better error might be nice...
+    }, /A state tree is not allowed to contain itself. Cannot add root to path '\/c'/)
     t.end()
 })
 
 
-test("cannot add tree deeple to itself", t => {
+test("cannot add tree deeply to itself", t => {
     const child = { c: null }
     $.asNode(child)
 
@@ -204,7 +204,17 @@ test("cannot add tree deeple to itself", t => {
 
     t.throws(() => {
         child.c = parent
-    }, /Cycle detected/) // Todo: better error might be nice...
+    }, /A state tree is not allowed to contain itself. Cannot add root to path '\/a\/c'/)
+    t.end()
+})
+
+test("cannot add tree deeple to itself - 2", t => {
+    const child = { c: null }
+    child.c = child
+
+    t.throws(() => {
+        $.asNode(child)
+    }, /A state tree is not allowed to contain itself. Cannot add root to path '\/c'/)
     t.end()
 })
 

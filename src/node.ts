@@ -25,7 +25,7 @@ export class Node<T> implements INode<T> {
     // TODO: fix type
     constructor(initialState: T, parent: Node<any> | null, subpath: string | null) {
         invariant((parent === null) === (subpath === null))
-        console.log("creating node for  "+ JSON.stringify(initialState))
+        // console.log("creating node for  "+ JSON.stringify(initialState))
         addHiddenFinalProp(initialState, "$treenode", this)
         this.nodeType = determineNodeType(initialState)
         this.typeHandler = getTypeHandler(this.nodeType)
@@ -130,6 +130,9 @@ export class Node<T> implements INode<T> {
         if (this._parent && newParent) {
             invariant(false, `A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
         }
+        if (!this._parent && newParent && getRoot(newParent) === this) {
+            invariant(false, `A state tree is not allowed to contain itself. Cannot add root to path '/${newParent.pathParts.concat(subpath!).join("/")}'`)
+        }
         invariant(!!newParent === !!subpath, "if a parent is set, path must be provide (and vice versa)")
         this._parent = newParent
         if (newParent instanceof Node)
@@ -225,4 +228,11 @@ export function prepareChild<T>(parent: Node<any>, subpath: string, child: T): T
         const node = asNode<T>(child, parent, subpath)
         return node.state // value might be converted!
     }
+}
+
+function getRoot(node: Node<any>) {
+    let p, r = node
+    while (p = r.parent)
+        r = p
+    return r;
 }
