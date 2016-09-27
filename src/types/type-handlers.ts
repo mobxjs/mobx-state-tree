@@ -38,18 +38,6 @@ export function getTypeHandler(nodeType: NodeType): ITypeHandler {
     }
 }
 
-export function valueToSnapshot(thing) {
-    if (thing instanceof Date) {
-        return {
-            $treetype: "Date",
-            time: thing.toJSON()
-        }
-    }
-    if (isMutable(thing))
-        return getNode(thing).snapshot
-    return thing
-}
-
 export function snapshotToValue(parent: Node<any>, subpart: string, thing) {
     if (!thing || typeof thing !== "object")
         return thing

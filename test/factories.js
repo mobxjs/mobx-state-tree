@@ -18,20 +18,3 @@ const message = messageFactory({
     }, {
         fetch: window.fetch
 })
-
-factory(snapshot)
-onAction(message, ({ name, path, args })) // fires only for top level actions!
-onPatch()
-onSnapshot()
-subscribe() // alias for on Snapshot
-applyPatch()
-applyAction()
-intercept() // from mobx
-
-getSnapshot()
-getParent()
-getPath()
-getPathParts()
-isRoot()
-resolve()
-getEnv()

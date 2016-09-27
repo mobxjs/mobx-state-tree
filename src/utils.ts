@@ -33,6 +33,14 @@ export function isMutable(value) {
     return value !== null && typeof value === "object"
 }
 
+export function isPrimitive(value): boolean {
+    if (value === null || value === undefined)
+        return true
+    if (typeof value === "string" || typeof value === "number" || value instanceof Date)
+        return true
+    return false
+}
+
 export function isSerializable(value) {
     return typeof value !== "function"
 }
@@ -53,4 +61,9 @@ export function registerEventHandler(handlers: Function[], handler: Function): I
         if (idx !== -1)
             handlers.splice(idx, 1)
     }
+}
+
+const prototypeHasOwnProperty = Object.prototype.hasOwnProperty;
+export function hasOwnProperty(object: Object, propName: string) {
+    return prototypeHasOwnProperty.call(object, propName);
 }

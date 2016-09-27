@@ -1,22 +1,83 @@
-export {INode} from "./inode"
+import {IJsonPatch} from "./json-patch"
+import {IDisposer} from "./utils"
+import {getNode} from "./node"
+
 export * from "./json-patch"
-// TODO type with INode instead of Node to external
-export {asNode, getNode, getParent, getPath, hasNode} from "./node"
+export {
+    ModelFactory,
+    createFactory,
+    action,
+    map,
+    isModelFactory
+} from "./factories"
 
+export type IActionCall = {
+    name: string;
+    path: string;
+    args: any[];
+}
 
-export * from "./factories";
+export type IActionCallOptions = {
+    supressPatches?: boolean
+    dryRun?: boolean
+}
 
-// TODO: createSnapShot(thing -> snapshot)
-// TODO: restoreStoreshot(snapshot -> thing)
-// TODO: standard integration with local storage for all root trees?
+export function onAction(target: Object, callback: (action: IActionCall) => void): IDisposer {
+    // TODO
+    return () => {}
+}
 
-// statetree.dryrun(fn(state) {
+export function onPatch(target: Object, callback: (patch: IJsonPatch) => void): IDisposer {
+    return getNode(target).onPatch(callback)
+}
 
-// }) => deltas
+export function onSnapshot(target: Object, callback: (snapshot: any) => void): IDisposer {
+    return getNode(target).onSnapshot(callback)
+}
 
+export function subscribe(target: Object, callback: (snapshot: any) => void): IDisposer {
+    return onSnapshot(target, callback)
+}
 
-// statetree.dryrun(moveEntity(x,y))
+export function applyPatch(target: Object, patch: IJsonPatch) {
+    return getNode(target).applyPatch(patch)
+}
 
-// moveEntity = createAction("moveEntity", (state, x,y) => {
+export function applyAction(target: Object, action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
+    // TODO
+    return []
+}
 
-// })
+export function intercept(target: Object, interceptor: (change) => Object | null): IDisposer {
+    // TODO
+    return () => {}
+}
+
+export function getSnapshot(target: Object): any {
+    return getNode(target).snapshot
+}
+
+export function getParent(target: Object): any {
+    return getNode(target).parent
+}
+
+export function getPath(target: Object): string {
+    return getNode(target).path
+}
+
+export function getPathParts(target: Object): string[] {
+    return getNode(target).pathParts
+}
+
+export function isRoot(target: Object): boolean {
+    return getNode(target).isRoot
+}
+
+export function resolve(target: Object, path: string): any {
+    // TODO
+    return null
+}
+
+export function getEnvironment(target: Object): Object {
+    return getNode(target).environment
+}
