@@ -47,7 +47,7 @@ export abstract class Node /* TODO: implements INode*/ {
     abstract didChange(change): void
     abstract serialize(): any
     abstract applyPatchLocally(subpath, patch): void
-    abstract getChildFactory(key: string): ModelFactory;
+    abstract getChildFactory(key: string): ModelFactory
 
     /**
      * Returnes (escaped) path representation as string

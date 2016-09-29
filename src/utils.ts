@@ -12,6 +12,10 @@ export function invariant(cond: boolean, message = "Illegal state") {
         throw new Error("[mobx-state-tree] " + message)
 }
 
+export function identity<T>(_: T): T {
+    return _
+}
+
 export function extend(a, ...b: any[]) {
     for (let i = 0; i < b.length; i++) {
         const current = b[i]

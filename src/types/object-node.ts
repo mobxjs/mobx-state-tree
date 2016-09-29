@@ -1,6 +1,6 @@
 import {IObjectChange, IObjectWillChange, isObservable} from "mobx"
 import {Node, maybeNode, getNode, valueToSnapshot} from "../core/node"
-import {invariant, isSerializable, fail, registerEventHandler, IDisposer} from "../utils"
+import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {ModelFactory} from "../core/factories"
 import {IActionCall, IActionCallOptions} from "../core/action"
@@ -21,7 +21,7 @@ export class ObjectNode extends Node {
     }
 
     getChildNode(key): Node {
-        return maybeNode(n => n, () => fail(`Illegal state, no node for "${key}"`))
+        return maybeNode(identity, () => fail(`Illegal state, no node for "${key}"`))
     }
 
     willChange(change: IObjectWillChange): Object | null {
