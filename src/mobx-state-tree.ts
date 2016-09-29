@@ -1,6 +1,7 @@
 import {IJsonPatch} from "./json-patch"
 import {IDisposer} from "./utils"
 import {getNode} from "./node"
+import {getObjectNode} from "./types/object-node";
 
 export * from "./json-patch"
 export {
@@ -23,8 +24,7 @@ export type IActionCallOptions = {
 }
 
 export function onAction(target: Object, callback: (action: IActionCall) => void): IDisposer {
-    // TODO
-    return () => {}
+    return getObjectNode(target).onAction(callback);
 }
 
 export function onPatch(target: Object, callback: (patch: IJsonPatch) => void): IDisposer {
@@ -44,13 +44,11 @@ export function applyPatch(target: Object, patch: IJsonPatch) {
 }
 
 export function applyAction(target: Object, action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
-    // TODO
-    return []
+    return getObjectNode(target).applyAction(action, options)
 }
 
 export function intercept(target: Object, interceptor: (change) => Object | null): IDisposer {
-    // TODO
-    return () => {}
+    return getNode(target).intercept(interceptor)
 }
 
 export function getSnapshot(target: Object): any {
@@ -74,10 +72,14 @@ export function isRoot(target: Object): boolean {
 }
 
 export function resolve(target: Object, path: string): any {
-    // TODO
-    return null
+    return getNode(target).resolve(path)
 }
 
 export function getEnvironment(target: Object): Object {
     return getNode(target).environment
+}
+
+export function clone<T>(source: T, customEnvironment?: any): T {
+    const node = getNode(source)
+    return node.factory(node.snapshot, customEnvironment || node.environment) as T
 }

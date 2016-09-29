@@ -3,3 +3,4 @@ node_modules
 lib
 coverage
 mobx-state-tree.umd.js
+.vscode

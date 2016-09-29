@@ -21,7 +21,7 @@ export abstract class Node /* TODO: implements INode*/ {
     readonly snapshotSubscribers: ((snapshot) => void)[] = [];
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = [];
 
-    // TODO: fix type
+    // TODO: is parent / subpath required here?
     constructor(initialState: any, parent: Node | null, environment: any, factory: ModelFactory, subpath: string | null) {
         invariant((parent === null) === (subpath === null))
         addHiddenFinalProp(initialState, "$treenode", this)

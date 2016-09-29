@@ -1,13 +1,16 @@
 import {IObjectChange, IObjectWillChange, isObservable} from "mobx"
-import {Node, maybeNode, getPath, valueToSnapshot} from "../node"
-import {invariant, isSerializable, fail} from "../utils"
+import {Node, maybeNode, getNode, valueToSnapshot} from "../node"
+import {invariant, isSerializable, fail, registerEventHandler, IDisposer} from "../utils"
 import {escapeJsonPath} from "../json-patch"
 import {ModelFactory} from "../factories"
+import {IActionCall} from "../mobx-state-tree"
 
 export class ObjectNode extends Node {
-    submodelType: {
+    readonly actionSubscribers: ((actionCall: IActionCall) => void)[] = [];
+    readonly submodelType: {
         [key: string]: ModelFactory;
     }
+    private _isExecutingAction = 0
 
     getChildNodes(): [string, Node][] {
         const res: [string, Node][] = []
@@ -72,4 +75,30 @@ export class ObjectNode extends Node {
     getChildFactory(key: string): ModelFactory {
         return this.submodelType[key] || fail(`No factory defined for '${key}' in '${this.path}'`)
     }
+
+    isExecutingAction() {
+        return this._isExecutingAction > 0
+    }
+
+    notifyActionStart(name, args) {
+        if (++this._isExecutingAction === 1) {
+
+        }
+    }
+
+    notifyActionEnd() {
+        // TODO: emit event when starting or ending an action?
+        --this._isExecutingAction
+    }
+
+    onAction(listener: (action: IActionCall) => void): IDisposer {
+        return registerEventHandler(this.actionSubscribers, listener)
+    }
+}
+
+export function getObjectNode(thing: any): ObjectNode {
+    const node = getNode(thing)
+    // TODO: no instanceof, better message
+    invariant(node instanceof ObjectNode, "Expected object node")
+    return node as ObjectNode
 }

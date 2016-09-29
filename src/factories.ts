@@ -1,23 +1,30 @@
-import {extendObservable, extras, asMap} from "mobx"
+import {action as mobxAction, extendObservable, extras, asMap} from "mobx"
 import {invariant, hasOwnProperty, isPrimitive, addHiddenFinalProp} from "./utils"
+import {Node, hasNode, getNode} from "./node"
+import {ObjectNode, getObjectNode} from "./types/object-node"
 
 // type Obje
 export type ModelFactory = (snapshot: Object, env?: Object) => Object
 
 export function createFactory(initializer: (env?: any) => Object): ModelFactory {
-    return function(snapshot: Object, env?: Object) {
+    // TODO: remember which keys are assignable and check that on next runs
+    let factory = mobxAction("factory", function(snapshot: Object, env?: Object) {
+        invariant(snapshot && typeof snapshot === "object" && !hasNode(snapshot), "Not a valid snapshot")
         // run initializer, environment will now be bound
         const baseModel = initializer(env)
         const instance = {}
-        const adm = new ModelAdministration(instance)
+        const adm = new ObjectNode(instance, null, env, factory as ModelFactory, null)
         Object.defineProperty(instance, "__modelAdministration", adm)
         copyBaseModelToInstance(baseModel, instance, adm)
-        adm.applySnapshot(snapshot)
+        Object.seal(instance) // don't allow new props to be added!
+        for (let key in snapshot)
+            instance[key] = snapshot
         return instance
-    }
+    } as ModelFactory)
+    return factory
 }
 
-function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: ModelAdministration) {
+function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: ObjectNode) {
     for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
         const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
         if ("get" in descriptor) {
@@ -61,7 +68,7 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Model
 function createNonActionWrapper(instance, key, func) {
     addHiddenFinalProp(instance, key, function () {
         invariant(
-            extras.isComputingDerivation() || getModelAdministration(instance).isExecutingAction(),
+            extras.isComputingDerivation() || getNode(instance).isExecutingAction(),
             "Functions stored in models are only allowed to be invoked from either computed values or actions"
         )
         return func.apply(instance, arguments);
@@ -70,7 +77,8 @@ function createNonActionWrapper(instance, key, func) {
 
 function createActionWrapper(instance, key, action: Function) {
     addHiddenFinalProp(instance, key, function() {
-        const adm = getModelAdministration(instance)
+        const adm = getObjectNode(instance)
+        // TODO: check if all arguments are serialize (Nodes are serializable as well!)
         let hasError = true
         try {
             adm.notifyActionStart(key, arguments)
@@ -78,17 +86,10 @@ function createActionWrapper(instance, key, action: Function) {
             invariant(res === undefined, `action '${key}' should not return a value but got '${res}'`)
             hasError = false
         } finally {
-            adm.notifyActionEnd(hasError)
+            adm.notifyActionEnd()
         }
     })
 }
-
-function getModelAdministration(instance) {
-    const adm = instance.__modelAdministration
-    invariant(adm && adm instanceof ModelAdministration)
-    return adm
-}
-
 
 class Action {
     constructor(public action: Function) {}
