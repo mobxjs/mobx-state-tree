@@ -1,4 +1,4 @@
-declare const global: any;
+declare const global: any
 
 export type IDisposer = () => void;
 
@@ -9,7 +9,7 @@ export function fail(message = "Illegal state"): never {
 
 export function invariant(cond: boolean, message = "Illegal state") {
     if (!cond)
-        throw new Error("[mobx-state-tree] " + message);
+        throw new Error("[mobx-state-tree] " + message)
 }
 
 export function extend(a, ...b: any[]) {
@@ -23,9 +23,9 @@ export function extend(a, ...b: any[]) {
 
 export function isPlainObject(value) {
     if (value === null || typeof value !== "object")
-        return false;
-    const proto = Object.getPrototypeOf(value);
-    return proto === Object.prototype || proto === null;
+        return false
+    const proto = Object.getPrototypeOf(value)
+    return proto === Object.prototype || proto === null
 }
 
 export function isMutable(value) {
@@ -63,7 +63,7 @@ export function registerEventHandler(handlers: Function[], handler: Function): I
     }
 }
 
-const prototypeHasOwnProperty = Object.prototype.hasOwnProperty;
+const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
 export function hasOwnProperty(object: Object, propName: string) {
-    return prototypeHasOwnProperty.call(object, propName);
+    return prototypeHasOwnProperty.call(object, propName)
 }

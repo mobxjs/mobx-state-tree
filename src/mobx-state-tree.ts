@@ -1,27 +1,20 @@
-import {IJsonPatch} from "./json-patch"
+import {IJsonPatch} from "./core/json-patch"
 import {IDisposer} from "./utils"
-import {getNode} from "./node"
-import {getObjectNode} from "./types/object-node";
+import {getNode} from "./core/node"
+import {getObjectNode} from "./types/object-node"
+import {IActionCall, IActionCallOptions} from "./core/action"
 
-export * from "./json-patch"
+export * from "./core/json-patch"
 export {
     ModelFactory,
     createFactory,
-    action,
-    map,
     isModelFactory
-} from "./factories"
+} from "./core/factories"
 
-export type IActionCall = {
-    name: string;
-    path: string;
-    args: any[];
-}
-
-export type IActionCallOptions = {
-    supressPatches?: boolean
-    dryRun?: boolean
-}
+export {
+    IActionCall,
+    IActionCallOptions
+} from "./core/action"
 
 export function onAction(target: Object, callback: (action: IActionCall) => void): IDisposer {
     return getObjectNode(target).onAction(callback);

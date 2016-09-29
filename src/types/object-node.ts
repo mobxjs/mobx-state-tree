@@ -1,9 +1,9 @@
 import {IObjectChange, IObjectWillChange, isObservable} from "mobx"
-import {Node, maybeNode, getNode, valueToSnapshot} from "../node"
+import {Node, maybeNode, getNode, valueToSnapshot} from "../core/node"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer} from "../utils"
-import {escapeJsonPath} from "../json-patch"
-import {ModelFactory} from "../factories"
-import {IActionCall} from "../mobx-state-tree"
+import {escapeJsonPath} from "../core/json-patch"
+import {ModelFactory} from "../core/factories"
+import {IActionCall} from "../core/action"
 
 export class ObjectNode extends Node {
     readonly actionSubscribers: ((actionCall: IActionCall) => void)[] = [];

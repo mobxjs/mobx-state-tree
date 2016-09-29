@@ -1,14 +1,16 @@
-import {action as mobxAction, extendObservable, extras, asMap} from "mobx"
-import {invariant, hasOwnProperty, isPrimitive, addHiddenFinalProp} from "./utils"
-import {Node, hasNode, getNode} from "./node"
-import {ObjectNode, getObjectNode} from "./types/object-node"
+import {action, isAction, extendObservable, asMap} from "mobx"
+import {invariant, hasOwnProperty, isPrimitive} from "../utils"
+import {hasNode} from "./node"
+import {ObjectNode} from "../types/object-node"
+import {createActionWrapper, createNonActionWrapper} from "./action"
+import {isMap} from "../types/map-node"
 
 // type Obje
 export type ModelFactory = (snapshot: Object, env?: Object) => Object
 
 export function createFactory(initializer: (env?: any) => Object): ModelFactory {
     // TODO: remember which keys are assignable and check that on next runs
-    let factory = mobxAction("factory", function(snapshot: Object, env?: Object) {
+    let factory = action("factory", function(snapshot: Object, env?: Object) {
         invariant(snapshot && typeof snapshot === "object" && !hasNode(snapshot), "Not a valid snapshot")
         // run initializer, environment will now be bound
         const baseModel = initializer(env)
@@ -63,58 +65,6 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Objec
             invariant(false)
         }
     }
-}
-
-function createNonActionWrapper(instance, key, func) {
-    addHiddenFinalProp(instance, key, function () {
-        invariant(
-            extras.isComputingDerivation() || getNode(instance).isExecutingAction(),
-            "Functions stored in models are only allowed to be invoked from either computed values or actions"
-        )
-        return func.apply(instance, arguments);
-    })
-}
-
-function createActionWrapper(instance, key, action: Function) {
-    addHiddenFinalProp(instance, key, function() {
-        const adm = getObjectNode(instance)
-        // TODO: check if all arguments are serialize (Nodes are serializable as well!)
-        let hasError = true
-        try {
-            adm.notifyActionStart(key, arguments)
-            const res = action.apply(this, arguments)
-            invariant(res === undefined, `action '${key}' should not return a value but got '${res}'`)
-            hasError = false
-        } finally {
-            adm.notifyActionEnd()
-        }
-    })
-}
-
-class Action {
-    constructor(public action: Function) {}
-}
-
-export function action(action): any {
-    return new Action(action)
-}
-
-function isAction(action: any): action is Action {
-    return action instanceof Action
-}
-
-class Map {
-    constructor(public subtype: ModelFactory | null) {
-        invariant(!subtype || isModelFactory(subtype))
-    }
-}
-
-export function map(subtype?: ModelFactory): any {
-    return new Map(subtype || null)
-}
-
-function isMap(value: any): value is Map {
-    return value instanceof Map
 }
 
 export function isModelFactory(value: any): value is ModelFactory {

@@ -5,9 +5,9 @@ import {
 import {
     invariant, fail, extend,
     addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
-} from "./utils"
+} from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
-import {ModelFactory} from "./factories";
+import {ModelFactory} from "./factories"
 
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
@@ -18,8 +18,8 @@ export abstract class Node /* TODO: implements INode*/ {
     _parent: Node | null = null
     readonly factory: ModelFactory
     readonly interceptDisposer: IDisposer
-    readonly snapshotSubscribers: ((snapshot) => void)[] = [];
-    readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = [];
+    readonly snapshotSubscribers: ((snapshot) => void)[] = []
+    readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
 
     // TODO: is parent / subpath required here?
     constructor(initialState: any, parent: Node | null, environment: any, factory: ModelFactory, subpath: string | null) {
@@ -46,8 +46,6 @@ export abstract class Node /* TODO: implements INode*/ {
     abstract willChange(change): Object | null
     abstract didChange(change): void
     abstract serialize(): any
-    //abstract deserialize(target, snapshot): void
-    //abstract isDeserializableFrom(snapshot): boolean
     abstract applyPatchLocally(subpath, patch): void
     abstract getChildFactory(key: string): ModelFactory;
 
