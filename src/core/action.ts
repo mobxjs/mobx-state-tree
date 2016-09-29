@@ -9,7 +9,8 @@ export type IActionCall = {
 }
 
 export type IActionCallOptions = {
-    supressPatches?: boolean
+    supressPatchEvents?: boolean
+    supressActionEvents?: boolean
     dryRun?: boolean
 }
 
@@ -26,7 +27,7 @@ export function createNonActionWrapper(instance, key, func) {
 export function createActionWrapper(instance, key, action: Function) {
     addHiddenFinalProp(instance, key, function() {
         const adm = getObjectNode(instance)
-        // TODO: check if all arguments are serialize (Nodes are serializable as well!)
+        // TODO: check if all arguments are plain (Factory based objects not supported atm, how would the type be known?)
         let hasError = true
         try {
             adm.notifyActionStart(key, arguments)

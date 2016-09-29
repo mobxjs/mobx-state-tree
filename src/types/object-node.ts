@@ -1,9 +1,10 @@
 import {IObjectChange, IObjectWillChange, isObservable} from "mobx"
 import {Node, maybeNode, getNode, valueToSnapshot} from "../core/node"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer} from "../utils"
-import {escapeJsonPath} from "../core/json-patch"
+import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {ModelFactory} from "../core/factories"
-import {IActionCall} from "../core/action"
+import {IActionCall, IActionCallOptions} from "../core/action"
+import {clone} from "../mobx-state-tree"
 
 export class ObjectNode extends Node {
     readonly actionSubscribers: ((actionCall: IActionCall) => void)[] = [];
@@ -70,6 +71,26 @@ export class ObjectNode extends Node {
         invariant(patch.op === "replace" || patch.op === "add")
         invariant(isObservable(this.state, subpath), `Not an observable key: '${subpath}' in '${this.path}'`)
         this.state[subpath] = patch.value // takes care of further deserialization
+    }
+
+    applyAction(action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
+        const node = getObjectNode(this.resolve(action.path))
+        return node.applyAction(action, options)
+    }
+
+    applyActionLocally(action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
+        const supressActionEvents = (options && options.supressActionEvents) || true
+        const supressPatchEvents = (options && options.supressPatchEvents) || false
+        const dryRun = (options && options.dryRun) || false
+        const target = dryRun ? getObjectNode(clone(this.state)) : this
+        const actionSubscriptions = supressActionEvents ? target.actionSubscribers.splice(0) : []
+        const patchSubscriptions  = supressPatchEvents  ? target.patchSubscribers.splice(0)  : []
+        try {
+            return target.state[action.name].apply(target.state, action.args)
+        } finally {
+            target.patchSubscribers.push(...patchSubscriptions)
+            target.actionSubscribers.push(...actionSubscriptions)
+        }
     }
 
     getChildFactory(key: string): ModelFactory {

@@ -17,7 +17,7 @@ export abstract class Node /* TODO: implements INode*/ {
     _path: string[] = []
     _parent: Node | null = null
     readonly factory: ModelFactory
-    readonly interceptDisposer: IDisposer
+    private  interceptDisposer: IDisposer
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
 
@@ -73,29 +73,20 @@ export abstract class Node /* TODO: implements INode*/ {
         return this.serialize()
     }
 
-    // @action public restoreSnapshot(snapshot) {
-    //     return this.typeHandler.deserialize(this, snapshot)
-    // }
-
     @action public applyPatch(patch: IJsonPatch) {
-        const path = splitJsonPath(patch.path)
-        // TODO: extract resolve method
-        let current: Node = this
-        for (let i = 0; i < path.length - 1; i++) {
-            current = current.getChildNode(path[i])
-            invariant(!!current, `Could not apply patch for '${patch.path}' within '${this.path}', path of the patch does not resolve`)
-        }
-        current.applyPatchLocally(path[path.length - 1], patch)
+        const parts = splitJsonPath(patch.path)
+        const node = this.resolvePath(parts.slice(0, -1))
+        node.applyPatchLocally(parts[parts.length - 1], patch)
     }
 
-    // public intercept(handler: (change) => any): IDisposer {
-    //     // TODO: don't fire normal mobx intercept handler, instead use middle ware mechanism, make sure to buble up..
-    //     // make sure own intercept handler is always last!
-    //     this.interceptDisposer()
-    //     const res = intercept(this.state, handler)
-    //     this.interceptDisposer = intercept(this.state, this.typeHandler.interceptor)
-    //     return res
-    // }
+    public intercept(handler: (change) => any): IDisposer {
+        // TODO: don't fire normal mobx intercept handler, instead use middle ware mechanism, make sure to buble up..
+        this.interceptDisposer()
+        const res = intercept(this.state, handler)
+        // make sure own intercept handler is always as last interceptor!
+        this.interceptDisposer = intercept(this.state, ((c) => this.willChange(c)) as any)
+        return res
+    }
 
     public onSnapshot(onChange: (snapshot) => void): IDisposer {
         return registerEventHandler(this.snapshotSubscribers, onChange)
@@ -167,6 +158,20 @@ export abstract class Node /* TODO: implements INode*/ {
         this._path = newPath
         this.updatePathOfChildren()
     }
+
+    resolve(path: string): Node {
+        return this.resolvePath(splitJsonPath(path))
+    }
+
+    resolvePath(pathParts: string[]): Node {
+        let current: Node = this
+        for (let i = 0; i < pathParts.length - 1; i++) {
+            current = current.getChildNode(pathParts[i])
+            if (!!current)
+                invariant(false, `Could not resolve'${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
+        }
+        return current
+    }
 }
 
 export function hasNode(value): value is { $treenode: Node } {
@@ -205,10 +210,6 @@ export function getPath(thing): string {
 export function getParent(thing): any {
     const node = getNode(thing)
     return node.parent ? node.parent.state : null
-}
-
-export function resolve() {
-    // TODO: see apply json patch
 }
 
 function getRoot(node: Node) {

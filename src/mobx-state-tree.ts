@@ -65,7 +65,8 @@ export function isRoot(target: Object): boolean {
 }
 
 export function resolve(target: Object, path: string): any {
-    return getNode(target).resolve(path)
+    const node = getNode(target).resolve(path)
+    return node ? node.state : undefined
 }
 
 export function getEnvironment(target: Object): Object {

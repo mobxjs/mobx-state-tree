@@ -24,9 +24,9 @@ export function unescapeJsonPath(str: string) {
 }
 
 export function joinJsonPath(path: string[]): string {
-    return "/" + path.map(escapeJsonPath).join("/")
+    return path.map(escapeJsonPath).join("/")
 }
 
 export function splitJsonPath(path: string): string[] {
-    return path.split("/").slice(1).map(unescapeJsonPath)
+    return path.split("/").map(unescapeJsonPath)
 }
