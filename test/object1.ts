@@ -98,9 +98,9 @@ objectTest("nested objects", { a: { b: { c: 3 }}}, state => {
     state.a.b = { c: 5 }
     state.a.b.c = 6
 }, [
-    { op: "replace", path: "a/b/c", value: 4 },
-    { op: "replace", path: "a/b", value: { c: 5} },
-    { op: "replace", path: "a/b/c", value: 6 }
+    { op: "replace", path: "/a/b/c", value: 4 },
+    { op: "replace", path: "/a/b", value: { c: 5} },
+    { op: "replace", path: "/a/b/c", value: 6 }
 ], [
     { a: { b: { c: 4}}},
     { a: { b: { c: 5}}},
@@ -144,15 +144,15 @@ test("structural sharing", t => {
 //     const snapshots: Object[] = []
 //     $parent.subscribe(s => snapshots.push(s))
 //     $child.subscribe(s => snapshots.push(s))
-//     $parent.patchStream(p => patches.push(p))
-//     $child.patchStream(p => patches.push(p))
+//     $parent.onPatch(p => patches.push(p))
+//     $child.onPatch(p => patches.push(p))
 
 //     t.equal($parent.isRoot, true)
 //     t.equal($child.isRoot, true)
 //     parent.a = child
 //     t.equal($child.isRoot, false)
-//     t.equal($parent.path, "/")
-//     t.equal($child.path, "/a")
+//     t.equal($parent.path, "")
+//     t.equal($child.path, "a")
 
 //     child.b = 3
 
@@ -164,11 +164,11 @@ test("structural sharing", t => {
 //     child.b = 4
 
 //     t.deepEqual(patches, [
-//         { op: 'replace', path: '/a', value: { b: 2 } },
-//         { op: 'replace', path: '/b', value: 3 },
-//         { op: 'replace', path: '/a/b', value: 3 },
-//         { op: 'replace', path: '/a', value: null },
-//         { op: 'replace', path: '/b', value: 4 }
+//         { op: 'replace', path: 'a', value: { b: 2 } },
+//         { op: 'replace', path: 'b', value: 3 },
+//         { op: 'replace', path: 'a/b', value: 3 },
+//         { op: 'replace', path: 'a', value: null },
+//         { op: 'replace', path: 'b', value: 4 }
 //     ])
 //     t.deepEqual(snapshots, [
 //         { a: { b: 2 } },
