@@ -2,6 +2,7 @@ import {ObservableMap, asMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {ModelFactory} from "../core/factories"
 import {invariant, isMutable, identity, fail, isPlainObject} from "../utils"
+import {escapeJsonPath} from "../core/json-patch"
 
 // TODO: support primitives. Have separate factory?
 export class MapNode extends Node {
@@ -58,11 +59,32 @@ export class MapNode extends Node {
     }
 
     didChange(change: IMapChange<any>): void {
-        // TODO:
+        switch (change.type) {
+            case "update":
+            case "add":
+                return void this.emitPatch({
+                    op: change.type === "add" ? "add" : "replace",
+                    path: "/" + escapeJsonPath(change.name),
+                    value: valueToSnapshot(change.newValue)
+                }, this)
+            case "delete":
+                return void this.emitPatch({
+                    op: "remove",
+                    path: "/" + escapeJsonPath(change.name)
+                }, this)
+        }
     }
 
     applyPatchLocally(subpath, patch): void {
-        // TODO:
+        switch (patch.type) {
+            case "add":
+            case "replace":
+                this.state.set(subpath, patch.value) // takes care of further deserialization
+                break
+            case "remove":
+                this.state.delete(subpath)
+                break
+        }
     }
 
     @action applySnapshot(snapshot): void {

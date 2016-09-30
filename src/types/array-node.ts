@@ -2,6 +2,7 @@ import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArray
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {ModelFactory} from "../core/factories"
 import {invariant, isMutable, identity, fail} from "../utils"
+import {escapeJsonPath} from "../core/json-patch"
 
 // TODO: support primitives. Have separate factory?
 export class ArrayNode extends Node {
@@ -47,11 +48,41 @@ export class ArrayNode extends Node {
     }
 
     didChange(change: IArrayChange<any> | IArraySplice<any>): void {
-        // TODO:
+        switch (change.type) {
+            case "update":
+                return void this.emitPatch({
+                    op: "replace",
+                    path: "/" + change.index,
+                    value: valueToSnapshot(change.newValue)
+                }, this)
+            case "splice":
+                for (let i = change.index + change.removedCount - 1; i >= change.index; i--)
+                    this.emitPatch({
+                        op: "remove",
+                        path: "/" + i
+                    }, this)
+                for (let i = 0; i < change.addedCount; i++)
+                    this.emitPatch({
+                        op: "add",
+                        path: "/" + (change.index + i)
+                    }, this)
+                return
+        }
     }
 
     applyPatchLocally(subpath, patch): void {
-        // TODO:
+        const index = subpath === "-" ? this.state.length : parseInt(subpath)
+        switch (patch.type) {
+            case "update":
+                this.state[index] = patch.value
+                break
+            case "add":
+                this.state.splice(index, 0, patch.value)
+                break
+            case "remove":
+                this.state.splice(index, 1)
+                break
+        }
     }
 
     @action applySnapshot(snapshot): void {
