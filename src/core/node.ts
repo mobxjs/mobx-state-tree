@@ -32,6 +32,7 @@ export abstract class Node /* TODO: implements INode*/ {
             this._path = parent.pathParts.concat(subpath)
         }
 
+        this.state = initialState
         this.interceptDisposer = intercept(this.state, ((c) => this.willChange(c)) as any)
         observe(this.state, (c) => this.didChange(c))
 
@@ -48,6 +49,7 @@ export abstract class Node /* TODO: implements INode*/ {
     abstract serialize(): any
     abstract applyPatchLocally(subpath, patch): void
     abstract getChildFactory(key: string): ModelFactory
+    abstract applySnapshot(snapshot): void
 
     /**
      * Returnes (escaped) path representation as string
@@ -138,12 +140,13 @@ export abstract class Node /* TODO: implements INode*/ {
             const childFactory = this.getChildFactory(subpath)
             invariant(node.factory === childFactory, `Unexpected child type`)
             node.setParent(this, subpath)
-            node.setParent(this, subpath)
             return node.state
         } else {
             const childFactory = this.getChildFactory(subpath)
             // convert object from snapshot
-            const instance = childFactory(child, this.environment)
+            const instance = childFactory(child, this.environment) // TODO: optimization: pass in parent as third arg
+            const node = getNode(instance)
+            node.setParent(this, subpath)
             return instance
         }
     }

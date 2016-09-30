@@ -54,12 +54,16 @@ export class ArrayNode extends Node {
         // TODO:
     }
 
+    @action applySnapshot(snapshot): void {
+        this.state.replace(snapshot)
+    }
+
     getChildFactory(): ModelFactory {
         return this.subType
     }
 }
 
-export function createArrayFactory(subtype: ModelFactory) : ModelFactory {
+export function createArrayFactory(subtype: ModelFactory): ModelFactory {
     let factory = action("array-factory", (snapshot: any[], env?) => {
         invariant(Array.isArray(snapshot), "Expected array")
         const instance = observable(
@@ -69,6 +73,11 @@ export function createArrayFactory(subtype: ModelFactory) : ModelFactory {
         adm.subType = subtype
         Object.defineProperty(instance, "__modelAdministration", adm)
         return instance
-    })
+    }) as ModelFactory
+    (factory as any).isArrayFactory = true
     return factory
+}
+
+export function isArrayFactory(factory): boolean {
+    return factory.isArrayFactory === true
 }

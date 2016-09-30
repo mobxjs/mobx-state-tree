@@ -1,16 +1,16 @@
-import {IObjectChange, IObjectWillChange, isObservable} from "mobx"
+import {IObjectChange, IObjectWillChange, isObservable, action} from "mobx"
 import {Node, maybeNode, getNode, valueToSnapshot} from "../core/node"
-import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity} from "../utils"
+import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
-import {ModelFactory} from "../core/factories"
+import {ModelFactory, primitiveFactory} from "../core/factories"
 import {IActionCall, IActionCallOptions} from "../core/action"
-import {clone} from "../mobx-state-tree"
+import {clone} from "../"
 
 export class ObjectNode extends Node {
     readonly actionSubscribers: ((actionCall: IActionCall) => void)[] = [];
     readonly submodelType: {
         [key: string]: ModelFactory;
-    }
+    } = {}
     private _isExecutingAction = 0
 
     getChildNodes(): [string, Node][] {
@@ -61,9 +61,6 @@ export class ObjectNode extends Node {
         return res
     }
 
-    // deserialize(target, snapshot): void {
-    // isDeserializableFrom(snapshot): boolean {
-
     applyPatchLocally(subpath, patch): void {
         // TODO: confusing that subpath should be used instead of patch, just clone the patch for simplicity?
         // works for both replace and add, remove is not a case in mobx-state-tree ATM
@@ -76,6 +73,10 @@ export class ObjectNode extends Node {
     applyAction(action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
         const node = getObjectNode(this.resolve(action.path))
         return node.applyAction(action, options)
+    }
+
+    @action applySnapshot(snapshot): void {
+        extend(this.state, snapshot)
     }
 
     applyActionLocally(action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
@@ -94,7 +95,7 @@ export class ObjectNode extends Node {
     }
 
     getChildFactory(key: string): ModelFactory {
-        return this.submodelType[key] || fail(`No factory defined for '${key}' in '${this.path}'`)
+        return this.submodelType[key] || primitiveFactory
     }
 
     isExecutingAction() {

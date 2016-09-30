@@ -1,6 +1,6 @@
 import {ObservableMap, asMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
-import {ModelFactory, isModelFactory} from "../core/factories"
+import {ModelFactory} from "../core/factories"
 import {invariant, isMutable, identity, fail, isPlainObject} from "../utils"
 
 // TODO: support primitives. Have separate factory?
@@ -65,6 +65,11 @@ export class MapNode extends Node {
         // TODO:
     }
 
+    @action applySnapshot(snapshot): void {
+        this.state.clear()
+        this.state.merge(snapshot)
+    }
+
     getChildFactory(): ModelFactory {
         return this.subType
     }
@@ -82,21 +87,11 @@ export function createMapFactory(subtype: ModelFactory): ModelFactory {
             instance.set(key, isMutable(value) ? subtype(value, env) : value)
         }
         return instance
-    })
+    }) as ModelFactory
+    (factory as any).isMapFactory = true
     return factory
 }
 
-// TODO: somehow just use map from mobx?
-export class Map {
-    constructor(public subtype: ModelFactory | null) {
-        invariant(!subtype || isModelFactory(subtype))
-    }
-}
-
-export function map(subtype?: ModelFactory): any {
-    return new Map(subtype || null)
-}
-
-export function isMap(value: any): value is Map {
-    return value instanceof Map // TODO: don't use instanceof
+export function isMapFactory(factory): boolean {
+    return factory.isMapFactory === true
 }
