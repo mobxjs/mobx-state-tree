@@ -6,13 +6,14 @@
         "declaration": true,
         "module": "commonjs",
         "removeComments": false,
-        "outDir": "../lib/",
+        "outDir": "lib/",
         "noImplicitAny": false,
         "moduleResolution": "node",
         "experimentalDecorators": true,
         "strictNullChecks": true
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "lib"
     ]
 }

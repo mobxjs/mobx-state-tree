@@ -3,12 +3,16 @@ import {IDisposer} from "./utils"
 import {getNode} from "./core/node"
 import {getObjectNode} from "./types/object-node"
 import {IActionCall, IActionCallOptions} from "./core/action"
+import {ModelFactory, primitiveFactory} from "./core/factories"
+import {createMapFactory} from "./types/map-node"
+import {createArrayFactory} from "./types/array-node"
 
 export * from "./core/json-patch"
 export {
     ModelFactory,
     createFactory,
-    isModelFactory
+    isModelFactory,
+    generateFactory
 } from "./core/factories"
 
 export {
@@ -38,6 +42,10 @@ export function applyPatch(target: Object, patch: IJsonPatch) {
 
 export function applyAction(target: Object, action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
     return getObjectNode(target).applyAction(action, options)
+}
+
+export function applySnapshot(target: Object, snapshot: Object) {
+    return getNode(target).applySnapshot(snapshot)
 }
 
 export function intercept(target: Object, interceptor: (change) => Object | null): IDisposer {
@@ -76,4 +84,20 @@ export function getEnvironment(target: Object): Object {
 export function clone<T>(source: T, customEnvironment?: any): T {
     const node = getNode(source)
     return node.factory(node.snapshot, customEnvironment || node.environment) as T
+}
+
+export function mapOf(subFactory: ModelFactory = primitiveFactory) {
+    return createMapFactory(subFactory)
+}
+
+
+export function arrayOf(subFactory: ModelFactory = primitiveFactory) {
+    return createArrayFactory(subFactory)
+}
+
+/**
+ * Internal function, use with care!
+ */
+export function _getNode(thing): any {
+    return getNode(thing)
 }
