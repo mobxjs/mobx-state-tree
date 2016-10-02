@@ -1,3 +1,4 @@
+import {transaction} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer} from "./utils"
 import {getNode} from "./core/node"
@@ -40,10 +41,30 @@ export function applyPatch(target: Object, patch: IJsonPatch) {
     return getNode(target).applyPatch(patch)
 }
 
+export function applyPatches(target: Object, patches: IJsonPatch[]) {
+    const node = getNode(target)
+    transaction(() => {
+        patches.forEach(p => node.applyPatch(p))
+    })
+}
+
+// TODO: actions return snapshot
 export function applyAction(target: Object, action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
+    // TODO: return snapshot instead of patches?
     return getObjectNode(target).applyAction(action, options)
 }
 
+export function applyActions(target: Object, actions: IActionCall[], options?: IActionCallOptions): IJsonPatch[] {
+    const node = getObjectNode(target)
+    // TODO: return snapshot or patches? if the latter, flatten!
+    transaction(() => {
+        actions.forEach(action => node.applyAction(action, options))
+    })
+    return [] // TODO!
+}
+
+// TODO: rename to restoreSnapshot
+// TODO: if target is not set, snapshot restores to it's original
 export function applySnapshot(target: Object, snapshot: Object) {
     return getNode(target).applySnapshot(snapshot)
 }

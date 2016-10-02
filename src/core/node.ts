@@ -8,6 +8,7 @@ import {
 } from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
 import {ModelFactory} from "./factories"
+import {ObjectNode} from "../types/object-node"
 
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
@@ -72,7 +73,7 @@ export abstract class Node /* TODO: implements INode*/ {
 
     @computed public get snapshot() {
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
-        return this.serialize()
+        return Object.freeze(this.serialize())
     }
 
     @action public applyPatch(patch: IJsonPatch) {
@@ -86,7 +87,11 @@ export abstract class Node /* TODO: implements INode*/ {
         this.interceptDisposer()
         const res = intercept(this.state, handler)
         // make sure own intercept handler is always as last interceptor!
-        this.interceptDisposer = intercept(this.state, ((c) => this.willChange(c)) as any)
+        this.interceptDisposer = intercept(this.state, (c: any) => {
+            if (!this.isRunningAction())
+                fail(`Attempted to modify attribute '${c.name || c.index}' of '${this.path}', but no action is currently (on this part of the state-tree)`)
+            return this.willChange(c) as any
+        })
         return res
     }
 
@@ -106,6 +111,7 @@ export abstract class Node /* TODO: implements INode*/ {
                 localizedPatch = patch
             else
                 localizedPatch = extend({}, patch, {
+                    // TODO: use relativePath(this, source)
                     path: joinJsonPath(source.pathParts.slice(-distance)) + patch.path
                 })
             this.patchSubscribers.forEach(f => f(localizedPatch))
@@ -121,12 +127,20 @@ export abstract class Node /* TODO: implements INode*/ {
         if (!this._parent && newParent && getRoot(newParent) === this) {
             invariant(false, `A state tree is not allowed to contain itself. Cannot add root to path '/${newParent.pathParts.concat(subpath!).join("/")}'`)
         }
+        if (this.parent && !newParent && (
+                this.patchSubscribers.length > 0 || this.snapshotSubscribers.length > 0 ||
+                 (this instanceof ObjectNode && this.actionSubscribers.length > 0)
+        )) {
+            console.warn("")
+        }
+
         invariant(!!newParent === !!subpath, "if a parent is set, path must be provide (and vice versa)")
         this._parent = newParent
         if (newParent instanceof Node)
             this._path = newParent.pathParts.concat(subpath!)
-        else
+        else {
             this._path = []
+        }
         this.updatePathOfChildren()
         return this
     }
@@ -167,13 +181,24 @@ export abstract class Node /* TODO: implements INode*/ {
     }
 
     resolvePath(pathParts: string[]): Node {
-        let current: Node = this
+        let current: Node | null = this
         for (let i = 0; i < pathParts.length - 1; i++) {
-            current = current.getChildNode(pathParts[i])
-            if (!!current)
+            if (pathParts[i] === "..")
+                current = current!.parent
+            else if (pathParts[i] === ".")
+                continue
+            else
+                current = current!.getChildNode(pathParts[i])
+            if (current === null)
                 invariant(false, `Could not resolve'${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
         }
-        return current
+        return current!
+    }
+
+    isRunningAction(): boolean {
+        if (this.isRoot)
+            return false
+        return this.parent!.isRunningAction()
     }
 }
 
@@ -208,6 +233,11 @@ export function getNode(value): Node {
 
 export function getPath(thing): string {
     return getNode(thing).path
+}
+
+export function getRelativePath(base: Node, target: Node): string {
+    // PRE condition target is (a child of) base!
+    return target.path.substr(base.path.length)
 }
 
 export function getParent(thing): any {

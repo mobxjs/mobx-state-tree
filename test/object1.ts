@@ -132,54 +132,54 @@ test("structural sharing", t => {
     t.end()
 })
 
-// test("add node to tree", t => {
-//     const f1 = createFactory(() => ({ a: null }))
-//     const f2 = createFactory(() => ({ b: 0 }))
-//     const parent = f1({ a : null })
-//     const child = f2({ b: 2 })
-//     const $parent = _getNode(parent)
-//     const $child = _getNode(child)
+test("add node to tree", t => {
+    const f1 = createFactory(() => ({ a: null }))
+    const f2 = createFactory(() => ({ b: 0 }))
+    const parent = f1({ a : null })
+    const child = f2({ b: 2 })
+    const $parent = _getNode(parent)
+    const $child = _getNode(child)
 
-//     const patches: IJsonPatch[] = []
-//     const snapshots: Object[] = []
-//     $parent.subscribe(s => snapshots.push(s))
-//     $child.subscribe(s => snapshots.push(s))
-//     $parent.onPatch(p => patches.push(p))
-//     $child.onPatch(p => patches.push(p))
+    const patches: IJsonPatch[] = []
+    const snapshots: Object[] = []
+    $parent.subscribe(s => snapshots.push(s))
+    $child.subscribe(s => snapshots.push(s))
+    $parent.onPatch(p => patches.push(p))
+    $child.onPatch(p => patches.push(p))
 
-//     t.equal($parent.isRoot, true)
-//     t.equal($child.isRoot, true)
-//     parent.a = child
-//     t.equal($child.isRoot, false)
-//     t.equal($parent.path, "")
-//     t.equal($child.path, "a")
+    t.equal($parent.isRoot, true)
+    t.equal($child.isRoot, true)
+    parent.a = child
+    t.equal($child.isRoot, false)
+    t.equal($parent.path, "")
+    t.equal($child.path, "a")
 
-//     child.b = 3
+    child.b = 3
 
-//     // detach
-//     parent.a = null
-//     t.equal($child.isRoot, true)
-//     t.equal($child.path, "/")
+    // detach
+    parent.a = null
+    t.equal($child.isRoot, true)
+    t.equal($child.path, "/")
 
-//     child.b = 4
+    child.b = 4
 
-//     t.deepEqual(patches, [
-//         { op: 'replace', path: 'a', value: { b: 2 } },
-//         { op: 'replace', path: 'b', value: 3 },
-//         { op: 'replace', path: 'a/b', value: 3 },
-//         { op: 'replace', path: 'a', value: null },
-//         { op: 'replace', path: 'b', value: 4 }
-//     ])
-//     t.deepEqual(snapshots, [
-//         { a: { b: 2 } },
-//         { b: 3 },
-//         { a: { b: 3 } },
-//         { a: null },
-//         { b: 4 }
-//     ])
+    t.deepEqual(patches, [
+        { op: 'replace', path: 'a', value: { b: 2 } },
+        { op: 'replace', path: 'b', value: 3 },
+        { op: 'replace', path: 'a/b', value: 3 },
+        { op: 'replace', path: 'a', value: null },
+        { op: 'replace', path: 'b', value: 4 }
+    ])
+    t.deepEqual(snapshots, [
+        { a: { b: 2 } },
+        { b: 3 },
+        { a: { b: 3 } },
+        { a: null },
+        { b: 4 }
+    ])
 
-//     t.end()
-// })
+    t.end()
+})
 
 // test("cannot add tree to node twice", t => {
 //     const parent = { a: null, b: null }

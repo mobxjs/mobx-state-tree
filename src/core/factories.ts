@@ -15,12 +15,10 @@ export function primitiveFactory(snapshot: any, env?: Object): any {
 }
 
 // TODO: move to object-node
-export function createFactory(initializer: (env?: any) => Object): ModelFactory {
+export function createFactory(baseModel: Object): ModelFactory {
     // TODO: remember which keys are assignable and check that on next runs
     let factory = action("object-factory", function(snapshot: Object, env?: Object) {
         invariant(snapshot && typeof snapshot === "object" && !hasNode(snapshot), "Not a valid snapshot")
-        // run initializer, environment will now be bound
-        const baseModel = initializer(env)
         const instance = observable({})
         const adm = new ObjectNode(instance, null, env, factory as ModelFactory, null)
         Object.defineProperty(instance, "__modelAdministration", adm)

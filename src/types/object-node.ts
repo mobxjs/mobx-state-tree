@@ -1,17 +1,16 @@
 import {IObjectChange, IObjectWillChange, isObservable, action} from "mobx"
-import {Node, maybeNode, getNode, valueToSnapshot} from "../core/node"
+import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath} from "../core/node"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {ModelFactory, primitiveFactory} from "../core/factories"
-import {IActionCall, IActionCallOptions} from "../core/action"
-import {clone} from "../"
+import {IActionCall, IActionCallOptions, IActionHandler, applyActionLocally} from "../core/action"
 
 export class ObjectNode extends Node {
-    readonly actionSubscribers: ((actionCall: IActionCall) => void)[] = [];
+    readonly actionSubscribers: IActionHandler[] = [];
     readonly submodelType: {
         [key: string]: ModelFactory;
     } = {}
-    private _isExecutingAction = 0
+    _isRunningAction = false
 
     getChildNodes(): [string, Node][] {
         const res: [string, Node][] = []
@@ -72,49 +71,48 @@ export class ObjectNode extends Node {
 
     applyAction(action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
         const node = getObjectNode(this.resolve(action.path))
-        return node.applyAction(action, options)
+        return applyActionLocally(node, action, options)
+    }
+
+    emitAction(instance, action: IActionCall, next) {
+        let idx = 0
+        const correctedAction: IActionCall = this.actionSubscribers.length
+            ? extend({}, action, { path: getRelativePath(this, instance) })
+            : null
+        function n() { // TODO: use tail recursion / trampoline
+            if (idx < this.actionSubscribers.length) {
+                this.actionSubscribers[idx](this, correctedAction!, n)
+                idx++
+            }
+            else {
+                const parent = findEnclosingObjectNode(this)
+                if (parent)
+                    parent.emitAction(instance, action, next) // TODO correct path
+                else
+                    next()
+            }
+        }
+        n()
     }
 
     @action applySnapshot(snapshot): void {
         extend(this.state, snapshot)
     }
 
-    applyActionLocally(action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
-        const supressActionEvents = (options && options.supressActionEvents) || true
-        const supressPatchEvents = (options && options.supressPatchEvents) || false
-        const dryRun = (options && options.dryRun) || false
-        const target = dryRun ? getObjectNode(clone(this.state)) : this
-        const actionSubscriptions = supressActionEvents ? target.actionSubscribers.splice(0) : []
-        const patchSubscriptions  = supressPatchEvents  ? target.patchSubscribers.splice(0)  : []
-        try {
-            return target.state[action.name].apply(target.state, action.args)
-        } finally {
-            target.patchSubscribers.push(...patchSubscriptions)
-            target.actionSubscribers.push(...actionSubscriptions)
-        }
-    }
-
     getChildFactory(key: string): ModelFactory {
         return this.submodelType[key] || primitiveFactory
     }
 
-    isExecutingAction() {
-        return this._isExecutingAction > 0
-    }
-
-    notifyActionStart(name, args) {
-        if (++this._isExecutingAction === 1) {
-
-        }
-    }
-
-    notifyActionEnd() {
-        // TODO: emit event when starting or ending an action?
-        --this._isExecutingAction
-    }
-
     onAction(listener: (action: IActionCall) => void): IDisposer {
         return registerEventHandler(this.actionSubscribers, listener)
+    }
+
+    isRunningAction(): boolean {
+        if (this._isRunningAction)
+            return true
+        if (this.isRoot)
+            return false
+        return this.parent!.isRunningAction()
     }
 }
 
@@ -123,4 +121,15 @@ export function getObjectNode(thing: any): ObjectNode {
     // TODO: no instanceof, better message
     invariant(node instanceof ObjectNode, "Expected object node")
     return node as ObjectNode
+}
+
+/**
+ * Returns first parent of the provided node that is an object node, or null
+ */
+export function findEnclosingObjectNode(thing: Node): ObjectNode | null {
+    let parent: Node | null = thing
+    while (parent = thing.parent)
+        if (parent instanceof ObjectNode)
+            return parent
+    return null
 }
