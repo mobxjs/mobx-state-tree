@@ -1,4 +1,3 @@
-import {extras} from "mobx"
 import {addHiddenFinalProp, invariant} from "../utils"
 import {getObjectNode, ObjectNode} from "../types/object-node"
 import {clone} from "../index"
@@ -31,14 +30,14 @@ export function createNonActionWrapper(instance, key, func) {
 export function createActionWrapper(instance, key, action: Function) {
     addHiddenFinalProp(instance, key, function(...args: any[]) {
         const adm = getObjectNode(instance)
-        const run = () => {
+        const runAction = () => {
             const res = action.apply(instance, args)
             invariant(res === undefined, `action '${key}' should not return a value but got '${res}'`)
         }
         if (_isRunningActionGlobally) {
             // an action is running, invoking this action
             invariant(instance.isRunningAction(), `Action ${key} was invoked on ${instance.path}. However another action is already running, and this object is not part of the tree it is allowed to modify`)
-            run()
+            runAction()
         } else {
             // an action is started!
             try {
@@ -47,7 +46,7 @@ export function createActionWrapper(instance, key, action: Function) {
                 adm.emitAction(
                     instance,
                     { name: key, path: "", args: args },
-                    run
+                    runAction
                 )
             } finally {
                 adm._isRunningAction = false

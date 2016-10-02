@@ -1,7 +1,7 @@
+import {getNode} from "./core/node"
 import {transaction} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer} from "./utils"
-import {getNode} from "./core/node"
 import {getObjectNode} from "./types/object-node"
 import {IActionCall, IActionCallOptions} from "./core/action"
 import {ModelFactory, primitiveFactory} from "./core/factories"

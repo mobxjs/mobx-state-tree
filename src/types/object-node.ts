@@ -20,7 +20,7 @@ export class ObjectNode extends Node {
     }
 
     getChildNode(key): Node {
-        return maybeNode(identity, () => fail(`Illegal state, no node for "${key}"`))
+        return maybeNode(this.state[key], identity, () => fail(`Illegal state, no node for "${key}"`))
     }
 
     willChange(change: IObjectWillChange): Object | null {
@@ -79,7 +79,7 @@ export class ObjectNode extends Node {
         const correctedAction: IActionCall = this.actionSubscribers.length
             ? extend({}, action, { path: getRelativePath(this, instance) })
             : null
-        function n() { // TODO: use tail recursion / trampoline
+        let n = () => { // TODO: use tail recursion / trampoline
             if (idx < this.actionSubscribers.length) {
                 this.actionSubscribers[idx](this, correctedAction!, n)
                 idx++
@@ -128,7 +128,7 @@ export function getObjectNode(thing: any): ObjectNode {
  */
 export function findEnclosingObjectNode(thing: Node): ObjectNode | null {
     let parent: Node | null = thing
-    while (parent = thing.parent)
+    while (parent = parent.parent)
         if (parent instanceof ObjectNode)
             return parent
     return null

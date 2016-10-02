@@ -2,18 +2,18 @@
   "name": "mobx-state-tree",
   "version": "0.0.1",
   "description": "Opinionated state container for MobX powered applications",
-  "main": "lib/mobx-state-tree.js",
-  "typings": "lib/mobx-state-tree.d.ts",
+  "main": "lib/src/index.js",
+  "typings": "lib/src/index.d.ts",
   "scripts": {
     "build": "npm run quick-build && npm run webpack",
-    "quick-build": "tsc -p src",
+    "quick-build": "tsc",
     "webpack": "webpack -p",
     "test": "ts-node node_modules/.bin/tape test/*.ts | faucet",
     "watch": "tsc --watch",
-    "prepublish": "npm run build && npm run build-docs",
+    "_TODO_prepublish": "npm run build && npm run build-docs",
     "test-travis": "npm run build && istanbul cover tape test/*.js",
     "coverage": "npm run quick-build && istanbul cover tape test/*.js",
-    "build-docs": "npm run quick-build && documentation readme lib/mobx-state-tree.js --github --section API"
+    "build-docs": "npm run quick-build && documentation readme lib/src/index.js --github --section API"
   },
   "repository": {
     "type": "git",

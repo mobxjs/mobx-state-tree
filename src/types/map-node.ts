@@ -1,4 +1,4 @@
-import {ObservableMap, asMap, IMapChange, IMapWillChange, action} from "mobx"
+import {ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {ModelFactory} from "../core/factories"
 import {invariant, isMutable, identity, fail, isPlainObject} from "../utils"
@@ -98,9 +98,9 @@ export class MapNode extends Node {
 }
 
 export function createMapFactory(subtype: ModelFactory): ModelFactory {
-    let factory = action("map-factory", (snapshot: any[], env?) => {
+    let factory = action("map-factory", (snapshot: any = {}, env?) => {
         invariant(isPlainObject(snapshot), "Expected array")
-        const instance = asMap()
+        const instance = new ObservableMap()
         const adm = new MapNode(instance, null, env, factory as ModelFactory, null)
         adm.subType = subtype
         Object.defineProperty(instance, "__modelAdministration", adm)
@@ -110,6 +110,7 @@ export function createMapFactory(subtype: ModelFactory): ModelFactory {
         }
         return instance
     }) as ModelFactory
+    (factory as any).isModelFactory = true; // TODO: DRY
     (factory as any).isMapFactory = true
     return factory
 }

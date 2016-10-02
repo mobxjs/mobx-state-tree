@@ -1,4 +1,4 @@
-import {action, isAction, extendObservable, asMap, observable} from "mobx"
+import {action, isAction, extendObservable, ObservableMap, observable} from "mobx"
 import {invariant, hasOwnProperty, isPrimitive} from "../utils"
 import {hasNode} from "./node"
 import {ObjectNode} from "../types/object-node"
@@ -7,17 +7,19 @@ import {isMapFactory, createMapFactory} from "../types/map-node"
 import {isArrayFactory, createArrayFactory} from "../types/array-node"
 
 // type Obje
-export type ModelFactory = (snapshot: any, env?: Object) => any
+export type ModelFactory = (snapshot?: any, env?: Object) => any
 
 export function primitiveFactory(snapshot: any, env?: Object): any {
     invariant(isPrimitive(snapshot), `Expected primitive, got '${snapshot}'`)
     return snapshot
 }
+(primitiveFactory as any).isModelFactory = true // TODO: DRY
+
 
 // TODO: move to object-node
 export function createFactory(baseModel: Object): ModelFactory {
     // TODO: remember which keys are assignable and check that on next runs
-    let factory = action("object-factory", function(snapshot: Object, env?: Object) {
+    let factory = action("object-factory", function(snapshot: Object = {}, env?: Object) {
         invariant(snapshot && typeof snapshot === "object" && !hasNode(snapshot), "Not a valid snapshot")
         const instance = observable({})
         const adm = new ObjectNode(instance, null, env, factory as ModelFactory, null)
@@ -27,7 +29,8 @@ export function createFactory(baseModel: Object): ModelFactory {
         for (let key in snapshot)
             instance[key] = snapshot[key]
         return instance
-    } as ModelFactory)
+    } as ModelFactory);
+    (factory as any).isModelFactory = true // TODO: DRY
     return factory
 }
 
@@ -36,10 +39,10 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Objec
     for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
         const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
         if ("get" in descriptor) {
-            invariant(!descriptor.set, "computed property setters are currently not allowed")
+            // invariant(!descriptor.set, "computed property setters are currently not allowed")
             const tmp = {} // yikes
             Object.defineProperty(tmp, key, descriptor)
-            extendObservable(baseModel, tmp)
+            extendObservable(instance, tmp)
             continue
         }
 
@@ -48,7 +51,7 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Objec
             extendObservable(instance, { [key] : value })
         } else if (isMapFactory(value)) {
             adm.submodelType[key] = value
-            extendObservable(instance, { [key] : asMap }) //TODO: allow predefined map in future? second arg to factory?
+            extendObservable(instance, { [key] : {} }) //TODO: allow predefined map in future? second arg to factory?
         } else if (isArrayFactory(value)) {
             adm.submodelType[key] = value
             extendObservable(instance, { [key] : [] }) //TODO: allow predefined map in future? second arg to factory?
@@ -62,7 +65,7 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Objec
             adm.submodelType[key] = value
             extendObservable(instance, { [key] : null })
         } else if (isAction(value)) {
-            createActionWrapper(instance, key, value.action)
+            createActionWrapper(instance, key, value)
         } else if (typeof value === "function") {
             createNonActionWrapper(instance, key, value)
         } else if (typeof value === "object") {
@@ -74,8 +77,7 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Objec
 }
 
 export function isModelFactory(value: any): value is ModelFactory {
-    // TODO:
-    return true
+    return typeof value === "function" && value.isModelFactory === true
 }
 
 export function generateFactory(value: any): ModelFactory {

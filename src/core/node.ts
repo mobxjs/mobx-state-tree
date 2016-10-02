@@ -2,13 +2,6 @@ import {
     action,
     intercept, observe, computed, reaction
 } from "mobx"
-import {
-    invariant, fail, extend,
-    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
-} from "../utils"
-import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
-import {ModelFactory} from "./factories"
-import {ObjectNode} from "../types/object-node"
 
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
@@ -182,7 +175,7 @@ export abstract class Node /* TODO: implements INode*/ {
 
     resolvePath(pathParts: string[]): Node {
         let current: Node | null = this
-        for (let i = 0; i < pathParts.length - 1; i++) {
+        for (let i = 0; i < pathParts.length; i++) {
             if (pathParts[i] === "..")
                 current = current!.parent
             else if (pathParts[i] === ".")
@@ -263,3 +256,12 @@ export function valueToSnapshot(thing) {
         return getNode(thing).snapshot
     return thing
 }
+
+// Late require for early Node declare
+import {
+    invariant, fail, extend,
+    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
+} from "../utils"
+import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
+import {ModelFactory} from "./factories"
+import {ObjectNode} from "../types/object-node"
