@@ -97,12 +97,11 @@ export class ArrayNode extends Node {
 export function createArrayFactory(subtype: ModelFactory): ModelFactory {
     let factory = action("array-factory", (snapshot: any[] = [], env?) => {
         invariant(Array.isArray(snapshot), "Expected array")
-        const instance = observable(
-            snapshot.map(value => isMutable(value) ? subtype(value, env) : value)
-        )
+        const instance: IObservableArray<any> = observable([])
         const adm = new ArrayNode(instance, null, env, factory as ModelFactory, null)
         adm.subType = subtype
         Object.defineProperty(instance, "__modelAdministration", adm)
+        instance.replace(snapshot.map(value => isMutable(value) ? subtype(value, env) : value))
         return instance
     }) as ModelFactory
     (factory as any).isModelFactory = true; // TODO: DRY

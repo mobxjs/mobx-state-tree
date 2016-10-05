@@ -2,7 +2,7 @@ import {getNode} from "./core/node"
 import {transaction} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer} from "./utils"
-import {getObjectNode} from "./types/object-node"
+import {getObjectNode, findEnclosingObjectNode} from "./types/object-node"
 import {IActionCall, IActionCallOptions} from "./core/action"
 import {ModelFactory, primitiveFactory} from "./core/factories"
 import {createMapFactory} from "./types/map-node"
@@ -69,16 +69,19 @@ export function applySnapshot(target: Object, snapshot: Object) {
     return getNode(target).applySnapshot(snapshot)
 }
 
-export function intercept(target: Object, interceptor: (change) => Object | null): IDisposer {
-    return getNode(target).intercept(interceptor)
-}
-
 export function getSnapshot(target: Object): any {
     return getNode(target).snapshot
 }
 
-export function getParent(target: Object): any {
-    return getNode(target).parent
+export function hasParent(target: Object, strict: boolean = false): boolean {
+    return getParent(target) !== null
+}
+
+export function getParent(target: Object, strict: boolean = false): any {
+    const node = strict
+        ? getNode(target).parent
+        : findEnclosingObjectNode(getNode(target))
+    return node ? node.state : null
 }
 
 export function getPath(target: Object): string {
@@ -110,7 +113,6 @@ export function clone<T>(source: T, customEnvironment?: any): T {
 export function mapOf(subFactory: ModelFactory = primitiveFactory) {
     return createMapFactory(subFactory)
 }
-
 
 export function arrayOf(subFactory: ModelFactory = primitiveFactory) {
     return createArrayFactory(subFactory)

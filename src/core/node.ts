@@ -75,19 +75,6 @@ export abstract class Node /* TODO: implements INode*/ {
         node.applyPatchLocally(parts[parts.length - 1], patch)
     }
 
-    public intercept(handler: (change) => any): IDisposer {
-        // TODO: don't fire normal mobx intercept handler, instead use middle ware mechanism, make sure to buble up..
-        this.interceptDisposer()
-        const res = intercept(this.state, handler)
-        // make sure own intercept handler is always as last interceptor!
-        this.interceptDisposer = intercept(this.state, (c: any) => {
-            if (!this.isRunningAction())
-                fail(`Attempted to modify attribute '${c.name || c.index}' of '${this.path}', but no action is currently (on this part of the state-tree)`)
-            return this.willChange(c) as any
-        })
-        return res
-    }
-
     public onSnapshot(onChange: (snapshot) => void): IDisposer {
         return registerEventHandler(this.snapshotSubscribers, onChange)
     }
@@ -113,7 +100,10 @@ export abstract class Node /* TODO: implements INode*/ {
             this.parent.emitPatch(patch, source, distance + 1)
     }
 
-    @action setParent(newParent: Node | null, subpath: string | null = null): Node {
+    // TODO: needs improvements, now called too often. Should be set propertly when applying snapshots / calling factories immediately!
+    setParent(newParent: Node | null, subpath: string | null = null) {
+        if (this.parent === newParent && this.pathParts[this.pathParts.length - 1] === subpath)
+            return
         if (this._parent && newParent) {
             invariant(false, `A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
         }
@@ -124,18 +114,18 @@ export abstract class Node /* TODO: implements INode*/ {
                 this.patchSubscribers.length > 0 || this.snapshotSubscribers.length > 0 ||
                  (this instanceof ObjectNode && this.actionSubscribers.length > 0)
         )) {
-            console.warn("")
+            console.warn("An object with active event listeners was removed from the tree. This might introduce a memory leak. Use detach() if this is intentional")
+            // TODO: create detach
         }
 
         invariant(!!newParent === !!subpath, "if a parent is set, path must be provide (and vice versa)")
         this._parent = newParent
-        if (newParent instanceof Node)
+        if (newParent)
             this._path = newParent.pathParts.concat(subpath!)
         else {
             this._path = []
         }
         this.updatePathOfChildren()
-        return this
     }
 
     prepareChild(subpath: string, child: any): any {
@@ -159,7 +149,6 @@ export abstract class Node /* TODO: implements INode*/ {
     }
 
     protected updatePathOfChildren() {
-        console.log("updated path to " + this.path)
         this.getChildNodes().forEach(([subpath, child]) => child.updatePath(this.pathParts.concat(subpath)))
     }
 
