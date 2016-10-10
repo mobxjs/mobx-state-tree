@@ -1,5 +1,5 @@
 import {
-    action,
+    action, observable,
     intercept, observe, computed, reaction
 } from "mobx"
 
@@ -9,7 +9,7 @@ export abstract class Node /* TODO: implements INode*/ {
     readonly state: any
     readonly environment: any
     _path: string[] = []
-    _parent: Node | null = null
+    @observable _parent: Node | null = null // TODO: needed?
     readonly factory: ModelFactory
     private  interceptDisposer: IDisposer
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
@@ -101,6 +101,7 @@ export abstract class Node /* TODO: implements INode*/ {
     }
 
     // TODO: needs improvements, now called too often. Should be set propertly when applying snapshots / calling factories immediately!
+    // TODO: should not be possible to change just subpath?
     setParent(newParent: Node | null, subpath: string | null = null) {
         if (this.parent === newParent && this.pathParts[this.pathParts.length - 1] === subpath)
             return
@@ -158,11 +159,15 @@ export abstract class Node /* TODO: implements INode*/ {
         this.updatePathOfChildren()
     }
 
-    resolve(path: string): Node {
-        return this.resolvePath(splitJsonPath(path))
+    resolve(pathParts: string): Node;
+    resolve(pathParts: string, failIfResolveFails: boolean): Node | undefined;
+    resolve(path: string, failIfResolveFails: boolean = true): Node | undefined {
+        return this.resolvePath(splitJsonPath(path), failIfResolveFails)
     }
 
-    resolvePath(pathParts: string[]): Node {
+    resolvePath(pathParts: string[]): Node;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean): Node | undefined;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): Node | undefined {
         let current: Node | null = this
         for (let i = 0; i < pathParts.length; i++) {
             if (pathParts[i] === "..")
@@ -171,8 +176,12 @@ export abstract class Node /* TODO: implements INode*/ {
                 continue
             else
                 current = current!.getChildNode(pathParts[i])
-            if (current === null)
-                invariant(false, `Could not resolve'${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
+            if (current === null) {
+                if (failIfResolveFails)
+                    fail(`Could not resolve'${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
+                else
+                    return undefined
+            }
         }
         return current!
     }

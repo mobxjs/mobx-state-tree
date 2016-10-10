@@ -96,6 +96,7 @@ export class ObjectNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
+        // TODO: make a smart deep merge, that recycles object nodes & instances
         extend(this.state, snapshot)
     }
 

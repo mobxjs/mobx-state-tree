@@ -21,6 +21,10 @@ export {
     IActionCallOptions
 } from "./core/action"
 
+export {
+    referenceTo
+} from "./core/reference"
+
 export function onAction(target: Object, callback: (action: IActionCall) => void): IDisposer {
     return getObjectNode(target).onAction(callback);
 }
@@ -101,6 +105,13 @@ export function resolve(target: Object, path: string): any {
     return node ? node.state : undefined
 }
 
+export function tryResolve(target: Object, path: string): any {
+    const node = getNode(target).resolve(path, false)
+    if (node === undefined)
+        return undefined
+    return node ? node.state : undefined
+}
+
 export function getEnvironment(target: Object): Object {
     return getNode(target).environment
 }
@@ -124,3 +135,8 @@ export function arrayOf(subFactory: ModelFactory = primitiveFactory) {
 export function _getNode(thing): any {
     return getNode(thing)
 }
+
+// TODO:
+// - setGlobalDefaultStore
+// - getGlobalDefaultStore
+// - dispatch?

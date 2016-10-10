@@ -5,6 +5,7 @@ import {ObjectNode} from "../types/object-node"
 import {createActionWrapper, createNonActionWrapper} from "./action"
 import {isMapFactory, createMapFactory} from "../types/map-node"
 import {isArrayFactory, createArrayFactory} from "../types/array-node"
+import {isReferenceFactory, createReferenceProps} from "./reference"
 
 // type Obje
 export type ModelFactory = (snapshot?: any, env?: Object) => any
@@ -39,7 +40,6 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Objec
     for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
         const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
         if ("get" in descriptor) {
-            // invariant(!descriptor.set, "computed property setters are currently not allowed")
             const tmp = {} // yikes
             Object.defineProperty(tmp, key, descriptor)
             extendObservable(instance, tmp)
@@ -64,7 +64,9 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Objec
         } else if (isModelFactory(value)) {
             adm.submodelType[key] = value
             extendObservable(instance, { [key] : null })
-        } else if (isAction(value)) {
+        } else if (isReferenceFactory(value)) {
+            extendObservable(instance, createReferenceProps(key, value))
+        }else if (isAction(value)) {
             createActionWrapper(instance, key, value)
         } else if (typeof value === "function") {
             createNonActionWrapper(instance, key, value)
