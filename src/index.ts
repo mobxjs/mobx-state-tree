@@ -31,8 +31,12 @@ export {
     asReduxStore,
     ReduxStore
 } from "./interop/redux"
+export {
+    connectReduxDevtools
+} from "./interop/redux-devtools"
 
-export function onAction(target: Object, callback: (action: IActionCall) => void): IDisposer {
+
+export function onAction(target: Object, callback: (action: IActionCall, next: () => void) => void): IDisposer {
     return getObjectNode(target).onAction(callback);
 }
 

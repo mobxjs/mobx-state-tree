@@ -105,7 +105,7 @@ export class ObjectNode extends Node {
         return this.submodelType[key] || primitiveFactory
     }
 
-    onAction(listener: (action: IActionCall) => void): IDisposer {
+    onAction(listener: (action: IActionCall, next: () => void) => void): IDisposer {
         return registerEventHandler(this.actionSubscribers, listener)
     }
 
