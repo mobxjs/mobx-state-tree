@@ -18,8 +18,6 @@ export type IActionCall = {
 export type IActionHandler  = (actionCall: IActionCall, next: () => void) => void
 
 export type IActionCallOptions = {
-    supressPatchEvents?: boolean
-    supressActionEvents?: boolean
     dryRun?: boolean
 }
 
@@ -58,20 +56,8 @@ export function createActionWrapper(instance, key, action: Function) {
 
 // TODO: return snapshot!
 export function applyActionLocally(node: ObjectNode, action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
-    // TODO: move to action.ts
-    const supressActionEvents = (options && options.supressActionEvents) || true
-    const supressPatchEvents = (options && options.supressPatchEvents) || false
     const dryRun = (options && options.dryRun) || false
     const target = dryRun ? getObjectNode(clone(node.state)) : node
     invariant(typeof target.state[action.name] === "function", `Action '${action.name}' does not exist in '${target.path}'`)
-    const actionSubscriptions = supressActionEvents ? target.actionSubscribers.splice(0) : []
-    const patchSubscriptions  = supressPatchEvents  ? target.patchSubscribers.splice(0)  : []
-    // TODO set global flag action is running
-    // TODO: disable all modifications if no action is running!
-    try {
-        return target.state[action.name].apply(target.state, action.args || [])
-    } finally {
-        target.patchSubscribers.push(...patchSubscriptions)
-        target.actionSubscribers.push(...actionSubscriptions)
-    }
+    return target.state[action.name].apply(target.state, action.args || [])
 }

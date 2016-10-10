@@ -18,8 +18,7 @@ export function asReduxStore(model): ReduxStore {
     return {
         getState : ()       => getSnapshot(model),
         subscribe: listener => onSnapshot(model, listener),
-        dispatch : action   => { applyAction(model, reduxActionToAction(action))
-        }
+        dispatch : action   => { applyAction(model, reduxActionToAction(action)) }
     }
 }
 
