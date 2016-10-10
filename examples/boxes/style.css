@@ -1,0 +1,88 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #2d3e4e
+}
+
+.box {
+    padding: 20px 0;
+    border: 2px solid white;
+    position: absolute;
+    border-radius: 8px;
+    background-color: #2d3e4e;
+    cursor: pointer;
+    color: white;
+    white-space: nowrap;
+    font-family: arial;
+    font-weight: 800;
+    text-align: center;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.box-selected {
+    background-color: #f99b1d;
+}
+
+.canvas svg {
+    background-color: #2d3e4e;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.canvas svg, .canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.canvas path {
+    stroke-width: 2;
+    stroke: white;
+    marker-end: url(#markerArrow);
+}
+
+#markerArrow {
+    stroke-width: 1;
+    stroke: white;
+    fill: #2d3e4e;
+}
+
+.canvas path {
+    fill: '#000000';
+}
+
+.sidebar {
+    position: fixed;
+    bottom: 0px;
+    top: 0px;
+    right: -340px;
+    width: 300px;
+    padding: 100px 40px;
+    background-color: #f0f0ee;
+    box-shadow: 0px 0px 9px #000;
+    transition: 1.2s cubic-bezier(0.32, 1, 0.23, 1);
+    transform: translate3d(-0px, 0, 0);
+}
+
+.sidebar-open {
+    transform: translate3d(-340px, 0, 0)
+}
+
+input, button {
+    padding: 4px;
+    font-size: 1.2em;
+}
+
+input {
+    width: 100%;
+}
+
+.funstuff {
+    position: fixed;
+    bottom: 0;
+}
