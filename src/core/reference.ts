@@ -8,9 +8,14 @@ export interface IReferenceDescription {
 }
 
 // TODO: support list / map references as well.
-export function referenceTo<T>(path: string, targetIdAttribute: string, sourceIdAttribute: string = ""): T {
+export function referenceTo<T>(path: string, sourceIdAttribute: string = ""): T {
+    // TODO check input args
+    const targetIdAttribute = path.split("/").slice(-1)[0]
+    path = path.split("/").slice(0, -1).join("/")
     return {
-        path, targetIdAttribute, sourceIdAttribute,
+        path,
+        targetIdAttribute,
+        sourceIdAttribute,
         isReferenceTo: true
     } as IReferenceDescription as any
 }

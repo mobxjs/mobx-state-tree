@@ -38,6 +38,9 @@ export class ArrayNode extends Node {
                 change.added = change.added.map((newValue, pos) => {
                     return this.prepareChild("" + (change.index + pos), newValue)
                 })
+                // TODO: move to didChange
+                for (let i = change.index + change.added.length; i < change.object.length; i++)
+                    maybeNode(change.object[i], adm => adm.setParent(this, "" + i))
                 break
         }
         return change
@@ -101,7 +104,7 @@ export function createArrayFactory(subtype: ModelFactory): ModelFactory {
         const adm = new ArrayNode(instance, null, env, factory as ModelFactory, null)
         adm.subType = subtype
         Object.defineProperty(instance, "__modelAdministration", adm)
-        instance.replace(snapshot.map(value => isMutable(value) ? subtype(value, env) : value))
+        instance.replace(snapshot)
         return instance
     }) as ModelFactory
     (factory as any).isModelFactory = true; // TODO: DRY

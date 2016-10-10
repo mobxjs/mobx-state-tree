@@ -1,5 +1,5 @@
 import * as test from "tape"
-import {subscribe, onPatch, createFactory, applyPatch, _getNode, getPath, IJsonPatch, applySnapshot, generateFactory} from "../src/"
+import {onSnapshot, onPatch, createFactory, applyPatch, _getNode, getPath, IJsonPatch, applySnapshot, generateFactory} from "../src/"
 
 function objectTest(name, initialState, f, expectedPatches, expectedSnapshots) {
     test(name, t => {
@@ -7,7 +7,7 @@ function objectTest(name, initialState, f, expectedPatches, expectedSnapshots) {
         const state = factory(initialState)
         const patches: IJsonPatch[] = []
         const snapshots: any[] = []
-        subscribe(state, snapshot => { snapshots.push(snapshot) })
+        onSnapshot(state, snapshot => { snapshots.push(snapshot) })
         onPatch(state, patch => patches.push(patch))
 
         f(state)
@@ -112,7 +112,7 @@ test("structural sharing", t => {
     const parent = createFactory(() => ({  a: child, c: 0 }))
     const state = parent({ a: { b: 3 }, c: 4})
     const s: any[] = []
-    subscribe(state, sn => s.push(sn))
+    onSnapshot(state, sn => s.push(sn))
 
     state.c = 5
     state.c = 6
@@ -142,8 +142,8 @@ test("add node to tree", t => {
 
     const patches: IJsonPatch[] = []
     const snapshots: Object[] = []
-    $parent.subscribe(s => snapshots.push(s))
-    $child.subscribe(s => snapshots.push(s))
+    $parent.onSnapshot(s => snapshots.push(s))
+    $child.onSnapshot(s => snapshots.push(s))
     $parent.onPatch(p => patches.push(p))
     $child.onPatch(p => patches.push(p))
 

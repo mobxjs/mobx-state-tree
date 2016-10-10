@@ -9,7 +9,7 @@
     "quick-build": "tsc",
     "webpack": "webpack -p",
     "test": "ts-node node_modules/.bin/tape test/*.ts | faucet",
-    "watch": "tsc --watch",
+    "watch": "tsc --pretty --watch",
     "_TODO_prepublish": "npm run build && npm run build-docs",
     "test-travis": "npm run build && istanbul cover tape test/*.js",
     "coverage": "npm run quick-build && istanbul cover tape test/*.js",

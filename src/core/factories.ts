@@ -18,9 +18,10 @@ export function primitiveFactory(snapshot: any, env?: Object): any {
 
 
 // TODO: move to object-node
+// TODO: add name attribute
 export function createFactory(baseModel: Object): ModelFactory {
     // TODO: remember which keys are assignable and check that on next runs
-    let factory = action("object-factory", function(snapshot: Object = {}, env?: Object) {
+    let factory = action("object-factory" /* TODO: use name */, function(snapshot: Object = {}, env?: Object) {
         invariant(snapshot && typeof snapshot === "object" && !hasNode(snapshot), "Not a valid snapshot")
         const instance = observable({})
         const adm = new ObjectNode(instance, null, env, factory as ModelFactory, null)
@@ -82,6 +83,8 @@ export function isModelFactory(value: any): value is ModelFactory {
     return typeof value === "function" && value.isModelFactory === true
 }
 
+// TODO: expose
+// TODO: introduce plainObjectFactory?
 export function generateFactory(value: any): ModelFactory {
     return generateFactoryHelper(value)
 }

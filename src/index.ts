@@ -8,6 +8,8 @@ import {ModelFactory, primitiveFactory} from "./core/factories"
 import {createMapFactory} from "./types/map-node"
 import {createArrayFactory} from "./types/array-node"
 
+// TODO: improve all typings
+
 export * from "./core/json-patch"
 export {
     ModelFactory,
@@ -25,6 +27,11 @@ export {
     referenceTo
 } from "./core/reference"
 
+export {
+    asReduxStore,
+    ReduxStore
+} from "./interop/redux"
+
 export function onAction(target: Object, callback: (action: IActionCall) => void): IDisposer {
     return getObjectNode(target).onAction(callback);
 }
@@ -35,10 +42,6 @@ export function onPatch(target: Object, callback: (patch: IJsonPatch) => void): 
 
 export function onSnapshot(target: Object, callback: (snapshot: any) => void): IDisposer {
     return getNode(target).onSnapshot(callback)
-}
-
-export function subscribe(target: Object, callback: (snapshot: any) => void): IDisposer {
-    return onSnapshot(target, callback)
 }
 
 export function applyPatch(target: Object, patch: IJsonPatch) {
@@ -53,8 +56,7 @@ export function applyPatches(target: Object, patches: IJsonPatch[]) {
 }
 
 // TODO: actions return snapshot
-export function applyAction(target: Object, action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
-    // TODO: return snapshot instead of patches?
+export function applyAction(target: Object, action: IActionCall, options?: IActionCallOptions) {
     return getObjectNode(target).applyAction(action, options)
 }
 
@@ -77,10 +79,12 @@ export function getSnapshot(target: Object): any {
     return getNode(target).snapshot
 }
 
+// TODO: hasParentObject
 export function hasParent(target: Object, strict: boolean = false): boolean {
     return getParent(target) !== null
 }
 
+// TODO: getParentObject
 export function getParent(target: Object, strict: boolean = false): any {
     const node = strict
         ? getNode(target).parent
@@ -112,6 +116,7 @@ export function tryResolve(target: Object, path: string): any {
     return node ? node.state : undefined
 }
 
+// TODO: require second arg, getFromEnvironment(target, field) ?
 export function getEnvironment(target: Object): Object {
     return getNode(target).environment
 }
@@ -137,6 +142,19 @@ export function _getNode(thing): any {
 }
 
 // TODO:
-// - setGlobalDefaultStore
+// - setGlobalDefaultStore(factory, initialData)
 // - getGlobalDefaultStore
 // - dispatch?
+// - connect({ propName: (stateTree) => value })
+// - RootComponent
+// - isModel
+// - isModelFactory
+// - getModelFactory
+// - getChildModelFactory
+
+export function isModel(thing: any): boolean {
+    // TODO:
+    return true
+}
+
+// TODO: support observables

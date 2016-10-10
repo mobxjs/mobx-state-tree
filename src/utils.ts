@@ -32,6 +32,7 @@ export function isPlainObject(value) {
     return proto === Object.prototype || proto === null
 }
 
+// TODO: should be isComplexObject?
 export function isMutable(value) {
     // TODO: not, date, regex, ..what more?
     return value !== null && typeof value === "object"
@@ -40,7 +41,7 @@ export function isMutable(value) {
 export function isPrimitive(value): boolean {
     if (value === null || value === undefined)
         return true
-    if (typeof value === "string" || typeof value === "number" || value instanceof Date)
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean" || value instanceof Date)
         return true
     return false
 }

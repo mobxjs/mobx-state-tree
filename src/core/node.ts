@@ -7,9 +7,9 @@ export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
 export abstract class Node /* TODO: implements INode*/ {
     readonly state: any
-    readonly environment: any
-    _path: string[] = []
-    @observable _parent: Node | null = null // TODO: needed?
+    readonly environment: any // TODO: combine own envionment with parent environment. Maybe just use lookup function?
+    _path: string[] = [] // TODO: store subpath as computed var, derive the rest
+    @observable _parent: Node | null = null // TODO: observable needed?
     readonly factory: ModelFactory
     private  interceptDisposer: IDisposer
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
@@ -105,6 +105,7 @@ export abstract class Node /* TODO: implements INode*/ {
     setParent(newParent: Node | null, subpath: string | null = null) {
         if (this.parent === newParent && this.pathParts[this.pathParts.length - 1] === subpath)
             return
+        // TODO: fix check so that things like this work:     this.todos = this.todos.filter(todo => todo.completed === false)
         if (this._parent && newParent) {
             invariant(false, `A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
         }

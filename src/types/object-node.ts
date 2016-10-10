@@ -69,22 +69,23 @@ export class ObjectNode extends Node {
         this.state[subpath] = patch.value // takes care of further deserialization
     }
 
-    applyAction(action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
-        const node = getObjectNode(this.resolve(action.path))
-        return applyActionLocally(node, action, options)
+    applyAction(action: IActionCall, options?: IActionCallOptions) {
+        const node = this.resolve(action.path || "")
+        if (node instanceof ObjectNode)
+            return applyActionLocally(node, action, options)
+        fail(`Invalid action path: ${action.path || ""}`)
     }
 
-    emitAction(instance, action: IActionCall, next) {
-        let idx = 0
+    emitAction(instance: ObjectNode, action: IActionCall, next) {
+        let idx = -1
         const correctedAction: IActionCall = this.actionSubscribers.length
             ? extend({}, action, { path: getRelativePath(this, instance) })
             : null
         let n = () => { // TODO: use tail recursion / trampoline
+            idx++
             if (idx < this.actionSubscribers.length) {
-                this.actionSubscribers[idx](this, correctedAction!, n)
-                idx++
-            }
-            else {
+                this.actionSubscribers[idx](correctedAction!, n)
+            } else {
                 const parent = findEnclosingObjectNode(this)
                 if (parent)
                     parent.emitAction(instance, action, next) // TODO correct path

@@ -10,12 +10,12 @@ export function isRunningAction(): boolean {
 }
 
 export type IActionCall = {
-    name: string;
-    path: string;
-    args: any[];
+    name: string; // TODO: rename to type
+    path?: string;
+    args?: any[];
 }
 
-export type IActionHandler  = (instance: any, actionCall: IActionCall, next: () => void) => void
+export type IActionHandler  = (actionCall: IActionCall, next: () => void) => void
 
 export type IActionCallOptions = {
     supressPatchEvents?: boolean
@@ -44,7 +44,7 @@ export function createActionWrapper(instance, key, action: Function) {
                 _isRunningActionGlobally = true
                 adm._isRunningAction = true
                 adm.emitAction(
-                    instance,
+                    adm,
                     { name: key, path: "", args: args },
                     runAction
                 )
@@ -69,7 +69,7 @@ export function applyActionLocally(node: ObjectNode, action: IActionCall, option
     // TODO set global flag action is running
     // TODO: disable all modifications if no action is running!
     try {
-        return target.state[action.name].apply(target.state, action.args)
+        return target.state[action.name].apply(target.state, action.args || [])
     } finally {
         target.patchSubscribers.push(...patchSubscriptions)
         target.actionSubscribers.push(...actionSubscriptions)
