@@ -1,0 +1,26 @@
+exports[`test it should be able to move boxes - 1 1`] = `
+Object {
+  "id": "",
+  "name": "",
+  "x": 120,
+  "y": 110,
+}
+`;
+
+exports[`test it should be able to move boxes - 1 2`] = `
+Object {
+  "id": "",
+  "name": "",
+  "x": 142,
+  "y": 97,
+}
+`;
+
+exports[`test it should be able to move boxes - 2 1`] = `
+Object {
+  "id": "",
+  "name": "",
+  "x": 108,
+  "y": 107,
+}
+`;

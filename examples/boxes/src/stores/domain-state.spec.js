@@ -1,0 +1,19 @@
+import {getSnapshot, applyAction, clone, testActions} from "mobx-state-tree"
+import {Box} from "./domain-state"
+
+test("it should be able to move boxes - 1", () => {
+    var box = Box({ x: 100, y: 100 })
+    box.move(20, 10)
+    expect(getSnapshot(box)).toMatchSnapshot()
+    box.move(22, -13)
+    expect(getSnapshot(box)).toMatchSnapshot()
+})
+
+test("it should be able to move boxes - 2", () => {
+    expect(testActions(
+        Box,
+        { x: 100, y: 100 },
+        { name: "move", args: [ 5, 5 ]},
+        { name: "move", args: [ 3, 2 ]}
+    )).toMatchSnapshot()
+})

@@ -3,7 +3,7 @@ import {createFactory, arrayOf, mapOf, getSnapshot, applySnapshot, getParent, ha
 
 import {randomUuid} from '../utils';
 
-const Arrow = createFactory({
+export const Arrow = createFactory({
     id: '',
     fromId: '',
     toId: '',
@@ -19,7 +19,7 @@ const Arrow = createFactory({
     }
 })
 
-const Box = createFactory({
+export const Box = createFactory({
     id: '',
     name: '',
     x: 0,
@@ -41,7 +41,7 @@ const Box = createFactory({
     })
 })
 
-const Store = createFactory({
+export const Store = createFactory({
     boxes: mapOf(Box),
     arrows: arrayOf(Arrow),
     selection: referenceTo("/boxes/id"),

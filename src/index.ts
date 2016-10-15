@@ -358,3 +358,11 @@ export function isModel(thing: any): boolean {
 }
 
 // TODO: support observables
+
+//export function testActions(baseModel, ...actions: IActionCall[]): Object {
+// TODO: 2 overloads, model or factory?
+export function testActions(factory: ModelFactory, initialState, ...actions: IActionCall[]): Object {
+    const testInstance = factory(initialState)
+    applyActions(testInstance, actions)
+    return getSnapshot(testInstance)
+}
