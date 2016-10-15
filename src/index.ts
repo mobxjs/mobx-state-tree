@@ -3,12 +3,15 @@ import {transaction} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer} from "./utils"
 import {getObjectNode, findEnclosingObjectNode} from "./types/object-node"
-import {IActionCall, IActionCallOptions} from "./core/action"
+import {IActionCall} from "./core/action"
 import {ModelFactory, primitiveFactory} from "./core/factories"
 import {createMapFactory} from "./types/map-node"
 import {createArrayFactory} from "./types/array-node"
 
 // TODO: improve all typings
+export {
+    action
+} from "mobx"
 
 export * from "./core/json-patch"
 export {
@@ -19,8 +22,7 @@ export {
 } from "./core/factories"
 
 export {
-    IActionCall,
-    IActionCallOptions
+    IActionCall
 } from "./core/action"
 
 export {
@@ -36,22 +38,66 @@ export {
 } from "./interop/redux-devtools"
 
 
+/**
+ * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
+ * Will only be invoked on 'root' actions, not on actions called from existing actions.
+ * See 'middlewares' for more details
+ *
+ * @export
+ * @param {Object} target model to intercept actions on
+ * @param {(action: IActionCall, next: () => void) => void} callback the middleware that should be invoked whenever an action is triggered.
+ * @returns {IDisposer} function to remove the middleware
+ */
 export function onAction(target: Object, callback: (action: IActionCall, next: () => void) => void): IDisposer {
     return getObjectNode(target).onAction(callback);
 }
 
+/**
+ * Registers a function that will be invoked for each that as made to the provided model instance, or any of it's children.
+ * See 'patches' for more details. onPatch events are emitted immediately and will not await the end of a transaction.
+ * Patches can be used to deep observe a model tree.
+ *
+ * @export
+ * @param {Object} target the model instance from which to receive patches
+ * @param {(patch: IJsonPatch) => void} callback the callback that is invoked for each patch
+ * @returns {IDisposer} function to remove the listener
+ */
 export function onPatch(target: Object, callback: (patch: IJsonPatch) => void): IDisposer {
     return getNode(target).onPatch(callback)
 }
 
+/**
+ * Registeres a function that is invoked whenever a new snapshot for the given model instance is available.
+ * The listener will only be fire at the and a MobX (trans)action
+ *
+ * @export
+ * @param {Object} target
+ * @param {(snapshot: any) => void} callback
+ * @returns {IDisposer}
+ */
 export function onSnapshot(target: Object, callback: (snapshot: any) => void): IDisposer {
     return getNode(target).onSnapshot(callback)
 }
 
+/**
+ * Applies a JSON-patch to the given model instance or bails out if the patch couldn't be applied
+ *
+ * @export
+ * @param {Object} target
+ * @param {IJsonPatch} patch
+ * @returns
+ */
 export function applyPatch(target: Object, patch: IJsonPatch) {
     return getNode(target).applyPatch(patch)
 }
 
+/**
+ * Applies a number of JSON patches in a single MobX transaction
+ *
+ * @export
+ * @param {Object} target
+ * @param {IJsonPatch[]} patches
+ */
 export function applyPatches(target: Object, patches: IJsonPatch[]) {
     const node = getNode(target)
     transaction(() => {
@@ -59,36 +105,93 @@ export function applyPatches(target: Object, patches: IJsonPatch[]) {
     })
 }
 
-// TODO: actions return snapshot
-export function applyAction(target: Object, action: IActionCall, options?: IActionCallOptions) {
-    return getObjectNode(target).applyAction(action, options)
+// TODO: return the action description (possibly as returned by the middleware)
+/**
+ * Dispatches an Action on a model instance. All middlewares will be triggered.
+ *
+ * @export
+ * @param {Object} target
+ * @param {IActionCall} action
+ * @param {IActionCallOptions} [options]
+ * @returns
+ */
+export function applyAction(target: Object, action: IActionCall) {
+    return getObjectNode(target).applyAction(action)
 }
 
-export function applyActions(target: Object, actions: IActionCall[], options?: IActionCallOptions): IJsonPatch[] {
+/**
+ * Applies a series of actions in a single MobX transaction.
+ *
+ * @export
+ * @param {Object} target
+ * @param {IActionCall[]} actions
+ * @param {IActionCallOptions} [options]
+ */
+export function applyActions(target: Object, actions: IActionCall[]): void {
     const node = getObjectNode(target)
-    // TODO: return snapshot or patches? if the latter, flatten!
     transaction(() => {
-        actions.forEach(action => node.applyAction(action, options))
+        actions.forEach(action => node.applyAction(action))
     })
-    return [] // TODO!
 }
 
 // TODO: rename to restoreSnapshot
 // TODO: if target is not set, snapshot restores to it's original
+/**
+ * Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
+ *
+ * @export
+ * @param {Object} target
+ * @param {Object} snapshot
+ * @returns
+ */
 export function applySnapshot(target: Object, snapshot: Object) {
     return getNode(target).applySnapshot(snapshot)
 }
 
+/**
+ * Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
+ * structural sharing where possible. Doesn't require MobX transactions to be completed.
+ *
+ * @export
+ * @param {Object} target
+ * @returns {*}
+ */
 export function getSnapshot(target: Object): any {
     return getNode(target).snapshot
 }
 
-// TODO: hasParentObject
+/**
+ * Given a model instance, returns `true` if the object has a parent, that is, is part of another object, map or array
+ *
+ * @export
+ * @param {Object} target
+ * @param {boolean} [strict=false]
+ * @returns {boolean}
+ */
 export function hasParent(target: Object, strict: boolean = false): boolean {
     return getParent(target) !== null
 }
 
-// TODO: getParentObject
+/**
+ * Given a model instance, returns `true` if the object has same parent, which is a model object, that is, not an
+ * map or array.
+ *
+ * @export
+ * @param {Object} target
+ * @returns {boolean}
+ */
+export function hasParentObject(target: Object): boolean {
+    return getParentObject(target !== null)
+}
+
+/**
+ * Returns the immediate parent of this object, or null. Parent can be either an object, map or array
+ *
+ * @export
+ * @param {Object} target
+ * @param {boolean} [strict=false]
+ * @returns {*}
+ */
 export function getParent(target: Object, strict: boolean = false): any {
     const node = strict
         ? getNode(target).parent
@@ -96,23 +199,72 @@ export function getParent(target: Object, strict: boolean = false): any {
     return node ? node.state : null
 }
 
+/**
+ * Returns the closest parent that is a model instance, but which isn't an array or map.
+ *
+ * @export
+ * @param {Object} target
+ * @returns {*}
+ */
+export function getParentObject(target: Object): any {
+    const node = findEnclosingObjectNode(getNode(target))
+    return node ? node.state : null
+}
+
+/**
+ *
+ *
+ * @export
+ * @param {Object} target
+ * @returns {string}
+ */
 export function getPath(target: Object): string {
     return getNode(target).path
 }
 
+/**
+ *
+ *
+ * @export
+ * @param {Object} target
+ * @returns {string[]}
+ */
 export function getPathParts(target: Object): string[] {
     return getNode(target).pathParts
 }
 
+/**
+ *
+ *
+ * @export
+ * @param {Object} target
+ * @returns {boolean}
+ */
 export function isRoot(target: Object): boolean {
     return getNode(target).isRoot
 }
 
+/**
+ *
+ *
+ * @export
+ * @param {Object} target
+ * @param {string} path
+ * @returns {*}
+ */
 export function resolve(target: Object, path: string): any {
     const node = getNode(target).resolve(path)
     return node ? node.state : undefined
 }
 
+/**
+ *
+ *
+ * @export
+ * @param {Object} target
+ * @param {string} path
+ * @returns {*}
+ */
 export function tryResolve(target: Object, path: string): any {
     const node = getNode(target).resolve(path, false)
     if (node === undefined)
@@ -121,25 +273,62 @@ export function tryResolve(target: Object, path: string): any {
 }
 
 // TODO: require second arg, getFromEnvironment(target, field) ?
+/**
+ *
+ *
+ * @export
+ * @param {Object} target
+ * @returns {Object}
+ */
 export function getEnvironment(target: Object): Object {
     return getNode(target).environment
 }
 
+/**
+ *
+ *
+ * @export
+ * @template T
+ * @param {T} source
+ * @param {*} [customEnvironment]
+ * @returns {T}
+ */
 export function clone<T>(source: T, customEnvironment?: any): T {
     const node = getNode(source)
     return node.factory(node.snapshot, customEnvironment || node.environment) as T
 }
 
+/**
+ *
+ *
+ * @export
+ * @param {ModelFactory} [subFactory=primitiveFactory]
+ * @returns
+ */
 export function mapOf(subFactory: ModelFactory = primitiveFactory) {
     return createMapFactory(subFactory)
 }
 
+/**
+ *
+ *
+ * @export
+ * @param {ModelFactory} [subFactory=primitiveFactory]
+ * @returns
+ */
 export function arrayOf(subFactory: ModelFactory = primitiveFactory) {
     return createArrayFactory(subFactory)
 }
 
 /**
  * Internal function, use with care!
+ */
+/**
+ *
+ *
+ * @export
+ * @param {any} thing
+ * @returns {*}
  */
 export function _getNode(thing): any {
     return getNode(thing)
@@ -156,6 +345,13 @@ export function _getNode(thing): any {
 // - getModelFactory
 // - getChildModelFactory
 
+/**
+ *
+ *
+ * @export
+ * @param {*} thing
+ * @returns {boolean}
+ */
 export function isModel(thing: any): boolean {
     // TODO:
     return true
