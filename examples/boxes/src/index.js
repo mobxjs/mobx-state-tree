@@ -17,16 +17,16 @@ function prepareStore(newStore) {
     storeInstance.set(newStore)
     connectReduxDevtools(newStore)
 
-    let supress = false
+    let isHandlingMessage = false
     onAction(newStore, (data, next) => {
         next()
-        if (!supress)
+        if (!isHandlingMessage)
             socket.send(JSON.stringify(data))
     })
     socket.onmessage = event => {
-        supress = true
+        isHandlingMessage = true
         applyAction(newStore, JSON.parse(event.data))
-        supress = false
+        isHandlingMessage = false
     }
 }
 

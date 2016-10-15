@@ -17,10 +17,6 @@ export type IActionCall = {
 
 export type IActionHandler  = (actionCall: IActionCall, next: () => void) => void
 
-export type IActionCallOptions = {
-    dryRun?: boolean
-}
-
 export function createNonActionWrapper(instance, key, func) {
     addHiddenFinalProp(instance, key, func.bind(instance))
 }
@@ -55,9 +51,7 @@ export function createActionWrapper(instance, key, action: Function) {
 }
 
 // TODO: return snapshot!
-export function applyActionLocally(node: ObjectNode, action: IActionCall, options?: IActionCallOptions): IJsonPatch[] {
-    const dryRun = (options && options.dryRun) || false
-    const target = dryRun ? getObjectNode(clone(node.state)) : node
+export function applyActionLocally(target: ObjectNode, action: IActionCall): IJsonPatch[] {
     invariant(typeof target.state[action.name] === "function", `Action '${action.name}' does not exist in '${target.path}'`)
     return target.state[action.name].apply(target.state, action.args || [])
 }

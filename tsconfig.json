@@ -10,10 +10,11 @@
         "noImplicitAny": false,
         "moduleResolution": "node",
         "experimentalDecorators": true,
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true
     },
-    "exclude": [
-        "node_modules",
-        "lib"
+    "files": [
+        "src/index.ts"
     ]
 }

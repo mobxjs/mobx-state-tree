@@ -3,7 +3,7 @@ import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath} from "../cor
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {ModelFactory, primitiveFactory} from "../core/factories"
-import {IActionCall, IActionCallOptions, IActionHandler, applyActionLocally} from "../core/action"
+import {IActionCall, IActionHandler, applyActionLocally} from "../core/action"
 
 export class ObjectNode extends Node {
     readonly actionSubscribers: IActionHandler[] = [];
@@ -69,11 +69,11 @@ export class ObjectNode extends Node {
         this.state[subpath] = patch.value // takes care of further deserialization
     }
 
-    applyAction(action: IActionCall, options?: IActionCallOptions) {
+    applyAction(action: IActionCall) {
         const node = this.resolve(action.path || "")
         if (node instanceof ObjectNode)
-            return applyActionLocally(node, action, options)
-        fail(`Invalid action path: ${action.path || ""}`)
+            return applyActionLocally(node, action)
+        return fail(`Invalid action path: ${action.path || ""}`)
     }
 
     emitAction(instance: ObjectNode, action: IActionCall, next) {

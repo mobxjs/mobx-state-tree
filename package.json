@@ -2,8 +2,8 @@
   "name": "mobx-state-tree",
   "version": "0.0.1",
   "description": "Opinionated state container for MobX powered applications",
-  "main": "lib/src/index.js",
-  "typings": "lib/src/index.d.ts",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "scripts": {
     "build": "npm run quick-build && npm run webpack",
     "quick-build": "tsc",
@@ -41,7 +41,9 @@
     "typescript": "^2.0.0",
     "webpack": "^1.13.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "remotedev": "^0.2.2"
+  },
   "peerDependencies": {
     "mobx": "^2.5.1"
   },

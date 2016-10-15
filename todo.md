@@ -2,7 +2,6 @@
 [ ] - make replayable action support optional, by default enabled
 [ ] - kill all instanceof checks
 
-
 press philosiohy
 simple object
 snapshots
