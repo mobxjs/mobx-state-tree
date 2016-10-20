@@ -1,20 +1,11 @@
 import React from 'react'
 import { render } from 'react-dom'
-import { Provider } from 'react-redux'
 import App from './containers/App'
-import todosFactory from './models/todos'
 import 'todomvc-app-css/index.css'
-import { asReduxStore } from 'mobx-state-tree'
 
-// Redux devtools support
-const devtools = window.__REDUX_DEVTOOLS_EXTENSION__
-const logger = api => next => action => {
-    const result = next(action)
-    if (devtools)
-        devtools.send(action, store.getState())
-    return result
-}
-
+import { Provider } from 'react-redux'
+import todosFactory from './models/todos'
+import { asReduxStore, connectReduxDevtools } from 'mobx-state-tree'
 
 const initialState = {
     todos: [{
@@ -23,11 +14,9 @@ const initialState = {
         id: 0
     }]
 }
-const todos = todosFactory(initialState)
-const store = asReduxStore(todos, logger)
-
-if (devtools)
-    devtools.send("@@INIT", store.getState())
+const todos = window.todos = todosFactory(initialState)
+const store = asReduxStore(todos)
+connectReduxDevtools(todos)
 
 render(
   <Provider store={store}>

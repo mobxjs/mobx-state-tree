@@ -2,7 +2,7 @@ exports[`test it should be able to move boxes - 1 1`] = `
 Object {
   "id": "",
   "name": "",
-  "x": 120,
+  "x": 123,
   "y": 110,
 }
 `;
@@ -11,7 +11,7 @@ exports[`test it should be able to move boxes - 1 2`] = `
 Object {
   "id": "",
   "name": "",
-  "x": 142,
+  "x": 145,
   "y": 97,
 }
 `;

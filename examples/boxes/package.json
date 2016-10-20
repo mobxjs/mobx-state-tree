@@ -4,7 +4,7 @@
   "description": "Runnable source code of the #GoReactive #mobservable talk",
   "scripts": {
     "start": "node server.js",
-    "test": "jest"
+    "test": "jest --watch"
   },
   "repository": {
     "type": "git",
