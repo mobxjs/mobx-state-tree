@@ -1,5 +1,9 @@
 # mobx-state-tree
 
+## _This package is work in progress, stay tuned_
+
+_Opinionated, transactional, MobX powered state container_
+
 Opinionated state container for MobX powered applications
 
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
@@ -8,26 +12,46 @@ Opinionated state container for MobX powered applications
 
 # Installation
 
+NPM:
+
+npm install mobx-state-tree --save-dev
+
+CDN:
+
+https://unpkg.com/mobx-state-tree/mobx-state-tree.umd.js
+
+
 # Philosophy
 
-MobX is unopionated about how state is structured throughout your application.
-This gives a lot of flexibility but makes it also harder to make generic tools for MobX applications, like a standardized serialization or time travelling mechanism.
-The `mobx-state-tree` is an opt-in standardized state container that enforces certain constraints making it easier to build generic extensions on top of it.
+`mobx-state-tree` is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
 
-`mobx-state-tree` allows you to create, as the name suggests, state trees.
-These trees have build in support for snapshotting, intercepting changes, dispatching action and providing streams with JSON patches
+It is an opt-in state container that can be used in MobX, but also Redux based applications.
 
-`mobx-state-tree` tries to combine the best ideas from both the mutable and immutable state management paradigms. How that works.. read on.
-What benefits that has:
+TODO: slides / reactive conf talk
 
-1. Mutable data structures are very efficient. MobX can establish fine-grained observers on mutable data structures and derive UI, values and effects very efficiently from observable data structures.
-2. It is trivial to write actions for mutable data structures.
-3. Immutable data structures on the other hand are very easy to serialize, clone, and transport.
-4. Immutable data structures can be used efficiently for time travelling.
-5. Replayable actions can easily be distributed.
-6. Or check the examples below to see which cool things can be done using a hybrid approach!
+Unlike MobX itself, mobx-state-tree is quite opionated on how you structure your data.
+This makes it possible to solve many problems generically and out of the box, like:
+
+* (De-) serialization
+* Snapshotting state
+* Replaying actions
+* Time travelling
+* Emitting and applying JSON patches
+* Protecting state against uncontrolled mutations
+* Using middleware
+* Using dependency injection
+* Maintaining invariants
+
+`mobx-state-tree` tries to take the best features from both object oriented (discoverability, co-location and encapsulation), and immutable based state management approaches (transactionality, sharing functionality through composition).
 
 # Concepts
+
+1. The state is represented as a _tree_ of _models_.
+2. _models_ are created using _factories_.
+3. A _factory_ basically takes a _snapshot_ and a clone of a base _model_ and copies the two into a fresh _model_ instance.
+4. A _snapshot_ is the immutable representation of the _state_ of a _model_. In other words, a one-time copy of the internal state of a model at a certain point in time.
+5. _snapshots_ use structural sharing. So a snapshot of a node in the tree is composed of the snapshots of it's children, where unmodified snapshots are always shared
+6. `mobx-state-tree` supports JSON patches, replayable actions, listeners for patches, actions and snapshots. References, maps, arrays. Just read on :)
 
 ## Models
 
@@ -38,7 +62,49 @@ Models are at the heart of `mobx-state-tree`. They simply store your data.
 * Models have derived fields. Based on the `mobx` concept of `computed` values.
 * Models have actions. Only actions are allowed to change fields. Fields cannot be changed directly. This ensures replayability of the application state.
 * Models can contain other models. However, models are not allowed to form a graph (using direct references) but must always have a tree shape. This enables many feature like standardized serialization and cloning.
-* Last but not least, models always have a `snapshot`
+* Models can be snapshotted at any time
+* Models can be created using factories, that take copy a base model and combine it with a (partial) snapshot
+
+Example:
+
+```javascript
+import {createFactory, action, arrayOf, refenceTo} from "mobx-state-tree"
+
+const Box = createFactory({
+    // props
+    name: "",
+    x: 0,
+    y: 0,
+
+    // computed prop
+    get width() {
+        return this.name.length * 15
+    },
+
+    // action
+    move: action(function(dx, dy) {
+        this.x += dx
+        this.y += dy
+    })
+})
+
+const BoxStore = createFactory({
+    boxes: mapOf(Box),
+    selection: referenceTo("boxes/name"),
+    createBox: action(function(name) {
+        this.boxes.set(name, Box({ name, x: 100, y: 100}))
+    })
+})
+
+const boxStore = BoxStore()
+boxStore.addBox("test")
+boxStore.boxes.get("test").move(7, 3)
+```
+
+Useful methods:
+
+ * `createFactory(exampleModel)`: creates a new factory
+ * `clone(model)`: constructs a deep clone of the given model instance
 
 ## Snapshots
 
@@ -51,6 +117,13 @@ This enables compatibility with any library that is based on immutable state tre
 * Snapshots can be used to update / restore models to a certain state
 * Snapshots use structural sharing
 * It is posible to subscribe to models and be notified of each new snapshot
+* Snapshots are automatically converted to models when needed. So assignments like `boxStore.boxes.set("test", Box({ name: "test" }))` and `boxStore.boxes.set("test", { name: "test" })` are both valid.
+
+Useful methods:
+
+* `getSnapshot(model)`: returns a snapshot representing the current state of the model
+* `onSnapshot(model, callback)`: creates a listener that fires whenever a new snapshot is available (but only one per MobX transaction).
+* `applySnapshot(model, snapshot)`: updates the state of the model and all its descendants to the state represented by the snapshot
 
 ## Actions
 
@@ -58,19 +131,23 @@ Actions modify models. Actions are replayable and are therefor constrained in se
 
 * Actions can be invoked directly as method on a model
 * All action arguments must be serializable
-* Actions mutate models but do not return values (Todo: or can they?)
+* Actions mutate models but do not return values (TODO: or can they?)
 * Actions are serializable and replayable
 * It is possible to subscribe to the stream of actions that is invoked on a model
 * Actions can only modify models that belong to the tree on which they are invoked
-
-## Factories
 
 ## Patches
 
 Modifying a model does not only result in a new snapshot, but also in a stream of [JSON-patches](http://jsonpatch.com/) describing which modifications are made.
 This means
 
-## Environments
+## Dependency Injection
+
+## References
+
+## Middleware
+
+## Integrations
 
 # Cool examples:
 
@@ -78,7 +155,7 @@ This means
 # API
 
 
-## FAQ
+# FAQ
 
 **Should all state of my app be stored in `mobx-state-tree`?**
 No, or, not necessarily. An application can use both state trees and vanilla MobX observables at the same time.
