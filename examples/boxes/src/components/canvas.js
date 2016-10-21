@@ -26,7 +26,7 @@ class Canvas extends Component {
                         <BoxView box={box} store={store} key={box.id} />
                     ) }
                 </div>
-                <Sidebar store={store} />
+                {/* temporarily disabled for demo to save screen real estate <Sidebar store={store} /> */}
                 <FunStuff />
                 <DevTools />
             </div>

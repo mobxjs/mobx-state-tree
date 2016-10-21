@@ -2,37 +2,18 @@ import ReactDOM from 'react-dom';
 import React from 'react';
 import {observable, asReference} from 'mobx';
 import {observer} from 'mobx-react';
-import {onSnapshot, applySnapshot, onPatch, applyPatch, onAction, applyAction, connectReduxDevtools} from 'mobx-state-tree';
+import {connectReduxDevtools} from 'mobx-state-tree';
 
 import store from './stores/domain-state';
 import Canvas from './components/canvas';
+import syncStoreWithBackend from './stores/socket';
 
 const socket = new WebSocket("ws://localhost:3001");
-/**
- * To support HMR of store, this ref holds the latest loaded store.
- */
+
+// To support HMR of store, this ref holds the latest loaded store.
 const storeInstance = observable(null);
 
-function prepareStore(newStore) {
-    storeInstance.set(newStore)
-    connectReduxDevtools(newStore)
-
-    let isHandlingMessage = false
-    onAction(newStore, (data, next) => {
-        next()
-        if (!isHandlingMessage)
-            socket.send(JSON.stringify(data))
-    })
-    socket.onmessage = event => {
-        isHandlingMessage = true
-        applyAction(newStore, JSON.parse(event.data))
-        isHandlingMessage = false
-    }
-}
-
 prepareStore(store)
-
-
 
 const App = observer(() => <Canvas store={storeInstance.get()} />)
 
@@ -41,6 +22,11 @@ ReactDOM.render(
     document.getElementById('root')
 );
 
+function prepareStore(newStore) {
+    storeInstance.set(newStore)
+    connectReduxDevtools(newStore)
+    syncStoreWithBackend(socket, newStore)
+}
 
 /**
     Replace the storeInstance if a new domain-state is available
@@ -50,5 +36,9 @@ if (module.hot) {
     module.hot.accept("./stores/domain-state", function() {
         // obtain new store
         prepareStore(require("./stores/domain-state").default)
+    });
+    module.hot.accept("./stores/socket", function() {
+        // new socket sync implementation
+        require("./stores/socket").default(socket, storeInstance.get())
     });
 }

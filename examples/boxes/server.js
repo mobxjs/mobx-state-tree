@@ -29,9 +29,8 @@ wss.on('connection', function connection(ws) {
 });
 
 function broadcast(sender, message) {
-    console.log(sender, "<--", message)
+    console.log("\n" + message)
     for (var key in connections) if (key !== sender) {
-        console.log(key, "-->", message)
         try {
             connections[key].send(message)
         } catch (e) {
