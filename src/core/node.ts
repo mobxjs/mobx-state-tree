@@ -179,7 +179,7 @@ export abstract class Node /* TODO: implements INode*/ {
                 current = current!.getChildNode(pathParts[i])
             if (current === null) {
                 if (failIfResolveFails)
-                    fail(`Could not resolve'${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
+                    return fail(`Could not resolve'${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
                 else
                     return undefined
             }
@@ -191,6 +191,14 @@ export abstract class Node /* TODO: implements INode*/ {
         if (this.isRoot)
             return false
         return this.parent!.isRunningAction()
+    }
+
+    getEnvironment(key: string): any {
+        if (this.environment && this.environment.hasOwnProperty(key))
+            return this.environment[key]
+        if (this.isRoot)
+            return fail(`Undefined environment variable '${key}'`)
+        return this.parent!.getEnvironment(key)
     }
 }
 

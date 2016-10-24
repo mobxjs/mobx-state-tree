@@ -5,7 +5,7 @@ import {generateStuff} from '../stores/domain-state';
 import * as history from '../stores/time';
 
 export default observer(() => (<div className="funstuff">
-    <button onClick={generateItems} title="generate 500 boxes">!</button>
+{/*    <button onClick={generateItems} title="generate 500 boxes">!</button> */}
     <button onClick={previous} title="previous state">&lt;</button>
     <button onClick={next} title="next state">&gt;</button>
 </div>));

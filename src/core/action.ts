@@ -10,7 +10,7 @@ export function isRunningAction(): boolean {
 }
 
 export type IActionCall = {
-    name: string; // TODO: rename to type
+    name: string;
     path?: string;
     args?: any[];
 }

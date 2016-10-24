@@ -1,5 +1,5 @@
-import {action, isAction, extendObservable, ObservableMap, observable} from "mobx"
-import {invariant, hasOwnProperty, isPrimitive} from "../utils"
+import {action, isAction, extendObservable, observable} from "mobx"
+import {invariant, hasOwnProperty, isPrimitive, fail} from "../utils"
 import {hasNode} from "./node"
 import {ObjectNode} from "../types/object-node"
 import {createActionWrapper, createNonActionWrapper} from "./action"
@@ -21,6 +21,7 @@ export function primitiveFactory(snapshot: any, env?: Object): any {
 // TODO: add name attribute
 export function createFactory(baseModel: Object): ModelFactory {
     // TODO: remember which keys are assignable and check that on next runs
+    // TODO: check that baseModel is plain object
     let factory = action("object-factory" /* TODO: use name */, function(snapshot: Object = {}, env?: Object) {
         invariant(snapshot && typeof snapshot === "object" && !hasNode(snapshot), "Not a valid snapshot")
         const instance = observable({})
@@ -87,6 +88,11 @@ export function isModelFactory(value: any): value is ModelFactory {
 // TODO: introduce plainObjectFactory?
 export function generateFactory(value: any): ModelFactory {
     return generateFactoryHelper(value)
+}
+
+export function composeFactory(...models: (ModelFactory | any)[]): ModelFactory {
+    // TODO: implement
+    return fail("not implemented yet")
 }
 
 function generateFactoryHelper(value): ModelFactory | any {

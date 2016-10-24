@@ -135,21 +135,88 @@ Actions modify models. Actions are replayable and are therefor constrained in se
 * Actions are serializable and replayable
 * It is possible to subscribe to the stream of actions that is invoked on a model
 * Actions can only modify models that belong to the tree on which they are invoked
+* Actions are allowed to invoke other actions, but only if they belong to the same subtree as the original action (this ensures replayability) (TODO: disputable constraint?)
+* Actions are automatically bound the their instance, so it is save to pass actions around first class without binding or wrapping in arrow functions.
+
+A serialized action call looks like:
+```
+{
+   name: "setAge"
+   path: "/user",
+   args: [17]
+}
+```
+
+Useful methods:
+
+* `action(fn)` constructs
+* `onAction(model, middleware)` listens to any action that is invoked on the model or any of it's descendants. See `onAction` for more details.
+* `applyAction(model, action)` invokes an action on the model according to the given action description
 
 ## Patches
 
 Modifying a model does not only result in a new snapshot, but also in a stream of [JSON-patches](http://jsonpatch.com/) describing which modifications are made.
-This means
+Patches have the following signature:
+
+```
+export interface IJsonPatch {
+    op: "replace" | "add" | "remove"
+    path: string
+    value?: any
+}
+```
+
+* Patches are constructed according to JSON-Patch, RFC 6902
+* Patches are emitted immediately when a mutation is made, and don't respect transaction boundaries (like snapshots)
+* Patch listeners can be used to achieve deep observing
+* The `path` attribute of a patch considers the relative path of the event from the place where the event listener is attached
+* A single mutation can result in multiple patches, for example when splicing an array
+
+Useful methods:
+
+* `onPatch(model, listener)` attaches a patch listener  to the provided model, which will be invoked whenever the model or any of it's descendants is mutated
+* `applyPatch(model, patch)` applies a patch to the provided model
 
 ## Dependency Injection
 
-## References
+The actual signature of all *factory* functions is `(snapshot, environment) => model`.
+This makes it possible to associate an environment with a factory created object.
+The environment is intended to be an inmutable object context information about the environment, for example which data fetch library should be used etc.
+This makes it easy to mock these kind of dependencies, as alternative to requireing singletons that might be needed inside actions.
 
-## Middleware
+It is recommended to only provide an environment to the root of your state tree; environments of non-roots might be lost when using functions like `applySnapshot`, `applyPatch` or `applyAction`.
+
+Useful methods:
+
+`getEnvironment(model, key)` Returns a value from the environment. Environments are stacked; the resolve the environment value the tree is walked up, until a model provides an environment value for the specified key.
+
+Example:
+
+```javascript
+
+const Store = createFactory({
+    users: [],
+    requestData: action(function() {
+        const fetchImpl = getEnvironment(this, "fetch")
+        fetchImpl("http://localhost/users").then(this.receiveData)
+    }),
+    receiveData: action(function(users) {
+        // etc...
+    })
+})
+```
+
+const myStore = Store({ users: []}, { fetch: window.fetch })
+
+## Working with references
+
+## Factory composition
 
 ## Integrations
 
-# Cool examples:
+# Examples
+
+
 
 
 # API

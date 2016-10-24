@@ -9,3 +9,5 @@ computed values
 composition
 required field / proptypes / invariants?
 referenceTo doesn't need params, just use relative path?
+
+composeFactory(...baseModels | factories)

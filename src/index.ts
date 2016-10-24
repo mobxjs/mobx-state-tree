@@ -17,6 +17,7 @@ export * from "./core/json-patch"
 export {
     ModelFactory,
     createFactory,
+    composeFactory,
     isModelFactory,
     generateFactory
 } from "./core/factories"
@@ -41,7 +42,38 @@ export {
 /**
  * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
  * Will only be invoked on 'root' actions, not on actions called from existing actions.
- * See 'middlewares' for more details
+ *
+ * The callback receives two parameter: the `action` parameter describes the action being invoked. The `next()` function can be used
+ * to kick off the next middleware in the chain. Not invoking `next()` prevents the action from actually being executed!
+ *
+ * Action calls have the following signature:
+ *
+ * ```
+ * export type IActionCall = {
+ *    name: string; // TODO: rename to type
+ *    path?: string;
+ *    args?: any[];
+ * }
+ * ```
+ *
+ * Example of a logging middleware:
+ * ```
+ * function logger(action, next) {
+ *   console.dir(action)
+ *   return next()
+ * }
+ *
+ * onAction(myStore, logger)
+ *
+ * myStore.user.setAge(17)
+ *
+ * // emits:
+ * {
+ *    name: "setAge"
+ *    path: "/user",
+ *    args: [17]
+ * }
+ * ```
  *
  * @export
  * @param {Object} target model to intercept actions on
@@ -280,8 +312,8 @@ export function tryResolve(target: Object, path: string): any {
  * @param {Object} target
  * @returns {Object}
  */
-export function getEnvironment(target: Object): Object {
-    return getNode(target).environment
+export function getEnvironment(target: Object, key: string): Object {
+    return getNode(target).getEnvironment(key)
 }
 
 /**
