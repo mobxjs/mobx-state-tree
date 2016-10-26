@@ -7,19 +7,29 @@ import {onSnapshot, applySnapshot, onPatch, applyPatch, onAction, applyAction} f
 let subscription;
 
 export default function syncStoreWithBackend(socket, store) {
-    let isHandlingMessage = false
 
-    subscription = onAction(store, (data, next) => {
-        const res = next()
-        if (!isHandlingMessage)
-            socket.send(JSON.stringify(data))
-        return res
+    subscription = onSnapshot(store, (data) => {
+        socketSend(data)
     })
 
-    socket.onmessage = event => {
-        isHandlingMessage = true
-        applyAction(store, JSON.parse(event.data))
-        isHandlingMessage = false
+    onSocketMessage((data) => {
+        applySnapshot(store, data)
+    })
+
+
+
+    let isHandlingMessage = false
+    function socketSend(data) {
+        if (!isHandlingMessage)
+            socket.send(JSON.stringify(data))
+    }
+
+    function onSocketMessage(handler) {
+        socket.onmessage = event => {
+            isHandlingMessage = true
+            handler(JSON.parse(event.data))
+            isHandlingMessage = false
+        }
     }
 }
 
