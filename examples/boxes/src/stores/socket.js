@@ -1,20 +1,26 @@
 import {onSnapshot, applySnapshot, onPatch, applyPatch, onAction, applyAction} from 'mobx-state-tree';
 
-
-
-
-
 let subscription;
-
 export default function syncStoreWithBackend(socket, store) {
 
-    subscription = onSnapshot(store, (data) => {
+
+
+
+
+    subscription = onAction(store, (data, next) => {
+        next()
         socketSend(data)
     })
 
     onSocketMessage((data) => {
-        applySnapshot(store, data)
+        applyAction(store, data)
     })
+
+
+
+
+
+
 
 
 

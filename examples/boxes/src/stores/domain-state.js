@@ -67,7 +67,7 @@ export const Store = createFactory({
 const store = Store({
     "boxes":{
         "ce9131ee-f528-4952-a012-543780c5e66d": {"id":"ce9131ee-f528-4952-a012-543780c5e66d","name":"Rotterdam","x":100,"y":100},
-        "14194d76-aa31-45c5-a00c-104cc550430f": {"id":"14194d76-aa31-45c5-a00c-104cc550430f","name":"Bratislave","x":650,"y":300}
+        "14194d76-aa31-45c5-a00c-104cc550430f": {"id":"14194d76-aa31-45c5-a00c-104cc550430f","name":"Bratislava","x":650,"y":300}
     },
     "arrows":[
         {"id":"7b5d33c1-5e12-4278-b1c5-e4ae05c036bd","fromId":"ce9131ee-f528-4952-a012-543780c5e66d","toId":"14194d76-aa31-45c5-a00c-104cc550430f"}

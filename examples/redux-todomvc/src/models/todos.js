@@ -2,14 +2,14 @@ import { ADD_TODO, DELETE_TODO, EDIT_TODO, COMPLETE_TODO, COMPLETE_ALL, CLEAR_CO
 import { action } from 'mobx'
 import { createFactory, arrayOf } from 'mobx-state-tree'
 
-export const todoFactory = createFactory({
+const Todo = createFactory({
     text: 'Use mobx-state-tree',
     completed: false,
     id: 0
 })
 
-export default createFactory({
-  todos: arrayOf(todoFactory),
+const TodoStore = createFactory({
+  todos: arrayOf(Todo),
 
   // utilities
   findTodoById: function (id) {
@@ -41,3 +41,5 @@ export default createFactory({
     this.todos.replace(this.todos.filter(todo => todo.completed === false))
   })
 })
+
+export default TodoStore
