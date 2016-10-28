@@ -3,26 +3,14 @@ import {onSnapshot, applySnapshot, onPatch, applyPatch, onAction, applyAction} f
 let subscription;
 export default function syncStoreWithBackend(socket, store) {
 
-
-
-
-
     subscription = onAction(store, (data, next) => {
-        next()
         socketSend(data)
+        return next()
     })
 
     onSocketMessage((data) => {
         applyAction(store, data)
     })
-
-
-
-
-
-
-
-
 
     let isHandlingMessage = false
     function socketSend(data) {
@@ -38,13 +26,6 @@ export default function syncStoreWithBackend(socket, store) {
         }
     }
 }
-
-
-
-
-
-
-
 
 /**
  * Clean up old subscription when switching communication system
