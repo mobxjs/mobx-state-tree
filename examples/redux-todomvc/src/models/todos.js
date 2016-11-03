@@ -3,7 +3,7 @@ import { action } from 'mobx'
 import { createFactory, arrayOf } from 'mobx-state-tree'
 
 const Todo = createFactory({
-    text: 'Use mobx-state-tree',
+    text: 'Learn Redux',
     completed: false,
     id: 0
 })

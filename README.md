@@ -4,11 +4,12 @@
 
 _Opinionated, transactional, MobX powered state container_
 
-Opinionated state container for MobX powered applications
-
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/mobxjs/mobx.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+An introduction to the philosophy can be watched [here](https://youtu.be/etnPDw5PKqg?t=32m15s). [Slides](immer-mutable-state.surge.sh). Or, as [markdown](https://github.com/mweststrate/reactive2016-slides/blob/master/slides.md) to read it quickly.
+
 
 # Installation
 

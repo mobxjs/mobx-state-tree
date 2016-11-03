@@ -9,7 +9,7 @@ import { asReduxStore, connectReduxDevtools } from 'mobx-state-tree'
 
 const initialState = {
     todos: [{
-        text: 'learn mobx-state-tree',
+        text: 'learn Redux',
         completed: false,
         id: 0
     }]
