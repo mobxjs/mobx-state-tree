@@ -18,7 +18,10 @@ module.exports = {
     new webpack.NoErrorsPlugin()
   ],
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx'],
+    alias: {
+      'mobx-state-tree': __dirname + '/../../lib'
+    }
   },
   module: {
     loaders: [{

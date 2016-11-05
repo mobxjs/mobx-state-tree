@@ -1,5 +1,5 @@
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
+import {Node, maybeNode, valueToSnapshot, getNode, hasNode} from "../core/node"
 import {ModelFactory} from "../core/factories"
 import {invariant, isMutable, identity, fail} from "../utils"
 import {escapeJsonPath} from "../core/json-patch"
@@ -95,13 +95,23 @@ export class ArrayNode extends Node {
     getChildFactory(): ModelFactory {
         return this.subType
     }
+
+    getPathForNode(node: Node): string | null{
+        for(var index = 0; index < this.state.length; index ++){
+            const element = this.state[index]
+            if(hasNode(element) && getNode(element) === node){
+                return index.toString()
+            }
+        }
+        return null
+    }
 }
 
 export function createArrayFactory(subtype: ModelFactory): ModelFactory {
     let factory = action("array-factory", (snapshot: any[] = [], env?) => {
         invariant(Array.isArray(snapshot), "Expected array")
         const instance: IObservableArray<any> = observable([])
-        const adm = new ArrayNode(instance, null, env, factory as ModelFactory, null)
+        const adm = new ArrayNode(instance, null, env, factory as ModelFactory)
         adm.subType = subtype
         Object.defineProperty(instance, "__modelAdministration", adm)
         instance.replace(snapshot)

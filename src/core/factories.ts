@@ -25,7 +25,7 @@ export function createFactory(baseModel: Object): ModelFactory {
     let factory = action("object-factory" /* TODO: use name */, function(snapshot: Object = {}, env?: Object) {
         invariant(snapshot && typeof snapshot === "object" && !hasNode(snapshot), "Not a valid snapshot")
         const instance = observable({})
-        const adm = new ObjectNode(instance, null, env, factory as ModelFactory, null)
+        const adm = new ObjectNode(instance, null, env, factory as ModelFactory)
         Object.defineProperty(instance, "__modelAdministration", adm)
         copyBaseModelToInstance(baseModel, instance, adm)
         Object.seal(instance) // don't allow new props to be added!

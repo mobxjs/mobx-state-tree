@@ -1,5 +1,5 @@
 import {ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
+import {Node, maybeNode, valueToSnapshot, getNode, hasNode} from "../core/node"
 import {ModelFactory} from "../core/factories"
 import {invariant, isMutable, identity, fail, isPlainObject} from "../utils"
 import {escapeJsonPath} from "../core/json-patch"
@@ -95,13 +95,22 @@ export class MapNode extends Node {
     getChildFactory(): ModelFactory {
         return this.subType
     }
+
+    getPathForNode(node: Node): string | null{
+        for(var [key, value] of this.state.entries()){
+            if(hasNode(value) && getNode(value) === node){
+                return key
+            }
+        }
+        return null
+    }
 }
 
 export function createMapFactory(subtype: ModelFactory): ModelFactory {
     let factory = action("map-factory", (snapshot: any = {}, env?) => {
         invariant(isPlainObject(snapshot), "Expected array")
         const instance = new ObservableMap()
-        const adm = new MapNode(instance, null, env, factory as ModelFactory, null)
+        const adm = new MapNode(instance, null, env, factory as ModelFactory)
         adm.subType = subtype
         Object.defineProperty(instance, "__modelAdministration", adm)
         for (let key in snapshot) {

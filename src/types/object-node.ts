@@ -1,5 +1,5 @@
 import {IObjectChange, IObjectWillChange, isObservable, action} from "mobx"
-import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath} from "../core/node"
+import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {ModelFactory, primitiveFactory} from "../core/factories"
@@ -115,6 +115,17 @@ export class ObjectNode extends Node {
         if (this.isRoot)
             return false
         return this.parent!.isRunningAction()
+    }
+
+    getPathForNode(node: Node): string | null{
+        const keys = Object.keys(this.state)
+        for(var i = 0; i < keys.length; i++){
+            const key = keys[i]
+            if(hasNode(this.state[key]) && getNode(this.state[key]) === node){
+                return key
+            }
+        }
+        return null
     }
 }
 
