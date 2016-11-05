@@ -1,5 +1,5 @@
 import {IObjectChange, IObjectWillChange, isObservable, action} from "mobx"
-import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
+import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath} from "../core/node"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {ModelFactory, primitiveFactory} from "../core/factories"

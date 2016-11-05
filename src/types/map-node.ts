@@ -1,5 +1,5 @@
 import {ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot, getNode, hasNode} from "../core/node"
+import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {ModelFactory} from "../core/factories"
 import {invariant, isMutable, identity, fail, isPlainObject} from "../utils"
 import {escapeJsonPath} from "../core/json-patch"
