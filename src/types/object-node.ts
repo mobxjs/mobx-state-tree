@@ -116,17 +116,6 @@ export class ObjectNode extends Node {
             return false
         return this.parent!.isRunningAction()
     }
-
-    getPathForNode(node: Node): string | null{
-        const keys = Object.keys(this.state)
-        for(var i = 0; i < keys.length; i++){
-            const key = keys[i]
-            if(hasNode(this.state[key]) && getNode(this.state[key]) === node){
-                return key
-            }
-        }
-        return null
-    }
 }
 
 export function getObjectNode(thing: any): ObjectNode {

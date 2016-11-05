@@ -95,16 +95,6 @@ export class ArrayNode extends Node {
     getChildFactory(): ModelFactory {
         return this.subType
     }
-
-    getPathForNode(node: Node): string | null{
-        for(var index = 0; index < this.state.length; index ++){
-            const element = this.state[index]
-            if(hasNode(element) && getNode(element) === node){
-                return index.toString()
-            }
-        }
-        return null
-    }
 }
 
 export function createArrayFactory(subtype: ModelFactory): ModelFactory {

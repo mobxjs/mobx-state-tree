@@ -95,15 +95,6 @@ export class MapNode extends Node {
     getChildFactory(): ModelFactory {
         return this.subType
     }
-
-    getPathForNode(node: Node): string | null{
-        for(var [key, value] of this.state.entries()){
-            if(hasNode(value) && getNode(value) === node){
-                return key
-            }
-        }
-        return null
-    }
 }
 
 export function createMapFactory(subtype: ModelFactory): ModelFactory {

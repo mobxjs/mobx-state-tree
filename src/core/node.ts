@@ -21,8 +21,10 @@ export abstract class Node /* TODO: implements INode*/ {
         }
 
         // get the key
-        const key = this._parent.getPathForNode(this)
-        if(key !== null){
+        const keys = this._parent.getChildNodes()
+            .filter(([key, node]) => node === this)
+        if(keys.length > 0){
+            const [key] = keys[0]
             return this._parent.pathParts.concat([key])
         }
 
@@ -55,7 +57,6 @@ export abstract class Node /* TODO: implements INode*/ {
     abstract applyPatchLocally(subpath, patch): void
     abstract getChildFactory(key: string): ModelFactory
     abstract applySnapshot(snapshot): void
-    abstract getPathForNode(node: Node): string | null
 
     /**
      * Returnes (escaped) path representation as string
@@ -111,7 +112,7 @@ export abstract class Node /* TODO: implements INode*/ {
     // TODO: needs improvements, now called too often. Should be set propertly when applying snapshots / calling factories immediately!
     // TODO: should not be possible to change just subpath?
     setParent(newParent: Node | null, subpath: string | null = null) {
-        if (this.parent === newParent && this.pathParts[this.pathParts.length - 1] === subpath)
+        if (this.parent === newParent)
             return
         // TODO: fix check so that things like this work:     this.todos = this.todos.filter(todo => todo.completed === false)
         if (this._parent && newParent) {
@@ -128,7 +129,6 @@ export abstract class Node /* TODO: implements INode*/ {
             // TODO: create detach
         }
 
-        invariant(!!newParent === !!subpath, "if a parent is set, path must be provide (and vice versa)")
         this._parent = newParent
     }
 
