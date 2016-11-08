@@ -8,24 +8,37 @@ export enum NodeType { ComplexObject, Map, Array, PlainObject };
 export abstract class Node /* TODO: implements INode*/ {
     readonly state: any
     readonly environment: any // TODO: combine own envionment with parent environment. Maybe just use lookup function?
-    _path: string[] = [] // TODO: store subpath as computed var, derive the rest
     @observable _parent: Node | null = null // TODO: observable needed?
     readonly factory: ModelFactory
     private  interceptDisposer: IDisposer
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
 
-    // TODO: is parent / subpath required here?
-    constructor(initialState: any, parent: Node | null, environment: any, factory: ModelFactory, subpath: string | null) {
-        invariant((parent === null) === (subpath === null))
-        addHiddenFinalProp(initialState, "$treenode", this)
-        this.environment = environment
-        this.factory = factory
-        if (parent !== null && subpath !== null) {
-            this._parent = parent
-            this._path = parent.pathParts.concat(subpath)
+    @computed get pathParts(): string[]{
+        // no parent? you are root!
+        if(this._parent === null){
+            return []
         }
 
+        // get the key
+        const keys = this._parent.getChildNodes()
+            .filter(([key, node]) => node === this)
+        if(keys.length > 0){
+            const [key] = keys[0]
+            return this._parent.pathParts.concat([key])
+        }
+
+        // TODO: maybe safely throw because of incoerent state? (parent do not own the node)
+        return []
+    }
+
+    // TODO: is parent / subpath required here?
+    constructor(initialState: any, parent: Node | null, environment: any, factory: ModelFactory) {
+        addHiddenFinalProp(initialState, "$treenode", this)
+
+        this.environment = environment
+        this.factory = factory
+        this._parent = parent
         this.state = initialState
         this.interceptDisposer = intercept(this.state, ((c) => this.willChange(c)) as any)
         observe(this.state, (c) => this.didChange(c))
@@ -49,11 +62,7 @@ export abstract class Node /* TODO: implements INode*/ {
      * Returnes (escaped) path representation as string
      */
     public get path(): string {
-        return joinJsonPath(this._path)
-    }
-
-    public get pathParts(): string[] {
-        return this._path
+        return joinJsonPath(this.pathParts)
     }
 
     public get isRoot(): boolean {
@@ -103,7 +112,7 @@ export abstract class Node /* TODO: implements INode*/ {
     // TODO: needs improvements, now called too often. Should be set propertly when applying snapshots / calling factories immediately!
     // TODO: should not be possible to change just subpath?
     setParent(newParent: Node | null, subpath: string | null = null) {
-        if (this.parent === newParent && this.pathParts[this.pathParts.length - 1] === subpath)
+        if (this.parent === newParent)
             return
         // TODO: fix check so that things like this work:     this.todos = this.todos.filter(todo => todo.completed === false)
         if (this._parent && newParent) {
@@ -120,14 +129,7 @@ export abstract class Node /* TODO: implements INode*/ {
             // TODO: create detach
         }
 
-        invariant(!!newParent === !!subpath, "if a parent is set, path must be provide (and vice versa)")
         this._parent = newParent
-        if (newParent)
-            this._path = newParent.pathParts.concat(subpath!)
-        else {
-            this._path = []
-        }
-        this.updatePathOfChildren()
     }
 
     prepareChild(subpath: string, child: any): any {
@@ -148,16 +150,6 @@ export abstract class Node /* TODO: implements INode*/ {
             node.setParent(this, subpath)
             return instance
         }
-    }
-
-    protected updatePathOfChildren() {
-        this.getChildNodes().forEach(([subpath, child]) => child.updatePath(this.pathParts.concat(subpath)))
-    }
-
-    updatePath(newPath: string[]) {
-        // TODO: combine with setParent?
-        this._path = newPath
-        this.updatePathOfChildren()
     }
 
     resolve(pathParts: string): Node;

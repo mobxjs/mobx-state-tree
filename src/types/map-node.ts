@@ -101,7 +101,7 @@ export function createMapFactory(subtype: ModelFactory): ModelFactory {
     let factory = action("map-factory", (snapshot: any = {}, env?) => {
         invariant(isPlainObject(snapshot), "Expected array")
         const instance = new ObservableMap()
-        const adm = new MapNode(instance, null, env, factory as ModelFactory, null)
+        const adm = new MapNode(instance, null, env, factory as ModelFactory)
         adm.subType = subtype
         Object.defineProperty(instance, "__modelAdministration", adm)
         for (let key in snapshot) {
