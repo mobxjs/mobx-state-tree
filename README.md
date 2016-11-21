@@ -92,7 +92,7 @@ const Box = createFactory({
 const BoxStore = createFactory({
     boxes: mapOf(Box),
     selection: referenceTo("boxes/name"),
-    createBox: action(function(name) {
+    addBox: action(function(name) {
         this.boxes.set(name, Box({ name, x: 100, y: 100}))
     })
 })
