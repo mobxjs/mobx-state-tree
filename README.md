@@ -3,7 +3,7 @@
 ## _This package is work in progress, stay tuned_
 
 _Opinionated, transactional, MobX powered state container_
-
+ 
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/mobxjs/mobx.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -30,7 +30,7 @@ It is an opt-in state container that can be used in MobX, but also Redux based a
 
 TODO: slides / reactive conf talk
 
-Unlike MobX itself, mobx-state-tree is quite opionated on how you structure your data.
+Unlike MobX itself, mobx-state-tree is quite opinionated on how you structure your data.
 This makes it possible to solve many problems generically and out of the box, like:
 
 * (De-) serialization
@@ -128,7 +128,7 @@ Useful methods:
 
 ## Actions
 
-Actions modify models. Actions are replayable and are therefor constrained in several ways:
+Actions modify models. Actions are replayable and are therefore constrained in several ways:
 
 * Actions can be invoked directly as method on a model
 * All action arguments must be serializable
@@ -183,9 +183,9 @@ Useful methods:
 The actual signature of all *factory* functions is `(snapshot, environment) => model`.
 This makes it possible to associate an environment with a factory created object.
 The environment is intended to be an inmutable object context information about the environment, for example which data fetch library should be used etc.
-This makes it easy to mock these kind of dependencies, as alternative to requireing singletons that might be needed inside actions.
+This makes it easy to mock these kind of dependencies, as alternative to requiring singletons that might be needed inside actions.
 
-It is recommended to only provide an environment to the root of your state tree; environments of non-roots might be lost when using functions like `applySnapshot`, `applyPatch` or `applyAction`.
+It is recommended to only provide an environment to the root of your state tree; environments of non-roots might be lost when using functions like `applySnapshot`, `applyPatch`, or `applyAction`.
 
 Useful methods:
 
