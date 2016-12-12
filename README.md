@@ -211,6 +211,10 @@ const myStore = Store({ users: []}, { fetch: window.fetch })
 
 ## Working with references
 
+## Be careful with direct references to items in the tree
+
+See [#10](https://github.com/mobxjs/mobx-state-tree/issues/10)
+
 ## Factory composition
 
 ## Integrations
