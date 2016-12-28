@@ -2,27 +2,27 @@ import {IActionCall} from "../core/action"
 import {onSnapshot, getSnapshot, applyAction, isModel} from "../index"
 import {invariant, extend} from "../utils"
 
-export interface MiddleWareApi {
+export interface IMiddleWareApi {
     getState: () => any
     dispatch: (action: any) => void
 }
 
-export interface ReduxStore extends MiddleWareApi {
+export interface IReduxStore extends IMiddleWareApi {
     subscribe(listener: (snapshot) => void)
 }
 
 export type MiddleWare =
-    (middlewareApi: MiddleWareApi) =>
+    (middlewareApi: IMiddleWareApi) =>
         ((next: (action: IActionCall) => void) => void)
 
-export function asReduxStore(model, ...middlewares: MiddleWare[]): ReduxStore {
+export function asReduxStore(model, ...middlewares: MiddleWare[]): IReduxStore {
     invariant(isModel(model), "Expected model object")
-    let store: ReduxStore = {
+    let store: IReduxStore = {
         getState : ()       => getSnapshot(model),
         dispatch : action   => {
-            runMiddleWare(action, runners.slice(), action => applyAction(model, reduxActionToAction(action)))
+            runMiddleWare(action, runners.slice(), newAction => applyAction(model, reduxActionToAction(newAction)))
         },
-        subscribe: listener => onSnapshot(model, listener),
+        subscribe: listener => onSnapshot(model, listener)
     }
     let runners = middlewares.map(mw => mw(store))
     return store

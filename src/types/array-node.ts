@@ -1,10 +1,10 @@
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
-import {ModelFactory, createFactory} from "../core/factories"
-import {invariant, identity, fail, extend} from "../utils"
+import {IModelFactory, createFactory} from "../core/factories"
+import {invariant, identity, fail} from "../utils"
 
 interface IArrayFactoryConfig {
-    subType: ModelFactory<any, any>
+    subType: IModelFactory<any, any>
     isArrayFactory: true
 }
 
@@ -92,12 +92,12 @@ export class ArrayNode extends Node {
         this.state.replace(snapshot)
     }
 
-    getChildFactory(): ModelFactory<any, any> {
+    getChildFactory(): IModelFactory<any, any> {
         return (this.factory.config as IArrayFactoryConfig).subType
     }
 }
 
-export function createArrayFactory<S, T extends S>(subtype: ModelFactory<S, T>): ModelFactory<S[], IObservableArray<T>> {
+export function createArrayFactory<S, T extends S>(subtype: IModelFactory<S, T>): IModelFactory<S[], IObservableArray<T>> {
     return createFactory(
         "array-factory",
         ArrayNode,

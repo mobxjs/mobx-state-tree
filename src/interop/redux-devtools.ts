@@ -1,9 +1,9 @@
 import {getSnapshot, onAction, IActionCall, applySnapshot} from "../"
-const { connectViaExtension, extractState } = require('remotedev')
+const { connectViaExtension, extractState } = require("remotedev")
 
 export function connectReduxDevtools(model: any) {
     // Connect to the monitor
-    const remotedev = connectViaExtension();
+    const remotedev = connectViaExtension()
     let applyingSnapshot = false
 
     // Subscribe to change state (if need more than just logging)

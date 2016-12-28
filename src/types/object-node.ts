@@ -1,9 +1,9 @@
 import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange} from "mobx"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
 import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
-import {ModelFactory, isModelFactory, createFactory, getModelFactory, IModel} from "../core/factories"
+import {IModelFactory, isModelFactory, createFactory, getModelFactory, IModel} from "../core/factories"
 import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
-import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
+import {escapeJsonPath} from "../core/json-patch"
 import {isArrayFactory} from "../types/array-node"
 import {isMapFactory} from "../types/map-node"
 import {isReferenceFactory, createReferenceProps} from "./reference"
@@ -19,7 +19,7 @@ export class ObjectNode extends Node {
 
     // Optimization: submodelTypes can be stored on the factory config!
     readonly submodelTypes: {
-        [key: string]: ModelFactory<any, any>;
+        [key: string]: IModelFactory<any, any>;
     } = {}
     _isRunningAction = false
 
@@ -165,7 +165,7 @@ export class ObjectNode extends Node {
         }
     }
 
-    getChildFactory(key: string): ModelFactory<any, any> {
+    getChildFactory(key: string): IModelFactory<any, any> {
         return this.submodelTypes[key] || primitiveFactory
     }
 
@@ -182,8 +182,8 @@ export class ObjectNode extends Node {
     }
 }
 
-export function createObjectFactory<S extends Object, T extends S>(baseModel: T): ModelFactory<S, T>
-export function createObjectFactory<S extends Object, T extends S>(name: string, baseModel: T): ModelFactory<S, T>
+export function createObjectFactory<S extends Object, T extends S>(baseModel: T): IModelFactory<S, T>
+export function createObjectFactory<S extends Object, T extends S>(name: string, baseModel: T): IModelFactory<S, T>
 export function createObjectFactory(arg1, arg2?) {
     return createFactory(
         typeof arg1 === "string" ? arg1 : "unnamed-object-factory",
@@ -196,12 +196,12 @@ export function createObjectFactory(arg1, arg2?) {
     )
 }
 
-export function composeFactory<AS, AT, BS, BT>(name: string, a: ModelFactory<AS, AT>, b: ModelFactory<BS, BT>): ModelFactory<AS & BS, AT & BT>;
-export function composeFactory<AS, AT, BS, BT, CS, CT>(name: string, a: ModelFactory<AS, AT>, b: ModelFactory<BS, BT>, c: ModelFactory<CS, CT>): ModelFactory<AS & BS & CS, AT & BT & CT>;
-export function composeFactory<S, T>(name: string, ...models: ModelFactory<any, any>[]): ModelFactory<S, T>;
-export function composeFactory<AS, AT, BS, BT>(a: ModelFactory<AS, AT>, b: ModelFactory<BS, BT>): ModelFactory<AS & BS, AT & BT>;
-export function composeFactory<AS, AT, BS, BT, CS, CT>(a: ModelFactory<AS, AT>, b: ModelFactory<BS, BT>, c: ModelFactory<CS, CT>): ModelFactory<AS & BS & CS, AT & BT & CT>;
-export function composeFactory<S, T>(...models: ModelFactory<any, any>[]): ModelFactory<S, T>;
+export function composeFactory<AS, AT, BS, BT>(name: string, a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>): IModelFactory<AS & BS, AT & BT>;
+export function composeFactory<AS, AT, BS, BT, CS, CT>(name: string, a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>, c: IModelFactory<CS, CT>): IModelFactory<AS & BS & CS, AT & BT & CT>;
+export function composeFactory<S, T>(name: string, ...models: IModelFactory<any, any>[]): IModelFactory<S, T>;
+export function composeFactory<AS, AT, BS, BT>(a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>): IModelFactory<AS & BS, AT & BT>;
+export function composeFactory<AS, AT, BS, BT, CS, CT>(a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>, c: IModelFactory<CS, CT>): IModelFactory<AS & BS & CS, AT & BT & CT>;
+export function composeFactory<S, T>(...models: IModelFactory<any, any>[]): IModelFactory<S, T>;
 export function composeFactory(...args: any[]) {
     const factoryName = typeof args[0] === "string" ? args[0] : "unnamed-factory"
     const baseModels = typeof args[0] === "string" ? args.slice(1) : args

@@ -9,13 +9,13 @@ import {IModel} from "./factories"
 
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
-export type NodeConstructor = new (target: any, environment: any, factory: ModelFactory<any, any>, factoryConfiguration: Object) => Node
+export type NodeConstructor = new (target: any, environment: any, factory: IModelFactory<any, any>, factoryConfiguration: Object) => Node
 
 export abstract class Node {
     readonly state: any
     readonly environment: any
     @observable _parent: Node | null = null
-    readonly factory: ModelFactory<any, any>
+    readonly factory: IModelFactory<any, any>
     private  interceptDisposer: IDisposer
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
@@ -29,7 +29,7 @@ export abstract class Node {
         // get the key
         // optimize: maybe this shouldn't be computed, this is called often and pretty expensive lookup ...
         const keys = this._parent.getChildNodes()
-            .filter(([key, node]) => node === this)
+            .filter(entry => entry[1] === this)
         if (keys.length > 0) {
             const [key] = keys[0]
             return this._parent.pathParts.concat([key])
@@ -38,7 +38,7 @@ export abstract class Node {
         return fail("Illegal state")
     }
 
-    constructor(initialState: any, environment: any, factory: ModelFactory<any, any>) {
+    constructor(initialState: any, environment: any, factory: IModelFactory<any, any>) {
         addHiddenFinalProp(initialState, "$treenode", this)
         this.factory = factory
         this.environment = environment
@@ -58,7 +58,7 @@ export abstract class Node {
     abstract didChange(change): void
     abstract serialize(): any
     abstract applyPatchLocally(subpath, patch): void
-    abstract getChildFactory(key: string): ModelFactory<any, any>
+    abstract getChildFactory(key: string): IModelFactory<any, any>
     abstract applySnapshot(snapshot): void
 
     /**
@@ -278,5 +278,5 @@ import {
     addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
 } from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
-import {ModelFactory} from "./factories"
+import {IModelFactory} from "./factories"
 import {ObjectNode} from "../types/object-node"

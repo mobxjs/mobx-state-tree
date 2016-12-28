@@ -4,7 +4,7 @@ import {IJsonPatch} from "./core/json-patch"
 import {IDisposer} from "./utils"
 import {getObjectNode, findEnclosingObjectNode} from "./types/object-node"
 import {IActionCall} from "./core/action"
-import {ModelFactory, IModel} from "./core/factories"
+import {IModelFactory, IModel} from "./core/factories"
 import {createMapFactory} from "./types/map-node"
 import {createArrayFactory} from "./types/array-node"
 import {primitiveFactory} from "./types/primitive"
@@ -17,7 +17,7 @@ export * from "./core/json-patch"
 export {
     IModel,
     isModel,
-    ModelFactory,
+    IModelFactory,
     isModelFactory,
     getModelFactory,
     getChildModelFactory
@@ -41,7 +41,7 @@ export {
 
 export {
     asReduxStore,
-    ReduxStore
+    IReduxStore
 } from "./interop/redux"
 
 export {
@@ -146,9 +146,13 @@ export function applyPatches(target: IModel, patches: IJsonPatch[]) {
     })
 }
 
-export function recordPatches(subject: IModel):
-    { patches: IJsonPatch[], stop(); replay(target: IModel); }
-{
+export interface IPatchRecorder {
+    patches: IJsonPatch[]
+    stop()
+    replay(target: IModel)
+}
+
+export function recordPatches(subject: IModel): IPatchRecorder {
     let recorder = {
         patches: [] as IJsonPatch[],
         stop: () => disposer(),
@@ -188,9 +192,13 @@ export function applyActions(target: IModel, actions: IActionCall[]): void {
     })
 }
 
-export function recordActions(subject: IModel):
-    { actions: IActionCall[]; stop(); replay(target: IModel); }
-{
+export interface IActionRecorder {
+    actions: IActionCall[]
+    stop()
+    replay(target: IModel)
+}
+
+export function recordActions(subject: IModel): IActionRecorder {
     let recorder = {
         actions: [] as IActionCall[],
         stop: () => disposer(),
@@ -384,7 +392,7 @@ export function clone<T extends IModel>(source: T, customEnvironment?: any): T {
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function mapOf<S, T>(subFactory: ModelFactory<S, T> = primitiveFactory): ObservableMap<T> {
+export function mapOf<S, T>(subFactory: IModelFactory<S, T> = primitiveFactory): ObservableMap<T> {
     return createMapFactory(subFactory) as any
 }
 
@@ -395,7 +403,7 @@ export function mapOf<S, T>(subFactory: ModelFactory<S, T> = primitiveFactory): 
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function arrayOf<S, T>(subFactory: ModelFactory<S, T> = primitiveFactory): IObservableArray<T> {
+export function arrayOf<S, T>(subFactory: IModelFactory<S, T> = primitiveFactory): IObservableArray<T> {
     return createArrayFactory(subFactory as any) as any
 }
 
@@ -418,7 +426,7 @@ export function detach<T extends IModel>(thing: T): T {
     return thing
 }
 
-export function testActions<S, T extends IModel>(factory: ModelFactory<S, T>, initialState: S, ...actions: IActionCall[]): S {
+export function testActions<S, T extends IModel>(factory: IModelFactory<S, T>, initialState: S, ...actions: IActionCall[]): S {
     const testInstance = factory(initialState)
     applyActions(testInstance, actions)
     return getSnapshot<S, T>(testInstance)

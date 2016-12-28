@@ -6,7 +6,7 @@ export type IModel = {
     $treenode: any // Actually Node, but that should not be exposed to the public...
 } & Object
 
-export interface ModelFactory<S, T> {
+export interface IModelFactory<S, T> {
     (snapshot?: S, env?: Object): T & IModel
     isModelFactory: true
     factoryName: string,
@@ -18,7 +18,7 @@ export function createFactory<S, T>(
     nodeClass: NodeConstructor,
     configuration,
     instanceCreator: () => any
-): ModelFactory<S, T> {
+): IModelFactory<S, T> {
     let factory = extend(
         action(name, function(snapshot?: any, environment?: Object) {
             const instance = instanceCreator()
@@ -35,15 +35,15 @@ export function createFactory<S, T>(
     return factory
 }
 
-export function isModelFactory(value: any): value is ModelFactory<any, any> {
+export function isModelFactory(value: any): value is IModelFactory<any, any> {
     return typeof value === "function" && value.isModelFactory === true
 }
 
-export function getModelFactory(object: IModel): ModelFactory<any, any> {
+export function getModelFactory(object: IModel): IModelFactory<any, any> {
     return getNode(object).factory
 }
 
-export function getChildModelFactory(object: IModel, child: string): ModelFactory<any, any> {
+export function getChildModelFactory(object: IModel, child: string): IModelFactory<any, any> {
     return getNode(object).getChildFactory(child)
 }
 

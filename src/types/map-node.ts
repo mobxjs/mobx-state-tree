@@ -1,11 +1,11 @@
 import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
-import {ModelFactory, createFactory} from "../core/factories"
+import {IModelFactory, createFactory} from "../core/factories"
 import {identity, fail, isPlainObject, invariant} from "../utils"
 import {escapeJsonPath} from "../core/json-patch"
 
 interface IMapFactoryConfig {
-    subType: ModelFactory<any, any>
+    subType: IModelFactory<any, any>
     isMapFactory: true
 }
 
@@ -94,12 +94,12 @@ export class MapNode extends Node {
         this.state.replace(snapshot)
     }
 
-    getChildFactory(): ModelFactory<any, any> {
+    getChildFactory(): IModelFactory<any, any> {
         return (this.factory.config as IMapFactoryConfig).subType
     }
 }
 
-export function createMapFactory<S, T>(subtype: ModelFactory<S, T>): ModelFactory<{[key: string]: S}, ObservableMap<T>> {
+export function createMapFactory<S, T>(subtype: IModelFactory<S, T>): IModelFactory<{[key: string]: S}, ObservableMap<T>> {
     return createFactory(
         "map-factory",
         MapNode,
