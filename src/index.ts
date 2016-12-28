@@ -11,7 +11,7 @@ import {primitiveFactory} from "./types/primitive"
 
 // TODO: improve all typings
 export {
-    action /* TODO: export action.bound instead? */
+    action
 } from "mobx"
 
 export * from "./core/json-patch"
@@ -59,7 +59,7 @@ export {
  *
  * ```
  * export type IActionCall = {
- *    name: string; // TODO: rename to type
+ *    name: string;
  *    path?: string;
  *    args?: any[];
  * }
@@ -161,7 +161,6 @@ export function recordPatches(subject: Object):
     return recorder
 }
 
-// TODO: return the action description (possibly as returned by the middleware)
 /**
  * Dispatches an Action on a model instance. All middlewares will be triggered.
  *
@@ -171,8 +170,8 @@ export function recordPatches(subject: Object):
  * @param {IActionCallOptions} [options]
  * @returns
  */
-export function applyAction(target: Object, action: IActionCall) {
-    return getObjectNode(target).applyAction(action)
+export function applyAction(target: Object, action: IActionCall): void {
+    getObjectNode(target).applyAction(action)
 }
 
 /**
@@ -413,6 +412,11 @@ export function arrayOf(subFactory: ModelFactory = primitiveFactory) {
  */
 export function _getNode(thing): any {
     return getNode(thing)
+}
+
+export function detach<T>(thing: T): T {
+    getNode(thing).detach()
+    return thing
 }
 
 export function testActions(factory: ModelFactory, initialState, ...actions: IActionCall[]): Object {

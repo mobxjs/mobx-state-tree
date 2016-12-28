@@ -1,14 +1,16 @@
 import {
     action, observable,
-    intercept, observe, computed, reaction
+    intercept, observe, computed, reaction,
+    isObservableArray,
+    isObservableMap
 } from "mobx"
 
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
-export abstract class Node /* TODO: implements INode*/ {
+export abstract class Node {
     readonly state: any
-    readonly environment: any // TODO: combine own envionment with parent environment. Maybe just use lookup function?
-    @observable _parent: Node | null = null // TODO: observable needed?
+    readonly environment: any
+    @observable _parent: Node | null = null
     readonly factory: ModelFactory
     private  interceptDisposer: IDisposer
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
@@ -16,37 +18,35 @@ export abstract class Node /* TODO: implements INode*/ {
 
     @computed get pathParts(): string[]{
         // no parent? you are root!
-        if(this._parent === null){
+        if (this._parent === null) {
             return []
         }
 
         // get the key
+        // optimize: maybe this shouldn't be computed, this is called often and pretty expensive lookup ...
         const keys = this._parent.getChildNodes()
             .filter(([key, node]) => node === this)
-        if(keys.length > 0){
+        if (keys.length > 0) {
             const [key] = keys[0]
             return this._parent.pathParts.concat([key])
         }
 
-        // TODO: maybe safely throw because of incoerent state? (parent do not own the node)
-        return []
+        return fail("Illegal state")
     }
 
-    // TODO: is parent / subpath required here?
     constructor(initialState: any, parent: Node | null, environment: any, factory: ModelFactory) {
         addHiddenFinalProp(initialState, "$treenode", this)
-
         this.environment = environment
         this.factory = factory
         this._parent = parent
         this.state = initialState
+
         this.interceptDisposer = intercept(this.state, ((c) => this.willChange(c)) as any)
         observe(this.state, (c) => this.didChange(c))
-
         reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
-        // dispose reaction, observe, intercept somewhere?
+        // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
     }
 
     abstract getChildNodes(): [string, Node][]
@@ -61,8 +61,15 @@ export abstract class Node /* TODO: implements INode*/ {
     /**
      * Returnes (escaped) path representation as string
      */
-    public get path(): string {
+    @computed public get path(): string {
         return joinJsonPath(this.pathParts)
+    }
+
+    @computed public get subpath(): string {
+        if (this.isRoot)
+            return ""
+        const parts = this.pathParts
+        return parts[parts.length - 1]
     }
 
     public get isRoot(): boolean {
@@ -88,7 +95,6 @@ export abstract class Node /* TODO: implements INode*/ {
         return registerEventHandler(this.snapshotSubscribers, onChange)
     }
 
-    // TODO: alias as Symbol.observable?
     public onPatch(onPatch: (patches: IJsonPatch) => void): IDisposer {
         return registerEventHandler(this.patchSubscribers, onPatch)
     }
@@ -126,7 +132,6 @@ export abstract class Node /* TODO: implements INode*/ {
                  (this instanceof ObjectNode && this.actionSubscribers.length > 0)
         )) {
             console.warn("An object with active event listeners was removed from the tree. This might introduce a memory leak. Use detach() if this is intentional")
-            // TODO: create detach
         }
 
         this._parent = newParent
@@ -145,11 +150,22 @@ export abstract class Node /* TODO: implements INode*/ {
         } else {
             const childFactory = this.getChildFactory(subpath)
             // convert object from snapshot
-            const instance = childFactory(child, this.environment) // TODO: optimization: pass in parent as third arg
+            const instance = childFactory(child, this.environment) // optimization: pass in parent as third arg
             const node = getNode(instance)
             node.setParent(this, subpath)
             return instance
         }
+    }
+
+    detach() {
+        if (this.isRoot)
+            return
+        if (isObservableArray(this.parent!.state))
+            this.parent!.state.splice(parseInt(this.subpath), 1)
+        else if (isObservableMap(this.parent!.state))
+            this.parent!.state.delete(this.subpath)
+        else // Object
+            this.parent!.state[this.subpath] = null
     }
 
     resolve(pathParts: string): Node;
@@ -204,7 +220,7 @@ export function hasNode(value): value is { $treenode: Node } {
  * The result of this function is the return value of the callbacks
  */
 export function maybeNode<T, R>(value: T, asNodeCb: (node: Node, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
-    // TODO: maybeNode might be quite inefficient runtime wise, might be factored out
+    // Optimization: maybeNode might be quite inefficient runtime wise, might be factored out at expensive places
     if (isMutable(value)) {
         const n = getNode(value)
         return asNodeCb(n, n.state)

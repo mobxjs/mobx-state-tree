@@ -1,3 +1,4 @@
+import {invariant} from "../utils"
 
 // https://tools.ietf.org/html/rfc6902
 // http://jsonpatch.com/
@@ -34,6 +35,6 @@ export function splitJsonPath(path: string): string[] {
     // `/` refers to property with an empty name, while `` refers to root itself!
     if (path === "")
         return []
-    // TODO: what if path doesn't start with "/" ?
+    invariant(path[0] === "/", `Expected path to start with '/', got: '${path}'`)
     return path.substr(1).split("/").map(unescapeJsonPath)
 }

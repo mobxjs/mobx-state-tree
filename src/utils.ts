@@ -36,10 +36,8 @@ export function isPlainObject(value) {
     return proto === Object.prototype || proto === null
 }
 
-// TODO: should be isComplexObject?
 export function isMutable(value) {
-    // TODO: not, date, regex, ..what more?
-    return value !== null && typeof value === "object"
+    return value !== null && typeof value === "object" && !(value instanceof Date) && !(value instanceof RegExp)
 }
 
 export function isPrimitive(value): boolean {

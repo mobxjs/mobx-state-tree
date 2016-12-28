@@ -11,7 +11,6 @@ export interface IReferenceDescription {
     isReferenceTo: true
 }
 
-// TODO: future work: create factories for reference lists and maps!
 export function referenceTo<T>(path: string): T;
 export function referenceTo<T>(getter: IReferenceGetter, setter?: IReferenceSetter): T;
 export function referenceTo(arg1, arg2?) {

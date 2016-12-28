@@ -5,7 +5,7 @@ import {invariant, identity, fail, isPlainObject, extend} from "../utils"
 import {escapeJsonPath} from "../core/json-patch"
 
 export class MapNode extends Node {
-    state: ObservableMap<any> // In future: use a proxy and work with plain objects
+    state: ObservableMap<any>
     subType: ModelFactory
 
     getChildNodes(): [string, Node][] {

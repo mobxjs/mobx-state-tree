@@ -73,11 +73,11 @@ export class ObjectNode extends Node {
         })
     }
 
-    applyAction(action: IActionCall) {
+    applyAction(action: IActionCall): void {
         const node = this.resolve(action.path || "")
         if (node instanceof ObjectNode)
-            return applyActionLocally(node, action)
-        return fail(`Invalid action path: ${action.path || ""}`)
+            applyActionLocally(node, action)
+        fail(`Invalid action path: ${action.path || ""}`)
     }
 
     emitAction(instance: ObjectNode, action: IActionCall, next) {
@@ -93,7 +93,7 @@ export class ObjectNode extends Node {
             } else {
                 const parent = findEnclosingObjectNode(this)
                 if (parent)
-                    parent.emitAction(instance, action, next) // TODO correct path // TODO: what is this todo? :P
+                    parent.emitAction(instance, action, next)
                 else
                     next()
             }
@@ -176,7 +176,6 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Objec
             addReadOnlyProp(instance, key, adm.prepareChild(key, []))
         } else if (isModelFactory(value)) {
             adm.submodelTypes[key] = value
-            // future work: allow initialization / default values
             extendShallowObservable(instance, { key: null })
         } else if (isReferenceFactory(value)) {
             extendShallowObservable(instance, createReferenceProps(key, value))
