@@ -142,7 +142,7 @@ export function createFactory(arg1, arg2?): ModelFactory {
         createFactoryHelper(factoryName, function(snapshot: Object = {}, env?: Object) {
             invariant(isPlainObject(snapshot) && !hasNode(snapshot), "Not a valid snapshot")
             const instance = observable.shallowObject({})
-            const adm = new ObjectNode(instance, null, env, factory)
+            const adm = new ObjectNode(instance, env, factory)
             Object.defineProperty(instance, "__modelAdministration", adm)
             copyBaseModelToInstance(baseModel, instance, adm)
             Object.seal(instance) // don't allow new props to be added!

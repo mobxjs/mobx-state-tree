@@ -34,11 +34,10 @@ export abstract class Node {
         return fail("Illegal state")
     }
 
-    constructor(initialState: any, parent: Node | null, environment: any, factory: ModelFactory) {
+    constructor(initialState: any, environment: any, factory: ModelFactory) {
         addHiddenFinalProp(initialState, "$treenode", this)
         this.environment = environment
         this.factory = factory
-        this._parent = parent
         this.state = initialState
 
         this.interceptDisposer = intercept(this.state, ((c) => this.willChange(c)) as any)

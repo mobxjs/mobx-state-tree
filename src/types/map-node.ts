@@ -99,7 +99,7 @@ export function createMapFactory(subtype: ModelFactory): ModelFactory {
         createFactoryHelper("map-factory", (snapshot: any = {}, env?) => {
             invariant(isPlainObject(snapshot), "Expected array")
             const instance = observable.shallowMap()
-            const adm = new MapNode(instance, null, env, factory)
+            const adm = new MapNode(instance, env, factory)
             adm.subType = subtype
             Object.defineProperty(instance, "__modelAdministration", adm)
             adm.applySnapshot(snapshot)
