@@ -1,7 +1,7 @@
 import {action, isAction, extendObservable, observable, IObjectChange, IObjectWillChange, isObservable} from "mobx"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty} from "../utils"
 import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
-import {ModelFactory, isModelFactory, createFactoryHelper} from "../core/factories"
+import {ModelFactory, isModelFactory, createFactoryHelper, getModelFactory} from "../core/factories"
 import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {isArrayFactory} from "../types/array-node"
@@ -85,7 +85,8 @@ export class ObjectNode extends Node {
         const correctedAction: IActionCall = this.actionSubscribers.length
             ? extend({}, action, { path: getRelativePath(this, instance) })
             : null
-        let n = () => { // TODO: use tail recursion / trampoline
+        let n = () => {
+            // optimization: use tail recursion / trampoline
             idx++
             if (idx < this.actionSubscribers.length) {
                 this.actionSubscribers[idx](correctedAction!, n)
@@ -187,6 +188,16 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Objec
     }
 }
 
+export function composeFactory(name: string, ...models: (ModelFactory | any)[]): ModelFactory;
+export function composeFactory(...models: (ModelFactory | any)[]): ModelFactory;
+export function composeFactory(...args: any[]): ModelFactory {
+    const factoryName = typeof args[0] === "string" ? args[0] : "unnamed-factory"
+    const baseModels = typeof args[0] === "string" ? args.slice(1) : args
+
+    return createFactory(factoryName, extend.apply(null, baseModels.map(baseModel =>
+        isModelFactory(baseModel) ? getModelFactory(baseModel) : baseModel
+    )))
+}
 
 export function getObjectNode(thing: any): ObjectNode {
     const node = getNode(thing)

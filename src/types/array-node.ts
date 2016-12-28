@@ -1,8 +1,7 @@
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {ModelFactory, createFactoryHelper} from "../core/factories"
-import {invariant, isMutable, identity, fail} from "../utils"
-import {escapeJsonPath} from "../core/json-patch"
+import {invariant, identity, fail, extend} from "../utils"
 
 // TODO: support primitives. Have separate factory?
 export class ArrayNode extends Node {
@@ -38,9 +37,6 @@ export class ArrayNode extends Node {
                 change.added = change.added.map((newValue, pos) => {
                     return this.prepareChild("" + (change.index + pos), newValue)
                 })
-                // TODO: move to didChange
-                for (let i = change.index + change.added.length; i < change.object.length; i++)
-                    maybeNode(change.object[i], adm => adm.setParent(this, "" + i))
                 break
         }
         return change
@@ -98,16 +94,18 @@ export class ArrayNode extends Node {
 }
 
 export function createArrayFactory(subtype: ModelFactory): ModelFactory {
-    let factory = createFactoryHelper("array-factory", (snapshot: any[] = [], env?) => {
-        invariant(Array.isArray(snapshot), "Expected array")
-        const instance: IObservableArray<any> = observable([])
-        const adm = new ArrayNode(instance, null, env, factory as ModelFactory)
-        adm.subType = subtype
-        Object.defineProperty(instance, "__modelAdministration", adm)
-        instance.replace(snapshot)
-        return instance
-    })
-    ;(factory as any).isArrayFactory = true
+    let factory = extend(
+        createFactoryHelper("array-factory", (snapshot: any[] = [], env?) => {
+            invariant(Array.isArray(snapshot), "Expected array")
+            const instance: IObservableArray<any> = observable([])
+            const adm = new ArrayNode(instance, null, env, factory)
+            adm.subType = subtype
+            Object.defineProperty(instance, "__modelAdministration", adm)
+            instance.replace(snapshot)
+            return instance
+        }),
+        { isArrayFactory: true }
+    )
     return factory
 }
 

@@ -1,7 +1,7 @@
 import {ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {ModelFactory, createFactoryHelper} from "../core/factories"
-import {invariant, isMutable, identity, fail, isPlainObject} from "../utils"
+import {invariant, isMutable, identity, fail, isPlainObject, extend} from "../utils"
 import {escapeJsonPath} from "../core/json-patch"
 
 // TODO: support primitives. Have separate factory?
@@ -98,19 +98,21 @@ export class MapNode extends Node {
 }
 
 export function createMapFactory(subtype: ModelFactory): ModelFactory {
-    let factory = createFactoryHelper("map-factory", (snapshot: any = {}, env?) => {
-        invariant(isPlainObject(snapshot), "Expected array")
-        const instance = new ObservableMap()
-        const adm = new MapNode(instance, null, env, factory as ModelFactory)
-        adm.subType = subtype
-        Object.defineProperty(instance, "__modelAdministration", adm)
-        for (let key in snapshot) {
-            const value = snapshot[key]
-            instance.set(key, isMutable(value) ? subtype(value, env) : value)
-        }
-        return instance
-    })
-    ;(factory as any).isMapFactory = true
+    let factory = extend(
+        createFactoryHelper("map-factory", (snapshot: any = {}, env?) => {
+            invariant(isPlainObject(snapshot), "Expected array")
+            const instance = new ObservableMap()
+            const adm = new MapNode(instance, null, env, factory)
+            adm.subType = subtype
+            Object.defineProperty(instance, "__modelAdministration", adm)
+            for (let key in snapshot) {
+                const value = snapshot[key]
+                instance.set(key, isMutable(value) ? subtype(value, env) : value)
+            }
+            return instance
+        }),
+        { isMapFactory: true }
+    )
     return factory
 }
 

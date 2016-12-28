@@ -16,8 +16,8 @@ export {
 
 export * from "./core/json-patch"
 export {
+    isModel,
     ModelFactory,
-    composeFactory,
     isModelFactory,
     getModelFactory,
     getChildModelFactory
@@ -31,7 +31,8 @@ export {
 } from "./types/primitive"
 
 export {
-    createFactory
+    createFactory,
+    composeFactory,
 } from "./types/object-node"
 
 export {
@@ -412,21 +413,6 @@ export function arrayOf(subFactory: ModelFactory = primitiveFactory) {
  */
 export function _getNode(thing): any {
     return getNode(thing)
-}
-
-// - getModelFactory
-// - getChildModelFactory
-
-/**
- *
- *
- * @export
- * @param {*} thing
- * @returns {boolean}
- */
-export function isModel(thing: any): boolean {
-    // TODO:
-    return true
 }
 
 export function testActions(factory: ModelFactory, initialState, ...actions: IActionCall[]): Object {
