@@ -3,7 +3,6 @@ import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {ModelFactory, createFactoryHelper} from "../core/factories"
 import {invariant, identity, fail, extend} from "../utils"
 
-// TODO: support primitives. Have separate factory?
 export class ArrayNode extends Node {
     state: IObservableArray<any>
     subType: ModelFactory

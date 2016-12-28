@@ -67,12 +67,10 @@ export class ObjectNode extends Node {
     }
 
     applyPatchLocally(subpath, patch): void {
-        // TODO: confusing that subpath should be used instead of patch, just clone the patch for simplicity?
-        // works for both replace and add, remove is not a case in mobx-state-tree ATM
-        // note that there is no clever merge going on, stuff is fully replaced instead. Would that be nice, or just confusing?
         invariant(patch.op === "replace" || patch.op === "add")
-        invariant(isObservable(this.state, subpath), `Not an observable key: '${subpath}' in '${this.path}'`)
-        this.state[subpath] = patch.value // takes care of further deserialization
+        this.applySnapshot({
+            [subpath]: patch.value
+        })
     }
 
     applyAction(action: IActionCall) {
@@ -95,7 +93,7 @@ export class ObjectNode extends Node {
             } else {
                 const parent = findEnclosingObjectNode(this)
                 if (parent)
-                    parent.emitAction(instance, action, next) // TODO correct path
+                    parent.emitAction(instance, action, next) // TODO correct path // TODO: what is this todo? :P
                 else
                     next()
             }
@@ -205,9 +203,13 @@ export function composeFactory(...args: any[]): ModelFactory {
     )))
 }
 
+export function isObjectFactory(factory): boolean {
+    return factory.isObjectFactory === true
+}
+
 export function getObjectNode(thing: any): ObjectNode {
     const node = getNode(thing)
-    invariant((node.factory as any).isObjectFactory === true, "Expected object node, got " + (node.constructor as any).name)
+    invariant(isObjectFactory(node.factory), "Expected object node, got " + (node.constructor as any).name)
     return node as ObjectNode
 }
 

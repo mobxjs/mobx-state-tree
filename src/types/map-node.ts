@@ -50,7 +50,6 @@ export class MapNode extends Node {
     }
 
     serialize(): Object {
-        // TODO: or serialize as entries?
         const res = {}
         this.state.forEach((value, key) => {
             res[key] = valueToSnapshot(value)
@@ -88,8 +87,7 @@ export class MapNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
-        this.state.clear()
-        this.state.merge(snapshot)
+        this.state.replace(snapshot)
     }
 
     getChildFactory(): ModelFactory {
@@ -105,10 +103,7 @@ export function createMapFactory(subtype: ModelFactory): ModelFactory {
             const adm = new MapNode(instance, null, env, factory)
             adm.subType = subtype
             Object.defineProperty(instance, "__modelAdministration", adm)
-            for (let key in snapshot) {
-                const value = snapshot[key]
-                instance.set(key, isMutable(value) ? subtype(value, env) : value)
-            }
+            adm.applySnapshot(snapshot)
             return instance
         }),
         { isMapFactory: true }
