@@ -1,12 +1,11 @@
 import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {ModelFactory, createFactoryHelper} from "../core/factories"
-import {invariant, isMutable, identity, fail, isPlainObject, extend} from "../utils"
+import {invariant, identity, fail, isPlainObject, extend} from "../utils"
 import {escapeJsonPath} from "../core/json-patch"
 
-// TODO: support primitives. Have separate factory?
 export class MapNode extends Node {
-    state: ObservableMap<any>
+    state: ObservableMap<any> // In future: use a proxy and work with plain objects
     subType: ModelFactory
 
     getChildNodes(): [string, Node][] {
