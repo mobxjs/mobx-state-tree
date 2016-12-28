@@ -1,7 +1,7 @@
-import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, isObservable} from "mobx"
+import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange} from "mobx"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
 import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
-import {ModelFactory, isModelFactory, createFactory, getModelFactory} from "../core/factories"
+import {ModelFactory, isModelFactory, createFactory, getModelFactory, IModel} from "../core/factories"
 import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {isArrayFactory} from "../types/array-node"
@@ -19,7 +19,7 @@ export class ObjectNode extends Node {
 
     // Optimization: submodelTypes can be stored on the factory config!
     readonly submodelTypes: {
-        [key: string]: ModelFactory;
+        [key: string]: ModelFactory<any, any>;
     } = {}
     _isRunningAction = false
 
@@ -165,7 +165,7 @@ export class ObjectNode extends Node {
         }
     }
 
-    getChildFactory(key: string): ModelFactory {
+    getChildFactory(key: string): ModelFactory<any, any> {
         return this.submodelTypes[key] || primitiveFactory
     }
 
@@ -182,9 +182,9 @@ export class ObjectNode extends Node {
     }
 }
 
-export function createObjectFactory(baseModel: Object): ModelFactory
-export function createObjectFactory(name: string, baseModel: Object): ModelFactory
-export function createObjectFactory(arg1, arg2?): ModelFactory {
+export function createObjectFactory<S extends Object, T extends S>(baseModel: T): ModelFactory<S, T>
+export function createObjectFactory<S extends Object, T extends S>(name: string, baseModel: T): ModelFactory<S, T>
+export function createObjectFactory(arg1, arg2?) {
     return createFactory(
         typeof arg1 === "string" ? arg1 : "unnamed-object-factory",
         ObjectNode,
@@ -196,24 +196,27 @@ export function createObjectFactory(arg1, arg2?): ModelFactory {
     )
 }
 
-export function composeFactory(name: string, ...models: (ModelFactory | any)[]): ModelFactory;
-export function composeFactory(...models: (ModelFactory | any)[]): ModelFactory;
-export function composeFactory(...args: any[]): ModelFactory {
+export function composeFactory<AS, AT, BS, BT>(name: string, a: ModelFactory<AS, AT>, b: ModelFactory<BS, BT>): ModelFactory<AS & BS, AT & BT>;
+export function composeFactory<AS, AT, BS, BT, CS, CT>(name: string, a: ModelFactory<AS, AT>, b: ModelFactory<BS, BT>, c: ModelFactory<CS, CT>): ModelFactory<AS & BS & CS, AT & BT & CT>;
+export function composeFactory<S, T>(name: string, ...models: ModelFactory<any, any>[]): ModelFactory<S, T>;
+export function composeFactory<AS, AT, BS, BT>(a: ModelFactory<AS, AT>, b: ModelFactory<BS, BT>): ModelFactory<AS & BS, AT & BT>;
+export function composeFactory<AS, AT, BS, BT, CS, CT>(a: ModelFactory<AS, AT>, b: ModelFactory<BS, BT>, c: ModelFactory<CS, CT>): ModelFactory<AS & BS & CS, AT & BT & CT>;
+export function composeFactory<S, T>(...models: ModelFactory<any, any>[]): ModelFactory<S, T>;
+export function composeFactory(...args: any[]) {
     const factoryName = typeof args[0] === "string" ? args[0] : "unnamed-factory"
     const baseModels = typeof args[0] === "string" ? args.slice(1) : args
 
     return createObjectFactory(
         factoryName,
-        extend.apply(null, baseModels.map(baseModel =>
-            isModelFactory(baseModel) ? getModelFactory(baseModel) : baseModel
-        )))
+        extend.apply(null, baseModels.map(getModelFactory))
+    )
 }
 
 export function isObjectFactory(factory): boolean {
     return factory && factory.config && factory.config.isObjectFactory === true
 }
 
-export function getObjectNode(thing: any): ObjectNode {
+export function getObjectNode(thing: IModel): ObjectNode {
     const node = getNode(thing)
     invariant(isObjectFactory(node.factory), "Expected object node, got " + (node.constructor as any).name)
     return node as ObjectNode

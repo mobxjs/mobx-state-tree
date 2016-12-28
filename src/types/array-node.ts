@@ -4,7 +4,7 @@ import {ModelFactory, createFactory} from "../core/factories"
 import {invariant, identity, fail, extend} from "../utils"
 
 interface IArrayFactoryConfig {
-    subType: ModelFactory
+    subType: ModelFactory<any, any>
     isArrayFactory: true
 }
 
@@ -92,12 +92,12 @@ export class ArrayNode extends Node {
         this.state.replace(snapshot)
     }
 
-    getChildFactory(): ModelFactory {
+    getChildFactory(): ModelFactory<any, any> {
         return (this.factory.config as IArrayFactoryConfig).subType
     }
 }
 
-export function createArrayFactory(subtype: ModelFactory): ModelFactory {
+export function createArrayFactory<S, T extends S>(subtype: ModelFactory<S, T>): ModelFactory<S[], IObservableArray<T>> {
     return createFactory(
         "array-factory",
         ArrayNode,
@@ -106,7 +106,7 @@ export function createArrayFactory(subtype: ModelFactory): ModelFactory {
             isArrayFactory: true
         } as IArrayFactoryConfig,
         () => observable.shallowArray()
-    )
+    ) as any
 }
 
 export function isArrayFactory(factory): boolean {

@@ -5,15 +5,17 @@ import {
     isObservableMap
 } from "mobx"
 
+import {IModel} from "./factories"
+
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
-export type NodeConstructor = new (target: any, environment: any, factory: ModelFactory, factoryConfiguration: Object) => Node
+export type NodeConstructor = new (target: any, environment: any, factory: ModelFactory<any, any>, factoryConfiguration: Object) => Node
 
 export abstract class Node {
     readonly state: any
     readonly environment: any
     @observable _parent: Node | null = null
-    readonly factory: ModelFactory
+    readonly factory: ModelFactory<any, any>
     private  interceptDisposer: IDisposer
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
@@ -36,7 +38,7 @@ export abstract class Node {
         return fail("Illegal state")
     }
 
-    constructor(initialState: any, environment: any, factory: ModelFactory) {
+    constructor(initialState: any, environment: any, factory: ModelFactory<any, any>) {
         addHiddenFinalProp(initialState, "$treenode", this)
         this.factory = factory
         this.environment = environment
@@ -56,7 +58,7 @@ export abstract class Node {
     abstract didChange(change): void
     abstract serialize(): any
     abstract applyPatchLocally(subpath, patch): void
-    abstract getChildFactory(key: string): ModelFactory
+    abstract getChildFactory(key: string): ModelFactory<any, any>
     abstract applySnapshot(snapshot): void
 
     /**
@@ -107,8 +109,7 @@ export abstract class Node {
                 localizedPatch = patch
             else
                 localizedPatch = extend({}, patch, {
-                    // better: use relativePath(this, source)
-                    path: joinJsonPath(source.pathParts.slice(-distance)) + patch.path
+                    path: getRelativePath(source, this)
                 })
             this.patchSubscribers.forEach(f => f(localizedPatch))
         }
@@ -208,7 +209,8 @@ export abstract class Node {
     }
 }
 
-export function hasNode(value): value is { $treenode: Node } {
+// TODO: duplicate with isModel
+export function hasNode(value): value is IModel {
     return value && value.$treenode
 }
 
@@ -217,7 +219,7 @@ export function hasNode(value): value is { $treenode: Node } {
  * the first callback is invoked, otherwise the second.
  * The result of this function is the return value of the callbacks
  */
-export function maybeNode<T, R>(value: T, asNodeCb: (node: Node, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
+export function maybeNode<T, R>(value: T & IModel, asNodeCb: (node: Node, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
     // Optimization: maybeNode might be quite inefficient runtime wise, might be factored out at expensive places
     if (isMutable(value)) {
         const n = getNode(value)
@@ -229,7 +231,7 @@ export function maybeNode<T, R>(value: T, asNodeCb: (node: Node, value: T) => R,
     }
 }
 
-export function getNode(value): Node {
+export function getNode(value: IModel): Node {
     if (hasNode(value))
         return value.$treenode
     else
@@ -237,7 +239,7 @@ export function getNode(value): Node {
 
 }
 
-export function getPath(thing): string {
+export function getPath(thing: IModel): string {
     return getNode(thing).path
 }
 
@@ -246,7 +248,7 @@ export function getRelativePath(base: Node, target: Node): string {
     return target.path.substr(base.path.length)
 }
 
-export function getParent(thing): any {
+export function getParent(thing: IModel): IModel {
     const node = getNode(thing)
     return node.parent ? node.parent.state : null
 }

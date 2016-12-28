@@ -1,20 +1,24 @@
 import {action} from "mobx"
-import {extend, addHiddenFinalProp} from "../utils"
+import {extend} from "../utils"
 import {getNode, hasNode, NodeConstructor} from "./node"
 
-export type ModelFactory = {
-    (snapshot?: any, env?: Object): any
+export type IModel = {
+    $treenode: any // Actually Node, but that should not be exposed to the public...
+} & Object
+
+export interface ModelFactory<S, T> {
+    (snapshot?: S, env?: Object): T & IModel
     isModelFactory: true
     factoryName: string,
     config: Object
 }
 
-export function createFactory(
+export function createFactory<S, T>(
     name: string,
     nodeClass: NodeConstructor,
     configuration,
     instanceCreator: () => any
-): ModelFactory {
+): ModelFactory<S, T> {
     let factory = extend(
         action(name, function(snapshot?: any, environment?: Object) {
             const instance = instanceCreator()
@@ -31,18 +35,18 @@ export function createFactory(
     return factory
 }
 
-export function isModelFactory(value: any): value is ModelFactory {
+export function isModelFactory(value: any): value is ModelFactory<any, any> {
     return typeof value === "function" && value.isModelFactory === true
 }
 
-export function getModelFactory(object: Object): ModelFactory {
+export function getModelFactory(object: IModel): ModelFactory<any, any> {
     return getNode(object).factory
 }
 
-export function getChildModelFactory(object: Object, child: string): ModelFactory {
+export function getChildModelFactory(object: IModel, child: string): ModelFactory<any, any> {
     return getNode(object).getChildFactory(child)
 }
 
-export function isModel(model: any): boolean {
+export function isModel(model: any): model is IModel {
     return hasNode(model)
 }

@@ -5,13 +5,12 @@ import {identity, fail, isPlainObject, invariant} from "../utils"
 import {escapeJsonPath} from "../core/json-patch"
 
 interface IMapFactoryConfig {
-    subType: ModelFactory
+    subType: ModelFactory<any, any>
     isMapFactory: true
 }
 
 export class MapNode extends Node {
     state: ObservableMap<any>
-    subType: ModelFactory
 
     getChildNodes(): [string, Node][] {
         const res: [string, Node][] = []
@@ -95,12 +94,12 @@ export class MapNode extends Node {
         this.state.replace(snapshot)
     }
 
-    getChildFactory(): ModelFactory {
+    getChildFactory(): ModelFactory<any, any> {
         return (this.factory.config as IMapFactoryConfig).subType
     }
 }
 
-export function createMapFactory(subtype: ModelFactory): ModelFactory {
+export function createMapFactory<S, T>(subtype: ModelFactory<S, T>): ModelFactory<{[key: string]: S}, ObservableMap<T>> {
     return createFactory(
         "map-factory",
         MapNode,
@@ -109,7 +108,7 @@ export function createMapFactory(subtype: ModelFactory): ModelFactory {
             isMapFactory: true
         } as IMapFactoryConfig,
         () => observable.shallowMap()
-    )
+    ) as any
 }
 
 export function isMapFactory(factory): boolean {

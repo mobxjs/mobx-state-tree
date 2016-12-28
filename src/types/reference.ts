@@ -1,18 +1,19 @@
+import {IModel} from "../core/factories"
 import {tryResolve, getRoot} from "../index"
 import {invariant, fail} from "../utils"
 import {getObjectNode} from "./object-node"
 
-export type IReferenceGetter = (identifier: string, owner: Object, propertyName: string) => any
-export type IReferenceSetter = (value: any, owner: Object, propertyName: string) => string
+export type IReferenceGetter<T> = (identifier: string, owner: IModel, propertyName: string) => T
+export type IReferenceSetter<T> = (value: T, owner: IModel, propertyName: string) => string
 
 export interface IReferenceDescription {
-    getter: IReferenceGetter
-    setter: IReferenceSetter
+    getter: IReferenceGetter<any>
+    setter: IReferenceSetter<any>
     isReferenceTo: true
 }
 
 export function referenceTo<T>(path: string): T;
-export function referenceTo<T>(getter: IReferenceGetter, setter?: IReferenceSetter): T;
+export function referenceTo<T>(getter: IReferenceGetter<T>, setter?: IReferenceSetter<T>): T;
 export function referenceTo(arg1, arg2?) {
     if (typeof arg1 === "string")
         return createRelativeReferenceTo(arg1)
@@ -27,7 +28,7 @@ function createRelativeReferenceTo(path: string) {
     const targetIdAttribute = path.split("/").slice(-1)[0]
     path = path.split("/").slice(0, -1).join("/")
     return referenceTo(
-        (identifier: string, owner: Object) => tryResolve(owner, `${path}/${identifier}`),
+        (identifier: string, owner: IModel) => tryResolve(owner, `${path}/${identifier}`),
         (value: any)                        => value[targetIdAttribute]
     )
 }

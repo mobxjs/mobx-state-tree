@@ -1,21 +1,21 @@
 import {getNode, getRootNode} from "./core/node"
-import {transaction} from "mobx"
+import {transaction, IObservableArray, ObservableMap} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer} from "./utils"
 import {getObjectNode, findEnclosingObjectNode} from "./types/object-node"
 import {IActionCall} from "./core/action"
-import {ModelFactory} from "./core/factories"
+import {ModelFactory, IModel} from "./core/factories"
 import {createMapFactory} from "./types/map-node"
 import {createArrayFactory} from "./types/array-node"
 import {primitiveFactory} from "./types/primitive"
 
-// TODO: improve all typings
 export {
     action
 } from "mobx"
 
 export * from "./core/json-patch"
 export {
+    IModel,
     isModel,
     ModelFactory,
     isModelFactory,
@@ -89,8 +89,8 @@ export {
  * @param {(action: IActionCall, next: () => void) => void} callback the middleware that should be invoked whenever an action is triggered.
  * @returns {IDisposer} function to remove the middleware
  */
-export function onAction(target: Object, callback: (action: IActionCall, next: () => void) => void): IDisposer {
-    return getObjectNode(target).onAction(callback);
+export function onAction(target: IModel, callback: (action: IActionCall, next: () => void) => void): IDisposer {
+    return getObjectNode(target).onAction(callback)
 }
 
 /**
@@ -103,7 +103,7 @@ export function onAction(target: Object, callback: (action: IActionCall, next: (
  * @param {(patch: IJsonPatch) => void} callback the callback that is invoked for each patch
  * @returns {IDisposer} function to remove the listener
  */
-export function onPatch(target: Object, callback: (patch: IJsonPatch) => void): IDisposer {
+export function onPatch(target: IModel, callback: (patch: IJsonPatch) => void): IDisposer {
     return getNode(target).onPatch(callback)
 }
 
@@ -116,7 +116,7 @@ export function onPatch(target: Object, callback: (patch: IJsonPatch) => void): 
  * @param {(snapshot: any) => void} callback
  * @returns {IDisposer}
  */
-export function onSnapshot(target: Object, callback: (snapshot: any) => void): IDisposer {
+export function onSnapshot(target: IModel, callback: (snapshot: any) => void): IDisposer {
     return getNode(target).onSnapshot(callback)
 }
 
@@ -128,7 +128,7 @@ export function onSnapshot(target: Object, callback: (snapshot: any) => void): I
  * @param {IJsonPatch} patch
  * @returns
  */
-export function applyPatch(target: Object, patch: IJsonPatch) {
+export function applyPatch(target: IModel, patch: IJsonPatch) {
     return getNode(target).applyPatch(patch)
 }
 
@@ -139,16 +139,15 @@ export function applyPatch(target: Object, patch: IJsonPatch) {
  * @param {Object} target
  * @param {IJsonPatch[]} patches
  */
-export function applyPatches(target: Object, patches: IJsonPatch[]) {
+export function applyPatches(target: IModel, patches: IJsonPatch[]) {
     const node = getNode(target)
     transaction(() => {
         patches.forEach(p => node.applyPatch(p))
     })
 }
 
-
-export function recordPatches(subject: Object):
-    { patches: IJsonPatch[], stop(); replay(target: Object); }
+export function recordPatches(subject: IModel):
+    { patches: IJsonPatch[], stop(); replay(target: IModel); }
 {
     let recorder = {
         patches: [] as IJsonPatch[],
@@ -170,7 +169,7 @@ export function recordPatches(subject: Object):
  * @param {IActionCallOptions} [options]
  * @returns
  */
-export function applyAction(target: Object, action: IActionCall): void {
+export function applyAction(target: IModel, action: IActionCall): void {
     getObjectNode(target).applyAction(action)
 }
 
@@ -182,15 +181,15 @@ export function applyAction(target: Object, action: IActionCall): void {
  * @param {IActionCall[]} actions
  * @param {IActionCallOptions} [options]
  */
-export function applyActions(target: Object, actions: IActionCall[]): void {
+export function applyActions(target: IModel, actions: IActionCall[]): void {
     const node = getObjectNode(target)
     transaction(() => {
         actions.forEach(action => node.applyAction(action))
     })
 }
 
-export function recordActions(subject: Object):
-    { actions: IActionCall[]; stop(); replay(target: Object); }
+export function recordActions(subject: IModel):
+    { actions: IActionCall[]; stop(); replay(target: IModel); }
 {
     let recorder = {
         actions: [] as IActionCall[],
@@ -214,7 +213,7 @@ export function recordActions(subject: Object):
  * @param {Object} snapshot
  * @returns
  */
-export function applySnapshot(target: Object, snapshot: Object) {
+export function applySnapshot<S, T>(target: T & IModel, snapshot: S) {
     return getNode(target).applySnapshot(snapshot)
 }
 
@@ -226,7 +225,7 @@ export function applySnapshot(target: Object, snapshot: Object) {
  * @param {Object} target
  * @returns {*}
  */
-export function getSnapshot(target: Object): any {
+export function getSnapshot<S, T>(target: T & IModel): S {
     return getNode(target).snapshot
 }
 
@@ -238,7 +237,7 @@ export function getSnapshot(target: Object): any {
  * @param {boolean} [strict=false]
  * @returns {boolean}
  */
-export function hasParent(target: Object, strict: boolean = false): boolean {
+export function hasParent(target: IModel, strict: boolean = false): boolean {
     return getParent(target, strict) !== null
 }
 
@@ -250,8 +249,8 @@ export function hasParent(target: Object, strict: boolean = false): boolean {
  * @param {Object} target
  * @returns {boolean}
  */
-export function hasParentObject(target: Object): boolean {
-    return getParentObject(target !== null)
+export function hasParentObject(target: IModel): boolean {
+    return getParentObject(target) !== null
 }
 
 /**
@@ -262,7 +261,7 @@ export function hasParentObject(target: Object): boolean {
  * @param {boolean} [strict=false]
  * @returns {*}
  */
-export function getParent(target: Object, strict: boolean = false): any {
+export function getParent(target: IModel, strict: boolean = false): IModel {
     const node = strict
         ? getNode(target).parent
         : findEnclosingObjectNode(getNode(target))
@@ -276,7 +275,7 @@ export function getParent(target: Object, strict: boolean = false): any {
  * @param {Object} target
  * @returns {*}
  */
-export function getParentObject(target: Object): any {
+export function getParentObject(target: IModel): IModel {
     const node = findEnclosingObjectNode(getNode(target))
     return node ? node.state : null
 }
@@ -288,7 +287,7 @@ export function getParentObject(target: Object): any {
  * @param {Object} target
  * @returns {*}
  */
-export function getRoot(target: Object): any {
+export function getRoot(target: IModel): IModel {
     return getRootNode(getNode(target)).state
 }
 
@@ -299,7 +298,7 @@ export function getRoot(target: Object): any {
  * @param {Object} target
  * @returns {string}
  */
-export function getPath(target: Object): string {
+export function getPath(target: IModel): string {
     return getNode(target).path
 }
 
@@ -310,7 +309,7 @@ export function getPath(target: Object): string {
  * @param {Object} target
  * @returns {string[]}
  */
-export function getPathParts(target: Object): string[] {
+export function getPathParts(target: IModel): string[] {
     return getNode(target).pathParts
 }
 
@@ -321,7 +320,7 @@ export function getPathParts(target: Object): string[] {
  * @param {Object} target
  * @returns {boolean}
  */
-export function isRoot(target: Object): boolean {
+export function isRoot(target: IModel): boolean {
     return getNode(target).isRoot
 }
 
@@ -333,7 +332,7 @@ export function isRoot(target: Object): boolean {
  * @param {string} path - escaped json path
  * @returns {*}
  */
-export function resolve(target: Object, path: string): any {
+export function resolve(target: IModel, path: string): IModel | any {
     const node = getNode(target).resolve(path)
     return node ? node.state : undefined
 }
@@ -346,7 +345,7 @@ export function resolve(target: Object, path: string): any {
  * @param {string} path
  * @returns {*}
  */
-export function tryResolve(target: Object, path: string): any {
+export function tryResolve(target: IModel, path: string): IModel | any {
     const node = getNode(target).resolve(path, false)
     if (node === undefined)
         return undefined
@@ -360,7 +359,7 @@ export function tryResolve(target: Object, path: string): any {
  * @param {Object} target
  * @returns {Object}
  */
-export function getFromEnvironment(target: Object, key: string): Object {
+export function getFromEnvironment(target: IModel, key: string): any {
     return getNode(target).getFromEnvironment(key)
 }
 
@@ -373,7 +372,7 @@ export function getFromEnvironment(target: Object, key: string): Object {
  * @param {*} [customEnvironment]
  * @returns {T}
  */
-export function clone<T>(source: T, customEnvironment?: any): T {
+export function clone<T extends IModel>(source: T, customEnvironment?: any): T {
     const node = getNode(source)
     return node.factory(node.snapshot, customEnvironment || node.environment) as T
 }
@@ -385,8 +384,8 @@ export function clone<T>(source: T, customEnvironment?: any): T {
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function mapOf(subFactory: ModelFactory = primitiveFactory) {
-    return createMapFactory(subFactory)
+export function mapOf<S, T>(subFactory: ModelFactory<S, T> = primitiveFactory): ObservableMap<T> {
+    return createMapFactory(subFactory) as any
 }
 
 /**
@@ -396,8 +395,8 @@ export function mapOf(subFactory: ModelFactory = primitiveFactory) {
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function arrayOf(subFactory: ModelFactory = primitiveFactory) {
-    return createArrayFactory(subFactory)
+export function arrayOf<S, T>(subFactory: ModelFactory<S, T> = primitiveFactory): IObservableArray<T> {
+    return createArrayFactory(subFactory as any) as any
 }
 
 /**
@@ -410,17 +409,17 @@ export function arrayOf(subFactory: ModelFactory = primitiveFactory) {
  * @param {any} thing
  * @returns {*}
  */
-export function _getNode(thing): any {
+export function _getNode(thing: IModel): any {
     return getNode(thing)
 }
 
-export function detach<T>(thing: T): T {
+export function detach<T extends IModel>(thing: T): T {
     getNode(thing).detach()
     return thing
 }
 
-export function testActions(factory: ModelFactory, initialState, ...actions: IActionCall[]): Object {
+export function testActions<S, T extends IModel>(factory: ModelFactory<S, T>, initialState: S, ...actions: IActionCall[]): S {
     const testInstance = factory(initialState)
     applyActions(testInstance, actions)
-    return getSnapshot(testInstance)
+    return getSnapshot<S, T>(testInstance)
 }
