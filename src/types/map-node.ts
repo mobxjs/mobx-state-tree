@@ -1,8 +1,13 @@
 import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
-import {ModelFactory, createFactoryHelper} from "../core/factories"
-import {invariant, identity, fail, isPlainObject, extend} from "../utils"
+import {ModelFactory, createFactory} from "../core/factories"
+import {identity, fail, isPlainObject, invariant} from "../utils"
 import {escapeJsonPath} from "../core/json-patch"
+
+interface IMapFactoryConfig {
+    subType: ModelFactory
+    isMapFactory: true
+}
 
 export class MapNode extends Node {
     state: ObservableMap<any>
@@ -77,7 +82,7 @@ export class MapNode extends Node {
         switch (patch.type) {
             case "add":
             case "replace":
-                this.state.set(subpath, patch.value) // takes care of further deserialization
+                this.state.set(subpath, patch.value)
                 break
             case "remove":
                 this.state.delete(subpath)
@@ -86,30 +91,27 @@ export class MapNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
+        invariant(isPlainObject(snapshot), "Expected plain object")
         this.state.replace(snapshot)
     }
 
     getChildFactory(): ModelFactory {
-        return this.subType
+        return (this.factory.config as IMapFactoryConfig).subType
     }
 }
 
 export function createMapFactory(subtype: ModelFactory): ModelFactory {
-    let factory = extend(
-        createFactoryHelper("map-factory", (snapshot: any = {}, env?) => {
-            invariant(isPlainObject(snapshot), "Expected array")
-            const instance = observable.shallowMap()
-            const adm = new MapNode(instance, env, factory)
-            adm.subType = subtype
-            Object.defineProperty(instance, "__modelAdministration", adm)
-            adm.applySnapshot(snapshot)
-            return instance
-        }),
-        { isMapFactory: true }
+    return createFactory(
+        "map-factory",
+        MapNode,
+        {
+            subType: subtype,
+            isMapFactory: true
+        } as IMapFactoryConfig,
+        () => observable.shallowMap()
     )
-    return factory
 }
 
 export function isMapFactory(factory): boolean {
-    return factory.isMapFactory === true
+    return factory && factory.config && factory.config.isMapFactory === true
 }

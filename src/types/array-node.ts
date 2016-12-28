@@ -1,11 +1,15 @@
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
-import {ModelFactory, createFactoryHelper} from "../core/factories"
+import {ModelFactory, createFactory} from "../core/factories"
 import {invariant, identity, fail, extend} from "../utils"
+
+interface IArrayFactoryConfig {
+    subType: ModelFactory
+    isArrayFactory: true
+}
 
 export class ArrayNode extends Node {
     state: IObservableArray<any>
-    subType: ModelFactory
 
     getChildNodes(): [string, Node][] {
         const res: [string, Node][] = []
@@ -84,30 +88,27 @@ export class ArrayNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
+        invariant(Array.isArray(snapshot), "Expected array")
         this.state.replace(snapshot)
     }
 
     getChildFactory(): ModelFactory {
-        return this.subType
+        return (this.factory.config as IArrayFactoryConfig).subType
     }
 }
 
 export function createArrayFactory(subtype: ModelFactory): ModelFactory {
-    let factory = extend(
-        createFactoryHelper("array-factory", (snapshot: any[] = [], env?) => {
-            invariant(Array.isArray(snapshot), "Expected array")
-            const instance = observable.shallowArray()
-            const adm = new ArrayNode(instance, env, factory)
-            adm.subType = subtype
-            Object.defineProperty(instance, "__modelAdministration", adm)
-            instance.replace(snapshot)
-            return instance
-        }),
-        { isArrayFactory: true }
+    return createFactory(
+        "array-factory",
+        ArrayNode,
+        {
+            subType: subtype,
+            isArrayFactory: true
+        } as IArrayFactoryConfig,
+        () => observable.shallowArray()
     )
-    return factory
 }
 
 export function isArrayFactory(factory): boolean {
-    return factory.isArrayFactory === true
+    return factory && factory.config && factory.config.isArrayFactory === true
 }

@@ -31,7 +31,7 @@ export {
 } from "./types/primitive"
 
 export {
-    createFactory,
+    createObjectFactory as createFactory,
     composeFactory,
 } from "./types/object-node"
 

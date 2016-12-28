@@ -7,6 +7,8 @@ import {
 
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
+export type NodeConstructor = new (target: any, environment: any, factory: ModelFactory, factoryConfiguration: Object) => Node
+
 export abstract class Node {
     readonly state: any
     readonly environment: any
@@ -36,8 +38,8 @@ export abstract class Node {
 
     constructor(initialState: any, environment: any, factory: ModelFactory) {
         addHiddenFinalProp(initialState, "$treenode", this)
-        this.environment = environment
         this.factory = factory
+        this.environment = environment
         this.state = initialState
 
         this.interceptDisposer = intercept(this.state, ((c) => this.willChange(c)) as any)

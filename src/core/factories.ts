@@ -1,21 +1,34 @@
 import {action} from "mobx"
-import {extend} from "../utils"
-import {getNode, hasNode} from "./node"
+import {extend, addHiddenFinalProp} from "../utils"
+import {getNode, hasNode, NodeConstructor} from "./node"
 
 export type ModelFactory = {
     (snapshot?: any, env?: Object): any
     isModelFactory: true
-    factoryName: string
+    factoryName: string,
+    config: Object
 }
 
-export function createFactoryHelper(name: string, factory: Function): ModelFactory {
-    return extend(
-        action(name, factory) as any,
+export function createFactory(
+    name: string,
+    nodeClass: NodeConstructor,
+    configuration,
+    instanceCreator: () => any
+): ModelFactory {
+    let factory = extend(
+        action(name, function(snapshot?: any, environment?: Object) {
+            const instance = instanceCreator()
+            const adm = new nodeClass(instance, environment, factory, configuration)
+            adm.applySnapshot(snapshot)
+            return instance
+        }) as any,
         {
             isModelFactory: true,
-            factoryName: name
+            factoryName: name,
+            config: configuration
         }
     )
+    return factory
 }
 
 export function isModelFactory(value: any): value is ModelFactory {
