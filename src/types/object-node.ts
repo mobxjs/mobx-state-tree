@@ -104,8 +104,15 @@ export class ObjectNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
-        // TODO: make a smart deep merge, that recycles object nodes & instances
-        extend(this.state, snapshot)
+        const target = this.state
+        for (let key in snapshot) {
+            invariant(key in this.submodelTypes, `It is not allowed to assign a value to non-declared property ${key} of ${this.factory.factoryName}`)
+            maybeNode(
+                target[key],
+                node => { node.applySnapshot(snapshot[key]) },
+                () =>   { target[key] = snapshot[key] }
+            )
+    }
     }
 
     getChildFactory(key: string): ModelFactory {
@@ -133,18 +140,19 @@ export function createFactory(arg1, arg2?): ModelFactory {
     const baseModel = typeof arg1 === "string" ? arg2 : arg1
 
     // optimization remember which keys are assignable and check that on next runs
-    let factory: ModelFactory = createFactoryHelper(factoryName, function(snapshot: Object = {}, env?: Object) {
-        invariant(snapshot && typeof snapshot === "object" && !hasNode(snapshot), "Not a valid snapshot")
-        const instance = observable({})
+    let factory = extend(
+        createFactoryHelper(factoryName, function(snapshot: Object = {}, env?: Object) {
+            invariant(isPlainObject(snapshot) && !hasNode(snapshot), "Not a valid snapshot")
+            const instance = observable.shallowObject({})
         const adm = new ObjectNode(instance, null, env, factory)
         Object.defineProperty(instance, "__modelAdministration", adm)
         copyBaseModelToInstance(baseModel, instance, adm)
         Object.seal(instance) // don't allow new props to be added!
-        for (let key in snapshot)
-            instance[key] = snapshot[key]
+            adm.applySnapshot(snapshot)
         return instance
-    })
-
+        }),
+        { isObjectFactory: true }
+    )
     return factory
 }
 
