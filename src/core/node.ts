@@ -107,7 +107,7 @@ export abstract class Node {
                 localizedPatch = patch
             else
                 localizedPatch = extend({}, patch, {
-                    // TODO: use relativePath(this, source)
+                    // better: use relativePath(this, source)
                     path: joinJsonPath(source.pathParts.slice(-distance)) + patch.path
                 })
             this.patchSubscribers.forEach(f => f(localizedPatch))
@@ -116,12 +116,9 @@ export abstract class Node {
             this.parent.emitPatch(patch, source, distance + 1)
     }
 
-    // TODO: needs improvements, now called too often. Should be set propertly when applying snapshots / calling factories immediately!
-    // TODO: should not be possible to change just subpath?
     setParent(newParent: Node | null, subpath: string | null = null) {
         if (this.parent === newParent)
             return
-        // TODO: fix check so that things like this work:     this.todos = this.todos.filter(todo => todo.completed === false)
         if (this._parent && newParent) {
             invariant(false, `A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
         }
