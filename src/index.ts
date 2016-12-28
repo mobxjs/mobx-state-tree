@@ -1,43 +1,51 @@
-import {getNode} from "./core/node"
+import {getNode, getRootNode} from "./core/node"
 import {transaction} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer} from "./utils"
 import {getObjectNode, findEnclosingObjectNode} from "./types/object-node"
 import {IActionCall} from "./core/action"
-import {ModelFactory, primitiveFactory} from "./core/factories"
+import {ModelFactory} from "./core/factories"
 import {createMapFactory} from "./types/map-node"
 import {createArrayFactory} from "./types/array-node"
+import {primitiveFactory} from "./types/primitive"
 
 // TODO: improve all typings
 export {
-    action
+    action /* TODO: export action.bound instead? */
 } from "mobx"
 
 export * from "./core/json-patch"
 export {
     ModelFactory,
-    createFactory,
     composeFactory,
     isModelFactory,
-    generateFactory
+    getModelFactory,
+    getChildModelFactory
 } from "./core/factories"
-
 export {
     IActionCall
 } from "./core/action"
 
 export {
+    primitiveFactory
+} from "./types/primitive"
+
+export {
+    createFactory
+} from "./types/object-node"
+
+export {
     referenceTo
-} from "./core/reference"
+} from "./types/reference"
 
 export {
     asReduxStore,
     ReduxStore
 } from "./interop/redux"
+
 export {
     connectReduxDevtools
 } from "./interop/redux-devtools"
-
 
 /**
  * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
@@ -137,6 +145,21 @@ export function applyPatches(target: Object, patches: IJsonPatch[]) {
     })
 }
 
+
+export function recordPatches(subject: Object):
+    { patches: IJsonPatch[], stop(); replay(target: Object); }
+{
+    let recorder = {
+        patches: [] as IJsonPatch[],
+        stop: () => disposer(),
+        replay: (target) => {
+            applyPatches(target, recorder.patches)
+        }
+    }
+    let disposer = onPatch(subject, recorder.patches.push.bind(recorder.patches))
+    return recorder
+}
+
 // TODO: return the action description (possibly as returned by the middleware)
 /**
  * Dispatches an Action on a model instance. All middlewares will be triggered.
@@ -166,8 +189,23 @@ export function applyActions(target: Object, actions: IActionCall[]): void {
     })
 }
 
-// TODO: rename to restoreSnapshot
-// TODO: if target is not set, snapshot restores to it's original
+export function recordActions(subject: Object):
+    { actions: IActionCall[]; stop(); replay(target: Object); }
+{
+    let recorder = {
+        actions: [] as IActionCall[],
+        stop: () => disposer(),
+        replay: (target) => {
+            applyActions(target, recorder.actions)
+        }
+    }
+    let disposer = onAction(subject, (action, next) => {
+        recorder.actions.push(action)
+        next()
+    })
+    return recorder
+}
+
 /**
  * Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
  *
@@ -201,7 +239,7 @@ export function getSnapshot(target: Object): any {
  * @returns {boolean}
  */
 export function hasParent(target: Object, strict: boolean = false): boolean {
-    return getParent(target) !== null
+    return getParent(target, strict) !== null
 }
 
 /**
@@ -244,7 +282,18 @@ export function getParentObject(target: Object): any {
 }
 
 /**
+ * Given an object in a model tree, returns the root object of that tree
  *
+ * @export
+ * @param {Object} target
+ * @returns {*}
+ */
+export function getRoot(target: Object): any {
+    return getRootNode(getNode(target)).state
+}
+
+/**
+ * Returns the path of the given object in the model tree
  *
  * @export
  * @param {Object} target
@@ -255,7 +304,7 @@ export function getPath(target: Object): string {
 }
 
 /**
- *
+ * Returns the path of the given object as unescaped string array
  *
  * @export
  * @param {Object} target
@@ -266,7 +315,7 @@ export function getPathParts(target: Object): string[] {
 }
 
 /**
- *
+ * Returns true if the given object is the root of a model tree
  *
  * @export
  * @param {Object} target
@@ -277,11 +326,11 @@ export function isRoot(target: Object): boolean {
 }
 
 /**
- *
+ * Resolves a path relatively to a given object.
  *
  * @export
  * @param {Object} target
- * @param {string} path
+ * @param {string} path - escaped json path
  * @returns {*}
  */
 export function resolve(target: Object, path: string): any {
@@ -304,7 +353,6 @@ export function tryResolve(target: Object, path: string): any {
     return node ? node.state : undefined
 }
 
-// TODO: require second arg, getFromEnvironment(target, field) ?
 /**
  *
  *
@@ -312,8 +360,8 @@ export function tryResolve(target: Object, path: string): any {
  * @param {Object} target
  * @returns {Object}
  */
-export function getEnvironment(target: Object, key: string): Object {
-    return getNode(target).getEnvironment(key)
+export function getFromEnvironment(target: Object, key: string): Object {
+    return getNode(target).getFromEnvironment(key)
 }
 
 /**
@@ -366,14 +414,6 @@ export function _getNode(thing): any {
     return getNode(thing)
 }
 
-// TODO:
-// - setGlobalDefaultStore(factory, initialData)
-// - getGlobalDefaultStore
-// - dispatch?
-// - connect({ propName: (stateTree) => value })
-// - RootComponent
-// - isModel
-// - isModelFactory
 // - getModelFactory
 // - getChildModelFactory
 
@@ -389,10 +429,6 @@ export function isModel(thing: any): boolean {
     return true
 }
 
-// TODO: support observables
-
-//export function testActions(baseModel, ...actions: IActionCall[]): Object {
-// TODO: 2 overloads, model or factory?
 export function testActions(factory: ModelFactory, initialState, ...actions: IActionCall[]): Object {
     const testInstance = factory(initialState)
     applyActions(testInstance, actions)

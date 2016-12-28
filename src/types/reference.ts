@@ -8,6 +8,8 @@ export interface IReferenceDescription {
 }
 
 // TODO: support list / map references as well.
+// TODO: overload: referenceTo(path => object, object => path)
+// .. or something like: https://gist.github.com/kenotron/8c4b0f70ecacf37d207853b40d0ddbed?
 export function referenceTo<T>(path: string, sourceIdAttribute: string = ""): T {
     // TODO check input args
     const targetIdAttribute = path.split("/").slice(-1)[0]
@@ -35,6 +37,7 @@ export function createReferenceProps(name: string, ref: IReferenceDescription) {
             return id ? tryResolve(this, ref.path + "/" + id) : null // TODO: insert slash etc?
         },
         set: function(v) {
+            // TODO: check if root of assign value is same as current root
             // TODO: emit action
             this[sourceIdAttribute] = v ? v[ref.targetIdAttribute] : ""
         },

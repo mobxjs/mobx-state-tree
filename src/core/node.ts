@@ -118,7 +118,7 @@ export abstract class Node /* TODO: implements INode*/ {
         if (this._parent && newParent) {
             invariant(false, `A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
         }
-        if (!this._parent && newParent && getRoot(newParent) === this) {
+        if (!this._parent && newParent && getRootNode(newParent) === this) {
             invariant(false, `A state tree is not allowed to contain itself. Cannot add root to path '/${newParent.pathParts.concat(subpath!).join("/")}'`)
         }
         if (this.parent && !newParent && (
@@ -185,12 +185,12 @@ export abstract class Node /* TODO: implements INode*/ {
         return this.parent!.isRunningAction()
     }
 
-    getEnvironment(key: string): any {
+    getFromEnvironment(key: string): any {
         if (this.environment && this.environment.hasOwnProperty(key))
             return this.environment[key]
         if (this.isRoot)
             return fail(`Undefined environment variable '${key}'`)
-        return this.parent!.getEnvironment(key)
+        return this.parent!.getFromEnvironment(key)
     }
 }
 
@@ -237,7 +237,7 @@ export function getParent(thing): any {
     return node.parent ? node.parent.state : null
 }
 
-function getRoot(node: Node) {
+export function getRootNode(node: Node) {
     let p, r = node
     while (p = r.parent)
         r = p
