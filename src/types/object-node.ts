@@ -127,7 +127,8 @@ export class ObjectNode extends Node {
         const node = this.resolve(action.path || "")
         if (node instanceof ObjectNode)
             applyActionLocally(node, action)
-        fail(`Invalid action path: ${action.path || ""}`)
+        else
+            fail(`Invalid action path: ${action.path || ""}`)
     }
 
     emitAction(instance: ObjectNode, action: IActionCall, next) {
