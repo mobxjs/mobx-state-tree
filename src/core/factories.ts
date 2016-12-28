@@ -10,7 +10,7 @@ export type ModelFactory = {
 
 export function createFactoryHelper(name: string, factory: Function): ModelFactory {
     return extend(
-        action(name, factory),
+        action(name, factory) as any,
         {
             isModelFactory: true,
             factoryName: name

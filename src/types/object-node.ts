@@ -10,8 +10,10 @@ import {isReferenceFactory, createReferenceProps} from "./reference"
 import {primitiveFactory} from "./primitive"
 
 export class ObjectNode extends Node {
-    readonly actionSubscribers: IActionHandler[] = [];
-    readonly submodelType: {
+    readonly actionSubscribers: IActionHandler[] = []
+
+    // Optimization: submodelTypes can be stored on the factory!
+    readonly submodelTypes: {
         [key: string]: ModelFactory;
     } = {}
     _isRunningAction = false
@@ -83,7 +85,7 @@ export class ObjectNode extends Node {
     emitAction(instance: ObjectNode, action: IActionCall, next) {
         let idx = -1
         const correctedAction: IActionCall = this.actionSubscribers.length
-            ? extend({}, action, { path: getRelativePath(this, instance) })
+            ? extend({} as any, action, { path: getRelativePath(this, instance) })
             : null
         let n = () => {
             // optimization: use tail recursion / trampoline
@@ -107,7 +109,7 @@ export class ObjectNode extends Node {
     }
 
     getChildFactory(key: string): ModelFactory {
-        return this.submodelType[key] || primitiveFactory
+        return this.submodelTypes[key] || primitiveFactory
     }
 
     onAction(listener: (action: IActionCall, next: () => void) => void): IDisposer {
@@ -201,8 +203,7 @@ export function composeFactory(...args: any[]): ModelFactory {
 
 export function getObjectNode(thing: any): ObjectNode {
     const node = getNode(thing)
-    // TODO: no instanceof, better message
-    invariant(node instanceof ObjectNode, "Expected object node")
+    invariant((node.factory as any).isObjectFactory === true, "Expected object node, got " + (node.constructor as any).name)
     return node as ObjectNode
 }
 

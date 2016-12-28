@@ -1,4 +1,4 @@
-import {ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
+import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {ModelFactory, createFactoryHelper} from "../core/factories"
 import {invariant, isMutable, identity, fail, isPlainObject, extend} from "../utils"
@@ -101,7 +101,7 @@ export function createMapFactory(subtype: ModelFactory): ModelFactory {
     let factory = extend(
         createFactoryHelper("map-factory", (snapshot: any = {}, env?) => {
             invariant(isPlainObject(snapshot), "Expected array")
-            const instance = new ObservableMap()
+            const instance = observable.shallowMap()
             const adm = new MapNode(instance, null, env, factory)
             adm.subType = subtype
             Object.defineProperty(instance, "__modelAdministration", adm)

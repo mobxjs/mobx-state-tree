@@ -97,7 +97,7 @@ export function createArrayFactory(subtype: ModelFactory): ModelFactory {
     let factory = extend(
         createFactoryHelper("array-factory", (snapshot: any[] = [], env?) => {
             invariant(Array.isArray(snapshot), "Expected array")
-            const instance: IObservableArray<any> = observable([])
+            const instance = observable.shallowArray()
             const adm = new ArrayNode(instance, null, env, factory)
             adm.subType = subtype
             Object.defineProperty(instance, "__modelAdministration", adm)
