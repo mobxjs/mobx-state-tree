@@ -1,5 +1,5 @@
-import {action, isAction, extendObservable, observable, IObjectChange, IObjectWillChange, isObservable} from "mobx"
-import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty} from "../utils"
+import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, isObservable} from "mobx"
+import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
 import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
 import {ModelFactory, isModelFactory, createFactoryHelper, getModelFactory} from "../core/factories"
 import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
@@ -112,7 +112,7 @@ export class ObjectNode extends Node {
                 node => { node.applySnapshot(snapshot[key]) },
                 () =>   { target[key] = snapshot[key] }
             )
-    }
+        }
     }
 
     getChildFactory(key: string): ModelFactory {
@@ -144,12 +144,12 @@ export function createFactory(arg1, arg2?): ModelFactory {
         createFactoryHelper(factoryName, function(snapshot: Object = {}, env?: Object) {
             invariant(isPlainObject(snapshot) && !hasNode(snapshot), "Not a valid snapshot")
             const instance = observable.shallowObject({})
-        const adm = new ObjectNode(instance, null, env, factory)
-        Object.defineProperty(instance, "__modelAdministration", adm)
-        copyBaseModelToInstance(baseModel, instance, adm)
-        Object.seal(instance) // don't allow new props to be added!
+            const adm = new ObjectNode(instance, null, env, factory)
+            Object.defineProperty(instance, "__modelAdministration", adm)
+            copyBaseModelToInstance(baseModel, instance, adm)
+            Object.seal(instance) // don't allow new props to be added!
             adm.applySnapshot(snapshot)
-        return instance
+            return instance
         }),
         { isObjectFactory: true }
     )
@@ -162,31 +162,27 @@ function copyBaseModelToInstance(baseModel: Object, instance: Object, adm: Objec
         if ("get" in descriptor) {
             const tmp = {} // yikes
             Object.defineProperty(tmp, key, descriptor)
-            extendObservable(instance, tmp)
+            extendShallowObservable(instance, tmp)
             continue
         }
 
         const {value} = descriptor
         if (isPrimitive(value)) {
-            extendObservable(instance, { [key] : value })
+            adm.submodelTypes[key] = primitiveFactory
+            extendShallowObservable(instance, { [key] : value })
         } else if (isMapFactory(value)) {
-            adm.submodelType[key] = value
-            extendObservable(instance, { [key] : {} }) //TODO: allow predefined map in future? second arg to factory?
+            adm.submodelTypes[key] = value
+            addReadOnlyProp(instance, key, adm.prepareChild(key, {}))
         } else if (isArrayFactory(value)) {
-            adm.submodelType[key] = value
-            extendObservable(instance, { [key] : [] }) //TODO: allow predefined map in future? second arg to factory?
-        // TODO: might be convenient shorthand in the future
-        // } else if (Array.isArray(value)) {
-        //     invariant(value.length < 2 && value.length >= 0, "Array fields should have length zero or one in: " + key)
-        //     // TODO: have separate factory for primitives?
-        //     const subFactory = createArrayFactory(value.length === 1 ? value[0] : primitiveFactory)
-        //     adm.submodelType[key] = subFactory
+            adm.submodelTypes[key] = value
+            addReadOnlyProp(instance, key, adm.prepareChild(key, []))
         } else if (isModelFactory(value)) {
-            adm.submodelType[key] = value
-            extendObservable(instance, { [key] : null })
+            adm.submodelTypes[key] = value
+            // future work: allow initialization / default values
+            extendShallowObservable(instance, { key: null })
         } else if (isReferenceFactory(value)) {
-            extendObservable(instance, createReferenceProps(key, value))
-        }else if (isAction(value)) {
+            extendShallowObservable(instance, createReferenceProps(key, value))
+        } else if (isAction(value)) {
             createActionWrapper(instance, key, value)
         } else if (typeof value === "function") {
             createNonActionWrapper(instance, key, value)

@@ -63,6 +63,15 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
     })
 }
 
+export function addReadOnlyProp(object: any, propName: string, value: any) {
+    Object.defineProperty(object, propName, {
+        enumerable: true,
+        writable: false,
+        configurable: true,
+        value
+    })
+}
+
 export function registerEventHandler(handlers: Function[], handler: Function): IDisposer {
     handlers.push(handler)
     return () => {
