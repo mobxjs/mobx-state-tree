@@ -23,7 +23,8 @@ export function createFactory<S, T>(
         action(name, function(snapshot?: any, environment?: Object) {
             const instance = instanceCreator()
             const adm = new nodeClass(instance, environment, factory, configuration)
-            adm.applySnapshot(snapshot)
+            if (arguments.length > 0)
+                adm.applySnapshot(snapshot)
             return instance
         }) as any,
         {

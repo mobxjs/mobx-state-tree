@@ -55,6 +55,7 @@ function verifyArgumentsAreStringifyable(actionName: string, args: any[]) {
     args.forEach((arg, index) => {
         if (isPrimitive(arg))
             return
+        // Future work: could model arguments be made serializable, e.g. represent as relative path?
         if (isModel(arg))
             throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive or plain object, received a ${getModelFactory(arg).factoryName} model.`)
         if (!isPlainObject(arg))

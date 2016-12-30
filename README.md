@@ -3,7 +3,7 @@
 ## _This package is work in progress, stay tuned_
 
 _Opinionated, transactional, MobX powered state container_
- 
+
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/mobxjs/mobx.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -154,6 +154,11 @@ Useful methods:
 * `onAction(model, middleware)` listens to any action that is invoked on the model or any of it's descendants. See `onAction` for more details.
 * `applyAction(model, action)` invokes an action on the model according to the given action description
 
+## Utility methods
+
+* No restriction in arguments and return types
+* Cannot modify data except though actions
+
 ## Patches
 
 Modifying a model does not only result in a new snapshot, but also in a stream of [JSON-patches](http://jsonpatch.com/) describing which modifications are made.
@@ -216,6 +221,10 @@ const myStore = Store({ users: []}, { fetch: window.fetch })
 See [#10](https://github.com/mobxjs/mobx-state-tree/issues/10)
 
 ## Factory composition
+
+## Single or multiple state
+
+## Using mobx and mobx-state-tree together
 
 ## Integrations
 
