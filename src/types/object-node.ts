@@ -47,6 +47,9 @@ export class ObjectNode extends Node {
                 extendShallowObservable(instance, { [key] : value })
             } else if (isMapFactory(value)) {
                 this.submodelTypes[key] = value
+                // there is no technical need for read only props, but
+                // it might avoid confusion if direct assingments are forbidden,
+                // and content of complex collections is replace instead
                 addReadOnlyProp(instance, key, this.prepareChild(key, {}))
             } else if (isArrayFactory(value)) {
                 this.submodelTypes[key] = value
@@ -61,9 +64,9 @@ export class ObjectNode extends Node {
             } else if (typeof value === "function") {
                 createNonActionWrapper(instance, key, value)
             } else if (typeof value === "object") {
-                invariant(false, `In property '${key}': base model's should not contain complex values: '${value}'`)
+                fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
             } else  {
-                invariant(false)
+                fail(`Unexpected value for property '${key}'`)
             }
         }
     }

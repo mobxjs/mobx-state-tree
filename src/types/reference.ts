@@ -29,7 +29,10 @@ function createRelativeReferenceTo(path: string) {
     path = path.split("/").slice(0, -1).join("/")
     return referenceTo(
         (identifier: string, owner: IModel) => tryResolve(owner, `${path}/${identifier}`),
-        (value: any)                        => value[targetIdAttribute]
+        (value: any)                        => {
+            invariant(!value || (getRoot(value) === getRoot(this)), `The value assigned to the reference '${name}' should already be part of the same model tree`)
+            return value[targetIdAttribute]
+        }
     )
 }
 
@@ -46,7 +49,6 @@ export function createReferenceProps(name: string, ref: IReferenceDescription) {
         },
         set: function(v) {
             invariant(getObjectNode(this).isRunningAction(), `Reference '${name}' can only be modified from within an action`)
-            invariant(!v || (getRoot(v) === getRoot(this)), `The value assigned to the reference '${name}' should already be part of the same model tree`)
             this[sourceIdAttribute] = v ? ref.setter(v, this, name) : ""
         },
         enumerable: true
