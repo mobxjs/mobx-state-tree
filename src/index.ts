@@ -1,7 +1,7 @@
 import {getNode, getRootNode} from "./core/node"
-import {transaction, IObservableArray, ObservableMap} from "mobx"
+import {transaction, IObservableArray, ObservableMap, observable} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
-import {IDisposer} from "./utils"
+import {IDisposer, invariant} from "./utils"
 import {getObjectNode, findEnclosingObjectNode} from "./types/object-node"
 import {IActionCall} from "./core/action"
 import {IModelFactory, IModel} from "./core/factories"
@@ -431,3 +431,20 @@ export function testActions<S, T extends IModel>(factory: IModelFactory<S, T>, i
     applyActions(testInstance, actions)
     return getSnapshot<S, T>(testInstance)
 }
+
+const appState = observable.shallowBox<any>(undefined)
+
+export function resetAppState() {
+    appState.set(undefined)
+}
+
+export function initializeAppState<S, T>(factory: IModelFactory<S, T>, initialSnapshot?: S, environment?: Object) {
+    invariant(!appState, `Global app state was already initialized, use 'resetAppState' to reset it`)
+    appState.set(factory(initialSnapshot, environment))
+}
+
+export function getAppState<T>(): T {
+    invariant(!!appState, `Global app state has not been initialized, use 'initializeAppState' for globally shared state`)
+    return appState.get() as T
+}
+
