@@ -1,6 +1,7 @@
 node_modules
 *.log
 lib
+test-lib
 coverage
 mobx-state-tree.umd.js
 .vscode
