@@ -7,6 +7,5 @@ test("it should create a factory", (t) => {
         hello: "world"
     })
 
-    // t.deepEqual(factory(), { hello: "world" })
-    t.deepEqual(true, true)
+    t.deepEqual(factory(), { hello: "world" })
 })

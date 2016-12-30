@@ -4,6 +4,5 @@
     "editor.trimAutoWhitespace": true,
     "editor.trimTrailingWhitespace": true,
     "tslint.configFile": "tslint.json",
-    "typescript.tsdk": "node_modules/typescript/lib",
-    "editor.lineHeight": 22,
+    "typescript.tsdk": "node_modules/typescript/lib"
 }
