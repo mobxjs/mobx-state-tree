@@ -7,6 +7,6 @@
         "outDir": "../test-lib"
     },
     "include": [
-        "*.ts"
+        "**/*.ts"
     ]
 }
