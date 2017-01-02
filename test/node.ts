@@ -137,3 +137,24 @@ test("it should clone a node", (t) => {
 
     t.deepEqual(doc, cloned)
 })
+
+// test tree unique
+test("a node can exists only once in a tree", (t) => {
+    const Row = createFactory({
+        article_id: 0
+    })
+
+    const Document = createFactory({
+        rows: arrayOf(Row),
+        foos: arrayOf(Row)
+    })
+
+    const doc = Document()
+    const row = Row()
+    doc.rows.push(row)
+
+    const error = t.throws(() => {
+        doc.foos.push(row)
+    })
+    t.is(error.message, "[mobx-state-tree] A node cannot exists twice in the state tree. Failed to add object to path '/foos/0', it exists already at '/rows/0'")
+})
