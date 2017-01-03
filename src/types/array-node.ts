@@ -66,7 +66,8 @@ export class ArrayNode extends Node {
                 for (let i = 0; i < change.addedCount; i++)
                     this.emitPatch({
                         op: "add",
-                        path: "/" + (change.index + i)
+                        path: "/" + (change.index + i),
+                        value: valueToSnapshot(change.added[i])
                     }, this)
                 return
         }
