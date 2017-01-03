@@ -109,7 +109,7 @@ export abstract class Node {
                 localizedPatch = patch
             else
                 localizedPatch = extend({}, patch, {
-                    path: getRelativePath(source, this)
+                    path: getRelativePath(this, source)
                 })
             this.patchSubscribers.forEach(f => f(localizedPatch))
         }
@@ -245,6 +245,7 @@ export function getPath(thing: IModel): string {
 
 export function getRelativePath(base: Node, target: Node): string {
     // PRE condition target is (a child of) base!
+    invariant(target.path.length >= base.path.length, 'getRelativePath received a target path "'+target.path+'" shorter than the base path "'+base.path+'".')
     return target.path.substr(base.path.length)
 }
 
