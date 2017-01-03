@@ -99,7 +99,7 @@ test("it should emit update patches", (t) => {
     let patches = []
     onPatch(doc, patch => patches.push(patch))
 
-    doc[0].to = "universe"
+    doc[0] = ItemFactory({to: "universe"})
 
     t.deepEqual(patches, [
         {op: "replace", path: "/0", value: {to: "universe"}}
@@ -140,8 +140,6 @@ test("it should apply a remove patch", (t) => {
     doc.push(ItemFactory({to: "universe"}))
 
     applyPatch(doc, {op: "remove", path: "/0"})
-
-    doc.splice(0)
 
     t.deepEqual(getSnapshot(doc), [{to: "universe"}])
 })

@@ -57,7 +57,7 @@ export abstract class Node {
     abstract willChange(change): Object | null
     abstract didChange(change): void
     abstract serialize(): any
-    abstract applyPatchLocally(subpath, patch): void
+    abstract applyPatchLocally(subpath: string, patch: IJsonPatch): void
     abstract getChildFactory(key: string): IModelFactory<any, any>
     abstract applySnapshot(snapshot): void
 

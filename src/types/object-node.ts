@@ -199,6 +199,12 @@ export function createObjectFactory(arg1, arg2?) {
     )
 }
 
+function getObjectFactoryBaseModel(item){
+    let factory = isModelFactory(item) ? item : getModelFactory(item)
+
+    return isObjectFactory(factory) ? (factory.config as IObjectFactoryConfig).baseModel : {}
+}
+
 export function composeFactory<AS, AT, BS, BT>(name: string, a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>): IModelFactory<AS & BS, AT & BT>;
 export function composeFactory<AS, AT, BS, BT, CS, CT>(name: string, a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>, c: IModelFactory<CS, CT>): IModelFactory<AS & BS & CS, AT & BT & CT>;
 export function composeFactory<S, T>(name: string, ...models: IModelFactory<any, any>[]): IModelFactory<S, T>;
@@ -211,7 +217,7 @@ export function composeFactory(...args: any[]) {
 
     return createObjectFactory(
         factoryName,
-        extend.apply(null, baseModels.map(getModelFactory))
+        extend.apply(null, baseModels.map(getObjectFactoryBaseModel))
     )
 }
 
