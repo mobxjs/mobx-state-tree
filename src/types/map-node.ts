@@ -2,7 +2,7 @@ import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mob
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {IModelFactory, createFactory} from "../core/factories"
 import {identity, fail, isPlainObject, invariant} from "../utils"
-import {escapeJsonPath} from "../core/json-patch"
+import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 
 interface IMapFactoryConfig {
     subType: IModelFactory<any, any>
@@ -77,8 +77,8 @@ export class MapNode extends Node {
         }
     }
 
-    applyPatchLocally(subpath, patch): void {
-        switch (patch.type) {
+    applyPatchLocally(subpath: string, patch: IJsonPatch): void {
+        switch (patch.op) {
             case "add":
             case "replace":
                 this.state.set(subpath, patch.value)
