@@ -109,12 +109,12 @@ export abstract class Node {
                 localizedPatch = patch
             else
                 localizedPatch = extend({}, patch, {
-                    path: getRelativePath(this, source)
+                    path: getRelativePath(this, source) + patch.path
                 })
             this.patchSubscribers.forEach(f => f(localizedPatch))
         }
         if (this.parent)
-            this.parent.emitPatch(patch, source, distance + 1)
+            this.parent.emitPatch(patch, this, distance + 1)
     }
 
     setParent(newParent: Node | null, subpath: string | null = null) {
