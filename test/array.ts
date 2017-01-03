@@ -8,15 +8,11 @@ interface ITestSnapshot{
 
 interface ITest{
     to: string
-    setTo: (to: string) => void
 }
 
 const createTestFactories = () => {
     const ItemFactory = createFactory({
-            to: 'world',
-            setTo: action(function(to){
-                this.to = to
-            })
+            to: 'world'
         })
 
     const Factory = (arrayOf(
