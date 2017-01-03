@@ -1,5 +1,6 @@
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
+import {IJsonPatch} from "../core/json-patch"
 import {IModelFactory, createFactory} from "../core/factories"
 import {invariant, identity, fail} from "../utils"
 
@@ -73,10 +74,10 @@ export class ArrayNode extends Node {
         }
     }
 
-    applyPatchLocally(subpath, patch): void {
+    applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         const index = subpath === "-" ? this.state.length : parseInt(subpath)
-        switch (patch.type) {
-            case "update":
+        switch (patch.op) {
+            case "replace":
                 this.state[index] = patch.value
                 break
             case "add":

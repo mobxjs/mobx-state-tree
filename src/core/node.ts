@@ -57,7 +57,7 @@ export abstract class Node {
     abstract willChange(change): Object | null
     abstract didChange(change): void
     abstract serialize(): any
-    abstract applyPatchLocally(subpath, patch): void
+    abstract applyPatchLocally(subpath: string, patch: IJsonPatch): void
     abstract getChildFactory(key: string): IModelFactory<any, any>
     abstract applySnapshot(snapshot): void
 
@@ -109,12 +109,12 @@ export abstract class Node {
                 localizedPatch = patch
             else
                 localizedPatch = extend({}, patch, {
-                    path: getRelativePath(source, this)
+                    path: getRelativePath(this, source) + patch.path
                 })
             this.patchSubscribers.forEach(f => f(localizedPatch))
         }
         if (this.parent)
-            this.parent.emitPatch(patch, source, distance + 1)
+            this.parent.emitPatch(patch, this, distance + 1)
     }
 
     setParent(newParent: Node | null, subpath: string | null = null) {
@@ -245,6 +245,7 @@ export function getPath(thing: IModel): string {
 
 export function getRelativePath(base: Node, target: Node): string {
     // PRE condition target is (a child of) base!
+    invariant(target.path.length >= base.path.length, 'getRelativePath received a target path "'+target.path+'" shorter than the base path "'+base.path+'".')
     return target.path.substr(base.path.length)
 }
 

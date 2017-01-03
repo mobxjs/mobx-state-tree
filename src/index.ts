@@ -160,7 +160,9 @@ export function recordPatches(subject: IModel): IPatchRecorder {
             applyPatches(target, recorder.patches)
         }
     }
-    let disposer = onPatch(subject, recorder.patches.push.bind(recorder.patches))
+    let disposer = onPatch(subject, (patch) => {
+        recorder.patches.push(patch)
+    })
     return recorder
 }
 
