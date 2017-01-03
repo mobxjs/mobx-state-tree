@@ -205,7 +205,6 @@ test("it can record and replay patches", (t) => {
     source.customer_id = 1
     source.rows.push(Row({article_id: 1}))
 
-    console.log('patches', recorder.patches)
     recorder.replay(target)
 
     t.deepEqual(getSnapshot(source), getSnapshot(target))
