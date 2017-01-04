@@ -37,3 +37,12 @@ test("it should compute exact union types", (t) => {
     t.deepEqual(DispatchPlane.is(Box()), true)
     t.deepEqual(DispatchPlane.is(Square()), true)
 })
+
+
+test("it should resolve the exact type", (t) => {
+    const {Box, DispatchPlane, Square} = createTestFactories()
+
+    const doc = DispatchPlane()
+
+    t.deepEqual(DispatchPlane.dispatch(doc), Square)
+})

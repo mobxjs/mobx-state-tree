@@ -18,6 +18,8 @@ export function createUnionFactory(dispatch: IModelFactoryDispatcher, ...otherTy
         "union",
         snapshot => types.some(type => type.is(snapshot)),
         getType,
-        (state?: any, env?: Object) => getType(state)(state, env)
+        function (state?: any, env?: Object){
+            return arguments.length > 0 ? getType(state)(state, env) : dispatch()()
+        }
     )
 }

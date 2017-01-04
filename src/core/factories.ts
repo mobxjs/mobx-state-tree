@@ -7,7 +7,7 @@ export type IModel = {
 } & Object
 
 export type IModelFactoryChecker = (snapshot: any) => boolean
-export type IModelFactoryDispatcher = (snapshot: any) => IModelFactory<any, any>
+export type IModelFactoryDispatcher = (snapshot?: any) => IModelFactory<any, any>
 export interface IModelFactoryConstructor<S, T>{
     (snapshot?: S, env?: Object): T & IModel
 }
