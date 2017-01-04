@@ -9,7 +9,7 @@ import {IModel} from "./factories"
 
 export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
-export type NodeConstructor = new (target: any, environment: any, factory: IModelFactory<any, any>, factoryConfiguration: Object) => Node
+export type NodeConstructor = new (target: any, environment: any, factory: IModelFactoryConstructor<any, any>, factoryConfiguration: Object) => Node
 
 export abstract class Node {
     readonly state: any
@@ -279,5 +279,5 @@ import {
     addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
 } from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
-import {IModelFactory} from "./factories"
+import {IModelFactory, IModelFactoryConstructor} from "./factories"
 import {ObjectNode} from "../types/object-node"

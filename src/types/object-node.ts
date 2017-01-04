@@ -1,7 +1,7 @@
 import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange} from "mobx"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
 import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
-import {IModelFactory, isModelFactory, createFactory, getModelFactory, IModel} from "../core/factories"
+import {IModelFactory, isModelFactory, createFactory, getModelFactory, IModel, createFactoryConstructor} from "../core/factories"
 import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
 import {escapeJsonPath} from "../core/json-patch"
 import {isArrayFactory} from "../types/array-node"
@@ -188,15 +188,27 @@ export class ObjectNode extends Node {
 export function createObjectFactory<S extends Object, T extends S>(baseModel: T): IModelFactory<S, T>
 export function createObjectFactory<S extends Object, T extends S>(name: string, baseModel: T): IModelFactory<S, T>
 export function createObjectFactory(arg1, arg2?) {
-    return createFactory(
-        typeof arg1 === "string" ? arg1 : "unnamed-object-factory",
-        ObjectNode,
-        {
-            isObjectFactory: true,
-            baseModel: typeof arg1 === "string" ? arg2 : arg1
-        },
-        () => observable.shallowObject({})
+    let name = typeof arg1 === "string" ? arg1 : "unnamed-object-factory"
+    let config: Object = typeof arg1 === "string" ? arg2 : arg1
+    let primitiveKeys = Object.keys(config).filter(key => isPrimitive(config[key]))
+
+    let factory = createFactory(
+        name,
+        "object",
+        snapshot => typeof snapshot === 'object' && Object.keys(snapshot).length === primitiveKeys.length && primitiveKeys.every(key => key in snapshot),
+        snapshot => factory,
+        createFactoryConstructor(
+            name,
+            ObjectNode,
+            {
+                isObjectFactory: true,
+                baseModel: typeof arg1 === "string" ? arg2 : arg1
+            },
+            () => observable.shallowObject({})
+        )
     )
+
+    return factory
 }
 
 function getObjectFactoryBaseModel(item){
