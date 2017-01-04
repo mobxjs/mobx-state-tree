@@ -4,7 +4,7 @@ import {invariant, isPrimitive, extend, identity} from "../utils"
 export const primitiveFactory = createFactory(
         "primitive",
         "primitive",
-        snapshot => isPrimitive(snapshot),
+        isPrimitive,
         snapshot => primitiveFactory,
         extend(
             function primitiveFactory(snapshot: any): any {
