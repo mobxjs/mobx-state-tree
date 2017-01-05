@@ -1,5 +1,5 @@
 import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
+import {Node, maybeNode, valueToSnapshot, hasNode} from "../core/node"
 import {IModelFactory, createFactory, createFactoryConstructor} from "../core/factories"
 import {identity, fail, isPlainObject, invariant} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
@@ -90,7 +90,7 @@ export class MapNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
-        invariant(isPlainObject(snapshot), "Expected plain object")
+        invariant(this.factory.is(snapshot) && !hasNode(snapshot), 'Snapshot ' + JSON.stringify(snapshot) + ' is not assignable to ' + this.factory.factoryName)
         this.state.replace(snapshot)
     }
 

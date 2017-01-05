@@ -156,7 +156,7 @@ export class ObjectNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
-        invariant(isPlainObject(snapshot) && !hasNode(snapshot), "Not a valid snapshot")
+        invariant(this.factory.is(snapshot) && !hasNode(snapshot), 'Snapshot ' + JSON.stringify(snapshot) + ' is not assignable to ' + this.factory.factoryName)
         const target = this.state
         for (let key in snapshot) {
             invariant(key in this.submodelTypes, `It is not allowed to assign a value to non-declared property ${key} of ${this.factory.factoryName}`)

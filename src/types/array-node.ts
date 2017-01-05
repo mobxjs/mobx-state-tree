@@ -1,5 +1,5 @@
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
+import {Node, maybeNode, valueToSnapshot, hasNode} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
 import {IModelFactory, createFactory, createFactoryConstructor} from "../core/factories"
 import {invariant, identity, fail} from "../utils"
@@ -90,7 +90,7 @@ export class ArrayNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
-        invariant(Array.isArray(snapshot), "Expected array")
+        invariant(this.factory.is(snapshot) && !hasNode(snapshot), 'Snapshot ' + JSON.stringify(snapshot) + ' is not assignable to ' + this.factory.factoryName)
         this.state.replace(snapshot)
     }
 
