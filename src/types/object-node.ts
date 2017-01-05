@@ -56,7 +56,7 @@ export class ObjectNode extends Node {
                 addReadOnlyProp(instance, key, this.prepareChild(key, []))
             } else if (isModelFactory(value)) {
                 this.submodelTypes[key] = value
-                extendShallowObservable(instance, { key: null })
+                extendShallowObservable(instance, { [key]: null })
             } else if (isReferenceFactory(value)) {
                 extendShallowObservable(instance, createReferenceProps(key, value))
             } else if (isAction(value)) {
