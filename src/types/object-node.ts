@@ -56,7 +56,7 @@ export class ObjectNode extends Node {
                 addReadOnlyProp(instance, key, this.prepareChild(key, []))
             } else if (isModelFactory(value)) {
                 this.submodelTypes[key] = value
-                extendShallowObservable(instance, { key: null })
+                extendShallowObservable(instance, { [key]: null })
             } else if (isReferenceFactory(value)) {
                 extendShallowObservable(instance, createReferenceProps(key, value))
             } else if (isAction(value)) {
@@ -190,12 +190,24 @@ export function createObjectFactory<S extends Object, T extends S>(name: string,
 export function createObjectFactory(arg1, arg2?) {
     let name = typeof arg1 === "string" ? arg1 : "unnamed-object-factory"
     let config: Object = typeof arg1 === "string" ? arg2 : arg1
-    let primitiveKeys = Object.keys(config).filter(key => isPrimitive(config[key]))
+    let modelKeys = Object.keys(config).filter(key => isPrimitive(config[key]) || isModelFactory(config[key]))
+
+    const is = snapshot => {
+        if(!isPlainObject(snapshot)) return false
+        const snapshotKeys = Object.keys(snapshot)
+        if(snapshotKeys.length > modelKeys.length) return false
+        return snapshotKeys.every(key => {
+            let keyInConfig = key in config
+            let bothArePrimitives = isPrimitive(config[key]) && isPrimitive(snapshot[key])
+            let ifModelFactoryIsCastable = isModelFactory(config[key]) && config[key].is(snapshot[key])
+            return keyInConfig && (bothArePrimitives || ifModelFactoryIsCastable)
+        })
+    }
 
     let factory = createFactory(
         name,
         "object",
-        snapshot => typeof snapshot === 'object' && Object.keys(snapshot).length === primitiveKeys.length && primitiveKeys.every(key => key in snapshot),
+        is,
         snapshot => factory,
         createFactoryConstructor(
             name,
