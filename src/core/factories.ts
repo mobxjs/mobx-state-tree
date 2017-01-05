@@ -1,36 +1,69 @@
 import {action} from "mobx"
-import {extend} from "../utils"
+import {extend, fail} from "../utils"
 import {getNode, hasNode, NodeConstructor} from "./node"
 
 export type IModel = {
     $treenode: any // Actually Node, but that should not be exposed to the public...
 } & Object
 
-export interface IModelFactory<S, T> {
+export type IModelFactoryChecker = (snapshot: any) => boolean
+export type IModelFactoryDispatcher = (snapshot?: any) => IModelFactory<any, any>
+export interface IModelFactoryConstructor<S, T>{
     (snapshot?: S, env?: Object): T & IModel
-    isModelFactory: true
+}
+
+export interface IModelFactory<S, T> extends IModelFactoryConstructor<S, T>{
     factoryName: string,
+    kind: string
+    is: IModelFactoryChecker
+    irreducible: boolean
+    dispatch: IModelFactoryDispatcher
     config: Object
+    isModelFactory: boolean
+}
+
+export function createFactoryConstructor<S, T>(
+    name: string,
+    nodeClass: NodeConstructor,
+    config,
+    instanceCreator: () => any
+): IModelFactoryConstructor<S, T>{
+    let factory = extend(
+        action(name, function(snapshot?: any, environment?: Object) {
+            const instance = instanceCreator()
+            const adm = new nodeClass(instance, environment, factory, config)
+            if (arguments.length > 0)
+                adm.applySnapshot(snapshot)
+            return instance
+        }),
+        {
+            config
+        }
+    )
+    return factory
 }
 
 export function createFactory<S, T>(
     name: string,
-    nodeClass: NodeConstructor,
-    configuration,
-    instanceCreator: () => any
+    kind: string,
+    is: IModelFactoryChecker,
+    dispatch: IModelFactoryDispatcher,
+    constructor: IModelFactoryConstructor<S, T>
 ): IModelFactory<S, T> {
     let factory = extend(
-        action(name, function(snapshot?: any, environment?: Object) {
-            const instance = instanceCreator()
-            const adm = new nodeClass(instance, environment, factory, configuration)
-            if (arguments.length > 0)
-                adm.applySnapshot(snapshot)
-            return instance
-        }) as any,
+        constructor,
         {
             isModelFactory: true,
             factoryName: name,
-            config: configuration
+            kind,
+            is: (nodeOrSnapshot) => {
+                let snapshot = isModel(nodeOrSnapshot) ? getNode(nodeOrSnapshot).snapshot : nodeOrSnapshot
+                return is(snapshot)
+            },
+            dispatch: (nodeOrSnapshot) => {
+                let snapshot = isModel(nodeOrSnapshot) ? getNode(nodeOrSnapshot).snapshot : nodeOrSnapshot
+                return dispatch(snapshot)
+            }
         }
     )
     return factory

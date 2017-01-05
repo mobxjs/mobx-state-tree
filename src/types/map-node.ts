@@ -1,6 +1,6 @@
 import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
-import {IModelFactory, createFactory} from "../core/factories"
+import {Node, maybeNode, valueToSnapshot, hasNode} from "../core/node"
+import {IModelFactory, createFactory, createFactoryConstructor} from "../core/factories"
 import {identity, fail, isPlainObject, invariant} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 
@@ -90,7 +90,7 @@ export class MapNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
-        invariant(isPlainObject(snapshot), "Expected plain object")
+        invariant(this.factory.is(snapshot) && !hasNode(snapshot), 'Snapshot ' + JSON.stringify(snapshot) + ' is not assignable to ' + this.factory.factoryName)
         this.state.replace(snapshot)
     }
 
@@ -100,15 +100,22 @@ export class MapNode extends Node {
 }
 
 export function createMapFactory<S, T>(subtype: IModelFactory<S, T>): IModelFactory<{[key: string]: S}, ObservableMap<T>> {
-    return createFactory(
+    let factory = createFactory(
         "map-factory",
-        MapNode,
-        {
-            subType: subtype,
-            isMapFactory: true
-        } as IMapFactoryConfig,
-        () => observable.shallowMap()
+        "map",
+        snapshot => (isPlainObject(snapshot) && Object.keys(snapshot).every(key => subtype.is(snapshot[key]))),
+        snapshot => factory,
+        createFactoryConstructor(
+            "map-factory",
+            MapNode,
+            {
+                subType: subtype,
+                isMapFactory: true
+            } as IMapFactoryConfig,
+            () => observable.shallowMap()
+        )
     ) as any
+    return factory
 }
 
 export function isMapFactory(factory): boolean {

@@ -182,3 +182,25 @@ test("it should compose factories", (t) => {
 
     t.deepEqual(ComposedFactory(), {width: 0, height: 0, color: "#FFFFFF"})
 })
+
+
+// === TYPE CHECKS ===
+test("it should check the type correctly", (t) => {
+    const {Factory} = createTestFactories()
+
+    const doc = Factory()
+
+    t.deepEqual(Factory.is(doc), true)
+    t.deepEqual(Factory.is([]), false)
+    t.deepEqual(Factory.is({}), true)
+    t.deepEqual(Factory.is({to: 'mars'}), true)
+    t.deepEqual(Factory.is({wrongKey: true}), false)
+})
+
+test("it should dispatch the type correctly", (t) => {
+    const {Factory} = createTestFactories()
+
+    const doc = Factory()
+
+    t.deepEqual(Factory.dispatch(doc) === Factory, true)
+})
