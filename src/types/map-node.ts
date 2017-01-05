@@ -103,7 +103,7 @@ export function createMapFactory<S, T>(subtype: IModelFactory<S, T>): IModelFact
     let factory = createFactory(
         "map-factory",
         "map",
-        snapshot => (typeof snapshot === 'object' && Object.keys(snapshot).every(key => subtype.is(snapshot[key]))),
+        snapshot => (isPlainObject(snapshot) && Object.keys(snapshot).every(key => subtype.is(snapshot[key]))),
         snapshot => factory,
         createFactoryConstructor(
             "map-factory",

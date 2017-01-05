@@ -152,3 +152,25 @@ test("it should apply patches", (t) => {
 
     t.deepEqual<any>(getSnapshot(doc), {hello: {to: 'universe'}})
 })
+
+
+// === TYPE CHECKS ===
+test("it should check the type correctly", (t) => {
+    const {Factory} = createTestFactories()
+
+    const doc = Factory()
+
+    t.deepEqual(Factory.is(doc), true)
+    t.deepEqual(Factory.is([]), false)
+    t.deepEqual(Factory.is({}), true)
+    t.deepEqual(Factory.is({hello: {to: 'mars'}}), true)
+    t.deepEqual(Factory.is({hello: {wrongKey: true}}), false)
+})
+
+test("it should dispatch the type correctly", (t) => {
+    const {Factory} = createTestFactories()
+
+    const doc = Factory()
+
+    t.deepEqual(Factory.dispatch(doc) === Factory, true)
+})
