@@ -9,9 +9,7 @@ interface IArrayFactoryConfig {
     isArrayFactory: true
 }
 
-export class ArrayNode extends Node {
-    state: IObservableArray<any>
-
+export class ArrayFactory extends Node {
     getChildNodes(): [string, Node][] {
         const res: [string, Node][] = []
         this.state.forEach((value, index) => {
@@ -110,7 +108,7 @@ export function createArrayFactory<S, T extends S>(subtype: IModelFactory<S, T>)
         snapshot => factory,
         createFactoryConstructor(
             "array-factory",
-            ArrayNode,
+            ArrayFactory,
             {
                 subType: subtype,
                 isArrayFactory: true

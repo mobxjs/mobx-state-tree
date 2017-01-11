@@ -9,7 +9,7 @@ interface IMapFactoryConfig {
     isMapFactory: true
 }
 
-export class MapNode extends Node {
+export class MapFactory extends Node {
     state: ObservableMap<any>
 
     getChildNodes(): [string, Node][] {
@@ -131,7 +131,7 @@ export function createMapFactory<S, T>(subtype: IModelFactory<S, T>): IModelFact
         snapshot => factory,
         createFactoryConstructor(
             "map-factory",
-            MapNode,
+            MapFactory,
             {
                 subType: subtype,
                 isMapFactory: true

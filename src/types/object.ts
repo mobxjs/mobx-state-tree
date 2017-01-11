@@ -4,8 +4,8 @@ import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} fro
 import {IModelFactory, isModelFactory, createFactory, getModelFactory, IModel, createFactoryConstructor} from "../core/factories"
 import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
 import {escapeJsonPath} from "../core/json-patch"
-import {isArrayFactory} from "../types/array-node"
-import {isMapFactory} from "../types/map-node"
+import {isArrayFactory} from "../types/array"
+import {isMapFactory} from "../types/map"
 import {isReferenceFactory, createReferenceProps} from "./reference"
 import {primitiveFactory} from "./primitive"
 
@@ -14,7 +14,7 @@ interface IObjectFactoryConfig {
     baseModel: Object
 }
 
-export class ObjectNode extends Node {
+export class ObjectFactory extends Node {
     readonly actionSubscribers: IActionHandler[] = []
 
     // Optimization: submodelTypes can be stored on the factory config!
@@ -128,13 +128,13 @@ export class ObjectNode extends Node {
 
     applyAction(action: IActionCall): void {
         const node = this.resolve(action.path || "")
-        if (node instanceof ObjectNode)
+        if (node instanceof ObjectFactory)
             applyActionLocally(node, action)
         else
             fail(`Invalid action path: ${action.path || ""}`)
     }
 
-    emitAction(instance: ObjectNode, action: IActionCall, next) {
+    emitAction(instance: ObjectFactory, action: IActionCall, next) {
         let idx = -1
         const correctedAction: IActionCall = this.actionSubscribers.length
             ? extend({} as any, action, { path: getRelativePath(this, instance) })
@@ -211,7 +211,7 @@ export function createObjectFactory(arg1, arg2?) {
         snapshot => factory,
         createFactoryConstructor(
             name,
-            ObjectNode,
+            ObjectFactory,
             {
                 isObjectFactory: true,
                 baseModel: typeof arg1 === "string" ? arg2 : arg1
@@ -249,19 +249,19 @@ export function isObjectFactory(factory): boolean {
     return factory && factory.config && factory.config.isObjectFactory === true
 }
 
-export function getObjectNode(thing: IModel): ObjectNode {
+export function getObjectNode(thing: IModel): ObjectFactory {
     const node = getNode(thing)
     invariant(isObjectFactory(node.factory), "Expected object node, got " + (node.constructor as any).name)
-    return node as ObjectNode
+    return node as ObjectFactory
 }
 
 /**
  * Returns first parent of the provided node that is an object node, or null
  */
-export function findEnclosingObjectNode(thing: Node): ObjectNode | null {
+export function findEnclosingObjectNode(thing: Node): ObjectFactory | null {
     let parent: Node | null = thing
     while (parent = parent.parent)
-        if (parent instanceof ObjectNode)
+        if (parent instanceof ObjectFactory)
             return parent
     return null
 }

@@ -128,7 +128,7 @@ export abstract class Node {
         }
         if (this.parent && !newParent && (
                 this.patchSubscribers.length > 0 || this.snapshotSubscribers.length > 0 ||
-                 (this instanceof ObjectNode && this.actionSubscribers.length > 0)
+                 (this instanceof ObjectFactory && this.actionSubscribers.length > 0)
         )) {
             console.warn("An object with active event listeners was removed from the tree. This might introduce a memory leak. Use detach() if this is intentional")
         }
@@ -280,4 +280,4 @@ import {
 } from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
 import {IModelFactory, IModelFactoryConstructor} from "./factories"
-import {ObjectNode} from "../types/object-node"
+import {ObjectFactory} from "../types/object"

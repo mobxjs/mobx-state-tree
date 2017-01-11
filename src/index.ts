@@ -2,11 +2,11 @@ import {getNode, getRootNode} from "./core/node"
 import {transaction, IObservableArray, ObservableMap, observable} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer, invariant} from "./utils"
-import {getObjectNode, findEnclosingObjectNode} from "./types/object-node"
+import {getObjectNode, findEnclosingObjectNode} from "./types/object"
 import {IActionCall} from "./core/action"
 import {IModelFactory, IModel} from "./core/factories"
-import {createMapFactory} from "./types/map-node"
-import {createArrayFactory} from "./types/array-node"
+import {createMapFactory} from "./types/map"
+import {createArrayFactory} from "./types/array"
 import {primitiveFactory} from "./types/primitive"
 
 export {
@@ -33,7 +33,7 @@ export {
 export {
     createObjectFactory as createFactory,
     composeFactory,
-} from "./types/object-node"
+} from "./types/object"
 
 export {
     referenceTo
@@ -290,6 +290,7 @@ export function getParent(target: IModel, strict: boolean = false): IModel {
  * @returns {*}
  */
 export function getParentObject(target: IModel): IModel {
+    // TODO: remove this special notion of closest object node?
     const node = findEnclosingObjectNode(getNode(target))
     return node ? node.state : null
 }

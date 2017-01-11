@@ -1,7 +1,7 @@
 import {isObservable} from "mobx"
 import {isModel, getModelFactory} from "../"
 import {addHiddenFinalProp, invariant, isPlainObject, isPrimitive} from "../utils"
-import {getObjectNode, ObjectNode} from "../types/object-node"
+import {getObjectNode, ObjectFactory} from "../types/object"
 
 let _isRunningActionGlobally = false
 
@@ -72,7 +72,7 @@ function verifyArgumentsAreStringifyable(actionName: string, args: any[]) {
     })
 }
 
-export function applyActionLocally(target: ObjectNode, action: IActionCall) {
+export function applyActionLocally(target: ObjectFactory, action: IActionCall) {
     invariant(typeof target.state[action.name] === "function", `Action '${action.name}' does not exist in '${target.path}'`)
     target.state[action.name].apply(target.state, action.args || [])
 }

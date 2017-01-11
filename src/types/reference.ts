@@ -1,7 +1,7 @@
 import {IModel} from "../core/factories"
 import {tryResolve, getRoot} from "../index"
 import {invariant, fail} from "../utils"
-import {getObjectNode} from "./object-node"
+import {getObjectNode} from "./object"
 
 export type IReferenceGetter<T> = (identifier: string, owner: IModel, propertyName: string) => T
 export type IReferenceSetter<T> = (value: T, owner: IModel, propertyName: string) => string

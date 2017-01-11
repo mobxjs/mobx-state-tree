@@ -1,5 +1,5 @@
 import {IModelFactory, createFactory} from "../core/factories"
-import {invariant, isPrimitive, extend, identity} from "../utils"
+import {invariant, isPrimitive, extend} from "../utils"
 
 export const primitiveFactory = createFactory(
         "primitive",
