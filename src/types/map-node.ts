@@ -1,7 +1,7 @@
 import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {IModelFactory, createFactory} from "../core/factories"
-import {identity, fail, isPlainObject, invariant} from "../utils"
+import {identity, fail, isPlainObject, invariant, isPrimitive} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 
 interface IMapFactoryConfig {
@@ -91,7 +91,31 @@ export class MapNode extends Node {
 
     @action applySnapshot(snapshot): void {
         invariant(isPlainObject(snapshot), "Expected plain object")
-        this.state.replace(snapshot)
+        // Try to update snapshot smartly, by reusing instances under the same key as much as possible
+        const currentKeys: { [key: string]: boolean } = {}
+        this.state.keys().forEach(key => { currentKeys[key] = false })
+        Object.keys(snapshot).forEach(key => {
+            // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
+            if (key in currentKeys && !isPrimitive(snapshot[key])) {
+                currentKeys[key] = true
+                maybeNode(
+                    this.state.get(key),
+                    node => {
+                        // update existing instance
+                        node.applySnapshot(snapshot[key])
+                    },
+                    () => {
+                        this.state.set(key, snapshot[key])
+                    }
+                )
+            } else {
+                this.state.set(key, snapshot[key])
+            }
+        })
+        Object.keys(currentKeys).forEach(key => {
+            if (currentKeys[key] === false)
+                this.state.delete(key)
+        })
     }
 
     getChildFactory(): IModelFactory<any, any> {
