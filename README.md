@@ -30,6 +30,8 @@ It is an opt-in state container that can be used in MobX, but also Redux based a
 
 TODO: slides / reactive conf talk
 
+If MobX is like a spreadsheet mechanism for javascript, then mobx-state-tree is like storing your spreadsheet in git.
+
 Unlike MobX itself, mobx-state-tree is quite opinionated on how you structure your data.
 This makes it possible to solve many problems generically and out of the box, like:
 
@@ -243,7 +245,13 @@ No, or, not necessarily. An application can use both state trees and vanilla Mob
 State trees are primarily designed to store your domain data, as this kind of state is often distributed and not very local.
 For, for example, local component state, vanilla MobX observables might often be simpler to use.
 
+**No constructors?**
 
+Neh, replayability. Use utilities instead
+
+**No inheritance?**
+
+No use composition or unions instead.
 
 
 ## Constraints

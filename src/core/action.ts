@@ -40,6 +40,7 @@ export function createActionWrapper(instance, key, action: Function) {
                 verifyArgumentsAreStringifyable(key, args)
                 adm.emitAction(
                     adm,
+                    // TODO: convert args
                     { name: key, path: "", args: args },
                     runAction
                 )

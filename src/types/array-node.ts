@@ -91,6 +91,9 @@ export class ArrayNode extends Node {
 
     @action applySnapshot(snapshot): void {
         invariant(Array.isArray(snapshot), "Expected array")
+        // TODO: make a smart merge here...
+        // MWE: should we try to reuse existing instances in the array? Guess not, that might be terribly confusing
+        // as they are not uniquely identifyable..
         this.state.replace(snapshot)
     }
 
