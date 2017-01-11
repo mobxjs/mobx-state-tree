@@ -1,7 +1,7 @@
 import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange} from "mobx"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
 import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
-import {IModelFactory, isModelFactory, createFactory, getModelFactory, IModel} from "../core/factories"
+import {IModelFactory, isModelFactory, createFactory, getModelFactory, IModel, createFactoryConstructor} from "../core/factories"
 import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
 import {escapeJsonPath} from "../core/json-patch"
 import {isArrayFactory} from "../types/array-node"
@@ -156,7 +156,7 @@ export class ObjectNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
-        invariant(isPlainObject(snapshot) && !hasNode(snapshot), "Not a valid snapshot")
+        invariant(this.factory.is(snapshot) && !hasNode(snapshot), 'Snapshot ' + JSON.stringify(snapshot) + ' is not assignable to ' + this.factory.factoryName)
         const target = this.state
         for (let key in snapshot) {
             invariant(key in this.submodelTypes, `It is not allowed to assign a value to non-declared property ${key} of ${this.factory.factoryName}`)
@@ -188,15 +188,39 @@ export class ObjectNode extends Node {
 export function createObjectFactory<S extends Object, T extends S>(baseModel: T): IModelFactory<S, T>
 export function createObjectFactory<S extends Object, T extends S>(name: string, baseModel: T): IModelFactory<S, T>
 export function createObjectFactory(arg1, arg2?) {
-    return createFactory(
-        typeof arg1 === "string" ? arg1 : "unnamed-object-factory",
-        ObjectNode,
-        {
-            isObjectFactory: true,
-            baseModel: typeof arg1 === "string" ? arg2 : arg1
-        },
-        () => observable.shallowObject({})
+    let name = typeof arg1 === "string" ? arg1 : "unnamed-object-factory"
+    let config: Object = typeof arg1 === "string" ? arg2 : arg1
+    let modelKeys = Object.keys(config).filter(key => isPrimitive(config[key]) || isModelFactory(config[key]))
+
+    const is = snapshot => {
+        if(!isPlainObject(snapshot)) return false
+        const snapshotKeys = Object.keys(snapshot)
+        if(snapshotKeys.length > modelKeys.length) return false
+        return snapshotKeys.every(key => {
+            let keyInConfig = key in config
+            let bothArePrimitives = isPrimitive(config[key]) && isPrimitive(snapshot[key])
+            let ifModelFactoryIsCastable = isModelFactory(config[key]) && config[key].is(snapshot[key])
+            return keyInConfig && (bothArePrimitives || ifModelFactoryIsCastable)
+        })
+    }
+
+    let factory = createFactory(
+        name,
+        "object",
+        is,
+        snapshot => factory,
+        createFactoryConstructor(
+            name,
+            ObjectNode,
+            {
+                isObjectFactory: true,
+                baseModel: typeof arg1 === "string" ? arg2 : arg1
+            },
+            () => observable.shallowObject({})
+        )
     )
+
+    return factory
 }
 
 function getObjectFactoryBaseModel(item){

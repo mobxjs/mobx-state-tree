@@ -1,7 +1,7 @@
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
+import {Node, maybeNode, valueToSnapshot, hasNode} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
-import {IModelFactory, createFactory} from "../core/factories"
+import {IModelFactory, createFactory, createFactoryConstructor} from "../core/factories"
 import {invariant, identity, fail} from "../utils"
 
 interface IArrayFactoryConfig {
@@ -90,7 +90,7 @@ export class ArrayNode extends Node {
     }
 
     @action applySnapshot(snapshot): void {
-        invariant(Array.isArray(snapshot), "Expected array")
+        invariant(this.factory.is(snapshot) && !hasNode(snapshot), 'Snapshot ' + JSON.stringify(snapshot) + ' is not assignable to ' + this.factory.factoryName)
         // TODO: make a smart merge here...
         // MWE: should we try to reuse existing instances in the array? Guess not, that might be terribly confusing
         // as they are not uniquely identifyable..
@@ -103,15 +103,23 @@ export class ArrayNode extends Node {
 }
 
 export function createArrayFactory<S, T extends S>(subtype: IModelFactory<S, T>): IModelFactory<S[], IObservableArray<T>> {
-    return createFactory(
+    let factory = createFactory(
         "array-factory",
-        ArrayNode,
-        {
-            subType: subtype,
-            isArrayFactory: true
-        } as IArrayFactoryConfig,
-        () => observable.shallowArray()
+        "array",
+        snapshot => (Array.isArray(snapshot) && snapshot.every(item => subtype.is(item))),
+        snapshot => factory,
+        createFactoryConstructor(
+            "array-factory",
+            ArrayNode,
+            {
+                subType: subtype,
+                isArrayFactory: true
+            } as IArrayFactoryConfig,
+            () => observable.shallowArray()
+        )
     ) as any
+
+    return factory
 }
 
 export function isArrayFactory(factory): boolean {
