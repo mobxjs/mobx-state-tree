@@ -40,7 +40,6 @@ const createTestFactories = () => {
 
 // === FACTORY TESTS ===
 test("it should create a factory", (t) => {
-    debugger;
     const {Factory} = createTestFactories()
 
     t.deepEqual(Factory(), {to: 'world'})
@@ -137,6 +136,7 @@ test("it should emit action calls", (t) => {
 })
 
 test("it should apply action call", (t) => {
+    debugger
     const {Factory} = createTestFactories()
     const doc = Factory()
 

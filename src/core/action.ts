@@ -74,7 +74,7 @@ function verifyArgumentsAreStringifyable(actionName: string, args: any[]) {
 }
 
 export function applyActionLocally(node: Node, instance, action: IActionCall) {
-    invariant(isAction(instance[action.name]), `Action '${action.name}' does not exist in '${node.path}'`)
+    invariant(typeof instance[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
     // TODO: deserialize args
     instance[action.name].apply(instance, action.args || [])
 }

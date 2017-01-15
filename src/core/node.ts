@@ -146,7 +146,7 @@ export class Node {
 
     prepareChild(subpath: string, child: any): any {
         const childFactory = this.getChildFactory(subpath)
-        invariant(!childFactory.is(child), `The given value is not assignable to "${subpath}": ${child}`)
+        invariant(childFactory.is(child), `The given value is not assignable to "${subpath}": ${child}`)
         if (!isMutable(child)) {
             return child
         }
@@ -228,7 +228,7 @@ export class Node {
             if (idx < this.actionSubscribers.length) {
                 this.actionSubscribers[idx](correctedAction!, n)
             } else {
-                const parent = instance.parent
+                const parent = this.parent
                 if (parent)
                     parent.emitAction(instance, action, next)
                 else

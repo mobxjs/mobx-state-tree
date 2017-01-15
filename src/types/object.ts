@@ -32,7 +32,7 @@ export class ObjectType extends Type {
     createNewInstance() {
         const instance = observable.shallowObject({})
         this.initializers.forEach(f => f(instance))
-        Object.seal(instance) // don't allow new props to be added!
+        // TODO: Object.seal(instance) // don't allow new props to be added!
         return instance as Object
     }
 
