@@ -1,4 +1,4 @@
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, arrayOf, getParent, hasParent, getRoot, getPathParts, clone, getModelFactory, getChildModelFactory, isModelFactory, recordActions, recordPatches} from "../"
+import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, arrayOf, getParent, hasParent, getRoot, getPathParts, clone, getFactory, getChildFactory, isFactory, recordActions, recordPatches} from "../"
 import {test} from "ava"
 
 // getParent
@@ -147,7 +147,7 @@ test("it should return the model factory", (t) => {
 
     const doc = Document()
 
-    t.deepEqual(getModelFactory(doc), Document)
+    t.deepEqual(getFactory(doc), Document)
 })
 
 // getChildModelFactory
@@ -164,7 +164,7 @@ test("it should return the child model factory", (t) => {
     const doc = Document()
 
     // TODO: any because of #19
-    t.deepEqual<any>(getChildModelFactory(doc, 'rows'), ArrayOfRow)
+    t.deepEqual<any>(getChildFactory(doc, 'rows'), ArrayOfRow)
 })
 
 // test tree unique

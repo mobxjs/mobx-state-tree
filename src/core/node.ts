@@ -5,19 +5,23 @@ import {
     isObservableMap
 } from "mobx"
 
-import {IModel} from "./factories"
+import {ComplexType} from "./types"
+import {IModel, IFactory} from "./factories"
 import {IActionHandler} from "./action"
-
-export enum NodeType { ComplexObject, Map, Array, PlainObject };
-
-export type NodeConstructor = new (target: any, environment: any, factory: IModelFactoryConstructor<any, any>, factoryConfiguration: Object) => Node
+import {
+    invariant, fail, extend,
+    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
+} from "../utils"
+import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
+import {IActionCall, applyActionLocally} from "./action"
+import {ObjectType} from "../types/object"
 
 // TODO: make Node more like a struct, extract the methods to snapshots.js, actions.js etc..
 export class Node {
     readonly target: any
     readonly environment: any
     @observable _parent: Node | null = null
-    readonly factory: IModelFactory<any, any>
+    readonly factory: IFactory<any, any>
     private  interceptDisposer: IDisposer
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
@@ -25,7 +29,7 @@ export class Node {
     _isRunningAction = false
 
 
-    constructor(initialState: any, environment, factory: IModelFactory<any, any>) {
+    constructor(initialState: any, environment, factory: IFactory<any, any>) {
         invariant(factory.type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
         this.factory = factory
@@ -269,7 +273,7 @@ export class Node {
         return this.type.getChildNodes(this, this.target)
     }
 
-    getChildFactory(key: string): IModelFactory<any, any> {
+    getChildFactory(key: string): IFactory<any, any> {
         return this.type.getChildFactory(key)
     }
 }
@@ -337,13 +341,3 @@ export function valueToSnapshot(thing) {
         return getNode(thing).snapshot
     return thing
 }
-
-// Late require for early Node declare
-import {
-    invariant, fail, extend,
-    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
-} from "../utils"
-import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
-import {IModelFactory, IModelFactoryConstructor, ComplexType} from "./factories"
-import {ObjectType} from "../types/object"
-import {IActionCall, applyActionLocally} from "./action"

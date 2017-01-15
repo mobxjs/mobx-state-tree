@@ -1,13 +1,14 @@
 import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange} from "mobx"
 import {nothing, invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
 import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
-import {ComplexType, IModelFactory, isModelFactory, getModelFactory, IModel} from "../core/factories"
+import {IFactory, isFactory, getFactory, IModel} from "../core/factories"
 import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
 import {escapeJsonPath} from "../core/json-patch"
 import {isArrayFactory} from "../types/array"
 import {isMapFactory} from "../types/map"
 import {isReferenceFactory, createReferenceProps} from "./reference"
 import {primitiveFactory} from "./primitive"
+import {ComplexType} from "../core/types"
 
 interface IObjectFactoryConfig {
     isObjectFactory: true,
@@ -16,7 +17,7 @@ interface IObjectFactoryConfig {
 
 export class ObjectType extends ComplexType {
     props: {
-        [key: string]: IModelFactory<any, any>
+        [key: string]: IFactory<any, any>
     } = {}
     baseModel: any
     initializers: ((target) => void)[] = []
@@ -61,7 +62,7 @@ export class ObjectType extends ComplexType {
                 // it might avoid confusion if direct assingments are forbidden,
                 // and content of complex collections is replace instead
                 addInitializer(t => addReadOnlyProp(t, key, value()))
-            } else if (isModelFactory(value)) {
+            } else if (isFactory(value)) {
                 this.props[key] = value
                 addInitializer(t => extendShallowObservable(t, { [key]: null })) // TODO: support default value
             } else if (isReferenceFactory(value)) {
@@ -145,27 +146,27 @@ export class ObjectType extends ComplexType {
     }
 
 
-    getChildFactory(key: string): IModelFactory<any, any> {
+    getChildFactory(key: string): IFactory<any, any> {
         return this.props[key] || primitiveFactory
     }
     is(snapshot) {
         const props = this.props
-        let modelKeys = Object.keys(props).filter(key => isPrimitive(props[key]) || isModelFactory(props[key]))
+        let modelKeys = Object.keys(props).filter(key => isPrimitive(props[key]) || isFactory(props[key]))
         if (!isPlainObject(snapshot)) return false
         const snapshotKeys = Object.keys(snapshot)
         if (snapshotKeys.length > modelKeys.length) return false
         return snapshotKeys.every(key => {
             let keyInConfig = key in props
             let bothArePrimitives = isPrimitive(props[key]) && isPrimitive(snapshot[key])
-            let ifModelFactoryIsCastable = isModelFactory(props[key]) && props[key].is(snapshot[key])
+            let ifModelFactoryIsCastable = isFactory(props[key]) && props[key].is(snapshot[key])
             return keyInConfig && (bothArePrimitives || ifModelFactoryIsCastable)
         })
     }
 }
 
-export function createObjectFactory<S extends Object, T extends S>(baseModel: T): IModelFactory<S, T>
-export function createObjectFactory<S extends Object, T extends S>(name: string, baseModel: T): IModelFactory<S, T>
-export function createObjectFactory(arg1, arg2?) {
+export function createModelFactory<S extends Object, T extends S>(baseModel: T): IFactory<S, T>
+export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: T): IFactory<S, T>
+export function createModelFactory(arg1, arg2?) {
     let name = typeof arg1 === "string" ? arg1 : "unnamed-object-factory"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
 
@@ -173,29 +174,29 @@ export function createObjectFactory(arg1, arg2?) {
 }
 
 function getObjectFactoryBaseModel(item){
-    let factory = isModelFactory(item) ? item : getModelFactory(item)
+    let factory = isFactory(item) ? item : getFactory(item)
 
     return isObjectFactory(factory) ? (factory as any).baseModel : {}
 }
 
-export function composeFactory<AS, AT, BS, BT>(name: string, a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>): IModelFactory<AS & BS, AT & BT>;
-export function composeFactory<AS, AT, BS, BT, CS, CT>(name: string, a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>, c: IModelFactory<CS, CT>): IModelFactory<AS & BS & CS, AT & BT & CT>;
-export function composeFactory<S, T>(name: string, ...models: IModelFactory<any, any>[]): IModelFactory<S, T>;
-export function composeFactory<AS, AT, BS, BT>(a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>): IModelFactory<AS & BS, AT & BT>;
-export function composeFactory<AS, AT, BS, BT, CS, CT>(a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>, c: IModelFactory<CS, CT>): IModelFactory<AS & BS & CS, AT & BT & CT>;
-export function composeFactory<S, T>(...models: IModelFactory<any, any>[]): IModelFactory<S, T>;
+export function composeFactory<AS, AT, BS, BT>(name: string, a: IFactory<AS, AT>, b: IFactory<BS, BT>): IFactory<AS & BS, AT & BT>;
+export function composeFactory<AS, AT, BS, BT, CS, CT>(name: string, a: IFactory<AS, AT>, b: IFactory<BS, BT>, c: IFactory<CS, CT>): IFactory<AS & BS & CS, AT & BT & CT>;
+export function composeFactory<S, T>(name: string, ...models: IFactory<any, any>[]): IFactory<S, T>;
+export function composeFactory<AS, AT, BS, BT>(a: IFactory<AS, AT>, b: IFactory<BS, BT>): IFactory<AS & BS, AT & BT>;
+export function composeFactory<AS, AT, BS, BT, CS, CT>(a: IFactory<AS, AT>, b: IFactory<BS, BT>, c: IFactory<CS, CT>): IFactory<AS & BS & CS, AT & BT & CT>;
+export function composeFactory<S, T>(...models: IFactory<any, any>[]): IFactory<S, T>;
 export function composeFactory(...args: any[]) {
     const factoryName = typeof args[0] === "string" ? args[0] : "unnamed-factory"
     const baseModels = typeof args[0] === "string" ? args.slice(1) : args
 
-    return createObjectFactory(
+    return createModelFactory(
         factoryName,
         extend.apply(null, baseModels.map(getObjectFactoryBaseModel))
     )
 }
 
 export function isObjectFactory(factory): boolean {
-    return isModelFactory(factory) && (factory.type as any).isObjectFactory === true
+    return isFactory(factory) && (factory.type as any).isObjectFactory === true
 }
 
 // export function getObjectNode(thing: IModel): ObjectNode {

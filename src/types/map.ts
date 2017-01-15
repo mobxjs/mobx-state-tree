@@ -1,8 +1,9 @@
 import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot, hasNode} from "../core/node"
-import {isModelFactory, IModelFactory, ComplexType} from "../core/factories"
+import {isFactory, IFactory} from "../core/factories"
 import {identity, fail, isPlainObject, invariant, nothing, isPrimitive} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
+import {ComplexType} from "../core/types"
 
 interface IMapFactoryConfig {
     isMapFactory: true
@@ -10,9 +11,9 @@ interface IMapFactoryConfig {
 
 export class MapType extends ComplexType {
     isMapFactory = true
-    subType: IModelFactory<any, any>
+    subType: IFactory<any, any>
 
-    constructor(name: string, subType: IModelFactory<any, any>) {
+    constructor(name: string, subType: IFactory<any, any>) {
         super(name)
         this.subType = subType
     }
@@ -127,7 +128,7 @@ export class MapType extends ComplexType {
         })
     }
 
-    getChildFactory(key: string): IModelFactory<any, any> {
+    getChildFactory(key: string): IFactory<any, any> {
         return this.subType
     }
 
@@ -136,10 +137,10 @@ export class MapType extends ComplexType {
     }
 }
 
-export function createMapFactory<S, T>(subtype: IModelFactory<S, T>): IModelFactory<{[key: string]: S}, ObservableMap<T>> {
+export function createMapFactory<S, T>(subtype: IFactory<S, T>): IFactory<{[key: string]: S}, ObservableMap<T>> {
     return new MapType(`map<string, ${subtype.factoryName}>`, subtype).factory
 }
 
 export function isMapFactory(factory): boolean {
-    return isModelFactory(factory) && (factory.type as any).isMapFactory === true
+    return isFactory(factory) && (factory.type as any).isMapFactory === true
 }

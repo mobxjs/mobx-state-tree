@@ -1,11 +1,12 @@
-import {isModelFactory, IModelFactory, Type} from "../core/factories"
+import {isFactory, IFactory} from "../core/factories"
 import {invariant, fail} from "../utils"
+import {Type} from "../core/types"
 
 export class Union extends Type {
-    types: IModelFactory<any, any>[] = []
+    types: IFactory<any, any>[] = []
 
     // TODO: support / use dispatch function instead of this
-    constructor(name, types: IModelFactory<any, any>[]) {
+    constructor(name, types: IFactory<any, any>[]) {
         super(name)
         this.types = types
     }
@@ -26,10 +27,10 @@ export class Union extends Type {
 
 // TODO: support dispatcher function
 // export function createUnionFactory<SA, SB, TA, TB>(dispatch: IModelFactoryDispatcher, A: IModelFactory<SA, TA>, B: IModelFactory<SB, TB>): IModelFactory<SA | SB, TA | TB>
-export function createUnionFactory<SA, SB, TA, TB>(A: IModelFactory<SA, TA>, B: IModelFactory<SB, TB>): IModelFactory<SA | SB, TA | TB> {
+export function createUnionFactory<SA, SB, TA, TB>(A: IFactory<SA, TA>, B: IFactory<SB, TB>): IFactory<SA | SB, TA | TB> {
     // const types = isModelFactory(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
     // TODO: generalize:
-    const types: IModelFactory<any, any>[] = [A, B]
+    const types: IFactory<any, any>[] = [A, B]
     const name = types.map(type => type.factoryName).join(" | ")
     return new Union(name, types).factory
 }

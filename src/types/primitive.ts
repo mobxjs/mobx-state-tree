@@ -1,9 +1,10 @@
-import {IModelFactory, ConcreteType} from "../core/factories"
-import {invariant, isPrimitive, extend, fail} from "../utils"
-import {Node} from "../core/node"
+import {IFactory} from "../core/factories"
+import {invariant, isPrimitive} from "../utils"
+import {Type} from "../core/types"
+
 
 // TODO: inherited for specific primitive types
-export class PrimitiveType extends ConcreteType {
+export class PrimitiveType extends Type {
     name: string
 
     create(value) {

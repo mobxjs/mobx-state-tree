@@ -1,14 +1,15 @@
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
-import {IModelFactory, ComplexType, isModelFactory} from "../core/factories"
+import {IFactory, isFactory} from "../core/factories"
 import {identity, nothing, fail} from "../utils"
+import {ComplexType} from "../core/types"
 
 export class ArrayType extends ComplexType {
     isArrayFactory = true
-    subType: IModelFactory<any, any> // TODO: type
+    subType: IFactory<any, any> // TODO: type
 
-    constructor(name, subType: IModelFactory<any, any>) {
+    constructor(name, subType: IFactory<any, any>) {
         super(name)
         this.subType = subType
     }
@@ -100,7 +101,7 @@ export class ArrayType extends ComplexType {
         target.replace(snapshot)
     }
 
-    getChildFactory(key: string): IModelFactory<any, any> {
+    getChildFactory(key: string): IFactory<any, any> {
         return this.subType
     }
 
@@ -109,10 +110,10 @@ export class ArrayType extends ComplexType {
     }
 }
 
-export function createArrayFactory<S, T extends S>(subtype: IModelFactory<S, T>): IModelFactory<S[], IObservableArray<T>> {
+export function createArrayFactory<S, T extends S>(subtype: IFactory<S, T>): IFactory<S[], IObservableArray<T>> {
     return new ArrayType(subtype.factoryName + "[]", subtype).factory
 }
 
 export function isArrayFactory(factory): boolean {
-    return isModelFactory(factory) && (factory.type as any).isArrayFactory === true
+    return isFactory(factory) && (factory.type as any).isArrayFactory === true
 }

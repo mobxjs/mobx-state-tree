@@ -1,7 +1,6 @@
-import {isObservable, isAction} from "mobx"
-import {isModel, getModelFactory} from "../"
+import {isObservable} from "mobx"
+import {isModel, getFactory} from "../"
 import {addHiddenFinalProp, invariant, isPlainObject, isPrimitive} from "../utils"
-import {ObjectType} from "../types/object"
 import {Node, getNode} from "./node"
 
 let _isRunningActionGlobally = false
@@ -59,7 +58,7 @@ function verifyArgumentsAreStringifyable(actionName: string, args: any[]) {
             return
         // Future work: could model arguments be made serializable, e.g. represent as relative path?
         if (isModel(arg))
-            throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive or plain object, received a ${getModelFactory(arg).factoryName} model.`)
+            throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive or plain object, received a ${getFactory(arg).factoryName} model.`)
         if (!isPlainObject(arg))
             throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive or plain object, received a ${(arg && arg.constructor) ? arg.constructor.name : "Complex Object"}`)
         if (isObservable(arg))

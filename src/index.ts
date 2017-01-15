@@ -3,7 +3,7 @@ import {transaction, IObservableArray, ObservableMap, observable} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer, invariant} from "./utils"
 import {IActionCall} from "./core/action"
-import {IModelFactory, IModel} from "./core/factories"
+import {IFactory, IModel} from "./core/factories"
 import {createMapFactory} from "./types/map"
 import {createArrayFactory} from "./types/array"
 import {primitiveFactory} from "./types/primitive"
@@ -16,10 +16,10 @@ export * from "./core/json-patch"
 export {
     IModel,
     isModel,
-    IModelFactory,
-    isModelFactory,
-    getModelFactory,
-    getChildModelFactory
+    IFactory,
+    isFactory,
+    getFactory,
+    getChildFactory
 } from "./core/factories"
 export {
     IActionCall
@@ -30,7 +30,7 @@ export {
 } from "./types/primitive"
 
 export {
-    createObjectFactory as createFactory,
+    createModelFactory as createFactory,
     composeFactory,
 } from "./types/object"
 
@@ -401,7 +401,7 @@ export function clone<T extends IModel>(source: T, customEnvironment?: any): T {
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function mapOf<S, T>(subFactory: IModelFactory<S, T> = primitiveFactory as any): ObservableMap<T> {
+export function mapOf<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): ObservableMap<T> {
     return createMapFactory(subFactory) as any
 }
 
@@ -412,7 +412,7 @@ export function mapOf<S, T>(subFactory: IModelFactory<S, T> = primitiveFactory a
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function arrayOf<S, T>(subFactory: IModelFactory<S, T> = primitiveFactory as any): IObservableArray<T> {
+export function arrayOf<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): IObservableArray<T> {
     return createArrayFactory(subFactory as any) as any
 }
 
@@ -435,7 +435,7 @@ export function detach<T extends IModel>(thing: T): T {
     return thing
 }
 
-export function testActions<S, T extends IModel>(factory: IModelFactory<S, T>, initialState: S, ...actions: IActionCall[]): S {
+export function testActions<S, T extends IModel>(factory: IFactory<S, T>, initialState: S, ...actions: IActionCall[]): S {
     const testInstance = factory(initialState)
     applyActions(testInstance, actions)
     return getSnapshot<S, T>(testInstance)
@@ -447,7 +447,7 @@ export function resetAppState() {
     appState.set(undefined)
 }
 
-export function initializeAppState<S, T>(factory: IModelFactory<S, T>, initialSnapshot?: S, environment?: Object) {
+export function initializeAppState<S, T>(factory: IFactory<S, T>, initialSnapshot?: S, environment?: Object) {
     invariant(!appState, `Global app state was already initialized, use 'resetAppState' to reset it`)
     appState.set(factory(initialSnapshot, environment))
 }
