@@ -165,12 +165,3 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is([{to: 'mars'}]), true)
     t.deepEqual(Factory.is([{wrongKey: true}]), false)
 })
-
-test("it should dispatch the type correctly", (t) => {
-    const {Factory} = createTestFactories()
-
-    const doc = Factory()
-
-    // TODO:
-    //t.deepEqual(Factory.dispatch(doc) === Factory, true)
-})

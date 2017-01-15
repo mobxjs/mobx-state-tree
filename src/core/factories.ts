@@ -25,6 +25,7 @@ export function getChildFactory(object: IModel, child: string): IFactory<any, an
     return getNode(object).getChildFactory(child)
 }
 
+// TODO: ambigous function name, remove
 export function isModel(model: any): model is IModel {
     return hasNode(model)
 }

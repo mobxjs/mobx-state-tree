@@ -12,10 +12,11 @@ export class Union extends Type {
     }
 
     create(value) {
-        invariant(this.is(value))
-        // TODO: copy error from below
+        invariant(this.is(value), `Value ${JSON.stringify(value)} is not assignable to union ${this.name}`)
         const applicableTypes = this.types.filter(type => type.is(value))
-        invariant(applicableTypes.length === 1, "Ambigous value") // TODO: better error message
+        if (applicableTypes.length > 1)
+             return fail(`Ambiguos snapshot ${JSON.stringify(value)} for union ${this.name}. Please provide a dispatch in the union declaration.`)
+
         return applicableTypes[0](value)
     }
 

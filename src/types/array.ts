@@ -105,7 +105,7 @@ export class ArrayType extends ComplexType {
         return this.subType
     }
 
-    is(snapshot) {
+    isValidSnapshot(snapshot) {
         return Array.isArray(snapshot) && snapshot.every(item => this.subType.is(item))
     }
 }

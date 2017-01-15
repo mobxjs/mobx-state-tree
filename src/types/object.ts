@@ -149,7 +149,8 @@ export class ObjectType extends ComplexType {
     getChildFactory(key: string): IFactory<any, any> {
         return this.props[key] || primitiveFactory
     }
-    is(snapshot) {
+
+    isValidSnapshot(snapshot) {
         const props = this.props
         let modelKeys = Object.keys(props).filter(key => isPrimitive(props[key]) || isFactory(props[key]))
         if (!isPlainObject(snapshot)) return false

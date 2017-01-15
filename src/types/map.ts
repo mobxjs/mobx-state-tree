@@ -132,7 +132,7 @@ export class MapType extends ComplexType {
         return this.subType
     }
 
-    is(snapshot) {
+    isValidSnapshot(snapshot) {
         return isPlainObject(snapshot) && Object.keys(snapshot).every(key => this.subType.is(snapshot[key]))
     }
 }

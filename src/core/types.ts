@@ -1,5 +1,5 @@
 import {action} from "mobx"
-import {Node} from "./node"
+import {Node, getNode, hasNode} from "./node"
 import {IJsonPatch} from "../core/json-patch"
 import {IFactory, IModel} from "./factories"
 
@@ -57,4 +57,13 @@ export abstract class ComplexType extends Type {
     abstract serialize(node: Node, target): any
     abstract applyPatchLocally(node: Node, target, subpath: string, patch: IJsonPatch): void
     abstract getChildFactory(key: string): IFactory<any, any>
+    abstract isValidSnapshot(snapshot: any): boolean
+
+    is(value: IModel | any): boolean {
+        if (!value || typeof value !== "object")
+            return false
+        if (hasNode(value))
+            return this.isValidSnapshot(getNode(value).snapshot) // could check factory, but that doesn't check structurally...
+        return this.isValidSnapshot(value)
+    }
 }

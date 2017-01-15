@@ -17,7 +17,7 @@ const createTestFactories = () => {
         depth: 0
     })
 
-    const Plane = unionOf(Box, Square)
+    const Plane = unionOf(Square, Box)
     // TODO:
     // const DispatchPlane = unionOf(snapshot => snapshot && 'height' in snapshot ? Box : Square, Box, Square)
 

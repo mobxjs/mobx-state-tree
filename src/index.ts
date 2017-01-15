@@ -1,5 +1,5 @@
 import {getNode, getRootNode} from "./core/node"
-import {transaction, IObservableArray, ObservableMap, observable} from "mobx"
+import {runInAction, IObservableArray, ObservableMap, observable} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer, invariant} from "./utils"
 import {IActionCall} from "./core/action"
@@ -144,7 +144,7 @@ export function applyPatch(target: IModel, patch: IJsonPatch) {
  */
 export function applyPatches(target: IModel, patches: IJsonPatch[]) {
     const node = getNode(target)
-    transaction(() => {
+    runInAction(() => {
         patches.forEach(p => node.applyPatch(p))
     })
 }
@@ -192,7 +192,7 @@ export function applyAction(target: IModel, action: IActionCall): void {
  */
 export function applyActions(target: IModel, actions: IActionCall[]): void {
     const node = getNode(target)
-    transaction(() => {
+    runInAction(() => {
         actions.forEach(action => node.applyAction(action))
     })
 }
