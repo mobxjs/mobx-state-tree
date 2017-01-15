@@ -1,7 +1,7 @@
 import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange} from "mobx"
-import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
+import {nothing, invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
 import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
-import {Type, IModelFactory, isModelFactory, createFactory, getModelFactory, IModel} from "../core/factories"
+import {ComplexType, IModelFactory, isModelFactory, getModelFactory, IModel} from "../core/factories"
 import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
 import {escapeJsonPath} from "../core/json-patch"
 import {isArrayFactory} from "../types/array"
@@ -14,7 +14,7 @@ interface IObjectFactoryConfig {
     baseModel: Object
 }
 
-export class ObjectType extends Type {
+export class ObjectType extends ComplexType {
     props: {
         [key: string]: IModelFactory<any, any>
     } = {}
@@ -86,8 +86,8 @@ export class ObjectType extends Type {
         return res
     }
 
-    getChildNode(node, instance, key): Node {
-        return maybeNode(instance[key], identity, () => fail(`Illegal state, no node for "${key}"`))
+    getChildNode(node, instance, key): Node | null {
+        return maybeNode(instance[key], identity, nothing)
     }
 
     willChange(node, change: IObjectWillChange): Object | null {
@@ -169,11 +169,7 @@ export function createObjectFactory(arg1, arg2?) {
     let name = typeof arg1 === "string" ? arg1 : "unnamed-object-factory"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
 
-    return createFactory(
-        name,
-        ObjectType,
-        baseModel
-    )
+    return new ObjectType(name, baseModel).factory
 }
 
 function getObjectFactoryBaseModel(item){

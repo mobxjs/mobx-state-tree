@@ -1,3 +1,5 @@
+// TODO: move file to better place, not really a type
+
 import {IModel} from "../core/factories"
 import {tryResolve, getRoot} from "../index"
 import {invariant, fail} from "../utils"

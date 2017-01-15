@@ -1,13 +1,39 @@
-// import {isModelFactory, IModelFactory, createFactory, IModelFactoryDispatcher} from "../core/factories"
-// import {invariant, fail} from "../utils"
+import {isModelFactory, IModelFactory, Type} from "../core/factories"
+import {invariant, fail} from "../utils"
 
+export class Union extends Type {
+    types: IModelFactory<any, any>[] = []
 
+    // TODO: support / use dispatch function instead of this
+    constructor(name, types: IModelFactory<any, any>[]) {
+        super(name)
+        this.types = types
+    }
+
+    create(value) {
+        invariant(this.is(value))
+        // TODO: copy error from below
+        const applicableTypes = this.types.filter(type => type.is(value))
+        invariant(applicableTypes.length === 1, "Ambigous value") // TODO: better error message
+        return applicableTypes[0](value)
+    }
+
+    is(value) {
+        return this.types.some(type => type.is(value))
+    }
+
+}
+
+// TODO: support dispatcher function
 // export function createUnionFactory<SA, SB, TA, TB>(dispatch: IModelFactoryDispatcher, A: IModelFactory<SA, TA>, B: IModelFactory<SB, TB>): IModelFactory<SA | SB, TA | TB>
-// export function createUnionFactory<SA, SB, TA, TB>(A: IModelFactory<SA, TA>, B: IModelFactory<SB, TB>): IModelFactory<SA | SB, TA | TB>
-// export function createUnionFactory(dispatchOrType: IModelFactoryDispatcher | IModelFactory<any, any>, ...otherTypes: IModelFactory<any, any>[]): IModelFactory<any, any>{
-//     const types = isModelFactory(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
+export function createUnionFactory<SA, SB, TA, TB>(A: IModelFactory<SA, TA>, B: IModelFactory<SB, TB>): IModelFactory<SA | SB, TA | TB> {
+    // const types = isModelFactory(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
+    // TODO: generalize:
+    const types: IModelFactory<any, any>[] = [A, B]
+    const name = types.map(type => type.factoryName).join(" | ")
+    return new Union(name, types).factory
+}
 //     const dispatch = isModelFactory(dispatchOrType) ? null : dispatchOrType
-//     const name = types.map(type => type.factoryName).join(" | ")
 
 //     const getType = (dispatch, snapshot): IModelFactory<any, any> => {
 //         let castableTypes = types.filter(type => type.is(snapshot))

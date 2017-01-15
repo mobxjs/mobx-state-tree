@@ -1,14 +1,14 @@
 import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot, hasNode} from "../core/node"
-import {isModelFactory, IModelFactory, createFactory, Type} from "../core/factories"
-import {identity, fail, isPlainObject, invariant, isPrimitive} from "../utils"
+import {isModelFactory, IModelFactory, ComplexType} from "../core/factories"
+import {identity, fail, isPlainObject, invariant, nothing, isPrimitive} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 
 interface IMapFactoryConfig {
     isMapFactory: true
 }
 
-export class MapType extends Type {
+export class MapType extends ComplexType {
     isMapFactory = true
     subType: IModelFactory<any, any>
 
@@ -29,8 +29,10 @@ export class MapType extends Type {
         return res
     }
 
-    getChildNode(node: Node, target, key): Node {
-        return maybeNode(target.get(key), identity, () => fail(`No node at index '${key}' in '${node.path}'`))
+    getChildNode(node: Node, target, key): Node | null {
+        if (target.has(key))
+            return maybeNode(target.get(key), identity, nothing)
+        return null
     }
 
     willChange(node: Node, change: IMapWillChange<any>): Object | null {
@@ -41,7 +43,6 @@ export class MapType extends Type {
                     const oldValue = change.object.get(change.name)
                     if (newValue === oldValue)
                         return null
-                    maybeNode(oldValue, adm => adm.setParent(null))
                     change.newValue = node.prepareChild("" + change.name, newValue)
                 }
                 break
@@ -136,11 +137,7 @@ export class MapType extends Type {
 }
 
 export function createMapFactory<S, T>(subtype: IModelFactory<S, T>): IModelFactory<{[key: string]: S}, ObservableMap<T>> {
-    return createFactory(
-        "map-of-" + subtype.factoryName,
-        MapType,
-        subtype
-    ) as any
+    return new MapType(`map<string, ${subtype.factoryName}>`, subtype).factory
 }
 
 export function isMapFactory(factory): boolean {

@@ -1,10 +1,10 @@
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
-import {IModelFactory, createFactory, Type, isModelFactory} from "../core/factories"
-import {identity, fail} from "../utils"
+import {IModelFactory, ComplexType, isModelFactory} from "../core/factories"
+import {identity, nothing, fail} from "../utils"
 
-export class ArrayType extends Type {
+export class ArrayType extends ComplexType {
     isArrayFactory = true
     subType: IModelFactory<any, any> // TODO: type
 
@@ -25,8 +25,10 @@ export class ArrayType extends Type {
         return res
     }
 
-    getChildNode(node: Node, target, key): Node {
-        return maybeNode(target[key], identity, () => fail(`No node at index '${key}' in '${node.path}'`))
+    getChildNode(node: Node, target, key): Node | null {
+        if (parseInt(key) < target.length)
+            return maybeNode(target[key], identity, nothing)
+        return null
     }
 
     willChange(node: Node, change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
@@ -36,7 +38,6 @@ export class ArrayType extends Type {
                 const oldValue = change.object[change.index]
                 if (newValue === oldValue)
                     return null
-                maybeNode(oldValue, adm => adm.setParent(null))
                 change.newValue = node.prepareChild("" + change.index, newValue)
                 break
             case "splice":
@@ -109,11 +110,7 @@ export class ArrayType extends Type {
 }
 
 export function createArrayFactory<S, T extends S>(subtype: IModelFactory<S, T>): IModelFactory<S[], IObservableArray<T>> {
-    return createFactory(
-        "array-of-" + subtype.factoryName,
-        ArrayType,
-        subtype
-    ) as any // TODO: no any
+    return new ArrayType(subtype.factoryName + "[]", subtype).factory
 }
 
 export function isArrayFactory(factory): boolean {

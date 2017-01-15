@@ -12,6 +12,7 @@ export enum NodeType { ComplexObject, Map, Array, PlainObject };
 
 export type NodeConstructor = new (target: any, environment: any, factory: IModelFactoryConstructor<any, any>, factoryConfiguration: Object) => Node
 
+// TODO: make Node more like a struct, extract the methods to snapshots.js, actions.js etc..
 export class Node {
     readonly target: any
     readonly environment: any
@@ -24,7 +25,8 @@ export class Node {
     _isRunningAction = false
 
 
-    constructor(initialState: any, environment: any, factory: IModelFactory<any, any>) {
+    constructor(initialState: any, environment, factory: IModelFactory<any, any>) {
+        invariant(factory.type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
         this.factory = factory
         this.environment = environment
@@ -38,8 +40,8 @@ export class Node {
         // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
     }
 
-    get type(): Type {
-        return this.factory.type
+    get type(): ComplexType {
+        return this.factory.type as ComplexType
     }
 
     @computed get pathParts(): string[]{
@@ -152,13 +154,22 @@ export class Node {
         }
 
         if (hasNode(child)) {
+            // TODO: fail here or implicitly clone?
             child = getNode(child).snapshot
         }
-        // convert object from snapshot
-        const instance = childFactory(child, this.environment) // optimization: pass in parent as third arg
-        const node = getNode(instance)
-        node.setParent(this, subpath)
-        return instance
+        const existingNode = this.getChildNode(subpath)
+        const newInstance = childFactory(child)
+        if (existingNode && existingNode.factory === newInstance.factory) {
+            // recycle instance..
+            existingNode.applySnapshot(child)
+            return existingNode.target
+        } else {
+            if (existingNode)
+                existingNode.setParent(null) // TODO: or delete / remove / whatever is a more explicit clean up
+            const node = getNode(newInstance)
+            node.setParent(this, subpath)
+            return newInstance
+        }
     }
 
     detach() {
@@ -250,7 +261,7 @@ export class Node {
         return this.parent!.getFromEnvironment(key)
     }
 
-    getChildNode(subpath: string): Node {
+    getChildNode(subpath: string): Node | null {
         return this.type.getChildNode(this, this.target, subpath)
     }
 
@@ -333,6 +344,6 @@ import {
     addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
 } from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
-import {IModelFactory, IModelFactoryConstructor, Type} from "./factories"
+import {IModelFactory, IModelFactoryConstructor, ComplexType} from "./factories"
 import {ObjectType} from "../types/object"
 import {IActionCall, applyActionLocally} from "./action"

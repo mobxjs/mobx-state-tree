@@ -1,52 +1,27 @@
-import {IModelFactory, createFactory, Type} from "../core/factories"
+import {IModelFactory, ConcreteType} from "../core/factories"
 import {invariant, isPrimitive, extend, fail} from "../utils"
 import {Node} from "../core/node"
 
-export class PrimitiveType extends Type {
+// TODO: inherited for specific primitive types
+export class PrimitiveType extends ConcreteType {
     name: string
-    constructor(name, args) {
-        super(name)
-        // TODO: support specializations
+
+    create(value) {
+        invariant(isPrimitive(value), `Not a primitive: '${value}'`)
+        return value
     }
 
-    createNewInstance() {
-        return fail("Nope.")
-    }
-
-    applySnapshot() {
-        return fail("Nope.")
-    }
-
-    getChildNodes() {
-        return fail("Nope.")
-    }
-
-    getChildNode() {
-        return fail("Nope.")
-    }
-
-    willChange(node: Node, change): Object | null {
-        return fail("Nope.")
-    }
-    didChange(node: Node, change): void {
-        return fail("Nope.")
-    }
-    serialize(node: Node, target): any {
-        return fail("Nope.")
-    }
-    applyPatchLocally(node: Node, target, subpath: string, patch): void {
-        return fail("Nope.")
-    }
-    getChildFactory(key: string): IModelFactory<any, any> {
-        return fail("Nope.")
-    }
     is(thing) {
         return isPrimitive(thing)
     }
+
+    // TODO:
+    // subType<T>(name: predicate: (value) => boolean): IModelFactory<T, T> {
+
+    // }
 }
 
-export const primitiveFactory = createFactory(
-        "primitive",
-        PrimitiveType,
-        []
-    )
+export const primitiveFactory = new PrimitiveType("primitive").factory
+
+// TODO:
+// export const String = primitiveFactory.subType("String", t => typeof t === "string")
