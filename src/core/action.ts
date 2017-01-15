@@ -1,7 +1,8 @@
-import {isObservable} from "mobx"
+import {isObservable, isAction} from "mobx"
 import {isModel, getModelFactory} from "../"
 import {addHiddenFinalProp, invariant, isPlainObject, isPrimitive} from "../utils"
-import {getObjectNode, ObjectFactory} from "../types/object"
+import {ObjectType} from "../types/object"
+import {Node, getNode} from "./node"
 
 let _isRunningActionGlobally = false
 
@@ -23,7 +24,7 @@ export function createNonActionWrapper(instance, key, func) {
 
 export function createActionWrapper(instance, key, action: Function) {
     addHiddenFinalProp(instance, key, function(...args: any[]) {
-        const adm = getObjectNode(instance)
+        const adm = getNode(instance)
         const runAction = () => {
             const res = action.apply(instance, args)
             invariant(res === undefined, `action '${key}' should not return a value but got '${res}'`)
@@ -72,7 +73,8 @@ function verifyArgumentsAreStringifyable(actionName: string, args: any[]) {
     })
 }
 
-export function applyActionLocally(target: ObjectFactory, action: IActionCall) {
-    invariant(typeof target.state[action.name] === "function", `Action '${action.name}' does not exist in '${target.path}'`)
-    target.state[action.name].apply(target.state, action.args || [])
+export function applyActionLocally(node: Node, instance, action: IActionCall) {
+    invariant(isAction(instance[action.name]), `Action '${action.name}' does not exist in '${node.path}'`)
+    // TODO: deserialize args
+    instance[action.name].apply(instance, action.args || [])
 }

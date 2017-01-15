@@ -1,28 +1,35 @@
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot, hasNode} from "../core/node"
+import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
-import {IModelFactory, createFactory, createFactoryConstructor} from "../core/factories"
-import {invariant, identity, fail} from "../utils"
+import {IModelFactory, createFactory, Type, isModelFactory} from "../core/factories"
+import {identity, fail} from "../utils"
 
-interface IArrayFactoryConfig {
-    subType: IModelFactory<any, any>
-    isArrayFactory: true
-}
+export class ArrayType extends Type {
+    isArrayFactory = true
+    subType: IModelFactory<any, any> // TODO: type
 
-export class ArrayFactory extends Node {
-    getChildNodes(): [string, Node][] {
+    constructor(name, subType: IModelFactory<any, any>) {
+        super(name)
+        this.subType = subType
+    }
+
+    createNewInstance() {
+        return observable.shallowArray()
+    }
+
+    getChildNodes(_: Node, target): [string, Node][] {
         const res: [string, Node][] = []
-        this.state.forEach((value, index) => {
+        target.forEach((value, index) => {
             maybeNode(value, node => { res.push(["" + index, node])})
         })
         return res
     }
 
-    getChildNode(key): Node {
-        return maybeNode(this.state[key], identity, () => fail(`No node at index '${key}' in '${this.path}'`))
+    getChildNode(node: Node, target, key): Node {
+        return maybeNode(target[key], identity, () => fail(`No node at index '${key}' in '${node.path}'`))
     }
 
-    willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
+    willChange(node: Node, change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
         switch (change.type) {
             case "update":
                 const {newValue} = change
@@ -30,96 +37,85 @@ export class ArrayFactory extends Node {
                 if (newValue === oldValue)
                     return null
                 maybeNode(oldValue, adm => adm.setParent(null))
-                change.newValue = this.prepareChild("" + change.index, newValue)
+                change.newValue = node.prepareChild("" + change.index, newValue)
                 break
             case "splice":
                 change.object.slice(change.index, change.removedCount).forEach(oldValue => {
                     maybeNode(oldValue, adm => adm.setParent(null))
                 })
                 change.added = change.added.map((newValue, pos) => {
-                    return this.prepareChild("" + (change.index + pos), newValue)
+                    return node.prepareChild("" + (change.index + pos), newValue)
                 })
                 break
         }
         return change
     }
 
-    serialize(): any {
-        return this.state.map(valueToSnapshot)
+    serialize(node: Node, target): any {
+        return target.map(valueToSnapshot)
     }
 
-    didChange(change: IArrayChange<any> | IArraySplice<any>): void {
+    didChange(node: Node, change: IArrayChange<any> | IArraySplice<any>): void {
         switch (change.type) {
             case "update":
-                return void this.emitPatch({
+                return void node.emitPatch({
                     op: "replace",
                     path: "/" + change.index,
                     value: valueToSnapshot(change.newValue)
-                }, this)
+                }, node)
             case "splice":
                 for (let i = change.index + change.removedCount - 1; i >= change.index; i--)
-                    this.emitPatch({
+                    node.emitPatch({
                         op: "remove",
                         path: "/" + i
-                    }, this)
+                    }, node)
                 for (let i = 0; i < change.addedCount; i++)
-                    this.emitPatch({
+                    node.emitPatch({
                         op: "add",
                         path: "/" + (change.index + i),
                         value: valueToSnapshot(change.added[i])
-                    }, this)
+                    }, node)
                 return
         }
     }
 
-    applyPatchLocally(subpath: string, patch: IJsonPatch): void {
-        const index = subpath === "-" ? this.state.length : parseInt(subpath)
+    applyPatchLocally(node: Node, target, subpath: string, patch: IJsonPatch): void {
+        const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
             case "replace":
-                this.state[index] = patch.value
+                target[index] = patch.value
                 break
             case "add":
-                this.state.splice(index, 0, patch.value)
+                target.splice(index, 0, patch.value)
                 break
             case "remove":
-                this.state.splice(index, 1)
+                target.splice(index, 1)
                 break
         }
     }
 
-    @action applySnapshot(snapshot): void {
-        invariant(this.factory.is(snapshot) && !hasNode(snapshot), 'Snapshot ' + JSON.stringify(snapshot) + ' is not assignable to ' + this.factory.factoryName)
-        // TODO: make a smart merge here...
-        // MWE: should we try to reuse existing instances in the array? Guess not, that might be terribly confusing
-        // as they are not uniquely identifyable..
-        this.state.replace(snapshot)
+    @action applySnapshot(node: Node, target, snapshot): void {
+        // TODO: make a smart merge here, try to reuse instances..
+        target.replace(snapshot)
     }
 
-    getChildFactory(): IModelFactory<any, any> {
-        return (this.factory.config as IArrayFactoryConfig).subType
+    getChildFactory(key: string): IModelFactory<any, any> {
+        return this.subType
+    }
+
+    is(snapshot) {
+        return Array.isArray(snapshot) && snapshot.every(item => this.subType.is(item))
     }
 }
 
 export function createArrayFactory<S, T extends S>(subtype: IModelFactory<S, T>): IModelFactory<S[], IObservableArray<T>> {
-    let factory = createFactory(
-        "array-factory",
-        "array",
-        snapshot => (Array.isArray(snapshot) && snapshot.every(item => subtype.is(item))),
-        snapshot => factory,
-        createFactoryConstructor(
-            "array-factory",
-            ArrayFactory,
-            {
-                subType: subtype,
-                isArrayFactory: true
-            } as IArrayFactoryConfig,
-            () => observable.shallowArray()
-        )
-    ) as any
-
-    return factory
+    return createFactory(
+        "array-of-" + subtype.factoryName,
+        ArrayType,
+        subtype
+    ) as any // TODO: no any
 }
 
 export function isArrayFactory(factory): boolean {
-    return factory && factory.config && factory.config.isArrayFactory === true
+    return isModelFactory(factory) && (factory.type as any).isArrayFactory === true
 }

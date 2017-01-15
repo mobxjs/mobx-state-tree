@@ -1,7 +1,7 @@
 import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange} from "mobx"
 import {invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
 import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
-import {IModelFactory, isModelFactory, createFactory, getModelFactory, IModel, createFactoryConstructor} from "../core/factories"
+import {Type, IModelFactory, isModelFactory, createFactory, getModelFactory, IModel} from "../core/factories"
 import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
 import {escapeJsonPath} from "../core/json-patch"
 import {isArrayFactory} from "../types/array"
@@ -14,55 +14,62 @@ interface IObjectFactoryConfig {
     baseModel: Object
 }
 
-export class ObjectFactory extends Node {
-    readonly actionSubscribers: IActionHandler[] = []
-
-    // Optimization: submodelTypes can be stored on the factory config!
-    readonly submodelTypes: {
-        [key: string]: IModelFactory<any, any>;
+export class ObjectType extends Type {
+    props: {
+        [key: string]: IModelFactory<any, any>
     } = {}
-    _isRunningAction = false
+    baseModel: any
+    initializers: ((target) => void)[] = []
+    isObjectFactory = true
 
-    constructor(instance, environment, factory) {
-        super(instance, environment, factory)
-        this.copyBaseModelToInstance()
-        Object.seal(instance) // don't allow new props to be added!
+    constructor(name: string, baseModel) {
+        super(name)
+        Object.seal(baseModel) // make sure nobody messes with it
+        this.baseModel = baseModel
+        this.extractPropsFromBaseModel()
     }
 
-    copyBaseModelToInstance() {
-        const baseModel = (this.factory.config as IObjectFactoryConfig).baseModel
-        const instance = this.state
+    createNewInstance() {
+        const instance = observable.shallowObject({})
+        this.initializers.forEach(f => f(instance))
+        Object.seal(instance) // don't allow new props to be added!
+        return instance as Object
+    }
+
+    extractPropsFromBaseModel() {
+        const baseModel = this.baseModel
+        const addInitializer = this.initializers.push.bind(this.initializers)
         for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
             const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
             if ("get" in descriptor) {
-                const tmp = {} // yikes
-                Object.defineProperty(tmp, key, descriptor)
-                extendShallowObservable(instance, tmp)
+                const computedDescriptor = {} // yikes
+                Object.defineProperty(computedDescriptor, key, descriptor)
+                addInitializer(t => extendShallowObservable(t, computedDescriptor))
                 continue
             }
 
             const {value} = descriptor
+
             if (isPrimitive(value)) {
-                this.submodelTypes[key] = primitiveFactory
-                extendShallowObservable(instance, { [key] : value })
-            } else if (isMapFactory(value)) {
-                this.submodelTypes[key] = value
+                // TODO: detect exact primitiveFactory!
+                this.props[key] = primitiveFactory
+                // MWE: optimization, create one single extendObservale
+                addInitializer(t => extendShallowObservable(t, { [key] : value }))
+            } else if (isMapFactory(value) || isArrayFactory(value)) {
+                this.props[key] = value
                 // there is no technical need for read only props, but
                 // it might avoid confusion if direct assingments are forbidden,
                 // and content of complex collections is replace instead
-                addReadOnlyProp(instance, key, this.prepareChild(key, {}))
-            } else if (isArrayFactory(value)) {
-                this.submodelTypes[key] = value
-                addReadOnlyProp(instance, key, this.prepareChild(key, []))
+                addInitializer(t => addReadOnlyProp(t, key, value()))
             } else if (isModelFactory(value)) {
-                this.submodelTypes[key] = value
-                extendShallowObservable(instance, { [key]: null })
+                this.props[key] = value
+                addInitializer(t => extendShallowObservable(t, { [key]: null })) // TODO: support default value
             } else if (isReferenceFactory(value)) {
-                extendShallowObservable(instance, createReferenceProps(key, value))
+                addInitializer(t => extendShallowObservable(t, createReferenceProps(key, value)))
             } else if (isAction(value)) {
-                createActionWrapper(instance, key, value)
+                addInitializer(t => createActionWrapper(t, key, value))
             } else if (typeof value === "function") {
-                createNonActionWrapper(instance, key, value)
+                addInitializer(t => createNonActionWrapper(t, key, value))
             } else if (typeof value === "object") {
                 fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
             } else  {
@@ -71,95 +78,64 @@ export class ObjectFactory extends Node {
         }
     }
 
-    getChildNodes(): [string, Node][] {
+    // TODO: adm or instance as param?
+    getChildNodes(node, instance): [string, Node][] {
         const res: [string, Node][] = []
-        for (let key in this.state)
-            maybeNode(this.state[key], node => res.push([key, node]))
+        for (let key in this.props)
+            maybeNode(instance[key], node => res.push([key, node]))
         return res
     }
 
-    getChildNode(key): Node {
-        return maybeNode(this.state[key], identity, () => fail(`Illegal state, no node for "${key}"`))
+    getChildNode(node, instance, key): Node {
+        return maybeNode(instance[key], identity, () => fail(`Illegal state, no node for "${key}"`))
     }
 
-    willChange(change: IObjectWillChange): Object | null {
+    willChange(node, change: IObjectWillChange): Object | null {
         const {newValue} = change
         const oldValue = change.object[change.name]
         if (newValue === oldValue)
             return null
         maybeNode(oldValue, adm => adm.setParent(null))
-        change.newValue = this.prepareChild(change.name, newValue)
+        change.newValue = node.prepareChild(change.name, newValue)
         return change
     }
 
-    didChange(change: IObjectChange): void {
+    didChange(node: Node, change: IObjectChange): void {
         switch (change.type) {
-            case "update": return void this.emitPatch({
+            case "update": return void node.emitPatch({
                 op: "replace",
                 path: "/" + escapeJsonPath(change.name),
                 value: valueToSnapshot(change.newValue)
-            }, this)
-            case "add": return void this.emitPatch({
+            }, node)
+            case "add": return void node.emitPatch({
                 op: "add",
                 path: "/" + escapeJsonPath(change.name),
                 value: valueToSnapshot(change.newValue)
-            }, this)
+            }, node)
         }
     }
 
-    serialize(): any {
-        const {state} = this
+    serialize(node: Node, instance): any {
         const res = {}
-        for (let key in state) {
-            const value = state[key]
+        for (let key in this.props) {
+            const value = instance[key]
             if (!isSerializable(value))
-                console.warn(`Encountered unserialize value '${value}' in ${this.path}/${key}`)
+                console.warn(`Encountered unserialize value '${value}' in ${node.path}/${key}`)
             res[key] = valueToSnapshot(value)
         }
         return res
     }
 
-    applyPatchLocally(subpath, patch): void {
+    applyPatchLocally(node: Node, target, subpath, patch): void {
         invariant(patch.op === "replace" || patch.op === "add")
-        this.applySnapshot({
+        this.applySnapshot(node ,target, {
             [subpath]: patch.value
         })
     }
 
-    applyAction(action: IActionCall): void {
-        const node = this.resolve(action.path || "")
-        if (node instanceof ObjectFactory)
-            applyActionLocally(node, action)
-        else
-            fail(`Invalid action path: ${action.path || ""}`)
-    }
-
-    emitAction(instance: ObjectFactory, action: IActionCall, next) {
-        let idx = -1
-        const correctedAction: IActionCall = this.actionSubscribers.length
-            ? extend({} as any, action, { path: getRelativePath(this, instance) })
-            : null
-        let n = () => {
-            // optimization: use tail recursion / trampoline
-            idx++
-            if (idx < this.actionSubscribers.length) {
-                this.actionSubscribers[idx](correctedAction!, n)
-            } else {
-                const parent = findEnclosingObjectNode(this)
-                if (parent)
-                    parent.emitAction(instance, action, next)
-                else
-                    next()
-            }
-        }
-        n()
-    }
-
-    @action applySnapshot(snapshot): void {
-        invariant(this.factory.is(snapshot) && !hasNode(snapshot), 'Snapshot ' + JSON.stringify(snapshot) + ' is not assignable to ' + this.factory.factoryName)
-        const target = this.state
+    @action applySnapshot(node: Node, target, snapshot): void {
         for (let key in snapshot) {
-            invariant(key in this.submodelTypes, `It is not allowed to assign a value to non-declared property ${key} of ${this.factory.factoryName}`)
+            invariant(key in this.props, `It is not allowed to assign a value to non-declared property ${key} of ${this.name}`)
             maybeNode(
                 target[key],
                 node => { node.applySnapshot(snapshot[key]) },
@@ -168,20 +144,22 @@ export class ObjectFactory extends Node {
         }
     }
 
+
     getChildFactory(key: string): IModelFactory<any, any> {
-        return this.submodelTypes[key] || primitiveFactory
+        return this.props[key] || primitiveFactory
     }
-
-    onAction(listener: (action: IActionCall, next: () => void) => void): IDisposer {
-        return registerEventHandler(this.actionSubscribers, listener)
-    }
-
-    isRunningAction(): boolean {
-        if (this._isRunningAction)
-            return true
-        if (this.isRoot)
-            return false
-        return this.parent!.isRunningAction()
+    is(snapshot) {
+        const props = this.props
+        let modelKeys = Object.keys(props).filter(key => isPrimitive(props[key]) || isModelFactory(props[key]))
+        if (!isPlainObject(snapshot)) return false
+        const snapshotKeys = Object.keys(snapshot)
+        if (snapshotKeys.length > modelKeys.length) return false
+        return snapshotKeys.every(key => {
+            let keyInConfig = key in props
+            let bothArePrimitives = isPrimitive(props[key]) && isPrimitive(snapshot[key])
+            let ifModelFactoryIsCastable = isModelFactory(props[key]) && props[key].is(snapshot[key])
+            return keyInConfig && (bothArePrimitives || ifModelFactoryIsCastable)
+        })
     }
 }
 
@@ -189,44 +167,19 @@ export function createObjectFactory<S extends Object, T extends S>(baseModel: T)
 export function createObjectFactory<S extends Object, T extends S>(name: string, baseModel: T): IModelFactory<S, T>
 export function createObjectFactory(arg1, arg2?) {
     let name = typeof arg1 === "string" ? arg1 : "unnamed-object-factory"
-    let config: Object = typeof arg1 === "string" ? arg2 : arg1
-    let modelKeys = Object.keys(config).filter(key => isPrimitive(config[key]) || isModelFactory(config[key]))
+    let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
 
-    const is = snapshot => {
-        if(!isPlainObject(snapshot)) return false
-        const snapshotKeys = Object.keys(snapshot)
-        if(snapshotKeys.length > modelKeys.length) return false
-        return snapshotKeys.every(key => {
-            let keyInConfig = key in config
-            let bothArePrimitives = isPrimitive(config[key]) && isPrimitive(snapshot[key])
-            let ifModelFactoryIsCastable = isModelFactory(config[key]) && config[key].is(snapshot[key])
-            return keyInConfig && (bothArePrimitives || ifModelFactoryIsCastable)
-        })
-    }
-
-    let factory = createFactory(
+    return createFactory(
         name,
-        "object",
-        is,
-        snapshot => factory,
-        createFactoryConstructor(
-            name,
-            ObjectFactory,
-            {
-                isObjectFactory: true,
-                baseModel: typeof arg1 === "string" ? arg2 : arg1
-            },
-            () => observable.shallowObject({})
-        )
+        ObjectType,
+        baseModel
     )
-
-    return factory
 }
 
 function getObjectFactoryBaseModel(item){
     let factory = isModelFactory(item) ? item : getModelFactory(item)
 
-    return isObjectFactory(factory) ? (factory.config as IObjectFactoryConfig).baseModel : {}
+    return isObjectFactory(factory) ? (factory as any).baseModel : {}
 }
 
 export function composeFactory<AS, AT, BS, BT>(name: string, a: IModelFactory<AS, AT>, b: IModelFactory<BS, BT>): IModelFactory<AS & BS, AT & BT>;
@@ -246,22 +199,22 @@ export function composeFactory(...args: any[]) {
 }
 
 export function isObjectFactory(factory): boolean {
-    return factory && factory.config && factory.config.isObjectFactory === true
+    return isModelFactory(factory) && (factory.type as any).isObjectFactory === true
 }
 
-export function getObjectNode(thing: IModel): ObjectFactory {
-    const node = getNode(thing)
-    invariant(isObjectFactory(node.factory), "Expected object node, got " + (node.constructor as any).name)
-    return node as ObjectFactory
-}
+// export function getObjectNode(thing: IModel): ObjectNode {
+//     const node = getNode(thing)
+//     invariant(isObjectFactory(node.factory), "Expected object node, got " + (node.constructor as any).name)
+//     return node as ObjectNode
+// }
 
-/**
- * Returns first parent of the provided node that is an object node, or null
- */
-export function findEnclosingObjectNode(thing: Node): ObjectFactory | null {
-    let parent: Node | null = thing
-    while (parent = parent.parent)
-        if (parent instanceof ObjectFactory)
-            return parent
-    return null
-}
+// /**
+//  * Returns first parent of the provided node that is an object node, or null
+//  */
+// export function findEnclosingObjectNode(thing: Node): ObjectNode | null {
+//     let parent: Node | null = thing
+//     while (parent = parent.parent)
+//         if (parent instanceof ObjectNode)
+//             return parent
+//     return null
+// }
