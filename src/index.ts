@@ -280,7 +280,7 @@ export function getParent(target: IModel, strict: boolean = false): IModel {
     //     ? getNode(target).parent
     //     : findNode(getNode(target))
     const node = getNode(target)
-    return node ? node.target : null
+    return node.parent ? node.parent.target : null
 }
 
 /**

@@ -21,6 +21,7 @@ export class ObjectType extends ComplexType {
     } = {}
     baseModel: any
     initializers: ((target) => void)[] = []
+    finalizers: ((target) => void)[] = []
     isObjectFactory = true
 
     constructor(name: string, baseModel) {
@@ -37,13 +38,18 @@ export class ObjectType extends ComplexType {
     createNewInstance() {
         const instance = observable.shallowObject({})
         this.initializers.forEach(f => f(instance))
-        // TODO: Object.seal(instance) // don't allow new props to be added!
         return instance as Object
+    }
+
+    finalizeNewInstance(instance){
+        this.finalizers.forEach(f => f(instance))
+        // TODO: Object.seal(instance) // don't allow new props to be added!
     }
 
     extractPropsFromBaseModel() {
         const baseModel = this.baseModel
         const addInitializer = this.initializers.push.bind(this.initializers)
+        const addFinalizer = this.finalizers.push.bind(this.finalizers)
         for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
             const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
             if ("get" in descriptor) {
@@ -60,15 +66,10 @@ export class ObjectType extends ComplexType {
                 this.props[key] = primitiveFactory
                 // MWE: optimization, create one single extendObservale
                 addInitializer(t => extendShallowObservable(t, { [key] : value }))
-            } else if (isMapFactory(value) || isArrayFactory(value)) {
-                this.props[key] = value
-                // there is no technical need for read only props, but
-                // it might avoid confusion if direct assingments are forbidden,
-                // and content of complex collections is replace instead
-                addInitializer(t => addReadOnlyProp(t, key, value()))
             } else if (isFactory(value)) {
                 this.props[key] = value
-                addInitializer(t => extendShallowObservable(t, { [key]: null })) // TODO: support default value
+                addInitializer(t => extendShallowObservable(t, { [key]: null }))
+                addFinalizer(t => t[key] = value())
             } else if (isReferenceFactory(value)) {
                 addInitializer(t => extendShallowObservable(t, createReferenceProps(key, value)))
             } else if (isAction(value)) {

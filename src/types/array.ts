@@ -22,6 +22,10 @@ export class ArrayType extends ComplexType {
         return observable.shallowArray()
     }
 
+    finalizeNewInstance(instance){
+        
+    }
+
     getChildNodes(_: Node, target): [string, Node][] {
         const res: [string, Node][] = []
         target.forEach((value, index) => {

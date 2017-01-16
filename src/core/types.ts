@@ -43,6 +43,7 @@ export abstract class ComplexType extends Type {
     create(snapshot, environment?) {
         const instance = this.createNewInstance()
         const node = new Node(instance, environment, this.factory)
+        this.finalizeNewInstance(instance)
         if (arguments.length > 0)
             node.applySnapshot(snapshot)
         Object.seal(instance)
@@ -50,6 +51,7 @@ export abstract class ComplexType extends Type {
     }
 
     abstract createNewInstance()
+    abstract finalizeNewInstance(target: any)
     abstract applySnapshot(node: Node, target, snapshot)
     abstract getChildNodes(node: Node, target): [string, Node][]
     abstract getChildNode(node: Node, target, key): Node | null

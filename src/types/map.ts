@@ -26,6 +26,10 @@ export class MapType extends ComplexType {
         return observable.shallowMap()
     }
 
+    finalizeNewInstance(instance){
+        
+    }
+
     getChildNodes(_node: Node, target): [string, Node][] {
         const res: [string, Node][] = []
         target.forEach((value, key) => {
