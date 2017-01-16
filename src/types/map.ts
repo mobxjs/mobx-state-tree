@@ -18,6 +18,10 @@ export class MapType extends ComplexType {
         this.subType = subType
     }
 
+    describe(){
+        return "Map<string, " + this.subType.type.describe() + ">"
+    }
+
     createNewInstance() {
         return observable.shallowMap()
     }

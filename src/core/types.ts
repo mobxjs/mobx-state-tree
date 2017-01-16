@@ -3,17 +3,17 @@ import {Node, getNode, hasNode} from "./node"
 import {IJsonPatch} from "../core/json-patch"
 import {IFactory, IModel} from "./factories"
 
-// TODO: generics S, T
 export interface IType {
     name: string
     is(thing: IModel | any): boolean
-    create(snapshot): any
+    create(snapshot, environment?): any
     factory: IFactory<any, any> // TODO type
+    describe(): string
 }
 
 export type ITypeChecker = (value: IModel | any) => boolean
 
-export abstract class Type { // TODO: generic for config and state of target
+export abstract class Type implements IType { // TODO: generic for config and state of target
     name: string
     factory: IFactory<any, any>
 
@@ -24,6 +24,7 @@ export abstract class Type { // TODO: generic for config and state of target
 
     abstract create(snapshot, environment?): any
     abstract is(thing): boolean
+    abstract describe(): string
 
     protected initializeFactory() {
         const factory = action(

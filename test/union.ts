@@ -30,7 +30,7 @@ test("it should complain about no dispatch method", (t) => {
     const error = t.throws(() => {
         const doc = Plane({width: 2})
     })
-    t.is(error.message, '[mobx-state-tree] Ambiguos snapshot {"width":2} for union Square | Box. Please provide a dispatch in the union declaration.')
+    t.is(error.message, '[mobx-state-tree] Ambiguos snapshot {"width":2} for union Box | Square. Please provide a dispatch in the union declaration.')
 })
 
 test("it should be smart enough to discriminate by keys", (t) => {

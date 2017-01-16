@@ -15,11 +15,11 @@ test("it should resolve to the parent instance", (t) => {
     const row = Row()
     doc.rows.push(row)
 
-    t.deepEqual(getParent(row), doc)
+    t.deepEqual<any>(getParent(row), doc.rows)
 })
 
 // hasParent
-test("it should resolve to the parent instance", (t) => {
+test("it should check for parent instance", (t) => {
     const Row = createFactory({
         article_id: 0
     })
@@ -36,7 +36,7 @@ test("it should resolve to the parent instance", (t) => {
 })
 
 
-test("it should resolve to the parent instance (unbound)", (t) => {
+test("it should check for parent instance (unbound)", (t) => {
     const Row = createFactory({
         article_id: 0
     })

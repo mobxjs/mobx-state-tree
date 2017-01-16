@@ -173,7 +173,7 @@ test("it should throw if snapshot has computed properties", (t) => {
         const doc = ComputedFactory({area: 3})
     })
 
-    t.is(error.message, "[mobx-state-tree] It is not allowed to assign a value to non-declared property area of unnamed-object-factory")
+    t.is(error.message, "[mobx-state-tree] Snapshot {\"area\":3} is not assignable to type unnamed-object-factory. Expected { width: primitive; height: primitive } instead.")
 })
 
 // === COMPOSE FACTORY ===

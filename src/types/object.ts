@@ -30,6 +30,10 @@ export class ObjectType extends ComplexType {
         this.extractPropsFromBaseModel()
     }
 
+    describe(){
+        return "{ " + Object.keys(this.props).map(key => key + ": " + this.props[key].type.describe()).join("; ") + " }"
+    }
+
     createNewInstance() {
         const instance = observable.shallowObject({})
         this.initializers.forEach(f => f(instance))
@@ -177,7 +181,7 @@ export function createModelFactory(arg1, arg2?) {
 function getObjectFactoryBaseModel(item){
     let factory = isFactory(item) ? item : getFactory(item)
 
-    return isObjectFactory(factory) ? (factory as any).baseModel : {}
+    return isObjectFactory(factory) ? (factory.type as ObjectType).baseModel : {}
 }
 
 export function composeFactory<AS, AT, BS, BT>(name: string, a: IFactory<AS, AT>, b: IFactory<BS, BT>): IFactory<AS & BS, AT & BT>;
@@ -192,7 +196,7 @@ export function composeFactory(...args: any[]) {
 
     return createModelFactory(
         factoryName,
-        extend.apply(null, baseModels.map(getObjectFactoryBaseModel))
+        extend.apply(null, [{}].concat(baseModels.map(getObjectFactoryBaseModel)))
     )
 }
 
