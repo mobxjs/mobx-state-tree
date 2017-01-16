@@ -18,10 +18,10 @@ const createTestFactories = () => {
     })
 
     const Plane = unionOf(Square, Box)
-    // TODO:
-    // const DispatchPlane = unionOf(snapshot => snapshot && 'height' in snapshot ? Box : Square, Box, Square)
 
-    return {Box, Square, Cube, Plane, /* TODO: DispatchPlane*/}
+    const DispatchPlane = unionOf(snapshot => snapshot && 'height' in snapshot ? Box : Square, Box, Square)
+
+    return {Box, Square, Cube, Plane, DispatchPlane}
 }
 
 test("it should complain about no dispatch method", (t) => {
@@ -72,19 +72,9 @@ test("it should compute exact union types", (t) => {
     t.deepEqual(Plane.is(Square()), true)
 })
 
-// TODO:
-// test("it should compute exact union types", (t) => {
-//     const {Box, DispatchPlane, Square} = createTestFactories()
+test("it should compute exact union types", (t) => {
+    const {Box, DispatchPlane, Square} = createTestFactories()
 
-//     t.deepEqual(DispatchPlane.is(Box()), true)
-//     t.deepEqual(DispatchPlane.is(Square()), true)
-// })
-
-// TODO:
-// test("it should resolve the exact type", (t) => {
-//     const {Box, DispatchPlane, Square} = createTestFactories()
-
-//     const doc = DispatchPlane()
-
-//     t.deepEqual(DispatchPlane.dispatch(doc), Square)
-// })
+    t.deepEqual(DispatchPlane.is(Box()), true)
+    t.deepEqual(DispatchPlane.is(Square()), true)
+})
