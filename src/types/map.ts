@@ -1,30 +1,50 @@
 import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
-import {IModelFactory, createFactory} from "../core/factories"
-import {identity, fail, isPlainObject, invariant, isPrimitive} from "../utils"
+import {Node, maybeNode, valueToSnapshot, hasNode} from "../core/node"
+import {isFactory, IFactory} from "../core/factories"
+import {identity, fail, isPlainObject, invariant, nothing, isPrimitive} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
+import {ComplexType} from "../core/types"
 
 interface IMapFactoryConfig {
-    subType: IModelFactory<any, any>
     isMapFactory: true
 }
 
-export class MapNode extends Node {
-    state: ObservableMap<any>
+export class MapType extends ComplexType {
+    isMapFactory = true
+    subType: IFactory<any, any>
 
-    getChildNodes(): [string, Node][] {
+    constructor(name: string, subType: IFactory<any, any>) {
+        super(name)
+        this.subType = subType
+    }
+
+    describe(){
+        return "Map<string, " + this.subType.type.describe() + ">"
+    }
+
+    createNewInstance() {
+        return observable.shallowMap()
+    }
+
+    finalizeNewInstance(instance){
+        
+    }
+
+    getChildNodes(_node: Node, target): [string, Node][] {
         const res: [string, Node][] = []
-        this.state.forEach((value, key) => {
+        target.forEach((value, key) => {
             maybeNode(value, node => { res.push([key, node])})
         })
         return res
     }
 
-    getChildNode(key): Node {
-        return maybeNode(this.state.get(key), identity, () => fail(`No node at index '${key}' in '${this.path}'`))
+    getChildNode(node: Node, target, key): Node | null {
+        if (target.has(key))
+            return maybeNode(target.get(key), identity, nothing)
+        return null
     }
 
-    willChange(change: IMapWillChange<any>): Object | null {
+    willChange(node: Node, change: IMapWillChange<any>): Object | null {
         switch (change.type) {
             case "update":
                 {
@@ -32,14 +52,13 @@ export class MapNode extends Node {
                     const oldValue = change.object.get(change.name)
                     if (newValue === oldValue)
                         return null
-                    maybeNode(oldValue, adm => adm.setParent(null))
-                    change.newValue = this.prepareChild("" + change.name, newValue)
+                    change.newValue = node.prepareChild("" + change.name, newValue)
                 }
                 break
             case "add":
                 {
                     const {newValue} = change
-                    change.newValue = this.prepareChild("" + change.name, newValue)
+                    change.newValue = node.prepareChild("" + change.name, newValue)
                 }
                 break
             case "delete":
@@ -52,89 +71,84 @@ export class MapNode extends Node {
         return change
     }
 
-    serialize(): Object {
+    serialize(node: Node, target): Object {
         const res = {}
-        this.state.forEach((value, key) => {
+        target.forEach((value, key) => {
             res[key] = valueToSnapshot(value)
         })
         return res
     }
 
-    didChange(change: IMapChange<any>): void {
+    didChange(node: Node, change: IMapChange<any>): void {
         switch (change.type) {
             case "update":
             case "add":
-                return void this.emitPatch({
+                return void node.emitPatch({
                     op: change.type === "add" ? "add" : "replace",
                     path: "/" + escapeJsonPath(change.name),
                     value: valueToSnapshot(change.newValue)
-                }, this)
+                }, node)
             case "delete":
-                return void this.emitPatch({
+                return void node.emitPatch({
                     op: "remove",
                     path: "/" + escapeJsonPath(change.name)
-                }, this)
+                }, node)
         }
     }
 
-    applyPatchLocally(subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: Node, target, subpath: string, patch: IJsonPatch): void {
         switch (patch.op) {
             case "add":
             case "replace":
-                this.state.set(subpath, patch.value)
+                target.set(subpath, patch.value)
                 break
             case "remove":
-                this.state.delete(subpath)
+                target.delete(subpath)
                 break
         }
     }
 
-    @action applySnapshot(snapshot): void {
-        invariant(isPlainObject(snapshot), "Expected plain object")
+    @action applySnapshot(node: Node, target, snapshot): void {
         // Try to update snapshot smartly, by reusing instances under the same key as much as possible
         const currentKeys: { [key: string]: boolean } = {}
-        this.state.keys().forEach(key => { currentKeys[key] = false })
+        target.keys().forEach(key => { currentKeys[key] = false })
         Object.keys(snapshot).forEach(key => {
             // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
             if (key in currentKeys && !isPrimitive(snapshot[key])) {
                 currentKeys[key] = true
                 maybeNode(
-                    this.state.get(key),
+                    target.get(key),
                     node => {
                         // update existing instance
                         node.applySnapshot(snapshot[key])
                     },
                     () => {
-                        this.state.set(key, snapshot[key])
+                        target.set(key, snapshot[key])
                     }
                 )
             } else {
-                this.state.set(key, snapshot[key])
+                target.set(key, snapshot[key])
             }
         })
         Object.keys(currentKeys).forEach(key => {
             if (currentKeys[key] === false)
-                this.state.delete(key)
+                target.delete(key)
         })
     }
 
-    getChildFactory(): IModelFactory<any, any> {
-        return (this.factory.config as IMapFactoryConfig).subType
+    getChildFactory(key: string): IFactory<any, any> {
+        return this.subType
+    }
+
+    isValidSnapshot(snapshot) {
+        return isPlainObject(snapshot) && Object.keys(snapshot).every(key => this.subType.is(snapshot[key]))
     }
 }
 
-export function createMapFactory<S, T>(subtype: IModelFactory<S, T>): IModelFactory<{[key: string]: S}, ObservableMap<T>> {
-    return createFactory(
-        "map-factory",
-        MapNode,
-        {
-            subType: subtype,
-            isMapFactory: true
-        } as IMapFactoryConfig,
-        () => observable.shallowMap()
-    ) as any
+export function createMapFactory<S, T>(subtype: IFactory<S, T>): IFactory<{[key: string]: S}, ObservableMap<T>> {
+    return new MapType(`map<string, ${subtype.factoryName}>`, subtype).factory
 }
 
 export function isMapFactory(factory): boolean {
-    return factory && factory.config && factory.config.isMapFactory === true
+    return isFactory(factory) && (factory.type as any).isMapFactory === true
 }

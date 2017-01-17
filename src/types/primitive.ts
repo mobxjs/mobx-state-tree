@@ -1,19 +1,32 @@
-import {IModelFactory} from "../core/factories"
-import {invariant, isPrimitive, extend} from "../utils"
+import {IFactory} from "../core/factories"
+import {invariant, isPrimitive} from "../utils"
+import {Type} from "../core/types"
 
-export interface IPrimitiveFactory extends IModelFactory<any, any> {
-    <T>(value: T): T
+
+// TODO: inherited for specific primitive types
+export class PrimitiveType extends Type {
+    name: string
+
+    describe(){
+        return "primitive"
+    }
+
+    create(value) {
+        invariant(isPrimitive(value), `Not a primitive: '${value}'`)
+        return value
+    }
+
+    is(thing) {
+        return isPrimitive(thing)
+    }
+
+    // TODO:
+    // subType<T>(name: predicate: (value) => boolean): IModelFactory<T, T> {
+
+    // }
 }
 
-export const primitiveFactory: IPrimitiveFactory = extend(
-    function primitiveFactory(snapshot: any): any {
-        // optimization: don't wrap primitive factory in action; it's overkill...
-        invariant(isPrimitive(snapshot), `Expected primitive, got '${snapshot}'`)
-        return snapshot
-    } as IModelFactory<any, any>,
-    {
-        factoryName: "primitive-factory",
-        isModelFactory: true,
-        isPrimitiveFactory: true
-    }
-)
+export const primitiveFactory = new PrimitiveType("primitive").factory
+
+// TODO:
+// export const String = primitiveFactory.subType("String", t => typeof t === "string")

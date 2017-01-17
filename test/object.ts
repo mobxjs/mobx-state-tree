@@ -136,6 +136,7 @@ test("it should emit action calls", (t) => {
 })
 
 test("it should apply action call", (t) => {
+    debugger
     const {Factory} = createTestFactories()
     const doc = Factory()
 
@@ -172,7 +173,7 @@ test("it should throw if snapshot has computed properties", (t) => {
         const doc = ComputedFactory({area: 3})
     })
 
-    t.is(error.message, "[mobx-state-tree] It is not allowed to assign a value to non-declared property area of unnamed-object-factory")
+    t.is(error.message, "[mobx-state-tree] Snapshot {\"area\":3} is not assignable to type unnamed-object-factory. Expected { width: primitive; height: primitive } instead.")
 })
 
 // === COMPOSE FACTORY ===
@@ -181,4 +182,18 @@ test("it should compose factories", (t) => {
     const ComposedFactory = composeFactory(BoxFactory, ColorFactory)
 
     t.deepEqual(ComposedFactory(), {width: 0, height: 0, color: "#FFFFFF"})
+})
+
+
+// === TYPE CHECKS ===
+test("it should check the type correctly", (t) => {
+    const {Factory} = createTestFactories()
+
+    const doc = Factory()
+
+    t.deepEqual(Factory.is(doc), true)
+    t.deepEqual(Factory.is([]), false)
+    t.deepEqual(Factory.is({}), true)
+    t.deepEqual(Factory.is({to: 'mars'}), true)
+    t.deepEqual(Factory.is({wrongKey: true}), false)
 })

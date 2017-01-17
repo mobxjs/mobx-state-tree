@@ -5,20 +5,48 @@ import {
     isObservableMap
 } from "mobx"
 
-import {IModel} from "./factories"
+import {ComplexType} from "./types"
+import {IModel, IFactory} from "./factories"
+import {IActionHandler} from "./action"
+import {
+    invariant, fail, extend,
+    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
+} from "../utils"
+import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
+import {IActionCall, applyActionLocally} from "./action"
+import {ObjectType} from "../types/object"
 
-export enum NodeType { ComplexObject, Map, Array, PlainObject };
-
-export type NodeConstructor = new (target: any, environment: any, factory: IModelFactory<any, any>, factoryConfiguration: Object) => Node
-
-export abstract class Node {
-    readonly state: any
+// TODO: make Node more like a struct, extract the methods to snapshots.js, actions.js etc..
+export class Node {
+    readonly target: any
     readonly environment: any
     @observable _parent: Node | null = null
-    readonly factory: IModelFactory<any, any>
+    readonly factory: IFactory<any, any>
     private  interceptDisposer: IDisposer
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
+    readonly actionSubscribers: IActionHandler[] = []
+    _isRunningAction = false
+
+
+    constructor(initialState: any, environment, factory: IFactory<any, any>) {
+        invariant(factory.type instanceof ComplexType, "Uh oh")
+        addHiddenFinalProp(initialState, "$treenode", this)
+        this.factory = factory
+        this.environment = environment
+        this.target = initialState
+
+        this.interceptDisposer = intercept(this.target, ((c) => this.type.willChange(this, c)) as any)
+        observe(this.target, (c) => this.type.didChange(this, c))
+        reaction(() => this.snapshot, snapshot => {
+            this.snapshotSubscribers.forEach(f => f(snapshot))
+        })
+        // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
+    }
+
+    get type(): ComplexType {
+        return this.factory.type as ComplexType
+    }
 
     @computed get pathParts(): string[]{
         // no parent? you are root!
@@ -37,29 +65,6 @@ export abstract class Node {
 
         return fail("Illegal state")
     }
-
-    constructor(initialState: any, environment: any, factory: IModelFactory<any, any>) {
-        addHiddenFinalProp(initialState, "$treenode", this)
-        this.factory = factory
-        this.environment = environment
-        this.state = initialState
-
-        this.interceptDisposer = intercept(this.state, ((c) => this.willChange(c)) as any)
-        observe(this.state, (c) => this.didChange(c))
-        reaction(() => this.snapshot, snapshot => {
-            this.snapshotSubscribers.forEach(f => f(snapshot))
-        })
-        // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
-    }
-
-    abstract getChildNodes(): [string, Node][]
-    abstract getChildNode(key): Node
-    abstract willChange(change): Object | null
-    abstract didChange(change): void
-    abstract serialize(): any
-    abstract applyPatchLocally(subpath: string, patch: IJsonPatch): void
-    abstract getChildFactory(key: string): IModelFactory<any, any>
-    abstract applySnapshot(snapshot): void
 
     /**
      * Returnes (escaped) path representation as string
@@ -85,7 +90,16 @@ export abstract class Node {
 
     @computed public get snapshot() {
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
-        return Object.freeze(this.serialize())
+        return Object.freeze(this.type.serialize(this, this.target))
+    }
+
+    public onSnapshot(onChange: (snapshot) => void): IDisposer {
+        return registerEventHandler(this.snapshotSubscribers, onChange)
+    }
+
+    public applySnapshot(snapshot) {
+        invariant(this.type.is(snapshot), `Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${this.factory.type.name}. Expected ${this.factory.type.describe()} instead.`)
+        return this.type.applySnapshot(this, this.target, snapshot)
     }
 
     @action public applyPatch(patch: IJsonPatch) {
@@ -94,8 +108,8 @@ export abstract class Node {
         node.applyPatchLocally(parts[parts.length - 1], patch)
     }
 
-    public onSnapshot(onChange: (snapshot) => void): IDisposer {
-        return registerEventHandler(this.snapshotSubscribers, onChange)
+    applyPatchLocally(subpath, patch: IJsonPatch): void {
+        this.type.applyPatchLocally(this, this.target, subpath, patch)
     }
 
     public onPatch(onPatch: (patches: IJsonPatch) => void): IDisposer {
@@ -128,7 +142,7 @@ export abstract class Node {
         }
         if (this.parent && !newParent && (
                 this.patchSubscribers.length > 0 || this.snapshotSubscribers.length > 0 ||
-                 (this instanceof ObjectNode && this.actionSubscribers.length > 0)
+                 (this instanceof ObjectType && this.actionSubscribers.length > 0)
         )) {
             console.warn("An object with active event listeners was removed from the tree. This might introduce a memory leak. Use detach() if this is intentional")
         }
@@ -139,32 +153,47 @@ export abstract class Node {
     prepareChild(subpath: string, child: any): any {
         if (!isMutable(child)) {
             return child
-        } else if (hasNode(child)) {
-            // already converted object
+        }
+        
+        const childFactory = this.getChildFactory(subpath)
+
+        if (hasNode(child)) {
             const node = getNode(child)
-            const childFactory = this.getChildFactory(subpath)
-            invariant(node.factory === childFactory, `Unexpected child type`)
-            node.setParent(this, subpath)
-            return node.state
+
+            if(node.parent === null){
+                // we are adding a node with no parent (first insert in the tree)
+                node.setParent(this, subpath)
+                return child
+            }
+
+            return fail("A node cannot exists twice in the state tree. Failed to add object to path '" + this.path + '/' + subpath + "', it exists already at '" + getPath(child) + "'")
+        }
+        const existingNode = this.getChildNode(subpath)
+        const newInstance = childFactory(child)
+        if (existingNode && existingNode.factory === newInstance.factory) {
+            // recycle instance..
+            existingNode.applySnapshot(child)
+            return existingNode.target
         } else {
-            const childFactory = this.getChildFactory(subpath)
-            // convert object from snapshot
-            const instance = childFactory(child, this.environment) // optimization: pass in parent as third arg
-            const node = getNode(instance)
+            if (existingNode)
+                existingNode.setParent(null) // TODO: or delete / remove / whatever is a more explicit clean up
+            const node = getNode(newInstance)
             node.setParent(this, subpath)
-            return instance
+            return newInstance
         }
     }
 
     detach() {
+        // TODO: change to return a clone
+        // TODO: detach / remove marks as End of life!...
         if (this.isRoot)
             return
-        if (isObservableArray(this.parent!.state))
-            this.parent!.state.splice(parseInt(this.subpath), 1)
-        else if (isObservableMap(this.parent!.state))
-            this.parent!.state.delete(this.subpath)
+        if (isObservableArray(this.parent!.target))
+            this.parent!.target.splice(parseInt(this.subpath), 1)
+        else if (isObservableMap(this.parent!.target))
+            this.parent!.target.delete(this.subpath)
         else // Object
-            this.parent!.state[this.subpath] = null
+            this.parent!.target[this.subpath] = null
     }
 
     resolve(pathParts: string): Node;
@@ -195,9 +224,44 @@ export abstract class Node {
     }
 
     isRunningAction(): boolean {
+        if (this._isRunningAction)
+            return true
         if (this.isRoot)
             return false
         return this.parent!.isRunningAction()
+    }
+
+    applyAction(action: IActionCall): void {
+        const targetNode = this.resolve(action.path || "")
+        if (targetNode)
+            applyActionLocally(targetNode, targetNode.target, action)
+        else
+            fail(`Invalid action path: ${action.path || ""}`)
+    }
+
+    emitAction(instance: Node, action: IActionCall, next) {
+        let idx = -1
+        const correctedAction: IActionCall = this.actionSubscribers.length
+            ? extend({} as any, action, { path: getRelativePath(this, instance) })
+            : null
+        let n = () => {
+            // optimization: use tail recursion / trampoline
+            idx++
+            if (idx < this.actionSubscribers.length) {
+                this.actionSubscribers[idx](correctedAction!, n)
+            } else {
+                const parent = this.parent
+                if (parent)
+                    parent.emitAction(instance, action, next)
+                else
+                    next()
+            }
+        }
+        n()
+    }
+
+    onAction(listener: (action: IActionCall, next: () => void) => void): IDisposer {
+        return registerEventHandler(this.actionSubscribers, listener)
     }
 
     getFromEnvironment(key: string): any {
@@ -206,6 +270,18 @@ export abstract class Node {
         if (this.isRoot)
             return fail(`Undefined environment variable '${key}'`)
         return this.parent!.getFromEnvironment(key)
+    }
+
+    getChildNode(subpath: string): Node | null {
+        return this.type.getChildNode(this, this.target, subpath)
+    }
+
+    getChildNodes(): [string, Node][] {
+        return this.type.getChildNodes(this, this.target)
+    }
+
+    getChildFactory(key: string): IFactory<any, any> {
+        return this.type.getChildFactory(key)
     }
 }
 
@@ -223,7 +299,7 @@ export function maybeNode<T, R>(value: T & IModel, asNodeCb: (node: Node, value:
     // Optimization: maybeNode might be quite inefficient runtime wise, might be factored out at expensive places
     if (isMutable(value)) {
         const n = getNode(value)
-        return asNodeCb(n, n.state)
+        return asNodeCb(n, n.target)
     } else if (asPrimitiveCb) {
         return asPrimitiveCb(value)
     } else {
@@ -251,7 +327,7 @@ export function getRelativePath(base: Node, target: Node): string {
 
 export function getParent(thing: IModel): IModel {
     const node = getNode(thing)
-    return node.parent ? node.parent.state : null
+    return node.parent ? node.parent.target : null
 }
 
 export function getRootNode(node: Node) {
@@ -272,12 +348,3 @@ export function valueToSnapshot(thing) {
         return getNode(thing).snapshot
     return thing
 }
-
-// Late require for early Node declare
-import {
-    invariant, fail, extend,
-    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
-} from "../utils"
-import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
-import {IModelFactory} from "./factories"
-import {ObjectNode} from "../types/object-node"

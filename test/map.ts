@@ -1,5 +1,5 @@
 import {ObservableMap} from 'mobx'
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, arrayOf, IModelFactory, mapOf} from "../"
+import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, arrayOf, IFactory, mapOf} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -17,7 +17,7 @@ const createTestFactories = () => {
 
     const Factory = (mapOf(
         ItemFactory
-    ) as any) as IModelFactory<{[key: string]: ITestSnapshot}, ObservableMap<ITest>>
+    ) as any) as IFactory<{[key: string]: ITestSnapshot}, ObservableMap<ITest>>
 
     return {Factory, ItemFactory}
 }
@@ -136,7 +136,7 @@ test("it should emit remove patches", (t) => {
 test("it should apply a remove patch", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory()
-    
+
     doc.set("hello", ItemFactory())
 
     applyPatch(doc, {op: "remove", path: "/hello"})
@@ -151,4 +151,18 @@ test("it should apply patches", (t) => {
     applyPatches(doc, [{op: "add", path: "/hello", value: {to: "mars"}}, {op: "replace", path: "/hello", value: {to: "universe"}}])
 
     t.deepEqual<any>(getSnapshot(doc), {hello: {to: 'universe'}})
+})
+
+
+// === TYPE CHECKS ===
+test("it should check the type correctly", (t) => {
+    const {Factory} = createTestFactories()
+
+    const doc = Factory()
+
+    t.deepEqual(Factory.is(doc), true)
+    t.deepEqual(Factory.is([]), false)
+    t.deepEqual(Factory.is({}), true)
+    t.deepEqual(Factory.is({hello: {to: 'mars'}}), true)
+    t.deepEqual(Factory.is({hello: {wrongKey: true}}), false)
 })

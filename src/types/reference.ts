@@ -1,7 +1,9 @@
+// TODO: move file to better place, not really a type
+
 import {IModel} from "../core/factories"
 import {tryResolve, getRoot} from "../index"
 import {invariant, fail} from "../utils"
-import {getObjectNode} from "./object-node"
+import {getNode} from "../core/node"
 
 export type IReferenceGetter<T> = (identifier: string, owner: IModel, propertyName: string) => T
 export type IReferenceSetter<T> = (value: T, owner: IModel, propertyName: string) => string
@@ -48,7 +50,7 @@ export function createReferenceProps(name: string, ref: IReferenceDescription) {
             return id ? ref.getter(id, this, name) : null
         },
         set: function(v) {
-            invariant(getObjectNode(this).isRunningAction(), `Reference '${name}' can only be modified from within an action`)
+            invariant(getNode(this).isRunningAction(), `Reference '${name}' can only be modified from within an action`)
             this[sourceIdAttribute] = v ? ref.setter(v, this, name) : ""
         },
         enumerable: true

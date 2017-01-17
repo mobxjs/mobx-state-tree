@@ -1,7 +1,7 @@
 import {isObservable} from "mobx"
-import {isModel, getModelFactory} from "../"
+import {isModel, getFactory} from "../"
 import {addHiddenFinalProp, invariant, isPlainObject, isPrimitive} from "../utils"
-import {getObjectNode, ObjectNode} from "../types/object-node"
+import {Node, getNode} from "./node"
 
 let _isRunningActionGlobally = false
 
@@ -23,7 +23,7 @@ export function createNonActionWrapper(instance, key, func) {
 
 export function createActionWrapper(instance, key, action: Function) {
     addHiddenFinalProp(instance, key, function(...args: any[]) {
-        const adm = getObjectNode(instance)
+        const adm = getNode(instance)
         const runAction = () => {
             const res = action.apply(instance, args)
             invariant(res === undefined, `action '${key}' should not return a value but got '${res}'`)
@@ -58,7 +58,7 @@ function verifyArgumentsAreStringifyable(actionName: string, args: any[]) {
             return
         // Future work: could model arguments be made serializable, e.g. represent as relative path?
         if (isModel(arg))
-            throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive or plain object, received a ${getModelFactory(arg).factoryName} model.`)
+            throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive or plain object, received a ${getFactory(arg).factoryName} model.`)
         if (!isPlainObject(arg))
             throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive or plain object, received a ${(arg && arg.constructor) ? arg.constructor.name : "Complex Object"}`)
         if (isObservable(arg))
@@ -72,7 +72,8 @@ function verifyArgumentsAreStringifyable(actionName: string, args: any[]) {
     })
 }
 
-export function applyActionLocally(target: ObjectNode, action: IActionCall) {
-    invariant(typeof target.state[action.name] === "function", `Action '${action.name}' does not exist in '${target.path}'`)
-    target.state[action.name].apply(target.state, action.args || [])
+export function applyActionLocally(node: Node, instance, action: IActionCall) {
+    invariant(typeof instance[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
+    // TODO: deserialize args
+    instance[action.name].apply(instance, action.args || [])
 }

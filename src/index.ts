@@ -1,12 +1,11 @@
 import {getNode, getRootNode} from "./core/node"
-import {transaction, IObservableArray, ObservableMap, observable} from "mobx"
+import {runInAction, IObservableArray, ObservableMap, observable} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer, invariant} from "./utils"
-import {getObjectNode, findEnclosingObjectNode} from "./types/object-node"
 import {IActionCall} from "./core/action"
-import {IModelFactory, IModel} from "./core/factories"
-import {createMapFactory} from "./types/map-node"
-import {createArrayFactory} from "./types/array-node"
+import {IFactory, IModel} from "./core/factories"
+import {createMapFactory} from "./types/map"
+import {createArrayFactory} from "./types/array"
 import {primitiveFactory} from "./types/primitive"
 
 export {
@@ -17,10 +16,10 @@ export * from "./core/json-patch"
 export {
     IModel,
     isModel,
-    IModelFactory,
-    isModelFactory,
-    getModelFactory,
-    getChildModelFactory
+    IFactory,
+    isFactory,
+    getFactory,
+    getChildFactory
 } from "./core/factories"
 export {
     IActionCall
@@ -31,9 +30,9 @@ export {
 } from "./types/primitive"
 
 export {
-    createObjectFactory as createFactory,
+    createModelFactory as createFactory,
     composeFactory,
-} from "./types/object-node"
+} from "./types/object"
 
 export {
     referenceTo
@@ -47,6 +46,10 @@ export {
 export {
     connectReduxDevtools
 } from "./interop/redux-devtools"
+
+export {
+    createUnionFactory as unionOf
+} from "./types/union"
 
 /**
  * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
@@ -90,7 +93,7 @@ export {
  * @returns {IDisposer} function to remove the middleware
  */
 export function onAction(target: IModel, callback: (action: IActionCall, next: () => void) => void): IDisposer {
-    return getObjectNode(target).onAction(callback)
+    return getNode(target).onAction(callback)
 }
 
 /**
@@ -141,7 +144,7 @@ export function applyPatch(target: IModel, patch: IJsonPatch) {
  */
 export function applyPatches(target: IModel, patches: IJsonPatch[]) {
     const node = getNode(target)
-    transaction(() => {
+    runInAction(() => {
         patches.forEach(p => node.applyPatch(p))
     })
 }
@@ -176,7 +179,7 @@ export function recordPatches(subject: IModel): IPatchRecorder {
  * @returns
  */
 export function applyAction(target: IModel, action: IActionCall): void {
-    getObjectNode(target).applyAction(action)
+    getNode(target).applyAction(action)
 }
 
 /**
@@ -188,8 +191,8 @@ export function applyAction(target: IModel, action: IActionCall): void {
  * @param {IActionCallOptions} [options]
  */
 export function applyActions(target: IModel, actions: IActionCall[]): void {
-    const node = getObjectNode(target)
-    transaction(() => {
+    const node = getNode(target)
+    runInAction(() => {
         actions.forEach(action => node.applyAction(action))
     })
 }
@@ -252,6 +255,7 @@ export function hasParent(target: IModel, strict: boolean = false): boolean {
 }
 
 /**
+ * TODO:
  * Given a model instance, returns `true` if the object has same parent, which is a model object, that is, not an
  * map or array.
  *
@@ -259,36 +263,39 @@ export function hasParent(target: IModel, strict: boolean = false): boolean {
  * @param {Object} target
  * @returns {boolean}
  */
-export function hasParentObject(target: IModel): boolean {
-    return getParentObject(target) !== null
-}
+// export function hasParentObject(target: IModel): boolean {
+//     return getParentObject(target) !== null
+// }
 
 /**
  * Returns the immediate parent of this object, or null. Parent can be either an object, map or array
- *
+ * TODO:? strict mode?
  * @export
  * @param {Object} target
  * @param {boolean} [strict=false]
  * @returns {*}
  */
 export function getParent(target: IModel, strict: boolean = false): IModel {
-    const node = strict
-        ? getNode(target).parent
-        : findEnclosingObjectNode(getNode(target))
-    return node ? node.state : null
+    // const node = strict
+    //     ? getNode(target).parent
+    //     : findNode(getNode(target))
+    const node = getNode(target)
+    return node.parent ? node.parent.target : null
 }
 
 /**
+ * TODO:
  * Returns the closest parent that is a model instance, but which isn't an array or map.
  *
  * @export
  * @param {Object} target
  * @returns {*}
  */
-export function getParentObject(target: IModel): IModel {
-    const node = findEnclosingObjectNode(getNode(target))
-    return node ? node.state : null
-}
+// export function getParentObject(target: IModel): IModel {
+//     // TODO: remove this special notion of closest object node?
+//     const node = findEnclosingObjectNode(getNode(target))
+//     return node ? node.state : null
+// }
 
 /**
  * Given an object in a model tree, returns the root object of that tree
@@ -298,7 +305,7 @@ export function getParentObject(target: IModel): IModel {
  * @returns {*}
  */
 export function getRoot(target: IModel): IModel {
-    return getRootNode(getNode(target)).state
+    return getRootNode(getNode(target)).target
 }
 
 /**
@@ -344,7 +351,7 @@ export function isRoot(target: IModel): boolean {
  */
 export function resolve(target: IModel, path: string): IModel | any {
     const node = getNode(target).resolve(path)
-    return node ? node.state : undefined
+    return node ? node.target : undefined
 }
 
 /**
@@ -359,7 +366,7 @@ export function tryResolve(target: IModel, path: string): IModel | any {
     const node = getNode(target).resolve(path, false)
     if (node === undefined)
         return undefined
-    return node ? node.state : undefined
+    return node ? node.target : undefined
 }
 
 /**
@@ -394,7 +401,7 @@ export function clone<T extends IModel>(source: T, customEnvironment?: any): T {
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function mapOf<S, T>(subFactory: IModelFactory<S, T> = primitiveFactory): ObservableMap<T> {
+export function mapOf<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): ObservableMap<T> {
     return createMapFactory(subFactory) as any
 }
 
@@ -405,7 +412,7 @@ export function mapOf<S, T>(subFactory: IModelFactory<S, T> = primitiveFactory):
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function arrayOf<S, T>(subFactory: IModelFactory<S, T> = primitiveFactory): IObservableArray<T> {
+export function arrayOf<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): IObservableArray<T> {
     return createArrayFactory(subFactory as any) as any
 }
 
@@ -428,7 +435,7 @@ export function detach<T extends IModel>(thing: T): T {
     return thing
 }
 
-export function testActions<S, T extends IModel>(factory: IModelFactory<S, T>, initialState: S, ...actions: IActionCall[]): S {
+export function testActions<S, T extends IModel>(factory: IFactory<S, T>, initialState: S, ...actions: IActionCall[]): S {
     const testInstance = factory(initialState)
     applyActions(testInstance, actions)
     return getSnapshot<S, T>(testInstance)
@@ -440,7 +447,7 @@ export function resetAppState() {
     appState.set(undefined)
 }
 
-export function initializeAppState<S, T>(factory: IModelFactory<S, T>, initialSnapshot?: S, environment?: Object) {
+export function initializeAppState<S, T>(factory: IFactory<S, T>, initialSnapshot?: S, environment?: Object) {
     invariant(!appState, `Global app state was already initialized, use 'resetAppState' to reset it`)
     appState.set(factory(initialSnapshot, environment))
 }

@@ -1,4 +1,4 @@
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, arrayOf, getParent, hasParent, hasParentObject, getRoot, getPathParts, clone, getModelFactory, getChildModelFactory, isModelFactory, recordActions, recordPatches} from "../"
+import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, arrayOf, getParent, hasParent, getRoot, getPathParts, clone, getFactory, getChildFactory, isFactory, recordActions, recordPatches} from "../"
 import {test} from "ava"
 
 // getParent
@@ -15,11 +15,11 @@ test("it should resolve to the parent instance", (t) => {
     const row = Row()
     doc.rows.push(row)
 
-    t.deepEqual(getParent(row), doc)
+    t.deepEqual<any>(getParent(row), doc.rows)
 })
 
 // hasParent
-test("it should resolve to the parent instance", (t) => {
+test("it should check for parent instance", (t) => {
     const Row = createFactory({
         article_id: 0
     })
@@ -36,7 +36,7 @@ test("it should resolve to the parent instance", (t) => {
 })
 
 
-test("it should resolve to the parent instance (unbound)", (t) => {
+test("it should check for parent instance (unbound)", (t) => {
     const Row = createFactory({
         article_id: 0
     })
@@ -65,7 +65,8 @@ test("it should resolve to the parent object instance", (t) => {
     const row = Row()
     doc.rows.push(row)
 
-    t.deepEqual(hasParentObject(row), true)
+    // TOOD: re-enable
+    // t.deepEqual(hasParentObject(row), true)
 })
 
 // getRoot
@@ -146,7 +147,7 @@ test("it should return the model factory", (t) => {
 
     const doc = Document()
 
-    t.deepEqual(getModelFactory(doc), Document)
+    t.deepEqual(getFactory(doc), Document)
 })
 
 // getChildModelFactory
@@ -163,10 +164,9 @@ test("it should return the child model factory", (t) => {
     const doc = Document()
 
     // TODO: any because of #19
-    t.deepEqual<any>(getChildModelFactory(doc, 'rows'), ArrayOfRow)
+    t.deepEqual<any>(getChildFactory(doc, 'rows'), ArrayOfRow)
 })
 
-// test tree unique
 test("a node can exists only once in a tree", (t) => {
     const Row = createFactory({
         article_id: 0
@@ -186,6 +186,31 @@ test("a node can exists only once in a tree", (t) => {
     })
     t.is(error.message, "[mobx-state-tree] A node cannot exists twice in the state tree. Failed to add object to path '/foos/0', it exists already at '/rows/0'")
 })
+
+// TODO
+// test("make sure array filter works properly", (t) => {
+//     const Row = createFactory({
+//         done: false
+//     })
+
+//     const Document = createFactory({
+//         rows: arrayOf(Row),
+//         clearDone: action(function(){
+//             this.rows =  doc.rows.filter(row => row.done === true)
+//         })
+//     })
+
+//     const doc = Document()
+//     const a = Row({ done: true })
+//     const b = Row({ done: false })
+
+//     doc.rows.push(a)
+//     doc.rows.push(b)
+
+//     doc.clearDone()
+
+//     t.deepEqual<any>(getSnapshot(doc), {rows: [{done: false}]})
+// })
 
 // === RECORD PATCHES ===
 test("it can record and replay patches", (t) => {
