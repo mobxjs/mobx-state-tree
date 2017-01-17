@@ -156,11 +156,13 @@ export class ObjectType extends ComplexType {
     }
 
     isValidSnapshot(snapshot) {
+        if (!isPlainObject(snapshot))
+            return false
         const props = this.props
         let modelKeys = Object.keys(props).filter(key => isPrimitive(props[key]) || isFactory(props[key]))
-        if (!isPlainObject(snapshot)) return false
         const snapshotKeys = Object.keys(snapshot)
-        if (snapshotKeys.length > modelKeys.length) return false
+        if (snapshotKeys.length > modelKeys.length)
+            return false
         return snapshotKeys.every(key => {
             let keyInConfig = key in props
             let bothArePrimitives = isPrimitive(props[key]) && isPrimitive(snapshot[key])

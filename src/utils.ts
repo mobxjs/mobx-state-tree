@@ -7,6 +7,7 @@ export function fail(message = "Illegal state"): never {
     throw "!"
 }
 
+// Optimize: accept () => string as message, so string doesn't have to be prepared at runtime
 export function invariant(cond: boolean, message = "Illegal state") {
     if (!cond)
         throw new Error("[mobx-state-tree] " + message)
