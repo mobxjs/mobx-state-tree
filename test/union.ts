@@ -18,10 +18,10 @@ const createTestFactories = () => {
     })
 
     const Plane = unionOf(Square, Box)
-    // TODO:
-    // const DispatchPlane = unionOf(snapshot => snapshot && 'height' in snapshot ? Box : Square, Box, Square)
 
-    return {Box, Square, Cube, Plane, /* TODO: DispatchPlane*/}
+    const DispatchPlane = unionOf(snapshot => snapshot && 'height' in snapshot ? Box : Square, Box, Square)
+
+    return {Box, Square, Cube, Plane, DispatchPlane}
 }
 
 test("it should complain about no dispatch method", (t) => {
@@ -30,7 +30,7 @@ test("it should complain about no dispatch method", (t) => {
     const error = t.throws(() => {
         const doc = Plane({width: 2})
     })
-    t.is(error.message, '[mobx-state-tree] Ambiguos snapshot {"width":2} for union Square | Box. Please provide a dispatch in the union declaration.')
+    t.is(error.message, '[mobx-state-tree] Ambiguos snapshot {"width":2} for union Box | Square. Please provide a dispatch in the union declaration.')
 })
 
 test("it should be smart enough to discriminate by keys", (t) => {
@@ -72,19 +72,9 @@ test("it should compute exact union types", (t) => {
     t.deepEqual(Plane.is(Square()), true)
 })
 
-// TODO:
-// test("it should compute exact union types", (t) => {
-//     const {Box, DispatchPlane, Square} = createTestFactories()
+test("it should compute exact union types", (t) => {
+    const {Box, DispatchPlane, Square} = createTestFactories()
 
-//     t.deepEqual(DispatchPlane.is(Box()), true)
-//     t.deepEqual(DispatchPlane.is(Square()), true)
-// })
-
-// TODO:
-// test("it should resolve the exact type", (t) => {
-//     const {Box, DispatchPlane, Square} = createTestFactories()
-
-//     const doc = DispatchPlane()
-
-//     t.deepEqual(DispatchPlane.dispatch(doc), Square)
-// })
+    t.deepEqual(DispatchPlane.is(Box()), true)
+    t.deepEqual(DispatchPlane.is(Square()), true)
+})

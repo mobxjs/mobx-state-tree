@@ -3,17 +3,17 @@ import {Node, getNode, hasNode} from "./node"
 import {IJsonPatch} from "../core/json-patch"
 import {IFactory, IModel} from "./factories"
 
-// TODO: generics S, T
 export interface IType {
     name: string
     is(thing: IModel | any): boolean
-    create(snapshot): any
+    create(snapshot, environment?): any
     factory: IFactory<any, any> // TODO type
+    describe(): string
 }
 
 export type ITypeChecker = (value: IModel | any) => boolean
 
-export abstract class Type { // TODO: generic for config and state of target
+export abstract class Type implements IType { // TODO: generic for config and state of target
     name: string
     factory: IFactory<any, any>
 
@@ -24,6 +24,7 @@ export abstract class Type { // TODO: generic for config and state of target
 
     abstract create(snapshot, environment?): any
     abstract is(thing): boolean
+    abstract describe(): string
 
     protected initializeFactory() {
         const factory = action(
@@ -42,6 +43,7 @@ export abstract class ComplexType extends Type {
     create(snapshot, environment?) {
         const instance = this.createNewInstance()
         const node = new Node(instance, environment, this.factory)
+        this.finalizeNewInstance(instance)
         if (arguments.length > 0)
             node.applySnapshot(snapshot)
         Object.seal(instance)
@@ -49,6 +51,7 @@ export abstract class ComplexType extends Type {
     }
 
     abstract createNewInstance()
+    abstract finalizeNewInstance(target: any)
     abstract applySnapshot(node: Node, target, snapshot)
     abstract getChildNodes(node: Node, target): [string, Node][]
     abstract getChildNode(node: Node, target, key): Node | null

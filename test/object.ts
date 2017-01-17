@@ -173,7 +173,7 @@ test("it should throw if snapshot has computed properties", (t) => {
         const doc = ComputedFactory({area: 3})
     })
 
-    t.is(error.message, "[mobx-state-tree] It is not allowed to assign a value to non-declared property area of unnamed-object-factory")
+    t.is(error.message, "[mobx-state-tree] Snapshot {\"area\":3} is not assignable to type unnamed-object-factory. Expected { width: primitive; height: primitive } instead.")
 })
 
 // === COMPOSE FACTORY ===
@@ -196,13 +196,4 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is({}), true)
     t.deepEqual(Factory.is({to: 'mars'}), true)
     t.deepEqual(Factory.is({wrongKey: true}), false)
-})
-
-test("it should dispatch the type correctly", (t) => {
-    const {Factory} = createTestFactories()
-
-    const doc = Factory()
-
-    // TODO:
-    // t.deepEqual(Factory.dispatch(doc) === Factory, true)
 })

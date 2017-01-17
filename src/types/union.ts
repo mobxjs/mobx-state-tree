@@ -2,17 +2,31 @@ import {isFactory, IFactory} from "../core/factories"
 import {invariant, fail} from "../utils"
 import {Type} from "../core/types"
 
-export class Union extends Type {
-    types: IFactory<any, any>[] = []
+export type IFactoryDispatcher = (snapshot: any) => IFactory<any, any>
 
-    // TODO: support / use dispatch function instead of this
-    constructor(name, types: IFactory<any, any>[]) {
+export class Union extends Type {
+    readonly dispatcher: IFactoryDispatcher | null = null
+    readonly types: IFactory<any, any>[]
+
+    constructor(name, types: IFactory<any, any>[], dispatcher: IFactoryDispatcher | null) {
         super(name)
+        this.dispatcher = dispatcher
         this.types = types
     }
 
-    create(value) {
+    describe(){
+        return "(" + this.types.map(factory => factory.type.describe()).join(" | ") + ")"
+    }
+
+    create(value, environment?) {
         invariant(this.is(value), `Value ${JSON.stringify(value)} is not assignable to union ${this.name}`)
+
+        // try the dispatcher, if defined
+        if(this.dispatcher !== null){
+            return this.dispatcher(value)(value, environment)
+        }
+        
+        // find the most accomodating type
         const applicableTypes = this.types.filter(type => type.is(value))
         if (applicableTypes.length > 1)
              return fail(`Ambiguos snapshot ${JSON.stringify(value)} for union ${this.name}. Please provide a dispatch in the union declaration.`)
@@ -26,35 +40,11 @@ export class Union extends Type {
 
 }
 
-// TODO: support dispatcher function
-// export function createUnionFactory<SA, SB, TA, TB>(dispatch: IModelFactoryDispatcher, A: IModelFactory<SA, TA>, B: IModelFactory<SB, TB>): IModelFactory<SA | SB, TA | TB>
-export function createUnionFactory<SA, SB, TA, TB>(A: IFactory<SA, TA>, B: IFactory<SB, TB>): IFactory<SA | SB, TA | TB> {
-    // const types = isModelFactory(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
-    // TODO: generalize:
-    const types: IFactory<any, any>[] = [A, B]
+export function createUnionFactory<SA, SB, TA, TB>(dispatch: IFactoryDispatcher, A: IFactory<SA, TA>, B: IFactory<SB, TB>): IFactory<SA | SB, TA | TB>
+export function createUnionFactory<SA, SB, TA, TB>(A: IFactory<SA, TA>, B: IFactory<SB, TB>): IFactory<SA | SB, TA | TB>
+export function createUnionFactory(dispatchOrType: IFactoryDispatcher | IFactory<any, any>, ...otherTypes: IFactory<any, any>[]): IFactory<any, any> {
+    const dispatcher = isFactory(dispatchOrType) ? null : dispatchOrType
+    const types = isFactory(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
     const name = types.map(type => type.factoryName).join(" | ")
-    return new Union(name, types).factory
+    return new Union(name, types, dispatcher).factory
 }
-//     const dispatch = isModelFactory(dispatchOrType) ? null : dispatchOrType
-
-//     const getType = (dispatch, snapshot): IModelFactory<any, any> => {
-//         let castableTypes = types.filter(type => type.is(snapshot))
-
-//         if(castableTypes.length === 1) return castableTypes[0]
-//         if(dispatch === null){
-//             fail('Ambiguos snapshot '+JSON.stringify(snapshot)+' for union '+name+'. Please provide a dispatch in the union declaration.')
-//         }
-//         return dispatch(snapshot)
-//     }
-
-//     return createFactory(
-//         name,
-//         "union",
-//         snapshot => types.some(type => type.is(snapshot)),
-//         snapshot => getType(dispatch, snapshot),
-//         function (snapshot?: any, env?: Object){
-//             let type = getType(dispatch, snapshot)
-//             return arguments.length > 0 ? type(snapshot, env) : type()
-//         }
-//     )
-// }

@@ -7,6 +7,10 @@ import {Type} from "../core/types"
 export class PrimitiveType extends Type {
     name: string
 
+    describe(){
+        return "primitive"
+    }
+
     create(value) {
         invariant(isPrimitive(value), `Not a primitive: '${value}'`)
         return value

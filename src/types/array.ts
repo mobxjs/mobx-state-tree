@@ -14,8 +14,16 @@ export class ArrayType extends ComplexType {
         this.subType = subType
     }
 
+    describe(){
+        return this.subType.type.describe() + "[]"
+    }
+
     createNewInstance() {
         return observable.shallowArray()
+    }
+
+    finalizeNewInstance(instance){
+        
     }
 
     getChildNodes(_: Node, target): [string, Node][] {

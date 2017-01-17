@@ -98,7 +98,7 @@ export class Node {
     }
 
     public applySnapshot(snapshot) {
-        invariant(this.type.is(snapshot), "Not assignable from " + snapshot)
+        invariant(this.type.is(snapshot), `Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${this.factory.type.name}. Expected ${this.factory.type.describe()} instead.`)
         return this.type.applySnapshot(this, this.target, snapshot)
     }
 
@@ -151,15 +151,22 @@ export class Node {
     }
 
     prepareChild(subpath: string, child: any): any {
-        const childFactory = this.getChildFactory(subpath)
-        invariant(childFactory.is(child), `The given value is not assignable to "${subpath}": ${child}`)
         if (!isMutable(child)) {
             return child
         }
+        
+        const childFactory = this.getChildFactory(subpath)
 
         if (hasNode(child)) {
-            // TODO: fail here or implicitly clone?
-            child = getNode(child).snapshot
+            const node = getNode(child)
+
+            if(node.parent === null){
+                // we are adding a node with no parent (first insert in the tree)
+                node.setParent(this, subpath)
+                return child
+            }
+
+            return fail("A node cannot exists twice in the state tree. Failed to add object to path '" + this.path + '/' + subpath + "', it exists already at '" + getPath(child) + "'")
         }
         const existingNode = this.getChildNode(subpath)
         const newInstance = childFactory(child)
