@@ -160,15 +160,13 @@ export class Node {
         if (hasNode(child)) {
             const node = getNode(child)
 
-            // TODO: reason about this... Mh... :/
-            // we are adding a node with no parent (first insert in the tree)
             if(node.parent === null){
+                // we are adding a node with no parent (first insert in the tree)
                 node.setParent(this, subpath)
                 return child
             }
 
-            // TODO: fail here or implicitly clone?
-            child = node.snapshot
+            return fail("A node cannot exists twice in the state tree. Failed to add object to path '" + this.path + '/' + subpath + "', it exists already at '" + getPath(child) + "'")
         }
         const existingNode = this.getChildNode(subpath)
         const newInstance = childFactory(child)

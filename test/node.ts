@@ -167,25 +167,49 @@ test("it should return the child model factory", (t) => {
     t.deepEqual<any>(getChildFactory(doc, 'rows'), ArrayOfRow)
 })
 
-// TODO: test tree unique
-// test("a node can exists only once in a tree", (t) => {
+test("a node can exists only once in a tree", (t) => {
+    const Row = createFactory({
+        article_id: 0
+    })
+
+    const Document = createFactory({
+        rows: arrayOf(Row),
+        foos: arrayOf(Row)
+    })
+
+    const doc = Document()
+    const row = Row()
+    doc.rows.push(row)
+
+    const error = t.throws(() => {
+        doc.foos.push(row)
+    })
+    t.is(error.message, "[mobx-state-tree] A node cannot exists twice in the state tree. Failed to add object to path '/foos/0', it exists already at '/rows/0'")
+})
+
+// TODO
+// test("make sure array filter works properly", (t) => {
 //     const Row = createFactory({
-//         article_id: 0
+//         done: false
 //     })
 
 //     const Document = createFactory({
 //         rows: arrayOf(Row),
-//         foos: arrayOf(Row)
+//         clearDone: action(function(){
+//             this.rows =  doc.rows.filter(row => row.done === true)
+//         })
 //     })
 
 //     const doc = Document()
-//     const row = Row()
-//     doc.rows.push(row)
+//     const a = Row({ done: true })
+//     const b = Row({ done: false })
 
-//     const error = t.throws(() => {
-//         doc.foos.push(row)
-//     })
-//     t.is(error.message, "[mobx-state-tree] A node cannot exists twice in the state tree. Failed to add object to path '/foos/0', it exists already at '/rows/0'")
+//     doc.rows.push(a)
+//     doc.rows.push(b)
+
+//     doc.clearDone()
+
+//     t.deepEqual<any>(getSnapshot(doc), {rows: [{done: false}]})
 // })
 
 // === RECORD PATCHES ===
