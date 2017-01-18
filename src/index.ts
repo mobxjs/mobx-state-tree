@@ -55,6 +55,14 @@ export {
     createDefaultValueFactory as withDefault
 } from "./types/with-default"
 
+export {
+    createConstantFactory as constant
+} from "./types/constant"
+
+export {
+    createMaybeFactory as maybe
+} from "./types/maybe"
+
 /**
  * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
  * Will only be invoked on 'root' actions, not on actions called from existing actions.
