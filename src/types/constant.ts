@@ -1,8 +1,8 @@
 import {isFactory, IFactory} from "../core/factories"
 import {invariant, fail, isPrimitive} from "../utils"
-import {PrimitiveType} from "./primitive"
+import {Type} from "../core/types"
 
-export class Constant extends PrimitiveType {
+export class Constant extends Type {
     readonly value: any
 
     constructor(value: any) {
@@ -10,12 +10,17 @@ export class Constant extends PrimitiveType {
         this.value = value
     }
 
+    create(value) {
+        invariant(isPrimitive(value), `Not a primitive: '${value}'`)
+        return value
+    }
+
     describe(){
-        return this.value
+        return JSON.stringify(this.value)
     }
 
     is(value) {
-        return value === this.value && super.is(value)
+        return value === this.value && isPrimitive(value)
     }
 
 }
