@@ -1,7 +1,7 @@
 var webpack = require('webpack');
 
 module.exports = {
-    entry: './lib/mobx-state-tree.js',
+    entry: './lib/index.js',
     output: {
         libraryTarget: 'umd',
         library: 'mobxStateTree',

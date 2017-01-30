@@ -63,6 +63,10 @@ export {
     createMaybeFactory as maybe
 } from "./types/maybe"
 
+export {
+    createRefinementFactory as refinement
+} from "./types/refinement"
+
 /**
  * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
  * Will only be invoked on 'root' actions, not on actions called from existing actions.
