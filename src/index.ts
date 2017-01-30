@@ -56,8 +56,8 @@ export {
 } from "./types/with-default"
 
 export {
-    createConstantFactory as constant
-} from "./types/constant"
+    createLiteralFactory as literal
+} from "./types/literal"
 
 export {
     createMaybeFactory as maybe

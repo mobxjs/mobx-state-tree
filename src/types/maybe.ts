@@ -1,9 +1,9 @@
 import {createUnionFactory} from "./union"
-import {createConstantFactory} from "./constant"
+import {createLiteralFactory} from "./literal"
 import {createDefaultValueFactory} from "./with-default"
 import {isFactory, IFactory} from "../core/factories"
 
-const nullFactory = createConstantFactory(null)
-export function createMaybeFactory(type: IFactory<any, any>): IFactory<any, any>{
+const nullFactory = createLiteralFactory(null)
+export function createMaybeFactory<S, T>(type: IFactory<S, T>): IFactory<S | null | undefined, T | null | undefined>{
     return createDefaultValueFactory(createUnionFactory(nullFactory, type), null)
 }

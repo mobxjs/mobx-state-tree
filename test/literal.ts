@@ -1,19 +1,19 @@
-import {createFactory, unionOf, constant} from "../"
+import {createFactory, unionOf, literal} from "../"
 import {test} from "ava"
 
 test("it should allow only primitives", t => {
     const error = t.throws(() => {
         const Factory = createFactory({
-            complexArg: constant({a: 1})
+            complexArg: literal({a: 1})
         })
     })
 
-    t.is(error.message, '[mobx-state-tree] Constant types can be built only on top of primitives')
+    t.is(error.message, '[mobx-state-tree] Literal types can be built only on top of primitives')
 })
 
 test("it should throw if a different type is given", t => {
     const Factory = createFactory({
-        shouldBeOne: constant(1)
+        shouldBeOne: literal(1)
     })
 
     const error = t.throws(() => {

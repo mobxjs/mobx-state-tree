@@ -2,7 +2,7 @@ import {isFactory, IFactory} from "../core/factories"
 import {invariant, fail, isPrimitive} from "../utils"
 import {Type} from "../core/types"
 
-export class Constant extends Type {
+export class Literal extends Type {
     readonly value: any
 
     constructor(value: any) {
@@ -25,7 +25,7 @@ export class Constant extends Type {
 
 }
 
-export function createConstantFactory(value: any): any {
-    invariant(isPrimitive(value), 'Constant types can be built only on top of primitives')
-    return new Constant(value).factory
+export function createLiteralFactory<S>(value: S): IFactory<S, S> {
+    invariant(isPrimitive(value), 'Literal types can be built only on top of primitives')
+    return new Literal(value).factory
 }
