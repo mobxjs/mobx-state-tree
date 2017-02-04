@@ -136,7 +136,6 @@ test("it should emit action calls", (t) => {
 })
 
 test("it should apply action call", (t) => {
-    debugger
     const {Factory} = createTestFactories()
     const doc = Factory()
 
@@ -154,6 +153,14 @@ test("it should apply actions calls", (t) => {
 
     t.deepEqual(doc, {to: 'universe'})
 })
+
+test("it should apply action calls with complext args", (t) => {
+    const OrdersStore = createFactory({
+        orders: arrayOf(Order),
+        catalog: arrayOfPart(Part)
+    })
+})
+
 
 // === COMPUTED VALUES ===
 test("it should have computed properties", (t) => {

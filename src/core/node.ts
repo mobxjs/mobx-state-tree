@@ -319,8 +319,24 @@ export function getPath(thing: IModel): string {
 
 export function getRelativePath(base: Node, target: Node): string {
     // PRE condition target is (a child of) base!
-    invariant(target.path.length >= base.path.length, `getRelativePath received a target path "'+target.path+'" shorter than the base path "'+base.path+'".`)
-    return target.path.substr(base.path.length)
+    invariant(
+        getRootNode(base) === getRootNode(target),
+        `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
+    )
+    const baseParts = base.pathParts
+    const targetParts = target.pathParts
+    let common = 0
+    for (; common < baseParts.length; common++) {
+        if (baseParts[common] !== targetParts[common])
+            break
+    }
+    return joinJsonPath(
+        baseParts
+        .slice(common).map(_ => "..")
+        .concat(
+            targetParts.slice(common)
+        )
+    )
 }
 
 export function getParent(thing: IModel): IModel {
