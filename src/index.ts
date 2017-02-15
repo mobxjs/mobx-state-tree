@@ -1,12 +1,9 @@
 import {getNode, getRootNode} from "./core/node"
-import {runInAction, IObservableArray, ObservableMap, observable} from "mobx"
+import {runInAction, observable} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer, invariant} from "./utils"
 import {IActionCall} from "./core/action"
 import {IFactory, IModel} from "./core/factories"
-import {createMapFactory} from "./types/map"
-import {createArrayFactory} from "./types/array"
-import {primitiveFactory} from "./types/primitive"
 
 export {
     action
@@ -26,19 +23,6 @@ export {
 } from "./core/action"
 
 export {
-    primitiveFactory
-} from "./types/primitive"
-
-export {
-    createModelFactory as createFactory,
-    composeFactory,
-} from "./types/object"
-
-export {
-    referenceTo
-} from "./types/reference"
-
-export {
     asReduxStore,
     IReduxStore
 } from "./interop/redux"
@@ -47,13 +31,15 @@ export {
     connectReduxDevtools
 } from "./interop/redux-devtools"
 
-export {
-    createUnionFactory as unionOf
-} from "./types/union"
 
 export {
-    createDefaultValueFactory as withDefault
-} from "./types/with-default"
+    createModelFactory as createFactory, 
+    composeFactory
+} from "./types/object"
+
+export {
+    types
+} from "./types/index"
 
 /**
  * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
@@ -396,28 +382,6 @@ export function getFromEnvironment(target: IModel, key: string): any {
 export function clone<T extends IModel>(source: T, customEnvironment?: any): T {
     const node = getNode(source)
     return node.factory(node.snapshot, customEnvironment || node.environment) as T
-}
-
-/**
- *
- *
- * @export
- * @param {ModelFactory} [subFactory=primitiveFactory]
- * @returns
- */
-export function mapOf<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): ObservableMap<T> {
-    return createMapFactory(subFactory) as any
-}
-
-/**
- *
- *
- * @export
- * @param {ModelFactory} [subFactory=primitiveFactory]
- * @returns
- */
-export function arrayOf<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): IObservableArray<T> {
-    return createArrayFactory(subFactory as any) as any
 }
 
 /**

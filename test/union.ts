@@ -1,4 +1,4 @@
-import {createFactory, unionOf} from "../"
+import {createFactory, types} from "../"
 import {test} from "ava"
 
 const createTestFactories = () => {
@@ -17,9 +17,9 @@ const createTestFactories = () => {
         depth: 0
     })
 
-    const Plane = unionOf(Square, Box)
+    const Plane = types.union(Square, Box)
 
-    const DispatchPlane = unionOf(snapshot => snapshot && 'height' in snapshot ? Box : Square, Box, Square)
+    const DispatchPlane = types.union(snapshot => snapshot && 'height' in snapshot ? Box : Square, Box, Square)
 
     return {Box, Square, Cube, Plane, DispatchPlane}
 }
@@ -57,7 +57,7 @@ test("it should discriminate by value type", (t) => {
         size: 0
     })
 
-    const PictureOrSquare = unionOf(Picture, Square)
+    const PictureOrSquare = types.union(Picture, Square)
 
     const doc = PictureOrSquare({ size: {width: 0, height: 0}})
 
