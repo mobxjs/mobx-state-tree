@@ -1,10 +1,10 @@
-import {createFactory, unionOf, literal} from "../"
+import {createFactory, types} from "../"
 import {test} from "ava"
 
 test("it should allow only primitives", t => {
     const error = t.throws(() => {
         const Factory = createFactory({
-            complexArg: literal({a: 1})
+            complexArg: types.literal({a: 1})
         })
     })
 
@@ -13,7 +13,7 @@ test("it should allow only primitives", t => {
 
 test("it should throw if a different type is given", t => {
     const Factory = createFactory({
-        shouldBeOne: literal(1)
+        shouldBeOne: types.literal(1)
     })
 
     const error = t.throws(() => {
