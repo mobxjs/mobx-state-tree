@@ -1,4 +1,4 @@
-import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange} from "mobx"
+import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, IAction} from "mobx"
 import {nothing, invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
 import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
 import {IFactory, isFactory, getFactory, IModel} from "../core/factories"
@@ -172,8 +172,10 @@ export class ObjectType extends ComplexType {
     }
 }
 
-export function createModelFactory<S extends Object, T extends S>(baseModel: T): IFactory<S, T>
-export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: T): IFactory<S, T>
+export type IBaseModelDefinition<S extends Object, T> = {[K in keyof T]: IFactory<any, T[K]> | T[K] & IAction | T[K]}
+
+export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<S, T>): IFactory<S, T>
+export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<S, T>): IFactory<S, T>
 export function createModelFactory(arg1, arg2?) {
     let name = typeof arg1 === "string" ? arg1 : "unnamed-object-factory"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
