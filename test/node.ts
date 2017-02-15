@@ -1,4 +1,4 @@
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, arrayOf, getParent, hasParent, getRoot, getPathParts, clone, getFactory, getChildFactory, isFactory, recordActions, recordPatches} from "../"
+import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getFactory, getChildFactory, isFactory, recordActions, recordPatches, types} from "../"
 import {test} from "ava"
 
 // getParent
@@ -8,7 +8,7 @@ test("it should resolve to the parent instance", (t) => {
     })
 
     const Document = createFactory({
-        rows: arrayOf(Row)
+        rows: types.array(Row)
     })
 
     const doc = Document()
@@ -25,7 +25,7 @@ test("it should check for parent instance", (t) => {
     })
 
     const Document = createFactory({
-        rows: arrayOf(Row)
+        rows: types.array(Row)
     })
 
     const doc = Document()
@@ -42,7 +42,7 @@ test("it should check for parent instance (unbound)", (t) => {
     })
 
     const Document = createFactory({
-        rows: arrayOf(Row)
+        rows: types.array(Row)
     })
 
     const doc = Document()
@@ -58,7 +58,7 @@ test("it should resolve to the parent object instance", (t) => {
     })
 
     const Document = createFactory({
-        rows: arrayOf(Row)
+        rows: types.array(Row)
     })
 
     const doc = Document()
@@ -76,7 +76,7 @@ test("it should resolve to the root of an object", (t) => {
     })
 
     const Document = createFactory({
-        rows: arrayOf(Row)
+        rows: types.array(Row)
     })
 
     const doc = Document()
@@ -93,7 +93,7 @@ test("it should resolve the path of an object", (t) => {
     })
 
     const Document = createFactory({
-        rows: arrayOf(Row)
+        rows: types.array(Row)
     })
 
     const doc = Document()
@@ -110,7 +110,7 @@ test("it should resolve the path of an object", (t) => {
     })
 
     const Document = createFactory({
-        rows: arrayOf(Row)
+        rows: types.array(Row)
     })
 
     const doc = Document()
@@ -127,7 +127,7 @@ test("it should clone a node", (t) => {
     })
 
     const Document = createFactory({
-        rows: arrayOf(Row)
+        rows: types.array(Row)
     })
 
     const doc = Document()
@@ -156,7 +156,7 @@ test("it should return the child model factory", (t) => {
         article_id: 0
     })
 
-    const ArrayOfRow = arrayOf(Row)
+    const ArrayOfRow = types.array(Row)
     const Document = createFactory({
         rows: ArrayOfRow
     })
@@ -173,8 +173,8 @@ test("a node can exists only once in a tree", (t) => {
     })
 
     const Document = createFactory({
-        rows: arrayOf(Row),
-        foos: arrayOf(Row)
+        rows: types.array(Row),
+        foos: types.array(Row)
     })
 
     const doc = Document()
@@ -220,7 +220,7 @@ test("it can record and replay patches", (t) => {
 
     const Document = createFactory({
         customer_id: 0,
-        rows: arrayOf(Row)
+        rows: types.array(Row)
     })
 
     const source = Document()
@@ -252,7 +252,7 @@ test("it can record and replay actions", (t) => {
         addRow: action(function(){
             this.rows.push(Row())
         }),
-        rows: arrayOf(Row)
+        rows: types.array(Row)
     })
 
     const source = Document()
