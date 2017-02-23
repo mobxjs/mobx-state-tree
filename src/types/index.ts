@@ -11,6 +11,7 @@ import {createDefaultValueFactory as withDefault} from "./with-default"
 import {createLiteralFactory as literal} from "./literal"
 import {createMaybeFactory as maybe} from "./maybe"
 import {createRefinementFactory as refinement} from "./refinement"
+import {frozen} from "./frozen"
 import {string, boolean, number} from "./core-types"
 
 /**
@@ -49,5 +50,6 @@ export const types = {
     boolean,
     number,
     map,
-    array
+    array,
+    frozen
 }
