@@ -10,7 +10,7 @@ import {IModel, IFactory} from "./factories"
 import {IActionHandler} from "./action"
 import {
     invariant, fail, extend,
-    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler
+    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler, isSerializable
 } from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
 import {IActionCall, applyActionLocally} from "./action"
@@ -151,10 +151,6 @@ export class Node {
     }
 
     prepareChild(subpath: string, child: any): any {
-        if (!isMutable(child)) {
-            return child
-        }
-        
         const childFactory = this.getChildFactory(subpath)
 
         if (hasNode(child)) {
@@ -170,6 +166,7 @@ export class Node {
         }
         const existingNode = this.getChildNode(subpath)
         const newInstance = childFactory(child)
+        
         if (existingNode && existingNode.factory === newInstance.factory) {
             // recycle instance..
             existingNode.applySnapshot(child)
@@ -177,8 +174,10 @@ export class Node {
         } else {
             if (existingNode)
                 existingNode.setParent(null) // TODO: or delete / remove / whatever is a more explicit clean up
-            const node = getNode(newInstance)
-            node.setParent(this, subpath)
+            if(hasNode(newInstance)){
+                const node = getNode(newInstance)
+                node.setParent(this, subpath)
+            }
             return newInstance
         }
     }
@@ -344,7 +343,9 @@ export function valueToSnapshot(thing) {
             time: thing.toJSON()
         }
     }
-    if (isMutable(thing))
+    if (hasNode(thing))
         return getNode(thing).snapshot
-    return thing
+    if (isSerializable(thing))
+        return thing
+    fail('Unable to convert value to snapshot.')
 }
