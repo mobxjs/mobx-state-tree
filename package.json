@@ -1,6 +1,6 @@
 {
   "name": "mobx-state-tree",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Opinionated, transactional, MobX powered state container",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -10,9 +10,9 @@
     "webpack": "webpack -p",
     "test": "tsc && tsc -p test/ && ava",
     "watch": "concurrently 'tsc --watch' 'tsc --watch -p test' 'ava --watch'",
-    "_TODO_prepublish": "npm run build && npm run build-docs",
+    "prepublish": "npm run build && npm run build-docs",
     "coverage": "tsc && tsc -p test/ && nyc ava && nyc report -r html && nyc report -r lcov",
-    "build-docs": "npm run quick-build && documentation readme lib/src/index.js --github --section API",
+    "build-docs": "npm run quick-build && documentation readme lib/index.js --github --section API",
     "lint": "tslint -c tslint.json 'src/**/*.ts'"
   },
   "repository": {
