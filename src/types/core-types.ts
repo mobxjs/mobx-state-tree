@@ -1,8 +1,30 @@
-import {createRefinementFactory} from "./refinement"
-import {createDefaultValueFactory} from "./with-default"
-import {primitiveFactory} from "./primitive"
 import {IFactory} from "../core/factories"
+import {invariant, isPrimitive} from "../utils"
+import {Type} from "../core/types"
 
-export const string = createRefinementFactory<string, string>("string", primitiveFactory, t => typeof t === 'string')
-export const number = createRefinementFactory<number, number>("number", primitiveFactory, t => typeof t === 'number')
-export const boolean = createRefinementFactory<boolean, boolean>("boolean", primitiveFactory, t => typeof t === 'boolean')
+export class CoreType extends Type {
+    readonly checker: (value: any) => boolean
+
+    constructor(name, checker){
+        super(name)
+        this.checker = checker
+    }
+
+    describe(){
+        return this.name
+    }
+
+    create(value) {
+        invariant(isPrimitive(value), `Not a primitive: '${value}'`)
+        invariant(this.checker(value), 'Value is not assignable to ' + this.name)
+        return value
+    }
+
+    is(thing) {
+        return isPrimitive(thing) && this.checker(thing)
+    }
+}
+
+export const string = new CoreType("string", v => typeof v === 'string').factory
+export const number = new CoreType("number", v => typeof v === 'number').factory
+export const boolean = new CoreType("boolean", v => typeof v === 'boolean').factory
