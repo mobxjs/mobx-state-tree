@@ -21,6 +21,10 @@ export {
 export {
     IActionCall
 } from "./core/action"
+export {
+    Type,
+    ComplexType
+} from "./core/types"
 
 export {
     asReduxStore,
