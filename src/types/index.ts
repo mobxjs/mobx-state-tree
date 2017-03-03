@@ -13,6 +13,7 @@ import {createMaybeFactory as maybe} from "./maybe"
 import {createRefinementFactory as refinement} from "./refinement"
 import {frozen} from "./frozen"
 import {string, boolean, number} from "./core-types"
+import {recursive} from "./recursive"
 
 /**
  *
@@ -51,5 +52,6 @@ export const types = {
     number,
     map,
     array,
-    frozen
+    frozen,
+    recursive
 }
