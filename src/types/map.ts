@@ -1,7 +1,7 @@
 import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot, hasNode} from "../core/node"
+import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {isFactory, IFactory} from "../core/factories"
-import {identity, fail, isPlainObject, invariant, nothing, isPrimitive} from "../utils"
+import {identity, isPlainObject, nothing, isPrimitive} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {ComplexType} from "../core/types"
 
@@ -18,7 +18,7 @@ export class MapType extends ComplexType {
         this.subType = subType
     }
 
-    describe(){
+    describe() {
         return "Map<string, " + this.subType.type.describe() + ">"
     }
 
@@ -26,8 +26,7 @@ export class MapType extends ComplexType {
         return observable.shallowMap()
     }
 
-    finalizeNewInstance(instance){
-        
+    finalizeNewInstance(instance) {
     }
 
     getChildNodes(_node: Node, target): [string, Node][] {
@@ -118,9 +117,9 @@ export class MapType extends ComplexType {
                 currentKeys[key] = true
                 maybeNode(
                     target.get(key),
-                    node => {
+                    propertyNode => {
                         // update existing instance
-                        node.applySnapshot(snapshot[key])
+                        propertyNode.applySnapshot(snapshot[key])
                     },
                     () => {
                         target.set(key, snapshot[key])

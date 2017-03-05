@@ -1,5 +1,5 @@
-import {isFactory, IFactory} from "../core/factories"
-import {invariant, fail, isPrimitive} from "../utils"
+import {IFactory} from "../core/factories"
+import {invariant, isPrimitive} from "../utils"
 import {Type} from "../core/types"
 
 export class Literal extends Type {
@@ -15,7 +15,7 @@ export class Literal extends Type {
         return value
     }
 
-    describe(){
+    describe() {
         return JSON.stringify(this.value)
     }
 
@@ -26,6 +26,6 @@ export class Literal extends Type {
 }
 
 export function createLiteralFactory<S>(value: S): IFactory<S, S> {
-    invariant(isPrimitive(value), 'Literal types can be built only on top of primitives')
+    invariant(isPrimitive(value), `Literal types can be built only on top of primitives`)
     return new Literal(value).factory
 }

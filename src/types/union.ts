@@ -14,7 +14,7 @@ export class Union extends Type {
         this.types = types
     }
 
-    describe(){
+    describe() {
         return "(" + this.types.map(factory => factory.type.describe()).join(" | ") + ")"
     }
 
@@ -22,10 +22,10 @@ export class Union extends Type {
         invariant(this.is(value), `Value ${JSON.stringify(value)} is not assignable to union ${this.name}`)
 
         // try the dispatcher, if defined
-        if(this.dispatcher !== null){
+        if (this.dispatcher !== null) {
             return this.dispatcher(value)(value, environment)
         }
-        
+
         // find the most accomodating type
         const applicableTypes = this.types.filter(type => type.is(value))
         if (applicableTypes.length > 1)

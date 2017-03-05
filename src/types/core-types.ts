@@ -5,18 +5,18 @@ import {Type} from "../core/types"
 export class CoreType extends Type {
     readonly checker: (value: any) => boolean
 
-    constructor(name, checker){
+    constructor(name, checker) {
         super(name)
         this.checker = checker
     }
 
-    describe(){
+    describe() {
         return this.name
     }
 
     create(value) {
         invariant(isPrimitive(value), `Not a primitive: '${value}'`)
-        invariant(this.checker(value), 'Value is not assignable to ' + this.name)
+        invariant(this.checker(value), `Value is not assignable to '` + this.name + `'`)
         return value
     }
 
@@ -25,6 +25,9 @@ export class CoreType extends Type {
     }
 }
 
-export const string = new CoreType("string", v => typeof v === 'string').factory
-export const number = new CoreType("number", v => typeof v === 'number').factory
-export const boolean = new CoreType("boolean", v => typeof v === 'boolean').factory
+// tslint:disable-next-line:variable-name
+export const string: IFactory<string, string> = new CoreType("string", v => typeof v === "string").factory
+// tslint:disable-next-line:variable-name
+export const number: IFactory<number, number> = new CoreType("number", v => typeof v === "number").factory
+// tslint:disable-next-line:variable-name
+export const boolean: IFactory<boolean, boolean> = new CoreType("boolean", v => typeof v === "boolean").factory

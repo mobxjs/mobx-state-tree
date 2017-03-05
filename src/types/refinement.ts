@@ -1,5 +1,5 @@
-import {isFactory, IFactory} from "../core/factories"
-import {invariant, fail} from "../utils"
+import {IFactory} from "../core/factories"
+import {invariant} from "../utils"
 import {Type} from "../core/types"
 import {hasNode, getNode} from "../core/node"
 
@@ -15,7 +15,7 @@ export class Refinement extends Type {
         this.predicate = predicate
     }
 
-    describe(){
+    describe() {
         return this.name
     }
 
@@ -38,7 +38,7 @@ export class Refinement extends Type {
 export function createRefinementFactory<S, T>(name: string, type: IFactory<S, T>, predicate: IPredicate): IFactory<S, T> {
     // check if the subtype default value passes the predicate
     const inst = type()
-    invariant(predicate(hasNode(inst) ? getNode(inst).snapshot : inst), 'Default value for refinement type ' + name + ' does not pass the predicate.')
-    
+    invariant(predicate(hasNode(inst) ? getNode(inst).snapshot : inst), `Default value for refinement type ` + name + ` does not pass the predicate.`)
+
     return new Refinement(name, type, predicate).factory
 }

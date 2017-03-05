@@ -2,7 +2,7 @@ import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArray
 import {Node, maybeNode, valueToSnapshot} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
 import {IFactory, isFactory} from "../core/factories"
-import {identity, nothing, fail} from "../utils"
+import {identity, nothing} from "../utils"
 import {ComplexType} from "../core/types"
 
 export class ArrayType extends ComplexType {
@@ -14,7 +14,7 @@ export class ArrayType extends ComplexType {
         this.subType = subType
     }
 
-    describe(){
+    describe() {
         return this.subType.type.describe() + "[]"
     }
 
@@ -22,8 +22,7 @@ export class ArrayType extends ComplexType {
         return observable.shallowArray()
     }
 
-    finalizeNewInstance(instance){
-        
+    finalizeNewInstance(instance) {
     }
 
     getChildNodes(_: Node, target): [string, Node][] {

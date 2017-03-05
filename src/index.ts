@@ -35,9 +35,8 @@ export {
     connectReduxDevtools
 } from "./interop/redux-devtools"
 
-
 export {
-    createModelFactory as createFactory, 
+    createModelFactory as createFactory,
     composeFactory
 } from "./types/object"
 
@@ -428,4 +427,3 @@ export function getAppState<T>(): T {
     invariant(!!appState, `Global app state has not been initialized, use 'initializeAppState' for globally shared state`)
     return appState.get() as T
 }
-

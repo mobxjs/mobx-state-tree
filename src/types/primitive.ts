@@ -2,12 +2,10 @@ import {IFactory} from "../core/factories"
 import {invariant, isPrimitive} from "../utils"
 import {Type} from "../core/types"
 
-
-// TODO: inherited for specific primitive types
 export class PrimitiveType extends Type {
     name: string
 
-    describe(){
+    describe() {
         return "primitive"
     }
 
@@ -26,7 +24,8 @@ export class PrimitiveType extends Type {
     // }
 }
 
-export const primitiveFactory = new PrimitiveType("primitive").factory
+export type IPrimitive = string | boolean | number | Date
+export const primitiveFactory: IFactory<IPrimitive, IPrimitive> = new PrimitiveType("primitive").factory
 
 // TODO:
 // export const String = primitiveFactory.subType("String", t => typeof t === "string")

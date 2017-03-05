@@ -1,5 +1,5 @@
-import {Type} from '../core/types'
-import {IFactory} from '../core/factories'
+import {Type} from "../core/types"
+import {IFactory} from "../core/factories"
 
 export type IRecursiveDef<S, T> = (type: IFactory<S, T>) => IFactory<any, any>
 
@@ -11,7 +11,7 @@ class Recursive extends Type {
         this.type = def(this.factory)
     }
 
-    create(snapshot, environment?){
+    create(snapshot, environment?) {
         return this.type(snapshot, environment)
     }
 
@@ -24,6 +24,6 @@ class Recursive extends Type {
     }
 }
 
-export function recursive<S, T>(name: string, def: IRecursiveDef<S, T>){
+export function recursive<S, T>(name: string, def: IRecursiveDef<S, T>) {
     return new Recursive(name, def).factory
 }

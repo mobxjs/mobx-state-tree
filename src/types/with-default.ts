@@ -1,8 +1,7 @@
-import {isFactory, IFactory} from "../core/factories"
+import {IFactory} from "../core/factories"
 import {hasNode, getNode} from "../core/node"
-import {invariant, fail} from "../utils"
+import {invariant} from "../utils"
 import {Type} from "../core/types"
-
 
 export class DefaultValue extends Type {
     readonly type: IFactory<any, any>
@@ -14,7 +13,7 @@ export class DefaultValue extends Type {
         this.defaultValue = defaultValue
     }
 
-    describe(){
+    describe() {
         return "(" + this.type.type.describe() + " = " + JSON.stringify(this.defaultValue) + ")"
     }
 

@@ -28,7 +28,6 @@ export class Node {
     readonly actionSubscribers: IActionHandler[] = []
     _isRunningAction = false
 
-
     constructor(initialState: any, environment, factory: IFactory<any, any>) {
         invariant(factory.type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
@@ -156,17 +155,17 @@ export class Node {
         if (hasNode(child)) {
             const node = getNode(child)
 
-            if(node.parent === null){
+            if (node.parent === null) {
                 // we are adding a node with no parent (first insert in the tree)
                 node.setParent(this, subpath)
                 return child
             }
 
-            return fail("A node cannot exists twice in the state tree. Failed to add object to path '" + this.path + '/' + subpath + "', it exists already at '" + getPath(child) + "'")
+            return fail("A node cannot exists twice in the state tree. Failed to add object to path '" + this.path + "/" + subpath + "', it exists already at '" + getPath(child) + "'")
         }
         const existingNode = this.getChildNode(subpath)
         const newInstance = childFactory(child)
-        
+
         if (existingNode && existingNode.factory === newInstance.factory) {
             // recycle instance..
             existingNode.applySnapshot(child)
@@ -174,7 +173,7 @@ export class Node {
         } else {
             if (existingNode)
                 existingNode.setParent(null) // TODO: or delete / remove / whatever is a more explicit clean up
-            if(hasNode(newInstance)){
+            if (hasNode(newInstance)) {
                 const node = getNode(newInstance)
                 node.setParent(this, subpath)
             }
@@ -320,7 +319,7 @@ export function getPath(thing: IModel): string {
 
 export function getRelativePath(base: Node, target: Node): string {
     // PRE condition target is (a child of) base!
-    invariant(target.path.length >= base.path.length, 'getRelativePath received a target path "'+target.path+'" shorter than the base path "'+base.path+'".')
+    invariant(target.path.length >= base.path.length, `getRelativePath received a target path "'+target.path+'" shorter than the base path "'+base.path+'".`)
     return target.path.substr(base.path.length)
 }
 
@@ -347,5 +346,5 @@ export function valueToSnapshot(thing) {
         return getNode(thing).snapshot
     if (isSerializable(thing))
         return thing
-    fail('Unable to convert value to snapshot.')
+    fail("Unable to convert value to snapshot.")
 }

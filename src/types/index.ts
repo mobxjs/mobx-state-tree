@@ -1,5 +1,6 @@
-import {runInAction, IObservableArray, ObservableMap, observable, IAction} from "mobx"
-import {IFactory, IModel} from "../core/factories"
+// tslint:disable-next-line:no_unused-variable
+import {IObservableArray, ObservableMap, IAction} from "mobx"
+import {IFactory} from "../core/factories"
 import {createMapFactory} from "./map"
 import {createArrayFactory} from "./array"
 import {primitiveFactory} from "./primitive"

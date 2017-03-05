@@ -1,11 +1,9 @@
 import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, IAction} from "mobx"
-import {nothing, invariant, isSerializable, fail, registerEventHandler, IDisposer, identity, extend, isPrimitive, hasOwnProperty, addReadOnlyProp, isPlainObject} from "../utils"
-import {Node, maybeNode, getNode, valueToSnapshot, getRelativePath, hasNode} from "../core/node"
-import {IFactory, isFactory, getFactory, IModel} from "../core/factories"
-import {IActionCall, IActionHandler, applyActionLocally, createActionWrapper, createNonActionWrapper} from "../core/action"
+import {nothing, invariant, isSerializable, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject} from "../utils"
+import {Node, maybeNode, valueToSnapshot} from "../core/node"
+import {IFactory, isFactory, getFactory} from "../core/factories"
+import {createActionWrapper, createNonActionWrapper} from "../core/action"
 import {escapeJsonPath} from "../core/json-patch"
-import {isArrayFactory} from "../types/array"
-import {isMapFactory} from "../types/map"
 import {isReferenceFactory, createReferenceProps} from "./reference"
 import {primitiveFactory} from "./primitive"
 import {ComplexType} from "../core/types"
@@ -31,7 +29,7 @@ export class ObjectType extends ComplexType {
         this.extractPropsFromBaseModel()
     }
 
-    describe(){
+    describe() {
         return "{ " + Object.keys(this.props).map(key => key + ": " + this.props[key].type.describe()).join("; ") + " }"
     }
 
@@ -41,7 +39,7 @@ export class ObjectType extends ComplexType {
         return instance as Object
     }
 
-    finalizeNewInstance(instance){
+    finalizeNewInstance(instance) {
         this.finalizers.forEach(f => f(instance))
         // TODO: Object.seal(instance) // don't allow new props to be added!
     }
@@ -88,7 +86,7 @@ export class ObjectType extends ComplexType {
     getChildNodes(node, instance): [string, Node][] {
         const res: [string, Node][] = []
         for (let key in this.props)
-            maybeNode(instance[key], node => res.push([key, node]))
+            maybeNode(instance[key], propertyNode => res.push([key, propertyNode]))
         return res
     }
 
@@ -134,7 +132,7 @@ export class ObjectType extends ComplexType {
 
     applyPatchLocally(node: Node, target, subpath, patch): void {
         invariant(patch.op === "replace" || patch.op === "add")
-        this.applySnapshot(node ,target, {
+        this.applySnapshot(node, target, {
             [subpath]: patch.value
         })
     }
@@ -144,12 +142,11 @@ export class ObjectType extends ComplexType {
             invariant(key in this.props, `It is not allowed to assign a value to non-declared property ${key} of ${this.name}`)
             maybeNode(
                 target[key],
-                node => { node.applySnapshot(snapshot[key]) },
+                propertyNode => { propertyNode.applySnapshot(snapshot[key]) },
                 () =>   { target[key] = snapshot[key] }
             )
         }
     }
-
 
     getChildFactory(key: string): IFactory<any, any> {
         return this.props[key] || primitiveFactory
@@ -183,7 +180,7 @@ export function createModelFactory(arg1, arg2?) {
     return new ObjectType(name, baseModel).factory
 }
 
-function getObjectFactoryBaseModel(item){
+function getObjectFactoryBaseModel(item) {
     let factory = isFactory(item) ? item : getFactory(item)
 
     return isObjectFactory(factory) ? (factory.type as ObjectType).baseModel : {}
