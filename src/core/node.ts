@@ -26,7 +26,7 @@ export class Node {
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     readonly actionSubscribers: IActionHandler[] = []
-    _isRunningAction = false
+    _isRunningAction = false // only relevant for root
 
     constructor(initialState: any, environment, factory: IFactory<any, any>) {
         invariant(factory.type instanceof ComplexType, "Uh oh")
@@ -87,6 +87,14 @@ export class Node {
         return this._parent
     }
 
+    public get root() {
+        // future optimization: store root ref in the node and maintain it
+        let p, r = this
+        while (p = r.parent)
+            r = p
+        return r
+    }
+
     @computed public get snapshot() {
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         return Object.freeze(this.type.serialize(this, this.target))
@@ -136,7 +144,7 @@ export class Node {
         if (this._parent && newParent) {
             invariant(false, `A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
         }
-        if (!this._parent && newParent && getRootNode(newParent) === this) {
+        if (!this._parent && newParent && newParent.root === this) {
             invariant(false, `A state tree is not allowed to contain itself. Cannot add root to path '/${newParent.pathParts.concat(subpath!).join("/")}'`)
         }
         if (this.parent && !newParent && (
@@ -155,13 +163,13 @@ export class Node {
         if (hasNode(child)) {
             const node = getNode(child)
 
-            if (node.parent === null) {
+            if (node.isRoot) {
                 // we are adding a node with no parent (first insert in the tree)
                 node.setParent(this, subpath)
                 return child
             }
 
-            return fail("A node cannot exists twice in the state tree. Failed to add object to path '" + this.path + "/" + subpath + "', it exists already at '" + getPath(child) + "'")
+            return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${getPath(child)}'`)
         }
         const existingNode = this.getChildNode(subpath)
         const newInstance = childFactory(child)
@@ -246,16 +254,16 @@ export class Node {
             // optimization: use tail recursion / trampoline
             idx++
             if (idx < this.actionSubscribers.length) {
-                this.actionSubscribers[idx](correctedAction!, n)
+                return this.actionSubscribers[idx](correctedAction!, n)
             } else {
                 const parent = this.parent
                 if (parent)
-                    parent.emitAction(instance, action, next)
+                    return parent.emitAction(instance, action, next)
                 else
-                    next()
+                    return next()
             }
         }
-        n()
+        return n()
     }
 
     onAction(listener: (action: IActionCall, next: () => void) => void): IDisposer {
@@ -320,7 +328,7 @@ export function getPath(thing: IModel): string {
 export function getRelativePath(base: Node, target: Node): string {
     // PRE condition target is (a child of) base!
     invariant(
-        getRootNode(base) === getRootNode(target),
+        base.root === target.root,
         `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
     )
     const baseParts = base.pathParts
@@ -342,13 +350,6 @@ export function getRelativePath(base: Node, target: Node): string {
 export function getParent(thing: IModel): IModel {
     const node = getNode(thing)
     return node.parent ? node.parent.target : null
-}
-
-export function getRootNode(node: Node) {
-    let p, r = node
-    while (p = r.parent)
-        r = p
-    return r
 }
 
 export function valueToSnapshot(thing) {

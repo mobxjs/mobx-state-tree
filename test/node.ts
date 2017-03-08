@@ -184,7 +184,7 @@ test("a node can exists only once in a tree", (t) => {
     const error = t.throws(() => {
         doc.foos.push(row)
     })
-    t.is(error.message, "[mobx-state-tree] A node cannot exists twice in the state tree. Failed to add object to path '/foos/0', it exists already at '/rows/0'")
+    t.is(error.message, "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/foos/0', but it lives already at '/rows/0'")
 })
 
 // TODO

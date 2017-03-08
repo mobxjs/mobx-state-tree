@@ -1,4 +1,4 @@
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, composeFactory} from "../"
+import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, composeFactory, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -152,13 +152,6 @@ test("it should apply actions calls", (t) => {
     applyActions(doc, [{name: "setTo", path: "", args: ["mars"]}, {name: "setTo", path: "", args: ["universe"]}])
 
     t.deepEqual(doc, {to: 'universe'})
-})
-
-test("it should apply action calls with complext args", (t) => {
-    const OrdersStore = createFactory({
-        orders: arrayOf(Order),
-        catalog: arrayOfPart(Part)
-    })
 })
 
 

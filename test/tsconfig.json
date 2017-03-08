@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "rootDir": "./",
         "module": "commonjs",
         "target": "es2015",
         "noImplicitAny": false,

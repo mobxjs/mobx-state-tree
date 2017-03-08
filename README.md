@@ -131,12 +131,10 @@ Useful methods:
 Actions modify models. Actions are replayable and are therefore constrained in several ways:
 
 -   Actions can be invoked directly as method on a model
--   All action arguments must be serializable
--   Actions mutate models but do not return values (TODO: or can they?)
+-   All action arguments must be serializable. Some arguments can be serialized automatically, such as relative paths to other nodes
 -   Actions are serializable and replayable
 -   It is possible to subscribe to the stream of actions that is invoked on a model
 -   Actions can only modify models that belong to the tree on which they are invoked
--   Actions are allowed to invoke other actions, but only if they belong to the same subtree as the original action (this ensures replayability) (TODO: disputable constraint?)
 -   Actions are automatically bound the their instance, so it is save to pass actions around first class without binding or wrapping in arrow functions.
 
 A serialized action call looks like:
@@ -230,7 +228,7 @@ See [#10](https://github.com/mobxjs/mobx-state-tree/issues/10)
 
 ## onAction
 
-[lib/index.js:70-72](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L70-L72 "Source code on GitHub")
+[lib/index.js:70-72](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L70-L72 "Source code on GitHub")
 
 Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
 Will only be invoked on 'root' actions, not on actions called from existing actions.
@@ -273,7 +271,7 @@ Returns **IDisposer** function to remove the middleware
 
 ## onPatch
 
-[lib/index.js:84-86](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L84-L86 "Source code on GitHub")
+[lib/index.js:84-86](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L84-L86 "Source code on GitHub")
 
 Registers a function that will be invoked for each that as made to the provided model instance, or any of it's children.
 See 'patches' for more details. onPatch events are emitted immediately and will not await the end of a transaction.
@@ -288,7 +286,7 @@ Returns **IDisposer** function to remove the listener
 
 ## onSnapshot
 
-[lib/index.js:97-99](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L97-L99 "Source code on GitHub")
+[lib/index.js:97-99](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L97-L99 "Source code on GitHub")
 
 Registeres a function that is invoked whenever a new snapshot for the given model instance is available.
 The listener will only be fire at the and a MobX (trans)action
@@ -302,7 +300,7 @@ Returns **IDisposer**
 
 ## applyPatch
 
-[lib/index.js:109-111](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L109-L111 "Source code on GitHub")
+[lib/index.js:109-111](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L109-L111 "Source code on GitHub")
 
 Applies a JSON-patch to the given model instance or bails out if the patch couldn't be applied
 
@@ -313,7 +311,7 @@ Applies a JSON-patch to the given model instance or bails out if the patch could
 
 ## applyPatches
 
-[lib/index.js:120-125](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L120-L125 "Source code on GitHub")
+[lib/index.js:120-125](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L120-L125 "Source code on GitHub")
 
 Applies a number of JSON patches in a single MobX transaction
 
@@ -324,9 +322,10 @@ Applies a number of JSON patches in a single MobX transaction
 
 ## applyAction
 
-[lib/index.js:150-152](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L150-L152 "Source code on GitHub")
+[lib/index.js:151-153](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L151-L153 "Source code on GitHub")
 
 Dispatches an Action on a model instance. All middlewares will be triggered.
+Returns the value of the last actoin
 
 **Parameters**
 
@@ -336,9 +335,11 @@ Dispatches an Action on a model instance. All middlewares will be triggered.
 
 ## applyActions
 
-[lib/index.js:162-167](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L162-L167 "Source code on GitHub")
+[lib/index.js:165-170](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L165-L170 "Source code on GitHub")
 
 Applies a series of actions in a single MobX transaction.
+
+Does not return any value
 
 **Parameters**
 
@@ -348,7 +349,7 @@ Applies a series of actions in a single MobX transaction.
 
 ## applySnapshot
 
-[lib/index.js:192-194](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L192-L194 "Source code on GitHub")
+[lib/index.js:195-197](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L195-L197 "Source code on GitHub")
 
 Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
 
@@ -359,7 +360,7 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 
 ## getSnapshot
 
-[lib/index.js:204-206](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L204-L206 "Source code on GitHub")
+[lib/index.js:207-209](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L207-L209 "Source code on GitHub")
 
 Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
 structural sharing where possible. Doesn't require MobX transactions to be completed.
@@ -372,7 +373,7 @@ Returns **Any**
 
 ## hasParent
 
-[lib/index.js:216-219](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L216-L219 "Source code on GitHub")
+[lib/index.js:219-222](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L219-L222 "Source code on GitHub")
 
 Given a model instance, returns `true` if the object has a parent, that is, is part of another object, map or array
 
@@ -385,7 +386,7 @@ Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ## getParent
 
-[lib/index.js:241-248](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L241-L248 "Source code on GitHub")
+[lib/index.js:244-251](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L244-L251 "Source code on GitHub")
 
 Returns the immediate parent of this object, or null. Parent can be either an object, map or array
 TODO:? strict mode?
@@ -399,7 +400,7 @@ Returns **Any**
 
 ## getParent
 
-[lib/index.js:241-248](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L241-L248 "Source code on GitHub")
+[lib/index.js:244-251](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L244-L251 "Source code on GitHub")
 
 TODO:
 Given a model instance, returns `true` if the object has same parent, which is a model object, that is, not an
@@ -414,7 +415,7 @@ Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ## getRoot
 
-[lib/index.js:270-272](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L270-L272 "Source code on GitHub")
+[lib/index.js:273-275](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L273-L275 "Source code on GitHub")
 
 Given an object in a model tree, returns the root object of that tree
 
@@ -426,7 +427,7 @@ Returns **Any**
 
 ## getRoot
 
-[lib/index.js:270-272](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L270-L272 "Source code on GitHub")
+[lib/index.js:273-275](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L273-L275 "Source code on GitHub")
 
 TODO:
 Returns the closest parent that is a model instance, but which isn't an array or map.
@@ -439,7 +440,7 @@ Returns **Any**
 
 ## getPath
 
-[lib/index.js:281-283](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L281-L283 "Source code on GitHub")
+[lib/index.js:284-286](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L284-L286 "Source code on GitHub")
 
 Returns the path of the given object in the model tree
 
@@ -451,7 +452,7 @@ Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ## getPathParts
 
-[lib/index.js:292-294](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L292-L294 "Source code on GitHub")
+[lib/index.js:295-297](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L295-L297 "Source code on GitHub")
 
 Returns the path of the given object as unescaped string array
 
@@ -463,7 +464,7 @@ Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refere
 
 ## isRoot
 
-[lib/index.js:303-305](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L303-L305 "Source code on GitHub")
+[lib/index.js:306-308](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L306-L308 "Source code on GitHub")
 
 Returns true if the given object is the root of a model tree
 
@@ -475,7 +476,7 @@ Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ## resolve
 
-[lib/index.js:315-318](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L315-L318 "Source code on GitHub")
+[lib/index.js:318-321](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L318-L321 "Source code on GitHub")
 
 Resolves a path relatively to a given object.
 
@@ -488,7 +489,7 @@ Returns **Any**
 
 ## tryResolve
 
-[lib/index.js:328-333](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L328-L333 "Source code on GitHub")
+[lib/index.js:331-336](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L331-L336 "Source code on GitHub")
 
 **Parameters**
 
@@ -499,7 +500,7 @@ Returns **Any**
 
 ## getFromEnvironment
 
-[lib/index.js:342-344](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L342-L344 "Source code on GitHub")
+[lib/index.js:345-347](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L345-L347 "Source code on GitHub")
 
 **Parameters**
 
@@ -510,7 +511,7 @@ Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ## clone
 
-[lib/index.js:355-358](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L355-L358 "Source code on GitHub")
+[lib/index.js:358-361](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L358-L361 "Source code on GitHub")
 
 **Parameters**
 
@@ -521,7 +522,7 @@ Returns **T**
 
 ## \_getNode
 
-[lib/index.js:370-372](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L370-L372 "Source code on GitHub")
+[lib/index.js:373-375](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L373-L375 "Source code on GitHub")
 
 **Parameters**
 
@@ -531,7 +532,7 @@ Returns **Any**
 
 ## \_getNode
 
-[lib/index.js:370-372](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/index.js#L370-L372 "Source code on GitHub")
+[lib/index.js:373-375](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/index.js#L373-L375 "Source code on GitHub")
 
 Internal function, use with care!
 
@@ -541,13 +542,13 @@ Internal function, use with care!
 
 ## get
 
-[lib/core/node.js:67-69](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/core/node.js#L67-L69 "Source code on GitHub")
+[lib/core/node.js:67-69](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/core/node.js#L67-L69 "Source code on GitHub")
 
 Returnes (escaped) path representation as string
 
 ## maybeNode
 
-[lib/core/node.js:303-315](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/core/node.js#L303-L315 "Source code on GitHub")
+[lib/core/node.js:314-326](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/core/node.js#L314-L326 "Source code on GitHub")
 
 Tries to convert a value to a TreeNode. If possible or already done,
 the first callback is invoked, otherwise the second.
@@ -561,7 +562,7 @@ The result of this function is the return value of the callbacks
 
 ## escapeJsonPath
 
-[lib/core/json-patch.js:9-11](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/core/json-patch.js#L9-L11 "Source code on GitHub")
+[lib/core/json-patch.js:9-11](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/core/json-patch.js#L9-L11 "Source code on GitHub")
 
 escape slashes and backslashes
 <http://tools.ietf.org/html/rfc6901>
@@ -572,7 +573,7 @@ escape slashes and backslashes
 
 ## unescapeJsonPath
 
-[lib/core/json-patch.js:16-18](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/core/json-patch.js#L16-L18 "Source code on GitHub")
+[lib/core/json-patch.js:16-18](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/core/json-patch.js#L16-L18 "Source code on GitHub")
 
 unescape slashes and backslashes
 
@@ -582,7 +583,7 @@ unescape slashes and backslashes
 
 ## map
 
-[lib/types/index.js:24-27](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/types/index.js#L24-L27 "Source code on GitHub")
+[lib/types/index.js:24-27](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/types/index.js#L24-L27 "Source code on GitHub")
 
 **Parameters**
 
@@ -590,7 +591,7 @@ unescape slashes and backslashes
 
 ## array
 
-[lib/types/index.js:36-39](https://github.com/mobxjs/mobx-state-tree/blob/8e0a1383efa8f689b089a495faec1418cd6a9dc8/lib/types/index.js#L36-L39 "Source code on GitHub")
+[lib/types/index.js:36-39](https://github.com/mweststrate/mobx-state-tree/blob/25ac31493e108ce63b24076dc7fda03673a0de65/lib/types/index.js#L36-L39 "Source code on GitHub")
 
 **Parameters**
 

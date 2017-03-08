@@ -13,7 +13,8 @@
     "prepublish": "npm run build && npm run build-docs",
     "coverage": "tsc && tsc -p test/ && nyc ava && nyc report -r html && nyc report -r lcov",
     "build-docs": "npm run quick-build && documentation readme lib/index.js --github --section API",
-    "lint": "tslint -c tslint.json 'src/**/*.ts'"
+    "lint": "tslint -c tslint.json 'src/**/*.ts'",
+    "clean": "rm lib && rm test-lib"
   },
   "repository": {
     "type": "git",
