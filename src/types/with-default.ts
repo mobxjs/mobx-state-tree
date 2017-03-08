@@ -27,7 +27,7 @@ export class DefaultValue extends Type {
 
 }
 
-export function createDefaultValueFactory(type: IFactory<any, any>, defaultValueOrNode: any): IFactory<any, any> {
+export function createDefaultValueFactory<S, T>(type: IFactory<S, T>, defaultValueOrNode: S | T): IFactory<S, T> {
     const defaultValue = hasNode(defaultValueOrNode) ? getNode(defaultValueOrNode).snapshot : defaultValueOrNode
     invariant(type.is(defaultValue), `Default value ${JSON.stringify(defaultValue)} is not assignable to type ${type.factoryName}. Expected ${JSON.stringify(type.type.describe())}`)
     return new DefaultValue(type, defaultValue).factory
