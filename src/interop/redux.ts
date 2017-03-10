@@ -1,5 +1,6 @@
 import {IActionCall} from "../core/action"
-import {onSnapshot, getSnapshot, applyAction, isModel} from "../index"
+import {isModel} from "../core/factories"
+import {onSnapshot, getSnapshot, applyAction} from "../top-level-api"
 import {invariant, extend} from "../utils"
 
 export interface IMiddleWareApi {

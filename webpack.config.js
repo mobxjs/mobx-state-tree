@@ -19,6 +19,7 @@ module.exports = {
             compress: {
                 warnings: false
             }
-        })
+        }),
+        require("webpack-fail-plugin")
     ]
 };
