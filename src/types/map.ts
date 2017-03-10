@@ -47,6 +47,8 @@ export class MapType extends ComplexType {
 
     willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
         // TODO: check type
+        // TODO: check if editable
+
         const node = getNode(change.object)
         switch (change.type) {
             case "update":

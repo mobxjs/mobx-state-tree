@@ -1,83 +1,240 @@
-import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, IAction, intercept, observe} from "mobx"
-import {nothing, invariant, isSerializable, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject} from "../utils"
-import {Node, maybeNode, valueToSnapshot, getNode} from "../core/node"
-import {IFactory, isFactory, getFactory} from "../core/factories"
-import {createActionWrapper, createNonActionWrapper} from "../core/action"
-import {escapeJsonPath} from "../core/json-patch"
-import {isReferenceFactory, createReferenceProps} from "./reference"
-import {primitiveFactory} from "./primitive"
-import {ComplexType} from "../core/types"
+import { action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, IAction, intercept, observe } from "mobx"
+import { nothing, invariant, isSerializable, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
+import { Node, maybeNode, valueToSnapshot, getNode } from "../core/node"
+import { IFactory, isFactory, getFactory } from "../core/factories"
+import { createActionWrapper, createNonActionWrapper } from "../core/action"
+import { escapeJsonPath } from "../core/json-patch"
+import { isReferenceFactory, createReferenceProps } from "./reference"
+import { primitiveFactory } from "./primitive"
+import { ComplexType } from "../core/types"
+import { createDefaultValueFactory } from "./with-default"
+
+
+interface IObjectInstance {
+    $objectprops: { [key: string]: any }
+    $treenode: Node
+}
 
 interface IObjectFactoryConfig {
     isObjectFactory: true,
     baseModel: Object
 }
 
+abstract class ObjectProperty {
+    constructor(public name: string) {
+        // empty
+    }
+
+    abstract initializePropDescriptors(baseProps: PropertyDescriptorMap)
+    abstract initialize(targetInstance: IObjectInstance)
+
+    abstract serialize(instance: IObjectInstance, snapshot): any
+    abstract deserialize(instance: IObjectInstance, snapshot)
+    abstract isValidSnapshot(snapshot): boolean
+}
+
+class ValueProperty extends ObjectProperty {
+    constructor(propertyName, public factory: IFactory<any, any>) {
+        super(propertyName)
+    }
+
+    initializePropDescriptors(props) {
+        const self = this
+        props[this.name] = {
+            configurable: false,
+            enumerable: true,
+            get: function () {
+                return self.get(this)
+            },
+            set: function (v) {
+                self.set(this, v)
+            }
+        }
+    }
+
+    initialize(targetInstance) {
+        extendShallowObservable(targetInstance.$objectprops, {
+            [this.name]: this.factory()
+        })
+    }
+
+    get(instance: IObjectInstance) {
+        return instance.$objectprops[this.name]
+    }
+
+    set(instance, newValue) {
+        const node = getNode(instance)
+        const oldValue = this.get(instance)
+        if (newValue === oldValue)
+            return
+
+        // TODO check type
+        // TODO: check if tree is editable
+        maybeNode(oldValue, adm => adm.setParent(null))
+        newValue = node.prepareChild(this.name, newValue)
+
+        instance.$objectprops[this.name] = newValue
+
+        node.emitPatch({
+            op: "replace",
+            path: "/" + escapeJsonPath(this.name),
+            value: valueToSnapshot(newValue)
+        }, node)
+    }
+
+    serialize(instance, snapshot) {
+        snapshot[this.name] = valueToSnapshot(instance[this.name])
+    }
+
+    deserialize(instance, snapshot) {
+        maybeNode(
+            instance[this.name],
+            propertyNode => { propertyNode.applySnapshot(snapshot[this.name]) },
+            () => { instance[this.name] = snapshot[this.name] }
+        )
+    }
+
+    instantiate(target) {
+        extendShallowObservable(target, {
+            [this.name]: this.factory()
+        })
+    }
+
+    isValidSnapshot(snapshot) {
+        return this.factory.is(snapshot[this.name])
+    }
+}
+
+// class ComputedProperty extends ObjectProperty {
+//     constructor(propertyName, public getter: () => any, public setter?: (v) => void) {
+//         super(propertyName)
+//     }
+
+//     get(instance) {
+//         return instance[this.name]
+//     }
+
+//     set(instance, v) {
+//         // TODO check type
+//         instance[this.name] = v
+//     }
+
+//     serialize(instance, snapshot) {
+//         snapshot[this.name] = valueToSnapshot(instance[this.name])
+//     }
+
+//     deserialize(instance, snapshot) {
+//         maybeNode(
+//             instance[this.name],
+//             propertyNode => { propertyNode.applySnapshot(snapshot[this.name]) },
+//             () => { instance[this.name] = snapshot[this.name] }
+//         )
+//     }
+
+//     instantiate(target) {
+//         extendShallowObservable(target, {
+//             [this.name]: this.factory()
+//         })
+//     }
+// }
+
+// class ActionProperty extends ObjectProperty {
+//     constructor(name: string, public fn: Function) {
+//         super(name)
+//     }
+// }
+
+
 export class ObjectType extends ComplexType {
-    props: {
-        [key: string]: IFactory<any, any>
-    } = {}
-    baseModel: any
-    initializers: ((target) => void)[] = []
-    finalizers: ((target) => void)[] = []
     isObjectFactory = true
+
+    /**
+     * The original object definition
+     */
+    baseModel: any
+
+    namedConstructor: new () => any
+
+    /**
+     * Parsed description of all properties
+     */
+    private props: {
+        [key: string]: ObjectProperty
+    } = {}
+
+    /**
+     * Base properties to quickly create new objects
+     */
+    baseProperties: PropertyDescriptorMap
 
     constructor(name: string, baseModel) {
         super(name)
         Object.seal(baseModel) // make sure nobody messes with it
+
         this.baseModel = baseModel
+        // TODO: verify valid name
+        this.namedConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
+        this.baseProperties = {}
         this.extractPropsFromBaseModel()
+        this.forAllProps(prop => prop.initializePropDescriptors(this.baseProperties))
+    }
+
+    private forAllProps(fn: (o: ObjectProperty) => void) {
+        Object.keys(this.props).forEach(key => fn(this.props[key]))
     }
 
     describe() {
-        return "{ " + Object.keys(this.props).map(key => key + ": " + this.props[key].type.describe()).join("; ") + " }"
+        // optimization: don't evaluate lazily
+        return "{ " + Object.keys(this.props).map(key => {
+            const prop = this.props[key]
+            return prop instanceof ValueProperty
+                ? key + ": " + prop.factory.type.describe()
+                : ""
+        }).filter(Boolean).join("; ") + " }"
     }
 
     createNewInstance() {
-        const instance = observable.shallowObject({})
-        this.initializers.forEach(f => f(instance))
+        const instance = new this.namedConstructor()
+        Object.defineProperty(instance, "$objectprops", {
+            enumerable: false,
+            configurable: false,
+            writable: false,
+            value: observable.shallowObject({}, )
+        })
+        Object.defineProperties(instance, this.baseProperties) // TODO: or, in constructor, do Object.defineProperty(this.namedConstructor.prototype, baseProperties) ?
         return instance as Object
     }
 
     finalizeNewInstance(instance) {
-        intercept(instance, this.willChange as any)
-        observe(instance, this.didChange)
-        this.finalizers.forEach(f => f(instance))
+        this.forAllProps(prop => prop.initialize(instance))
     }
 
     extractPropsFromBaseModel() {
         const baseModel = this.baseModel
-        const addInitializer = this.initializers.push.bind(this.initializers)
-        const addFinalizer = this.finalizers.push.bind(this.finalizers)
         for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
             const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
             if ("get" in descriptor) {
-                const computedDescriptor = {} // yikes
-                Object.defineProperty(computedDescriptor, key, descriptor)
-                addInitializer(t => extendShallowObservable(t, computedDescriptor))
+// TODO:                this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
                 continue
             }
 
-            const {value} = descriptor
+            const { value } = descriptor
 
             if (isPrimitive(value)) {
                 // TODO: detect exact primitiveFactory!
-                this.props[key] = primitiveFactory
-                // MWE: optimization, create one single extendObservale
-                addInitializer(t => extendShallowObservable(t, { [key] : value }))
+                this.props[key] = new ValueProperty(key, createDefaultValueFactory(primitiveFactory, value))
             } else if (isFactory(value)) {
-                this.props[key] = value
-                addInitializer(t => extendShallowObservable(t, { [key]: null }))
-                addFinalizer(t => t[key] = value())
+                this.props[key] = new ValueProperty(key, value)
             } else if (isReferenceFactory(value)) {
-                addInitializer(t => extendShallowObservable(t, createReferenceProps(key, value)))
+                // TODO:               addInitializer(t => extendShallowObservable(t, createReferenceProps(key, value)))
             } else if (isAction(value)) {
-                addInitializer(t => createActionWrapper(t, key, value))
+// TODO:                this.props[key] = new ActionProperty(key, value)
             } else if (typeof value === "function") {
-                addInitializer(t => createNonActionWrapper(t, key, value))
+                // TODO: threat as action
+                // addInitializer(t => createNonActionWrapper(t, key, value))
             } else if (typeof value === "object") {
                 fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
-            } else  {
+            } else {
                 fail(`Unexpected value for property '${key}'`)
             }
         }
@@ -86,8 +243,10 @@ export class ObjectType extends ComplexType {
     // TODO: adm or instance as param?
     getChildNodes(node, instance): [string, Node][] {
         const res: [string, Node][] = []
-        for (let key in this.props)
-            maybeNode(instance[key], propertyNode => res.push([key, propertyNode]))
+        this.forAllProps(prop => {
+            if (prop instanceof ValueProperty)
+                maybeNode(instance[prop.name], propertyNode => res.push([prop.name, propertyNode]))
+        })
         return res
     }
 
@@ -95,42 +254,10 @@ export class ObjectType extends ComplexType {
         return maybeNode(instance[key], identity, nothing)
     }
 
-    willChange(change: IObjectWillChange): IObjectWillChange | null {
-        // TODO: typecheck
-        const node = getNode(change.object)
-        const {newValue} = change
-        const oldValue = change.object[change.name]
-        if (newValue === oldValue)
-            return null
-        maybeNode(oldValue, adm => adm.setParent(null))
-        change.newValue = node.prepareChild(change.name, newValue)
-        return change
-    }
-
-    didChange(change: IObjectChange): void {
-        const node = getNode(change.object)
-        switch (change.type) {
-            case "update": return void node.emitPatch({
-                op: "replace",
-                path: "/" + escapeJsonPath(change.name),
-                value: valueToSnapshot(change.newValue)
-            }, node)
-            case "add": return void node.emitPatch({
-                op: "add",
-                path: "/" + escapeJsonPath(change.name),
-                value: valueToSnapshot(change.newValue)
-            }, node)
-        }
-    }
-
+    // TODO: node or instance?
     serialize(node: Node, instance): any {
         const res = {}
-        for (let key in this.props) {
-            const value = instance[key]
-            if (!isSerializable(value))
-                console.warn(`Encountered unserialize value '${value}' in ${node.path}/${key}`)
-            res[key] = valueToSnapshot(value)
-        }
+        this.forAllProps(prop => prop.serialize(instance, res))
         return res
     }
 
@@ -141,35 +268,29 @@ export class ObjectType extends ComplexType {
         })
     }
 
+    // TODO: remove node arg
     @action applySnapshot(node: Node, target, snapshot): void {
+        // TODO typecheck?
         for (let key in snapshot) {
             invariant(key in this.props, `It is not allowed to assign a value to non-declared property ${key} of ${this.name}`)
-            maybeNode(
-                target[key],
-                propertyNode => { propertyNode.applySnapshot(snapshot[key]) },
-                () =>   { target[key] = snapshot[key] }
-            )
+            this.props[key].deserialize(target, snapshot)
         }
     }
 
     getChildFactory(key: string): IFactory<any, any> {
-        return this.props[key] || primitiveFactory
+        return (this.props[key] as ValueProperty).factory
     }
 
     isValidSnapshot(snapshot) {
         if (!isPlainObject(snapshot))
             return false
-        const props = this.props
-        let modelKeys = Object.keys(props).filter(key => isPrimitive(props[key]) || isFactory(props[key]))
-        const snapshotKeys = Object.keys(snapshot)
-        if (snapshotKeys.length > modelKeys.length)
-            return false
-        return snapshotKeys.every(key => {
-            let keyInConfig = key in props
-            let bothArePrimitives = isPrimitive(props[key]) && isPrimitive(snapshot[key])
-            let ifModelFactoryIsCastable = isFactory(props[key]) && props[key].is(snapshot[key])
-            return keyInConfig && (bothArePrimitives || ifModelFactoryIsCastable)
-        })
+        for (let key in snapshot)
+            if (!(key in this.props))
+                return false
+        for (let key in this.props)
+            if (!this.props[key].isValidSnapshot(snapshot))
+                return false
+        return true
     }
 }
 
@@ -178,7 +299,7 @@ export type IBaseModelDefinition<S extends Object, T> = {[K in keyof T]: IFactor
 export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<S, T>): IFactory<S, T>
 export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<S, T>): IFactory<S, T>
 export function createModelFactory(arg1, arg2?) {
-    let name = typeof arg1 === "string" ? arg1 : "unnamed-object-factory"
+    let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
 
     return new ObjectType(name, baseModel).factory
@@ -197,12 +318,12 @@ export function composeFactory<AS, AT, BS, BT>(a: IFactory<AS, AT>, b: IFactory<
 export function composeFactory<AS, AT, BS, BT, CS, CT>(a: IFactory<AS, AT>, b: IFactory<BS, BT>, c: IFactory<CS, CT>): IFactory<AS & BS & CS, AT & BT & CT>;
 export function composeFactory<S, T>(...models: IFactory<any, any>[]): IFactory<S, T>;
 export function composeFactory(...args: any[]) {
-    const factoryName = typeof args[0] === "string" ? args[0] : "unnamed-factory"
-    const baseModels = typeof args[0] === "string" ? args.slice(1) : args
+    const baseFactories = typeof args[0] === "string" ? args.slice(1) : args
+    const factoryName = typeof args[0] === "string" ? args[0] : baseFactories.map(f => f.type.name).join("_")
 
     return createModelFactory(
         factoryName,
-        extend.apply(null, [{}].concat(baseModels.map(getObjectFactoryBaseModel)))
+        extend.apply(null, [{}].concat(baseFactories.map(getObjectFactoryBaseModel)))
     )
 }
 

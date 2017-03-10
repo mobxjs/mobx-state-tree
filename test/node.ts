@@ -7,6 +7,7 @@ test("it should resolve to the parent instance", (t) => {
         article_id: 0
     })
 
+    debugger;
     const Document = createFactory({
         rows: types.array(Row)
     })

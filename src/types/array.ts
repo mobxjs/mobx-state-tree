@@ -43,6 +43,8 @@ export class ArrayType extends ComplexType {
 
     willChange = (change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null => {
         // TODO: verify type
+                // TODO check type
+        // TODO: check if tree is editable
         const node = getNode(change.object)
         switch (change.type) {
             case "update":
