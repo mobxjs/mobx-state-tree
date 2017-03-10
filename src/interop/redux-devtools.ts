@@ -1,4 +1,6 @@
-import {getSnapshot, onAction, IActionCall, applySnapshot} from "../"
+import {getSnapshot, onAction, applySnapshot} from "../top-level-api"
+import {IActionCall} from "../core/action"
+
 const { connectViaExtension, extractState } = require("remotedev")
 
 export function connectReduxDevtools(model: any) {

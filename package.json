@@ -44,7 +44,8 @@
     "webpack": "^1.13.1"
   },
   "dependencies": {
-    "remotedev": "^0.2.2"
+    "remotedev": "^0.2.2",
+    "webpack-fail-plugin": "^1.0.6"
   },
   "peerDependencies": {
     "mobx": "^3.1.0"

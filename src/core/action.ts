@@ -1,5 +1,6 @@
 import {isObservable} from "mobx"
-import {isModel, resolve} from "../"
+import {isModel} from "./factories"
+import {resolve} from "../top-level-api"
 import {addHiddenFinalProp, invariant, isPlainObject, isPrimitive} from "../utils"
 import {Node, getNode, getRelativePath} from "./node"
 

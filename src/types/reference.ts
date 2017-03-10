@@ -1,9 +1,9 @@
 // TODO: move file to better place, not really a type
 
 import {IModel, IFactory, isFactory, isModel} from "../core/factories"
-import {resolve} from "../index"
+import {resolve} from "../top-level-api"
 import {invariant, fail} from "../utils"
-import { getNode, getRelativePath } from "../core/node";
+import { getNode, getRelativePath } from "../core/node"
 
 export type IReferenceGetter<T> = (identifier: string, owner: IModel, propertyName: string) => T
 export type IReferenceSetter<T> = (value: T, owner: IModel, propertyName: string) => string
