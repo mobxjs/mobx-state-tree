@@ -1,6 +1,6 @@
-import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, IAction} from "mobx"
+import {action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, IAction, intercept, observe} from "mobx"
 import {nothing, invariant, isSerializable, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject} from "../utils"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
+import {Node, maybeNode, valueToSnapshot, getNode} from "../core/node"
 import {IFactory, isFactory, getFactory} from "../core/factories"
 import {createActionWrapper, createNonActionWrapper} from "../core/action"
 import {escapeJsonPath} from "../core/json-patch"
@@ -40,8 +40,9 @@ export class ObjectType extends ComplexType {
     }
 
     finalizeNewInstance(instance) {
+        intercept(instance, this.willChange as any)
+        observe(instance, this.didChange)
         this.finalizers.forEach(f => f(instance))
-        // TODO: Object.seal(instance) // don't allow new props to be added!
     }
 
     extractPropsFromBaseModel() {
@@ -94,7 +95,9 @@ export class ObjectType extends ComplexType {
         return maybeNode(instance[key], identity, nothing)
     }
 
-    willChange(node, change: IObjectWillChange): Object | null {
+    willChange(change: IObjectWillChange): IObjectWillChange | null {
+        // TODO: typecheck
+        const node = getNode(change.object)
         const {newValue} = change
         const oldValue = change.object[change.name]
         if (newValue === oldValue)
@@ -104,7 +107,8 @@ export class ObjectType extends ComplexType {
         return change
     }
 
-    didChange(node: Node, change: IObjectChange): void {
+    didChange(change: IObjectChange): void {
+        const node = getNode(change.object)
         switch (change.type) {
             case "update": return void node.emitPatch({
                 op: "replace",

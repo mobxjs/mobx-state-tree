@@ -32,8 +32,6 @@ export class Node {
         this.factory = factory
         this.target = initialState
 
-        intercept(this.target, ((c) => this.type.willChange(this, c)) as any)
-        observe(this.target, (c) => this.type.didChange(this, c))
         reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
@@ -302,7 +300,7 @@ export function maybeNode<T, R>(value: T & IModel, asNodeCb: (node: Node, value:
     }
 }
 
-export function getNode(value: IModel): Node {
+export function getNode(value: any): Node {
     if (hasNode(value))
         return value.$treenode
     else

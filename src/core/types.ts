@@ -55,8 +55,6 @@ export abstract class ComplexType extends Type {
     abstract applySnapshot(node: Node, target, snapshot)
     abstract getChildNodes(node: Node, target): [string, Node][]
     abstract getChildNode(node: Node, target, key): Node | null
-    abstract willChange(node: Node, change): Object | null
-    abstract didChange(node: Node, change): void
     abstract serialize(node: Node, target): any
     abstract applyPatchLocally(node: Node, target, subpath: string, patch: IJsonPatch): void
     abstract getChildFactory(key: string): IFactory<any, any>

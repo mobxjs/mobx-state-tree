@@ -1,5 +1,5 @@
-import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
+import {observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe} from "mobx"
+import {Node, maybeNode, valueToSnapshot, getNode} from "../core/node"
 import {isFactory, IFactory} from "../core/factories"
 import {identity, isPlainObject, nothing, isPrimitive} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
@@ -26,7 +26,9 @@ export class MapType extends ComplexType {
         return observable.shallowMap()
     }
 
-    finalizeNewInstance(instance) {
+    finalizeNewInstance(instance: ObservableMap<any>) {
+        intercept(instance, this.willChange as any)
+        observe(instance, this.didChange)
     }
 
     getChildNodes(_node: Node, target): [string, Node][] {
@@ -43,7 +45,9 @@ export class MapType extends ComplexType {
         return null
     }
 
-    willChange(node: Node, change: IMapWillChange<any>): Object | null {
+    willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
+        // TODO: check type
+        const node = getNode(change.object)
         switch (change.type) {
             case "update":
                 {
@@ -78,7 +82,8 @@ export class MapType extends ComplexType {
         return res
     }
 
-    didChange(node: Node, change: IMapChange<any>): void {
+    didChange(change: IMapChange<any>): void {
+        const node = getNode(change.object)
         switch (change.type) {
             case "update":
             case "add":

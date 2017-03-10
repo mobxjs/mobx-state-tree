@@ -1,5 +1,5 @@
-import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
+import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe} from "mobx"
+import {Node, maybeNode, valueToSnapshot, getNode} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
 import {IFactory, isFactory} from "../core/factories"
 import {identity, nothing} from "../utils"
@@ -22,7 +22,9 @@ export class ArrayType extends ComplexType {
         return observable.shallowArray()
     }
 
-    finalizeNewInstance(instance) {
+    finalizeNewInstance(instance: IObservableArray<any>) {
+        intercept(instance, this.willChange as any)
+        observe(instance, this.didChange)
     }
 
     getChildNodes(_: Node, target): [string, Node][] {
@@ -39,7 +41,9 @@ export class ArrayType extends ComplexType {
         return null
     }
 
-    willChange(node: Node, change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
+    willChange = (change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null => {
+        // TODO: verify type
+        const node = getNode(change.object)
         switch (change.type) {
             case "update":
                 const {newValue} = change
@@ -64,7 +68,8 @@ export class ArrayType extends ComplexType {
         return target.map(valueToSnapshot)
     }
 
-    didChange(node: Node, change: IArrayChange<any> | IArraySplice<any>): void {
+    didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
+        const node = getNode(change.object)
         switch (change.type) {
             case "update":
                 return void node.emitPatch({
