@@ -22,7 +22,6 @@ export function createActionWrapper(instance, key, action: Function) {
         function(...args: any[]) {
             const adm = getNode(instance)
             const runAction = () => {
-                // MWE: discuss: should not be allowed to return?
                 return action.apply(instance, args)
             }
             if (adm.isRunningAction()) {
