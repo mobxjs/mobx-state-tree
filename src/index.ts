@@ -1,4 +1,4 @@
-import {getNode, getRootNode} from "./core/node"
+import {getNode} from "./core/node"
 import {runInAction, observable} from "mobx"
 import {IJsonPatch} from "./core/json-patch"
 import {IDisposer, invariant} from "./utils"
@@ -164,6 +164,7 @@ export function recordPatches(subject: IModel): IPatchRecorder {
 
 /**
  * Dispatches an Action on a model instance. All middlewares will be triggered.
+ * Returns the value of the last actoin
  *
  * @export
  * @param {Object} target
@@ -171,12 +172,14 @@ export function recordPatches(subject: IModel): IPatchRecorder {
  * @param {IActionCallOptions} [options]
  * @returns
  */
-export function applyAction(target: IModel, action: IActionCall): void {
-    getNode(target).applyAction(action)
+export function applyAction(target: IModel, action: IActionCall): any {
+    return getNode(target).applyAction(action)
 }
 
 /**
  * Applies a series of actions in a single MobX transaction.
+ *
+ * Does not return any value
  *
  * @export
  * @param {Object} target
@@ -206,7 +209,7 @@ export function recordActions(subject: IModel): IActionRecorder {
     }
     let disposer = onAction(subject, (action, next) => {
         recorder.actions.push(action)
-        next()
+        return next()
     })
     return recorder
 }
@@ -298,7 +301,7 @@ export function getParent(target: IModel, strict: boolean = false): IModel {
  * @returns {*}
  */
 export function getRoot(target: IModel): IModel {
-    return getRootNode(getNode(target)).target
+    return getNode(target).root.target
 }
 
 /**

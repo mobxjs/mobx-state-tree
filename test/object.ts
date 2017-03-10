@@ -1,4 +1,4 @@
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, composeFactory} from "../"
+import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, composeFactory, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -136,7 +136,6 @@ test("it should emit action calls", (t) => {
 })
 
 test("it should apply action call", (t) => {
-    debugger
     const {Factory} = createTestFactories()
     const doc = Factory()
 
@@ -154,6 +153,7 @@ test("it should apply actions calls", (t) => {
 
     t.deepEqual(doc, {to: 'universe'})
 })
+
 
 // === COMPUTED VALUES ===
 test("it should have computed properties", (t) => {

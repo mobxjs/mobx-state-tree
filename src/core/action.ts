@@ -1,13 +1,7 @@
 import {isObservable} from "mobx"
-import {isModel, getFactory} from "../"
+import {isModel, resolve} from "../"
 import {addHiddenFinalProp, invariant, isPlainObject, isPrimitive} from "../utils"
-import {Node, getNode} from "./node"
-
-let _isRunningActionGlobally = false
-
-export function isRunningAction(): boolean {
-    return _isRunningActionGlobally
-}
+import {Node, getNode, getRelativePath} from "./node"
 
 export type IActionCall = {
     name: string;
@@ -22,58 +16,79 @@ export function createNonActionWrapper(instance, key, func) {
 }
 
 export function createActionWrapper(instance, key, action: Function) {
-    addHiddenFinalProp(instance, key, function(...args: any[]) {
-        const adm = getNode(instance)
-        const runAction = () => {
-            const res = action.apply(instance, args)
-            invariant(res === undefined, `action '${key}' should not return a value but got '${res}'`)
-        }
-        if (_isRunningActionGlobally) {
-            // an action is running, invoking this action
-            invariant(instance.isRunningAction(), `Action ${key} was invoked on ${instance.path}. However another action is already running, and this object is not part of the tree it is allowed to modify`)
-            runAction()
-        } else {
-            // an action is started!
-            try {
-                _isRunningActionGlobally = true
-                adm._isRunningAction = true
-                verifyArgumentsAreStringifyable(key, args)
-                adm.emitAction(
-                    adm,
-                    // TODO: convert args
-                    { name: key, path: "", args: args },
-                    runAction
-                )
-            } finally {
-                adm._isRunningAction = false
-                _isRunningActionGlobally = false
+    addHiddenFinalProp(
+        instance,
+        key,
+        function(...args: any[]) {
+            const adm = getNode(instance)
+            const runAction = () => {
+                return action.apply(instance, args)
+            }
+            if (adm.isRunningAction()) {
+                // an action is already running in this tree, invoking this action does not emit a new action
+                return runAction()
+            } else {
+                // start the action!
+                const root = adm.root
+                root._isRunningAction = true
+                try {
+                    return adm.emitAction(
+                        adm,
+                        {
+                            name: key,
+                            path: "",
+                            args: args.map((arg, index) => serializeArgument(adm, key, index, arg))
+                        },
+                        runAction
+                    )
+                } finally {
+                    root._isRunningAction = false
+                }
             }
         }
-    })
+    )
 }
 
-function verifyArgumentsAreStringifyable(actionName: string, args: any[]) {
-    args.forEach((arg, index) => {
-        if (isPrimitive(arg))
-            return
-        // Future work: could model arguments be made serializable, e.g. represent as relative path?
-        if (isModel(arg))
-            throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive or plain object, received a ${getFactory(arg).factoryName} model.`)
-        if (!isPlainObject(arg))
-            throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive or plain object, received a ${(arg && arg.constructor) ? arg.constructor.name : "Complex Object"}`)
-        if (isObservable(arg))
-            throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive or plain object, received an mobx observable.`)
-        try {
-            // MWE: there must be a better way....
-            JSON.stringify(arg)
-        } catch (e) {
-            throw new Error(`Argument ${index} that was passed to action '${actionName}' is not serializable.`)
-        }
-    })
+function serializeArgument(adm: Node, actionName: string, index: number, arg: any): any {
+    if (isPrimitive(arg))
+        return arg
+    if (isModel(arg)) {
+        const targetNode = getNode(arg)
+        if (adm.root !== targetNode.root)
+            throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
+        return ({
+            $ref: getRelativePath(adm, getNode(arg))
+        })
+    }
+    if (typeof arg === "function")
+        throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a function`)
+    if (typeof arg === "object" && !isPlainObject(arg))
+        throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg && arg.constructor) ? arg.constructor.name : "Complex Object"}`)
+    if (isObservable(arg))
+        throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received an mobx observable.`)
+    try {
+        // Check if serializable, cycle free etc...
+        // MWE: there must be a better way....
+        JSON.stringify(arg) // or throws
+        return arg
+    } catch (e) {
+        throw new Error(`Argument ${index} that was passed to action '${actionName}' is not serializable.`)
+    }
+}
+
+function deserializeArgument(adm: Node, value: any): any {
+    if (typeof value === "object") {
+        const keys = Object.keys(value)
+        if (keys.length === 1 && keys[0] === "$ref")
+            return resolve(adm.target, value.$ref)
+    }
+    return value
 }
 
 export function applyActionLocally(node: Node, instance, action: IActionCall) {
     invariant(typeof instance[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
-    // TODO: deserialize args
-    instance[action.name].apply(instance, action.args || [])
+    instance[action.name].apply(
+        instance,
+        action.args ? action.args.map(v => deserializeArgument(node, v)) : []
+    )
 }
