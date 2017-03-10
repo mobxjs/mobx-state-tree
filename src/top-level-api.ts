@@ -330,25 +330,13 @@ export function tryResolve(target: IModel, path: string): IModel | any {
  *
  *
  * @export
- * @param {Object} target
- * @returns {Object}
- */
-export function getFromEnvironment(target: IModel, key: string): any {
-    return getNode(target).getFromEnvironment(key)
-}
-
-/**
- *
- *
- * @export
  * @template T
  * @param {T} source
- * @param {*} [customEnvironment]
  * @returns {T}
  */
-export function clone<T extends IModel>(source: T, customEnvironment?: any): T {
+export function clone<T extends IModel>(source: T): T {
     const node = getNode(source)
-    return node.factory(node.snapshot, customEnvironment || node.environment) as T
+    return node.factory(node.snapshot) as T
 }
 
 /**
@@ -382,9 +370,9 @@ export function resetAppState() {
     appState.set(undefined)
 }
 
-export function initializeAppState<S, T>(factory: IFactory<S, T>, initialSnapshot?: S, environment?: Object) {
+export function initializeAppState<S, T>(factory: IFactory<S, T>, initialSnapshot?: S) {
     invariant(!appState, `Global app state was already initialized, use 'resetAppState' to reset it`)
-    appState.set(factory(initialSnapshot, environment))
+    appState.set(factory(initialSnapshot))
 }
 
 export function getAppState<T>(): T {

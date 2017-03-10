@@ -6,7 +6,7 @@ import {IFactory, IModel} from "./factories"
 export interface IType {
     name: string
     is(thing: IModel | any): boolean
-    create(snapshot, environment?): any
+    create(snapshot): any
     factory: IFactory<any, any> // TODO type
     describe(): string
 }
@@ -22,7 +22,7 @@ export abstract class Type implements IType { // TODO: generic for config and st
         this.factory = this.initializeFactory()
     }
 
-    abstract create(snapshot, environment?): any
+    abstract create(snapshot): any
     abstract is(thing): boolean
     abstract describe(): string
 
@@ -40,9 +40,9 @@ export abstract class Type implements IType { // TODO: generic for config and st
 }
 
 export abstract class ComplexType extends Type {
-    create(snapshot, environment?) {
+    create(snapshot) {
         const instance = this.createNewInstance()
-        const node = new Node(instance, environment, this.factory)
+        const node = new Node(instance, this.factory)
         this.finalizeNewInstance(instance)
         if (arguments.length > 0)
             node.applySnapshot(snapshot)

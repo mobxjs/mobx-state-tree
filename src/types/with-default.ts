@@ -17,7 +17,7 @@ export class DefaultValue extends Type {
         return "(" + this.type.type.describe() + " = " + JSON.stringify(this.defaultValue) + ")"
     }
 
-    create(value, environment?) {
+    create(value) {
         return typeof value === "undefined" ? this.type(this.defaultValue) : this.type(value)
     }
 

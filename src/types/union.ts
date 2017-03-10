@@ -18,12 +18,12 @@ export class Union extends Type {
         return "(" + this.types.map(factory => factory.type.describe()).join(" | ") + ")"
     }
 
-    create(value, environment?) {
+    create(value) {
         invariant(this.is(value), `Value ${JSON.stringify(value)} is not assignable to union ${this.name}`)
 
         // try the dispatcher, if defined
         if (this.dispatcher !== null) {
-            return this.dispatcher(value)(value, environment)
+            return this.dispatcher(value)(value)
         }
 
         // find the most accomodating type

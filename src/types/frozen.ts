@@ -26,7 +26,7 @@ export class Frozen extends Type {
         return "frozen"
     }
 
-    create(value, environment?) {
+    create(value) {
         invariant(isSerializable(value), "Given value should be serializable")
         // deep freeze the object/array
         return isMutable(value) ? freeze(value) : value

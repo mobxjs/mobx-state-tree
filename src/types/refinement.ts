@@ -19,9 +19,9 @@ export class Refinement extends Type {
         return this.name
     }
 
-    create(value, environment?) {
+    create(value) {
         // create the child type
-        const inst = this.type(value, environment)
+        const inst = this.type(value)
         const snapshot = hasNode(inst) ? getNode(inst).snapshot : inst
 
         // check if pass the predicate

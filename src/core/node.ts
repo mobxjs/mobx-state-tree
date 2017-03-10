@@ -19,23 +19,20 @@ import {ObjectType} from "../types/object"
 // TODO: make Node more like a struct, extract the methods to snapshots.js, actions.js etc..
 export class Node {
     readonly target: any
-    readonly environment: any
     @observable _parent: Node | null = null
     readonly factory: IFactory<any, any>
-    private  interceptDisposer: IDisposer
     readonly snapshotSubscribers: ((snapshot) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     readonly actionSubscribers: IActionHandler[] = []
     _isRunningAction = false // only relevant for root
 
-    constructor(initialState: any, environment, factory: IFactory<any, any>) {
+    constructor(initialState: any, factory: IFactory<any, any>) {
         invariant(factory.type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
         this.factory = factory
-        this.environment = environment
         this.target = initialState
 
-        this.interceptDisposer = intercept(this.target, ((c) => this.type.willChange(this, c)) as any)
+        intercept(this.target, ((c) => this.type.willChange(this, c)) as any)
         observe(this.target, (c) => this.type.didChange(this, c))
         reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
@@ -268,14 +265,6 @@ export class Node {
 
     onAction(listener: (action: IActionCall, next: () => void) => void): IDisposer {
         return registerEventHandler(this.actionSubscribers, listener)
-    }
-
-    getFromEnvironment(key: string): any {
-        if (this.environment && this.environment.hasOwnProperty(key))
-            return this.environment[key]
-        if (this.isRoot)
-            return fail(`Undefined environment variable '${key}'`)
-        return this.parent!.getFromEnvironment(key)
     }
 
     getChildNode(subpath: string): Node | null {

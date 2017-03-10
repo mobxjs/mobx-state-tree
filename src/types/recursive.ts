@@ -11,8 +11,8 @@ class Recursive extends Type {
         this.type = def(this.factory)
     }
 
-    create(snapshot, environment?) {
-        return this.type(snapshot, environment)
+    create(snapshot) {
+        return this.type(snapshot)
     }
 
     is(thing: any): boolean {
