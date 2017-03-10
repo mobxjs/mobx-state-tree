@@ -6,7 +6,7 @@ import {createArrayFactory} from "./array"
 import {primitiveFactory} from "./primitive"
 import {primitiveFactory as primitive} from "./primitive"
 import {createModelFactory as struct, composeFactory as extend} from "./object"
-import {referenceTo} from "./reference"
+import {reference} from "./reference"
 import {createUnionFactory as union} from "./union"
 import {createDefaultValueFactory as withDefault} from "./with-default"
 import {createLiteralFactory as literal} from "./literal"
@@ -42,7 +42,7 @@ export const types = {
     primitive,
     struct,
     extend,
-    referenceTo,
+    reference,
     union,
     withDefault,
     literal,

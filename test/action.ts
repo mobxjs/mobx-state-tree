@@ -56,7 +56,7 @@ const Customer = createFactory({
 })
 
 const Order = createFactory({
-    customer: types.referenceTo(Customer),
+    customer: types.reference(Customer),
     setCustomer: action(function (customer) {
         this.customer = customer
     })
@@ -94,7 +94,7 @@ test("it should be possible to pass a complex object", t => {
 
     t.deepEqual(
         recorder.actions,
-        [{ "name": "setCustomer", "path": "/orders/0", "args": [{ "$path": "/../../customers/0" }] }]
+        [{ "name": "setCustomer", "path": "/orders/0", "args": [{ "$ref": "/../../customers/0" }] }]
     )
 
     const store2  = createTestStore()

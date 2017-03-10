@@ -11,19 +11,19 @@ export type IReferenceSetter<T> = (value: T, owner: IModel, propertyName: string
 export interface IReferenceDescription {
     getter: IReferenceGetter<any>
     setter: IReferenceSetter<any>
-    isReferenceTo: true
+    isReference: true
 }
 
-export function referenceTo<T>(path: string): T;
-export function referenceTo<T>(getter: IReferenceGetter<T>, setter?: IReferenceSetter<T>): T;
-export function referenceTo<T>(factory: IFactory<any, T>): T;
-export function referenceTo(arg1, arg2?) {
+export function reference<T>(path: string): T;
+export function reference<T>(getter: IReferenceGetter<T>, setter?: IReferenceSetter<T>): T;
+export function reference<T>(factory: IFactory<any, T>): T;
+export function reference(arg1, arg2?) {
     if (isFactory(arg1))
         return createGenericRelativeReference(arg1)
     if (typeof arg1 === "string")
         return createRelativeReferenceTo(arg1)
     return {
-        isReferenceTo: true,
+        isReference: true,
         getter: arg1,
         setter: arg2 || unwritableReference
     } as IReferenceDescription
@@ -33,7 +33,7 @@ function createRelativeReferenceTo(path: string) {
     // TODO: remove this option?
     const targetIdAttribute = path.split("/").slice(-1)[0]
     path = path.split("/").slice(0, -1).join("/")
-    return referenceTo(
+    return reference(
         (identifier: string, owner: IModel) => resolve(owner, `${path}/${identifier}`),
         (value: any, owner: IModel, name)   => {
             invariant(!value || (getNode(value).root === getNode(owner).root), `The value assigned to the reference '${name}' should already be part of the same model tree`)
@@ -43,7 +43,8 @@ function createRelativeReferenceTo(path: string) {
 }
 
 function createGenericRelativeReference(factory: IFactory<any, any>) {
-    return referenceTo(
+    // TODO: store as {$ref: "..."} instead of just the string
+    return reference(
         (identifier: string, owner: IModel) => {
             if (identifier === null || identifier === undefined)
                 return identifier
@@ -87,5 +88,5 @@ function unwritableReference(_, owner, propertyName) {
 }
 
 export function isReferenceFactory(thing) {
-    return thing.isReferenceTo === true
+    return thing.isReference === true
 }

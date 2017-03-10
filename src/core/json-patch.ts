@@ -10,6 +10,9 @@ export interface IJsonPatch {
     value?: any
 }
 
+
+// TODO: use https://www.npmjs.com/package/json-pointer
+
 /**
  * escape slashes and backslashes
  * http://tools.ietf.org/html/rfc6901

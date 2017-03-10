@@ -57,7 +57,7 @@ function serializeArgument(adm: Node, actionName: string, index: number, arg: an
         if (adm.root !== targetNode.root)
             throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
         return ({
-            $path: getRelativePath(adm, getNode(arg))
+            $ref: getRelativePath(adm, getNode(arg))
         })
     }
     if (typeof arg === "function")
@@ -79,8 +79,8 @@ function serializeArgument(adm: Node, actionName: string, index: number, arg: an
 function deserializeArgument(adm: Node, value: any): any {
     if (typeof value === "object") {
         const keys = Object.keys(value)
-        if (keys.length === 1 && keys[0] === "$path")
-            return resolve(adm.target, value.$path)
+        if (keys.length === 1 && keys[0] === "$ref")
+            return resolve(adm.target, value.$ref)
     }
     return value
 }

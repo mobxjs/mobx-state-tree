@@ -9,7 +9,7 @@
     "quick-build": "tsc",
     "webpack": "webpack -p",
     "test": "tsc && tsc -p test/ && ava",
-    "watch": "concurrently 'tsc --watch' 'tsc --watch -p test' 'ava --watch'",
+    "watch": "concurrently --kill-others --names 'build,build-tests,test-runner' 'tsc --watch' 'tsc --watch -p test' --raw  'ava --watch'",
     "prepublish": "npm run build && npm run build-docs",
     "coverage": "tsc && tsc -p test/ && nyc ava && nyc report -r html && nyc report -r lcov",
     "build-docs": "npm run quick-build && documentation readme lib/index.js --github --section API",
