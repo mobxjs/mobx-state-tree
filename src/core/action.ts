@@ -15,7 +15,7 @@ export type IActionHandler  = (actionCall: IActionCall, next: () => void) => voi
 export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
 
-    return function() {
+    const actionInvoker = function () {
         const adm = getNode(this)
         if (adm.isRunningAction()) {
             // an action is already running in this tree, invoking this action does not emit a new action
@@ -40,6 +40,10 @@ export function createActionInvoker(name: string, fn: Function) {
             }
         }
     }
+
+    // This construction helps producing a better function name in the stack trace, but could be optimized
+    // away in prod builds, and `invoker` be returned directly
+    return new Function("f", `return function ${name}() { return f.apply(this, arguments)}`)(actionInvoker)
 }
 
 
