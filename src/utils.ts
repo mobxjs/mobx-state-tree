@@ -95,3 +95,7 @@ export function argsToArray(args: IArguments): any [] {
         res[i] = args[i]
     return res
 }
+
+export function createNamedFunction(name: string, fn: Function) {
+    return new Function("f", `return function ${name}() { return f.apply(this, arguments)}`)(fn)
+}

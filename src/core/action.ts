@@ -1,7 +1,7 @@
 import { action as mobxAction, isObservable } from "mobx"
 import {isModel} from "./factories"
 import {resolve} from "../top-level-api"
-import {invariant, isPlainObject, isPrimitive, argsToArray} from "../utils"
+import {invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction} from "../utils"
 import {Node, getNode, getRelativePath} from "./node"
 
 export type IActionCall = {
@@ -43,7 +43,7 @@ export function createActionInvoker(name: string, fn: Function) {
 
     // This construction helps producing a better function name in the stack trace, but could be optimized
     // away in prod builds, and `invoker` be returned directly
-    return new Function("f", `return function ${name}() { return f.apply(this, arguments)}`)(actionInvoker)
+    return createNamedFunction(name, actionInvoker)
 }
 
 

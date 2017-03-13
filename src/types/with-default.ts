@@ -14,7 +14,9 @@ export class DefaultValue extends Type {
     }
 
     describe() {
-        return "(" + this.type.type.describe() + " = " + JSON.stringify(this.defaultValue) + ")"
+        // return "(" + this.type.type.describe() + " = " + JSON.stringify(this.defaultValue) + ")"
+        // MWE: discuss a default value is not part of the type description? (unlike a literal)
+        return this.type.type.describe()
     }
 
     create(value) {

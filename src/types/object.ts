@@ -10,10 +10,9 @@ import { Property } from "./property-types/property"
 import { ComputedProperty } from "./property-types/computed-property"
 import { ValueProperty } from "./property-types/value-property"
 import { ActionProperty } from "./property-types/action-property"
-
+import { getSnapshot } from "../top-level-api"
 
 export interface IObjectInstance {
-    $objectprops: { [key: string]: any }
     $treenode: Node
 }
 
@@ -45,6 +44,12 @@ export class ObjectType extends ComplexType {
         this.baseModel = baseModel
         // TODO: verify valid name
         this.modelConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
+        this.modelConstructor.prototype.toString = function() {
+            return `${name}${JSON.stringify(getSnapshot(this))}`
+        }
+        this.modelConstructor.prototype.toJSON = function() {
+            return getSnapshot(this)
+        }
         this.parseModelProps()
         this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
     }
@@ -56,9 +61,9 @@ export class ObjectType extends ComplexType {
     }
 
     finalizeNewInstance(instance) {
-        this.forAllProps(prop => prop.initialize(instance))
         intercept(instance, this.willChange as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
+        this.forAllProps(prop => prop.initialize(instance))
     }
 
     willChange = (change: IObjectWillChange): IObjectWillChange | null => {
@@ -171,8 +176,9 @@ export class ObjectType extends ComplexType {
 
 export type IBaseModelDefinition<S extends Object, T> = {[K in keyof T]: IFactory<any, T[K]> | T[K] & IAction | T[K]}
 
-export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<S, T>): IFactory<S, T>
-export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<S, T>): IFactory<S, T>
+// MWE: somehow get  & { toJSON(): S } in here...?
+export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<S, T>): IFactory<S, T & { toJSON(): any }>
+export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<S, T>): IFactory<S, T & { toJSON(): any }>
 export function createModelFactory(arg1, arg2?) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1

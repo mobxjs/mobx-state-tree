@@ -7,7 +7,6 @@ test("it should resolve to the parent instance", (t) => {
         article_id: 0
     })
 
-    debugger;
     const Document = createFactory({
         rows: types.array(Row)
     })
@@ -72,19 +71,18 @@ test("it should resolve to the parent object instance", (t) => {
 
 // getRoot
 test("it should resolve to the root of an object", (t) => {
-    const Row = createFactory({
+    const Row = createFactory("Row", {
         article_id: 0
     })
 
-    const Document = createFactory({
+    const Document = createFactory("Document", {
         rows: types.array(Row)
     })
 
     const doc = Document()
     const row = Row()
     doc.rows.push(row)
-
-    t.deepEqual(getRoot(row), doc)
+    t.is(getRoot(row), doc)
 })
 
 // getPath

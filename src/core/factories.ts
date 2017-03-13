@@ -9,7 +9,7 @@ export interface IFactory<S, T> {
     (snapshot?: S, env?: Object): T & IModel
     factoryName: string,
     is: ITypeChecker
-    isFactory: boolean // TODO: rename to isFactory
+    isFactory: boolean
     type: IType
 }
 

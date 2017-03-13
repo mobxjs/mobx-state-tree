@@ -42,13 +42,14 @@ const createTestFactories = () => {
 test("it should create a factory", (t) => {
     const {Factory} = createTestFactories()
 
-    t.deepEqual(Factory(), {to: 'world'})
+    t.deepEqual(getSnapshot(Factory()) as any, {to: 'world'})
+    t.deepEqual(Factory().toString(), "AnonymousModel{\"to\":\"world\"}")
 })
 
 test("it should restore the state from the snapshot", (t) => {
     const {Factory} = createTestFactories()
 
-    t.deepEqual(Factory({to: 'universe'}), { to: 'universe' })
+    t.deepEqual(Factory({to: 'universe'}).toJSON(), { to: 'universe' })
 })
 
 // === SNAPSHOT TESTS ===
@@ -70,7 +71,7 @@ test("it should apply snapshots", (t) => {
 
     applySnapshot(doc, {to: 'universe'})
 
-    t.deepEqual(doc, {to: 'universe'})
+    t.deepEqual(doc.toJSON(), {to: 'universe'})
 })
 
 test("it should return a snapshot", (t) => {
@@ -101,7 +102,7 @@ test("it should apply a patch", (t) => {
 
     applyPatch(doc, {op: "replace", path: "/to", value: "universe"})
 
-    t.deepEqual(doc, {to: 'universe'})
+    t.deepEqual(doc.toJSON(), {to: 'universe'})
 })
 
 test("it should apply patches", (t) => {
@@ -110,7 +111,7 @@ test("it should apply patches", (t) => {
 
     applyPatches(doc, [{op: "replace", path: "/to", value: "mars"}, {op: "replace", path: "/to", value: "universe"}])
 
-    t.deepEqual(doc, {to: 'universe'})
+    t.deepEqual(doc.toJSON(), {to: 'universe'})
 })
 
 // === ACTIONS TESTS ===
@@ -120,7 +121,7 @@ test("it should call actions correctly", (t) => {
 
     doc.setTo('universe')
 
-    t.deepEqual(doc, {to: 'universe'})
+    t.deepEqual(doc.toJSON(), {to: 'universe'})
 })
 
 test("it should emit action calls", (t) => {
@@ -141,7 +142,7 @@ test("it should apply action call", (t) => {
 
     applyAction(doc, {name: "setTo", path: "", args: ["universe"]})
 
-    t.deepEqual(doc, {to: 'universe'})
+    t.deepEqual(doc.toJSON(), {to: 'universe'})
 })
 
 
@@ -151,7 +152,7 @@ test("it should apply actions calls", (t) => {
 
     applyActions(doc, [{name: "setTo", path: "", args: ["mars"]}, {name: "setTo", path: "", args: ["universe"]}])
 
-    t.deepEqual(doc, {to: 'universe'})
+    t.deepEqual(doc.toJSON(), {to: 'universe'})
 })
 
 
@@ -173,7 +174,7 @@ test("it should throw if snapshot has computed properties", (t) => {
         const doc = ComputedFactory({area: 3})
     })
 
-    t.is(error.message, "[mobx-state-tree] Snapshot {\"area\":3} is not assignable to type unnamed-object-factory. Expected { width: primitive; height: primitive } instead.")
+    t.is(error.message, "[mobx-state-tree] Snapshot {\"area\":3} is not assignable to type AnonymousModel. Expected { width: primitive; height: primitive } instead.")
 })
 
 // === COMPOSE FACTORY ===
@@ -181,7 +182,7 @@ test("it should compose factories", (t) => {
     const {BoxFactory, ColorFactory} = createTestFactories()
     const ComposedFactory = composeFactory(BoxFactory, ColorFactory)
 
-    t.deepEqual(ComposedFactory(), {width: 0, height: 0, color: "#FFFFFF"})
+    t.deepEqual(ComposedFactory().toJSON(), {width: 0, height: 0, color: "#FFFFFF"})
 })
 
 

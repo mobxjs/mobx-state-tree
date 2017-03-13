@@ -46,5 +46,5 @@ test("it should throw if default value is invalid snapshot", t => {
         })
     })
 
-    t.is(error.message, '[mobx-state-tree] Default value [{"wrongProp":true}] is not assignable to type unnamed-object-factory[]. Expected "{ name: primitive; quantity: primitive }[]"')
+    t.is(error.message, '[mobx-state-tree] Default value [{"wrongProp":true}] is not assignable to type AnonymousModel[]. Expected "{ name: primitive; quantity: primitive }[]"')
 })

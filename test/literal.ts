@@ -12,7 +12,7 @@ test("it should allow only primitives", t => {
 })
 
 test("it should throw if a different type is given", t => {
-    const Factory = createFactory({
+    const Factory = createFactory("TestFactory", {
         shouldBeOne: types.literal(1)
     })
 
@@ -20,5 +20,5 @@ test("it should throw if a different type is given", t => {
         const doc = Factory({ shouldBeOne: 2 })
     })
 
-    t.is(error.message, '[mobx-state-tree] Snapshot {"shouldBeOne":2} is not assignable to type unnamed-object-factory. Expected { shouldBeOne: 1 } instead.')
+    t.is(error.message, '[mobx-state-tree] Snapshot {"shouldBeOne":2} is not assignable to type TestFactory. Expected { shouldBeOne: 1 } instead.')
 })
