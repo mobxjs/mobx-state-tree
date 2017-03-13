@@ -1,16 +1,18 @@
-import { action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, IAction, intercept, observe } from "mobx"
+import { action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, IAction, intercept, observe, computed } from "mobx"
 import { nothing, invariant, isSerializable, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
 import { Node, maybeNode, valueToSnapshot, getNode } from "../core/node"
 import { IFactory, isFactory, getFactory } from "../core/factories"
-import { createActionWrapper, createNonActionWrapper } from "../core/action"
-import { escapeJsonPath } from "../core/json-patch"
 import { isReferenceFactory, createReferenceProps } from "./reference"
 import { primitiveFactory } from "./primitive"
 import { ComplexType } from "../core/types"
 import { createDefaultValueFactory } from "./with-default"
+import { Property } from "./property-types/property"
+import { ComputedProperty } from "./property-types/computed-property"
+import { ValueProperty } from "./property-types/value-property"
+import { ActionProperty } from "./property-types/action-property"
 
 
-interface IObjectInstance {
+export interface IObjectInstance {
     $objectprops: { [key: string]: any }
     $treenode: Node
 }
@@ -20,131 +22,6 @@ interface IObjectFactoryConfig {
     baseModel: Object
 }
 
-abstract class ObjectProperty {
-    constructor(public name: string) {
-        // empty
-    }
-
-    abstract initializePropDescriptors(baseProps: PropertyDescriptorMap)
-    abstract initialize(targetInstance: IObjectInstance)
-
-    abstract serialize(instance: IObjectInstance, snapshot): any
-    abstract deserialize(instance: IObjectInstance, snapshot)
-    abstract isValidSnapshot(snapshot): boolean
-}
-
-class ValueProperty extends ObjectProperty {
-    constructor(propertyName, public factory: IFactory<any, any>) {
-        super(propertyName)
-    }
-
-    initializePropDescriptors(props) {
-        const self = this
-        props[this.name] = {
-            configurable: false,
-            enumerable: true,
-            get: function () {
-                return self.get(this)
-            },
-            set: function (v) {
-                self.set(this, v)
-            }
-        }
-    }
-
-    initialize(targetInstance) {
-        extendShallowObservable(targetInstance.$objectprops, {
-            [this.name]: this.factory()
-        })
-    }
-
-    get(instance: IObjectInstance) {
-        return instance.$objectprops[this.name]
-    }
-
-    set(instance, newValue) {
-        const node = getNode(instance)
-        const oldValue = this.get(instance)
-        if (newValue === oldValue)
-            return
-
-        // TODO check type
-        // TODO: check if tree is editable
-        maybeNode(oldValue, adm => adm.setParent(null))
-        newValue = node.prepareChild(this.name, newValue)
-
-        instance.$objectprops[this.name] = newValue
-
-        node.emitPatch({
-            op: "replace",
-            path: "/" + escapeJsonPath(this.name),
-            value: valueToSnapshot(newValue)
-        }, node)
-    }
-
-    serialize(instance, snapshot) {
-        snapshot[this.name] = valueToSnapshot(instance[this.name])
-    }
-
-    deserialize(instance, snapshot) {
-        maybeNode(
-            instance[this.name],
-            propertyNode => { propertyNode.applySnapshot(snapshot[this.name]) },
-            () => { instance[this.name] = snapshot[this.name] }
-        )
-    }
-
-    instantiate(target) {
-        extendShallowObservable(target, {
-            [this.name]: this.factory()
-        })
-    }
-
-    isValidSnapshot(snapshot) {
-        return this.factory.is(snapshot[this.name])
-    }
-}
-
-// class ComputedProperty extends ObjectProperty {
-//     constructor(propertyName, public getter: () => any, public setter?: (v) => void) {
-//         super(propertyName)
-//     }
-
-//     get(instance) {
-//         return instance[this.name]
-//     }
-
-//     set(instance, v) {
-//         // TODO check type
-//         instance[this.name] = v
-//     }
-
-//     serialize(instance, snapshot) {
-//         snapshot[this.name] = valueToSnapshot(instance[this.name])
-//     }
-
-//     deserialize(instance, snapshot) {
-//         maybeNode(
-//             instance[this.name],
-//             propertyNode => { propertyNode.applySnapshot(snapshot[this.name]) },
-//             () => { instance[this.name] = snapshot[this.name] }
-//         )
-//     }
-
-//     instantiate(target) {
-//         extendShallowObservable(target, {
-//             [this.name]: this.factory()
-//         })
-//     }
-// }
-
-// class ActionProperty extends ObjectProperty {
-//     constructor(name: string, public fn: Function) {
-//         super(name)
-//     }
-// }
-
-
 export class ObjectType extends ComplexType {
     isObjectFactory = true
 
@@ -153,68 +30,51 @@ export class ObjectType extends ComplexType {
      */
     baseModel: any
 
-    namedConstructor: new () => any
+    modelConstructor: new () => any
 
     /**
      * Parsed description of all properties
      */
     private props: {
-        [key: string]: ObjectProperty
+        [key: string]: Property
     } = {}
-
-    /**
-     * Base properties to quickly create new objects
-     */
-    baseProperties: PropertyDescriptorMap
 
     constructor(name: string, baseModel) {
         super(name)
         Object.seal(baseModel) // make sure nobody messes with it
-
         this.baseModel = baseModel
         // TODO: verify valid name
-        this.namedConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
-        this.baseProperties = {}
-        this.extractPropsFromBaseModel()
-        this.forAllProps(prop => prop.initializePropDescriptors(this.baseProperties))
-    }
-
-    private forAllProps(fn: (o: ObjectProperty) => void) {
-        Object.keys(this.props).forEach(key => fn(this.props[key]))
-    }
-
-    describe() {
-        // optimization: don't evaluate lazily
-        return "{ " + Object.keys(this.props).map(key => {
-            const prop = this.props[key]
-            return prop instanceof ValueProperty
-                ? key + ": " + prop.factory.type.describe()
-                : ""
-        }).filter(Boolean).join("; ") + " }"
+        this.modelConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
+        this.parseModelProps()
+        this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
     }
 
     createNewInstance() {
-        const instance = new this.namedConstructor()
-        Object.defineProperty(instance, "$objectprops", {
-            enumerable: false,
-            configurable: false,
-            writable: false,
-            value: observable.shallowObject({}, )
-        })
-        Object.defineProperties(instance, this.baseProperties) // TODO: or, in constructor, do Object.defineProperty(this.namedConstructor.prototype, baseProperties) ?
+        const instance = new this.modelConstructor()
+        extendShallowObservable(instance, {})
         return instance as Object
     }
 
     finalizeNewInstance(instance) {
         this.forAllProps(prop => prop.initialize(instance))
+        intercept(instance, this.willChange as any /* wait for typing fix in mobx */)
+        observe(instance, this.didChange)
     }
 
-    extractPropsFromBaseModel() {
+    willChange = (change: IObjectWillChange): IObjectWillChange | null => {
+        return this.props[change.name].willChange(change)
+    }
+
+    didChange = (change: IObjectChange) => {
+        this.props[change.name].didChange(change)
+    }
+
+    parseModelProps() {
         const baseModel = this.baseModel
         for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
             const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
             if ("get" in descriptor) {
-// TODO:                this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
+                this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
                 continue
             }
 
@@ -228,7 +88,7 @@ export class ObjectType extends ComplexType {
             } else if (isReferenceFactory(value)) {
                 // TODO:               addInitializer(t => extendShallowObservable(t, createReferenceProps(key, value)))
             } else if (isAction(value)) {
-// TODO:                this.props[key] = new ActionProperty(key, value)
+                this.props[key] = new ActionProperty(key, value)
             } else if (typeof value === "function") {
                 // TODO: threat as action
                 // addInitializer(t => createNonActionWrapper(t, key, value))
@@ -291,6 +151,21 @@ export class ObjectType extends ComplexType {
             if (!this.props[key].isValidSnapshot(snapshot))
                 return false
         return true
+    }
+
+    private forAllProps(fn: (o: Property) => void) {
+        // optimization: persists keys or loop more efficiently
+        Object.keys(this.props).forEach(key => fn(this.props[key]))
+    }
+
+    describe() {
+        // optimization: cache
+        return "{ " + Object.keys(this.props).map(key => {
+            const prop = this.props[key]
+            return prop instanceof ValueProperty
+                ? key + ": " + prop.factory.type.describe()
+                : ""
+        }).filter(Boolean).join("; ") + " }"
     }
 }
 

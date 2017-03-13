@@ -88,3 +88,10 @@ const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
 export function hasOwnProperty(object: Object, propName: string) {
     return prototypeHasOwnProperty.call(object, propName)
 }
+
+export function argsToArray(args: IArguments): any [] {
+    const res = new Array(args.length)
+    for (let i = 0; i < args.length; i++)
+        res[i] = args[i]
+    return res
+}

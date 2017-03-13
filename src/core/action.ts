@@ -1,7 +1,7 @@
-import {isObservable} from "mobx"
+import { action as mobxAction, isObservable } from "mobx"
 import {isModel} from "./factories"
 import {resolve} from "../top-level-api"
-import {addHiddenFinalProp, invariant, isPlainObject, isPrimitive} from "../utils"
+import {invariant, isPlainObject, isPrimitive, argsToArray} from "../utils"
 import {Node, getNode, getRelativePath} from "./node"
 
 export type IActionCall = {
@@ -12,43 +12,36 @@ export type IActionCall = {
 
 export type IActionHandler  = (actionCall: IActionCall, next: () => void) => void
 
-export function createNonActionWrapper(instance, key, func) {
-    addHiddenFinalProp(instance, key, func.bind(instance))
-}
+export function createActionInvoker(name: string, fn: Function) {
+    const action = mobxAction(name, fn)
 
-export function createActionWrapper(instance, key, action: Function) {
-    addHiddenFinalProp(
-        instance,
-        key,
-        function(...args: any[]) {
-            const adm = getNode(instance)
-            const runAction = () => {
-                return action.apply(instance, args)
-            }
-            if (adm.isRunningAction()) {
-                // an action is already running in this tree, invoking this action does not emit a new action
-                return runAction()
-            } else {
-                // start the action!
-                const root = adm.root
-                root._isRunningAction = true
-                try {
-                    return adm.emitAction(
-                        adm,
-                        {
-                            name: key,
-                            path: "",
-                            args: args.map((arg, index) => serializeArgument(adm, key, index, arg))
-                        },
-                        runAction
-                    )
-                } finally {
-                    root._isRunningAction = false
-                }
+    return function() {
+        const adm = getNode(this)
+        if (adm.isRunningAction()) {
+            // an action is already running in this tree, invoking this action does not emit a new action
+            return action.apply(this, arguments)
+        } else {
+            // start the action!
+            const root = adm.root
+            const args = arguments
+            root._isRunningAction = true
+            try {
+                return adm.emitAction(
+                    adm,
+                    {
+                        name: name,
+                        path: "",
+                        args: argsToArray(args).map((arg, index) => serializeArgument(adm, name, index, arg))
+                    },
+                    () => action.apply(this, args)
+                )
+            } finally {
+                root._isRunningAction = false
             }
         }
-    )
+    }
 }
+
 
 function serializeArgument(adm: Node, actionName: string, index: number, arg: any): any {
     if (isPrimitive(arg))
