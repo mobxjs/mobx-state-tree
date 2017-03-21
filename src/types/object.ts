@@ -1,8 +1,9 @@
+import { TransformedProperty } from './property-types/transformed-property';
 import { action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, IAction, intercept, observe, computed } from "mobx"
 import { nothing, invariant, isSerializable, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
 import { Node, maybeNode, valueToSnapshot, getNode } from "../core/node"
 import { IFactory, isFactory, getFactory } from "../core/factories"
-import { isReferenceFactory, createReferenceProps } from "./reference"
+import { isReferenceFactory } from "./reference"
 import { primitiveFactory } from "./primitive"
 import { ComplexType } from "../core/types"
 import { createDefaultValueFactory } from "./with-default"
@@ -91,7 +92,7 @@ export class ObjectType extends ComplexType {
             } else if (isFactory(value)) {
                 this.props[key] = new ValueProperty(key, value)
             } else if (isReferenceFactory(value)) {
-                // TODO:               addInitializer(t => extendShallowObservable(t, createReferenceProps(key, value)))
+                this.props[key] =  new TransformedProperty(key, value.setter, value.getter)
             } else if (isAction(value)) {
                 this.props[key] = new ActionProperty(key, value)
             } else if (typeof value === "function") {

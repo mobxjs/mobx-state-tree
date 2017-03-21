@@ -70,7 +70,9 @@ const OrderStore = createFactory({
 function createTestStore() {
     return OrderStore({
         customers: [{ name: "Mattia" }],
-        orders: [{}]
+        orders: [{
+            customer: null
+        }]
     })
 }
 
@@ -88,7 +90,7 @@ test("it should be possible to pass a complex object", t => {
             name: "Mattia"
         }],
         orders: [{
-            // TODO: customer: "../../customers/0"
+            customer: "../../customers/0"
         }]
     })
 

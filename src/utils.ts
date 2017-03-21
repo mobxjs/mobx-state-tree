@@ -66,6 +66,15 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
     })
 }
 
+export function addHiddenWritableProp(object: any, propName: string, value: any) {
+    Object.defineProperty(object, propName, {
+        enumerable: false,
+        writable: true,
+        configurable: true,
+        value
+    })
+}
+
 export function addReadOnlyProp(object: any, propName: string, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: true,
