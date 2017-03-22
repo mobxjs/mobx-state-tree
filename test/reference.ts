@@ -1,8 +1,8 @@
-import { createFactory, action, recordActions, types, getSnapshot } from "../"
+import { createFactory, types, getSnapshot } from "../"
 import { test } from "ava"
 
 
-test("it should support relative paths", t => {
+test("it should support generic relative paths", t => {
     const User = createFactory({
         name: types.primitive()
     })
@@ -12,7 +12,7 @@ test("it should support relative paths", t => {
     })
 
     const store = UserStore({
-        user: "users/17",
+        user: { $ref: "users/17" },
         users: {
             "17": { name: "Michel" },
             "18": { name: "Veria" }
@@ -29,7 +29,7 @@ test("it should support relative paths", t => {
     store.users.get("18").name = "Noa" as any // TODO: improve typings.
     t.is(store.user.name as string, "Noa") // TODO: improve typings
 
-    t.deepEqual(getSnapshot(store), {user: "users/18", "users": {"17": {name: "Michel"}, "18": {name: "Noa"}}} as any) // TODO: better typings
+    t.deepEqual(getSnapshot(store), {user: { $ref: "users/18" }, "users": {"17": {name: "Michel"}, "18": {name: "Noa"}}} as any) // TODO: better typings
 })
 
 test("it should support prefixed paths in maps", t => {

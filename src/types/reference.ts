@@ -4,6 +4,10 @@ import {resolve} from "../top-level-api"
 import {invariant, fail} from "../utils"
 import { getNode, getRelativePath } from "../core/node"
 
+export interface IReference {
+    $ref: string
+}
+
 export interface IReferenceDescription {
     getter: (value: any) => any
     setter: (value: any) => any
@@ -18,15 +22,16 @@ export function reference<T>(factory: IFactory<any, T>, basePath?: string): T {
 }
 
 function createGenericRelativeReference(factory: IFactory<any, any>): IReferenceDescription {
-    // TODO: store as {$ref: "..."} instead of just the string
     return {
         isReference: true,
-        getter: function (this: IModel, identifier: string | null | undefined): any {
+        getter: function (this: IModel, identifier: IReference | null | undefined): any {
             if (identifier === null || identifier === undefined)
                 return identifier
-            return resolve(this, identifier)
+            // TODO: would be better to test as part of snapshot...
+            invariant(typeof identifier.$ref === "string", "Expected a reference in the format `{ $ref: ... }`")
+            return resolve(this, identifier.$ref)
         },
-        setter: function(this: IModel, value: IModel): string {
+        setter: function(this: IModel, value: IModel): IReference {
             if (value === null || value === undefined)
                 return value
             invariant(isModel(value), `Failed to assign a value to a reference; the value is not a model instance`)
@@ -34,7 +39,7 @@ function createGenericRelativeReference(factory: IFactory<any, any>): IReference
             const base = getNode(this)
             const target = getNode(value)
             invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
-            return getRelativePath(base, target)
+            return { $ref: getRelativePath(base, target) }
         }
     }
 }

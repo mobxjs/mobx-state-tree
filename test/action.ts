@@ -89,7 +89,7 @@ test("it should be possible to pass a complex object", t => {
             name: "Mattia"
         }],
         orders: [{
-            customer: "../../customers/0"
+            customer: { $ref: "../../customers/0" }
         }]
     })
 
