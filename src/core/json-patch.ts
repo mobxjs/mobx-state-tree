@@ -37,5 +37,5 @@ export function splitJsonPath(path: string): string[] {
     // `/` refers to property with an empty name, while `` refers to root itself!
     if (path === "")
         return []
-    return path.split("/").map(unescapeJsonPath)
+    return path.replace(/\/$/, "").split("/").map(unescapeJsonPath)
 }

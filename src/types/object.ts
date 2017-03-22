@@ -4,6 +4,7 @@ import { Node, maybeNode } from "../core/node"
 import { IFactory, isFactory, getFactory } from "../core/factories"
 import { isReferenceFactory } from "./reference"
 import { primitiveFactory } from "./primitive"
+import { isIdentifierFactory } from "./identifier"
 import { ComplexType } from "../core/types"
 import { createDefaultValueFactory } from "./with-default"
 import { Property } from "./property-types/property"
@@ -39,6 +40,8 @@ export class ObjectType extends ComplexType {
     private props: {
         [key: string]: Property
     } = {}
+
+    identifierAttribute: string | null = null
 
     constructor(name: string, baseModel: Object) {
         super(name)
@@ -86,8 +89,11 @@ export class ObjectType extends ComplexType {
             }
 
             const { value } = descriptor
-
-            if (isPrimitive(value)) {
+            if (isIdentifierFactory(value)) {
+                invariant(!this.identifierAttribute, `Cannot define property '${key}' as object identifier, property '${this.identifierAttribute}' is already defined as identifier property`)
+                this.identifierAttribute = key
+                this.props[key] = new ValueProperty(key, createDefaultValueFactory(primitiveFactory, ""))
+            } else if (isPrimitive(value)) {
                 // TODO: detect exact primitiveFactory!
                 this.props[key] = new ValueProperty(key, createDefaultValueFactory(primitiveFactory, value))
             } else if (isFactory(value)) {
@@ -212,6 +218,11 @@ export function composeFactory(...args: any[]) {
 
 export function isObjectFactory(factory: any): boolean {
     return isFactory(factory) && (factory.type as any).isObjectFactory === true
+}
+
+export function getIdentifierAttribute(factory: any): string | null {
+    invariant(isObjectFactory(factory), "argument is not an object factory")
+    return (factory.type as ObjectType).identifierAttribute
 }
 
 // export function getObjectNode(thing: IModel): ObjectNode {

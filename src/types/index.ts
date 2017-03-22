@@ -5,6 +5,7 @@ import {createMapFactory} from "./map"
 import {createArrayFactory} from "./array"
 import {primitiveFactory} from "./primitive"
 import {primitiveFactory as primitive} from "./primitive"
+import {identifier} from "./identifier"
 import {createModelFactory as struct, composeFactory as extend} from "./object"
 import {reference} from "./reference"
 import {createUnionFactory as union} from "./union"
@@ -54,5 +55,6 @@ export const types = {
     map,
     array,
     frozen,
-    recursive
+    recursive,
+    identifier
 }

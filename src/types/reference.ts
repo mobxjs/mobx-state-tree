@@ -1,8 +1,9 @@
 import {isObservableArray, isObservableMap} from "mobx"
-import {IModel, IFactory, isFactory, isModel} from "../core/factories"
+import {IModel, IFactory, isModel} from "../core/factories"
 import {resolve} from "../top-level-api"
 import {invariant, fail} from "../utils"
 import { getNode, getRelativePath } from "../core/node"
+import { getIdentifierAttribute } from "./object"
 
 export interface IReference {
     $ref: string
@@ -45,8 +46,9 @@ function createGenericRelativeReference(factory: IFactory<any, any>): IReference
 }
 
 function createReferenceWithBasePath(factory: IFactory<any, any>, path: string): IReferenceDescription {
-    const targetIdAttribute = path.split("/").slice(-1)[0]
-    path = path.split("/").slice(0, -1).join("/")
+    const targetIdAttribute = getIdentifierAttribute(factory)
+    if (!targetIdAttribute)
+        return fail(`Cannot create reference to path '${path}'; the targetted type, ${factory.type.describe()}, does not specify an identifier property`)
 
     return {
         isReference: true,

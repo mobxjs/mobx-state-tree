@@ -34,11 +34,11 @@ test("it should support generic relative paths", t => {
 
 test("it should support prefixed paths in maps", t => {
     const User = createFactory({
-        id: types.primitive(),
+        id: types.identifier(),
         name: types.primitive()
     })
     const UserStore = createFactory({
-        user: types.reference(User, "users/id"),
+        user: types.reference(User, "users"),
         users: types.map(User)
     })
 
@@ -65,11 +65,11 @@ test("it should support prefixed paths in maps", t => {
 
 test("it should support prefixed paths in arrays", t => {
     const User = createFactory({
-        id: types.primitive(),
+        id: types.identifier(),
         name: types.primitive()
     })
     const UserStore = createFactory({
-        user: types.reference(User, "/users/id"),
+        user: types.reference(User, "/users/"),
         users: types.array(User)
     })
 
