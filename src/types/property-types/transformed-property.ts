@@ -18,6 +18,8 @@ export class TransformedProperty extends Property {
                 return self.getter.call(this, box.get())
             },
             set: function(v) {
+                if (this[self.name] === v)
+                    return
                 const node = getNode(this)
                 const newValue = self.setter.call(this, v)
                 box.set(newValue)
