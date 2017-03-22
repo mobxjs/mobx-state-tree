@@ -10,7 +10,7 @@ export class Literal extends Type {
         this.value = value
     }
 
-    create(value) {
+    create(value: any) {
         invariant(isPrimitive(value), `Not a primitive: '${value}'`)
         return value
     }
@@ -19,7 +19,7 @@ export class Literal extends Type {
         return JSON.stringify(this.value)
     }
 
-    is(value) {
+    is(value: any) {
         return value === this.value && isPrimitive(value)
     }
 

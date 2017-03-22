@@ -26,18 +26,18 @@ export class MapType extends ComplexType {
         return observable.shallowMap()
     }
 
-    finalizeNewInstance(instance) {
+    finalizeNewInstance(instance: any) {
     }
 
-    getChildNodes(_node: Node, target): [string, Node][] {
+    getChildNodes(_node: Node, target: any): [string, Node][] {
         const res: [string, Node][] = []
-        target.forEach((value, key) => {
+        target.forEach((value: any, key: any) => {
             maybeNode(value, node => { res.push([key, node])})
         })
         return res
     }
 
-    getChildNode(node: Node, target, key): Node | null {
+    getChildNode(node: Node, target: any, key: any): Node | null {
         if (target.has(key))
             return maybeNode(target.get(key), identity, nothing)
         return null
@@ -70,9 +70,9 @@ export class MapType extends ComplexType {
         return change
     }
 
-    serialize(node: Node, target): Object {
-        const res = {}
-        target.forEach((value, key) => {
+    serialize(node: Node, target: any): Object {
+        const res: {[index: string]: any} = {}
+        target.forEach((value: any, key: any) => {
             res[key] = valueToSnapshot(value)
         })
         return res
@@ -95,7 +95,7 @@ export class MapType extends ComplexType {
         }
     }
 
-    applyPatchLocally(node: Node, target, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: Node, target: any, subpath: string, patch: IJsonPatch): void {
         switch (patch.op) {
             case "add":
             case "replace":
@@ -107,10 +107,10 @@ export class MapType extends ComplexType {
         }
     }
 
-    @action applySnapshot(node: Node, target, snapshot): void {
+    @action applySnapshot(node: Node, target: any, snapshot: any): void {
         // Try to update snapshot smartly, by reusing instances under the same key as much as possible
         const currentKeys: { [key: string]: boolean } = {}
-        target.keys().forEach(key => { currentKeys[key] = false })
+        target.keys().forEach((key: any) => { currentKeys[key] = false })
         Object.keys(snapshot).forEach(key => {
             // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
             if (key in currentKeys && !isPrimitive(snapshot[key])) {
@@ -139,7 +139,7 @@ export class MapType extends ComplexType {
         return this.subType
     }
 
-    isValidSnapshot(snapshot) {
+    isValidSnapshot(snapshot: any) {
         return isPlainObject(snapshot) && Object.keys(snapshot).every(key => this.subType.is(snapshot[key]))
     }
 }
@@ -148,6 +148,6 @@ export function createMapFactory<S, T>(subtype: IFactory<S, T>): IFactory<{[key:
     return new MapType(`map<string, ${subtype.factoryName}>`, subtype).factory
 }
 
-export function isMapFactory(factory): boolean {
+export function isMapFactory(factory: any): boolean {
     return isFactory(factory) && (factory.type as any).isMapFactory === true
 }

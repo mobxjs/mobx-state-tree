@@ -9,12 +9,12 @@ export class PrimitiveType extends Type {
         return "primitive"
     }
 
-    create(value) {
+    create(value: any) {
         invariant(isPrimitive(value), `Not a primitive: '${value}'`)
         return value
     }
 
-    is(thing) {
+    is(thing: any) {
         return isPrimitive(thing)
     }
 

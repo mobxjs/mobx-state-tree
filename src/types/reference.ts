@@ -17,7 +17,7 @@ export interface IReferenceDescription {
 export function reference<T>(path: string): T;
 export function reference<T>(getter: IReferenceGetter<T>, setter?: IReferenceSetter<T>): T;
 export function reference<T>(factory: IFactory<any, T>): T;
-export function reference(arg1, arg2?) {
+export function reference(arg1: any, arg2?: any) {
     if (isFactory(arg1))
         return createGenericRelativeReference(arg1)
     if (typeof arg1 === "string")
@@ -83,10 +83,10 @@ export function createReferenceProps(name: string, ref: IReferenceDescription) {
     return res
 }
 
-function unwritableReference(_, owner, propertyName) {
+function unwritableReference(_: any, owner: any, propertyName: any) {
     return fail(`Cannot assign a new value to the reference '${propertyName}', the reference is read-only`)
 }
 
-export function isReferenceFactory(thing) {
+export function isReferenceFactory(thing: any) {
     return thing.isReference === true
 }

@@ -23,19 +23,19 @@ export class Node {
     @observable _parent: Node | null = null
     readonly factory: IFactory<any, any>
     private  interceptDisposer: IDisposer
-    readonly snapshotSubscribers: ((snapshot) => void)[] = []
+    readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     readonly actionSubscribers: IActionHandler[] = []
     _isRunningAction = false // only relevant for root
 
-    constructor(initialState: any, environment, factory: IFactory<any, any>) {
+    constructor(initialState: any, environment: any, factory: IFactory<any, any>) {
         invariant(factory.type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
         this.factory = factory
         this.environment = environment
         this.target = initialState
 
-        this.interceptDisposer = intercept(this.target, ((c) => this.type.willChange(this, c)) as any)
+        this.interceptDisposer = intercept(this.target, ((c: any) => this.type.willChange(this, c)) as any)
         observe(this.target, (c) => this.type.didChange(this, c))
         reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
@@ -89,7 +89,7 @@ export class Node {
 
     public get root() {
         // future optimization: store root ref in the node and maintain it
-        let p, r = this
+        let p, r: any = this
         while (p = r.parent)
             r = p
         return r
@@ -100,11 +100,11 @@ export class Node {
         return Object.freeze(this.type.serialize(this, this.target))
     }
 
-    public onSnapshot(onChange: (snapshot) => void): IDisposer {
+    public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
         return registerEventHandler(this.snapshotSubscribers, onChange)
     }
 
-    public applySnapshot(snapshot) {
+    public applySnapshot(snapshot: any) {
         invariant(this.type.is(snapshot), `Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${this.factory.type.name}. Expected ${this.factory.type.describe()} instead.`)
         return this.type.applySnapshot(this, this.target, snapshot)
     }
@@ -115,7 +115,7 @@ export class Node {
         node.applyPatchLocally(parts[parts.length - 1], patch)
     }
 
-    applyPatchLocally(subpath, patch: IJsonPatch): void {
+    applyPatchLocally(subpath: any, patch: IJsonPatch): void {
         this.type.applyPatchLocally(this, this.target, subpath, patch)
     }
 
@@ -125,7 +125,7 @@ export class Node {
 
     emitPatch(patch: IJsonPatch, source: Node, distance = 0) {
         if (this.patchSubscribers.length) {
-            let localizedPatch
+            let localizedPatch: any
             if (distance === 0)
                 localizedPatch = patch
             else
@@ -245,12 +245,12 @@ export class Node {
             fail(`Invalid action path: ${action.path || ""}`)
     }
 
-    emitAction(instance: Node, action: IActionCall, next) {
+    emitAction(instance: Node, action: IActionCall, next: any) {
         let idx = -1
         const correctedAction: IActionCall = this.actionSubscribers.length
             ? extend({} as any, action, { path: getRelativePath(this, instance) })
             : null
-        let n = () => {
+        let n = (): any => {
             // optimization: use tail recursion / trampoline
             idx++
             if (idx < this.actionSubscribers.length) {
@@ -292,7 +292,7 @@ export class Node {
 }
 
 // TODO: duplicate with isModel
-export function hasNode(value): value is IModel {
+export function hasNode(value: any): value is IModel {
     return value && value.$treenode
 }
 
@@ -352,7 +352,7 @@ export function getParent(thing: IModel): IModel {
     return node.parent ? node.parent.target : null
 }
 
-export function valueToSnapshot(thing) {
+export function valueToSnapshot(thing: any) {
     if (thing instanceof Date) {
         return {
             $treetype: "Date",
