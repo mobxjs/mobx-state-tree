@@ -8,7 +8,7 @@ export class Union extends Type {
     readonly dispatcher: IFactoryDispatcher | null = null
     readonly types: IFactory<any, any>[]
 
-    constructor(name, types: IFactory<any, any>[], dispatcher: IFactoryDispatcher | null) {
+    constructor(name: any, types: IFactory<any, any>[], dispatcher: IFactoryDispatcher | null) {
         super(name)
         this.dispatcher = dispatcher
         this.types = types
@@ -18,7 +18,7 @@ export class Union extends Type {
         return "(" + this.types.map(factory => factory.type.describe()).join(" | ") + ")"
     }
 
-    create(value, environment?) {
+    create(value: any, environment?: any) {
         invariant(this.is(value), `Value ${JSON.stringify(value)} is not assignable to union ${this.name}`)
 
         // try the dispatcher, if defined
@@ -34,7 +34,7 @@ export class Union extends Type {
         return applicableTypes[0](value)
     }
 
-    is(value) {
+    is(value: any) {
         return this.types.some(type => type.is(value))
     }
 

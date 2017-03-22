@@ -9,7 +9,7 @@ export function connectReduxDevtools(model: any) {
     let applyingSnapshot = false
 
     // Subscribe to change state (if need more than just logging)
-    remotedev.subscribe(message => {
+    remotedev.subscribe((message: any) => {
         // Helper when only time travelling needed
         const state = extractState(message)
         if (state) {

@@ -18,11 +18,11 @@ export class ObjectType extends ComplexType {
         [key: string]: IFactory<any, any>
     } = {}
     baseModel: any
-    initializers: ((target) => void)[] = []
-    finalizers: ((target) => void)[] = []
+    initializers: ((target: any) => void)[] = []
+    finalizers: ((target: any) => void)[] = []
     isObjectFactory = true
 
-    constructor(name: string, baseModel) {
+    constructor(name: string, baseModel: any) {
         super(name)
         Object.seal(baseModel) // make sure nobody messes with it
         this.baseModel = baseModel
@@ -39,7 +39,7 @@ export class ObjectType extends ComplexType {
         return instance as Object
     }
 
-    finalizeNewInstance(instance) {
+    finalizeNewInstance(instance: any) {
         this.finalizers.forEach(f => f(instance))
         // TODO: Object.seal(instance) // don't allow new props to be added!
     }
@@ -53,7 +53,7 @@ export class ObjectType extends ComplexType {
             if ("get" in descriptor) {
                 const computedDescriptor = {} // yikes
                 Object.defineProperty(computedDescriptor, key, descriptor)
-                addInitializer(t => extendShallowObservable(t, computedDescriptor))
+                addInitializer((t: any) => extendShallowObservable(t, computedDescriptor))
                 continue
             }
 
@@ -63,17 +63,17 @@ export class ObjectType extends ComplexType {
                 // TODO: detect exact primitiveFactory!
                 this.props[key] = primitiveFactory
                 // MWE: optimization, create one single extendObservale
-                addInitializer(t => extendShallowObservable(t, { [key] : value }))
+                addInitializer((t: any) => extendShallowObservable(t, { [key] : value }))
             } else if (isFactory(value)) {
                 this.props[key] = value
-                addInitializer(t => extendShallowObservable(t, { [key]: null }))
-                addFinalizer(t => t[key] = value())
+                addInitializer((t: any) => extendShallowObservable(t, { [key]: null }))
+                addFinalizer((t: any) => t[key] = value())
             } else if (isReferenceFactory(value)) {
-                addInitializer(t => extendShallowObservable(t, createReferenceProps(key, value)))
+                addInitializer((t: any) => extendShallowObservable(t, createReferenceProps(key, value)))
             } else if (isAction(value)) {
-                addInitializer(t => createActionWrapper(t, key, value))
+                addInitializer((t: any) => createActionWrapper(t, key, value))
             } else if (typeof value === "function") {
-                addInitializer(t => createNonActionWrapper(t, key, value))
+                addInitializer((t: any) => createNonActionWrapper(t, key, value))
             } else if (typeof value === "object") {
                 fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
             } else  {
@@ -83,18 +83,18 @@ export class ObjectType extends ComplexType {
     }
 
     // TODO: adm or instance as param?
-    getChildNodes(node, instance): [string, Node][] {
+    getChildNodes(node: any, instance: any): [string, Node][] {
         const res: [string, Node][] = []
         for (let key in this.props)
             maybeNode(instance[key], propertyNode => res.push([key, propertyNode]))
         return res
     }
 
-    getChildNode(node, instance, key): Node | null {
+    getChildNode(node: any, instance: any, key: any): Node | null {
         return maybeNode(instance[key], identity, nothing)
     }
 
-    willChange(node, change: IObjectWillChange): Object | null {
+    willChange(node: any, change: IObjectWillChange): Object | null {
         const {newValue} = change
         const oldValue = change.object[change.name]
         if (newValue === oldValue)
@@ -119,8 +119,8 @@ export class ObjectType extends ComplexType {
         }
     }
 
-    serialize(node: Node, instance): any {
-        const res = {}
+    serialize(node: Node, instance: any): any {
+        const res:{[index: string]: any} = {}
         for (let key in this.props) {
             const value = instance[key]
             if (!isSerializable(value))
@@ -130,14 +130,14 @@ export class ObjectType extends ComplexType {
         return res
     }
 
-    applyPatchLocally(node: Node, target, subpath, patch): void {
+    applyPatchLocally(node: Node, target: any, subpath: any, patch: any): void {
         invariant(patch.op === "replace" || patch.op === "add")
         this.applySnapshot(node, target, {
             [subpath]: patch.value
         })
     }
 
-    @action applySnapshot(node: Node, target, snapshot): void {
+    @action applySnapshot(node: Node, target: any, snapshot: any): void {
         for (let key in snapshot) {
             invariant(key in this.props, `It is not allowed to assign a value to non-declared property ${key} of ${this.name}`)
             maybeNode(
@@ -152,7 +152,7 @@ export class ObjectType extends ComplexType {
         return this.props[key] || primitiveFactory
     }
 
-    isValidSnapshot(snapshot) {
+    isValidSnapshot(snapshot: any) {
         if (!isPlainObject(snapshot))
             return false
         const props = this.props
@@ -173,14 +173,14 @@ export type IBaseModelDefinition<S extends Object, T> = {[K in keyof T]: IFactor
 
 export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<S, T>): IFactory<S, T>
 export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<S, T>): IFactory<S, T>
-export function createModelFactory(arg1, arg2?) {
+export function createModelFactory(arg1: any, arg2?: any) {
     let name = typeof arg1 === "string" ? arg1 : "unnamed-object-factory"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
 
     return new ObjectType(name, baseModel).factory
 }
 
-function getObjectFactoryBaseModel(item) {
+function getObjectFactoryBaseModel(item: any) {
     let factory = isFactory(item) ? item : getFactory(item)
 
     return isObjectFactory(factory) ? (factory.type as ObjectType).baseModel : {}
@@ -202,7 +202,7 @@ export function composeFactory(...args: any[]) {
     )
 }
 
-export function isObjectFactory(factory): boolean {
+export function isObjectFactory(factory: any): boolean {
     return isFactory(factory) && (factory.type as any).isObjectFactory === true
 }
 

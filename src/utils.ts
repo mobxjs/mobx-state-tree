@@ -24,8 +24,8 @@ export function nothing(): null {
 export function extend<A, B>(a: A, b: B): A & B
 export function extend<A, B, C>(a: A, b: B, c: C): A & B & C
 export function extend<A, B, C, D>(a: A, b: B, c: C, d: D): A & B & C & D
-export function extend(a, ...b: any[])
-export function extend(a, ...b: any[]) {
+export function extend(a: any, ...b: any[]): any
+export function extend(a: any, ...b: any[]) {
     for (let i = 0; i < b.length; i++) {
         const current = b[i]
         for (let key in current)
@@ -34,18 +34,18 @@ export function extend(a, ...b: any[]) {
     return a
 }
 
-export function isPlainObject(value) {
+export function isPlainObject(value: any) {
     if (value === null || typeof value !== "object")
         return false
     const proto = Object.getPrototypeOf(value)
     return proto === Object.prototype || proto === null
 }
 
-export function isMutable(value) {
+export function isMutable(value: any) {
     return value !== null && typeof value === "object" && !(value instanceof Date) && !(value instanceof RegExp)
 }
 
-export function isPrimitive(value): boolean {
+export function isPrimitive(value: any): boolean {
     if (value === null || value === undefined)
         return true
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean" || value instanceof Date)
@@ -53,7 +53,7 @@ export function isPrimitive(value): boolean {
     return false
 }
 
-export function isSerializable(value) {
+export function isSerializable(value: any) {
     return typeof value !== "function"
 }
 

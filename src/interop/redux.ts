@@ -9,19 +9,19 @@ export interface IMiddleWareApi {
 }
 
 export interface IReduxStore extends IMiddleWareApi {
-    subscribe(listener: (snapshot) => void)
+    subscribe(listener: (snapshot: any) => void): any
 }
 
 export type MiddleWare =
     (middlewareApi: IMiddleWareApi) =>
         ((next: (action: IActionCall) => void) => void)
 
-export function asReduxStore(model, ...middlewares: MiddleWare[]): IReduxStore {
+export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxStore {
     invariant(isModel(model), "Expected model object")
     let store: IReduxStore = {
         getState : ()       => getSnapshot(model),
         dispatch : action   => {
-            runMiddleWare(action, runners.slice(), newAction => applyAction(model, reduxActionToAction(newAction)))
+            runMiddleWare(action, runners.slice(), (newAction: any) => applyAction(model, reduxActionToAction(newAction)))
         },
         subscribe: listener => onSnapshot(model, listener)
     }
@@ -29,7 +29,7 @@ export function asReduxStore(model, ...middlewares: MiddleWare[]): IReduxStore {
     return store
 }
 
-function reduxActionToAction(action): IActionCall {
+function reduxActionToAction(action: any): IActionCall {
     const actionArgs = extend({}, action)
     delete actionArgs.type
     return {
@@ -38,8 +38,8 @@ function reduxActionToAction(action): IActionCall {
     }
 }
 
-function runMiddleWare(action, runners, next) {
-    function n(retVal) {
+function runMiddleWare(action: any, runners: any, next: any) {
+    function n(retVal: any) {
         const f = runners.shift()
         if (f)
             f(n)(retVal)

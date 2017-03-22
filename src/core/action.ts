@@ -12,11 +12,11 @@ export type IActionCall = {
 
 export type IActionHandler  = (actionCall: IActionCall, next: () => void) => void
 
-export function createNonActionWrapper(instance, key, func) {
+export function createNonActionWrapper(instance: any, key: any, func: any) {
     addHiddenFinalProp(instance, key, func.bind(instance))
 }
 
-export function createActionWrapper(instance, key, action: Function) {
+export function createActionWrapper(instance: any, key: any, action: Function) {
     addHiddenFinalProp(
         instance,
         key,
@@ -86,7 +86,7 @@ function deserializeArgument(adm: Node, value: any): any {
     return value
 }
 
-export function applyActionLocally(node: Node, instance, action: IActionCall) {
+export function applyActionLocally(node: Node, instance: any, action: IActionCall) {
     invariant(typeof instance[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
     instance[action.name].apply(
         instance,

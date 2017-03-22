@@ -2,7 +2,7 @@ import {IFactory} from "../core/factories"
 import {invariant, isMutable, isSerializable, isPlainObject} from "../utils"
 import {Type} from "../core/types"
 
-function freeze(value) {
+function freeze(value: any) {
     Object.freeze(value)
 
     if (isPlainObject(value)) {
@@ -26,13 +26,13 @@ export class Frozen extends Type {
         return "frozen"
     }
 
-    create(value, environment?) {
+    create(value: any, environment?: any) {
         invariant(isSerializable(value), "Given value should be serializable")
         // deep freeze the object/array
         return isMutable(value) ? freeze(value) : value
     }
 
-    is(value) {
+    is(value: any) {
         return isSerializable(value)
     }
 
