@@ -64,7 +64,7 @@ export class Node {
      * Returnes (escaped) path representation as string
      */
     @computed public get path(): string {
-        return joinJsonPath(this.pathParts)
+        return "/" + joinJsonPath(this.pathParts)
     }
 
     @computed public get subpath(): string {
@@ -208,7 +208,9 @@ export class Node {
     resolvePath(pathParts: string[], failIfResolveFails: boolean = true): Node | undefined {
         let current: Node | null = this
         for (let i = 0; i < pathParts.length; i++) {
-            if (pathParts[i] === "..")
+            if (pathParts[i] === "") // '/bla' or 'a//b' splits to empty strings
+                current = current.root
+            else if (pathParts[i] === "..")
                 current = current!.parent
             else if (pathParts[i] === ".")
                 continue

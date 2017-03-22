@@ -84,7 +84,6 @@ test("it should be possible to pass a complex object", t => {
     store.orders[0].setCustomer(store.customers[0])
     t.is(store.orders[0].customer.name, "Mattia")
     t.is(store.orders[0].customer, store.customers[0])
-    console.dir(getSnapshot(store))
     t.deepEqual(getSnapshot(store) as any, {
         customers: [{
             name: "Mattia"
@@ -94,9 +93,10 @@ test("it should be possible to pass a complex object", t => {
         }]
     })
 
+    console.dir(JSON.stringify(recorder.actions))
     t.deepEqual(
         recorder.actions,
-        [{ "name": "setCustomer", "path": "/orders/0", "args": [{ "$ref": "/../../customers/0" }] }]
+        [{ "name": "setCustomer", "path": "orders/0", "args": [{ "$ref": "../../customers/0" }] }]
     )
 
     const store2  = createTestStore()
