@@ -93,7 +93,6 @@ test("it should be possible to pass a complex object", t => {
         }]
     })
 
-    console.dir(JSON.stringify(recorder.actions))
     t.deepEqual(
         recorder.actions,
         [{ "name": "setCustomer", "path": "orders/0", "args": [{ "$ref": "../../customers/0" }] }]
