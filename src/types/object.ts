@@ -1,17 +1,18 @@
-import { TransformedProperty } from './property-types/transformed-property';
-import { action, isAction, extendShallowObservable, observable, IObjectChange, IObjectWillChange, IAction, intercept, observe, computed } from "mobx"
-import { nothing, invariant, isSerializable, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
-import { Node, maybeNode, valueToSnapshot, getNode } from "../core/node"
+import { action, isAction, extendShallowObservable, IObjectChange, IObjectWillChange, IAction, intercept, observe } from "mobx"
+import { nothing, invariant, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
+import { Node, maybeNode } from "../core/node"
 import { IFactory, isFactory, getFactory } from "../core/factories"
 import { isReferenceFactory } from "./reference"
 import { primitiveFactory } from "./primitive"
 import { ComplexType } from "../core/types"
 import { createDefaultValueFactory } from "./with-default"
 import { Property } from "./property-types/property"
+import { TransformedProperty } from "./property-types/transformed-property"
 import { ComputedProperty } from "./property-types/computed-property"
 import { ValueProperty } from "./property-types/value-property"
 import { ActionProperty } from "./property-types/action-property"
 import { getSnapshot } from "../top-level-api"
+import { IJsonPatch } from "../index";
 
 export interface IObjectInstance {
     $treenode: Node
@@ -39,7 +40,7 @@ export class ObjectType extends ComplexType {
         [key: string]: Property
     } = {}
 
-    constructor(name: string, baseModel) {
+    constructor(name: string, baseModel: Object) {
         super(name)
         Object.seal(baseModel) // make sure nobody messes with it
         this.baseModel = baseModel
@@ -61,7 +62,7 @@ export class ObjectType extends ComplexType {
         return instance as Object
     }
 
-    finalizeNewInstance(instance) {
+    finalizeNewInstance(instance: IObjectInstance) {
         intercept(instance, this.willChange as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
         this.forAllProps(prop => prop.initialize(instance))
@@ -107,7 +108,7 @@ export class ObjectType extends ComplexType {
     }
 
     // TODO: adm or instance as param?
-    getChildNodes(node, instance): [string, Node][] {
+    getChildNodes(node: Node, instance: any): [string, Node][] {
         const res: [string, Node][] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
@@ -116,18 +117,18 @@ export class ObjectType extends ComplexType {
         return res
     }
 
-    getChildNode(node, instance, key): Node | null {
+    getChildNode(node: Node, instance: any, key: string): Node | null {
         return maybeNode(instance[key], identity, nothing)
     }
 
     // TODO: node or instance?
-    serialize(node: Node, instance): any {
+    serialize(node: Node, instance: any): any {
         const res = {}
         this.forAllProps(prop => prop.serialize(instance, res))
         return res
     }
 
-    applyPatchLocally(node: Node, target, subpath, patch): void {
+    applyPatchLocally(node: Node, target: any, subpath: string, patch: IJsonPatch): void {
         invariant(patch.op === "replace" || patch.op === "add")
         this.applySnapshot(node, target, {
             [subpath]: patch.value
@@ -135,7 +136,7 @@ export class ObjectType extends ComplexType {
     }
 
     // TODO: remove node arg
-    @action applySnapshot(node: Node, target, snapshot): void {
+    @action applySnapshot(node: Node, target: any, snapshot: any): void {
         // TODO typecheck?
         for (let key in snapshot) {
             invariant(key in this.props, `It is not allowed to assign a value to non-declared property ${key} of ${this.name}`)
@@ -147,7 +148,7 @@ export class ObjectType extends ComplexType {
         return (this.props[key] as ValueProperty).factory
     }
 
-    isValidSnapshot(snapshot) {
+    isValidSnapshot(snapshot: any) {
         if (!isPlainObject(snapshot))
             return false
         for (let key in snapshot)
@@ -180,14 +181,14 @@ export type IBaseModelDefinition<S extends Object, T> = {[K in keyof T]: IFactor
 // MWE: somehow get  & { toJSON(): S } in here...?
 export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<S, T>): IFactory<S, T & { toJSON(): any }>
 export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<S, T>): IFactory<S, T & { toJSON(): any }>
-export function createModelFactory(arg1, arg2?) {
+export function createModelFactory(arg1: any, arg2?: any) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
 
     return new ObjectType(name, baseModel).factory
 }
 
-function getObjectFactoryBaseModel(item) {
+function getObjectFactoryBaseModel(item: any) {
     let factory = isFactory(item) ? item : getFactory(item)
 
     return isObjectFactory(factory) ? (factory.type as ObjectType).baseModel : {}
@@ -209,7 +210,7 @@ export function composeFactory(...args: any[]) {
     )
 }
 
-export function isObjectFactory(factory): boolean {
+export function isObjectFactory(factory: any): boolean {
     return isFactory(factory) && (factory.type as any).isObjectFactory === true
 }
 

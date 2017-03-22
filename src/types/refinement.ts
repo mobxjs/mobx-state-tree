@@ -9,7 +9,7 @@ export class Refinement extends Type {
     readonly type: IFactory<any, any>
     readonly predicate: IPredicate
 
-    constructor(name, type: IFactory<any, any>, predicate: IPredicate) {
+    constructor(name: string, type: IFactory<any, any>, predicate: IPredicate) {
         super(name)
         this.type = type
         this.predicate = predicate
@@ -19,7 +19,7 @@ export class Refinement extends Type {
         return this.name
     }
 
-    create(value) {
+    create(value: any) {
         // create the child type
         const inst = this.type(value)
         const snapshot = hasNode(inst) ? getNode(inst).snapshot : inst
@@ -30,7 +30,7 @@ export class Refinement extends Type {
         return inst
     }
 
-    is(value) {
+    is(value: any) {
         return this.type.is(value) && this.predicate(value)
     }
 }

@@ -11,7 +11,7 @@ class Recursive extends Type {
         this.type = def(this.factory)
     }
 
-    create(snapshot) {
+    create(snapshot: any) {
         return this.type(snapshot)
     }
 

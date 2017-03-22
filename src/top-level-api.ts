@@ -105,15 +105,15 @@ export function applyPatches(target: IModel, patches: IJsonPatch[]) {
 
 export interface IPatchRecorder {
     patches: IJsonPatch[]
-    stop()
-    replay(target: IModel)
+    stop(): any
+    replay(target: IModel): any
 }
 
 export function recordPatches(subject: IModel): IPatchRecorder {
     let recorder = {
         patches: [] as IJsonPatch[],
         stop: () => disposer(),
-        replay: (target) => {
+        replay: (target: any) => {
             applyPatches(target, recorder.patches)
         }
     }
@@ -156,15 +156,15 @@ export function applyActions(target: IModel, actions: IActionCall[]): void {
 
 export interface IActionRecorder {
     actions: IActionCall[]
-    stop()
-    replay(target: IModel)
+    stop(): any
+    replay(target: IModel): any
 }
 
 export function recordActions(subject: IModel): IActionRecorder {
     let recorder = {
         actions: [] as IActionCall[],
         stop: () => disposer(),
-        replay: (target) => {
+        replay: (target: any) => {
             applyActions(target, recorder.actions)
         }
     }

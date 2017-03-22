@@ -83,7 +83,7 @@ function deserializeArgument(adm: Node, value: any): any {
     return value
 }
 
-export function applyActionLocally(node: Node, instance, action: IActionCall) {
+export function applyActionLocally(node: Node, instance: any, action: IActionCall) {
     invariant(typeof instance[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
     instance[action.name].apply(
         instance,

@@ -10,11 +10,11 @@ export class ActionProperty extends Property {
         this.invokeAction =  createActionInvoker(name, fn)
     }
 
-    initialize(target) {
+    initialize(target: any) {
         addHiddenFinalProp(target, this.name, this.invokeAction)
     }
 
-    isValidSnapshot(snapshot) {
+    isValidSnapshot(snapshot: any) {
         return !(this.name in snapshot)
     }
 }

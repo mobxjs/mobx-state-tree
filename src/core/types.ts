@@ -6,7 +6,7 @@ import {IFactory, IModel} from "./factories"
 export interface IType {
     name: string
     is(thing: IModel | any): boolean
-    create(snapshot): any
+    create(snapshot: any): any
     factory: IFactory<any, any> // TODO type
     describe(): string
 }
@@ -22,8 +22,8 @@ export abstract class Type implements IType { // TODO: generic for config and st
         this.factory = this.initializeFactory()
     }
 
-    abstract create(snapshot): any
-    abstract is(thing): boolean
+    abstract create(snapshot: any): any
+    abstract is(thing: any): boolean
     abstract describe(): string
 
     protected initializeFactory() {
@@ -40,7 +40,7 @@ export abstract class Type implements IType { // TODO: generic for config and st
 }
 
 export abstract class ComplexType extends Type {
-    create(snapshot) {
+    create(snapshot: any) {
         const instance = this.createNewInstance()
         const node = new Node(instance, this.factory)
         this.finalizeNewInstance(instance)
@@ -50,17 +50,17 @@ export abstract class ComplexType extends Type {
         return instance
     }
 
-    abstract createNewInstance()
-    abstract finalizeNewInstance(target: any)
-    abstract applySnapshot(node: Node, target, snapshot)
-    abstract getChildNodes(node: Node, target): [string, Node][]
-    abstract getChildNode(node: Node, target, key): Node | null
-    abstract serialize(node: Node, target): any
-    abstract applyPatchLocally(node: Node, target, subpath: string, patch: IJsonPatch): void
+    abstract createNewInstance(): any
+    abstract finalizeNewInstance(target: any): void
+    abstract applySnapshot(node: Node, target: any, snapshot: any): void
+    abstract getChildNodes(node: Node, target: any): [string, Node][]
+    abstract getChildNode(node: Node, target: any, key: string): Node | null
+    abstract serialize(node: Node, target: any): any
+    abstract applyPatchLocally(node: Node, target: any, subpath: string, patch: IJsonPatch): void
     abstract getChildFactory(key: string): IFactory<any, any>
     abstract isValidSnapshot(snapshot: any): boolean
 
-    is(value: IModel | any): boolean {
+    is(value: any): boolean {
         if (!value || typeof value !== "object")
             return false
         if (hasNode(value))

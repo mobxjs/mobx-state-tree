@@ -2,11 +2,11 @@ import { computed } from "mobx"
 import { Property } from "./property"
 
 export class ComputedProperty extends Property {
-    constructor(propertyName, public getter, public setter) {
+    constructor(propertyName: string, public getter: () => any, public setter?: (value: any) => void) {
         super(propertyName)
     }
 
-    initializePrototype(proto) {
+    initializePrototype(proto: any) {
         Object.defineProperty(
             proto,
             this.name,
@@ -14,7 +14,7 @@ export class ComputedProperty extends Property {
         )
     }
 
-    isValidSnapshot(snapshot) {
+    isValidSnapshot(snapshot: any) {
         return !(this.name in snapshot)
     }
 }

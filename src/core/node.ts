@@ -21,7 +21,7 @@ export class Node {
     readonly target: any
     @observable _parent: Node | null = null
     readonly factory: IFactory<any, any>
-    readonly snapshotSubscribers: ((snapshot) => void)[] = []
+    readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     readonly actionSubscribers: IActionHandler[] = []
     _isRunningAction = false // only relevant for root
@@ -84,7 +84,7 @@ export class Node {
 
     public get root() {
         // future optimization: store root ref in the node and maintain it
-        let p, r = this
+        let p, r: Node = this
         while (p = r.parent)
             r = p
         return r
@@ -95,11 +95,11 @@ export class Node {
         return Object.freeze(this.type.serialize(this, this.target))
     }
 
-    public onSnapshot(onChange: (snapshot) => void): IDisposer {
+    public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
         return registerEventHandler(this.snapshotSubscribers, onChange)
     }
 
-    public applySnapshot(snapshot) {
+    public applySnapshot(snapshot: any) {
         invariant(this.type.is(snapshot), `Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${this.factory.type.name}. Expected ${this.factory.type.describe()} instead.`)
         return this.type.applySnapshot(this, this.target, snapshot)
     }
@@ -110,7 +110,7 @@ export class Node {
         node.applyPatchLocally(parts[parts.length - 1], patch)
     }
 
-    applyPatchLocally(subpath, patch: IJsonPatch): void {
+    applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.type.applyPatchLocally(this, this.target, subpath, patch)
     }
 
@@ -120,7 +120,7 @@ export class Node {
 
     emitPatch(patch: IJsonPatch, source: Node, distance = 0) {
         if (this.patchSubscribers.length) {
-            let localizedPatch
+            let localizedPatch: IJsonPatch
             if (distance === 0)
                 localizedPatch = patch
             else
@@ -242,7 +242,7 @@ export class Node {
             fail(`Invalid action path: ${action.path || ""}`)
     }
 
-    emitAction(instance: Node, action: IActionCall, next) {
+    emitAction(instance: Node, action: IActionCall, next: () => any): any {
         let idx = -1
         const correctedAction: IActionCall = this.actionSubscribers.length
             ? extend({} as any, action, { path: getRelativePath(this, instance) })
@@ -281,7 +281,7 @@ export class Node {
 }
 
 // TODO: duplicate with isModel
-export function hasNode(value): value is IModel {
+export function hasNode(value: any): value is IModel {
     return value && value.$treenode
 }
 
@@ -341,7 +341,7 @@ export function getParent(thing: IModel): IModel {
     return node.parent ? node.parent.target : null
 }
 
-export function valueToSnapshot(thing) {
+export function valueToSnapshot(thing: any) {
     if (thing instanceof Date) {
         return {
             $treetype: "Date",

@@ -5,15 +5,15 @@ import { IFactory } from "../../core/factories"
 import { escapeJsonPath } from "../../core/json-patch"
 
 export class ValueProperty extends Property {
-    constructor(propertyName, public factory: IFactory<any, any>) {
+    constructor(propertyName: string, public factory: IFactory<any, any>) {
         super(propertyName)
     }
 
-    initializePrototype(proto) {
+    initializePrototype(proto: any) {
         observable.ref(proto, this.name, { value: undefined })
     }
 
-    initialize(targetInstance) {
+    initialize(targetInstance: any) {
         targetInstance[this.name] = this.factory()
     }
 
@@ -37,11 +37,11 @@ export class ValueProperty extends Property {
         }, node)
     }
 
-    serialize(instance, snapshot) {
+    serialize(instance: any, snapshot: any) {
         snapshot[this.name] = valueToSnapshot(instance[this.name])
     }
 
-    deserialize(instance, snapshot) {
+    deserialize(instance: any, snapshot: any) {
         maybeNode(
             instance[this.name],
             propertyNode => { propertyNode.applySnapshot(snapshot[this.name]) },
@@ -49,7 +49,7 @@ export class ValueProperty extends Property {
         )
     }
 
-    isValidSnapshot(snapshot) {
+    isValidSnapshot(snapshot: any) {
         return this.factory.is(snapshot[this.name])
     }
 }

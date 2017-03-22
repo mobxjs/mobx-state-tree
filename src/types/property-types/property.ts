@@ -15,7 +15,7 @@ export abstract class Property {
 
     didChange(change: IObjectChange) { }
 
-    serialize(instance: IObjectInstance, snapshot) { }
-    deserialize(instance: IObjectInstance, snapshot) { }
-    abstract isValidSnapshot(snapshot): boolean
+    serialize(instance: IObjectInstance, snapshot: any) { }
+    deserialize(instance: IObjectInstance, snapshot: any) { }
+    abstract isValidSnapshot(snapshot: any): boolean
 }

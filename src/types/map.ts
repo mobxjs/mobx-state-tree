@@ -31,7 +31,7 @@ export class MapType extends ComplexType {
         observe(instance, this.didChange)
     }
 
-    getChildNodes(_node: Node, target): [string, Node][] {
+    getChildNodes(_node: Node, target: ObservableMap<any>): [string, Node][] {
         const res: [string, Node][] = []
         target.forEach((value, key) => {
             maybeNode(value, node => { res.push([key, node])})
@@ -39,7 +39,7 @@ export class MapType extends ComplexType {
         return res
     }
 
-    getChildNode(node: Node, target, key): Node | null {
+    getChildNode(node: Node, target: ObservableMap<any>, key: string): Node | null {
         if (target.has(key))
             return maybeNode(target.get(key), identity, nothing)
         return null
@@ -76,8 +76,8 @@ export class MapType extends ComplexType {
         return change
     }
 
-    serialize(node: Node, target): Object {
-        const res = {}
+    serialize(node: Node, target: ObservableMap<any>): Object {
+        const res: {[key: string]: any} = {}
         target.forEach((value, key) => {
             res[key] = valueToSnapshot(value)
         })
@@ -102,7 +102,7 @@ export class MapType extends ComplexType {
         }
     }
 
-    applyPatchLocally(node: Node, target, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: Node, target: ObservableMap<any>, subpath: string, patch: IJsonPatch): void {
         switch (patch.op) {
             case "add":
             case "replace":
@@ -114,7 +114,7 @@ export class MapType extends ComplexType {
         }
     }
 
-    @action applySnapshot(node: Node, target, snapshot): void {
+    @action applySnapshot(node: Node, target: ObservableMap<any>, snapshot: any): void {
         // Try to update snapshot smartly, by reusing instances under the same key as much as possible
         const currentKeys: { [key: string]: boolean } = {}
         target.keys().forEach(key => { currentKeys[key] = false })
@@ -146,7 +146,7 @@ export class MapType extends ComplexType {
         return this.subType
     }
 
-    isValidSnapshot(snapshot) {
+    isValidSnapshot(snapshot: any) {
         return isPlainObject(snapshot) && Object.keys(snapshot).every(key => this.subType.is(snapshot[key]))
     }
 }
@@ -155,6 +155,6 @@ export function createMapFactory<S, T>(subtype: IFactory<S, T>): IFactory<{[key:
     return new MapType(`map<string, ${subtype.factoryName}>`, subtype).factory
 }
 
-export function isMapFactory(factory): boolean {
+export function isMapFactory(factory: any): boolean {
     return isFactory(factory) && (factory.type as any).isMapFactory === true
 }

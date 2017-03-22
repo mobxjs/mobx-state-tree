@@ -19,11 +19,11 @@ export class DefaultValue extends Type {
         return this.type.type.describe()
     }
 
-    create(value) {
+    create(value: any) {
         return typeof value === "undefined" ? this.type(this.defaultValue) : this.type(value)
     }
 
-    is(value) {
+    is(value: any) {
         return this.type.is(value)
     }
 

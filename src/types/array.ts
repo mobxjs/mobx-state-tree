@@ -9,7 +9,7 @@ export class ArrayType extends ComplexType {
     isArrayFactory = true
     subType: IFactory<any, any> // TODO: type
 
-    constructor(name, subType: IFactory<any, any>) {
+    constructor(name: string, subType: IFactory<any, any>) {
         super(name)
         this.subType = subType
     }
@@ -27,7 +27,7 @@ export class ArrayType extends ComplexType {
         observe(instance, this.didChange)
     }
 
-    getChildNodes(_: Node, target): [string, Node][] {
+    getChildNodes(_: Node, target: IObservableArray<any>): [string, Node][] {
         const res: [string, Node][] = []
         target.forEach((value, index) => {
             maybeNode(value, node => { res.push(["" + index, node])})
@@ -35,9 +35,10 @@ export class ArrayType extends ComplexType {
         return res
     }
 
-    getChildNode(node: Node, target, key): Node | null {
-        if (parseInt(key) < target.length)
-            return maybeNode(target[key], identity, nothing)
+    getChildNode(node: Node, target: IObservableArray<any>, key: string): Node | null {
+        const index = parseInt(key, 10)
+        if (index < target.length)
+            return maybeNode(target[index], identity, nothing)
         return null
     }
 
@@ -66,7 +67,7 @@ export class ArrayType extends ComplexType {
         return change
     }
 
-    serialize(node: Node, target): any {
+    serialize(node: Node, target: IObservableArray<any>): any {
         return target.map(valueToSnapshot)
     }
 
@@ -95,7 +96,7 @@ export class ArrayType extends ComplexType {
         }
     }
 
-    applyPatchLocally(node: Node, target, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: Node, target: IObservableArray<any>, subpath: string, patch: IJsonPatch): void {
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
             case "replace":
@@ -110,7 +111,7 @@ export class ArrayType extends ComplexType {
         }
     }
 
-    @action applySnapshot(node: Node, target, snapshot): void {
+    @action applySnapshot(node: Node, target: IObservableArray<any>, snapshot: any): void {
         // TODO: make a smart merge here, try to reuse instances..
         target.replace(snapshot)
     }
@@ -119,7 +120,7 @@ export class ArrayType extends ComplexType {
         return this.subType
     }
 
-    isValidSnapshot(snapshot) {
+    isValidSnapshot(snapshot: any) {
         return Array.isArray(snapshot) && snapshot.every(item => this.subType.is(item))
     }
 }
@@ -128,6 +129,6 @@ export function createArrayFactory<S, T extends S>(subtype: IFactory<S, T>): IFa
     return new ArrayType(subtype.factoryName + "[]", subtype).factory
 }
 
-export function isArrayFactory(factory): boolean {
+export function isArrayFactory(factory: any): boolean {
     return isFactory(factory) && (factory.type as any).isArrayFactory === true
 }

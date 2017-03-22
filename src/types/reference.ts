@@ -71,7 +71,7 @@ function createReferenceWithBasePath(factory: IFactory<any, any>, path: string):
             const base = getNode(this)
             const target = getNode(value)
             invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
-            const identifier = value[targetIdAttribute]
+            const identifier = (value as any)[targetIdAttribute]
             const targetCollection = resolve(this, `${path}`)
             if (isObservableArray(targetCollection)) {
                 invariant(targetCollection.indexOf(value) !== -1, `The assigned value is not part of the collection the reference resolves to`)
@@ -84,6 +84,6 @@ function createReferenceWithBasePath(factory: IFactory<any, any>, path: string):
     }
 }
 
-export function isReferenceFactory(thing): thing is IReferenceDescription {
+export function isReferenceFactory(thing: any): thing is IReferenceDescription {
     return thing.isReference === true
 }

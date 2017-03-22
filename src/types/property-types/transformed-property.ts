@@ -5,11 +5,11 @@ import { escapeJsonPath } from "../../core/json-patch"
 import { addHiddenWritableProp } from "../../utils"
 
 export class TransformedProperty extends Property {
-    constructor(propertyName, public setter: Function, public getter: Function) {
+    constructor(propertyName: string, public setter: Function, public getter: Function) {
         super(propertyName)
     }
 
-    initialize(targetInstance) {
+    initialize(targetInstance: any) {
         const box = observable.shallowBox(null, targetInstance.constructor.name + "." + this.name)
         addHiddenWritableProp(targetInstance, this.name + "$value", box)
         const self = this
@@ -30,15 +30,15 @@ export class TransformedProperty extends Property {
         })
     }
 
-    serialize(instance, snapshot) {
+    serialize(instance: any, snapshot: any) {
         snapshot[this.name] = valueToSnapshot(instance[this.name + "$value"].get())
     }
 
-    deserialize(instance, snapshot) {
+    deserialize(instance: any, snapshot: any) {
         instance[this.name + "$value"].set(snapshot[this.name])
     }
 
-    isValidSnapshot(snapshot) {
+    isValidSnapshot(snapshot: any) {
         // TODO: is a better check possible?
         return this.name in snapshot
     }
