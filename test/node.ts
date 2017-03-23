@@ -1,4 +1,4 @@
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getFactory, getChildFactory, isFactory, recordActions, recordPatches, types} from "../"
+import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getFactory, getChildFactory, isFactory, recordActions, recordPatches, types} from "../"
 import {test} from "ava"
 
 // getParent
@@ -238,19 +238,19 @@ test("it can record and replay patches", (t) => {
 test("it can record and replay actions", (t) => {
     const Row = createFactory({
         article_id: 0,
-        setArticle: action(function(article_id){
+        setArticle(article_id){
             this.article_id = article_id
-        })
+        }
     })
 
     const Document = createFactory({
         customer_id: 0,
-        setCustomer: action(function(customer_id){
+        setCustomer(customer_id) {
             this.customer_id = customer_id
-        }),
-        addRow: action(function(){
+        },
+        addRow() {
             this.rows.push(Row())
-        }),
+        },
         rows: types.array(Row)
     })
 

@@ -1,4 +1,4 @@
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, composeFactory, types} from "../"
+import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, composeFactory, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -13,9 +13,9 @@ interface ITest{
 const createTestFactories = () => {
     const Factory = createFactory({
         to: 'world',
-        setTo: action(function(to){
+        setTo(to) {
             this.to = to
-        })
+        }
     })
 
     const ComputedFactory = createFactory({
