@@ -1,5 +1,5 @@
-import { applySnapshot } from '../../lib/top-level-api';
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe} from "mobx"
+import { applySnapshot } from "../top-level-api"
 import {Node, maybeNode, valueToSnapshot, getNode} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
 import {IFactory, isFactory, getFactory} from "../core/factories"
