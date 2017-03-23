@@ -165,3 +165,63 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is([{to: 'mars'}]), true)
     t.deepEqual(Factory.is([{wrongKey: true}]), false)
 })
+
+test("it should reconciliate instances correctly", (t) => {
+    const Store = createFactory({
+        todos: types.array(createFactory("Task", {
+            id: types.identifier(),
+            task: "",
+            done: false
+        }))
+    })
+
+    const store = Store({
+        todos: [
+            { id: "1", task: "coffee", done: false},
+            { id: "2", task: "tea", done: false},
+            { id: "3", task: "biscuit", done: false}
+        ]
+    })
+
+    t.deepEqual(store.todos.map(todo => todo.task), ["coffee", "tea", "biscuit"])
+    t.deepEqual(store.todos.map(todo => todo.done), [false, false, false])
+    t.deepEqual(store.todos.map(todo => todo.id), ["1", "2", "3"])
+
+    const a = store.todos[0]
+    const b = store.todos[1]
+    const c = store.todos[2]
+
+    applySnapshot(store, {
+        todos: [
+            { id: "2", task: "Tee", done: true},
+            { id: "1", task: "coffee", done: true},
+            { id: "4", task: "biscuit", done: false},
+            { id: "5", task: "stuffz", done: false}
+        ]
+    })
+
+    t.deepEqual(store.todos.map(todo => todo.task), ["Tee", "coffee", "biscuit", "stuffz"])
+    t.deepEqual(store.todos.map(todo => todo.done), [true, true, false, false])
+    t.deepEqual(store.todos.map(todo => todo.id), ["2", "1", "4", "5"])
+
+    t.is(store.todos[0] === b, true)
+    t.is(store.todos[1] === a, true)
+    t.is(store.todos[2] === c, false)
+})
+
+// test("it should reconciliate instances correctly", (t) => {
+//     const Store = createFactory({
+//         todos: types.array(types.union(
+//             createFactory("completedTask", {
+//                 id: types.identifier(),
+//                 task: "",
+//                 done: types.literal(true)
+//             }),
+//             createFactory("uncompletedTask", {
+//                 id: types.identifier()
+//                 task: "",
+//                 done: types.literal(true)
+//             })
+//         ))
+//     })
+// })

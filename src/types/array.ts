@@ -1,9 +1,11 @@
+import { applySnapshot } from '../../lib/top-level-api';
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe} from "mobx"
 import {Node, maybeNode, valueToSnapshot, getNode} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
-import {IFactory, isFactory} from "../core/factories"
-import {identity, nothing} from "../utils"
+import {IFactory, isFactory, getFactory} from "../core/factories"
+import {identity, nothing, invariant} from "../utils"
 import {ComplexType} from "../core/types"
+import {getIdentifierAttribute} from "./object"
 
 export class ArrayType extends ComplexType {
     isArrayFactory = true
@@ -111,9 +113,12 @@ export class ArrayType extends ComplexType {
         }
     }
 
-    @action applySnapshot(node: Node, target: IObservableArray<any>, snapshot: any): void {
-        // TODO: make a smart merge here, try to reuse instances..
-        target.replace(snapshot)
+    @action applySnapshot(node: Node, target: IObservableArray<any>, snapshot: any[]): void {
+        const identifierAttr = getIdentifierAttribute(this.subType)
+        if (identifierAttr)
+            target.replace(reconcileArrayItems(identifierAttr, target, snapshot, this.subType))
+        else
+            target.replace(snapshot)
     }
 
     getChildFactory(key: string): IFactory<any, any> {
@@ -123,6 +128,24 @@ export class ArrayType extends ComplexType {
     isValidSnapshot(snapshot: any) {
         return Array.isArray(snapshot) && snapshot.every(item => this.subType.is(item))
     }
+}
+
+function reconcileArrayItems(identifierAttr: string, target: IObservableArray<any>, snapshot: any[], factory: IFactory<any, any>): any[] {
+    const current: any = {}
+    target.forEach(item => {
+        const id = item[identifierAttr]
+        invariant(!current[id], `Identifier '${id}' (of ${getNode(item).path}) is not unique!`)
+        current[id] = item
+    })
+    return snapshot.map(item => {
+        const existing = current[item[identifierAttr]]
+        if (existing && getFactory(existing).is(item)) {
+            applySnapshot(existing, item)
+            return existing
+        } else {
+            return factory(item)
+        }
+    })
 }
 
 export function createArrayFactory<S, T extends S>(subtype: IFactory<S, T>): IFactory<S[], IObservableArray<T>> {
