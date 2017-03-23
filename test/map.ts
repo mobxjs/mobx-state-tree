@@ -1,5 +1,5 @@
 import {ObservableMap} from 'mobx'
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, IFactory, types as t} from "../"
+import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, IFactory, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -15,7 +15,7 @@ const createTestFactories = () => {
             to: 'world'
         })
 
-    const Factory = (t.map(
+    const Factory = (types.map(
         ItemFactory
     ) as any) as IFactory<{[key: string]: ITestSnapshot}, ObservableMap<ITest>>
 
@@ -165,4 +165,30 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is({}), true)
     t.deepEqual(Factory.is({hello: {to: 'mars'}}), true)
     t.deepEqual(Factory.is({hello: {wrongKey: true}}), false)
+})
+
+test("it should support identifiers", (t) => {
+    const Store = createFactory({
+        todos: types.map(createFactory({
+            id: types.identifier()
+        }))
+    })
+
+    const store = Store()
+    store.todos.set("17", { id: "17"} as any)
+
+    const a = store.todos.get("17")
+
+    t.throws(
+        () => applySnapshot(store.todos as any, { "17": { id: "18"} }), // TODO: fix typings
+        "[mobx-state-tree] A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '17', but expected: '18'"
+    )
+
+    applySnapshot(store.todos as any, { "16" : { id: "16"}, "17": { id: "17"}}) // TODO: fix typings
+    t.is(a === store.todos.get("17"), true) // same instance still
+
+    t.is(store.todos.get("17").id, "17")
+
+    store.todos.put({ id: "19"} as any) // TODO: fix typings
+    t.is(store.todos.get("19").id, "19")
 })

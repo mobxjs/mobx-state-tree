@@ -24,7 +24,7 @@ import {recursive} from "./recursive"
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function map<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): IFactory<{[key: string]: S}, ObservableMap<T>> {
+export function map<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): IFactory<{[key: string]: S}, ObservableMap<T> & { put(value: T): void }> {
     return createMapFactory(subFactory) as any
 }
 

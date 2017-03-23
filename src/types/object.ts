@@ -92,7 +92,7 @@ export class ObjectType extends ComplexType {
             if (isIdentifierFactory(value)) {
                 invariant(!this.identifierAttribute, `Cannot define property '${key}' as object identifier, property '${this.identifierAttribute}' is already defined as identifier property`)
                 this.identifierAttribute = key
-                this.props[key] = new ValueProperty(key, createDefaultValueFactory(primitiveFactory, ""))
+                this.props[key] = new ValueProperty(key, createDefaultValueFactory(primitiveFactory, "")) // TODO: create string non-empty subtype value!
             } else if (isPrimitive(value)) {
                 // TODO: detect exact primitiveFactory!
                 this.props[key] = new ValueProperty(key, createDefaultValueFactory(primitiveFactory, value))
@@ -144,6 +144,8 @@ export class ObjectType extends ComplexType {
     // TODO: remove node arg
     @action applySnapshot(node: Node, target: any, snapshot: any): void {
         // TODO typecheck?
+        if (this.identifierAttribute && target[this.identifierAttribute] /* empty before applying first snapshot */ && snapshot[this.identifierAttribute] !== target[this.identifierAttribute])
+            fail(`It is not allowed to update an object with a snapshot that has a different identifier. Expected '${target[this.identifierAttribute]}', got '${snapshot[this.identifierAttribute]}`)
         for (let key in snapshot) {
             invariant(key in this.props, `It is not allowed to assign a value to non-declared property ${key} of ${this.name}`)
             this.props[key].deserialize(target, snapshot)
@@ -221,8 +223,7 @@ export function isObjectFactory(factory: any): boolean {
 }
 
 export function getIdentifierAttribute(factory: any): string | null {
-    invariant(isObjectFactory(factory), "argument is not an object factory")
-    return (factory.type as ObjectType).identifierAttribute
+    return isObjectFactory(factory) ? (factory.type as ObjectType).identifierAttribute : null
 }
 
 // export function getObjectNode(thing: IModel): ObjectNode {
