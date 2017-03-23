@@ -48,6 +48,7 @@ export class ArrayType extends ComplexType {
         // TODO: verify type
                 // TODO check type
         // TODO: check if tree is editable
+        // TODO: check for key duplication
         const node = getNode(change.object)
         switch (change.type) {
             case "update":
