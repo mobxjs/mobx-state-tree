@@ -90,8 +90,8 @@ const Box = createFactory({
 })
 
 const BoxStore = createFactory({
-    boxes: mapOf(Box),
-    selection: referenceTo("boxes/name"),
+    boxes: types.map(Box),
+    selection: types.reference("boxes/name"),
     addBox: action(function(name) {
         this.boxes.set(name, Box({ name, x: 100, y: 100}))
     })
@@ -150,6 +150,75 @@ Useful methods:
 -   `action(fn)` constructs
 -   `onAction(model, middleware)` listens to any action that is invoked on the model or any of it's descendants. See `onAction` for more details.
 -   `applyAction(model, action)` invokes an action on the model according to the given action description
+
+## Identifiers
+
+Identifiers and references are two powerful abstraction that work well together.
+
+- Each model can define zero or one `identifier()` properties
+- The identifier property of an object cannot be modified after initialization
+- Identifiers should be unique within their parent collection (`array` or `map`)
+- Identifiers are used to reconcile items inside arrays and maps wherever possible when applying snapshots
+- The `map.put()` method can be used to simplify adding objects to maps that have identifiers
+
+Example:
+```javascript
+const Todo = createFactory({
+    id: types.identifier(),
+    title: "",
+    done: false
+})
+
+const todo1 = Todo() // not ok, identifier is required
+const todo1 = Todo({ id: "1" }) // ok
+applySnapshot(todo1, { id: "2", done: false}) // not ok; cannot modify the identifier of an object
+
+const store = types.map(Todo)
+store.put(todo1) // short-hand for store.set(todo1.id, todo)
+```
+
+## References
+
+References can be used to refer to link to an arbitrarily different object in the tree transparently.
+This makes it possible to use the tree as graph, while behind the scenes the graph is still properly serialized as tree
+
+Example:
+
+```javascript
+const Store = createFactory({
+    selectedTodo: types.reference(Todo),
+    todos: types.array(Todo)
+})
+
+const store = Store({ todos: [ /* some todos */ ]})
+
+store.selectedTodo = store.todos[0] // ok
+store.selectedTodo === store.todos[0] // true
+getSnapshot(store) // serializes properly as tree: { selectedTodo: { $ref: "../todos/0" }, todos: /* */ }
+
+store.selectedTodo = Todo() // not ok; have to refer to something already in the same tree
+```
+
+By default references can point to any arbitrary object in the same tree (as long as it has the proper type).
+
+## References with predefined resolve paths
+
+It is also possible to specifiy in which collection the reference should resolve by passing a second argument, the resolve path (this can be relative):
+
+```javascript
+const Store = createFactory({
+    selectedTodo: types.reference(Todo, "/todos/"),
+    todos: types.array(Todo)
+})
+```
+
+If a resolve path is provided, `reference` no longer stores a json pointer, but pinpoints the exact object that is being referred to by it's *identifier*. Assuming that `Todo` specified an `identifier()` property:
+
+```javascript
+getSnapshot(store) // serializes tree: { selectedTodo: "17" /* the identifier of the todo */, todos: /* */ }
+```
+
+The advantage of this approach is that paths are less fragile, where default references serialize the path by for example using array indices, an identifier with a resolve path will find the object by using it's identifier.
 
 ## Utility methods
 
