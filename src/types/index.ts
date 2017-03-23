@@ -1,7 +1,7 @@
 // tslint:disable-next-line:no_unused-variable
 import {IObservableArray, ObservableMap, IAction} from "mobx"
 import {IFactory} from "../core/factories"
-import {createMapFactory} from "./map"
+import {createMapFactory, IExtendedObservableMap} from "./map"
 import {createArrayFactory} from "./array"
 import {primitiveFactory} from "./primitive"
 import {primitiveFactory as primitive} from "./primitive"
@@ -24,7 +24,7 @@ import {recursive} from "./recursive"
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function map<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): IFactory<{[key: string]: S}, ObservableMap<T> & { put(value: T): void }> {
+export function map<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): IFactory<{[key: string]: S}, IExtendedObservableMap<T>> {
     return createMapFactory(subFactory) as any
 }
 

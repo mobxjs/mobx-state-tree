@@ -10,6 +10,10 @@ interface IMapFactoryConfig {
     isMapFactory: true
 }
 
+export interface IExtendedObservableMap<T> extends ObservableMap<T> {
+    put(value: T): this
+}
+
 export class MapType extends ComplexType {
     isMapFactory = true
     subType: IFactory<any, any>
@@ -32,6 +36,7 @@ export class MapType extends ComplexType {
             invariant(!!identifierAttr, `Map.put is only supported if the subtype has an idenfier attribute`)
             invariant(!!value, `Map.put cannot be used to set empty values`)
             this.set(value[identifierAttr!], value)
+            return this
         }
         return map
     }
@@ -166,7 +171,7 @@ export class MapType extends ComplexType {
     }
 }
 
-export function createMapFactory<S, T>(subtype: IFactory<S, T>): IFactory<{[key: string]: S}, ObservableMap<T> & { put(value: T): void }> {
+export function createMapFactory<S, T>(subtype: IFactory<S, T>): IFactory<{[key: string]: S}, IExtendedObservableMap<T>> {
     return new MapType(`map<string, ${subtype.factoryName}>`, subtype).factory
 }
 

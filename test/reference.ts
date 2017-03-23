@@ -1,4 +1,4 @@
-import { createFactory, types, getSnapshot } from "../"
+import { createFactory, types, getSnapshot, applySnapshot } from "../"
 import { test } from "ava"
 
 
@@ -92,4 +92,25 @@ test("it should support prefixed paths in arrays", t => {
     t.is(store.user.name as string, "Noa") // TODO: improve typings
 
     t.deepEqual(getSnapshot(store), {user: "18", "users": [{id: "17", name: "Michel"}, {id: "18", name: "Noa"}]} as any) // TODO: better typings
+})
+
+test.skip("identifiers are required", (t) => {
+    const Todo = createFactory({
+        id: types.identifier()
+    })
+
+    t.is(Todo.is({}), false)
+    t.is(Todo.is({ id: "x" }), true)
+
+    t.throws(() => Todo(), "bla")
+})
+
+test("identifiers cannot be modified", (t) => {
+    const Todo = createFactory({
+        id: types.identifier()
+    })
+
+    const todo = Todo({ id: "x" })
+    t.throws(() => todo.id = "stuff", "[mobx-state-tree] It is not allowed to change the identifier of an object, got: 'stuff'")
+    t.throws(() => applySnapshot(todo, {}), "[mobx-state-tree] Snapshot {} is not assignable to type AnonymousModel. Expected { id: identifier() } instead.")
 })

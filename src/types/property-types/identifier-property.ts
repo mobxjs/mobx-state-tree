@@ -1,6 +1,6 @@
 import { observable, IObjectWillChange } from "mobx"
 import { Property } from "./property"
-import { isValidIdentifier } from "../../utils"
+import { isValidIdentifier, fail } from "../../utils"
 
 export class IdentifierProperty extends Property {
     constructor(propertyName: string) {
@@ -16,7 +16,7 @@ export class IdentifierProperty extends Property {
             fail(`Not a valid identifier: '${change.newValue}`)
         const oldValue = change.object[this.name]
         if (oldValue !== undefined && oldValue !== change.newValue)
-            fail(`It is not allowed to change the identifier of an object, got: '${change.newValue}`)
+            fail(`It is not allowed to change the identifier of an object, got: '${change.newValue}'`)
 
         return change
     }

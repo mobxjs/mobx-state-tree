@@ -178,7 +178,9 @@ export class ObjectType extends ComplexType {
             const prop = this.props[key]
             return prop instanceof ValueProperty
                 ? key + ": " + prop.factory.type.describe()
-                : ""
+                : prop instanceof IdentifierProperty
+                    ? key + ": identifier()"
+                    : ""
         }).filter(Boolean).join("; ") + " }"
     }
 }
