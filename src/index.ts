@@ -1,17 +1,19 @@
-export * from "./core/json-patch"
+// Fix some circular deps:
+import "./core/type"
+import "./core/complex-type"
+
 export {
-    IModel,
-    isModel,
+    IMSTNode,
+    isMST,
     IType,
     isType,
     getType,
     getChildType,
     Type,
-    ComplexType
-} from "./core/type"
-export {
+    ComplexType,
     IActionCall
-} from "./core/action"
+} from "./core"
+export * from "./core/json-patch"
 
 export {
     asReduxStore,

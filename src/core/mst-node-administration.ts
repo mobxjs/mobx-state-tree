@@ -5,7 +5,9 @@ import {
     isObservableMap
 } from "mobx"
 
-import { ComplexType, typecheck, IModel, IType } from './type';
+import { typecheck, IType } from './type';
+import { IMSTNode, getRelativePath, maybeMST, hasMST, getMST, getPath } from './mst-node';
+
 import {IActionHandler} from "./action"
 import {
     invariant, fail, extend,
@@ -13,7 +15,8 @@ import {
 } from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
 import {IActionCall, applyActionLocally} from "./action"
-import {ObjectType} from "../types/object"
+import { ObjectType } from "../types/object"
+import { ComplexType } from "./complex-type";
 
 // TODO: make Node more like a struct, extract the methods to snapshots.js, actions.js etc..
 // TODO: make Node generic?
@@ -275,79 +278,4 @@ export class MSTAdminisration {
     getChildType(key: string): IType<any, any> {
         return this.type.getChildType(key)
     }
-}
-
-// TODO: duplicate with isModel
-export function hasMST(value: any): value is IModel {
-    return value && value.$treenode
-}
-
-/**
- * Tries to convert a value to a TreeNode. If possible or already done,
- * the first callback is invoked, otherwise the second.
- * The result of this function is the return value of the callbacks
- */
-export function maybeMST<T, R>(value: T & IModel, asNodeCb: (node: MSTAdminisration, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
-    // Optimization: maybeNode might be quite inefficient runtime wise, might be factored out at expensive places
-    if (isMutable(value)) {
-        const n = getMST(value)
-        return asNodeCb(n, n.target)
-    } else if (asPrimitiveCb) {
-        return asPrimitiveCb(value)
-    } else {
-        return value as any as R
-    }
-}
-
-export function getMST(value: any): MSTAdminisration {
-    if (hasMST(value))
-        return value.$treenode
-    else
-        return fail("element has no Node")
-
-}
-
-export function getPath(thing: IModel): string {
-    return getMST(thing).path
-}
-
-export function getRelativePath(base: MSTAdminisration, target: MSTAdminisration): string {
-    // PRE condition target is (a child of) base!
-    invariant(
-        base.root === target.root,
-        `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
-    )
-    const baseParts = base.pathParts
-    const targetParts = target.pathParts
-    let common = 0
-    for (; common < baseParts.length; common++) {
-        if (baseParts[common] !== targetParts[common])
-            break
-    }
-    return joinJsonPath(
-        baseParts
-        .slice(common).map(_ => "..")
-        .concat(
-            targetParts.slice(common)
-        )
-    )
-}
-
-export function getParent(thing: IModel): IModel {
-    const node = getMST(thing)
-    return node.parent ? node.parent.target : null
-}
-
-export function valueToSnapshot(thing: any) {
-    if (thing instanceof Date) {
-        return {
-            $treetype: "Date",
-            time: thing.toJSON()
-        }
-    }
-    if (hasMST(thing))
-        return getMST(thing).snapshot
-    if (isSerializable(thing))
-        return thing
-    fail("Unable to convert value to snapshot.")
 }

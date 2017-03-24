@@ -1,8 +1,4 @@
 import { action as mobxAction, isObservable } from "mobx"
-import {isModel} from "./type"
-import {resolve} from "../top-level-api"
-import {invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction} from "../utils"
-import {MSTAdminisration, getMST, getRelativePath} from "./administration"
 
 export type IActionCall = {
     name: string;
@@ -50,7 +46,7 @@ export function createActionInvoker(name: string, fn: Function) {
 function serializeArgument(adm: MSTAdminisration, actionName: string, index: number, arg: any): any {
     if (isPrimitive(arg))
         return arg
-    if (isModel(arg)) {
+    if (isMST(arg)) {
         const targetNode = getMST(arg)
         if (adm.root !== targetNode.root)
             throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
@@ -90,3 +86,8 @@ export function applyActionLocally(node: MSTAdminisration, instance: any, action
         action.args ? action.args.map(v => deserializeArgument(node, v)) : []
     )
 }
+
+import {isMST, getMST, getRelativePath} from "./mst-node"
+import {MSTAdminisration} from "./mst-node-administration"
+import {resolve} from "../top-level-api"
+import {invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction} from "../utils"

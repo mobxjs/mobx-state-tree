@@ -1,7 +1,7 @@
-import {IType} from "../core/type"
+import {IType} from "../core"
 import {invariant} from "../utils"
-import {Type} from "../core/type"
-import {hasMST, getMST} from "../core/administration"
+import {Type} from "../core"
+import {hasMST, getMST} from "../core"
 
 export class Refinement extends Type<any, any> {
     readonly type: IType<any, any>

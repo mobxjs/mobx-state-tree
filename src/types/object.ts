@@ -1,11 +1,11 @@
 import { IdentifierProperty } from './property-types/identifier-property';
 import { action, isAction, extendShallowObservable, IObjectChange, IObjectWillChange, IAction, intercept, observe } from "mobx"
 import { nothing, invariant, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
-import { MSTAdminisration, maybeMST } from "../core/administration"
+import { MSTAdminisration, maybeMST } from "../core"
 import { isReferenceFactory } from "./reference"
 import { primitiveFactory } from "./primitive"
 import { isIdentifierFactory } from "./identifier"
-import { ComplexType, getType, IModel, isType, IType } from '../core/type';
+import { ComplexType, getType, IMSTNode, isType, IType } from '../core';
 import { createDefaultValueFactory } from "./with-default"
 import { Property } from "./property-types/property"
 import { TransformedProperty } from "./property-types/transformed-property"
@@ -195,8 +195,8 @@ export type DeepPartial<T> = {
 }
 
 // MWE: somehow get  & { toJSON(): S } in here...?
-export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, T & { toJSON(): any } & IModel>
-export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, T & { toJSON(): any } & IModel>
+export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, T & { toJSON(): any } & IMSTNode>
+export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, T & { toJSON(): any } & IMSTNode>
 export function createModelFactory(arg1: any, arg2?: any) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1

@@ -1,7 +1,6 @@
 import { observable } from "mobx"
 import { Property } from "./property"
-import { getMST, valueToSnapshot } from "../../core/administration"
-import { escapeJsonPath } from "../../core/json-patch"
+import { getMST, valueToSnapshot, escapeJsonPath } from "../../core"
 import { addHiddenWritableProp } from "../../utils"
 
 export class TransformedProperty extends Property {

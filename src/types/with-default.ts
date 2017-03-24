@@ -1,5 +1,5 @@
 import {IType} from "../core/type"
-import {hasMST, getMST} from "../core/administration"
+import {hasMST, getMST} from "../core"
 import {invariant} from "../utils"
 import {Type} from "../core/type"
 

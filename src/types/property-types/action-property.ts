@@ -1,5 +1,5 @@
 import { addHiddenFinalProp } from "../../utils"
-import { createActionInvoker } from "../../core/action"
+import { createActionInvoker } from "../../core"
 import { Property } from "./property"
 
 export class ActionProperty extends Property {

@@ -1,8 +1,6 @@
 import { observable, IObjectWillChange, IObjectChange } from "mobx"
 import { Property } from "./property"
-import { getMST, maybeMST, valueToSnapshot } from "../../core/administration"
-import { IType } from "../../core/type"
-import { escapeJsonPath } from "../../core/json-patch"
+import { getMST, maybeMST, valueToSnapshot, IType, escapeJsonPath } from "../../core"
 
 export class ValueProperty extends Property {
     constructor(propertyName: string, public type: IType<any, any>) {

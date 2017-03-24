@@ -1,8 +1,8 @@
 import {isObservableArray, isObservableMap} from "mobx"
-import {IModel, IType, isModel} from "../core/type"
+import {IMSTNode, IType, isMST} from "../core"
 import {resolve} from "../top-level-api"
 import {invariant, fail} from "../utils"
-import { getMST, getRelativePath } from "../core/administration"
+import { getMST, getRelativePath } from "../core"
 import { getIdentifierAttribute } from "./object"
 
 export interface IReference {
@@ -25,17 +25,17 @@ export function reference<T>(factory: IType<any, T>, basePath?: string): T {
 function createGenericRelativeReference(factory: IType<any, any>): IReferenceDescription {
     return {
         isReference: true,
-        getter: function (this: IModel, identifier: IReference | null | undefined): any {
+        getter: function (this: IMSTNode, identifier: IReference | null | undefined): any {
             if (identifier === null || identifier === undefined)
                 return identifier
             // TODO: would be better to test as part of snapshot...
             invariant(typeof identifier.$ref === "string", "Expected a reference in the format `{ $ref: ... }`")
             return resolve(this, identifier.$ref)
         },
-        setter: function(this: IModel, value: IModel): IReference {
+        setter: function(this: IMSTNode, value: IMSTNode): IReference {
             if (value === null || value === undefined)
                 return value
-            invariant(isModel(value), `Failed to assign a value to a reference; the value is not a model instance`)
+            invariant(isMST(value), `Failed to assign a value to a reference; the value is not a model instance`)
             invariant(factory.is(value), `Failed to assign a value to a reference; the value is not a model of type ${factory}`)
             const base = getMST(this)
             const target = getMST(value)
@@ -52,7 +52,7 @@ function createReferenceWithBasePath(type: IType<any, any>, path: string): IRefe
 
     return {
         isReference: true,
-        getter: function (this: IModel, identifier: string | null | undefined): any {
+        getter: function (this: IMSTNode, identifier: string | null | undefined): any {
             if (identifier === null || identifier === undefined)
                 return identifier
             const targetCollection = resolve(this, `${path}`)
@@ -65,10 +65,10 @@ function createReferenceWithBasePath(type: IType<any, any>, path: string): IRefe
             } else
                 return fail("References with base paths should point to either an `array` or `map` collection")
         },
-        setter: function(this: IModel, value: IModel): string {
+        setter: function(this: IMSTNode, value: IMSTNode): string {
             if (value === null || value === undefined)
                 return value
-            invariant(isModel(value), `Failed to assign a value to a reference; the value is not a model instance`)
+            invariant(isMST(value), `Failed to assign a value to a reference; the value is not a model instance`)
             invariant(type.is(value), `Failed to assign a value to a reference; the value is not a model of type ${type}`)
             const base = getMST(this)
             const target = getMST(value)

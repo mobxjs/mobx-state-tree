@@ -1,6 +1,5 @@
-import {IType} from "../core/type"
+import {IType, Type} from "../core"
 import {invariant, isMutable, isSerializable, isPlainObject} from "../utils"
-import {Type} from "../core/type"
 
 function freeze(value: any) {
     Object.freeze(value)
