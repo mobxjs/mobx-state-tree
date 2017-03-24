@@ -3,7 +3,7 @@ import {IFactory} from "../core/factories"
 
 export type IRecursiveDef<S, T> = (type: IFactory<S, T>) => IFactory<any, any>
 
-class Recursive extends Type {
+class Recursive<S, T> extends Type<S, T> {
     readonly type: IFactory<any, any>
 
     constructor(name: string, def: IRecursiveDef<any, any>) {
@@ -15,7 +15,7 @@ class Recursive extends Type {
         return this.type.create(snapshot)
     }
 
-    is(thing: any): boolean {
+    is(thing: any): thing is S | T {
         return this.type.is(thing)
     }
 

@@ -38,8 +38,8 @@ export class Node {
         // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
     }
 
-    get type(): ComplexType {
-        return this.factory.type as ComplexType
+    get type(): ComplexType<any, any> {
+        return this.factory.type as ComplexType<any, any>
     }
 
     @computed get pathParts(): string[]{

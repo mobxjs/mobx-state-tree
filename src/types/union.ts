@@ -4,7 +4,7 @@ import {Type} from "../core/types"
 
 export type IFactoryDispatcher = (snapshot: any) => IFactory<any, any>
 
-export class Union extends Type {
+export class Union extends Type<any, any> {
     readonly dispatcher: IFactoryDispatcher | null = null
     readonly types: IFactory<any, any>[]
 
@@ -34,7 +34,7 @@ export class Union extends Type {
         return applicableTypes[0].create(value)
     }
 
-    is(value: any) {
+    is(value: any): value is any {
         return this.types.some(type => type.is(value))
     }
 

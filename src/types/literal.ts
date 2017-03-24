@@ -3,7 +3,7 @@ import {IFactory} from "../core/factories"
 import {invariant, isPrimitive} from "../utils"
 import {Type} from "../core/types"
 
-export class Literal extends Type {
+export class Literal<T> extends Type<T, T> {
     readonly value: any
 
     constructor(value: any) {
@@ -19,7 +19,7 @@ export class Literal extends Type {
         return JSON.stringify(this.value)
     }
 
-    is(value: any) {
+    is(value: any): value is T {
         return value === this.value && isPrimitive(value)
     }
 

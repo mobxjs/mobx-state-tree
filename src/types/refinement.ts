@@ -3,13 +3,11 @@ import {invariant} from "../utils"
 import {Type} from "../core/types"
 import {hasNode, getNode} from "../core/node"
 
-export type IPredicate = (snapshot: any) => boolean
-
-export class Refinement extends Type {
+export class Refinement extends Type<any, any> {
     readonly type: IFactory<any, any>
-    readonly predicate: IPredicate
+    readonly predicate: (v: any) => boolean
 
-    constructor(name: string, type: IFactory<any, any>, predicate: IPredicate) {
+    constructor(name: string, type: IFactory<any, any>, predicate: (v: any) => boolean) {
         super(name)
         this.type = type
         this.predicate = predicate
@@ -30,12 +28,14 @@ export class Refinement extends Type {
         return inst
     }
 
-    is(value: any) {
+    is(value: any): value is any {
         return this.type.is(value) && this.predicate(value)
     }
 }
 
-export function createRefinementFactory<S, T>(name: string, type: IFactory<S, T>, predicate: IPredicate): IFactory<S, T> {
+export function createRefinementFactory<T>(name: string, type: IFactory<T, T>, predicate: (snapshot: T) => boolean): IFactory<T, T>
+export function createRefinementFactory<S, T extends S, U extends S>(name: string, type: IFactory<S, T>, predicate: (snapshot: S) => snapshot is U): IFactory<S, U>
+export function createRefinementFactory(name: string, type: IFactory<any, any>, predicate: (snapshot: any) => boolean): IFactory<any, any> {
     // check if the subtype default value passes the predicate
     const inst = type.create()
     invariant(predicate(hasNode(inst) ? getNode(inst).snapshot : inst), `Default value for refinement type ` + name + ` does not pass the predicate.`)

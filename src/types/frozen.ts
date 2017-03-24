@@ -16,7 +16,7 @@ function freeze(value: any) {
     return value
 }
 
-export class Frozen extends Type {
+export class Frozen<T> extends Type<T, T> {
 
     constructor() {
         super("frozen")
@@ -32,10 +32,11 @@ export class Frozen extends Type {
         return isMutable(value) ? freeze(value) : value
     }
 
-    is(value: any) {
+    is(value: any): value is T {
         return isSerializable(value)
     }
 
 }
 
+// TODO: improve typings?
 export const frozen: IFactory<any, any> = new Frozen().factory

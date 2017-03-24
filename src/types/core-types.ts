@@ -2,7 +2,7 @@ import {IFactory} from "../core/factories"
 import {invariant, isPrimitive} from "../utils"
 import {Type} from "../core/types"
 
-export class CoreType extends Type {
+export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean
 
     constructor(name: any, checker: any) {
@@ -20,7 +20,7 @@ export class CoreType extends Type {
         return value
     }
 
-    is(thing: any) {
+    is(thing: any): thing is T {
         return isPrimitive(thing) && this.checker(thing)
     }
 }

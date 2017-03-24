@@ -1,16 +1,17 @@
 import {getNode, hasNode} from "./node"
 import {IType, ITypeChecker} from "./types"
 
+// TODO: combine with object type
 export type IModel = {
     $treenode: any // Actually Node, but that should not be exposed to the public...
 } & Object
 
 export interface IFactory<S, T> {
-    create(snapshot?: S): T & IModel
+    create(snapshot?: S): T & IModel // TODO: factor out?
     factoryName: string,
-    is: ITypeChecker
+    is: ITypeChecker<S, T>
     isFactory: boolean
-    type: IType
+    type: IType<S, T>
 }
 
 export function isFactory(value: any): value is IFactory<any, any> {

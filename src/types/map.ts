@@ -15,7 +15,7 @@ export interface IExtendedObservableMap<T> extends ObservableMap<T> {
     put(value: T): this
 }
 
-export class MapType extends ComplexType {
+export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
     isMapFactory = true
     subType: IFactory<any, any>
 

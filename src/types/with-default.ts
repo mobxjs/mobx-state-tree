@@ -3,11 +3,11 @@ import {hasNode, getNode} from "../core/node"
 import {invariant} from "../utils"
 import {Type} from "../core/types"
 
-export class DefaultValue extends Type {
-    readonly type: IFactory<any, any>
+export class DefaultValue<S, T> extends Type<S, T> {
+    readonly type: IFactory<S, T>
     readonly defaultValue: any
 
-    constructor(type: IFactory<any, any>, defaultValue: any) {
+    constructor(type: IFactory<S, T>, defaultValue: S) {
         super(type.type.name)
         this.type = type
         this.defaultValue = defaultValue
@@ -23,17 +23,16 @@ export class DefaultValue extends Type {
         return typeof value === "undefined" ? this.type.create(this.defaultValue) : this.type.create(value)
     }
 
-    is(value: any) {
+    is(value: any): value is S | T {
         // defaulted values can be skipped
         return value === undefined || this.type.is(value)
     }
 
 }
 
-// TODO: improve typings to S } void or something?
-export function createDefaultValueFactory<S, T>(type: IFactory<S, T>, defaultValueOrNode: S | T): IFactory<S, T>;
-export function createDefaultValueFactory<S, T>(type: IFactory<S, T>, defaultValueOrNode: any): IFactory<S, T>; /* any snapshot, as snapshots cannot properly typed yet */
-export function createDefaultValueFactory<S, T>(type: IFactory<S, T>, defaultValueOrNode: S | T): IFactory<S, T> {
+export function createDefaultValueFactory<T>(type: IFactory<T, T>, defaultValueOrNode: T): IFactory<T, T>;
+export function createDefaultValueFactory<S, T>(type: IFactory<S, T>, defaultValueOrNode: S): IFactory<S, T>;
+export function createDefaultValueFactory(type: IFactory<any, any>, defaultValueOrNode: any): IFactory<any, any> {
     const defaultValue = hasNode(defaultValueOrNode) ? getNode(defaultValueOrNode).snapshot : defaultValueOrNode
     invariant(type.is(defaultValue), `Default value ${JSON.stringify(defaultValue)} is not assignable to type ${type.factoryName}. Expected ${JSON.stringify(type.type.describe())}`)
     return new DefaultValue(type, defaultValue).factory

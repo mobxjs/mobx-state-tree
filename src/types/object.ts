@@ -27,7 +27,7 @@ interface IObjectFactoryConfig {
     baseModel: Object
 }
 
-export class ObjectType extends ComplexType {
+export class ObjectType extends ComplexType<any, any> {
     isObjectFactory = true
 
     /**
@@ -55,6 +55,7 @@ export class ObjectType extends ComplexType {
         this.modelConstructor.prototype.toString = function() {
             return `${name}${JSON.stringify(getSnapshot(this))}`
         }
+        // TODO: kill toJSON
         this.modelConstructor.prototype.toJSON = function() {
             return getSnapshot(this)
         }
@@ -98,7 +99,7 @@ export class ObjectType extends ComplexType {
                 this.props[key] = new IdentifierProperty(key)
             } else if (isPrimitive(value)) {
                 // TODO: detect exact primitiveFactory!
-                this.props[key] = new ValueProperty(key, createDefaultValueFactory(primitiveFactory, value))
+                this.props[key] = new ValueProperty(key, createDefaultValueFactory(primitiveFactory as any, value))
             } else if (isFactory(value)) {
                 this.props[key] = new ValueProperty(key, value)
             } else if (isReferenceFactory(value)) {

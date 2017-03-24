@@ -8,7 +8,7 @@ import {identity, nothing, invariant} from "../utils"
 import {ComplexType} from "../core/types"
 import {getIdentifierAttribute} from "./object"
 
-export class ArrayType extends ComplexType {
+export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     isArrayFactory = true
     subType: IFactory<any, any> // TODO: type
 
@@ -155,7 +155,7 @@ function reconcileArrayItems(identifierAttr: string, target: IObservableArray<an
     })
 }
 
-export function createArrayFactory<S, T extends S>(subtype: IFactory<S, T>): IFactory<S[], IObservableArray<T>> {
+export function createArrayFactory<S, T>(subtype: IFactory<S, T>): IFactory<S[], IObservableArray<T>> {
     return createDefaultValueFactory(new ArrayType(subtype.factoryName + "[]", subtype).factory, [])
 }
 

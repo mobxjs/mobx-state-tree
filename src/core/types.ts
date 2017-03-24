@@ -4,17 +4,17 @@ import {IJsonPatch} from "../core/json-patch"
 import {IFactory, IModel} from "./factories"
 import {fail} from "../utils"
 
-export interface IType {
+export interface IType<S, T> {
     name: string
-    is(thing: IModel | any): boolean
-    create(snapshot: any): any
-    factory: IFactory<any, any> // TODO type
+    is(thing: any): thing is S | T
+    create(snapshot: S): T
+    factory: IFactory<S, T>
     describe(): string
 }
 
-export type ITypeChecker = (value: IModel | any) => boolean
+export type ITypeChecker<S, T> = (value: any) => value is S | T
 
-export abstract class Type implements IType { // TODO: generic for config and state of target
+export abstract class Type<S, T> implements IType<S, T> { // TODO: generic for config and state of target
     name: string
     factory: IFactory<any, any>
 
@@ -24,16 +24,16 @@ export abstract class Type implements IType { // TODO: generic for config and st
     }
 
     abstract create(snapshot: any): any
-    abstract is(thing: any): boolean
+    abstract is(thing: any): thing is S | T
     abstract describe(): string
 
-    protected initializeFactory(this: Type) {
+    protected initializeFactory() {
         return {
             create: action(
                 this.name,
                 this.create.bind(this)
             ),
-            type: this,
+            type: this as any,
             isFactory: true,
             factoryName: this.name,
             is: this.is.bind(this)
@@ -41,7 +41,7 @@ export abstract class Type implements IType { // TODO: generic for config and st
     }
 }
 
-export abstract class ComplexType extends Type {
+export abstract class ComplexType<S, T> extends Type<S, T> {
     create(snapshot: any = this.getDefaultSnapshot()) {
         typecheck(this, snapshot)
         const instance = this.createNewInstance()
@@ -62,7 +62,7 @@ export abstract class ComplexType extends Type {
     abstract getChildFactory(key: string): IFactory<any, any>
     abstract isValidSnapshot(snapshot: any): boolean
 
-    is(value: any): boolean {
+    is(value: any): value is S | T {
         if (!value || typeof value !== "object")
             return false
         if (hasNode(value))
@@ -71,7 +71,7 @@ export abstract class ComplexType extends Type {
     }
 }
 
-export function typecheck(type: IType, snapshot: any) {
+export function typecheck(type: IType<any, any>, snapshot: any) {
     if (!type.is(snapshot))
         fail(`Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${type.name}. Expected ${type.describe()} instead.`)
 }
