@@ -1,7 +1,7 @@
 import { createDefaultValueFactory } from './with-default';
-import {IType} from "../core/types"
+import {IType} from "../core/type"
 import {invariant, isPrimitive} from "../utils"
-import {Type} from "../core/types"
+import {Type} from "../core/type"
 
 export class Literal<T> extends Type<T, T> {
     readonly value: any

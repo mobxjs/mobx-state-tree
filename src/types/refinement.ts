@@ -1,7 +1,7 @@
-import {IType} from "../core/types"
+import {IType} from "../core/type"
 import {invariant} from "../utils"
-import {Type} from "../core/types"
-import {hasNode, getNode} from "../core/node"
+import {Type} from "../core/type"
+import {hasMST, getMST} from "../core/administration"
 
 export class Refinement extends Type<any, any> {
     readonly type: IType<any, any>
@@ -20,7 +20,7 @@ export class Refinement extends Type<any, any> {
     create(value: any) {
         // create the child type
         const inst = this.type.create(value)
-        const snapshot = hasNode(inst) ? getNode(inst).snapshot : inst
+        const snapshot = hasMST(inst) ? getMST(inst).snapshot : inst
 
         // check if pass the predicate
         invariant(this.is(snapshot), `Value ${JSON.stringify(snapshot)} is not assignable to type ${this.name}`)
@@ -38,7 +38,7 @@ export function createRefinementFactory<S, T extends S, U extends S>(name: strin
 export function createRefinementFactory(name: string, type: IType<any, any>, predicate: (snapshot: any) => boolean): IType<any, any> {
     // check if the subtype default value passes the predicate
     const inst = type.create()
-    invariant(predicate(hasNode(inst) ? getNode(inst).snapshot : inst), `Default value for refinement type ` + name + ` does not pass the predicate.`)
+    invariant(predicate(hasMST(inst) ? getMST(inst).snapshot : inst), `Default value for refinement type ` + name + ` does not pass the predicate.`)
 
     return new Refinement(name, type, predicate)
 }

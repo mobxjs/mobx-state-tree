@@ -1,5 +1,5 @@
 import {IActionCall} from "../core/action"
-import {isModel} from "../core/types"
+import {isModel} from "../core/type"
 import {onSnapshot, getSnapshot, applyAction} from "../top-level-api"
 import {invariant, extend} from "../utils"
 

@@ -5,15 +5,13 @@ export {
     IType,
     isType,
     getType,
-    getChildType
-} from "./core/types"
+    getChildType,
+    Type,
+    ComplexType
+} from "./core/type"
 export {
     IActionCall
 } from "./core/action"
-export {
-    Type,
-    ComplexType
-} from "./core/types"
 
 export {
     asReduxStore,

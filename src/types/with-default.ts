@@ -1,7 +1,7 @@
-import {IType} from "../core/types"
-import {hasNode, getNode} from "../core/node"
+import {IType} from "../core/type"
+import {hasMST, getMST} from "../core/administration"
 import {invariant} from "../utils"
-import {Type} from "../core/types"
+import {Type} from "../core/type"
 
 export class DefaultValue<S, T> extends Type<S, T> {
     readonly type: IType<S, T>
@@ -33,7 +33,7 @@ export class DefaultValue<S, T> extends Type<S, T> {
 export function createDefaultValueFactory<T>(type: IType<T, T>, defaultValueOrNode: T): IType<T, T>;
 export function createDefaultValueFactory<S, T>(type: IType<S, T>, defaultValueOrNode: S): IType<S, T>;
 export function createDefaultValueFactory(type: IType<any, any>, defaultValueOrNode: any): IType<any, any> {
-    const defaultValue = hasNode(defaultValueOrNode) ? getNode(defaultValueOrNode).snapshot : defaultValueOrNode
+    const defaultValue = hasMST(defaultValueOrNode) ? getMST(defaultValueOrNode).snapshot : defaultValueOrNode
     invariant(type.is(defaultValue), `Default value ${JSON.stringify(defaultValue)} is not assignable to type ${type.name}. Expected ${JSON.stringify(type.describe())}`)
     return new DefaultValue(type, defaultValue)
 }

@@ -1,8 +1,8 @@
 import {isObservableArray, isObservableMap} from "mobx"
-import {IModel, IType, isModel} from "../core/types"
+import {IModel, IType, isModel} from "../core/type"
 import {resolve} from "../top-level-api"
 import {invariant, fail} from "../utils"
-import { getNode, getRelativePath } from "../core/node"
+import { getMST, getRelativePath } from "../core/administration"
 import { getIdentifierAttribute } from "./object"
 
 export interface IReference {
@@ -37,8 +37,8 @@ function createGenericRelativeReference(factory: IType<any, any>): IReferenceDes
                 return value
             invariant(isModel(value), `Failed to assign a value to a reference; the value is not a model instance`)
             invariant(factory.is(value), `Failed to assign a value to a reference; the value is not a model of type ${factory}`)
-            const base = getNode(this)
-            const target = getNode(value)
+            const base = getMST(this)
+            const target = getMST(value)
             invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
             return { $ref: getRelativePath(base, target) }
         }
@@ -70,8 +70,8 @@ function createReferenceWithBasePath(type: IType<any, any>, path: string): IRefe
                 return value
             invariant(isModel(value), `Failed to assign a value to a reference; the value is not a model instance`)
             invariant(type.is(value), `Failed to assign a value to a reference; the value is not a model of type ${type}`)
-            const base = getNode(this)
-            const target = getNode(value)
+            const base = getMST(this)
+            const target = getMST(value)
             invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
             const identifier = (value as any)[targetIdAttribute]
             const targetCollection = resolve(this, `${path}`)

@@ -1,6 +1,6 @@
 import {createUnionFactory} from "./union"
 import {createLiteralFactory} from "./literal"
-import {IType} from "../core/types"
+import {IType} from "../core/type"
 
 const nullFactory = createLiteralFactory(null)
 

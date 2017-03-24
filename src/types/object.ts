@@ -1,11 +1,11 @@
 import { IdentifierProperty } from './property-types/identifier-property';
 import { action, isAction, extendShallowObservable, IObjectChange, IObjectWillChange, IAction, intercept, observe } from "mobx"
 import { nothing, invariant, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
-import { Node, maybeNode } from "../core/node"
+import { MSTAdminisration, maybeMST } from "../core/administration"
 import { isReferenceFactory } from "./reference"
 import { primitiveFactory } from "./primitive"
 import { isIdentifierFactory } from "./identifier"
-import { ComplexType, getType, IModel, isType, IType } from '../core/types';
+import { ComplexType, getType, IModel, isType, IType } from '../core/type';
 import { createDefaultValueFactory } from "./with-default"
 import { Property } from "./property-types/property"
 import { TransformedProperty } from "./property-types/transformed-property"
@@ -17,7 +17,7 @@ import { IJsonPatch } from "../index";
 
 // TODO: make generic with snapshot type
 export interface IObjectInstance {
-    $treenode: Node
+    $treenode: MSTAdminisration
 }
 
 
@@ -114,27 +114,27 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     // TODO: adm or instance as param?
-    getChildNodes(node: Node, instance: any): [string, Node][] {
-        const res: [string, Node][] = []
+    getChildMSTs(node: MSTAdminisration, instance: any): [string, MSTAdminisration][] {
+        const res: [string, MSTAdminisration][] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
-                maybeNode(instance[prop.name], propertyNode => res.push([prop.name, propertyNode]))
+                maybeMST(instance[prop.name], propertyNode => res.push([prop.name, propertyNode]))
         })
         return res
     }
 
-    getChildNode(node: Node, instance: any, key: string): Node | null {
-        return maybeNode(instance[key], identity, nothing)
+    getChildMST(node: MSTAdminisration, instance: any, key: string): MSTAdminisration | null {
+        return maybeMST(instance[key], identity, nothing)
     }
 
     // TODO: node or instance?
-    serialize(node: Node, instance: any): any {
+    serialize(node: MSTAdminisration, instance: any): any {
         const res = {}
         this.forAllProps(prop => prop.serialize(instance, res))
         return res
     }
 
-    applyPatchLocally(node: Node, target: any, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdminisration, target: any, subpath: string, patch: IJsonPatch): void {
         invariant(patch.op === "replace" || patch.op === "add")
         this.applySnapshot(node, target, {
             [subpath]: patch.value
@@ -142,7 +142,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     // TODO: remove node arg
-    @action applySnapshot(node: Node, target: any, snapshot: any): void {
+    @action applySnapshot(node: MSTAdminisration, target: any, snapshot: any): void {
         // TODO typecheck?
         for (let key in snapshot) {
             invariant(key in this.props, `It is not allowed to assign a value to non-declared property ${key} of ${this.name}`)

@@ -1,7 +1,7 @@
 import { observable, IObjectWillChange, IObjectChange } from "mobx"
 import { Property } from "./property"
-import { getNode, maybeNode, valueToSnapshot } from "../../core/node"
-import { IType } from "../../core/types"
+import { getMST, maybeMST, valueToSnapshot } from "../../core/administration"
+import { IType } from "../../core/type"
 import { escapeJsonPath } from "../../core/json-patch"
 
 export class ValueProperty extends Property {
@@ -18,18 +18,18 @@ export class ValueProperty extends Property {
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
-        const node = getNode(change.object)
+        const node = getMST(change.object)
         const oldValue = change.object[this.name]
 
         // TODO check type
         // TODO: check if tree is editable
-        maybeNode(oldValue, adm => adm.setParent(null))
+        maybeMST(oldValue, adm => adm.setParent(null))
         change.newValue = node.prepareChild(this.name, change.newValue)
         return change
     }
 
     didChange(change: IObjectChange) {
-        const node = getNode(change.object)
+        const node = getMST(change.object)
         node.emitPatch({
             op: "replace",
             path: "/" + escapeJsonPath(this.name),
@@ -42,7 +42,7 @@ export class ValueProperty extends Property {
     }
 
     deserialize(instance: any, snapshot: any) {
-        maybeNode(
+        maybeMST(
             instance[this.name],
             propertyNode => { propertyNode.applySnapshot(snapshot[this.name]) },
             () => { instance[this.name] = snapshot[this.name] }

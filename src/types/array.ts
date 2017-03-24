@@ -1,10 +1,10 @@
 import { createDefaultValueFactory } from './with-default';
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe} from "mobx"
 import { applySnapshot } from "../top-level-api"
-import {Node, maybeNode, valueToSnapshot, getNode} from "../core/node"
+import {MSTAdminisration, maybeMST, valueToSnapshot, getMST} from "../core/administration"
 import {IJsonPatch} from "../core/json-patch"
 import {identity, nothing, invariant} from "../utils"
-import {ComplexType, IType, isType, getType, IModel} from "../core/types"
+import {ComplexType, IType, isType, getType, IModel} from "../core/type"
 import {getIdentifierAttribute} from "./object"
 
 export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
@@ -27,21 +27,21 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     finalizeNewInstance(instance: IObservableArray<any>, snapshot: any) {
         intercept(instance, this.willChange as any)
         observe(instance, this.didChange)
-        getNode(instance).applySnapshot(snapshot)
+        getMST(instance).applySnapshot(snapshot)
     }
 
-    getChildNodes(_: Node, target: IObservableArray<any>): [string, Node][] {
-        const res: [string, Node][] = []
+    getChildMSTs(_: MSTAdminisration, target: IObservableArray<any>): [string, MSTAdminisration][] {
+        const res: [string, MSTAdminisration][] = []
         target.forEach((value, index) => {
-            maybeNode(value, node => { res.push(["" + index, node])})
+            maybeMST(value, node => { res.push(["" + index, node])})
         })
         return res
     }
 
-    getChildNode(node: Node, target: IObservableArray<any>, key: string): Node | null {
+    getChildMST(node: MSTAdminisration, target: IObservableArray<any>, key: string): MSTAdminisration | null {
         const index = parseInt(key, 10)
         if (index < target.length)
-            return maybeNode(target[index], identity, nothing)
+            return maybeMST(target[index], identity, nothing)
         return null
     }
 
@@ -50,7 +50,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
                 // TODO check type
         // TODO: check if tree is editable
         // TODO: check for key duplication
-        const node = getNode(change.object)
+        const node = getMST(change.object)
         switch (change.type) {
             case "update":
                 const {newValue} = change
@@ -61,7 +61,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
                 break
             case "splice":
                 change.object.slice(change.index, change.removedCount).forEach(oldValue => {
-                    maybeNode(oldValue, adm => adm.setParent(null))
+                    maybeMST(oldValue, adm => adm.setParent(null))
                 })
                 change.added = change.added.map((newValue, pos) => {
                     return node.prepareChild("" + (change.index + pos), newValue)
@@ -71,12 +71,12 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         return change
     }
 
-    serialize(node: Node, target: IObservableArray<any>): any {
+    serialize(node: MSTAdminisration, target: IObservableArray<any>): any {
         return target.map(valueToSnapshot)
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
-        const node = getNode(change.object)
+        const node = getMST(change.object)
         switch (change.type) {
             case "update":
                 return void node.emitPatch({
@@ -100,7 +100,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         }
     }
 
-    applyPatchLocally(node: Node, target: IObservableArray<any>, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdminisration, target: IObservableArray<any>, subpath: string, patch: IJsonPatch): void {
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
             case "replace":
@@ -115,7 +115,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         }
     }
 
-    @action applySnapshot(node: Node, target: IObservableArray<any>, snapshot: any[]): void {
+    @action applySnapshot(node: MSTAdminisration, target: IObservableArray<any>, snapshot: any[]): void {
         const identifierAttr = getIdentifierAttribute(this.subType)
         if (identifierAttr)
             target.replace(reconcileArrayItems(identifierAttr, target, snapshot, this.subType))
@@ -140,7 +140,7 @@ function reconcileArrayItems(identifierAttr: string, target: IObservableArray<an
     const current: any = {}
     target.forEach(item => {
         const id = item[identifierAttr]
-        invariant(!current[id], `Identifier '${id}' (of ${getNode(item).path}) is not unique!`)
+        invariant(!current[id], `Identifier '${id}' (of ${getMST(item).path}) is not unique!`)
         current[id] = item
     })
     return snapshot.map(item => {

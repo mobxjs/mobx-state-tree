@@ -1,8 +1,8 @@
 import { action as mobxAction, isObservable } from "mobx"
-import {isModel} from "./types"
+import {isModel} from "./type"
 import {resolve} from "../top-level-api"
 import {invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction} from "../utils"
-import {Node, getNode, getRelativePath} from "./node"
+import {MSTAdminisration, getMST, getRelativePath} from "./administration"
 
 export type IActionCall = {
     name: string;
@@ -16,7 +16,7 @@ export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
 
     const actionInvoker = function () {
-        const adm = getNode(this)
+        const adm = getMST(this)
         if (adm.isRunningAction()) {
             // an action is already running in this tree, invoking this action does not emit a new action
             return action.apply(this, arguments)
@@ -47,15 +47,15 @@ export function createActionInvoker(name: string, fn: Function) {
 }
 
 
-function serializeArgument(adm: Node, actionName: string, index: number, arg: any): any {
+function serializeArgument(adm: MSTAdminisration, actionName: string, index: number, arg: any): any {
     if (isPrimitive(arg))
         return arg
     if (isModel(arg)) {
-        const targetNode = getNode(arg)
+        const targetNode = getMST(arg)
         if (adm.root !== targetNode.root)
             throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
         return ({
-            $ref: getRelativePath(adm, getNode(arg))
+            $ref: getRelativePath(adm, getMST(arg))
         })
     }
     if (typeof arg === "function")
@@ -74,7 +74,7 @@ function serializeArgument(adm: Node, actionName: string, index: number, arg: an
     }
 }
 
-function deserializeArgument(adm: Node, value: any): any {
+function deserializeArgument(adm: MSTAdminisration, value: any): any {
     if (typeof value === "object") {
         const keys = Object.keys(value)
         if (keys.length === 1 && keys[0] === "$ref")
@@ -83,7 +83,7 @@ function deserializeArgument(adm: Node, value: any): any {
     return value
 }
 
-export function applyActionLocally(node: Node, instance: any, action: IActionCall) {
+export function applyActionLocally(node: MSTAdminisration, instance: any, action: IActionCall) {
     invariant(typeof instance[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
     instance[action.name].apply(
         instance,

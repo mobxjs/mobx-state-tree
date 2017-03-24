@@ -1,6 +1,6 @@
 import { observable } from "mobx"
 import { Property } from "./property"
-import { getNode, valueToSnapshot } from "../../core/node"
+import { getMST, valueToSnapshot } from "../../core/administration"
 import { escapeJsonPath } from "../../core/json-patch"
 import { addHiddenWritableProp } from "../../utils"
 
@@ -20,7 +20,7 @@ export class TransformedProperty extends Property {
             set: function(v) {
                 if (this[self.name] === v)
                     return
-                const node = getNode(this)
+                const node = getMST(this)
                 const newValue = self.setter.call(this, v)
                 box.set(newValue)
                 node.emitPatch({

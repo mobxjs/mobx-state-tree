@@ -1,6 +1,6 @@
 // tslint:disable-next-line:no_unused-variable
 import {IObservableArray, ObservableMap, IAction} from "mobx"
-import {IType} from "../core/types"
+import {IType} from "../core/type"
 import {createMapFactory, IExtendedObservableMap} from "./map"
 import {createArrayFactory} from "./array"
 import {primitiveFactory} from "./primitive"
