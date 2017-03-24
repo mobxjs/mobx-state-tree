@@ -4,14 +4,14 @@ import { test } from "ava"
 
 test("it should support generic relative paths", t => {
     const User = createFactory({
-        name: types.primitive()
+        name: types.primitive
     })
     const UserStore = createFactory({
         user: types.reference(User),
         users: types.map(User)
     })
 
-    const store = UserStore({
+    const store = UserStore.create({
         user: { $ref: "users/17" },
         users: {
             "17": { name: "Michel" },
@@ -35,14 +35,14 @@ test("it should support generic relative paths", t => {
 test("it should support prefixed paths in maps", t => {
     const User = createFactory({
         id: types.identifier(),
-        name: types.primitive()
+        name: types.primitive
     })
     const UserStore = createFactory({
         user: types.reference(User, "users"),
         users: types.map(User)
     })
 
-    const store = UserStore({
+    const store = UserStore.create({
         user: "17",
         users: {
             "17": { id: "17", name: "Michel" },
@@ -66,14 +66,14 @@ test("it should support prefixed paths in maps", t => {
 test("it should support prefixed paths in arrays", t => {
     const User = createFactory({
         id: types.identifier(),
-        name: types.primitive()
+        name: types.primitive
     })
     const UserStore = createFactory({
         user: types.reference(User, "/users/"),
         users: types.array(User)
     })
 
-    const store = UserStore({
+    const store = UserStore.create({
         user: "17",
         users: [
             { id: "17", name: "Michel" },
@@ -102,7 +102,7 @@ test.skip("identifiers are required", (t) => {
     t.is(Todo.is({}), false)
     t.is(Todo.is({ id: "x" }), true)
 
-    t.throws(() => Todo(), "bla")
+    t.throws(() => Todo.create(), "bla")
 })
 
 test("identifiers cannot be modified", (t) => {
@@ -110,7 +110,7 @@ test("identifiers cannot be modified", (t) => {
         id: types.identifier()
     })
 
-    const todo = Todo({ id: "x" })
+    const todo = Todo.create({ id: "x" })
     t.throws(() => todo.id = "stuff", "[mobx-state-tree] It is not allowed to change the identifier of an object, got: 'stuff'")
     t.throws(() => applySnapshot(todo, {}), "[mobx-state-tree] Snapshot {} is not assignable to type AnonymousModel. Expected { id: identifier() } instead.")
 })

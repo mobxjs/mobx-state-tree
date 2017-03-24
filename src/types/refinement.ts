@@ -21,7 +21,7 @@ export class Refinement extends Type {
 
     create(value: any) {
         // create the child type
-        const inst = this.type(value)
+        const inst = this.type.create(value)
         const snapshot = hasNode(inst) ? getNode(inst).snapshot : inst
 
         // check if pass the predicate
@@ -37,7 +37,7 @@ export class Refinement extends Type {
 
 export function createRefinementFactory<S, T>(name: string, type: IFactory<S, T>, predicate: IPredicate): IFactory<S, T> {
     // check if the subtype default value passes the predicate
-    const inst = type()
+    const inst = type.create()
     invariant(predicate(hasNode(inst) ? getNode(inst).snapshot : inst), `Default value for refinement type ` + name + ` does not pass the predicate.`)
 
     return new Refinement(name, type, predicate).factory

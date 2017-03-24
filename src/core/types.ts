@@ -1,3 +1,4 @@
+import { isFactory } from '../../lib';
 import {action} from "mobx"
 import {Node, getNode, hasNode} from "./node"
 import {IJsonPatch} from "../core/json-patch"
@@ -26,16 +27,17 @@ export abstract class Type implements IType { // TODO: generic for config and st
     abstract is(thing: any): boolean
     abstract describe(): string
 
-    protected initializeFactory() {
-        const factory = action(
-            this.name,
-            this.create.bind(this)
-        ) as IFactory<any, any>
-        factory.type = this
-        factory.isFactory = true
-        factory.factoryName = this.name
-        factory.is = (value) => this.is(value)
-        return factory
+    protected initializeFactory(this: Type) {
+        return {
+            create: action(
+                this.name,
+                this.create.bind(this)
+            ),
+            type: this,
+            isFactory: true,
+            factoryName: this.name,
+            is: this.is.bind(this)
+        }
     }
 }
 

@@ -12,7 +12,7 @@ test("it should provide a default value, if no snapshot is provided", t => {
         rows: types.withDefault(types.array(Row) as any, [{name: 'test'}])
     })
 
-    const doc = Factory()
+    const doc = Factory.create()
     t.deepEqual<any>(getSnapshot(doc), {rows: [{name: 'test', quantity: 0}]})
 })
 
@@ -28,7 +28,7 @@ test("it should use the snapshot if provided", t => {
         rows: types.withDefault(types.array(Row) as any, [{name: 'test'}])
     })
 
-    const doc = Factory({rows: [{name: 'snapshot', quantity: 0}]})
+    const doc = Factory.create({rows: [{name: 'snapshot', quantity: 0}]})
     t.deepEqual<any>(getSnapshot(doc), {rows: [{name: 'snapshot', quantity: 0}]})
 })
 

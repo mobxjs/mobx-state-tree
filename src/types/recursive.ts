@@ -12,7 +12,7 @@ class Recursive extends Type {
     }
 
     create(snapshot: any) {
-        return this.type(snapshot)
+        return this.type.create(snapshot)
     }
 
     is(thing: any): boolean {

@@ -14,7 +14,7 @@ export class ValueProperty extends Property {
     }
 
     initialize(targetInstance: any) {
-        targetInstance[this.name] = this.factory()
+        targetInstance[this.name] = this.factory.create()
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {

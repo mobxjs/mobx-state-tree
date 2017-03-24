@@ -144,7 +144,7 @@ function reconcileArrayItems(identifierAttr: string, target: IObservableArray<an
             applySnapshot(existing, item)
             return existing
         } else {
-            return factory(item)
+            return factory.create(item)
         }
     })
 }

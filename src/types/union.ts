@@ -23,7 +23,7 @@ export class Union extends Type {
 
         // try the dispatcher, if defined
         if (this.dispatcher !== null) {
-            return this.dispatcher(value)(value)
+            return this.dispatcher(value).create(value)
         }
 
         // find the most accomodating type
@@ -31,7 +31,7 @@ export class Union extends Type {
         if (applicableTypes.length > 1)
              return fail(`Ambiguos snapshot ${JSON.stringify(value)} for union ${this.name}. Please provide a dispatch in the union declaration.`)
 
-        return applicableTypes[0](value)
+        return applicableTypes[0].create(value)
     }
 
     is(value: any) {

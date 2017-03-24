@@ -26,31 +26,31 @@ const createTestFactories = () => {
 test("it should create a factory", (t) => {
     const {Factory} = createTestFactories()
 
-    t.deepEqual<any>(getSnapshot<{[key: string]: ITestSnapshot}, ObservableMap<ITest>>(Factory()), {})
+    t.deepEqual<any>(getSnapshot<{[key: string]: ITestSnapshot}, ObservableMap<ITest>>(Factory.create()), {})
 })
 
 test("it should restore the state from the snapshot", (t) => {
     const {Factory} = createTestFactories()
 
-    t.deepEqual<any>(getSnapshot(Factory({hello: {to: 'world'}})), {hello: {to: 'world'}})
+    t.deepEqual<any>(getSnapshot(Factory.create({hello: {to: 'world'}})), {hello: {to: 'world'}})
 })
 
 // === SNAPSHOT TESTS ===
 test("it should emit snapshots", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
-    const doc = Factory()
+    const doc = Factory.create()
 
     let snapshots = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
 
-    doc.set("hello", ItemFactory())
+    doc.set("hello", ItemFactory.create())
 
     t.deepEqual(snapshots, [{hello: {to: 'world'}}])
 })
 
 test("it should apply snapshots", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
-    const doc = Factory()
+    const doc = Factory.create()
 
     applySnapshot(doc, {hello: {to: 'universe'}})
 
@@ -59,9 +59,9 @@ test("it should apply snapshots", (t) => {
 
 test("it should return a snapshot", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
-    const doc = Factory()
+    const doc = Factory.create()
 
-    doc.set("hello", ItemFactory())
+    doc.set("hello", ItemFactory.create())
 
     t.deepEqual<any>(getSnapshot<any, any>(doc), {hello: {to: 'world'}})
 })
@@ -70,12 +70,12 @@ test("it should return a snapshot", (t) => {
 // === PATCHES TESTS ===
 test("it should emit add patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
-    const doc = Factory()
+    const doc = Factory.create()
 
     let patches = []
     onPatch(doc, patch => patches.push(patch))
 
-    doc.set("hello", ItemFactory({to: "universe"}))
+    doc.set("hello", ItemFactory.create({to: "universe"}))
 
     t.deepEqual(patches, [
         {op: "add", path: "/hello", value: {to: "universe"}}
@@ -84,7 +84,7 @@ test("it should emit add patches", (t) => {
 
 test("it should apply a add patch", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
-    const doc = Factory()
+    const doc = Factory.create()
 
     applyPatch(doc, {op: "add", path: "/hello", value: {to: "universe"}})
 
@@ -93,14 +93,14 @@ test("it should apply a add patch", (t) => {
 
 test("it should emit update patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
-    const doc = Factory()
+    const doc = Factory.create()
 
-    doc.set("hello", ItemFactory())
+    doc.set("hello", ItemFactory.create())
 
     let patches = []
     onPatch(doc, patch => patches.push(patch))
 
-    doc.set("hello", ItemFactory({to: "universe"}))
+    doc.set("hello", ItemFactory.create({to: "universe"}))
 
     t.deepEqual(patches, [
         {op: "replace", path: "/hello", value: {to: "universe"}}
@@ -109,7 +109,7 @@ test("it should emit update patches", (t) => {
 
 test("it should apply a update patch", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
-    const doc = Factory()
+    const doc = Factory.create()
 
     applyPatch(doc, {op: "replace", path: "/hello", value: {to: "universe"}})
 
@@ -119,9 +119,9 @@ test("it should apply a update patch", (t) => {
 
 test("it should emit remove patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
-    const doc = Factory()
+    const doc = Factory.create()
 
-    doc.set("hello", ItemFactory())
+    doc.set("hello", ItemFactory.create())
 
     let patches = []
     onPatch(doc, patch => patches.push(patch))
@@ -135,9 +135,9 @@ test("it should emit remove patches", (t) => {
 
 test("it should apply a remove patch", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
-    const doc = Factory()
+    const doc = Factory.create()
 
-    doc.set("hello", ItemFactory())
+    doc.set("hello", ItemFactory.create())
 
     applyPatch(doc, {op: "remove", path: "/hello"})
 
@@ -146,7 +146,7 @@ test("it should apply a remove patch", (t) => {
 
 test("it should apply patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
-    const doc = Factory()
+    const doc = Factory.create()
 
     applyPatches(doc, [{op: "add", path: "/hello", value: {to: "mars"}}, {op: "replace", path: "/hello", value: {to: "universe"}}])
 
@@ -158,7 +158,7 @@ test("it should apply patches", (t) => {
 test("it should check the type correctly", (t) => {
     const {Factory} = createTestFactories()
 
-    const doc = Factory()
+    const doc = Factory.create()
 
     t.deepEqual(Factory.is(doc), true)
     t.deepEqual(Factory.is([]), false)
@@ -174,7 +174,7 @@ test("it should support identifiers", (t) => {
         }))
     })
 
-    const store = Store()
+    const store = Store.create()
     store.todos.set("17", { id: "17"} as any)
 
     const a = store.todos.get("17")

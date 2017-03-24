@@ -11,8 +11,8 @@ test("it should resolve to the parent instance", (t) => {
         rows: types.array(Row)
     })
 
-    const doc = Document()
-    const row = Row()
+    const doc = Document.create()
+    const row = Row.create()
     doc.rows.push(row)
 
     t.deepEqual<any>(getParent(row), doc.rows)
@@ -28,8 +28,8 @@ test("it should check for parent instance", (t) => {
         rows: types.array(Row)
     })
 
-    const doc = Document()
-    const row = Row()
+    const doc = Document.create()
+    const row = Row.create()
 
     doc.rows.push(row)
     t.deepEqual(hasParent(row), true)
@@ -45,8 +45,8 @@ test("it should check for parent instance (unbound)", (t) => {
         rows: types.array(Row)
     })
 
-    const doc = Document()
-    const row = Row()
+    const doc = Document.create()
+    const row = Row.create()
 
     t.deepEqual(hasParent(row), false)
 })
@@ -61,8 +61,8 @@ test("it should resolve to the parent object instance", (t) => {
         rows: types.array(Row)
     })
 
-    const doc = Document()
-    const row = Row()
+    const doc = Document.create()
+    const row = Row.create()
     doc.rows.push(row)
 
     // TOOD: re-enable
@@ -79,8 +79,8 @@ test("it should resolve to the root of an object", (t) => {
         rows: types.array(Row)
     })
 
-    const doc = Document()
-    const row = Row()
+    const doc = Document.create()
+    const row = Row.create()
     doc.rows.push(row)
     t.is(getRoot(row), doc)
 })
@@ -95,8 +95,8 @@ test("it should resolve the path of an object", (t) => {
         rows: types.array(Row)
     })
 
-    const doc = Document()
-    const row = Row()
+    const doc = Document.create()
+    const row = Row.create()
     doc.rows.push(row)
 
     t.deepEqual(getPath(row), "/rows/0")
@@ -112,8 +112,8 @@ test("it should resolve the path of an object", (t) => {
         rows: types.array(Row)
     })
 
-    const doc = Document()
-    const row = Row()
+    const doc = Document.create()
+    const row = Row.create()
     doc.rows.push(row)
 
     t.deepEqual(getPathParts(row), ["rows", "0"])
@@ -129,8 +129,8 @@ test("it should clone a node", (t) => {
         rows: types.array(Row)
     })
 
-    const doc = Document()
-    const row = Row()
+    const doc = Document.create()
+    const row = Row.create()
     doc.rows.push(row)
 
     const cloned = clone(doc)
@@ -144,7 +144,7 @@ test("it should return the model factory", (t) => {
         customer_id: 0
     })
 
-    const doc = Document()
+    const doc = Document.create()
 
     t.deepEqual(getFactory(doc), Document)
 })
@@ -160,7 +160,7 @@ test("it should return the child model factory", (t) => {
         rows: ArrayOfRow
     })
 
-    const doc = Document()
+    const doc = Document.create()
 
     // TODO: any because of #19
     t.deepEqual<any>(getChildFactory(doc, 'rows'), ArrayOfRow)
@@ -176,8 +176,8 @@ test("a node can exists only once in a tree", (t) => {
         foos: types.array(Row)
     })
 
-    const doc = Document()
-    const row = Row()
+    const doc = Document.create()
+    const row = Row.create()
     doc.rows.push(row)
 
     const error = t.throws(() => {
@@ -199,9 +199,9 @@ test("a node can exists only once in a tree", (t) => {
 //         })
 //     })
 
-//     const doc = Document()
-//     const a = Row({ done: true })
-//     const b = Row({ done: false })
+//     const doc = Document.create()
+//     const a = Row.create({ done: true })
+//     const b = Row.create({ done: false })
 
 //     doc.rows.push(a)
 //     doc.rows.push(b)
@@ -222,12 +222,12 @@ test("it can record and replay patches", (t) => {
         rows: types.array(Row)
     })
 
-    const source = Document()
-    const target = Document()
+    const source = Document.create()
+    const target = Document.create()
     const recorder = recordPatches(source)
 
     source.customer_id = 1
-    source.rows.push(Row({article_id: 1}))
+    source.rows.push(Row.create({article_id: 1}))
 
     recorder.replay(target)
 
@@ -249,13 +249,13 @@ test("it can record and replay actions", (t) => {
             this.customer_id = customer_id
         }),
         addRow: action(function(){
-            this.rows.push(Row())
+            this.rows.push(Row.create())
         }),
         rows: types.array(Row)
     })
 
-    const source = Document()
-    const target = Document()
+    const source = Document.create()
+    const target = Document.create()
     const recorder = recordActions(source)
 
     source.setCustomer(1)

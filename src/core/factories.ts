@@ -6,7 +6,7 @@ export type IModel = {
 } & Object
 
 export interface IFactory<S, T> {
-    (snapshot?: S, env?: Object): T & IModel
+    create(snapshot?: S): T & IModel
     factoryName: string,
     is: ITypeChecker
     isFactory: boolean
@@ -14,7 +14,7 @@ export interface IFactory<S, T> {
 }
 
 export function isFactory(value: any): value is IFactory<any, any> {
-    return typeof value === "function" && value.isFactory === true
+    return typeof value === "object" && value && value.isFactory === true
 }
 
 export function getFactory(object: IModel): IFactory<any, any> {

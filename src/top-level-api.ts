@@ -336,7 +336,7 @@ export function tryResolve(target: IModel, path: string): IModel | any {
  */
 export function clone<T extends IModel>(source: T): T {
     const node = getNode(source)
-    return node.factory(node.snapshot) as T
+    return node.factory.create(node.snapshot) as T
 }
 
 /**
@@ -359,7 +359,7 @@ export function detach<T extends IModel>(thing: T): T {
 }
 
 export function testActions<S, T extends IModel>(factory: IFactory<S, T>, initialState: S, ...actions: IActionCall[]): S {
-    const testInstance = factory(initialState)
+    const testInstance = factory.create(initialState)
     applyActions(testInstance, actions)
     return getSnapshot<S, T>(testInstance)
 }
@@ -372,7 +372,7 @@ export function resetAppState() {
 
 export function initializeAppState<S, T>(factory: IFactory<S, T>, initialSnapshot?: S) {
     invariant(!appState, `Global app state was already initialized, use 'resetAppState' to reset it`)
-    appState.set(factory(initialSnapshot))
+    appState.set(factory.create(initialSnapshot))
 }
 
 export function getAppState<T>(): T {

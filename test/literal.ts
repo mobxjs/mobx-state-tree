@@ -17,7 +17,7 @@ test("it should throw if a different type is given", t => {
     })
 
     const error = t.throws(() => {
-        const doc = Factory({ shouldBeOne: 2 })
+        const doc = Factory.create({ shouldBeOne: 2 })
     })
 
     t.is(error.message, '[mobx-state-tree] Snapshot {"shouldBeOne":2} is not assignable to type TestFactory. Expected { shouldBeOne: 1 } instead.')

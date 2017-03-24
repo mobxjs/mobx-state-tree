@@ -12,7 +12,7 @@ const Task = createFactory({
 })
 
 test("it should be possible to invoke a simple action", t => {
-    const t1 = Task()
+    const t1 = Task.create()
     t.is(t1.done, false)
 
     t.is(t1.toggle(), true)
@@ -20,8 +20,8 @@ test("it should be possible to invoke a simple action", t => {
 })
 
 test("it should be possible to record & replay a simple action", t => {
-    const t1 = Task()
-    const t2 = Task()
+    const t1 = Task.create()
+    const t2 = Task.create()
     t.is(t1.done, false)
     t.is(t2.done, false)
     const recorder = recordActions(t1)
@@ -41,7 +41,7 @@ test("it should be possible to record & replay a simple action", t => {
 })
 
 test.skip("it should not be possible to change state without action", t => {
-    const t1 = Task()
+    const t1 = Task.create()
     t.throws(
         () => {
             t1.done = !t1.done
@@ -68,7 +68,7 @@ const OrderStore = createFactory({
 })
 
 function createTestStore() {
-    return OrderStore({
+    return OrderStore.create({
         customers: [{ name: "Mattia" }],
         orders: [{
             customer: null
@@ -140,8 +140,8 @@ test("it should not be possible to pass an unserializable object", t => {
 })
 
 test("it should be possible to pass a complex plain object", t => {
-    const t1 = Task()
-    const t2 = Task()
+    const t1 = Task.create()
+    const t2 = Task.create()
 
     const recorder = recordActions(t1)
 

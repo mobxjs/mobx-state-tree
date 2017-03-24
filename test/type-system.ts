@@ -36,7 +36,7 @@ test("it should recognize an invalid snapshot", (t) => {
 test("it should check valid nodes as well", (t) => {
     const {Box} = createTestFactories()
 
-    const doc = Box()
+    const doc = Box.create()
 
     t.deepEqual(Box.is(doc), true)
 })
@@ -44,7 +44,7 @@ test("it should check valid nodes as well", (t) => {
 test("it should check invalid nodes as well", (t) => {
     const {Box, Cube} = createTestFactories()
 
-    const doc = Cube()
+    const doc = Cube.create()
 
     t.deepEqual(Box.is(doc), false)
 })
@@ -52,7 +52,7 @@ test("it should check invalid nodes as well", (t) => {
 test("it should cast different compatible factories", (t) => {
     const {Box, Square} = createTestFactories()
 
-    const doc = Square()
+    const doc = Square.create()
 
     t.deepEqual(Box.is(doc), true)
 })

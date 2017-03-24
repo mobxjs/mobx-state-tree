@@ -167,7 +167,7 @@ export class Node {
             return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${getPath(child)}'`)
         }
         const existingNode = this.getChildNode(subpath)
-        const newInstance = childFactory(child)
+        const newInstance = childFactory.create(child)
 
         if (existingNode && existingNode.factory === newInstance.factory) {
             // recycle instance..
