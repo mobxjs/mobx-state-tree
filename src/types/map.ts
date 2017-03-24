@@ -2,7 +2,7 @@ import { createDefaultValueFactory } from './with-default';
 import { getIdentifierAttribute } from './object';
 import {observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe} from "mobx"
 import { getNode, hasNode, maybeNode, Node, valueToSnapshot } from '../core/node';
-import {isType, IFactory} from "../core/factories"
+import {isType, IType, IModel} from "../core/types"
 import {identity, isPlainObject, nothing, isPrimitive, invariant, fail} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {ComplexType} from "../core/types"
@@ -17,15 +17,15 @@ export interface IExtendedObservableMap<T> extends ObservableMap<T> {
 
 export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
     isMapFactory = true
-    subType: IFactory<any, any>
+    subType: IType<any, any>
 
-    constructor(name: string, subType: IFactory<any, any>) {
+    constructor(name: string, subType: IType<any, any>) {
         super(name)
         this.subType = subType
     }
 
     describe() {
-        return "Map<string, " + this.subType.type.describe() + ">"
+        return "Map<string, " + this.subType.describe() + ">"
     }
 
     createNewInstance() {
@@ -164,7 +164,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         })
     }
 
-    getChildType(key: string): IFactory<any, any> {
+    getChildType(key: string): IType<any, any> {
         return this.subType
     }
 
@@ -177,10 +177,10 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 }
 
-export function createMapFactory<S, T>(subtype: IFactory<S, T>): IFactory<{[key: string]: S}, IExtendedObservableMap<T>> {
-    return createDefaultValueFactory(new MapType(`map<string, ${subtype.factoryName}>`, subtype).factory, {})
+export function createMapFactory<S, T>(subtype: IType<S, T>): IType<{[key: string]: S}, IExtendedObservableMap<T> & IModel> {
+    return createDefaultValueFactory(new MapType(`map<string, ${subtype.name}>`, subtype), {})
 }
 
 export function isMapFactory(factory: any): boolean {
-    return isType(factory) && (factory.type as any).isMapFactory === true
+    return isType(factory) && (factory as any).isMapFactory === true
 }

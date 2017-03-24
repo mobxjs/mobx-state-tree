@@ -1,13 +1,13 @@
-import {IFactory} from "../core/factories"
+import {IType} from "../core/types"
 import {invariant} from "../utils"
 import {Type} from "../core/types"
 import {hasNode, getNode} from "../core/node"
 
 export class Refinement extends Type<any, any> {
-    readonly type: IFactory<any, any>
+    readonly type: IType<any, any>
     readonly predicate: (v: any) => boolean
 
-    constructor(name: string, type: IFactory<any, any>, predicate: (v: any) => boolean) {
+    constructor(name: string, type: IType<any, any>, predicate: (v: any) => boolean) {
         super(name)
         this.type = type
         this.predicate = predicate
@@ -33,12 +33,12 @@ export class Refinement extends Type<any, any> {
     }
 }
 
-export function createRefinementFactory<T>(name: string, type: IFactory<T, T>, predicate: (snapshot: T) => boolean): IFactory<T, T>
-export function createRefinementFactory<S, T extends S, U extends S>(name: string, type: IFactory<S, T>, predicate: (snapshot: S) => snapshot is U): IFactory<S, U>
-export function createRefinementFactory(name: string, type: IFactory<any, any>, predicate: (snapshot: any) => boolean): IFactory<any, any> {
+export function createRefinementFactory<T>(name: string, type: IType<T, T>, predicate: (snapshot: T) => boolean): IType<T, T>
+export function createRefinementFactory<S, T extends S, U extends S>(name: string, type: IType<S, T>, predicate: (snapshot: S) => snapshot is U): IType<S, U>
+export function createRefinementFactory(name: string, type: IType<any, any>, predicate: (snapshot: any) => boolean): IType<any, any> {
     // check if the subtype default value passes the predicate
     const inst = type.create()
     invariant(predicate(hasNode(inst) ? getNode(inst).snapshot : inst), `Default value for refinement type ` + name + ` does not pass the predicate.`)
 
-    return new Refinement(name, type, predicate).factory
+    return new Refinement(name, type, predicate)
 }

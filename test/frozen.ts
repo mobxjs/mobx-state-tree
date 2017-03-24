@@ -1,5 +1,5 @@
 import {test} from "ava"
-import {createFactory, getSnapshot, types, IFactory} from "../"
+import {createFactory, getSnapshot, types, IType} from "../"
 
 test("it should accept any serializable value", t => {
     const Factory = createFactory({

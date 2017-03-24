@@ -2,11 +2,11 @@ export * from "./core/json-patch"
 export {
     IModel,
     isModel,
-    IFactory,
+    IType,
     isType,
     getType,
     getChildType
-} from "./core/factories"
+} from "./core/types"
 export {
     IActionCall
 } from "./core/action"

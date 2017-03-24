@@ -1,11 +1,11 @@
 import { observable, IObjectWillChange, IObjectChange } from "mobx"
 import { Property } from "./property"
 import { getNode, maybeNode, valueToSnapshot } from "../../core/node"
-import { IFactory } from "../../core/factories"
+import { IType } from "../../core/types"
 import { escapeJsonPath } from "../../core/json-patch"
 
 export class ValueProperty extends Property {
-    constructor(propertyName: string, public factory: IFactory<any, any>) {
+    constructor(propertyName: string, public type: IType<any, any>) {
         super(propertyName)
     }
 
@@ -14,7 +14,7 @@ export class ValueProperty extends Property {
     }
 
     initialize(targetInstance: any, snapshot: any) {
-        targetInstance[this.name] = this.factory.create(snapshot[this.name])
+        targetInstance[this.name] = this.type.create(snapshot[this.name])
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
@@ -50,6 +50,6 @@ export class ValueProperty extends Property {
     }
 
     isValidSnapshot(snapshot: any) {
-        return this.factory.is(snapshot[this.name])
+        return this.type.is(snapshot[this.name])
     }
 }

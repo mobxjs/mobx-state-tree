@@ -1,21 +1,21 @@
-import {isType, IFactory} from "../core/factories"
+import {isType, IType} from "../core/types"
 import {invariant, fail} from "../utils"
 import {Type} from "../core/types"
 
-export type IFactoryDispatcher = (snapshot: any) => IFactory<any, any>
+export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
 export class Union extends Type<any, any> {
-    readonly dispatcher: IFactoryDispatcher | null = null
-    readonly types: IFactory<any, any>[]
+    readonly dispatcher: ITypeDispatcher | null = null
+    readonly types: IType<any, any>[]
 
-    constructor(name: string, types: IFactory<any, any>[], dispatcher: IFactoryDispatcher | null) {
+    constructor(name: string, types: IType<any, any>[], dispatcher: ITypeDispatcher | null) {
         super(name)
         this.dispatcher = dispatcher
         this.types = types
     }
 
     describe() {
-        return "(" + this.types.map(factory => factory.type.describe()).join(" | ") + ")"
+        return "(" + this.types.map(factory => factory.describe()).join(" | ") + ")"
     }
 
     create(value: any) {
@@ -40,11 +40,11 @@ export class Union extends Type<any, any> {
 
 }
 
-export function createUnionFactory<SA, SB, TA, TB>(dispatch: IFactoryDispatcher, A: IFactory<SA, TA>, B: IFactory<SB, TB>): IFactory<SA | SB, TA | TB>
-export function createUnionFactory<SA, SB, TA, TB>(A: IFactory<SA, TA>, B: IFactory<SB, TB>): IFactory<SA | SB, TA | TB>
-export function createUnionFactory(dispatchOrType: IFactoryDispatcher | IFactory<any, any>, ...otherTypes: IFactory<any, any>[]): IFactory<any, any> {
+export function createUnionFactory<SA, SB, TA, TB>(dispatch: ITypeDispatcher, A: IType<SA, TA>, B: IType<SB, TB>): IType<SA | SB, TA | TB>
+export function createUnionFactory<SA, SB, TA, TB>(A: IType<SA, TA>, B: IType<SB, TB>): IType<SA | SB, TA | TB>
+export function createUnionFactory(dispatchOrType: ITypeDispatcher | IType<any, any>, ...otherTypes: IType<any, any>[]): IType<any, any> {
     const dispatcher = isType(dispatchOrType) ? null : dispatchOrType
     const types = isType(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
-    const name = types.map(type => type.factoryName).join(" | ")
-    return new Union(name, types, dispatcher).factory
+    const name = types.map(type => type.name).join(" | ")
+    return new Union(name, types, dispatcher)
 }

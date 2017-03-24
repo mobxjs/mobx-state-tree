@@ -1,6 +1,6 @@
 // tslint:disable-next-line:no_unused-variable
 import {IObservableArray, ObservableMap, IAction} from "mobx"
-import {IFactory} from "../core/factories"
+import {IType} from "../core/types"
 import {createMapFactory, IExtendedObservableMap} from "./map"
 import {createArrayFactory} from "./array"
 import {primitiveFactory} from "./primitive"
@@ -14,7 +14,7 @@ import {createLiteralFactory as literal} from "./literal"
 import {createMaybeFactory as maybe} from "./maybe"
 import {createRefinementFactory as refinement} from "./refinement"
 import {frozen} from "./frozen"
-import {string, boolean, number} from "./core-types"
+import { boolean, DatePrimitive, number, string } from './core-types';
 import {recursive} from "./recursive"
 
 /**
@@ -24,7 +24,7 @@ import {recursive} from "./recursive"
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function map<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): IFactory<{[key: string]: S}, IExtendedObservableMap<T>> {
+export function map<S, T>(subFactory: IType<S, T> = primitiveFactory as any): IType<{[key: string]: S}, IExtendedObservableMap<T>> {
     return createMapFactory(subFactory) as any
 }
 
@@ -35,7 +35,7 @@ export function map<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any):
  * @param {ModelFactory} [subFactory=primitiveFactory]
  * @returns
  */
-export function array<S, T>(subFactory: IFactory<S, T> = primitiveFactory as any): IFactory<T[], IObservableArray<T>> {
+export function array<S, T>(subFactory: IType<S, T> = primitiveFactory as any): IType<T[], IObservableArray<T>> {
     return createArrayFactory(subFactory as any) as any
 }
 
@@ -52,6 +52,7 @@ export const types = {
     string,
     boolean,
     number,
+    Date: DatePrimitive,
     map,
     array,
     frozen,

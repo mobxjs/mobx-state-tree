@@ -1,4 +1,4 @@
-import {IFactory} from "../core/factories"
+import {IType} from "../core/types"
 import {invariant, isMutable, isSerializable, isPlainObject} from "../utils"
 import {Type} from "../core/types"
 
@@ -39,4 +39,4 @@ export class Frozen<T> extends Type<T, T> {
 }
 
 // TODO: improve typings?
-export const frozen: IFactory<any, any> = new Frozen().factory
+export const frozen: IType<any, any> = new Frozen()

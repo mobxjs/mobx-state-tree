@@ -3,22 +3,21 @@ import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArray
 import { applySnapshot } from "../top-level-api"
 import {Node, maybeNode, valueToSnapshot, getNode} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
-import {IFactory, isType, getType} from "../core/factories"
 import {identity, nothing, invariant} from "../utils"
-import {ComplexType} from "../core/types"
+import {ComplexType, IType, isType, getType, IModel} from "../core/types"
 import {getIdentifierAttribute} from "./object"
 
 export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     isArrayFactory = true
-    subType: IFactory<any, any> // TODO: type
+    subType: IType<any, any> // TODO: type
 
-    constructor(name: string, subType: IFactory<any, any>) {
+    constructor(name: string, subType: IType<any, any>) {
         super(name)
         this.subType = subType
     }
 
     describe() {
-        return this.subType.type.describe() + "[]"
+        return this.subType.describe() + "[]"
     }
 
     createNewInstance() {
@@ -124,7 +123,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
             target.replace(snapshot)
     }
 
-    getChildType(key: string): IFactory<any, any> {
+    getChildType(key: string): IType<any, any> {
         return this.subType
     }
 
@@ -137,7 +136,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     }
 }
 
-function reconcileArrayItems(identifierAttr: string, target: IObservableArray<any>, snapshot: any[], factory: IFactory<any, any>): any[] {
+function reconcileArrayItems(identifierAttr: string, target: IObservableArray<any>, snapshot: any[], factory: IType<any, any>): any[] {
     const current: any = {}
     target.forEach(item => {
         const id = item[identifierAttr]
@@ -155,10 +154,10 @@ function reconcileArrayItems(identifierAttr: string, target: IObservableArray<an
     })
 }
 
-export function createArrayFactory<S, T>(subtype: IFactory<S, T>): IFactory<S[], IObservableArray<T>> {
-    return createDefaultValueFactory(new ArrayType(subtype.factoryName + "[]", subtype).factory, [])
+export function createArrayFactory<S, T>(subtype: IType<S, T>): IType<S[], IObservableArray<T> & IModel> {
+    return createDefaultValueFactory(new ArrayType(subtype.name + "[]", subtype), [])
 }
 
-export function isArrayFactory(factory: any): boolean {
-    return isType(factory) && (factory.type as any).isArrayFactory === true
+export function isArrayFactory(type: any): boolean {
+    return isType(type) && (type as any).isArrayFactory === true
 }

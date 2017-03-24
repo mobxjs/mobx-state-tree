@@ -1,5 +1,5 @@
 import {isObservableArray, isObservableMap} from "mobx"
-import {IModel, IFactory, isModel} from "../core/factories"
+import {IModel, IType, isModel} from "../core/types"
 import {resolve} from "../top-level-api"
 import {invariant, fail} from "../utils"
 import { getNode, getRelativePath } from "../core/node"
@@ -15,14 +15,14 @@ export interface IReferenceDescription {
     isReference: true
 }
 
-export function reference<T>(factory: IFactory<any, T>, basePath?: string): T {
+export function reference<T>(factory: IType<any, T>, basePath?: string): T {
     if (arguments.length === 1)
         return createGenericRelativeReference(factory) as any
     else
         return createReferenceWithBasePath(factory, basePath!) as any
 }
 
-function createGenericRelativeReference(factory: IFactory<any, any>): IReferenceDescription {
+function createGenericRelativeReference(factory: IType<any, any>): IReferenceDescription {
     return {
         isReference: true,
         getter: function (this: IModel, identifier: IReference | null | undefined): any {
@@ -45,10 +45,10 @@ function createGenericRelativeReference(factory: IFactory<any, any>): IReference
     }
 }
 
-function createReferenceWithBasePath(factory: IFactory<any, any>, path: string): IReferenceDescription {
-    const targetIdAttribute = getIdentifierAttribute(factory)
+function createReferenceWithBasePath(type: IType<any, any>, path: string): IReferenceDescription {
+    const targetIdAttribute = getIdentifierAttribute(type)
     if (!targetIdAttribute)
-        return fail(`Cannot create reference to path '${path}'; the targetted type, ${factory.type.describe()}, does not specify an identifier property`)
+        return fail(`Cannot create reference to path '${path}'; the targetted type, ${type.describe()}, does not specify an identifier property`)
 
     return {
         isReference: true,
@@ -69,7 +69,7 @@ function createReferenceWithBasePath(factory: IFactory<any, any>, path: string):
             if (value === null || value === undefined)
                 return value
             invariant(isModel(value), `Failed to assign a value to a reference; the value is not a model instance`)
-            invariant(factory.is(value), `Failed to assign a value to a reference; the value is not a model of type ${factory}`)
+            invariant(type.is(value), `Failed to assign a value to a reference; the value is not a model of type ${type}`)
             const base = getNode(this)
             const target = getNode(value)
             invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)

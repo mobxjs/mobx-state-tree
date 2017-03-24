@@ -1,5 +1,5 @@
 import { action as mobxAction, isObservable } from "mobx"
-import {isModel} from "./factories"
+import {isModel} from "./types"
 import {resolve} from "../top-level-api"
 import {invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction} from "../utils"
 import {Node, getNode, getRelativePath} from "./node"

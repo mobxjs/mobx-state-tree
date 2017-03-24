@@ -1,51 +1,58 @@
 import {action} from "mobx"
-import {Node, getNode, hasNode} from "./node"
 import {IJsonPatch} from "../core/json-patch"
-import {IFactory, IModel} from "./factories"
 import {fail} from "../utils"
+
+// TODO: combine with object type
+export type IModel = {
+    $treenode: any // Actually Node, but that should not be exposed to the public...
+} & Object
+
+export function isType(value: any): value is IType<any, any> {
+    return typeof value === "object" && value && value.isType === true
+}
+
+export function getType(object: IModel): IType<any, any> {
+    return getNode(object).type
+}
+
+export function getChildType(object: IModel, child: string): IType<any, any> {
+    return getNode(object).getChildType(child)
+}
+
+// TODO: ambigous function name, remove
+export function isModel(model: any): model is IModel {
+    return hasNode(model)
+}
+
 
 export interface IType<S, T> {
     name: string
     is(thing: any): thing is S | T
-    create(snapshot: S): T
-    factory: IFactory<S, T>
+    create(snapshot?: S): T
+    isType: boolean
     describe(): string
 }
 
-export type ITypeChecker<S, T> = (value: any) => value is S | T
-
 export abstract class Type<S, T> implements IType<S, T> { // TODO: generic for config and state of target
     name: string
-    factory: IFactory<any, any>
+    isType = true
 
     constructor(name: string) {
         this.name = name
-        this.factory = this.initializeFactory()
+        this.create = action(this.name, this.create)
     }
 
     abstract create(snapshot: any): any
     abstract is(thing: any): thing is S | T
     abstract describe(): string
-
-    protected initializeFactory() {
-        return {
-            create: action(
-                this.name,
-                this.create.bind(this)
-            ),
-            type: this as any,
-            isFactory: true,
-            factoryName: this.name,
-            is: this.is.bind(this)
-        }
-    }
 }
 
 export abstract class ComplexType<S, T> extends Type<S, T> {
     create(snapshot: any = this.getDefaultSnapshot()) {
         typecheck(this, snapshot)
         const instance = this.createNewInstance()
-        const node = new Node(instance, this.factory)
+        // tslint:disable-next-line:no_unused-variable
+        const node = new Node(instance, this)
         this.finalizeNewInstance(instance, snapshot)
         Object.seal(instance)
         return instance
@@ -59,7 +66,7 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     abstract getChildNode(node: Node, target: any, key: string): Node | null
     abstract serialize(node: Node, target: any): any
     abstract applyPatchLocally(node: Node, target: any, subpath: string, patch: IJsonPatch): void
-    abstract getChildType(key: string): IFactory<any, any>
+    abstract getChildType(key: string): IType<any, any>
     abstract isValidSnapshot(snapshot: any): boolean
 
     is(value: any): value is S | T {
@@ -75,3 +82,5 @@ export function typecheck(type: IType<any, any>, snapshot: any) {
     if (!type.is(snapshot))
         fail(`Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${type.name}. Expected ${type.describe()} instead.`)
 }
+
+import {Node, getNode, hasNode} from "./node"

@@ -2,11 +2,10 @@ import { IdentifierProperty } from './property-types/identifier-property';
 import { action, isAction, extendShallowObservable, IObjectChange, IObjectWillChange, IAction, intercept, observe } from "mobx"
 import { nothing, invariant, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
 import { Node, maybeNode } from "../core/node"
-import { IFactory, isType, getType } from "../core/factories"
 import { isReferenceFactory } from "./reference"
 import { primitiveFactory } from "./primitive"
 import { isIdentifierFactory } from "./identifier"
-import { ComplexType } from "../core/types"
+import { ComplexType, getType, IModel, isType, IType } from '../core/types';
 import { createDefaultValueFactory } from "./with-default"
 import { Property } from "./property-types/property"
 import { TransformedProperty } from "./property-types/transformed-property"
@@ -151,8 +150,8 @@ export class ObjectType extends ComplexType<any, any> {
         }
     }
 
-    getChildType(key: string): IFactory<any, any> {
-        return (this.props[key] as ValueProperty).factory
+    getChildType(key: string): IType<any, any> {
+        return (this.props[key] as ValueProperty).type
     }
 
     isValidSnapshot(snapshot: any) {
@@ -177,7 +176,7 @@ export class ObjectType extends ComplexType<any, any> {
         return "{ " + Object.keys(this.props).map(key => {
             const prop = this.props[key]
             return prop instanceof ValueProperty
-                ? key + ": " + prop.factory.type.describe()
+                ? key + ": " + prop.type.describe()
                 : prop instanceof IdentifierProperty
                     ? key + ": identifier()"
                     : ""
@@ -189,37 +188,37 @@ export class ObjectType extends ComplexType<any, any> {
     }
 }
 
-export type IBaseModelDefinition<T> = {[K in keyof T]: IFactory<any, T[K]> | T[K] & IAction | T[K]}
+export type IBaseModelDefinition<T> = {[K in keyof T]: IType<any, T[K]> | T[K] & IAction | T[K]}
 
 export type DeepPartial<T> = {
     [K in keyof T]?: DeepPartial<T[K]>
 }
 
 // MWE: somehow get  & { toJSON(): S } in here...?
-export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<T>): IFactory<DeepPartial<T>, T & { toJSON(): any }>
-export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<T>): IFactory<DeepPartial<T>, T & { toJSON(): any }>
+export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, T & { toJSON(): any } & IModel>
+export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, T & { toJSON(): any } & IModel>
 export function createModelFactory(arg1: any, arg2?: any) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
 
-    return new ObjectType(name, baseModel).factory
+    return new ObjectType(name, baseModel)
 }
 
 function getObjectFactoryBaseModel(item: any) {
-    let factory = isType(item) ? item : getType(item)
+    let type = isType(item) ? item : getType(item)
 
-    return isObjectFactory(factory) ? (factory.type as ObjectType).baseModel : {}
+    return isObjectFactory(type) ? (type as ObjectType).baseModel : {}
 }
 
-export function composeFactory<AS, AT, BS, BT>(name: string, a: IFactory<AS, AT>, b: IFactory<BS, BT>): IFactory<AS & BS, AT & BT>;
-export function composeFactory<AS, AT, BS, BT, CS, CT>(name: string, a: IFactory<AS, AT>, b: IFactory<BS, BT>, c: IFactory<CS, CT>): IFactory<AS & BS & CS, AT & BT & CT>;
-export function composeFactory<S, T>(name: string, ...models: IFactory<any, any>[]): IFactory<S, T>;
-export function composeFactory<AS, AT, BS, BT>(a: IFactory<AS, AT>, b: IFactory<BS, BT>): IFactory<AS & BS, AT & BT>;
-export function composeFactory<AS, AT, BS, BT, CS, CT>(a: IFactory<AS, AT>, b: IFactory<BS, BT>, c: IFactory<CS, CT>): IFactory<AS & BS & CS, AT & BT & CT>;
-export function composeFactory<S, T>(...models: IFactory<any, any>[]): IFactory<S, T>;
+export function composeFactory<AS, AT, BS, BT>(name: string, a: IType<AS, AT>, b: IType<BS, BT>): IType<AS & BS, AT & BT>;
+export function composeFactory<AS, AT, BS, BT, CS, CT>(name: string, a: IType<AS, AT>, b: IType<BS, BT>, c: IType<CS, CT>): IType<AS & BS & CS, AT & BT & CT>;
+export function composeFactory<S, T>(name: string, ...models: IType<any, any>[]): IType<S, T>;
+export function composeFactory<AS, AT, BS, BT>(a: IType<AS, AT>, b: IType<BS, BT>): IType<AS & BS, AT & BT>;
+export function composeFactory<AS, AT, BS, BT, CS, CT>(a: IType<AS, AT>, b: IType<BS, BT>, c: IType<CS, CT>): IType<AS & BS & CS, AT & BT & CT>;
+export function composeFactory<S, T>(...models: IType<any, any>[]): IType<S, T>;
 export function composeFactory(...args: any[]) {
     const baseFactories = typeof args[0] === "string" ? args.slice(1) : args
-    const factoryName = typeof args[0] === "string" ? args[0] : baseFactories.map(f => f.type.name).join("_")
+    const factoryName = typeof args[0] === "string" ? args[0] : baseFactories.map(f => f.name).join("_")
 
     return createModelFactory(
         factoryName,
@@ -227,12 +226,12 @@ export function composeFactory(...args: any[]) {
     )
 }
 
-export function isObjectFactory(factory: any): boolean {
-    return isType(factory) && (factory.type as any).isObjectFactory === true
+export function isObjectFactory(type: any): boolean {
+    return isType(type) && (type as any).isObjectFactory === true
 }
 
 export function getIdentifierAttribute(factory: any): string | null {
-    return isObjectFactory(factory) ? (factory.type as ObjectType).identifierAttribute : null
+    return isObjectFactory(factory) ? factory.identifierAttribute : null
 }
 
 // export function getObjectNode(thing: IModel): ObjectNode {

@@ -1,6 +1,6 @@
-import {IFactory} from "../core/factories"
-import {invariant, isPrimitive} from "../utils"
 import {Type} from "../core/types"
+import {IType} from "../core/types"
+import {invariant, isPrimitive} from "../utils"
 
 export class PrimitiveType<T> extends Type<T, T> {
     name: string
@@ -26,9 +26,9 @@ export class PrimitiveType<T> extends Type<T, T> {
 
 export type IPrimitive = string | boolean | number | Date
 
-export type IPrimitiveFactory<T extends IPrimitive> = IFactory<T, T>
+export type IPrimitiveFactory<T extends IPrimitive> = IType<T, T>
 
-export const primitiveFactory: IPrimitiveFactory<any> = new PrimitiveType("primitive").factory
+export const primitiveFactory: IPrimitiveFactory<any> = new PrimitiveType("primitive")
 
 // TODO:
 // export const String = primitiveFactory.subType("String", t => typeof t === "string")

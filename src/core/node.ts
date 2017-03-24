@@ -1,12 +1,11 @@
 import {
     action, observable,
-    intercept, observe, computed, reaction,
+    computed, reaction,
     isObservableArray,
     isObservableMap
 } from "mobx"
 
-import { ComplexType, typecheck } from './types';
-import {IModel, IFactory} from "./factories"
+import { ComplexType, typecheck, IModel, IType } from './types';
 import {IActionHandler} from "./action"
 import {
     invariant, fail, extend,
@@ -17,29 +16,27 @@ import {IActionCall, applyActionLocally} from "./action"
 import {ObjectType} from "../types/object"
 
 // TODO: make Node more like a struct, extract the methods to snapshots.js, actions.js etc..
+// TODO: make Node generic?
+// TODO: introduce IComplexInstance instead of IModel?
 export class Node {
     readonly target: any
     @observable _parent: Node | null = null
-    readonly factory: IFactory<any, any>
+    readonly type: ComplexType<any, any>
     readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     readonly actionSubscribers: IActionHandler[] = []
     _isRunningAction = false // only relevant for root
 
-    constructor(initialState: any, factory: IFactory<any, any>) {
-        invariant(factory.type instanceof ComplexType, "Uh oh")
+    constructor(initialState: any, type: ComplexType<any, any>) {
+        invariant(type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
-        this.factory = factory
+        this.type = type
         this.target = initialState
 
         reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
         // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
-    }
-
-    get type(): ComplexType<any, any> {
-        return this.factory.type as ComplexType<any, any>
     }
 
     @computed get pathParts(): string[]{
@@ -169,7 +166,7 @@ export class Node {
         const existingNode = this.getChildNode(subpath)
         const newInstance = childFactory.create(child)
 
-        if (existingNode && existingNode.factory === newInstance.factory) {
+        if (existingNode && existingNode.type === newInstance.factory) {
             // recycle instance..
             existingNode.applySnapshot(child)
             return existingNode.target
@@ -275,7 +272,7 @@ export class Node {
         return this.type.getChildNodes(this, this.target)
     }
 
-    getChildType(key: string): IFactory<any, any> {
+    getChildType(key: string): IType<any, any> {
         return this.type.getChildType(key)
     }
 }
