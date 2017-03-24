@@ -1,7 +1,3 @@
-export {
-    action
-} from "mobx"
-
 export * from "./core/json-patch"
 export {
     IModel,

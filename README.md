@@ -26,8 +26,6 @@ CDN:
 
 It is an opt-in state container that can be used in MobX, but also Redux based applications.
 
-TODO: slides / reactive conf talk
-
 If MobX is like a spreadsheet mechanism for javascript, then mobx-state-tree is like storing your spreadsheet in git.
 
 Unlike MobX itself, mobx-state-tree is quite opinionated on how you structure your data.
@@ -83,10 +81,10 @@ const Box = createFactory({
     },
 
     // action
-    move: action(function(dx, dy) {
+    move(dx, dy) {
         this.x += dx
         this.y += dy
-    })
+    }
 })
 
 const BoxStore = createFactory({
@@ -147,7 +145,7 @@ A serialized action call looks like:
 
 Useful methods:
 
--   `action(fn)` constructs
+-   Use `name: function(/* args */) { /* body */ }` (ES5) or `name (/* args */) { /* body */ }` (ES6) to construct actions
 -   `onAction(model, middleware)` listens to any action that is invoked on the model or any of it's descendants. See `onAction` for more details.
 -   `applyAction(model, action)` invokes an action on the model according to the given action description
 

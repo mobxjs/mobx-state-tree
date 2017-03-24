@@ -1,14 +1,14 @@
-import { createFactory, action, recordActions, types, getSnapshot } from "../"
+import { createFactory, recordActions, types, getSnapshot } from "../"
 import { test } from "ava"
 
 /// Simple action replay and invocation
 
 const Task = createFactory({
     done: false,
-    toggle: action(function () {
+    toggle() {
         this.done = !this.done
         return this.done
-    })
+    }
 })
 
 test("it should be possible to invoke a simple action", t => {
@@ -57,9 +57,9 @@ const Customer = createFactory({
 
 const Order = createFactory({
     customer: types.reference(Customer),
-    setCustomer: action(function (customer) {
+    setCustomer(customer) {
         this.customer = customer
-    })
+    }
 })
 
 const OrderStore = createFactory({

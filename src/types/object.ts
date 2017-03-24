@@ -101,11 +101,8 @@ export class ObjectType extends ComplexType {
                 this.props[key] = new ValueProperty(key, value)
             } else if (isReferenceFactory(value)) {
                 this.props[key] =  new TransformedProperty(key, value.setter, value.getter)
-            } else if (isAction(value)) {
-                this.props[key] = new ActionProperty(key, value)
             } else if (typeof value === "function") {
-                // TODO: threat as action
-                // addInitializer(t => createNonActionWrapper(t, key, value))
+                this.props[key] = new ActionProperty(key, value)
             } else if (typeof value === "object") {
                 fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
             } else {
