@@ -3,7 +3,7 @@ import { IType, Type, typecheck } from "./type"
 /**
  * A complex type produces a MST node (Node in the state tree)
  */
-export abstract class ComplexType<S, T> extends Type<S, T & IMSTNode> {
+export abstract class ComplexType<S, T> extends Type<S, T> {
     create(snapshot: any = this.getDefaultSnapshot()) {
         typecheck(this, snapshot)
         const instance = this.createNewInstance()

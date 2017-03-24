@@ -17,7 +17,7 @@ export abstract class Type<S, T> implements IType<S, T> { // TODO: generic for c
 
     constructor(name: string) {
         this.name = name
-        this.create = action(this.name, this.create)
+        this.create = action(this.name, this.create) // TODO: only do this for complex types
     }
 
     abstract create(snapshot: any): any

@@ -195,8 +195,8 @@ export type DeepPartial<T> = {
 }
 
 // MWE: somehow get  & { toJSON(): S } in here...?
-export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, T & { toJSON(): any } & IMSTNode>
-export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, T & { toJSON(): any } & IMSTNode>
+export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, T>
+export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, T>
 export function createModelFactory(arg1: any, arg2?: any) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1

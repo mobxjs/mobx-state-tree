@@ -152,7 +152,7 @@ function reconcileArrayItems(identifierAttr: string, target: IObservableArray<an
     })
 }
 
-export function createArrayFactory<S, T>(subtype: IType<S, T>): IType<S[], IObservableArray<T> & IMSTNode> {
+export function createArrayFactory<S, T>(subtype: IType<S, T>): IType<S[], IObservableArray<T>> {
     return createDefaultValueFactory(new ArrayType(subtype.name + "[]", subtype), [])
 }
 
