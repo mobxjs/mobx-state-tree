@@ -7,7 +7,7 @@ export abstract class Property {
     }
 
     initializePrototype(prototype: any) { }
-    initialize(targetInstance: IObjectInstance) { }
+    initialize(targetInstance: IObjectInstance, snapshot: any) { }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         return null

@@ -1,3 +1,4 @@
+import { createDefaultValueFactory } from './with-default';
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe} from "mobx"
 import { applySnapshot } from "../top-level-api"
 import {Node, maybeNode, valueToSnapshot, getNode} from "../core/node"
@@ -24,9 +25,10 @@ export class ArrayType extends ComplexType {
         return observable.shallowArray()
     }
 
-    finalizeNewInstance(instance: IObservableArray<any>) {
+    finalizeNewInstance(instance: IObservableArray<any>, snapshot: any) {
         intercept(instance, this.willChange as any)
         observe(instance, this.didChange)
+        getNode(instance).applySnapshot(snapshot)
     }
 
     getChildNodes(_: Node, target: IObservableArray<any>): [string, Node][] {
@@ -129,6 +131,10 @@ export class ArrayType extends ComplexType {
     isValidSnapshot(snapshot: any) {
         return Array.isArray(snapshot) && snapshot.every(item => this.subType.is(item))
     }
+
+    getDefaultSnapshot() {
+        return []
+    }
 }
 
 function reconcileArrayItems(identifierAttr: string, target: IObservableArray<any>, snapshot: any[], factory: IFactory<any, any>): any[] {
@@ -150,7 +156,7 @@ function reconcileArrayItems(identifierAttr: string, target: IObservableArray<an
 }
 
 export function createArrayFactory<S, T extends S>(subtype: IFactory<S, T>): IFactory<S[], IObservableArray<T>> {
-    return new ArrayType(subtype.factoryName + "[]", subtype).factory
+    return createDefaultValueFactory(new ArrayType(subtype.factoryName + "[]", subtype).factory, [])
 }
 
 export function isArrayFactory(factory: any): boolean {

@@ -1,3 +1,4 @@
+import { createDefaultValueFactory } from './with-default';
 import {IFactory} from "../core/factories"
 import {invariant, isPrimitive} from "../utils"
 import {Type} from "../core/types"
@@ -10,9 +11,8 @@ export class Literal extends Type {
         this.value = value
     }
 
-    create(value: any) {
-        invariant(isPrimitive(value), `Not a primitive: '${value}'`)
-        return value
+    create() {
+        return this.value
     }
 
     describe() {
@@ -27,5 +27,5 @@ export class Literal extends Type {
 
 export function createLiteralFactory<S>(value: S): IFactory<S, S> {
     invariant(isPrimitive(value), `Literal types can be built only on top of primitives`)
-    return new Literal(value).factory
+    return createDefaultValueFactory(new Literal(value).factory, value)
 }

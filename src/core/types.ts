@@ -2,6 +2,7 @@ import {action} from "mobx"
 import {Node, getNode, hasNode} from "./node"
 import {IJsonPatch} from "../core/json-patch"
 import {IFactory, IModel} from "./factories"
+import {fail} from "../utils"
 
 export interface IType {
     name: string
@@ -41,19 +42,19 @@ export abstract class Type implements IType { // TODO: generic for config and st
 }
 
 export abstract class ComplexType extends Type {
-    create(snapshot: any) {
+    create(snapshot: any = this.getDefaultSnapshot()) {
+        typecheck(this, snapshot)
         const instance = this.createNewInstance()
         const node = new Node(instance, this.factory)
-        this.finalizeNewInstance(instance)
-        if (arguments.length > 0)
-            node.applySnapshot(snapshot)
+        this.finalizeNewInstance(instance, snapshot)
         Object.seal(instance)
         return instance
     }
 
     abstract createNewInstance(): any
-    abstract finalizeNewInstance(target: any): void
+    abstract finalizeNewInstance(target: any, snapshot: any): void
     abstract applySnapshot(node: Node, target: any, snapshot: any): void
+    abstract getDefaultSnapshot(): any
     abstract getChildNodes(node: Node, target: any): [string, Node][]
     abstract getChildNode(node: Node, target: any, key: string): Node | null
     abstract serialize(node: Node, target: any): any
@@ -68,4 +69,9 @@ export abstract class ComplexType extends Type {
             return this.isValidSnapshot(getNode(value).snapshot) // could check factory, but that doesn't check structurally...
         return this.isValidSnapshot(value)
     }
+}
+
+export function typecheck(type: IType, snapshot: any) {
+    if (!type.is(snapshot))
+        fail(`Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${type.name}. Expected ${type.describe()} instead.`)
 }

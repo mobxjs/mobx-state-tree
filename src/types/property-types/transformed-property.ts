@@ -9,8 +9,8 @@ export class TransformedProperty extends Property {
         super(propertyName)
     }
 
-    initialize(targetInstance: any) {
-        const box = observable.shallowBox(null, targetInstance.constructor.name + "." + this.name)
+    initialize(targetInstance: any, snapshot: any) {
+        const box = observable.shallowBox(snapshot[this.name], targetInstance.constructor.name + "." + this.name)
         addHiddenWritableProp(targetInstance, this.name + "$value", box)
         const self = this
         Object.defineProperty(targetInstance, this.name, {

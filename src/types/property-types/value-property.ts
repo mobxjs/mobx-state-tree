@@ -13,8 +13,8 @@ export class ValueProperty extends Property {
         observable.ref(proto, this.name, { value: undefined })
     }
 
-    initialize(targetInstance: any) {
-        targetInstance[this.name] = this.factory.create()
+    initialize(targetInstance: any, snapshot: any) {
+        targetInstance[this.name] = this.factory.create(snapshot[this.name])
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {

@@ -66,10 +66,10 @@ export class ObjectType extends ComplexType {
         return instance as Object
     }
 
-    finalizeNewInstance(instance: IObjectInstance) {
+    finalizeNewInstance(instance: IObjectInstance, snapshot: any) {
         intercept(instance, this.willChange as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
-        this.forAllProps(prop => prop.initialize(instance))
+        this.forAllProps(prop => prop.initialize(instance, snapshot))
     }
 
     willChange = (change: IObjectWillChange): IObjectWillChange | null => {
@@ -180,13 +180,21 @@ export class ObjectType extends ComplexType {
                     : ""
         }).filter(Boolean).join("; ") + " }"
     }
+
+    getDefaultSnapshot(): any {
+        return {}
+    }
 }
 
-export type IBaseModelDefinition<S extends Object, T> = {[K in keyof T]: IFactory<any, T[K]> | T[K] & IAction | T[K]}
+export type IBaseModelDefinition<T> = {[K in keyof T]: IFactory<any, T[K]> | T[K] & IAction | T[K]}
+
+export type DeepPartial<T> = {
+    [K in keyof T]?: DeepPartial<T[K]>
+}
 
 // MWE: somehow get  & { toJSON(): S } in here...?
-export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<S, T>): IFactory<S, T & { toJSON(): any }>
-export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<S, T>): IFactory<S, T & { toJSON(): any }>
+export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<T>): IFactory<DeepPartial<T>, T & { toJSON(): any }>
+export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<T>): IFactory<DeepPartial<T>, T & { toJSON(): any }>
 export function createModelFactory(arg1: any, arg2?: any) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1

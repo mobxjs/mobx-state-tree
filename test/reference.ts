@@ -12,12 +12,12 @@ test("it should support generic relative paths", t => {
     })
 
     const store = UserStore.create({
-        user: { $ref: "users/17" },
+        user: { $ref: "users/17"},
         users: {
             "17": { name: "Michel" },
             "18": { name: "Veria" }
         }
-    })
+    } as any /* TODO: typings */)
 
     t.is(store.users.get("17").name as string, "Michel") // TODO: improve typings
     t.is(store.users.get("18").name as string, "Veria") // TODO: improve typings
@@ -48,7 +48,7 @@ test("it should support prefixed paths in maps", t => {
             "17": { id: "17", name: "Michel" },
             "18": { id: "18", name: "Veria" }
         }
-    })
+    } as any /* TODO: typings */)
 
     t.is(store.users.get("17").name as string, "Michel") // TODO: improve typings
     t.is(store.users.get("18").name as string, "Veria") // TODO: improve typings

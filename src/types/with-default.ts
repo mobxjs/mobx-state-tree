@@ -24,11 +24,15 @@ export class DefaultValue extends Type {
     }
 
     is(value: any) {
-        return this.type.is(value)
+        // defaulted values can be skipped
+        return value === undefined || this.type.is(value)
     }
 
 }
 
+// TODO: improve typings to S } void or something?
+export function createDefaultValueFactory<S, T>(type: IFactory<S, T>, defaultValueOrNode: S | T): IFactory<S, T>;
+export function createDefaultValueFactory<S, T>(type: IFactory<S, T>, defaultValueOrNode: any): IFactory<S, T>; /* any snapshot, as snapshots cannot properly typed yet */
 export function createDefaultValueFactory<S, T>(type: IFactory<S, T>, defaultValueOrNode: S | T): IFactory<S, T> {
     const defaultValue = hasNode(defaultValueOrNode) ? getNode(defaultValueOrNode).snapshot : defaultValueOrNode
     invariant(type.is(defaultValue), `Default value ${JSON.stringify(defaultValue)} is not assignable to type ${type.factoryName}. Expected ${JSON.stringify(type.type.describe())}`)

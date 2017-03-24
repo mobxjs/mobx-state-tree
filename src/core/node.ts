@@ -5,7 +5,7 @@ import {
     isObservableMap
 } from "mobx"
 
-import {ComplexType} from "./types"
+import { ComplexType, typecheck } from './types';
 import {IModel, IFactory} from "./factories"
 import {IActionHandler} from "./action"
 import {
@@ -100,7 +100,7 @@ export class Node {
     }
 
     public applySnapshot(snapshot: any) {
-        invariant(this.type.is(snapshot), `Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${this.factory.type.name}. Expected ${this.factory.type.describe()} instead.`)
+        typecheck(this.type, snapshot)
         return this.type.applySnapshot(this, this.target, snapshot)
     }
 

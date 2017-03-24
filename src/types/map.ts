@@ -1,3 +1,4 @@
+import { createDefaultValueFactory } from './with-default';
 import { getIdentifierAttribute } from './object';
 import {observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe} from "mobx"
 import { getNode, hasNode, maybeNode, Node, valueToSnapshot } from '../core/node';
@@ -41,9 +42,10 @@ export class MapType extends ComplexType {
         return map
     }
 
-    finalizeNewInstance(instance: ObservableMap<any>) {
+    finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
         intercept(instance, this.willChange as any)
         observe(instance, this.didChange)
+        getNode(instance).applySnapshot(snapshot)
     }
 
     getChildNodes(_node: Node, target: ObservableMap<any>): [string, Node][] {
@@ -169,10 +171,14 @@ export class MapType extends ComplexType {
     isValidSnapshot(snapshot: any) {
         return isPlainObject(snapshot) && Object.keys(snapshot).every(key => this.subType.is(snapshot[key]))
     }
+
+    getDefaultSnapshot() {
+        return {}
+    }
 }
 
 export function createMapFactory<S, T>(subtype: IFactory<S, T>): IFactory<{[key: string]: S}, IExtendedObservableMap<T>> {
-    return new MapType(`map<string, ${subtype.factoryName}>`, subtype).factory
+    return createDefaultValueFactory(new MapType(`map<string, ${subtype.factoryName}>`, subtype).factory, {})
 }
 
 export function isMapFactory(factory: any): boolean {

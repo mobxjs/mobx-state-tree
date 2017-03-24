@@ -7,8 +7,8 @@ export class IdentifierProperty extends Property {
         super(propertyName)
     }
 
-    initializePrototype(proto: any) {
-        observable.ref(proto, this.name, { value: undefined })
+    initialize(target: any, snapshot: any) {
+        observable.ref(target, this.name, { value: snapshot[this.name] })
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
@@ -23,7 +23,7 @@ export class IdentifierProperty extends Property {
 
     serialize(instance: any, snapshot: any) {
         if (!isValidIdentifier(instance[this.name]))
-            fail(`Object does not have a valid identifier yet: '${instance[this.name]}`)
+            fail(`Object does not have a valid identifier yet: '${instance[this.name]}'`)
         snapshot[this.name] = instance[this.name]
     }
 
