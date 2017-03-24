@@ -16,9 +16,11 @@ import { ActionProperty } from "./property-types/action-property"
 import { getSnapshot } from "../top-level-api"
 import { IJsonPatch } from "../index";
 
+// TODO: make generic with snapshot type
 export interface IObjectInstance {
     $treenode: Node
 }
+
 
 interface IObjectFactoryConfig {
     isObjectFactory: true,

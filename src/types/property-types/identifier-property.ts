@@ -1,4 +1,4 @@
-import { observable, IObjectWillChange } from "mobx"
+import { extendObservable, observable, IObjectWillChange } from "mobx"
 import { Property } from "./property"
 import { isValidIdentifier, fail } from "../../utils"
 
@@ -8,7 +8,9 @@ export class IdentifierProperty extends Property {
     }
 
     initialize(target: any, snapshot: any) {
-        observable.ref(target, this.name, { value: snapshot[this.name] })
+        extendObservable(target, {
+            [this.name]: observable.ref(snapshot[this.name])
+        })
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
