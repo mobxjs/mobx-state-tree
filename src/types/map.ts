@@ -2,7 +2,7 @@ import { createDefaultValueFactory } from './with-default';
 import { getIdentifierAttribute } from './object';
 import {observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe} from "mobx"
 import { getNode, hasNode, maybeNode, Node, valueToSnapshot } from '../core/node';
-import {isFactory, IFactory} from "../core/factories"
+import {isType, IFactory} from "../core/factories"
 import {identity, isPlainObject, nothing, isPrimitive, invariant, fail} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
 import {ComplexType} from "../core/types"
@@ -164,7 +164,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         })
     }
 
-    getChildFactory(key: string): IFactory<any, any> {
+    getChildType(key: string): IFactory<any, any> {
         return this.subType
     }
 
@@ -182,5 +182,5 @@ export function createMapFactory<S, T>(subtype: IFactory<S, T>): IFactory<{[key:
 }
 
 export function isMapFactory(factory: any): boolean {
-    return isFactory(factory) && (factory.type as any).isMapFactory === true
+    return isType(factory) && (factory.type as any).isMapFactory === true
 }

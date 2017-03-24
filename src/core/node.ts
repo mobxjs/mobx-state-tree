@@ -153,7 +153,7 @@ export class Node {
     }
 
     prepareChild(subpath: string, child: any): any {
-        const childFactory = this.getChildFactory(subpath)
+        const childFactory = this.getChildType(subpath)
 
         if (hasNode(child)) {
             const node = getNode(child)
@@ -275,8 +275,8 @@ export class Node {
         return this.type.getChildNodes(this, this.target)
     }
 
-    getChildFactory(key: string): IFactory<any, any> {
-        return this.type.getChildFactory(key)
+    getChildType(key: string): IFactory<any, any> {
+        return this.type.getChildType(key)
     }
 }
 

@@ -2,7 +2,7 @@ import { IdentifierProperty } from './property-types/identifier-property';
 import { action, isAction, extendShallowObservable, IObjectChange, IObjectWillChange, IAction, intercept, observe } from "mobx"
 import { nothing, invariant, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
 import { Node, maybeNode } from "../core/node"
-import { IFactory, isFactory, getFactory } from "../core/factories"
+import { IFactory, isType, getType } from "../core/factories"
 import { isReferenceFactory } from "./reference"
 import { primitiveFactory } from "./primitive"
 import { isIdentifierFactory } from "./identifier"
@@ -100,7 +100,7 @@ export class ObjectType extends ComplexType<any, any> {
             } else if (isPrimitive(value)) {
                 // TODO: detect exact primitiveFactory!
                 this.props[key] = new ValueProperty(key, createDefaultValueFactory(primitiveFactory as any, value))
-            } else if (isFactory(value)) {
+            } else if (isType(value)) {
                 this.props[key] = new ValueProperty(key, value)
             } else if (isReferenceFactory(value)) {
                 this.props[key] =  new TransformedProperty(key, value.setter, value.getter)
@@ -151,7 +151,7 @@ export class ObjectType extends ComplexType<any, any> {
         }
     }
 
-    getChildFactory(key: string): IFactory<any, any> {
+    getChildType(key: string): IFactory<any, any> {
         return (this.props[key] as ValueProperty).factory
     }
 
@@ -206,7 +206,7 @@ export function createModelFactory(arg1: any, arg2?: any) {
 }
 
 function getObjectFactoryBaseModel(item: any) {
-    let factory = isFactory(item) ? item : getFactory(item)
+    let factory = isType(item) ? item : getType(item)
 
     return isObjectFactory(factory) ? (factory.type as ObjectType).baseModel : {}
 }
@@ -228,7 +228,7 @@ export function composeFactory(...args: any[]) {
 }
 
 export function isObjectFactory(factory: any): boolean {
-    return isFactory(factory) && (factory.type as any).isObjectFactory === true
+    return isType(factory) && (factory.type as any).isObjectFactory === true
 }
 
 export function getIdentifierAttribute(factory: any): string | null {

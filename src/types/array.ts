@@ -3,7 +3,7 @@ import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArray
 import { applySnapshot } from "../top-level-api"
 import {Node, maybeNode, valueToSnapshot, getNode} from "../core/node"
 import {IJsonPatch} from "../core/json-patch"
-import {IFactory, isFactory, getFactory} from "../core/factories"
+import {IFactory, isType, getType} from "../core/factories"
 import {identity, nothing, invariant} from "../utils"
 import {ComplexType} from "../core/types"
 import {getIdentifierAttribute} from "./object"
@@ -124,7 +124,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
             target.replace(snapshot)
     }
 
-    getChildFactory(key: string): IFactory<any, any> {
+    getChildType(key: string): IFactory<any, any> {
         return this.subType
     }
 
@@ -146,7 +146,7 @@ function reconcileArrayItems(identifierAttr: string, target: IObservableArray<an
     })
     return snapshot.map(item => {
         const existing = current[item[identifierAttr]]
-        if (existing && getFactory(existing).is(item)) {
+        if (existing && getType(existing).is(item)) {
             applySnapshot(existing, item)
             return existing
         } else {
@@ -160,5 +160,5 @@ export function createArrayFactory<S, T>(subtype: IFactory<S, T>): IFactory<S[],
 }
 
 export function isArrayFactory(factory: any): boolean {
-    return isFactory(factory) && (factory.type as any).isArrayFactory === true
+    return isType(factory) && (factory.type as any).isArrayFactory === true
 }

@@ -1,4 +1,4 @@
-import {isFactory, IFactory} from "../core/factories"
+import {isType, IFactory} from "../core/factories"
 import {invariant, fail} from "../utils"
 import {Type} from "../core/types"
 
@@ -43,8 +43,8 @@ export class Union extends Type<any, any> {
 export function createUnionFactory<SA, SB, TA, TB>(dispatch: IFactoryDispatcher, A: IFactory<SA, TA>, B: IFactory<SB, TB>): IFactory<SA | SB, TA | TB>
 export function createUnionFactory<SA, SB, TA, TB>(A: IFactory<SA, TA>, B: IFactory<SB, TB>): IFactory<SA | SB, TA | TB>
 export function createUnionFactory(dispatchOrType: IFactoryDispatcher | IFactory<any, any>, ...otherTypes: IFactory<any, any>[]): IFactory<any, any> {
-    const dispatcher = isFactory(dispatchOrType) ? null : dispatchOrType
-    const types = isFactory(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
+    const dispatcher = isType(dispatchOrType) ? null : dispatchOrType
+    const types = isType(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
     const name = types.map(type => type.factoryName).join(" | ")
     return new Union(name, types, dispatcher).factory
 }

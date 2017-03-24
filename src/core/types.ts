@@ -59,7 +59,7 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     abstract getChildNode(node: Node, target: any, key: string): Node | null
     abstract serialize(node: Node, target: any): any
     abstract applyPatchLocally(node: Node, target: any, subpath: string, patch: IJsonPatch): void
-    abstract getChildFactory(key: string): IFactory<any, any>
+    abstract getChildType(key: string): IFactory<any, any>
     abstract isValidSnapshot(snapshot: any): boolean
 
     is(value: any): value is S | T {

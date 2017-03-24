@@ -1,4 +1,4 @@
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getFactory, getChildFactory, isFactory, recordActions, recordPatches, types} from "../"
+import {createFactory, getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getType, getChildType, recordActions, recordPatches, types} from "../"
 import {test} from "ava"
 
 // getParent
@@ -146,7 +146,7 @@ test("it should return the model factory", (t) => {
 
     const doc = Document.create()
 
-    t.deepEqual(getFactory(doc), Document)
+    t.deepEqual(getType(doc), Document)
 })
 
 // getChildModelFactory
@@ -163,7 +163,7 @@ test("it should return the child model factory", (t) => {
     const doc = Document.create()
 
     // TODO: any because of #19
-    t.deepEqual<any>(getChildFactory(doc, 'rows'), ArrayOfRow)
+    t.deepEqual<any>(getChildType(doc, 'rows'), ArrayOfRow)
 })
 
 test("a node can exists only once in a tree", (t) => {

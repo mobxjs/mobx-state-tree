@@ -3,9 +3,9 @@ export {
     IModel,
     isModel,
     IFactory,
-    isFactory,
-    getFactory,
-    getChildFactory
+    isType,
+    getType,
+    getChildType
 } from "./core/factories"
 export {
     IActionCall

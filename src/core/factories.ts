@@ -14,16 +14,16 @@ export interface IFactory<S, T> {
     type: IType<S, T>
 }
 
-export function isFactory(value: any): value is IFactory<any, any> {
+export function isType(value: any): value is IFactory<any, any> {
     return typeof value === "object" && value && value.isFactory === true
 }
 
-export function getFactory(object: IModel): IFactory<any, any> {
+export function getType(object: IModel): IFactory<any, any> {
     return getNode(object).factory
 }
 
-export function getChildFactory(object: IModel, child: string): IFactory<any, any> {
-    return getNode(object).getChildFactory(child)
+export function getChildType(object: IModel, child: string): IFactory<any, any> {
+    return getNode(object).getChildType(child)
 }
 
 // TODO: ambigous function name, remove
