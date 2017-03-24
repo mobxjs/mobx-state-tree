@@ -1,4 +1,3 @@
-import { isFactory } from '../../lib';
 import {action} from "mobx"
 import {Node, getNode, hasNode} from "./node"
 import {IJsonPatch} from "../core/json-patch"

@@ -1,5 +1,5 @@
 import {ObservableMap} from 'mobx'
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, action, getSnapshot, IFactory, types} from "../"
+import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, IFactory, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
