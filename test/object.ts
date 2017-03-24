@@ -182,7 +182,8 @@ test("it should compose factories", (t) => {
     const {BoxFactory, ColorFactory} = createTestFactories()
     const ComposedFactory = composeFactory(BoxFactory, ColorFactory)
 
-    t.deepEqual(ComposedFactory.create().toJSON(), {width: 0, height: 0, color: "#FFFFFF"})
+    // TODO: fix typecheck
+    t.deepEqual(ComposedFactory.create().toJSON() as any, {width: 0, height: 0, color: "#FFFFFF"})
 })
 
 

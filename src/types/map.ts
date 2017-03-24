@@ -176,7 +176,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 }
 
-export function createMapFactory<S, T>(subtype: IType<S, T>): IType<{[key: string]: S}, IExtendedObservableMap<T>> {
+export function createMapFactory<S, T>(subtype: IType<S, T>): IType<{[key: string]: S}, IMSTNode<{[key: string]: S}, IExtendedObservableMap<T>>> {
     return createDefaultValueFactory(new MapType(`map<string, ${subtype.name}>`, subtype), {})
 }
 

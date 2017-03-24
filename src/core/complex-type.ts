@@ -25,7 +25,7 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     abstract getChildType(key: string): IType<any, any>
     abstract isValidSnapshot(snapshot: any): boolean
 
-    is(value: any): value is S | (T & IMSTNode) {
+    is(value: any): value is S | IMSTNode<S, T> {
         if (!value || typeof value !== "object")
             return false
         if (hasMST(value))
