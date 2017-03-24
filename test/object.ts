@@ -57,7 +57,7 @@ test("it should emit snapshots", (t) => {
     const {Factory} = createTestFactories()
     const doc = Factory.create()
 
-    let snapshots = []
+    let snapshots: any[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
 
     doc.to = 'universe'
@@ -86,7 +86,7 @@ test("it should emit patches", (t) => {
     const {Factory} = createTestFactories()
     const doc = Factory.create()
 
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
 
     doc.to = "universe"
@@ -128,7 +128,7 @@ test("it should emit action calls", (t) => {
     const {Factory} = createTestFactories()
     const doc = Factory.create()
 
-    let actions = []
+    let actions: any[] = []
     onAction(doc, action => actions.push(action))
 
     doc.setTo('universe')

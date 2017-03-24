@@ -92,7 +92,7 @@ test("it should do typescript type inference correctly", (t) => {
 
     // sub fields have proper type
     b.sub.x = 4
-    const d: string = b.sub.y
+    const d: string = b.sub.y!
 
     a.y = null // TODO: enable strict null checks and verify this
 

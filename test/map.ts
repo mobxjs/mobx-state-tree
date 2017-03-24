@@ -40,7 +40,7 @@ test("it should emit snapshots", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
 
-    let snapshots = []
+    let snapshots: any[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
 
     doc.set("hello", ItemFactory.create())
@@ -72,7 +72,7 @@ test("it should emit add patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
 
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
 
     doc.set("hello", ItemFactory.create({to: "universe"}))
@@ -97,7 +97,7 @@ test("it should emit update patches", (t) => {
 
     doc.set("hello", ItemFactory.create())
 
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
 
     doc.set("hello", ItemFactory.create({to: "universe"}))
@@ -123,7 +123,7 @@ test("it should emit remove patches", (t) => {
 
     doc.set("hello", ItemFactory.create())
 
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
 
     doc.delete("hello")
@@ -187,8 +187,8 @@ test("it should support identifiers", (t) => {
     applySnapshot(store.todos as any, { "16" : { id: "16"}, "17": { id: "17"}}) // TODO: fix typings
     t.is(a === store.todos.get("17"), true) // same instance still
 
-    t.is(store.todos.get("17").id, "17")
+    t.is(store.todos.get("17")!.id, "17")
 
     store.todos.put({ id: "19"} as any) // TODO: fix typings
-    t.is(store.todos.get("19").id, "19")
+    t.is(store.todos.get("19")!.id, "19")
 })

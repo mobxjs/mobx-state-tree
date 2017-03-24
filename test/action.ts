@@ -125,7 +125,7 @@ test("it should not be possible to pass the element of another tree", t => {
 
 test("it should not be possible to pass an unserializable object", t => {
     const store = createTestStore()
-    const circular = { a: null }
+    const circular = { a: null as any }
     circular.a = circular
 
     t.throws(

@@ -40,7 +40,7 @@ test("it should emit snapshots", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
 
-    let snapshots = []
+    let snapshots: any[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
 
     doc.push(ItemFactory.create())
@@ -71,7 +71,7 @@ test("it should emit add patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
 
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
 
     doc.push(ItemFactory.create({to: "universe"}))
@@ -96,7 +96,7 @@ test("it should emit update patches", (t) => {
 
     doc.push(ItemFactory.create())
 
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
 
     doc[0] = ItemFactory.create({to: "universe"})
@@ -122,7 +122,7 @@ test("it should emit remove patches", (t) => {
 
     doc.push(ItemFactory.create())
 
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
 
     doc.splice(0)
