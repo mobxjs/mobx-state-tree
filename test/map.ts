@@ -1,5 +1,5 @@
 import {ObservableMap} from 'mobx'
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, IType, types} from "../"
+import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, IType, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -11,7 +11,7 @@ interface ITest{
 }
 
 const createTestFactories = () => {
-    const ItemFactory = createFactory({
+    const ItemFactory = types.model({
             to: 'world'
         })
 
@@ -168,8 +168,8 @@ test("it should check the type correctly", (t) => {
 })
 
 test("it should support identifiers", (t) => {
-    const Store = createFactory({
-        todos: types.map(createFactory({
+    const Store = types.model({
+        todos: types.map(types.model({
             id: types.identifier()
         }))
     })

@@ -67,9 +67,9 @@ Models are at the heart of `mobx-state-tree`. They simply store your data.
 Example:
 
 ```javascript
-import {createFactory, action, mapOf, referenceTo} from "mobx-state-tree"
+import {types.model, action, mapOf, referenceTo} from "mobx-state-tree"
 
-const Box = createFactory({
+const Box = types.model({
     // props
     name: "",
     x: 0,
@@ -87,7 +87,7 @@ const Box = createFactory({
     }
 })
 
-const BoxStore = createFactory({
+const BoxStore = types.model({
     boxes: types.map(Box),
     selection: types.reference("boxes/name"),
     addBox: action(function(name) {
@@ -95,14 +95,14 @@ const BoxStore = createFactory({
     })
 })
 
-const boxStore = BoxStore()
+const boxStore = BoxStore.create()
 boxStore.addBox("test")
 boxStore.boxes.get("test").move(7, 3)
 ```
 
 Useful methods:
 
--   `createFactory(exampleModel)`: creates a new factory
+-   `types.model(exampleModel)`: creates a new factory
 -   `clone(model)`: constructs a deep clone of the given model instance
 
 ## Snapshots
@@ -161,14 +161,14 @@ Identifiers and references are two powerful abstraction that work well together.
 
 Example:
 ```javascript
-const Todo = createFactory({
+const Todo = types.model({
     id: types.identifier(),
     title: "",
     done: false
 })
 
-const todo1 = Todo() // not ok, identifier is required
-const todo1 = Todo({ id: "1" }) // ok
+const todo1 = Todo.create() // not ok, identifier is required
+const todo1 = Todo.create({ id: "1" }) // ok
 applySnapshot(todo1, { id: "2", done: false}) // not ok; cannot modify the identifier of an object
 
 const store = types.map(Todo)
@@ -183,7 +183,7 @@ This makes it possible to use the tree as graph, while behind the scenes the gra
 Example:
 
 ```javascript
-const Store = createFactory({
+const Store = types.model({
     selectedTodo: types.reference(Todo),
     todos: types.array(Todo)
 })
@@ -204,7 +204,7 @@ By default references can point to any arbitrary object in the same tree (as lon
 It is also possible to specifiy in which collection the reference should resolve by passing a second argument, the resolve path (this can be relative):
 
 ```javascript
-const Store = createFactory({
+const Store = types.model({
     selectedTodo: types.reference(Todo, "/todos/"),
     todos: types.array(Todo)
 })
@@ -244,8 +244,6 @@ Useful methods:
 
 -   `onPatch(model, listener)` attaches a patch listener  to the provided model, which will be invoked whenever the model or any of it's descendants is mutated
 -   `applyPatch(model, patch)` applies a patch to the provided model
-
-## Working with references
 
 ## Be careful with direct references to items in the tree
 
@@ -674,20 +672,3 @@ So far this might look a lot like an immutable state tree as found for example i
 -   mobx-state-tree allows for fine grained and efficient observability on any point in the state tree
 -   mobx-state-tree generates json patches for any modification that is made
 -   (?) mobx-state-tree is a valid redux store, providing the same api (TODO)
-
-# Working with assocations
-
-```javascript
-import { resolve } from "mobx-state-tree"
-
-class Message {
-    @observable _author = "103"
-
-    @computed get author() {
-        return resolve(this, `/users`, this._author)
-    }
-    set author(author: User) {
-        this._author = author ? author.id : null
-    }
-}
-```

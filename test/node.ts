@@ -1,13 +1,13 @@
-import {createFactory, getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getType, getChildType, recordActions, recordPatches, types} from "../"
+import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getType, getChildType, recordActions, recordPatches, types} from "../"
 import {test} from "ava"
 
 // getParent
 test("it should resolve to the parent instance", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0
     })
 
-    const Document = createFactory({
+    const Document = types.model({
         rows: types.array(Row)
     })
 
@@ -20,11 +20,11 @@ test("it should resolve to the parent instance", (t) => {
 
 // hasParent
 test("it should check for parent instance", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0
     })
 
-    const Document = createFactory({
+    const Document = types.model({
         rows: types.array(Row)
     })
 
@@ -37,11 +37,11 @@ test("it should check for parent instance", (t) => {
 
 
 test("it should check for parent instance (unbound)", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0
     })
 
-    const Document = createFactory({
+    const Document = types.model({
         rows: types.array(Row)
     })
 
@@ -53,11 +53,11 @@ test("it should check for parent instance (unbound)", (t) => {
 
 // hasParentObject
 test("it should resolve to the parent object instance", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0
     })
 
-    const Document = createFactory({
+    const Document = types.model({
         rows: types.array(Row)
     })
 
@@ -71,11 +71,11 @@ test("it should resolve to the parent object instance", (t) => {
 
 // getRoot
 test("it should resolve to the root of an object", (t) => {
-    const Row = createFactory("Row", {
+    const Row = types.model("Row", {
         article_id: 0
     })
 
-    const Document = createFactory("Document", {
+    const Document = types.model("Document", {
         rows: types.array(Row)
     })
 
@@ -87,11 +87,11 @@ test("it should resolve to the root of an object", (t) => {
 
 // getPath
 test("it should resolve the path of an object", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0
     })
 
-    const Document = createFactory({
+    const Document = types.model({
         rows: types.array(Row)
     })
 
@@ -104,11 +104,11 @@ test("it should resolve the path of an object", (t) => {
 
 // getPathParts
 test("it should resolve the path of an object", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0
     })
 
-    const Document = createFactory({
+    const Document = types.model({
         rows: types.array(Row)
     })
 
@@ -121,11 +121,11 @@ test("it should resolve the path of an object", (t) => {
 
 // clone
 test("it should clone a node", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0
     })
 
-    const Document = createFactory({
+    const Document = types.model({
         rows: types.array(Row)
     })
 
@@ -140,7 +140,7 @@ test("it should clone a node", (t) => {
 
 // getModelFactory
 test("it should return the model factory", (t) => {
-    const Document = createFactory({
+    const Document = types.model({
         customer_id: 0
     })
 
@@ -151,12 +151,12 @@ test("it should return the model factory", (t) => {
 
 // getChildModelFactory
 test("it should return the child model factory", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0
     })
 
     const ArrayOfRow = types.array(Row)
-    const Document = createFactory({
+    const Document = types.model({
         rows: ArrayOfRow
     })
 
@@ -167,11 +167,11 @@ test("it should return the child model factory", (t) => {
 })
 
 test("a node can exists only once in a tree", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0
     })
 
-    const Document = createFactory({
+    const Document = types.model({
         rows: types.array(Row),
         foos: types.array(Row)
     })
@@ -188,11 +188,11 @@ test("a node can exists only once in a tree", (t) => {
 
 // TODO
 // test("make sure array filter works properly", (t) => {
-//     const Row = createFactory({
+//     const Row = types.model({
 //         done: false
 //     })
 
-//     const Document = createFactory({
+//     const Document = types.model({
 //         rows: arrayOf(Row),
 //         clearDone: action(function(){
 //             this.rows =  doc.rows.filter(row => row.done === true)
@@ -213,11 +213,11 @@ test("a node can exists only once in a tree", (t) => {
 
 // === RECORD PATCHES ===
 test("it can record and replay patches", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0
     })
 
-    const Document = createFactory({
+    const Document = types.model({
         customer_id: 0,
         rows: types.array(Row)
     })
@@ -236,14 +236,14 @@ test("it can record and replay patches", (t) => {
 
 // === RECORD ACTIONS ===
 test("it can record and replay actions", (t) => {
-    const Row = createFactory({
+    const Row = types.model({
         article_id: 0,
         setArticle(article_id){
             this.article_id = article_id
         }
     })
 
-    const Document = createFactory({
+    const Document = types.model({
         customer_id: 0,
         setCustomer(customer_id) {
             this.customer_id = customer_id

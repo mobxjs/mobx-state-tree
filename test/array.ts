@@ -1,5 +1,5 @@
 import {IObservableArray} from 'mobx'
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, IType, types} from "../"
+import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, IType, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -11,7 +11,7 @@ interface ITest{
 }
 
 const createTestFactories = () => {
-    const ItemFactory = createFactory({
+    const ItemFactory = types.model({
             to: 'world'
         })
 
@@ -167,8 +167,8 @@ test("it should check the type correctly", (t) => {
 })
 
 test("it should reconciliate instances correctly", (t) => {
-    const Store = createFactory({
-        todos: types.array(createFactory("Task", {
+    const Store = types.model({
+        todos: types.array(types.model("Task", {
             id: types.identifier(),
             task: "",
             done: false
@@ -211,14 +211,14 @@ test("it should reconciliate instances correctly", (t) => {
 
 // TODO: in future, support identifier in unions etc
 // test("it should reconciliate instances correctly", (t) => {
-//     const Store = createFactory.create({
+//     const Store = types.model.create({
 //         todos: types.array(types.union(
-//             createFactory.create("completedTask", {
+//             types.model.create("completedTask", {
 //                 id: types.identifier(),
 //                 task: "",
 //                 done: types.literal(true)
 //             }),
-//             createFactory.create("uncompletedTask", {
+//             types.model.create("uncompletedTask", {
 //                 id: types.identifier()
 //                 task: "",
 //                 done: types.literal(true)

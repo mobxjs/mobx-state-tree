@@ -25,11 +25,6 @@ export {
 } from "./interop/redux-devtools"
 
 export {
-    createModelFactory as createFactory,
-    composeFactory
-} from "./types/object"
-
-export {
     types
 } from "./types/index"
 

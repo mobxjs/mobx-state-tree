@@ -1,6 +1,6 @@
 import { IdentifierProperty } from './property-types/identifier-property';
 import { action, isAction, extendShallowObservable, IObjectChange, IObjectWillChange, IAction, intercept, observe } from "mobx"
-import { nothing, invariant, fail, identity, extend, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
+import { nothing, extend as extendObject, invariant, fail, identity, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
 import { MSTAdminisration, maybeMST } from "../core"
 import { isReferenceFactory } from "./reference"
 import { primitiveFactory } from "./primitive"
@@ -213,19 +213,19 @@ function getObjectFactoryBaseModel(item: any) {
 }
 
 // TODO: toJSON() is now not typed correctly...
-export function composeFactory<AS, AT, BS, BT>(name: string, a: IType<AS, AT>, b: IType<BS, BT>): IType<AS & BS, AT & BT>;
-export function composeFactory<AS, AT, BS, BT, CS, CT>(name: string, a: IType<AS, AT>, b: IType<BS, BT>, c: IType<CS, CT>): IType<AS & BS & CS, AT & BT & CT>;
-export function composeFactory<S, T>(name: string, ...models: IType<any, any>[]): IType<S, T>;
-export function composeFactory<AS, AT, BS, BT>(a: IType<AS, AT>, b: IType<BS, BT>): IType<AS & BS, AT & BT>;
-export function composeFactory<AS, AT, BS, BT, CS, CT>(a: IType<AS, AT>, b: IType<BS, BT>, c: IType<CS, CT>): IType<AS & BS & CS, AT & BT & CT>;
-export function composeFactory<S, T>(...models: IType<any, any>[]): IType<S, T>;
-export function composeFactory(...args: any[]) {
+export function extend<AS, AT, BS, BT>(name: string, a: IType<AS, AT>, b: IType<BS, BT>): IType<AS & BS, AT & BT>;
+export function extend<AS, AT, BS, BT, CS, CT>(name: string, a: IType<AS, AT>, b: IType<BS, BT>, c: IType<CS, CT>): IType<AS & BS & CS, AT & BT & CT>;
+export function extend<S, T>(name: string, ...models: IType<any, any>[]): IType<S, T>;
+export function extend<AS, AT, BS, BT>(a: IType<AS, AT>, b: IType<BS, BT>): IType<AS & BS, AT & BT>;
+export function extend<AS, AT, BS, BT, CS, CT>(a: IType<AS, AT>, b: IType<BS, BT>, c: IType<CS, CT>): IType<AS & BS & CS, AT & BT & CT>;
+export function extend<S, T>(...models: IType<any, any>[]): IType<S, T>;
+export function extend(...args: any[]) {
     const baseFactories = typeof args[0] === "string" ? args.slice(1) : args
     const factoryName = typeof args[0] === "string" ? args[0] : baseFactories.map(f => f.name).join("_")
 
     return createModelFactory(
         factoryName,
-        extend.apply(null, [{}].concat(baseFactories.map(getObjectFactoryBaseModel)))
+        extendObject.apply(null, [{}].concat(baseFactories.map(getObjectFactoryBaseModel)))
     )
 }
 

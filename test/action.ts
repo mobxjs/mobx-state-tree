@@ -1,9 +1,9 @@
-import { createFactory, recordActions, types, getSnapshot } from "../"
+import { recordActions, types, getSnapshot } from "../"
 import { test } from "ava"
 
 /// Simple action replay and invocation
 
-const Task = createFactory({
+const Task = types.model({
     done: false,
     toggle() {
         this.done = !this.done
@@ -51,18 +51,18 @@ test.skip("it should not be possible to change state without action", t => {
 })
 
 // Complex actions
-const Customer = createFactory({
+const Customer = types.model({
     name: ""
 })
 
-const Order = createFactory({
+const Order = types.model({
     customer: types.reference(Customer),
     setCustomer(customer) {
         this.customer = customer
     }
 })
 
-const OrderStore = createFactory({
+const OrderStore = types.model({
     customers: types.array(Customer),
     orders: types.array(Order)
 })

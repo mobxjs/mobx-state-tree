@@ -1,4 +1,4 @@
-import {onSnapshot, onPatch, onAction, createFactory, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, composeFactory, types} from "../"
+import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -11,14 +11,14 @@ interface ITest{
 }
 
 const createTestFactories = () => {
-    const Factory = createFactory({
+    const Factory = types.model({
         to: 'world',
         setTo(to) {
             this.to = to
         }
     })
 
-    const ComputedFactory = createFactory({
+    const ComputedFactory = types.model({
         width: 100,
         height: 200,
         get area(){
@@ -26,12 +26,12 @@ const createTestFactories = () => {
         }
     })
 
-    const BoxFactory = createFactory({
+    const BoxFactory = types.model({
         width: 0,
         height: 0
     })
 
-    const ColorFactory = createFactory({
+    const ColorFactory = types.model({
         color: "#FFFFFF"
     })
 
@@ -180,7 +180,7 @@ test("it should throw if snapshot has computed properties", (t) => {
 // === COMPOSE FACTORY ===
 test("it should compose factories", (t) => {
     const {BoxFactory, ColorFactory} = createTestFactories()
-    const ComposedFactory = composeFactory(BoxFactory, ColorFactory)
+    const ComposedFactory = types.extend(BoxFactory, ColorFactory)
 
     // TODO: fix typecheck
     t.deepEqual(ComposedFactory.create().toJSON() as any, {width: 0, height: 0, color: "#FFFFFF"})

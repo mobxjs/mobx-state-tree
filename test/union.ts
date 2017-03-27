@@ -1,17 +1,17 @@
-import {createFactory, types} from "../"
+import {types} from "../"
 import {test} from "ava"
 
 const createTestFactories = () => {
-    const Box = createFactory("Box", {
+    const Box = types.model("Box", {
         width: 0,
         height: 0
     })
 
-    const Square = createFactory("Square", {
+    const Square = types.model("Square", {
         width: 0
     })
 
-    const Cube = createFactory("Cube", {
+    const Cube = types.model("Cube", {
         width: 0,
         height: 0,
         depth: 0
@@ -43,17 +43,17 @@ test("it should be smart enough to discriminate by keys", (t) => {
 })
 
 test("it should discriminate by value type", (t) => {
-    const Size = createFactory("Size", {
+    const Size = types.model("Size", {
         width: 0,
         height: 0
     })
 
-    const Picture = createFactory("Picture", {
+    const Picture = types.model("Picture", {
         url: "",
         size: Size
     })
 
-    const Square = createFactory("Square", {
+    const Square = types.model("Square", {
         size: 0
     })
 

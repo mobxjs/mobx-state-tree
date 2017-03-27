@@ -1,18 +1,18 @@
-import { createFactory, types } from "../"
+import { types } from "../"
 import { test } from "ava"
 
 const createTestFactories = () => {
-    const Box = createFactory({
+    const Box = types.model({
         width: 0,
         height: 0
     })
 
-    const Square = createFactory({
+    const Square = types.model({
         width: 0,
         height: 0
     })
 
-    const Cube = createFactory({
+    const Cube = types.model({
         width: 0,
         height: 0,
         depth: 0
@@ -59,7 +59,7 @@ test("it should cast different compatible factories", (t) => {
 
 test("it should do typescript type inference correctly", (t) => {
     debugger
-    const A = createFactory({
+    const A = types.model({
         x: types.number,
         y: types.maybe(types.string),
         method() {},
@@ -80,7 +80,7 @@ test("it should do typescript type inference correctly", (t) => {
     // MANUAL TEST: not ok: a.x = "stuff"
 
     // sub factories work
-    const B = createFactory({
+    const B = types.model({
         sub: types.maybe(A)
     })
 

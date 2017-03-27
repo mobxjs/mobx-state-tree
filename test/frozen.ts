@@ -1,8 +1,8 @@
 import {test} from "ava"
-import {createFactory, getSnapshot, types, IType} from "../"
+import {getSnapshot, types, IType} from "../"
 
 test("it should accept any serializable value", t => {
-    const Factory = createFactory({
+    const Factory = types.model({
         value: types.frozen
     })
 
@@ -14,7 +14,7 @@ test("it should accept any serializable value", t => {
 
 
 test("it should throw if value is not serializable", t => {
-    const Factory = createFactory({
+    const Factory = types.model({
         value: types.frozen
     })
 

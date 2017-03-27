@@ -1,12 +1,12 @@
-import { createFactory, types, getSnapshot, applySnapshot } from "../"
+import { types, getSnapshot, applySnapshot } from "../"
 import { test } from "ava"
 
 
 test("it should support generic relative paths", t => {
-    const User = createFactory({
+    const User = types.model({
         name: types.string
     })
-    const UserStore = createFactory({
+    const UserStore = types.model({
         user: types.reference(User),
         users: types.map(User)
     })
@@ -33,11 +33,11 @@ test("it should support generic relative paths", t => {
 })
 
 test("it should support prefixed paths in maps", t => {
-    const User = createFactory({
+    const User = types.model({
         id: types.identifier(),
         name: types.string
     })
-    const UserStore = createFactory({
+    const UserStore = types.model({
         user: types.reference(User, "users"),
         users: types.map(User)
     })
@@ -64,11 +64,11 @@ test("it should support prefixed paths in maps", t => {
 })
 
 test("it should support prefixed paths in arrays", t => {
-    const User = createFactory({
+    const User = types.model({
         id: types.identifier(),
         name: types.string
     })
-    const UserStore = createFactory({
+    const UserStore = types.model({
         user: types.reference(User, "/users/"),
         users: types.array(User)
     })
@@ -95,7 +95,7 @@ test("it should support prefixed paths in arrays", t => {
 })
 
 test.skip("identifiers are required", (t) => {
-    const Todo = createFactory({
+    const Todo = types.model({
         id: types.identifier()
     })
 
@@ -106,7 +106,7 @@ test.skip("identifiers are required", (t) => {
 })
 
 test("identifiers cannot be modified", (t) => {
-    const Todo = createFactory({
+    const Todo = types.model({
         id: types.identifier()
     })
 

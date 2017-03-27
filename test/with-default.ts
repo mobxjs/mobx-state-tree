@@ -1,13 +1,13 @@
 import {test} from "ava"
-import {createFactory, getSnapshot, types} from "../"
+import {getSnapshot, types} from "../"
 
 test("it should provide a default value, if no snapshot is provided", t => {
-    const Row = createFactory({
+    const Row = types.model({
         name: '',
         quantity: 0
     })
 
-    const Factory = createFactory({
+    const Factory = types.model({
         rows: types.withDefault(types.array(Row), [{name: 'test'}])
     })
 
@@ -17,12 +17,12 @@ test("it should provide a default value, if no snapshot is provided", t => {
 
 
 test("it should use the snapshot if provided", t => {
-    const Row = createFactory({
+    const Row = types.model({
         name: '',
         quantity: 0
     })
 
-    const Factory = createFactory({
+    const Factory = types.model({
         rows: types.withDefault(types.array(Row), [{name: 'test'}])
     })
 
@@ -32,13 +32,13 @@ test("it should use the snapshot if provided", t => {
 
 
 test("it should throw if default value is invalid snapshot", t => {
-    const Row = createFactory({
+    const Row = types.model({
         name: '',
         quantity: 0
     })
 
     const error = t.throws(() => {
-        const Factory = createFactory({
+        const Factory = types.model({
             // TODO: as any due to #19
             rows: types.withDefault(types.array(Row) as any, [{wrongProp: true}])
         })
