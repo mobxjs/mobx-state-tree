@@ -188,15 +188,17 @@ export class ObjectType extends ComplexType<any, any> {
     }
 }
 
-export type IBaseModelDefinition<T> = {[K in keyof T]: IType<any, T[K]> | T[K] & IAction | T[K]}
+export type IBaseModelDefinition<T> = {
+    [K in keyof T]: IType<any, T[K]> | T[K] & IAction | T[K]
+}
 
-export type DeepPartial<T> = {
-    [K in keyof T]?: DeepPartial<T[K]>
+export type Snapshot<T> = {
+    [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
 }
 
 // MWE: somehow get  & { toJSON(): S } in here...?
-export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, IMSTNode<DeepPartial<T>, T> & { toJSON(): DeepPartial<T> }>
-export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<T>): IType<DeepPartial<T>, IMSTNode<DeepPartial<T>, T> & { toJSON(): DeepPartial<T> }>
+export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<T>): IType<Snapshot<T>, IMSTNode<Snapshot<T>, T> & { toJSON(): Snapshot<T> }>
+export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<T>): IType<Snapshot<T>, IMSTNode<Snapshot<T>, T> & { toJSON(): Snapshot<T> }>
 export function createModelFactory(arg1: any, arg2?: any) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1

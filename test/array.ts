@@ -209,6 +209,7 @@ test("it should reconciliate instances correctly", (t) => {
     t.is(store.todos[2] === c, false)
 })
 
+// TODO: in future, support identifier in unions etc
 // test("it should reconciliate instances correctly", (t) => {
 //     const Store = createFactory.create({
 //         todos: types.array(types.union(

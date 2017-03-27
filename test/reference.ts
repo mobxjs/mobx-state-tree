@@ -4,7 +4,7 @@ import { test } from "ava"
 
 test("it should support generic relative paths", t => {
     const User = createFactory({
-        name: types.primitive
+        name: types.string
     })
     const UserStore = createFactory({
         user: types.reference(User),
@@ -17,17 +17,17 @@ test("it should support generic relative paths", t => {
             "17": { name: "Michel" },
             "18": { name: "Veria" }
         }
-    } as any /* TODO: typings */)
+    })
 
-    t.is(store.users.get("17")!.name as string, "Michel") // TODO: improve typings
-    t.is(store.users.get("18")!.name as string, "Veria") // TODO: improve typings
-    t.is(store.user.name as string, "Michel") // TODO: improve typings
+    t.is(store.users.get("17")!.name, "Michel")
+    t.is(store.users.get("18")!.name, "Veria")
+    t.is(store.user.name, "Michel")
 
     store.user =  store.users.get("18")!
-    t.is(store.user.name as string, "Veria") // TODO: improve typings
+    t.is(store.user.name, "Veria")
 
-    store.users.get("18")!.name = "Noa" as any // TODO: improve typings.
-    t.is(store.user.name as string, "Noa") // TODO: improve typings
+    store.users.get("18")!.name = "Noa"
+    t.is(store.user.name, "Noa")
 
     t.deepEqual(getSnapshot(store), {user: { $ref: "users/18" }, "users": {"17": {name: "Michel"}, "18": {name: "Noa"}}} as any) // TODO: better typings
 })
@@ -35,7 +35,7 @@ test("it should support generic relative paths", t => {
 test("it should support prefixed paths in maps", t => {
     const User = createFactory({
         id: types.identifier(),
-        name: types.primitive
+        name: types.string
     })
     const UserStore = createFactory({
         user: types.reference(User, "users"),
@@ -48,17 +48,17 @@ test("it should support prefixed paths in maps", t => {
             "17": { id: "17", name: "Michel" },
             "18": { id: "18", name: "Veria" }
         }
-    } as any /* TODO: typings */)
+    })
 
-    t.is(store.users.get("17")!.name as string, "Michel") // TODO: improve typings
-    t.is(store.users.get("18")!.name as string, "Veria") // TODO: improve typings
-    t.is(store.user.name as string, "Michel") // TODO: improve typings
+    t.is(store.users.get("17")!.name as string, "Michel")
+    t.is(store.users.get("18")!.name as string, "Veria")
+    t.is(store.user.name as string, "Michel")
 
     store.user =  store.users.get("18")!
-    t.is(store.user.name as string, "Veria") // TODO: improve typings
+    t.is(store.user.name as string, "Veria")
 
-    store.users.get("18")!.name = "Noa" as any // TODO: improve typings.
-    t.is(store.user.name as string, "Noa") // TODO: improve typings
+    store.users.get("18")!.name = "Noa"
+    t.is(store.user.name as string, "Noa")
 
     t.deepEqual(getSnapshot(store), {user: "18", "users": {"17": {id: "17", name: "Michel"}, "18": {id: "18", name: "Noa"}}} as any) // TODO: better typings
 })
@@ -66,7 +66,7 @@ test("it should support prefixed paths in maps", t => {
 test("it should support prefixed paths in arrays", t => {
     const User = createFactory({
         id: types.identifier(),
-        name: types.primitive
+        name: types.string
     })
     const UserStore = createFactory({
         user: types.reference(User, "/users/"),
@@ -81,15 +81,15 @@ test("it should support prefixed paths in arrays", t => {
         ]
     })
 
-    t.is(store.users[0].name as string, "Michel") // TODO: improve typings
-    t.is(store.users[1].name as string, "Veria") // TODO: improve typings
-    t.is(store.user.name as string, "Michel") // TODO: improve typings
+    t.is(store.users[0].name, "Michel")
+    t.is(store.users[1].name, "Veria")
+    t.is(store.user.name, "Michel")
 
     store.user =  store.users[1]
-    t.is(store.user.name as string, "Veria") // TODO: improve typings
+    t.is(store.user.name, "Veria")
 
-    store.users[1].name = "Noa" as any // TODO: improve typings.
-    t.is(store.user.name as string, "Noa") // TODO: improve typings
+    store.users[1].name = "Noa"
+    t.is(store.user.name, "Noa")
 
     t.deepEqual(getSnapshot(store), {user: "18", "users": [{id: "17", name: "Michel"}, {id: "18", name: "Noa"}]} as any) // TODO: better typings
 })

@@ -5,22 +5,19 @@ import {
     isObservableMap
 } from "mobx"
 
-import { typecheck, IType } from './type';
-import { IMSTNode, getRelativePath, maybeMST, hasMST, getMST, getPath } from './mst-node';
+import { typecheck, IType } from "./type"
+import { getRelativePath, hasMST, getMST, getPath } from "./mst-node"
 
 import {IActionHandler} from "./action"
 import {
     invariant, fail, extend,
-    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler, isSerializable
+    addHiddenFinalProp, IDisposer, registerEventHandler
 } from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
 import {IActionCall, applyActionLocally} from "./action"
 import { ObjectType } from "../types/object"
-import { ComplexType } from "./complex-type";
+import { ComplexType } from "./complex-type"
 
-// TODO: make Node more like a struct, extract the methods to snapshots.js, actions.js etc..
-// TODO: make Node generic?
-// TODO: introduce IComplexInstance instead of IModel?
 export class MSTAdminisration {
     readonly target: any
     @observable _parent: MSTAdminisration | null = null

@@ -11,7 +11,7 @@ interface IMapFactoryConfig {
 }
 
 export interface IExtendedObservableMap<T> extends ObservableMap<T> {
-    put(value: T): this
+    put(value: T | any): this // downtype to any, again, because we cannot type the snapshot, see
 }
 
 export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {

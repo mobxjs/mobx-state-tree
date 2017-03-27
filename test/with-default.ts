@@ -8,8 +8,7 @@ test("it should provide a default value, if no snapshot is provided", t => {
     })
 
     const Factory = createFactory({
-        // TODO: as any due to #19
-        rows: types.withDefault(types.array(Row) as any, [{name: 'test'}])
+        rows: types.withDefault(types.array(Row), [{name: 'test'}])
     })
 
     const doc = Factory.create()
@@ -24,7 +23,6 @@ test("it should use the snapshot if provided", t => {
     })
 
     const Factory = createFactory({
-        // TODO: as any due to #19
         rows: types.withDefault(types.array(Row), [{name: 'test'}])
     })
 

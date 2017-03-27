@@ -14,7 +14,10 @@ export interface IReferenceDescription {
     isReference: true
 }
 
-export function reference<T>(factory: IType<any, T>, basePath?: string): T {
+export function reference<T>(factory: IType<any, T>): IType<{ $ref: string }, T>;
+export function reference<T>(factory: IType<any, T>, basePath: string): IType<string, T>;
+export function reference<T>(factory: IType<any, T>, basePath?: string): any {
+    // FIXME: IType return type is inconsistent with what is actually returned, however, results in the best type-inference results for objects...
     if (arguments.length === 1)
         return createGenericRelativeReference(factory) as any
     else

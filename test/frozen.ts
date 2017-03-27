@@ -6,8 +6,7 @@ test("it should accept any serializable value", t => {
         value: types.frozen
     })
 
-    // TODO: waiting for conditional types in TypeScript :(
-    const doc: any = Factory.create()
+    const doc = Factory.create()
 
     doc.value = {a: 1, b: 2}
     t.deepEqual<any>(getSnapshot(doc), {value: {a: 1, b: 2}})
@@ -19,7 +18,6 @@ test("it should throw if value is not serializable", t => {
         value: types.frozen
     })
 
-    // TODO: waiting for conditional types in TypeScript :(
     const doc: any = Factory.create()
 
     const error = t.throws(() => {

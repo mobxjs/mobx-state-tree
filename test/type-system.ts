@@ -62,7 +62,9 @@ test("it should do typescript type inference correctly", (t) => {
     const A = createFactory({
         x: types.number,
         y: types.maybe(types.string),
-        method() {}
+        method() {},
+        get z(): string { return "hi" },
+        set z(v: string) { }
     })
 
     // factory is invokable
@@ -95,6 +97,9 @@ test("it should do typescript type inference correctly", (t) => {
     const d: string = b.sub.y!
 
     a.y = null // TODO: enable strict null checks and verify this
+
+    const zz: string = a.z
+    a.z = "test"
 
     b.sub.method()
 })

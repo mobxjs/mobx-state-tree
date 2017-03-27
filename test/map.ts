@@ -180,15 +180,15 @@ test("it should support identifiers", (t) => {
     const a = store.todos.get("17")
 
     t.throws(
-        () => applySnapshot(store.todos as any, { "17": { id: "18"} }), // TODO: fix typings
+        () => applySnapshot(store.todos, { "17": { id: "18"} }),
         "[mobx-state-tree] A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '17', but expected: '18'"
     )
 
-    applySnapshot(store.todos as any, { "16" : { id: "16"}, "17": { id: "17"}}) // TODO: fix typings
+    applySnapshot(store.todos, { "16" : { id: "16"}, "17": { id: "17"}})
     t.is(a === store.todos.get("17"), true) // same instance still
 
     t.is(store.todos.get("17")!.id, "17")
 
-    store.todos.put({ id: "19"} as any) // TODO: fix typings
+    store.todos.put({ id: "19"})
     t.is(store.todos.get("19")!.id, "19")
 })
