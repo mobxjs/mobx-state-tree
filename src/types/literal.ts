@@ -1,8 +1,9 @@
-import {IFactory} from "../core/factories"
+import { createDefaultValueFactory } from './with-default';
+import {IType} from "../core/type"
 import {invariant, isPrimitive} from "../utils"
-import {Type} from "../core/types"
+import {Type} from "../core/type"
 
-export class Literal extends Type {
+export class Literal<T> extends Type<T, T> {
     readonly value: any
 
     constructor(value: any) {
@@ -10,22 +11,21 @@ export class Literal extends Type {
         this.value = value
     }
 
-    create(value: any) {
-        invariant(isPrimitive(value), `Not a primitive: '${value}'`)
-        return value
+    create() {
+        return this.value
     }
 
     describe() {
         return JSON.stringify(this.value)
     }
 
-    is(value: any) {
+    is(value: any): value is T {
         return value === this.value && isPrimitive(value)
     }
 
 }
 
-export function createLiteralFactory<S>(value: S): IFactory<S, S> {
+export function createLiteralFactory<S>(value: S): IType<S, S> {
     invariant(isPrimitive(value), `Literal types can be built only on top of primitives`)
-    return new Literal(value).factory
+    return createDefaultValueFactory(new Literal(value), value)
 }

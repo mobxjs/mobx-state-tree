@@ -26,8 +26,6 @@ CDN:
 
 It is an opt-in state container that can be used in MobX, but also Redux based applications.
 
-TODO: slides / reactive conf talk
-
 If MobX is like a spreadsheet mechanism for javascript, then mobx-state-tree is like storing your spreadsheet in git.
 
 Unlike MobX itself, mobx-state-tree is quite opinionated on how you structure your data.
@@ -69,9 +67,9 @@ Models are at the heart of `mobx-state-tree`. They simply store your data.
 Example:
 
 ```javascript
-import {createFactory, action, mapOf, referenceTo} from "mobx-state-tree"
+import {types.model, action, mapOf, referenceTo} from "mobx-state-tree"
 
-const Box = createFactory({
+const Box = types.model({
     // props
     name: "",
     x: 0,
@@ -83,28 +81,28 @@ const Box = createFactory({
     },
 
     // action
-    move: action(function(dx, dy) {
+    move(dx, dy) {
         this.x += dx
         this.y += dy
-    })
+    }
 })
 
-const BoxStore = createFactory({
-    boxes: mapOf(Box),
-    selection: referenceTo("boxes/name"),
+const BoxStore = types.model({
+    boxes: types.map(Box),
+    selection: types.reference("boxes/name"),
     addBox: action(function(name) {
         this.boxes.set(name, Box({ name, x: 100, y: 100}))
     })
 })
 
-const boxStore = BoxStore()
+const boxStore = BoxStore.create()
 boxStore.addBox("test")
 boxStore.boxes.get("test").move(7, 3)
 ```
 
 Useful methods:
 
--   `createFactory(exampleModel)`: creates a new factory
+-   `types.model(exampleModel)`: creates a new factory
 -   `clone(model)`: constructs a deep clone of the given model instance
 
 ## Snapshots
@@ -147,9 +145,78 @@ A serialized action call looks like:
 
 Useful methods:
 
--   `action(fn)` constructs
+-   Use `name: function(/* args */) { /* body */ }` (ES5) or `name (/* args */) { /* body */ }` (ES6) to construct actions
 -   `onAction(model, middleware)` listens to any action that is invoked on the model or any of it's descendants. See `onAction` for more details.
 -   `applyAction(model, action)` invokes an action on the model according to the given action description
+
+## Identifiers
+
+Identifiers and references are two powerful abstraction that work well together.
+
+- Each model can define zero or one `identifier()` properties
+- The identifier property of an object cannot be modified after initialization
+- Identifiers should be unique within their parent collection (`array` or `map`)
+- Identifiers are used to reconcile items inside arrays and maps wherever possible when applying snapshots
+- The `map.put()` method can be used to simplify adding objects to maps that have identifiers
+
+Example:
+```javascript
+const Todo = types.model({
+    id: types.identifier(),
+    title: "",
+    done: false
+})
+
+const todo1 = Todo.create() // not ok, identifier is required
+const todo1 = Todo.create({ id: "1" }) // ok
+applySnapshot(todo1, { id: "2", done: false}) // not ok; cannot modify the identifier of an object
+
+const store = types.map(Todo)
+store.put(todo1) // short-hand for store.set(todo1.id, todo)
+```
+
+## References
+
+References can be used to refer to link to an arbitrarily different object in the tree transparently.
+This makes it possible to use the tree as graph, while behind the scenes the graph is still properly serialized as tree
+
+Example:
+
+```javascript
+const Store = types.model({
+    selectedTodo: types.reference(Todo),
+    todos: types.array(Todo)
+})
+
+const store = Store({ todos: [ /* some todos */ ]})
+
+store.selectedTodo = store.todos[0] // ok
+store.selectedTodo === store.todos[0] // true
+getSnapshot(store) // serializes properly as tree: { selectedTodo: { $ref: "../todos/0" }, todos: /* */ }
+
+store.selectedTodo = Todo() // not ok; have to refer to something already in the same tree
+```
+
+By default references can point to any arbitrary object in the same tree (as long as it has the proper type).
+
+## References with predefined resolve paths
+
+It is also possible to specifiy in which collection the reference should resolve by passing a second argument, the resolve path (this can be relative):
+
+```javascript
+const Store = types.model({
+    selectedTodo: types.reference(Todo, "/todos/"),
+    todos: types.array(Todo)
+})
+```
+
+If a resolve path is provided, `reference` no longer stores a json pointer, but pinpoints the exact object that is being referred to by it's *identifier*. Assuming that `Todo` specified an `identifier()` property:
+
+```javascript
+getSnapshot(store) // serializes tree: { selectedTodo: "17" /* the identifier of the todo */, todos: /* */ }
+```
+
+The advantage of this approach is that paths are less fragile, where default references serialize the path by for example using array indices, an identifier with a resolve path will find the object by using it's identifier.
 
 ## Utility methods
 
@@ -178,38 +245,6 @@ Useful methods:
 -   `onPatch(model, listener)` attaches a patch listener  to the provided model, which will be invoked whenever the model or any of it's descendants is mutated
 -   `applyPatch(model, patch)` applies a patch to the provided model
 
-## Dependency Injection
-
-The actual signature of all _factory_ functions is `(snapshot, environment) => model`.
-This makes it possible to associate an environment with a factory created object.
-The environment is intended to be an inmutable object context information about the environment, for example which data fetch library should be used etc.
-This makes it easy to mock these kind of dependencies, as alternative to requiring singletons that might be needed inside actions.
-
-It is recommended to only provide an environment to the root of your state tree; environments of non-roots might be lost when using functions like `applySnapshot`, `applyPatch`, or `applyAction`.
-
-Useful methods:
-
-`getEnvironment(model, key)` Returns a value from the environment. Environments are stacked; the resolve the environment value the tree is walked up, until a model provides an environment value for the specified key.
-
-Example:
-
-```javascript
-const Store = createFactory({
-    users: [],
-    requestData: action(function() {
-        const fetchImpl = getEnvironment(this, "fetch")
-        fetchImpl("http://localhost/users").then(this.receiveData)
-    }),
-    receiveData: action(function(users) {
-        // etc...
-    })
-})
-```
-
-const myStore = Store({ users: \[]}, { fetch: window.fetch })
-
-## Working with references
-
 ## Be careful with direct references to items in the tree
 
 See [#10](https://github.com/mobxjs/mobx-state-tree/issues/10)
@@ -235,7 +270,7 @@ escape slashes and backslashes
 
 **Parameters**
 
--   `str`  
+-   `str`
 
 ## unescapeJsonPath
 
@@ -245,7 +280,7 @@ unescape slashes and backslashes
 
 **Parameters**
 
--   `str`  
+-   `str`
 
 ## map
 
@@ -302,7 +337,7 @@ Example of a logging middleware:
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** model to intercept actions on
--   `callback`  
+-   `callback`
 
 Returns **IDisposer** function to remove the middleware
 
@@ -317,7 +352,7 @@ Patches can be used to deep observe a model tree.
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the model instance from which to receive patches
--   `callback`  
+-   `callback`
 
 Returns **IDisposer** function to remove the listener
 
@@ -330,10 +365,10 @@ The listener will only be fire at the and a MobX (trans)action
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `callback`  
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `callback`
 
-Returns **IDisposer** 
+Returns **IDisposer**
 
 ## applyPatch
 
@@ -343,8 +378,8 @@ Applies a JSON-patch to the given model instance or bails out if the patch could
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `patch` **IJsonPatch** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `patch` **IJsonPatch**
 
 ## applyPatches
 
@@ -354,8 +389,8 @@ Applies a number of JSON patches in a single MobX transaction
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `patches` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IJsonPatch>** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `patches` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IJsonPatch>**
 
 ## applyAction
 
@@ -366,9 +401,9 @@ Returns the value of the last actoin
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `action` **IActionCall** 
--   `options` **\[IActionCallOptions]** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `action` **IActionCall**
+-   `options` **\[IActionCallOptions]**
 
 ## applyActions
 
@@ -380,9 +415,9 @@ Does not return any value
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IActionCall>** 
--   `options` **\[IActionCallOptions]** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IActionCall>**
+-   `options` **\[IActionCallOptions]**
 
 ## applySnapshot
 
@@ -392,8 +427,8 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `snapshot` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `snapshot` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
 ## getSnapshot
 
@@ -404,9 +439,9 @@ structural sharing where possible. Doesn't require MobX transactions to be compl
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **Any** 
+Returns **Any**
 
 ## hasParent
 
@@ -416,10 +451,10 @@ Given a model instance, returns `true` if the object has a parent, that is, is p
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 -   `strict` **\[[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]**  (optional, default `false`)
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
 
 ## getParent
 
@@ -431,10 +466,10 @@ map or array.
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `strict`  
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `strict`
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
 
 ## getParent
 
@@ -445,10 +480,10 @@ TODO:? strict mode?
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 -   `strict` **\[[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]**  (optional, default `false`)
 
-Returns **Any** 
+Returns **Any**
 
 ## getRoot
 
@@ -459,9 +494,9 @@ Returns the closest parent that is a model instance, but which isn't an array or
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **Any** 
+Returns **Any**
 
 ## getRoot
 
@@ -471,9 +506,9 @@ Given an object in a model tree, returns the root object of that tree
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **Any** 
+Returns **Any**
 
 ## getPath
 
@@ -483,9 +518,9 @@ Returns the path of the given object in the model tree
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
 
 ## getPathParts
 
@@ -495,9 +530,9 @@ Returns the path of the given object as unescaped string array
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** 
+Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>**
 
 ## isRoot
 
@@ -507,9 +542,9 @@ Returns true if the given object is the root of a model tree
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
 
 ## resolve
 
@@ -519,10 +554,10 @@ Resolves a path relatively to a given object.
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 -   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** escaped json path
 
-Returns **Any** 
+Returns **Any**
 
 ## tryResolve
 
@@ -530,10 +565,10 @@ Returns **Any**
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
 
-Returns **Any** 
+Returns **Any**
 
 ## getFromEnvironment
 
@@ -541,10 +576,10 @@ Returns **Any**
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `key`  
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `key`
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
 ## clone
 
@@ -552,10 +587,10 @@ Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 **Parameters**
 
--   `source` **T** 
--   `customEnvironment` **\[Any]** 
+-   `source` **T**
+-   `customEnvironment` **\[Any]**
 
-Returns **T** 
+Returns **T**
 
 ## \_getNode
 
@@ -565,7 +600,7 @@ Internal function, use with care!
 
 **Parameters**
 
--   `thing`  
+-   `thing`
 
 ## \_getNode
 
@@ -573,9 +608,9 @@ Internal function, use with care!
 
 **Parameters**
 
--   `thing` **any** 
+-   `thing` **any**
 
-Returns **Any** 
+Returns **Any**
 
 ## get
 
@@ -593,9 +628,9 @@ The result of this function is the return value of the callbacks
 
 **Parameters**
 
--   `value`  
--   `asNodeCb`  
--   `asPrimitiveCb`  
+-   `value`
+-   `asNodeCb`
+-   `asPrimitiveCb`
 
 # FAQ
 
@@ -637,20 +672,3 @@ So far this might look a lot like an immutable state tree as found for example i
 -   mobx-state-tree allows for fine grained and efficient observability on any point in the state tree
 -   mobx-state-tree generates json patches for any modification that is made
 -   (?) mobx-state-tree is a valid redux store, providing the same api (TODO)
-
-# Working with assocations
-
-```javascript
-import { resolve } from "mobx-state-tree"
-
-class Message {
-    @observable _author = "103"
-
-    @computed get author() {
-        return resolve(this, `/users`, this._author)
-    }
-    set author(author: User) {
-        this._author = author ? author.id : null
-    }
-}
-```

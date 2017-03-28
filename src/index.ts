@@ -1,23 +1,19 @@
-export {
-    action
-} from "mobx"
+// Fix some circular deps:
+import "./core/type"
+import "./core/complex-type"
 
-export * from "./core/json-patch"
 export {
-    IModel,
-    isModel,
-    IFactory,
-    isFactory,
-    getFactory,
-    getChildFactory
-} from "./core/factories"
-export {
-    IActionCall
-} from "./core/action"
-export {
+    IMSTNode,
+    isMST,
+    IType,
+    isType,
+    getType,
+    getChildType,
     Type,
-    ComplexType
-} from "./core/types"
+    ComplexType,
+    IActionCall
+} from "./core"
+export * from "./core/json-patch"
 
 export {
     asReduxStore,
@@ -27,11 +23,6 @@ export {
 export {
     connectReduxDevtools
 } from "./interop/redux-devtools"
-
-export {
-    createModelFactory as createFactory,
-    composeFactory
-} from "./types/object"
 
 export {
     types

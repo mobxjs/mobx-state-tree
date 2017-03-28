@@ -1,18 +1,18 @@
-import { createFactory, action, recordActions, types, getSnapshot } from "../"
+import { recordActions, types, getSnapshot } from "../"
 import { test } from "ava"
 
 /// Simple action replay and invocation
 
-const Task = createFactory({
+const Task = types.model({
     done: false,
-    toggle: action(function () {
+    toggle() {
         this.done = !this.done
         return this.done
-    })
+    }
 })
 
 test("it should be possible to invoke a simple action", t => {
-    const t1 = Task()
+    const t1 = Task.create()
     t.is(t1.done, false)
 
     t.is(t1.toggle(), true)
@@ -20,8 +20,8 @@ test("it should be possible to invoke a simple action", t => {
 })
 
 test("it should be possible to record & replay a simple action", t => {
-    const t1 = Task()
-    const t2 = Task()
+    const t1 = Task.create()
+    const t2 = Task.create()
     t.is(t1.done, false)
     t.is(t2.done, false)
     const recorder = recordActions(t1)
@@ -41,7 +41,7 @@ test("it should be possible to record & replay a simple action", t => {
 })
 
 test.skip("it should not be possible to change state without action", t => {
-    const t1 = Task()
+    const t1 = Task.create()
     t.throws(
         () => {
             t1.done = !t1.done
@@ -51,26 +51,28 @@ test.skip("it should not be possible to change state without action", t => {
 })
 
 // Complex actions
-const Customer = createFactory({
+const Customer = types.model({
     name: ""
 })
 
-const Order = createFactory({
+const Order = types.model({
     customer: types.reference(Customer),
-    setCustomer: action(function (customer) {
+    setCustomer(customer) {
         this.customer = customer
-    })
+    }
 })
 
-const OrderStore = createFactory({
+const OrderStore = types.model({
     customers: types.array(Customer),
     orders: types.array(Order)
 })
 
 function createTestStore() {
-    return OrderStore({
+    return OrderStore.create({
         customers: [{ name: "Mattia" }],
-        orders: [{}]
+        orders: [{
+            customer: null
+        }]
     })
 }
 
@@ -82,19 +84,18 @@ test("it should be possible to pass a complex object", t => {
     store.orders[0].setCustomer(store.customers[0])
     t.is(store.orders[0].customer.name, "Mattia")
     t.is(store.orders[0].customer, store.customers[0])
-    console.dir(getSnapshot(store))
     t.deepEqual(getSnapshot(store) as any, {
         customers: [{
             name: "Mattia"
         }],
         orders: [{
-            // TODO: customer: "../../customers/0"
+            customer: { $ref: "../../customers/0" }
         }]
     })
 
     t.deepEqual(
         recorder.actions,
-        [{ "name": "setCustomer", "path": "/orders/0", "args": [{ "$ref": "/../../customers/0" }] }]
+        [{ "name": "setCustomer", "path": "orders/0", "args": [{ "$ref": "../../customers/0" }] }]
     )
 
     const store2  = createTestStore()
@@ -124,7 +125,7 @@ test("it should not be possible to pass the element of another tree", t => {
 
 test("it should not be possible to pass an unserializable object", t => {
     const store = createTestStore()
-    const circular = { a: null }
+    const circular = { a: null as any }
     circular.a = circular
 
     t.throws(
@@ -139,8 +140,8 @@ test("it should not be possible to pass an unserializable object", t => {
 })
 
 test("it should be possible to pass a complex plain object", t => {
-    const t1 = Task()
-    const t2 = Task()
+    const t1 = Task.create()
+    const t2 = Task.create()
 
     const recorder = recordActions(t1)
 

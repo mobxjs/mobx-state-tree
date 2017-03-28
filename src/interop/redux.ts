@@ -1,5 +1,4 @@
-import {IActionCall} from "../core/action"
-import {isModel} from "../core/factories"
+import {isMST, IActionCall} from "../core"
 import {onSnapshot, getSnapshot, applyAction} from "../top-level-api"
 import {invariant, extend} from "../utils"
 
@@ -17,7 +16,7 @@ export type MiddleWare =
         ((next: (action: IActionCall) => void) => void)
 
 export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxStore {
-    invariant(isModel(model), "Expected model object")
+    invariant(isMST(model), "Expected model object")
     let store: IReduxStore = {
         getState : ()       => getSnapshot(model),
         dispatch : action   => {

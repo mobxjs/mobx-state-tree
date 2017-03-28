@@ -1,6 +1,5 @@
-import {IFactory} from "../core/factories"
+import {IType, Type} from "../core"
 import {invariant, isMutable, isSerializable, isPlainObject} from "../utils"
-import {Type} from "../core/types"
 
 function freeze(value: any) {
     Object.freeze(value)
@@ -16,7 +15,7 @@ function freeze(value: any) {
     return value
 }
 
-export class Frozen extends Type {
+export class Frozen<T> extends Type<T, T> {
 
     constructor() {
         super("frozen")
@@ -26,16 +25,17 @@ export class Frozen extends Type {
         return "frozen"
     }
 
-    create(value: any, environment?: any) {
+    create(value: any) {
         invariant(isSerializable(value), "Given value should be serializable")
         // deep freeze the object/array
         return isMutable(value) ? freeze(value) : value
     }
 
-    is(value: any) {
+    is(value: any): value is T {
         return isSerializable(value)
     }
 
 }
 
-export const frozen: IFactory<any, any> = new Frozen().factory
+// TODO: improve typings?
+export const frozen: IType<any, any> = new Frozen()

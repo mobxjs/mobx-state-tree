@@ -1,8 +1,7 @@
-import {IFactory} from "../core/factories"
+import {IType, Type} from "../core"
 import {invariant, isPrimitive} from "../utils"
-import {Type} from "../core/types"
 
-export class CoreType extends Type {
+export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean
 
     constructor(name: any, checker: any) {
@@ -20,14 +19,16 @@ export class CoreType extends Type {
         return value
     }
 
-    is(thing: any) {
+    is(thing: any): thing is T {
         return isPrimitive(thing) && this.checker(thing)
     }
 }
 
 // tslint:disable-next-line:variable-name
-export const string: IFactory<string, string> = new CoreType("string", (v: any) => typeof v === "string").factory
+export const string: IType<string, string> = new CoreType<string>("string", (v: any) => typeof v === "string")
 // tslint:disable-next-line:variable-name
-export const number: IFactory<number, number> = new CoreType("number", (v: any) => typeof v === "number").factory
+export const number: IType<number, number> = new CoreType<number>("number", (v: any) => typeof v === "number")
 // tslint:disable-next-line:variable-name
-export const boolean: IFactory<boolean, boolean> = new CoreType("boolean", (v: any) => typeof v === "boolean").factory
+export const boolean: IType<boolean, boolean> = new CoreType<boolean>("boolean", (v: any) => typeof v === "boolean")
+// tslint:disable-next-line:variable-name
+export const DatePrimitive: IType<Date, Date> = new CoreType<Date>("Date", (v: any) => v instanceof Date)

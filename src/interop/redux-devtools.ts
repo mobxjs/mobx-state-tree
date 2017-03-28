@@ -1,5 +1,5 @@
 import {getSnapshot, onAction, applySnapshot} from "../top-level-api"
-import {IActionCall} from "../core/action"
+import {IActionCall} from "../core"
 
 const { connectViaExtension, extractState } = require("remotedev")
 

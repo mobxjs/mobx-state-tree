@@ -1,92 +1,93 @@
-// TODO: move file to better place, not really a type
-
-import {IModel, IFactory, isFactory, isModel} from "../core/factories"
+import {isObservableArray, isObservableMap} from "mobx"
 import {resolve} from "../top-level-api"
 import {invariant, fail} from "../utils"
-import { getNode, getRelativePath } from "../core/node"
+import { getMST, getRelativePath, IType, isMST, IMSTNode } from "../core"
+import { getIdentifierAttribute } from "./object"
 
-export type IReferenceGetter<T> = (identifier: string, owner: IModel, propertyName: string) => T
-export type IReferenceSetter<T> = (value: T, owner: IModel, propertyName: string) => string
+export interface IReference {
+    $ref: string
+}
 
 export interface IReferenceDescription {
-    getter: IReferenceGetter<any>
-    setter: IReferenceSetter<any>
+    getter: (value: any) => any
+    setter: (value: any) => any
     isReference: true
 }
 
-export function reference<T>(path: string): T;
-export function reference<T>(getter: IReferenceGetter<T>, setter?: IReferenceSetter<T>): T;
-export function reference<T>(factory: IFactory<any, T>): T;
-export function reference(arg1: any, arg2?: any) {
-    if (isFactory(arg1))
-        return createGenericRelativeReference(arg1)
-    if (typeof arg1 === "string")
-        return createRelativeReferenceTo(arg1)
+export function reference<T>(factory: IType<any, T>): IType<{ $ref: string }, T>;
+export function reference<T>(factory: IType<any, T>, basePath: string): IType<string, T>;
+export function reference<T>(factory: IType<any, T>, basePath?: string): any {
+    // FIXME: IType return type is inconsistent with what is actually returned, however, results in the best type-inference results for objects...
+    if (arguments.length === 1)
+        return createGenericRelativeReference(factory) as any
+    else
+        return createReferenceWithBasePath(factory, basePath!) as any
+}
+
+function createGenericRelativeReference(factory: IType<any, any>): IReferenceDescription {
     return {
         isReference: true,
-        getter: arg1,
-        setter: arg2 || unwritableReference
-    } as IReferenceDescription
-}
-
-function createRelativeReferenceTo(path: string) {
-    // TODO: remove this option?
-    const targetIdAttribute = path.split("/").slice(-1)[0]
-    path = path.split("/").slice(0, -1).join("/")
-    return reference(
-        (identifier: string, owner: IModel) => resolve(owner, `${path}/${identifier}`),
-        (value: any, owner: IModel, name)   => {
-            invariant(!value || (getNode(value).root === getNode(owner).root), `The value assigned to the reference '${name}' should already be part of the same model tree`)
-            return value[targetIdAttribute]
-        }
-    )
-}
-
-function createGenericRelativeReference(factory: IFactory<any, any>) {
-    // TODO: store as {$ref: "..."} instead of just the string
-    return reference(
-        (identifier: string, owner: IModel) => {
+        getter: function (this: IMSTNode<any, any>, identifier: IReference | null | undefined): any {
             if (identifier === null || identifier === undefined)
                 return identifier
-            return resolve(owner, identifier)
+            // TODO: would be better to test as part of snapshot...
+            invariant(typeof identifier.$ref === "string", "Expected a reference in the format `{ $ref: ... }`")
+            return resolve(this, identifier.$ref)
         },
-        (value: any, owner: IModel, name) => {
+        setter: function(this: IMSTNode<any, any>, value: IMSTNode<any, any>): IReference {
             if (value === null || value === undefined)
                 return value
-            invariant(isModel(value), `The value assigned to the reference '${name}' is not a model instance`)
-            invariant(factory.is(value), `The value assigned to the reference '${name}' is not a model of type ${factory}`)
-            const base = getNode(owner)
-            const target = getNode(value)
-            invariant(base.root === target.root, `The value assigned to the reference '${name}' should already be part of the same model tree`)
-            return getRelativePath(base, target)
+            invariant(isMST(value), `Failed to assign a value to a reference; the value is not a model instance`)
+            invariant(factory.is(value), `Failed to assign a value to a reference; the value is not a model of type ${factory}`)
+            const base = getMST(this)
+            const target = getMST(value)
+            invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
+            return { $ref: getRelativePath(base, target) }
         }
-    )
-}
-
-export function createReferenceProps(name: string, ref: IReferenceDescription) {
-    const sourceIdAttribute = `${name}_id`
-    const res = {
-        [sourceIdAttribute]: "" // the raw attribute value
     }
-    Object.defineProperty(res, name, {
-        get: function() {
-            // Optimization: reuse closures based on the same name or configuration
-            const id = this[sourceIdAttribute]
-            return id ? ref.getter(id, this, name) : null
-        },
-        set: function(v) {
-            invariant(getNode(this).isRunningAction(), `Reference '${name}' can only be modified from within an action`)
-            this[sourceIdAttribute] = v ? ref.setter(v, this, name) : ""
-        },
-        enumerable: true
-    })
-    return res
 }
 
-function unwritableReference(_: any, owner: any, propertyName: any) {
-    return fail(`Cannot assign a new value to the reference '${propertyName}', the reference is read-only`)
+function createReferenceWithBasePath(type: IType<any, any>, path: string): IReferenceDescription {
+    const targetIdAttribute = getIdentifierAttribute(type)
+    if (!targetIdAttribute)
+        return fail(`Cannot create reference to path '${path}'; the targetted type, ${type.describe()}, does not specify an identifier property`)
+
+    return {
+        isReference: true,
+        getter: function (this: IMSTNode<any, any>, identifier: string | null | undefined): any {
+            if (identifier === null || identifier === undefined)
+                return identifier
+            const targetCollection = resolve(this, `${path}`)
+            if (isObservableArray(targetCollection)) {
+                return targetCollection.find(item => item && item[targetIdAttribute] === identifier)
+            } else if (isObservableMap(targetCollection)) {
+                const child = targetCollection.get(identifier)
+                invariant(!child || child[targetIdAttribute] === identifier, `Inconsistent collection, the map entry under key '${identifier}' should have property '${targetIdAttribute}' set to value '${identifier}`)
+                return child
+            } else
+                return fail("References with base paths should point to either an `array` or `map` collection")
+        },
+        setter: function(this: IMSTNode<any, any>, value: IMSTNode<any, any>): string {
+            if (value === null || value === undefined)
+                return value
+            invariant(isMST(value), `Failed to assign a value to a reference; the value is not a model instance`)
+            invariant(type.is(value), `Failed to assign a value to a reference; the value is not a model of type ${type}`)
+            const base = getMST(this)
+            const target = getMST(value)
+            invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
+            const identifier = (value as any)[targetIdAttribute]
+            const targetCollection = resolve(this, `${path}`)
+            if (isObservableArray(targetCollection)) {
+                invariant(targetCollection.indexOf(value) !== -1, `The assigned value is not part of the collection the reference resolves to`)
+            } else if (isObservableMap(targetCollection)) {
+                invariant(targetCollection.get(identifier) === value, `The assigned value was not found in the collection the reference resolves to, under key '${identifier}'`)
+            } else
+                return fail("References with base paths should point to either an `array` or `map` collection")
+            return identifier
+        }
+    }
 }
 
-export function isReferenceFactory(thing: any) {
+export function isReferenceFactory(thing: any): thing is IReferenceDescription {
     return thing.isReference === true
 }

@@ -66,6 +66,15 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
     })
 }
 
+export function addHiddenWritableProp(object: any, propName: string, value: any) {
+    Object.defineProperty(object, propName, {
+        enumerable: false,
+        writable: true,
+        configurable: true,
+        value
+    })
+}
+
 export function addReadOnlyProp(object: any, propName: string, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: true,
@@ -87,4 +96,21 @@ export function registerEventHandler(handlers: Function[], handler: Function): I
 const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
 export function hasOwnProperty(object: Object, propName: string) {
     return prototypeHasOwnProperty.call(object, propName)
+}
+
+export function argsToArray(args: IArguments): any [] {
+    const res = new Array(args.length)
+    for (let i = 0; i < args.length; i++)
+        res[i] = args[i]
+    return res
+}
+
+export function createNamedFunction(name: string, fn: Function) {
+    return new Function("f", `return function ${name}() { return f.apply(this, arguments)}`)(fn)
+}
+
+export function isValidIdentifier(identifier: any): boolean {
+    if (typeof identifier !== "string")
+        return false
+    return /^[a-z0-9_-]+$/i.test(identifier)
 }

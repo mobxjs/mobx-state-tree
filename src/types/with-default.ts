@@ -1,34 +1,39 @@
-import {IFactory} from "../core/factories"
-import {hasNode, getNode} from "../core/node"
+import {IType} from "../core/type"
+import {hasMST, getMST} from "../core"
 import {invariant} from "../utils"
-import {Type} from "../core/types"
+import {Type} from "../core/type"
 
-export class DefaultValue extends Type {
-    readonly type: IFactory<any, any>
+export class DefaultValue<S, T> extends Type<S, T> {
+    readonly type: IType<S, T>
     readonly defaultValue: any
 
-    constructor(type: IFactory<any, any>, defaultValue: any) {
-        super(type.type.name)
+    constructor(type: IType<S, T>, defaultValue: S) {
+        super(type.name)
         this.type = type
         this.defaultValue = defaultValue
     }
 
     describe() {
-        return "(" + this.type.type.describe() + " = " + JSON.stringify(this.defaultValue) + ")"
+        // return "(" + this.type.type.describe() + " = " + JSON.stringify(this.defaultValue) + ")"
+        // MWE: discuss a default value is not part of the type description? (unlike a literal)
+        return this.type.describe()
     }
 
-    create(value: any, environment?: any) {
-        return typeof value === "undefined" ? this.type(this.defaultValue) : this.type(value)
+    create(value: any) {
+        return typeof value === "undefined" ? this.type.create(this.defaultValue) : this.type.create(value)
     }
 
-    is(value: any) {
-        return this.type.is(value)
+    is(value: any): value is S | T {
+        // defaulted values can be skipped
+        return value === undefined || this.type.is(value)
     }
 
 }
 
-export function createDefaultValueFactory<S, T>(type: IFactory<S, T>, defaultValueOrNode: S | T): IFactory<S, T> {
-    const defaultValue = hasNode(defaultValueOrNode) ? getNode(defaultValueOrNode).snapshot : defaultValueOrNode
-    invariant(type.is(defaultValue), `Default value ${JSON.stringify(defaultValue)} is not assignable to type ${type.factoryName}. Expected ${JSON.stringify(type.type.describe())}`)
-    return new DefaultValue(type, defaultValue).factory
+export function createDefaultValueFactory<T>(type: IType<T, T>, defaultValueOrNode: T): IType<T, T>;
+export function createDefaultValueFactory<S, T>(type: IType<S, T>, defaultValueOrNode: S): IType<S, T>;
+export function createDefaultValueFactory(type: IType<any, any>, defaultValueOrNode: any): IType<any, any> {
+    const defaultValue = hasMST(defaultValueOrNode) ? getMST(defaultValueOrNode).snapshot : defaultValueOrNode
+    invariant(type.is(defaultValue), `Default value ${JSON.stringify(defaultValue)} is not assignable to type ${type.name}. Expected ${JSON.stringify(type.describe())}`)
+    return new DefaultValue(type, defaultValue)
 }

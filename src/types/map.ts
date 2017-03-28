@@ -1,49 +1,72 @@
-import {observable, ObservableMap, IMapChange, IMapWillChange, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
-import {isFactory, IFactory} from "../core/factories"
-import {identity, isPlainObject, nothing, isPrimitive} from "../utils"
+import { createDefaultValueFactory } from './with-default';
+import { getIdentifierAttribute } from './object';
+import {observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe} from "mobx"
+import { isType, IType, IMSTNode, getMST, hasMST, maybeMST, MSTAdminisration, valueToSnapshot, ComplexType } from '../core';
+import {} from "../core"
+import {identity, isPlainObject, nothing, isPrimitive, invariant, fail} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
-import {ComplexType} from "../core/types"
 
 interface IMapFactoryConfig {
     isMapFactory: true
 }
 
-export class MapType extends ComplexType {
-    isMapFactory = true
-    subType: IFactory<any, any>
+export interface IExtendedObservableMap<T> extends ObservableMap<T> {
+    put(value: T | any): this // downtype to any, again, because we cannot type the snapshot, see
+}
 
-    constructor(name: string, subType: IFactory<any, any>) {
+export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
+    isMapFactory = true
+    subType: IType<any, any>
+
+    constructor(name: string, subType: IType<any, any>) {
         super(name)
         this.subType = subType
     }
 
     describe() {
-        return "Map<string, " + this.subType.type.describe() + ">"
+        return "Map<string, " + this.subType.describe() + ">"
     }
 
     createNewInstance() {
-        return observable.shallowMap()
+        const identifierAttr = getIdentifierAttribute(this.subType)
+        const map = observable.shallowMap()
+
+        // map.put(x) is a shorthand for map.set(x[identifier], x)
+        ; (map as any).put = function(value: any) {
+            invariant(!!identifierAttr, `Map.put is only supported if the subtype has an idenfier attribute`)
+            invariant(!!value, `Map.put cannot be used to set empty values`)
+            this.set(value[identifierAttr!], value)
+            return this
+        }
+        return map
     }
 
-    finalizeNewInstance(instance: any) {
+    finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
+        intercept(instance, this.willChange as any)
+        observe(instance, this.didChange)
+        getMST(instance).applySnapshot(snapshot)
     }
 
-    getChildNodes(_node: Node, target: any): [string, Node][] {
-        const res: [string, Node][] = []
-        target.forEach((value: any, key: any) => {
-            maybeNode(value, node => { res.push([key, node])})
+    getChildMSTs(_node: MSTAdminisration, target: ObservableMap<any>): [string, MSTAdminisration][] {
+        const res: [string, MSTAdminisration][] = []
+        target.forEach((value, key) => {
+            maybeMST(value, node => { res.push([key, node])})
         })
         return res
     }
 
-    getChildNode(node: Node, target: any, key: any): Node | null {
+    getChildMST(node: MSTAdminisration, target: ObservableMap<any>, key: string): MSTAdminisration | null {
         if (target.has(key))
-            return maybeNode(target.get(key), identity, nothing)
+            return maybeMST(target.get(key), identity, nothing)
         return null
     }
 
-    willChange(node: Node, change: IMapWillChange<any>): Object | null {
+    willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
+        const node = getMST(change.object)
+        const identifierAttr = getIdentifierAttribute(node)
+        if (identifierAttr && change.newValue && typeof change.newValue === "object" && change.newValue[identifierAttr] !== change.name)
+            fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${change.name}', but expected: '${change.newValue[identifierAttr!]}'`)
+
         switch (change.type) {
             case "update":
                 {
@@ -63,22 +86,23 @@ export class MapType extends ComplexType {
             case "delete":
                 {
                     const oldValue = change.object.get(change.name)
-                    maybeNode(oldValue, adm => adm.setParent(null))
+                    maybeMST(oldValue, adm => adm.setParent(null))
                 }
                 break
         }
         return change
     }
 
-    serialize(node: Node, target: any): Object {
-        const res: {[index: string]: any} = {}
-        target.forEach((value: any, key: any) => {
+    serialize(node: MSTAdminisration, target: ObservableMap<any>): Object {
+        const res: {[key: string]: any} = {}
+        target.forEach((value, key) => {
             res[key] = valueToSnapshot(value)
         })
         return res
     }
 
-    didChange(node: Node, change: IMapChange<any>): void {
+    didChange(change: IMapChange<any>): void {
+        const node = getMST(change.object)
         switch (change.type) {
             case "update":
             case "add":
@@ -95,7 +119,7 @@ export class MapType extends ComplexType {
         }
     }
 
-    applyPatchLocally(node: Node, target: any, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdminisration, target: ObservableMap<any>, subpath: string, patch: IJsonPatch): void {
         switch (patch.op) {
             case "add":
             case "replace":
@@ -107,26 +131,30 @@ export class MapType extends ComplexType {
         }
     }
 
-    @action applySnapshot(node: Node, target: any, snapshot: any): void {
+    @action applySnapshot(node: MSTAdminisration, target: ObservableMap<any>, snapshot: any): void {
+        const identifierAttr = getIdentifierAttribute(this.subType)
         // Try to update snapshot smartly, by reusing instances under the same key as much as possible
         const currentKeys: { [key: string]: boolean } = {}
-        target.keys().forEach((key: any) => { currentKeys[key] = false })
+        target.keys().forEach(key => { currentKeys[key] = false })
         Object.keys(snapshot).forEach(key => {
+            const item = snapshot[key]
+            if (identifierAttr && item && typeof item === "object" && key !== item[identifierAttr])
+                fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${key}', but expected: '${item[identifierAttr]}'`)
             // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
-            if (key in currentKeys && !isPrimitive(snapshot[key])) {
+            if (key in currentKeys && !isPrimitive(item)) {
                 currentKeys[key] = true
-                maybeNode(
+                maybeMST(
                     target.get(key),
                     propertyNode => {
                         // update existing instance
-                        propertyNode.applySnapshot(snapshot[key])
+                        propertyNode.applySnapshot(item)
                     },
                     () => {
-                        target.set(key, snapshot[key])
+                        target.set(key, item)
                     }
                 )
             } else {
-                target.set(key, snapshot[key])
+                target.set(key, item)
             }
         })
         Object.keys(currentKeys).forEach(key => {
@@ -135,19 +163,23 @@ export class MapType extends ComplexType {
         })
     }
 
-    getChildFactory(key: string): IFactory<any, any> {
+    getChildType(key: string): IType<any, any> {
         return this.subType
     }
 
     isValidSnapshot(snapshot: any) {
         return isPlainObject(snapshot) && Object.keys(snapshot).every(key => this.subType.is(snapshot[key]))
     }
+
+    getDefaultSnapshot() {
+        return {}
+    }
 }
 
-export function createMapFactory<S, T>(subtype: IFactory<S, T>): IFactory<{[key: string]: S}, ObservableMap<T>> {
-    return new MapType(`map<string, ${subtype.factoryName}>`, subtype).factory
+export function createMapFactory<S, T>(subtype: IType<S, T>): IType<{[key: string]: S}, IMSTNode<{[key: string]: S}, IExtendedObservableMap<T>>> {
+    return createDefaultValueFactory(new MapType(`map<string, ${subtype.name}>`, subtype), {})
 }
 
 export function isMapFactory(factory: any): boolean {
-    return isFactory(factory) && (factory.type as any).isMapFactory === true
+    return isType(factory) && (factory as any).isMapFactory === true
 }

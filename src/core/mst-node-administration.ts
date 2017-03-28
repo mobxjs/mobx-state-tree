@@ -1,50 +1,42 @@
 import {
     action, observable,
-    intercept, observe, computed, reaction,
+    computed, reaction,
     isObservableArray,
     isObservableMap
 } from "mobx"
 
-import {ComplexType} from "./types"
-import {IModel, IFactory} from "./factories"
+import { typecheck, IType } from "./type"
+import { getRelativePath, hasMST, getMST, getPath } from "./mst-node"
+
 import {IActionHandler} from "./action"
 import {
     invariant, fail, extend,
-    addHiddenFinalProp, isMutable, IDisposer, registerEventHandler, isSerializable
+    addHiddenFinalProp, IDisposer, registerEventHandler
 } from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
 import {IActionCall, applyActionLocally} from "./action"
-import {ObjectType} from "../types/object"
+import { ObjectType } from "../types/object"
+import { ComplexType } from "./complex-type"
 
-// TODO: make Node more like a struct, extract the methods to snapshots.js, actions.js etc..
-export class Node {
+export class MSTAdminisration {
     readonly target: any
-    readonly environment: any
-    @observable _parent: Node | null = null
-    readonly factory: IFactory<any, any>
-    private  interceptDisposer: IDisposer
+    @observable _parent: MSTAdminisration | null = null
+    readonly type: ComplexType<any, any>
     readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     readonly actionSubscribers: IActionHandler[] = []
     _isRunningAction = false // only relevant for root
 
-    constructor(initialState: any, environment: any, factory: IFactory<any, any>) {
-        invariant(factory.type instanceof ComplexType, "Uh oh")
+    constructor(initialState: any, type: ComplexType<any, any>) {
+        invariant(type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
-        this.factory = factory
-        this.environment = environment
+        this.type = type
         this.target = initialState
 
-        this.interceptDisposer = intercept(this.target, ((c: any) => this.type.willChange(this, c)) as any)
-        observe(this.target, (c) => this.type.didChange(this, c))
         reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
         // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
-    }
-
-    get type(): ComplexType {
-        return this.factory.type as ComplexType
     }
 
     @computed get pathParts(): string[]{
@@ -55,7 +47,7 @@ export class Node {
 
         // get the key
         // optimize: maybe this shouldn't be computed, this is called often and pretty expensive lookup ...
-        const keys = this._parent.getChildNodes()
+        const keys = this._parent.getChildMSTs()
             .filter(entry => entry[1] === this)
         if (keys.length > 0) {
             const [key] = keys[0]
@@ -69,7 +61,7 @@ export class Node {
      * Returnes (escaped) path representation as string
      */
     @computed public get path(): string {
-        return joinJsonPath(this.pathParts)
+        return "/" + joinJsonPath(this.pathParts)
     }
 
     @computed public get subpath(): string {
@@ -89,7 +81,7 @@ export class Node {
 
     public get root() {
         // future optimization: store root ref in the node and maintain it
-        let p, r: any = this
+        let p, r: MSTAdminisration = this
         while (p = r.parent)
             r = p
         return r
@@ -105,7 +97,7 @@ export class Node {
     }
 
     public applySnapshot(snapshot: any) {
-        invariant(this.type.is(snapshot), `Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${this.factory.type.name}. Expected ${this.factory.type.describe()} instead.`)
+        typecheck(this.type, snapshot)
         return this.type.applySnapshot(this, this.target, snapshot)
     }
 
@@ -115,7 +107,7 @@ export class Node {
         node.applyPatchLocally(parts[parts.length - 1], patch)
     }
 
-    applyPatchLocally(subpath: any, patch: IJsonPatch): void {
+    applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.type.applyPatchLocally(this, this.target, subpath, patch)
     }
 
@@ -123,9 +115,9 @@ export class Node {
         return registerEventHandler(this.patchSubscribers, onPatch)
     }
 
-    emitPatch(patch: IJsonPatch, source: Node, distance = 0) {
+    emitPatch(patch: IJsonPatch, source: MSTAdminisration, distance = 0) {
         if (this.patchSubscribers.length) {
-            let localizedPatch: any
+            let localizedPatch: IJsonPatch
             if (distance === 0)
                 localizedPatch = patch
             else
@@ -138,7 +130,7 @@ export class Node {
             this.parent.emitPatch(patch, this, distance + 1)
     }
 
-    setParent(newParent: Node | null, subpath: string | null = null) {
+    setParent(newParent: MSTAdminisration | null, subpath: string | null = null) {
         if (this.parent === newParent)
             return
         if (this._parent && newParent) {
@@ -158,10 +150,10 @@ export class Node {
     }
 
     prepareChild(subpath: string, child: any): any {
-        const childFactory = this.getChildFactory(subpath)
+        const childFactory = this.getChildType(subpath)
 
-        if (hasNode(child)) {
-            const node = getNode(child)
+        if (hasMST(child)) {
+            const node = getMST(child)
 
             if (node.isRoot) {
                 // we are adding a node with no parent (first insert in the tree)
@@ -171,18 +163,18 @@ export class Node {
 
             return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${getPath(child)}'`)
         }
-        const existingNode = this.getChildNode(subpath)
-        const newInstance = childFactory(child)
+        const existingNode = this.getChildMST(subpath)
+        const newInstance = childFactory.create(child)
 
-        if (existingNode && existingNode.factory === newInstance.factory) {
+        if (existingNode && existingNode.type === newInstance.factory) {
             // recycle instance..
             existingNode.applySnapshot(child)
             return existingNode.target
         } else {
             if (existingNode)
                 existingNode.setParent(null) // TODO: or delete / remove / whatever is a more explicit clean up
-            if (hasNode(newInstance)) {
-                const node = getNode(newInstance)
+            if (hasMST(newInstance)) {
+                const node = getMST(newInstance)
                 node.setParent(this, subpath)
             }
             return newInstance
@@ -202,23 +194,25 @@ export class Node {
             this.parent!.target[this.subpath] = null
     }
 
-    resolve(pathParts: string): Node;
-    resolve(pathParts: string, failIfResolveFails: boolean): Node | undefined;
-    resolve(path: string, failIfResolveFails: boolean = true): Node | undefined {
+    resolve(pathParts: string): MSTAdminisration;
+    resolve(pathParts: string, failIfResolveFails: boolean): MSTAdminisration | undefined;
+    resolve(path: string, failIfResolveFails: boolean = true): MSTAdminisration | undefined {
         return this.resolvePath(splitJsonPath(path), failIfResolveFails)
     }
 
-    resolvePath(pathParts: string[]): Node;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean): Node | undefined;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): Node | undefined {
-        let current: Node | null = this
+    resolvePath(pathParts: string[]): MSTAdminisration;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean): MSTAdminisration | undefined;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): MSTAdminisration | undefined {
+        let current: MSTAdminisration | null = this
         for (let i = 0; i < pathParts.length; i++) {
-            if (pathParts[i] === "..")
+            if (pathParts[i] === "") // '/bla' or 'a//b' splits to empty strings
+                current = current.root
+            else if (pathParts[i] === "..")
                 current = current!.parent
             else if (pathParts[i] === ".")
                 continue
             else
-                current = current!.getChildNode(pathParts[i])
+                current = current!.getChildMST(pathParts[i])
             if (current === null) {
                 if (failIfResolveFails)
                     return fail(`Could not resolve'${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
@@ -245,12 +239,12 @@ export class Node {
             fail(`Invalid action path: ${action.path || ""}`)
     }
 
-    emitAction(instance: Node, action: IActionCall, next: any) {
+    emitAction(instance: MSTAdminisration, action: IActionCall, next: () => any): any {
         let idx = -1
         const correctedAction: IActionCall = this.actionSubscribers.length
             ? extend({} as any, action, { path: getRelativePath(this, instance) })
             : null
-        let n = (): any => {
+        let n = () => {
             // optimization: use tail recursion / trampoline
             idx++
             if (idx < this.actionSubscribers.length) {
@@ -270,98 +264,15 @@ export class Node {
         return registerEventHandler(this.actionSubscribers, listener)
     }
 
-    getFromEnvironment(key: string): any {
-        if (this.environment && this.environment.hasOwnProperty(key))
-            return this.environment[key]
-        if (this.isRoot)
-            return fail(`Undefined environment variable '${key}'`)
-        return this.parent!.getFromEnvironment(key)
+    getChildMST(subpath: string): MSTAdminisration | null {
+        return this.type.getChildMST(this, this.target, subpath)
     }
 
-    getChildNode(subpath: string): Node | null {
-        return this.type.getChildNode(this, this.target, subpath)
+    getChildMSTs(): [string, MSTAdminisration][] {
+        return this.type.getChildMSTs(this, this.target)
     }
 
-    getChildNodes(): [string, Node][] {
-        return this.type.getChildNodes(this, this.target)
+    getChildType(key: string): IType<any, any> {
+        return this.type.getChildType(key)
     }
-
-    getChildFactory(key: string): IFactory<any, any> {
-        return this.type.getChildFactory(key)
-    }
-}
-
-// TODO: duplicate with isModel
-export function hasNode(value: any): value is IModel {
-    return value && value.$treenode
-}
-
-/**
- * Tries to convert a value to a TreeNode. If possible or already done,
- * the first callback is invoked, otherwise the second.
- * The result of this function is the return value of the callbacks
- */
-export function maybeNode<T, R>(value: T & IModel, asNodeCb: (node: Node, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
-    // Optimization: maybeNode might be quite inefficient runtime wise, might be factored out at expensive places
-    if (isMutable(value)) {
-        const n = getNode(value)
-        return asNodeCb(n, n.target)
-    } else if (asPrimitiveCb) {
-        return asPrimitiveCb(value)
-    } else {
-        return value as any as R
-    }
-}
-
-export function getNode(value: IModel): Node {
-    if (hasNode(value))
-        return value.$treenode
-    else
-        return fail("element has no Node")
-
-}
-
-export function getPath(thing: IModel): string {
-    return getNode(thing).path
-}
-
-export function getRelativePath(base: Node, target: Node): string {
-    // PRE condition target is (a child of) base!
-    invariant(
-        base.root === target.root,
-        `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
-    )
-    const baseParts = base.pathParts
-    const targetParts = target.pathParts
-    let common = 0
-    for (; common < baseParts.length; common++) {
-        if (baseParts[common] !== targetParts[common])
-            break
-    }
-    return joinJsonPath(
-        baseParts
-        .slice(common).map(_ => "..")
-        .concat(
-            targetParts.slice(common)
-        )
-    )
-}
-
-export function getParent(thing: IModel): IModel {
-    const node = getNode(thing)
-    return node.parent ? node.parent.target : null
-}
-
-export function valueToSnapshot(thing: any) {
-    if (thing instanceof Date) {
-        return {
-            $treetype: "Date",
-            time: thing.toJSON()
-        }
-    }
-    if (hasNode(thing))
-        return getNode(thing).snapshot
-    if (isSerializable(thing))
-        return thing
-    fail("Unable to convert value to snapshot.")
 }

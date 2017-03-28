@@ -1,45 +1,54 @@
-import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action} from "mobx"
-import {Node, maybeNode, valueToSnapshot} from "../core/node"
-import {IJsonPatch} from "../core/json-patch"
-import {IFactory, isFactory} from "../core/factories"
-import {identity, nothing} from "../utils"
-import {ComplexType} from "../core/types"
+import { createDefaultValueFactory } from './with-default';
+import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe} from "mobx"
+import { applySnapshot } from "../top-level-api"
+import { MSTAdminisration, maybeMST, valueToSnapshot, getMST, IJsonPatch, getType, IMSTNode, ComplexType, IType, isType } from "../core"
+import {identity, nothing, invariant} from "../utils"
+import {getIdentifierAttribute} from "./object"
 
-export class ArrayType extends ComplexType {
+export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     isArrayFactory = true
-    subType: IFactory<any, any> // TODO: type
+    subType: IType<any, any> // TODO: type
 
-    constructor(name: any, subType: IFactory<any, any>) {
+    constructor(name: string, subType: IType<any, any>) {
         super(name)
         this.subType = subType
     }
 
     describe() {
-        return this.subType.type.describe() + "[]"
+        return this.subType.describe() + "[]"
     }
 
     createNewInstance() {
         return observable.shallowArray()
     }
 
-    finalizeNewInstance(instance: any) {
+    finalizeNewInstance(instance: IObservableArray<any>, snapshot: any) {
+        intercept(instance, this.willChange as any)
+        observe(instance, this.didChange)
+        getMST(instance).applySnapshot(snapshot)
     }
 
-    getChildNodes(_: Node, target: any): [string, Node][] {
-        const res: [string, Node][] = []
-        target.forEach((value: any, index: any) => {
-            maybeNode(value, node => { res.push(["" + index, node])})
+    getChildMSTs(_: MSTAdminisration, target: IObservableArray<any>): [string, MSTAdminisration][] {
+        const res: [string, MSTAdminisration][] = []
+        target.forEach((value, index) => {
+            maybeMST(value, node => { res.push(["" + index, node])})
         })
         return res
     }
 
-    getChildNode(node: Node, target: any, key: any): Node | null {
-        if (parseInt(key) < target.length)
-            return maybeNode(target[key], identity, nothing)
+    getChildMST(node: MSTAdminisration, target: IObservableArray<any>, key: string): MSTAdminisration | null {
+        const index = parseInt(key, 10)
+        if (index < target.length)
+            return maybeMST(target[index], identity, nothing)
         return null
     }
 
-    willChange(node: Node, change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
+    willChange = (change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null => {
+        // TODO: verify type
+                // TODO check type
+        // TODO: check if tree is editable
+        // TODO: check for key duplication
+        const node = getMST(change.object)
         switch (change.type) {
             case "update":
                 const {newValue} = change
@@ -50,7 +59,7 @@ export class ArrayType extends ComplexType {
                 break
             case "splice":
                 change.object.slice(change.index, change.removedCount).forEach(oldValue => {
-                    maybeNode(oldValue, adm => adm.setParent(null))
+                    maybeMST(oldValue, adm => adm.setParent(null))
                 })
                 change.added = change.added.map((newValue, pos) => {
                     return node.prepareChild("" + (change.index + pos), newValue)
@@ -60,11 +69,12 @@ export class ArrayType extends ComplexType {
         return change
     }
 
-    serialize(node: Node, target: any): any {
+    serialize(node: MSTAdminisration, target: IObservableArray<any>): any {
         return target.map(valueToSnapshot)
     }
 
-    didChange(node: Node, change: IArrayChange<any> | IArraySplice<any>): void {
+    didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
+        const node = getMST(change.object)
         switch (change.type) {
             case "update":
                 return void node.emitPatch({
@@ -88,7 +98,7 @@ export class ArrayType extends ComplexType {
         }
     }
 
-    applyPatchLocally(node: Node, target: any, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdminisration, target: IObservableArray<any>, subpath: string, patch: IJsonPatch): void {
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
             case "replace":
@@ -103,24 +113,49 @@ export class ArrayType extends ComplexType {
         }
     }
 
-    @action applySnapshot(node: Node, target: any, snapshot: any): void {
-        // TODO: make a smart merge here, try to reuse instances..
-        target.replace(snapshot)
+    @action applySnapshot(node: MSTAdminisration, target: IObservableArray<any>, snapshot: any[]): void {
+        const identifierAttr = getIdentifierAttribute(this.subType)
+        if (identifierAttr)
+            target.replace(reconcileArrayItems(identifierAttr, target, snapshot, this.subType))
+        else
+            target.replace(snapshot)
     }
 
-    getChildFactory(key: string): IFactory<any, any> {
+    getChildType(key: string): IType<any, any> {
         return this.subType
     }
 
     isValidSnapshot(snapshot: any) {
         return Array.isArray(snapshot) && snapshot.every(item => this.subType.is(item))
     }
+
+    getDefaultSnapshot() {
+        return []
+    }
 }
 
-export function createArrayFactory<S, T extends S>(subtype: IFactory<S, T>): IFactory<S[], IObservableArray<T>> {
-    return new ArrayType(subtype.factoryName + "[]", subtype).factory
+function reconcileArrayItems(identifierAttr: string, target: IObservableArray<any>, snapshot: any[], factory: IType<any, any>): any[] {
+    const current: any = {}
+    target.forEach(item => {
+        const id = item[identifierAttr]
+        invariant(!current[id], `Identifier '${id}' (of ${getMST(item).path}) is not unique!`)
+        current[id] = item
+    })
+    return snapshot.map(item => {
+        const existing = current[item[identifierAttr]]
+        if (existing && getType(existing).is(item)) {
+            applySnapshot(existing, item)
+            return existing
+        } else {
+            return factory.create(item)
+        }
+    })
 }
 
-export function isArrayFactory(factory: any): boolean {
-    return isFactory(factory) && (factory.type as any).isArrayFactory === true
+export function createArrayFactory<S, T>(subtype: IType<S, T>): IType<S[], IObservableArray<T>> {
+    return createDefaultValueFactory(new ArrayType(subtype.name + "[]", subtype), [])
+}
+
+export function isArrayFactory(type: any): boolean {
+    return isType(type) && (type as any).isArrayFactory === true
 }

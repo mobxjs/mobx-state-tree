@@ -1,8 +1,9 @@
 import {createUnionFactory} from "./union"
 import {createLiteralFactory} from "./literal"
-import {IFactory} from "../core/factories"
+import {IType} from "../core/type"
 
 const nullFactory = createLiteralFactory(null)
-export function createMaybeFactory<S, T>(type: IFactory<S, T>): IFactory<S | null | undefined, T | null | undefined> {
+
+export function createMaybeFactory<S, T>(type: IType<S, T>): IType<S | null | undefined, T | null> {
     return createUnionFactory(nullFactory, type)
 }
