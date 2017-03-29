@@ -20,7 +20,8 @@ module.exports = {
   resolve: {
     extensions: ['', '.js', '.jsx'],
     alias: {
-      'mobx-state-tree': __dirname + '/../../lib'
+      'mobx-state-tree': __dirname + '/../../lib',
+      'mobx': __dirname + '/node_modules/mobx'
     }
   },
   module: {

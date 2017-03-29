@@ -3,14 +3,34 @@ import {onSnapshot, applySnapshot, onPatch, applyPatch, onAction, applyAction} f
 let subscription;
 export default function syncStoreWithBackend(socket, store) {
 
-    subscription = onAction(store, (data, next) => {
+    // === SYNC PATCHES (recommended)
+    subscription = onPatch(store, (data) => {
         socketSend(data)
-        return next()
     })
 
     onSocketMessage((data) => {
-        applyAction(store, data)
+        applyPatch(store, data)
     })
+
+    // === SYNC ACTIONS
+    // subscription = onAction(store, (data, next) => {
+    //     socketSend(data)
+    //     return next()
+    // })
+
+    // onSocketMessage((data) => {
+    //     applyAction(store, data)
+    // })
+
+    // === SYNC SNAPSNOTS
+    // subscription = onSnapshot(store, (data) => {
+    //     socketSend(data)
+    // })
+
+    // onSocketMessage((data) => {
+    //     applySnapshot(store, data)
+    // })
+
 
     let isHandlingMessage = false
     function socketSend(data) {

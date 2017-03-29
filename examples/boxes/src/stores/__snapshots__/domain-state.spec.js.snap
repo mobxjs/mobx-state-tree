@@ -1,7 +1,7 @@
 exports[`test it should be able to move boxes - 1 1`] = `
 Object {
-  "id": "",
-  "name": "",
+  "id": "1",
+  "name": "test",
   "x": 123,
   "y": 110,
 }
@@ -9,8 +9,8 @@ Object {
 
 exports[`test it should be able to move boxes - 1 2`] = `
 Object {
-  "id": "",
-  "name": "",
+  "id": "1",
+  "name": "test",
   "x": 145,
   "y": 97,
 }
@@ -18,8 +18,8 @@ Object {
 
 exports[`test it should be able to move boxes - 2 1`] = `
 Object {
-  "id": "",
-  "name": "",
+  "id": "1",
+  "name": "test",
   "x": 108,
   "y": 107,
 }
