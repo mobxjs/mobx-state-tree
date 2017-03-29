@@ -14,6 +14,8 @@ export interface IReferenceDescription {
     isReference: true
 }
 
+// TODO: fix, references are not mentioned in type.describe...
+
 export function reference<T>(factory: IType<any, T>): IType<{ $ref: string }, T>;
 export function reference<T>(factory: IType<any, T>, basePath: string): IType<string, T>;
 export function reference<T>(factory: IType<any, T>, basePath?: string): any {

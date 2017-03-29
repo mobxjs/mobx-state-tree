@@ -61,7 +61,7 @@ export class MSTAdminisration {
      * Returnes (escaped) path representation as string
      */
     @computed public get path(): string {
-        return "/" + joinJsonPath(this.pathParts)
+        return joinJsonPath(this.pathParts)
     }
 
     @computed public get subpath(): string {
@@ -115,19 +115,15 @@ export class MSTAdminisration {
         return registerEventHandler(this.patchSubscribers, onPatch)
     }
 
-    emitPatch(patch: IJsonPatch, source: MSTAdminisration, distance = 0) {
+    emitPatch(patch: IJsonPatch, source: MSTAdminisration) {
         if (this.patchSubscribers.length) {
-            let localizedPatch: IJsonPatch
-            if (distance === 0)
-                localizedPatch = patch
-            else
-                localizedPatch = extend({}, patch, {
-                    path: getRelativePath(this, source) + patch.path
+            const localizedPatch: IJsonPatch = extend({}, patch, {
+                    path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
                 })
             this.patchSubscribers.forEach(f => f(localizedPatch))
         }
         if (this.parent)
-            this.parent.emitPatch(patch, this, distance + 1)
+            this.parent.emitPatch(patch, source)
     }
 
     setParent(newParent: MSTAdminisration | null, subpath: string | null = null) {
@@ -203,19 +199,25 @@ export class MSTAdminisration {
     resolvePath(pathParts: string[]): MSTAdminisration;
     resolvePath(pathParts: string[], failIfResolveFails: boolean): MSTAdminisration | undefined;
     resolvePath(pathParts: string[], failIfResolveFails: boolean = true): MSTAdminisration | undefined {
+        // counter part of getRelativePath
+        // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
+        // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
+        // so we treat leading ../ apart...
         let current: MSTAdminisration | null = this
         for (let i = 0; i < pathParts.length; i++) {
             if (pathParts[i] === "") // '/bla' or 'a//b' splits to empty strings
                 current = current.root
             else if (pathParts[i] === "..")
                 current = current!.parent
-            else if (pathParts[i] === ".")
+            else if (pathParts[i] === "." || pathParts[i] === "")
                 continue
             else
                 current = current!.getChildMST(pathParts[i])
             if (current === null) {
-                if (failIfResolveFails)
-                    return fail(`Could not resolve'${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
+                if (failIfResolveFails) {
+                    debugger
+                    return fail(`Could not resolve '${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
+                }
                 else
                     return undefined
             }

@@ -95,7 +95,7 @@ test("it should be possible to pass a complex object", t => {
 
     t.deepEqual(
         recorder.actions,
-        [{ "name": "setCustomer", "path": "orders/0", "args": [{ "$ref": "../../customers/0" }] }]
+        [{ "name": "setCustomer", "path": "/orders/0", "args": [{ "$ref": "../../customers/0" }] }]
     )
 
     const store2  = createTestStore()

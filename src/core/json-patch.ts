@@ -1,10 +1,9 @@
 // TODO: move file to utils
-import {invariant} from "../utils"
 
 // https://tools.ietf.org/html/rfc6902
 // http://jsonpatch.com/
 
-export interface IJsonPatch {
+export type IJsonPatch = {
     op: "replace" | "add" | "remove"
     path: string
     value?: any
@@ -30,12 +29,14 @@ export function joinJsonPath(path: string[]): string {
     // `/` refers to property with an empty name, while `` refers to root itself!
     if (path.length === 0)
         return ""
-    return path.map(escapeJsonPath).join("/")
+    return "/" + path.map(escapeJsonPath).join("/")
 }
 
 export function splitJsonPath(path: string): string[] {
     // `/` refers to property with an empty name, while `` refers to root itself!
-    if (path === "")
-        return []
-    return path.replace(/\/$/, "").split("/").map(unescapeJsonPath)
+    const parts = path.split("/").map(unescapeJsonPath)
+
+    // path '/a/b/c' -> a b c
+    // path '../../b/c -> .. .. b c
+    return parts[0] === "" ? parts.slice(1) : parts
 }

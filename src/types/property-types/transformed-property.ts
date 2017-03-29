@@ -24,7 +24,7 @@ export class TransformedProperty extends Property {
                 box.set(newValue)
                 node.emitPatch({
                     op: "replace",
-                    path: "/" + escapeJsonPath(self.name),
+                    path: escapeJsonPath(self.name),
                     value: valueToSnapshot(newValue)
                 }, node)
             }

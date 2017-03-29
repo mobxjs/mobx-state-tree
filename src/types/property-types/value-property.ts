@@ -30,7 +30,7 @@ export class ValueProperty extends Property {
         const node = getMST(change.object)
         node.emitPatch({
             op: "replace",
-            path: "/" + escapeJsonPath(this.name),
+            path: escapeJsonPath(this.name),
             value: valueToSnapshot(change.newValue)
         }, node)
     }

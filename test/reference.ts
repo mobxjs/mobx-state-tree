@@ -12,7 +12,7 @@ test("it should support generic relative paths", t => {
     })
 
     const store = UserStore.create({
-        user: { $ref: "users/17"},
+        user: { $ref: "/users/17"},
         users: {
             "17": { name: "Michel" },
             "18": { name: "Veria" }
@@ -29,7 +29,7 @@ test("it should support generic relative paths", t => {
     store.users.get("18")!.name = "Noa"
     t.is(store.user.name, "Noa")
 
-    t.deepEqual(getSnapshot(store), {user: { $ref: "users/18" }, "users": {"17": {name: "Michel"}, "18": {name: "Noa"}}} as any) // TODO: better typings
+    t.deepEqual(getSnapshot(store), {user: { $ref: "/users/18" }, "users": {"17": {name: "Michel"}, "18": {name: "Noa"}}} as any) // TODO: better typings
 })
 
 test("it should support prefixed paths in maps", t => {
@@ -69,7 +69,7 @@ test("it should support prefixed paths in arrays", t => {
         name: types.string
     })
     const UserStore = types.model({
-        user: types.reference(User, "/users/"),
+        user: types.reference(User, "/users"),
         users: types.array(User)
     })
 

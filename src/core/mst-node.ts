@@ -62,13 +62,9 @@ export function getRelativePath(base: MSTAdminisration, target: MSTAdminisration
         if (baseParts[common] !== targetParts[common])
             break
     }
-    return joinJsonPath(
-        baseParts
-        .slice(common).map(_ => "..")
-        .concat(
-            targetParts.slice(common)
-        )
-    )
+    // TODO: assert that no targetParts paths are "..", "." or ""!
+    return baseParts.slice(common).map(_ => "..").join("/")
+        + joinJsonPath(targetParts.slice(common))
 }
 
 export function getParent(thing: IMSTNode<any, any>): IMSTNode<any, any> {

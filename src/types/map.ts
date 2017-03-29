@@ -108,13 +108,13 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
             case "add":
                 return void node.emitPatch({
                     op: change.type === "add" ? "add" : "replace",
-                    path: "/" + escapeJsonPath(change.name),
+                    path: escapeJsonPath(change.name),
                     value: valueToSnapshot(change.newValue)
                 }, node)
             case "delete":
                 return void node.emitPatch({
                     op: "remove",
-                    path: "/" + escapeJsonPath(change.name)
+                    path: escapeJsonPath(change.name)
                 }, node)
         }
     }

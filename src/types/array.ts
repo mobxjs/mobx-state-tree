@@ -79,19 +79,19 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
             case "update":
                 return void node.emitPatch({
                     op: "replace",
-                    path: "/" + change.index,
+                    path: "" + change.index,
                     value: valueToSnapshot(change.newValue)
                 }, node)
             case "splice":
                 for (let i = change.index + change.removedCount - 1; i >= change.index; i--)
                     node.emitPatch({
                         op: "remove",
-                        path: "/" + i
+                        path: "" + i
                     }, node)
                 for (let i = 0; i < change.addedCount; i++)
                     node.emitPatch({
                         op: "add",
-                        path: "/" + (change.index + i),
+                        path: "" + (change.index + i),
                         value: valueToSnapshot(change.added[i])
                     }, node)
                 return
