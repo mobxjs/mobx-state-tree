@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch",
+            "name": "Debug unit test",
             "type": "node",
             "request": "launch",
             "program": "${workspaceRoot}/node_modules/ava/profile.js",
