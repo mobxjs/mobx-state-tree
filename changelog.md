@@ -2,6 +2,7 @@
 
 * Renamed `createFactory` to `types.model` (breaking!)
 * Renamed `composeFactory` to `types.extend` (breaking!)
+* Actions should now be declared as `name(params) { body }`, instead of `name: action(function (params) { body})` (breaking!)
 * Models are no longer constructed by invoking the factory as function, but by calling `factory.create` (breaking!)
 * Introduced `identifier`
 * Introduced / improved `reference`
