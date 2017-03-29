@@ -1,15 +1,14 @@
 import { ADD_TODO, DELETE_TODO, EDIT_TODO, COMPLETE_TODO, COMPLETE_ALL, CLEAR_COMPLETED } from '../constants/ActionTypes'
-import { action } from 'mobx'
-import { createFactory, arrayOf } from 'mobx-state-tree'
+import { types } from 'mobx-state-tree'
 
-const Todo = createFactory({
+const Todo = types.model({
     text: 'Learn Redux',
     completed: false,
     id: 0
 })
 
-const TodoStore = createFactory({
-  todos: arrayOf(Todo),
+const TodoStore = types.model({
+  todos: types.array(Todo),
 
   // utilities
   findTodoById: function (id) {
@@ -17,29 +16,29 @@ const TodoStore = createFactory({
   },
 
   // actions
-  [ADD_TODO]: action(function ({text}) {
+  [ADD_TODO]({text}) {
     const id = this.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
     this.todos.push({
       id, text
     })
-  }),
-  [DELETE_TODO]: action(function ({id}) {
+  },
+  [DELETE_TODO]({id}) {
     this.todos.remove(this.findTodoById(id))
-  }),
-  [EDIT_TODO]: action(function ({id, text}) {
+  },
+  [EDIT_TODO]({id, text}) {
     this.findTodoById(id).text = text
-  }),
-  [COMPLETE_TODO]: action(function ({id}) {
+  },
+  [COMPLETE_TODO]({id}) {
     const todo = this.findTodoById(id)
     todo.completed = !todo.completed
-  }),
-  [COMPLETE_ALL]: action(function () {
+  },
+  [COMPLETE_ALL]() {
     const areAllMarked = this.todos.every(todo => todo.completed)
     this.todos.forEach(todo => todo.completed = !areAllMarked)
-  }),
-  [CLEAR_COMPLETED]: action(function () {
+  },
+  [CLEAR_COMPLETED]() {
     this.todos.replace(this.todos.filter(todo => todo.completed === false))
-  })
+  }
 })
 
 export default TodoStore

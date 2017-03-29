@@ -10,7 +10,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "mobx": "^2.6.0",
-    "mobx-state-tree": "0.0.1",
+    "mobx-state-tree": "0.2.0",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
     "react-redux": "^4.4.5",

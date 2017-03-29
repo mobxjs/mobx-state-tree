@@ -14,7 +14,7 @@ const initialState = {
         id: 0
     }]
 }
-const todos = window.todos = todosFactory(initialState)
+const todos = window.todos = todosFactory.create(initialState)
 const store = asReduxStore(todos)
 connectReduxDevtools(todos)
 
