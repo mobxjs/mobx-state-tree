@@ -1,26 +1,10 @@
 import {observable, transaction, action, autorun, spy} from 'mobx';
-import {createFactory, arrayOf, mapOf, getSnapshot, applySnapshot, getParent, hasParent, referenceTo, onPatch} from 'mobx-state-tree';
+import {types, getSnapshot, applySnapshot, getParent, hasParent, onPatch} from 'mobx-state-tree';
 
 import {randomUuid} from '../utils';
 
-export const Arrow = createFactory({
-    id: '',
-    fromId: '',
-    toId: '',
-    get from() {
-        if (!hasParent(this))
-            return null
-        return getParent(this).boxes.get(this.fromId)
-    },
-    get to() {
-        if (!hasParent(this))
-            return null
-        return getParent(this).boxes.get(this.toId)
-    }
-})
-
-export const Box = createFactory({
-    id: '',
+export const Box = types.model("Box", {
+    id: types.identifier(),
     name: '',
     x: 0,
     y: 0,
@@ -30,49 +14,58 @@ export const Box = createFactory({
     get isSelected() {
         if (!hasParent(this))
             return false
-        return getParent(this).selection === this
+        return getParent(getParent(this)).selection === this
     },
-    move: action(function(dx, dy) {
+    move(dx, dy) {
         this.x += dx
         this.y += dy
-    }),
-    setName: action(function(newName) {
+    },
+    setName(newName) {
         this.name = newName
-    })
+    }
 })
 
-export const Store = createFactory({
-    boxes: mapOf(Box),
-    arrows: arrayOf(Arrow),
-    selection: referenceTo("/boxes/id"),
-    addBox: action(function(name, x, y) {
-        const id = randomUuid()
-        this.boxes.set(id, Box({ name, x, y, id }))
-    }),
-    addArrow: action(function(fromId, toId) {
-        this.arrows.push(Arrow({ id: randomUuid(), fromId, toId }))
-    }),
-    setSelection: action(function(selection) {
-        this.selection = selection // TODO: remove action by emitting in reference
-    }),
-    createBox: action(function(name, x, y) {
-        this.addBox(name, x, y)
-        // TODO: set selection
-    })
+export const Arrow = types.model("Arrow", {
+    id: types.identifier(),
+    from: types.reference(Box, "../../boxes"),
+    to: types.reference(Box, "../../boxes")
+})
+
+export const Store = types.model("Store", {
+    boxes: types.map(Box),
+    arrows: types.array(Arrow),
+    selection: types.reference(Box, "./boxes"),
+    addBox(name, x, y) {
+        const box = Box.create({ name, x, y, id: randomUuid() })
+        this.boxes.put(box)
+        return box
+    },
+    addArrow(from, to) {
+        this.arrows.push(Arrow.create({ id: randomUuid(), from, to }))
+    },
+    setSelection(selection) {
+        this.selection = selection
+    },
+    createBox(name, x, y, source) {
+        const box = this.addBox(name, x, y)
+        this.setSelection(box)
+        if (source)
+            this.addArrow(source.id, box.id)
+    }
 })
 
 /*
     The store that holds our domain: boxes and arrows
 */
-const store = Store({
+const store = Store.create({
     "boxes":{
         "ce9131ee-f528-4952-a012-543780c5e66d": {"id":"ce9131ee-f528-4952-a012-543780c5e66d","name":"Rotterdam","x":100,"y":100},
         "14194d76-aa31-45c5-a00c-104cc550430f": {"id":"14194d76-aa31-45c5-a00c-104cc550430f","name":"Bratislava","x":650,"y":300}
     },
     "arrows":[
-        {"id":"7b5d33c1-5e12-4278-b1c5-e4ae05c036bd","fromId":"ce9131ee-f528-4952-a012-543780c5e66d","toId":"14194d76-aa31-45c5-a00c-104cc550430f"}
+        {"id":"7b5d33c1-5e12-4278-b1c5-e4ae05c036bd","from":"ce9131ee-f528-4952-a012-543780c5e66d","to":"14194d76-aa31-45c5-a00c-104cc550430f"}
     ],
-    "selection_id":""
+    "selection":""
 })
 
 export default store;
