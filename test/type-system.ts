@@ -31,7 +31,6 @@ test("it should recognize a valid snapshot", (t) => {
 test("it should recognize an invalid snapshot", (t) => {
     const { Box } = createTestFactories()
 
-    debugger;
     t.deepEqual(Box.is({ width: "1", height: "2" }), false)
 })
 
