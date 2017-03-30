@@ -25,12 +25,14 @@ test("it should recognize a valid snapshot", (t) => {
     const { Box } = createTestFactories()
 
     t.deepEqual(Box.is({ width: 1, height: 2 }), true)
+    t.deepEqual(Box.is({ width: 1, height: 2, depth: 3 }), true)
 })
 
 test("it should recognize an invalid snapshot", (t) => {
     const { Box } = createTestFactories()
 
-    t.deepEqual(Box.is({ width: 1, height: 2, depth: 3 }), false)
+    debugger;
+    t.deepEqual(Box.is({ width: "1", height: "2" }), false)
 })
 
 test("it should check valid nodes as well", (t) => {
@@ -42,11 +44,11 @@ test("it should check valid nodes as well", (t) => {
 })
 
 test("it should check invalid nodes as well", (t) => {
-    const { Box, Cube } = createTestFactories()
+    const { Box } = createTestFactories()
 
-    const doc = Cube.create()
+    const doc = Box.create()
 
-    t.deepEqual(Box.is(doc), false)
+    t.deepEqual(types.model({ anotherAttr: types.number }).is(doc), false)
 })
 
 test("it should cast different compatible factories", (t) => {
@@ -58,17 +60,16 @@ test("it should cast different compatible factories", (t) => {
 })
 
 test("it should do typescript type inference correctly", (t) => {
-    debugger
     const A = types.model({
         x: types.number,
         y: types.maybe(types.string),
-        method() {},
+        method() { },
         get z(): string { return "hi" },
         set z(v: string) { }
     })
 
     // factory is invokable
-    const a = A.create({ x: 2, y: "7"})
+    const a = A.create({ x: 2, y: "7" })
 
     // property can be used as proper type
     const z: number = a.x
@@ -102,4 +103,63 @@ test("it should do typescript type inference correctly", (t) => {
     a.z = "test"
 
     b.sub.method()
+})
+
+test("#66 - it should accept superfluous fields", t => {
+    const Item = types.model({
+        id: types.number,
+        name: types.string
+    })
+
+    t.is(Item.is({}), false)
+    t.is(Item.is({ id: 3 }), false)
+    t.is(Item.is({ id: 3, name: "" }), true)
+    t.is(Item.is({ id: 3, name: "", description: "" }), true)
+
+    const a = Item.create({ id: 3, name: "", description: "bla" } as any)
+    t.is((a as any).description, undefined)
+})
+
+test("#66 - it should not require defaulted fields", t => {
+    const Item = types.model({
+        id: types.number,
+        name: types.withDefault(types.string, "boo")
+    })
+
+    t.is(Item.is({}), false)
+    t.is(Item.is({ id: 3 }), true)
+    t.is(Item.is({ id: 3, name: "" }), true)
+    t.is(Item.is({ id: 3, name: "", description: "" }), true)
+
+    const a = Item.create({ id: 3, description: "bla" } as any)
+    t.is((a as any).description, undefined)
+    t.is(a.name, "boo")
+})
+
+test("#66 - it should be possible to omit defaulted fields", t => {
+    const Item = types.model({
+        id: types.number,
+        name: "boo"
+    })
+
+    t.is(Item.is({}), false)
+    t.is(Item.is({ id: 3 }), true)
+    t.is(Item.is({ id: 3, name: "" }), true)
+    t.is(Item.is({ id: 3, name: "", description: "" }), true)
+
+    const a = Item.create({ id: 3, description: "bla" } as any)
+    t.is((a as any).description, undefined)
+    t.is(a.name, "boo")
+})
+
+
+test("#66 - it should pick the correct type of defaulted fields", t => {
+    const Item = types.model({
+        id: types.number,
+        name: "boo"
+    })
+
+    const a = Item.create({ id: 3 })
+    t.is(a.name, "boo")
+    t.throws(() => a.name = 3 as any, /Value is not assignable to 'string'/)
 })

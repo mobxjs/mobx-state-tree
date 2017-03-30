@@ -33,16 +33,15 @@ test("it should use the snapshot if provided", t => {
 
 test("it should throw if default value is invalid snapshot", t => {
     const Row = types.model({
-        name: '',
-        quantity: 0
+        name: types.string,
+        quantity: types.number
     })
 
     const error = t.throws(() => {
         const Factory = types.model({
-            // TODO: as any due to #19
-            rows: types.withDefault(types.array(Row) as any, [{wrongProp: true}])
+            rows: types.withDefault(types.array(Row), [{}])
         })
     })
 
-    t.is(error.message, '[mobx-state-tree] Default value [{"wrongProp":true}] is not assignable to type AnonymousModel[]. Expected "{ name: primitive; quantity: primitive }[]"')
+    t.is(error.message, "[mobx-state-tree] Default value [{}] is not assignable to type AnonymousModel[]. Expected \"{ name: string; quantity: number }[]\"")
 })
