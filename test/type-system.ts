@@ -162,3 +162,27 @@ test("#66 - it should pick the correct type of defaulted fields", t => {
     t.is(a.name, "boo")
     t.throws(() => a.name = 3 as any, /Value is not assignable to 'string'/)
 })
+
+test("cannot create factories with null values", t => {
+    t.throws(
+        () => types.model({ x: null }),
+        /The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe\(someType\)`?/
+    )
+})
+
+test("can create factories with maybe primitives", t => {
+    const F = types.model({
+        x: types.maybe(types.string)
+    })
+
+    t.is(F.is(undefined as any), false)
+    t.is(F.is({}), true)
+    t.is(F.is({ x: null }), true)
+    t.is(F.is({ x: "test" }), true)
+    t.is(F.is({ x: 3 }), false)
+
+    t.is(F.create().x, null)
+    t.is(F.create({ x: undefined}).x, null)
+    t.is(F.create({ x: ""}).x, "")
+    t.is(F.create({ x: "3"}).x, "3")
+})
