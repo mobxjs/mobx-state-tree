@@ -154,3 +154,4 @@ test("it should be possible to pass a complex plain object", t => {
     recorder.replay(t2)
     t.is(t2.done, true)
 })
+

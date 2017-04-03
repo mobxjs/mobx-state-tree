@@ -5,7 +5,7 @@ import { MSTAdminisration, maybeMST } from "../core"
 import { isReferenceFactory } from "./reference"
 import { primitiveFactory } from "./primitive"
 import { isIdentifierFactory } from "./identifier"
-import { ComplexType, getType, IMSTNode, isType, IType } from '../core';
+import { ComplexType, getType, IMSTNode, isType, IType, getMST } from '../core';
 import { createDefaultValueFactory } from "./with-default"
 import { Property } from "./property-types/property"
 import { TransformedProperty } from "./property-types/transformed-property"
@@ -76,6 +76,9 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     willChange = (change: IObjectWillChange): IObjectWillChange | null => {
+        const node = getMST(change.object)
+        node.assertWritable()
+
         return this.props[change.name].willChange(change)
     }
 
@@ -146,9 +149,8 @@ export class ObjectType extends ComplexType<any, any> {
 
     // TODO: remove node arg
     @action applySnapshot(node: MSTAdminisration, target: any, snapshot: any): void {
-        // TODO typecheck?
-        for (let key in snapshot) {
-            invariant(key in this.props, `It is not allowed to assign a value to non-declared property ${key} of ${this.name}`)
+        node.assertWritable()
+        for (let key in snapshot) if (key in this.props) {
             this.props[key].deserialize(target, snapshot)
         }
     }

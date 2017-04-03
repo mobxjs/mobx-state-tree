@@ -47,7 +47,10 @@ import {IType, IMSTNode} from "./core"
  * @returns {IDisposer} function to remove the middleware
  */
 export function onAction(target: IMSTNode<any, any>, callback: (action: IActionCall, next: () => void) => void): IDisposer {
-    return getMST(target).onAction(callback)
+    const node = getMST(target)
+    if (!node.isProtected)
+        console.warn("It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`")
+    return node.onAction(callback)
 }
 
 /**
@@ -174,6 +177,38 @@ export function recordActions(subject: IMSTNode<any, any>): IActionRecorder {
     })
     return recorder
 }
+
+/**
+ * By default it is allowed to both directly modify a model or through an action.
+ * However, in some cases you want to guarantee that the state tree is only modified through actions.
+ * So that replaying action will reflect everything that can possible have happened to your objects, or that every mutation passes through your action middleware etc.
+ * To disable modifying data in the tree without action, simple call `protect(model)`. Protect protects the passed model an all it's children
+ *
+ * @example
+ * const Todo = types.model({
+ *     done: false,
+ *     toggle() {
+ *         this.done = !this.done
+ *     }
+ * })
+ *
+ * const todo = new Todo()
+ * todo.done = true // OK
+ * protect(todo)
+ * todo.done = false // throws!
+ * todo.toggle() // OK
+ */
+export function protect(target: IMSTNode<any, any>) {
+    getMST(target).protect()
+}
+
+/**
+ * Returns true if the object is in protected mode, @see protect
+ */
+export function isProtected(target: IMSTNode<any, any>): boolean {
+    return getMST(target).isProtected
+}
+
 
 /**
  * Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
