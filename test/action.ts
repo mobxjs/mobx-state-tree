@@ -40,16 +40,6 @@ test("it should be possible to record & replay a simple action", t => {
     t.is(t2.done, true)
 })
 
-test.skip("it should not be possible to change state without action", t => {
-    const t1 = Task.create()
-    t.throws(
-        () => {
-            t1.done = !t1.done
-        },
-        "bla"
-    )
-})
-
 // Complex actions
 const Customer = types.model({
     name: ""

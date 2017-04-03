@@ -94,7 +94,7 @@ test("it should support prefixed paths in arrays", t => {
     t.deepEqual(getSnapshot(store), {user: "18", "users": [{id: "17", name: "Michel"}, {id: "18", name: "Noa"}]} as any) // TODO: better typings
 })
 
-test.skip("identifiers are required", (t) => {
+test("identifiers are required", (t) => {
     const Todo = types.model({
         id: types.identifier()
     })
@@ -102,7 +102,7 @@ test.skip("identifiers are required", (t) => {
     t.is(Todo.is({}), false)
     t.is(Todo.is({ id: "x" }), true)
 
-    t.throws(() => Todo.create(), "bla")
+    t.throws(() => Todo.create(), "[mobx-state-tree] Snapshot {} is not assignable to type AnonymousModel. Expected { id: identifier() } instead.")
 })
 
 test("identifiers cannot be modified", (t) => {
