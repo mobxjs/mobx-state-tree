@@ -163,7 +163,8 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is([]), true)
     t.deepEqual(Factory.is({}), false)
     t.deepEqual(Factory.is([{to: 'mars'}]), true)
-    t.deepEqual(Factory.is([{wrongKey: true}]), false)
+    t.deepEqual(Factory.is([{wrongKey: true}]), true)
+    t.deepEqual(Factory.is([{to: true}]), false)
 })
 
 test("it should reconciliate instances correctly", (t) => {

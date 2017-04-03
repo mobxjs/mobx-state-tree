@@ -14,6 +14,7 @@ import { ValueProperty } from "./property-types/value-property"
 import { ActionProperty } from "./property-types/action-property"
 import { getSnapshot } from "../top-level-api"
 import { IJsonPatch } from "../index";
+import { getPrimitiveFactoryFromValue } from "./core-types";
 
 // TODO: make generic with snapshot type
 export interface IObjectInstance {
@@ -92,13 +93,15 @@ export class ObjectType extends ComplexType<any, any> {
             }
 
             const { value } = descriptor
-            if (isIdentifierFactory(value)) {
+            if (value === null || undefined) {
+                fail("The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?")
+            } else if (isIdentifierFactory(value)) {
                 invariant(!this.identifierAttribute, `Cannot define property '${key}' as object identifier, property '${this.identifierAttribute}' is already defined as identifier property`)
                 this.identifierAttribute = key
                 this.props[key] = new IdentifierProperty(key)
             } else if (isPrimitive(value)) {
-                // TODO: detect exact primitiveFactory!
-                this.props[key] = new ValueProperty(key, createDefaultValueFactory(primitiveFactory as any, value))
+                const baseType = getPrimitiveFactoryFromValue(value)
+                this.props[key] = new ValueProperty(key, createDefaultValueFactory(baseType, value))
             } else if (isType(value)) {
                 this.props[key] = new ValueProperty(key, value)
             } else if (isReferenceFactory(value)) {
@@ -157,9 +160,6 @@ export class ObjectType extends ComplexType<any, any> {
     isValidSnapshot(snapshot: any) {
         if (!isPlainObject(snapshot))
             return false
-        for (let key in snapshot)
-            if (!(key in this.props))
-                return false
         for (let key in this.props)
             if (!this.props[key].isValidSnapshot(snapshot))
                 return false

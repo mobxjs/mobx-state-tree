@@ -214,10 +214,8 @@ export class MSTAdminisration {
             else
                 current = current!.getChildMST(pathParts[i])
             if (current === null) {
-                if (failIfResolveFails) {
-                    debugger
+                if (failIfResolveFails)
                     return fail(`Could not resolve '${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
-                }
                 else
                     return undefined
             }

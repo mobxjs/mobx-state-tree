@@ -1,5 +1,5 @@
 import {IType, Type} from "../core"
-import {invariant, isPrimitive} from "../utils"
+import {invariant, isPrimitive, fail} from "../utils"
 
 export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean
@@ -32,3 +32,18 @@ export const number: IType<number, number> = new CoreType<number>("number", (v: 
 export const boolean: IType<boolean, boolean> = new CoreType<boolean>("boolean", (v: any) => typeof v === "boolean")
 // tslint:disable-next-line:variable-name
 export const DatePrimitive: IType<Date, Date> = new CoreType<Date>("Date", (v: any) => v instanceof Date)
+
+export function getPrimitiveFactoryFromValue(value: any): IType<any, any> {
+    switch (typeof value) {
+        case "string":
+            return string
+        case "number":
+            return number
+        case "boolean":
+            return boolean
+        case "object":
+            if (value instanceof Date)
+                return DatePrimitive
+    }
+    return fail("Cannot determine primtive type from value " + value)
+}

@@ -3,18 +3,18 @@ import {test} from "ava"
 
 const createTestFactories = () => {
     const Box = types.model("Box", {
-        width: 0,
-        height: 0
+        width: types.number,
+        height: types.number
     })
 
     const Square = types.model("Square", {
-        width: 0
+        width: types.number
     })
 
     const Cube = types.model("Cube", {
-        width: 0,
-        height: 0,
-        depth: 0
+        width: types.number,
+        height: types.number,
+        depth: types.number
     })
 
     const Plane = types.union(Square, Box)
@@ -28,18 +28,18 @@ test("it should complain about no dispatch method", (t) => {
     const {Box, Plane, Square} = createTestFactories()
 
     const error = t.throws(() => {
-        const doc = Plane.create({width: 2})
+        const doc = Plane.create({width: 2, height: 2})
     })
-    t.is(error.message, '[mobx-state-tree] Ambiguos snapshot {"width":2} for union Box | Square. Please provide a dispatch in the union declaration.')
+    t.is(error.message, '[mobx-state-tree] Ambiguos snapshot {"width":2,"height":2} for union Box | Square. Please provide a dispatch in the union declaration.')
 })
 
 test("it should be smart enough to discriminate by keys", (t) => {
     const {Box, Plane, Square} = createTestFactories()
 
-    const doc = Plane.create({height: 1, width: 2})
+    const doc = types.union(Square, Box).create({width: 2})
 
-    t.deepEqual(Box.is(doc), true)
-    t.deepEqual(Square.is(doc), false)
+    t.deepEqual(Box.is(doc), false)
+    t.deepEqual(Square.is(doc), true)
 })
 
 test("it should discriminate by value type", (t) => {
@@ -68,13 +68,13 @@ test("it should discriminate by value type", (t) => {
 test("it should compute exact union types", (t) => {
     const {Box, Plane, Square} = createTestFactories()
 
-    t.deepEqual(Plane.is(Box.create()), true)
-    t.deepEqual(Plane.is(Square.create()), true)
+    t.deepEqual(Plane.is(Box.create({ width: 3, height: 2})), true)
+    t.deepEqual(Plane.is(Square.create({ width: 3})), true)
 })
 
-test("it should compute exact union types", (t) => {
+test("it should compute exact union types - 2", (t) => {
     const {Box, DispatchPlane, Square} = createTestFactories()
 
-    t.deepEqual(DispatchPlane.is(Box.create()), true)
-    t.deepEqual(DispatchPlane.is(Square.create()), true)
+    t.deepEqual(DispatchPlane.is(Box.create({ width: 3, height: 2})), true)
+    t.deepEqual(DispatchPlane.is(Square.create({ width: 3, height: 2} as any)), true)
 })

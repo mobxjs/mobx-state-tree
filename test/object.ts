@@ -174,7 +174,7 @@ test("it should throw if snapshot has computed properties", (t) => {
         const doc = ComputedFactory.create({area: 3})
     })
 
-    t.is(error.message, "[mobx-state-tree] Snapshot {\"area\":3} is not assignable to type AnonymousModel. Expected { width: primitive; height: primitive } instead.")
+    t.is(error.message, "[mobx-state-tree] Snapshot {\"area\":3} is not assignable to type AnonymousModel. Expected { width: number; height: number } instead.")
 })
 
 // === COMPOSE FACTORY ===
@@ -197,5 +197,6 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is([]), false)
     t.deepEqual(Factory.is({}), true)
     t.deepEqual(Factory.is({to: 'mars'}), true)
-    t.deepEqual(Factory.is({wrongKey: true}), false)
+    t.deepEqual(Factory.is({wrongKey: true}), true)
+    t.deepEqual(Factory.is({to: 3 }), false)
 })

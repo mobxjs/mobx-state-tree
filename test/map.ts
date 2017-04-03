@@ -164,7 +164,8 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is([]), false)
     t.deepEqual(Factory.is({}), true)
     t.deepEqual(Factory.is({hello: {to: 'mars'}}), true)
-    t.deepEqual(Factory.is({hello: {wrongKey: true}}), false)
+    t.deepEqual(Factory.is({hello: {wrongKey: true}}), true)
+    t.deepEqual(Factory.is({hello: {to: true}}), false)
 })
 
 test("it should support identifiers", (t) => {
