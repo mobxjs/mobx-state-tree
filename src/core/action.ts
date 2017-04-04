@@ -13,6 +13,7 @@ export function createActionInvoker(name: string, fn: Function) {
 
     const actionInvoker = function () {
         const adm = getMST(this)
+        adm.assertAlive()
         if (adm.isRunningAction()) {
             // an action is already running in this tree, invoking this action does not emit a new action
             return action.apply(this, arguments)

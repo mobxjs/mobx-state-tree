@@ -1,9 +1,7 @@
-import { isProtected } from '../top-level-api';
 import {
     action, observable,
     computed, reaction,
-    isObservableArray,
-    isObservableMap
+    IReactionDisposer
 } from "mobx"
 
 import { typecheck, IType } from "./type"
@@ -30,6 +28,7 @@ export class MSTAdminisration {
     readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     readonly actionSubscribers: IActionHandler[] = []
+    readonly snapshotDisposer: IReactionDisposer
 
     constructor(initialState: any, type: ComplexType<any, any>) {
         invariant(type instanceof ComplexType, "Uh oh")
@@ -37,8 +36,11 @@ export class MSTAdminisration {
         this.type = type
         this.target = initialState
 
-        reaction(() => this.snapshot, snapshot => {
+        this.snapshotDisposer = reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
+        })
+        ; (this.snapshotDisposer as any).onError((e: any) => { // as any is caused by wrong typing in mobx
+            throw e
         })
         // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
     }
@@ -65,10 +67,12 @@ export class MSTAdminisration {
      * Returnes (escaped) path representation as string
      */
     @computed public get path(): string {
+        this.assertAlive()
         return joinJsonPath(this.pathParts)
     }
 
     @computed public get subpath(): string {
+        this.assertAlive()
         if (this.isRoot)
             return ""
         const parts = this.pathParts
@@ -94,15 +98,17 @@ export class MSTAdminisration {
     public die() {
         if (!this.isRoot)
             fail(`Model ${this.path} cannot die while it is still in a tree`)
+        this.snapshotDisposer()
         this._isAlive = false
     }
 
     public assertAlive() {
-        if (!this._isAlive)
+        if ((this.isRoot && !this._isAlive) || !this.root._isAlive)
             fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach'`)
     }
 
     @computed public get snapshot() {
+        this.assertAlive()
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         return Object.freeze(this.type.serialize(this, this.target))
     }
@@ -208,6 +214,7 @@ export class MSTAdminisration {
     resolvePath(pathParts: string[]): MSTAdminisration;
     resolvePath(pathParts: string[], failIfResolveFails: boolean): MSTAdminisration | undefined;
     resolvePath(pathParts: string[], failIfResolveFails: boolean = true): MSTAdminisration | undefined {
+        this.assertAlive()
         // counter part of getRelativePath
         // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
         // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
@@ -249,6 +256,7 @@ export class MSTAdminisration {
     }
 
     emitAction(instance: MSTAdminisration, action: IActionCall, next: () => any): any {
+        this.assertAlive()
         let idx = -1
         const correctedAction: IActionCall = this.actionSubscribers.length
             ? extend({} as any, action, { path: getRelativePath(this, instance) })
@@ -275,6 +283,7 @@ export class MSTAdminisration {
     }
 
     getChildMST(subpath: string): MSTAdminisration | null {
+        this.assertAlive()
         return this.type.getChildMST(this, this.target, subpath)
     }
 
@@ -301,6 +310,7 @@ export class MSTAdminisration {
     }
 
     assertWritable() {
+        this.assertAlive()
         if (!this.isRunningAction() && this.isProtected) {
             fail(`Cannot modify '${this.path}', the object is protected and can only be modified from model actions`)
         }

@@ -14,6 +14,7 @@ export class TransformedProperty extends Property {
         const self = this
         Object.defineProperty(targetInstance, this.name, {
             get: function() {
+                getMST(this).assertAlive() // Expensive for each read, so optimize away in prod builds!
                 return self.getter.call(this, box.get())
             },
             set: function(v) {
