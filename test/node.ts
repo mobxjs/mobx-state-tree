@@ -1,4 +1,4 @@
-import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getType, getChildType, recordActions, recordPatches, types} from "../"
+import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getType, getChildType, recordActions, recordPatches, types, detach} from "../"
 import {test} from "ava"
 
 // getParent
@@ -186,30 +186,29 @@ test("a node can exists only once in a tree", (t) => {
     t.is(error.message, "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/foos/0', but it lives already at '/rows/0'")
 })
 
-// TODO
-// test("make sure array filter works properly", (t) => {
-//     const Row = types.model({
-//         done: false
-//     })
+test("make sure array filter works properly", (t) => {
+    const Row = types.model({
+        done: false
+    })
 
-//     const Document = types.model({
-//         rows: arrayOf(Row),
-//         clearDone: action(function(){
-//             this.rows =  doc.rows.filter(row => row.done === true)
-//         })
-//     })
+    const Document = types.model({
+        rows: types.array(Row),
+        clearDone() {
+            this.rows.filter(row => row.done === true).forEach(detach)
+        }
+    })
 
-//     const doc = Document.create()
-//     const a = Row.create({ done: true })
-//     const b = Row.create({ done: false })
+    const doc = Document.create()
+    const a = Row.create({ done: true })
+    const b = Row.create({ done: false })
 
-//     doc.rows.push(a)
-//     doc.rows.push(b)
+    doc.rows.push(a)
+    doc.rows.push(b)
 
-//     doc.clearDone()
+    doc.clearDone()
 
-//     t.deepEqual<any>(getSnapshot(doc), {rows: [{done: false}]})
-// })
+    t.deepEqual<any>(getSnapshot(doc), {rows: [{done: false}]})
+})
 
 // === RECORD PATCHES ===
 test("it can record and replay patches", (t) => {

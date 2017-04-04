@@ -179,19 +179,6 @@ export class MSTAdminisration {
         }
     }
 
-    detach() {
-        // TODO: change to return a clone
-        // TODO: detach / remove marks as End of life!...
-        if (this.isRoot)
-            return
-        if (isObservableArray(this.parent!.target))
-            this.parent!.target.splice(parseInt(this.subpath), 1)
-        else if (isObservableMap(this.parent!.target))
-            this.parent!.target.delete(this.subpath)
-        else // Object
-            this.parent!.target[this.subpath] = null
-    }
-
     resolve(pathParts: string): MSTAdminisration;
     resolve(pathParts: string, failIfResolveFails: boolean): MSTAdminisration | undefined;
     resolve(path: string, failIfResolveFails: boolean = true): MSTAdminisration | undefined {
@@ -297,5 +284,16 @@ export class MSTAdminisration {
         if (!this.isRunningAction() && this.isProtected) {
             fail(`Cannot modify '${this.path}', the object is protected and can only be modified from model actions`)
         }
+    }
+
+    removeChild(subpath: string) {
+        this.type.removeChild(this, subpath)
+    }
+
+    detach() {
+        if (this.isRoot)
+            return
+        else
+            this.parent!.removeChild(this.subpath)
     }
 }

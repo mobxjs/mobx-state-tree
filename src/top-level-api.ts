@@ -388,6 +388,9 @@ export function _getNode(thing: IMSTNode<any, any>): any {
     return getMST(thing)
 }
 
+/**
+ * Removes a model element from the state tree, and let it live on as a new state tree
+ */
 export function detach<T extends IMSTNode<any, any>>(thing: T): T {
     getMST(thing).detach()
     return thing

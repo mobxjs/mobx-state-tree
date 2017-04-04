@@ -188,6 +188,10 @@ export class ObjectType extends ComplexType<any, any> {
     getDefaultSnapshot(): any {
         return {}
     }
+
+    removeChild(node: MSTAdminisration, subpath: string) {
+        node.target[subpath] = null
+    }
 }
 
 export type IBaseModelDefinition<T> = {
