@@ -1,4 +1,4 @@
-import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getType, getChildType, recordActions, recordPatches, types, detach} from "../"
+import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getType, getChildType, recordActions, recordPatches, types, destroy} from "../"
 import {test} from "ava"
 
 // getParent
@@ -194,7 +194,7 @@ test("make sure array filter works properly", (t) => {
     const Document = types.model({
         rows: types.array(Row),
         clearDone() {
-            this.rows.filter(row => row.done === true).forEach(detach)
+            this.rows.filter(row => row.done === true).forEach(destroy)
         }
     })
 

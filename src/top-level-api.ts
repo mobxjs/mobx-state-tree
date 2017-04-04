@@ -396,6 +396,16 @@ export function detach<T extends IMSTNode<any, any>>(thing: T): T {
     return thing
 }
 
+
+/**
+ * Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
+ */
+export function destroy(thing: IMSTNode<any, any>) {
+    const node = getMST(thing)
+    node.detach()
+    node.die()
+}
+
 export function testActions<S, T>(factory: IType<S, IMSTNode<S, T>>, initialState: S, ...actions: IActionCall[]): S {
     const testInstance = factory.create(initialState)
     applyActions(testInstance, actions)

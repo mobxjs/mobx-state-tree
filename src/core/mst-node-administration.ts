@@ -23,11 +23,13 @@ export class MSTAdminisration {
     readonly target: any
     @observable _parent: MSTAdminisration | null = null
     readonly type: ComplexType<any, any>
+    private _isAlive = true
+    private _isProtected = false
+    _isRunningAction = false // only relevant for root
+
     readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     readonly actionSubscribers: IActionHandler[] = []
-    _isRunningAction = false // only relevant for root
-    private _isProtected = false
 
     constructor(initialState: any, type: ComplexType<any, any>) {
         invariant(type instanceof ComplexType, "Uh oh")
@@ -89,6 +91,17 @@ export class MSTAdminisration {
         return r
     }
 
+    public die() {
+        if (!this.isRoot)
+            fail(`Model ${this.path} cannot die while it is still in a tree`)
+        this._isAlive = false
+    }
+
+    public assertAlive() {
+        if (!this._isAlive)
+            fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach'`)
+    }
+
     @computed public get snapshot() {
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         return Object.freeze(this.type.serialize(this, this.target))
@@ -129,6 +142,7 @@ export class MSTAdminisration {
     }
 
     setParent(newParent: MSTAdminisration | null, subpath: string | null = null) {
+        // TODO: factor out subpath? It is not updated in this function, which is confusing
         if (this.parent === newParent)
             return
         if (this._parent && newParent) {
@@ -137,14 +151,20 @@ export class MSTAdminisration {
         if (!this._parent && newParent && newParent.root === this) {
             invariant(false, `A state tree is not allowed to contain itself. Cannot add root to path '/${newParent.pathParts.concat(subpath!).join("/")}'`)
         }
-        if (this.parent && !newParent && (
-                this.patchSubscribers.length > 0 || this.snapshotSubscribers.length > 0 ||
+        if (this.parent && !newParent) {
+            if (
+                 this.patchSubscribers.length > 0 ||
+                 this.snapshotSubscribers.length > 0 ||
                  (this instanceof ObjectType && this.actionSubscribers.length > 0)
-        )) {
-            console.warn("An object with active event listeners was removed from the tree. This might introduce a memory leak. Use detach() if this is intentional")
+            ) {
+                console.warn("An object with active event listeners was removed from the tree. This might introduce a memory leak. Use detach() if this is intentional")
+            }
+            this._parent = newParent
+            this.die()
+        } else {
+            this._parent = newParent
         }
 
-        this._parent = newParent
     }
 
     prepareChild(subpath: string, child: any): any {
