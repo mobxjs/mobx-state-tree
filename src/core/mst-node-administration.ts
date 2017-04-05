@@ -99,6 +99,9 @@ export class MSTAdminisration {
         if (!this.isRoot)
             fail(`Model ${this.path} cannot die while it is still in a tree`)
         this.snapshotDisposer()
+        this.patchSubscribers.splice(0)
+        this.snapshotSubscribers.splice(0)
+        this.patchSubscribers.splice(0)
         this._isAlive = false
     }
 
@@ -118,6 +121,7 @@ export class MSTAdminisration {
     }
 
     public applySnapshot(snapshot: any) {
+        this.assertWritable()
         typecheck(this.type, snapshot)
         return this.type.applySnapshot(this, this.target, snapshot)
     }
@@ -129,6 +133,7 @@ export class MSTAdminisration {
     }
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
+        this.assertWritable()
         this.type.applyPatchLocally(this, this.target, subpath, patch)
     }
 
@@ -163,7 +168,7 @@ export class MSTAdminisration {
                  this.snapshotSubscribers.length > 0 ||
                  (this instanceof ObjectType && this.actionSubscribers.length > 0)
             ) {
-                console.warn("An object with active event listeners was removed from the tree. This might introduce a memory leak. Use detach() if this is intentional")
+                console.warn("An object with active event listeners was removed from the tree. The subscriptions have been disposed.")
             }
             this._parent = newParent
             this.die()

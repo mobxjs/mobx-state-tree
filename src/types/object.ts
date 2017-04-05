@@ -149,7 +149,6 @@ export class ObjectType extends ComplexType<any, any> {
 
     // TODO: remove node arg
     @action applySnapshot(node: MSTAdminisration, target: any, snapshot: any): void {
-        node.assertWritable()
         for (let key in snapshot) if (key in this.props) {
             this.props[key].deserialize(target, snapshot)
         }
