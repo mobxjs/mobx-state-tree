@@ -1,3 +1,7 @@
+# 0.2.1
+
+* Introduced .Type and .SnapshotType to be used with TypeScript to get the type for a model
+
 # 0.2.0
 
 * Renamed `createFactory` to `types.model` (breaking!)

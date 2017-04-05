@@ -186,3 +186,44 @@ test("can create factories with maybe primitives", t => {
     t.is(F.create({ x: ""}).x, "")
     t.is(F.create({ x: "3"}).x, "3")
 })
+
+test("it is possible to refer to a type", t => {
+    const Todo = types.model({
+        title: types.string,
+        setTitle(v: string) {
+
+        }
+    })
+
+    function x(): typeof Todo.Type {
+        return Todo.create({ title: "test" }) as any // as any to make sure the type is not inferred accidentally
+    }
+
+    const z = x()
+    z.setTitle("bla")
+    z.title = "bla"
+    // z.title = 3 // Test manual: should give compile error
+})
+
+test(".Type should not be callable", t => {
+    const Todo = types.model({
+        title: types.string,
+        setTitle(v: string) {
+
+        }
+    })
+
+    t.throws(() => Todo.Type)
+})
+
+
+test(".SnapshotType should not be callable", t => {
+    const Todo = types.model({
+        title: types.string,
+        setTitle(v: string) {
+
+        }
+    })
+
+    t.throws(() => Todo.SnapshotType)
+})

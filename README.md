@@ -673,3 +673,19 @@ So far this might look a lot like an immutable state tree as found for example i
 -   mobx-state-tree allows for fine grained and efficient observability on any point in the state tree
 -   mobx-state-tree generates json patches for any modification that is made
 -   (?) mobx-state-tree is a valid redux store, providing the same api (TODO)
+
+## TypeScript & MST
+
+When using models, you write interface along with it's property types that will be used to perform type checks at runtime. 
+What about compile time? You can use TypeScript interfaces indeed to perform those checks, but that would require writing again all the properties and their actions! 
+Good news? You don't need to write it twice! Using the `typeof` operator of TypeScript over the `.Type` property of a MST Type, will result in a valid TypeScript Type!
+
+```typescript
+const Todo = types.model({
+    title: types.string,
+    setTitle(v: string) {
+        this.title = v
+    }
+})
+type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { title: string; setTitle: (v: string) => void }
+```
