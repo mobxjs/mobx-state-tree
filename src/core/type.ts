@@ -10,6 +10,7 @@ export interface IType<S, T> {
     isType: boolean
     describe(): string,
     Type: T
+    SnapshotType: S
 }
 
 export abstract class Type<S, T> implements IType<S, T> { // TODO: generic for config and state of target
@@ -27,6 +28,9 @@ export abstract class Type<S, T> implements IType<S, T> { // TODO: generic for c
 
     get Type(): T {
         return fail("Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`")
+    }
+    get SnapshotType(): S {
+        return fail("Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`")
     }
 }
 
