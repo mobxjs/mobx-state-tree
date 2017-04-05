@@ -44,11 +44,13 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     }
 
     willChange = (change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null => {
+        const node = getMST(change.object)
+        node.assertWritable()
+
         // TODO: verify type
                 // TODO check type
-        // TODO: check if tree is editable
+
         // TODO: check for key duplication
-        const node = getMST(change.object)
         switch (change.type) {
             case "update":
                 const {newValue} = change

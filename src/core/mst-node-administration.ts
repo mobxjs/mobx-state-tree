@@ -1,3 +1,4 @@
+import { isProtected } from '../top-level-api';
 import {
     action, observable,
     computed, reaction,
@@ -26,6 +27,7 @@ export class MSTAdminisration {
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     readonly actionSubscribers: IActionHandler[] = []
     _isRunningAction = false // only relevant for root
+    private _isProtected = false
 
     constructor(initialState: any, type: ComplexType<any, any>) {
         invariant(type instanceof ComplexType, "Uh oh")
@@ -261,6 +263,7 @@ export class MSTAdminisration {
     }
 
     onAction(listener: (action: IActionCall, next: () => void) => void): IDisposer {
+        // TODO: check / warn if not protected!
         return registerEventHandler(this.actionSubscribers, listener)
     }
 
@@ -274,5 +277,25 @@ export class MSTAdminisration {
 
     getChildType(key: string): IType<any, any> {
         return this.type.getChildType(key)
+    }
+
+    get isProtected(): boolean {
+        let cur: MSTAdminisration | null = this
+        while (cur) {
+            if (cur._isProtected === true)
+                return true
+            cur = cur.parent
+        }
+        return false
+    }
+
+    protect() {
+        this._isProtected = true
+    }
+
+    assertWritable() {
+        if (!this.isRunningAction() && this.isProtected) {
+            fail(`Cannot modify '${this.path}', the object is protected and can only be modified from model actions`)
+        }
     }
 }

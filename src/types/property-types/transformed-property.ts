@@ -17,9 +17,10 @@ export class TransformedProperty extends Property {
                 return self.getter.call(this, box.get())
             },
             set: function(v) {
+                const node = getMST(this)
+                node.assertWritable()
                 if (this[self.name] === v)
                     return
-                const node = getMST(this)
                 const newValue = self.setter.call(this, v)
                 box.set(newValue)
                 node.emitPatch({
