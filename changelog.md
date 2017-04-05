@@ -1,7 +1,8 @@
-# 0.2.0
+# 0.2.2
 
 * Introduced the concept of livelyness; if nodes are removed from the the tree because they are replaced by some other value, they will be marked as "died". This should help to early signal when people hold on to references that are not part of the tree anymore. To explicitly remove an node from a tree, with the intent to spawn a new state tree from it, use `detach`.
 * Introduced the convenience method `destroy` to remove a model from it's parent and mark it as dead.
+* Introduced the concept of protected trees. If a tree is protected using `protect`, it can only be modified through action, and not by mutating it directly anymore.
 
 # 0.2.1
 
