@@ -215,3 +215,15 @@ test(".Type should not be callable", t => {
 
     t.throws(() => Todo.Type)
 })
+
+
+test(".SnapshotType should not be callable", t => {
+    const Todo = types.model({
+        title: types.string,
+        setTitle(v: string) {
+
+        }
+    })
+
+    t.throws(() => Todo.SnapshotType)
+})
