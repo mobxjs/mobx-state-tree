@@ -1,6 +1,6 @@
 {
   "name": "mobx-state-tree",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Opinionated, transactional, MobX powered state container",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
