@@ -24,6 +24,7 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     abstract applyPatchLocally(node: MSTAdminisration, target: any, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IType<any, any>
     abstract isValidSnapshot(snapshot: any): boolean
+    abstract removeChild(node: MSTAdminisration, subpath: string): void
 
     is(value: any): value is S | IMSTNode<S, T> {
         if (!value || typeof value !== "object")

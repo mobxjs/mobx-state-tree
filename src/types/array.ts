@@ -134,6 +134,10 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     getDefaultSnapshot() {
         return []
     }
+
+    removeChild(node: MSTAdminisration, subpath: string) {
+        node.target.splice(parseInt(subpath, 10), 1)
+    }
 }
 
 function reconcileArrayItems(identifierAttr: string, target: IObservableArray<any>, snapshot: any[], factory: IType<any, any>): any[] {

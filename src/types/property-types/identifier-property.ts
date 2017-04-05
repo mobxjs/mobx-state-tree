@@ -1,3 +1,4 @@
+import { getMST } from "../../core";
 import { extendObservable, observable, IObjectWillChange } from "mobx"
 import { Property } from "./property"
 import { isValidIdentifier, fail } from "../../utils"
@@ -16,6 +17,8 @@ export class IdentifierProperty extends Property {
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         if (!isValidIdentifier(change.newValue))
             fail(`Not a valid identifier: '${change.newValue}`)
+        const node = getMST(change.object)
+        node.assertWritable()
         const oldValue = change.object[this.name]
         if (oldValue !== undefined && oldValue !== change.newValue)
             fail(`It is not allowed to change the identifier of an object, got: '${change.newValue}'`)

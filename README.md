@@ -278,6 +278,8 @@ See [#10](https://github.com/mobxjs/mobx-state-tree/issues/10)
 
 ## Factory composition
 
+## Tree semantics
+
 ## Single or multiple state
 
 ## Using mobx and mobx-state-tree together

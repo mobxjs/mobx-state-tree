@@ -1,9 +1,7 @@
-import { isProtected } from '../top-level-api';
 import {
     action, observable,
     computed, reaction,
-    isObservableArray,
-    isObservableMap
+    IReactionDisposer
 } from "mobx"
 
 import { typecheck, IType } from "./type"
@@ -23,11 +21,14 @@ export class MSTAdminisration {
     readonly target: any
     @observable _parent: MSTAdminisration | null = null
     readonly type: ComplexType<any, any>
+    private _isAlive = true
+    private _isProtected = false
+    _isRunningAction = false // only relevant for root
+
     readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     readonly actionSubscribers: IActionHandler[] = []
-    _isRunningAction = false // only relevant for root
-    private _isProtected = false
+    readonly snapshotDisposer: IReactionDisposer
 
     constructor(initialState: any, type: ComplexType<any, any>) {
         invariant(type instanceof ComplexType, "Uh oh")
@@ -35,8 +36,11 @@ export class MSTAdminisration {
         this.type = type
         this.target = initialState
 
-        reaction(() => this.snapshot, snapshot => {
+        this.snapshotDisposer = reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
+        })
+        ; (this.snapshotDisposer as any).onError((e: any) => { // as any is caused by wrong typing in mobx
+            throw e
         })
         // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
     }
@@ -63,10 +67,12 @@ export class MSTAdminisration {
      * Returnes (escaped) path representation as string
      */
     @computed public get path(): string {
+        this.assertAlive()
         return joinJsonPath(this.pathParts)
     }
 
     @computed public get subpath(): string {
+        this.assertAlive()
         if (this.isRoot)
             return ""
         const parts = this.pathParts
@@ -89,7 +95,23 @@ export class MSTAdminisration {
         return r
     }
 
+    public die() {
+        if (!this.isRoot)
+            fail(`Model ${this.path} cannot die while it is still in a tree`)
+        this.snapshotDisposer()
+        this.patchSubscribers.splice(0)
+        this.snapshotSubscribers.splice(0)
+        this.patchSubscribers.splice(0)
+        this._isAlive = false
+    }
+
+    public assertAlive() {
+        if ((this.isRoot && !this._isAlive) || !this.root._isAlive)
+            fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach'`)
+    }
+
     @computed public get snapshot() {
+        this.assertAlive()
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         return Object.freeze(this.type.serialize(this, this.target))
     }
@@ -99,6 +121,7 @@ export class MSTAdminisration {
     }
 
     public applySnapshot(snapshot: any) {
+        this.assertWritable()
         typecheck(this.type, snapshot)
         return this.type.applySnapshot(this, this.target, snapshot)
     }
@@ -110,6 +133,7 @@ export class MSTAdminisration {
     }
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
+        this.assertWritable()
         this.type.applyPatchLocally(this, this.target, subpath, patch)
     }
 
@@ -129,6 +153,7 @@ export class MSTAdminisration {
     }
 
     setParent(newParent: MSTAdminisration | null, subpath: string | null = null) {
+        // TODO: factor out subpath? It is not updated in this function, which is confusing
         if (this.parent === newParent)
             return
         if (this._parent && newParent) {
@@ -137,14 +162,20 @@ export class MSTAdminisration {
         if (!this._parent && newParent && newParent.root === this) {
             invariant(false, `A state tree is not allowed to contain itself. Cannot add root to path '/${newParent.pathParts.concat(subpath!).join("/")}'`)
         }
-        if (this.parent && !newParent && (
-                this.patchSubscribers.length > 0 || this.snapshotSubscribers.length > 0 ||
+        if (this.parent && !newParent) {
+            if (
+                 this.patchSubscribers.length > 0 ||
+                 this.snapshotSubscribers.length > 0 ||
                  (this instanceof ObjectType && this.actionSubscribers.length > 0)
-        )) {
-            console.warn("An object with active event listeners was removed from the tree. This might introduce a memory leak. Use detach() if this is intentional")
+            ) {
+                console.warn("An object with active event listeners was removed from the tree. The subscriptions have been disposed.")
+            }
+            this._parent = newParent
+            this.die()
+        } else {
+            this._parent = newParent
         }
 
-        this._parent = newParent
     }
 
     prepareChild(subpath: string, child: any): any {
@@ -179,19 +210,6 @@ export class MSTAdminisration {
         }
     }
 
-    detach() {
-        // TODO: change to return a clone
-        // TODO: detach / remove marks as End of life!...
-        if (this.isRoot)
-            return
-        if (isObservableArray(this.parent!.target))
-            this.parent!.target.splice(parseInt(this.subpath), 1)
-        else if (isObservableMap(this.parent!.target))
-            this.parent!.target.delete(this.subpath)
-        else // Object
-            this.parent!.target[this.subpath] = null
-    }
-
     resolve(pathParts: string): MSTAdminisration;
     resolve(pathParts: string, failIfResolveFails: boolean): MSTAdminisration | undefined;
     resolve(path: string, failIfResolveFails: boolean = true): MSTAdminisration | undefined {
@@ -201,6 +219,7 @@ export class MSTAdminisration {
     resolvePath(pathParts: string[]): MSTAdminisration;
     resolvePath(pathParts: string[], failIfResolveFails: boolean): MSTAdminisration | undefined;
     resolvePath(pathParts: string[], failIfResolveFails: boolean = true): MSTAdminisration | undefined {
+        this.assertAlive()
         // counter part of getRelativePath
         // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
         // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
@@ -242,6 +261,7 @@ export class MSTAdminisration {
     }
 
     emitAction(instance: MSTAdminisration, action: IActionCall, next: () => any): any {
+        this.assertAlive()
         let idx = -1
         const correctedAction: IActionCall = this.actionSubscribers.length
             ? extend({} as any, action, { path: getRelativePath(this, instance) })
@@ -268,6 +288,7 @@ export class MSTAdminisration {
     }
 
     getChildMST(subpath: string): MSTAdminisration | null {
+        this.assertAlive()
         return this.type.getChildMST(this, this.target, subpath)
     }
 
@@ -294,8 +315,20 @@ export class MSTAdminisration {
     }
 
     assertWritable() {
+        this.assertAlive()
         if (!this.isRunningAction() && this.isProtected) {
             fail(`Cannot modify '${this.path}', the object is protected and can only be modified from model actions`)
         }
+    }
+
+    removeChild(subpath: string) {
+        this.type.removeChild(this, subpath)
+    }
+
+    detach() {
+        if (this.isRoot)
+            return
+        else
+            this.parent!.removeChild(this.subpath)
     }
 }

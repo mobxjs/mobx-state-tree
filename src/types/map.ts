@@ -178,6 +178,10 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     getDefaultSnapshot() {
         return {}
     }
+
+    removeChild(node: MSTAdminisration, subpath: string) {
+        (node.target as ObservableMap<any>).delete(subpath)
+    }
 }
 
 export function createMapFactory<S, T>(subtype: IType<S, T>): IType<{[key: string]: S}, IMSTNode<{[key: string]: S}, IExtendedObservableMap<T>>> {
