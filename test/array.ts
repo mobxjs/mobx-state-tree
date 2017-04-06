@@ -26,7 +26,9 @@ const createTestFactories = () => {
 test("it should create a factory", (t) => {
     const {Factory} = createTestFactories()
 
-    t.deepEqual<ITestSnapshot[]>(getSnapshot<ITestSnapshot[], IObservableArray<ITest>>(Factory.create()), [])
+    const s = getSnapshot(Factory.create())
+
+    t.deepEqual(getSnapshot(Factory.create()), [])
 })
 
 test("it should restore the state from the snapshot", (t) => {
@@ -63,7 +65,7 @@ test("it should return a snapshot", (t) => {
 
     doc.push(ItemFactory.create())
 
-    t.deepEqual(getSnapshot<ITestSnapshot[], IObservableArray<ITest>>(doc), [{to: 'world'}])
+    t.deepEqual(getSnapshot(doc), [{to: 'world'}])
 })
 
 // === PATCHES TESTS ===

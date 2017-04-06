@@ -25,8 +25,8 @@ const createTestFactories = () => {
 // === FACTORY TESTS ===
 test("it should create a factory", (t) => {
     const {Factory} = createTestFactories()
-
-    t.deepEqual<any>(getSnapshot<{[key: string]: ITestSnapshot}, ObservableMap<ITest>>(Factory.create()), {})
+    const snapshot = getSnapshot(Factory.create())
+    t.deepEqual(snapshot, {})
 })
 
 test("it should restore the state from the snapshot", (t) => {
@@ -63,7 +63,7 @@ test("it should return a snapshot", (t) => {
 
     doc.set("hello", ItemFactory.create())
 
-    t.deepEqual<any>(getSnapshot<any, any>(doc), {hello: {to: 'world'}})
+    t.deepEqual<any>(getSnapshot(doc), {hello: {to: 'world'}})
 })
 
 

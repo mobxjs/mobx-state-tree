@@ -197,7 +197,7 @@ export type Snapshot<T> = {
     [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
 }
 
-export type IModelType<T> = IComplexType<Snapshot<T>, T>
+export interface IModelType<T> extends IComplexType<Snapshot<T>, T> { }
 
 export function createModelFactory<T>(baseModel: IBaseModelDefinition<T>): IModelType<T>
 export function createModelFactory<T>(name: string, baseModel: IBaseModelDefinition<T>): IModelType<T>

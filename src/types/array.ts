@@ -1,7 +1,20 @@
 import { createDefaultValueFactory } from './with-default';
 import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe} from "mobx"
 import { applySnapshot } from "../top-level-api"
-import { MSTAdminisration, maybeMST, valueToSnapshot, getMST, IJsonPatch, getType, IMSTNode, ComplexType, IType, IComplexType, isType } from "../core"
+import {
+    ComplexType,
+    getMST,
+    getType,
+    IComplexType,
+    IJsonPatch,
+    IMSTNode,
+    ISnapshottable,
+    isType,
+    IType,
+    maybeMST,
+    MSTAdminisration,
+    valueToSnapshot
+} from '../core';
 import {identity, nothing, invariant} from "../utils"
 import {getIdentifierAttribute} from "./object"
 
@@ -158,7 +171,7 @@ function reconcileArrayItems(identifierAttr: string, target: IObservableArray<an
     })
 }
 
-export function createArrayFactory<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
+export function createArrayFactory<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T> & ISnapshottable<S[]>> {
     return createDefaultValueFactory(new ArrayType(subtype.name + "[]", subtype), [])
 }
 

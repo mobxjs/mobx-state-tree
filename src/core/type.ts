@@ -3,6 +3,8 @@ export function isType(value: any): value is IType<any, any> {
     return typeof value === "object" && value && value.isType === true
 }
 
+export interface ISnapshottable<S> {}
+
 export interface IType<S, T> {
     name: string
     is(thing: any): thing is S | T
@@ -15,9 +17,9 @@ export interface IType<S, T> {
 
 export type ISimpleType<T> = IType<T, T>
 
-export type IComplexType<S, T> = IType<S, IMSTNode<S, T>>
+export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S>> {}
 
-export abstract class Type<S, T> implements IType<S, T> { // TODO: generic for config and state of target
+export abstract class Type<S, T> implements IType<S, T> {
     name: string
     isType = true
 

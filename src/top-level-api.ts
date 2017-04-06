@@ -1,9 +1,11 @@
-import {runInAction, observable} from "mobx"
-import {getMST} from "./core"
+import { IModelType, Snapshot } from './types/object';
+import {runInAction, observable, IObservableArray, ObservableMap} from "mobx"
+import {getMST, ISnapshottable} from "./core"
 import {IJsonPatch} from "./core"
 import {IDisposer, invariant} from "./utils"
 import {IActionCall} from "./core"
 import {IType, IMSTNode} from "./core"
+
 
 /**
  * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
@@ -76,7 +78,10 @@ export function onPatch(target: IMSTNode<any, any>, callback: (patch: IJsonPatch
  * @param {(snapshot: any) => void} callback
  * @returns {IDisposer}
  */
-export function onSnapshot<S>(target: IMSTNode<S, any>, callback: (snapshot: S) => void): IDisposer {
+export function onSnapshot<S>(target: ObservableMap<S>, callback: (snapshot: { [key: string]: S }) => void): IDisposer;
+export function onSnapshot<S>(target: IObservableArray<S>, callback: (snapshot: S[]) => void): IDisposer;
+export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer;
+export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer {
     return getMST(target).onSnapshot(callback)
 }
 
@@ -230,7 +235,10 @@ export function applySnapshot<S, T>(target: IMSTNode<S, T>, snapshot: S) {
  * @param {Object} target
  * @returns {*}
  */
-export function getSnapshot<S, T>(target: IMSTNode<S, T>): S {
+export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S };
+export function getSnapshot<S>(target: IObservableArray<S>): S[];
+export function getSnapshot<S>(target: ISnapshottable<S>): S;
+export function getSnapshot<S>(target: ISnapshottable<S>): S {
     return getMST(target).snapshot
 }
 
@@ -407,9 +415,9 @@ export function destroy(thing: IMSTNode<any, any>) {
 }
 
 export function testActions<S, T>(factory: IType<S, IMSTNode<S, T>>, initialState: S, ...actions: IActionCall[]): S {
-    const testInstance = factory.create(initialState)
+    const testInstance = factory.create(initialState) as T
     applyActions(testInstance, actions)
-    return getSnapshot(testInstance)
+    return getSnapshot(testInstance) as S
 }
 
 const appState = observable.shallowBox<any>(undefined)
