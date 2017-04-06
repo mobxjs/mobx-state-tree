@@ -1,7 +1,7 @@
 import { createDefaultValueFactory } from './with-default';
 import { getIdentifierAttribute } from './object';
 import {observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe} from "mobx"
-import { isType, IType, IComplexType, IMSTNode, getMST, hasMST, maybeMST, MSTAdminisration, valueToSnapshot, ComplexType } from '../core';
+import { isType, IType, IComplexType, IMSTNode, getMST, isMST, maybeMST, MSTAdminisration, valueToSnapshot, ComplexType } from '../core';
 import {} from "../core"
 import {identity, isPlainObject, nothing, isPrimitive, invariant, fail} from "../utils"
 import {escapeJsonPath, IJsonPatch} from "../core/json-patch"

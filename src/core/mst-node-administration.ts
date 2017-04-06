@@ -5,7 +5,7 @@ import {
 } from "mobx"
 
 import { typecheck, IType } from "./type"
-import { getRelativePath, hasMST, getMST, getPath } from "./mst-node"
+import { getRelativePath, isMST, getMST, getPath } from "./mst-node"
 
 import {IActionHandler} from "./action"
 import {
@@ -42,7 +42,6 @@ export class MSTAdminisration {
         ; (this.snapshotDisposer as any).onError((e: any) => { // as any is caused by wrong typing in mobx
             throw e
         })
-        // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
     }
 
     @computed get pathParts(): string[]{
@@ -181,7 +180,7 @@ export class MSTAdminisration {
     prepareChild(subpath: string, child: any): any {
         const childFactory = this.getChildType(subpath)
 
-        if (hasMST(child)) {
+        if (isMST(child)) {
             const node = getMST(child)
 
             if (node.isRoot) {
@@ -202,7 +201,7 @@ export class MSTAdminisration {
         } else {
             if (existingNode)
                 existingNode.setParent(null) // TODO: or delete / remove / whatever is a more explicit clean up
-            if (hasMST(newInstance)) {
+            if (isMST(newInstance)) {
                 const node = getMST(newInstance)
                 node.setParent(this, subpath)
             }

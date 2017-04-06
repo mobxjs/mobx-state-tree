@@ -3,7 +3,6 @@ import { action, isAction, extendShallowObservable, IObjectChange, IObjectWillCh
 import { nothing, extend as extendObject, invariant, fail, identity, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
 import { MSTAdminisration, maybeMST } from "../core"
 import { isReferenceFactory } from "./reference"
-import { primitiveFactory } from "./primitive"
 import { isIdentifierFactory } from "./identifier"
 import { ComplexType, getType, IMSTNode, isType, IType, getMST, IComplexType } from '../core';
 import { createDefaultValueFactory } from "./with-default"
@@ -226,20 +225,3 @@ export function isObjectFactory(type: any): boolean {
 export function getIdentifierAttribute(factory: any): string | null {
     return isObjectFactory(factory) ? factory.identifierAttribute : null
 }
-
-// export function getObjectNode(thing: IModel): ObjectNode {
-//     const node = getNode(thing)
-//     invariant(isObjectFactory(node.factory), "Expected object node, got " + (node.constructor as any).name)
-//     return node as ObjectNode
-// }
-
-// /**
-//  * Returns first parent of the provided node that is an object node, or null
-//  */
-// export function findEnclosingObjectNode(thing: Node): ObjectNode | null {
-//     let parent: Node | null = thing
-//     while (parent = parent.parent)
-//         if (parent instanceof ObjectNode)
-//             return parent
-//     return null
-// }

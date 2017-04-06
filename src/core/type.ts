@@ -1,8 +1,3 @@
-
-export function isType(value: any): value is IType<any, any> {
-    return typeof value === "object" && value && value.isType === true
-}
-
 export interface ISnapshottable<S> {}
 
 export interface IType<S, T> {
@@ -17,8 +12,10 @@ export interface IType<S, T> {
 
 export interface ISimpleType<T> extends IType<T, T> { }
 
-export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IMSTNode> {
+export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IMSTNode> { }
 
+export function isType(value: any): value is IType<any, any> {
+    return typeof value === "object" && value && value.isType === true
 }
 
 export abstract class Type<S, T> implements IType<S, T> {
@@ -27,7 +24,6 @@ export abstract class Type<S, T> implements IType<S, T> {
 
     constructor(name: string) {
         this.name = name
-        this.create = action(this.name, this.create) // TODO: only do this for complex types
     }
 
     abstract create(snapshot: any): any
@@ -47,6 +43,5 @@ export function typecheck(type: IType<any, any>, snapshot: any) {
         fail(`Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${type.name}. Expected ${type.describe()} instead.`)
 }
 
-import {action} from "mobx"
 import { fail } from "../utils"
 import { IMSTNode } from "./mst-node"

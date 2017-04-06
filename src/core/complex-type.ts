@@ -1,9 +1,15 @@
+import { action } from "mobx"
 import { IType, Type, typecheck } from "./type"
 
 /**
  * A complex type produces a MST node (Node in the state tree)
  */
 export abstract class ComplexType<S, T> extends Type<S, T> {
+    constructor(name: string) {
+        super(name)
+        this.create = action(this.name, this.create)
+    }
+
     create(snapshot: any = this.getDefaultSnapshot()) {
         typecheck(this, snapshot)
         const instance = this.createNewInstance()
@@ -29,12 +35,12 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     is(value: any): value is S | (T & IMSTNode) {
         if (!value || typeof value !== "object")
             return false
-        if (hasMST(value))
+        if (isMST(value))
             return this.isValidSnapshot(getMST(value).snapshot) // could check factory, but that doesn't check structurally...
         return this.isValidSnapshot(value)
     }
 }
 
-import { IMSTNode, hasMST, getMST } from "./mst-node"
+import { IMSTNode, isMST, getMST } from "./mst-node"
 import { MSTAdminisration } from "./mst-node-administration"
 import { IJsonPatch } from "./json-patch"

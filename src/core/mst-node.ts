@@ -1,5 +1,5 @@
-import { Type, IType, typecheck } from "./type"
-import {IJsonPatch, joinJsonPath} from "../core/json-patch"
+import { IType } from "./type"
+import { joinJsonPath} from "../core/json-patch"
 
 export interface IMSTNode {
     readonly $treenode?: MSTAdminisration
@@ -13,20 +13,15 @@ export function getChildType(object: IMSTNode, child: string): IType<any, any> {
     return getMST(object).getChildType(child)
 }
 
-export function hasMST(value: any): value is IMSTNode {
+export function isMST(value: any): value is IMSTNode {
     return value && value.$treenode
 }
 
-export function isMST(model: any): model is IMSTNode {
-    return hasMST(model)
-}
-
 export function getMST(value: any): MSTAdminisration {
-    if (hasMST(value))
+    if (isMST(value))
         return value.$treenode!
     else
         return fail("element has no Node")
-
 }
 
 /**
@@ -81,7 +76,7 @@ export function valueToSnapshot(thing: any) {
             time: thing.toJSON()
         }
     }
-    if (hasMST(thing))
+    if (isMST(thing))
         return getMST(thing).snapshot
     if (isSerializable(thing))
         return thing
