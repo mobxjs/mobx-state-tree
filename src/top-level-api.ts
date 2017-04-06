@@ -245,59 +245,33 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
 /**
  * Given a model instance, returns `true` if the object has a parent, that is, is part of another object, map or array
  *
+ * TODO: introduce amount = 1
  * @export
  * @param {Object} target
  * @param {boolean} [strict=false]
  * @returns {boolean}
  */
-export function hasParent(target: IMSTNode, strict: boolean = false): boolean {
-    return getParent(target, strict) !== null
+export function hasParent(target: IMSTNode): boolean {
+    return getParent(target) !== null
 }
 
 /**
- * TODO:
- * Given a model instance, returns `true` if the object has same parent, which is a model object, that is, not an
- * map or array.
+ * Returns the immediate parent of this object, or null.
  *
+ * Note that the immediate parent can be either an object, map or array, and
+ * doesn't necessarily refer to the parent model
+ *
+ * TODO: introduce amount = 1
  * @export
  * @param {Object} target
- * @returns {boolean}
- */
-// export function hasParentObject(target: IModel): boolean {
-//     return getParentObject(target) !== null
-// }
-
-/**
- * Returns the immediate parent of this object, or null. Parent can be either an object, map or array
- * TODO:? strict mode?
- * @export
- * @param {Object} target
- * @param {boolean} [strict=false]
  * @returns {*}
  */
-export function getParent(target: IMSTNode, strict?: boolean): any & IMSTNode;
-export function getParent<T>(target: IMSTNode, strict?: boolean): T & IMSTNode;
-export function getParent<T>(target: IMSTNode, strict: boolean = false): T & IMSTNode {
-    // const node = strict
-    //     ? getNode(target).parent
-    //     : findNode(getNode(target))
+export function getParent(target: IMSTNode): any & IMSTNode;
+export function getParent<T>(target: IMSTNode): T & IMSTNode;
+export function getParent<T>(target: IMSTNode): T & IMSTNode {
     const node = getMST(target)
     return node.parent ? node.parent.target : null
 }
-
-/**
- * TODO:
- * Returns the closest parent that is a model instance, but which isn't an array or map.
- *
- * @export
- * @param {Object} target
- * @returns {*}
- */
-// export function getParentObject(target: IModel): IModel {
-//     // TODO: remove this special notion of closest object node?
-//     const node = findEnclosingObjectNode(getNode(target))
-//     return node ? node.state : null
-// }
 
 /**
  * Given an object in a model tree, returns the root object of that tree
@@ -387,28 +361,12 @@ export function clone<T extends IMSTNode>(source: T): T {
 }
 
 /**
- * Internal function, use with care!
- */
-/**
- *
- *
- * @export
- * @param {any} thing
- * @returns {*}
- */
-// TODO: remove
-export function _getNode(thing: IMSTNode): any {
-    return getMST(thing)
-}
-
-/**
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
 export function detach<T extends IMSTNode>(thing: T): T {
     getMST(thing).detach()
     return thing
 }
-
 
 /**
  * Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
@@ -423,21 +381,4 @@ export function testActions<S, T>(factory: IType<S, IMSTNode>, initialState: S, 
     const testInstance = factory.create(initialState) as T
     applyActions(testInstance, actions)
     return getSnapshot(testInstance) as S
-}
-
-// TODO: remove?
-const appState = observable.shallowBox<any>(undefined)
-
-export function resetAppState() {
-    appState.set(undefined)
-}
-
-export function initializeAppState<S, T>(factory: IType<S, T>, initialSnapshot?: S) {
-    invariant(!appState, `Global app state was already initialized, use 'resetAppState' to reset it`)
-    appState.set(factory.create(initialSnapshot))
-}
-
-export function getAppState<T>(): T {
-    invariant(!!appState, `Global app state has not been initialized, use 'initializeAppState' for globally shared state`)
-    return appState.get() as T
 }
