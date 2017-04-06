@@ -1,27 +1,29 @@
 import { Type, IType, typecheck } from "./type"
 import {IJsonPatch, joinJsonPath} from "../core/json-patch"
 
-export type IMSTNode<S, T> = T & { $treenode?: MSTAdminisration }
+export interface IMSTNode {
+    readonly $treenode?: MSTAdminisration
+}
 
-export function getType<S, T>(object: IMSTNode<S, T>): IType<S, T> {
+export function getType<S, T>(object: IMSTNode): IType<S, T> {
     return getMST(object).type
 }
 
-export function getChildType(object: IMSTNode<any, any>, child: string): IType<any, any> {
+export function getChildType(object: IMSTNode, child: string): IType<any, any> {
     return getMST(object).getChildType(child)
 }
 
-export function hasMST(value: any): value is IMSTNode<any, any> {
+export function hasMST(value: any): value is IMSTNode {
     return value && value.$treenode
 }
 
-export function isMST(model: any): model is IMSTNode<any, any> {
+export function isMST(model: any): model is IMSTNode {
     return hasMST(model)
 }
 
 export function getMST(value: any): MSTAdminisration {
     if (hasMST(value))
-        return value.$treenode
+        return value.$treenode!
     else
         return fail("element has no Node")
 
@@ -32,7 +34,7 @@ export function getMST(value: any): MSTAdminisration {
  * the first callback is invoked, otherwise the second.
  * The result of this function is the return value of the callbacks
  */
-export function maybeMST<T, R>(value: T & IMSTNode<any, any>, asNodeCb: (node: MSTAdminisration, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
+export function maybeMST<T, R>(value: T & IMSTNode, asNodeCb: (node: MSTAdminisration, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
     // Optimization: maybeNode might be quite inefficient runtime wise, might be factored out at expensive places
     if (isMutable(value)) {
         const n = getMST(value)
@@ -45,7 +47,7 @@ export function maybeMST<T, R>(value: T & IMSTNode<any, any>, asNodeCb: (node: M
 }
 
 
-export function getPath(thing: IMSTNode<any, any>): string {
+export function getPath(thing: IMSTNode): string {
     return getMST(thing).path
 }
 
@@ -67,7 +69,7 @@ export function getRelativePath(base: MSTAdminisration, target: MSTAdminisration
         + joinJsonPath(targetParts.slice(common))
 }
 
-export function getParent(thing: IMSTNode<any, any>): IMSTNode<any, any> {
+export function getParent(thing: IMSTNode): IMSTNode {
     const node = getMST(thing)
     return node.parent ? node.parent.target : null
 }

@@ -1,5 +1,5 @@
+import { IMSTNode } from '../../core/';
 import { IObjectChange, IObjectWillChange } from "mobx"
-import { IObjectInstance } from "../object"
 
 export abstract class Property {
     constructor(public name: string) {
@@ -7,7 +7,7 @@ export abstract class Property {
     }
 
     initializePrototype(prototype: any) { }
-    initialize(targetInstance: IObjectInstance, snapshot: any) { }
+    initialize(targetInstance: IMSTNode, snapshot: any) { }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         return null
@@ -15,7 +15,7 @@ export abstract class Property {
 
     didChange(change: IObjectChange) { }
 
-    serialize(instance: IObjectInstance, snapshot: any) { }
-    deserialize(instance: IObjectInstance, snapshot: any) { }
+    serialize(instance: IMSTNode, snapshot: any) { }
+    deserialize(instance: IMSTNode, snapshot: any) { }
     abstract isValidSnapshot(snapshot: any): boolean
 }

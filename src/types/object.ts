@@ -16,17 +16,6 @@ import { getSnapshot } from "../top-level-api"
 import { IJsonPatch } from "../index";
 import { getPrimitiveFactoryFromValue } from "./core-types";
 
-// TODO: make generic with snapshot type
-export interface IObjectInstance {
-    $treenode: MSTAdminisration
-}
-
-
-interface IObjectFactoryConfig {
-    isObjectFactory: true,
-    baseModel: Object
-}
-
 export class ObjectType extends ComplexType<any, any> {
     isObjectFactory = true
 
@@ -65,7 +54,7 @@ export class ObjectType extends ComplexType<any, any> {
         return instance as Object
     }
 
-    finalizeNewInstance(instance: IObjectInstance, snapshot: any) {
+    finalizeNewInstance(instance: IMSTNode, snapshot: any) {
         intercept(instance, this.willChange as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
         this.forAllProps(prop => prop.initialize(instance, snapshot))

@@ -15,9 +15,11 @@ export interface IType<S, T> {
     SnapshotType: S
 }
 
-export type ISimpleType<T> = IType<T, T>
+export interface ISimpleType<T> extends IType<T, T> { }
 
-export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S>> {}
+export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IMSTNode> {
+
+}
 
 export abstract class Type<S, T> implements IType<S, T> {
     name: string

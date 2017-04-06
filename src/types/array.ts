@@ -171,7 +171,7 @@ function reconcileArrayItems(identifierAttr: string, target: IObservableArray<an
     })
 }
 
-export function createArrayFactory<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T> & ISnapshottable<S[]>> {
+export function createArrayFactory<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
     return createDefaultValueFactory(new ArrayType(subtype.name + "[]", subtype), [])
 }
 

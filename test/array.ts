@@ -17,7 +17,7 @@ const createTestFactories = () => {
 
     const Factory = (types.array(
         ItemFactory
-    ) as any) as IType<ITestSnapshot[], IObservableArray<ITest>>
+    )) as IType<ITestSnapshot[], IObservableArray<ITest>>
 
     return {Factory, ItemFactory}
 }
