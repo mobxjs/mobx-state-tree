@@ -119,6 +119,28 @@ test("it should resolve the path of an object", (t) => {
     t.deepEqual(getPathParts(row), ["rows", "0"])
 })
 
+test("it should resolve parents", (t) => {
+    const Row = types.model({
+        article_id: 0
+    })
+
+    const Document = types.model({
+        rows: types.array(Row)
+    })
+
+    const doc = Document.create()
+    const row = Row.create()
+    doc.rows.push(row)
+
+    t.is(hasParent(row), true) // array
+    t.is(hasParent(row, 2), true) // row
+    t.is(hasParent(row, 3), false)
+
+    t.is(getParent(row) === doc.rows, true) // array
+    t.is(getParent(row, 2) === doc, true) // row
+    t.is(getParent(row, 3) === null, true)
+})
+
 // clone
 test("it should clone a node", (t) => {
     const Row = types.model({

@@ -3,7 +3,7 @@ import {runInAction, observable, IObservableArray, ObservableMap} from "mobx"
 import {getMST, ISnapshottable} from "./core"
 import {IJsonPatch} from "./core"
 import {IDisposer, invariant} from "./utils"
-import {IActionCall} from "./core"
+import {IActionCall, MSTAdminisration} from "./core"
 import {IType, IMSTNode} from "./core"
 
 
@@ -245,14 +245,13 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
 /**
  * Given a model instance, returns `true` if the object has a parent, that is, is part of another object, map or array
  *
- * TODO: introduce amount = 1
  * @export
  * @param {Object} target
- * @param {boolean} [strict=false]
+ * @param {number} depth = 1, how far should we look upward?
  * @returns {boolean}
  */
-export function hasParent(target: IMSTNode): boolean {
-    return getParent(target) !== null
+export function hasParent(target: IMSTNode, depth: number = 1): boolean {
+    return getParent(target, depth) !== null
 }
 
 /**
@@ -261,16 +260,22 @@ export function hasParent(target: IMSTNode): boolean {
  * Note that the immediate parent can be either an object, map or array, and
  * doesn't necessarily refer to the parent model
  *
- * TODO: introduce amount = 1
  * @export
  * @param {Object} target
+ * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent(target: IMSTNode): any & IMSTNode;
-export function getParent<T>(target: IMSTNode): T & IMSTNode;
-export function getParent<T>(target: IMSTNode): T & IMSTNode {
-    const node = getMST(target)
-    return node.parent ? node.parent.target : null
+export function getParent(target: IMSTNode, depth?: number): (any & IMSTNode) | null;
+export function getParent<T>(target: IMSTNode, depth?: number): (T & IMSTNode) | null;
+export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) | null {
+    invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
+    let parent: MSTAdminisration | null = getMST(target).parent
+    while (parent) {
+        if (--depth === 0)
+            return parent ? parent.target : null
+        parent = parent.parent
+    }
+    return null
 }
 
 /**

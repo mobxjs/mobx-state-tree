@@ -39,7 +39,7 @@ export class MSTAdminisration {
         this.snapshotDisposer = reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
-        this.snapshotDisposer.onError((e: any) => { // as any is caused by wrong typing in mobx
+        this.snapshotDisposer.onError((e: any) => {
             throw e
         })
     }
