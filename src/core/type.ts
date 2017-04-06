@@ -13,6 +13,10 @@ export interface IType<S, T> {
     SnapshotType: S
 }
 
+export type ISimpleType<T> = IType<T, T>
+
+export type IComplexType<S, T> = IType<S, IMSTNode<S, T>>
+
 export abstract class Type<S, T> implements IType<S, T> { // TODO: generic for config and state of target
     name: string
     isType = true
@@ -40,4 +44,5 @@ export function typecheck(type: IType<any, any>, snapshot: any) {
 }
 
 import {action} from "mobx"
-import {fail} from "../utils"
+import { fail } from "../utils"
+import { IMSTNode } from "./mst-node"
