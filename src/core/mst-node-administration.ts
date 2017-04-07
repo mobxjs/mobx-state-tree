@@ -5,15 +5,14 @@ import {
 } from "mobx"
 
 import { typecheck, IType } from "./type"
-import { getRelativePath, isMST, getMST, getPath } from "./mst-node"
+import { isMST, getMST, getPath } from "./mst-node"
 
-import {IActionHandler} from "./action"
+import {IMiddleWareHandler} from "./action"
 import {
     invariant, fail, extend,
     addHiddenFinalProp, IDisposer, registerEventHandler
 } from "../utils"
 import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
-import {IActionCall, applyActionLocally} from "./action"
 import { ObjectType } from "../types/object"
 import { ComplexType } from "./complex-type"
 
@@ -25,9 +24,9 @@ export class MSTAdminisration {
     private _isProtected = false
     _isRunningAction = false // only relevant for root
 
+    readonly middlewares: IMiddleWareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
-    private readonly actionSubscribers: IActionHandler[] = []
     private readonly snapshotDisposer: IReactionDisposer
 
     constructor(initialState: any, type: ComplexType<any, any>) {
@@ -165,7 +164,7 @@ export class MSTAdminisration {
             if (
                  this.patchSubscribers.length > 0 ||
                  this.snapshotSubscribers.length > 0 ||
-                 (this instanceof ObjectType && this.actionSubscribers.length > 0)
+                 (this instanceof ObjectType && this.middlewares.length > 0)
             ) {
                 console.warn("An object with active event listeners was removed from the tree. The subscriptions have been disposed.")
             }
@@ -252,40 +251,9 @@ export class MSTAdminisration {
         return this.parent!.isRunningAction()
     }
 
-    applyAction(action: IActionCall): void {
-        const targetNode = this.resolve(action.path || "")
-        if (targetNode)
-            applyActionLocally(targetNode, targetNode.target, action)
-        else
-            fail(`Invalid action path: ${action.path || ""}`)
-    }
-
-    emitAction(instance: MSTAdminisration, action: IActionCall, next: () => any): any {
-        this.assertAlive()
-        // TODO: simplify implementation by collection all listeners first
-        let idx = -1
-        const correctedAction: IActionCall = this.actionSubscribers.length
-            ? extend({} as any, action, { path: getRelativePath(this, instance) })
-            : null
-        let n = () => {
-            // optimization: use tail recursion / trampoline
-            idx++
-            if (idx < this.actionSubscribers.length) {
-                return this.actionSubscribers[idx](correctedAction!, n)
-            } else {
-                const parent = this.parent
-                if (parent)
-                    return parent.emitAction(instance, action, next)
-                else
-                    return next()
-            }
-        }
-        return n()
-    }
-
-    onAction(listener: (action: IActionCall, next: () => void) => void): IDisposer {
+    addMiddleWare(handler: IMiddleWareHandler) {
         // TODO: check / warn if not protected!
-        return registerEventHandler(this.actionSubscribers, listener)
+        return registerEventHandler(this.middlewares, handler)
     }
 
     getChildMST(subpath: string): MSTAdminisration | null {

@@ -10,8 +10,7 @@ export {
     getType,
     getChildType,
     Type,
-    ComplexType,
-    IActionCall
+    ComplexType
 } from "./core"
 export * from "./core/json-patch"
 

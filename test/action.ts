@@ -1,4 +1,4 @@
-import { recordActions, types, getSnapshot } from "../"
+import { recordActions, types, getSnapshot, onAction } from "../"
 import { test } from "ava"
 
 /// Simple action replay and invocation
@@ -58,12 +58,14 @@ const OrderStore = types.model("OrderStore", {
 })
 
 function createTestStore() {
-    return OrderStore.create({
+    const store = OrderStore.create({
         customers: [{ name: "Mattia" }],
         orders: [{
             customer: null
         }]
     })
+    onAction(store, () => {})
+    return store
 }
 
 test("it should be possible to pass a complex object", t => {
@@ -110,7 +112,9 @@ test("it should not be possible to pass the element of another tree", t => {
     const store2 = createTestStore()
 
     t.throws(
-        () => store1.orders[0].setCustomer(store2.customers[0]),
+        () => {
+            store1.orders[0].setCustomer(store2.customers[0])
+        },
         "Argument 0 that was passed to action 'setCustomer' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead"
     )
 })

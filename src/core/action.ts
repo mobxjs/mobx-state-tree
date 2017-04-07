@@ -1,12 +1,49 @@
 import { action as mobxAction, isObservable } from "mobx"
 
-export type IActionCall = {
+export type ISerializedActionCall = {
     name: string;
     path?: string;
     args?: any[];
 }
 
-export type IActionHandler  = (actionCall: IActionCall, next: () => void) => void
+export type IRawActionCall = {
+    name: string;
+    object: any & IMSTNode,
+    args: any[]
+}
+
+export type IMiddleWareHandler = (actionCall: IRawActionCall, next: (actionCall: IRawActionCall) => any) => any
+
+function runRawAction(actioncall: IRawActionCall): any {
+    return actioncall.object[actioncall.name].apply(actioncall.object, actioncall.args)
+}
+
+function collectMiddlewareHandlers(node: MSTAdminisration): IMiddleWareHandler[] {
+    let handlers = node.middlewares.slice()
+    let n: MSTAdminisration | null = node
+    // Find all middlewares. Optimization: cache this?
+    while (n.parent) {
+        n = n.parent
+        handlers = handlers.concat(n.middlewares)
+    }
+    return handlers
+}
+
+function runMiddleWares(node: MSTAdminisration, baseCall: IRawActionCall): any {
+    const handlers = collectMiddlewareHandlers(node)
+    // Short circuit
+    if (!handlers.length)
+        return runRawAction(baseCall)
+
+    function runNextMiddleware(call: IRawActionCall): any {
+        const handler = handlers.shift() // Optimization: counter instead of shift is probably faster
+        if (handler)
+            return handler(call, runNextMiddleware)
+        else
+            return runRawAction(call)
+    }
+    return runNextMiddleware(baseCall)
+}
 
 export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
@@ -18,23 +55,16 @@ export function createActionInvoker(name: string, fn: Function) {
             // an action is already running in this tree, invoking this action does not emit a new action
             return action.apply(this, arguments)
         } else {
-            // start the action!
+            // outer action, run middlewares and start the action!
+            const call: IRawActionCall = {
+                name,
+                object: adm.target,
+                args: argsToArray(arguments)
+            }
             const root = adm.root
-            const args = arguments
             root._isRunningAction = true
             try {
-                // TODO: only check for serializability if there are action listeners?
-                // Is serializability a must? Have dedicated middleware for that?
-                // TODO: apply middle ware for all or only outer action?
-                return adm.emitAction(
-                    adm,
-                    {
-                        name: name,
-                        path: "",
-                        args: argsToArray(args).map((arg, index) => serializeArgument(adm, name, index, arg))
-                    },
-                    () => action.apply(this, args)
-                )
+                return runMiddleWares(adm, call)
             } finally {
                 root._isRunningAction = false
             }
@@ -42,10 +72,9 @@ export function createActionInvoker(name: string, fn: Function) {
     }
 
     // This construction helps producing a better function name in the stack trace, but could be optimized
-    // away in prod builds, and `invoker` be returned directly
+    // away in prod builds, and `actionInvoker` be returned directly
     return createNamedFunction(name, actionInvoker)
 }
-
 
 function serializeArgument(adm: MSTAdminisration, actionName: string, index: number, arg: any): any {
     if (isPrimitive(arg))
@@ -83,15 +112,41 @@ function deserializeArgument(adm: MSTAdminisration, value: any): any {
     return value
 }
 
-export function applyActionLocally(node: MSTAdminisration, instance: any, action: IActionCall) {
-    invariant(typeof instance[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
-    instance[action.name].apply(
-        instance,
+/**
+ * Dispatches an Action on a model instance. All middlewares will be triggered.
+ * Returns the value of the last actoin
+ *
+ * @export
+ * @param {Object} target
+ * @param {IActionCall} action
+ * @param {IActionCallOptions} [options]
+ * @returns
+ */
+export function applyAction(target: IMSTNode, action: ISerializedActionCall): any {
+    const resolvedTarget = tryResolve(target, action.path || "")
+    if (!resolvedTarget)
+        return fail(`Invalid action path: ${action.path || ""}`)
+    const node = getMST(resolvedTarget)
+    invariant(typeof resolvedTarget[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
+    return resolvedTarget[action.name].apply(
+        resolvedTarget,
         action.args ? action.args.map(v => deserializeArgument(node, v)) : []
     )
 }
 
-import {isMST, getMST, getRelativePath} from "./mst-node"
+export function onAction(target: IMSTNode, listener: (call: ISerializedActionCall) => void): IDisposer {
+    return addMiddleware(target, (rawCall, next) => {
+        const sourceNode = getMST(rawCall.object)
+        listener({
+            name: rawCall.name,
+            path: getRelativePath(getMST(target), sourceNode),
+            args: rawCall.args.map((arg, index) => serializeArgument(sourceNode, rawCall.name, index, arg))
+        })
+        return next(rawCall)
+    })
+}
+
+import { getMST, getRelativePath, IMSTNode, isMST } from "./mst-node";
 import {MSTAdminisration} from "./mst-node-administration"
-import {resolve} from "../top-level-api"
-import {invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction} from "../utils"
+import { resolve, tryResolve, addMiddleware } from "../top-level-api"
+import {invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer} from "../utils"

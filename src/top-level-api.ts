@@ -1,13 +1,16 @@
+import { IRawActionCall, applyAction, onAction } from './core/action';
 import { IModelType, Snapshot } from './types/object';
 import {runInAction, observable, IObservableArray, ObservableMap} from "mobx"
 import {getMST, ISnapshottable} from "./core"
 import {IJsonPatch} from "./core"
 import {IDisposer, invariant} from "./utils"
-import {IActionCall, MSTAdminisration} from "./core"
+import {ISerializedActionCall, MSTAdminisration} from "./core"
 import {IType, IMSTNode} from "./core"
 
+export { onAction, applyAction }
 
 /**
+ * TODO: update docs
  * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
  * Will only be invoked on 'root' actions, not on actions called from existing actions.
  *
@@ -48,11 +51,11 @@ import {IType, IMSTNode} from "./core"
  * @param {(action: IActionCall, next: () => void) => void} callback the middleware that should be invoked whenever an action is triggered.
  * @returns {IDisposer} function to remove the middleware
  */
-export function onAction(target: IMSTNode, callback: (action: IActionCall, next: () => void) => void): IDisposer {
+export function addMiddleware(target: IMSTNode, middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any): IDisposer {
     const node = getMST(target)
     if (!node.isProtected)
         console.warn("It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`")
-    return node.onAction(callback)
+    return node.addMiddleWare(middleware)
 }
 
 /**
@@ -132,20 +135,6 @@ export function recordPatches(subject: IMSTNode): IPatchRecorder {
 }
 
 /**
- * Dispatches an Action on a model instance. All middlewares will be triggered.
- * Returns the value of the last actoin
- *
- * @export
- * @param {Object} target
- * @param {IActionCall} action
- * @param {IActionCallOptions} [options]
- * @returns
- */
-export function applyAction(target: IMSTNode, action: IActionCall): any {
-    return getMST(target).applyAction(action)
-}
-
-/**
  * Applies a series of actions in a single MobX transaction.
  *
  * Does not return any value
@@ -155,31 +144,27 @@ export function applyAction(target: IMSTNode, action: IActionCall): any {
  * @param {IActionCall[]} actions
  * @param {IActionCallOptions} [options]
  */
-export function applyActions(target: IMSTNode, actions: IActionCall[]): void {
-    const node = getMST(target)
+export function applyActions(target: IMSTNode, actions: ISerializedActionCall[]): void {
     runInAction(() => {
-        actions.forEach(action => node.applyAction(action))
+        actions.forEach(action => applyAction(target, action))
     })
 }
 
 export interface IActionRecorder {
-    actions: IActionCall[]
+    actions: ISerializedActionCall[]
     stop(): any
     replay(target: IMSTNode): any
 }
 
 export function recordActions(subject: IMSTNode): IActionRecorder {
     let recorder = {
-        actions: [] as IActionCall[],
+        actions: [] as ISerializedActionCall[],
         stop: () => disposer(),
         replay: (target: IMSTNode) => {
             applyActions(target, recorder.actions)
         }
     }
-    let disposer = onAction(subject, (action, next) => {
-        recorder.actions.push(action)
-        return next()
-    })
+    let disposer = onAction(subject, recorder.actions.push.bind(recorder.actions))
     return recorder
 }
 
@@ -382,7 +367,8 @@ export function destroy(thing: IMSTNode) {
     node.die()
 }
 
-export function testActions<S, T>(factory: IType<S, IMSTNode>, initialState: S, ...actions: IActionCall[]): S {
+// TODO: remove or to test utils?
+export function testActions<S, T>(factory: IType<S, IMSTNode>, initialState: S, ...actions: ISerializedActionCall[]): S {
     const testInstance = factory.create(initialState) as T
     applyActions(testInstance, actions)
     return getSnapshot(testInstance) as S

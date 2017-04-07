@@ -1,5 +1,5 @@
 import {getSnapshot, onAction, applySnapshot} from "../top-level-api"
-import {IActionCall} from "../core"
+import {ISerializedActionCall} from "../core"
 
 const { connectViaExtension, extractState } = require("remotedev")
 
@@ -20,8 +20,7 @@ export function connectReduxDevtools(model: any) {
     })
 
     // Send changes to the remote monitor
-    onAction(model, (action: IActionCall, next) => {
-        next()
+    onAction(model, (action: ISerializedActionCall) => {
         if (applyingSnapshot)
             return
         const copy: any = {}

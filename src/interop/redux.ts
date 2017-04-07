@@ -1,6 +1,6 @@
-import {isMST, IActionCall} from "../core"
+import {isMST, IRawActionCall} from "../core"
 import {onSnapshot, getSnapshot, applyAction} from "../top-level-api"
-import {invariant, extend} from "../utils"
+import {invariant, extend, fail} from "../utils"
 
 export interface IMiddleWareApi {
     getState: () => any
@@ -13,14 +13,16 @@ export interface IReduxStore extends IMiddleWareApi {
 
 export type MiddleWare =
     (middlewareApi: IMiddleWareApi) =>
-        ((next: (action: IActionCall) => void) => void)
+        ((next: (action: IRawActionCall) => void) => void)
 
 export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxStore {
     invariant(isMST(model), "Expected model object")
     let store: IReduxStore = {
         getState : ()       => getSnapshot(model),
         dispatch : action   => {
-            runMiddleWare(action, runners.slice(), (newAction: any) => applyAction(model, reduxActionToAction(newAction)))
+            // TODO: reimplement redux middleware
+            fail("Not implemented")
+            // runMiddleWare(action, runners.slice(), (newAction: any) => applyAction(model, reduxActionToAction(newAction)))
         },
         subscribe: listener => onSnapshot(model, listener)
     }
@@ -28,13 +30,13 @@ export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxSt
     return store
 }
 
-function reduxActionToAction(action: any): IActionCall {
+function reduxActionToAction(action: any): IRawActionCall {
     const actionArgs = extend({}, action)
     delete actionArgs.type
     return {
         name: action.type,
         args: [actionArgs]
-    }
+    } as any // TODO: restore functionality!
 }
 
 function runMiddleWare(action: any, runners: any, next: any) {
