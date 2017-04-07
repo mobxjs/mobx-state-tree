@@ -22,12 +22,12 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
 
     abstract createNewInstance(): any
     abstract finalizeNewInstance(target: any, snapshot: any): void
-    abstract applySnapshot(node: MSTAdminisration, target: any, snapshot: any): void
+    abstract applySnapshot(node: MSTAdminisration, snapshot: any): void
     abstract getDefaultSnapshot(): any
-    abstract getChildMSTs(node: MSTAdminisration, target: any): [string, MSTAdminisration][]
-    abstract getChildMST(node: MSTAdminisration, target: any, key: string): MSTAdminisration | null
-    abstract serialize(node: MSTAdminisration, target: any): any
-    abstract applyPatchLocally(node: MSTAdminisration, target: any, subpath: string, patch: IJsonPatch): void
+    abstract getChildMSTs(node: MSTAdminisration): [string, MSTAdminisration][]
+    abstract getChildMST(node: MSTAdminisration, key: string): MSTAdminisration | null
+    abstract serialize(node: MSTAdminisration): any
+    abstract applyPatchLocally(node: MSTAdminisration, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IType<any, any>
     abstract isValidSnapshot(snapshot: any): boolean
     abstract removeChild(node: MSTAdminisration, subpath: string): void

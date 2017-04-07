@@ -103,38 +103,35 @@ export class ObjectType extends ComplexType<any, any> {
         }
     }
 
-    // TODO: adm or instance as param?
-    getChildMSTs(node: MSTAdminisration, instance: any): [string, MSTAdminisration][] {
+    getChildMSTs(node: MSTAdminisration): [string, MSTAdminisration][] {
         const res: [string, MSTAdminisration][] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
-                maybeMST(instance[prop.name], propertyNode => res.push([prop.name, propertyNode]))
+                maybeMST(node.target[prop.name], propertyNode => res.push([prop.name, propertyNode]))
         })
         return res
     }
 
-    getChildMST(node: MSTAdminisration, instance: any, key: string): MSTAdminisration | null {
-        return maybeMST(instance[key], identity, nothing)
+    getChildMST(node: MSTAdminisration, key: string): MSTAdminisration | null {
+        return maybeMST(node.target[key], identity, nothing)
     }
 
-    // TODO: node or instance?
-    serialize(node: MSTAdminisration, instance: any): any {
+    serialize(node: MSTAdminisration): any {
         const res = {}
-        this.forAllProps(prop => prop.serialize(instance, res))
+        this.forAllProps(prop => prop.serialize(node.target, res))
         return res
     }
 
-    applyPatchLocally(node: MSTAdminisration, target: any, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdminisration, subpath: string, patch: IJsonPatch): void {
         invariant(patch.op === "replace" || patch.op === "add")
-        this.applySnapshot(node, target, {
+        this.applySnapshot(node, {
             [subpath]: patch.value
         })
     }
 
-    // TODO: remove node arg
-    @action applySnapshot(node: MSTAdminisration, target: any, snapshot: any): void {
+    @action applySnapshot(node: MSTAdminisration, snapshot: any): void {
         for (let key in snapshot) if (key in this.props) {
-            this.props[key].deserialize(target, snapshot)
+            this.props[key].deserialize(node.target, snapshot)
         }
     }
 

@@ -25,10 +25,10 @@ export class MSTAdminisration {
     private _isProtected = false
     _isRunningAction = false // only relevant for root
 
-    readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
-    readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
-    readonly actionSubscribers: IActionHandler[] = []
-    readonly snapshotDisposer: IReactionDisposer
+    private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
+    private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
+    private readonly actionSubscribers: IActionHandler[] = []
+    private readonly snapshotDisposer: IReactionDisposer
 
     constructor(initialState: any, type: ComplexType<any, any>) {
         invariant(type instanceof ComplexType, "Uh oh")
@@ -112,7 +112,7 @@ export class MSTAdminisration {
     @computed public get snapshot() {
         this.assertAlive()
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
-        return Object.freeze(this.type.serialize(this, this.target))
+        return Object.freeze(this.type.serialize(this))
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
@@ -122,7 +122,7 @@ export class MSTAdminisration {
     public applySnapshot(snapshot: any) {
         this.assertWritable()
         typecheck(this.type, snapshot)
-        return this.type.applySnapshot(this, this.target, snapshot)
+        return this.type.applySnapshot(this, snapshot)
     }
 
     @action public applyPatch(patch: IJsonPatch) {
@@ -133,7 +133,7 @@ export class MSTAdminisration {
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.assertWritable()
-        this.type.applyPatchLocally(this, this.target, subpath, patch)
+        this.type.applyPatchLocally(this, subpath, patch)
     }
 
     public onPatch(onPatch: (patches: IJsonPatch) => void): IDisposer {
@@ -290,11 +290,11 @@ export class MSTAdminisration {
 
     getChildMST(subpath: string): MSTAdminisration | null {
         this.assertAlive()
-        return this.type.getChildMST(this, this.target, subpath)
+        return this.type.getChildMST(this, subpath)
     }
 
     getChildMSTs(): [string, MSTAdminisration][] {
-        return this.type.getChildMSTs(this, this.target)
+        return this.type.getChildMSTs(this)
     }
 
     getChildType(key: string): IType<any, any> {

@@ -39,7 +39,8 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         getMST(instance).applySnapshot(snapshot)
     }
 
-    getChildMSTs(_: MSTAdminisration, target: IObservableArray<any>): [string, MSTAdminisration][] {
+    getChildMSTs(node: MSTAdminisration): [string, MSTAdminisration][] {
+        const target = node.target as IObservableArray<any>
         const res: [string, MSTAdminisration][] = []
         target.forEach((value, index) => {
             maybeMST(value, node => { res.push(["" + index, node])})
@@ -47,7 +48,8 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         return res
     }
 
-    getChildMST(node: MSTAdminisration, target: IObservableArray<any>, key: string): MSTAdminisration | null {
+    getChildMST(node: MSTAdminisration, key: string): MSTAdminisration | null {
+        const target = node.target as IObservableArray<any>
         const index = parseInt(key, 10)
         if (index < target.length)
             return maybeMST(target[index], identity, nothing)
@@ -79,7 +81,8 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         return change
     }
 
-    serialize(node: MSTAdminisration, target: IObservableArray<any>): any {
+    serialize(node: MSTAdminisration): any {
+        const target = node.target as IObservableArray<any>
         return target.map(valueToSnapshot)
     }
 
@@ -108,7 +111,8 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         }
     }
 
-    applyPatchLocally(node: MSTAdminisration, target: IObservableArray<any>, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdminisration, subpath: string, patch: IJsonPatch): void {
+        const target = node.target as IObservableArray<any>
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
             case "replace":
@@ -123,7 +127,8 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         }
     }
 
-    @action applySnapshot(node: MSTAdminisration, target: IObservableArray<any>, snapshot: any[]): void {
+    @action applySnapshot(node: MSTAdminisration, snapshot: any[]): void {
+        const target = node.target as IObservableArray<any>
         const identifierAttr = getIdentifierAttribute(this.subType)
         if (identifierAttr)
             target.replace(reconcileArrayItems(identifierAttr, target, snapshot, this.subType))

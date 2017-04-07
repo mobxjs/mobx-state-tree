@@ -47,15 +47,16 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         getMST(instance).applySnapshot(snapshot)
     }
 
-    getChildMSTs(_node: MSTAdminisration, target: ObservableMap<any>): [string, MSTAdminisration][] {
+    getChildMSTs(node: MSTAdminisration): [string, MSTAdminisration][] {
         const res: [string, MSTAdminisration][] = []
-        target.forEach((value, key) => {
+        ; (node.target as ObservableMap<any>).forEach((value: any, key: string) => {
             maybeMST(value, node => { res.push([key, node])})
         })
         return res
     }
 
-    getChildMST(node: MSTAdminisration, target: ObservableMap<any>, key: string): MSTAdminisration | null {
+    getChildMST(node: MSTAdminisration, key: string): MSTAdminisration | null {
+        const target = node.target as ObservableMap<any>
         if (target.has(key))
             return maybeMST(target.get(key), identity, nothing)
         return null
@@ -95,7 +96,8 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         return change
     }
 
-    serialize(node: MSTAdminisration, target: ObservableMap<any>): Object {
+    serialize(node: MSTAdminisration): Object {
+        const target = node.target as ObservableMap<any>
         const res: {[key: string]: any} = {}
         target.forEach((value, key) => {
             res[key] = valueToSnapshot(value)
@@ -121,7 +123,8 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         }
     }
 
-    applyPatchLocally(node: MSTAdminisration, target: ObservableMap<any>, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdminisration, subpath: string, patch: IJsonPatch): void {
+        const target = node.target as ObservableMap<any>
         switch (patch.op) {
             case "add":
             case "replace":
@@ -133,7 +136,8 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         }
     }
 
-    @action applySnapshot(node: MSTAdminisration, target: ObservableMap<any>, snapshot: any): void {
+    @action applySnapshot(node: MSTAdminisration, snapshot: any): void {
+        const target = node.target as ObservableMap<any>
         const identifierAttr = getIdentifierAttribute(this.subType)
         // Try to update snapshot smartly, by reusing instances under the same key as much as possible
         const currentKeys: { [key: string]: boolean } = {}
