@@ -38,10 +38,12 @@ export abstract class Type<S, T> implements IType<S, T> {
     }
 }
 
-export function typecheck(type: IType<any, any>, snapshot: any) {
-    if (!type.is(snapshot))
-        fail(`Snapshot ${JSON.stringify(snapshot)} is not assignable to type ${type.name}. Expected ${type.describe()} instead.`)
+export function typecheck(type: IType<any, any>, value: any): void {
+    if (!type.is(value)) {
+        const currentTypename = maybeMST(value, node => ` of type ${node.type.name}:`, () => "")
+        fail(`Value${currentTypename} '${isSerializable(value) ? JSON.stringify(value) : value}' is not assignable to type: ${type.name}. Expected ${type.describe()} instead.`)
+    }
 }
 
-import { fail } from "../utils"
-import { IMSTNode } from "./mst-node"
+import { fail, isSerializable } from "../utils"
+import { IMSTNode, maybeMST } from "./mst-node"

@@ -65,8 +65,6 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         const node = getMST(change.object)
         node.assertWritable()
 
-         // TODO: verify type
-        // TODO check type
         const identifierAttr = getIdentifierAttribute(node)
         if (identifierAttr && change.newValue && typeof change.newValue === "object" && change.newValue[identifierAttr] !== change.name)
             fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${change.name}', but expected: '${change.newValue[identifierAttr!]}'`)

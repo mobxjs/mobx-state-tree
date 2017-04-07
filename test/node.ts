@@ -184,8 +184,7 @@ test("it should return the child model factory", (t) => {
 
     const doc = Document.create()
 
-    // TODO: any because of #19
-    t.deepEqual<any>(getChildType(doc, 'rows'), ArrayOfRow)
+    t.deepEqual(getChildType(doc, 'rows'), ArrayOfRow)
 })
 
 test("a node can exists only once in a tree", (t) => {

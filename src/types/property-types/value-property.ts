@@ -19,8 +19,6 @@ export class ValueProperty extends Property {
         const node = getMST(change.object)
         const oldValue = change.object[this.name]
 
-        // TODO check type
-        // TODO: check if tree is editable
         maybeMST(oldValue, adm => adm.setParent(null))
         change.newValue = node.prepareChild(this.name, change.newValue)
         return change

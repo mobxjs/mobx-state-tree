@@ -75,8 +75,8 @@ test("store is deserialized correctly", (t) => {
     t.is(s.boxes.size, 2)
     t.is(s.arrows.length, 1)
     t.true(s.selection === s.boxes.get("aa"))
-    t.is(s.arrows[0].from.name, "Rotterdam")
-    t.is(s.arrows[0].to.name, "Bratislava")
+    t.is(s.arrows[0].from!.name, "Rotterdam")
+    t.is(s.arrows[0].to!.name, "Bratislava")
     t.deepEqual(s.boxes.values().map(b => b.isSelected), [false, true])
 })
 
@@ -86,7 +86,7 @@ test("store emits correct patch paths", (t) => {
     const recorder2 = recordPatches(s.boxes)
     const recorder3 = recordPatches(s.boxes.get("cc")!)
 
-    s.arrows[0].from.x += 117
+    s.arrows[0].from!.x += 117
     t.deepEqual(recorder1.patches, [{ op: "replace", path: "/boxes/cc/x", value: 217 } as IJsonPatch])
     t.deepEqual(recorder2.patches, [{ op: "replace", path: "/cc/x", value: 217 } as IJsonPatch])
     t.deepEqual(recorder3.patches, [{ op: "replace", path: "/x", value: 217 } as IJsonPatch])

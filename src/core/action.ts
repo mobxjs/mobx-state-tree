@@ -23,6 +23,9 @@ export function createActionInvoker(name: string, fn: Function) {
             const args = arguments
             root._isRunningAction = true
             try {
+                // TODO: only check for serializability if there are action listeners?
+                // Is serializability a must? Have dedicated middleware for that?
+                // TODO: apply middle ware for all or only outer action?
                 return adm.emitAction(
                     adm,
                     {

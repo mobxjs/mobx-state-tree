@@ -179,6 +179,7 @@ export class MSTAdminisration {
 
     prepareChild(subpath: string, child: any): any {
         const childFactory = this.getChildType(subpath)
+        typecheck(childFactory, child)
 
         if (isMST(child)) {
             const node = getMST(child)
@@ -261,6 +262,7 @@ export class MSTAdminisration {
 
     emitAction(instance: MSTAdminisration, action: IActionCall, next: () => any): any {
         this.assertAlive()
+        // TODO: simplify implementation by collection all listeners first
         let idx = -1
         const correctedAction: IActionCall = this.actionSubscribers.length
             ? extend({} as any, action, { path: getRelativePath(this, instance) })

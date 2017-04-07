@@ -41,18 +41,18 @@ test("it should be possible to record & replay a simple action", t => {
 })
 
 // Complex actions
-const Customer = types.model({
-    name: ""
+const Customer = types.model("Customer", {
+    name: types.string
 })
 
-const Order = types.model({
+const Order = types.model("Order", {
     customer: types.reference(Customer),
     setCustomer(customer) {
         this.customer = customer
     }
 })
 
-const OrderStore = types.model({
+const OrderStore = types.model("OrderStore", {
     customers: types.array(Customer),
     orders: types.array(Order)
 })
@@ -72,7 +72,7 @@ test("it should be possible to pass a complex object", t => {
 
     t.is(store.customers[0].name, "Mattia")
     store.orders[0].setCustomer(store.customers[0])
-    t.is(store.orders[0].customer.name, "Mattia")
+    t.is(store.orders[0].customer!.name, "Mattia")
     t.is(store.orders[0].customer, store.customers[0])
     t.deepEqual(getSnapshot(store) as any, {
         customers: [{
@@ -94,12 +94,14 @@ test("it should be possible to pass a complex object", t => {
     t.deepEqual(getSnapshot(store2), getSnapshot(store))
 })
 
-test.skip("it should not be possible to set the wrong type", t => {
+test("it should not be possible to set the wrong type", t => {
     const store = createTestStore()
 
     t.throws(
-        () => store.orders[0].setCustomer(store.orders[0]), // wrong type!
-        "bla"
+        () => {
+            store.orders[0].setCustomer(store.orders[0])
+        }, // wrong type!
+        "[mobx-state-tree] Value of type Order: '{}' is not assignable to type: Customer. Expected { name: string } instead."
     )
 })
 

@@ -174,7 +174,7 @@ test("it should throw if snapshot has computed properties", (t) => {
         const doc = ComputedFactory.create({area: 3})
     })
 
-    t.is(error.message, "[mobx-state-tree] Snapshot {\"area\":3} is not assignable to type AnonymousModel. Expected { width: number; height: number } instead.")
+    t.is(error.message, "[mobx-state-tree] Value '{\"area\":3}' is not assignable to type: AnonymousModel. Expected { width: number; height: number } instead.")
 })
 
 test("it should throw if a replaced object is read or written to", (t) => {
@@ -220,7 +220,6 @@ test("it should compose factories", (t) => {
     const {BoxFactory, ColorFactory} = createTestFactories()
     const ComposedFactory = types.extend(BoxFactory, ColorFactory)
 
-    // TODO: fix typecheck
     t.deepEqual(getSnapshot(ComposedFactory.create()), {width: 0, height: 0, color: "#FFFFFF"})
 })
 

@@ -38,7 +38,7 @@ export class ObjectType extends ComplexType<any, any> {
         super(name)
         Object.seal(baseModel) // make sure nobody messes with it
         this.baseModel = baseModel
-        // TODO: verify valid name
+        invariant(/^\w[\w\d_]*$/.test(name), `Typename should be a valid identifier: ${name}`)
         this.modelConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
         this.modelConstructor.prototype.toString = function() {
             return `${name}${JSON.stringify(getSnapshot(this))}`

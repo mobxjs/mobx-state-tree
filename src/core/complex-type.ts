@@ -35,12 +35,15 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     is(value: any): value is S | (T & IMSTNode) {
         if (!value || typeof value !== "object")
             return false
-        if (isMST(value))
-            return this.isValidSnapshot(getMST(value).snapshot) // could check factory, but that doesn't check structurally...
+        if (isMST(value)) {
+            if (getType(value) === this)
+                return true
+            return this.isValidSnapshot(getMST(value).snapshot)
+        }
         return this.isValidSnapshot(value)
     }
 }
 
-import { IMSTNode, isMST, getMST } from "./mst-node"
+import { IMSTNode, isMST, getType, getMST } from "./mst-node"
 import { MSTAdminisration } from "./mst-node-administration"
 import { IJsonPatch } from "./json-patch"

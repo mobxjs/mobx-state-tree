@@ -1,5 +1,5 @@
-import { createDefaultValueFactory } from './with-default';
-import {observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe} from "mobx"
+import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe } from "mobx"
+import { createDefaultValueFactory } from "./with-default"
 import { applySnapshot } from "../top-level-api"
 import {
     ComplexType,
@@ -7,20 +7,18 @@ import {
     getType,
     IComplexType,
     IJsonPatch,
-    IMSTNode,
-    ISnapshottable,
     isType,
     IType,
     maybeMST,
     MSTAdminisration,
     valueToSnapshot
-} from '../core';
-import {identity, nothing, invariant} from "../utils"
-import {getIdentifierAttribute} from "./object"
+} from "../core"
+import { identity, nothing, invariant } from "../utils"
+import { getIdentifierAttribute } from "./object"
 
 export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     isArrayFactory = true
-    subType: IType<any, any> // TODO: type
+    subType: IType<any, any>
 
     constructor(name: string, subType: IType<any, any>) {
         super(name)
@@ -59,9 +57,6 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     willChange = (change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null => {
         const node = getMST(change.object)
         node.assertWritable()
-
-        // TODO: verify type
-                // TODO check type
 
         // TODO: check for key duplication
         switch (change.type) {

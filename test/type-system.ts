@@ -96,7 +96,7 @@ test("it should do typescript type inference correctly", (t) => {
     b.sub.x = 4
     const d: string = b.sub.y!
 
-    a.y = null // TODO: enable strict null checks and verify this
+    a.y = null
 
     const zz: string = a.z
     a.z = "test"
@@ -160,7 +160,7 @@ test("#66 - it should pick the correct type of defaulted fields", t => {
 
     const a = Item.create({ id: 3 })
     t.is(a.name, "boo")
-    t.throws(() => a.name = 3 as any, /Value is not assignable to 'string'/)
+    t.throws(() => a.name = 3 as any, `[mobx-state-tree] Value '3' is not assignable to type: string. Expected string instead.`)
 })
 
 test("cannot create factories with null values", t => {

@@ -20,7 +20,7 @@ test("it should throw if a correct type with failing predicate is given", t => {
         const doc = Factory.create({ number: "givenStringInstead" })
     })
 
-    t.is(error.message, '[mobx-state-tree] Snapshot {\"number\":\"givenStringInstead\"} is not assignable to type AnonymousModel. Expected { number: Number } instead.')
+    t.is(error.message, `[mobx-state-tree] Value '{\"number\":\"givenStringInstead\"}' is not assignable to type: AnonymousModel. Expected { number: Number } instead.`)
 })
 
 test("it should throw if default value does not pass the predicate", t => {
