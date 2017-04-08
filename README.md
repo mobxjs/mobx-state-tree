@@ -67,7 +67,7 @@ Models are at the heart of `mobx-state-tree`. They simply store your data.
 Example:
 
 ```javascript
-import {types.model, action, mapOf, referenceTo} from "mobx-state-tree"
+import {types, action, mapOf, referenceTo} from "mobx-state-tree"
 
 const Box = types.model({
     // props
