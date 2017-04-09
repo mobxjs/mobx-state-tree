@@ -67,10 +67,11 @@ Models are at the heart of `mobx-state-tree`. They simply store your data.
 Example:
 
 ```javascript
-import {types, action, mapOf, referenceTo} from "mobx-state-tree"
+import {types, mapOf, referenceTo} from "mobx-state-tree"
 
-const Box = types.model({
+const Box = types.model("Box",{
     // props
+    id: types.identifier(),
     name: "",
     x: 0,
     y: 0,
@@ -87,17 +88,20 @@ const Box = types.model({
     }
 })
 
-const BoxStore = types.model({
+const BoxStore = types.model("Store",{
     boxes: types.map(Box),
     selection: types.reference("boxes/name"),
-    addBox: action(function(name) {
-        this.boxes.set(name, Box({ name, x: 100, y: 100}))
+    addBox(id,name,x,y) {
+        this.boxes.set(name, Box({ id, name, x, y }))
     })
 })
 
-const boxStore = BoxStore.create()
-boxStore.addBox("test")
-boxStore.boxes.get("test").move(7, 3)
+const boxStore = BoxStore.create({
+    "boxes": {},
+    "selection": ""
+})
+boxStore.addBox("1","test",100,100)
+boxStore.boxes.get("1").move(7, 3)
 ```
 
 Useful methods:
