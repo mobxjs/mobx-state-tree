@@ -1,6 +1,8 @@
 import {getSnapshot, onAction, applySnapshot} from "../top-level-api"
 import {ISerializedActionCall} from "../core"
 
+// TODO: package should not be dependent on remotedev...
+declare var require: any
 const { connectViaExtension, extractState } = require("remotedev")
 
 export function connectReduxDevtools(model: any) {

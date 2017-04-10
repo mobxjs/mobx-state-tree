@@ -38,12 +38,12 @@
     "nyc": "^10.0.0",
     "tape": "^4.6.0",
     "tslint": "^3.15.1",
-    "typescript": "^2.1.4",
-    "webpack": "^1.13.1"
+    "typescript": "2.2.2",
+    "webpack": "^1.13.1",
+    "webpack-fail-plugin": "^1.0.6"
   },
   "dependencies": {
-    "remotedev": "^0.2.2",
-    "webpack-fail-plugin": "^1.0.6"
+    "remotedev": "^0.2.2"
   },
   "peerDependencies": {
     "mobx": "^3.1.9"

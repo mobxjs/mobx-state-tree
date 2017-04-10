@@ -38,7 +38,7 @@ export class MSTAdminisration {
         this.snapshotDisposer = reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
-        this.snapshotDisposer.onError((e: any) => {
+        this.snapshotDisposer!.onError((e: any) => {
             throw e
         })
     }
