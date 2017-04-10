@@ -5,7 +5,7 @@ import { MSTAdminisration, maybeMST } from "../core"
 import { isReferenceFactory } from "./reference"
 import { primitiveFactory } from "./primitive"
 import { isIdentifierFactory } from "./identifier"
-import { ComplexType, getType, IMSTNode, isType, IType, getMST } from '../core';
+import { ComplexType, getType, IMSTNode, isType, IType, getMST, IComplexType } from '../core';
 import { createDefaultValueFactory } from "./with-default"
 import { Property } from "./property-types/property"
 import { TransformedProperty } from "./property-types/transformed-property"
@@ -15,17 +15,6 @@ import { ActionProperty } from "./property-types/action-property"
 import { getSnapshot } from "../top-level-api"
 import { IJsonPatch } from "../index";
 import { getPrimitiveFactoryFromValue } from "./core-types";
-
-// TODO: make generic with snapshot type
-export interface IObjectInstance {
-    $treenode: MSTAdminisration
-}
-
-
-interface IObjectFactoryConfig {
-    isObjectFactory: true,
-    baseModel: Object
-}
 
 export class ObjectType extends ComplexType<any, any> {
     isObjectFactory = true
@@ -55,10 +44,6 @@ export class ObjectType extends ComplexType<any, any> {
         this.modelConstructor.prototype.toString = function() {
             return `${name}${JSON.stringify(getSnapshot(this))}`
         }
-        // TODO: kill toJSON
-        this.modelConstructor.prototype.toJSON = function() {
-            return getSnapshot(this)
-        }
         this.parseModelProps()
         this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
     }
@@ -69,7 +54,7 @@ export class ObjectType extends ComplexType<any, any> {
         return instance as Object
     }
 
-    finalizeNewInstance(instance: IObjectInstance, snapshot: any) {
+    finalizeNewInstance(instance: IMSTNode, snapshot: any) {
         intercept(instance, this.willChange as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
         this.forAllProps(prop => prop.initialize(instance, snapshot))
@@ -201,9 +186,10 @@ export type Snapshot<T> = {
     [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
 }
 
-// MWE: somehow get  & { toJSON(): S } in here...?
-export function createModelFactory<S extends Object, T extends S>(baseModel: IBaseModelDefinition<T>): IType<Snapshot<T>, IMSTNode<Snapshot<T>, T> & { toJSON(): Snapshot<T> }>
-export function createModelFactory<S extends Object, T extends S>(name: string, baseModel: IBaseModelDefinition<T>): IType<Snapshot<T>, IMSTNode<Snapshot<T>, T> & { toJSON(): Snapshot<T> }>
+export interface IModelType<T> extends IComplexType<Snapshot<T>, T> { }
+
+export function createModelFactory<T>(baseModel: IBaseModelDefinition<T>): IModelType<T>
+export function createModelFactory<T>(name: string, baseModel: IBaseModelDefinition<T>): IModelType<T>
 export function createModelFactory(arg1: any, arg2?: any) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
@@ -217,13 +203,12 @@ function getObjectFactoryBaseModel(item: any) {
     return isObjectFactory(type) ? (type as ObjectType).baseModel : {}
 }
 
-// TODO: toJSON() is now not typed correctly...
-export function extend<AS, AT, BS, BT>(name: string, a: IType<AS, AT>, b: IType<BS, BT>): IType<AS & BS, AT & BT>;
-export function extend<AS, AT, BS, BT, CS, CT>(name: string, a: IType<AS, AT>, b: IType<BS, BT>, c: IType<CS, CT>): IType<AS & BS & CS, AT & BT & CT>;
-export function extend<S, T>(name: string, ...models: IType<any, any>[]): IType<S, T>;
-export function extend<AS, AT, BS, BT>(a: IType<AS, AT>, b: IType<BS, BT>): IType<AS & BS, AT & BT>;
-export function extend<AS, AT, BS, BT, CS, CT>(a: IType<AS, AT>, b: IType<BS, BT>, c: IType<CS, CT>): IType<AS & BS & CS, AT & BT & CT>;
-export function extend<S, T>(...models: IType<any, any>[]): IType<S, T>;
+export function extend<A, B>(name: string, a: IModelType<A>, b: IModelType<B>): IModelType<A & B>
+export function extend<A, B, C>(name: string, a: IModelType<A>, b: IModelType<B>, c: IModelType<C>): IModelType<A & B & C>
+export function extend<A, B, C, D>(name: string, a: IModelType<A>, b: IModelType<B>, c: IModelType<C>, d: IModelType<D>): IModelType<A & B & C & D>
+export function extend<A, B>(a: IModelType<A>, b: IModelType<B>): IModelType<A & B>
+export function extend<A, B, C>(a: IModelType<A>, b: IModelType<B>, c: IModelType<C>): IModelType<A & B & C>
+export function extend<A, B, C, D>(a: IModelType<A>, b: IModelType<B>, c: IModelType<C>, d: IModelType<D>): IModelType<A & B & C & D>
 export function extend(...args: any[]) {
     const baseFactories = typeof args[0] === "string" ? args.slice(1) : args
     const factoryName = typeof args[0] === "string" ? args[0] : baseFactories.map(f => f.name).join("_")

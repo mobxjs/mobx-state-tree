@@ -1,9 +1,11 @@
-import {runInAction, observable} from "mobx"
-import {getMST} from "./core"
+import { IModelType, Snapshot } from './types/object';
+import {runInAction, observable, IObservableArray, ObservableMap} from "mobx"
+import {getMST, ISnapshottable} from "./core"
 import {IJsonPatch} from "./core"
 import {IDisposer, invariant} from "./utils"
 import {IActionCall} from "./core"
 import {IType, IMSTNode} from "./core"
+
 
 /**
  * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
@@ -46,7 +48,7 @@ import {IType, IMSTNode} from "./core"
  * @param {(action: IActionCall, next: () => void) => void} callback the middleware that should be invoked whenever an action is triggered.
  * @returns {IDisposer} function to remove the middleware
  */
-export function onAction(target: IMSTNode<any, any>, callback: (action: IActionCall, next: () => void) => void): IDisposer {
+export function onAction(target: IMSTNode, callback: (action: IActionCall, next: () => void) => void): IDisposer {
     const node = getMST(target)
     if (!node.isProtected)
         console.warn("It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`")
@@ -63,7 +65,7 @@ export function onAction(target: IMSTNode<any, any>, callback: (action: IActionC
  * @param {(patch: IJsonPatch) => void} callback the callback that is invoked for each patch
  * @returns {IDisposer} function to remove the listener
  */
-export function onPatch(target: IMSTNode<any, any>, callback: (patch: IJsonPatch) => void): IDisposer {
+export function onPatch(target: IMSTNode, callback: (patch: IJsonPatch) => void): IDisposer {
     return getMST(target).onPatch(callback)
 }
 
@@ -76,7 +78,10 @@ export function onPatch(target: IMSTNode<any, any>, callback: (patch: IJsonPatch
  * @param {(snapshot: any) => void} callback
  * @returns {IDisposer}
  */
-export function onSnapshot<S>(target: IMSTNode<S, any>, callback: (snapshot: S) => void): IDisposer {
+export function onSnapshot<S>(target: ObservableMap<S>, callback: (snapshot: { [key: string]: S }) => void): IDisposer;
+export function onSnapshot<S>(target: IObservableArray<S>, callback: (snapshot: S[]) => void): IDisposer;
+export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer;
+export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer {
     return getMST(target).onSnapshot(callback)
 }
 
@@ -88,7 +93,7 @@ export function onSnapshot<S>(target: IMSTNode<S, any>, callback: (snapshot: S) 
  * @param {IJsonPatch} patch
  * @returns
  */
-export function applyPatch(target: IMSTNode<any, any>, patch: IJsonPatch) {
+export function applyPatch(target: IMSTNode, patch: IJsonPatch) {
     return getMST(target).applyPatch(patch)
 }
 
@@ -99,7 +104,7 @@ export function applyPatch(target: IMSTNode<any, any>, patch: IJsonPatch) {
  * @param {Object} target
  * @param {IJsonPatch[]} patches
  */
-export function applyPatches(target: IMSTNode<any, any>, patches: IJsonPatch[]) {
+export function applyPatches(target: IMSTNode, patches: IJsonPatch[]) {
     const node = getMST(target)
     runInAction(() => {
         patches.forEach(p => node.applyPatch(p))
@@ -109,14 +114,14 @@ export function applyPatches(target: IMSTNode<any, any>, patches: IJsonPatch[]) 
 export interface IPatchRecorder {
     patches: IJsonPatch[]
     stop(): any
-    replay(target: IMSTNode<any, any>): any
+    replay(target: IMSTNode): any
 }
 
-export function recordPatches(subject: IMSTNode<any, any>): IPatchRecorder {
+export function recordPatches(subject: IMSTNode): IPatchRecorder {
     let recorder = {
         patches: [] as IJsonPatch[],
         stop: () => disposer(),
-        replay: (target: any) => {
+        replay: (target: IMSTNode) => {
             applyPatches(target, recorder.patches)
         }
     }
@@ -136,7 +141,7 @@ export function recordPatches(subject: IMSTNode<any, any>): IPatchRecorder {
  * @param {IActionCallOptions} [options]
  * @returns
  */
-export function applyAction(target: IMSTNode<any, any>, action: IActionCall): any {
+export function applyAction(target: IMSTNode, action: IActionCall): any {
     return getMST(target).applyAction(action)
 }
 
@@ -150,7 +155,7 @@ export function applyAction(target: IMSTNode<any, any>, action: IActionCall): an
  * @param {IActionCall[]} actions
  * @param {IActionCallOptions} [options]
  */
-export function applyActions(target: IMSTNode<any, any>, actions: IActionCall[]): void {
+export function applyActions(target: IMSTNode, actions: IActionCall[]): void {
     const node = getMST(target)
     runInAction(() => {
         actions.forEach(action => node.applyAction(action))
@@ -160,14 +165,14 @@ export function applyActions(target: IMSTNode<any, any>, actions: IActionCall[])
 export interface IActionRecorder {
     actions: IActionCall[]
     stop(): any
-    replay(target: IMSTNode<any, any>): any
+    replay(target: IMSTNode): any
 }
 
-export function recordActions(subject: IMSTNode<any, any>): IActionRecorder {
+export function recordActions(subject: IMSTNode): IActionRecorder {
     let recorder = {
         actions: [] as IActionCall[],
         stop: () => disposer(),
-        replay: (target: any) => {
+        replay: (target: IMSTNode) => {
             applyActions(target, recorder.actions)
         }
     }
@@ -198,14 +203,14 @@ export function recordActions(subject: IMSTNode<any, any>): IActionRecorder {
  * todo.done = false // throws!
  * todo.toggle() // OK
  */
-export function protect(target: IMSTNode<any, any>) {
+export function protect(target: IMSTNode) {
     getMST(target).protect()
 }
 
 /**
  * Returns true if the object is in protected mode, @see protect
  */
-export function isProtected(target: IMSTNode<any, any>): boolean {
+export function isProtected(target: IMSTNode): boolean {
     return getMST(target).isProtected
 }
 
@@ -218,7 +223,7 @@ export function isProtected(target: IMSTNode<any, any>): boolean {
  * @param {Object} snapshot
  * @returns
  */
-export function applySnapshot<S, T>(target: IMSTNode<S, T>, snapshot: S) {
+export function applySnapshot<S, T>(target: IMSTNode, snapshot: S) {
     return getMST(target).applySnapshot(snapshot)
 }
 
@@ -230,7 +235,10 @@ export function applySnapshot<S, T>(target: IMSTNode<S, T>, snapshot: S) {
  * @param {Object} target
  * @returns {*}
  */
-export function getSnapshot<S, T>(target: IMSTNode<S, T>): S {
+export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S };
+export function getSnapshot<S>(target: IObservableArray<S>): S[];
+export function getSnapshot<S>(target: ISnapshottable<S>): S;
+export function getSnapshot<S>(target: ISnapshottable<S>): S {
     return getMST(target).snapshot
 }
 
@@ -242,7 +250,7 @@ export function getSnapshot<S, T>(target: IMSTNode<S, T>): S {
  * @param {boolean} [strict=false]
  * @returns {boolean}
  */
-export function hasParent(target: IMSTNode<any, any>, strict: boolean = false): boolean {
+export function hasParent(target: IMSTNode, strict: boolean = false): boolean {
     return getParent(target, strict) !== null
 }
 
@@ -267,7 +275,9 @@ export function hasParent(target: IMSTNode<any, any>, strict: boolean = false): 
  * @param {boolean} [strict=false]
  * @returns {*}
  */
-export function getParent(target: IMSTNode<any, any>, strict: boolean = false): IMSTNode<any, any> {
+export function getParent(target: IMSTNode, strict?: boolean): any & IMSTNode;
+export function getParent<T>(target: IMSTNode, strict?: boolean): T & IMSTNode;
+export function getParent<T>(target: IMSTNode, strict: boolean = false): T & IMSTNode {
     // const node = strict
     //     ? getNode(target).parent
     //     : findNode(getNode(target))
@@ -296,7 +306,9 @@ export function getParent(target: IMSTNode<any, any>, strict: boolean = false): 
  * @param {Object} target
  * @returns {*}
  */
-export function getRoot(target: IMSTNode<any, any>): IMSTNode<any, any> {
+export function getRoot(target: IMSTNode): any & IMSTNode;
+export function getRoot<T>(target: IMSTNode): T & IMSTNode;
+export function getRoot(target: IMSTNode): IMSTNode {
     return getMST(target).root.target
 }
 
@@ -307,7 +319,7 @@ export function getRoot(target: IMSTNode<any, any>): IMSTNode<any, any> {
  * @param {Object} target
  * @returns {string}
  */
-export function getPath(target: IMSTNode<any, any>): string {
+export function getPath(target: IMSTNode): string {
     return getMST(target).path
 }
 
@@ -318,7 +330,7 @@ export function getPath(target: IMSTNode<any, any>): string {
  * @param {Object} target
  * @returns {string[]}
  */
-export function getPathParts(target: IMSTNode<any, any>): string[] {
+export function getPathParts(target: IMSTNode): string[] {
     return getMST(target).pathParts
 }
 
@@ -329,7 +341,7 @@ export function getPathParts(target: IMSTNode<any, any>): string[] {
  * @param {Object} target
  * @returns {boolean}
  */
-export function isRoot(target: IMSTNode<any, any>): boolean {
+export function isRoot(target: IMSTNode): boolean {
     return getMST(target).isRoot
 }
 
@@ -341,7 +353,7 @@ export function isRoot(target: IMSTNode<any, any>): boolean {
  * @param {string} path - escaped json path
  * @returns {*}
  */
-export function resolve(target: IMSTNode<any, any>, path: string): IMSTNode<any, any> | any {
+export function resolve(target: IMSTNode, path: string): IMSTNode | any {
     const node = getMST(target).resolve(path)
     return node ? node.target : undefined
 }
@@ -354,7 +366,7 @@ export function resolve(target: IMSTNode<any, any>, path: string): IMSTNode<any,
  * @param {string} path
  * @returns {*}
  */
-export function tryResolve(target: IMSTNode<any, any>, path: string): IMSTNode<any, any> | any {
+export function tryResolve(target: IMSTNode, path: string): IMSTNode | any {
     const node = getMST(target).resolve(path, false)
     if (node === undefined)
         return undefined
@@ -369,7 +381,7 @@ export function tryResolve(target: IMSTNode<any, any>, path: string): IMSTNode<a
  * @param {T} source
  * @returns {T}
  */
-export function clone<T extends IMSTNode<any, any>>(source: T): T {
+export function clone<T extends IMSTNode>(source: T): T {
     const node = getMST(source)
     return node.type.create(node.snapshot) as T
 }
@@ -384,14 +396,15 @@ export function clone<T extends IMSTNode<any, any>>(source: T): T {
  * @param {any} thing
  * @returns {*}
  */
-export function _getNode(thing: IMSTNode<any, any>): any {
+// TODO: remove
+export function _getNode(thing: IMSTNode): any {
     return getMST(thing)
 }
 
 /**
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
-export function detach<T extends IMSTNode<any, any>>(thing: T): T {
+export function detach<T extends IMSTNode>(thing: T): T {
     getMST(thing).detach()
     return thing
 }
@@ -400,18 +413,19 @@ export function detach<T extends IMSTNode<any, any>>(thing: T): T {
 /**
  * Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
  */
-export function destroy(thing: IMSTNode<any, any>) {
+export function destroy(thing: IMSTNode) {
     const node = getMST(thing)
     node.detach()
     node.die()
 }
 
-export function testActions<S, T>(factory: IType<S, IMSTNode<S, T>>, initialState: S, ...actions: IActionCall[]): S {
-    const testInstance = factory.create(initialState)
+export function testActions<S, T>(factory: IType<S, IMSTNode>, initialState: S, ...actions: IActionCall[]): S {
+    const testInstance = factory.create(initialState) as T
     applyActions(testInstance, actions)
-    return getSnapshot(testInstance)
+    return getSnapshot(testInstance) as S
 }
 
+// TODO: remove?
 const appState = observable.shallowBox<any>(undefined)
 
 export function resetAppState() {

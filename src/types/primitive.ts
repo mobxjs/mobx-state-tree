@@ -1,5 +1,5 @@
 import {Type} from "../core/type"
-import {IType} from "../core/type"
+import {ISimpleType} from "../core/type"
 import {invariant, isPrimitive} from "../utils"
 
 export class PrimitiveType<T> extends Type<T, T> {
@@ -26,7 +26,7 @@ export class PrimitiveType<T> extends Type<T, T> {
 
 export type IPrimitive = string | boolean | number | Date
 
-export type IPrimitiveFactory<T extends IPrimitive> = IType<T, T>
+export type IPrimitiveFactory<T extends IPrimitive> = ISimpleType<T>
 
 export const primitiveFactory: IPrimitiveFactory<any> = new PrimitiveType("primitive")
 

@@ -1,4 +1,4 @@
-import {IType, Type} from "../core"
+import {ISimpleType, Type} from "../core"
 import {invariant, isPrimitive, fail} from "../utils"
 
 export class CoreType<T> extends Type<T, T> {
@@ -25,15 +25,15 @@ export class CoreType<T> extends Type<T, T> {
 }
 
 // tslint:disable-next-line:variable-name
-export const string: IType<string, string> = new CoreType<string>("string", (v: any) => typeof v === "string")
+export const string: ISimpleType<string> = new CoreType<string>("string", (v: any) => typeof v === "string")
 // tslint:disable-next-line:variable-name
-export const number: IType<number, number> = new CoreType<number>("number", (v: any) => typeof v === "number")
+export const number: ISimpleType<number> = new CoreType<number>("number", (v: any) => typeof v === "number")
 // tslint:disable-next-line:variable-name
-export const boolean: IType<boolean, boolean> = new CoreType<boolean>("boolean", (v: any) => typeof v === "boolean")
+export const boolean: ISimpleType<boolean> = new CoreType<boolean>("boolean", (v: any) => typeof v === "boolean")
 // tslint:disable-next-line:variable-name
-export const DatePrimitive: IType<Date, Date> = new CoreType<Date>("Date", (v: any) => v instanceof Date)
+export const DatePrimitive: ISimpleType<Date> = new CoreType<Date>("Date", (v: any) => v instanceof Date)
 
-export function getPrimitiveFactoryFromValue(value: any): IType<any, any> {
+export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     switch (typeof value) {
         case "string":
             return string

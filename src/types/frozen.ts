@@ -1,4 +1,4 @@
-import {IType, Type} from "../core"
+import { ISimpleType, Type } from "../core";
 import {invariant, isMutable, isSerializable, isPlainObject} from "../utils"
 
 function freeze(value: any) {
@@ -37,5 +37,4 @@ export class Frozen<T> extends Type<T, T> {
 
 }
 
-// TODO: improve typings?
-export const frozen: IType<any, any> = new Frozen()
+export const frozen: ISimpleType<any> = new Frozen()

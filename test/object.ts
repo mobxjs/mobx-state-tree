@@ -41,15 +41,15 @@ const createTestFactories = () => {
 // === FACTORY TESTS ===
 test("it should create a factory", (t) => {
     const {Factory} = createTestFactories()
-
-    t.deepEqual(getSnapshot(Factory.create()) as any, {to: 'world'})
+    const snapshot = getSnapshot(Factory.create())
+    t.deepEqual(snapshot, {to: 'world'})
     t.deepEqual(Factory.create().toString(), "AnonymousModel{\"to\":\"world\"}")
 })
 
 test("it should restore the state from the snapshot", (t) => {
     const {Factory} = createTestFactories()
 
-    t.deepEqual(Factory.create({to: 'universe'}).toJSON(), { to: 'universe' })
+    t.deepEqual(getSnapshot(Factory.create({to: 'universe'})), { to: 'universe' })
 })
 
 // === SNAPSHOT TESTS ===
@@ -71,14 +71,14 @@ test("it should apply snapshots", (t) => {
 
     applySnapshot(doc, {to: 'universe'})
 
-    t.deepEqual(doc.toJSON(), {to: 'universe'})
+    t.deepEqual(getSnapshot(doc), {to: 'universe'})
 })
 
 test("it should return a snapshot", (t) => {
     const {Factory} = createTestFactories()
     const doc = Factory.create()
 
-    t.deepEqual(getSnapshot<ITestSnapshot, ITest>(doc), {to: 'world'})
+    t.deepEqual(getSnapshot(doc), {to: 'world'})
 })
 
 // === PATCHES TESTS ===
@@ -102,7 +102,7 @@ test("it should apply a patch", (t) => {
 
     applyPatch(doc, {op: "replace", path: "/to", value: "universe"})
 
-    t.deepEqual(doc.toJSON(), {to: 'universe'})
+    t.deepEqual(getSnapshot(doc), {to: 'universe'})
 })
 
 test("it should apply patches", (t) => {
@@ -111,7 +111,7 @@ test("it should apply patches", (t) => {
 
     applyPatches(doc, [{op: "replace", path: "/to", value: "mars"}, {op: "replace", path: "/to", value: "universe"}])
 
-    t.deepEqual(doc.toJSON(), {to: 'universe'})
+    t.deepEqual(getSnapshot(doc), {to: 'universe'})
 })
 
 // === ACTIONS TESTS ===
@@ -121,7 +121,7 @@ test("it should call actions correctly", (t) => {
 
     doc.setTo('universe')
 
-    t.deepEqual(doc.toJSON(), {to: 'universe'})
+    t.deepEqual(getSnapshot(doc), {to: 'universe'})
 })
 
 test("it should emit action calls", (t) => {
@@ -142,7 +142,7 @@ test("it should apply action call", (t) => {
 
     applyAction(doc, {name: "setTo", path: "", args: ["universe"]})
 
-    t.deepEqual(doc.toJSON(), {to: 'universe'})
+    t.deepEqual(getSnapshot(doc), {to: 'universe'})
 })
 
 
@@ -152,7 +152,7 @@ test("it should apply actions calls", (t) => {
 
     applyActions(doc, [{name: "setTo", path: "", args: ["mars"]}, {name: "setTo", path: "", args: ["universe"]}])
 
-    t.deepEqual(doc.toJSON(), {to: 'universe'})
+    t.deepEqual(getSnapshot(doc), {to: 'universe'})
 })
 
 
@@ -221,7 +221,7 @@ test("it should compose factories", (t) => {
     const ComposedFactory = types.extend(BoxFactory, ColorFactory)
 
     // TODO: fix typecheck
-    t.deepEqual(ComposedFactory.create().toJSON() as any, {width: 0, height: 0, color: "#FFFFFF"})
+    t.deepEqual(getSnapshot(ComposedFactory.create()), {width: 0, height: 0, color: "#FFFFFF"})
 })
 
 

@@ -84,7 +84,7 @@ test("store emits correct patch paths", (t) => {
     const s = createStore();
     const recorder1 = recordPatches(s)
     const recorder2 = recordPatches(s.boxes)
-    const recorder3 = recordPatches(s.boxes.get("cc"))
+    const recorder3 = recordPatches(s.boxes.get("cc")!)
 
     s.arrows[0].from.x += 117
     t.deepEqual(recorder1.patches, [{ op: "replace", path: "/boxes/cc/x", value: 217 } as IJsonPatch])

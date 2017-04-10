@@ -29,14 +29,14 @@ export function reference<T>(factory: IType<any, T>, basePath?: string): any {
 function createGenericRelativeReference(factory: IType<any, any>): IReferenceDescription {
     return {
         isReference: true,
-        getter: function (this: IMSTNode<any, any>, identifier: IReference | null | undefined): any {
+        getter: function (this: IMSTNode, identifier: IReference | null | undefined): any {
             if (identifier === null || identifier === undefined)
                 return identifier
             // TODO: would be better to test as part of snapshot...
             invariant(typeof identifier.$ref === "string", "Expected a reference in the format `{ $ref: ... }`")
             return resolve(this, identifier.$ref)
         },
-        setter: function(this: IMSTNode<any, any>, value: IMSTNode<any, any>): IReference {
+        setter: function(this: IMSTNode, value: IMSTNode): IReference {
             if (value === null || value === undefined)
                 return value
             invariant(isMST(value), `Failed to assign a value to a reference; the value is not a model instance`)
@@ -56,7 +56,7 @@ function createReferenceWithBasePath(type: IType<any, any>, path: string): IRefe
 
     return {
         isReference: true,
-        getter: function (this: IMSTNode<any, any>, identifier: string | null | undefined): any {
+        getter: function (this: IMSTNode, identifier: string | null | undefined): any {
             if (identifier === null || identifier === undefined)
                 return identifier
             const targetCollection = resolve(this, `${path}`)
@@ -69,7 +69,7 @@ function createReferenceWithBasePath(type: IType<any, any>, path: string): IRefe
             } else
                 return fail("References with base paths should point to either an `array` or `map` collection")
         },
-        setter: function(this: IMSTNode<any, any>, value: IMSTNode<any, any>): string {
+        setter: function(this: IMSTNode, value: IMSTNode): string {
             if (value === null || value === undefined)
                 return value
             invariant(isMST(value), `Failed to assign a value to a reference; the value is not a model instance`)

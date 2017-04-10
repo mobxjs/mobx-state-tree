@@ -3,6 +3,8 @@ export function isType(value: any): value is IType<any, any> {
     return typeof value === "object" && value && value.isType === true
 }
 
+export interface ISnapshottable<S> {}
+
 export interface IType<S, T> {
     name: string
     is(thing: any): thing is S | T
@@ -13,7 +15,13 @@ export interface IType<S, T> {
     SnapshotType: S
 }
 
-export abstract class Type<S, T> implements IType<S, T> { // TODO: generic for config and state of target
+export interface ISimpleType<T> extends IType<T, T> { }
+
+export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IMSTNode> {
+
+}
+
+export abstract class Type<S, T> implements IType<S, T> {
     name: string
     isType = true
 
@@ -40,4 +48,5 @@ export function typecheck(type: IType<any, any>, snapshot: any) {
 }
 
 import {action} from "mobx"
-import {fail} from "../utils"
+import { fail } from "../utils"
+import { IMSTNode } from "./mst-node"
