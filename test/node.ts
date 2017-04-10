@@ -115,7 +115,10 @@ test("it should resolve parents", (t) => {
 
     t.is(getParent(row) === doc.rows, true) // array
     t.is(getParent(row, 2) === doc, true) // row
-    t.is(getParent(row, 3) === null, true)
+    t.throws(
+        () => getParent(row, 3),
+        "[mobx-state-tree] Failed to find a parent for '/rows/0 with depth 3"
+    )
 })
 
 // clone

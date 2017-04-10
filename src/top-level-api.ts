@@ -3,7 +3,7 @@ import { IModelType, Snapshot } from './types/object';
 import {runInAction, observable, IObservableArray, ObservableMap} from "mobx"
 import {getMST, ISnapshottable} from "./core"
 import {IJsonPatch} from "./core"
-import {IDisposer, invariant} from "./utils"
+import {IDisposer, invariant, fail} from "./utils"
 import {ISerializedActionCall, MSTAdminisration} from "./core"
 import {IType, IMSTNode} from "./core"
 
@@ -236,7 +236,14 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
  * @returns {boolean}
  */
 export function hasParent(target: IMSTNode, depth: number = 1): boolean {
-    return getParent(target, depth) !== null
+    invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
+    let parent: MSTAdminisration | null = getMST(target).parent
+    while (parent) {
+        if (--depth === 0)
+            return true
+        parent = parent.parent
+    }
+    return false
 }
 
 /**
@@ -250,17 +257,18 @@ export function hasParent(target: IMSTNode, depth: number = 1): boolean {
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent(target: IMSTNode, depth?: number): (any & IMSTNode) | null;
-export function getParent<T>(target: IMSTNode, depth?: number): (T & IMSTNode) | null;
-export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) | null {
+export function getParent(target: IMSTNode, depth?: number): (any & IMSTNode);
+export function getParent<T>(target: IMSTNode, depth?: number): (T & IMSTNode);
+export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) {
     invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
+    let d = depth
     let parent: MSTAdminisration | null = getMST(target).parent
     while (parent) {
-        if (--depth === 0)
-            return parent ? parent.target : null
+        if (--d === 0)
+            return parent.target
         parent = parent.parent
     }
-    return null
+    return fail(`Failed to find a parent for '${getPath(target)} with depth ${depth}`)
 }
 
 /**
