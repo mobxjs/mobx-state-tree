@@ -34,7 +34,7 @@
     "concurrently": "^3.1.0",
     "coveralls": "^2.11.4",
     "documentation": "^4.0.0-beta9",
-    "mobx": "^3.1.0",
+    "mobx": "^3.1.9",
     "nyc": "^10.0.0",
     "tape": "^4.6.0",
     "tslint": "^3.15.1",
