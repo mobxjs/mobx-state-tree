@@ -154,13 +154,14 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     describe() {
+        // TODO: make proptypes responsible
         // optimization: cache
         return "{ " + Object.keys(this.props).map(key => {
             const prop = this.props[key]
             return prop instanceof ValueProperty
                 ? key + ": " + prop.type.describe()
                 : prop instanceof IdentifierProperty
-                    ? key + ": identifier()"
+                    ? key + ": identifier"
                     : ""
         }).filter(Boolean).join("; ") + " }"
     }

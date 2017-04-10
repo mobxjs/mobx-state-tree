@@ -102,7 +102,7 @@ test("identifiers are required", (t) => {
     t.is(Todo.is({}), false)
     t.is(Todo.is({ id: "x" }), true)
 
-    t.throws(() => Todo.create(), "[mobx-state-tree] Value '{}' is not assignable to type: AnonymousModel. Expected { id: identifier() } instead.")
+    t.throws(() => Todo.create(), "[mobx-state-tree] Value '{}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ id: identifier }' instead.")
 })
 
 test("identifiers cannot be modified", (t) => {
@@ -112,5 +112,5 @@ test("identifiers cannot be modified", (t) => {
 
     const todo = Todo.create({ id: "x" })
     t.throws(() => todo.id = "stuff", "[mobx-state-tree] It is not allowed to change the identifier of an object, got: 'stuff'")
-    t.throws(() => applySnapshot(todo, {}), "[mobx-state-tree] Value '{}' is not assignable to type: AnonymousModel. Expected { id: identifier() } instead.")
+    t.throws(() => applySnapshot(todo, {}), "[mobx-state-tree] Value '{}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ id: identifier }' instead.")
 })

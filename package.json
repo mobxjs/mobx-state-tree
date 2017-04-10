@@ -30,9 +30,7 @@
     "mobx-state-tree.umd.js"
   ],
   "devDependencies": {
-    "@types/jest": "^16.0.2",
-    "@types/tape": "^4.2.28",
-    "ava": "^0.17.0",
+    "ava": "^0.19.0",
     "concurrently": "^3.1.0",
     "coveralls": "^2.11.4",
     "documentation": "^4.0.0-beta9",

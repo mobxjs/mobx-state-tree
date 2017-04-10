@@ -24,5 +24,5 @@ test("it should throw if value is not serializable", t => {
         doc.value = function IAmUnserializable(){}
     })
 
-    t.is(error.message, "[mobx-state-tree] Value 'function IAmUnserializable() {}' is not assignable to type: frozen. Expected frozen instead.")
+    t.is(error.message, "[mobx-state-tree] Value 'function IAmUnserializable() {}' is not assignable to type: frozen, expected an instance of frozen or a snapshot like '<any immutable value>' instead.")
 })

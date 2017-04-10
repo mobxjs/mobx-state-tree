@@ -174,7 +174,7 @@ test("it should throw if snapshot has computed properties", (t) => {
         const doc = ComputedFactory.create({area: 3})
     })
 
-    t.is(error.message, "[mobx-state-tree] Value '{\"area\":3}' is not assignable to type: AnonymousModel. Expected { width: number; height: number } instead.")
+    t.is(error.message, "[mobx-state-tree] Value '{\"area\":3}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ width: number; height: number }' instead.")
 })
 
 test("it should throw if a replaced object is read or written to", (t) => {

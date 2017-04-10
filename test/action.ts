@@ -103,7 +103,7 @@ test("it should not be possible to set the wrong type", t => {
         () => {
             store.orders[0].setCustomer(store.orders[0])
         }, // wrong type!
-        "[mobx-state-tree] Value of type Order: '{}' is not assignable to type: Customer. Expected { name: string } instead."
+        "[mobx-state-tree] Value of type Order: '{}' is not assignable to type: Customer, expected an instance of Customer or a snapshot like '{ name: string }' instead."
     )
 })
 

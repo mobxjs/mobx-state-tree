@@ -1,4 +1,4 @@
-import {ISimpleType, Type} from "../core"
+import {ISimpleType, Type} from "../core/type"
 import {invariant, isPrimitive, fail} from "../utils"
 
 export class CoreType<T> extends Type<T, T> {
@@ -46,4 +46,8 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
                 return DatePrimitive
     }
     return fail("Cannot determine primtive type from value " + value)
+}
+
+export function isPrimitiveType(type: any): type is CoreType<any> {
+    return type instanceof CoreType
 }

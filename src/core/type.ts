@@ -41,9 +41,20 @@ export abstract class Type<S, T> implements IType<S, T> {
 export function typecheck(type: IType<any, any>, value: any): void {
     if (!type.is(value)) {
         const currentTypename = maybeMST(value, node => ` of type ${node.type.name}:`, () => "")
-        fail(`Value${currentTypename} '${isSerializable(value) ? JSON.stringify(value) : value}' is not assignable to type: ${type.name}. Expected ${type.describe()} instead.`)
+        const isSnapshotCompatible = isMST(value) && type.is(getMST(value).snapshot)
+        fail(
+            `Value${currentTypename} '${isSerializable(value) ? JSON.stringify(value) : value}' is not assignable to type: ${type.name}` +
+            (isPrimitiveType(type) || (type instanceof DefaultValue && isPrimitiveType(type.type))
+                ? `.`
+                : (`, expected an instance of ${type.name} or a snapshot like '${type.describe()}' instead.` +
+                    (isSnapshotCompatible ? " (Note that a snapshot of the provided value is compatible with the targeted type)" : "")
+                )
+            )
+        )
     }
 }
 
 import { fail, isSerializable } from "../utils"
-import { IMSTNode, maybeMST } from "./mst-node"
+import { getMST, IMSTNode, isMST, maybeMST } from "./mst-node"
+import { isPrimitiveType } from "../types/core-types"
+import { DefaultValue } from "../types/with-default"

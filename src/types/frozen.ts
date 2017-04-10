@@ -22,7 +22,7 @@ export class Frozen<T> extends Type<T, T> {
     }
 
     describe() {
-        return "frozen"
+        return "<any immutable value>"
     }
 
     create(value: any) {

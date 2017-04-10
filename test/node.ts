@@ -15,7 +15,7 @@ test("it should resolve to the parent instance", (t) => {
     const row = Row.create()
     doc.rows.push(row)
 
-    t.deepEqual<any>(getParent(row), doc.rows)
+    t.deepEqual(getParent(row), doc.rows)
 })
 
 // hasParent
@@ -41,32 +41,9 @@ test("it should check for parent instance (unbound)", (t) => {
         article_id: 0
     })
 
-    const Document = types.model({
-        rows: types.array(Row)
-    })
-
-    const doc = Document.create()
     const row = Row.create()
 
     t.deepEqual(hasParent(row), false)
-})
-
-// hasParentObject
-test("it should resolve to the parent object instance", (t) => {
-    const Row = types.model({
-        article_id: 0
-    })
-
-    const Document = types.model({
-        rows: types.array(Row)
-    })
-
-    const doc = Document.create()
-    const row = Row.create()
-    doc.rows.push(row)
-
-    // TOOD: re-enable
-    // t.deepEqual(hasParentObject(row), true)
 })
 
 // getRoot

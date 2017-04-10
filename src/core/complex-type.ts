@@ -36,9 +36,8 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         if (!value || typeof value !== "object")
             return false
         if (isMST(value)) {
-            if (getType(value) === this)
-                return true
-            return this.isValidSnapshot(getMST(value).snapshot)
+            return getType(value) === this
+            // it is tempting to compare snapshots, but in that case we should always clone on assignments...
         }
         return this.isValidSnapshot(value)
     }
