@@ -1,6 +1,7 @@
 import { recordActions, types, getSnapshot, onAction } from "../"
 import { test } from "ava"
 
+declare var Buffer
 /// Simple action replay and invocation
 
 const Task = types.model({
