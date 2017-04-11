@@ -152,3 +152,8 @@ test("it should be possible to pass a complex plain object", t => {
     t.is(t2.done, true)
 })
 
+test("action should be bound", t => {
+    const task = Task.create()
+    const f = task.toggle
+    t.is(f(), true)
+})

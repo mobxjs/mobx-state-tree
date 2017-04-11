@@ -1,3 +1,7 @@
+# 0.3.2
+
+* Fix: actions where not bound automatically
+
 # 0.3.1
 
 * (re) introduced the concept of environments, which can be passed as second argument to `.create`, and picked up using `getEnv`
