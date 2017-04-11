@@ -1,6 +1,9 @@
 # 0.3.0
 
 * Removed `primitive` type, use a more specific type instead
+* Improved typescript typings of snapshots
+* Added `depth` parameter to `getParent` and `hasParent`
+* Separated the concepts of middleware and serializable actions. It is now possible to intercept, modify actions etc through `addMiddleWare`. `onAction` now uses middleware, if it is used, all parameters of actions should be serializable!
 
 # 0.2.2
 
