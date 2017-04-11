@@ -307,4 +307,6 @@ export class MSTAdminisration {
             this._isAlive = true
         }
     }
+
+    // TODO: give good toString, with type and path, and use it in errors
 }

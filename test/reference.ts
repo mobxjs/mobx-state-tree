@@ -1,5 +1,6 @@
-import { types, getSnapshot, applySnapshot } from "../"
+import { reaction } from "mobx"
 import { test } from "ava"
+import { types, getSnapshot, applySnapshot } from "../"
 
 
 test("it should support generic relative paths", t => {
@@ -113,4 +114,37 @@ test("identifiers cannot be modified", (t) => {
     const todo = Todo.create({ id: "x" })
     t.throws(() => todo.id = "stuff", "[mobx-state-tree] It is not allowed to change the identifier of an object, got: 'stuff'")
     t.throws(() => applySnapshot(todo, {}), "[mobx-state-tree] Value '{}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ id: identifier }' instead.")
+})
+
+// TODO: duplicate test for ref without path
+test("it should resolve refs during creation", t => {
+    const values: number[] = []
+    const Book = types.model({
+        id: types.identifier(),
+        price: types.number
+    })
+    const BookEntry = types.model({
+        book: types.reference(Book, "../../books"),
+        get price() {
+            return this.book.price * 2
+        }
+    })
+    const Store = types.model({
+        books: types.array(Book),
+        entries: types.array(BookEntry)
+    })
+
+    const s = Store.create({
+        books: [{ id: "3", price: 2 }]
+    })
+    reaction(
+        () => s.entries.reduce((a, e) => a + e.price, 0),
+        v => values.push(v)
+    )
+
+    s.entries.push({ book: s.books[0] } as any)
+    t.is(s.entries[0].price, 4)
+    t.is(s.entries.reduce((a, e) => a + e.price, 0), 4)
+
+    t.deepEqual(values, [4])
 })

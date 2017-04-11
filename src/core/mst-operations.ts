@@ -340,6 +340,7 @@ export function isRoot(target: IMSTNode): boolean {
  * @returns {*}
  */
 export function resolve(target: IMSTNode, path: string): IMSTNode | any {
+    // TODO: give better error messages!
     const node = getMSTAdministration(target).resolve(path)
     return node ? node.target : undefined
 }
