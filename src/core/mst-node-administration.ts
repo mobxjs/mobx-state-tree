@@ -3,18 +3,16 @@ import {
     computed, reaction,
     IReactionDisposer
 } from "mobx"
-
-import { typecheck, IType } from "./type"
-import { isMST, getMST, getPath } from "./mst-node"
-
-import {IMiddleWareHandler} from "./action"
+import { typecheck, IType } from "../types/type"
+import { isMST, getMSTAdministration } from "./mst-node"
+import { IMiddleWareHandler } from "./action"
 import {
     invariant, fail, extend,
     addHiddenFinalProp, IDisposer, registerEventHandler
 } from "../utils"
-import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
-import { ObjectType } from "../types/object"
-import { ComplexType } from "./complex-type"
+import { IJsonPatch, joinJsonPath, splitJsonPath } from "./json-patch"
+import { ObjectType } from "../types/complex-types/object"
+import { ComplexType } from "../types/complex-types/complex-type"
 
 export class MSTAdminisration {
     readonly target: any
@@ -181,15 +179,15 @@ export class MSTAdminisration {
         typecheck(childFactory, child)
 
         if (isMST(child)) {
-            const node = getMST(child)
+            const childNode = getMSTAdministration(child)
 
-            if (node.isRoot) {
+            if (childNode.isRoot) {
                 // we are adding a node with no parent (first insert in the tree)
-                node.setParent(this, subpath)
+                childNode.setParent(this, subpath)
                 return child
             }
 
-            return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${getPath(child)}'`)
+            return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${childNode.path}'`)
         }
         const existingNode = this.getChildMST(subpath)
         const newInstance = childFactory.create(child)
@@ -202,7 +200,7 @@ export class MSTAdminisration {
             if (existingNode)
                 existingNode.setParent(null) // TODO: or delete / remove / whatever is a more explicit clean up
             if (isMST(newInstance)) {
-                const node = getMST(newInstance)
+                const node = getMSTAdministration(newInstance)
                 node.setParent(this, subpath)
             }
             return newInstance

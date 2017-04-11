@@ -1,8 +1,8 @@
-import {isObservableArray, isObservableMap} from "mobx"
-import {resolve} from "../top-level-api"
-import {invariant, fail} from "../utils"
-import { getMST, getRelativePath, IType, isMST, IMSTNode, typecheck } from "../core"
-import { getIdentifierAttribute } from "./object"
+import { isObservableArray, isObservableMap } from "mobx"
+import { resolve, getMSTAdministration, getRelativePath, isMST, IMSTNode } from "../../core"
+import { invariant, fail } from "../../utils"
+import { getIdentifierAttribute } from "../complex-types/object"
+import { IType, typecheck } from "../type"
 
 export interface IReference {
     $ref: string
@@ -42,8 +42,8 @@ function createGenericRelativeReference(factory: IType<any, any>): IReferenceDes
                 return value
             invariant(isMST(value), `Failed to assign a value to a reference; the value is not a model instance`)
             typecheck(factory, value)
-            const base = getMST(this)
-            const target = getMST(value)
+            const base = getMSTAdministration(this)
+            const target = getMSTAdministration(value)
             invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
             return { $ref: getRelativePath(base, target) }
         }
@@ -75,8 +75,8 @@ function createReferenceWithBasePath(type: IType<any, any>, path: string): IRefe
                 return value
             invariant(isMST(value), `Failed to assign a value to a reference; the value is not a model instance`)
             invariant(type.is(value), `Failed to assign a value to a reference; the value is not a model of type ${type}`)
-            const base = getMST(this)
-            const target = getMST(value)
+            const base = getMSTAdministration(this)
+            const target = getMSTAdministration(value)
             invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
             const identifier = (value as any)[targetIdAttribute]
             const targetCollection = resolve(this, `${path}`)

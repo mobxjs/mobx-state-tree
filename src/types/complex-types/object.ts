@@ -1,19 +1,34 @@
-import { IdentifierProperty } from './property-types/identifier-property';
-import { action, isAction, extendShallowObservable, IObjectChange, IObjectWillChange, IAction, intercept, observe } from "mobx"
-import { nothing, extend as extendObject, invariant, fail, identity, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
-import { MSTAdminisration, maybeMST } from "../core"
-import { isReferenceFactory } from "./reference"
-import { isIdentifierFactory } from "./identifier"
-import { ComplexType, getType, IMSTNode, isType, IType, getMST, IComplexType } from '../core';
-import { createDefaultValueFactory } from "./with-default"
-import { Property } from "./property-types/property"
-import { TransformedProperty } from "./property-types/transformed-property"
-import { ComputedProperty } from "./property-types/computed-property"
-import { ValueProperty } from "./property-types/value-property"
-import { ActionProperty } from "./property-types/action-property"
-import { getSnapshot } from "../top-level-api"
-import { IJsonPatch } from "../index";
-import { getPrimitiveFactoryFromValue } from "./core-types";
+import {
+    action,
+    extendShallowObservable,
+    IObjectChange,
+    IObjectWillChange,
+    IAction,
+    intercept,
+    observe
+} from "mobx"
+import {
+    nothing,
+    extend as extendObject,
+    invariant,
+    fail, identity,
+    isPrimitive,
+    hasOwnProperty,
+    isPlainObject
+} from "../../utils"
+import { MSTAdminisration, maybeMST, getType, IMSTNode, getMSTAdministration, getSnapshot,IJsonPatch } from "../../core"
+import { IType, IComplexType, isType } from "../type"
+import { ComplexType } from "./complex-type"
+import { getPrimitiveFactoryFromValue } from "../primitives"
+import { createDefaultValueFactory } from "../utility-types/with-default"
+import { isReferenceFactory } from "../utility-types/reference"
+import { isIdentifierFactory } from "../utility-types/identifier"
+import { Property } from "../property-types/property"
+import { IdentifierProperty } from "../property-types/identifier-property"
+import { TransformedProperty } from "../property-types/transformed-property"
+import { ComputedProperty } from "../property-types/computed-property"
+import { ValueProperty } from "../property-types/value-property"
+import { ActionProperty } from "../property-types/action-property"
 
 export class ObjectType extends ComplexType<any, any> {
     isObjectFactory = true
@@ -60,7 +75,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     willChange = (change: IObjectWillChange): IObjectWillChange | null => {
-        const node = getMST(change.object)
+        const node = getMSTAdministration(change.object)
         node.assertWritable()
 
         return this.props[change.name].willChange(change)

@@ -1,3 +1,7 @@
+# 0.3.0
+
+* Removed `primitive` type, use a more specific type instead
+
 # 0.2.2
 
 * Introduced the concept of livelyness; if nodes are removed from the the tree because they are replaced by some other value, they will be marked as "died". This should help to early signal when people hold on to references that are not part of the tree anymore. To explicitly remove an node from a tree, with the intent to spawn a new state tree from it, use `detach`.

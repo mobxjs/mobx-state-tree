@@ -1,5 +1,5 @@
-import {ISimpleType, Type} from "../core/type"
-import {invariant, isPrimitive, fail} from "../utils"
+import { ISimpleType, Type } from "./type"
+import { invariant, isPrimitive, fail } from "../utils"
 
 export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean

@@ -1,13 +1,10 @@
-import { IRawActionCall, applyAction, onAction } from './core/action';
-import { IModelType, Snapshot } from './types/object';
-import {runInAction, observable, IObservableArray, ObservableMap} from "mobx"
-import {getMST, ISnapshottable} from "./core"
-import {IJsonPatch} from "./core"
-import {IDisposer, invariant, fail} from "./utils"
-import {ISerializedActionCall, MSTAdminisration} from "./core"
-import {IType, IMSTNode} from "./core"
-
-export { onAction, applyAction }
+import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
+import { runInAction, IObservableArray, ObservableMap } from "mobx"
+import { getMSTAdministration, IMSTNode } from "./mst-node"
+import { MSTAdminisration } from "./mst-node-administration"
+import { IJsonPatch, joinJsonPath } from "./json-patch"
+import { IDisposer, invariant, fail } from "../utils"
+import { ISnapshottable, IType } from "../types/type"
 
 /**
  * TODO: update docs
@@ -52,7 +49,7 @@ export { onAction, applyAction }
  * @returns {IDisposer} function to remove the middleware
  */
 export function addMiddleware(target: IMSTNode, middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any): IDisposer {
-    const node = getMST(target)
+    const node = getMSTAdministration(target)
     if (!node.isProtected)
         console.warn("It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`")
     return node.addMiddleWare(middleware)
@@ -69,7 +66,7 @@ export function addMiddleware(target: IMSTNode, middleware: (action: IRawActionC
  * @returns {IDisposer} function to remove the listener
  */
 export function onPatch(target: IMSTNode, callback: (patch: IJsonPatch) => void): IDisposer {
-    return getMST(target).onPatch(callback)
+    return getMSTAdministration(target).onPatch(callback)
 }
 
 /**
@@ -85,7 +82,7 @@ export function onSnapshot<S>(target: ObservableMap<S>, callback: (snapshot: { [
 export function onSnapshot<S>(target: IObservableArray<S>, callback: (snapshot: S[]) => void): IDisposer;
 export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer;
 export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer {
-    return getMST(target).onSnapshot(callback)
+    return getMSTAdministration(target).onSnapshot(callback)
 }
 
 /**
@@ -97,7 +94,7 @@ export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S)
  * @returns
  */
 export function applyPatch(target: IMSTNode, patch: IJsonPatch) {
-    return getMST(target).applyPatch(patch)
+    return getMSTAdministration(target).applyPatch(patch)
 }
 
 /**
@@ -108,7 +105,7 @@ export function applyPatch(target: IMSTNode, patch: IJsonPatch) {
  * @param {IJsonPatch[]} patches
  */
 export function applyPatches(target: IMSTNode, patches: IJsonPatch[]) {
-    const node = getMST(target)
+    const node = getMSTAdministration(target)
     runInAction(() => {
         patches.forEach(p => node.applyPatch(p))
     })
@@ -189,16 +186,15 @@ export function recordActions(subject: IMSTNode): IActionRecorder {
  * todo.toggle() // OK
  */
 export function protect(target: IMSTNode) {
-    getMST(target).protect()
+    getMSTAdministration(target).protect()
 }
 
 /**
  * Returns true if the object is in protected mode, @see protect
  */
 export function isProtected(target: IMSTNode): boolean {
-    return getMST(target).isProtected
+    return getMSTAdministration(target).isProtected
 }
-
 
 /**
  * Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
@@ -209,7 +205,7 @@ export function isProtected(target: IMSTNode): boolean {
  * @returns
  */
 export function applySnapshot<S, T>(target: IMSTNode, snapshot: S) {
-    return getMST(target).applySnapshot(snapshot)
+    return getMSTAdministration(target).applySnapshot(snapshot)
 }
 
 /**
@@ -224,7 +220,7 @@ export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S };
 export function getSnapshot<S>(target: IObservableArray<S>): S[];
 export function getSnapshot<S>(target: ISnapshottable<S>): S;
 export function getSnapshot<S>(target: ISnapshottable<S>): S {
-    return getMST(target).snapshot
+    return getMSTAdministration(target).snapshot
 }
 
 /**
@@ -237,7 +233,7 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
  */
 export function hasParent(target: IMSTNode, depth: number = 1): boolean {
     invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
-    let parent: MSTAdminisration | null = getMST(target).parent
+    let parent: MSTAdminisration | null = getMSTAdministration(target).parent
     while (parent) {
         if (--depth === 0)
             return true
@@ -262,7 +258,7 @@ export function getParent<T>(target: IMSTNode, depth?: number): (T & IMSTNode);
 export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) {
     invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
     let d = depth
-    let parent: MSTAdminisration | null = getMST(target).parent
+    let parent: MSTAdminisration | null = getMSTAdministration(target).parent
     while (parent) {
         if (--d === 0)
             return parent.target
@@ -281,7 +277,7 @@ export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) {
 export function getRoot(target: IMSTNode): any & IMSTNode;
 export function getRoot<T>(target: IMSTNode): T & IMSTNode;
 export function getRoot(target: IMSTNode): IMSTNode {
-    return getMST(target).root.target
+    return getMSTAdministration(target).root.target
 }
 
 /**
@@ -292,7 +288,7 @@ export function getRoot(target: IMSTNode): IMSTNode {
  * @returns {string}
  */
 export function getPath(target: IMSTNode): string {
-    return getMST(target).path
+    return getMSTAdministration(target).path
 }
 
 /**
@@ -303,7 +299,25 @@ export function getPath(target: IMSTNode): string {
  * @returns {string[]}
  */
 export function getPathParts(target: IMSTNode): string[] {
-    return getMST(target).pathParts
+    return getMSTAdministration(target).pathParts
+}
+
+export function getRelativePath(base: MSTAdminisration, target: MSTAdminisration): string {
+    // PRE condition target is (a child of) base!
+    invariant(
+        base.root === target.root,
+        `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
+    )
+    const baseParts = base.pathParts
+    const targetParts = target.pathParts
+    let common = 0
+    for (; common < baseParts.length; common++) {
+        if (baseParts[common] !== targetParts[common])
+            break
+    }
+    // TODO: assert that no targetParts paths are "..", "." or ""!
+    return baseParts.slice(common).map(_ => "..").join("/")
+        + joinJsonPath(targetParts.slice(common))
 }
 
 /**
@@ -314,7 +328,7 @@ export function getPathParts(target: IMSTNode): string[] {
  * @returns {boolean}
  */
 export function isRoot(target: IMSTNode): boolean {
-    return getMST(target).isRoot
+    return getMSTAdministration(target).isRoot
 }
 
 /**
@@ -326,7 +340,7 @@ export function isRoot(target: IMSTNode): boolean {
  * @returns {*}
  */
 export function resolve(target: IMSTNode, path: string): IMSTNode | any {
-    const node = getMST(target).resolve(path)
+    const node = getMSTAdministration(target).resolve(path)
     return node ? node.target : undefined
 }
 
@@ -339,7 +353,7 @@ export function resolve(target: IMSTNode, path: string): IMSTNode | any {
  * @returns {*}
  */
 export function tryResolve(target: IMSTNode, path: string): IMSTNode | any {
-    const node = getMST(target).resolve(path, false)
+    const node = getMSTAdministration(target).resolve(path, false)
     if (node === undefined)
         return undefined
     return node ? node.target : undefined
@@ -354,7 +368,7 @@ export function tryResolve(target: IMSTNode, path: string): IMSTNode | any {
  * @returns {T}
  */
 export function clone<T extends IMSTNode>(source: T): T {
-    const node = getMST(source)
+    const node = getMSTAdministration(source)
     return node.type.create(node.snapshot) as T
 }
 
@@ -362,7 +376,7 @@ export function clone<T extends IMSTNode>(source: T): T {
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
 export function detach<T extends IMSTNode>(thing: T): T {
-    getMST(thing).detach()
+    getMSTAdministration(thing).detach()
     return thing
 }
 
@@ -370,7 +384,7 @@ export function detach<T extends IMSTNode>(thing: T): T {
  * Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
  */
 export function destroy(thing: IMSTNode) {
-    const node = getMST(thing)
+    const node = getMSTAdministration(thing)
     node.detach()
     node.die()
 }

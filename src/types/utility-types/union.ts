@@ -1,6 +1,5 @@
-import {isType, IType} from "../core/type"
-import {invariant, fail} from "../utils"
-import {Type} from "../core/type"
+import {isType, IType, Type} from "../type"
+import {invariant, fail} from "../../utils"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 

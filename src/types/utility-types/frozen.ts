@@ -1,5 +1,5 @@
-import { ISimpleType, Type } from "../core";
-import {invariant, isMutable, isSerializable, isPlainObject} from "../utils"
+import { ISimpleType, Type } from "../type"
+import { invariant, isMutable, isSerializable, isPlainObject } from "../../utils"
 
 function freeze(value: any) {
     Object.freeze(value)

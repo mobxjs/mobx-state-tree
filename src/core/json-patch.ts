@@ -7,7 +7,6 @@ export type IJsonPatch = {
     value?: any
 }
 
-
 /**
  * escape slashes and backslashes
  * http://tools.ietf.org/html/rfc6901

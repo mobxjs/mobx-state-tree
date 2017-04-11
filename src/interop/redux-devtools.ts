@@ -1,5 +1,6 @@
-import {getSnapshot, onAction, applySnapshot} from "../top-level-api"
-import {ISerializedActionCall} from "../core"
+import { getSnapshot, applySnapshot } from "../core/mst-operations"
+import { onAction } from "../core/action"
+import { ISerializedActionCall } from "../core"
 
 // TODO: package should not be dependent on remotedev...
 declare var require: any

@@ -1,4 +1,4 @@
-import {Type, IType} from "../core/type"
+import {Type, IType} from "../type"
 
 export class DefaultValue<S, T> extends Type<S, T> {
     readonly type: IType<S, T>
@@ -30,10 +30,10 @@ export class DefaultValue<S, T> extends Type<S, T> {
 export function createDefaultValueFactory<T>(type: IType<T, T>, defaultValueOrNode: T): IType<T, T>;
 export function createDefaultValueFactory<S, T>(type: IType<S, T>, defaultValueOrNode: S): IType<S, T>;
 export function createDefaultValueFactory(type: IType<any, any>, defaultValueOrNode: any): IType<any, any> {
-    const defaultValue = isMST(defaultValueOrNode) ? getMST(defaultValueOrNode).snapshot : defaultValueOrNode
+    const defaultValue = isMST(defaultValueOrNode) ? getMSTAdministration(defaultValueOrNode).snapshot : defaultValueOrNode
     invariant(type.is(defaultValue), `Default value ${JSON.stringify(defaultValue)} is not assignable to type ${type.name}. Expected ${JSON.stringify(type.describe())}`)
     return new DefaultValue(type, defaultValue)
 }
 
-import {isMST, getMST} from "../core/mst-node"
-import {invariant} from "../utils"
+import {isMST, getMSTAdministration} from "../../core/mst-node"
+import {invariant} from "../../utils"

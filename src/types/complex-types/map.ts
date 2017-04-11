@@ -1,10 +1,10 @@
-import { createDefaultValueFactory } from './with-default';
-import { getIdentifierAttribute } from './object';
-import {observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe} from "mobx"
-import { isType, IType, IComplexType, IMSTNode, getMST, isMST, maybeMST, MSTAdminisration, valueToSnapshot, ComplexType } from '../core';
-import {} from "../core"
-import {identity, isPlainObject, nothing, isPrimitive, invariant, fail} from "../utils"
-import {escapeJsonPath, IJsonPatch} from "../core/json-patch"
+import { createDefaultValueFactory } from "../utility-types/with-default"
+import { getIdentifierAttribute } from "./object"
+import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
+import { getMSTAdministration, maybeMST, MSTAdminisration, valueToSnapshot, escapeJsonPath, IJsonPatch } from "../../core"
+import { identity, isPlainObject, nothing, isPrimitive, invariant, fail } from "../../utils"
+import { IType, IComplexType, isType } from "../type"
+import { ComplexType } from "./complex-type"
 
 interface IMapFactoryConfig {
     isMapFactory: true
@@ -44,13 +44,13 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
         intercept(instance, this.willChange as any)
         observe(instance, this.didChange)
-        getMST(instance).applySnapshot(snapshot)
+        getMSTAdministration(instance).applySnapshot(snapshot)
     }
 
     getChildMSTs(node: MSTAdminisration): [string, MSTAdminisration][] {
         const res: [string, MSTAdminisration][] = []
         ; (node.target as ObservableMap<any>).forEach((value: any, key: string) => {
-            maybeMST(value, node => { res.push([key, node])})
+            maybeMST(value, childNode => { res.push([key, childNode])})
         })
         return res
     }
@@ -63,7 +63,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
-        const node = getMST(change.object)
+        const node = getMSTAdministration(change.object)
         node.assertWritable()
 
         const identifierAttr = getIdentifierAttribute(node)
@@ -106,7 +106,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     didChange(change: IMapChange<any>): void {
-        const node = getMST(change.object)
+        const node = getMSTAdministration(change.object)
         switch (change.type) {
             case "update":
             case "add":

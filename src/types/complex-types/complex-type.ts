@@ -1,5 +1,5 @@
 import { action } from "mobx"
-import { IType, Type, typecheck } from "./type"
+import { IType, Type, typecheck } from "../type"
 
 /**
  * A complex type produces a MST node (Node in the state tree)
@@ -43,6 +43,6 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     }
 }
 
-import { IMSTNode, isMST, getType, getMST } from "./mst-node"
-import { MSTAdminisration } from "./mst-node-administration"
-import { IJsonPatch } from "./json-patch"
+import { IMSTNode, isMST, getType } from "../../core/mst-node"
+import { MSTAdminisration } from "../../core/mst-node-administration"
+import { IJsonPatch } from "../../core/json-patch"

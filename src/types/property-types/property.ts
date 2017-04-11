@@ -1,4 +1,4 @@
-import { IMSTNode } from '../../core/';
+import { IMSTNode } from "../../core/"
 import { IObjectChange, IObjectWillChange } from "mobx"
 
 export abstract class Property {

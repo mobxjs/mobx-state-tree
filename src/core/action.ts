@@ -49,7 +49,7 @@ export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
 
     const actionInvoker = function () {
-        const adm = getMST(this)
+        const adm = getMSTAdministration(this)
         adm.assertAlive()
         if (adm.isRunningAction()) {
             // an action is already running in this tree, invoking this action does not emit a new action
@@ -80,11 +80,11 @@ function serializeArgument(adm: MSTAdminisration, actionName: string, index: num
     if (isPrimitive(arg))
         return arg
     if (isMST(arg)) {
-        const targetNode = getMST(arg)
+        const targetNode = getMSTAdministration(arg)
         if (adm.root !== targetNode.root)
             throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
         return ({
-            $ref: getRelativePath(adm, getMST(arg))
+            $ref: getRelativePath(adm, getMSTAdministration(arg))
         })
     }
     if (typeof arg === "function")
@@ -126,7 +126,7 @@ export function applyAction(target: IMSTNode, action: ISerializedActionCall): an
     const resolvedTarget = tryResolve(target, action.path || "")
     if (!resolvedTarget)
         return fail(`Invalid action path: ${action.path || ""}`)
-    const node = getMST(resolvedTarget)
+    const node = getMSTAdministration(resolvedTarget)
     invariant(typeof resolvedTarget[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
@@ -136,17 +136,17 @@ export function applyAction(target: IMSTNode, action: ISerializedActionCall): an
 
 export function onAction(target: IMSTNode, listener: (call: ISerializedActionCall) => void): IDisposer {
     return addMiddleware(target, (rawCall, next) => {
-        const sourceNode = getMST(rawCall.object)
+        const sourceNode = getMSTAdministration(rawCall.object)
         listener({
             name: rawCall.name,
-            path: getRelativePath(getMST(target), sourceNode),
-            args: rawCall.args.map((arg, index) => serializeArgument(sourceNode, rawCall.name, index, arg))
+            path: getRelativePath(getMSTAdministration(target), sourceNode),
+            args: rawCall.args.map((arg: any, index: number) => serializeArgument(sourceNode, rawCall.name, index, arg))
         })
         return next(rawCall)
     })
 }
 
-import { getMST, getRelativePath, IMSTNode, isMST } from "./mst-node"
-import {MSTAdminisration} from "./mst-node-administration"
-import { resolve, tryResolve, addMiddleware } from "../top-level-api"
-import {fail, invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer} from "../utils"
+import { getMSTAdministration, IMSTNode, isMST } from "./mst-node"
+import { MSTAdminisration } from "./mst-node-administration"
+import { resolve, tryResolve, addMiddleware, getRelativePath } from "./mst-operations"
+import { fail, invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"

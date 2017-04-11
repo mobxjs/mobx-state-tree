@@ -1,6 +1,7 @@
-import {isMST, IRawActionCall} from "../core"
-import {onSnapshot, getSnapshot, applyAction} from "../top-level-api"
-import {invariant, extend, fail} from "../utils"
+import { isMST, IRawActionCall } from "../core"
+import { getSnapshot, applySnapshot, onSnapshot } from "../core/mst-operations"
+import { applyAction } from "../core/action"
+import { invariant, extend, fail } from "../utils"
 
 export interface IMiddleWareApi {
     getState: () => any
