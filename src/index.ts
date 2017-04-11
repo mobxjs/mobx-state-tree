@@ -1,6 +1,6 @@
 // Fix some circular deps:
-import "./core/type"
-import "./core/complex-type"
+import "./types/type"
+import "./types/complex-types/complex-type"
 
 export {
     types
