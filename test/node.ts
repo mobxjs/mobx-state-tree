@@ -15,7 +15,7 @@ test("it should resolve to the parent instance", (t) => {
     const row = Row.create()
     doc.rows.push(row)
 
-    t.deepEqual<any>(getParent(row), doc.rows)
+    t.deepEqual(getParent(row), doc.rows)
 })
 
 // hasParent
@@ -41,32 +41,9 @@ test("it should check for parent instance (unbound)", (t) => {
         article_id: 0
     })
 
-    const Document = types.model({
-        rows: types.array(Row)
-    })
-
-    const doc = Document.create()
     const row = Row.create()
 
     t.deepEqual(hasParent(row), false)
-})
-
-// hasParentObject
-test("it should resolve to the parent object instance", (t) => {
-    const Row = types.model({
-        article_id: 0
-    })
-
-    const Document = types.model({
-        rows: types.array(Row)
-    })
-
-    const doc = Document.create()
-    const row = Row.create()
-    doc.rows.push(row)
-
-    // TOOD: re-enable
-    // t.deepEqual(hasParentObject(row), true)
 })
 
 // getRoot
@@ -119,6 +96,31 @@ test("it should resolve the path of an object", (t) => {
     t.deepEqual(getPathParts(row), ["rows", "0"])
 })
 
+test("it should resolve parents", (t) => {
+    const Row = types.model({
+        article_id: 0
+    })
+
+    const Document = types.model({
+        rows: types.array(Row)
+    })
+
+    const doc = Document.create()
+    const row = Row.create()
+    doc.rows.push(row)
+
+    t.is(hasParent(row), true) // array
+    t.is(hasParent(row, 2), true) // row
+    t.is(hasParent(row, 3), false)
+
+    t.is(getParent(row) === doc.rows, true) // array
+    t.is(getParent(row, 2) === doc, true) // row
+    t.throws(
+        () => getParent(row, 3),
+        "[mobx-state-tree] Failed to find a parent for '/rows/0 with depth 3"
+    )
+})
+
 // clone
 test("it should clone a node", (t) => {
     const Row = types.model({
@@ -162,8 +164,7 @@ test("it should return the child model factory", (t) => {
 
     const doc = Document.create()
 
-    // TODO: any because of #19
-    t.deepEqual<any>(getChildType(doc, 'rows'), ArrayOfRow)
+    t.deepEqual(getChildType(doc, 'rows'), ArrayOfRow)
 })
 
 test("a node can exists only once in a tree", (t) => {

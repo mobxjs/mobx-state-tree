@@ -1,19 +1,21 @@
 // Fix some circular deps:
-import "./core/type"
-import "./core/complex-type"
+import "./types/type"
+import "./types/complex-types/complex-type"
 
 export {
-    IMSTNode,
+    types
+} from "./types"
+
+export * from "./core/mst-operations"
+export * from "./core/json-patch"
+
+export {
     isMST,
-    IType,
-    isType,
     getType,
     getChildType,
-    Type,
-    ComplexType,
-    IActionCall
+    onAction,
+    applyAction
 } from "./core"
-export * from "./core/json-patch"
 
 export {
     asReduxStore,
@@ -23,9 +25,3 @@ export {
 export {
     connectReduxDevtools
 } from "./interop/redux-devtools"
-
-export {
-    types
-} from "./types/index"
-
-export * from "./top-level-api"

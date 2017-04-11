@@ -1,5 +1,5 @@
-import {ISimpleType, Type} from "../core"
-import {invariant, isPrimitive, fail} from "../utils"
+import { ISimpleType, Type } from "./type"
+import { invariant, isPrimitive, fail } from "../utils"
 
 export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean
@@ -46,4 +46,8 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
                 return DatePrimitive
     }
     return fail("Cannot determine primtive type from value " + value)
+}
+
+export function isPrimitiveType(type: any): type is CoreType<any> {
+    return type instanceof CoreType
 }

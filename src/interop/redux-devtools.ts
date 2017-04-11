@@ -1,6 +1,9 @@
-import {getSnapshot, onAction, applySnapshot} from "../top-level-api"
-import {IActionCall} from "../core"
+import { getSnapshot, applySnapshot } from "../core/mst-operations"
+import { onAction } from "../core/action"
+import { ISerializedActionCall } from "../core"
 
+// TODO: package should not be dependent on remotedev...
+declare var require: any
 const { connectViaExtension, extractState } = require("remotedev")
 
 export function connectReduxDevtools(model: any) {
@@ -20,8 +23,7 @@ export function connectReduxDevtools(model: any) {
     })
 
     // Send changes to the remote monitor
-    onAction(model, (action: IActionCall, next) => {
-        next()
+    onAction(model, (action: ISerializedActionCall) => {
         if (applyingSnapshot)
             return
         const copy: any = {}

@@ -1,13 +1,13 @@
-import { IModelType, Snapshot } from './types/object';
-import {runInAction, observable, IObservableArray, ObservableMap} from "mobx"
-import {getMST, ISnapshottable} from "./core"
-import {IJsonPatch} from "./core"
-import {IDisposer, invariant} from "./utils"
-import {IActionCall} from "./core"
-import {IType, IMSTNode} from "./core"
-
+import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
+import { runInAction, IObservableArray, ObservableMap } from "mobx"
+import { getMSTAdministration, IMSTNode } from "./mst-node"
+import { MSTAdminisration } from "./mst-node-administration"
+import { IJsonPatch, joinJsonPath } from "./json-patch"
+import { IDisposer, invariant, fail } from "../utils"
+import { ISnapshottable, IType } from "../types/type"
 
 /**
+ * TODO: update docs
  * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
  * Will only be invoked on 'root' actions, not on actions called from existing actions.
  *
@@ -48,11 +48,11 @@ import {IType, IMSTNode} from "./core"
  * @param {(action: IActionCall, next: () => void) => void} callback the middleware that should be invoked whenever an action is triggered.
  * @returns {IDisposer} function to remove the middleware
  */
-export function onAction(target: IMSTNode, callback: (action: IActionCall, next: () => void) => void): IDisposer {
-    const node = getMST(target)
+export function addMiddleware(target: IMSTNode, middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any): IDisposer {
+    const node = getMSTAdministration(target)
     if (!node.isProtected)
         console.warn("It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`")
-    return node.onAction(callback)
+    return node.addMiddleWare(middleware)
 }
 
 /**
@@ -66,7 +66,7 @@ export function onAction(target: IMSTNode, callback: (action: IActionCall, next:
  * @returns {IDisposer} function to remove the listener
  */
 export function onPatch(target: IMSTNode, callback: (patch: IJsonPatch) => void): IDisposer {
-    return getMST(target).onPatch(callback)
+    return getMSTAdministration(target).onPatch(callback)
 }
 
 /**
@@ -82,7 +82,7 @@ export function onSnapshot<S>(target: ObservableMap<S>, callback: (snapshot: { [
 export function onSnapshot<S>(target: IObservableArray<S>, callback: (snapshot: S[]) => void): IDisposer;
 export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer;
 export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer {
-    return getMST(target).onSnapshot(callback)
+    return getMSTAdministration(target).onSnapshot(callback)
 }
 
 /**
@@ -94,7 +94,7 @@ export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S)
  * @returns
  */
 export function applyPatch(target: IMSTNode, patch: IJsonPatch) {
-    return getMST(target).applyPatch(patch)
+    return getMSTAdministration(target).applyPatch(patch)
 }
 
 /**
@@ -105,7 +105,7 @@ export function applyPatch(target: IMSTNode, patch: IJsonPatch) {
  * @param {IJsonPatch[]} patches
  */
 export function applyPatches(target: IMSTNode, patches: IJsonPatch[]) {
-    const node = getMST(target)
+    const node = getMSTAdministration(target)
     runInAction(() => {
         patches.forEach(p => node.applyPatch(p))
     })
@@ -132,20 +132,6 @@ export function recordPatches(subject: IMSTNode): IPatchRecorder {
 }
 
 /**
- * Dispatches an Action on a model instance. All middlewares will be triggered.
- * Returns the value of the last actoin
- *
- * @export
- * @param {Object} target
- * @param {IActionCall} action
- * @param {IActionCallOptions} [options]
- * @returns
- */
-export function applyAction(target: IMSTNode, action: IActionCall): any {
-    return getMST(target).applyAction(action)
-}
-
-/**
  * Applies a series of actions in a single MobX transaction.
  *
  * Does not return any value
@@ -155,31 +141,27 @@ export function applyAction(target: IMSTNode, action: IActionCall): any {
  * @param {IActionCall[]} actions
  * @param {IActionCallOptions} [options]
  */
-export function applyActions(target: IMSTNode, actions: IActionCall[]): void {
-    const node = getMST(target)
+export function applyActions(target: IMSTNode, actions: ISerializedActionCall[]): void {
     runInAction(() => {
-        actions.forEach(action => node.applyAction(action))
+        actions.forEach(action => applyAction(target, action))
     })
 }
 
 export interface IActionRecorder {
-    actions: IActionCall[]
+    actions: ISerializedActionCall[]
     stop(): any
     replay(target: IMSTNode): any
 }
 
 export function recordActions(subject: IMSTNode): IActionRecorder {
     let recorder = {
-        actions: [] as IActionCall[],
+        actions: [] as ISerializedActionCall[],
         stop: () => disposer(),
         replay: (target: IMSTNode) => {
             applyActions(target, recorder.actions)
         }
     }
-    let disposer = onAction(subject, (action, next) => {
-        recorder.actions.push(action)
-        return next()
-    })
+    let disposer = onAction(subject, recorder.actions.push.bind(recorder.actions))
     return recorder
 }
 
@@ -204,16 +186,15 @@ export function recordActions(subject: IMSTNode): IActionRecorder {
  * todo.toggle() // OK
  */
 export function protect(target: IMSTNode) {
-    getMST(target).protect()
+    getMSTAdministration(target).protect()
 }
 
 /**
  * Returns true if the object is in protected mode, @see protect
  */
 export function isProtected(target: IMSTNode): boolean {
-    return getMST(target).isProtected
+    return getMSTAdministration(target).isProtected
 }
-
 
 /**
  * Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
@@ -224,7 +205,7 @@ export function isProtected(target: IMSTNode): boolean {
  * @returns
  */
 export function applySnapshot<S, T>(target: IMSTNode, snapshot: S) {
-    return getMST(target).applySnapshot(snapshot)
+    return getMSTAdministration(target).applySnapshot(snapshot)
 }
 
 /**
@@ -239,7 +220,7 @@ export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S };
 export function getSnapshot<S>(target: IObservableArray<S>): S[];
 export function getSnapshot<S>(target: ISnapshottable<S>): S;
 export function getSnapshot<S>(target: ISnapshottable<S>): S {
-    return getMST(target).snapshot
+    return getMSTAdministration(target).snapshot
 }
 
 /**
@@ -247,57 +228,44 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
  *
  * @export
  * @param {Object} target
- * @param {boolean} [strict=false]
+ * @param {number} depth = 1, how far should we look upward?
  * @returns {boolean}
  */
-export function hasParent(target: IMSTNode, strict: boolean = false): boolean {
-    return getParent(target, strict) !== null
+export function hasParent(target: IMSTNode, depth: number = 1): boolean {
+    invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
+    let parent: MSTAdminisration | null = getMSTAdministration(target).parent
+    while (parent) {
+        if (--depth === 0)
+            return true
+        parent = parent.parent
+    }
+    return false
 }
 
 /**
- * TODO:
- * Given a model instance, returns `true` if the object has same parent, which is a model object, that is, not an
- * map or array.
+ * Returns the immediate parent of this object, or null.
+ *
+ * Note that the immediate parent can be either an object, map or array, and
+ * doesn't necessarily refer to the parent model
  *
  * @export
  * @param {Object} target
- * @returns {boolean}
- */
-// export function hasParentObject(target: IModel): boolean {
-//     return getParentObject(target) !== null
-// }
-
-/**
- * Returns the immediate parent of this object, or null. Parent can be either an object, map or array
- * TODO:? strict mode?
- * @export
- * @param {Object} target
- * @param {boolean} [strict=false]
+ * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent(target: IMSTNode, strict?: boolean): any & IMSTNode;
-export function getParent<T>(target: IMSTNode, strict?: boolean): T & IMSTNode;
-export function getParent<T>(target: IMSTNode, strict: boolean = false): T & IMSTNode {
-    // const node = strict
-    //     ? getNode(target).parent
-    //     : findNode(getNode(target))
-    const node = getMST(target)
-    return node.parent ? node.parent.target : null
+export function getParent(target: IMSTNode, depth?: number): (any & IMSTNode);
+export function getParent<T>(target: IMSTNode, depth?: number): (T & IMSTNode);
+export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) {
+    invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
+    let d = depth
+    let parent: MSTAdminisration | null = getMSTAdministration(target).parent
+    while (parent) {
+        if (--d === 0)
+            return parent.target
+        parent = parent.parent
+    }
+    return fail(`Failed to find a parent for '${getPath(target)} with depth ${depth}`)
 }
-
-/**
- * TODO:
- * Returns the closest parent that is a model instance, but which isn't an array or map.
- *
- * @export
- * @param {Object} target
- * @returns {*}
- */
-// export function getParentObject(target: IModel): IModel {
-//     // TODO: remove this special notion of closest object node?
-//     const node = findEnclosingObjectNode(getNode(target))
-//     return node ? node.state : null
-// }
 
 /**
  * Given an object in a model tree, returns the root object of that tree
@@ -309,7 +277,7 @@ export function getParent<T>(target: IMSTNode, strict: boolean = false): T & IMS
 export function getRoot(target: IMSTNode): any & IMSTNode;
 export function getRoot<T>(target: IMSTNode): T & IMSTNode;
 export function getRoot(target: IMSTNode): IMSTNode {
-    return getMST(target).root.target
+    return getMSTAdministration(target).root.target
 }
 
 /**
@@ -320,7 +288,7 @@ export function getRoot(target: IMSTNode): IMSTNode {
  * @returns {string}
  */
 export function getPath(target: IMSTNode): string {
-    return getMST(target).path
+    return getMSTAdministration(target).path
 }
 
 /**
@@ -331,7 +299,25 @@ export function getPath(target: IMSTNode): string {
  * @returns {string[]}
  */
 export function getPathParts(target: IMSTNode): string[] {
-    return getMST(target).pathParts
+    return getMSTAdministration(target).pathParts
+}
+
+export function getRelativePath(base: MSTAdminisration, target: MSTAdminisration): string {
+    // PRE condition target is (a child of) base!
+    invariant(
+        base.root === target.root,
+        `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
+    )
+    const baseParts = base.pathParts
+    const targetParts = target.pathParts
+    let common = 0
+    for (; common < baseParts.length; common++) {
+        if (baseParts[common] !== targetParts[common])
+            break
+    }
+    // TODO: assert that no targetParts paths are "..", "." or ""!
+    return baseParts.slice(common).map(_ => "..").join("/")
+        + joinJsonPath(targetParts.slice(common))
 }
 
 /**
@@ -342,7 +328,7 @@ export function getPathParts(target: IMSTNode): string[] {
  * @returns {boolean}
  */
 export function isRoot(target: IMSTNode): boolean {
-    return getMST(target).isRoot
+    return getMSTAdministration(target).isRoot
 }
 
 /**
@@ -354,7 +340,7 @@ export function isRoot(target: IMSTNode): boolean {
  * @returns {*}
  */
 export function resolve(target: IMSTNode, path: string): IMSTNode | any {
-    const node = getMST(target).resolve(path)
+    const node = getMSTAdministration(target).resolve(path)
     return node ? node.target : undefined
 }
 
@@ -367,7 +353,7 @@ export function resolve(target: IMSTNode, path: string): IMSTNode | any {
  * @returns {*}
  */
 export function tryResolve(target: IMSTNode, path: string): IMSTNode | any {
-    const node = getMST(target).resolve(path, false)
+    const node = getMSTAdministration(target).resolve(path, false)
     if (node === undefined)
         return undefined
     return node ? node.target : undefined
@@ -382,62 +368,30 @@ export function tryResolve(target: IMSTNode, path: string): IMSTNode | any {
  * @returns {T}
  */
 export function clone<T extends IMSTNode>(source: T): T {
-    const node = getMST(source)
+    const node = getMSTAdministration(source)
     return node.type.create(node.snapshot) as T
-}
-
-/**
- * Internal function, use with care!
- */
-/**
- *
- *
- * @export
- * @param {any} thing
- * @returns {*}
- */
-// TODO: remove
-export function _getNode(thing: IMSTNode): any {
-    return getMST(thing)
 }
 
 /**
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
 export function detach<T extends IMSTNode>(thing: T): T {
-    getMST(thing).detach()
+    getMSTAdministration(thing).detach()
     return thing
 }
-
 
 /**
  * Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
  */
 export function destroy(thing: IMSTNode) {
-    const node = getMST(thing)
+    const node = getMSTAdministration(thing)
     node.detach()
     node.die()
 }
 
-export function testActions<S, T>(factory: IType<S, IMSTNode>, initialState: S, ...actions: IActionCall[]): S {
+// TODO: remove or to test utils?
+export function testActions<S, T>(factory: IType<S, IMSTNode>, initialState: S, ...actions: ISerializedActionCall[]): S {
     const testInstance = factory.create(initialState) as T
     applyActions(testInstance, actions)
     return getSnapshot(testInstance) as S
-}
-
-// TODO: remove?
-const appState = observable.shallowBox<any>(undefined)
-
-export function resetAppState() {
-    appState.set(undefined)
-}
-
-export function initializeAppState<S, T>(factory: IType<S, T>, initialSnapshot?: S) {
-    invariant(!appState, `Global app state was already initialized, use 'resetAppState' to reset it`)
-    appState.set(factory.create(initialSnapshot))
-}
-
-export function getAppState<T>(): T {
-    invariant(!!appState, `Global app state has not been initialized, use 'initializeAppState' for globally shared state`)
-    return appState.get() as T
 }

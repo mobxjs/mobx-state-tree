@@ -1,4 +1,4 @@
-import {IType, Type} from "../core/type"
+import { IType, Type } from "../type"
 
 export type IRecursiveDef<S, T> = (type: IType<S, T>) => IType<any, any>
 

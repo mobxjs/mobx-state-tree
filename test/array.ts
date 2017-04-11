@@ -1,5 +1,5 @@
 import {IObservableArray} from 'mobx'
-import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, IType, types} from "../"
+import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -17,7 +17,7 @@ const createTestFactories = () => {
 
     const Factory = (types.array(
         ItemFactory
-    )) as IType<ITestSnapshot[], IObservableArray<ITest>>
+    ))
 
     return {Factory, ItemFactory}
 }

@@ -1,5 +1,3 @@
-// TODO: move file to utils
-
 // https://tools.ietf.org/html/rfc6902
 // http://jsonpatch.com/
 
@@ -8,7 +6,6 @@ export type IJsonPatch = {
     path: string
     value?: any
 }
-
 
 /**
  * escape slashes and backslashes

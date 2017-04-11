@@ -1,6 +1,7 @@
 import { observable, IObjectWillChange, IObjectChange } from "mobx"
 import { Property } from "./property"
-import { getMST, maybeMST, valueToSnapshot, IType, escapeJsonPath } from "../../core"
+import { getMSTAdministration, maybeMST, valueToSnapshot, escapeJsonPath } from "../../core"
+import { IType } from "../type"
 
 export class ValueProperty extends Property {
     constructor(propertyName: string, public type: IType<any, any>) {
@@ -16,18 +17,16 @@ export class ValueProperty extends Property {
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
-        const node = getMST(change.object)
+        const node = getMSTAdministration(change.object)
         const oldValue = change.object[this.name]
 
-        // TODO check type
-        // TODO: check if tree is editable
         maybeMST(oldValue, adm => adm.setParent(null))
         change.newValue = node.prepareChild(this.name, change.newValue)
         return change
     }
 
     didChange(change: IObjectChange) {
-        const node = getMST(change.object)
+        const node = getMSTAdministration(change.object)
         node.emitPatch({
             op: "replace",
             path: escapeJsonPath(this.name),
@@ -36,7 +35,7 @@ export class ValueProperty extends Property {
     }
 
     serialize(instance: any, snapshot: any) {
-        getMST(instance).assertAlive()
+        getMSTAdministration(instance).assertAlive()
         snapshot[this.name] = valueToSnapshot(instance[this.name])
     }
 

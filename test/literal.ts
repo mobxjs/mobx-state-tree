@@ -20,5 +20,5 @@ test("it should throw if a different type is given", t => {
         const doc = Factory.create({ shouldBeOne: 2 })
     })
 
-    t.is(error.message, '[mobx-state-tree] Snapshot {"shouldBeOne":2} is not assignable to type TestFactory. Expected { shouldBeOne: 1 } instead.')
+    t.is(error.message, `[mobx-state-tree] Value '{"shouldBeOne":2}' is not assignable to type: TestFactory, expected an instance of TestFactory or a snapshot like \'{ shouldBeOne: 1 }\' instead.`)
 })

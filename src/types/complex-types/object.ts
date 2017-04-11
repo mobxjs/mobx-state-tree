@@ -1,20 +1,34 @@
-import { IdentifierProperty } from './property-types/identifier-property';
-import { action, isAction, extendShallowObservable, IObjectChange, IObjectWillChange, IAction, intercept, observe } from "mobx"
-import { nothing, extend as extendObject, invariant, fail, identity, isPrimitive, hasOwnProperty, isPlainObject } from "../utils"
-import { MSTAdminisration, maybeMST } from "../core"
-import { isReferenceFactory } from "./reference"
-import { primitiveFactory } from "./primitive"
-import { isIdentifierFactory } from "./identifier"
-import { ComplexType, getType, IMSTNode, isType, IType, getMST, IComplexType } from '../core';
-import { createDefaultValueFactory } from "./with-default"
-import { Property } from "./property-types/property"
-import { TransformedProperty } from "./property-types/transformed-property"
-import { ComputedProperty } from "./property-types/computed-property"
-import { ValueProperty } from "./property-types/value-property"
-import { ActionProperty } from "./property-types/action-property"
-import { getSnapshot } from "../top-level-api"
-import { IJsonPatch } from "../index";
-import { getPrimitiveFactoryFromValue } from "./core-types";
+import {
+    action,
+    extendShallowObservable,
+    IObjectChange,
+    IObjectWillChange,
+    IAction,
+    intercept,
+    observe
+} from "mobx"
+import {
+    nothing,
+    extend as extendObject,
+    invariant,
+    fail, identity,
+    isPrimitive,
+    hasOwnProperty,
+    isPlainObject
+} from "../../utils"
+import { MSTAdminisration, maybeMST, getType, IMSTNode, getMSTAdministration, getSnapshot,IJsonPatch } from "../../core"
+import { IType, IComplexType, isType } from "../type"
+import { ComplexType } from "./complex-type"
+import { getPrimitiveFactoryFromValue } from "../primitives"
+import { createDefaultValueFactory } from "../utility-types/with-default"
+import { isReferenceFactory } from "../utility-types/reference"
+import { isIdentifierFactory } from "../utility-types/identifier"
+import { Property } from "../property-types/property"
+import { IdentifierProperty } from "../property-types/identifier-property"
+import { TransformedProperty } from "../property-types/transformed-property"
+import { ComputedProperty } from "../property-types/computed-property"
+import { ValueProperty } from "../property-types/value-property"
+import { ActionProperty } from "../property-types/action-property"
 
 export class ObjectType extends ComplexType<any, any> {
     isObjectFactory = true
@@ -39,7 +53,7 @@ export class ObjectType extends ComplexType<any, any> {
         super(name)
         Object.seal(baseModel) // make sure nobody messes with it
         this.baseModel = baseModel
-        // TODO: verify valid name
+        invariant(/^\w[\w\d_]*$/.test(name), `Typename should be a valid identifier: ${name}`)
         this.modelConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
         this.modelConstructor.prototype.toString = function() {
             return `${name}${JSON.stringify(getSnapshot(this))}`
@@ -61,7 +75,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     willChange = (change: IObjectWillChange): IObjectWillChange | null => {
-        const node = getMST(change.object)
+        const node = getMSTAdministration(change.object)
         node.assertWritable()
 
         return this.props[change.name].willChange(change)
@@ -104,38 +118,35 @@ export class ObjectType extends ComplexType<any, any> {
         }
     }
 
-    // TODO: adm or instance as param?
-    getChildMSTs(node: MSTAdminisration, instance: any): [string, MSTAdminisration][] {
+    getChildMSTs(node: MSTAdminisration): [string, MSTAdminisration][] {
         const res: [string, MSTAdminisration][] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
-                maybeMST(instance[prop.name], propertyNode => res.push([prop.name, propertyNode]))
+                maybeMST(node.target[prop.name], propertyNode => res.push([prop.name, propertyNode]))
         })
         return res
     }
 
-    getChildMST(node: MSTAdminisration, instance: any, key: string): MSTAdminisration | null {
-        return maybeMST(instance[key], identity, nothing)
+    getChildMST(node: MSTAdminisration, key: string): MSTAdminisration | null {
+        return maybeMST(node.target[key], identity, nothing)
     }
 
-    // TODO: node or instance?
-    serialize(node: MSTAdminisration, instance: any): any {
+    serialize(node: MSTAdminisration): any {
         const res = {}
-        this.forAllProps(prop => prop.serialize(instance, res))
+        this.forAllProps(prop => prop.serialize(node.target, res))
         return res
     }
 
-    applyPatchLocally(node: MSTAdminisration, target: any, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdminisration, subpath: string, patch: IJsonPatch): void {
         invariant(patch.op === "replace" || patch.op === "add")
-        this.applySnapshot(node, target, {
+        this.applySnapshot(node, {
             [subpath]: patch.value
         })
     }
 
-    // TODO: remove node arg
-    @action applySnapshot(node: MSTAdminisration, target: any, snapshot: any): void {
+    @action applySnapshot(node: MSTAdminisration, snapshot: any): void {
         for (let key in snapshot) if (key in this.props) {
-            this.props[key].deserialize(target, snapshot)
+            this.props[key].deserialize(node.target, snapshot)
         }
     }
 
@@ -158,13 +169,14 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     describe() {
+        // TODO: make proptypes responsible
         // optimization: cache
         return "{ " + Object.keys(this.props).map(key => {
             const prop = this.props[key]
             return prop instanceof ValueProperty
                 ? key + ": " + prop.type.describe()
                 : prop instanceof IdentifierProperty
-                    ? key + ": identifier()"
+                    ? key + ": identifier"
                     : ""
         }).filter(Boolean).join("; ") + " }"
     }
@@ -226,20 +238,3 @@ export function isObjectFactory(type: any): boolean {
 export function getIdentifierAttribute(factory: any): string | null {
     return isObjectFactory(factory) ? factory.identifierAttribute : null
 }
-
-// export function getObjectNode(thing: IModel): ObjectNode {
-//     const node = getNode(thing)
-//     invariant(isObjectFactory(node.factory), "Expected object node, got " + (node.constructor as any).name)
-//     return node as ObjectNode
-// }
-
-// /**
-//  * Returns first parent of the provided node that is an object node, or null
-//  */
-// export function findEnclosingObjectNode(thing: Node): ObjectNode | null {
-//     let parent: Node | null = thing
-//     while (parent = parent.parent)
-//         if (parent instanceof ObjectNode)
-//             return parent
-//     return null
-// }

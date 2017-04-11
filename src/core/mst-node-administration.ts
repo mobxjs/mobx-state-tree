@@ -3,19 +3,16 @@ import {
     computed, reaction,
     IReactionDisposer
 } from "mobx"
-
-import { typecheck, IType } from "./type"
-import { getRelativePath, hasMST, getMST, getPath } from "./mst-node"
-
-import {IActionHandler} from "./action"
+import { typecheck, IType } from "../types/type"
+import { isMST, getMSTAdministration } from "./mst-node"
+import { IMiddleWareHandler } from "./action"
 import {
     invariant, fail, extend,
     addHiddenFinalProp, IDisposer, registerEventHandler
 } from "../utils"
-import {IJsonPatch, joinJsonPath, splitJsonPath} from "./json-patch"
-import {IActionCall, applyActionLocally} from "./action"
-import { ObjectType } from "../types/object"
-import { ComplexType } from "./complex-type"
+import { IJsonPatch, joinJsonPath, splitJsonPath } from "./json-patch"
+import { ObjectType } from "../types/complex-types/object"
+import { ComplexType } from "../types/complex-types/complex-type"
 
 export class MSTAdminisration {
     readonly target: any
@@ -25,10 +22,10 @@ export class MSTAdminisration {
     private _isProtected = false
     _isRunningAction = false // only relevant for root
 
-    readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
-    readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
-    readonly actionSubscribers: IActionHandler[] = []
-    readonly snapshotDisposer: IReactionDisposer
+    readonly middlewares: IMiddleWareHandler[] = []
+    private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
+    private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
+    private readonly snapshotDisposer: IReactionDisposer
 
     constructor(initialState: any, type: ComplexType<any, any>) {
         invariant(type instanceof ComplexType, "Uh oh")
@@ -39,10 +36,9 @@ export class MSTAdminisration {
         this.snapshotDisposer = reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
-        ; (this.snapshotDisposer as any).onError((e: any) => { // as any is caused by wrong typing in mobx
+        this.snapshotDisposer.onError((e: any) => {
             throw e
         })
-        // dispose reaction, observe, intercept somewhere explicitly? Should strictly speaking not be needed for GC
     }
 
     @computed get pathParts(): string[]{
@@ -113,7 +109,7 @@ export class MSTAdminisration {
     @computed public get snapshot() {
         this.assertAlive()
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
-        return Object.freeze(this.type.serialize(this, this.target))
+        return Object.freeze(this.type.serialize(this))
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
@@ -123,7 +119,7 @@ export class MSTAdminisration {
     public applySnapshot(snapshot: any) {
         this.assertWritable()
         typecheck(this.type, snapshot)
-        return this.type.applySnapshot(this, this.target, snapshot)
+        return this.type.applySnapshot(this, snapshot)
     }
 
     @action public applyPatch(patch: IJsonPatch) {
@@ -134,7 +130,7 @@ export class MSTAdminisration {
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.assertWritable()
-        this.type.applyPatchLocally(this, this.target, subpath, patch)
+        this.type.applyPatchLocally(this, subpath, patch)
     }
 
     public onPatch(onPatch: (patches: IJsonPatch) => void): IDisposer {
@@ -166,7 +162,7 @@ export class MSTAdminisration {
             if (
                  this.patchSubscribers.length > 0 ||
                  this.snapshotSubscribers.length > 0 ||
-                 (this instanceof ObjectType && this.actionSubscribers.length > 0)
+                 (this instanceof ObjectType && this.middlewares.length > 0)
             ) {
                 console.warn("An object with active event listeners was removed from the tree. The subscriptions have been disposed.")
             }
@@ -180,17 +176,18 @@ export class MSTAdminisration {
 
     prepareChild(subpath: string, child: any): any {
         const childFactory = this.getChildType(subpath)
+        typecheck(childFactory, child)
 
-        if (hasMST(child)) {
-            const node = getMST(child)
+        if (isMST(child)) {
+            const childNode = getMSTAdministration(child)
 
-            if (node.isRoot) {
+            if (childNode.isRoot) {
                 // we are adding a node with no parent (first insert in the tree)
-                node.setParent(this, subpath)
+                childNode.setParent(this, subpath)
                 return child
             }
 
-            return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${getPath(child)}'`)
+            return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${childNode.path}'`)
         }
         const existingNode = this.getChildMST(subpath)
         const newInstance = childFactory.create(child)
@@ -202,8 +199,8 @@ export class MSTAdminisration {
         } else {
             if (existingNode)
                 existingNode.setParent(null) // TODO: or delete / remove / whatever is a more explicit clean up
-            if (hasMST(newInstance)) {
-                const node = getMST(newInstance)
+            if (isMST(newInstance)) {
+                const node = getMSTAdministration(newInstance)
                 node.setParent(this, subpath)
             }
             return newInstance
@@ -252,48 +249,18 @@ export class MSTAdminisration {
         return this.parent!.isRunningAction()
     }
 
-    applyAction(action: IActionCall): void {
-        const targetNode = this.resolve(action.path || "")
-        if (targetNode)
-            applyActionLocally(targetNode, targetNode.target, action)
-        else
-            fail(`Invalid action path: ${action.path || ""}`)
-    }
-
-    emitAction(instance: MSTAdminisration, action: IActionCall, next: () => any): any {
-        this.assertAlive()
-        let idx = -1
-        const correctedAction: IActionCall = this.actionSubscribers.length
-            ? extend({} as any, action, { path: getRelativePath(this, instance) })
-            : null
-        let n = () => {
-            // optimization: use tail recursion / trampoline
-            idx++
-            if (idx < this.actionSubscribers.length) {
-                return this.actionSubscribers[idx](correctedAction!, n)
-            } else {
-                const parent = this.parent
-                if (parent)
-                    return parent.emitAction(instance, action, next)
-                else
-                    return next()
-            }
-        }
-        return n()
-    }
-
-    onAction(listener: (action: IActionCall, next: () => void) => void): IDisposer {
+    addMiddleWare(handler: IMiddleWareHandler) {
         // TODO: check / warn if not protected!
-        return registerEventHandler(this.actionSubscribers, listener)
+        return registerEventHandler(this.middlewares, handler)
     }
 
     getChildMST(subpath: string): MSTAdminisration | null {
         this.assertAlive()
-        return this.type.getChildMST(this, this.target, subpath)
+        return this.type.getChildMST(this, subpath)
     }
 
     getChildMSTs(): [string, MSTAdminisration][] {
-        return this.type.getChildMSTs(this, this.target)
+        return this.type.getChildMSTs(this)
     }
 
     getChildType(key: string): IType<any, any> {

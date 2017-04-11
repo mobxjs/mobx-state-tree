@@ -1,3 +1,10 @@
+# 0.3.0
+
+* Removed `primitive` type, use a more specific type instead
+* Improved typescript typings of snapshots
+* Added `depth` parameter to `getParent` and `hasParent`
+* Separated the concepts of middleware and serializable actions. It is now possible to intercept, modify actions etc through `addMiddleWare`. `onAction` now uses middleware, if it is used, all parameters of actions should be serializable!
+
 # 0.2.2
 
 * Introduced the concept of livelyness; if nodes are removed from the the tree because they are replaced by some other value, they will be marked as "died". This should help to early signal when people hold on to references that are not part of the tree anymore. To explicitly remove an node from a tree, with the intent to spawn a new state tree from it, use `detach`.

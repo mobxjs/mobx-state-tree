@@ -295,19 +295,13 @@ See [#10](https://github.com/mobxjs/mobx-state-tree/issues/10)
 
 # API
 
-## ComplexType
-
-[lib/core/complex-type.js:17-40](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/core/complex-type.js#L17-L40 "Source code on GitHub")
-
-A complex type produces a MST node (Node in the state tree)
-
 ## maybeMST
 
-[lib/core/mst-node.js:32-44](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/core/mst-node.js#L32-L44 "Source code on GitHub")
+[lib/core/mst-node.js:28-40](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/core/mst-node.js#L28-L40 "Source code on GitHub")
 
 Tries to convert a value to a TreeNode. If possible or already done,
 the first callback is invoked, otherwise the second.
-The result of this function is the return value of the callbacks
+The result of this function is the return value of the callbacks, or the original value if the second callback is omitted
 
 **Parameters**
 
@@ -315,15 +309,21 @@ The result of this function is the return value of the callbacks
 -   `asNodeCb`  
 -   `asPrimitiveCb`  
 
+## ComplexType
+
+[lib/core/complex-type.js:18-45](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/core/complex-type.js#L18-L45 "Source code on GitHub")
+
+A complex type produces a MST node (Node in the state tree)
+
 ## get
 
-[lib/core/mst-node-administration.js:63-66](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/core/mst-node-administration.js#L63-L66 "Source code on GitHub")
+[lib/core/mst-node-administration.js:61-64](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/core/mst-node-administration.js#L61-L64 "Source code on GitHub")
 
 Returnes (escaped) path representation as string
 
 ## escapeJsonPath
 
-[lib/core/json-patch.js:8-10](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/core/json-patch.js#L8-L10 "Source code on GitHub")
+[lib/core/json-patch.js:9-11](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/core/json-patch.js#L9-L11 "Source code on GitHub")
 
 escape slashes and backslashes
 <http://tools.ietf.org/html/rfc6901>
@@ -334,7 +334,7 @@ escape slashes and backslashes
 
 ## unescapeJsonPath
 
-[lib/core/json-patch.js:15-17](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/core/json-patch.js#L15-L17 "Source code on GitHub")
+[lib/core/json-patch.js:16-18](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/core/json-patch.js#L16-L18 "Source code on GitHub")
 
 unescape slashes and backslashes
 
@@ -344,7 +344,7 @@ unescape slashes and backslashes
 
 ## map
 
-[lib/types/index.js:25-28](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/types/index.js#L25-L28 "Source code on GitHub")
+[lib/types/index.js:25-28](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/types/index.js#L25-L28 "Source code on GitHub")
 
 **Parameters**
 
@@ -352,7 +352,7 @@ unescape slashes and backslashes
 
 ## array
 
-[lib/types/index.js:37-40](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/types/index.js#L37-L40 "Source code on GitHub")
+[lib/types/index.js:37-40](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/types/index.js#L37-L40 "Source code on GitHub")
 
 **Parameters**
 
@@ -360,14 +360,15 @@ unescape slashes and backslashes
 
 ## props
 
-[lib/types/object.js:41-41](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/types/object.js#L41-L41 "Source code on GitHub")
+[lib/types/object.js:41-41](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/types/object.js#L41-L41 "Source code on GitHub")
 
 Parsed description of all properties
 
-## onAction
+## addMiddleware
 
-[lib/top-level-api.js:47-52](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L47-L52 "Source code on GitHub")
+[lib/top-level-api.js:51-56](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L51-L56 "Source code on GitHub")
 
+TODO: update docs
 Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
 Will only be invoked on 'root' actions, not on actions called from existing actions.
 
@@ -403,13 +404,13 @@ Example of a logging middleware:
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** model to intercept actions on
--   `callback`  
+-   `middleware`  
 
 Returns **IDisposer** function to remove the middleware
 
 ## onPatch
 
-[lib/top-level-api.js:64-66](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L64-L66 "Source code on GitHub")
+[lib/top-level-api.js:68-70](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L68-L70 "Source code on GitHub")
 
 Registers a function that will be invoked for each that as made to the provided model instance, or any of it's children.
 See 'patches' for more details. onPatch events are emitted immediately and will not await the end of a transaction.
@@ -422,23 +423,9 @@ Patches can be used to deep observe a model tree.
 
 Returns **IDisposer** function to remove the listener
 
-## onSnapshot
-
-[lib/top-level-api.js:77-79](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L77-L79 "Source code on GitHub")
-
-Registeres a function that is invoked whenever a new snapshot for the given model instance is available.
-The listener will only be fire at the and a MobX (trans)action
-
-**Parameters**
-
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `callback`  
-
-Returns **IDisposer** 
-
 ## applyPatch
 
-[lib/top-level-api.js:89-91](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L89-L91 "Source code on GitHub")
+[lib/top-level-api.js:84-86](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L84-L86 "Source code on GitHub")
 
 Applies a JSON-patch to the given model instance or bails out if the patch couldn't be applied
 
@@ -449,7 +436,7 @@ Applies a JSON-patch to the given model instance or bails out if the patch could
 
 ## applyPatches
 
-[lib/top-level-api.js:100-105](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L100-L105 "Source code on GitHub")
+[lib/top-level-api.js:95-100](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L95-L100 "Source code on GitHub")
 
 Applies a number of JSON patches in a single MobX transaction
 
@@ -458,22 +445,9 @@ Applies a number of JSON patches in a single MobX transaction
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 -   `patches` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IJsonPatch>** 
 
-## applyAction
-
-[lib/top-level-api.js:131-133](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L131-L133 "Source code on GitHub")
-
-Dispatches an Action on a model instance. All middlewares will be triggered.
-Returns the value of the last actoin
-
-**Parameters**
-
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `action` **IActionCall** 
--   `options` **\[IActionCallOptions]** 
-
 ## applyActions
 
-[lib/top-level-api.js:145-150](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L145-L150 "Source code on GitHub")
+[lib/top-level-api.js:126-130](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L126-L130 "Source code on GitHub")
 
 Applies a series of actions in a single MobX transaction.
 
@@ -487,7 +461,7 @@ Does not return any value
 
 ## protect
 
-[lib/top-level-api.js:187-189](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L187-L189 "Source code on GitHub")
+[lib/top-level-api.js:164-166](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L164-L166 "Source code on GitHub")
 
 By default it is allowed to both directly modify a model or through an action.
 However, in some cases you want to guarantee that the state tree is only modified through actions.
@@ -517,7 +491,7 @@ todo.toggle() // OK
 
 ## isProtected
 
-[lib/top-level-api.js:194-196](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L194-L196 "Source code on GitHub")
+[lib/top-level-api.js:171-173](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L171-L173 "Source code on GitHub")
 
 Returns true if the object is in protected mode, @see protect
 
@@ -527,7 +501,7 @@ Returns true if the object is in protected mode, @see protect
 
 ## applySnapshot
 
-[lib/top-level-api.js:206-208](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L206-L208 "Source code on GitHub")
+[lib/top-level-api.js:183-185](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L183-L185 "Source code on GitHub")
 
 Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
 
@@ -536,89 +510,22 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 -   `snapshot` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
-## getSnapshot
-
-[lib/top-level-api.js:218-220](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L218-L220 "Source code on GitHub")
-
-Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
-structural sharing where possible. Doesn't require MobX transactions to be completed.
-
-**Parameters**
-
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
-
-Returns **Any** 
-
 ## hasParent
 
-[lib/top-level-api.js:230-233](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L230-L233 "Source code on GitHub")
+[lib/top-level-api.js:199-209](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L199-L209 "Source code on GitHub")
 
 Given a model instance, returns `true` if the object has a parent, that is, is part of another object, map or array
 
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `strict` **\[[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]**  (optional, default `false`)
+-   `depth` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** = 1, how far should we look upward?
 
 Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
-
-## getParent
-
-[lib/top-level-api.js:255-262](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L255-L262 "Source code on GitHub")
-
-TODO:
-Given a model instance, returns `true` if the object has same parent, which is a model object, that is, not an
-map or array.
-
-**Parameters**
-
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `strict`  
-
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
-
-## getParent
-
-[lib/top-level-api.js:255-262](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L255-L262 "Source code on GitHub")
-
-Returns the immediate parent of this object, or null. Parent can be either an object, map or array
-TODO:? strict mode?
-
-**Parameters**
-
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `strict` **\[[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)]**  (optional, default `false`)
-
-Returns **Any** 
-
-## getRoot
-
-[lib/top-level-api.js:284-286](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L284-L286 "Source code on GitHub")
-
-TODO:
-Returns the closest parent that is a model instance, but which isn't an array or map.
-
-**Parameters**
-
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
-
-Returns **Any** 
-
-## getRoot
-
-[lib/top-level-api.js:284-286](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L284-L286 "Source code on GitHub")
-
-Given an object in a model tree, returns the root object of that tree
-
-**Parameters**
-
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
-
-Returns **Any** 
 
 ## getPath
 
-[lib/top-level-api.js:295-297](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L295-L297 "Source code on GitHub")
+[lib/top-level-api.js:235-237](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L235-L237 "Source code on GitHub")
 
 Returns the path of the given object in the model tree
 
@@ -630,7 +537,7 @@ Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ## getPathParts
 
-[lib/top-level-api.js:306-308](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L306-L308 "Source code on GitHub")
+[lib/top-level-api.js:246-248](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L246-L248 "Source code on GitHub")
 
 Returns the path of the given object as unescaped string array
 
@@ -642,7 +549,7 @@ Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refere
 
 ## isRoot
 
-[lib/top-level-api.js:317-319](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L317-L319 "Source code on GitHub")
+[lib/top-level-api.js:257-259](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L257-L259 "Source code on GitHub")
 
 Returns true if the given object is the root of a model tree
 
@@ -654,7 +561,7 @@ Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ## resolve
 
-[lib/top-level-api.js:329-332](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L329-L332 "Source code on GitHub")
+[lib/top-level-api.js:269-272](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L269-L272 "Source code on GitHub")
 
 Resolves a path relatively to a given object.
 
@@ -667,7 +574,7 @@ Returns **Any**
 
 ## tryResolve
 
-[lib/top-level-api.js:342-347](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L342-L347 "Source code on GitHub")
+[lib/top-level-api.js:282-287](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L282-L287 "Source code on GitHub")
 
 **Parameters**
 
@@ -678,7 +585,7 @@ Returns **Any**
 
 ## clone
 
-[lib/top-level-api.js:357-360](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L357-L360 "Source code on GitHub")
+[lib/top-level-api.js:297-300](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L297-L300 "Source code on GitHub")
 
 **Parameters**
 
@@ -686,29 +593,9 @@ Returns **Any**
 
 Returns **T** 
 
-## \_getNode
-
-[lib/top-level-api.js:372-374](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L372-L374 "Source code on GitHub")
-
-Internal function, use with care!
-
-**Parameters**
-
--   `thing`  
-
-## \_getNode
-
-[lib/top-level-api.js:372-374](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L372-L374 "Source code on GitHub")
-
-**Parameters**
-
--   `thing` **any** 
-
-Returns **Any** 
-
 ## detach
 
-[lib/top-level-api.js:379-382](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L379-L382 "Source code on GitHub")
+[lib/top-level-api.js:305-308](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L305-L308 "Source code on GitHub")
 
 Removes a model element from the state tree, and let it live on as a new state tree
 
@@ -718,13 +605,26 @@ Removes a model element from the state tree, and let it live on as a new state t
 
 ## destroy
 
-[lib/top-level-api.js:387-391](https://github.com/mweststrate/mobx-state-tree/blob/992c4594af2120a86bc6e4bb7fbd645b645c8775/lib/top-level-api.js#L387-L391 "Source code on GitHub")
+[lib/top-level-api.js:313-317](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/top-level-api.js#L313-L317 "Source code on GitHub")
 
 Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
 
 **Parameters**
 
 -   `thing`  
+
+## applyAction
+
+[lib/core/action.js:107-114](https://github.com/mweststrate/mobx-state-tree/blob/15deca1e9c1d96519ccf7dc62aa9677510e904fd/lib/core/action.js#L107-L114 "Source code on GitHub")
+
+Dispatches an Action on a model instance. All middlewares will be triggered.
+Returns the value of the last actoin
+
+**Parameters**
+
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `action` **IActionCall** 
+-   `options` **\[IActionCallOptions]** 
 
 # FAQ
 

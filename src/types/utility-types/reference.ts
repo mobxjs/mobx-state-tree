@@ -1,8 +1,8 @@
-import {isObservableArray, isObservableMap} from "mobx"
-import {resolve} from "../top-level-api"
-import {invariant, fail} from "../utils"
-import { getMST, getRelativePath, IType, isMST, IMSTNode } from "../core"
-import { getIdentifierAttribute } from "./object"
+import { isObservableArray, isObservableMap } from "mobx"
+import { resolve, getMSTAdministration, getRelativePath, isMST, IMSTNode } from "../../core"
+import { invariant, fail } from "../../utils"
+import { getIdentifierAttribute } from "../complex-types/object"
+import { IType, typecheck } from "../type"
 
 export interface IReference {
     $ref: string
@@ -15,9 +15,10 @@ export interface IReferenceDescription {
 }
 
 // TODO: fix, references are not mentioned in type.describe...
-
-export function reference<T>(factory: IType<any, T>): IType<{ $ref: string }, T>;
-export function reference<T>(factory: IType<any, T>, basePath: string): IType<string, T>;
+// TODO: make distinction between nullable and non-nullable refs?
+// TODO: verify ref is requird in non-nullable snapshos and vice versa
+export function reference<T>(factory: IType<any, T>): IType<{ $ref: string }, T | null>;
+export function reference<T>(factory: IType<any, T>, basePath: string): IType<string, T | null>;
 export function reference<T>(factory: IType<any, T>, basePath?: string): any {
     // FIXME: IType return type is inconsistent with what is actually returned, however, results in the best type-inference results for objects...
     if (arguments.length === 1)
@@ -31,7 +32,7 @@ function createGenericRelativeReference(factory: IType<any, any>): IReferenceDes
         isReference: true,
         getter: function (this: IMSTNode, identifier: IReference | null | undefined): any {
             if (identifier === null || identifier === undefined)
-                return identifier
+                return null
             // TODO: would be better to test as part of snapshot...
             invariant(typeof identifier.$ref === "string", "Expected a reference in the format `{ $ref: ... }`")
             return resolve(this, identifier.$ref)
@@ -40,9 +41,9 @@ function createGenericRelativeReference(factory: IType<any, any>): IReferenceDes
             if (value === null || value === undefined)
                 return value
             invariant(isMST(value), `Failed to assign a value to a reference; the value is not a model instance`)
-            invariant(factory.is(value), `Failed to assign a value to a reference; the value is not a model of type ${factory}`)
-            const base = getMST(this)
-            const target = getMST(value)
+            typecheck(factory, value)
+            const base = getMSTAdministration(this)
+            const target = getMSTAdministration(value)
             invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
             return { $ref: getRelativePath(base, target) }
         }
@@ -74,8 +75,8 @@ function createReferenceWithBasePath(type: IType<any, any>, path: string): IRefe
                 return value
             invariant(isMST(value), `Failed to assign a value to a reference; the value is not a model instance`)
             invariant(type.is(value), `Failed to assign a value to a reference; the value is not a model of type ${type}`)
-            const base = getMST(this)
-            const target = getMST(value)
+            const base = getMSTAdministration(this)
+            const target = getMSTAdministration(value)
             invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
             const identifier = (value as any)[targetIdAttribute]
             const targetCollection = resolve(this, `${path}`)

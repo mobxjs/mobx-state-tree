@@ -1,5 +1,5 @@
-import { types } from "../"
 import { test } from "ava"
+import { types, getSnapshot } from "../"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -50,14 +50,6 @@ test("it should check invalid nodes as well", (t) => {
     t.deepEqual(types.model({ anotherAttr: types.number }).is(doc), false)
 })
 
-test("it should cast different compatible factories", (t) => {
-    const { Box, Square } = createTestFactories()
-
-    const doc = Square.create()
-
-    t.deepEqual(Box.is(doc), true)
-})
-
 test("it should do typescript type inference correctly", (t) => {
     const A = types.model({
         x: types.number,
@@ -96,12 +88,14 @@ test("it should do typescript type inference correctly", (t) => {
     b.sub.x = 4
     const d: string = b.sub.y!
 
-    a.y = null // TODO: enable strict null checks and verify this
+    a.y = null
 
     const zz: string = a.z
     a.z = "test"
 
     b.sub.method()
+
+    t.is(true, true) // supress no asserts warning
 })
 
 test("#66 - it should accept superfluous fields", t => {
@@ -160,7 +154,7 @@ test("#66 - it should pick the correct type of defaulted fields", t => {
 
     const a = Item.create({ id: 3 })
     t.is(a.name, "boo")
-    t.throws(() => a.name = 3 as any, /Value is not assignable to 'string'/)
+    t.throws(() => a.name = 3 as any, `[mobx-state-tree] Value '3' is not assignable to type: string.`)
 })
 
 test("cannot create factories with null values", t => {
@@ -203,6 +197,8 @@ test("it is possible to refer to a type", t => {
     z.setTitle("bla")
     z.title = "bla"
     // z.title = 3 // Test manual: should give compile error
+
+    t.is(true, true) // supress no asserts warning
 })
 
 test(".Type should not be callable", t => {
@@ -226,4 +222,29 @@ test(".SnapshotType should not be callable", t => {
     })
 
     t.throws(() => Todo.SnapshotType)
+})
+
+test("types instances with compatible snapshots should not be interchangeable", t => {
+    const A = types.model("A", {
+        doA() {}
+    })
+    const B = types.model("B", {
+        doB() {}
+    })
+    const C = types.model("C", {
+        x: types.maybe(A)
+    })
+
+    t.is(A.is({}), true)
+    t.is(A.is(B.create()), false) // if thies yielded true, then `B.create().doA()` should work!
+    t.is(A.is(getSnapshot(B.create())), true)
+
+    const c = C.create()
+    t.notThrows(() => { c.x = null })
+    t.notThrows(() => { c.x = {} as any })
+    t.notThrows(() => { c.x = A.create() })
+    t.throws(
+        () => { c.x = B.create() as any },
+        "[mobx-state-tree] Value of type B: '{}' is not assignable to type: A | null, expected an instance of A | null or a snapshot like '({  } | null)' instead. (Note that a snapshot of the provided value is compatible with the targeted type)"
+    )
 })

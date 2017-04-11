@@ -1,5 +1,5 @@
-import { ISimpleType, Type } from "../core";
-import {invariant, isMutable, isSerializable, isPlainObject} from "../utils"
+import { ISimpleType, Type } from "../type"
+import { invariant, isMutable, isSerializable, isPlainObject } from "../../utils"
 
 function freeze(value: any) {
     Object.freeze(value)
@@ -22,7 +22,7 @@ export class Frozen<T> extends Type<T, T> {
     }
 
     describe() {
-        return "frozen"
+        return "<any immutable value>"
     }
 
     create(value: any) {

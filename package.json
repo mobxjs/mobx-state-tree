@@ -30,25 +30,23 @@
     "mobx-state-tree.umd.js"
   ],
   "devDependencies": {
-    "@types/jest": "^16.0.2",
-    "@types/tape": "^4.2.28",
-    "ava": "^0.17.0",
+    "ava": "^0.19.0",
     "concurrently": "^3.1.0",
     "coveralls": "^2.11.4",
     "documentation": "^4.0.0-beta9",
-    "mobx": "^3.1.0",
+    "mobx": "^3.1.9",
     "nyc": "^10.0.0",
     "tape": "^4.6.0",
     "tslint": "^3.15.1",
-    "typescript": "^2.1.4",
-    "webpack": "^1.13.1"
-  },
-  "dependencies": {
-    "remotedev": "^0.2.2",
+    "typescript": "2.2.2",
+    "webpack": "^1.13.1",
     "webpack-fail-plugin": "^1.0.6"
   },
+  "dependencies": {
+    "remotedev": "^0.2.2"
+  },
   "peerDependencies": {
-    "mobx": "^3.1.0"
+    "mobx": "^3.1.9"
   },
   "keywords": [
     "mobx",

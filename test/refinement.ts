@@ -3,7 +3,7 @@ import {test} from "ava"
 
 test("it should allow if type and predicate is correct", t => {
     const Factory = types.model({
-        number: types.refinement('Number', types.withDefault(types.primitive, 0), s => typeof s === "number")
+        number: types.refinement('positive number', types.withDefault(types.number, 0), s => typeof s === "number" && s >= 0)
     })
 
     const doc = Factory.create({ number: 42 })
@@ -13,23 +13,24 @@ test("it should allow if type and predicate is correct", t => {
 
 test("it should throw if a correct type with failing predicate is given", t => {
     const Factory = types.model({
-        number: types.refinement('Number', types.withDefault(types.primitive, 0), s => typeof s === "number")
+        number: types.refinement('positive number', types.withDefault(types.number, 0), s => typeof s === "number" && s >= 0)
     })
 
-    const error = t.throws(() => {
-        const doc = Factory.create({ number: "givenStringInstead" })
-    })
+    t.throws(() => {
+        Factory.create({ number: "givenStringInstead" })
+    }, `[mobx-state-tree] Value '{"number":"givenStringInstead"}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ number: positive number }' instead.`)
 
-    t.is(error.message, '[mobx-state-tree] Snapshot {\"number\":\"givenStringInstead\"} is not assignable to type AnonymousModel. Expected { number: Number } instead.')
+    t.throws(() => {
+        Factory.create({ number: -4 })
+    }, `[mobx-state-tree] Value '{"number":-4}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ number: positive number }' instead.`)
 })
 
 test("it should throw if default value does not pass the predicate", t => {
-
     const error = t.throws(() => {
         const Factory = types.model({
-            number: types.refinement('Number', types.primitive, s => typeof s === "number")
+            number: types.refinement('Number', types.number, s => typeof s === "number")
         })
     })
 
-    t.is(error.message, '[mobx-state-tree] Default value for refinement type Number does not pass the predicate.')
+    t.is(error.message, "[mobx-state-tree] Value is not assignable to \'number\'")
 })

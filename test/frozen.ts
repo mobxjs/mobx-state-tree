@@ -1,5 +1,5 @@
 import {test} from "ava"
-import {getSnapshot, types, IType} from "../"
+import {getSnapshot, types} from "../"
 
 test("it should accept any serializable value", t => {
     const Factory = types.model({
@@ -20,9 +20,7 @@ test("it should throw if value is not serializable", t => {
 
     const doc: any = Factory.create()
 
-    const error = t.throws(() => {
+    t.throws(() => {
         doc.value = function IAmUnserializable(){}
-    })
-
-    t.is(error.message, '[mobx-state-tree] Given value should be serializable')
+    }, /IAmUnserializable.*is not assignable to type: frozen/)
 })

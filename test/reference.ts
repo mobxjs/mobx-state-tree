@@ -21,7 +21,7 @@ test("it should support generic relative paths", t => {
 
     t.is(store.users.get("17")!.name, "Michel")
     t.is(store.users.get("18")!.name, "Veria")
-    t.is(store.user.name, "Michel")
+    t.is(store.user!.name, "Michel")
 
     store.user =  store.users.get("18")!
     t.is(store.user.name, "Veria")
@@ -52,7 +52,7 @@ test("it should support prefixed paths in maps", t => {
 
     t.is(store.users.get("17")!.name as string, "Michel")
     t.is(store.users.get("18")!.name as string, "Veria")
-    t.is(store.user.name as string, "Michel")
+    t.is(store.user!.name as string, "Michel")
 
     store.user =  store.users.get("18")!
     t.is(store.user.name as string, "Veria")
@@ -83,7 +83,7 @@ test("it should support prefixed paths in arrays", t => {
 
     t.is(store.users[0].name, "Michel")
     t.is(store.users[1].name, "Veria")
-    t.is(store.user.name, "Michel")
+    t.is(store.user!.name, "Michel")
 
     store.user =  store.users[1]
     t.is(store.user.name, "Veria")
@@ -102,7 +102,7 @@ test("identifiers are required", (t) => {
     t.is(Todo.is({}), false)
     t.is(Todo.is({ id: "x" }), true)
 
-    t.throws(() => Todo.create(), "[mobx-state-tree] Snapshot {} is not assignable to type AnonymousModel. Expected { id: identifier() } instead.")
+    t.throws(() => Todo.create(), "[mobx-state-tree] Value '{}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ id: identifier }' instead.")
 })
 
 test("identifiers cannot be modified", (t) => {
@@ -112,5 +112,5 @@ test("identifiers cannot be modified", (t) => {
 
     const todo = Todo.create({ id: "x" })
     t.throws(() => todo.id = "stuff", "[mobx-state-tree] It is not allowed to change the identifier of an object, got: 'stuff'")
-    t.throws(() => applySnapshot(todo, {}), "[mobx-state-tree] Snapshot {} is not assignable to type AnonymousModel. Expected { id: identifier() } instead.")
+    t.throws(() => applySnapshot(todo, {}), "[mobx-state-tree] Value '{}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ id: identifier }' instead.")
 })

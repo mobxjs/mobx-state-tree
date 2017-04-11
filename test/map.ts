@@ -1,5 +1,5 @@
 import {ObservableMap} from 'mobx'
-import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, _getNode, getPath, IJsonPatch, applySnapshot, getSnapshot, IType, types} from "../"
+import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -17,7 +17,7 @@ const createTestFactories = () => {
 
     const Factory = (types.map(
         ItemFactory
-    ) as any) as IType<{[key: string]: ITestSnapshot}, ObservableMap<ITest>>
+    ))
 
     return {Factory, ItemFactory}
 }
