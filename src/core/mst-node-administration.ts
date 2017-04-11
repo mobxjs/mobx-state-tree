@@ -18,20 +18,22 @@ export class MSTAdminisration {
     readonly target: any
     @observable _parent: MSTAdminisration | null = null
     readonly type: ComplexType<any, any>
+    _environment: any = undefined
+    _isRunningAction = false // only relevant for root
     private _isAlive = true
     private _isProtected = false
-    _isRunningAction = false // only relevant for root
 
     readonly middlewares: IMiddleWareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     private readonly snapshotDisposer: IReactionDisposer
 
-    constructor(initialState: any, type: ComplexType<any, any>) {
+    constructor(initialState: any, type: ComplexType<any, any>, environment: any) {
         invariant(type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
         this.type = type
         this.target = initialState
+        this._environment = environment
 
         this.snapshotDisposer = reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
@@ -153,10 +155,13 @@ export class MSTAdminisration {
         if (this.parent === newParent)
             return
         if (this._parent && newParent) {
-            invariant(false, `A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
+            fail(`A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
         }
         if (!this._parent && newParent && newParent.root === this) {
-            invariant(false, `A state tree is not allowed to contain itself. Cannot add root to path '/${newParent.pathParts.concat(subpath!).join("/")}'`)
+            fail(`A state tree is not allowed to contain itself. Cannot add root to path '/${newParent.pathParts.concat(subpath!).join("/")}'`)
+        }
+        if (!this._parent && !!this._environment) {
+            fail(`A state tree that has been initialized with an environment cannot be made part of another state tree.`)
         }
         if (this.parent && !newParent) {
             if (
@@ -293,9 +298,13 @@ export class MSTAdminisration {
     }
 
     detach() {
+        invariant(this._isAlive)
         if (this.isRoot)
             return
-        else
+        else {
+            this._environment = this.root._environment // make backup of environment
             this.parent!.removeChild(this.subpath)
+            this._isAlive = true
+        }
     }
 }

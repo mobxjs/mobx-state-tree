@@ -367,9 +367,16 @@ export function tryResolve(target: IMSTNode, path: string): IMSTNode | any {
  * @param {T} source
  * @returns {T}
  */
-export function clone<T extends IMSTNode>(source: T): T {
+export function clone<T extends IMSTNode>(source: T, keepEnvironment: boolean | any = true): T {
     const node = getMSTAdministration(source)
-    return node.type.create(node.snapshot) as T
+    return node.type.create(
+        node.snapshot,
+        keepEnvironment === true
+            ? node.root._environment
+            : keepEnvironment === false
+                ? undefined
+                : keepEnvironment // it's an object or something else
+    ) as T
 }
 
 /**
@@ -387,6 +394,13 @@ export function destroy(thing: IMSTNode) {
     const node = getMSTAdministration(thing)
     node.detach()
     node.die()
+}
+
+export function getEnv(thing: IMSTNode): any {
+    const node = getMSTAdministration(thing)
+    const env = node.root._environment
+    invariant(!!env, `Node '${node.path}' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()`)
+    return env
 }
 
 // TODO: remove or to test utils?

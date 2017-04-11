@@ -1,3 +1,7 @@
+# 0.3.1
+
+* (re) introduced the concept of environments, which can be passed as second argument to `.create`, and picked up using `getEnv`
+
 # 0.3.0
 
 * Removed `primitive` type, use a more specific type instead

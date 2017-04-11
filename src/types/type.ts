@@ -3,7 +3,7 @@ export interface ISnapshottable<S> {}
 export interface IType<S, T> {
     name: string
     is(thing: any): thing is S | T
-    create(snapshot?: S): T
+    create(snapshot?: S, environment?: any): T
     isType: boolean
     describe(): string,
     Type: T
