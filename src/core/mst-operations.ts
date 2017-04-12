@@ -1,6 +1,6 @@
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
-import { getMSTAdministration, IMSTNode } from "./mst-node"
+import { getMSTAdministration, IMSTNode, getRelativePathForNodes } from "./mst-node"
 import { MSTAdminisration } from "./mst-node-administration"
 import { IJsonPatch, joinJsonPath } from "./json-patch"
 import { IDisposer, invariant, fail } from "../utils"
@@ -343,6 +343,10 @@ export function resolve(target: IMSTNode, path: string): IMSTNode | any {
     // TODO: give better error messages!
     const node = getMSTAdministration(target).resolve(path)
     return node ? node.target : undefined
+}
+
+export function getRelativePath(base: IMSTNode, target: IMSTNode): string {
+    return getRelativePathForNodes(getMSTAdministration(base), getMSTAdministration(target))
 }
 
 /**

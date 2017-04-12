@@ -1,5 +1,5 @@
 import { isObservableArray, isObservableMap } from "mobx"
-import { resolve, getMSTAdministration, getRelativePath, isMST, IMSTNode } from "../../core"
+import { resolve, getMSTAdministration, getRelativePathForNodes, isMST, IMSTNode } from "../../core"
 import { invariant, fail } from "../../utils"
 import { getIdentifierAttribute } from "../complex-types/object"
 import { IType, typecheck } from "../type"
@@ -45,7 +45,7 @@ function createGenericRelativeReference(factory: IType<any, any>): IReferenceDes
             const base = getMSTAdministration(this)
             const target = getMSTAdministration(value)
             invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
-            return { $ref: getRelativePath(base, target) }
+            return { $ref: getRelativePathForNodes(base, target) }
         }
     }
 }

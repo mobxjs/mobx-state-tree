@@ -54,5 +54,23 @@ export function valueToSnapshot(thing: any) {
     fail("Unable to convert value to snapshot.")
 }
 
+export function getRelativePathForNodes(base: MSTAdminisration, target: MSTAdminisration): string {
+    // PRE condition target is (a child of) base!
+    invariant(
+        base.root === target.root,
+        `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
+    )
+    const baseParts = splitJsonPath(base.path)
+    const targetParts = splitJsonPath(target.path)
+    let common = 0
+    for (; common < baseParts.length; common++) {
+        if (baseParts[common] !== targetParts[common])
+            break
+    }
+    // TODO: assert that no targetParts paths are "..", "." or ""!
+    return baseParts.slice(common).map(_ => "..").join("/")
+        + joinJsonPath(targetParts.slice(common))
+}
+
 import { MSTAdminisration } from "./mst-node-administration"
-import { isMutable, isSerializable, fail } from "../utils"
+import { invariant, isMutable, isSerializable, fail } from "../utils"
