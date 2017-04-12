@@ -154,14 +154,14 @@ export class MSTAdminisration {
         }
     }
 
-    prepareChild(subpath: string, child: any): any {
+    prepareChild(subpath: string, child: any, reconcile = true): any {
         const childFactory = this.getChildType(subpath)
         typecheck(childFactory, child)
 
         if (isMST(child)) {
             const childNode = getMSTAdministration(child)
 
-            if (childNode.isRoot) {
+            if (childNode.isRoot || childNode.parent === this) {
                 // we are adding a node with no parent (first insert in the tree)
                 childNode.setParent(this, subpath)
                 return child
@@ -169,10 +169,10 @@ export class MSTAdminisration {
 
             return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${childNode.path}'`)
         }
-        const existingNode = this.getChildMST(subpath)
+        const existingNode = reconcile ? this.getChildMST(subpath) : null
         const newInstance = childFactory.create(child)
 
-        if (existingNode && existingNode.type === newInstance.factory) {
+        if (existingNode && isMST(newInstance) && getMSTAdministration(newInstance).type === existingNode.type) {
             // recycle instance..
             existingNode.applySnapshot(child)
             return existingNode.target

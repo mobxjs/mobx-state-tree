@@ -68,12 +68,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
                 change.newValue = node.prepareChild("" + change.index, newValue)
                 break
             case "splice":
-                change.object.slice(change.index, change.removedCount).forEach(oldValue => {
-                    maybeMST(oldValue, adm => adm.setParent(null))
-                })
-                change.added = change.added.map((newValue, pos) => {
-                    return node.prepareChild("" + (change.index + pos), newValue)
-                })
+                change.added = reconcileUnkeyedArrayItems(node, change.object, this.subType, change.index, change.added, change.removedCount)
                 break
         }
         return change
@@ -149,6 +144,47 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     removeChild(node: MSTAdminisration, subpath: string) {
         node.target.splice(parseInt(subpath, 10), 1)
     }
+}
+
+/**
+ * This function reconciles array items, given a splice. Example:
+ *
+ * Orig array:    [ a a b c]
+ *                     ^
+ *                    [ d d d ], delete 'b'
+ * Splice:        index: 2, remove 1, add 3
+ *
+ * Reconciled     [ a a b - - c ]
+ *                  | | |     |
+ *                  v v v + + v
+ * To:            [ a a d d d c]
+ *
+ */
+function reconcileUnkeyedArrayItems(node: MSTAdminisration, target: IObservableArray<any>, subtype: IType<any, any>, index: number, added: any[], removedCount: number) {
+    // possible optimization: loops instead of splice / map
+    const reconcilableCount = Math.min(removedCount, added.length)
+
+    // remove items that won't be reconciled...
+    if (removedCount > reconcilableCount) {
+        target.slice(index + reconcilableCount, index + removedCount).forEach(oldValue => {
+            maybeMST(oldValue, adm => adm.setParent(null))
+        })
+    }
+    // give new indexes to items that will be pushed forward / backward..
+    const delta = added.length - removedCount
+    target.slice(index + removedCount).forEach((oldValue, idx) => {
+        maybeMST(oldValue, adm => adm.setParent(node, "" + (index + removedCount + idx + delta)))
+    })
+
+    // reconcile + create new items for the new ones
+    const reconciled = added.slice(0, reconcilableCount).map((newValue, pos) =>
+        node.prepareChild("" + (index + pos), newValue)
+    )
+    // for new items, don't reconcile items currently at that position
+    const created = added.slice(reconcilableCount).map((newValue, pos) =>
+        node.prepareChild("" + (index + pos + reconcilableCount), newValue, false)
+    )
+    return reconciled.concat(created)
 }
 
 function reconcileArrayItems(identifierAttr: string, target: IObservableArray<any>, snapshot: any[], factory: IType<any, any>): any[] {
