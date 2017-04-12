@@ -117,7 +117,7 @@ test("identifiers cannot be modified", (t) => {
 })
 
 // TODO: duplicate test for ref without path
-test("it should resolve refs during creation", t => {
+test.skip("it should resolve refs during creation", t => {
     const values: number[] = []
     const Book = types.model({
         id: types.identifier(),

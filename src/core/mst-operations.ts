@@ -2,7 +2,7 @@ import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { getMSTAdministration, IMSTNode, getRelativePathForNodes } from "./mst-node"
 import { MSTAdminisration } from "./mst-node-administration"
-import { IJsonPatch, joinJsonPath } from "./json-patch"
+import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, invariant, fail } from "../utils"
 import { ISnapshottable, IType } from "../types/type"
 
@@ -299,25 +299,7 @@ export function getPath(target: IMSTNode): string {
  * @returns {string[]}
  */
 export function getPathParts(target: IMSTNode): string[] {
-    return getMSTAdministration(target).pathParts
-}
-
-export function getRelativePath(base: MSTAdminisration, target: MSTAdminisration): string {
-    // PRE condition target is (a child of) base!
-    invariant(
-        base.root === target.root,
-        `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
-    )
-    const baseParts = base.pathParts
-    const targetParts = target.pathParts
-    let common = 0
-    for (; common < baseParts.length; common++) {
-        if (baseParts[common] !== targetParts[common])
-            break
-    }
-    // TODO: assert that no targetParts paths are "..", "." or ""!
-    return baseParts.slice(common).map(_ => "..").join("/")
-        + joinJsonPath(targetParts.slice(common))
+    return splitJsonPath(getMSTAdministration(target).path)
 }
 
 /**
@@ -345,10 +327,6 @@ export function resolve(target: IMSTNode, path: string): IMSTNode | any {
     return node ? node.target : undefined
 }
 
-export function getRelativePath(base: IMSTNode, target: IMSTNode): string {
-    return getRelativePathForNodes(getMSTAdministration(base), getMSTAdministration(target))
-}
-
 /**
  *
  *
@@ -362,6 +340,10 @@ export function tryResolve(target: IMSTNode, path: string): IMSTNode | any {
     if (node === undefined)
         return undefined
     return node ? node.target : undefined
+}
+
+export function getRelativePath(base: IMSTNode, target: IMSTNode): string {
+    return getRelativePathForNodes(getMSTAdministration(base), getMSTAdministration(target))
 }
 
 /**

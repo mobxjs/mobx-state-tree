@@ -31,7 +31,7 @@ export class TransformedProperty extends Property {
                 }, node)
             }
         })
-        targetInstance[this.name] = snapshot[this.name]
+        // targetInstance[this.name] = snapshot[this.name]
     }
 
     serialize(instance: any, snapshot: any) {

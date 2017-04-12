@@ -1,3 +1,4 @@
+import { splitJsonPath, joinJsonPath } from "./json-patch"
 import { IType } from "../types/type"
 
 export interface IMSTNode {

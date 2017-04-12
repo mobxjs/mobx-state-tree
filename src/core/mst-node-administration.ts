@@ -10,13 +10,14 @@ import {
     invariant, fail, extend,
     addHiddenFinalProp, IDisposer, registerEventHandler
 } from "../utils"
-import { IJsonPatch, joinJsonPath, splitJsonPath } from "./json-patch"
+import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
 import { ObjectType } from "../types/complex-types/object"
 import { ComplexType } from "../types/complex-types/complex-type"
 
 export class MSTAdminisration {
     readonly target: any
     @observable _parent: MSTAdminisration | null = null
+    @observable subpath: string = ""
     readonly type: ComplexType<any, any>
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
@@ -43,38 +44,13 @@ export class MSTAdminisration {
         })
     }
 
-    @computed get pathParts(): string[]{
-        // no parent? you are root!
-        if (this._parent === null) {
-            return []
-        }
-
-        // get the key
-        // optimize: maybe this shouldn't be computed, this is called often and pretty expensive lookup ...
-        const keys = this._parent.getChildMSTs()
-            .filter(entry => entry[1] === this)
-        if (keys.length > 0) {
-            const [key] = keys[0]
-            return this._parent.pathParts.concat([key])
-        }
-
-        return fail("Illegal state")
-    }
-
     /**
      * Returnes (escaped) path representation as string
      */
     @computed public get path(): string {
-        this.assertAlive()
-        return joinJsonPath(this.pathParts)
-    }
-
-    @computed public get subpath(): string {
-        this.assertAlive()
-        if (this.isRoot)
+        if (!this.parent)
             return ""
-        const parts = this.pathParts
-        return parts[parts.length - 1]
+        return this.parent.path + "/" + escapeJsonPath(this.subpath)
     }
 
     public get isRoot(): boolean {
@@ -151,14 +127,13 @@ export class MSTAdminisration {
     }
 
     setParent(newParent: MSTAdminisration | null, subpath: string | null = null) {
-        // TODO: factor out subpath? It is not updated in this function, which is confusing
-        if (this.parent === newParent)
+        if (this.parent === newParent && this.subpath === subpath)
             return
-        if (this._parent && newParent) {
-            fail(`A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
+        if (this._parent && newParent && newParent !== this._parent) {
+            fail(`A node cannot exists twice in the state tree. Failed to add object to path '${newParent.path}"/"${subpath}', it exists already at '${this.path}'`)
         }
         if (!this._parent && newParent && newParent.root === this) {
-            fail(`A state tree is not allowed to contain itself. Cannot add root to path '/${newParent.pathParts.concat(subpath!).join("/")}'`)
+            fail(`A state tree is not allowed to contain itself. Cannot add root to path '${newParent.path}"/"${subpath}'`)
         }
         if (!this._parent && !!this._environment) {
             fail(`A state tree that has been initialized with an environment cannot be made part of another state tree.`)
@@ -175,8 +150,8 @@ export class MSTAdminisration {
             this.die()
         } else {
             this._parent = newParent
+            this.subpath = subpath || "" // TODO: mweh
         }
-
     }
 
     prepareChild(subpath: string, child: any): any {
