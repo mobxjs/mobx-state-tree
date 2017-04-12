@@ -58,18 +58,34 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         const node = getMSTAdministration(change.object)
         node.assertWritable()
 
-        // TODO: check for key duplication
         switch (change.type) {
-            case "update":
-                const {newValue} = change
-                const oldValue = change.object[change.index]
-                if (newValue === oldValue)
-                    return null
-                change.newValue = node.prepareChild("" + change.index, newValue)
-                break
-            case "splice":
-                change.added = reconcileUnkeyedArrayItems(node, change.object, this.subType, change.index, change.added, change.removedCount)
-                break
+            case "update": {
+                const identifierAttr = getIdentifierAttribute(this.subType)
+                if (identifierAttr) {
+                    return { // use a splice to benefit from all the identifier checks
+                        type: "splice",
+                        object: change.object,
+                        added: reconcileKeyedArrayItems(node, change.object, this.subType, identifierAttr, change.index, [change.newValue], 1),
+                        removedCount: 1,
+                        index: change.index
+                    } as IArrayWillSplice<any>
+                } else {
+                    const {newValue} = change
+                    const oldValue = change.object[change.index]
+                    if (newValue === oldValue)
+                        return null
+                    change.newValue = node.prepareChild("" + change.index, newValue)
+                }
+            }
+            break
+            case "splice": {
+                const identifierAttr = getIdentifierAttribute(this.subType)
+                if (identifierAttr)
+                    change.added = reconcileKeyedArrayItems(node, change.object, this.subType, identifierAttr, change.index, change.added, change.removedCount)
+                else
+                    change.added = reconcileUnkeyedArrayItems(node, change.object, this.subType, change.index, change.added, change.removedCount)
+            }
+            break
         }
         return change
     }
@@ -122,11 +138,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
 
     @action applySnapshot(node: MSTAdminisration, snapshot: any[]): void {
         const target = node.target as IObservableArray<any>
-        const identifierAttr = getIdentifierAttribute(this.subType)
-        if (identifierAttr)
-            target.replace(reconcileArrayItems(identifierAttr, target, snapshot, this.subType))
-        else
-            target.replace(snapshot)
+        target.replace(snapshot)
     }
 
     getChildType(key: string): IType<any, any> {
@@ -187,23 +199,50 @@ function reconcileUnkeyedArrayItems(node: MSTAdminisration, target: IObservableA
     return reconciled.concat(created)
 }
 
-function reconcileArrayItems(identifierAttr: string, target: IObservableArray<any>, snapshot: any[], factory: IType<any, any>): any[] {
-    const current: any = {}
+function reconcileKeyedArrayItems(node: MSTAdminisration, target: IObservableArray<any>, subtype: IType<any, any>, identifierAttr: string, index: number, added: any[], removedCount: number) {
+    // possible optimization: loops instead of splice / map
+    const currentItems: { [key: string]: MSTAdminisration } = {} // Optimization: cache this in the future
     target.forEach(item => {
         const id = item[identifierAttr]
-        invariant(!current[id], `Identifier '${id}' (of ${getMSTAdministration(item).path}) is not unique!`)
-        current[id] = item
+        if (currentItems[id])
+            fail(`Duplicate key ${id} in array '${node.path}'`)
+        currentItems[id] = getMSTAdministration(item)
     })
-    return snapshot.map(item => {
-        const existing = current[item[identifierAttr]]
-        if (existing && getType(existing).is(item)) {
-            applySnapshot(existing, item)
-            return existing
+
+    const itemsToBeRemoved: { [key: string]: MSTAdminisration } = {}
+    target.slice(index, removedCount).forEach(item => {
+        itemsToBeRemoved[item[identifierAttr]] = getMSTAdministration(item)
+    })
+
+    // check if we are not adding items which are already in the tree
+    const newItems = added.map((item, idx) => {
+        const id = item[identifierAttr]
+        const reconcilableNode = itemsToBeRemoved[id]
+        if (reconcilableNode) {
+            // try to reconcile if possible
+            // note that we are reconciling on maybe the wrong position, but the correct node
+            const updatedItem = node.prepareChild(reconcilableNode.subpath, item)
+            // update the path of the reconciled node
+            getMSTAdministration(updatedItem).setParent(node, "" + (index + idx))
+            return updatedItem
+        } else if (id in currentItems) {
+            // the id was not in the to-be-removed collection, but it is in the array
+            return fail(`Cannot add item with id '${id}' to the tree, it already exists in the array '${node.path}'`)
         } else {
-            return factory.create(item)
+            // create a new node
+            return node.prepareChild("" + (index + idx), item, false)
         }
     })
+
+    // subpath of remaining items
+    const delta = added.length - removedCount
+    target.slice(index + removedCount).forEach((item, idx) => {
+        getMSTAdministration(item).setParent(node, "" + (index + removedCount + idx + delta))
+    })
+
+    return newItems
 }
+
 
 export function createArrayFactory<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
     return createDefaultValueFactory(new ArrayType(subtype.name + "[]", subtype), [])

@@ -21,7 +21,7 @@ export class IdentifierProperty extends Property {
         node.assertWritable()
         const oldValue = change.object[this.name]
         if (oldValue !== undefined && oldValue !== change.newValue)
-            fail(`It is not allowed to change the identifier of an object, got: '${change.newValue}'`)
+            fail(`It is not allowed to change the identifier of an object, got: '${change.newValue}' but expected: '${oldValue}'`)
 
         return change
     }
