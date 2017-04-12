@@ -170,6 +170,7 @@ test("it should check the type correctly", (t) => {
 })
 
 test("it should reconciliate instances correctly", (t) => {
+    debugger;
     const Store = types.model({
         todos: types.array(types.model("Task", {
             id: types.identifier(),

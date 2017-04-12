@@ -68,12 +68,15 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
                 change.newValue = node.prepareChild("" + change.index, newValue)
                 break
             case "splice":
-                change.object.slice(change.index, change.removedCount).forEach(oldValue => {
-                    maybeMST(oldValue, adm => adm.setParent(null))
-                })
+                if (change.removedCount > change.added.length) {
+                    change.object.slice(change.index + change.added.length, change.removedCount - change.added.length).forEach(oldValue => {
+                        maybeMST(oldValue, adm => adm.setParent(null))
+                    })
+                }
                 change.added = change.added.map((newValue, pos) => {
                     return node.prepareChild("" + (change.index + pos), newValue)
                 })
+                // TODO: make test that verifies path of all elements is correct after insertion / deletion
                 break
         }
         return change
