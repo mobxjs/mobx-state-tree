@@ -18,9 +18,6 @@ export class ValueProperty extends Property {
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getMSTAdministration(change.object)
-        const oldValue = change.object[this.name]
-
-        maybeMST(oldValue, adm => adm.setParent(null))
         change.newValue = node.prepareChild(this.name, change.newValue)
         return change
     }

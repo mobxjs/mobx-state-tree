@@ -192,7 +192,7 @@ test("it should throw if a replaced object is read or written to", (t) => {
         todo: { title: "3" }
     })
     const todo = s.todo
-    s.todo = { title: "4"} as any
+    s.todo = Todo.create({ title: "4"})
 
     t.is(s.todo.title, "4")
 

@@ -154,37 +154,40 @@ export class MSTAdminisration {
         }
     }
 
-    prepareChild(subpath: string, child: any, reconcile = true): any {
-        const childFactory = this.getChildType(subpath)
-        typecheck(childFactory, child)
+    prepareChild(subpath: string, value: any, reconcile = true): any {
+        // TODO: verify coverage of all code paths
+        const childType = this.getChildType(subpath)
+        typecheck(childType, value)
+        if (isMST(value) && hasParent(value))
+            return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${getPath(value)}'`)
 
-        if (isMST(child)) {
-            const childNode = getMSTAdministration(child)
+        const valueIsSnapshot = !isMST(value)
+        const currentNode = reconcile ? this.getChildMST(subpath) : null
 
-            if (childNode.isRoot || childNode.parent === this) {
-                // we are adding a node with no parent (first insert in the tree)
-                childNode.setParent(this, subpath)
-                return child
-            }
-
-            return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${childNode.path}'`)
+        if (valueIsSnapshot && currentNode && childType === currentNode.type) {
+            // actual type matches declared type, so we can always apply the snapshot and recycle instance
+            currentNode.applySnapshot(value)
+            return currentNode.target
         }
-        const existingNode = reconcile ? this.getChildMST(subpath) : null
-        const newInstance = childFactory.create(child)
 
-        if (existingNode && isMST(newInstance) && getMSTAdministration(newInstance).type === existingNode.type) {
-            // recycle instance..
-            existingNode.applySnapshot(child)
-            return existingNode.target
-        } else {
-            if (existingNode)
-                existingNode.setParent(null) // TODO: or delete / remove / whatever is a more explicit clean up
-            if (isMST(newInstance)) {
-                const node = getMSTAdministration(newInstance)
-                node.setParent(this, subpath)
-            }
-            return newInstance
+        const child = valueIsSnapshot
+            ? childType.create(value) // TODO: pass parent / child
+            : value
+        const childNode = isMST(child) ? getMSTAdministration(child) : null
+
+        if (valueIsSnapshot && currentNode && childNode && childNode.type === currentNode.type) {
+            // The actual type the snapshot was resolved to, matches the actual type of the current value, so we
+            // can reconciliate instead of using the new instance
+            childNode.die() // TODO: lifecycle hooks firing might be confusing here and during create?
+            currentNode.applySnapshot(value)
+            return currentNode.target
         }
+
+        if (currentNode)
+            currentNode.setParent(null) // TODO: or just call die?
+        if (/* TODO: !valueIsSnapshot && */ childNode)
+            childNode.setParent(this, subpath) // TODO: remove this, should be done during create
+        return child
     }
 
     resolve(pathParts: string): MSTAdminisration;
@@ -285,3 +288,5 @@ export class MSTAdminisration {
 
     // TODO: give good toString, with type and path, and use it in errors
 }
+
+import { hasParent, getPath } from "./mst-operations"
