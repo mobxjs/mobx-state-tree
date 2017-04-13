@@ -29,9 +29,11 @@ export class MSTAdminisration {
     private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     private readonly snapshotDisposer: IReactionDisposer
 
-    constructor(initialState: any, type: ComplexType<any, any>, environment: any) {
+    constructor(parent: MSTAdminisration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
         invariant(type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
+        this._parent = parent
+        this.subpath = subpath
         this.type = type
         this.target = initialState
         this._environment = environment
@@ -171,7 +173,7 @@ export class MSTAdminisration {
         }
 
         const child = valueIsSnapshot
-            ? childType.create(value) // TODO: pass parent / child
+            ? (childType as any).create(value, undefined, this, subpath) // any -> we don't want this typing public
             : value
         const childNode = isMST(child) ? getMSTAdministration(child) : null
 
@@ -185,8 +187,10 @@ export class MSTAdminisration {
 
         if (currentNode)
             currentNode.setParent(null) // TODO: or just call die?
-        if (/* TODO: !valueIsSnapshot && */ childNode)
-            childNode.setParent(this, subpath) // TODO: remove this, should be done during create
+        if (!valueIsSnapshot && childNode) {
+            // if child was a node, we still need to update the path
+            childNode.setParent(this, subpath)
+        }
         return child
     }
 

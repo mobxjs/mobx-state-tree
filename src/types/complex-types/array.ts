@@ -179,7 +179,7 @@ function reconcileUnkeyedArrayItems(node: MSTAdminisration, target: IObservableA
     // remove items that won't be reconciled...
     if (removedCount > reconcilableCount) {
         target.slice(index + reconcilableCount, index + removedCount).forEach(oldValue => {
-            maybeMST(oldValue, adm => adm.setParent(null))
+            maybeMST(oldValue, adm => adm.setParent(null)) // TODO: or just die
         })
     }
     // give new indexes to items that will be pushed forward / backward..
@@ -234,7 +234,7 @@ function reconcileKeyedArrayItems(node: MSTAdminisration, target: IObservableArr
         }
     })
 
-    // subpath of remaining items
+    // update path of remaining items
     const delta = added.length - removedCount
     target.slice(index + removedCount).forEach((item, idx) => {
         getMSTAdministration(item).setParent(node, "" + (index + removedCount + idx + delta))
