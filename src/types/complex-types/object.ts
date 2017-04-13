@@ -145,6 +145,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     @action applySnapshot(node: MSTAdminisration, snapshot: any): void {
+        // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed
         for (let key in snapshot) if (key in this.props) {
             this.props[key].deserialize(node.target, snapshot)
         }
