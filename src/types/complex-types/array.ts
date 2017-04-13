@@ -173,6 +173,8 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
  *
  */
 function reconcileUnkeyedArrayItems(node: MSTAdminisration, target: IObservableArray<any>, subtype: IType<any, any>, index: number, added: any[], removedCount: number) {
+    // TODO: improved reconcilation: see if the items being spliced in are part of the deleted set
+
     // possible optimization: loops instead of splice / map
     const reconcilableCount = Math.min(removedCount, added.length)
 

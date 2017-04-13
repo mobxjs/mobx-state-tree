@@ -321,20 +321,40 @@ test("it should reconciliate keyed instances correctly", (t) => {
     t.is(store.todos[2] === c, false)
 })
 
-// TODO: in future, support identifier in unions etc
-// test("it should reconciliate instances correctly", (t) => {
-//     const Store = types.model.create({
-//         todos: types.array(types.union(
-//             types.model.create("completedTask", {
-//                 id: types.identifier(),
-//                 task: "",
-//                 done: types.literal(true)
-//             }),
-//             types.model.create("uncompletedTask", {
-//                 id: types.identifier()
-//                 task: "",
-//                 done: types.literal(true)
-//             })
-//         ))
-//     })
-// })
+test("it correctly reconciliate when swapping", t => {
+    const Task = types.model("Task", {
+    })
+    const Store = types.model({
+        todos: types.array(Task)
+    })
+
+    const s = Store.create()
+    const a = Task.create()
+    const b = Task.create()
+    s.todos.push(a, b)
+
+    s.todos.replace([b, a])
+    t.true(s.todos[0] === b)
+    t.true(s.todos[1] === a)
+    t.deepEqual(s.todos.map(getPath), ["/todos/0", "/todos/1"])
+})
+
+test("it should not be allowed to add the same item twice to the same store", t => {
+    const Task = types.model("Task", {
+    })
+    const Store = types.model({
+        todos: types.array(Task)
+    })
+
+    const s = Store.create()
+    const a = Task.create()
+    s.todos.push(a)
+    t.throws(() => {
+        s.todos.push(a)
+    }, "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/1', but it lives already at '/todos/0'")
+
+    const b = Task.create()
+    t.throws(() => {
+        s.todos.push(b, b)
+    }, "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/2', but it lives already at '/todos/1'")
+})

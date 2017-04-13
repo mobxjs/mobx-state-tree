@@ -89,7 +89,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
             case "delete":
                 {
                     const oldValue = change.object.get(change.name)
-                    maybeMST(oldValue, adm => adm.setParent(null)) // TODO: or just die
+                    maybeMST(oldValue, adm => adm.die())
                 }
                 break
         }

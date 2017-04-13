@@ -72,13 +72,13 @@ export class MSTAdminisration {
     }
 
     public die() {
-        if (!this.isRoot)
-            fail(`Model ${this.path} cannot die while it is still in a tree`)
+        // TODO: kill $mobx.values
         this.snapshotDisposer()
         this.patchSubscribers.splice(0)
         this.snapshotSubscribers.splice(0)
         this.patchSubscribers.splice(0)
         this._isAlive = false
+        // Post conditions, element will not be in the tree anymore...
     }
 
     public assertAlive() {
@@ -186,7 +186,7 @@ export class MSTAdminisration {
         }
 
         if (currentNode)
-            currentNode.setParent(null) // TODO: or just call die?
+            currentNode.die()
         if (!valueIsSnapshot && childNode) {
             // if child was a node, we still need to update the path
             childNode.setParent(this, subpath)
