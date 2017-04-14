@@ -82,7 +82,7 @@ export class MSTAdminisration {
     }
 
     public assertAlive() {
-        if ((this.isRoot && !this._isAlive) || !this.root._isAlive)
+        if (!this._isAlive || (this.root && !this.root._isAlive))
             fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach'`)
     }
 

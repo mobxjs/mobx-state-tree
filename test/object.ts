@@ -197,13 +197,17 @@ test("it should throw if a replaced object is read or written to", (t) => {
     t.is(s.todo.title, "4")
 
     t.throws(
-        () => { getSnapshot(todo) },
+        () => {
+            getSnapshot(todo)
+        },
         "[mobx-state-tree] The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach'"
     )
     t.throws(
         () => { todo.fn() },
         "[mobx-state-tree] The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach'"
     )
+
+    // TODO:
     // Ideally...? But expensive!
     // t.throws(
     //     () => { todo.title },
