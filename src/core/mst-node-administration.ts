@@ -14,9 +14,9 @@ import { IJsonPatch, joinJsonPath, splitJsonPath } from "./json-patch"
 import { ObjectType } from "../types/complex-types/object"
 import { ComplexType } from "../types/complex-types/complex-type"
 
-export class MSTAdminisration {
+export class MSTAdministration {
     readonly target: any
-    @observable _parent: MSTAdminisration | null = null
+    @observable _parent: MSTAdministration | null = null
     readonly type: ComplexType<any, any>
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
@@ -87,7 +87,7 @@ export class MSTAdminisration {
 
     public get root() {
         // future optimization: store root ref in the node and maintain it
-        let p, r: MSTAdminisration = this
+        let p, r: MSTAdministration = this
         while (p = r.parent)
             r = p
         return r
@@ -139,7 +139,7 @@ export class MSTAdminisration {
         return registerEventHandler(this.patchSubscribers, onPatch)
     }
 
-    emitPatch(patch: IJsonPatch, source: MSTAdminisration) {
+    emitPatch(patch: IJsonPatch, source: MSTAdministration) {
         if (this.patchSubscribers.length) {
             const localizedPatch: IJsonPatch = extend({}, patch, {
                     path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
@@ -150,7 +150,7 @@ export class MSTAdminisration {
             this.parent.emitPatch(patch, source)
     }
 
-    setParent(newParent: MSTAdminisration | null, subpath: string | null = null) {
+    setParent(newParent: MSTAdministration | null, subpath: string | null = null) {
         // TODO: factor out subpath? It is not updated in this function, which is confusing
         if (this.parent === newParent)
             return
@@ -212,21 +212,21 @@ export class MSTAdminisration {
         }
     }
 
-    resolve(pathParts: string): MSTAdminisration;
-    resolve(pathParts: string, failIfResolveFails: boolean): MSTAdminisration | undefined;
-    resolve(path: string, failIfResolveFails: boolean = true): MSTAdminisration | undefined {
+    resolve(pathParts: string): MSTAdministration;
+    resolve(pathParts: string, failIfResolveFails: boolean): MSTAdministration | undefined;
+    resolve(path: string, failIfResolveFails: boolean = true): MSTAdministration | undefined {
         return this.resolvePath(splitJsonPath(path), failIfResolveFails)
     }
 
-    resolvePath(pathParts: string[]): MSTAdminisration;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean): MSTAdminisration | undefined;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): MSTAdminisration | undefined {
+    resolvePath(pathParts: string[]): MSTAdministration;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean): MSTAdministration | undefined;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): MSTAdministration | undefined {
         this.assertAlive()
         // counter part of getRelativePath
         // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
         // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
         // so we treat leading ../ apart...
-        let current: MSTAdminisration | null = this
+        let current: MSTAdministration | null = this
         for (let i = 0; i < pathParts.length; i++) {
             if (pathParts[i] === "") // '/bla' or 'a//b' splits to empty strings
                 current = current.root
@@ -259,12 +259,12 @@ export class MSTAdminisration {
         return registerEventHandler(this.middlewares, handler)
     }
 
-    getChildMST(subpath: string): MSTAdminisration | null {
+    getChildMST(subpath: string): MSTAdministration | null {
         this.assertAlive()
         return this.type.getChildMST(this, subpath)
     }
 
-    getChildMSTs(): [string, MSTAdminisration][] {
+    getChildMSTs(): [string, MSTAdministration][] {
         return this.type.getChildMSTs(this)
     }
 
@@ -273,7 +273,7 @@ export class MSTAdminisration {
     }
 
     get isProtected(): boolean {
-        let cur: MSTAdminisration | null = this
+        let cur: MSTAdministration | null = this
         while (cur) {
             if (cur._isProtected === true)
                 return true

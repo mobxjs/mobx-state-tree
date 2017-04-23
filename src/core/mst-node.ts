@@ -1,7 +1,7 @@
 import { IType } from "../types/type"
 
 export interface IMSTNode {
-    readonly $treenode?: MSTAdminisration
+    readonly $treenode?: MSTAdministration
 }
 
 export function getType<S, T>(object: IMSTNode): IType<S, T> {
@@ -16,7 +16,7 @@ export function isMST(value: any): value is IMSTNode {
     return value && value.$treenode
 }
 
-export function getMSTAdministration(value: any): MSTAdminisration {
+export function getMSTAdministration(value: any): MSTAdministration {
     if (isMST(value))
         return value.$treenode!
     else
@@ -28,7 +28,7 @@ export function getMSTAdministration(value: any): MSTAdminisration {
  * the first callback is invoked, otherwise the second.
  * The result of this function is the return value of the callbacks, or the original value if the second callback is omitted
  */
-export function maybeMST<T, R>(value: T & IMSTNode, asNodeCb: (node: MSTAdminisration, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
+export function maybeMST<T, R>(value: T & IMSTNode, asNodeCb: (node: MSTAdministration, value: T) => R, asPrimitiveCb?: (value: T) => R): R {
     // Optimization: maybeNode might be quite inefficient runtime wise, might be factored out at expensive places
     if (isMutable(value) && isMST(value)) {
         const n = getMSTAdministration(value)
@@ -54,5 +54,5 @@ export function valueToSnapshot(thing: any) {
     fail("Unable to convert value to snapshot.")
 }
 
-import { MSTAdminisration } from "./mst-node-administration"
+import { MSTAdministration } from "./mst-node-administration"
 import { isMutable, isSerializable, fail } from "../utils"

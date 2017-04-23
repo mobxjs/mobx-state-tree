@@ -1,7 +1,7 @@
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { getMSTAdministration, IMSTNode } from "./mst-node"
-import { MSTAdminisration } from "./mst-node-administration"
+import { MSTAdministration } from "./mst-node-administration"
 import { IJsonPatch, joinJsonPath } from "./json-patch"
 import { IDisposer, invariant, fail } from "../utils"
 import { ISnapshottable, IType } from "../types/type"
@@ -233,7 +233,7 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
  */
 export function hasParent(target: IMSTNode, depth: number = 1): boolean {
     invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
-    let parent: MSTAdminisration | null = getMSTAdministration(target).parent
+    let parent: MSTAdministration | null = getMSTAdministration(target).parent
     while (parent) {
         if (--depth === 0)
             return true
@@ -258,7 +258,7 @@ export function getParent<T>(target: IMSTNode, depth?: number): (T & IMSTNode);
 export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) {
     invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
     let d = depth
-    let parent: MSTAdminisration | null = getMSTAdministration(target).parent
+    let parent: MSTAdministration | null = getMSTAdministration(target).parent
     while (parent) {
         if (--d === 0)
             return parent.target
@@ -302,7 +302,7 @@ export function getPathParts(target: IMSTNode): string[] {
     return getMSTAdministration(target).pathParts
 }
 
-export function getRelativePath(base: MSTAdminisration, target: MSTAdminisration): string {
+export function getRelativePath(base: MSTAdministration, target: MSTAdministration): string {
     // PRE condition target is (a child of) base!
     invariant(
         base.root === target.root,
