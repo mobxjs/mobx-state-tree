@@ -1,7 +1,7 @@
 import { createDefaultValueFactory } from "../utility-types/with-default"
 import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
-import { getMSTAdministration, maybeMST, MSTAdminisration, valueToSnapshot, escapeJsonPath, IJsonPatch } from "../../core"
+import { getMSTAdministration, maybeMST, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, invariant, fail } from "../../utils"
 import { IType, IComplexType, isType } from "../type"
 import { ComplexType } from "./complex-type"
@@ -47,15 +47,15 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         getMSTAdministration(instance).applySnapshot(snapshot)
     }
 
-    getChildMSTs(node: MSTAdminisration): [string, MSTAdminisration][] {
-        const res: [string, MSTAdminisration][] = []
+    getChildMSTs(node: MSTAdministration): [string, MSTAdministration][] {
+        const res: [string, MSTAdministration][] = []
         ; (node.target as ObservableMap<any>).forEach((value: any, key: string) => {
             maybeMST(value, childNode => { res.push([key, childNode])})
         })
         return res
     }
 
-    getChildMST(node: MSTAdminisration, key: string): MSTAdminisration | null {
+    getChildMST(node: MSTAdministration, key: string): MSTAdministration | null {
         const target = node.target as ObservableMap<any>
         if (target.has(key))
             return maybeMST(target.get(key), identity, nothing)
@@ -96,7 +96,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         return change
     }
 
-    serialize(node: MSTAdminisration): Object {
+    serialize(node: MSTAdministration): Object {
         const target = node.target as ObservableMap<any>
         const res: {[key: string]: any} = {}
         target.forEach((value, key) => {
@@ -123,7 +123,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         }
     }
 
-    applyPatchLocally(node: MSTAdminisration, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void {
         const target = node.target as ObservableMap<any>
         switch (patch.op) {
             case "add":
@@ -136,7 +136,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         }
     }
 
-    @action applySnapshot(node: MSTAdminisration, snapshot: any): void {
+    @action applySnapshot(node: MSTAdministration, snapshot: any): void {
         const target = node.target as ObservableMap<any>
         const identifierAttr = getIdentifierAttribute(this.subType)
         // Try to update snapshot smartly, by reusing instances under the same key as much as possible
@@ -181,7 +181,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         return {}
     }
 
-    removeChild(node: MSTAdminisration, subpath: string) {
+    removeChild(node: MSTAdministration, subpath: string) {
         (node.target as ObservableMap<any>).delete(subpath)
     }
 }

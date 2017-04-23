@@ -18,9 +18,9 @@ function runRawAction(actioncall: IRawActionCall): any {
     return actioncall.object[actioncall.name].apply(actioncall.object, actioncall.args)
 }
 
-function collectMiddlewareHandlers(node: MSTAdminisration): IMiddleWareHandler[] {
+function collectMiddlewareHandlers(node: MSTAdministration): IMiddleWareHandler[] {
     let handlers = node.middlewares.slice()
-    let n: MSTAdminisration | null = node
+    let n: MSTAdministration | null = node
     // Find all middlewares. Optimization: cache this?
     while (n.parent) {
         n = n.parent
@@ -29,7 +29,7 @@ function collectMiddlewareHandlers(node: MSTAdminisration): IMiddleWareHandler[]
     return handlers
 }
 
-function runMiddleWares(node: MSTAdminisration, baseCall: IRawActionCall): any {
+function runMiddleWares(node: MSTAdministration, baseCall: IRawActionCall): any {
     const handlers = collectMiddlewareHandlers(node)
     // Short circuit
     if (!handlers.length)
@@ -76,7 +76,7 @@ export function createActionInvoker(name: string, fn: Function) {
     return createNamedFunction(name, actionInvoker)
 }
 
-function serializeArgument(adm: MSTAdminisration, actionName: string, index: number, arg: any): any {
+function serializeArgument(adm: MSTAdministration, actionName: string, index: number, arg: any): any {
     if (isPrimitive(arg))
         return arg
     if (isMST(arg)) {
@@ -103,7 +103,7 @@ function serializeArgument(adm: MSTAdminisration, actionName: string, index: num
     }
 }
 
-function deserializeArgument(adm: MSTAdminisration, value: any): any {
+function deserializeArgument(adm: MSTAdministration, value: any): any {
     if (typeof value === "object") {
         const keys = Object.keys(value)
         if (keys.length === 1 && keys[0] === "$ref")
@@ -147,6 +147,6 @@ export function onAction(target: IMSTNode, listener: (call: ISerializedActionCal
 }
 
 import { getMSTAdministration, IMSTNode, isMST } from "./mst-node"
-import { MSTAdminisration } from "./mst-node-administration"
+import { MSTAdministration } from "./mst-node-administration"
 import { resolve, tryResolve, addMiddleware, getRelativePath } from "./mst-operations"
 import { fail, invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"
