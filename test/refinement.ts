@@ -1,4 +1,4 @@
-import {getSnapshot, types} from "../"
+import {getSnapshot, types} from "../src"
 import {test} from "ava"
 
 test("it should allow if type and predicate is correct", t => {

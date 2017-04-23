@@ -1,4 +1,4 @@
-import {types, getEnv, clone, detach} from "../"
+import {types, getEnv, clone, detach} from "../src"
 import {test} from "ava"
 
 const Todo = types.model({

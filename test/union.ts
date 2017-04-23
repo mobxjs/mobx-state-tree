@@ -1,4 +1,4 @@
-import {types} from "../"
+import {types} from "../src"
 import {test} from "ava"
 
 const createTestFactories = () => {

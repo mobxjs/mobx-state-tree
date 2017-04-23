@@ -1,5 +1,5 @@
 import {IObservableArray} from 'mobx'
-import {onSnapshot, onPatch, clone, onAction, isAlive, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../"
+import {onSnapshot, onPatch, clone, onAction, isAlive, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../src"
 import {test} from "ava"
 
 interface ITestSnapshot{
