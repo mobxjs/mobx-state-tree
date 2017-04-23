@@ -1,5 +1,5 @@
 import { test } from "ava"
-import { types, getSnapshot } from "../"
+import { types, getSnapshot } from "../src"
 
 const createTestFactories = () => {
     const Box = types.model({

@@ -1,4 +1,4 @@
-import {types} from "../"
+import {types} from "../src"
 import {test} from "ava"
 
 test("it should allow only primitives", t => {

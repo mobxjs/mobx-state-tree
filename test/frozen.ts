@@ -1,5 +1,5 @@
 import {test} from "ava"
-import {getSnapshot, types} from "../"
+import {getSnapshot, types} from "../src"
 
 test("it should accept any serializable value", t => {
     const Factory = types.model({

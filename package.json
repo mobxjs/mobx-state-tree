@@ -60,10 +60,7 @@
   ],
   "ava": {
     "files": [
-      "test-lib/**/*.js"
-    ],
-    "source": [
-      "lib/**/*.js"
+      "test-lib/test/**/*.js"
     ]
   }
 }

@@ -1,7 +1,7 @@
 /**
  *  Based on examples/boxes/domain-state.js
  */
-import { types, getSnapshot, applySnapshot, getParent, hasParent, onPatch, recordPatches, IJsonPatch } from "..";
+import { types, getSnapshot, applySnapshot, getParent, hasParent, onPatch, recordPatches, IJsonPatch } from "../src";
 import { test } from "ava"
 
 const randomUuid = () => Math.random()
