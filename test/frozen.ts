@@ -22,5 +22,5 @@ test("it should throw if value is not serializable", t => {
 
     t.throws(() => {
         doc.value = function IAmUnserializable(){}
-    }, /IAmUnserializable.*is not assignable to type: frozen/)
+    }, /IAmUnserializable(.|\n)* is not assignable to type: frozen/)
 })
