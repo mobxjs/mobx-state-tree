@@ -18,10 +18,7 @@ export class ValueProperty extends Property {
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getMSTAdministration(change.object)
-        const oldValue = change.object[this.name]
-
-        maybeMST(oldValue, adm => adm.setParent(null))
-        change.newValue = node.prepareChild(this.name, change.newValue)
+        change.newValue = node.reconcileChildren(this.type, [change.object[change.name]], [change.newValue], [change.name])[0]
         return change
     }
 
@@ -35,7 +32,6 @@ export class ValueProperty extends Property {
     }
 
     serialize(instance: any, snapshot: any) {
-        getMSTAdministration(instance).assertAlive()
         snapshot[this.name] = valueToSnapshot(instance[this.name])
     }
 

@@ -7,11 +7,11 @@ export class ActionProperty extends Property {
 
     constructor(name: string, fn: Function) {
         super(name)
-        this.invokeAction =  createActionInvoker(name, fn)
+        this.invokeAction = createActionInvoker(name, fn)
     }
 
     initialize(target: any) {
-        addHiddenFinalProp(target, this.name, this.invokeAction)
+        addHiddenFinalProp(target, this.name, this.invokeAction.bind(target))
     }
 
     isValidSnapshot(snapshot: any) {

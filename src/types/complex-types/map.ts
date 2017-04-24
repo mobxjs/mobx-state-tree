@@ -42,7 +42,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
-        intercept(instance, this.willChange as any)
+        intercept(instance, c => this.willChange(c))
         observe(instance, this.didChange)
         getMSTAdministration(instance).applySnapshot(snapshot)
     }
@@ -66,6 +66,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         const node = getMSTAdministration(change.object)
         node.assertWritable()
 
+        // Q: how to create a map that is not keyed by identifier, but contains objects with identifiers? Is that a use case? A: No, that is were reference maps should come into play...
         const identifierAttr = getIdentifierAttribute(node)
         if (identifierAttr && change.newValue && typeof change.newValue === "object" && change.newValue[identifierAttr] !== change.name)
             fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${change.name}', but expected: '${change.newValue[identifierAttr!]}'`)
@@ -77,19 +78,19 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                     const oldValue = change.object.get(change.name)
                     if (newValue === oldValue)
                         return null
-                    change.newValue = node.prepareChild("" + change.name, newValue)
+                    change.newValue = node.reconcileChildren(this.subType, [oldValue], [newValue], [change.name])[0]
                 }
                 break
             case "add":
                 {
                     const {newValue} = change
-                    change.newValue = node.prepareChild("" + change.name, newValue)
+                    change.newValue = node.reconcileChildren(this.subType, [], [newValue], [change.name])[0]
                 }
                 break
             case "delete":
                 {
                     const oldValue = change.object.get(change.name)
-                    maybeMST(oldValue, adm => adm.setParent(null))
+                    node.reconcileChildren(this.subType, [oldValue], [], [])
                 }
                 break
         }

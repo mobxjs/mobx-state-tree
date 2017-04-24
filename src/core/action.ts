@@ -84,7 +84,7 @@ function serializeArgument(adm: MSTAdminisration, actionName: string, index: num
         if (adm.root !== targetNode.root)
             throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
         return ({
-            $ref: getRelativePath(adm, getMSTAdministration(arg))
+            $ref: getRelativePathForNodes(adm, getMSTAdministration(arg))
         })
     }
     if (typeof arg === "function")
@@ -139,14 +139,14 @@ export function onAction(target: IMSTNode, listener: (call: ISerializedActionCal
         const sourceNode = getMSTAdministration(rawCall.object)
         listener({
             name: rawCall.name,
-            path: getRelativePath(getMSTAdministration(target), sourceNode),
+            path: getRelativePathForNodes(getMSTAdministration(target), sourceNode),
             args: rawCall.args.map((arg: any, index: number) => serializeArgument(sourceNode, rawCall.name, index, arg))
         })
         return next(rawCall)
     })
 }
 
-import { getMSTAdministration, IMSTNode, isMST } from "./mst-node"
+import { getMSTAdministration, IMSTNode, isMST, getRelativePathForNodes } from "./mst-node"
 import { MSTAdminisration } from "./mst-node-administration"
-import { resolve, tryResolve, addMiddleware, getRelativePath } from "./mst-operations"
+import { resolve, tryResolve, addMiddleware } from "./mst-operations"
 import { fail, invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"

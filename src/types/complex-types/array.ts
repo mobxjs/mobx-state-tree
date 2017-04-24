@@ -1,17 +1,14 @@
 import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe } from "mobx"
 import {
     getMSTAdministration,
-    getType,
     IJsonPatch,
     maybeMST,
     MSTAdminisration,
-    valueToSnapshot,
-    applySnapshot
+    valueToSnapshot
 } from "../../core"
-import { identity, nothing, invariant } from "../../utils"
+import { identity, nothing } from "../../utils"
 import { IType, IComplexType, isType } from "../type"
 import { ComplexType } from "./complex-type"
-import { getIdentifierAttribute } from "./object"
 import { createDefaultValueFactory } from "../utility-types/with-default"
 
 export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
@@ -32,7 +29,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     }
 
     finalizeNewInstance(instance: IObservableArray<any>, snapshot: any) {
-        intercept(instance, this.willChange as any)
+        intercept(instance, change => this.willChange(change) as any)
         observe(instance, this.didChange)
         getMSTAdministration(instance).applySnapshot(snapshot)
     }
@@ -54,26 +51,31 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         return null
     }
 
-    willChange = (change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null => {
+    willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
         const node = getMSTAdministration(change.object)
         node.assertWritable()
 
-        // TODO: check for key duplication
         switch (change.type) {
             case "update":
-                const {newValue} = change
-                const oldValue = change.object[change.index]
-                if (newValue === oldValue)
+                if (change.newValue === change.object[change.index])
                     return null
-                change.newValue = node.prepareChild("" + change.index, newValue)
+                change.newValue = node.reconcileChildren(this.subType, [change.object[change.index]], [change.newValue], [change.index])[0]
                 break
             case "splice":
-                change.object.slice(change.index, change.removedCount).forEach(oldValue => {
-                    maybeMST(oldValue, adm => adm.setParent(null))
-                })
-                change.added = change.added.map((newValue, pos) => {
-                    return node.prepareChild("" + (change.index + pos), newValue)
-                })
+                const {index, removedCount, added, object} = change
+                change.added = node.reconcileChildren(
+                    this.subType,
+                    object.slice(index, index + removedCount),
+                    added,
+                    added.map((_, i) => index + i)
+                )
+
+                // update paths of remaining items
+                for (let i = index + removedCount; i < object.length; i++) {
+                    maybeMST(object[i], child => {
+                        child.setParent(node, "" + (i + added.length - removedCount))
+                    })
+                }
                 break
         }
         return change
@@ -127,11 +129,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
 
     @action applySnapshot(node: MSTAdminisration, snapshot: any[]): void {
         const target = node.target as IObservableArray<any>
-        const identifierAttr = getIdentifierAttribute(this.subType)
-        if (identifierAttr)
-            target.replace(reconcileArrayItems(identifierAttr, target, snapshot, this.subType))
-        else
-            target.replace(snapshot)
+        target.replace(snapshot)
     }
 
     getChildType(key: string): IType<any, any> {
@@ -149,24 +147,6 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     removeChild(node: MSTAdminisration, subpath: string) {
         node.target.splice(parseInt(subpath, 10), 1)
     }
-}
-
-function reconcileArrayItems(identifierAttr: string, target: IObservableArray<any>, snapshot: any[], factory: IType<any, any>): any[] {
-    const current: any = {}
-    target.forEach(item => {
-        const id = item[identifierAttr]
-        invariant(!current[id], `Identifier '${id}' (of ${getMSTAdministration(item).path}) is not unique!`)
-        current[id] = item
-    })
-    return snapshot.map(item => {
-        const existing = current[item[identifierAttr]]
-        if (existing && getType(existing).is(item)) {
-            applySnapshot(existing, item)
-            return existing
-        } else {
-            return factory.create(item)
-        }
-    })
 }
 
 export function createArrayFactory<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {

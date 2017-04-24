@@ -1,4 +1,4 @@
-import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, clone, getType, getChildType, recordActions, recordPatches, types, destroy} from "../"
+import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, isAlive, clone, getType, getChildType, recordActions, recordPatches, types, destroy} from "../"
 import {test} from "ava"
 
 // getParent
@@ -138,6 +138,28 @@ test("it should clone a node", (t) => {
     const cloned = clone(doc)
 
     t.deepEqual(doc, cloned)
+})
+
+test("it should be possible to clone a dead object", (t) => {
+    const Task = types.model("Task", {
+        x: types.string
+    })
+    const a = Task.create({ x: "a" })
+
+    const store = types.model({
+        todos: types.array(Task)
+    }).create({
+        todos: [a]
+    })
+
+    t.deepEqual(store.todos.slice(), [a])
+    t.is(isAlive(a), true)
+
+    store.todos.splice(0, 1)
+    t.is(isAlive(a), false)
+    const a2 = clone(a)
+    store.todos.splice(0, 0, a2)
+    t.is(store.todos[0].x, "a")
 })
 
 // getModelFactory

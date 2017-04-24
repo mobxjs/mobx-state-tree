@@ -25,7 +25,7 @@ import { isReferenceFactory } from "../utility-types/reference"
 import { isIdentifierFactory } from "../utility-types/identifier"
 import { Property } from "../property-types/property"
 import { IdentifierProperty } from "../property-types/identifier-property"
-import { TransformedProperty } from "../property-types/transformed-property"
+import { ReferenceProperty } from "../property-types/reference-property"
 import { ComputedProperty } from "../property-types/computed-property"
 import { ValueProperty } from "../property-types/value-property"
 import { ActionProperty } from "../property-types/action-property"
@@ -69,12 +69,12 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     finalizeNewInstance(instance: IMSTNode, snapshot: any) {
-        intercept(instance, this.willChange as any /* wait for typing fix in mobx */)
+        intercept(instance, change => this.willChange(change) as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
         this.forAllProps(prop => prop.initialize(instance, snapshot))
     }
 
-    willChange = (change: IObjectWillChange): IObjectWillChange | null => {
+    willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getMSTAdministration(change.object)
         node.assertWritable()
 
@@ -107,7 +107,7 @@ export class ObjectType extends ComplexType<any, any> {
             } else if (isType(value)) {
                 this.props[key] = new ValueProperty(key, value)
             } else if (isReferenceFactory(value)) {
-                this.props[key] =  new TransformedProperty(key, value.setter, value.getter)
+                this.props[key] =  new ReferenceProperty(key, value.targetType, value.basePath)
             } else if (typeof value === "function") {
                 this.props[key] = new ActionProperty(key, value)
             } else if (typeof value === "object") {
@@ -145,6 +145,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     @action applySnapshot(node: MSTAdminisration, snapshot: any): void {
+        // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed
         for (let key in snapshot) if (key in this.props) {
             this.props[key].deserialize(node.target, snapshot)
         }

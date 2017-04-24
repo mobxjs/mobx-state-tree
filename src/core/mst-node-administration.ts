@@ -8,15 +8,19 @@ import { isMST, getMSTAdministration } from "./mst-node"
 import { IMiddleWareHandler } from "./action"
 import {
     invariant, fail, extend,
-    addHiddenFinalProp, IDisposer, registerEventHandler
+    addHiddenFinalProp, IDisposer, registerEventHandler, isMutable
 } from "../utils"
-import { IJsonPatch, joinJsonPath, splitJsonPath } from "./json-patch"
-import { ObjectType } from "../types/complex-types/object"
+import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
+import { getIdentifierAttribute, ObjectType } from "../types/complex-types/object"
 import { ComplexType } from "../types/complex-types/complex-type"
 
+let nextNodeId = 1
+
 export class MSTAdminisration {
+    readonly nodeId = ++nextNodeId
     readonly target: any
     @observable _parent: MSTAdminisration | null = null
+    @observable subpath: string = ""
     readonly type: ComplexType<any, any>
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
@@ -28,9 +32,11 @@ export class MSTAdminisration {
     private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     private readonly snapshotDisposer: IReactionDisposer
 
-    constructor(initialState: any, type: ComplexType<any, any>, environment: any) {
+    constructor(parent: MSTAdminisration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
         invariant(type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
+        this._parent = parent
+        this.subpath = subpath
         this.type = type
         this.target = initialState
         this._environment = environment
@@ -43,38 +49,13 @@ export class MSTAdminisration {
         })
     }
 
-    @computed get pathParts(): string[]{
-        // no parent? you are root!
-        if (this._parent === null) {
-            return []
-        }
-
-        // get the key
-        // optimize: maybe this shouldn't be computed, this is called often and pretty expensive lookup ...
-        const keys = this._parent.getChildMSTs()
-            .filter(entry => entry[1] === this)
-        if (keys.length > 0) {
-            const [key] = keys[0]
-            return this._parent.pathParts.concat([key])
-        }
-
-        return fail("Illegal state")
-    }
-
     /**
      * Returnes (escaped) path representation as string
      */
     @computed public get path(): string {
-        this.assertAlive()
-        return joinJsonPath(this.pathParts)
-    }
-
-    @computed public get subpath(): string {
-        this.assertAlive()
-        if (this.isRoot)
+        if (!this.parent)
             return ""
-        const parts = this.pathParts
-        return parts[parts.length - 1]
+        return this.parent.path + "/" + escapeJsonPath(this.subpath)
     }
 
     public get isRoot(): boolean {
@@ -93,23 +74,26 @@ export class MSTAdminisration {
         return r
     }
 
+    public get isAlive() {
+        return this._isAlive
+    }
+
     public die() {
-        if (!this.isRoot)
-            fail(`Model ${this.path} cannot die while it is still in a tree`)
+        // TODO: kill $mobx.values
         this.snapshotDisposer()
         this.patchSubscribers.splice(0)
         this.snapshotSubscribers.splice(0)
         this.patchSubscribers.splice(0)
         this._isAlive = false
+        // Post conditions, element will not be in the tree anymore...
     }
 
     public assertAlive() {
-        if ((this.isRoot && !this._isAlive) || !this.root._isAlive)
-            fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach'`)
+        if (!this._isAlive || (this.root && !this.root._isAlive))
+            fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`)
     }
 
     @computed public get snapshot() {
-        this.assertAlive()
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         return Object.freeze(this.type.serialize(this))
     }
@@ -151,14 +135,13 @@ export class MSTAdminisration {
     }
 
     setParent(newParent: MSTAdminisration | null, subpath: string | null = null) {
-        // TODO: factor out subpath? It is not updated in this function, which is confusing
-        if (this.parent === newParent)
+        if (this.parent === newParent && this.subpath === subpath)
             return
-        if (this._parent && newParent) {
-            fail(`A node cannot exists twice in the state tree. Failed to add object to path '/${newParent.pathParts.concat(subpath!).join("/")}', it exists already at '${this.path}'`)
+        if (this._parent && newParent && newParent !== this._parent) {
+            fail(`A node cannot exists twice in the state tree. Failed to add object to path '${newParent.path}"/"${subpath}', it exists already at '${this.path}'`)
         }
         if (!this._parent && newParent && newParent.root === this) {
-            fail(`A state tree is not allowed to contain itself. Cannot add root to path '/${newParent.pathParts.concat(subpath!).join("/")}'`)
+            fail(`A state tree is not allowed to contain itself. Cannot add root to path '${newParent.path}"/"${subpath}'`)
         }
         if (!this._parent && !!this._environment) {
             fail(`A state tree that has been initialized with an environment cannot be made part of another state tree.`)
@@ -175,41 +158,70 @@ export class MSTAdminisration {
             this.die()
         } else {
             this._parent = newParent
+            this.subpath = subpath || "" // TODO: mweh
         }
-
     }
 
-    prepareChild(subpath: string, child: any): any {
-        const childFactory = this.getChildType(subpath)
-        typecheck(childFactory, child)
+    reconcileChildren<T>(childType: IType<any, T>, oldValues: T[], newValues: T[], newPaths: (string|number)[]): T[] {
+        // optimization: overload for a single old / new value to avoid all the array allocations
+        const res = new Array(newValues.length)
+        const oldValuesByNode: any = {}
+        const oldValuesById: any = {}
+        const identifierAttribute = getIdentifierAttribute(childType)
 
-        if (isMST(child)) {
-            const childNode = getMSTAdministration(child)
-
-            if (childNode.isRoot) {
-                // we are adding a node with no parent (first insert in the tree)
-                childNode.setParent(this, subpath)
-                return child
+        // Investigate which values we could reconcile
+        oldValues.forEach(oldValue => {
+            if (identifierAttribute) {
+                const id = (oldValue as any)[identifierAttribute]
+                if (id)
+                    oldValuesById[id] = oldValue
             }
-
-            return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${childNode.path}'`)
-        }
-        const existingNode = this.getChildMST(subpath)
-        const newInstance = childFactory.create(child)
-
-        if (existingNode && existingNode.type === newInstance.factory) {
-            // recycle instance..
-            existingNode.applySnapshot(child)
-            return existingNode.target
-        } else {
-            if (existingNode)
-                existingNode.setParent(null) // TODO: or delete / remove / whatever is a more explicit clean up
-            if (isMST(newInstance)) {
-                const node = getMSTAdministration(newInstance)
-                node.setParent(this, subpath)
+            if (isMST(oldValue)) {
+                oldValuesByNode[getMSTAdministration(oldValue).nodeId] = oldValue
             }
-            return newInstance
-        }
+        })
+
+        // Prepare new values, try to reconcile
+        newValues.forEach((newValue, index) => {
+            const subPath = "" + newPaths[index]
+            if (isMST(newValue)) {
+                const childNode = getMSTAdministration(newValue)
+                childNode.assertAlive()
+                if (childNode.parent && (childNode.parent !== this || !oldValuesByNode[childNode.nodeId]))
+                    return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subPath}', but it lives already at '${childNode.path}'`)
+
+                // Try to reconcile based on already existing nodes
+                oldValuesByNode[childNode.nodeId] = undefined
+                childNode.setParent(this, subPath)
+                res[index] = newValue
+            } else if (identifierAttribute && isMutable(newValue)) {
+                typecheck(childType, newValue)
+
+                // Try to reconcile based on id
+                const id = (newValue as any)[identifierAttribute]
+                const existing = oldValuesById[id]
+                if (existing) {
+                    const childNode = getMSTAdministration(existing)
+                    oldValuesByNode[childNode.nodeId] = undefined
+                    childNode.setParent(this, subPath)
+                    childNode.applySnapshot(newValue)
+                    res[index] = existing
+                } else {
+                    res[index] = (childType as any).create(newValue, undefined, this, subPath) // any -> we don't want this typing public
+                }
+            } else {
+                typecheck(childType, newValue)
+
+                // create a fresh MST node
+                res[index] = (childType as any).create(newValue, undefined, this, subPath) // any -> we don't want this typing public
+            }
+        })
+
+        // Kill non reconciled values
+        for (let key in oldValuesByNode) if (oldValuesByNode[key])
+            getMSTAdministration(oldValuesByNode[key]).die()
+
+        return res
     }
 
     resolve(pathParts: string): MSTAdminisration;
@@ -307,4 +319,6 @@ export class MSTAdminisration {
             this._isAlive = true
         }
     }
+
+    // TODO: give good toString, with type and path, and use it in errors
 }
