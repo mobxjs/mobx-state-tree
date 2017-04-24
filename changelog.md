@@ -1,6 +1,9 @@
 # 0.3.2
 
 * Fix: actions where not bound automatically
+* Improved and simplified the reconciliation mechanism, fixed many edge cases
+* Improved the reference mechanism, fixed many edge cases
+* Improved performance
 
 # 0.3.1
 

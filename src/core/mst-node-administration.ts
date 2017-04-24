@@ -200,8 +200,8 @@ export class MSTAdminisration {
                 // Try to reconcile based on id
                 const id = (newValue as any)[identifierAttribute]
                 const existing = oldValuesById[id]
-                if (existing) {
-                    const childNode = getMSTAdministration(existing)
+                const childNode = existing && getMSTAdministration(existing)
+                if (existing && childNode.type.is(newValue)) {
                     oldValuesByNode[childNode.nodeId] = undefined
                     childNode.setParent(this, subPath)
                     childNode.applySnapshot(newValue)
