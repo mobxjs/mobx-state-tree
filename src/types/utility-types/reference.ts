@@ -1,4 +1,4 @@
-import { MSTAdminisration } from "../../core/mst-node-administration"
+import { MSTAdministration } from "../../core/mst-node-administration"
 import { isObservableArray, isObservableMap, observable, computed } from "mobx"
 import { resolve, getMSTAdministration, getRelativePathForNodes, isMST, IMSTNode } from "../../core"
 import { invariant, fail } from "../../utils"

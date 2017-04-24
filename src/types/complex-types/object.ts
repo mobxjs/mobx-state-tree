@@ -16,7 +16,7 @@ import {
     hasOwnProperty,
     isPlainObject
 } from "../../utils"
-import { MSTAdminisration, maybeMST, getType, IMSTNode, getMSTAdministration, getSnapshot,IJsonPatch } from "../../core"
+import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, getSnapshot,IJsonPatch } from "../../core"
 import { IType, IComplexType, isType } from "../type"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
@@ -118,8 +118,8 @@ export class ObjectType extends ComplexType<any, any> {
         }
     }
 
-    getChildMSTs(node: MSTAdminisration): [string, MSTAdminisration][] {
-        const res: [string, MSTAdminisration][] = []
+    getChildMSTs(node: MSTAdministration): [string, MSTAdministration][] {
+        const res: [string, MSTAdministration][] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
                 maybeMST(node.target[prop.name], propertyNode => res.push([prop.name, propertyNode]))
@@ -127,24 +127,24 @@ export class ObjectType extends ComplexType<any, any> {
         return res
     }
 
-    getChildMST(node: MSTAdminisration, key: string): MSTAdminisration | null {
+    getChildMST(node: MSTAdministration, key: string): MSTAdministration | null {
         return maybeMST(node.target[key], identity, nothing)
     }
 
-    serialize(node: MSTAdminisration): any {
+    serialize(node: MSTAdministration): any {
         const res = {}
         this.forAllProps(prop => prop.serialize(node.target, res))
         return res
     }
 
-    applyPatchLocally(node: MSTAdminisration, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void {
         invariant(patch.op === "replace" || patch.op === "add")
         this.applySnapshot(node, {
             [subpath]: patch.value
         })
     }
 
-    @action applySnapshot(node: MSTAdminisration, snapshot: any): void {
+    @action applySnapshot(node: MSTAdministration, snapshot: any): void {
         // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed
         for (let key in snapshot) if (key in this.props) {
             this.props[key].deserialize(node.target, snapshot)
@@ -186,7 +186,7 @@ export class ObjectType extends ComplexType<any, any> {
         return {}
     }
 
-    removeChild(node: MSTAdminisration, subpath: string) {
+    removeChild(node: MSTAdministration, subpath: string) {
         node.target[subpath] = null
     }
 }

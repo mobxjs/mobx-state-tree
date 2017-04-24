@@ -10,11 +10,11 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         this.create = action(this.name, this.create)
     }
 
-    create(snapshot: any = this.getDefaultSnapshot(), environment: any = undefined, parent: MSTAdminisration | null = null, subpath: string = "") {
+    create(snapshot: any = this.getDefaultSnapshot(), environment: any = undefined, parent: MSTAdministration | null = null, subpath: string = "") {
         typecheck(this, snapshot)
         const instance = this.createNewInstance()
         // tslint:disable-next-line:no_unused-variable
-        const node = new MSTAdminisration(parent, subpath, instance, this, environment)
+        const node = new MSTAdministration(parent, subpath, instance, this, environment)
         this.finalizeNewInstance(instance, snapshot)
         Object.seal(instance)
         return instance
@@ -22,15 +22,15 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
 
     abstract createNewInstance(): any
     abstract finalizeNewInstance(target: any, snapshot: any): void
-    abstract applySnapshot(node: MSTAdminisration, snapshot: any): void
+    abstract applySnapshot(node: MSTAdministration, snapshot: any): void
     abstract getDefaultSnapshot(): any
-    abstract getChildMSTs(node: MSTAdminisration): [string, MSTAdminisration][]
-    abstract getChildMST(node: MSTAdminisration, key: string): MSTAdminisration | null
-    abstract serialize(node: MSTAdminisration): any
-    abstract applyPatchLocally(node: MSTAdminisration, subpath: string, patch: IJsonPatch): void
+    abstract getChildMSTs(node: MSTAdministration): [string, MSTAdministration][]
+    abstract getChildMST(node: MSTAdministration, key: string): MSTAdministration | null
+    abstract serialize(node: MSTAdministration): any
+    abstract applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IType<any, any>
     abstract isValidSnapshot(snapshot: any): boolean
-    abstract removeChild(node: MSTAdminisration, subpath: string): void
+    abstract removeChild(node: MSTAdministration, subpath: string): void
 
     is(value: any): value is S | (T & IMSTNode) {
         if (!value || typeof value !== "object")
@@ -44,5 +44,5 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
 }
 
 import { IMSTNode, isMST, getType } from "../../core/mst-node"
-import { MSTAdminisration } from "../../core/mst-node-administration"
+import { MSTAdministration } from "../../core/mst-node-administration"
 import { IJsonPatch } from "../../core/json-patch"

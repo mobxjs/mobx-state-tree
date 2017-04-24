@@ -16,10 +16,10 @@ import { ComplexType } from "../types/complex-types/complex-type"
 
 let nextNodeId = 1
 
-export class MSTAdminisration {
+export class MSTAdministration {
     readonly nodeId = ++nextNodeId
     readonly target: any
-    @observable _parent: MSTAdminisration | null = null
+    @observable _parent: MSTAdministration | null = null
     @observable subpath: string = ""
     readonly type: ComplexType<any, any>
     _environment: any = undefined
@@ -32,7 +32,7 @@ export class MSTAdminisration {
     private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     private readonly snapshotDisposer: IReactionDisposer
 
-    constructor(parent: MSTAdminisration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
+    constructor(parent: MSTAdministration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
         invariant(type instanceof ComplexType, "Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
         this._parent = parent
@@ -68,7 +68,7 @@ export class MSTAdminisration {
 
     public get root() {
         // future optimization: store root ref in the node and maintain it
-        let p, r: MSTAdminisration = this
+        let p, r: MSTAdministration = this
         while (p = r.parent)
             r = p
         return r
@@ -123,7 +123,7 @@ export class MSTAdminisration {
         return registerEventHandler(this.patchSubscribers, onPatch)
     }
 
-    emitPatch(patch: IJsonPatch, source: MSTAdminisration) {
+    emitPatch(patch: IJsonPatch, source: MSTAdministration) {
         if (this.patchSubscribers.length) {
             const localizedPatch: IJsonPatch = extend({}, patch, {
                     path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
@@ -134,7 +134,7 @@ export class MSTAdminisration {
             this.parent.emitPatch(patch, source)
     }
 
-    setParent(newParent: MSTAdminisration | null, subpath: string | null = null) {
+    setParent(newParent: MSTAdministration | null, subpath: string | null = null) {
         if (this.parent === newParent && this.subpath === subpath)
             return
         if (this._parent && newParent && newParent !== this._parent) {
@@ -224,21 +224,21 @@ export class MSTAdminisration {
         return res
     }
 
-    resolve(pathParts: string): MSTAdminisration;
-    resolve(pathParts: string, failIfResolveFails: boolean): MSTAdminisration | undefined;
-    resolve(path: string, failIfResolveFails: boolean = true): MSTAdminisration | undefined {
+    resolve(pathParts: string): MSTAdministration;
+    resolve(pathParts: string, failIfResolveFails: boolean): MSTAdministration | undefined;
+    resolve(path: string, failIfResolveFails: boolean = true): MSTAdministration | undefined {
         return this.resolvePath(splitJsonPath(path), failIfResolveFails)
     }
 
-    resolvePath(pathParts: string[]): MSTAdminisration;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean): MSTAdminisration | undefined;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): MSTAdminisration | undefined {
+    resolvePath(pathParts: string[]): MSTAdministration;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean): MSTAdministration | undefined;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): MSTAdministration | undefined {
         this.assertAlive()
         // counter part of getRelativePath
         // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
         // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
         // so we treat leading ../ apart...
-        let current: MSTAdminisration | null = this
+        let current: MSTAdministration | null = this
         for (let i = 0; i < pathParts.length; i++) {
             if (pathParts[i] === "") // '/bla' or 'a//b' splits to empty strings
                 current = current.root
@@ -271,12 +271,12 @@ export class MSTAdminisration {
         return registerEventHandler(this.middlewares, handler)
     }
 
-    getChildMST(subpath: string): MSTAdminisration | null {
+    getChildMST(subpath: string): MSTAdministration | null {
         this.assertAlive()
         return this.type.getChildMST(this, subpath)
     }
 
-    getChildMSTs(): [string, MSTAdminisration][] {
+    getChildMSTs(): [string, MSTAdministration][] {
         return this.type.getChildMSTs(this)
     }
 
@@ -285,7 +285,7 @@ export class MSTAdminisration {
     }
 
     get isProtected(): boolean {
-        let cur: MSTAdminisration | null = this
+        let cur: MSTAdministration | null = this
         while (cur) {
             if (cur._isProtected === true)
                 return true

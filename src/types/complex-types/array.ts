@@ -3,7 +3,7 @@ import {
     getMSTAdministration,
     IJsonPatch,
     maybeMST,
-    MSTAdminisration,
+    MSTAdministration,
     valueToSnapshot
 } from "../../core"
 import { identity, nothing } from "../../utils"
@@ -34,16 +34,16 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         getMSTAdministration(instance).applySnapshot(snapshot)
     }
 
-    getChildMSTs(node: MSTAdminisration): [string, MSTAdminisration][] {
+    getChildMSTs(node: MSTAdministration): [string, MSTAdministration][] {
         const target = node.target as IObservableArray<any>
-        const res: [string, MSTAdminisration][] = []
+        const res: [string, MSTAdministration][] = []
         target.forEach((value, index) => {
             maybeMST(value, childNode => { res.push(["" + index, childNode])})
         })
         return res
     }
 
-    getChildMST(node: MSTAdminisration, key: string): MSTAdminisration | null {
+    getChildMST(node: MSTAdministration, key: string): MSTAdministration | null {
         const target = node.target as IObservableArray<any>
         const index = parseInt(key, 10)
         if (index < target.length)
@@ -81,7 +81,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         return change
     }
 
-    serialize(node: MSTAdminisration): any {
+    serialize(node: MSTAdministration): any {
         const target = node.target as IObservableArray<any>
         return target.map(valueToSnapshot)
     }
@@ -111,7 +111,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         }
     }
 
-    applyPatchLocally(node: MSTAdminisration, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void {
         const target = node.target as IObservableArray<any>
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
@@ -127,7 +127,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         }
     }
 
-    @action applySnapshot(node: MSTAdminisration, snapshot: any[]): void {
+    @action applySnapshot(node: MSTAdministration, snapshot: any[]): void {
         const target = node.target as IObservableArray<any>
         target.replace(snapshot)
     }
@@ -144,7 +144,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         return []
     }
 
-    removeChild(node: MSTAdminisration, subpath: string) {
+    removeChild(node: MSTAdministration, subpath: string) {
         node.target.splice(parseInt(subpath, 10), 1)
     }
 }
