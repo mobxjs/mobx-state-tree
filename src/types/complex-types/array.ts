@@ -1,15 +1,18 @@
 import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe } from "mobx"
 import {
+    applySnapshot,
     getMSTAdministration,
     getType,
     IJsonPatch,
+    isMST,
     maybeMST,
     MSTAdminisration,
     valueToSnapshot,
-    applySnapshot
-} from "../../core"
-import { identity, nothing, invariant } from "../../utils"
-import { IType, IComplexType, isType } from "../type"
+    hasParent,
+    getPath
+} from '../../core';
+import { identity, invariant, fail, isMutable, nothing } from '../../utils';
+import { IType, IComplexType, isType, typecheck } from "../type"
 import { ComplexType } from "./complex-type"
 import { getIdentifierAttribute } from "./object"
 import { createDefaultValueFactory } from "../utility-types/with-default"
@@ -59,33 +62,26 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
         node.assertWritable()
 
         switch (change.type) {
-            case "update": {
-                const identifierAttr = getIdentifierAttribute(this.subType)
-                if (identifierAttr) {
-                    return { // use a splice to benefit from all the identifier checks
-                        type: "splice",
-                        object: change.object,
-                        added: reconcileKeyedArrayItems(node, change.object, this.subType, identifierAttr, change.index, [change.newValue], 1),
-                        removedCount: 1,
-                        index: change.index
-                    } as IArrayWillSplice<any>
-                } else {
-                    const {newValue} = change
-                    const oldValue = change.object[change.index]
-                    if (newValue === oldValue)
-                        return null
-                    change.newValue = node.prepareChild("" + change.index, newValue)
+            case "update":
+                change.newValue = reconcileChildren(node, this.subType, [change.object[change.index]], [change.newValue], [change.index])[0]
+                break
+            case "splice":
+                const {index, removedCount, added, object} = change
+                change.added = reconcileChildren(
+                    node,
+                    this.subType,
+                    object.slice(index, index + removedCount),
+                    added,
+                    added.map((_, i) => index + i)
+                )
+
+                // update paths of remaining items
+                for (let i = index + removedCount; i < object.length; i++) {
+                    maybeMST(object[i], child => {
+                        child.setParent(node, "" + (i + added.length - removedCount))
+                    })
                 }
-            }
-            break
-            case "splice": {
-                const identifierAttr = getIdentifierAttribute(this.subType)
-                if (identifierAttr)
-                    change.added = reconcileKeyedArrayItems(node, change.object, this.subType, identifierAttr, change.index, change.added, change.removedCount)
-                else
-                    change.added = reconcileUnkeyedArrayItems(node, change.object, this.subType, change.index, change.added, change.removedCount)
-            }
-            break
+                break
         }
         return change
     }
@@ -245,6 +241,66 @@ function reconcileKeyedArrayItems(node: MSTAdminisration, target: IObservableArr
     return newItems
 }
 
+function reconcileChildren(parent: MSTAdminisration, childType: IType<any, any>, oldValues: any[], newValues: any[], newPaths: (string|number)[]): any {
+    const res = new Array(newValues.length)
+    const oldValuesByNode: any = {}
+    const oldValuesById: any = {}
+    const identifierAttribute = getIdentifierAttribute(childType)
+
+    // Investigate which values we could reconcile
+    oldValues.forEach(oldValue => {
+        if (identifierAttribute) {
+            const id = oldValue[identifierAttribute]
+            if (id)
+                oldValuesById[id] = oldValue
+        }
+        if (isMST(oldValue)) {
+            oldValuesByNode[getMSTAdministration(oldValue).nodeId] = oldValue
+        }
+    })
+
+    // Prepare new values, try to reconcile
+    newValues.forEach((newValue, index) => {
+        const subPath = "" + newPaths[index]
+        if (isMST(newValue)) {
+            const childNode = getMSTAdministration(newValue)
+            childNode.assertAlive()
+            if (childNode.parent && (childNode.parent !== parent || !oldValuesByNode[childNode.nodeId]))
+                return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${subPath}', but it lives already at '${getPath(newValue)}'`)
+
+            // Try to reconcile based on already existing nodes
+            oldValuesByNode[childNode.nodeId] = undefined
+            childNode.setParent(parent, subPath)
+            res[index] = newValue
+        } else if (identifierAttribute && isMutable(newValue)) {
+            typecheck(childType, newValue)
+
+            // Try to reconcile based on id
+            const id = newValue[identifierAttribute]
+            const existing = oldValuesById[id]
+            if (existing) {
+                const childNode = getMSTAdministration(existing)
+                oldValuesByNode[childNode.nodeId] = undefined
+                childNode.setParent(parent, subPath)
+                childNode.applySnapshot(newValue)
+                res[index] = existing
+            } else {
+                res[index] = (childType as any).create(newValue, undefined, parent, subPath) // any -> we don't want this typing public
+            }
+        } else {
+            typecheck(childType, newValue)
+
+            // create a fresh MST node
+            res[index] = (childType as any).create(newValue, undefined, parent, subPath) // any -> we don't want this typing public
+        }
+    })
+
+    // Kill non reconciled values
+    for (let key in oldValuesByNode) if (oldValuesByNode[key])
+        getMSTAdministration(oldValuesByNode[key]).die()
+
+    return res
+}
 
 export function createArrayFactory<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
     return createDefaultValueFactory(new ArrayType(subtype.name + "[]", subtype), [])

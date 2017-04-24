@@ -11,10 +11,13 @@ import {
     addHiddenFinalProp, IDisposer, registerEventHandler
 } from "../utils"
 import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
-import { ObjectType } from "../types/complex-types/object"
+import { getIdentifierAttribute, ObjectType } from '../types/complex-types/object';
 import { ComplexType } from "../types/complex-types/complex-type"
 
+let nextNodeId = 1
+
 export class MSTAdminisration {
+    readonly nodeId = ++nextNodeId
     readonly target: any
     @observable _parent: MSTAdminisration | null = null
     @observable subpath: string = ""
@@ -71,6 +74,10 @@ export class MSTAdminisration {
         return r
     }
 
+    public get isAlive() {
+        return this._isAlive
+    }
+
     public die() {
         // TODO: kill $mobx.values
         this.snapshotDisposer()
@@ -83,11 +90,10 @@ export class MSTAdminisration {
 
     public assertAlive() {
         if (!this._isAlive || (this.root && !this.root._isAlive))
-            fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach'`)
+            fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`)
     }
 
     @computed public get snapshot() {
-        this.assertAlive()
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         return Object.freeze(this.type.serialize(this))
     }

@@ -1,5 +1,5 @@
 import {IObservableArray} from 'mobx'
-import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../"
+import {onSnapshot, onPatch, clone, onAction, isAlive, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -211,6 +211,7 @@ test("items should be reconciled correctly when splicing - 1", t => {
     })
 
     t.deepEqual(store.todos.slice(), [a])
+    t.is(isAlive(a), true)
 
     store.todos.push(b)
     t.deepEqual(store.todos.slice(), [a, b])
@@ -220,9 +221,17 @@ test("items should be reconciled correctly when splicing - 1", t => {
 
     store.todos.splice(0, 2)
     t.deepEqual(store.todos.slice(), [b])
+    t.is(isAlive(a), false)
+    t.is(isAlive(b), true)
+    t.is(isAlive(c), false)
 
-    store.todos.splice(0, 1, a, c, d)
-    t.deepEqual(store.todos.slice(), [a, c, d])
+    t.throws(
+        () => store.todos.splice(0, 1, a, c, d),
+        "[mobx-state-tree] The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value"
+    )
+
+    store.todos.splice(0, 1, clone(a), clone(c), clone(d))
+    t.deepEqual(store.todos.map(_ => _.x), ["a", "c", "d"])
 })
 
 test("items should be reconciled correctly when splicing - 2", t => {
@@ -247,9 +256,9 @@ test("items should be reconciled correctly when splicing - 2", t => {
     t.is(store.todos.length, 5)
     t.true(store.todos[0] === a)
     t.true(store.todos[1] === b)
-    t.true(store.todos[2] === c) // reconciled
+    t.true(store.todos[2] !== c)
     t.is(store.todos[2].x, "e")
-    t.true(store.todos[3] !== d) // not reconciled
+    t.true(store.todos[3] !== d)
     t.is(store.todos[3].x, "f")
     t.true(store.todos[4] === d) // preserved and moved
     t.is(store.todos[4].x, "d")
@@ -268,7 +277,7 @@ test("items should be reconciled correctly when splicing - 2", t => {
     t.true(store.todos[0] === a)
     t.is(store.todos[1].x, "g")
     t.is(store.todos[2].x, "d")
-    t.true(store.todos[1] === b) // still reconciled
+    t.true(store.todos[1] !== b)
     t.true(store.todos[2] === d) // still original d
 
     t.deepEqual(store.todos.map(getPath), [

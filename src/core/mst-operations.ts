@@ -383,6 +383,10 @@ export function destroy(thing: IMSTNode) {
     node.die()
 }
 
+export function isAlive(thing: IMSTNode): boolean {
+    return getMSTAdministration(thing).isAlive
+}
+
 export function getEnv(thing: IMSTNode): any {
     const node = getMSTAdministration(thing)
     const env = node.root._environment

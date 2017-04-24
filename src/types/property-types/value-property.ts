@@ -32,7 +32,6 @@ export class ValueProperty extends Property {
     }
 
     serialize(instance: any, snapshot: any) {
-        getMSTAdministration(instance).assertAlive()
         snapshot[this.name] = valueToSnapshot(instance[this.name])
     }
 
