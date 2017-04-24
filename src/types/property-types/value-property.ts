@@ -18,7 +18,7 @@ export class ValueProperty extends Property {
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getMSTAdministration(change.object)
-        change.newValue = node.prepareChild(this.name, change.newValue)
+        change.newValue = node.reconcileChildren(this.type, [change.object[change.name]], [change.newValue], [change.name])[0]
         return change
     }
 

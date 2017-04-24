@@ -8,10 +8,10 @@ import { isMST, getMSTAdministration } from "./mst-node"
 import { IMiddleWareHandler } from "./action"
 import {
     invariant, fail, extend,
-    addHiddenFinalProp, IDisposer, registerEventHandler
+    addHiddenFinalProp, IDisposer, registerEventHandler, isMutable
 } from "../utils"
 import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
-import { getIdentifierAttribute, ObjectType } from '../types/complex-types/object';
+import { getIdentifierAttribute, ObjectType } from "../types/complex-types/object"
 import { ComplexType } from "../types/complex-types/complex-type"
 
 let nextNodeId = 1
@@ -162,42 +162,66 @@ export class MSTAdminisration {
         }
     }
 
-    prepareChild(subpath: string, value: any, reconcile = true): any {
-        // TODO: verify coverage of all code paths
-        const childType = this.getChildType(subpath)
-        typecheck(childType, value)
-        if (isMST(value) && hasParent(value))
-            return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subpath}', but it lives already at '${getPath(value)}'`)
+    reconcileChildren(childType: IType<any, any>, oldValues: any[], newValues: any[], newPaths: (string|number)[]): any {
+        // optimization: overload for a single old / new value to avoid all the array allocations
+        const res = new Array(newValues.length)
+        const oldValuesByNode: any = {}
+        const oldValuesById: any = {}
+        const identifierAttribute = getIdentifierAttribute(childType)
 
-        const valueIsSnapshot = !isMST(value)
-        const currentNode = reconcile ? this.getChildMST(subpath) : null
+        // Investigate which values we could reconcile
+        oldValues.forEach(oldValue => {
+            if (identifierAttribute) {
+                const id = oldValue[identifierAttribute]
+                if (id)
+                    oldValuesById[id] = oldValue
+            }
+            if (isMST(oldValue)) {
+                oldValuesByNode[getMSTAdministration(oldValue).nodeId] = oldValue
+            }
+        })
 
-        if (valueIsSnapshot && currentNode && childType === currentNode.type) {
-            // actual type matches declared type, so we can always apply the snapshot and recycle instance
-            currentNode.applySnapshot(value)
-            return currentNode.target
-        }
+        // Prepare new values, try to reconcile
+        newValues.forEach((newValue, index) => {
+            const subPath = "" + newPaths[index]
+            if (isMST(newValue)) {
+                const childNode = getMSTAdministration(newValue)
+                childNode.assertAlive()
+                if (childNode.parent && (childNode.parent !== this || !oldValuesByNode[childNode.nodeId]))
+                    return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subPath}', but it lives already at '${getPath(newValue)}'`)
 
-        const child = valueIsSnapshot
-            ? (childType as any).create(value, undefined, this, subpath) // any -> we don't want this typing public
-            : value
-        const childNode = isMST(child) ? getMSTAdministration(child) : null
+                // Try to reconcile based on already existing nodes
+                oldValuesByNode[childNode.nodeId] = undefined
+                childNode.setParent(this, subPath)
+                res[index] = newValue
+            } else if (identifierAttribute && isMutable(newValue)) {
+                typecheck(childType, newValue)
 
-        if (valueIsSnapshot && currentNode && childNode && childNode.type === currentNode.type) {
-            // The actual type the snapshot was resolved to, matches the actual type of the current value, so we
-            // can reconciliate instead of using the new instance
-            childNode.die() // TODO: lifecycle hooks firing might be confusing here and during create?
-            currentNode.applySnapshot(value)
-            return currentNode.target
-        }
+                // Try to reconcile based on id
+                const id = newValue[identifierAttribute]
+                const existing = oldValuesById[id]
+                if (existing) {
+                    const childNode = getMSTAdministration(existing)
+                    oldValuesByNode[childNode.nodeId] = undefined
+                    childNode.setParent(this, subPath)
+                    childNode.applySnapshot(newValue)
+                    res[index] = existing
+                } else {
+                    res[index] = (childType as any).create(newValue, undefined, this, subPath) // any -> we don't want this typing public
+                }
+            } else {
+                typecheck(childType, newValue)
 
-        if (currentNode)
-            currentNode.die()
-        if (!valueIsSnapshot && childNode) {
-            // if child was a node, we still need to update the path
-            childNode.setParent(this, subpath)
-        }
-        return child
+                // create a fresh MST node
+                res[index] = (childType as any).create(newValue, undefined, this, subPath) // any -> we don't want this typing public
+            }
+        })
+
+        // Kill non reconciled values
+        for (let key in oldValuesByNode) if (oldValuesByNode[key])
+            getMSTAdministration(oldValuesByNode[key]).die()
+
+        return res
     }
 
     resolve(pathParts: string): MSTAdminisration;

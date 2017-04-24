@@ -42,7 +42,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
-        intercept(instance, this.willChange as any)
+        intercept(instance, c => this.willChange(c))
         observe(instance, this.didChange)
         getMSTAdministration(instance).applySnapshot(snapshot)
     }
@@ -78,19 +78,19 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                     const oldValue = change.object.get(change.name)
                     if (newValue === oldValue)
                         return null
-                    change.newValue = node.prepareChild("" + change.name, newValue)
+                    change.newValue = node.reconcileChildren(this.subType, [oldValue], [newValue], [change.name])[0]
                 }
                 break
             case "add":
                 {
                     const {newValue} = change
-                    change.newValue = node.prepareChild("" + change.name, newValue)
+                    change.newValue = node.reconcileChildren(this.subType, [], [newValue], [change.name])[0]
                 }
                 break
             case "delete":
                 {
                     const oldValue = change.object.get(change.name)
-                    maybeMST(oldValue, adm => adm.die())
+                    node.reconcileChildren(this.subType, [oldValue], [], [])
                 }
                 break
         }

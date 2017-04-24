@@ -69,12 +69,12 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     finalizeNewInstance(instance: IMSTNode, snapshot: any) {
-        intercept(instance, this.willChange as any /* wait for typing fix in mobx */)
+        intercept(instance, change => this.willChange(change) as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
         this.forAllProps(prop => prop.initialize(instance, snapshot))
     }
 
-    willChange = (change: IObjectWillChange): IObjectWillChange | null => {
+    willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getMSTAdministration(change.object)
         node.assertWritable()
 
