@@ -162,7 +162,7 @@ export class MSTAdminisration {
         }
     }
 
-    reconcileChildren(childType: IType<any, any>, oldValues: any[], newValues: any[], newPaths: (string|number)[]): any {
+    reconcileChildren<T>(childType: IType<any, T>, oldValues: T[], newValues: T[], newPaths: (string|number)[]): T[] {
         // optimization: overload for a single old / new value to avoid all the array allocations
         const res = new Array(newValues.length)
         const oldValuesByNode: any = {}
@@ -172,7 +172,7 @@ export class MSTAdminisration {
         // Investigate which values we could reconcile
         oldValues.forEach(oldValue => {
             if (identifierAttribute) {
-                const id = oldValue[identifierAttribute]
+                const id = (oldValue as any)[identifierAttribute]
                 if (id)
                     oldValuesById[id] = oldValue
             }
@@ -188,7 +188,7 @@ export class MSTAdminisration {
                 const childNode = getMSTAdministration(newValue)
                 childNode.assertAlive()
                 if (childNode.parent && (childNode.parent !== this || !oldValuesByNode[childNode.nodeId]))
-                    return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subPath}', but it lives already at '${getPath(newValue)}'`)
+                    return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subPath}', but it lives already at '${childNode.path}'`)
 
                 // Try to reconcile based on already existing nodes
                 oldValuesByNode[childNode.nodeId] = undefined
@@ -198,7 +198,7 @@ export class MSTAdminisration {
                 typecheck(childType, newValue)
 
                 // Try to reconcile based on id
-                const id = newValue[identifierAttribute]
+                const id = (newValue as any)[identifierAttribute]
                 const existing = oldValuesById[id]
                 if (existing) {
                     const childNode = getMSTAdministration(existing)
@@ -322,5 +322,3 @@ export class MSTAdminisration {
 
     // TODO: give good toString, with type and path, and use it in errors
 }
-
-import { hasParent, getPath } from "./mst-operations"
