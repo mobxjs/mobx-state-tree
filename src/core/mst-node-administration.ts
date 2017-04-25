@@ -79,7 +79,12 @@ export class MSTAdministration {
     }
 
     public die() {
+        this.type.getChildMSTs(this).forEach(([_, node]) => {
+            node.die()
+        })
+
         // TODO: kill $mobx.values
+        this.fireHook("beforeDestroy")
         this.snapshotDisposer()
         this.patchSubscribers.splice(0)
         this.snapshotSubscribers.splice(0)
@@ -89,12 +94,13 @@ export class MSTAdministration {
     }
 
     public assertAlive() {
-        if (!this._isAlive || (this.root && !this.root._isAlive))
+        if (!this._isAlive)
             fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`)
     }
 
     @computed public get snapshot() {
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
+        // Optimization: only freeze on dev builds
         return Object.freeze(this.type.serialize(this))
     }
 
@@ -320,5 +326,10 @@ export class MSTAdministration {
         }
     }
 
+    fireHook(name: string) {
+        const fn = this.target[name]
+        if (typeof fn === "function")
+            fn.apply(this.target)
+    }
     // TODO: give good toString, with type and path, and use it in errors
 }

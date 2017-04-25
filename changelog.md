@@ -1,3 +1,7 @@
+# 0.3.3
+
+* Introduced lifecycle hooks `afterCreate`, `afterAttach`, `beforeDetach`, `beforeDestroy`, implements #76
+
 # 0.3.2
 
 * Fix: actions where not bound automatically

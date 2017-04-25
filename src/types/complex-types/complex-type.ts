@@ -16,7 +16,7 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         // tslint:disable-next-line:no_unused-variable
         const node = new MSTAdministration(parent, subpath, instance, this, environment)
         this.finalizeNewInstance(instance, snapshot)
-        Object.seal(instance)
+        node.fireHook("afterCreate")
         return instance
     }
 
