@@ -379,8 +379,10 @@ export function detach<T extends IMSTNode>(thing: T): T {
  */
 export function destroy(thing: IMSTNode) {
     const node = getMSTAdministration(thing)
-    node.detach()
-    node.die()
+    if (node.isRoot)
+        node.die()
+    else
+        node.parent!.removeChild(node.subpath)
 }
 
 export function isAlive(thing: IMSTNode): boolean {

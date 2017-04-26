@@ -16,7 +16,7 @@ import {
     hasOwnProperty,
     isPlainObject
 } from "../../utils"
-import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, getSnapshot,IJsonPatch } from "../../core"
+import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, getSnapshot, IJsonPatch } from "../../core"
 import { IType, IComplexType, isType } from "../type"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"

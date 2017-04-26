@@ -17,6 +17,8 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         const node = new MSTAdministration(parent, subpath, instance, this, environment)
         this.finalizeNewInstance(instance, snapshot)
         node.fireHook("afterCreate")
+        if (parent)
+            node.fireHook("afterAttach")
         return instance
     }
 

@@ -11,7 +11,7 @@ import {
     addHiddenFinalProp, IDisposer, registerEventHandler, isMutable
 } from "../utils"
 import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
-import { getIdentifierAttribute, ObjectType } from "../types/complex-types/object"
+import { getIdentifierAttribute } from "../types/complex-types/object"
 import { ComplexType } from "../types/complex-types/complex-type"
 
 let nextNodeId = 1
@@ -24,8 +24,9 @@ export class MSTAdministration {
     readonly type: ComplexType<any, any>
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
-    private _isAlive = true
+    private _isAlive = true // optimization: use binary flags for all these switches
     private _isProtected = false
+    private _isDetaching = false
 
     readonly middlewares: IMiddleWareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
@@ -79,6 +80,9 @@ export class MSTAdministration {
     }
 
     public die() {
+        if (this._isDetaching)
+            return
+
         this.type.getChildMSTs(this).forEach(([_, node]) => {
             node.die()
         })
@@ -90,6 +94,8 @@ export class MSTAdministration {
         this.snapshotSubscribers.splice(0)
         this.patchSubscribers.splice(0)
         this._isAlive = false
+        this._parent = null
+        this.subpath = ""
         // Post conditions, element will not be in the tree anymore...
     }
 
@@ -153,18 +159,11 @@ export class MSTAdministration {
             fail(`A state tree that has been initialized with an environment cannot be made part of another state tree.`)
         }
         if (this.parent && !newParent) {
-            if (
-                 this.patchSubscribers.length > 0 ||
-                 this.snapshotSubscribers.length > 0 ||
-                 (this instanceof ObjectType && this.middlewares.length > 0)
-            ) {
-                console.warn("An object with active event listeners was removed from the tree. The subscriptions have been disposed.")
-            }
-            this._parent = newParent
             this.die()
         } else {
             this._parent = newParent
             this.subpath = subpath || "" // TODO: mweh
+            this.fireHook("afterAttach")
         }
     }
 
@@ -320,9 +319,13 @@ export class MSTAdministration {
         if (this.isRoot)
             return
         else {
+            this.fireHook("beforeDetach")
             this._environment = this.root._environment // make backup of environment
+            this._isDetaching = true
             this.parent!.removeChild(this.subpath)
-            this._isAlive = true
+            this._parent = null
+            this.subpath = ""
+            this._isDetaching = false
         }
     }
 
