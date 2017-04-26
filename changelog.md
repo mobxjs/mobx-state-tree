@@ -1,3 +1,8 @@
+# 0.3.3
+
+* Introduced lifecycle hooks `afterCreate`, `afterAttach`, `beforeDetach`, `beforeDestroy`, implements #76
+* Introduced the convenience method `addDisposer(this, cb)` that can be used to easily destruct reactions etc. which are set up in `afterCreate`. See #76
+
 # 0.3.2
 
 * Fix: actions where not bound automatically

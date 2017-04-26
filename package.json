@@ -8,13 +8,14 @@
     "build": "npm run quick-build && npm run webpack",
     "quick-build": "tsc",
     "webpack": "webpack -p",
-    "test": "tsc && tsc -p test/ && ava",
+    "build-tests": "tsc && tsc -p test/",
+    "test": "npm run build-tests && ava",
     "watch": "concurrently --kill-others --names 'build,build-tests,test-runner' 'tsc --watch' 'tsc --watch -p test' --raw  'ava --watch'",
     "prepublish": "npm run build && npm run build-docs",
     "coverage": "tsc && tsc -p test/ && nyc ava && nyc report -r html && nyc report -r lcov",
     "build-docs": "npm run quick-build && documentation readme lib/index.js --github --section API",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "clean": "rm -rf lib && rm -rf test-lib"
+    "clean": "rm -rf lib test-lib .nyc_output coverage"
   },
   "repository": {
     "type": "git",

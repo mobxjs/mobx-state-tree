@@ -11,7 +11,7 @@ import {
     addHiddenFinalProp, IDisposer, registerEventHandler, isMutable
 } from "../utils"
 import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
-import { getIdentifierAttribute, ObjectType } from "../types/complex-types/object"
+import { getIdentifierAttribute } from "../types/complex-types/object"
 import { ComplexType } from "../types/complex-types/complex-type"
 
 let nextNodeId = 1
@@ -24,13 +24,14 @@ export class MSTAdministration {
     readonly type: ComplexType<any, any>
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
-    private _isAlive = true
+    private _isAlive = true // optimization: use binary flags for all these switches
     private _isProtected = false
+    private _isDetaching = false
 
     readonly middlewares: IMiddleWareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
-    private readonly snapshotDisposer: IReactionDisposer
+    private readonly disposers: (() => void)[] = []
 
     constructor(parent: MSTAdministration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
         invariant(type instanceof ComplexType, "Uh oh")
@@ -41,12 +42,13 @@ export class MSTAdministration {
         this.target = initialState
         this._environment = environment
 
-        this.snapshotDisposer = reaction(() => this.snapshot, snapshot => {
+        const snapshotDisposer = reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
-        this.snapshotDisposer.onError((e: any) => {
+        snapshotDisposer.onError((e: any) => {
             throw e
         })
+        this.addDisposer(snapshotDisposer)
     }
 
     /**
@@ -79,22 +81,33 @@ export class MSTAdministration {
     }
 
     public die() {
+        if (this._isDetaching)
+            return
+
+        this.type.getChildMSTs(this).forEach(([_, node]) => {
+            node.die()
+        })
+
         // TODO: kill $mobx.values
-        this.snapshotDisposer()
+        this.fireHook("beforeDestroy")
+        this.disposers.splice(0).reverse().forEach(f => f())
         this.patchSubscribers.splice(0)
         this.snapshotSubscribers.splice(0)
         this.patchSubscribers.splice(0)
         this._isAlive = false
+        this._parent = null
+        this.subpath = ""
         // Post conditions, element will not be in the tree anymore...
     }
 
     public assertAlive() {
-        if (!this._isAlive || (this.root && !this.root._isAlive))
+        if (!this._isAlive)
             fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`)
     }
 
     @computed public get snapshot() {
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
+        // Optimization: only freeze on dev builds
         return Object.freeze(this.type.serialize(this))
     }
 
@@ -147,19 +160,16 @@ export class MSTAdministration {
             fail(`A state tree that has been initialized with an environment cannot be made part of another state tree.`)
         }
         if (this.parent && !newParent) {
-            if (
-                 this.patchSubscribers.length > 0 ||
-                 this.snapshotSubscribers.length > 0 ||
-                 (this instanceof ObjectType && this.middlewares.length > 0)
-            ) {
-                console.warn("An object with active event listeners was removed from the tree. The subscriptions have been disposed.")
-            }
-            this._parent = newParent
             this.die()
         } else {
             this._parent = newParent
             this.subpath = subpath || "" // TODO: mweh
+            this.fireHook("afterAttach")
         }
+    }
+
+    addDisposer(disposer: () => void) {
+        this.disposers.push(disposer)
     }
 
     reconcileChildren<T>(childType: IType<any, T>, oldValues: T[], newValues: T[], newPaths: (string|number)[]): T[] {
@@ -314,11 +324,20 @@ export class MSTAdministration {
         if (this.isRoot)
             return
         else {
+            this.fireHook("beforeDetach")
             this._environment = this.root._environment // make backup of environment
+            this._isDetaching = true
             this.parent!.removeChild(this.subpath)
-            this._isAlive = true
+            this._parent = null
+            this.subpath = ""
+            this._isDetaching = false
         }
     }
 
+    fireHook(name: string) {
+        const fn = this.target[name]
+        if (typeof fn === "function")
+            fn.apply(this.target)
+    }
     // TODO: give good toString, with type and path, and use it in errors
 }
