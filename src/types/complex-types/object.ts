@@ -216,8 +216,8 @@ export type Snapshot<T> = {
 
 export interface IModelType<T, A> extends IComplexType<Snapshot<T>, T & A> { }
 
-export function createModelFactory<T>(baseModel: IBaseModelDefinition<T>): IModelType<T, {}>
-export function createModelFactory<T>(name: string, baseModel: IBaseModelDefinition<T>): IModelType<T, {}>
+export function createModelFactory<T>(baseModel: IBaseModelDefinition<T> & ThisType<T>): IModelType<T, {}>
+export function createModelFactory<T>(name: string, baseModel: IBaseModelDefinition<T> & ThisType<T>): IModelType<T, {}>
 export function createModelFactory<T, A>(baseModel: IBaseModelDefinition<T> & ThisType<T>, actions: A & ThisType<T & A>): IModelType<T, A>
 export function createModelFactory<T, A>(name: string, baseModel: IBaseModelDefinition<T> & ThisType<T>, actions: A & ThisType<T & A>): IModelType<T, A>
 export function createModelFactory(arg1: any, arg2?: any, arg3?: any) {

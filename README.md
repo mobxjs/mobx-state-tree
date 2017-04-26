@@ -164,6 +164,8 @@ TODO
 
 Views versus actions
 
+Exception: `"Invariant failed: Side effects like changing state are not allowed at this point."` indicates that a view function tries to modifies a model. This is only allowed in actions.
+
 ## Protecting the state tree
 
 By default it is allowed to both directly modify a model or through an action.

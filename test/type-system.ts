@@ -191,7 +191,8 @@ test("can create factories with maybe primitives", t => {
 
 test("it is possible to refer to a type", t => {
     const Todo = types.model({
-        title: types.string,
+        title: types.string
+    }, {
         setTitle(v: string) {
 
         }
@@ -211,7 +212,8 @@ test("it is possible to refer to a type", t => {
 
 test(".Type should not be callable", t => {
     const Todo = types.model({
-        title: types.string,
+        title: types.string
+    }, {
         setTitle(v: string) {
 
         }
@@ -223,7 +225,8 @@ test(".Type should not be callable", t => {
 
 test(".SnapshotType should not be callable", t => {
     const Todo = types.model({
-        title: types.string,
+        title: types.string
+    }, {
         setTitle(v: string) {
 
         }
@@ -233,10 +236,10 @@ test(".SnapshotType should not be callable", t => {
 })
 
 test("types instances with compatible snapshots should not be interchangeable", t => {
-    const A = types.model("A", {
+    const A = types.model("A", {}, {
         doA() {}
     })
-    const B = types.model("B", {
+    const B = types.model("B", {}, {
         doB() {}
     })
     const C = types.model("C", {
@@ -256,4 +259,32 @@ test("types instances with compatible snapshots should not be interchangeable", 
     //     () => { c.x = B.create() as any },
     //     "[mobx-state-tree] Value of type B: '{}' is not assignable to type: A | null, expected an instance of A | null or a snapshot like '({  } | null)' instead. (Note that a snapshot of the provided value is compatible with the targeted type)"
     // )
+})
+
+test("it handles complex types correctly", t => {
+    const Todo = types.model({
+        title: types.string
+    }, {
+        setTitle(v: string) {
+
+        }
+    })
+
+    const Store = types.model({
+        todos: types.map(Todo),
+        get amount() {
+            // double check, not available design time:
+            /// this.setAmount()
+            return this.todos.size
+        },
+        getAmount(): number {
+            return this.todos.size + this.amount
+        }
+    }, {
+        setAmount() {
+            const x: number = this.todos.size + this.amount + this.getAmount
+        }
+    })
+
+    t.is(true, true) // supress no asserts warning
 })
