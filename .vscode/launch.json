@@ -9,7 +9,7 @@
             "stopOnEntry": false,
             "args": ["--no-power-assert", "test-lib/${fileBasenameNoExtension}.js"],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": null,
+            "preLaunchTask": "build-tests",
             "runtimeExecutable": null,
             "runtimeArgs": [
                 "--nolazy"
