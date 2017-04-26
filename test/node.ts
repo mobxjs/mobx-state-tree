@@ -216,6 +216,7 @@ test("make sure array filter works properly", (t) => {
 
     const Document = types.model({
         rows: types.array(Row),
+    }, {
         clearDone() {
             this.rows.filter(row => row.done === true).forEach(destroy)
         }
@@ -267,13 +268,14 @@ test("it can record and replay actions", (t) => {
 
     const Document = types.model({
         customer_id: 0,
+        rows: types.array(Row)
+    }, {
         setCustomer(customer_id) {
             this.customer_id = customer_id
         },
         addRow() {
             this.rows.push(Row.create())
-        },
-        rows: types.array(Row)
+        }
     })
 
     const source = Document.create()
