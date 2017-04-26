@@ -12,7 +12,8 @@
         "experimentalDecorators": true,
         "strictNullChecks": true,
         "noFallthroughCasesInSwitch": true,
-        "noImplicitReturns": true
+        "noImplicitReturns": true,
+        "noImplicitThis": true
     },
     "files": [
         "src/index.ts"
