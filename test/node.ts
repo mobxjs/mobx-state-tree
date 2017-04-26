@@ -215,7 +215,7 @@ test("make sure array filter works properly", (t) => {
     })
 
     const Document = types.model({
-        rows: types.array(Row),
+        rows: types.array(Row)
     }, {
         clearDone() {
             this.rows.filter(row => row.done === true).forEach(destroy)
@@ -260,8 +260,9 @@ test("it can record and replay patches", (t) => {
 // === RECORD ACTIONS ===
 test("it can record and replay actions", (t) => {
     const Row = types.model({
-        article_id: 0,
-        setArticle(article_id){
+        article_id: 0
+    }, {
+        setArticle(article_id) {
             this.article_id = article_id
         }
     })

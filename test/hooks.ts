@@ -29,10 +29,7 @@ function createTestStore(listener) {
     })
 
     const Store = types.model("Store", {
-        todos: types.array(Todo),
-        getLength() {
-            return this.todos.length
-        }
+        todos: types.array(Todo)
     }, {
         afterCreate() {
             listener("new store: " + this.todos.length)

@@ -8,6 +8,7 @@ export class ViewProperty extends Property {
     constructor(name: string, fn: Function) {
         super(name)
         this.invokeAction = createActionInvoker(name, fn)
+        throw new Error("oops")
     }
 
     initialize(target: any) {

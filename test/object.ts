@@ -12,7 +12,8 @@ interface ITest{
 
 const createTestFactories = () => {
     const Factory = types.model({
-        to: 'world',
+        to: 'world'
+    }, {
         setTo(to) {
             this.to = to
         }
@@ -179,7 +180,8 @@ test("it should throw if snapshot has computed properties", (t) => {
 
 test("it should throw if a replaced object is read or written to", (t) => {
     const Todo = types.model({
-        title: "test",
+        title: "test"
+    }, {
         fn() {
 
         }

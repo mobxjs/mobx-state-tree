@@ -5,7 +5,8 @@ declare var Buffer
 /// Simple action replay and invocation
 
 const Task = types.model({
-    done: false,
+    done: false
+}, {
     toggle() {
         this.done = !this.done
         return this.done
@@ -47,7 +48,8 @@ const Customer = types.model("Customer", {
 })
 
 const Order = types.model("Order", {
-    customer: types.reference(Customer),
+    customer: types.reference(Customer)
+}, {
     setCustomer(customer) {
         this.customer = customer
     }
