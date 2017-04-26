@@ -54,9 +54,17 @@ test("it should do typescript type inference correctly", (t) => {
     const A = types.model({
         x: types.number,
         y: types.maybe(types.string),
-        method() { },
         get z(): string { return "hi" },
         set z(v: string) { }
+    }, {
+        method() {
+            // Correct this. Requires typescript 2.3
+            const x: string = this.z + this.x + this.y
+            this.anotherMethod(x)
+        },
+        anotherMethod(x: string) {
+
+        }
     })
 
     // factory is invokable
