@@ -1,4 +1,4 @@
-import { detach, types, destroy } from "../"
+import { detach, types, destroy, addDisposer } from "../"
 import { test } from "ava"
 
 function createTestStore(listener) {
@@ -9,6 +9,12 @@ function createTestStore(listener) {
         },
         afterCreate() {
             listener("new todo: " + this.title)
+            addDisposer(this, () => {
+                listener("custom disposer 1 for " + this.title)
+            })
+            addDisposer(this, () => {
+                listener("custom disposer 2 for " + this.title)
+            })
         },
         beforeDestroy() {
             listener("destroy todo: " + this.title)
@@ -25,6 +31,9 @@ function createTestStore(listener) {
         todos: types.array(Todo),
         afterCreate() {
             listener("new store: " + this.todos.length)
+            addDisposer(this, () => {
+                listener("custom disposer for store")
+            })
         },
         beforeDestroy() {
             listener("destroy store: " + this.todos.length)
@@ -75,13 +84,22 @@ test("it should trigger lifecycle hooks", t => {
         "detach todo: Give talk",
         "-",
         "destroy todo: Get biscuit",
+        "custom disposer 2 for Get biscuit",
+        "custom disposer 1 for Get biscuit",
         "--",
         "new todo: add sugar",
         "attach todo: add sugar",
         "---",
         "destroy todo: Get coffee",
+        "custom disposer 2 for Get coffee",
+        "custom disposer 1 for Get coffee",
         "destroy todo: add sugar",
+        "custom disposer 2 for add sugar",
+        "custom disposer 1 for add sugar",
         "destroy store: 2",
-        "destroy todo: Give talk"
+        "custom disposer for store",
+        "destroy todo: Give talk",
+        "custom disposer 2 for Give talk",
+        "custom disposer 1 for Give talk"
     ])
 })

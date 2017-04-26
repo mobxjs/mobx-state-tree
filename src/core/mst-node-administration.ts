@@ -31,7 +31,7 @@ export class MSTAdministration {
     readonly middlewares: IMiddleWareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
-    private readonly snapshotDisposer: IReactionDisposer
+    private readonly disposers: (() => void)[] = []
 
     constructor(parent: MSTAdministration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
         invariant(type instanceof ComplexType, "Uh oh")
@@ -42,12 +42,13 @@ export class MSTAdministration {
         this.target = initialState
         this._environment = environment
 
-        this.snapshotDisposer = reaction(() => this.snapshot, snapshot => {
+        const snapshotDisposer = reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
-        this.snapshotDisposer.onError((e: any) => {
+        snapshotDisposer.onError((e: any) => {
             throw e
         })
+        this.addDisposer(snapshotDisposer)
     }
 
     /**
@@ -89,7 +90,7 @@ export class MSTAdministration {
 
         // TODO: kill $mobx.values
         this.fireHook("beforeDestroy")
-        this.snapshotDisposer()
+        this.disposers.splice(0).reverse().forEach(f => f())
         this.patchSubscribers.splice(0)
         this.snapshotSubscribers.splice(0)
         this.patchSubscribers.splice(0)
@@ -165,6 +166,10 @@ export class MSTAdministration {
             this.subpath = subpath || "" // TODO: mweh
             this.fireHook("afterAttach")
         }
+    }
+
+    addDisposer(disposer: () => void) {
+        this.disposers.push(disposer)
     }
 
     reconcileChildren<T>(childType: IType<any, T>, oldValues: T[], newValues: T[], newPaths: (string|number)[]): T[] {
