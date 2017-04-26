@@ -3,7 +3,8 @@ import { test } from "ava"
 
 function createTestStore(listener) {
     const Todo = types.model("Todo", {
-        title: "",
+        title: ""
+    }, {
         setTitle(newTitle) {
             this.title = newTitle
         },

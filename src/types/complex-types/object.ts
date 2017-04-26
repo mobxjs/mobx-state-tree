@@ -3,7 +3,6 @@ import {
     extendShallowObservable,
     IObjectChange,
     IObjectWillChange,
-    IAction,
     intercept,
     observe
 } from "mobx"
@@ -29,6 +28,7 @@ import { ReferenceProperty } from "../property-types/reference-property"
 import { ComputedProperty } from "../property-types/computed-property"
 import { ValueProperty } from "../property-types/value-property"
 import { ActionProperty } from "../property-types/action-property"
+import { ViewProperty } from "../property-types/view-property"
 
 export class ObjectType extends ComplexType<any, any> {
     isObjectFactory = true
@@ -89,8 +89,9 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     parseModelProps() {
-        const baseModel = this.baseModel
+        const {baseModel, baseActions} = this
         for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
+            // TODO: check that hooks are not defined as part of baseModel
             const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
             if ("get" in descriptor) {
                 this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
@@ -112,11 +113,22 @@ export class ObjectType extends ComplexType<any, any> {
             } else if (isReferenceFactory(value)) {
                 this.props[key] =  new ReferenceProperty(key, value.targetType, value.basePath)
             } else if (typeof value === "function") {
-                this.props[key] = new ActionProperty(key, value)
+                this.props[key] = new ViewProperty(key, value)
             } else if (typeof value === "object") {
                 fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
             } else {
                 fail(`Unexpected value for property '${key}'`)
+            }
+        }
+
+        for (let key in baseActions) if (hasOwnProperty(baseActions, key)) {
+            const value = baseActions[key]
+            if (key in this.baseModel)
+                fail(`Property '${key}' was also defined as action. Actions and properties should not collide`)
+            if (typeof value === "function") {
+                this.props[key] = new ActionProperty(key, value)
+            } else {
+                fail(`Unexpected value for action '${key}'. Expected function, got ${typeof value}`)
             }
         }
     }

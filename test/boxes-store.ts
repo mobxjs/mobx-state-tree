@@ -8,11 +8,11 @@ const randomUuid = () => Math.random()
 
 export const Box = types.model("Box", {
     id: types.identifier(),
-    name: '',
+    name: "",
     x: 0,
     y: 0,
     get width() {
-        return this.name.length * 15;
+        return this.name.length * 15
     },
     get isSelected() {
         if (!hasParent(this))
