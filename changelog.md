@@ -1,3 +1,34 @@
+# 0.4.0
+
+**BREAKING** `types.model` no requires 2 parameters to define a model. The first parameter defines the properties, derived values and view functions. The second argment is used to define the actions. For example:
+
+```javascript
+const Todo = types.model("Todo", {
+    done: types.boolean,
+    toggle() {
+        this.done = !this.done
+    }
+})
+```
+
+Now should be defined as:
+
+```javascript
+const Todo = types.model(
+    "Todo",
+    {
+        done: types.boolean,
+    },
+    {
+        toggle() {
+            this.done = !this.done
+        }
+    }
+)
+```
+
+It is still possible to define functions on the first object. However, those functions are not considered to be actions, but views. They are not allowed to modify values, but instead should produce a new value themselves.
+
 # 0.3.3
 
 * Introduced lifecycle hooks `afterCreate`, `afterAttach`, `beforeDetach`, `beforeDestroy`, implements #76

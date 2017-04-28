@@ -239,6 +239,7 @@ export function extend<A, B, C, AA, BA, CA>(name: string, a: IModelType<A, AA>, 
 export function extend<A, B, AA, BA>(a: IModelType<A, AA>, b: IModelType<B, BA>): IModelType<A & B, AA & BA>
 export function extend<A, B, C, AA, BA, CA>(a: IModelType<A, AA>, b: IModelType<B, BA>, c: IModelType<C, CA>): IModelType<A & B & C, AA & BA & CA>
 export function extend(...args: any[]) {
+    console.warn("[mobx-state-tree] `extend` is an experimental feature and it's behavior will probably change in the future")
     const baseFactories = typeof args[0] === "string" ? args.slice(1) : args
     const factoryName = typeof args[0] === "string" ? args[0] : baseFactories.map(f => f.name).join("_")
 

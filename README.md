@@ -77,12 +77,12 @@ const Box = types.model("Box",{
     x: 0,
     y: 0,
 
-    // computed prop
+    // computed prop / views
     get width() {
         return this.name.length * 15
-    },
-
-    // action
+    }
+}, {
+    // actions
     move(dx, dy) {
         this.x += dx
         this.y += dy
@@ -91,7 +91,8 @@ const Box = types.model("Box",{
 
 const BoxStore = types.model("BoxStore",{
     boxes: types.map(Box),
-    selection: types.reference("boxes/name"),
+    selection: types.reference("boxes/name")
+}, {
     addBox(name, x, y) {
         const box = Box.create({ id: uuid(), name, x, y })
         this.boxes.put(box)
@@ -175,7 +176,8 @@ To disable modifying data in the tree without action, simple call `protect(model
 
 ```javascript
 const Todo = types.model({
-    done: false,
+    done: false
+}, {
     toggle() {
         this.done = !this.done
     }
@@ -700,7 +702,8 @@ Good news? You don't need to write it twice! Using the `typeof` operator of Type
 
 ```typescript
 const Todo = types.model({
-    title: types.string,
+    title: types.string
+}, {
     setTitle(v: string) {
         this.title = v
     }
