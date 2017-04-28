@@ -1,5 +1,6 @@
 import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../"
 import {test} from "ava"
+import {autorun} from "mobx"
 
 interface ITestSnapshot{
     to: string
@@ -12,7 +13,8 @@ interface ITest{
 
 const createTestFactories = () => {
     const Factory = types.model({
-        to: 'world',
+        to: 'world'
+    }, {
         setTo(to) {
             this.to = to
         }
@@ -179,7 +181,8 @@ test("it should throw if snapshot has computed properties", (t) => {
 
 test("it should throw if a replaced object is read or written to", (t) => {
     const Todo = types.model({
-        title: "test",
+        title: "test"
+    }, {
         fn() {
 
         }
@@ -234,4 +237,44 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is({to: 'mars'}), true)
     t.deepEqual(Factory.is({wrongKey: true}), true)
     t.deepEqual(Factory.is({to: 3 }), false)
+})
+
+// === VIEW FUNCTIONS ===
+
+test("view functions should be tracked", (t) => {
+    const model = types.model({
+        x: 3,
+        doubler() {
+            return this.x * 2
+        }
+    }).create()
+
+    const values: number[] = []
+    const d = autorun(() => {
+        values.push(model.doubler())
+    })
+
+    model.x = 7
+    t.deepEqual(values, [6, 14])
+})
+
+test("view functions should not be allowed to change state", (t) => {
+    const model = types.model({
+        x: 3,
+        doubler() {
+            this.x *= 2
+        }
+    }, {
+        anotherDoubler() {
+            this.x *= 2
+        }
+    }).create()
+
+    t.throws(
+        () => model.doubler(),
+        /Invariant failed: Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component?/
+    )
+
+    model.anotherDoubler()
+    t.is(model.x, 6)
 })

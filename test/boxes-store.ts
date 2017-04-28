@@ -1,24 +1,25 @@
 /**
  *  Based on examples/boxes/domain-state.js
  */
-import { types, getSnapshot, applySnapshot, getParent, hasParent, onPatch, recordPatches, IJsonPatch } from "..";
+import { types, getParent, hasParent, recordPatches, IJsonPatch } from ".."
 import { test } from "ava"
 
 const randomUuid = () => Math.random()
 
 export const Box = types.model("Box", {
     id: types.identifier(),
-    name: '',
+    name: "",
     x: 0,
     y: 0,
     get width() {
-        return this.name.length * 15;
+        return this.name.length * 15
     },
     get isSelected() {
         if (!hasParent(this))
             return false
         return getParent(getParent(this)).selection === this
-    },
+    }
+}, {
     move(dx, dy) {
         this.x += dx
         this.y += dy
@@ -37,7 +38,8 @@ export const Arrow = types.model("Arrow", {
 export const Store = types.model("Store", {
     boxes: types.map(Box),
     arrows: types.array(Arrow),
-    selection: types.reference(Box, "./boxes"),
+    selection: types.reference(Box, "./boxes")
+}, {
     addBox(name, x, y) {
         const box = Box.create({ name, x, y, id: randomUuid() })
         this.boxes.put(box)

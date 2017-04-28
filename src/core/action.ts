@@ -48,7 +48,7 @@ function runMiddleWares(node: MSTAdministration, baseCall: IRawActionCall): any 
 export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
 
-    const actionInvoker = function () {
+    const actionInvoker = function (this: IMSTNode) {
         const adm = getMSTAdministration(this)
         adm.assertAlive()
         if (adm.isRunningAction()) {

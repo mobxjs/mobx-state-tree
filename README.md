@@ -77,12 +77,12 @@ const Box = types.model("Box",{
     x: 0,
     y: 0,
 
-    // computed prop
+    // computed prop / views
     get width() {
         return this.name.length * 15
-    },
-
-    // action
+    }
+}, {
+    // actions
     move(dx, dy) {
         this.x += dx
         this.y += dy
@@ -91,7 +91,8 @@ const Box = types.model("Box",{
 
 const BoxStore = types.model("BoxStore",{
     boxes: types.map(Box),
-    selection: types.reference("boxes/name"),
+    selection: types.reference("boxes/name")
+}, {
     addBox(name, x, y) {
         const box = Box.create({ id: uuid(), name, x, y })
         this.boxes.put(box)
@@ -158,6 +159,14 @@ Useful methods:
 
 It is not necessary to express all logic around models as actions. For example it is not possible to define constructors on models. Rather, it is recommended to create stateless utility methods that operate on your models. It is recommended to keep models self-contained and to do orchestration around models in utilities around it.
 
+## Views
+
+TODO
+
+Views versus actions
+
+Exception: `"Invariant failed: Side effects like changing state are not allowed at this point."` indicates that a view function tries to modifies a model. This is only allowed in actions.
+
 ## Protecting the state tree
 
 By default it is allowed to both directly modify a model or through an action.
@@ -167,7 +176,8 @@ To disable modifying data in the tree without action, simple call `protect(model
 
 ```javascript
 const Todo = types.model({
-    done: false,
+    done: false
+}, {
     toggle() {
         this.done = !this.done
     }
@@ -318,9 +328,9 @@ The result of this function is the return value of the callbacks, or the origina
 
 **Parameters**
 
--   `value`  
--   `asNodeCb`  
--   `asPrimitiveCb`  
+-   `value`
+-   `asNodeCb`
+-   `asPrimitiveCb`
 
 ## ComplexType
 
@@ -396,7 +406,7 @@ Example of a logging middleware:
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** model to intercept actions on
--   `middleware`  
+-   `middleware`
 
 Returns **IDisposer** function to remove the middleware
 
@@ -411,7 +421,7 @@ Patches can be used to deep observe a model tree.
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the model instance from which to receive patches
--   `callback`  
+-   `callback`
 
 Returns **IDisposer** function to remove the listener
 
@@ -423,8 +433,8 @@ Applies a JSON-patch to the given model instance or bails out if the patch could
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `patch` **IJsonPatch** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `patch` **IJsonPatch**
 
 ## applyPatches
 
@@ -434,8 +444,8 @@ Applies a number of JSON patches in a single MobX transaction
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `patches` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IJsonPatch>** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `patches` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IJsonPatch>**
 
 ## applyActions
 
@@ -447,9 +457,9 @@ Does not return any value
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IActionCall>** 
--   `options` **\[IActionCallOptions]** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IActionCall>**
+-   `options` **\[IActionCallOptions]**
 
 ## protect
 
@@ -462,7 +472,7 @@ To disable modifying data in the tree without action, simple call `protect(model
 
 **Parameters**
 
--   `target`  
+-   `target`
 
 **Examples**
 
@@ -489,7 +499,7 @@ Returns true if the object is in protected mode, @see protect
 
 **Parameters**
 
--   `target`  
+-   `target`
 
 ## applySnapshot
 
@@ -499,8 +509,8 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `snapshot` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `snapshot` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
 ## hasParent
 
@@ -510,10 +520,10 @@ Given a model instance, returns `true` if the object has a parent, that is, is p
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 -   `depth` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** = 1, how far should we look upward?
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
 
 ## getPath
 
@@ -523,9 +533,9 @@ Returns the path of the given object in the model tree
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
 
 ## getPathParts
 
@@ -535,9 +545,9 @@ Returns the path of the given object as unescaped string array
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** 
+Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>**
 
 ## isRoot
 
@@ -547,9 +557,9 @@ Returns true if the given object is the root of a model tree
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
 
 ## resolve
 
@@ -559,10 +569,10 @@ Resolves a path relatively to a given object.
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 -   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** escaped json path
 
-Returns **Any** 
+Returns **Any**
 
 ## tryResolve
 
@@ -570,10 +580,10 @@ Returns **Any**
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
 
-Returns **Any** 
+Returns **Any**
 
 ## clone
 
@@ -581,10 +591,10 @@ Returns **Any**
 
 **Parameters**
 
--   `source` **T** 
--   `keepEnvironment`  
+-   `source` **T**
+-   `keepEnvironment`
 
-Returns **T** 
+Returns **T**
 
 ## detach
 
@@ -594,7 +604,7 @@ Removes a model element from the state tree, and let it live on as a new state t
 
 **Parameters**
 
--   `thing`  
+-   `thing`
 
 ## destroy
 
@@ -604,7 +614,7 @@ Removes a model element from the state tree, and mark it as end-of-life; the ele
 
 **Parameters**
 
--   `thing`  
+-   `thing`
 
 ## applyAction
 
@@ -615,9 +625,9 @@ Returns the value of the last actoin
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `action` **IActionCall** 
--   `options` **\[IActionCallOptions]** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `action` **IActionCall**
+-   `options` **\[IActionCallOptions]**
 
 ## escapeJsonPath
 
@@ -628,7 +638,7 @@ escape slashes and backslashes
 
 **Parameters**
 
--   `str`  
+-   `str`
 
 ## unescapeJsonPath
 
@@ -638,7 +648,7 @@ unescape slashes and backslashes
 
 **Parameters**
 
--   `str`  
+-   `str`
 
 # FAQ
 
@@ -683,13 +693,17 @@ So far this might look a lot like an immutable state tree as found for example i
 
 ## TypeScript & MST
 
+TypeScript support is best effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we got pretty close! As MST uses the latest fancy typescript features it is recommended to use TypeScript 2.3 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
+
 When using models, you write interface along with it's property types that will be used to perform type checks at runtime.
 What about compile time? You can use TypeScript interfaces indeed to perform those checks, but that would require writing again all the properties and their actions!
+
 Good news? You don't need to write it twice! Using the `typeof` operator of TypeScript over the `.Type` property of a MST Type, will result in a valid TypeScript Type!
 
 ```typescript
 const Todo = types.model({
-    title: types.string,
+    title: types.string
+}, {
     setTitle(v: string) {
         this.title = v
     }

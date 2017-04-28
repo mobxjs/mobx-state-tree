@@ -3,7 +3,8 @@ import { test } from "ava"
 
 function createTestStore(listener) {
     const Todo = types.model("Todo", {
-        title: "",
+        title: ""
+    }, {
         setTitle(newTitle) {
             this.title = newTitle
         },
@@ -28,7 +29,8 @@ function createTestStore(listener) {
     })
 
     const Store = types.model("Store", {
-        todos: types.array(Todo),
+        todos: types.array(Todo)
+    }, {
         afterCreate() {
             listener("new store: " + this.todos.length)
             addDisposer(this, () => {
