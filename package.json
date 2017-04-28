@@ -39,7 +39,7 @@
     "nyc": "^10.0.0",
     "tape": "^4.6.0",
     "tslint": "^3.15.1",
-    "typescript": "next",
+    "typescript": "^2.3.1",
     "webpack": "^1.13.1",
     "webpack-fail-plugin": "^1.0.6"
   },

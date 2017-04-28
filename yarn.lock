@@ -4732,9 +4732,9 @@ typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@next:
-  version "2.3.0-dev.20170426"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.3.0-dev.20170426.tgz#d0cb8b4263dfe65363f2b2c4b6ab12182b586e68"
+typescript@^2.3.1:
+  version "2.3.1"
+  resolved "http://localhost:4873/typescript/-/typescript-2.3.1.tgz#e3361fb395c6c3f9c69faeeabc9503f8bdecaea1"
 
 uglify-js@^2.6, uglify-js@~2.7.3:
   version "2.7.5"
