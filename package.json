@@ -11,7 +11,7 @@
     "build-tests": "tsc -p test/",
     "test": "npm run build-tests && ava",
     "watch": "concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
-    "prepublish": "npm run build && npm run build-docs",
+    "prepublish": "_npm run build && npm run build-docs",
     "coverage": "npm run build-tests && nyc ava && nyc report -r html && nyc report -r lcov",
     "build-docs": "npm run quick-build && documentation readme lib/index.js --github --section API",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",

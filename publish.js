@@ -3,6 +3,7 @@
 /* Publish.js, publish a new version of the npm package as found in the current directory */
 module.exports = function(shell, npm, git) {
     npm("test")
+    npm("run", "_prepublish")
 
     var pkg = JSON.parse(shell.read('package.json'));
 
