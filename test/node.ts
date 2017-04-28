@@ -1,4 +1,4 @@
-import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, isAlive, clone, getType, getChildType, recordActions, recordPatches, types, destroy} from "../"
+import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, isAlive, clone, getType, getChildType, recordActions, recordPatches, types, destroy} from "../src"
 import {test} from "ava"
 
 // getParent

@@ -1,7 +1,6 @@
 import { reaction } from "mobx"
+import { types, getSnapshot, applySnapshot } from "../src"
 import { test } from "ava"
-import { types, getSnapshot, applySnapshot } from "../"
-
 
 test("it should support generic relative paths", t => {
     const User = types.model({

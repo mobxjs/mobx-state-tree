@@ -1,4 +1,4 @@
-import { recordActions, types, getSnapshot, onAction } from "../"
+import { recordActions, types, getSnapshot, onAction} from "../src"
 import { test } from "ava"
 
 declare var Buffer

@@ -1,5 +1,5 @@
 import {test} from "ava"
-import {getSnapshot, types} from "../"
+import {getSnapshot, types} from "../src"
 
 test("it should provide a default value, if no snapshot is provided", t => {
     const Row = types.model({

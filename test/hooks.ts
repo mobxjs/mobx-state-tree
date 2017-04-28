@@ -1,4 +1,4 @@
-import { detach, types, destroy, addDisposer } from "../"
+import { detach, types, destroy, addDisposer } from "../src"
 import { test } from "ava"
 
 function createTestStore(listener) {

@@ -1,4 +1,4 @@
-import { protect, applySnapshot, types } from "../"
+import { protect, applySnapshot, types } from "../src"
 import { test } from "ava"
 
 function createTestStore() {

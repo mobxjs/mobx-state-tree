@@ -1,5 +1,5 @@
 import {test} from "ava"
-import {getSnapshot, types} from "../"
+import {getSnapshot, types} from "../src"
 
 test("it should accept any serializable value", t => {
     const Factory = types.model({
@@ -22,5 +22,5 @@ test("it should throw if value is not serializable", t => {
 
     t.throws(() => {
         doc.value = function IAmUnserializable(){}
-    }, /IAmUnserializable.*is not assignable to type: frozen/)
+    }, /IAmUnserializable(.|\n)* is not assignable to type: frozen/)
 })
