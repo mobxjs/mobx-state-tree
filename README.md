@@ -64,6 +64,8 @@ Models are at the heart of `mobx-state-tree`. They simply store your data.
 -   Models can be snapshotted at any time
 -   Models can be created using factories, that take copy a base model and combine it with a (partial) snapshot
 
+TODO: properties & operations
+
 Example:
 
 ```javascript
@@ -328,9 +330,9 @@ The result of this function is the return value of the callbacks, or the origina
 
 **Parameters**
 
--   `value`  
--   `asNodeCb`  
--   `asPrimitiveCb`  
+-   `value`
+-   `asNodeCb`
+-   `asPrimitiveCb`
 
 ## ComplexType
 
@@ -406,7 +408,7 @@ Example of a logging middleware:
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** model to intercept actions on
--   `middleware`  
+-   `middleware`
 
 Returns **IDisposer** function to remove the middleware
 
@@ -421,7 +423,7 @@ Patches can be used to deep observe a model tree.
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the model instance from which to receive patches
--   `callback`  
+-   `callback`
 
 Returns **IDisposer** function to remove the listener
 
@@ -433,8 +435,8 @@ Applies a JSON-patch to the given model instance or bails out if the patch could
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `patch` **IJsonPatch** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `patch` **IJsonPatch**
 
 ## applyPatches
 
@@ -444,8 +446,8 @@ Applies a number of JSON patches in a single MobX transaction
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `patches` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IJsonPatch>** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `patches` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IJsonPatch>**
 
 ## applyActions
 
@@ -457,9 +459,9 @@ Does not return any value
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IActionCall>** 
--   `options` **\[IActionCallOptions]** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IActionCall>**
+-   `options` **\[IActionCallOptions]**
 
 ## protect
 
@@ -472,7 +474,7 @@ To disable modifying data in the tree without action, simple call `protect(model
 
 **Parameters**
 
--   `target`  
+-   `target`
 
 **Examples**
 
@@ -499,7 +501,7 @@ Returns true if the object is in protected mode, @see protect
 
 **Parameters**
 
--   `target`  
+-   `target`
 
 ## applySnapshot
 
@@ -509,8 +511,8 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `snapshot` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `snapshot` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
 ## hasParent
 
@@ -520,10 +522,10 @@ Given a model instance, returns `true` if the object has a parent, that is, is p
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 -   `depth` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** = 1, how far should we look upward?
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
 
 ## getPath
 
@@ -533,9 +535,9 @@ Returns the path of the given object in the model tree
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
 
 ## getPathParts
 
@@ -545,9 +547,9 @@ Returns the path of the given object as unescaped string array
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** 
+Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>**
 
 ## isRoot
 
@@ -557,9 +559,9 @@ Returns true if the given object is the root of a model tree
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
 
 ## resolve
 
@@ -569,10 +571,10 @@ Resolves a path relatively to a given object.
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
 -   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** escaped json path
 
-Returns **Any** 
+Returns **Any**
 
 ## tryResolve
 
@@ -580,10 +582,10 @@ Returns **Any**
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
 
-Returns **Any** 
+Returns **Any**
 
 ## clone
 
@@ -591,10 +593,10 @@ Returns **Any**
 
 **Parameters**
 
--   `source` **T** 
--   `keepEnvironment`  
+-   `source` **T**
+-   `keepEnvironment`
 
-Returns **T** 
+Returns **T**
 
 ## detach
 
@@ -604,7 +606,7 @@ Removes a model element from the state tree, and let it live on as a new state t
 
 **Parameters**
 
--   `thing`  
+-   `thing`
 
 ## destroy
 
@@ -614,7 +616,7 @@ Removes a model element from the state tree, and mark it as end-of-life; the ele
 
 **Parameters**
 
--   `thing`  
+-   `thing`
 
 ## applyAction
 
@@ -625,9 +627,9 @@ Returns the value of the last actoin
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `action` **IActionCall** 
--   `options` **\[IActionCallOptions]** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `action` **IActionCall**
+-   `options` **\[IActionCallOptions]**
 
 ## escapeJsonPath
 
@@ -638,7 +640,7 @@ escape slashes and backslashes
 
 **Parameters**
 
--   `str`  
+-   `str`
 
 ## unescapeJsonPath
 
@@ -648,7 +650,7 @@ unescape slashes and backslashes
 
 **Parameters**
 
--   `str`  
+-   `str`
 
 # FAQ
 
