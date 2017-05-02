@@ -6,9 +6,15 @@ import { typecheck, IType } from "../types/type"
 import { isMST, getMSTAdministration } from "./mst-node"
 import { IMiddleWareHandler } from "./action"
 import {
-    invariant, fail, extend,
-    addHiddenFinalProp, IDisposer, registerEventHandler, isMutable
-} from "../utils"
+    addHiddenFinalProp,
+    addReadOnlyProp,
+    extend,
+    fail,
+    IDisposer,
+    invariant,
+    isMutable,
+    registerEventHandler
+} from '../utils';
 import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
 import { getIdentifierAttribute } from "../types/complex-types/object"
 import { ComplexType } from "../types/complex-types/complex-type"
@@ -85,11 +91,13 @@ export class MSTAdministration {
 
         // tslint:disable-next-line:no_unused-variable
         this.type.getChildMSTs(this).forEach(([_, node]) => {
+            // TODO: improve: first just trigger beforeDestroy, fire die() after all have run?
             node.die()
         })
 
         // TODO: kill $mobx.values
         this.fireHook("beforeDestroy")
+        addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
         this.disposers.splice(0).reverse().forEach(f => f())
         this.patchSubscribers.splice(0)
         this.snapshotSubscribers.splice(0)
@@ -97,6 +105,11 @@ export class MSTAdministration {
         this._isAlive = false
         this._parent = null
         this.subpath = ""
+        Object.defineProperty(this.target, "$mobx", {
+            get() {
+                throw new Error("died")
+            }
+        })
         // Post conditions, element will not be in the tree anymore...
     }
 
