@@ -50,7 +50,7 @@ import { ISnapshottable, IType } from "../types/type"
  */
 export function addMiddleware(target: IMSTNode, middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any): IDisposer {
     const node = getMSTAdministration(target)
-    if (!node.isProtected)
+    if (!node.isProtectionEnabled)
         console.warn("It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`")
     return node.addMiddleWare(middleware)
 }
@@ -186,14 +186,18 @@ export function recordActions(subject: IMSTNode): IActionRecorder {
  * todo.toggle() // OK
  */
 export function protect(target: IMSTNode) {
-    getMSTAdministration(target).protect()
+    getMSTAdministration(target).isProtectionEnabled = true
+}
+
+export function unprotect(target: IMSTNode) {
+    getMSTAdministration(target).isProtectionEnabled = false
 }
 
 /**
  * Returns true if the object is in protected mode, @see protect
  */
 export function isProtected(target: IMSTNode): boolean {
-    return getMSTAdministration(target).isProtected
+    return getMSTAdministration(target).isProtectionEnabled
 }
 
 /**

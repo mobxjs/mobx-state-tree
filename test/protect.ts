@@ -1,4 +1,4 @@
-import { protect, applySnapshot, types } from "../src"
+import { protect, unprotect, applySnapshot, types } from "../src"
 import { test } from "ava"
 
 function createTestStore() {
@@ -26,6 +26,7 @@ test("it should be possible to protect an object", t => {
     const store = createTestStore()
 
     protect(store.todos[0])
+    unprotect(store.todos[1])
 
     store.todos[1].title = "A"
 
@@ -43,9 +44,9 @@ test("it should be possible to protect an object", t => {
 
 test("protect should protect against any update", t => {
     const store = createTestStore()
-    protect(store)
 
-    t.throws(
+    t.notThrows(
+        // apply Snapshot / patch are currently allowed, even outside protected mode
         () => { applySnapshot(store, { todos: [ { title: "Get tea" } ]}) },
         "[mobx-state-tree] Cannot modify '', the object is protected and can only be modified from model actions"
     )
@@ -63,7 +64,6 @@ test("protect should protect against any update", t => {
 
 test("protect should also protect children", t => {
     const store = createTestStore()
-    protect(store)
 
     t.throws(
         () => { store.todos[0].title = "B" },

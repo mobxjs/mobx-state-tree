@@ -1,3 +1,7 @@
+# 0.5.0
+
+** BREAKING ** protection enabled by default
+
 # 0.4.0
 
 **BREAKING** `types.model` no requires 2 parameters to define a model. The first parameter defines the properties, derived values and view functions. The second argment is used to define the actions. For example:

@@ -160,10 +160,10 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     @action applySnapshot(node: MSTAdministration, snapshot: any): void {
-        // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed
-        for (let key in snapshot) if (key in this.props) {
+        // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed?
+        node.pseudoAction(() => { for (let key in snapshot) if (key in this.props) {
             this.props[key].deserialize(node.target, snapshot)
-        }
+        }})
     }
 
     getChildType(key: string): IType<any, any> {
@@ -206,7 +206,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 }
 
-export type IBaseModelDefinition<T> = {
+export type IModelProperties<T> = {
     [K in keyof T]: IType<any, T[K]> | T[K]
 }
 
@@ -216,10 +216,10 @@ export type Snapshot<T> = {
 
 export interface IModelType<T, A> extends IComplexType<Snapshot<T>, T & A> { }
 
-export function createModelFactory<T>(baseModel: IBaseModelDefinition<T> & ThisType<T>): IModelType<T, {}>
-export function createModelFactory<T>(name: string, baseModel: IBaseModelDefinition<T> & ThisType<T>): IModelType<T, {}>
-export function createModelFactory<T, A>(baseModel: IBaseModelDefinition<T> & ThisType<T>, actions: A & ThisType<T & A>): IModelType<T, A>
-export function createModelFactory<T, A>(name: string, baseModel: IBaseModelDefinition<T> & ThisType<T>, actions: A & ThisType<T & A>): IModelType<T, A>
+export function createModelFactory<T>(properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}>
+export function createModelFactory<T>(name: string, properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}>
+export function createModelFactory<T, A>(properties: IModelProperties<T> & ThisType<T>, operations: A & ThisType<T & A>): IModelType<T, A>
+export function createModelFactory<T, A>(name: string, properties: IModelProperties<T> & ThisType<T>, operations: A & ThisType<T & A>): IModelType<T, A>
 export function createModelFactory(arg1: any, arg2?: any, arg3?: any) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1

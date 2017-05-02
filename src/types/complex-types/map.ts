@@ -138,35 +138,37 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     @action applySnapshot(node: MSTAdministration, snapshot: any): void {
-        const target = node.target as ObservableMap<any>
-        const identifierAttr = getIdentifierAttribute(this.subType)
-        // Try to update snapshot smartly, by reusing instances under the same key as much as possible
-        const currentKeys: { [key: string]: boolean } = {}
-        target.keys().forEach(key => { currentKeys[key] = false })
-        Object.keys(snapshot).forEach(key => {
-            const item = snapshot[key]
-            if (identifierAttr && item && typeof item === "object" && key !== item[identifierAttr])
-                fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${key}', but expected: '${item[identifierAttr]}'`)
-            // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
-            if (key in currentKeys && !isPrimitive(item)) {
-                currentKeys[key] = true
-                maybeMST(
-                    target.get(key),
-                    propertyNode => {
-                        // update existing instance
-                        propertyNode.applySnapshot(item)
-                    },
-                    () => {
-                        target.set(key, item)
-                    }
-                )
-            } else {
-                target.set(key, item)
-            }
-        })
-        Object.keys(currentKeys).forEach(key => {
-            if (currentKeys[key] === false)
-                target.delete(key)
+        node.pseudoAction(() => {
+            const target = node.target as ObservableMap<any>
+            const identifierAttr = getIdentifierAttribute(this.subType)
+            // Try to update snapshot smartly, by reusing instances under the same key as much as possible
+            const currentKeys: { [key: string]: boolean } = {}
+            target.keys().forEach(key => { currentKeys[key] = false })
+            Object.keys(snapshot).forEach(key => {
+                const item = snapshot[key]
+                if (identifierAttr && item && typeof item === "object" && key !== item[identifierAttr])
+                    fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${key}', but expected: '${item[identifierAttr]}'`)
+                // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
+                if (key in currentKeys && !isPrimitive(item)) {
+                    currentKeys[key] = true
+                    maybeMST(
+                        target.get(key),
+                        propertyNode => {
+                            // update existing instance
+                            propertyNode.applySnapshot(item)
+                        },
+                        () => {
+                            target.set(key, item)
+                        }
+                    )
+                } else {
+                    target.set(key, item)
+                }
+            })
+            Object.keys(currentKeys).forEach(key => {
+                if (currentKeys[key] === false)
+                    target.delete(key)
+            })
         })
     }
 

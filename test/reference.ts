@@ -1,5 +1,5 @@
 import { reaction } from "mobx"
-import { types, getSnapshot, applySnapshot } from "../src"
+import { types, getSnapshot, applySnapshot, unprotect } from "../src"
 import { test } from "ava"
 
 test("it should support generic relative paths", t => {
@@ -9,6 +9,10 @@ test("it should support generic relative paths", t => {
     const UserStore = types.model({
         user: types.reference(User),
         users: types.map(User)
+    }, {
+        postCreate() {
+            unprotect(this)
+        }
     })
 
     const store = UserStore.create({
@@ -18,12 +22,13 @@ test("it should support generic relative paths", t => {
             "18": { name: "Veria" }
         }
     })
+    unprotect(store)
 
     t.is(store.users.get("17")!.name, "Michel")
     t.is(store.users.get("18")!.name, "Veria")
     t.is(store.user!.name, "Michel")
 
-    store.user =  store.users.get("18")!
+    store.user = store.users.get("18")!
     t.is(store.user.name, "Veria")
 
     store.users.get("18")!.name = "Noa"
@@ -49,6 +54,7 @@ test("it should support prefixed paths in maps", t => {
             "18": { id: "18", name: "Veria" }
         }
     })
+    unprotect(store)
 
     t.is(store.users.get("17")!.name as string, "Michel")
     t.is(store.users.get("18")!.name as string, "Veria")
@@ -80,6 +86,7 @@ test("it should support prefixed paths in arrays", t => {
             { id: "18", name: "Veria" }
         ]
     })
+    unprotect(store)
 
     t.is(store.users[0].name, "Michel")
     t.is(store.users[1].name, "Veria")
@@ -111,6 +118,8 @@ test("identifiers cannot be modified", (t) => {
     })
 
     const todo = Todo.create({ id: "x" })
+    unprotect(todo)
+
     t.throws(() => todo.id = "stuff", "[mobx-state-tree] It is not allowed to change the identifier of an object, got: 'stuff' but expected: 'x'")
     t.throws(() => applySnapshot(todo, {}), "[mobx-state-tree] Value '{}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ id: identifier }' instead.")
 })
@@ -135,6 +144,8 @@ test("it should resolve refs during creation, when using path", t => {
     const s = Store.create({
         books: [{ id: "3", price: 2 }]
     })
+    unprotect(s)
+
     reaction(
         () => s.entries.reduce((a, e) => a + e.price, 0),
         v => values.push(v)
@@ -167,6 +178,8 @@ test("it should resolve refs during creation, when using generic reference", t =
     const s = Store.create({
         books: [{ id: "3", price: 2 }]
     })
+    unprotect(s)
+
     reaction(
         () => s.entries.reduce((a, e) => a + e.price, 0),
         v => values.push(v)

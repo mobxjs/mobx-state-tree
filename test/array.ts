@@ -1,5 +1,5 @@
 import {IObservableArray} from 'mobx'
-import {onSnapshot, onPatch, clone, onAction, isAlive, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../src"
+import {unprotect, onSnapshot, onPatch, clone, onAction, isAlive, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../src"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -41,6 +41,7 @@ test("it should restore the state from the snapshot", (t) => {
 test("it should emit snapshots", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     let snapshots: any[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
@@ -62,6 +63,7 @@ test("it should apply snapshots", (t) => {
 test("it should return a snapshot", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     doc.push(ItemFactory.create())
 
@@ -72,6 +74,7 @@ test("it should return a snapshot", (t) => {
 test("it should emit add patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
@@ -95,6 +98,7 @@ test("it should apply a add patch", (t) => {
 test("it should emit update patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     doc.push(ItemFactory.create())
 
@@ -121,6 +125,7 @@ test("it should apply a update patch", (t) => {
 test("it should emit remove patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     doc.push(ItemFactory.create())
 
@@ -137,6 +142,7 @@ test("it should emit remove patches", (t) => {
 test("it should apply a remove patch", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     doc.push(ItemFactory.create())
     doc.push(ItemFactory.create({to: "universe"}))
@@ -177,6 +183,7 @@ test("paths shoud remain correct when splicing", t => {
     }).create({
         todos: [{}]
     })
+    unprotect(store)
 
     t.deepEqual(store.todos.map(getPath), ["/todos/0"])
 
@@ -209,6 +216,7 @@ test("items should be reconciled correctly when splicing - 1", t => {
     }).create({
         todos: [a]
     })
+    unprotect(store)
 
     t.deepEqual(store.todos.slice(), [a])
     t.is(isAlive(a), true)
@@ -250,6 +258,7 @@ test("items should be reconciled correctly when splicing - 2", t => {
     }).create({
         todos: [a, b, c, d]
     })
+    unprotect(store)
 
     store.todos.splice(2, 1, { x: "e" }, { x: "f"})
     // becomes, a, b, e, f, d
@@ -338,6 +347,7 @@ test("it correctly reconciliate when swapping", t => {
     })
 
     const s = Store.create()
+    unprotect(s)
     const a = Task.create()
     const b = Task.create()
     s.todos.push(a, b)
@@ -356,6 +366,7 @@ test("it should not be allowed to add the same item twice to the same store", t 
     })
 
     const s = Store.create()
+    unprotect(s)
     const a = Task.create()
     s.todos.push(a)
     t.throws(() => {

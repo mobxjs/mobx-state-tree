@@ -7,7 +7,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/node_modules/ava/profile.js",
             "stopOnEntry": false,
-            "args": ["--no-power-assert", "test-lib/${fileBasenameNoExtension}.js"],
+            "args": ["--no-power-assert", "test-lib/test/${fileBasenameNoExtension}.js"],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build-tests",
             "runtimeExecutable": null,
