@@ -11,7 +11,7 @@
     "build-tests": "tsc -p test/",
     "test": "npm run build-tests && ava",
     "watch": "concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
-    "prepublish": "_npm run build && npm run build-docs",
+    "_prepublish": "npm run build && npm run build-docs",
     "coverage": "npm run build-tests && nyc ava && nyc report -r html && nyc report -r lcov",
     "build-docs": "npm run quick-build && documentation readme lib/index.js --github --section API",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
@@ -39,7 +39,7 @@
     "nyc": "^10.0.0",
     "tape": "^4.6.0",
     "tslint": "^3.15.1",
-    "typescript": "next",
+    "typescript": "2.3.2",
     "webpack": "^1.13.1",
     "webpack-fail-plugin": "^1.0.6"
   },
