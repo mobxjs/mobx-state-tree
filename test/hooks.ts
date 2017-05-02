@@ -1,4 +1,4 @@
-import { detach, types, destroy, addDisposer } from "../src"
+import { detach, types, destroy, addDisposer, unprotect } from "../src"
 import { test } from "ava"
 
 function createTestStore(listener) {
@@ -32,6 +32,7 @@ function createTestStore(listener) {
         todos: types.array(Todo)
     }, {
         afterCreate() {
+            unprotect(this)
             listener("new store: " + this.todos.length)
             addDisposer(this, () => {
                 listener("custom disposer for store")

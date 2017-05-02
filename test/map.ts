@@ -1,5 +1,5 @@
 import {ObservableMap} from 'mobx'
-import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../src"
+import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types, unprotect} from "../src"
 import {test} from "ava"
 
 interface ITestSnapshot{
@@ -39,6 +39,7 @@ test("it should restore the state from the snapshot", (t) => {
 test("it should emit snapshots", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     let snapshots: any[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
@@ -60,6 +61,7 @@ test("it should apply snapshots", (t) => {
 test("it should return a snapshot", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     doc.set("hello", ItemFactory.create())
 
@@ -71,6 +73,7 @@ test("it should return a snapshot", (t) => {
 test("it should emit add patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
@@ -94,6 +97,7 @@ test("it should apply a add patch", (t) => {
 test("it should emit update patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     doc.set("hello", ItemFactory.create())
 
@@ -110,6 +114,7 @@ test("it should emit update patches", (t) => {
 test("it should apply a update patch", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     applyPatch(doc, {op: "replace", path: "/hello", value: {to: "universe"}})
 
@@ -120,6 +125,7 @@ test("it should apply a update patch", (t) => {
 test("it should emit remove patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     doc.set("hello", ItemFactory.create())
 
@@ -136,6 +142,7 @@ test("it should emit remove patches", (t) => {
 test("it should apply a remove patch", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     doc.set("hello", ItemFactory.create())
 
@@ -176,6 +183,8 @@ test("it should support identifiers", (t) => {
     })
 
     const store = Store.create()
+    unprotect(store)
+
     store.todos.set("17", { id: "17"} as any)
 
     const a = store.todos.get("17")

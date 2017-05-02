@@ -1,7 +1,7 @@
 /**
  *  Based on examples/boxes/domain-state.js
  */
-import { types, getParent, hasParent, recordPatches, IJsonPatch } from "../src"
+import { types, getParent, hasParent, recordPatches, IJsonPatch, unprotect } from "../src"
 import { test } from "ava"
 
 const randomUuid = () => Math.random()
@@ -40,6 +40,9 @@ export const Store = types.model("Store", {
     arrows: types.array(Arrow),
     selection: types.reference(Box, "./boxes")
 }, {
+    afterCreate() {
+        unprotect(this)
+    },
     addBox(name, x, y) {
         const box = Box.create({ name, x, y, id: randomUuid() })
         this.boxes.put(box)

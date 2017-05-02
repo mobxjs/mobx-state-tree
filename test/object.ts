@@ -1,3 +1,4 @@
+import { unprotect } from '../src/core/mst-operations';
 import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../src"
 import {test} from "ava"
 import {autorun} from "mobx"
@@ -58,6 +59,7 @@ test("it should restore the state from the snapshot", (t) => {
 test("it should emit snapshots", (t) => {
     const {Factory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     let snapshots: any[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
@@ -70,7 +72,6 @@ test("it should emit snapshots", (t) => {
 test("it should apply snapshots", (t) => {
     const {Factory} = createTestFactories()
     const doc = Factory.create()
-
     applySnapshot(doc, {to: 'universe'})
 
     t.deepEqual(getSnapshot(doc), {to: 'universe'})
@@ -87,6 +88,7 @@ test("it should return a snapshot", (t) => {
 test("it should emit patches", (t) => {
     const {Factory} = createTestFactories()
     const doc = Factory.create()
+    unprotect(doc)
 
     let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
@@ -162,6 +164,7 @@ test("it should apply actions calls", (t) => {
 test("it should have computed properties", (t) => {
     const {ComputedFactory} = createTestFactories()
     const doc = ComputedFactory.create()
+    unprotect(doc)
 
     doc.width = 3
     doc.height = 2
@@ -194,6 +197,8 @@ test("it should throw if a replaced object is read or written to", (t) => {
     const s = Store.create({
         todo: { title: "3" }
     })
+    unprotect(s)
+
     const todo = s.todo
     s.todo = Todo.create({ title: "4"})
 
@@ -248,6 +253,7 @@ test("view functions should be tracked", (t) => {
             return this.x * 2
         }
     }).create()
+    unprotect(model)
 
     const values: number[] = []
     const d = autorun(() => {
@@ -272,7 +278,7 @@ test("view functions should not be allowed to change state", (t) => {
 
     t.throws(
         () => model.doubler(),
-        /Invariant failed: Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component?/
+        /Cannot modify '', the object is protected and can only be modified from model actions/
     )
 
     model.anotherDoubler()

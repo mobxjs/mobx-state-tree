@@ -1,5 +1,5 @@
 import { test } from "ava"
-import { types, getSnapshot } from "../src"
+import { types, getSnapshot, unprotect } from "../src"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -69,6 +69,7 @@ test("it should do typescript type inference correctly", (t) => {
 
     // factory is invokable
     const a = A.create({ x: 2, y: "7" })
+    unprotect(a)
 
     // property can be used as proper type
     const z: number = a.x
@@ -85,12 +86,14 @@ test("it should do typescript type inference correctly", (t) => {
     })
 
     const b = B.create()
+    unprotect(b)
 
     // sub fields can be reassigned
     b.sub = A.create({
         // MANUAL TEST not ok: z: 4
         x: 3
     })
+    unprotect(b.sub)
 
     // sub fields have proper type
     b.sub.x = 4
@@ -161,6 +164,8 @@ test("#66 - it should pick the correct type of defaulted fields", t => {
     })
 
     const a = Item.create({ id: 3 })
+    unprotect(a)
+
     t.is(a.name, "boo")
     t.throws(() => a.name = 3 as any, `[mobx-state-tree] Value '3' is not assignable to type: string.`)
 })
@@ -203,6 +208,8 @@ test("it is possible to refer to a type", t => {
     }
 
     const z = x()
+    unprotect(z)
+
     z.setTitle("bla")
     z.title = "bla"
     // z.title = 3 // Test manual: should give compile error
@@ -251,6 +258,8 @@ test("types instances with compatible snapshots should not be interchangeable", 
     t.is(A.is(getSnapshot(B.create())), true)
 
     const c = C.create()
+    unprotect(c)
+
     t.notThrows(() => { c.x = null })
     t.notThrows(() => { c.x = {} as any })
     t.notThrows(() => { c.x = A.create() })

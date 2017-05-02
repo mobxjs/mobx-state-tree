@@ -1,4 +1,4 @@
-import {types, getEnv, clone, detach} from "../src"
+import { types, getEnv, clone, detach, unprotect } from "../src"
 import {test} from "ava"
 
 const Todo = types.model({
@@ -49,13 +49,14 @@ test("getEnv throws in absence of env", t => {
     t.throws(() => todo.description, "[mobx-state-tree] Node '' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()")
 })
 
-test("detach should preserve environment environments", t => {
+test("detach should preserve environment", t => {
     const env = createEnvironment()
 
     const store = Store.create(
         { todos: [{}] },
         env
     )
+    unprotect(store)
 
     const todo = detach(store.todos[0])
 
@@ -71,6 +72,7 @@ test("it is not possible to assign instance with environment to a tree", t => {
         env
     )
     const todo = Todo.create({}, env)
+    unprotect(store)
     t.throws(() => store.todos.push(todo), "[mobx-state-tree] A state tree that has been initialized with an environment cannot be made part of another state tree.")
 })
 

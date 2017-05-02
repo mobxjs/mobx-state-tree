@@ -1,4 +1,4 @@
-import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, isAlive, clone, getType, getChildType, recordActions, recordPatches, types, destroy} from "../src"
+import {getPath, getSnapshot, getParent, hasParent, getRoot, getPathParts, isAlive, clone, getType, getChildType, recordActions, recordPatches, types, destroy, unprotect} from "../src"
 import {test} from "ava"
 
 // getParent
@@ -12,6 +12,8 @@ test("it should resolve to the parent instance", (t) => {
     })
 
     const doc = Document.create()
+    unprotect(doc)
+
     const row = Row.create()
     doc.rows.push(row)
 
@@ -29,6 +31,8 @@ test("it should check for parent instance", (t) => {
     })
 
     const doc = Document.create()
+    unprotect(doc)
+
     const row = Row.create()
 
     doc.rows.push(row)
@@ -57,6 +61,8 @@ test("it should resolve to the root of an object", (t) => {
     })
 
     const doc = Document.create()
+    unprotect(doc)
+
     const row = Row.create()
     doc.rows.push(row)
     t.is(getRoot(row), doc)
@@ -73,6 +79,8 @@ test("it should resolve the path of an object", (t) => {
     })
 
     const doc = Document.create()
+    unprotect(doc)
+
     const row = Row.create()
     doc.rows.push(row)
 
@@ -90,6 +98,8 @@ test("it should resolve the path of an object", (t) => {
     })
 
     const doc = Document.create()
+    unprotect(doc)
+
     const row = Row.create()
     doc.rows.push(row)
 
@@ -106,6 +116,8 @@ test("it should resolve parents", (t) => {
     })
 
     const doc = Document.create()
+    unprotect(doc)
+
     const row = Row.create()
     doc.rows.push(row)
 
@@ -132,6 +144,7 @@ test("it should clone a node", (t) => {
     })
 
     const doc = Document.create()
+    unprotect(doc)
     const row = Row.create()
     doc.rows.push(row)
 
@@ -151,6 +164,7 @@ test("it should be possible to clone a dead object", (t) => {
     }).create({
         todos: [a]
     })
+    unprotect(store)
 
     t.deepEqual(store.todos.slice(), [a])
     t.is(isAlive(a), true)
@@ -200,6 +214,7 @@ test("a node can exists only once in a tree", (t) => {
     })
 
     const doc = Document.create()
+    unprotect(doc)
     const row = Row.create()
     doc.rows.push(row)
 
@@ -223,6 +238,7 @@ test("make sure array filter works properly", (t) => {
     })
 
     const doc = Document.create()
+    unprotect(doc)
     const a = Row.create({ done: true })
     const b = Row.create({ done: false })
 
@@ -246,6 +262,7 @@ test("it can record and replay patches", (t) => {
     })
 
     const source = Document.create()
+    unprotect(source)
     const target = Document.create()
     const recorder = recordPatches(source)
 
