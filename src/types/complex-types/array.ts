@@ -128,8 +128,10 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     }
 
     @action applySnapshot(node: MSTAdministration, snapshot: any[]): void {
-        const target = node.target as IObservableArray<any>
-        target.replace(snapshot)
+        node.pseudoAction(() => {
+            const target = node.target as IObservableArray<any>
+            target.replace(snapshot)
+        })
     }
 
     getChildType(key: string): IType<any, any> {

@@ -1,7 +1,6 @@
 import {
     action, observable,
-    computed, reaction,
-    IReactionDisposer
+    computed, reaction
 } from "mobx"
 import { typecheck, IType } from "../types/type"
 import { isMST, getMSTAdministration } from "./mst-node"
@@ -22,10 +21,10 @@ export class MSTAdministration {
     @observable _parent: MSTAdministration | null = null
     @observable subpath: string = ""
     readonly type: ComplexType<any, any>
+    isProtectionEnabled = true
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
     private _isAlive = true // optimization: use binary flags for all these switches
-    private _isProtected = false
     private _isDetaching = false
 
     readonly middlewares: IMiddleWareHandler[] = []
@@ -84,6 +83,7 @@ export class MSTAdministration {
         if (this._isDetaching)
             return
 
+        // tslint:disable-next-line:no_unused-variable
         this.type.getChildMSTs(this).forEach(([_, node]) => {
             node.die()
         })
@@ -116,7 +116,6 @@ export class MSTAdministration {
     }
 
     public applySnapshot(snapshot: any) {
-        this.assertWritable()
         typecheck(this.type, snapshot)
         return this.type.applySnapshot(this, snapshot)
     }
@@ -124,7 +123,9 @@ export class MSTAdministration {
     @action public applyPatch(patch: IJsonPatch) {
         const parts = splitJsonPath(patch.path)
         const node = this.resolvePath(parts.slice(0, -1))
-        node.applyPatchLocally(parts[parts.length - 1], patch)
+        node.pseudoAction(() => {
+            node.applyPatchLocally(parts[parts.length - 1], patch)
+        })
     }
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
@@ -297,15 +298,22 @@ export class MSTAdministration {
     get isProtected(): boolean {
         let cur: MSTAdministration | null = this
         while (cur) {
-            if (cur._isProtected === true)
-                return true
+            if (cur.isProtectionEnabled === false)
+                return false
             cur = cur.parent
         }
-        return false
+        return true
     }
 
-    protect() {
-        this._isProtected = true
+    /**
+     * Pseudo action is an action that is not named, does not trigger middleware but does unlock the tree.
+     * Used for applying (initial) snapshots and patches
+     */
+    pseudoAction(fn: () => void) {
+        const inAction = this._isRunningAction
+        this._isRunningAction = true
+        fn()
+        this._isRunningAction = inAction
     }
 
     assertWritable() {

@@ -161,6 +161,11 @@ Useful methods:
 
 It is not necessary to express all logic around models as actions. For example it is not possible to define constructors on models. Rather, it is recommended to create stateless utility methods that operate on your models. It is recommended to keep models self-contained and to do orchestration around models in utilities around it.
 
+
+## (Un) protecting state tree
+
+`afterCreate() { unprotect(this) }`
+
 ## Views
 
 TODO
