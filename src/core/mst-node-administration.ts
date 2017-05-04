@@ -89,6 +89,7 @@ export class MSTAdministration {
         if (this._isDetaching)
             return
 
+        const oldPath = this.path;
         // tslint:disable-next-line:no_unused-variable
         this.type.getChildMSTs(this).forEach(([_, node]) => {
             // TODO: improve: first just trigger beforeDestroy, fire die() after all have run?
@@ -105,9 +106,12 @@ export class MSTAdministration {
         this._isAlive = false
         this._parent = null
         this.subpath = ""
+
+        // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
+        // we could express this in a much nicer way
         Object.defineProperty(this.target, "$mobx", {
             get() {
-                throw new Error("died")
+                fail(`It is not allowed to use the values of this object, since it has died and no longer part of a state tree. The object used to live at '${oldPath}'. This object can no longer be used, but it is possible to access it's last snapshot by using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach'.`)
             }
         })
         // Post conditions, element will not be in the tree anymore...
