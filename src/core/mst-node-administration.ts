@@ -89,17 +89,20 @@ export class MSTAdministration {
         if (this._isDetaching)
             return
 
-        const oldPath = this.path;
-        // tslint:disable-next-line:no_unused-variable
-        this.type.getChildMSTs(this).forEach(([_, node]) => {
-            // TODO: improve: first just trigger beforeDestroy, fire die() after all have run?
-            node.die()
-        })
+        walk(this.target, child => getMSTAdministration(child).aboutToDie())
+        walk(this.target, child => getMSTAdministration(child).finalizeDeath())
+    }
 
-        // TODO: kill $mobx.values
+    public aboutToDie() {
+        this.disposers.splice(0).forEach(f => f())
         this.fireHook("beforeDestroy")
+    }
+
+    public finalizeDeath() {
+        // invariant: not called directly but from "die"
+        const oldPath = this.path
         addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
-        this.disposers.splice(0).reverse().forEach(f => f())
+
         this.patchSubscribers.splice(0)
         this.snapshotSubscribers.splice(0)
         this.patchSubscribers.splice(0)
@@ -114,7 +117,6 @@ export class MSTAdministration {
                 fail(`It is not allowed to use the values of this object, since it has died and no longer part of a state tree. The object used to live at '${oldPath}'. This object can no longer be used, but it is possible to access it's last snapshot by using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach'.`)
             }
         })
-        // Post conditions, element will not be in the tree anymore...
     }
 
     public assertAlive() {
@@ -187,7 +189,7 @@ export class MSTAdministration {
     }
 
     addDisposer(disposer: () => void) {
-        this.disposers.push(disposer)
+        this.disposers.unshift(disposer)
     }
 
     reconcileChildren<T>(childType: IType<any, T>, oldValues: T[], newValues: T[], newPaths: (string|number)[]): T[] {
@@ -366,3 +368,5 @@ export class MSTAdministration {
     }
     // TODO: give good toString, with type and path, and use it in errors
 }
+
+import { walk } from "./mst-operations"
