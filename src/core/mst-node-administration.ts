@@ -6,9 +6,15 @@ import { typecheck, IType } from "../types/type"
 import { isMST, getMSTAdministration } from "./mst-node"
 import { IMiddleWareHandler } from "./action"
 import {
-    invariant, fail, extend,
-    addHiddenFinalProp, IDisposer, registerEventHandler, isMutable
-} from "../utils"
+    addHiddenFinalProp,
+    addReadOnlyProp,
+    extend,
+    fail,
+    IDisposer,
+    invariant,
+    isMutable,
+    registerEventHandler
+} from '../utils';
 import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
 import { getIdentifierAttribute } from "../types/complex-types/object"
 import { ComplexType } from "../types/complex-types/complex-type"
@@ -83,21 +89,34 @@ export class MSTAdministration {
         if (this._isDetaching)
             return
 
-        // tslint:disable-next-line:no_unused-variable
-        this.type.getChildMSTs(this).forEach(([_, node]) => {
-            node.die()
-        })
+        walk(this.target, child => getMSTAdministration(child).aboutToDie())
+        walk(this.target, child => getMSTAdministration(child).finalizeDeath())
+    }
 
-        // TODO: kill $mobx.values
+    public aboutToDie() {
+        this.disposers.splice(0).forEach(f => f())
         this.fireHook("beforeDestroy")
-        this.disposers.splice(0).reverse().forEach(f => f())
+    }
+
+    public finalizeDeath() {
+        // invariant: not called directly but from "die"
+        const oldPath = this.path
+        addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
+
         this.patchSubscribers.splice(0)
         this.snapshotSubscribers.splice(0)
         this.patchSubscribers.splice(0)
         this._isAlive = false
         this._parent = null
         this.subpath = ""
-        // Post conditions, element will not be in the tree anymore...
+
+        // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
+        // we could express this in a much nicer way
+        Object.defineProperty(this.target, "$mobx", {
+            get() {
+                fail(`It is not allowed to use the values of this object, since it has died and no longer part of a state tree. The object used to live at '${oldPath}'. This object can no longer be used, but it is possible to access it's last snapshot by using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach'.`)
+            }
+        })
     }
 
     public assertAlive() {
@@ -170,7 +189,7 @@ export class MSTAdministration {
     }
 
     addDisposer(disposer: () => void) {
-        this.disposers.push(disposer)
+        this.disposers.unshift(disposer)
     }
 
     reconcileChildren<T>(childType: IType<any, T>, oldValues: T[], newValues: T[], newPaths: (string|number)[]): T[] {
@@ -349,3 +368,5 @@ export class MSTAdministration {
     }
     // TODO: give good toString, with type and path, and use it in errors
 }
+
+import { walk } from "./mst-operations"

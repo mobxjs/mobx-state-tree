@@ -404,6 +404,18 @@ export function getEnv(thing: IMSTNode): any {
     return env
 }
 
+/**
+ * Performs a depth first walk through a tree
+ */
+export function walk(thing: IMSTNode, processor: (item: IMSTNode) => void) {
+    const node = getMSTAdministration(thing)
+    // tslint:disable-next-line:no_unused-variable
+    node.getChildMSTs().forEach(([_, childNode]) => {
+        walk(childNode.target, processor)
+    })
+    processor(node.target)
+}
+
 // TODO: remove or to test utils?
 export function testActions<S, T>(factory: IType<S, IMSTNode>, initialState: S, ...actions: ISerializedActionCall[]): S {
     const testInstance = factory.create(initialState) as T
