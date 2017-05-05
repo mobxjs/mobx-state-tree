@@ -16,6 +16,7 @@ import { createRefinementFactory as refinement } from "./utility-types/refinemen
 import { frozen } from "./utility-types/frozen"
 import { boolean, DatePrimitive, number, string  } from "./primitives"
 import { recursive } from "./utility-types/recursive"
+import { late } from "./utility-types/late"
 
 /**
  *
@@ -56,5 +57,6 @@ export const types = {
     array,
     frozen,
     recursive,
-    identifier
+    identifier,
+    late
 }
