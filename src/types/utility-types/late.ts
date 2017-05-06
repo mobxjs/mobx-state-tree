@@ -13,7 +13,7 @@ export class Late<S, T> extends Type<S, T> {
     }
 
     describe() {
-        return this.name
+        return this.subType().name
     }
 
     is(value: any): value is T {

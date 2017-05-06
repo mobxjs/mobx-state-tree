@@ -43,5 +43,5 @@ test("it should throw if default value is invalid snapshot", t => {
         })
     })
 
-    t.is(error.message, "[mobx-state-tree] Default value [{}] is not assignable to type AnonymousModel[]. Expected \"{ name: string; quantity: number }[]\"")
+    t.is(error.message, "[mobx-state-tree] Value \'[{}]\' is not assignable to type: AnonymousModel[], expected an instance of AnonymousModel[] or a snapshot like \'{ name: string; quantity: number }[]\' instead.")
 })

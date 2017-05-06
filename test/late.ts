@@ -28,3 +28,17 @@ test("late should allow circular references", t => {
     t.notThrows(() => Node.create())
     t.notThrows(() => Node.create({ childs: [{}, { childs: []}]}))
 })
+
+test("late should describe correctly circular references", t => {
+
+    interface INode {
+        childs: INode[]
+    }
+
+    // TypeScript is'nt smart enough to infer self referencing types.
+    const Node = types.model("Node", {
+        childs: types.array(types.late<any, INode>(() => Node))
+    })
+
+    t.deepEqual(Node.describe(), "{ childs: Node[] }")
+})
