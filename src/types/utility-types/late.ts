@@ -1,23 +1,31 @@
 import { Type, IType } from "../type"
 
 export class Late<S, T> extends Type<S, T> {
-    readonly subType: () => IType<S, T>
+    readonly definition: () => IType<S, T>
+    private _subType: IType<S, T> | null = null
 
-    constructor(name: string, subType: () => IType<S, T>) {
+    get subType(): IType<S, T> {
+        if (this._subType === null) {
+            this._subType = this.definition()
+        }
+        return this._subType
+    }
+
+    constructor(name: string, definition: () => IType<S, T>) {
         super(name)
-        this.subType = subType
+        this.definition = definition
     }
 
     create(snapshot?: any, environment?: any) {
-        return this.subType().create(snapshot, environment)
+        return this.subType.create(snapshot, environment)
     }
 
     describe() {
-        return this.subType().name
+        return this.subType.name
     }
 
     is(value: any): value is T {
-        return this.subType().is(value)
+        return this.subType.is(value)
     }
 
 }
