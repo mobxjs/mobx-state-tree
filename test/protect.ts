@@ -32,7 +32,7 @@ test("it should be possible to protect an object", t => {
 
     t.throws(
         () => { store.todos[0].title = "B" },
-        "[mobx-state-tree] Cannot modify '/todos/0', the object is protected and can only be modified from model actions"
+        "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action."
     )
 
     t.is(store.todos[1].title, "A")
@@ -48,17 +48,17 @@ test("protect should protect against any update", t => {
     t.notThrows(
         // apply Snapshot / patch are currently allowed, even outside protected mode
         () => { applySnapshot(store, { todos: [ { title: "Get tea" } ]}) },
-        "[mobx-state-tree] Cannot modify '', the object is protected and can only be modified from model actions"
+        "[mobx-state-tree] Cannot modify 'Todo@<root>', the object is protected and can only be modified by using an action."
     )
 
     t.throws(
         () => { store.todos.push({ title: "test" } as any) },
-        "[mobx-state-tree] Cannot modify '/todos', the object is protected and can only be modified from model actions"
+        "[mobx-state-tree] Cannot modify 'Todo[]@/todos', the object is protected and can only be modified by using an action."
     )
 
     t.throws(
         () => { store.todos[0].title = "test" },
-        "[mobx-state-tree] Cannot modify '/todos/0', the object is protected and can only be modified from model actions"
+        "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action."
     )
 })
 
@@ -67,7 +67,7 @@ test("protect should also protect children", t => {
 
     t.throws(
         () => { store.todos[0].title = "B" },
-        "[mobx-state-tree] Cannot modify '/todos/0', the object is protected and can only be modified from model actions"
+        "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action."
     )
 
     store.todos[0].setTitle("B")

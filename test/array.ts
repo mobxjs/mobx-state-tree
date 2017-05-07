@@ -235,7 +235,7 @@ test("items should be reconciled correctly when splicing - 1", t => {
 
     t.throws(
         () => store.todos.splice(0, 1, a, c, d),
-        "[mobx-state-tree] The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value"
+        "[mobx-state-tree] Task@<root>[dead] cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value"
     )
 
     store.todos.splice(0, 1, clone(a), clone(c), clone(d))

@@ -204,21 +204,23 @@ test("it should throw if a replaced object is read or written to", (t) => {
 
     t.is(s.todo.title, "4")
 
+    const err = "[mobx-state-tree] This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type 'AnonymousModel') used to live at '/todo'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead."
+
     t.throws(
         () => { todo.fn() },
-        "[mobx-state-tree] The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value"
+        "[mobx-state-tree] AnonymousModel@<root>[dead] cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value"
     )
 
     t.throws(
         () => {
             todo.title
         },
-        "[mobx-state-tree] It is not allowed to use the values of this object, since it has died and no longer part of a state tree. The object used to live at '/todo'. This object can no longer be used, but it is possible to access it's last snapshot by using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach'."
+        err
     )
 
     t.throws(
         () => { todo.title = "5"},
-        "[mobx-state-tree] It is not allowed to use the values of this object, since it has died and no longer part of a state tree. The object used to live at '/todo'. This object can no longer be used, but it is possible to access it's last snapshot by using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach'."
+        err
     )
 })
 
@@ -279,7 +281,7 @@ test("view functions should not be allowed to change state", (t) => {
 
     t.throws(
         () => model.doubler(),
-        /Cannot modify '', the object is protected and can only be modified from model actions/
+        /Cannot modify 'AnonymousModel@<root>', the object is protected and can only be modified by using an action./
     )
 
     model.anotherDoubler()

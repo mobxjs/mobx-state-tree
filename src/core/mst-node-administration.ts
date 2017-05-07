@@ -14,7 +14,7 @@ import {
     invariant,
     isMutable,
     registerEventHandler
-} from '../utils';
+} from "../utils"
 import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
 import { getIdentifierAttribute } from "../types/complex-types/object"
 import { ComplexType } from "../types/complex-types/complex-type"
@@ -100,6 +100,7 @@ export class MSTAdministration {
 
     public finalizeDeath() {
         // invariant: not called directly but from "die"
+        const self = this
         const oldPath = this.path
         addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
 
@@ -114,14 +115,14 @@ export class MSTAdministration {
         // we could express this in a much nicer way
         Object.defineProperty(this.target, "$mobx", {
             get() {
-                fail(`It is not allowed to use the values of this object, since it has died and no longer part of a state tree. The object used to live at '${oldPath}'. This object can no longer be used, but it is possible to access it's last snapshot by using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach'.`)
+                fail(`This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type '${self.type.name}') used to live at '${oldPath}'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead.`)
             }
         })
     }
 
     public assertAlive() {
         if (!this._isAlive)
-            fail(`The model cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`)
+            fail(`${this} cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`)
     }
 
     @computed public get snapshot() {
@@ -171,10 +172,10 @@ export class MSTAdministration {
         if (this.parent === newParent && this.subpath === subpath)
             return
         if (this._parent && newParent && newParent !== this._parent) {
-            fail(`A node cannot exists twice in the state tree. Failed to add object to path '${newParent.path}"/"${subpath}', it exists already at '${this.path}'`)
+            fail(`A node cannot exists twice in the state tree. Failed to add ${this} to path '${newParent.path}/${subpath}'.`)
         }
         if (!this._parent && newParent && newParent.root === this) {
-            fail(`A state tree is not allowed to contain itself. Cannot add root to path '${newParent.path}"/"${subpath}'`)
+            fail(`A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`)
         }
         if (!this._parent && !!this._environment) {
             fail(`A state tree that has been initialized with an environment cannot be made part of another state tree.`)
@@ -183,7 +184,7 @@ export class MSTAdministration {
             this.die()
         } else {
             this._parent = newParent
-            this.subpath = subpath || "" // TODO: mweh
+            this.subpath = subpath || ""
             this.fireHook("afterAttach")
         }
     }
@@ -338,7 +339,7 @@ export class MSTAdministration {
     assertWritable() {
         this.assertAlive()
         if (!this.isRunningAction() && this.isProtected) {
-            fail(`Cannot modify '${this.path}', the object is protected and can only be modified from model actions`)
+            fail(`Cannot modify '${this}', the object is protected and can only be modified by using an action.`)
         }
     }
 
@@ -366,7 +367,10 @@ export class MSTAdministration {
         if (typeof fn === "function")
             fn.apply(this.target)
     }
-    // TODO: give good toString, with type and path, and use it in errors
+
+    toString(): string {
+        return `${this.type.name}@${this.path || "<root>"}${this.isAlive ? "" : "[dead]"}`
+    }
 }
 
 import { walk } from "./mst-operations"

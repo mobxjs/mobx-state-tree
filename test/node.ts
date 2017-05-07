@@ -129,7 +129,7 @@ test("it should resolve parents", (t) => {
     t.is(getParent(row, 2) === doc, true) // row
     t.throws(
         () => getParent(row, 3),
-        "[mobx-state-tree] Failed to find a parent for '/rows/0 with depth 3"
+        "[mobx-state-tree] Failed to find the parent of AnonymousModel@/rows/0 at depth 3"
     )
 })
 

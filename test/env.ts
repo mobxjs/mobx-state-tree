@@ -46,7 +46,10 @@ test("it should be possible to inherit environments", t => {
 
 test("getEnv throws in absence of env", t => {
     const todo = Todo.create()
-    t.throws(() => todo.description, "[mobx-state-tree] Node '' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()")
+    t.throws(
+        () => todo.description,
+        "[mobx-state-tree] Node 'AnonymousModel@<root>' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()"
+    )
 })
 
 test("detach should preserve environment", t => {
@@ -94,7 +97,10 @@ test("clone preserves environnment", t => {
     }
     {
         const todo = clone(store.todos[0], false)
-        t.throws(() => getEnv(todo), "[mobx-state-tree] Node '' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()")
+        t.throws(
+            () => getEnv(todo),
+            "[mobx-state-tree] Node 'AnonymousModel@<root>' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()"
+        )
     }
     {
         const env2 = createEnvironment()

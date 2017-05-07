@@ -268,7 +268,7 @@ export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) {
             return parent.target
         parent = parent.parent
     }
-    return fail(`Failed to find a parent for '${getPath(target)} with depth ${depth}`)
+    return fail(`Failed to find the parent of ${getMSTAdministration(target)} at depth ${depth}`)
 }
 
 /**
@@ -400,7 +400,7 @@ export function addDisposer(thing: IMSTNode, disposer: () => void) {
 export function getEnv(thing: IMSTNode): any {
     const node = getMSTAdministration(thing)
     const env = node.root._environment
-    invariant(!!env, `Node '${node.path}' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()`)
+    invariant(!!env, `Node '${node}' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()`)
     return env
 }
 
