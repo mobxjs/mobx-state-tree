@@ -3,7 +3,7 @@ import "./types/type"
 import "./types/complex-types/complex-type"
 
 export {
-    types
+    types, IType
 } from "./types"
 
 export * from "./core/mst-operations"

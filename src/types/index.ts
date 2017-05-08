@@ -15,7 +15,7 @@ import { createMaybeFactory as maybe } from "./utility-types/maybe"
 import { createRefinementFactory as refinement } from "./utility-types/refinement"
 import { frozen } from "./utility-types/frozen"
 import { boolean, DatePrimitive, number, string  } from "./primitives"
-import { recursive } from "./utility-types/recursive"
+import { late } from "./utility-types/late"
 
 /**
  *
@@ -39,6 +39,8 @@ function array<S, T>(subFactory: IType<S, T>): IType<T[], IObservableArray<T>> {
     return createArrayFactory(subFactory as any) as any
 }
 
+export { IType }
+
 export const types = {
     model,
     extend,
@@ -55,6 +57,6 @@ export const types = {
     map,
     array,
     frozen,
-    recursive,
-    identifier
+    identifier,
+    late
 }
