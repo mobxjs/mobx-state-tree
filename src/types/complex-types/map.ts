@@ -2,7 +2,7 @@ import { createDefaultValueFactory } from "../utility-types/with-default"
 import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
 import { getMSTAdministration, maybeMST, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch } from "../../core"
-import { identity, isPlainObject, nothing, isPrimitive, invariant, fail } from "../../utils"
+import { identity, isPlainObject, nothing, isPrimitive, invariant, fail, addHiddenFinalProp } from "../../utils"
 import { IType, IComplexType, isType } from "../type"
 import { ComplexType } from "./complex-type"
 
@@ -12,6 +12,18 @@ interface IMapFactoryConfig {
 
 export interface IExtendedObservableMap<T> extends ObservableMap<T> {
     put(value: T | any): this // downtype to any, again, because we cannot type the snapshot, see
+}
+
+export function mapToString(this: ObservableMap<any>) {
+    return `${getMSTAdministration(this)}(${this.size} items)`
+}
+
+function put(this: ObservableMap<any>, value: any) {
+    const identifierAttr = getIdentifierAttribute((getMSTAdministration(this).type as MapType<any, any>).subType)
+    invariant(!!identifierAttr, `Map.put is only supported if the subtype has an idenfier attribute`)
+    invariant(!!value, `Map.put cannot be used to set empty values`)
+    this.set(value[identifierAttr!], value)
+    return this
 }
 
 export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
@@ -31,13 +43,8 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         const identifierAttr = getIdentifierAttribute(this.subType)
         const map = observable.shallowMap()
 
-        // map.put(x) is a shorthand for map.set(x[identifier], x)
-        ; (map as any).put = function(value: any) {
-            invariant(!!identifierAttr, `Map.put is only supported if the subtype has an idenfier attribute`)
-            invariant(!!value, `Map.put cannot be used to set empty values`)
-            this.set(value[identifierAttr!], value)
-            return this
-        }
+        addHiddenFinalProp(map, "put", put)
+        addHiddenFinalProp(map, "toString", mapToString)
         return map
     }
 

@@ -1,5 +1,5 @@
-import {observable, transaction, action, autorun, spy} from 'mobx';
-import {types, getSnapshot, applySnapshot, getParent, hasParent, onPatch} from 'mobx-state-tree';
+import {runInAction} from 'mobx';
+import {types, getSnapshot, applySnapshot, getParent, hasParent} from 'mobx-state-tree';
 
 import {randomUuid} from '../utils';
 
@@ -14,7 +14,7 @@ export const Box = types.model("Box", {
         get isSelected() {
             if (!hasParent(this))
                 return false
-            return getParent(getParent(this)).selection === this
+            return getParent(this, 2).selection === this
         }
     }, {
       move(dx, dy) {
@@ -43,7 +43,7 @@ export const Store = types.model("Store", {
             return box
         },
         addArrow(from, to) {
-            this.arrows.push(Arrow.create({ id: randomUuid(), from, to }))
+            this.arrows.push({ id: randomUuid(), from, to })
         },
         setSelection(selection) {
             this.selection = selection
@@ -77,12 +77,15 @@ window.store = store; // for demo
     Generate 'amount' new random arrows and boxes
 */
 export function generateStuff(amount) {
-    transaction(() => {
+    runInAction(() => {
         for(var i = 0; i < amount; i++) {
             store.addBox('#' + i, Math.random() * window.innerWidth * 0.5, Math.random() * window.innerHeight);
+        }
+        const allBoxes = store.boxes.values();
+        for(var i = 0; i < amount; i++) {
             store.addArrow(
-                store.boxes[Math.floor(Math.random() * store.boxes.length)].id,
-                store.boxes[Math.floor(Math.random() * store.boxes.length)].id
+                allBoxes[Math.floor(Math.random() * allBoxes.length)],
+                allBoxes[Math.floor(Math.random() * allBoxes.length)]
             );
         }
     });

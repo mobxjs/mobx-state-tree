@@ -1,14 +1,12 @@
 import React, {Component} from 'react';
 import {observer} from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
-import {randomUuid} from '../utils';
 
 import BoxView from './box-view';
 import ArrowView from './arrow-view';
 import Sidebar from './sidebar';
 import FunStuff from './fun-stuff';
 
-@observer
 class Canvas extends Component {
     render() {
         const {store} = this.props;
@@ -26,7 +24,7 @@ class Canvas extends Component {
                         <BoxView box={box} store={store} key={box.id} />
                     ) }
                 </div>
-                {/* temporarily disabled for demo to save screen real estate <Sidebar store={store} /> */}
+                <Sidebar store={store} />
                 <FunStuff />
                 <DevTools />
             </div>
@@ -43,4 +41,4 @@ class Canvas extends Component {
     }
 }
 
-export default Canvas;
+export default observer(Canvas);

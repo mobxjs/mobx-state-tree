@@ -1,5 +1,5 @@
 import store from './domain-state';
-import {getSnapshot, applySnapshot, onSnapshot} from 'mobx-state-tree';
+import {applySnapshot, onSnapshot} from 'mobx-state-tree';
 
 var states = [];
 var currentFrame = -1;
