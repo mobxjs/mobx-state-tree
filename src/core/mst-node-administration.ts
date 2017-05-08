@@ -369,7 +369,9 @@ export class MSTAdministration {
     }
 
     toString(): string {
-        return `${this.type.name}@${this.path || "<root>"}${this.isAlive ? "" : "[dead]"}`
+        const identifierAttr = getIdentifierAttribute(this.type)
+        const identifier = identifierAttr ? `(${identifierAttr}: ${this.target[identifierAttr]})` : ""
+        return `${this.type.name}@${this.path || "<root>"}${identifier}${this.isAlive ? "" : "[dead]"}`
     }
 }
 

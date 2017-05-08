@@ -6,10 +6,14 @@ import {
     MSTAdministration,
     valueToSnapshot
 } from "../../core"
-import { identity, nothing } from "../../utils"
+import { addHiddenFinalProp, identity, nothing } from "../../utils"
 import { IType, IComplexType, isType } from "../type"
 import { ComplexType } from "./complex-type"
 import { createDefaultValueFactory } from "../utility-types/with-default"
+
+export function arrayToString(this: IObservableArray<any>) {
+    return `${getMSTAdministration(this)}(${this.length} items)`
+}
 
 export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     isArrayFactory = true
@@ -25,7 +29,9 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
     }
 
     createNewInstance() {
-        return observable.shallowArray()
+        const array = observable.shallowArray()
+        addHiddenFinalProp(array, "toString", arrayToString)
+        return array
     }
 
     finalizeNewInstance(instance: IObservableArray<any>, snapshot: any) {

@@ -46,7 +46,7 @@ test("it should create a factory", (t) => {
     const {Factory} = createTestFactories()
     const snapshot = getSnapshot(Factory.create())
     t.deepEqual(snapshot, {to: 'world'})
-    t.deepEqual(Factory.create().toString(), "AnonymousModel{\"to\":\"world\"}")
+    t.deepEqual(Factory.create().toString(), "AnonymousModel@<root>")
 })
 
 test("it should restore the state from the snapshot", (t) => {

@@ -32,7 +32,9 @@ test("it should create a factory", (t) => {
 test("it should restore the state from the snapshot", (t) => {
     const {Factory} = createTestFactories()
 
-    t.deepEqual<any>(getSnapshot(Factory.create({hello: {to: 'world'}})), {hello: {to: 'world'}})
+    const instance = Factory.create({hello: {to: 'world'}});
+    t.deepEqual<any>(getSnapshot(instance), {hello: {to: 'world'}})
+    t.is("" + instance, "map<string, AnonymousModel>@<root>(1 items)")
 })
 
 // === SNAPSHOT TESTS ===
@@ -201,4 +203,6 @@ test("it should support identifiers", (t) => {
 
     store.todos.put({ id: "19"})
     t.is(store.todos.get("19")!.id, "19")
+
+    t.is("" + store.todos.get("19"), "AnonymousModel@/todos/19(id: 19)")
 })

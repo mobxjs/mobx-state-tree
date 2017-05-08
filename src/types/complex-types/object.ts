@@ -30,6 +30,10 @@ import { ValueProperty } from "../property-types/value-property"
 import { ActionProperty } from "../property-types/action-property"
 import { ViewProperty } from "../property-types/view-property"
 
+function objectTypeToString(this: any) {
+    return getMSTAdministration(this).toString()
+}
+
 export class ObjectType extends ComplexType<any, any> {
     isObjectFactory = true
 
@@ -58,9 +62,7 @@ export class ObjectType extends ComplexType<any, any> {
         this.baseActions = baseActions
         invariant(/^\w[\w\d_]*$/.test(name), `Typename should be a valid identifier: ${name}`)
         this.modelConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
-        this.modelConstructor.prototype.toString = function(this: any) {
-            return `${name}${JSON.stringify(getSnapshot(this))}`
-        }
+        this.modelConstructor.prototype.toString = objectTypeToString
         this.parseModelProps()
         this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
     }

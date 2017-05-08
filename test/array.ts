@@ -34,7 +34,9 @@ test("it should create a factory", (t) => {
 test("it should restore the state from the snapshot", (t) => {
     const {Factory} = createTestFactories()
 
-    t.deepEqual(getSnapshot(Factory.create([{to: 'universe'}])), [{ to: 'universe' }])
+    const instance = Factory.create([{to: 'universe'}])
+    t.deepEqual(getSnapshot(instance), [{ to: 'universe' }])
+    t.is("" + instance, "AnonymousModel[]@<root>(1 items)")
 })
 
 // === SNAPSHOT TESTS ===
