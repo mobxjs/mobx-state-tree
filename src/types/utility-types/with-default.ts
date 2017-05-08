@@ -1,10 +1,13 @@
 import {Type, IType, typecheck} from "../type"
 
+export type IFunctionReturn<T> = () => T
+export type IDefaultValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>
+
 export class DefaultValue<S, T> extends Type<S, T> {
     readonly type: IType<S, T>
-    readonly defaultValue: any
+    readonly defaultValue: IDefaultValue<S, T>
 
-    constructor(type: IType<S, T>, defaultValue: S) {
+    constructor(type: IType<S, T>, defaultValue: IDefaultValue<S, T>) {
         super(type.name)
         this.type = type
         this.defaultValue = defaultValue
@@ -17,7 +20,13 @@ export class DefaultValue<S, T> extends Type<S, T> {
     }
 
     create(value: any) {
-        return typeof value === "undefined" ? this.type.create(this.defaultValue) : this.type.create(value)
+        if (typeof value === "undefined") {
+            const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
+            const defaultSnapshot = isMST(defaultValue) ? getMSTAdministration(defaultValue).snapshot : defaultValue
+            return this.type.create(defaultSnapshot)
+        }
+    
+        return this.type.create(value)
     }
 
     is(value: any): value is S | T {
@@ -27,12 +36,15 @@ export class DefaultValue<S, T> extends Type<S, T> {
 
 }
 
-export function createDefaultValueFactory<T>(type: IType<T, T>, defaultValueOrNode: T): IType<T, T>;
-export function createDefaultValueFactory<S, T>(type: IType<S, T>, defaultValueOrNode: S): IType<S, T>;
-export function createDefaultValueFactory(type: IType<any, any>, defaultValueOrNode: any): IType<any, any> {
-    const defaultValue = isMST(defaultValueOrNode) ? getMSTAdministration(defaultValueOrNode).snapshot : defaultValueOrNode
-    typecheck(type, defaultValue)
-    return new DefaultValue(type, defaultValue)
+export function createDefaultValueFactory<S, T>(type: IType<S, T>, defaultValueOrFunction: S): IType<S, T>
+export function createDefaultValueFactory<S, T>(type: IType<S, T>, defaultValueOrFunction: T): IType<S, T>
+export function createDefaultValueFactory<S, T>(type: IType<S, T>, defaultValueOrFunction: () => S): IType<S, T>
+export function createDefaultValueFactory<S, T>(type: IType<S, T>, defaultValueOrFunction: () => T): IType<S, T>
+export function createDefaultValueFactory<S, T>(type: IType<S, T>, defaultValueOrFunction: any): IType<S, T> {
+    const defaultValue = typeof defaultValueOrFunction === "function" ? defaultValueOrFunction() : defaultValueOrFunction
+    const defaultSnapshot = isMST(defaultValue) ? getMSTAdministration(defaultValue).snapshot : defaultValue
+    typecheck(type, defaultSnapshot)
+    return new DefaultValue(type, defaultValueOrFunction)
 }
 
 import {isMST, getMSTAdministration} from "../../core/mst-node"
