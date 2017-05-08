@@ -3,11 +3,8 @@ import "./types/type"
 import "./types/complex-types/complex-type"
 
 export {
-    types
+    types, IType
 } from "./types"
-export {
-    IType
-} from "./types/type"
 
 export * from "./core/mst-operations"
 export * from "./core/json-patch"

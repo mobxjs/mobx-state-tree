@@ -39,6 +39,8 @@ function array<S, T>(subFactory: IType<S, T>): IType<T[], IObservableArray<T>> {
     return createArrayFactory(subFactory as any) as any
 }
 
+export { IType }
+
 export const types = {
     model,
     extend,
