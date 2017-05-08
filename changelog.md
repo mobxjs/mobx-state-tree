@@ -1,8 +1,10 @@
 # 0.5.0
 
-** BREAKING ** protection enabled by default
-
-* Introduced `types.late`, removed `types.recursive` in favor of `types.late`. Usage: `types.late(() => typeDefinition)`. Can be used for circular / recursive type definitions, even across files. See `test/circular(1|2).ts` for an example
+* ** BREAKING ** protection is now enabled by default (#101)
+* ** BREAKING ** it is no longer possible to read values from a dead object. Except through `getSnapshot` or `clone` (#102)
+* ** BREAKING ** `types.recursive` has been removed in favor of `types.late`
+* Introduced `unprotect`, to disable protection mode for a certain instance. Useful in `afterCreate` hooks
+* Introduced `types.late`. Usage: `types.late(() => typeDefinition)`. Can be used for circular / recursive type definitions, even across files. See `test/circular(1|2).ts` for an example (#74)
 
 # 0.4.0
 
