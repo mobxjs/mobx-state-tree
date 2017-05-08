@@ -26,5 +26,5 @@ export class Literal<T> extends Type<T, T> {
 
 export function createLiteralFactory<S>(value: S): ISimpleType<S> {
     invariant(isPrimitive(value), `Literal types can be built only on top of primitives`)
-    return createDefaultValueFactory(new Literal(value), value)
+    return createDefaultValueFactory(new Literal<S>(value), value)
 }

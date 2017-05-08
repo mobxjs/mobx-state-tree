@@ -1,3 +1,4 @@
+import { unprotect } from '../src/core';
 import {test} from "ava"
 import {getSnapshot, types} from "../src"
 
@@ -44,4 +45,48 @@ test("it should throw if default value is invalid snapshot", t => {
     })
 
     t.is(error.message, "[mobx-state-tree] Value \'[{}]\' is not assignable to type: AnonymousModel[], expected an instance of AnonymousModel[] or a snapshot like \'{ name: string; quantity: number }[]\' instead.")
+})
+
+test("it should accept a function to provide dynamic values", t => {
+    let defaultValue: any = 1
+    const Factory = types.model({
+        a: types.withDefault(types.number, () => defaultValue)
+    })
+
+    t.deepEqual(getSnapshot(Factory.create()), {a: 1})
+
+    defaultValue = 2
+    t.deepEqual(getSnapshot(Factory.create()), {a: 2})
+
+    defaultValue = "hello world!"
+    const ex = t.throws(() => Factory.create())
+    t.deepEqual(ex.message, "[mobx-state-tree] Value is not assignable to \'number\'")
+})
+
+test("it should be possible to create types on the fly", t => {
+    const Box = types.model({
+        point: {
+            x: 10,
+            y: 10
+        }
+    }, {
+        afterCreate() {
+            unprotect(this)
+        }
+    })
+
+    const b1 = Box.create()
+    const b2 = Box.create()
+    const b3 = Box.create({ point: { x: 5 }})
+
+    b2.point.x = 42
+    b2.point.y = 52
+
+    t.is(b1.point.x, 10)
+    t.is(b1.point.y, 10)
+    t.is(b2.point.x, 42)
+    t.is(b2.point.y, 52)
+    t.is(b3.point.x, 5)
+    t.is(b3.point.y, 10)
+    t.is("" + b1.point, "AnonymousModel__point@/point")
 })

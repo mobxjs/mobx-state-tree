@@ -15,7 +15,7 @@ export function arrayToString(this: IObservableArray<any>) {
     return `${getMSTAdministration(this)}(${this.length} items)`
 }
 
-export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
+export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     isArrayFactory = true
     subType: IType<any, any>
 
@@ -158,7 +158,7 @@ export class ArrayType<T> extends ComplexType<T[], IObservableArray<T>> {
 }
 
 export function createArrayFactory<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
-    return createDefaultValueFactory(new ArrayType(subtype.name + "[]", subtype), [])
+    return createDefaultValueFactory(new ArrayType<S, T>(subtype.name + "[]", subtype), [])
 }
 
 export function isArrayFactory<S, T>(type: any): type is IComplexType<S[], IObservableArray<T>> {
