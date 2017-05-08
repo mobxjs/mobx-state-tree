@@ -1,3 +1,4 @@
+import { invariant } from "../../utils"
 import { Type, IType } from "../type"
 
 export class Late<S, T> extends Type<S, T> {
@@ -13,6 +14,7 @@ export class Late<S, T> extends Type<S, T> {
 
     constructor(name: string, definition: () => IType<S, T>) {
         super(name)
+        invariant(typeof definition === "function" && definition.length === 0, "Invalid late type, expected a function with zero arguments that returns a type, got: " + definition)
         this.definition = definition
     }
 

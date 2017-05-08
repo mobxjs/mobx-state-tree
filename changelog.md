@@ -2,6 +2,8 @@
 
 ** BREAKING ** protection enabled by default
 
+* Introduced `types.late`, removed `types.recursive` in favor of `types.late`. Usage: `types.late(() => typeDefinition)`. Can be used for circular / recursive type definitions, even across files. See `test/circular(1|2).ts` for an example
+
 # 0.4.0
 
 **BREAKING** `types.model` no requires 2 parameters to define a model. The first parameter defines the properties, derived values and view functions. The second argment is used to define the actions. For example:
