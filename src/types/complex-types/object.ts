@@ -123,6 +123,7 @@ export class ObjectType extends ComplexType<any, any> {
                         () => value)
                     )
                 } else {
+                    // TODO: in future also expand on `[Type]` and  `[{ x: 3 }]`
                     fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
                 }
             } else {

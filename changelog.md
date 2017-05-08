@@ -1,3 +1,19 @@
+# 0.5.1
+
+* Introduced support for lazy evaluating values in `withDefault`, useful to generate UUID's, timestamps or non-primitive default values
+* It is now possible to define something like
+
+```javascript
+const Box = types.model({
+    point: {
+        x: 10,
+        y: 10
+    }
+}
+```
+
+Where the type of `point` property is inferred to `point: types.withDefault(types.model({ x: 10, y: 10}), () => ({ x: 10, y: 10 }))`
+
 # 0.5.0
 
 * ** BREAKING ** protection is now enabled by default (#101)
