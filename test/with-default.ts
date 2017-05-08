@@ -45,3 +45,19 @@ test("it should throw if default value is invalid snapshot", t => {
 
     t.is(error.message, "[mobx-state-tree] Value \'[{}]\' is not assignable to type: AnonymousModel[], expected an instance of AnonymousModel[] or a snapshot like \'{ name: string; quantity: number }[]\' instead.")
 })
+
+test("it should accept a function to provide dynamic values", t => {
+    let defaultValue: any = 1
+    const Factory = types.model({
+        a: types.withDefault(types.number, () => defaultValue)
+    })
+
+    t.deepEqual(getSnapshot(Factory.create()), {a: 1})
+
+    defaultValue = 2
+    t.deepEqual(getSnapshot(Factory.create()), {a: 2})
+
+    defaultValue = "hello world!"
+    const ex = t.throws(() => Factory.create())
+    t.deepEqual(ex.message, "[mobx-state-tree] Value is not assignable to \'number\'")
+})
