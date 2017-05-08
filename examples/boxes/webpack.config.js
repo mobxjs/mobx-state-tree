@@ -17,13 +17,6 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin()
   ],
-  resolve: {
-    extensions: ['', '.js', '.jsx'],
-    alias: {
-      'mobx-state-tree': __dirname + '/../../lib',
-      'mobx': __dirname + '/node_modules/mobx'
-    }
-  },
   module: {
     loaders: [{
       test: /\.jsx?$/,

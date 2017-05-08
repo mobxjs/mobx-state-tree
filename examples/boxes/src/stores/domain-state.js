@@ -4,25 +4,26 @@ import {types, getSnapshot, applySnapshot, getParent, hasParent, onPatch} from '
 import {randomUuid} from '../utils';
 
 export const Box = types.model("Box", {
-    id: types.identifier(),
-    name: '',
-    x: 0,
-    y: 0,
-    get width() {
-        return this.name.length * 15;
-    },
-    get isSelected() {
-        if (!hasParent(this))
-            return false
-        return getParent(getParent(this)).selection === this
-    },
-    move(dx, dy) {
-        this.x += dx
-        this.y += dy
-    },
-    setName(newName) {
-        this.name = newName
-    }
+        id: types.identifier(),
+        name: 'hal',
+        x: 0,
+        y: 0,
+        get width() {
+            return this.name.length * 15;
+        },
+        get isSelected() {
+            if (!hasParent(this))
+                return false
+            return getParent(getParent(this)).selection === this
+        }
+    }, {
+      move(dx, dy) {
+          this.x += dx
+          this.y += dy
+      },
+      setName(newName) {
+          this.name = newName
+      }
 })
 
 export const Arrow = types.model("Arrow", {
@@ -32,26 +33,27 @@ export const Arrow = types.model("Arrow", {
 })
 
 export const Store = types.model("Store", {
-    boxes: types.map(Box),
-    arrows: types.array(Arrow),
-    selection: types.reference(Box, "./boxes"),
-    addBox(name, x, y) {
-        const box = Box.create({ name, x, y, id: randomUuid() })
-        this.boxes.put(box)
-        return box
-    },
-    addArrow(from, to) {
-        this.arrows.push(Arrow.create({ id: randomUuid(), from, to }))
-    },
-    setSelection(selection) {
-        this.selection = selection
-    },
-    createBox(name, x, y, source) {
-        const box = this.addBox(name, x, y)
-        this.setSelection(box)
-        if (source)
-            this.addArrow(source.id, box.id)
-    }
+        boxes: types.map(Box),
+        arrows: types.array(Arrow),
+        selection: types.reference(Box, "./boxes")
+    }, {
+        addBox(name, x, y) {
+            const box = Box.create({ name, x, y, id: randomUuid() })
+            this.boxes.put(box)
+            return box
+        },
+        addArrow(from, to) {
+            this.arrows.push(Arrow.create({ id: randomUuid(), from, to }))
+        },
+        setSelection(selection) {
+            this.selection = selection
+        },
+        createBox(name, x, y, source) {
+            const box = this.addBox(name, x, y)
+            this.setSelection(box)
+            if (source)
+                this.addArrow(source.id, box.id)
+        }
 })
 
 /*
