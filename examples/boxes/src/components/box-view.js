@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
-import {observable, transaction, computed} from 'mobx';
 import {observer} from 'mobx-react';
 import {DraggableCore} from 'react-draggable';
 
-@observer
 class BoxView extends Component {
     render() {
         const {box} = this.props;
@@ -34,4 +32,4 @@ class BoxView extends Component {
     }
 }
 
-export default BoxView;
+export default observer(BoxView);

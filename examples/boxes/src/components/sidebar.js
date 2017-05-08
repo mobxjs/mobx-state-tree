@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {observer} from 'mobx-react';
 
-@observer
 class Sidebar extends Component {
     render() {
         const {selection} = this.props.store;
@@ -17,4 +16,4 @@ class Sidebar extends Component {
     }
 }
 
-export default Sidebar;
+export default observer(Sidebar);

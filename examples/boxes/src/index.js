@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
-import {observable, asReference} from 'mobx';
+import {observable} from 'mobx';
 import {observer} from 'mobx-react';
 import {connectReduxDevtools} from 'mobx-state-tree';
 
@@ -11,7 +11,7 @@ import syncStoreWithBackend from './stores/socket';
 const socket = new WebSocket("ws://localhost:3001");
 
 // To support HMR of store, this ref holds the latest loaded store.
-const storeInstance = observable(null);
+const storeInstance = observable.box(null);
 
 prepareStore(store)
 

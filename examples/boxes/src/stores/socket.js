@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import {onSnapshot, applySnapshot, onPatch, applyPatch, onAction, applyAction} from 'mobx-state-tree';
 
 let subscription;
