@@ -13,7 +13,7 @@
     "watch": "concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
     "_prepublish": "npm run build && npm run build-docs",
     "coverage": "npm run build-tests && nyc ava && nyc report -r html && nyc report -r lcov",
-    "build-docs": "npm run quick-build && documentation readme lib/index.js --github --section API",
+    "build-docs": "npm run quick-build && documentation  build lib/index.js --github -f md -o API.md",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "clean": "rm -rf lib test-lib .nyc_output coverage"
   },
