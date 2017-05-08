@@ -16,7 +16,7 @@ const initialState = {
 }
 const todos = window.todos = todosFactory.create(initialState)
 const store = asReduxStore(todos)
-connectReduxDevtools(todos)
+connectReduxDevtools(require("remotedev"), todos)
 
 render(
   <Provider store={store}>

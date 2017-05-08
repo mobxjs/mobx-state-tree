@@ -1,7 +1,7 @@
 import { isMST, IRawActionCall } from "../core"
 import { getSnapshot, applySnapshot, onSnapshot } from "../core/mst-operations"
-import { applyAction } from "../core/action"
-import { invariant, extend, fail } from "../utils"
+import { applyAction, onAction, ISerializedActionCall } from "../core/action"
+import { invariant, extend } from "../utils"
 
 export interface IMiddleWareApi {
     getState: () => any
@@ -21,9 +21,7 @@ export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxSt
     let store: IReduxStore = {
         getState : ()       => getSnapshot(model),
         dispatch : action   => {
-            // TODO: reimplement redux middleware
-            fail("Not implemented")
-            // runMiddleWare(action, runners.slice(), (newAction: any) => applyAction(model, reduxActionToAction(newAction)))
+            runMiddleWare(action, runners.slice(), (newAction: any) => applyAction(model, reduxActionToAction(newAction)))
         },
         subscribe: listener => onSnapshot(model, listener)
     }
@@ -49,4 +47,32 @@ function runMiddleWare(action: any, runners: any, next: any) {
             next(retVal)
     }
     n(action)
+}
+
+export function connectReduxDevtools(remoteDevDep: any, model: any) {
+    // Connect to the monitor
+    const remotedev = remoteDevDep.connectViaExtension()
+    let applyingSnapshot = false
+
+    // Subscribe to change state (if need more than just logging)
+    remotedev.subscribe((message: any) => {
+        // Helper when only time travelling needed
+        const state = remoteDevDep.extractState(message)
+        if (state) {
+            applyingSnapshot = true
+            applySnapshot(model, state)
+            applyingSnapshot = false
+        }
+    })
+
+    // Send changes to the remote monitor
+    onAction(model, (action: ISerializedActionCall) => {
+        if (applyingSnapshot)
+            return
+        const copy: any = {}
+        copy.type = action.name
+        if (action.args)
+            action.args.forEach((value, index) => copy[index] = value)
+        remotedev.send(copy, getSnapshot(model))
+    })
 }

@@ -19,9 +19,6 @@ export {
 
 export {
     asReduxStore,
-    IReduxStore
-} from "./interop/redux"
-
-export {
+    IReduxStore,
     connectReduxDevtools
-} from "./interop/redux-devtools"
+} from "./interop/redux"

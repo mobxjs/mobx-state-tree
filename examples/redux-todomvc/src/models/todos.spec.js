@@ -1,17 +1,20 @@
-import todos from './todos'
+import {asReduxStore, getSnapshot} from 'mobx-state-tree'
+import TodoStore from './todos'
 import * as types from '../constants/ActionTypes'
+
+function todos(initialState, action) {
+  const store = TodoStore.create({ todos: initialState })
+  const reduxStore = asReduxStore(store)
+  if (action.type)
+    reduxStore.dispatch(action)
+  return getSnapshot(store).todos
+}
 
 describe('todos reducer', () => {
   it('should handle initial state', () => {
     expect(
       todos(undefined, {})
-    ).toEqual([
-      {
-        text: 'Use Redux',
-        completed: false,
-        id: 0
-      }
-    ])
+    ).toEqual([])
   })
 
   it('should handle ADD_TODO', () => {

@@ -8,37 +8,37 @@ const Todo = types.model({
 })
 
 const TodoStore = types.model({
-  todos: types.array(Todo),
+    todos: types.array(Todo),
 
-  // utilities
-  findTodoById: function (id) {
-    return this.todos.find(todo => todo.id === id)
-  },
-
-  // actions
-  [ADD_TODO]({text}) {
-    const id = this.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
-    this.todos.push({
-      id, text
-    })
-  },
-  [DELETE_TODO]({id}) {
-    this.todos.remove(this.findTodoById(id))
-  },
-  [EDIT_TODO]({id, text}) {
-    this.findTodoById(id).text = text
-  },
-  [COMPLETE_TODO]({id}) {
-    const todo = this.findTodoById(id)
-    todo.completed = !todo.completed
-  },
-  [COMPLETE_ALL]() {
-    const areAllMarked = this.todos.every(todo => todo.completed)
-    this.todos.forEach(todo => todo.completed = !areAllMarked)
-  },
-  [CLEAR_COMPLETED]() {
-    this.todos.replace(this.todos.filter(todo => todo.completed === false))
-  }
+    // utilities
+    findTodoById: function (id) {
+      return this.todos.find(todo => todo.id === id)
+    }
+  }, {
+    // actions
+    [ADD_TODO]({text}) {
+      const id = this.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
+      this.todos.unshift({
+        id, text
+      })
+    },
+    [DELETE_TODO]({id}) {
+      this.todos.remove(this.findTodoById(id))
+    },
+    [EDIT_TODO]({id, text}) {
+      this.findTodoById(id).text = text
+    },
+    [COMPLETE_TODO]({id}) {
+      const todo = this.findTodoById(id)
+      todo.completed = !todo.completed
+    },
+    [COMPLETE_ALL]() {
+      const areAllMarked = this.todos.every(todo => todo.completed)
+      this.todos.forEach(todo => todo.completed = !areAllMarked)
+    },
+    [CLEAR_COMPLETED]() {
+      this.todos.replace(this.todos.filter(todo => todo.completed === false))
+    }
 })
 
 export default TodoStore
