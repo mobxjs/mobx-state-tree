@@ -4,7 +4,7 @@ export interface IIdentifierDescriptor {
 
 // TODO: properly turn this into a factory, that reuses `types.string`?
 // See: https://github.com/mobxjs/mobx-state-tree/pull/65#issuecomment-289603441
-// todo: change to const `types.identifier`
+// todo: change to const `types.identifier`!
 export function identifier(): string {
     return {
         isIdentifier: true

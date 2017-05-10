@@ -7,7 +7,6 @@ export interface IReferenceDescription {
 }
 
 
-// TODO: test, what if an snapshot refers to an object not yet initialized?
 // TODO: fix, references are not mentioned in type.describe...
 // TODO: make distinction between nullable and non-nullable refs?
 // TODO: verify ref is requird in non-nullable snapshos and vice versa

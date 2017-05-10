@@ -58,7 +58,6 @@ test("it should do typescript type inference correctly", (t) => {
         set z(v: string) { }
     }, {
         method() {
-            // Correct this. Requires typescript 2.3
             const x: string = this.z + this.x + this.y
             this.anotherMethod(x)
         },
