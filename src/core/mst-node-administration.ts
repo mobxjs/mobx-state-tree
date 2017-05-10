@@ -203,6 +203,8 @@ export class MSTAdministration {
 
         // Investigate which values we could reconcile
         oldValues.forEach(oldValue => {
+            if (!oldValue)
+                return
             if (identifierAttribute) {
                 const id = (oldValue as any)[identifierAttribute]
                 if (id)

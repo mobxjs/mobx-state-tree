@@ -30,6 +30,10 @@ export class Refinement extends Type<any, any> {
     is(value: any): value is any {
         return this.type.is(value) && this.predicate(value)
     }
+
+    get identifierAttribute() {
+        return this.type.identifierAttribute
+    }
 }
 
 export function createRefinementFactory<T>(name: string, type: IType<T, T>, predicate: (snapshot: T) => boolean): IType<T, T>

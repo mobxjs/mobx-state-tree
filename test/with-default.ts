@@ -91,13 +91,13 @@ test("it should be possible to create types on the fly", t => {
     t.is("" + b1.point, "AnonymousModel__point@/point")
 })
 
-test.only("Values should reset to default if omitted in snapshot", t => {
+test("Values should reset to default if omitted in snapshot", t => {
     const Store = types.model({
-        todo: {
+        todo: types.model({
             id: types.identifier(),
             done: false,
             title: "test"
-        }
+        })
     })
     const store = Store.create({ todo: { id: "2" } })
     unprotect(store)
@@ -105,7 +105,6 @@ test.only("Values should reset to default if omitted in snapshot", t => {
     store.todo.done = true
     t.is(store.todo.done, true)
 
-    debugger;
     store.todo = { title: "stuff", id: "2"} as any
 
     t.is(store.todo.title, "stuff")

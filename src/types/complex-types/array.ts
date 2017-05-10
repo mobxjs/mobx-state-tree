@@ -155,6 +155,10 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     removeChild(node: MSTAdministration, subpath: string) {
         node.target.splice(parseInt(subpath, 10), 1)
     }
+
+    get identifierAttribute() {
+        return null
+    }
 }
 
 export function createArrayFactory<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {

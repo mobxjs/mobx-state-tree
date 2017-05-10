@@ -22,6 +22,9 @@ export class Literal<T> extends Type<T, T> {
         return value === this.value && isPrimitive(value)
     }
 
+    get identifierAttribute() {
+        return null
+    }
 }
 
 export function createLiteralFactory<S>(value: S): ISimpleType<S> {

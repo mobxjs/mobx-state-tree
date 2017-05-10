@@ -35,6 +35,9 @@ export class Frozen<T> extends Type<T, T> {
         return isSerializable(value)
     }
 
+    get identifierAttribute() {
+        return null
+    }
 }
 
 export const frozen: ISimpleType<any> = new Frozen()

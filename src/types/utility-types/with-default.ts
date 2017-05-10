@@ -1,3 +1,4 @@
+import { identifier } from './identifier';
 import {Type, IType, typecheck} from "../type"
 
 export type IFunctionReturn<T> = () => T
@@ -34,6 +35,9 @@ export class DefaultValue<S, T> extends Type<S, T> {
         return value === undefined || this.type.is(value)
     }
 
+    get identifierAttribute() {
+        return this.type.identifierAttribute
+    }
 }
 
 export function createDefaultValueFactory<S, T>(type: IType<S, T>, defaultValueOrFunction: S): IType<S, T>

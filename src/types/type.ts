@@ -5,9 +5,10 @@ export interface IType<S, T> {
     is(thing: any): thing is S | T
     create(snapshot?: S, environment?: any): T
     isType: boolean
-    describe(): string,
+    describe(): string
     Type: T
     SnapshotType: S
+    identifierAttribute: string | null
 }
 
 export interface ISimpleType<T> extends IType<T, T> { }
@@ -36,6 +37,8 @@ export abstract class Type<S, T> implements IType<S, T> {
     get SnapshotType(): S {
         return fail("Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`")
     }
+
+    abstract get identifierAttribute(): string | null
 }
 
 export function typecheck(type: IType<any, any>, value: any): void {

@@ -30,6 +30,9 @@ export class Late<S, T> extends Type<S, T> {
         return this.subType.is(value)
     }
 
+    get identifierAttribute() {
+        return this.subType.identifierAttribute
+    }
 }
 
 export type ILateType<S, T> = () => IType<S, T>

@@ -22,6 +22,10 @@ export class CoreType<T> extends Type<T, T> {
     is(thing: any): thing is T {
         return isPrimitive(thing) && this.checker(thing)
     }
+
+    get identifierAttribute() {
+        return null
+    }
 }
 
 // tslint:disable-next-line:variable-name
