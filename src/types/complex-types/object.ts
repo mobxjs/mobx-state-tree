@@ -117,15 +117,16 @@ export class ObjectType extends ComplexType<any, any> {
             } else if (typeof value === "function") {
                 this.props[key] = new ViewProperty(key, value)
             } else if (typeof value === "object") {
-                if (!Array.isArray(value) && isPlainObject(value)) {
-                    this.props[key] = new ValueProperty(key, createDefaultValueFactory(
-                        createModelFactory(this.name + "__" + key, value),
-                        () => value)
-                    )
-                } else {
+                // if (!Array.isArray(value) && isPlainObject(value)) {
+                //     TODO: also check if the entire type is simple! (no identifiers and other complex types)
+                //     this.props[key] = new ValueProperty(key, createDefaultValueFactory(
+                //         createModelFactory(this.name + "__" + key, value),
+                //         () => value)
+                //     )
+                // } else {
                     // TODO: in future also expand on `[Type]` and  `[{ x: 3 }]`
                     fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
-                }
+                // }
             } else {
                 fail(`Unexpected value for property '${key}'`)
             }

@@ -26,7 +26,7 @@ export class DefaultValue<S, T> extends Type<S, T> {
             const defaultSnapshot = isMST(defaultValue) ? getMSTAdministration(defaultValue).snapshot : defaultValue
             return this.type.create(defaultSnapshot)
         }
-    
+
         return this.type.create(value)
     }
 
