@@ -1,7 +1,18 @@
+# 0.6.0
+
+* Array and map types can no longer be left out of snapshots by default. Use `optional` to make them optional in the snapshot
+* **BREAKING** Literals no longer have a default value by default (use optional + literal instead)
+* Improved identifier support, they are no properly propageted through utility types like `maybe`, `union` etc
+* Fixed issue where fields where not referted back to default when a partial snapshot was provided
+* **BREAKING** Disabled inlining type.model definitions as introduced in 0.5.1; to many subtle issues
+* **BREAKING** `types.withDefault` has been renamed to `types.optional`
+
+// NOTE: Also, can we name all the functions in types directly with their final name? (optional instead of createOptionalFactory...etc.)
+
 # 0.5.1
 
 * Introduced support for lazy evaluating values in `withDefault`, useful to generate UUID's, timestamps or non-primitive default values
-* It is now possible to define something like
+* ~~It is now possible to define something like~~ Removed in 0.6.0
 
 ```javascript
 const Box = types.model({
