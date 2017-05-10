@@ -164,16 +164,15 @@ export class ObjectType extends ComplexType<any, any> {
 
     applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void {
         invariant(patch.op === "replace" || patch.op === "add")
-        this.applySnapshot(node, {
-            [subpath]: patch.value
-        })
+        node.target[subpath] = patch.value
     }
 
     @action applySnapshot(node: MSTAdministration, snapshot: any): void {
         // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed?
-        node.pseudoAction(() => { for (let key in snapshot) if (key in this.props) {
-            this.props[key].deserialize(node.target, snapshot)
-        }})
+        node.pseudoAction(() => {
+            for (let key in this.props)
+                this.props[key].deserialize(node.target, snapshot)
+        })
     }
 
     getChildType(key: string): IType<any, any> {
