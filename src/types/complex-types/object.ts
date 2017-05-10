@@ -263,6 +263,9 @@ export function isObjectFactory(type: any): boolean {
     return isType(type) && (type as any).isObjectFactory === true
 }
 
-export function getIdentifierAttribute(factory: any): string | null {
-    return isObjectFactory(factory) ? factory.identifierAttribute : null
+export function getIdentifierAttribute(type: IType<any, any>): string | null {
+    // TODO: this should be a general property of types
+    if (type instanceof ObjectType)
+        return type.identifierAttribute
+    return null
 }

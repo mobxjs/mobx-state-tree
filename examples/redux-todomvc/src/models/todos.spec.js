@@ -10,6 +10,8 @@ function todos(initialState, action) {
   return getSnapshot(store).todos
 }
 
+// TODO: introduce `createReducer(Type): (initialState, action) in redux-interop
+
 describe('todos reducer', () => {
   it('should handle initial state', () => {
     expect(

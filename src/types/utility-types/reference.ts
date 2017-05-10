@@ -1,9 +1,4 @@
-import { MSTAdministration } from "../../core/mst-node-administration"
-import { isObservableArray, isObservableMap, observable, computed } from "mobx"
-import { resolve, getMSTAdministration, getRelativePathForNodes, isMST, IMSTNode } from "../../core"
-import { invariant, fail } from "../../utils"
-import { getIdentifierAttribute } from "../complex-types/object"
-import { IType, typecheck } from "../type"
+import { IType } from "../type"
 
 export interface IReferenceDescription {
     targetType: IType<any, any>

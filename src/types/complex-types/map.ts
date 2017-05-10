@@ -74,7 +74,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         node.assertWritable()
 
         // Q: how to create a map that is not keyed by identifier, but contains objects with identifiers? Is that a use case? A: No, that is were reference maps should come into play...
-        const identifierAttr = getIdentifierAttribute(node)
+        const identifierAttr = getIdentifierAttribute(node.type)
         if (identifierAttr && change.newValue && typeof change.newValue === "object" && change.newValue[identifierAttr] !== change.name)
             fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${change.name}', but expected: '${change.newValue[identifierAttr!]}'`)
 

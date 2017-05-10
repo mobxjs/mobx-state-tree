@@ -195,6 +195,7 @@ export class MSTAdministration {
 
     reconcileChildren<T>(childType: IType<any, T>, oldValues: T[], newValues: T[], newPaths: (string|number)[]): T[] {
         // optimization: overload for a single old / new value to avoid all the array allocations
+        // optimization: skip reconciler for non-complex types
         const res = new Array(newValues.length)
         const oldValuesByNode: any = {}
         const oldValuesById: any = {}
