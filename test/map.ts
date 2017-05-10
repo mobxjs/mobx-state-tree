@@ -29,6 +29,14 @@ test("it should create a factory", (t) => {
     t.deepEqual(snapshot, {})
 })
 
+test("it should fail if not optional and no default provided", (t) => {
+    const Factory = types.map(types.string)
+    const ex = t.throws(() => {
+        Factory.create()
+    })
+    t.deepEqual(ex.message, "[mobx-state-tree] Value \'undefined\' is not assignable to type: map<string, string>, expected an instance of map<string, string> or a snapshot like \'Map<string, string>\' instead.")
+})
+
 test("it should restore the state from the snapshot", (t) => {
     const {Factory} = createTestFactories()
 

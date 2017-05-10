@@ -27,6 +27,7 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     abstract createNewInstance(): any
     abstract finalizeNewInstance(target: any, snapshot: any): void
     abstract applySnapshot(node: MSTAdministration, snapshot: any): void
+    // TODO: Maybe optional could resolve to this if omitted?
     abstract getDefaultSnapshot(): any
     abstract getChildMSTs(node: MSTAdministration): [string, MSTAdministration][]
     abstract getChildMST(node: MSTAdministration, key: string): MSTAdministration | null

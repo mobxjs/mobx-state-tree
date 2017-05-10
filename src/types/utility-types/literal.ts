@@ -1,4 +1,4 @@
-import { ISimpleType, Type } from "../type"
+import { ISimpleType, Type, typecheck } from "../type"
 import { invariant, isPrimitive } from "../../utils"
 
 export class Literal<T> extends Type<T, T> {
@@ -9,7 +9,8 @@ export class Literal<T> extends Type<T, T> {
         this.value = value
     }
 
-    create() {
+    create(snapshot: any) {
+        typecheck(this, snapshot)
         return this.value
     }
 

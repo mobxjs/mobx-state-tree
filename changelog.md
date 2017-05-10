@@ -1,6 +1,6 @@
 # 0.6.0
 
-* Array and map types can no longer be left out of snapshots by default. Use `optional` to make them optional in the snapshot
+* **BREAKING** Array and map types can no longer be left out of snapshots by default. Use `optional` to make them optional in the snapshot
 * **BREAKING** Literals no longer have a default value by default (use optional + literal instead)
 * Improved identifier support, they are no properly propageted through utility types like `maybe`, `union` etc
 * Fixed issue where fields where not referted back to default when a partial snapshot was provided

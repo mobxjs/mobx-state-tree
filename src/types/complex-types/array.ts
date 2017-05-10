@@ -148,7 +148,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getDefaultSnapshot() {
-        return []
+        return undefined
     }
 
     removeChild(node: MSTAdministration, subpath: string) {
