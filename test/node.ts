@@ -39,7 +39,6 @@ test("it should check for parent instance", (t) => {
     t.deepEqual(hasParent(row), true)
 })
 
-
 test("it should check for parent instance (unbound)", (t) => {
     const Row = types.model({
         article_id: 0

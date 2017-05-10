@@ -1,4 +1,3 @@
-import {ObservableMap} from "mobx"
 import {onSnapshot, onPatch, applyPatch, applyPatches, applySnapshot, getSnapshot, types, unprotect} from "../src"
 import {test} from "ava"
 
@@ -33,7 +32,7 @@ test("it should create a factory", (t) => {
 test("it should restore the state from the snapshot", (t) => {
     const {Factory} = createTestFactories()
 
-    const instance = Factory.create({hello: {to: "world"}});
+    const instance = Factory.create({hello: {to: "world"}})
     t.deepEqual<any>(getSnapshot(instance), {hello: {to: "world"}})
     t.is("" + instance, "map<string, AnonymousModel>@<root>(1 items)")
 })
@@ -70,7 +69,6 @@ test("it should return a snapshot", (t) => {
 
     t.deepEqual<any>(getSnapshot(doc), {hello: {to: "world"}})
 })
-
 
 // === PATCHES TESTS ===
 test("it should emit add patches", (t) => {
@@ -124,7 +122,6 @@ test("it should apply a update patch", (t) => {
     t.deepEqual<any>(getSnapshot(doc), {hello: {to: "universe"}})
 })
 
-
 test("it should emit remove patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
@@ -162,7 +159,6 @@ test("it should apply patches", (t) => {
 
     t.deepEqual<any>(getSnapshot(doc), {hello: {to: "universe"}})
 })
-
 
 // === TYPE CHECKS ===
 test("it should check the type correctly", (t) => {

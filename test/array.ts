@@ -1,4 +1,3 @@
-import { IObservableArray } from "mobx"
 import {unprotect, onSnapshot, onPatch, clone, isAlive, applyPatch, applyPatches, getPath, applySnapshot, getSnapshot, types} from "../src"
 import {test} from "ava"
 
@@ -123,7 +122,6 @@ test("it should apply a update patch", (t) => {
     t.deepEqual(getSnapshot(doc), [{to: "universe"}])
 })
 
-
 test("it should emit remove patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
@@ -211,7 +209,6 @@ test("items should be reconciled correctly when splicing - 1", t => {
         b = Task.create({ x: "b" }),
         c = Task.create({ x: "c" }),
         d = Task.create({ x: "d" })
-    ;
 
     const store = types.model({
         todos: types.optional(types.array(Task), [])
@@ -253,7 +250,6 @@ test("items should be reconciled correctly when splicing - 2", t => {
         b = Task.create({ x: "b" }),
         c = Task.create({ x: "c" }),
         d = Task.create({ x: "d" })
-    ;
 
     const store = types.model({
         todos: types.array(Task)
