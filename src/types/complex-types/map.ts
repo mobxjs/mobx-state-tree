@@ -1,4 +1,3 @@
-import { optional } from "../utility-types/optional"
 import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
 import { getMSTAdministration, maybeMST, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch } from "../../core"
@@ -201,7 +200,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
 }
 
 export function map<S, T>(subtype: IType<S, T>): IComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
-    return optional(new MapType<S, T>(`map<string, ${subtype.name}>`, subtype), {})
+    return new MapType<S, T>(`map<string, ${subtype.name}>`, subtype)
 }
 
 export function isMapFactory<S, T>(factory: any): factory is IComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {

@@ -1,4 +1,3 @@
-import { optional } from "./optional"
 import { ISimpleType, Type } from "../type"
 import { invariant, isPrimitive } from "../../utils"
 
@@ -29,5 +28,5 @@ export class Literal<T> extends Type<T, T> {
 
 export function literal<S>(value: S): ISimpleType<S> {
     invariant(isPrimitive(value), `Literal types can be built only on top of primitives`)
-    return optional(new Literal<S>(value), value)
+    return new Literal<S>(value)
 }

@@ -8,7 +8,7 @@ test("it should resolve to the parent instance", (t) => {
     })
 
     const Document = types.model({
-        rows: types.array(Row)
+        rows: types.optional(types.array(Row), [])
     })
 
     const doc = Document.create()
@@ -27,7 +27,7 @@ test("it should check for parent instance", (t) => {
     })
 
     const Document = types.model({
-        rows: types.array(Row)
+        rows: types.optional(types.array(Row), [])
     })
 
     const doc = Document.create()
@@ -57,7 +57,7 @@ test("it should resolve to the root of an object", (t) => {
     })
 
     const Document = types.model("Document", {
-        rows: types.array(Row)
+        rows: types.optional(types.array(Row), [])
     })
 
     const doc = Document.create()
@@ -75,7 +75,7 @@ test("it should resolve the path of an object", (t) => {
     })
 
     const Document = types.model({
-        rows: types.array(Row)
+        rows: types.optional(types.array(Row), [])
     })
 
     const doc = Document.create()
@@ -94,7 +94,7 @@ test("it should resolve the path of an object", (t) => {
     })
 
     const Document = types.model({
-        rows: types.array(Row)
+        rows: types.optional(types.array(Row), [])
     })
 
     const doc = Document.create()
@@ -112,7 +112,7 @@ test("it should resolve parents", (t) => {
     })
 
     const Document = types.model({
-        rows: types.array(Row)
+        rows: types.optional(types.array(Row), [])
     })
 
     const doc = Document.create()
@@ -140,7 +140,7 @@ test("it should clone a node", (t) => {
     })
 
     const Document = types.model({
-        rows: types.array(Row)
+        rows: types.optional(types.array(Row), [])
     })
 
     const doc = Document.create()
@@ -160,7 +160,7 @@ test("it should be possible to clone a dead object", (t) => {
     const a = Task.create({ x: "a" })
 
     const store = types.model({
-        todos: types.array(Task)
+        todos: types.optional(types.array(Task), [])
     }).create({
         todos: [a]
     })
@@ -193,14 +193,14 @@ test("it should return the child model factory", (t) => {
         article_id: 0
     })
 
-    const ArrayOfRow = types.array(Row)
+    const ArrayOfRow = types.optional(types.array(Row), [])
     const Document = types.model({
         rows: ArrayOfRow
     })
 
     const doc = Document.create()
 
-    t.deepEqual(getChildType(doc, 'rows'), ArrayOfRow)
+    t.deepEqual(getChildType(doc, "rows"), ArrayOfRow)
 })
 
 test("a node can exists only once in a tree", (t) => {
@@ -209,8 +209,8 @@ test("a node can exists only once in a tree", (t) => {
     })
 
     const Document = types.model({
-        rows: types.array(Row),
-        foos: types.array(Row)
+        rows: types.optional(types.array(Row), []),
+        foos: types.optional(types.array(Row), [])
     })
 
     const doc = Document.create()
@@ -230,7 +230,7 @@ test("make sure array filter works properly", (t) => {
     })
 
     const Document = types.model({
-        rows: types.array(Row)
+        rows: types.optional(types.array(Row), [])
     }, {
         clearDone() {
             this.rows.filter(row => row.done === true).forEach(destroy)
@@ -258,7 +258,7 @@ test("it can record and replay patches", (t) => {
 
     const Document = types.model({
         customer_id: 0,
-        rows: types.array(Row)
+        rows: types.optional(types.array(Row), [])
     })
 
     const source = Document.create()
@@ -286,7 +286,7 @@ test("it can record and replay actions", (t) => {
 
     const Document = types.model({
         customer_id: 0,
-        rows: types.array(Row)
+        rows: types.optional(types.array(Row), [])
     }, {
         setCustomer(customer_id) {
             this.customer_id = customer_id
