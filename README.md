@@ -1,7 +1,5 @@
 # mobx-state-tree
 
-## _This package is work in progress, stay tuned_
-
 _Opinionated, transactional, MobX powered state container_
 
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
@@ -11,40 +9,60 @@ _Opinionated, transactional, MobX powered state container_
 * [Api Docs](API.md)
 * [Changelog](changelog.md)
 
-An introduction to the philosophy can be watched [here](https://youtu.be/ta8QKmNRXZM?t=21m52s). [Slides](https://immer-mutable-state.surge.sh/). Or, as [markdown](https://github.com/mweststrate/reactive2016-slides/blob/master/slides.md) to read it quickly.
-
 # Installation
 
-NPM:
-
-npm install mobx-state-tree --save-dev
-
-CDN:
-
-<https://unpkg.com/mobx-state-tree/mobx-state-tree.umd.js>
+* NPM: `npm install mobx-state-tree --save`
+* Yarn: `yarn add mobx-state-tree`
+* CDN: https://unpkg.com/mobx-state-tree/mobx-state-tree.umd.js
 
 # Philosophy
 
 `mobx-state-tree` is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
 
-It is an opt-in state container that can be used in MobX, but also Redux based applications.
+Put simply, mobx-state-tree tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
+Unlike MobX itself, mobx-state-tree is very opinionated on how data should be structured and updated.
+This makes it possible to solve many common problems out of the box.
 
-If MobX is like a spreadsheet mechanism for javascript, then mobx-state-tree is like storing your spreadsheet in git.
+Central in MST (mobx-state-tree) is the concept of a *living tree*. The tree consists of mutable, but strictly protected objects enriched with _runtime type information_.
+From this living tree, (structurally shared) snapshots are generated automatically.
 
-Unlike MobX itself, mobx-state-tree is quite opinionated on how you structure your data.
-This makes it possible to solve many problems generically and out of the box, like:
+(example)
 
--   (De-) serialization
--   Snapshotting state
--   Replaying actions
--   Time travelling
--   Emitting and applying JSON patches
--   Protecting state against uncontrolled mutations
--   Using middleware
--   Using dependency injection
--   Maintaining invariants
+By using the type information available; snapshots can be converted to living trees and vice versa with zero effort.
+Because of this, [time travelling](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/time.js) is supported out of the box, and tools like HMR are trivial to support.
 
-`mobx-state-tree` tries to take the best features from both object oriented (discoverability, co-location and encapsulation), and immutable based state management approaches (transactionality, sharing functionality through composition).
+(example)
+
+The type information is designed in such a way that it is used both at design- and run-time to verify type correctness (Design time type checking is TypeScript only atm, Flow PR's are welcome!)
+
+(screenshot)
+
+Because state trees are living, mutable models actions are straight-forward to write.
+
+(Example)
+
+But fear not; actions have many interesting properties.
+By default trees cannot only be modified by using an action that belongs to the same subtree.
+Furthermore actions are replayable and can be used as means to distribute changes ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
+
+Moreover; since changes can be detected on a fine grained level. JSON patches are supported out of the box.
+Simply subscribing to the patch stream of a tree is another way to sync diffs with for example back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
+
+Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](todo) and [mobx-react](todo). But even cooler; because it supports snapshots, middleware and replayable actions out of the box. It is even possible to replace a Redux store and reducer with a MobX state tree. This makes it even possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](todo).
+
+Finally, MST has built-in support for references, identifiers, dependency injection, change recording and circular type definitions (even across files).
+Even fancier; it analyses liveleness of objects, failing early when you try to access accidentally cached information! (More on that later)
+
+Despite all that, you will see that the [API](api.md) is pretty straight forward!
+
+---
+
+Another way to look at mobx-state-tree is to consider it, as argued by Daniel Earwicker, to be ["React, but for data"](http://danielearwicker.github.io/json_mobx_Like_React_but_for_Data_Part_2_.html).
+Like React, MST consists of composable components, called *models*, which capture a small piece of state. They are instantiated from props (snapshots) and after that manage and protect their own internal state (using actions). Moreover, when applying snapshots, tree nodes are reconciled as much as possible. There is even a context-like mechanism, called environments, to pass information to deep descendants.
+
+An introduction to the philosophy can be watched [here](https://youtu.be/ta8QKmNRXZM?t=21m52s). [Slides](https://immer-mutable-state.surge.sh/). Or, as [markdown](https://github.com/mweststrate/reactive2016-slides/blob/master/slides.md) to read it quickly.
+
+TODO: react europe talk
 
 # Concepts
 
