@@ -1,10 +1,10 @@
-import { createUnionFactory } from "./union"
-import { createLiteralFactory } from "./literal"
+import { union } from "./union"
+import { literal } from "./literal"
 import { IType } from "../type"
 
-const nullFactory = createLiteralFactory(null)
+const nullFactory = literal(null)
 
-export function createMaybeFactory<S, T>(type: IType<S, T>): IType<S | null | undefined, T | null> {
+export function maybe<S, T>(type: IType<S, T>): IType<S | null | undefined, T | null> {
     // TODO: is identifierAttr correct for maybe?
-    return createUnionFactory(nullFactory, type)
+    return union(nullFactory, type)
 }

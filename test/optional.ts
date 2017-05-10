@@ -1,36 +1,33 @@
-import { unprotect } from '../src/core';
 import {test} from "ava"
-import {getSnapshot, types} from "../src"
+import {getSnapshot, types, unprotect} from "../src"
 
 test("it should provide a default value, if no snapshot is provided", t => {
     const Row = types.model({
-        name: '',
+        name: "",
         quantity: 0
     })
 
     const Factory = types.model({
-        rows: types.withDefault(types.array(Row), [{name: 'test'}])
+        rows: types.optional(types.array(Row), [{name: "test"}])
     })
 
     const doc = Factory.create()
-    t.deepEqual<any>(getSnapshot(doc), {rows: [{name: 'test', quantity: 0}]})
+    t.deepEqual<any>(getSnapshot(doc), {rows: [{name: "test", quantity: 0}]})
 })
-
 
 test("it should use the snapshot if provided", t => {
     const Row = types.model({
-        name: '',
+        name: "",
         quantity: 0
     })
 
     const Factory = types.model({
-        rows: types.withDefault(types.array(Row), [{name: 'test'}])
+        rows: types.optional(types.array(Row), [{name: "test"}])
     })
 
-    const doc = Factory.create({rows: [{name: 'snapshot', quantity: 0}]})
-    t.deepEqual<any>(getSnapshot(doc), {rows: [{name: 'snapshot', quantity: 0}]})
+    const doc = Factory.create({rows: [{name: "snapshot", quantity: 0}]})
+    t.deepEqual<any>(getSnapshot(doc), {rows: [{name: "snapshot", quantity: 0}]})
 })
-
 
 test("it should throw if default value is invalid snapshot", t => {
     const Row = types.model({
@@ -39,8 +36,8 @@ test("it should throw if default value is invalid snapshot", t => {
     })
 
     const error = t.throws(() => {
-        const Factory = types.model({
-            rows: types.withDefault(types.array(Row), [{}])
+        types.model({
+            rows: types.optional(types.array(Row), [{}])
         })
     })
 
@@ -50,7 +47,7 @@ test("it should throw if default value is invalid snapshot", t => {
 test("it should accept a function to provide dynamic values", t => {
     let defaultValue: any = 1
     const Factory = types.model({
-        a: types.withDefault(types.number, () => defaultValue)
+        a: types.optional(types.number, () => defaultValue)
     })
 
     t.deepEqual(getSnapshot(Factory.create()), {a: 1})

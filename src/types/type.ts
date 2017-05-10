@@ -47,7 +47,7 @@ export function typecheck(type: IType<any, any>, value: any): void {
         const isSnapshotCompatible = isMST(value) && type.is(getMSTAdministration(value).snapshot)
         fail(
             `Value${currentTypename} '${isSerializable(value) ? JSON.stringify(value) : value}' is not assignable to type: ${type.name}` +
-            (isPrimitiveType(type) || (type instanceof DefaultValue && isPrimitiveType(type.type))
+            (isPrimitiveType(type) || (type instanceof OptionalValue && isPrimitiveType((<OptionalValue<any, any>> type).type))
                 ? `.`
                 : (`, expected an instance of ${type.name} or a snapshot like '${type.describe()}' instead.` +
                     (isSnapshotCompatible ? " (Note that a snapshot of the provided value is compatible with the targeted type)" : "")
@@ -60,4 +60,4 @@ export function typecheck(type: IType<any, any>, value: any): void {
 import { fail, isSerializable } from "../utils"
 import { getMSTAdministration, IMSTNode, isMST, maybeMST } from "../core/mst-node"
 import { isPrimitiveType } from "./primitives"
-import { DefaultValue } from "./utility-types/with-default"
+import { OptionalValue } from "./utility-types/optional"
