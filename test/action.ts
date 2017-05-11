@@ -106,7 +106,7 @@ test("it should not be possible to set the wrong type", t => {
         () => {
             store.orders[0].setCustomer(store.orders[0])
         }, // wrong type!
-        "[mobx-state-tree] Value of type Order: '{}' is not assignable to type: Customer, expected an instance of Customer or a snapshot like '{ name: string }' instead."
+        `[mobx-state-tree] Value of type Order: '{"customer":null}' is not assignable to type: Customer, expected an instance of Customer or a snapshot like '{ name: string }' instead.`
     )
 })
 
@@ -144,7 +144,7 @@ test("it should be possible to pass a complex plain object", t => {
 
     const recorder = recordActions(t1)
 
-    ;(t1 as any).toggle({ bla : [ "nuff", ["said" ]]}) // nonsense, but serializable!
+    ; (t1 as any).toggle({ bla : [ "nuff", ["said" ]]}) // nonsense, but serializable!
 
     t.deepEqual(recorder.actions, [
         { name: "toggle", path: "", args: [{ bla : [ "nuff", ["said" ]]}] }

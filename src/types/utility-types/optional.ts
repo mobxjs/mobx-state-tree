@@ -16,7 +16,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
     describe() {
         // return "(" + this.type.type.describe() + " = " + JSON.stringify(this.defaultValue) + ")"
         // MWE: discuss a default value is not part of the type description? (unlike a literal)
-        return this.type.describe()
+        return this.type.describe() + "?"
     }
 
     create(value: any) {

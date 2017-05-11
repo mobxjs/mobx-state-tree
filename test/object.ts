@@ -46,6 +46,7 @@ test("it should create a factory", (t) => {
     const {Factory} = createTestFactories()
     const snapshot = getSnapshot(Factory.create())
     t.deepEqual(snapshot, {to: 'world'})
+    t.deepEqual((Factory.create() as any).toJSON(), {to: 'world'}) // toJSON is there as shortcut for getSnapshot(), primarily for debugging convenience
     t.deepEqual(Factory.create().toString(), "AnonymousModel@<root>")
 })
 
@@ -179,7 +180,7 @@ test("it should throw if snapshot has computed properties", (t) => {
         const doc = ComputedFactory.create({area: 3})
     })
 
-    t.is(error.message, "[mobx-state-tree] Value '{\"area\":3}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ width: number; height: number }' instead.")
+    t.is(error.message, "[mobx-state-tree] Value '{\"area\":3}' is not assignable to type: AnonymousModel, expected an instance of AnonymousModel or a snapshot like '{ width: number?; height: number? }' instead.")
 })
 
 test("it should throw if a replaced object is read or written to", (t) => {
@@ -245,6 +246,26 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is({to: 'mars'}), true)
     t.deepEqual(Factory.is({wrongKey: true}), true)
     t.deepEqual(Factory.is({to: 3 }), false)
+})
+
+test("it should require complex fields to be present", (t) => {
+    t.is(types.model({ todo: types.model({}) }).is({}), false)
+    t.throws(
+        () => types.model({ todo: types.model({}) }).create(),
+        /is not assignable to type/
+    )
+
+    t.is(types.model({ todo: types.array(types.string) }).is({}), false) // TBD: or true?
+    t.throws(
+        () => types.model({ todo: types.array(types.string) }).create(),
+        /is not assignable to type/
+    )
+
+    t.is(types.model({ todo: types.map(types.string) }).is({}), false)
+    t.throws(
+        () => types.model({ todo: types.map(types.string) }).create(),
+        /is not assignable to type/
+    )
 })
 
 // === VIEW FUNCTIONS ===
