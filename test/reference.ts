@@ -155,10 +155,16 @@ test("it should resolve refs during creation, when using path", t => {
     t.is(s.entries[0].price, 4)
     t.is(s.entries.reduce((a, e) => a + e.price, 0), 4)
 
-    t.deepEqual(values, [4])
+    const entry = BookEntry.create({ book: s.books[0] }) // N.B. ref is initially not resolvable!
+    s.entries.push(entry)
+    t.is(s.entries[1].price, 4)
+    t.is(s.entries.reduce((a, e) => a + e.price, 0), 8)
+
+    t.deepEqual(values, [4, 8])
 })
 
 test("it should resolve refs during creation, when using generic reference", t => {
+    debugger;
     const values: number[] = []
     const Book = types.model({
         id: types.identifier(),
@@ -188,6 +194,11 @@ test("it should resolve refs during creation, when using generic reference", t =
     s.entries.push({ book: s.books[0] } as any)
     t.is(s.entries[0].price, 4)
     t.is(s.entries.reduce((a, e) => a + e.price, 0), 4)
+
+    t.throws(
+        () => BookEntry.create({ book: s.books[0] }), // N.B. ref is initially not resolvable!
+        /the value should already be part of the same model tree/
+    )
 
     t.deepEqual(values, [4])
 })

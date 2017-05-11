@@ -126,6 +126,8 @@ export class MSTAdministration {
     }
 
     @computed public get snapshot() {
+        if (!this._isAlive)
+            return undefined
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         // Optimization: only freeze on dev builds
         return Object.freeze(this.type.serialize(this))

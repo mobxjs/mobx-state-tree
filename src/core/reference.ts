@@ -53,11 +53,12 @@ export class Reference {
             typecheck(this.type, value)
             const base = getMSTAdministration(this.owner)
             const target = getMSTAdministration(value)
-            invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
             if (this.targetIdAttribute)
                 this.identifier = (value as any)[this.targetIdAttribute]
-            else
+            else {
+                invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
                 this.identifier = getRelativePathForNodes(base, target)
+            }
         } else if (this.targetIdAttribute) {
             invariant(typeof value === "string", "Expected an identifier, got: " + value)
             this.identifier = value

@@ -15,13 +15,23 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         const instance = this.createNewInstance()
         // tslint:disable-next-line:no_unused-variable
         const node = new MSTAdministration(parent, subpath, instance, this, environment)
-        node.pseudoAction(() => {
-            this.finalizeNewInstance(instance, snapshot)
-        })
-        node.fireHook("afterCreate")
-        if (parent)
-            node.fireHook("afterAttach")
-        return instance
+        let sawException = true
+        try {
+            node.pseudoAction(() => {
+                this.finalizeNewInstance(instance, snapshot)
+            })
+            addReadOnlyProp(instance, "toJSON", toJSON)
+            node.fireHook("afterCreate")
+            if (parent)
+                node.fireHook("afterAttach")
+            sawException = false
+            return instance
+        } finally {
+            if (sawException) {
+                // short-cut to die the instance, to avoid the snapshot computed starting to throw...
+                (node as any)._isAlive = false
+            }
+        }
     }
 
     abstract createNewInstance(): any
