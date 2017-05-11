@@ -15,11 +15,11 @@ import {
     hasOwnProperty,
     isPlainObject
 } from "../../utils"
-import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, getSnapshot, IJsonPatch } from "../../core"
+import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, IJsonPatch } from "../../core"
 import { IType, IComplexType, isType } from "../type"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
-import { createDefaultValueFactory } from "../utility-types/with-default"
+import { optional } from "../utility-types/optional"
 import { isReferenceFactory } from "../utility-types/reference"
 import { isIdentifierFactory } from "../utility-types/identifier"
 import { Property } from "../property-types/property"
@@ -109,7 +109,7 @@ export class ObjectType extends ComplexType<any, any> {
                 this.props[key] = new IdentifierProperty(key)
             } else if (isPrimitive(value)) {
                 const baseType = getPrimitiveFactoryFromValue(value)
-                this.props[key] = new ValueProperty(key, createDefaultValueFactory(baseType, value))
+                this.props[key] = new ValueProperty(key, optional(baseType, value))
             } else if (isType(value)) {
                 this.props[key] = new ValueProperty(key, value)
             } else if (isReferenceFactory(value)) {
@@ -226,11 +226,11 @@ export type Snapshot<T> = {
 
 export interface IModelType<T, A> extends IComplexType<Snapshot<T>, T & A> { }
 
-export function createModelFactory<T>(properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}>
-export function createModelFactory<T>(name: string, properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}>
-export function createModelFactory<T, A>(properties: IModelProperties<T> & ThisType<T>, operations: A & ThisType<T & A>): IModelType<T, A>
-export function createModelFactory<T, A>(name: string, properties: IModelProperties<T> & ThisType<T>, operations: A & ThisType<T & A>): IModelType<T, A>
-export function createModelFactory(arg1: any, arg2?: any, arg3?: any) {
+export function model<T>(properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}>
+export function model<T>(name: string, properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}>
+export function model<T, A>(properties: IModelProperties<T> & ThisType<T>, operations: A & ThisType<T & A>): IModelType<T, A>
+export function model<T, A>(name: string, properties: IModelProperties<T> & ThisType<T>, operations: A & ThisType<T & A>): IModelType<T, A>
+export function model(arg1: any, arg2?: any, arg3?: any) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
     let actions: Object =  typeof arg1 === "string" ? arg3 : arg2
@@ -253,7 +253,7 @@ export function extend(...args: any[]) {
     const baseFactories = typeof args[0] === "string" ? args.slice(1) : args
     const factoryName = typeof args[0] === "string" ? args[0] : baseFactories.map(f => f.name).join("_")
 
-    return createModelFactory(
+    return model(
         factoryName,
         extendObject.apply(null, [{}].concat(baseFactories.map(getObjectFactoryBaseModel)))
     )

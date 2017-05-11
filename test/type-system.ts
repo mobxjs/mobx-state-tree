@@ -126,7 +126,7 @@ test("#66 - it should accept superfluous fields", t => {
 test("#66 - it should not require defaulted fields", t => {
     const Item = types.model({
         id: types.number,
-        name: types.withDefault(types.string, "boo")
+        name: types.optional(types.string, "boo")
     })
 
     t.is(Item.is({}), false)
@@ -154,7 +154,6 @@ test("#66 - it should be possible to omit defaulted fields", t => {
     t.is((a as any).description, undefined)
     t.is(a.name, "boo")
 })
-
 
 test("#66 - it should pick the correct type of defaulted fields", t => {
     const Item = types.model({
@@ -227,7 +226,6 @@ test(".Type should not be callable", t => {
 
     t.throws(() => Todo.Type)
 })
-
 
 test(".SnapshotType should not be callable", t => {
     const Todo = types.model({

@@ -138,7 +138,7 @@ test("it should resolve refs during creation, when using path", t => {
     })
     const Store = types.model({
         books: types.array(Book),
-        entries: types.array(BookEntry)
+        entries: types.optional(types.array(BookEntry), [])
     })
 
     const s = Store.create({
@@ -172,7 +172,7 @@ test("it should resolve refs during creation, when using generic reference", t =
     })
     const Store = types.model({
         books: types.array(Book),
-        entries: types.array(BookEntry)
+        entries: types.optional(types.array(BookEntry), [])
     })
 
     const s = Store.create({

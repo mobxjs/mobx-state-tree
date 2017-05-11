@@ -1,23 +1,23 @@
-import {ObservableMap} from 'mobx'
-import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types, unprotect} from "../src"
+import {onSnapshot, onPatch, applyPatch, applyPatches, applySnapshot, getSnapshot, types, unprotect} from "../src"
 import {test} from "ava"
 
-interface ITestSnapshot{
+interface ITestSnapshot {
     to: string
 }
 
-interface ITest{
+interface ITest {
     to: string
 }
 
 const createTestFactories = () => {
     const ItemFactory = types.model({
-            to: 'world'
+            to: "world"
         })
 
-    const Factory = (types.map(
-        ItemFactory
-    ))
+    const Factory = types.optional(
+        types.map(
+            ItemFactory
+        ), {})
 
     return {Factory, ItemFactory}
 }
@@ -29,11 +29,19 @@ test("it should create a factory", (t) => {
     t.deepEqual(snapshot, {})
 })
 
+test("it should fail if not optional and no default provided", (t) => {
+    const Factory = types.map(types.string)
+    const ex = t.throws(() => {
+        Factory.create()
+    })
+    t.deepEqual(ex.message, "[mobx-state-tree] Value \'undefined\' is not assignable to type: map<string, string>, expected an instance of map<string, string> or a snapshot like \'Map<string, string>\' instead.")
+})
+
 test("it should restore the state from the snapshot", (t) => {
     const {Factory} = createTestFactories()
 
-    const instance = Factory.create({hello: {to: 'world'}});
-    t.deepEqual<any>(getSnapshot(instance), {hello: {to: 'world'}})
+    const instance = Factory.create({hello: {to: "world"}})
+    t.deepEqual<any>(getSnapshot(instance), {hello: {to: "world"}})
     t.is("" + instance, "map<string, AnonymousModel>@<root>(1 items)")
 })
 
@@ -48,16 +56,16 @@ test("it should emit snapshots", (t) => {
 
     doc.set("hello", ItemFactory.create())
 
-    t.deepEqual(snapshots, [{hello: {to: 'world'}}])
+    t.deepEqual(snapshots, [{hello: {to: "world"}}])
 })
 
 test("it should apply snapshots", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
 
-    applySnapshot(doc, {hello: {to: 'universe'}})
+    applySnapshot(doc, {hello: {to: "universe"}})
 
-    t.deepEqual<any>(getSnapshot(doc), {hello: {to: 'universe'}})
+    t.deepEqual<any>(getSnapshot(doc), {hello: {to: "universe"}})
 })
 
 test("it should return a snapshot", (t) => {
@@ -67,9 +75,8 @@ test("it should return a snapshot", (t) => {
 
     doc.set("hello", ItemFactory.create())
 
-    t.deepEqual<any>(getSnapshot(doc), {hello: {to: 'world'}})
+    t.deepEqual<any>(getSnapshot(doc), {hello: {to: "world"}})
 })
-
 
 // === PATCHES TESTS ===
 test("it should emit add patches", (t) => {
@@ -93,7 +100,7 @@ test("it should apply a add patch", (t) => {
 
     applyPatch(doc, {op: "add", path: "/hello", value: {to: "universe"}})
 
-    t.deepEqual<any>(getSnapshot(doc), {hello: {to: 'universe'}})
+    t.deepEqual<any>(getSnapshot(doc), {hello: {to: "universe"}})
 })
 
 test("it should emit update patches", (t) => {
@@ -120,9 +127,8 @@ test("it should apply a update patch", (t) => {
 
     applyPatch(doc, {op: "replace", path: "/hello", value: {to: "universe"}})
 
-    t.deepEqual<any>(getSnapshot(doc), {hello: {to: 'universe'}})
+    t.deepEqual<any>(getSnapshot(doc), {hello: {to: "universe"}})
 })
-
 
 test("it should emit remove patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
@@ -159,9 +165,8 @@ test("it should apply patches", (t) => {
 
     applyPatches(doc, [{op: "add", path: "/hello", value: {to: "mars"}}, {op: "replace", path: "/hello", value: {to: "universe"}}])
 
-    t.deepEqual<any>(getSnapshot(doc), {hello: {to: 'universe'}})
+    t.deepEqual<any>(getSnapshot(doc), {hello: {to: "universe"}})
 })
-
 
 // === TYPE CHECKS ===
 test("it should check the type correctly", (t) => {
@@ -172,16 +177,16 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is(doc), true)
     t.deepEqual(Factory.is([]), false)
     t.deepEqual(Factory.is({}), true)
-    t.deepEqual(Factory.is({hello: {to: 'mars'}}), true)
+    t.deepEqual(Factory.is({hello: {to: "mars"}}), true)
     t.deepEqual(Factory.is({hello: {wrongKey: true}}), true)
     t.deepEqual(Factory.is({hello: {to: true}}), false)
 })
 
 test("it should support identifiers", (t) => {
     const Store = types.model({
-        todos: types.map(types.model({
+        todos: types.optional(types.map(types.model({
             id: types.identifier()
-        }))
+        })), {})
     })
 
     const store = Store.create()

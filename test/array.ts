@@ -1,23 +1,24 @@
-import {IObservableArray} from 'mobx'
-import {unprotect, onSnapshot, onPatch, clone, onAction, isAlive, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../src"
+import {unprotect, onSnapshot, onPatch, clone, isAlive, applyPatch, applyPatches, getPath, applySnapshot, getSnapshot, types} from "../src"
 import {test} from "ava"
 
-interface ITestSnapshot{
+interface ITestSnapshot {
     to: string
 }
 
-interface ITest{
+interface ITest {
     to: string
 }
 
 const createTestFactories = () => {
-    const ItemFactory = types.model({
-            to: 'world'
-        })
+    const ItemFactory = types.optional(
+        types.model({
+            to: "world"
+        }), {})
 
-    const Factory = (types.array(
-        ItemFactory
-    ))
+    const Factory = types.optional(
+        types.array(
+            ItemFactory
+        ), [])
 
     return {Factory, ItemFactory}
 }
@@ -26,16 +27,22 @@ const createTestFactories = () => {
 test("it should create a factory", (t) => {
     const {Factory} = createTestFactories()
 
-    const s = getSnapshot(Factory.create())
-
     t.deepEqual(getSnapshot(Factory.create()), [])
+})
+
+test("it should fail if not optional and no default provided", (t) => {
+    const Factory = types.array(types.string)
+    const ex = t.throws(() => {
+        Factory.create()
+    })
+    t.deepEqual(ex.message, "[mobx-state-tree] Value \'undefined\' is not assignable to type: string[], expected an instance of string[] or a snapshot like \'string[]\' instead.")
 })
 
 test("it should restore the state from the snapshot", (t) => {
     const {Factory} = createTestFactories()
 
-    const instance = Factory.create([{to: 'universe'}])
-    t.deepEqual(getSnapshot(instance), [{ to: 'universe' }])
+    const instance = Factory.create([{to: "universe"}])
+    t.deepEqual(getSnapshot(instance), [{ to: "universe" }])
     t.is("" + instance, "AnonymousModel[]@<root>(1 items)")
 })
 
@@ -50,16 +57,16 @@ test("it should emit snapshots", (t) => {
 
     doc.push(ItemFactory.create())
 
-    t.deepEqual(snapshots, [[{to: 'world'}]])
+    t.deepEqual(snapshots, [[{to: "world"}]])
 })
 
 test("it should apply snapshots", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
     const doc = Factory.create()
 
-    applySnapshot(doc, [{to: 'universe'}])
+    applySnapshot(doc, [{to: "universe"}])
 
-    t.deepEqual(getSnapshot(doc), [{to: 'universe'}])
+    t.deepEqual(getSnapshot(doc), [{to: "universe"}])
 })
 
 test("it should return a snapshot", (t) => {
@@ -69,7 +76,7 @@ test("it should return a snapshot", (t) => {
 
     doc.push(ItemFactory.create())
 
-    t.deepEqual(getSnapshot(doc), [{to: 'world'}])
+    t.deepEqual(getSnapshot(doc), [{to: "world"}])
 })
 
 // === PATCHES TESTS ===
@@ -94,7 +101,7 @@ test("it should apply a add patch", (t) => {
 
     applyPatch(doc, {op: "add", path: "/0", value: {to: "universe"}})
 
-    t.deepEqual(getSnapshot(doc), [{to: 'universe'}])
+    t.deepEqual(getSnapshot(doc), [{to: "universe"}])
 })
 
 test("it should emit update patches", (t) => {
@@ -120,9 +127,8 @@ test("it should apply a update patch", (t) => {
 
     applyPatch(doc, {op: "replace", path: "/0", value: {to: "universe"}})
 
-    t.deepEqual(getSnapshot(doc), [{to: 'universe'}])
+    t.deepEqual(getSnapshot(doc), [{to: "universe"}])
 })
-
 
 test("it should emit remove patches", (t) => {
     const {Factory, ItemFactory} = createTestFactories()
@@ -160,7 +166,7 @@ test("it should apply patches", (t) => {
 
     applyPatches(doc, [{op: "add", path: "/0", value: {to: "mars"}}, {op: "replace", path: "/0", value: {to: "universe"}}])
 
-    t.deepEqual(getSnapshot(doc), [{to: 'universe'}])
+    t.deepEqual(getSnapshot(doc), [{to: "universe"}])
 })
 
 // === TYPE CHECKS ===
@@ -172,7 +178,7 @@ test("it should check the type correctly", (t) => {
     t.deepEqual(Factory.is(doc), true)
     t.deepEqual(Factory.is([]), true)
     t.deepEqual(Factory.is({}), false)
-    t.deepEqual(Factory.is([{to: 'mars'}]), true)
+    t.deepEqual(Factory.is([{to: "mars"}]), true)
     t.deepEqual(Factory.is([{wrongKey: true}]), true)
     t.deepEqual(Factory.is([{to: true}]), false)
 })
@@ -211,10 +217,9 @@ test("items should be reconciled correctly when splicing - 1", t => {
         b = Task.create({ x: "b" }),
         c = Task.create({ x: "c" }),
         d = Task.create({ x: "d" })
-    ;
 
     const store = types.model({
-        todos: types.array(Task)
+        todos: types.optional(types.array(Task), [])
     }).create({
         todos: [a]
     })
@@ -253,7 +258,6 @@ test("items should be reconciled correctly when splicing - 2", t => {
         b = Task.create({ x: "b" }),
         c = Task.create({ x: "c" }),
         d = Task.create({ x: "d" })
-    ;
 
     const store = types.model({
         todos: types.array(Task)
@@ -300,11 +304,11 @@ test("items should be reconciled correctly when splicing - 2", t => {
 
 test("it should reconciliate keyed instances correctly", (t) => {
     const Store = types.model({
-        todos: types.array(types.model("Task", {
+        todos: types.optional(types.array(types.model("Task", {
             id: types.identifier(),
             task: "",
             done: false
-        }))
+        })), [])
     })
 
     const store = Store.create({
@@ -345,7 +349,7 @@ test("it correctly reconciliate when swapping", t => {
     const Task = types.model("Task", {
     })
     const Store = types.model({
-        todos: types.array(Task)
+        todos: types.optional(types.array(Task), [])
     })
 
     const s = Store.create()
@@ -364,7 +368,7 @@ test("it should not be allowed to add the same item twice to the same store", t 
     const Task = types.model("Task", {
     })
     const Store = types.model({
-        todos: types.array(Task)
+        todos: types.optional(types.array(Task), [])
     })
 
     const s = Store.create()

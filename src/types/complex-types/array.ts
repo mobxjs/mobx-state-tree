@@ -9,7 +9,6 @@ import {
 import { addHiddenFinalProp, identity, nothing } from "../../utils"
 import { IType, IComplexType, isType } from "../type"
 import { ComplexType } from "./complex-type"
-import { createDefaultValueFactory } from "../utility-types/with-default"
 
 export function arrayToString(this: IObservableArray<any>) {
     return `${getMSTAdministration(this)}(${this.length} items)`
@@ -149,7 +148,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getDefaultSnapshot() {
-        return []
+        return undefined
     }
 
     removeChild(node: MSTAdministration, subpath: string) {
@@ -161,8 +160,8 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 }
 
-export function createArrayFactory<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
-    return createDefaultValueFactory(new ArrayType<S, T>(subtype.name + "[]", subtype), [])
+export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
+    return new ArrayType<S, T>(subtype.name + "[]", subtype)
 }
 
 export function isArrayFactory<S, T>(type: any): type is IComplexType<S[], IObservableArray<T>> {
