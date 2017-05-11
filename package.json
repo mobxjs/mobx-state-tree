@@ -10,7 +10,7 @@
     "webpack": "webpack -p",
     "build-tests": "tsc -p test/",
     "test": "npm run build-tests && ava",
-    "watch": "concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
+    "watch": "tsc -p test && concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
     "_prepublish": "npm run build && npm run build-docs",
     "coverage": "npm run build-tests && nyc ava && nyc report -r html && nyc report -r lcov",
     "build-docs": "npm run quick-build && documentation  build lib/index.js --github -f md -o API.md",

@@ -164,7 +164,6 @@ test("it should resolve refs during creation, when using path", t => {
 })
 
 test("it should resolve refs during creation, when using generic reference", t => {
-    debugger;
     const values: number[] = []
     const Book = types.model({
         id: types.identifier(),

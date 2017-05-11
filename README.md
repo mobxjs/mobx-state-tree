@@ -13,7 +13,8 @@ _Opinionated, transactional, MobX powered state container_
 
 * NPM: `npm install mobx-state-tree --save`
 * Yarn: `yarn add mobx-state-tree`
-* CDN: https://unpkg.com/mobx-state-tree/mobx-state-tree.umd.js
+* CDN: https://unpkg.com/mobx-state-tree/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
+* JSBin [playground](http://jsbin.com/petoxeheta/edit?html,js,console) (without UI)
 
 # Philosophy
 
@@ -63,6 +64,10 @@ Like React, MST consists of composable components, called *models*, which captur
 An introduction to the philosophy can be watched [here](https://youtu.be/ta8QKmNRXZM?t=21m52s). [Slides](https://immer-mutable-state.surge.sh/). Or, as [markdown](https://github.com/mweststrate/reactive2016-slides/blob/master/slides.md) to read it quickly.
 
 TODO: react europe talk
+
+# Examples
+
+TODO: move https://github.com/mweststrate/react-mobx-shop/tree/mobx-state-tree to this repo
 
 # Concepts
 
