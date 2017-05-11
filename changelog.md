@@ -6,6 +6,7 @@
 * **BREAKING** Disabled inlining type.model definitions as introduced in 0.5.1; to many subtle issues
 * Improved identifier support, they are no properly propageted through utility types like `maybe`, `union` etc
 * Fixed issue where fields where not referted back to default when a partial snapshot was provided
+* Fixed #122: `types.identifier` now also accepts a subtype to override the default string type; e.g. `types.identifier(types.number)`
 
 # 0.5.1
 

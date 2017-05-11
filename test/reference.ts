@@ -201,3 +201,38 @@ test("it should resolve refs during creation, when using generic reference", t =
 
     t.deepEqual(values, [4])
 })
+
+test("identifiers should only support types.string and types.number", t => {
+    t.throws(
+        () => types.model({
+            id: types.identifier(types.model({}))
+        }),
+        "[mobx-state-tree] Only 'types.number' and 'types.string' are acceptable as type specification for identifiers"
+    )
+})
+
+test("string identifiers should not accept numbers", t => {
+    const F = types.model({
+        id: types.identifier()
+    })
+    t.is(F.is({ id: "4" }), true)
+    t.is(F.is({ id: 4 }), false)
+
+    const F2 = types.model({
+        id: types.identifier(types.string)
+    })
+    t.is(F2.is({ id: "4" }), true)
+    t.is(F2.is({ id: 4 }), false)
+})
+
+test("122 - identifiers should support numbers as well", t => {
+    const F = types.model({
+        id: types.identifier(types.number)
+    })
+    t.is(F.create({
+        id: 3
+    }).id, 3)
+
+    t.is(F.is({ id: 4 }), true)
+    t.is(F.is({ id: "4" }), false)
+})
