@@ -187,7 +187,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     getDefaultSnapshot() {
-        return undefined
+        return {}
     }
 
     removeChild(node: MSTAdministration, subpath: string) {

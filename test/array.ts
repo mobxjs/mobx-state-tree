@@ -30,12 +30,9 @@ test("it should create a factory", (t) => {
     t.deepEqual(getSnapshot(Factory.create()), [])
 })
 
-test("it should fail if not optional and no default provided", (t) => {
+test("it should succeed if not optional and no default provided", (t) => {
     const Factory = types.array(types.string)
-    const ex = t.throws(() => {
-        Factory.create()
-    })
-    t.deepEqual(ex.message, "[mobx-state-tree] Value \'undefined\' is not assignable to type: string[], expected an instance of string[] or a snapshot like \'string[]\' instead.")
+    t.deepEqual((Factory.create() as any).toJSON(), [])
 })
 
 test("it should restore the state from the snapshot", (t) => {

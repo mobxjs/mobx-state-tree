@@ -1,13 +1,11 @@
 # 0.6.0
 
+* **BREAKING** `types.withDefault` has been renamed to `types.optional`
 * **BREAKING** Array and map types can no longer be left out of snapshots by default. Use `optional` to make them optional in the snapshot
 * **BREAKING** Literals no longer have a default value by default (use optional + literal instead)
+* **BREAKING** Disabled inlining type.model definitions as introduced in 0.5.1; to many subtle issues
 * Improved identifier support, they are no properly propageted through utility types like `maybe`, `union` etc
 * Fixed issue where fields where not referted back to default when a partial snapshot was provided
-* **BREAKING** Disabled inlining type.model definitions as introduced in 0.5.1; to many subtle issues
-* **BREAKING** `types.withDefault` has been renamed to `types.optional`
-
-// NOTE: Also, can we name all the functions in types directly with their final name? (optional instead of createOptionalFactory...etc.)
 
 # 0.5.1
 
