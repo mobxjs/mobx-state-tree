@@ -1,4 +1,4 @@
-import {Type, IType, typecheck} from "../type"
+import {Type, IType, IContext, IValidationResult, typecheck} from "../type"
 
 export type IFunctionReturn<T> = () => T
 export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>
@@ -29,9 +29,12 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.create(value)
     }
 
-    is(value: any): value is S | T {
+    validate(snapshot: any, context: IContext): IValidationResult {
         // defaulted values can be skipped
-        return value === undefined || this.type.is(value)
+        if (snapshot === undefined || this.type.is(snapshot)) {
+            return []
+        }
+        return [{ snapshot, context }]
     }
 
     get identifierAttribute() {

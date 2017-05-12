@@ -1,4 +1,4 @@
-import { IType, Type } from "../type"
+import { IType, IContext, IValidationResult, Type } from "../type"
 import {invariant} from "../../utils"
 import {isMST, getMSTAdministration} from "../../core"
 
@@ -27,8 +27,11 @@ export class Refinement extends Type<any, any> {
         return inst
     }
 
-    is(value: any): value is any {
-        return this.type.is(value) && this.predicate(value)
+    validate(snapshot: any, context: IContext): IValidationResult {
+        if (this.type.is(snapshot) && this.predicate(snapshot)) {
+            return []
+        }
+        return [{ snapshot, context }]
     }
 
     get identifierAttribute() {

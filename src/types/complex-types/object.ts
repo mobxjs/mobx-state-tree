@@ -16,7 +16,7 @@ import {
     isPlainObject
 } from "../../utils"
 import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, IJsonPatch } from "../../core"
-import { IType, IComplexType, isType } from "../type"
+import { IType, IComplexType, IContext, IValidationResult, isType } from "../type"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
 import { optional } from "../utility-types/optional"
@@ -180,13 +180,16 @@ export class ObjectType extends ComplexType<any, any> {
         return (this.props[key] as ValueProperty).type
     }
 
-    isValidSnapshot(snapshot: any) {
-        if (!isPlainObject(snapshot))
-            return false
-        for (let key in this.props)
-            if (!this.props[key].isValidSnapshot(snapshot))
-                return false
-        return true
+    isValidSnapshot(snapshot: any, context: IContext): IValidationResult {
+        if (!isPlainObject(snapshot)) {
+            return [{snapshot, context}]
+        }
+
+        return Object.keys(this.props).map(
+            (path) => this.props[path].validate(snapshot, context)
+        ).reduce(
+            (a, e) => a.concat(e)
+        , [])
     }
 
     private forAllProps(fn: (o: Property) => void) {

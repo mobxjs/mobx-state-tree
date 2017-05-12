@@ -2,7 +2,7 @@ import { getMSTAdministration } from "../../core"
 import { extendObservable, observable, IObjectWillChange } from "mobx"
 import { Property } from "./property"
 import { isValidIdentifier, fail } from "../../utils"
-import { IType, typecheck } from "../type"
+import { IType, IContext, IValidationResult, typecheck } from "../type"
 
 export class IdentifierProperty extends Property {
     subtype: IType<any, any>
@@ -43,8 +43,12 @@ export class IdentifierProperty extends Property {
         instance[this.name] = snapshot[this.name]
     }
 
-    isValidSnapshot(snapshot: any) {
-        return this.isValidIdentifier(snapshot[this.name])
+    validate(snapshot: any, context: IContext): IValidationResult {
+        if ( !this.isValidIdentifier(snapshot[this.name])) {
+            return [{ context: context.concat([ { path: this.name } ]), snapshot: snapshot[this.name], message: "The provided identifier is not valid" }]
+        }
+
+        return []
     }
 
     isValidIdentifier(identifier: any): boolean {

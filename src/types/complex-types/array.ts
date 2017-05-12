@@ -7,7 +7,7 @@ import {
     valueToSnapshot
 } from "../../core"
 import { addHiddenFinalProp, identity, nothing } from "../../utils"
-import { IType, IComplexType, isType } from "../type"
+import { IType, IComplexType, IContext, IValidationResult, isType } from "../type"
 import { ComplexType } from "./complex-type"
 
 export function arrayToString(this: IObservableArray<any>) {
@@ -143,8 +143,16 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return this.subType
     }
 
-    isValidSnapshot(snapshot: any) {
-        return Array.isArray(snapshot) && snapshot.every(item => this.subType.is(item))
+    isValidSnapshot(snapshot: any, context: IContext): IValidationResult {
+        if (!Array.isArray(snapshot)) {
+            return [{ context, snapshot }]
+        }
+
+        return snapshot.map(
+            (item, index) => this.subType.validate(item, context.concat([ {path: "" + index, type: this.subType} ]))
+        ).reduce(
+            (a, e) => a.concat(e)
+        , [])
     }
 
     getDefaultSnapshot() {

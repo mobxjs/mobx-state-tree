@@ -1,4 +1,5 @@
 import { IMSTNode } from "../../core/"
+import { IContext, IValidationResult } from "../type"
 import { IObjectChange, IObjectWillChange } from "mobx"
 
 export abstract class Property {
@@ -17,5 +18,5 @@ export abstract class Property {
 
     serialize(instance: IMSTNode, snapshot: any) { }
     deserialize(instance: IMSTNode, snapshot: any) { }
-    abstract isValidSnapshot(snapshot: any): boolean
+    abstract validate(snapshot: any, context: IContext): IValidationResult
 }

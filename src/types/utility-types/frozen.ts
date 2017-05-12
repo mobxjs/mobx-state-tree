@@ -1,4 +1,4 @@
-import { ISimpleType, Type } from "../type"
+import { ISimpleType, IContext, IValidationResult, Type } from "../type"
 import { invariant, isMutable, isSerializable, isPlainObject } from "../../utils"
 
 function freeze(value: any) {
@@ -31,8 +31,11 @@ export class Frozen<T> extends Type<T, T> {
         return isMutable(value) ? freeze(value) : value
     }
 
-    is(value: any): value is T {
-        return isSerializable(value)
+    validate(snapshot: any, context: IContext): IValidationResult {
+        if (!isSerializable(snapshot)) {
+            return [ {snapshot, context} ]
+        }
+        return []
     }
 
     get identifierAttribute() {

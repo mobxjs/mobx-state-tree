@@ -1,7 +1,7 @@
 import { Property } from "./property"
 import { addHiddenFinalProp } from "../../utils"
 import { getMSTAdministration, escapeJsonPath } from "../../core"
-import { IType } from "../type"
+import { IType, IContext, IValidationResult } from "../type"
 import { Reference } from "../../core/reference"
 
 export class ReferenceProperty extends Property {
@@ -44,8 +44,11 @@ export class ReferenceProperty extends Property {
         (instance[this.name + "$value"] as Reference).setNewValue(snapshot[this.name])
     }
 
-    isValidSnapshot(snapshot: any) {
+    validate(snapshot: any, context: IContext): IValidationResult {
         // TODO: and check name is string or $ref object
-        return this.name in snapshot
+        if (this.name in snapshot) {
+            return []
+        }
+        return [{ snapshot, context: context.concat([ {path: this.name, type: this.type} ]) }]
     }
 }

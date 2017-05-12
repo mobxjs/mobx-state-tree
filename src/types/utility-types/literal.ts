@@ -1,4 +1,4 @@
-import { ISimpleType, Type, typecheck } from "../type"
+import { ISimpleType, IContext, IValidationResult, Type, typecheck } from "../type"
 import { invariant, isPrimitive } from "../../utils"
 
 export class Literal<T> extends Type<T, T> {
@@ -18,8 +18,11 @@ export class Literal<T> extends Type<T, T> {
         return JSON.stringify(this.value)
     }
 
-    is(value: any): value is T {
-        return value === this.value && isPrimitive(value)
+    validate(snapshot: any, context: IContext): IValidationResult {
+        if (isPrimitive(snapshot) && snapshot === this.value) {
+            return []            
+        }
+        return [{ snapshot, context }]
     }
 
     get identifierAttribute() {

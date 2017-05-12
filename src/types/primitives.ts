@@ -1,4 +1,4 @@
-import { ISimpleType, Type } from "./type"
+import { ISimpleType, IContext, IValidationResult, Type } from "./type"
 import { invariant, isPrimitive, fail } from "../utils"
 
 export class CoreType<T> extends Type<T, T> {
@@ -19,8 +19,11 @@ export class CoreType<T> extends Type<T, T> {
         return value
     }
 
-    is(thing: any): thing is T {
-        return isPrimitive(thing) && this.checker(thing)
+    validate(snapshot: any, context: IContext): IValidationResult {
+        if (isPrimitive(snapshot) && this.checker(snapshot)) {
+            return []
+        }
+        return [{ snapshot, context }]
     }
 
     get identifierAttribute() {

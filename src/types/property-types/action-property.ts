@@ -1,6 +1,7 @@
 import { addHiddenFinalProp } from "../../utils"
 import { createActionInvoker } from "../../core"
 import { Property } from "./property"
+import { IContext, IValidationResult } from "../type"
 
 export class ActionProperty extends Property {
     invokeAction: Function
@@ -14,7 +15,11 @@ export class ActionProperty extends Property {
         addHiddenFinalProp(target, this.name, this.invokeAction.bind(target))
     }
 
-    isValidSnapshot(snapshot: any) {
-        return !(this.name in snapshot)
+    validate(snapshot: any, context: IContext): IValidationResult {
+        if( this.name in snapshot ) {
+            return [{ context: context.concat([ { path: this.name } ]), snapshot: snapshot[this.name], message: "Action properties should not be provided in the snapshot" }]
+        }
+
+        return []
     }
 }
