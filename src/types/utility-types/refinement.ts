@@ -1,6 +1,7 @@
-import { IType, IContext, IValidationResult, Type } from "../type"
+import { IType, Type } from "../type"
 import {invariant} from "../../utils"
 import {isMST, getMSTAdministration} from "../../core"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export class Refinement extends Type<any, any> {
     readonly type: IType<any, any>
@@ -29,9 +30,9 @@ export class Refinement extends Type<any, any> {
 
     validate(value: any, context: IContext): IValidationResult {
         if (this.type.is(value) && this.predicate(value)) {
-            return []
+            return typeCheckSuccess()
         }
-        return [{ value, context }]
+        return typeCheckFailure(context, value)
     }
 
     get identifierAttribute() {

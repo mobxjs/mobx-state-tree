@@ -178,8 +178,8 @@ test("it should throw if snapshot has computed properties", (t) => {
 
     const error = t.throws(() => {
         const doc = ComputedFactory.create({area: 3})
-    }, `[mobx-state-tree] Error while converting {"area":3} to AnonymousModel:
-at path "/area" snapshot 3 is not assignable  (Computed properties should not be provided in the snapshot).`)
+    }, `[mobx-state-tree] Error while converting \`{"area":3}\` to \`AnonymousModel\`:
+at path "/area" value \`3\` is not assignable  (Computed properties should not be provided in the snapshot).`)
 })
 
 test("it should throw if a replaced object is read or written to", (t) => {

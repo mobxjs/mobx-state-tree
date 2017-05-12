@@ -1,4 +1,5 @@
-import {isType, IType, IContext, IValidationResult, Type} from "../type"
+import {isType, IType, Type} from "../type"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, getContextForPath } from "../type-checker"
 import {invariant, fail} from "../../utils"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
@@ -35,9 +36,9 @@ export class Union extends Type<any, any> {
 
     validate(value: any, context: IContext): IValidationResult {
         if (this.types.some(type => type.is(value))) {
-            return []
+            return typeCheckSuccess()
         }
-        return [{ value, context }]
+        return typeCheckFailure(context, value)
     }
 
     get identifierAttribute() {

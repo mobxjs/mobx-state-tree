@@ -109,8 +109,8 @@ test("identifiers are required", (t) => {
     t.is(Todo.is({}), false)
     t.is(Todo.is({ id: "x" }), true)
 
-    t.throws(() => Todo.create(), `[mobx-state-tree] Error while converting {} to AnonymousModel:
-at path "/id" snapshot undefined is not assignable to type: string (The provided identifier is not valid).`)
+    t.throws(() => Todo.create(), `[mobx-state-tree] Error while converting \`{}\` to \`AnonymousModel\`:
+at path "/id" value \`undefined\` is not assignable to type: \`string\` (The provided identifier is not valid).`)
 })
 
 test("identifiers cannot be modified", (t) => {
@@ -122,8 +122,8 @@ test("identifiers cannot be modified", (t) => {
     unprotect(todo)
 
     t.throws(() => todo.id = "stuff", "[mobx-state-tree] It is not allowed to change the identifier of an object, got: 'stuff' but expected: 'x'")
-    t.throws(() => applySnapshot(todo, {}), `[mobx-state-tree] Error while converting {} to AnonymousModel:
-at path "/id" snapshot undefined is not assignable to type: string (The provided identifier is not valid).`)
+    t.throws(() => applySnapshot(todo, {}), `[mobx-state-tree] Error while converting \`{}\` to \`AnonymousModel\`:
+at path "/id" value \`undefined\` is not assignable to type: \`string\` (The provided identifier is not valid).`)
 })
 
 test("it should resolve refs during creation, when using path", t => {

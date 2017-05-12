@@ -1,6 +1,7 @@
 import { action } from "mobx"
-import { IType, IContext, IValidationResult, Type, typecheck } from "../type"
+import { IType, Type } from "../type"
 import { addReadOnlyProp } from "../../utils"
+import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getDefaultContext, typecheck } from "../type-checker"
 
 function toJSON(this: IMSTNode) {
     return getMSTAdministration(this).snapshot
@@ -50,18 +51,18 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     abstract applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IType<any, any>
     abstract removeChild(node: MSTAdministration, subpath: string): void
-    abstract isValidSnapshot(value: any, context: IContext): IValidationResult 
+    abstract isValidSnapshot(value: any, context: IContext): IValidationResult
 
     validate(value: any, context: IContext): IValidationResult {
         if (!value || typeof value !== "object")
-            return [{ value: value, context }]
+            return typeCheckFailure(context, value)
         if (isMST(value)) {
-            return getType(value) === this ? [] : [{ value: value, context }]
+            return getType(value) === this ? typeCheckSuccess() : typeCheckFailure(context, value)
             // it is tempting to compare snapshots, but in that case we should always clone on assignments...
         }
         return this.isValidSnapshot(
             value,
-            [{ path: "", type: this }]
+            context
         )
     }
 }

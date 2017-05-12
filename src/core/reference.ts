@@ -2,7 +2,8 @@ import { isObservableArray, isObservableMap, observable, computed } from "mobx"
 import { getMSTAdministration, getRelativePathForNodes, isMST, IMSTNode } from "./mst-node"
 import { invariant, fail } from "../utils"
 import { getIdentifierAttribute } from "../types/complex-types/object"
-import { IType, typecheck } from "../types/type"
+import { IType } from "../types/type"
+import { typecheck } from "../types/type-checker"
 import { resolve } from "./mst-operations"
 
 export interface IReference {

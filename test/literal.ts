@@ -11,10 +11,10 @@ test("it should allow only primitives", t => {
 
 test("it should fail if not optional and no default provided", (t) => {
     const Factory = types.literal("hello")
-    const ex = t.throws(() => {
+    t.throws(() => {
         Factory.create()
-    }, `[mobx-state-tree] Error while converting undefined to hello:
-snapshot undefined is not assignable to type: hello, expected an instance of hello or a snapshot like '"hello"' instead.`)
+    }, `[mobx-state-tree] Error while converting \`undefined\` to \`hello\`:
+value \`undefined\` is not assignable to type: \`hello\`, expected an instance of \`hello\` or a snapshot like \`"hello"\` instead.`)
 })
 
 test("it should throw if a different type is given", t => {
@@ -24,6 +24,6 @@ test("it should throw if a different type is given", t => {
 
     const error = t.throws(() => {
         Factory.create({ shouldBeOne: 2 })
-    }, `[mobx-state-tree] Error while converting {"shouldBeOne":2} to TestFactory:
-at path "/shouldBeOne" snapshot 2 is not assignable to type: 1, expected an instance of 1 or a snapshot like '1' instead.`)
+    }, `[mobx-state-tree] Error while converting \`{"shouldBeOne":2}\` to \`TestFactory\`:
+at path "/shouldBeOne" value \`2\` is not assignable to type: \`1\`, expected an instance of \`1\` or a snapshot like \`1\` instead.`)
 })

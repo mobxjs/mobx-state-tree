@@ -1,5 +1,7 @@
 declare const global: any
 
+export const EMPTY_ARRAY = Object.freeze([])
+
 export type IDisposer = () => void;
 
 export function fail(message = "Illegal state"): never {

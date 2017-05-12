@@ -1,4 +1,5 @@
-import { ISimpleType, IContext, IValidationResult, Type } from "./type"
+import { ISimpleType, Type } from "./type"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
 import { invariant, isPrimitive, fail } from "../utils"
 
 export class CoreType<T> extends Type<T, T> {
@@ -21,9 +22,9 @@ export class CoreType<T> extends Type<T, T> {
 
     validate(value: any, context: IContext): IValidationResult {
         if (isPrimitive(value) && this.checker(value)) {
-            return []
+            return typeCheckSuccess()
         }
-        return [{ value, context }]
+        return typeCheckFailure(context, value)
     }
 
     get identifierAttribute() {

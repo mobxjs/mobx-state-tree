@@ -2,7 +2,8 @@ import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
 import { getMSTAdministration, maybeMST, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, invariant, fail, addHiddenFinalProp } from "../../utils"
-import { IType, IComplexType, IContext, IValidationResult, isType } from "../type"
+import { IType, IComplexType, isType } from "../type"
+import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
 
 interface IMapFactoryConfig {
@@ -184,14 +185,14 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (!isPlainObject(value)) {
-            return [{value, context}]
+            return typeCheckFailure(context, value)
         }
 
-        return Object.keys(value).map(
-            (path) => this.subType.validate(value[path], context.concat([{ path, type: this.subType }]))
-        ).reduce(
-            (a, e) => a.concat(e)
-        , [])
+        return flattenTypeErrors(
+            Object.keys(value).map(
+                (path) => this.subType.validate(value[path], getContextForPath(context, path, this.subType))
+            )
+        )
     }
 
     getDefaultSnapshot() {

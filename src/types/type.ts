@@ -1,18 +1,5 @@
 export interface ISnapshottable<S> {}
 
-export interface IContextEntry {
-    path: string
-    type?: IType<any, any>
-}
-
-export type IContext = IContextEntry[]
-export interface IValidationError {
-    context: IContext
-    value: any
-    message?: string
-}
-export type IValidationResult = IValidationError[]
-
 export interface IType<S, T> {
     name: string
     is(thing: any): thing is S | T
@@ -47,7 +34,7 @@ export abstract class Type<S, T> implements IType<S, T> {
 
     is(value: any): value is S | T {
         return this.validate(
-            value, 
+            value,
             [{ path: "", type: this }]
         ).length === 0
     }
@@ -62,39 +49,6 @@ export abstract class Type<S, T> implements IType<S, T> {
     abstract get identifierAttribute(): string | null
 }
 
-function toErrorString(error: IValidationError): string {
-    const { value } = error
-    const type: IType<any, any> = error.context[error.context.length - 1].type as any
-    const path = error.context.map(({path}) => path).filter(path => path.length > 0).join("/")
-
-    const pathPrefix = path.length > 0 ? `at path "/${path}" ` : ``
-
-    const currentTypename = maybeMST(value, node => `value of type ${node.type.name}:`, () => "snapshot")
-    const isSnapshotCompatible = type && isMST(value) && type.is(getMSTAdministration(value).snapshot)
-
-    return `${pathPrefix}${currentTypename} ${isSerializable(value) ? JSON.stringify(value) : value} is not assignable ${type ? `to type: ${type.name}` : ``}` +
-            (error.message ? ` (${error.message})` : "") +    
-            (type ?
-                (isPrimitiveType(type) || (type instanceof OptionalValue && isPrimitiveType((<OptionalValue<any, any>> type).type))
-                    ? `.`
-                    : (`, expected an instance of ${type.name} or a snapshot like '${type.describe()}' instead.` +
-                        (isSnapshotCompatible ? " (Note that a snapshot of the provided value is compatible with the targeted type)" : "")
-                    )
-                ) : `.`)
-}
-
-export function typecheck(type: IType<any, any>, value: any): void {
-    const errors = type.validate(value, [{ path: "", type }])
-
-    if (errors.length > 0) {
-        fail(
-            `Error while converting ${isMST(value) ? "<" + value + ">" : JSON.stringify(value)} to ${type.name}:\n` +
-            errors.map(toErrorString).join("\n")
-        )
-    }
-}
-
-import { fail, isSerializable } from "../utils"
-import { getMSTAdministration, IMSTNode, isMST, maybeMST, getType } from "../core/mst-node"
-import { isPrimitiveType } from "./primitives"
-import { OptionalValue } from "./utility-types/optional"
+import { fail } from "../utils"
+import { IMSTNode } from "../core/mst-node"
+import { IContext, IValidationResult } from "./type-checker"

@@ -1,7 +1,8 @@
 import { observable, IObjectWillChange, IObjectChange } from "mobx"
 import { Property } from "./property"
 import { getMSTAdministration, maybeMST, valueToSnapshot, escapeJsonPath } from "../../core"
-import { IType, IContext, IValidationResult } from "../type"
+import { IType } from "../type"
+import { IContext, IValidationResult, getContextForPath } from "../type-checker"
 
 export class ValueProperty extends Property {
     constructor(propertyName: string, public type: IType<any, any>) {
@@ -44,6 +45,6 @@ export class ValueProperty extends Property {
     }
 
     validate(snapshot: any, context: IContext): IValidationResult {
-        return this.type.validate(snapshot[this.name], context.concat([ {path: this.name, type: this.type} ]))
+        return this.type.validate(snapshot[this.name], getContextForPath(context, this.name, this.type))
     }
 }

@@ -1,4 +1,5 @@
-import {Type, IType, IContext, IValidationResult, typecheck} from "../type"
+import {Type, IType} from "../type"
+import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export type IFunctionReturn<T> = () => T
 export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>
@@ -32,9 +33,9 @@ export class OptionalValue<S, T> extends Type<S, T> {
     validate(value: any, context: IContext): IValidationResult {
         // defaulted values can be skipped
         if (value === undefined || this.type.is(value)) {
-            return []
+            return typeCheckSuccess()
         }
-        return [{ value, context }]
+        return typeCheckFailure(context, value)
     }
 
     get identifierAttribute() {
