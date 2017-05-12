@@ -1,6 +1,6 @@
 # mobx-state-tree
 
-_Opinionated, transactional, MobX powered state container_
+_Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX_
 
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
@@ -20,39 +20,98 @@ _Opinionated, transactional, MobX powered state container_
 
 `mobx-state-tree` is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
 
-Put simply, mobx-state-tree tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
+Simply put, mobx-state-tree tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
 Unlike MobX itself, mobx-state-tree is very opinionated on how data should be structured and updated.
 This makes it possible to solve many common problems out of the box.
 
-Central in MST (mobx-state-tree) is the concept of a *living tree*. The tree consists of mutable, but strictly protected objects enriched with _runtime type information_.
-From this living tree, (structurally shared) snapshots are generated automatically.
+Central in MST (mobx-state-tree) is the concept of a *living tree*. The tree consists of mutable, but strictly protected objects enriched with _runtime type information_. In other words; each tree has a _shape_ (type information) and _state_ (data).
+From this living tree, immutable, structurally shared, snapshots are generated automatically.
 
-(example)
+```javascript
+import { types, onSnapshot } from "mobx-state-tree"
+
+const Todo = types.model("Todo", {
+    title: types.string,
+    done: false
+}, {
+    toggle() {
+        this.done = !this.done
+    }
+})
+
+const Store = types.model("Store", {
+    todos: types.array(Todo)
+})
+
+// create an instance from a snapshot
+const store = Store.create({ todos: [{
+    title: "Get coffee"
+}]})
+
+// listen to new snapshots
+onSnapshot(store, (snapshot) => {
+    console.dir(snapshot)
+})
+
+// invoke action that modifies the tree
+store.todos[0].toggle()
+// prints: `{ todos: [{ title: "Get coffee", done: true }]}`
+```
 
 By using the type information available; snapshots can be converted to living trees and vice versa with zero effort.
-Because of this, [time travelling](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/time.js) is supported out of the box, and tools like HMR are trivial to support.
-
-(example)
+Because of this, [time travelling](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/time.js) is supported out of the box, and tools like HMR are trivial to support [example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/boxes/src/stores/domain-state.js#L94).
 
 The type information is designed in such a way that it is used both at design- and run-time to verify type correctness (Design time type checking is TypeScript only atm, Flow PR's are welcome!)
 
-(screenshot)
+```
+[mobx-state-tree] Value '{\"todos\":[{\"turtle\":\"Get tea\"}]}' is not assignable to type: Store, expected an instance of Store or a snapshot like '{ todos: { title: string; done: boolean }[] }' instead.
+```
 
-Because state trees are living, mutable models actions are straight-forward to write.
+_Runtime type error_
 
-(Example)
+![typescript error](docs/tserror.png)
 
-But fear not; actions have many interesting properties.
+_Designtime type error_
+
+Because state trees are living, mutable models actions are straight-forward to write; just modify local instance properties where appropiate. See `toggleTodo()` above or the examples below. It is not needed to produce a new state tree yourself, MST's snapshot functionality will derive one for you automatically.
+
+Although mutable sounds scare to some, fear not; actions have many interesting properties.
 By default trees cannot only be modified by using an action that belongs to the same subtree.
 Furthermore actions are replayable and can be used as means to distribute changes ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
 
 Moreover; since changes can be detected on a fine grained level. JSON patches are supported out of the box.
 Simply subscribing to the patch stream of a tree is another way to sync diffs with for example back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
 
-Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](todo) and [mobx-react](todo). But even cooler; because it supports snapshots, middleware and replayable actions out of the box. It is even possible to replace a Redux store and reducer with a MobX state tree. This makes it even possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](todo).
+(screenshot of patches being emitted)
+
+Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](github.com/mobxjs/mobx-react).
+But even cooler; because it supports snapshots, middleware and replayable actions out of the box, it is even possible to replace a Redux store and reducer with a MobX state tree.
+This makes it even possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/redux-todomvc/src/index.js#L6).
+
+(screenshot)
 
 Finally, MST has built-in support for references, identifiers, dependency injection, change recording and circular type definitions (even across files).
 Even fancier; it analyses liveleness of objects, failing early when you try to access accidentally cached information! (More on that later)
+
+A pretty unique feature of MST is that it offers livelyness guarantees; it will throw when reading or writing from objects that are for whatever reason
+no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
+
+const oldTodo = store.todos[0]
+store.removeTodo(0)
+
+```javascript
+function logTodo(todo) {
+    setTimeout(
+        () => console.log(todo.title),
+        1000
+    )
+)
+
+logTodo(store.todos[0])
+store.removeTodo(0)
+// throws exception in one second for using an stale object!
+```
+
 
 Despite all that, you will see that the [API](api.md) is pretty straight forward!
 
