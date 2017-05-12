@@ -22,6 +22,7 @@ import { getPrimitiveFactoryFromValue } from "../primitives"
 import { optional } from "../utility-types/optional"
 import { isReferenceFactory } from "../utility-types/reference"
 import { isIdentifierFactory, IIdentifierDescriptor } from "../utility-types/identifier"
+import { Late } from "../utility-types/late"
 import { Property } from "../property-types/property"
 import { IdentifierProperty } from "../property-types/identifier-property"
 import { ReferenceProperty } from "../property-types/reference-property"
@@ -267,5 +268,8 @@ export function getIdentifierAttribute(type: IType<any, any>): string | null {
     // TODO: this should be a general property of types
     if (type instanceof ObjectType)
         return type.identifierAttribute
+    if (type instanceof Late)
+      return (type as any).definition().identifierAttribute
+
     return null
 }
