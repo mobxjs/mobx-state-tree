@@ -8,9 +8,12 @@ _Opinionated, transactional, MobX powered state container combining the best fea
 
 # Contents
 
-* [Philosophy & Overview](#philosophy_&_overview)
-* [Short types overview](#types_overview)
-* [Short api overview](#api_overview)
+* [Installation](#installation)
+* [Philosophy & Overview](#philosophy--overview)
+* [Concepts](#concepts)
+* [Short types overview](#types-overview)
+* [Short api overview](#api-overview)
+* [FAQ](#FAQ)
 * [Full Api Docs](API.md)
 * [Changelog](changelog.md)
 
@@ -438,7 +441,48 @@ Property types can only be used as direct member of a `types.model` type and not
 
 # Api overview
 
+| signature | |
+| ---- | --- |
+| `addDisposer(node, () => void) ` | Function to be invoked whenever the target node is to be destroyed |
+| `addMiddleware(node, middleware: (actionDescription, next) => any)` | Attaches middleware to a node. See [actions](#actions). Returns disposer. |
+| `applyAction(node, actionDescription)` | Replays an action on the targeted node |
+| `applyPatch(node, jsonPatch)` | Applies a JSON patch to a node in the tree |
+| `applySnapshot(node, snapshot)` | Updates a node with the given snapshot |
+| `asReduxStore(node)` | Wraps a node in a Redux store compatible api |
+| `clone(node, keepEnvironment?: true | false | newEnvironment)` | Creates a full clone of a certain node. By default preserves the same environment |
+| `connectReduxDevtools(removeDevModule, node)` | Connects a node to the redux development tools [example](https://github.com/mobxjs/mobx-state-tree/blob/b01fe97d427ca664f7ecc99349d10e58d08d2d98/examples/redux-todomvc/src/index.js)  |
+| `destroy(node)` | Kills a node, making it unusable. Removes it from any parent in the process |
+| `detach(node)` | Removes a node from it's current parent, and let's it live on as stand alone tree |
+| `getChildType(node, property?)` | Returns the declared type of the given property of a node. For arrays and maps `property` can be omitted as they all have the same type |
+| `getEnv(node)` | Returns the environment of the given node, see [environments](#environments) |
+| `getParent(node, depth=1)` | Returns the intermediate parent of the given node, or a higher one if `depth > 1` |
+| `getPath(node)` | Returns the path of a certain node in the tree |
+| `getPathParts(node)` | Returns the path of a certain node in the tree, unescaped as separate parts |
+| `getRelativePath(base, target)` | Returns the short path which one could use to walk from node `base` to node `target`, assuming they are in the same tree. Up is represented as `../` |
+| `getRoot(node)` | Returns the root element of the tree containing `node` |
+| `getSnapshot(node)` | Returns the snapshot of provided node. See [snapshots](#snapshots) |
+| `getType(node)` | Returns the type of the given node |
+| `hasParent(node, depth=1)` | Returns `true` if the node has a parent at the given `depth` |
+| `isAlive(node)` | Returns `true` if the node hasn't died yet |
+| `isMST(value)` | Returns `true` if the value is a node of a mobx-state-tree |
+| `isProtected(value)` | Returns `true` if the given node is protected, see [actions](#actions) |
+| `isRoot(node)` | Returns true if the has no parents  |
+| `joinJsonPath(parts)` | Joins and escapes the given path parts into a json path |
+| `onAction(node, (actionDescription) => void` | A built-in middleware that calls the provided callback with an action description upon each invocation. Returns disposer |
+| `onPatch(node, (patch) => void)` | Attach a JSONPatch listener, that is invoked for each change in the tree. Returns disposer |
+| `onSnapshot` | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer |
+| `protect` | Protects an unprotected tree against modifications from outside actions |
+| `recordActions(node)` | Creates a recorder that listens to all actions in the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
+| `recordPatches` | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree |
+| `resolve(node, path)` | Resolves a `path` (json path) relatively to the given `node` |
+| `splitJsonPath(path)` | Splits and unescapes the given json path into path parts |
+| `tryResolve(node, path)` | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
+| `unprotect(node)` | Unprotects a node, making it possible to directly modify any value in the subtree, without actions |
+| `walk(startNode, (node) => void)` | Performs a depth-first walk through a tree |
 
+A _disposer_ is a function that cancels the effect it was created for.
+
+# FAQ
 
 ## Single or multiple state
 
@@ -446,11 +490,6 @@ Property types can only be used as direct member of a `types.model` type and not
 
 ## Integrations
 
-# Examples
-
-# Environments
-
-# FAQ
 
 **Should all state of my app be stored in `mobx-state-tree`?**
 No, or, not necessarily. An application can use both state trees and vanilla MobX observables at the same time.
