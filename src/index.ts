@@ -2,6 +2,11 @@
 import "./types/type"
 import "./types/complex-types/complex-type"
 
+// TODO: things that should not be exposed (?)
+// TODO: add test to verify exposed api
+// escapeJsonPath
+// unescapeJsonPath
+
 export {
     types, IType
 } from "./types"

@@ -48,6 +48,10 @@ export class IdentifierProperty extends Property {
     }
 
     isValidIdentifier(identifier: any): boolean {
+        // TODO: MWE, I don't think this isValidIdentifier things makes sense.
+        // Who are we to decide? Maybe just rule out empty string
+        // Making types.identifier(types.refinement(types.string, (v) => coolCheck(v))) work would be great!
+        // On the other hand, this avoids problems with json paths, so maybe we should support all identifiers that don't require further escaping?
         if (typeof identifier !== "number" && !isValidIdentifier(identifier))
             return false
         return this.subtype.is(identifier)

@@ -16,7 +16,7 @@ const initialState = {
 }
 const todos = window.todos = todosFactory.create(initialState)
 const store = asReduxStore(todos)
-connectReduxDevtools(require("remotedev"), todos)
+connectReduxDevtools(require("remotedev"), todos) // TODO: would make more sense to pass in `store`?
 
 render(
   <Provider store={store}>

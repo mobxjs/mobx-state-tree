@@ -268,6 +268,7 @@ export function getIdentifierAttribute(type: IType<any, any>): string | null {
     // TODO: this should be a general property of types
     if (type instanceof ObjectType)
         return type.identifierAttribute
+    // TODO: make this a generic utility!
     if (type instanceof Late)
       return (type as any).definition().identifierAttribute
 

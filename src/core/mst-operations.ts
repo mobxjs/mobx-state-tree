@@ -99,7 +99,7 @@ export function applyPatch(target: IMSTNode, patch: IJsonPatch) {
 
 /**
  * Applies a number of JSON patches in a single MobX transaction
- *
+ * TODO: merge with applyPatch
  * @export
  * @param {Object} target
  * @param {IJsonPatch[]} patches
@@ -133,6 +133,7 @@ export function recordPatches(subject: IMSTNode): IPatchRecorder {
 
 /**
  * Applies a series of actions in a single MobX transaction.
+ * TODO: just merge with applyAction
  *
  * Does not return any value
  *
@@ -186,10 +187,12 @@ export function recordActions(subject: IMSTNode): IActionRecorder {
  * todo.toggle() // OK
  */
 export function protect(target: IMSTNode) {
+    // TODO: verify that no parent is unprotectd, as that would be a noop
     getMSTAdministration(target).isProtectionEnabled = true
 }
 
 export function unprotect(target: IMSTNode) {
+    // TODO: verify that any node in the given tree is unprotected
     getMSTAdministration(target).isProtectionEnabled = false
 }
 
@@ -327,6 +330,7 @@ export function isRoot(target: IMSTNode): boolean {
  */
 export function resolve(target: IMSTNode, path: string): IMSTNode | any {
     // TODO: give better error messages!
+    // TODO: also accept path parts
     const node = getMSTAdministration(target).resolve(path)
     return node ? node.target : undefined
 }
@@ -374,6 +378,7 @@ export function clone<T extends IMSTNode>(source: T, keepEnvironment: boolean | 
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
 export function detach<T extends IMSTNode>(thing: T): T {
+    // TODO: should throw if it cannot be removed from the parent? e.g. parent type wouldn't allow that
     getMSTAdministration(thing).detach()
     return thing
 }
@@ -383,6 +388,7 @@ export function detach<T extends IMSTNode>(thing: T): T {
  */
 export function destroy(thing: IMSTNode) {
     const node = getMSTAdministration(thing)
+    // TODO: should throw if it cannot be removed from the parent? e.g. parent type wouldn't allow that
     if (node.isRoot)
         node.die()
     else
@@ -416,7 +422,7 @@ export function walk(thing: IMSTNode, processor: (item: IMSTNode) => void) {
     processor(node.target)
 }
 
-// TODO: remove or to test utils?
+// TODO: remove
 export function testActions<S, T>(factory: IType<S, IMSTNode>, initialState: S, ...actions: ISerializedActionCall[]): S {
     const testInstance = factory.create(initialState) as T
     applyActions(testInstance, actions)

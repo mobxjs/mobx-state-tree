@@ -47,6 +47,10 @@ export class MSTAdministration {
         this.target = initialState
         this._environment = environment
 
+        // optimization: don't keep the snapshot by default alive with a reaction by default
+        // in prod mode. This saves lot of GC overhead (important for e.g. React Native)
+        // if the feature is not actively used
+        // downside; no structural sharing if getSnapshot is called incidently
         const snapshotDisposer = reaction(() => this.snapshot, snapshot => {
             this.snapshotSubscribers.forEach(f => f(snapshot))
         })
