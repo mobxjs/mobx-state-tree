@@ -295,3 +295,44 @@ test("it handles complex types correctly", t => {
 
     t.is(true, true) // supress no asserts warning
 })
+
+test("it should provide detailed reasons why the value is not appicable", t => {
+    const Todo = types.model({
+        title: types.string
+    }, {
+        setTitle(v: string) {
+
+        }
+    })
+
+    const Store = types.model({
+        todos: types.map(Todo),
+        get amount() {
+            // double check, not available design time:
+            /// this.setAmount()
+            return this.todos.size
+        },
+        getAmount(): number {
+            return this.todos.size + this.amount
+        }
+    }, {
+        setAmount() {
+            const x: number = this.todos.size + this.amount + this.getAmount
+        }
+    })
+
+    t.throws(() => Store.create({
+        todos: {
+            "1":{
+                title: true,
+                setTitle: "hello"
+            }
+        },
+        amount: 1,
+        getAmount: "hello"
+    }), `[mobx-state-tree] Error while converting {"todos":{"1":{"title":true,"setTitle":"hello"}},"amount":1,"getAmount":"hello"} to AnonymousModel:
+at path "/title" snapshot true is not assignable to type: string.
+at path "/setTitle" snapshot "hello" is not assignable  (Action properties should not be provided in the snapshot).
+at path "/amount" snapshot 1 is not assignable  (Computed properties should not be provided in the snapshot).
+at path "/getAmount" snapshot "hello" is not assignable  (View properties should not be provided in the snapshot).`)
+})
