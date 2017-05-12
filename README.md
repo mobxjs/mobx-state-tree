@@ -6,7 +6,12 @@ _Opinionated, transactional, MobX powered state container combining the best fea
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/mobxjs/mobx.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-* [Api Docs](API.md)
+# Contents
+
+* [Philosophy & Overview](#philosophy_&_overview)
+* [Short types overview](#types_overview)
+* [Short api overview](#api_overview)
+* [Full Api Docs](API.md)
 * [Changelog](changelog.md)
 
 # Installation
@@ -16,7 +21,7 @@ _Opinionated, transactional, MobX powered state container combining the best fea
 * CDN: https://unpkg.com/mobx-state-tree/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
 * JSBin [playground](http://jsbin.com/petoxeheta/edit?html,js,console) (without UI)
 
-# Philosophy
+# Philosophy & Overview
 
 `mobx-state-tree` is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
 
@@ -388,7 +393,41 @@ See [#10](https://github.com/mobxjs/mobx-state-tree/issues/10)
 
 TODO: document
 
-## LifeCycle hooks
+
+# Types overview
+
+These are the types available in MST. All types can be found in the `types` namespace, e.g. `types.string`. See [Api Docs](API.md) for examples.
+
+## Complex types
+
+* `types.model(properties, actions)` Defines a "class like" type, with properties and actions to operate on the object.
+* `types.array(type)` Declares an array of the specified type
+* `types.map(type)` Declares an map of the specified type
+
+## Primitive types
+
+* `types.string`
+* `types.number`
+* `types.boolean`
+* `types.Date`
+
+## Utility types
+
+* `types.union(dispatcher?, types...)` create a union of multiple types. If the correct type cannot be inferred unambigously from a snapshot, provide a dispatcher function.
+* `types.optional(type, defaultValue)` marks an value as being optional (in e.g. a model). If a value is not provided the `defaultValue` will be used instead. If `defaultValue` is a function, it will be evaluated. This can be used to generate for example id's or timestamps upon creation.
+* `types.literal(value)` can be used to create a literal type, a type which only possible value is specifically that value, very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
+* `types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific then the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
+* `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(null)), null)`.
+* `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
+* `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is immutable.
+
+## Property types
+
+Property types can only be used as direct member of a `types.model` type and not further composed (for now).
+* `types.identifier(subType?)` Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](#identifiers) for more details. `subType` should be either `types.string` or `types.number`, defaulting to the first if not specified.
+* `types.reference(targetType, basePath?)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
+
+## LifeCycle hooks for `types.model`
 
 | Hook            | Meaning                                                                                                                                                   |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -396,6 +435,10 @@ TODO: document
 | `afterAttach`   | As soon as the _direct_ parent is assigned (this node is attached to an other node)                                                                       |
 | `beforeDetach`  | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used             |
 | `beforeDestroy` | Before the node is destroyed as a result of calling `destroy` or removing or replacing the node from the tree. Child destructors will fire before parents |
+
+# Api overview
+
+
 
 ## Single or multiple state
 
