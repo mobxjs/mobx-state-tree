@@ -27,11 +27,11 @@ export class Refinement extends Type<any, any> {
         return inst
     }
 
-    validate(snapshot: any, context: IContext): IValidationResult {
-        if (this.type.is(snapshot) && this.predicate(snapshot)) {
+    validate(value: any, context: IContext): IValidationResult {
+        if (this.type.is(value) && this.predicate(value)) {
             return []
         }
-        return [{ snapshot, context }]
+        return [{ value, context }]
     }
 
     get identifierAttribute() {

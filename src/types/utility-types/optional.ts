@@ -29,12 +29,12 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.create(value)
     }
 
-    validate(snapshot: any, context: IContext): IValidationResult {
+    validate(value: any, context: IContext): IValidationResult {
         // defaulted values can be skipped
-        if (snapshot === undefined || this.type.is(snapshot)) {
+        if (value === undefined || this.type.is(value)) {
             return []
         }
-        return [{ snapshot, context }]
+        return [{ value, context }]
     }
 
     get identifierAttribute() {

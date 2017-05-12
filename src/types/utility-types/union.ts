@@ -33,11 +33,11 @@ export class Union extends Type<any, any> {
         return applicableTypes[0].create(value)
     }
 
-    validate(snapshot: any, context: IContext): IValidationResult {
-        if (this.types.some(type => type.is(snapshot))) {
+    validate(value: any, context: IContext): IValidationResult {
+        if (this.types.some(type => type.is(value))) {
             return []
         }
-        return [{ snapshot, context }]
+        return [{ value, context }]
     }
 
     get identifierAttribute() {

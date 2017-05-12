@@ -19,11 +19,11 @@ export class CoreType<T> extends Type<T, T> {
         return value
     }
 
-    validate(snapshot: any, context: IContext): IValidationResult {
-        if (isPrimitive(snapshot) && this.checker(snapshot)) {
+    validate(value: any, context: IContext): IValidationResult {
+        if (isPrimitive(value) && this.checker(value)) {
             return []
         }
-        return [{ snapshot, context }]
+        return [{ value, context }]
     }
 
     get identifierAttribute() {

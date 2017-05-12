@@ -180,13 +180,13 @@ export class ObjectType extends ComplexType<any, any> {
         return (this.props[key] as ValueProperty).type
     }
 
-    isValidSnapshot(snapshot: any, context: IContext): IValidationResult {
-        if (!isPlainObject(snapshot)) {
-            return [{snapshot, context}]
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
+        if (!isPlainObject(value)) {
+            return [{value, context}]
         }
 
         return Object.keys(this.props).map(
-            (path) => this.props[path].validate(snapshot, context)
+            (path) => this.props[path].validate(value, context)
         ).reduce(
             (a, e) => a.concat(e)
         , [])

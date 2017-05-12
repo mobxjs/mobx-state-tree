@@ -39,9 +39,9 @@ test("it should throw if default value is invalid snapshot", t => {
         types.model({
             rows: types.optional(types.array(Row), [{}])
         })
-    })
-
-    t.is(error.message, "[mobx-state-tree] Value \'[{}]\' is not assignable to type: AnonymousModel[], expected an instance of AnonymousModel[] or a snapshot like \'{ name: string; quantity: number }[]\' instead.")
+    }, `[mobx-state-tree] Error while converting [{}] to AnonymousModel[]:
+at path "/name" snapshot undefined is not assignable to type: string.
+at path "/quantity" snapshot undefined is not assignable to type: number.`)
 })
 
 test("it should accept a function to provide dynamic values", t => {

@@ -143,12 +143,12 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return this.subType
     }
 
-    isValidSnapshot(snapshot: any, context: IContext): IValidationResult {
-        if (!Array.isArray(snapshot)) {
-            return [{ context, snapshot }]
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
+        if (!Array.isArray(value)) {
+            return [{ context, value }]
         }
 
-        return snapshot.map(
+        return value.map(
             (item, index) => this.subType.validate(item, context.concat([ {path: "" + index, type: this.subType} ]))
         ).reduce(
             (a, e) => a.concat(e)

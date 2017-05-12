@@ -44,11 +44,11 @@ export class ReferenceProperty extends Property {
         (instance[this.name + "$value"] as Reference).setNewValue(snapshot[this.name])
     }
 
-    validate(snapshot: any, context: IContext): IValidationResult {
+    validate(value: any, context: IContext): IValidationResult {
         // TODO: and check name is string or $ref object
-        if (this.name in snapshot) {
+        if (this.name in value) {
             return []
         }
-        return [{ snapshot, context: context.concat([ {path: this.name, type: this.type} ]) }]
+        return [{ value, context: context.concat([ {path: this.name, type: this.type} ]) }]
     }
 }

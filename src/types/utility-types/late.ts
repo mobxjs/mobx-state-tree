@@ -26,9 +26,9 @@ export class Late<S, T> extends Type<S, T> {
         return this.subType.name
     }
 
-    validate(snapshot: any, context: IContext): IValidationResult {
-        if (!this.subType.is(snapshot)) {
-            return [{ context, snapshot }]
+    validate(value: any, context: IContext): IValidationResult {
+        if (!this.subType.is(value)) {
+            return [{ context, value }]
         }
         return []
     }

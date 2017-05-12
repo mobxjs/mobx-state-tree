@@ -165,7 +165,8 @@ test("#66 - it should pick the correct type of defaulted fields", t => {
     unprotect(a)
 
     t.is(a.name, "boo")
-    t.throws(() => a.name = 3 as any, `[mobx-state-tree] Value '3' is not assignable to type: string.`)
+    t.throws(() => a.name = 3 as any, `[mobx-state-tree] Error while converting 3 to string:
+snapshot 3 is not assignable to type: string.`)
 })
 
 test("cannot create factories with null values", t => {

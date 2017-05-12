@@ -1,5 +1,14 @@
 # 0.6.0
 
+* Improved reporting of Type.is(), now it returns a fine grained report of why the provided value is not applicable.
+```
+[mobx-state-tree] Error while converting [{}] to AnonymousModel[]:
+at path "/name" snapshot undefined is not assignable to type: string.
+at path "/quantity" snapshot undefined is not assignable to type: number.
+```
+
+# 0.6.0
+
 * **BREAKING** `types.withDefault` has been renamed to `types.optional`
 * **BREAKING** Array and map types can no longer be left out of snapshots by default. Use `optional` to make them optional in the snapshot
 * **BREAKING** Literals no longer have a default value by default (use optional + literal instead)

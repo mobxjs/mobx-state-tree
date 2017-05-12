@@ -18,11 +18,11 @@ export class Literal<T> extends Type<T, T> {
         return JSON.stringify(this.value)
     }
 
-    validate(snapshot: any, context: IContext): IValidationResult {
-        if (isPrimitive(snapshot) && snapshot === this.value) {
+    validate(value: any, context: IContext): IValidationResult {
+        if (isPrimitive(value) && value === this.value) {
             return []            
         }
-        return [{ snapshot, context }]
+        return [{ value, context }]
     }
 
     get identifierAttribute() {

@@ -54,14 +54,14 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
 
     validate(value: any, context: IContext): IValidationResult {
         if (!value || typeof value !== "object")
-            return [{ snapshot: value, context }]
+            return [{ value: value, context }]
         if (isMST(value)) {
-            return getType(value) === this ? [] : [{ snapshot: value, context }]
+            return getType(value) === this ? [] : [{ value: value, context }]
             // it is tempting to compare snapshots, but in that case we should always clone on assignments...
         }
         return this.isValidSnapshot(
             value,
-            [{path: "", type: this}]
+            [{ path: "", type: this }]
         )
     }
 }

@@ -31,9 +31,9 @@ export class Frozen<T> extends Type<T, T> {
         return isMutable(value) ? freeze(value) : value
     }
 
-    validate(snapshot: any, context: IContext): IValidationResult {
-        if (!isSerializable(snapshot)) {
-            return [ {snapshot, context} ]
+    validate(value: any, context: IContext): IValidationResult {
+        if (!isSerializable(value)) {
+            return [ {value, context} ]
         }
         return []
     }

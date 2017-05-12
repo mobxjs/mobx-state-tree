@@ -17,7 +17,7 @@ export class ActionProperty extends Property {
 
     validate(snapshot: any, context: IContext): IValidationResult {
         if( this.name in snapshot ) {
-            return [{ context: context.concat([ { path: this.name } ]), snapshot: snapshot[this.name], message: "Action properties should not be provided in the snapshot" }]
+            return [{ context: context.concat([ { path: this.name } ]), value: snapshot[this.name], message: "Action properties should not be provided in the snapshot" }]
         }
 
         return []

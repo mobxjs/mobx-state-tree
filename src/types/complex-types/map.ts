@@ -182,13 +182,13 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         return this.subType
     }
 
-    isValidSnapshot(snapshot: any, context: IContext): IValidationResult {
-        if (!isPlainObject(snapshot)) {
-            return [{snapshot, context}]
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
+        if (!isPlainObject(value)) {
+            return [{value, context}]
         }
 
-        return Object.keys(snapshot).map(
-            (path) => this.subType.validate(snapshot[path], context.concat([{ path, type: this.subType }]))
+        return Object.keys(value).map(
+            (path) => this.subType.validate(value[path], context.concat([{ path, type: this.subType }]))
         ).reduce(
             (a, e) => a.concat(e)
         , [])

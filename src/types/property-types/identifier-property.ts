@@ -45,7 +45,7 @@ export class IdentifierProperty extends Property {
 
     validate(snapshot: any, context: IContext): IValidationResult {
         if ( !this.isValidIdentifier(snapshot[this.name])) {
-            return [{ context: context.concat([ { path: this.name } ]), snapshot: snapshot[this.name], message: "The provided identifier is not valid" }]
+            return [{ context: context.concat([ { path: this.name, type: this.subtype } ]), value: snapshot[this.name], message: "The provided identifier is not valid" }]
         }
 
         return []
