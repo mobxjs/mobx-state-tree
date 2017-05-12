@@ -236,3 +236,41 @@ test("122 - identifiers should support numbers as well", t => {
     t.is(F.is({ id: 4 }), true)
     t.is(F.is({ id: "4" }), false)
 })
+
+test("self reference with a late type", t => {
+    const values: string[] = []
+    interface IBook {
+        id: string,
+        genre: string,
+        reference: IBook
+    }
+
+    const Book = types.model("Book", {
+      id: types.identifier(),
+      genre: types.string ,
+      reference: types.reference(types.late<any, IBook>(() => Book), '../../books')
+    })
+
+    const Store = types.model("Store", {
+        books: types.array(Book)
+      },
+      {
+        addBook(book) {
+          this.books.push(book)
+        }
+    })
+
+    const s = Store.create({
+        books: [{ id: "1", genre: "thriller", reference: "" }]
+    })
+
+    const book2 = Book.create({
+        id: "2",
+        genre: "romance",
+        reference: s.books[0]
+    })
+
+    s.addBook(book2)
+
+    t.is((s as any).books[1].reference.genre, "thriller")
+})
