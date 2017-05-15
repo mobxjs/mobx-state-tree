@@ -2,7 +2,8 @@ import {
     action, observable,
     computed, reaction
 } from "mobx"
-import { typecheck, IType } from "../types/type"
+import { IType } from "../types/type"
+import { typecheck } from "../types/type-checker"
 import { isMST, getMSTAdministration } from "./mst-node"
 import { IMiddleWareHandler } from "./action"
 import {

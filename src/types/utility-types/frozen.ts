@@ -1,4 +1,5 @@
 import { ISimpleType, Type } from "../type"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { invariant, isMutable, isSerializable, isPlainObject } from "../../utils"
 
 function freeze(value: any) {
@@ -31,8 +32,11 @@ export class Frozen<T> extends Type<T, T> {
         return isMutable(value) ? freeze(value) : value
     }
 
-    is(value: any): value is T {
-        return isSerializable(value)
+    validate(value: any, context: IContext): IValidationResult {
+        if (!isSerializable(value)) {
+            return typeCheckFailure(context, value)
+        }
+        return typeCheckSuccess()
     }
 
     get identifierAttribute() {

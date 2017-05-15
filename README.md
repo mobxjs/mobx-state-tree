@@ -554,3 +554,6 @@ type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { 
 ## Circular dependencies:
 
 `types.late(() => require("./OtherType"))`
+
+## Thanks
+Thanks to @gcanti who inspired lot of the Type and validation API!

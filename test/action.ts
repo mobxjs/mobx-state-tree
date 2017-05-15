@@ -106,7 +106,8 @@ test("it should not be possible to set the wrong type", t => {
         () => {
             store.orders[0].setCustomer(store.orders[0])
         }, // wrong type!
-        `[mobx-state-tree] Value of type Order: '{"customer":null}' is not assignable to type: Customer, expected an instance of Customer or a snapshot like '{ name: string }' instead.`
+        `[mobx-state-tree] Error while converting <Order@/orders/0> to \`Customer\`:
+value of type Order: <Order@/orders/0> is not assignable to type: \`Customer\`, expected an instance of \`Customer\` or a snapshot like \`{ name: string }\` instead.`
     )
 })
 

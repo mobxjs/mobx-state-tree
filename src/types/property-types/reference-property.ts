@@ -3,6 +3,7 @@ import { addHiddenFinalProp } from "../../utils"
 import { getMSTAdministration, escapeJsonPath } from "../../core"
 import { IType } from "../type"
 import { Reference } from "../../core/reference"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, getContextForPath } from "../type-checker"
 
 export class ReferenceProperty extends Property {
     constructor(propertyName: string, private type: IType<any, any>, private basePath: string) {
@@ -44,8 +45,11 @@ export class ReferenceProperty extends Property {
         (instance[this.name + "$value"] as Reference).setNewValue(snapshot[this.name])
     }
 
-    isValidSnapshot(snapshot: any) {
+    validate(value: any, context: IContext): IValidationResult {
         // TODO: and check name is string or $ref object
-        return this.name in snapshot
+        if (this.name in value) {
+            return typeCheckSuccess()
+        }
+        return typeCheckFailure(getContextForPath(context, this.name, this.type), undefined, "Reference is required.")
     }
 }

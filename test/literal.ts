@@ -6,17 +6,15 @@ test("it should allow only primitives", t => {
         types.model({
             complexArg: types.literal({a: 1})
         })
-    })
-
-    t.is(error.message, "[mobx-state-tree] Literal types can be built only on top of primitives")
+    }, "[mobx-state-tree] Literal types can be built only on top of primitives")
 })
 
 test("it should fail if not optional and no default provided", (t) => {
     const Factory = types.literal("hello")
-    const ex = t.throws(() => {
+    t.throws(() => {
         Factory.create()
-    })
-    t.deepEqual(ex.message, "[mobx-state-tree] Value \'undefined\' is not assignable to type: hello, expected an instance of hello or a snapshot like \'\"hello\"\' instead.")
+    }, `[mobx-state-tree] Error while converting \`undefined\` to \`hello\`:
+value \`undefined\` is not assignable to type: \`hello\`, expected an instance of \`hello\` or a snapshot like \`"hello"\` instead.`)
 })
 
 test("it should throw if a different type is given", t => {
@@ -26,7 +24,6 @@ test("it should throw if a different type is given", t => {
 
     const error = t.throws(() => {
         Factory.create({ shouldBeOne: 2 })
-    })
-
-    t.is(error.message, `[mobx-state-tree] Value '{"shouldBeOne":2}' is not assignable to type: TestFactory, expected an instance of TestFactory or a snapshot like \'{ shouldBeOne: 1 }\' instead.`)
+    }, `[mobx-state-tree] Error while converting \`{"shouldBeOne":2}\` to \`TestFactory\`:
+at path "/shouldBeOne" value \`2\` is not assignable to type: \`1\`, expected an instance of \`1\` or a snapshot like \`1\` instead.`)
 })

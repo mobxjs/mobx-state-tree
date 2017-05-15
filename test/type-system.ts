@@ -165,7 +165,8 @@ test("#66 - it should pick the correct type of defaulted fields", t => {
     unprotect(a)
 
     t.is(a.name, "boo")
-    t.throws(() => a.name = 3 as any, `[mobx-state-tree] Value '3' is not assignable to type: string.`)
+    t.throws(() => a.name = 3 as any, `[mobx-state-tree] Error while converting \`3\` to \`string\`:
+value \`3\` is not assignable to type: \`string\`.`)
 })
 
 test("cannot create factories with null values", t => {
@@ -293,4 +294,45 @@ test("it handles complex types correctly", t => {
     })
 
     t.is(true, true) // supress no asserts warning
+})
+
+test("it should provide detailed reasons why the value is not appicable", t => {
+    const Todo = types.model({
+        title: types.string
+    }, {
+        setTitle(v: string) {
+
+        }
+    })
+
+    const Store = types.model({
+        todos: types.map(Todo),
+        get amount() {
+            // double check, not available design time:
+            /// this.setAmount()
+            return this.todos.size
+        },
+        getAmount(): number {
+            return this.todos.size + this.amount
+        }
+    }, {
+        setAmount() {
+            const x: number = this.todos.size + this.amount + this.getAmount
+        }
+    })
+
+    t.throws(() => Store.create({
+        todos: {
+            "1":{
+                title: true,
+                setTitle: "hello"
+            }
+        },
+        amount: 1,
+        getAmount: "hello"
+    }), `[mobx-state-tree] Error while converting \`{"todos":{"1":{"title":true,"setTitle":"hello"}},"amount":1,"getAmount":"hello"}\` to \`AnonymousModel\`:
+at path "/todos/1/title" value \`true\` is not assignable to type: \`string\`.
+at path "/todos/1/setTitle" value \`"hello"\` is not assignable  (Action properties should not be provided in the snapshot).
+at path "/amount" value \`1\` is not assignable  (Computed properties should not be provided in the snapshot).
+at path "/getAmount" value \`"hello"\` is not assignable  (View properties should not be provided in the snapshot).`)
 })

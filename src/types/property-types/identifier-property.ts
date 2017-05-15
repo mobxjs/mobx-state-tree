@@ -2,7 +2,8 @@ import { getMSTAdministration } from "../../core"
 import { extendObservable, observable, IObjectWillChange } from "mobx"
 import { Property } from "./property"
 import { isValidIdentifier, fail } from "../../utils"
-import { IType, typecheck } from "../type"
+import { IType } from "../type"
+import { typecheck, IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, getContextForPath } from "../type-checker"
 
 export class IdentifierProperty extends Property {
     subtype: IType<any, any>
@@ -43,8 +44,12 @@ export class IdentifierProperty extends Property {
         instance[this.name] = snapshot[this.name]
     }
 
-    isValidSnapshot(snapshot: any) {
-        return this.isValidIdentifier(snapshot[this.name])
+    validate(snapshot: any, context: IContext): IValidationResult {
+        if (!this.isValidIdentifier(snapshot[this.name])) {
+            return typeCheckFailure(getContextForPath(context, this.name, this.subtype), snapshot[this.name], "The provided identifier is not valid")
+        }
+
+        return typeCheckSuccess()
     }
 
     isValidIdentifier(identifier: any): boolean {

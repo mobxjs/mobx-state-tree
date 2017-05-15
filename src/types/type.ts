@@ -3,6 +3,7 @@ export interface ISnapshottable<S> {}
 export interface IType<S, T> {
     name: string
     is(thing: any): thing is S | T
+    validate(thing: any, context: IContext): IValidationResult
     create(snapshot?: S, environment?: any): T
     isType: boolean
     describe(): string
@@ -28,8 +29,15 @@ export abstract class Type<S, T> implements IType<S, T> {
     }
 
     abstract create(snapshot: any): any
-    abstract is(thing: any): thing is S | T
+    abstract validate(thing: any, context: IContext): IValidationResult
     abstract describe(): string
+
+    is(value: any): value is S | T {
+        return this.validate(
+            value,
+            [{ path: "", type: this }]
+        ).length === 0
+    }
 
     get Type(): T {
         return fail("Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`")
@@ -41,23 +49,6 @@ export abstract class Type<S, T> implements IType<S, T> {
     abstract get identifierAttribute(): string | null
 }
 
-export function typecheck(type: IType<any, any>, value: any): void {
-    if (!type.is(value)) {
-        const currentTypename = maybeMST(value, node => ` of type ${node.type.name}:`, () => "")
-        const isSnapshotCompatible = isMST(value) && type.is(getMSTAdministration(value).snapshot)
-        fail(
-            `Value${currentTypename} '${isSerializable(value) ? JSON.stringify(value) : value}' is not assignable to type: ${type.name}` +
-            (isPrimitiveType(type) || (type instanceof OptionalValue && isPrimitiveType((<OptionalValue<any, any>> type).type))
-                ? `.`
-                : (`, expected an instance of ${type.name} or a snapshot like '${type.describe()}' instead.` +
-                    (isSnapshotCompatible ? " (Note that a snapshot of the provided value is compatible with the targeted type)" : "")
-                )
-            )
-        )
-    }
-}
-
-import { fail, isSerializable } from "../utils"
-import { getMSTAdministration, IMSTNode, isMST, maybeMST } from "../core/mst-node"
-import { isPrimitiveType } from "./primitives"
-import { OptionalValue } from "./utility-types/optional"
+import { fail } from "../utils"
+import { IMSTNode } from "../core/mst-node"
+import { IContext, IValidationResult } from "./type-checker"

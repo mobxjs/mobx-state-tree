@@ -1,5 +1,6 @@
 import { invariant } from "../../utils"
 import { Type, IType } from "../type"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>
@@ -26,8 +27,11 @@ export class Late<S, T> extends Type<S, T> {
         return this.subType.name
     }
 
-    is(value: any): value is T {
-        return this.subType.is(value)
+    validate(value: any, context: IContext): IValidationResult {
+        if (!this.subType.is(value)) {
+            return typeCheckFailure(context, value)
+        }
+        return typeCheckSuccess()
     }
 
     get identifierAttribute() {

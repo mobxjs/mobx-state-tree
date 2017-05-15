@@ -2,6 +2,7 @@ import { extras } from "mobx"
 import { addHiddenFinalProp, createNamedFunction } from "../../utils"
 import { IMSTNode, getMSTAdministration } from "../../core"
 import { Property } from "./property"
+import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getContextForPath } from "../type-checker"
 
 export class ViewProperty extends Property {
     invokeView: Function
@@ -15,8 +16,12 @@ export class ViewProperty extends Property {
         addHiddenFinalProp(target, this.name, this.invokeView.bind(target))
     }
 
-    isValidSnapshot(snapshot: any) {
-        return !(this.name in snapshot)
+    validate(snapshot: any, context: IContext): IValidationResult {
+        if ( this.name in snapshot ) {
+            return typeCheckFailure(getContextForPath(context, this.name), snapshot[this.name], "View properties should not be provided in the snapshot")
+        }
+
+        return typeCheckSuccess()
     }
 }
 
