@@ -1,4 +1,4 @@
-# 0.6.0
+# 0.6.1
 
 * Improved reporting of Type.is(), now it returns a fine grained report of why the provided value is not applicable.
 ```
@@ -6,6 +6,7 @@
 at path "/name" snapshot undefined is not assignable to type: string.
 at path "/quantity" snapshot undefined is not assignable to type: number.
 ```
+* Fixed support for `types.reference` in combination with `types.late`, by @robinfehr
 
 # 0.6.0
 
