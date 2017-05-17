@@ -1,6 +1,6 @@
 import {isType, IType, Type} from "../type"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, getContextForPath } from "../type-checker"
-import {invariant, fail} from "../../utils"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors, typecheck } from "../type-checker"
+import {fail} from "../../utils"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
@@ -19,7 +19,7 @@ export class Union extends Type<any, any> {
     }
 
     create(value: any) {
-        invariant(this.is(value), `Value ${JSON.stringify(value)} is not assignable to union ${this.name}`)
+        typecheck(this, value)
 
         // try the dispatcher, if defined
         if (this.dispatcher !== null) {
@@ -35,10 +35,21 @@ export class Union extends Type<any, any> {
     }
 
     validate(value: any, context: IContext): IValidationResult {
-        if (this.types.some(type => type.is(value))) {
-            return typeCheckSuccess()
+        if (this.dispatcher !== null) {
+            return this.dispatcher(value).validate(value, context)
         }
-        return typeCheckFailure(context, value)
+
+        const errors = this.types.map(type => type.validate(value, context))
+        const applicableTypes = errors.filter(errorArray => errorArray.length === 0)
+
+        if (applicableTypes.length > 1) {
+            return typeCheckFailure(context, value, "Multiple types are applicable and no dispatch method is defined for the union")
+        } else if (applicableTypes.length < 1) {
+            return typeCheckFailure(context, value, "No type is applicable and no dispatch method is defined for the union")
+                .concat(flattenTypeErrors(errors))
+        }
+
+        return typeCheckSuccess()
     }
 
     get identifierAttribute() {

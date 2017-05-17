@@ -18,19 +18,32 @@ const createTestFactories = () => {
     })
 
     const Plane = types.union(Square, Box)
+    const Heighed = types.union(Box, Cube)
 
-    const DispatchPlane = types.union(snapshot => snapshot && 'height' in snapshot ? Box : Square, Box, Square)
+    const DispatchPlane = types.union(snapshot => snapshot && "height" in snapshot ? Box : Square, Box, Square)
 
-    return {Box, Square, Cube, Plane, DispatchPlane}
+    return {Box, Square, Cube, Plane, DispatchPlane, Heighed}
 }
 
 test("it should complain about no dispatch method", (t) => {
     const {Box, Plane, Square} = createTestFactories()
 
-    const error = t.throws(() => {
-        const doc = Plane.create({width: 2, height: 2})
-    })
-    t.is(error.message, '[mobx-state-tree] Ambiguos snapshot {"width":2,"height":2} for union Box | Square. Please provide a dispatch in the union declaration.')
+    t.throws(() => {
+        Plane.create({width: 2, height: 2})
+    }, `[mobx-state-tree] Error while converting \`{"width":2,"height":2}\` to \`Box | Square\`:
+snapshot \`{"width":2,"height":2}\` is not assignable to type: \`Box | Square\` (Multiple types are applicable and no dispatch method is defined for the union), expected an instance of \`Box | Square\` or a snapshot like \`({ width: number; height: number } | { width: number })\` instead.`)
+})
+
+test("it should complain about no dispatch method and multiple applicable types", (t) => {
+    const {Heighed} = createTestFactories()
+
+    t.throws(() => {
+        Heighed.create({ height: 2 })
+    }, `[mobx-state-tree] Error while converting \`{"height":2}\` to \`Cube | Box\`:
+snapshot \`{"height":2}\` is not assignable to type: \`Cube | Box\` (No type is applicable and no dispatch method is defined for the union), expected an instance of \`Cube | Box\` or a snapshot like \`({ width: number; height: number; depth: number } | { width: number; height: number })\` instead.
+at path "/width" value \`undefined\` is not assignable to type: \`number\`.
+at path "/depth" value \`undefined\` is not assignable to type: \`number\`.
+at path "/width" value \`undefined\` is not assignable to type: \`number\`.`)
 })
 
 test("it should be smart enough to discriminate by keys", (t) => {
