@@ -100,10 +100,21 @@ export function hasOwnProperty(object: Object, propName: string) {
     return prototypeHasOwnProperty.call(object, propName)
 }
 
-export function argsToArray(args: IArguments): any [] {
-    const res = new Array(args.length)
-    for (let i = 0; i < args.length; i++)
-        res[i] = args[i]
+export function getArgNames(fn: Function): any[] {
+    var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+    const ARGUMENT_NAMES = /([^\s,]+)/g
+    const fnStr = fn.toString().replace(STRIP_COMMENTS, '')
+    let result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES)
+    if(result === null)
+      result = []
+    return result
+}
+
+export function getArgs(args: any[], fn: Function): any {
+    const argNames:any[] = getArgNames(fn)
+    const res:any = {}
+    for (let i = 0; i < argNames.length; i++)
+        res[argNames[i]] = args[i]
     return res
 }
 

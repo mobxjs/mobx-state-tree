@@ -72,7 +72,7 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
         const copy: any = {}
         copy.type = action.name
         if (action.args)
-            action.args.forEach((value, index) => copy[index] = value)
+            ((Object as any).values(action.args) as any[]).forEach((value, index) => copy[index] = value)
         remotedev.send(copy, getSnapshot(model))
     })
 }
