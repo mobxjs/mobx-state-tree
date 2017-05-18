@@ -3,7 +3,7 @@ import { action as mobxAction, isObservable } from "mobx"
 export type ISerializedActionCall = {
     name: string;
     path?: string;
-    args?: any[];
+    args?: any;
 }
 
 export type IRawActionCall = {
@@ -12,7 +12,14 @@ export type IRawActionCall = {
     args: any[]
 }
 
-export type IMiddleWareHandler = (actionCall: IRawActionCall, next: (actionCall: IRawActionCall) => any) => any
+export type IMiddlewareActionCall = {
+    name: string;
+    object: any & IMSTNode,
+    args: any[]
+    fn: Function
+}
+
+export type IMiddleWareHandler = (actionCall: IMiddlewareActionCall, next: (actionCall: IMiddlewareActionCall) => any) => any
 
 function runRawAction(actioncall: IRawActionCall): any {
     return actioncall.object[actioncall.name].apply(actioncall.object, actioncall.args)
@@ -29,19 +36,27 @@ function collectMiddlewareHandlers(node: MSTAdministration): IMiddleWareHandler[
     return handlers
 }
 
-function runMiddleWares(node: MSTAdministration, baseCall: IRawActionCall): any {
+function runMiddleWares(node: MSTAdministration, baseCall: IMiddlewareActionCall): any {
     const handlers = collectMiddlewareHandlers(node)
     // Short circuit
     if (!handlers.length)
         return runRawAction(baseCall)
 
-    function runNextMiddleware(call: IRawActionCall): any {
+    function runNextMiddleware(call: IMiddlewareActionCall): any {
         const handler = handlers.shift() // Optimization: counter instead of shift is probably faster
-        if (handler)
+        if (handler) {
             return handler(call, runNextMiddleware)
-        else
-            return runRawAction(call)
+        }
+        else {
+          const rawCall: IRawActionCall = {
+            name: call.name,
+            object: call.object,
+            args: call.args
+          }
+          return runRawAction(rawCall)
+        }
     }
+
     return runNextMiddleware(baseCall)
 }
 
@@ -56,10 +71,11 @@ export function createActionInvoker(name: string, fn: Function) {
             return action.apply(this, arguments)
         } else {
             // outer action, run middlewares and start the action!
-            const call: IRawActionCall = {
+            const call: IMiddlewareActionCall = {
                 name,
                 object: adm.target,
-                args: argsToArray(arguments)
+                args: (Array as any).from(arguments),
+                fn: fn
             }
             const root = adm.root
             root._isRunningAction = true
@@ -76,30 +92,38 @@ export function createActionInvoker(name: string, fn: Function) {
     return createNamedFunction(name, actionInvoker)
 }
 
-function serializeArgument(adm: MSTAdministration, actionName: string, index: number, arg: any): any {
+function serializeArguments(adm: MSTAdministration, actionName: string, args: any): any {
+    const res: any = {};
+    (Object as any).entries(args).forEach(([argName, arg]: [string, any]) => {
+        res[argName] = serializeArgument(adm, actionName, argName, arg)
+    })
+    return res
+}
+
+function serializeArgument(adm: MSTAdministration, actionName: string, argName: string, arg: any): any {
     if (isPrimitive(arg))
         return arg
     if (isMST(arg)) {
         const targetNode = getMSTAdministration(arg)
         if (adm.root !== targetNode.root)
-            throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
+            throw new Error(`Argument ${argName} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
         return ({
             $ref: getRelativePathForNodes(adm, getMSTAdministration(arg))
         })
     }
     if (typeof arg === "function")
-        throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a function`)
+        throw new Error(`Argument ${argName} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a function`)
     if (typeof arg === "object" && !isPlainObject(arg))
-        throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any && (arg as any).constructor) ? (arg as any).constructor.name : "Complex Object"}`)
+        throw new Error(`Argument ${argName} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any && (arg as any).constructor) ? (arg as any).constructor.name : "Complex Object"}`)
     if (isObservable(arg))
-        throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received an mobx observable.`)
+        throw new Error(`Argument ${argName} that was passed to action '${actionName}' should be a primitive, model object or plain object, received an mobx observable.`)
     try {
         // Check if serializable, cycle free etc...
         // MWE: there must be a better way....
         JSON.stringify(arg) // or throws
         return arg
     } catch (e) {
-        throw new Error(`Argument ${index} that was passed to action '${actionName}' is not serializable.`)
+        throw new Error(`Argument ${argName} that was passed to action '${actionName}' is not serializable.`)
     }
 }
 
@@ -130,23 +154,25 @@ export function applyAction(target: IMSTNode, action: ISerializedActionCall): an
     invariant(typeof resolvedTarget[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
-        action.args ? action.args.map(v => deserializeArgument(node, v)) : []
+        action.args ? ((Object as any).values(action.args) as any[]).map(v => deserializeArgument(node, v)) : []
     )
 }
 
 export function onAction(target: IMSTNode, listener: (call: ISerializedActionCall) => void): IDisposer {
-    return addMiddleware(target, (rawCall, next) => {
-        const sourceNode = getMSTAdministration(rawCall.object)
+    return addMiddleware(target, (middlewareCall, next) => {
+        const sourceNode = getMSTAdministration(middlewareCall.object)
+        const args = getArgs(middlewareCall.args, middlewareCall.fn)
+        const serializedArgs = serializeArguments(sourceNode, middlewareCall.name, args)
         listener({
-            name: rawCall.name,
+            name: middlewareCall.name,
             path: getRelativePathForNodes(getMSTAdministration(target), sourceNode),
-            args: rawCall.args.map((arg: any, index: number) => serializeArgument(sourceNode, rawCall.name, index, arg))
+            args: serializedArgs
         })
-        return next(rawCall)
+        return next(middlewareCall)
     })
 }
 
 import { getMSTAdministration, IMSTNode, isMST, getRelativePathForNodes } from "./mst-node"
 import { MSTAdministration } from "./mst-node-administration"
 import { resolve, tryResolve, addMiddleware } from "./mst-operations"
-import { fail, invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"
+import { fail, invariant, isPlainObject, isPrimitive, getArgs, createNamedFunction, IDisposer } from "../utils"

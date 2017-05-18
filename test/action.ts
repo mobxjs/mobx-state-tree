@@ -10,6 +10,10 @@ const Task = types.model({
     toggle() {
         this.done = !this.done
         return this.done
+    },
+    toggleWithArg(arg) {
+        this.done = !this.done
+        return this.done
     }
 })
 
@@ -33,9 +37,9 @@ test("it should be possible to record & replay a simple action", t => {
     t1.toggle()
 
     t.deepEqual(recorder.actions, [
-        { name: "toggle", path: "", args: [] },
-        { name: "toggle", path: "", args: [] },
-        { name: "toggle", path: "", args: [] }
+      { name: "toggle", path: "", args: {} },
+      { name: "toggle", path: "", args: {} },
+      { name: "toggle", path: "", args: {} }
     ])
 
     recorder.replay(t2)
@@ -90,7 +94,7 @@ test("it should be possible to pass a complex object", t => {
 
     t.deepEqual(
         recorder.actions,
-        [{ "name": "setCustomer", "path": "/orders/0", "args": [{ "$ref": "../../customers/0" }] }]
+      [{ "name": "setCustomer", "path": "/orders/0", "args": { customer: { "$ref": "../../customers/0" }}}]
     )
 
     const store2  = createTestStore()
@@ -119,7 +123,7 @@ test("it should not be possible to pass the element of another tree", t => {
         () => {
             store1.orders[0].setCustomer(store2.customers[0])
         },
-        "Argument 0 that was passed to action 'setCustomer' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead"
+        "Argument customer that was passed to action 'setCustomer' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead"
     )
 })
 
@@ -130,13 +134,29 @@ test("it should not be possible to pass an unserializable object", t => {
 
     t.throws(
         () => store.orders[0].setCustomer(circular),
-        "Argument 0 that was passed to action 'setCustomer' is not serializable."
+        "Argument customer that was passed to action 'setCustomer' is not serializable."
     )
 
     t.throws(
         () => store.orders[0].setCustomer(new Buffer("bla")),
-        "Argument 0 that was passed to action 'setCustomer' should be a primitive, model object or plain object, received a Buffer"
+        "Argument customer that was passed to action 'setCustomer' should be a primitive, model object or plain object, received a Buffer"
     )
+})
+
+test("it should not record parameters that are not declared", t => {
+    const t1 = Task.create()
+    const t2 = Task.create()
+
+    const recorder = recordActions(t1)
+
+    ; (t1 as any).toggle({ bla : [ "nuff", ["said" ]]}) // nonsense, but which is not declared within the toggle action
+
+    t.deepEqual(recorder.actions, [
+      { name: "toggle", path: "", args: {} }
+    ])
+
+    recorder.replay(t2)
+    t.is(t2.done, true)
 })
 
 test("it should be possible to pass a complex plain object", t => {
@@ -145,10 +165,10 @@ test("it should be possible to pass a complex plain object", t => {
 
     const recorder = recordActions(t1)
 
-    ; (t1 as any).toggle({ bla : [ "nuff", ["said" ]]}) // nonsense, but serializable!
+    ; (t1 as any).toggleWithArg({ bla : [ "nuff", ["said" ]]}) // nonsense, but serializable
 
     t.deepEqual(recorder.actions, [
-        { name: "toggle", path: "", args: [{ bla : [ "nuff", ["said" ]]}] }
+      { name: "toggleWithArg", path: "", args: { arg: { bla: ["nuff", ["said"]]} } }
     ])
 
     recorder.replay(t2)

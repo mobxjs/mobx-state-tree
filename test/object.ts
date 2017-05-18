@@ -138,7 +138,7 @@ test("it should emit action calls", (t) => {
 
     doc.setTo('universe')
 
-    t.deepEqual(actions, [{name: "setTo", path: "", args: ["universe"]}])
+  t.deepEqual(actions, [{name: "setTo", path: "", args: { to: "universe" }}])
 })
 
 test("it should apply action call", (t) => {

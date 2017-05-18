@@ -1,4 +1,4 @@
-import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
+import { IMiddlewareActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { getMSTAdministration, IMSTNode, getRelativePathForNodes } from "./mst-node"
 import { MSTAdministration } from "./mst-node-administration"
@@ -48,7 +48,7 @@ import { ISnapshottable, IType } from "../types/type"
  * @param {(action: IActionCall, next: () => void) => void} callback the middleware that should be invoked whenever an action is triggered.
  * @returns {IDisposer} function to remove the middleware
  */
-export function addMiddleware(target: IMSTNode, middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any): IDisposer {
+export function addMiddleware(target: IMSTNode, middleware: (action: IMiddlewareActionCall, next: (call: IMiddlewareActionCall) => any) => any): IDisposer {
     const node = getMSTAdministration(target)
     if (!node.isProtectionEnabled)
         console.warn("It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`")
