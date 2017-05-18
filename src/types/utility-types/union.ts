@@ -1,4 +1,4 @@
-import {isType, IType, Type} from "../type"
+import {isType, IType, TypeFlags, Type} from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors, typecheck } from "../type-checker"
 import {fail} from "../../utils"
 
@@ -7,6 +7,16 @@ export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 export class Union extends Type<any, any> {
     readonly dispatcher: ITypeDispatcher | null = null
     readonly types: IType<any, any>[]
+
+    get flags () {
+        let result: TypeFlags = 0
+        
+        this.types.forEach(type => {
+            result |= type.flags
+        })
+
+        return result
+    }
 
     constructor(name: string, types: IType<any, any>[], dispatcher: ITypeDispatcher | null) {
         super(name)

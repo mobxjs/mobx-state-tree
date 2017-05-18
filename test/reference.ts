@@ -165,6 +165,32 @@ test("it should resolve refs during creation, when using path", t => {
     t.deepEqual(values, [4, 8])
 })
 
+test("it should resolve refs over late types", t => {
+    const Book = types.model({
+        id: types.identifier(),
+        price: types.number
+    })
+    const BookEntry = types.model({
+        book: types.reference(types.late(() => Book), "../../books"),
+        get price() {
+            return this.book.price * 2
+        }
+    })
+    const Store = types.model({
+        books: types.array(Book),
+        entries: types.optional(types.array(BookEntry), [])
+    })
+
+    const s = Store.create({
+        books: [{ id: "3", price: 2 }]
+    })
+    unprotect(s)
+
+    s.entries.push({ book: s.books[0] } as any)
+    t.is(s.entries[0].price, 4)
+    t.is(s.entries.reduce((a, e) => a + e.price, 0), 4)
+})
+
 test("it should resolve refs during creation, when using generic reference", t => {
     const values: number[] = []
     const Book = types.model({

@@ -7,7 +7,7 @@ import {
     valueToSnapshot
 } from "../../core"
 import { addHiddenFinalProp, identity, nothing } from "../../utils"
-import { IType, IComplexType, isType } from "../type"
+import { IType, IComplexType, TypeFlags, isType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
 
@@ -18,6 +18,7 @@ export function arrayToString(this: IObservableArray<any>) {
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     isArrayFactory = true
     subType: IType<any, any>
+    readonly flags = TypeFlags.Array
 
     constructor(name: string, subType: IType<any, any>) {
         super(name)
@@ -174,5 +175,5 @@ export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservable
 }
 
 export function isArrayFactory<S, T>(type: any): type is IComplexType<S[], IObservableArray<T>> {
-    return isType(type) && (type as any).isArrayFactory === true
+    return isType(type) && ((type as IType<any, any>).flags & TypeFlags.Array) > 0
 }

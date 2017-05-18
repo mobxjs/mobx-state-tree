@@ -1,4 +1,4 @@
-import {Type, IType} from "../type"
+import {Type, IType, TypeFlags} from "../type"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export type IFunctionReturn<T> = () => T
@@ -7,6 +7,10 @@ export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<
 export class OptionalValue<S, T> extends Type<S, T> {
     readonly type: IType<S, T>
     readonly defaultValue: IOptionalValue<S, T>
+
+    get flags () {
+        return this.type.flags | TypeFlags.Optional
+    }
 
     constructor(type: IType<S, T>, defaultValue: IOptionalValue<S, T>) {
         super(type.name)

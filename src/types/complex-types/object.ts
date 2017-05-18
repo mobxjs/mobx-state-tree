@@ -16,7 +16,7 @@ import {
     isPlainObject
 } from "../../utils"
 import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, IJsonPatch } from "../../core"
-import { IType, IComplexType, isType } from "../type"
+import { IType, IComplexType, TypeFlags, isType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
@@ -38,6 +38,7 @@ function objectTypeToString(this: any) {
 
 export class ObjectType extends ComplexType<any, any> {
     isObjectFactory = true
+    readonly flags = TypeFlags.Object
 
     /**
      * The original object definition
@@ -265,16 +266,12 @@ export function extend(...args: any[]) {
 }
 
 export function isObjectFactory(type: any): boolean {
-    return isType(type) && (type as any).isObjectFactory === true
+    return isType(type) && ((type as IType<any, any>).flags & TypeFlags.Object) > 0
 }
 
 export function getIdentifierAttribute(type: IType<any, any>): string | null {
-    // TODO: this should be a general property of types
-    if (type instanceof ObjectType)
+    if ( isObjectFactory(type) )
         return type.identifierAttribute
-    // TODO: make this a generic utility!
-    if (type instanceof Late)
-      return (type as any).definition().identifierAttribute
 
     return null
 }

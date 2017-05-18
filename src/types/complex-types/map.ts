@@ -2,7 +2,7 @@ import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
 import { getMSTAdministration, maybeMST, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, invariant, fail, addHiddenFinalProp } from "../../utils"
-import { IType, IComplexType, isType } from "../type"
+import { IType, IComplexType, TypeFlags, isType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
 
@@ -29,6 +29,7 @@ function put(this: ObservableMap<any>, value: any) {
 export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
     isMapFactory = true
     subType: IType<any, any>
+    readonly flags = TypeFlags.Map
 
     constructor(name: string, subType: IType<any, any>) {
         super(name)
@@ -212,6 +213,6 @@ export function map<S, T>(subtype: IType<S, T>): IComplexType<{[key: string]: S}
     return new MapType<S, T>(`map<string, ${subtype.name}>`, subtype)
 }
 
-export function isMapFactory<S, T>(factory: any): factory is IComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
-    return isType(factory) && (factory as any).isMapFactory === true
+export function isMapFactory<S, T>(type: any): type is IComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
+    return isType(type) && ((type as IType<any, any>).flags & TypeFlags.Map) > 0
 }

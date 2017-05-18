@@ -1,9 +1,10 @@
-import { ISimpleType, Type} from "../type"
+import { ISimpleType, TypeFlags, Type} from "../type"
 import { invariant, isPrimitive } from "../../utils"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export class Literal<T> extends Type<T, T> {
     readonly value: any
+    readonly flags = TypeFlags.Literal
 
     constructor(value: any) {
         super("" + value)
