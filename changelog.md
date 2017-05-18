@@ -1,3 +1,7 @@
+# 0.6.2
+
+Fixed issue where arrays where not properly serialized as action argument
+
 # 0.6.1
 
 * Improved reporting of Type.is(), now it returns a fine grained report of why the provided value is not applicable.

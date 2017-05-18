@@ -89,7 +89,7 @@ function serializeArgument(adm: MSTAdministration, actionName: string, index: nu
     }
     if (typeof arg === "function")
         throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a function`)
-    if (typeof arg === "object" && !isPlainObject(arg))
+    if (typeof arg === "object" && !isPlainObject(arg) && !Array.isArray(arg))
         throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any && (arg as any).constructor) ? (arg as any).constructor.name : "Complex Object"}`)
     if (isObservable(arg))
         throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received an mobx observable.`)
