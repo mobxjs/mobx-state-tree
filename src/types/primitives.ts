@@ -59,5 +59,5 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
 }
 
 export function isPrimitiveType(type: any): type is CoreType<any> {
-    return type instanceof CoreType
+    return (type.flags & (TypeFlags.String | TypeFlags.Number | TypeFlags.Boolean | TypeFlags.Date)) > 0
 }

@@ -19,12 +19,12 @@ test("it should throw if a correct type with failing predicate is given", t => {
     t.throws(() => {
         Factory.create({ number: "givenStringInstead" })
     }, `[mobx-state-tree] Error while converting \`{"number":"givenStringInstead"}\` to \`AnonymousModel\`:
-at path "/number" value \`"givenStringInstead"\` is not assignable to type: \`positive number\`, expected an instance of \`positive number\` or a snapshot like \`positive number\` instead.`)
+at path "/number" value \`"givenStringInstead"\` is not assignable to type: \`positive number\`.`)
 
     t.throws(() => {
         Factory.create({ number: -4 })
     }, `[mobx-state-tree] Error while converting \`{"number":-4}\` to \`AnonymousModel\`:
-at path "/number" value \`-4\` is not assignable to type: \`positive number\`, expected an instance of \`positive number\` or a snapshot like \`positive number\` instead.`)
+at path "/number" value \`-4\` is not assignable to type: \`positive number\`.`)
 })
 
 test("it should throw if default value does not pass the predicate", t => {
