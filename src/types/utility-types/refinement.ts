@@ -1,4 +1,4 @@
-import { IType, Type } from "../type"
+import { IType, TypeFlags, Type } from "../type"
 import {invariant} from "../../utils"
 import {isMST, getMSTAdministration} from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
@@ -6,6 +6,10 @@ import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from 
 export class Refinement extends Type<any, any> {
     readonly type: IType<any, any>
     readonly predicate: (v: any) => boolean
+
+    get flags () {
+        return this.type.flags
+    }
 
     constructor(name: string, type: IType<any, any>, predicate: (v: any) => boolean) {
         super(name)

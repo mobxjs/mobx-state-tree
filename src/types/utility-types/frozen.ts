@@ -1,4 +1,4 @@
-import { ISimpleType, Type } from "../type"
+import { ISimpleType, TypeFlags, Type } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { invariant, isMutable, isSerializable, isPlainObject } from "../../utils"
 
@@ -17,6 +17,7 @@ function freeze(value: any) {
 }
 
 export class Frozen<T> extends Type<T, T> {
+    flags = TypeFlags.Frozen
 
     constructor() {
         super("frozen")

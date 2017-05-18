@@ -1,7 +1,21 @@
 export interface ISnapshottable<S> {}
 
+export enum TypeFlags {
+    String  = 1 << 0,
+    Number  = 1 << 1,
+    Boolean = 1 << 2,
+    Date    = 1 << 3,
+    Literal = 1 << 4,
+    Array   = 1 << 5,
+    Map     = 1 << 6,
+    Object  = 1 << 7,
+    Frozen  = 1 << 8,
+    Optional = 1 << 9
+}
+
 export interface IType<S, T> {
     name: string
+    flags: TypeFlags
     is(thing: any): thing is S | T
     validate(thing: any, context: IContext): IValidationResult
     create(snapshot?: S, environment?: any): T
@@ -28,6 +42,7 @@ export abstract class Type<S, T> implements IType<S, T> {
         this.name = name
     }
 
+    abstract flags: TypeFlags
     abstract create(snapshot: any): any
     abstract validate(thing: any, context: IContext): IValidationResult
     abstract describe(): string
