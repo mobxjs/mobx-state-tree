@@ -1,0 +1,29 @@
+{
+  "name": "shop",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "custom-react-scripts": "0.0.23"
+  },
+  "dependencies": {
+    "mobx": "^3.1.9",
+    "mobx-react": "^4.1.7",
+    "mobx-react-devtools": "^4.2.11",
+    "mobx-state-tree": "^0.6.2",
+    "mobx-utils": "^2.0.1",
+    "path-match": "^1.2.4",
+    "react": "^15.5.0",
+    "react-dom": "^15.5.0",
+    "react-tabs": "^1.0.0",
+    "react-test-renderer": "^15.5.0",
+    "remotedev": "^0.2.7",
+    "surge": "^0.18.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "surge": "npm run build && cd build && cp index.html 200.html && cp index.html 404.html && surge --project . --domain book-shop-2017-02-17.surge.sh"
+  }
+}

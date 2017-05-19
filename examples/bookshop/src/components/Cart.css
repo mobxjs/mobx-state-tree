@@ -1,0 +1,27 @@
+.Page-cart-item {
+  border: 1px solid orangered;
+  border-radius: 4px;
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.Page-cart-item-details {
+  width: 200px;
+  margin-left: auto;
+  margin-right: 0px;
+  background-color: #e2e2e2;
+  padding: 8px 20px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  text-align: right;
+}
+
+.Page-cart-item-details p {
+  margin: 0;
+  padding: 0;
+}
+
+.Page-cart-item-details input {
+  width: 50px;
+}
