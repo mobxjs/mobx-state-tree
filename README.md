@@ -85,9 +85,9 @@ _Designtime type error_
 
 Because state trees are living, mutable models actions are straight-forward to write; just modify local instance properties where appropiate. See `toggleTodo()` above or the examples below. It is not needed to produce a new state tree yourself, MST's snapshot functionality will derive one for you automatically.
 
-Although mutable sounds scare to some, fear not; actions have many interesting properties.
+Although mutable sounds scary to some, fear not; actions have many interesting properties.
 By default trees cannot only be modified by using an action that belongs to the same subtree.
-Furthermore actions are replayable and can be used as means to distribute changes ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
+Furthermore, actions are replayable and can be used as means to distribute changes ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
 
 Moreover; since changes can be detected on a fine grained level. JSON patches are supported out of the box.
 Simply subscribing to the patch stream of a tree is another way to sync diffs with for example back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
@@ -132,7 +132,7 @@ Like React, MST consists of composable components, called *models*, which captur
 
 An introduction to the philosophy can be watched [here](https://youtu.be/ta8QKmNRXZM?t=21m52s). [Slides](https://immer-mutable-state.surge.sh/). Or, as [markdown](https://github.com/mweststrate/reactive2016-slides/blob/master/slides.md) to read it quickly.
 
-TODO: react europe talk
+mobx-state-tree "immutable trees" and "graph model" features talk, ["Next Generation State Management"](https://www.youtube.com/watch?v=nhNiKel6U9Y&feature=youtu.be&t=1h8m34s) at React Europe 2017. [Slides](http://tree.surge.sh/#1). 
 
 # Examples
 
