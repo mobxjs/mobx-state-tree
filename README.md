@@ -1,3 +1,5 @@
+![MST logo](docs/logo.png)
+
 # mobx-state-tree
 
 _Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX_
@@ -218,6 +220,8 @@ The _properties_ argument is a key-value set where each key indicates the introd
 4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but it's value can be tracked by Mobx nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
 
 The _actions_ argument is a key-value set with actions that are available to manage the model. Only actions are allowed to manage models (including any contained objects).
+
+It is also possible to define lifecycle hooks in the _actions_ object, these are actions with a predefined name that are run at a specific moment. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel).
 
 _Tip: Note that `{ action1() { }, action2() { }}` is ES6 syntax for `{ action1: function() { }, action2: function() { } }`, in other words; it's just an object literal.
 For that reason a comma between each member of a model is mandatory, unlike classes which are syntactically a totally different concept._
