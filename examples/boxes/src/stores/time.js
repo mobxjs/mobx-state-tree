@@ -19,7 +19,7 @@ export function previousState() {
 }
 
 export function nextState() {
-    if (currentFrame === states.length)
+    if (currentFrame === states.length - 1)
         return
     currentFrame++;
     applySnapshot(store, states[currentFrame])
