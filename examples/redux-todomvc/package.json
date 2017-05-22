@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "mobx": "^2.6.0",
-    "mobx-state-tree": "^0.5.0",
+    "mobx": "^3.1.9",
+    "mobx-state-tree": "^0.6.2",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
     "react-redux": "^4.4.5",

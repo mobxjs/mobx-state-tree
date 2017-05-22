@@ -3687,15 +3687,13 @@ mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkd
   dependencies:
     minimist "0.0.8"
 
-mobx-state-tree@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/mobx-state-tree/-/mobx-state-tree-0.5.0.tgz#c96c3936945cfd0f906c50cee52f7287b66c16de"
-  dependencies:
-    remotedev "^0.2.2"
+mobx-state-tree@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/mobx-state-tree/-/mobx-state-tree-0.6.2.tgz#aef2fdc2c71731c963c418525cfdc52e8031c9c7"
 
-mobx@^2.6.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/mobx/-/mobx-2.7.0.tgz#cf3d82d18c0ca7f458d8f2a240817b3dc7e54a01"
+mobx@^3.1.9:
+  version "3.1.9"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-3.1.9.tgz#ed4af9d874ff6032c7af91fc1b87d9d33122a557"
 
 ms@0.7.1:
   version "0.7.1"
@@ -4766,7 +4764,7 @@ relateurl@0.2.x:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/relateurl/-/relateurl-0.2.7.tgz#54dbf377e51440aca90a4cd274600d3ff2d888a9"
 
-remotedev@^0.2.2, remotedev@^0.2.7:
+remotedev@^0.2.7:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/remotedev/-/remotedev-0.2.7.tgz#85ef370b52eb5721bd3e869d681dc7027d527ee3"
   dependencies:
