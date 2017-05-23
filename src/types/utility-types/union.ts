@@ -97,6 +97,7 @@ export function union<SA, SB, SC, SD, SE, SF, SG, SH, SI, TA, TB, TC, TD, TE, TF
 export function union<SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ>(dispatch: ITypeDispatcher, A: IType<SA, TA>, B: IType<SB, TB>, C: IType<SC, TC>, D: IType<SD, TD>, E: IType<SE, TE>, F: IType<SF, TF>, G: IType<SG, TG>, H: IType<SH, TH>, I: IType<SI, TI>, J: IType<SJ, TJ>): IType<SA | SB | SC | SD | SE | SF | SG | SH | SI | SJ, TA | TB | TC | TD | TE | TF | TG | TH | TI | TJ>
 export function union<SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ>(A: IType<SA, TA>, B: IType<SB, TB>, C: IType<SC, TC>, D: IType<SD, TD>, E: IType<SE, TE>, F: IType<SF, TF>, G: IType<SG, TG>, H: IType<SH, TH>, I: IType<SI, TI>, J: IType<SJ, TJ>): IType<SA | SB | SC | SD | SE | SF | SG | SH | SI | SJ, TA | TB | TC | TD | TE | TF | TG | TH | TI | TJ>
 
+export function union(...types: IType<any, any>[]): IType<any, any>
 export function union(dispatchOrType: ITypeDispatcher | IType<any, any>, ...otherTypes: IType<any, any>[]): IType<any, any>
 
 export function union(dispatchOrType: ITypeDispatcher | IType<any, any>, ...otherTypes: IType<any, any>[]): IType<any, any> {
