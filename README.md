@@ -297,7 +297,13 @@ Useful methods:
 -   `addMiddleware(model, middleware)` listens to any action that is invoked on the model or any of it's descendants. See `addMiddleware` for more details.
 -   `applyAction(model, action)` invokes an action on the model according to the given action description
 
+#### Action listeners versus middleware
+
 The difference between action listeners and middlewares is: Middleware can intercept the action that is about to be invoked, modify arguments, return types etc. Action listeners cannot intercept, but are only notified. Action listeners receive the action arguments in a serializable format, while middleware receive the raw arguments. (`onAction` is actually just a built-in middleware)
+
+#### Disabling protected mode
+
+If the default protection of mobx-state-tree doesn't fit your use case. For example if you are not interested in replayable actions or hate the effort of writing actions to modify any field; `unprotect(tree)` will disable the protected mode of a tree, allowing anyone to directly modify the tree.
 
 ### Snapshots
 
@@ -604,6 +610,20 @@ const Cat = types.model(
 )
 
 const Animal = types.union(Dog, Cat)
+```
+
+### Creating enumerations
+
+There is no built-in type for enumerations, but enumarations can simply be constructed by combining unions and literals:
+
+```javascript
+const Temperature = types.union(types.literal("Hot"), types.literal("Cold"))
+```
+
+Or, fancier:
+
+```javascript
+const Temperature = types.union(...["Hot", "Cold"].map(types.literal))
 ```
 
 
