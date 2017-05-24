@@ -1,9 +1,8 @@
 <div align="center">
  <p>![MST logo](docs/logo.png)</p>
  <p># mobx-state-tree</p>
+ <p><em>_Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX_</em></p>
 </div>
-
-_Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX_
 
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
