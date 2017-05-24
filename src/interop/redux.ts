@@ -1,7 +1,7 @@
 import { isMST, IRawActionCall } from "../core"
 import { getSnapshot, applySnapshot, onSnapshot } from "../core/mst-operations"
 import { applyAction, onAction, ISerializedActionCall } from "../core/action"
-import { invariant, extend } from "../utils"
+import { fail, extend } from "../utils"
 
 export interface IMiddleWareApi {
     getState: () => any
@@ -17,7 +17,7 @@ export type MiddleWare =
         ((next: (action: IRawActionCall) => void) => void)
 
 export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxStore {
-    invariant(isMST(model), "Expected model object")
+    if (!isMST(model)) fail("Expected model object")
     let store: IReduxStore = {
         getState : ()       => getSnapshot(model),
         dispatch : action   => {

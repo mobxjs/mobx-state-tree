@@ -127,7 +127,7 @@ export function applyAction(target: IMSTNode, action: ISerializedActionCall): an
     if (!resolvedTarget)
         return fail(`Invalid action path: ${action.path || ""}`)
     const node = getMSTAdministration(resolvedTarget)
-    invariant(typeof resolvedTarget[action.name] === "function", `Action '${action.name}' does not exist in '${node.path}'`)
+    if(!(typeof resolvedTarget[action.name] === "function")) fail(`Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
         action.args ? action.args.map(v => deserializeArgument(node, v)) : []
@@ -149,4 +149,4 @@ export function onAction(target: IMSTNode, listener: (call: ISerializedActionCal
 import { getMSTAdministration, IMSTNode, isMST, getRelativePathForNodes } from "./mst-node"
 import { MSTAdministration } from "./mst-node-administration"
 import { resolve, tryResolve, addMiddleware } from "./mst-operations"
-import { fail, invariant, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"
+import { fail, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"

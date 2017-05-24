@@ -5,14 +5,7 @@ export const EMPTY_ARRAY = Object.freeze([])
 export type IDisposer = () => void;
 
 export function fail(message = "Illegal state"): never {
-    invariant(false, message)
-    throw "!"
-}
-
-// Optimize: accept () => string as message, so string doesn't have to be prepared at runtime
-export function invariant(cond: boolean, message = "Illegal state") {
-    if (!cond)
-        throw new Error("[mobx-state-tree] " + message)
+    throw new Error("[mobx-state-tree] " + message)
 }
 
 export function identity<T>(_: T): T {

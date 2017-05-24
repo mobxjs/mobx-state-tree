@@ -1,6 +1,6 @@
 import { ISimpleType, TypeFlags, Type } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { invariant, isMutable, isSerializable, isPlainObject } from "../../utils"
+import { fail, isMutable, isSerializable, isPlainObject } from "../../utils"
 
 function freeze(value: any) {
     Object.freeze(value)
@@ -28,7 +28,7 @@ export class Frozen<T> extends Type<T, T> {
     }
 
     create(value: any) {
-        invariant(isSerializable(value), "Given value should be serializable")
+        if (!isSerializable(value)) fail("Given value should be serializable")
         // deep freeze the object/array
         return isMutable(value) ? freeze(value) : value
     }

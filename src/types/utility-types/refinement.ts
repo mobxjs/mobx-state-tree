@@ -1,6 +1,6 @@
 import { IType, TypeFlags, Type } from "../type"
-import {invariant} from "../../utils"
-import {isMST, getMSTAdministration} from "../../core"
+import { fail } from "../../utils"
+import { isMST, getMSTAdministration } from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export class Refinement extends Type<any, any> {
@@ -27,7 +27,7 @@ export class Refinement extends Type<any, any> {
         const snapshot = isMST(inst) ? getMSTAdministration(inst).snapshot : inst
 
         // check if pass the predicate
-        invariant(this.is(snapshot), `Value ${JSON.stringify(snapshot)} is not assignable to type ${this.name}`)
+        if (!this.is(snapshot)) fail(`Value ${JSON.stringify(snapshot)} is not assignable to type ${this.name}`)
 
         return inst
     }
@@ -49,7 +49,7 @@ export function refinement<S, T extends S, U extends S>(name: string, type: ITyp
 export function refinement(name: string, type: IType<any, any>, predicate: (snapshot: any) => boolean): IType<any, any> {
     // check if the subtype default value passes the predicate
     const inst = type.create()
-    invariant(predicate(isMST(inst) ? getMSTAdministration(inst).snapshot : inst), `Default value for refinement type ` + name + ` does not pass the predicate.`)
+    if (!predicate(isMST(inst) ? getMSTAdministration(inst).snapshot : inst)) fail(`Default value for refinement type ` + name + ` does not pass the predicate.`)
 
     return new Refinement(name, type, predicate)
 }

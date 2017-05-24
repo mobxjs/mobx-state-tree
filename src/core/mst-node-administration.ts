@@ -12,7 +12,6 @@ import {
     extend,
     fail,
     IDisposer,
-    invariant,
     isMutable,
     registerEventHandler
 } from "../utils"
@@ -40,7 +39,7 @@ export class MSTAdministration {
     private readonly disposers: (() => void)[] = []
 
     constructor(parent: MSTAdministration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
-        invariant(type instanceof ComplexType, "Uh oh")
+        if (!(type instanceof ComplexType)) fail("Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
         this._parent = parent
         this.subpath = subpath
@@ -358,7 +357,7 @@ export class MSTAdministration {
     }
 
     detach() {
-        invariant(this._isAlive)
+        if (!this._isAlive) fail(`Error while detaching, node is not alive.`)
         if (this.isRoot)
             return
         else {

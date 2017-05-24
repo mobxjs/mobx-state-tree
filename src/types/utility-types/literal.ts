@@ -1,5 +1,5 @@
 import { ISimpleType, TypeFlags, Type} from "../type"
-import { invariant, isPrimitive } from "../../utils"
+import { fail, isPrimitive } from "../../utils"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export class Literal<T> extends Type<T, T> {
@@ -33,6 +33,6 @@ export class Literal<T> extends Type<T, T> {
 }
 
 export function literal<S>(value: S): ISimpleType<S> {
-    invariant(isPrimitive(value), `Literal types can be built only on top of primitives`)
+    if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
     return new Literal<S>(value)
 }
