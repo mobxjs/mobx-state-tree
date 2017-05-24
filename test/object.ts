@@ -326,3 +326,32 @@ test("view functions should not be allowed to change state", (t) => {
     model.anotherDoubler()
     t.is(model.x, 6)
 })
+
+test("it should consider primitives as proposed defaults", t => {
+    const now = new Date()
+    const Todo = types.model({
+        id: 0,
+        name: "Hello world",
+        done: false,
+        createdAt: now
+    })
+
+    const doc = Todo.create()
+
+    t.deepEqual(getSnapshot(doc), {id: 0, name: "Hello world", done: false, createdAt: {
+            $treetype: "Date",
+            time: now.toJSON()
+        }})
+})
+
+test("it should throw if a non-primitive value is provided and no default can be created", t => {
+    t.throws(() => {
+
+        const Todo = types.model({
+            complex: {
+                a: 1,
+                b: 2
+            }
+        })
+    })
+})

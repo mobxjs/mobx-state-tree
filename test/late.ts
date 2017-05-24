@@ -1,6 +1,15 @@
 import { types } from "../src"
 import { test } from "ava"
 
+test("it should throw if late doesnt received a function as parameter", t => {
+
+    t.throws(() => {
+        const Before = types.model({
+            after: types.late(1 as any)
+        })
+    })
+})
+
 test("it should accept a type and infer it correctly", t => {
 
     const Before = types.model({
