@@ -1,6 +1,6 @@
 import { isObservableArray, isObservableMap, observable, computed } from "mobx"
 import { getMSTAdministration, getRelativePathForNodes, isMST, IMSTNode } from "./mst-node"
-import { invariant, fail } from "../utils"
+import { fail } from "../utils"
 import { getIdentifierAttribute } from "../types/complex-types/object"
 import { IType } from "../types/type"
 import { typecheck } from "../types/type-checker"
@@ -40,7 +40,7 @@ export class Reference {
                 return targetCollection.find(item => item && item[targetIdAttribute] === identifier)
             } else if (isObservableMap(targetCollection)) {
                 const child = targetCollection.get(identifier)
-                invariant(!child || child[targetIdAttribute] === identifier, `Inconsistent collection, the map entry under key '${identifier}' should have property '${targetIdAttribute}' set to value '${identifier}`)
+                if (!(!child || child[targetIdAttribute] === identifier)) fail(`Inconsistent collection, the map entry under key '${identifier}' should have property '${targetIdAttribute}' set to value '${identifier}`)
                 return child
             } else
                 return fail("References with base paths should point to either an `array` or `map` collection")
@@ -57,15 +57,15 @@ export class Reference {
             if (this.targetIdAttribute)
                 this.identifier = (value as any)[this.targetIdAttribute]
             else {
-                invariant(base.root === target.root, `Failed to assign a value to a reference; the value should already be part of the same model tree`)
+                if (base.root !== target.root) fail(`Failed to assign a value to a reference; the value should already be part of the same model tree`)
                 this.identifier = getRelativePathForNodes(base, target)
             }
         } else if (this.targetIdAttribute) {
-            invariant(typeof value === "string", "Expected an identifier, got: " + value)
+            if (typeof value !== "string") fail("Expected an identifier, got: " + value)
             this.identifier = value
         }
         else {
-            invariant(typeof value === "object" && typeof value.$ref === "string", "Expected a reference in the format `{ $ref: ... }`, got: " + value)
+            if (!(typeof value === "object" && typeof value.$ref === "string")) fail("Expected a reference in the format `{ $ref: ... }`, got: " + value)
             this.identifier = value.$ref
         }
     }

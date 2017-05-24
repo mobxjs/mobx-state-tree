@@ -1,4 +1,4 @@
-import { invariant } from "../../utils"
+import { fail } from "../../utils"
 import { Type, IType, TypeFlags } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
@@ -19,7 +19,7 @@ export class Late<S, T> extends Type<S, T> {
 
     constructor(name: string, definition: () => IType<S, T>) {
         super(name)
-        invariant(typeof definition === "function" && definition.length === 0, "Invalid late type, expected a function with zero arguments that returns a type, got: " + definition)
+        if (!(typeof definition === "function" && definition.length === 0)) fail("Invalid late type, expected a function with zero arguments that returns a type, got: " + definition)
         this.definition = definition
     }
 

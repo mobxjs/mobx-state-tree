@@ -3,7 +3,7 @@ import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { getMSTAdministration, IMSTNode, getRelativePathForNodes } from "./mst-node"
 import { MSTAdministration } from "./mst-node-administration"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
-import { IDisposer, invariant, fail } from "../utils"
+import { IDisposer, fail } from "../utils"
 import { ISnapshottable, IType } from "../types/type"
 
 /**
@@ -239,7 +239,7 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
  * @returns {boolean}
  */
 export function hasParent(target: IMSTNode, depth: number = 1): boolean {
-    invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
+    if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let parent: MSTAdministration | null = getMSTAdministration(target).parent
     while (parent) {
         if (--depth === 0)
@@ -263,7 +263,7 @@ export function hasParent(target: IMSTNode, depth: number = 1): boolean {
 export function getParent(target: IMSTNode, depth?: number): (any & IMSTNode);
 export function getParent<T>(target: IMSTNode, depth?: number): (T & IMSTNode);
 export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) {
-    invariant(depth >= 0, `Invalid depth: ${depth}, should be >= 1`)
+    if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let d = depth
     let parent: MSTAdministration | null = getMSTAdministration(target).parent
     while (parent) {
@@ -406,7 +406,7 @@ export function addDisposer(thing: IMSTNode, disposer: () => void) {
 export function getEnv(thing: IMSTNode): any {
     const node = getMSTAdministration(thing)
     const env = node.root._environment
-    invariant(!!env, `Node '${node}' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()`)
+    if (!(!!env)) fail(`Node '${node}' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()`)
     return env
 }
 

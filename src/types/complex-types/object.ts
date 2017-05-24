@@ -9,7 +9,6 @@ import {
 import {
     nothing,
     extend as extendObject,
-    invariant,
     fail, identity,
     isPrimitive,
     hasOwnProperty,
@@ -63,7 +62,7 @@ export class ObjectType extends ComplexType<any, any> {
         Object.freeze(baseActions)
         this.baseModel = baseModel
         this.baseActions = baseActions
-        invariant(/^\w[\w\d_]*$/.test(name), `Typename should be a valid identifier: ${name}`)
+        if (!(/^\w[\w\d_]*$/.test(name))) fail(`Typename should be a valid identifier: ${name}`)
         this.modelConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
         this.modelConstructor.prototype.toString = objectTypeToString
         this.parseModelProps()
@@ -107,7 +106,7 @@ export class ObjectType extends ComplexType<any, any> {
             if (value === null || undefined) {
                 fail("The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?")
             } else if (isIdentifierFactory(value)) {
-                invariant(!this.identifierAttribute, `Cannot define property '${key}' as object identifier, property '${this.identifierAttribute}' is already defined as identifier property`)
+                if (this.identifierAttribute) fail(`Cannot define property '${key}' as object identifier, property '${this.identifierAttribute}' is already defined as identifier property`)
                 this.identifierAttribute = key
                 this.props[key] = new IdentifierProperty(key, (value as IIdentifierDescriptor<any>).primitiveType)
             } else if (isPrimitive(value)) {
@@ -167,7 +166,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void {
-        invariant(patch.op === "replace" || patch.op === "add")
+        if (!(patch.op === "replace" || patch.op === "add")) fail(`object does not support operation ${patch.op}`)
         node.target[subpath] = patch.value
     }
 

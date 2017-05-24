@@ -1,7 +1,7 @@
 import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
 import { getMSTAdministration, maybeMST, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch } from "../../core"
-import { identity, isPlainObject, nothing, isPrimitive, invariant, fail, addHiddenFinalProp } from "../../utils"
+import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
@@ -20,8 +20,8 @@ export function mapToString(this: ObservableMap<any>) {
 
 function put(this: ObservableMap<any>, value: any) {
     const identifierAttr = getIdentifierAttribute((getMSTAdministration(this).type as MapType<any, any>).subType)
-    invariant(!!identifierAttr, `Map.put is only supported if the subtype has an idenfier attribute`)
-    invariant(!!value, `Map.put cannot be used to set empty values`)
+    if (!(!!identifierAttr)) fail(`Map.put is only supported if the subtype has an idenfier attribute`)
+    if (!(!!value)) fail(`Map.put cannot be used to set empty values`)
     this.set(value[identifierAttr!], value)
     return this
 }

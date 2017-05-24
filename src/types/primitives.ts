@@ -1,6 +1,6 @@
 import { ISimpleType, TypeFlags, Type } from "./type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
-import { invariant, isPrimitive, fail } from "../utils"
+import { isPrimitive, fail } from "../utils"
 
 export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean
@@ -17,8 +17,8 @@ export class CoreType<T> extends Type<T, T> {
     }
 
     create(value: any) {
-        invariant(isPrimitive(value), `Not a primitive: '${value}'`)
-        invariant(this.checker(value), `Value is not assignable to '` + this.name + `'`)
+        if (!isPrimitive(value)) fail(`Not a primitive: '${value}'`)
+        if (!this.checker(value)) fail(`Value is not assignable to '` + this.name + `'`)
         return value
     }
 
