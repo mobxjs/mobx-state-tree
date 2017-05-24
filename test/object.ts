@@ -119,6 +119,25 @@ test("it should apply patches", (t) => {
     t.deepEqual(getSnapshot(doc), {to: 'universe'})
 })
 
+test("it should stop listening to patches patches", (t) => {
+    const {Factory} = createTestFactories()
+    const doc = Factory.create()
+    unprotect(doc)
+
+    let patches: any[] = []
+    let disposer = onPatch(doc, patch => patches.push(patch))
+
+    doc.to = "universe"
+
+    disposer()
+
+    doc.to = "mweststrate"
+
+    t.deepEqual(patches, [
+        {op: "replace", path: "/to", value: "universe"}
+    ])
+})
+
 // === ACTIONS TESTS ===
 test("it should call actions correctly", (t) => {
     const {Factory} = createTestFactories()
