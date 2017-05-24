@@ -1,6 +1,7 @@
-![MST logo](docs/logo.png)
-
-# mobx-state-tree
+<div align="center">
+ <p>![MST logo](docs/logo.png)</p>
+ <p># mobx-state-tree</p>
+</div>
 
 _Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX_
 
