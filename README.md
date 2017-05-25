@@ -99,7 +99,7 @@ _Designtime type error_
 Because state trees are living, mutable models actions are straight-forward to write; just modify local instance properties where appropiate. See `toggleTodo()` above or the examples below. It is not needed to produce a new state tree yourself, MST's snapshot functionality will derive one for you automatically.
 
 Although mutable sounds scary to some, fear not; actions have many interesting properties.
-By default trees cannot only be modified by using an action that belongs to the same subtree.
+By default trees can only be modified by using an action that belongs to the same subtree.
 Furthermore, actions are replayable and can be used as means to distribute changes ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
 
 Moreover; since changes can be detected on a fine grained level. JSON patches are supported out of the box.
@@ -119,10 +119,10 @@ Even fancier; it analyses liveleness of objects, failing early when you try to a
 A pretty unique feature of MST is that it offers livelyness guarantees; it will throw when reading or writing from objects that are for whatever reason
 no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
 
+```javascript
 const oldTodo = store.todos[0]
 store.removeTodo(0)
 
-```javascript
 function logTodo(todo) {
     setTimeout(
         () => console.log(todo.title),
