@@ -18,7 +18,7 @@ export interface IType<S, T> {
     flags: TypeFlags
     is(thing: any): thing is S | T
     validate(thing: any, context: IContext): IValidationResult
-    create(snapshot?: S, environment?: any): T
+    create(snapshot?: S, environment?: any, parent?: MSTAdministration | null, subpath?: string): T
     isType: boolean
     describe(): string
     Type: T
@@ -67,3 +67,4 @@ export abstract class Type<S, T> implements IType<S, T> {
 import { fail } from "../utils"
 import { IMSTNode } from "../core/mst-node"
 import { IContext, IValidationResult } from "./type-checker"
+import { MSTAdministration } from "../core/mst-node-administration"
