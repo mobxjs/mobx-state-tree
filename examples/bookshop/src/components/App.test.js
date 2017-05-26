@@ -13,7 +13,7 @@ it('matches snapshot before and after loading', (done) => {
   const shop = ShopStore.create({}, { fetch: bookFetcher })
 
   const app = renderer.create(
-    <Provider shop={shop}>
+    <Provider shop={shop} history={null}>
       <App />
     </Provider>
   )

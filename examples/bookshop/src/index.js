@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'mobx-react'
 import { observable, reaction } from 'mobx'
-import { onSnapshot, onAction, onPatch, applySnapshot, applyAction, applyPatch, getSnapshot, connectReduxDevtools } from 'mobx-state-tree'
+import { onSnapshot, onAction, onPatch, applySnapshot, applyAction, applyPatch, getSnapshot } from 'mobx-state-tree'
 
 import createRouter from './utils/router'
 import App from './components/App'
@@ -16,18 +16,54 @@ const shop = ShopStore.create({}, {
   alert: m => console.log(m) // Noop for demo: window.alert(m)
 })
 
-window.shop = shop // for playing around
-connectReduxDevtools(require("remotedev"), shop)
-
-/**
- * "DevToos"
- */
-
 const history = {
   snapshots: observable.shallowArray(),
   actions: observable.shallowArray(),
   patches: observable.shallowArray()
 }
+
+/**
+ * Rendering
+ */
+ReactDOM.render(
+  <Provider shop={shop} history={history}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+)
+
+/**
+ * Routing
+ */
+
+reaction(
+  () => shop.view.currentUrl,
+  (path) => {
+    if (window.location.pathname !== path)
+      window.history.pushState(null, null, path)
+  }
+)
+
+const router = createRouter({
+  "/book/:bookId": ({bookId}) => shop.view.openBookPageById(bookId),
+  "/cart":         shop.view.openCartPage,
+  "/":             shop.view.openBooksPage
+})
+
+window.onpopstate = function historyChange(ev) {
+  if (ev.type === "popstate")
+    router(window.location.pathname)
+}
+
+router(window.location.pathname)
+
+// ---------------
+
+window.shop = shop // for playing around with the console
+
+/**
+ * Poor man's effort of "DevTools" to demonstrate the api:
+ */
 
 let recording = true // supress recording history when replaying
 
@@ -66,38 +102,3 @@ history.snapshots.push({
     recording = true
   }
 })
-
-/**
- * Rendering
- */
-ReactDOM.render(
-  <Provider shop={shop} history={history}>
-    <App />
-  </Provider>,
-  document.getElementById('root')
-)
-
-/**
- * Routing
- */
-
-reaction(
-  () => shop.view.currentUrl,
-  (path) => {
-    if (window.location.pathname !== path)
-      window.history.pushState(null, null, path)
-  }
-)
-
-const router = createRouter({
-  "/book/:bookId": ({bookId}) => shop.view.openBookPageById(bookId),
-  "/cart":         shop.view.openCartPage,
-  "/":             shop.view.openBooksPage
-})
-
-window.onpopstate = function historyChange(ev) {
-  if (ev.type === "popstate")
-    router(window.location.pathname)
-}
-
-router(window.location.pathname)
