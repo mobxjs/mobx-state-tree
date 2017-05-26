@@ -39,6 +39,8 @@
 * CDN: https://unpkg.com/mobx-state-tree/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
 * JSBin [playground](http://jsbin.com/petoxeheta/edit?html,js,console) (without UI)
 
+Typescript typings are included in the packages. Use `module: "commonjs"` or `moduleResolution: "node"` to make sure they are picked up automatically in any consuming project.
+
 # Philosophy & Overview
 
 `mobx-state-tree` is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
