@@ -28,7 +28,7 @@ import { ISnapshottable, IType } from "../types/type"
  * ```
  * function logger(action, next) {
  *   console.dir(action)
- *   return next()
+ *   return next(action)
  * }
  *
  * onAction(myStore, logger)

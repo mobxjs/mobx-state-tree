@@ -6,7 +6,7 @@ export interface IReferenceDescription {
     isReference: true
 }
 
-
+// TODO: fix; handle paths deeply to elements with multiple id's in it correctly....
 // TODO: fix, references are not mentioned in type.describe...
 // TODO: make distinction between nullable and non-nullable refs?
 // TODO: verify ref is requird in non-nullable snapshos and vice versa

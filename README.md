@@ -560,6 +560,12 @@ A _disposer_ is a function that cancels the effect it was created for.
 
 # Tips
 
+### `optionals` and default value functions
+
+`types.optional` can takes as default function also a function, which will be invoked each time the default value is needed. This is useful to generate timestamps, identifiers or even complex objects:
+
+`createdDate: types.optional(types.date, () => new Date())`
+
 ### `toJSON()` for debugging
 
 For debugging you might want to use `getSnapshot(model)` to print the state of a model. But if you didn't import `getSnapshot` while debugging in some debugger; don't worry, `model.toJSON()` will produce the same snapshot. (For api consistency, this feature is not part of the typed api)
@@ -628,8 +634,11 @@ Or, fancier:
 const Temperature = types.union(...["Hot", "Cold"].map(types.literal))
 ```
 
-
 # FAQ
+
+### Creating async processes
+
+For asynchronous processes, for each step that intends to modify a model you need a separate action. So for example one to kick off the process. And one to update the model. In a multi stage async process, consider postponing all updates until the last step is completed.
 
 ### Using mobx and mobx-state-tree together
 

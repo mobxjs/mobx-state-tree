@@ -85,6 +85,7 @@ export class ObjectType extends ComplexType<any, any> {
         const node = getMSTAdministration(change.object)
         node.assertWritable()
 
+        // TODO: assigning a new snapshot / MST to a property should result in a nice patch in itself
         return this.props[change.name].willChange(change)
     }
 
