@@ -18,7 +18,7 @@ export interface IType<S, T> {
     flags: TypeFlags
     is(thing: any): thing is S | T
     validate(thing: any, context: IContext): IValidationResult
-    create(snapshot?: S, environment?: any, parent?: MSTAdministration | null, subpath?: string): T
+    create(snapshot?: S, environment?: any): T
     isType: boolean
     describe(): string
     Type: T

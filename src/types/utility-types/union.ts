@@ -34,7 +34,7 @@ export class Union extends Type<any, any> {
 
         // try the dispatcher, if defined
         if (this.dispatcher !== null) {
-            return this.dispatcher(value).create(value, environment, parent, subpath)
+            return (this.dispatcher(value) as any).create(value, environment, parent, subpath)
         }
 
         // find the most accomodating type
@@ -42,7 +42,7 @@ export class Union extends Type<any, any> {
         if (applicableTypes.length > 1)
              return fail(`Ambiguos snapshot ${JSON.stringify(value)} for union ${this.name}. Please provide a dispatch in the union declaration.`)
 
-        return applicableTypes[0].create(value, environment, parent, subpath)
+        return (applicableTypes[0] as any).create(value, environment, parent, subpath)
     }
 
     validate(value: any, context: IContext): IValidationResult {
