@@ -15,6 +15,16 @@ export function arrayToString(this: IObservableArray<any>) {
     return `${getMSTAdministration(this)}(${this.length} items)`
 }
 
+class Box {
+    constructor(private value: any) {
+
+    }
+
+    get(): any {
+        return this.value
+    }
+}
+
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     isArrayFactory = true
     subType: IType<any, any>
@@ -31,6 +41,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
     createNewInstance() {
         const array = observable.shallowArray()
+        ; (array as any).$mobx.dehancer = (v: any) => v.get()
         addHiddenFinalProp(array, "toString", arrayToString)
         return array
     }
@@ -66,7 +77,9 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
             case "update":
                 if (change.newValue === change.object[change.index])
                     return null
-                change.newValue = node.reconcileChildren(this.subType, [change.object[change.index]], [change.newValue], [change.index])[0]
+                change.newValue = new Box(
+                    node.reconcileChildren(this.subType, [change.object[change.index]], [change.newValue], [change.index])[0]
+                )
                 break
             case "splice":
                 const {index, removedCount, added, object} = change
@@ -75,7 +88,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                     object.slice(index, index + removedCount),
                     added,
                     added.map((_, i) => index + i)
-                )
+                ).map(x => new Box(x))
 
                 // update paths of remaining items
                 for (let i = index + removedCount; i < object.length; i++) {
