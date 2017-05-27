@@ -10,7 +10,9 @@ export enum TypeFlags {
     Map     = 1 << 6,
     Object  = 1 << 7,
     Frozen  = 1 << 8,
-    Optional = 1 << 9
+    Optional = 1 << 9,
+    Reference = 1 << 10,
+    Identifier = 1 << 11
 }
 
 export interface IType<S, T> {
@@ -18,7 +20,8 @@ export interface IType<S, T> {
     flags: TypeFlags
     is(thing: any): thing is S | T
     validate(thing: any, context: IContext): IValidationResult
-    create(snapshot?: S, environment?: any): T
+    // TODO: restore:  create(snapshot?: S, environment?: any): T
+    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: S): INode
     isType: boolean
     describe(): string
     Type: T
@@ -43,9 +46,14 @@ export abstract class Type<S, T> implements IType<S, T> {
     }
 
     abstract flags: TypeFlags
-    abstract create(snapshot: any): any
+    abstract instantiate(parent: MSTAdministration, subpath: string, environment: any, snapshot: S): INode
     abstract validate(thing: any, context: IContext): IValidationResult
     abstract describe(): string
+
+    // TODO: restore:
+    // create(snapshot?: S, environment?: any): T {
+    //     return this.instantiate(null, null, environment, snapshot)
+    // }
 
     is(value: any): value is S | T {
         return this.validate(
@@ -67,3 +75,5 @@ export abstract class Type<S, T> implements IType<S, T> {
 import { fail } from "../utils"
 import { IMSTNode } from "../core/mst-node"
 import { IContext, IValidationResult } from "./type-checker"
+import { MSTAdministration, INode } from "../core/mst-node-administration"
+

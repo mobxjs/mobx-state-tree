@@ -25,6 +25,7 @@ const createTestFactories = () => {
 
 // === FACTORY TESTS ===
 test("it should create a factory", (t) => {
+    debugger;
     const {Factory} = createTestFactories()
 
     t.deepEqual(getSnapshot(Factory.create()), [])

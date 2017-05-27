@@ -1,6 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { fail, isMutable, isSerializable, isPlainObject } from "../../utils"
+import { ImmutableNode, INode, MSTAdministration } from '../../core/mst-node-administration'
 
 function freeze(value: any) {
     Object.freeze(value)
@@ -27,10 +28,10 @@ export class Frozen<T> extends Type<T, T> {
         return "<any immutable value>"
     }
 
-    create(value: any) {
+    instantiate(parent: MSTAdministration, subpath: string, environment: any, value: any): INode {
         if (!isSerializable(value)) fail("Given value should be serializable")
         // deep freeze the object/array
-        return isMutable(value) ? freeze(value) : value
+        return new ImmutableNode(this, parent, subpath, isMutable(value) ? freeze(value) : value)
     }
 
     validate(value: any, context: IContext): IValidationResult {

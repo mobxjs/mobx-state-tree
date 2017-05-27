@@ -24,14 +24,14 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.describe() + "?"
     }
 
-    create(value: any) {
+    instantiate(parent: MSTAdministration, subpath: string, environment: any, value: S): INode {
         if (typeof value === "undefined") {
             const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
             const defaultSnapshot = isMST(defaultValue) ? getMSTAdministration(defaultValue).snapshot : defaultValue
-            return this.type.create(defaultSnapshot)
+            return this.type.instantiate(parent, subpath, environment, defaultSnapshot)
         }
 
-        return this.type.create(value)
+        return this.type.instantiate(parent, subpath, environment, value)
     }
 
     validate(value: any, context: IContext): IValidationResult {
@@ -58,4 +58,6 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): 
     return new OptionalValue(type, defaultValueOrFunction)
 }
 
-import {isMST, getMSTAdministration} from "../../core/mst-node"
+import { isMST, getMSTAdministration } from "../../core/mst-node"
+import { MSTAdministration, INode } from "../../core/mst-node-administration"
+

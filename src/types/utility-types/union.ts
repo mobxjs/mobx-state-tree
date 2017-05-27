@@ -1,6 +1,7 @@
 import {isType, IType, TypeFlags, Type} from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors, typecheck } from "../type-checker"
 import {fail} from "../../utils"
+import { MSTAdministration, INode } from "../../core/mst-node-administration"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
@@ -10,7 +11,7 @@ export class Union extends Type<any, any> {
 
     get flags () {
         let result: TypeFlags = 0
-        
+
         this.types.forEach(type => {
             result |= type.flags
         })
@@ -28,12 +29,13 @@ export class Union extends Type<any, any> {
         return "(" + this.types.map(factory => factory.describe()).join(" | ") + ")"
     }
 
-    create(value: any) {
+    instantiate(parent: MSTAdministration, subpath: string, environment: any, value: any): INode {
+
         typecheck(this, value)
 
         // try the dispatcher, if defined
         if (this.dispatcher !== null) {
-            return this.dispatcher(value).create(value)
+            return this.dispatcher(value).instantiate(parent, subpath, environment, value)
         }
 
         // find the most accomodating type
@@ -41,7 +43,7 @@ export class Union extends Type<any, any> {
         if (applicableTypes.length > 1)
              return fail(`Ambiguos snapshot ${JSON.stringify(value)} for union ${this.name}. Please provide a dispatch in the union declaration.`)
 
-        return applicableTypes[0].create(value)
+        return applicableTypes[0].instantiate(parent, subpath, environment, value)
     }
 
     validate(value: any, context: IContext): IValidationResult {

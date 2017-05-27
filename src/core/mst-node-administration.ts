@@ -21,11 +21,75 @@ import { ComplexType } from "../types/complex-types/complex-type"
 
 let nextNodeId = 1
 
-export class MSTAdministration {
-    readonly nodeId = ++nextNodeId
+// TODO: make node generic?
+export interface INode {
+    // readonly nodeId = ++nextNodeId
+    parent: MSTAdministration | null
+    subpath: string
+    type: IType<any, any>
+    getValue(): any
+    getSnapshot(): any
+}
+
+// export abstract class AbstractNode implements INode {
+//     @observable parent: MSTAdministration | null = null
+//     @observable subpath: string = ""
+
+//     // TODO: should have environment as well?
+//     constructor(type: IType<any, any>, parent: MSTAdministration | null, subpath: string) {
+//         this.type = type
+//         this.parent = parent
+//         this.subpath = subpath
+//     }
+
+//     abstract value(): any
+// }
+
+export class ImmutableNode implements INode {
+    constructor(
+        public readonly type: IType<any, any>,
+        public readonly parent: MSTAdministration | null,
+        public subpath: string,
+        protected readonly value: any
+    ) {
+
+    }
+
+    getValue() {
+        return this.value
+    }
+
+    getSnapshot() {
+        return this.value
+    }
+}
+
+// export class WrappedNode implements INode {
+//     constructor(
+//         public readonly type: IType<any, any>,
+//         private readonly wrapped: INode
+//     ) {
+
+//     }
+
+//     get parent(): MSTAdministration | null {
+//         return this.wrapped.parent
+//     }
+//     set parent(v: MSTAdministration | null) {
+//         this.wrapped.parent = v
+//     }
+
+//     get subpath(): string {
+//         return this.wrapped.subpath
+//     }
+//     set subpath(v: string) {
+//         this.wrapped.subpath = v
+//     }
+// }
+
+// TODO: rename to Node
+export class MSTAdministration extends AbstractNode {
     readonly target: any
-    @observable _parent: MSTAdministration | null = null
-    @observable subpath: string = ""
     readonly type: ComplexType<any, any>
     isProtectionEnabled = true
     _environment: any = undefined
@@ -39,6 +103,7 @@ export class MSTAdministration {
     private readonly disposers: (() => void)[] = []
 
     constructor(parent: MSTAdministration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
+        super()
         if (!(type instanceof ComplexType)) fail("Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
         this._parent = parent
@@ -58,6 +123,10 @@ export class MSTAdministration {
             throw e
         })
         this.addDisposer(snapshotDisposer)
+    }
+
+    value() {
+        return this.target
     }
 
     /**

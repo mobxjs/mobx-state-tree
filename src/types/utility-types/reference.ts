@@ -1,9 +1,38 @@
-import { IType } from "../type"
+import { IReference, ReferenceNode } from '../../core/reference';
+import { ISimpleType, TypeFlags, Type, IType } from "../type"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
+import { isPrimitive, fail } from "../../utils"
+import { ImmutableNode, MSTAdministration, INode } from "../../core"
 
-export interface IReferenceDescription {
-    targetType: IType<any, any>
-    basePath: string
-    isReference: true
+export type ReferenceSnapshot = string | null | IReference
+
+export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
+    readonly flags = TypeFlags.Reference
+
+    constructor(
+        private readonly targetType: IType<any, T>,
+        private readonly basePath: string
+    ) {
+        super(`reference(${targetType.name})`)
+    }
+
+    instantiate(parent: MSTAdministration, subpath: string, environment: any, snapshot: ReferenceSnapshot): INode {
+        typecheck(this.targetType, snapshot)
+        return new ReferenceNode(this, parent, subpath, snapshot)
+    }
+
+    describe() {
+        return this.name
+    }
+
+    validate(value: any, context: IContext): IValidationResult {
+        return typeCheckSuccess()
+        // TODO:
+    }
+
+    get identifierAttribute() {
+        return null
+    }
 }
 
 // TODO: fix; handle paths deeply to elements with multiple id's in it correctly....
@@ -14,13 +43,9 @@ export function reference<T>(factory: IType<any, T>): IType<{ $ref: string }, T 
 export function reference<T>(factory: IType<any, T>, basePath: string): IType<string, T | null>;
 export function reference<T>(factory: IType<any, T>, basePath: string = ""): any {
     // FIXME: IType return type is inconsistent with what is actually returned, however, results in the best type-inference results for objects...
-    return {
-        targetType: factory,
-        basePath: basePath,
-        isReference: true
-    } as IReferenceDescription
+    return new ReferenceType(factory, basePath)
 }
 
-export function isReferenceFactory(thing: any): thing is IReferenceDescription {
-    return thing.isReference === true
+export function isReferenceType(type: any): type is ReferenceType<any> {
+    return (type.flags & (TypeFlags.Reference)) > 0
 }

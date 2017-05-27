@@ -11,9 +11,9 @@ export class Literal<T> extends Type<T, T> {
         this.value = value
     }
 
-    create(snapshot: any) {
+    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: T): INode {
         typecheck(this, snapshot)
-        return this.value
+        return new ImmutableNode(this, parent, subpath, this.value)
     }
 
     describe() {
@@ -36,3 +36,5 @@ export function literal<S>(value: S): ISimpleType<S> {
     if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
     return new Literal<S>(value)
 }
+
+import { ImmutableNode, INode, MSTAdministration } from '../../core/mst-node-administration';

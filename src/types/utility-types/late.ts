@@ -1,6 +1,7 @@
 import { fail } from "../../utils"
 import { Type, IType, TypeFlags } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import { MSTAdministration, INode } from "../../core/mst-node-administration";
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>
@@ -23,8 +24,8 @@ export class Late<S, T> extends Type<S, T> {
         this.definition = definition
     }
 
-    create(snapshot?: any, environment?: any) {
-        return this.subType.create(snapshot, environment)
+    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: any): INode {
+        return this.subType.instantiate(parent, subpath, environment, snapshot)
     }
 
     describe() {

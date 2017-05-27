@@ -1,6 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "./type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
 import { isPrimitive, fail } from "../utils"
+import { ImmutableNode, MSTAdministration, INode } from "../core"
 
 export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean
@@ -16,10 +17,10 @@ export class CoreType<T> extends Type<T, T> {
         return this.name
     }
 
-    create(value: any) {
-        if (!isPrimitive(value)) fail(`Not a primitive: '${value}'`)
-        if (!this.checker(value)) fail(`Value is not assignable to '` + this.name + `'`)
-        return value
+    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: T): INode {
+        if (!isPrimitive(snapshot)) fail(`Not a primitive: '${snapshot}'`)
+        if (!this.checker(snapshot)) fail(`Value is not assignable to '` + this.name + `'`)
+        return new ImmutableNode(this, parent, subpath, snapshot)
     }
 
     validate(value: any, context: IContext): IValidationResult {
