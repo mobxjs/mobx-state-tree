@@ -211,7 +211,7 @@ const TodoStore = types.model("TodoStore", {      // 1
 })
 ```
 
-When defining a model, it is adviced to give the model a name for debugging purposes (see `// 1`).
+When defining a model, it is advised to give the model a name for debugging purposes (see `// 1`).
 A model takes two objects arguments, first all the properties, then the actions.
 
 The _properties_ argument is a key-value set where each key indicates the introduction of a property, and the value it's type. The following types are acceptable as type:
