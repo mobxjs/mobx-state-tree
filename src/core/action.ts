@@ -20,7 +20,7 @@ function runRawAction(actioncall: IRawActionCall): any {
 
 function collectMiddlewareHandlers(node: MSTAdministration): IMiddleWareHandler[] {
     let handlers = node.middlewares.slice()
-    let n: MSTAdministration | null = node
+    let n: MSTAdministration = node
     // Find all middlewares. Optimization: cache this?
     while (n.parent) {
         n = n.parent

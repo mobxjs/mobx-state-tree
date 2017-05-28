@@ -13,10 +13,9 @@ function toJSON(this: IMSTNode) {
 export abstract class ComplexType<S, T> extends Type<S, T> {
     constructor(name: string) {
         super(name)
-        this.create = action(this.name, this.create)
     }
 
-    create(snapshot: any = this.getDefaultSnapshot(), environment: any = undefined, parent: MSTAdministration | null = null, subpath: string = "") {
+    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): INode {
         typecheck(this, snapshot)
         const instance = this.createNewInstance()
         // tslint:disable-next-line:no_unused-variable
@@ -68,5 +67,5 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
 }
 
 import { IMSTNode, isMST, getType, getMSTAdministration } from "../../core/mst-node"
-import { MSTAdministration } from "../../core/mst-node-administration"
+import { MSTAdministration, INode } from "../../core/mst-node-administration"
 import { IJsonPatch } from "../../core/json-patch"

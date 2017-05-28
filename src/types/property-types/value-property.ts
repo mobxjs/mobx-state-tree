@@ -1,8 +1,13 @@
-import { observable, IObjectWillChange, IObjectChange } from "mobx"
+import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
-import { getMSTAdministration, maybeMST, valueToSnapshot, escapeJsonPath } from "../../core"
+import { getMSTAdministration, maybeMST, valueToSnapshot, escapeJsonPath, INode } from "../../core"
 import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath } from "../type-checker"
+
+// TODO: move to better place, reuse
+function unbox(b: INode): any {
+    return b.getValue()
+}
 
 export class ValueProperty extends Property {
     constructor(propertyName: string, public type: IType<any, any>) {
@@ -11,10 +16,12 @@ export class ValueProperty extends Property {
 
     initializePrototype(proto: any) {
         observable.ref(proto, this.name, { value: undefined })
+        extras.getAdministration(proto, this.name).dehancer = unbox
     }
 
     initialize(targetInstance: any, snapshot: any) {
-        targetInstance[this.name] = this.type.create(snapshot[this.name])
+        const adm = getMSTAdministration(targetInstance)
+        targetInstance[this.name] = this.type.instantiate(adm, this.name, adm._environment, snapshot[this.name])
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {

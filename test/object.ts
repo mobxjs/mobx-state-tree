@@ -42,7 +42,7 @@ const createTestFactories = () => {
 }
 
 // === FACTORY TESTS ===
-test("it should create a factory", (t) => {
+test.only("it should create a factory", (t) => {
     const {Factory} = createTestFactories()
     const snapshot = getSnapshot(Factory.create())
     t.deepEqual(snapshot, {to: 'world'})

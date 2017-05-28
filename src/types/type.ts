@@ -1,3 +1,5 @@
+import {action} from "mobx"
+
 export interface ISnapshottable<S> {}
 
 export enum TypeFlags {
@@ -20,8 +22,9 @@ export interface IType<S, T> {
     flags: TypeFlags
     is(thing: any): thing is S | T
     validate(thing: any, context: IContext): IValidationResult
-    // TODO: restore:  create(snapshot?: S, environment?: any): T
-    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: S): INode
+    // TODO: not all types need create?
+    create(snapshot?: S, environment?: any): T
+    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot?: S): INode
     isType: boolean
     describe(): string
     Type: T
@@ -46,14 +49,13 @@ export abstract class Type<S, T> implements IType<S, T> {
     }
 
     abstract flags: TypeFlags
-    abstract instantiate(parent: MSTAdministration, subpath: string, environment: any, snapshot: S): INode
+    abstract instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot?: S): INode
     abstract validate(thing: any, context: IContext): IValidationResult
     abstract describe(): string
 
-    // TODO: restore:
-    // create(snapshot?: S, environment?: any): T {
-    //     return this.instantiate(null, null, environment, snapshot)
-    // }
+    @action create(snapshot?: S, environment?: any): T {
+        return this.instantiate(null, "", environment, snapshot).getValue()
+    }
 
     is(value: any): value is S | T {
         return this.validate(

@@ -28,7 +28,7 @@ export interface INode {
     subpath: string
     type: IType<any, any>
     getValue(): any
-    getSnapshot(): any
+    // getSnapshot(): any
 }
 
 // export abstract class AbstractNode implements INode {
@@ -59,9 +59,9 @@ export class ImmutableNode implements INode {
         return this.value
     }
 
-    getSnapshot() {
-        return this.value
-    }
+    // getSnapshot() {
+    //     return this.value
+    // }
 }
 
 // export class WrappedNode implements INode {
@@ -87,8 +87,11 @@ export class ImmutableNode implements INode {
 //     }
 // }
 
-// TODO: rename to Node
-export class MSTAdministration extends AbstractNode {
+// TODO: rename to ComplexNode
+export class MSTAdministration implements INode {
+    readonly nodeId = ++nextNodeId
+    @observable _parent: MSTAdministration | null = null
+    @observable subpath: string = ""
     readonly target: any
     readonly type: ComplexType<any, any>
     isProtectionEnabled = true
@@ -103,7 +106,6 @@ export class MSTAdministration extends AbstractNode {
     private readonly disposers: (() => void)[] = []
 
     constructor(parent: MSTAdministration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
-        super()
         if (!(type instanceof ComplexType)) fail("Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
         this._parent = parent
@@ -125,7 +127,7 @@ export class MSTAdministration extends AbstractNode {
         this.addDisposer(snapshotDisposer)
     }
 
-    value() {
+    getValue() {
         return this.target
     }
 
