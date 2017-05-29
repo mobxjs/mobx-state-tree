@@ -18,7 +18,7 @@ const createTestFactories = () => {
         types.map(
             ItemFactory
         ), {})
-    
+
     const PrimitiveMapFactory = types.model({
             boolean: types.map(types.boolean),
             string: types.map(types.string),
@@ -84,26 +84,15 @@ test("it should return a snapshot", (t) => {
 test("it should be the same each time", (t) => {
     const {PrimitiveMapFactory} = createTestFactories()
     const data = {
-        string: {
-            a: "a",
-            b: ""
-        },
-        boolean: {
-            c: true,
-            d: false
-        },
-        number: {
-            i: 0,
-            f: 1,
-            g: NaN
-        }
+        string: {a: "a", b: ""},
+        boolean: {a: true, b: false},
+        number: {a: 0, b: 42, c: NaN}
     }
     const doc = PrimitiveMapFactory.create(data)
-    unprotect(doc)
     t.deepEqual<any>(getSnapshot(doc), data)
-    doc.applySnapshot(data)
+    applySnapshot(doc, data)
     t.deepEqual<any>(getSnapshot(doc), data)
-    doc.applySnapshot(data)
+    applySnapshot(doc, data)
     t.deepEqual<any>(getSnapshot(doc), data)
 })
 
