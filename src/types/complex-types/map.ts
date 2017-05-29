@@ -158,7 +158,6 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                     fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${key}', but expected: '${item[identifierAttr]}'`)
                 // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
                 if (key in currentKeys && !isPrimitive(item)) {
-                    currentKeys[key] = true
                     maybeMST(
                         target.get(key),
                         propertyNode => {
@@ -172,6 +171,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                 } else {
                     target.set(key, item)
                 }
+                currentKeys[key] = true
             })
             Object.keys(currentKeys).forEach(key => {
                 if (currentKeys[key] === false)
