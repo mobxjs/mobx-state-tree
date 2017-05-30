@@ -1,7 +1,7 @@
 import { ISimpleType, TypeFlags, Type, IType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
-import { AbstractNode } from "../../core"
+import { Node } from "../../core"
 import { string as stringType, number as numberType } from "../primitives"
 
 export class IdentifierType<T> extends Type<T, T> {
@@ -13,12 +13,12 @@ export class IdentifierType<T> extends Type<T, T> {
         super(`identifier(${identifierType.name})`)
     }
 
-    instantiate(parent: AbstractNode, subpath: string, environment: any, snapshot: T): AbstractNode {
+    instantiate(parent: Node, subpath: string, environment: any, snapshot: T): Node {
         typecheck(this.identifierType, snapshot)
         // TODO: assert parent.type is a model type!
         // TODO: return IdentifierNode
         // TODO: check uniques in parent
-        return new AbstractNode(this, parent, subpath, environment, snapshot)
+        return new Node(this, parent, subpath, environment, snapshot)
     }
 
     describe() {

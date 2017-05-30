@@ -1,7 +1,7 @@
 import { fail } from "../../utils"
 import { Type, IType, TypeFlags } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { AbstractNode } from "../../core";
+import { Node } from "../../core";
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>
@@ -24,7 +24,7 @@ export class Late<S, T> extends Type<S, T> {
         this.definition = definition
     }
 
-    instantiate(parent: AbstractNode | null, subpath: string, environment: any, snapshot: any): AbstractNode {
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
         return this.subType.instantiate(parent, subpath, environment, snapshot)
     }
 

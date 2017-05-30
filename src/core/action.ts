@@ -18,9 +18,9 @@ function runRawAction(actioncall: IRawActionCall): any {
     return actioncall.object[actioncall.name].apply(actioncall.object, actioncall.args)
 }
 
-function collectMiddlewareHandlers(node: AbstractNode): IMiddleWareHandler[] {
+function collectMiddlewareHandlers(node: Node): IMiddleWareHandler[] {
     let handlers = node.middlewares.slice()
-    let n: AbstractNode = node
+    let n: Node = node
     // Find all middlewares. Optimization: cache this?
     while (n.parent) {
         n = n.parent
@@ -29,7 +29,7 @@ function collectMiddlewareHandlers(node: AbstractNode): IMiddleWareHandler[] {
     return handlers
 }
 
-function runMiddleWares(node: AbstractNode, baseCall: IRawActionCall): any {
+function runMiddleWares(node: Node, baseCall: IRawActionCall): any {
     const handlers = collectMiddlewareHandlers(node)
     // Short circuit
     if (!handlers.length)
@@ -76,7 +76,7 @@ export function createActionInvoker(name: string, fn: Function) {
     return createNamedFunction(name, actionInvoker)
 }
 
-function serializeArgument(node: AbstractNode, actionName: string, index: number, arg: any): any {
+function serializeArgument(node: Node, actionName: string, index: number, arg: any): any {
     if (isPrimitive(arg))
         return arg
     if (isComplexValue(arg)) {
@@ -103,7 +103,7 @@ function serializeArgument(node: AbstractNode, actionName: string, index: number
     }
 }
 
-function deserializeArgument(adm: AbstractNode, value: any): any {
+function deserializeArgument(adm: Node, value: any): any {
     if (typeof value === "object") {
         const keys = Object.keys(value)
         if (keys.length === 1 && keys[0] === "$ref")
@@ -146,6 +146,6 @@ export function onAction(target: IComplexValue, listener: (call: ISerializedActi
     })
 }
 
-import { AbstractNode, getComplexNode,  IComplexValue, isComplexValue, } from "./nodes/abstract-node"
+import { Node, getComplexNode,  IComplexValue, isComplexValue, } from "./nodes/abstract-node"
 import { resolve, tryResolve, addMiddleware,  } from "./mst-operations"
 import { fail, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"

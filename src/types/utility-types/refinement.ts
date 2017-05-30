@@ -1,6 +1,6 @@
 import { IType, TypeFlags, Type } from "../type"
 import { fail } from "../../utils"
-import { isComplexValue, getComplexNode, AbstractNode } from "../../core"
+import { isComplexValue, getComplexNode, Node } from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export class Refinement extends Type<any, any> {
@@ -21,7 +21,7 @@ export class Refinement extends Type<any, any> {
         return this.name
     }
 
-    instantiate(parent: AbstractNode, subpath: string, environment: any, value: any): AbstractNode {
+    instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
         // create the child type
         const inst = this.type.instantiate(parent, subpath, environment, value)
         const snapshot = isComplexValue(inst) ? getComplexNode(inst).snapshot : inst

@@ -1,6 +1,6 @@
 import {Type, IType, TypeFlags} from "../type"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { isComplexValue, getComplexNode, AbstractNode  } from "../../core"
+import { isComplexValue, getComplexNode, Node  } from "../../core"
 
 export type IFunctionReturn<T> = () => T
 export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>
@@ -25,7 +25,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.describe() + "?"
     }
 
-    instantiate(parent: AbstractNode, subpath: string, environment: any, value: S): AbstractNode {
+    instantiate(parent: Node, subpath: string, environment: any, value: S): Node {
         if (typeof value === "undefined") {
             const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
             const defaultSnapshot = isComplexValue(defaultValue) ? getComplexNode(defaultValue).snapshot : defaultValue

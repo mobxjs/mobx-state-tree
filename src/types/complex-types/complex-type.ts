@@ -14,11 +14,11 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         super(name)
     }
 
-    instantiate(parent: AbstractNode | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): AbstractNode {
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): Node {
         typecheck(this, snapshot)
         const instance = this.createNewInstance()
         // tslint:disable-next-line:no_unused-variable
-        const node = new AbstractNode(this, parent, subpath, environment, instance)
+        const node = new Node(this, parent, subpath, environment, instance)
 
         addHiddenFinalProp(instance, "$treenode", node)
         // optimization: don't keep the snapshot by default alive with a reaction by default
@@ -52,21 +52,21 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         }
     }
 
-    toSnapshot(node: AbstractNode) {
+    toSnapshot(node: Node) {
         return this.serialize(node) // TODO: factor out
     }
 
     abstract createNewInstance(): any
     abstract finalizeNewInstance(target: any, snapshot: any): void
-    abstract applySnapshot(node: AbstractNode, snapshot: any): void
+    abstract applySnapshot(node: Node, snapshot: any): void
     // TODO: Maybe optional could resolve to this if omitted?
     abstract getDefaultSnapshot(): any
-    abstract getChildren(node: AbstractNode): AbstractNode[]
-    abstract getChildNode(node: AbstractNode, key: string): AbstractNode
-    abstract serialize(node: AbstractNode): any
-    abstract applyPatchLocally(node: AbstractNode, subpath: string, patch: IJsonPatch): void
+    abstract getChildren(node: Node): Node[]
+    abstract getChildNode(node: Node, key: string): Node
+    abstract serialize(node: Node): any
+    abstract applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IType<any, any>
-    abstract removeChild(node: AbstractNode, subpath: string): void
+    abstract removeChild(node: Node, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
 
     validate(value: any, context: IContext): IValidationResult {
@@ -84,13 +84,13 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
 }
 
 export interface IMSTNode {
-    readonly $treenode?: AbstractNode
+    readonly $treenode?: Node
 }
 
 export function isMST(value: any): value is IMSTNode {
     return value && value.$treenode
 }
 
-import { getType, getComplexNode, AbstractNode } from "../../core"
+import { getType, getComplexNode, Node } from "../../core"
 import { IJsonPatch } from "../../core/json-patch"
 import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getDefaultContext, typecheck } from "../type-checker"

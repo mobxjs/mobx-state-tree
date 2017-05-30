@@ -6,12 +6,11 @@ import {
 
 let nextNodeId = 1
 
-// TODO: rename to Node
-export class AbstractNode  {
+export class Node  {
     readonly nodeId = ++nextNodeId
     readonly type: IType<any, any>
     readonly storedValue: any
-    @observable protected _parent: AbstractNode | null = null
+    @observable protected _parent: Node | null = null
     @observable subpath: string = ""
 
     isProtectionEnabled = true
@@ -26,7 +25,7 @@ export class AbstractNode  {
     private readonly disposers: (() => void)[] = []
 
     // TODO: should have environment as well?
-    constructor(type: IType<any, any>, parent: AbstractNode | null, subpath: string, environment: any, storedValue: any) {
+    constructor(type: IType<any, any>, parent: Node | null, subpath: string, environment: any, storedValue: any) {
         this.type = type
         this._parent = parent
         this.subpath = subpath
@@ -47,19 +46,19 @@ export class AbstractNode  {
         return this.parent === null
     }
 
-    public get parent(): AbstractNode | null {
+    public get parent(): Node | null {
         return this._parent
     }
 
-    public get root(): AbstractNode {
+    public get root(): Node {
         // future optimization: store root ref in the node and maintain it
-        let p, r: AbstractNode = this
+        let p, r: Node = this
         while (p = r.parent)
             r = p
-        return r as AbstractNode
+        return r as Node
     }
 
-    getRelativePathTo(target: AbstractNode): string {
+    getRelativePathTo(target: Node): string {
         // PRE condition target is (a child of) base!
         if (this.root !== target.root) fail(`Cannot calculate relative path: objects '${this}' and '${target}' are not part of the same object tree`)
 
@@ -75,20 +74,20 @@ export class AbstractNode  {
             + joinJsonPath(targetParts.slice(common))
     }
 
-    resolve(pathParts: string): AbstractNode;
-    resolve(pathParts: string, failIfResolveFails: boolean): AbstractNode | undefined;
-    resolve(path: string, failIfResolveFails: boolean = true): AbstractNode | undefined {
+    resolve(pathParts: string): Node;
+    resolve(pathParts: string, failIfResolveFails: boolean): Node | undefined;
+    resolve(path: string, failIfResolveFails: boolean = true): Node | undefined {
         return this.resolvePath(splitJsonPath(path), failIfResolveFails)
     }
 
-    resolvePath(pathParts: string[]): AbstractNode;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean): AbstractNode | undefined;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): AbstractNode | undefined {
+    resolvePath(pathParts: string[]): Node;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean): Node | undefined;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): Node | undefined {
         // counter part of getRelativePath
         // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
         // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
         // so we treat leading ../ apart...
-        let current: AbstractNode | null = this
+        let current: Node | null = this
         for (let i = 0; i < pathParts.length; i++) {
             if (pathParts[i] === "") // '/bla' or 'a//b' splits to empty strings
                 current = current!.root
@@ -198,7 +197,7 @@ export class AbstractNode  {
         return registerEventHandler(this.patchSubscribers, onPatch)
     }
 
-    emitPatch(patch: IJsonPatch, source: AbstractNode) {
+    emitPatch(patch: IJsonPatch, source: Node) {
         if (this.patchSubscribers.length) {
             const localizedPatch: IJsonPatch = extend({}, patch, {
                     path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
@@ -209,7 +208,7 @@ export class AbstractNode  {
             this.parent.emitPatch(patch, source)
     }
 
-    setParent(newParent: AbstractNode | null, subpath: string | null = null) {
+    setParent(newParent: Node | null, subpath: string | null = null) {
         if (this.parent === newParent && this.subpath === subpath)
             return
         if (this._parent && newParent && newParent !== this._parent) {
@@ -234,7 +233,7 @@ export class AbstractNode  {
         this.disposers.unshift(disposer)
     }
 
-    reconcileChildren<T>(childType: IType<any, T>, oldNodes: AbstractNode[], newValues: T[], newPaths: (string|number)[]): T[] {
+    reconcileChildren<T>(childType: IType<any, T>, oldNodes: Node[], newValues: T[], newPaths: (string|number)[]): T[] {
         // TODO: pick identifiers based on actual type instead of declared type
         // optimization: overload for a single old / new value to avoid all the array allocations
         // optimization: skip reconciler for non-complex types
@@ -317,12 +316,12 @@ export class AbstractNode  {
         return registerEventHandler(this.middlewares, handler)
     }
 
-    getChildNode(subpath: string): AbstractNode {
+    getChildNode(subpath: string): Node {
         this.assertAlive()
         return this.type.getChildNode(this, subpath)
     }
 
-    getChildren(): AbstractNode[] {
+    getChildren(): Node[] {
         return this.type.getChildren(this)
     }
 
@@ -331,7 +330,7 @@ export class AbstractNode  {
     }
 
     get isProtected(): boolean {
-        let cur: AbstractNode | null = this
+        let cur: Node | null = this
         while (cur) {
             if (cur.isProtectionEnabled === false)
                 return false
@@ -368,7 +367,7 @@ export class AbstractNode  {
             return
         else {
             this.fireHook("beforeDetach")
-            this._environment = (this.root as AbstractNode)._environment // make backup of environment
+            this._environment = (this.root as Node)._environment // make backup of environment
             this._isDetaching = true
             this.parent!.removeChild(this.subpath)
             this._parent = null
@@ -392,14 +391,14 @@ export class AbstractNode  {
 
 
 export interface IComplexValue {
-    readonly $treenode?: AbstractNode
+    readonly $treenode?: Node
 }
 
 export function isComplexValue(value: any): value is IComplexValue {
     return value && value.$treenode
 }
 
-export function getComplexNode(value: IComplexValue): AbstractNode {
+export function getComplexNode(value: IComplexValue): Node {
     if (isComplexValue(value))
         return value.$treenode!
     else

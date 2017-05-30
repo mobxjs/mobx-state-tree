@@ -15,7 +15,7 @@ import {
     isPlainObject
 } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
-import { getType, IComplexValue, getComplexNode, IJsonPatch, AbstractNode } from "../../core"
+import { getType, IComplexValue, getComplexNode, IJsonPatch, Node } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
@@ -147,8 +147,8 @@ export class ObjectType extends ComplexType<any, any> {
         }
     }
 
-    getChildren(node: AbstractNode): AbstractNode[] {
-        const res: AbstractNode[] = []
+    getChildren(node: Node): Node[] {
+        const res: Node[] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
                 res.push(prop.getValueNode(node.storedValue))
@@ -156,24 +156,24 @@ export class ObjectType extends ComplexType<any, any> {
         return res
     }
 
-    getChildNode(node: AbstractNode, key: string): AbstractNode {
+    getChildNode(node: Node, key: string): Node {
         if (!(this.props[key] instanceof ValueProperty))
             return fail("Not a value property: " + key)
         return (this.props[key] as ValueProperty).getValueNode(node.storedValue)
     }
 
-    serialize(node: AbstractNode): any {
+    serialize(node: Node): any {
         const res = {}
         this.forAllProps(prop => prop.serialize(node.storedValue, res))
         return res
     }
 
-    applyPatchLocally(node: AbstractNode, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add")) fail(`object does not support operation ${patch.op}`)
         node.storedValue[subpath] = patch.value
     }
 
-    @action applySnapshot(node: AbstractNode, snapshot: any): void {
+    @action applySnapshot(node: Node, snapshot: any): void {
         // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed?
         node.pseudoAction(() => {
             for (let key in this.props)
@@ -219,7 +219,7 @@ export class ObjectType extends ComplexType<any, any> {
         return {}
     }
 
-    removeChild(node: AbstractNode, subpath: string) {
+    removeChild(node: Node, subpath: string) {
         node.storedValue[subpath] = null
     }
 }

@@ -32,4 +32,4 @@ export function literal<S>(value: S): ISimpleType<S> {
     return new Literal<S>(value)
 }
 
-import { AbstractNode } from '../../core';
+import { Node } from '../../core';

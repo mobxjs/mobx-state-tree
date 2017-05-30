@@ -1,11 +1,11 @@
 import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
-import { getComplexNode, escapeJsonPath, AbstractNode } from "../../core"
+import { getComplexNode, escapeJsonPath, Node } from "../../core"
 import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath } from "../type-checker"
 import { fail } from "../../utils"
 
-function unbox(b: AbstractNode): any {
+function unbox(b: Node): any {
     return b.getValue()
 }
 
@@ -24,7 +24,7 @@ export class ValueProperty extends Property {
         extras.getAdministration(targetInstance, this.name).dehancer = unbox
     }
 
-    getValueNode(targetInstance: any): AbstractNode {
+    getValueNode(targetInstance: any): Node {
         const node = targetInstance.$mobx.values[this.name].value // TODO: blegh!
         if (!node)
             return fail("Node not available")
