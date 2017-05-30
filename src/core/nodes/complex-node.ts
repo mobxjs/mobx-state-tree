@@ -2,91 +2,13 @@ import {
     action, observable,
     computed, reaction
 } from "mobx"
-import { IComplexType, IType } from '../types/type';
-import { typecheck } from "../types/type-checker"
+import { AbstractNode } from "./abstract-node"
+import { IComplexType, IType } from '../../types/type'
+import { typecheck } from "../../types/type-checker"
 
-let nextNodeId = 1
-
-export abstract class AbstractNode  {
-    readonly nodeId = ++nextNodeId
-    readonly type: IType<any, any>
-    @observable protected _parent: MSTAdministration | null = null
-    @observable subpath: string = ""
-
-    // TODO: should have environment as well?
-    constructor(type: IType<any, any>, parent: MSTAdministration | null, subpath: string) {
-        this.type = type
-        this._parent = parent
-        this.subpath = subpath
-    }
-
-    /**
-     * Returnes (escaped) path representation as string
-     */
-    @computed public get path(): string {
-        if (!this.parent)
-            return ""
-        return this.parent.path + "/" + escapeJsonPath(this.subpath)
-    }
-
-    public get isRoot(): boolean {
-        return this.parent === null
-    }
-
-    public get parent(): MSTAdministration | null {
-        return this._parent
-    }
-
-    public get root(): MSTAdministration {
-        // future optimization: store root ref in the node and maintain it
-        let p, r: AbstractNode = this
-        while (p = r.parent)
-            r = p
-        return r as MSTAdministration
-    }
-
-    abstract getValue(): any
-    abstract isLeaf(): boolean
-    abstract getChildren(): AbstractNode[]
-    abstract getChildNode(name: string): AbstractNode | null
-    abstract setParent(newParent: MSTAdministration, subpath: string): void
-}
-
-export class ImmutableNode extends AbstractNode implements AbstractNode {
-    constructor(
-        type: IType<any, any>,
-        parent: MSTAdministration | null,
-        subpath: string,
-        protected readonly value: any
-    ) {
-        super(type, parent, subpath)
-    }
-
-    getValue() {
-        return this.value
-    }
-
-    isLeaf() {
-        return true
-    }
-
-    getChildren(): AbstractNode[] {
-        return EMPTY_ARRAY as any
-    }
-
-    getChildNode(name: string) {
-        return null
-    }
-
-    setParent(newParent: MSTAdministration, subpath: string): void {
-        if (newParent !== this.parent)
-            fail("Only complex types can be assigned to a new parent")
-        this.subpath = subpath
-    }
-}
 
 // TODO: rename to ComplexNode
-export class MSTAdministration extends AbstractNode implements AbstractNode  {
+export class MSTAdministration extends AbstractNode  {
     type: ComplexType<any, any>
     readonly target: any
     isProtectionEnabled = true
@@ -442,9 +364,9 @@ function assertComplexNode(thing: AbstractNode | null): MSTAdministration {
     return fail("Not a complex node: " + thing)
 }
 
-import { walk } from "./mst-operations"
-import { isMST, getMSTAdministration } from "./mst-node"
-import { IMiddleWareHandler } from "./action"
+import { walk } from "../mst-operations"
+import { isMST, getMSTAdministration } from "../mst-node"
+import { IMiddleWareHandler } from "../action"
 import {
     addHiddenFinalProp,
     addReadOnlyProp,
@@ -454,7 +376,8 @@ import {
     IDisposer,
     isMutable,
     registerEventHandler
-} from '../utils';
-import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
-import { getIdentifierAttribute } from "../types/complex-types/object"
-import { ComplexType } from "../types/complex-types/complex-type"
+} from '../../utils';
+import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "../json-patch"
+import { getIdentifierAttribute } from "../../types/complex-types/object"
+import { ComplexType } from "../../types/complex-types/complex-type"
+

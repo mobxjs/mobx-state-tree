@@ -65,7 +65,6 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     }
 }
 
-import { IMSTNode, isMST, getType, getMSTAdministration } from "../../core/mst-node"
-import { MSTAdministration, AbstractNode } from "../../core/mst-node-administration"
+import { IMSTNode, isMST, getType, getMSTAdministration, AbstractNode, MSTAdministration } from "../../core"
 import { IJsonPatch } from "../../core/json-patch"
 import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getDefaultContext, typecheck } from "../type-checker"

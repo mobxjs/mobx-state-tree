@@ -58,6 +58,5 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): 
     return new OptionalValue(type, defaultValueOrFunction)
 }
 
-import { isMST, getMSTAdministration } from "../../core/mst-node"
-import { MSTAdministration, AbstractNode } from "../../core/mst-node-administration"
+import { isMST, getMSTAdministration, MSTAdministration, AbstractNode  } from "../../core"
 

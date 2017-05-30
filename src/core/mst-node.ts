@@ -51,7 +51,7 @@ export function getRelativePathForNodes(base: MSTAdministration, target: MSTAdmi
         + joinJsonPath(targetParts.slice(common))
 }
 
-import { MSTAdministration } from "./mst-node-administration"
+import { MSTAdministration } from "./nodes/complex-node"
 import { isMutable, isSerializable, fail } from "../utils"
 import { splitJsonPath, joinJsonPath } from "./json-patch"
 import { IType } from "../types/type"

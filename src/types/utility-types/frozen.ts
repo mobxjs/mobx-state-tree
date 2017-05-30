@@ -1,7 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { fail, isMutable, isSerializable, isPlainObject } from "../../utils"
-import { ImmutableNode, AbstractNode, MSTAdministration } from '../../core/mst-node-administration'
+import { ImmutableNode, AbstractNode, MSTAdministration } from '../../core'
 
 function freeze(value: any) {
     Object.freeze(value)

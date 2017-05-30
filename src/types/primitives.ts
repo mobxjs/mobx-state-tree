@@ -1,7 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "./type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
 import { isPrimitive, fail } from "../utils"
-import { ImmutableNode, MSTAdministration, AbstractNode } from "../core/mst-node-administration"
+import { ImmutableNode, MSTAdministration, AbstractNode } from "../core"
 
 export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean

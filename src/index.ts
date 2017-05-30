@@ -1,4 +1,5 @@
 // Fix some circular deps:
+import "./core/nodes/abstract-node"
 import "./types/type"
 import "./types/complex-types/complex-type"
 

@@ -37,4 +37,4 @@ export function literal<S>(value: S): ISimpleType<S> {
     return new Literal<S>(value)
 }
 
-import { ImmutableNode, AbstractNode, MSTAdministration } from '../../core/mst-node-administration';
+import { ImmutableNode, AbstractNode, MSTAdministration } from '../../core';

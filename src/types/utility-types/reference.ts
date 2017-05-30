@@ -1,4 +1,4 @@
-import { IReference, ReferenceNode } from '../../core/reference';
+import { IReference, ReferenceNode } from '../../core';
 import { ISimpleType, TypeFlags, Type, IType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"

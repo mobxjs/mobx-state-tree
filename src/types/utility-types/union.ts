@@ -1,7 +1,7 @@
 import {isType, IType, TypeFlags, Type} from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors, typecheck } from "../type-checker"
 import {fail} from "../../utils"
-import { MSTAdministration, AbstractNode } from "../../core/mst-node-administration"
+import { MSTAdministration, AbstractNode } from "../../core"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 

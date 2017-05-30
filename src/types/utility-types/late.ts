@@ -1,7 +1,7 @@
 import { fail } from "../../utils"
 import { Type, IType, TypeFlags } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { MSTAdministration, AbstractNode } from "../../core/mst-node-administration";
+import { MSTAdministration, AbstractNode } from "../../core";
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>

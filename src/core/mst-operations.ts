@@ -1,7 +1,7 @@
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { getMSTAdministration, IMSTNode, getRelativePathForNodes, isMST } from "./mst-node"
-import { MSTAdministration } from "./mst-node-administration"
+import { MSTAdministration } from "./nodes/complex-node"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, fail } from "../utils"
 import { ISnapshottable, IType } from "../types/type"
