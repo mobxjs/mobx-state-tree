@@ -1,12 +1,12 @@
 import { ImmutableNode } from "./immutable-node";
 import { isObservableArray, isObservableMap, observable, computed } from "mobx"
-import { getMSTAdministration, getRelativePathForNodes,  } from "../mst-node"
+import { getRelativePathForNodes,  } from "./abstract-node"
 import { fail } from "../../utils"
 import { getIdentifierAttribute } from "../../types/complex-types/object"
 import { IType } from "../../types/type"
 import { typecheck } from "../../types/type-checker"
-import { resolve, isMST, IMSTNode } from "../mst-operations"
-import { ComplexNode } from "./complex-node";
+import { resolve,  } from "../mst-operations"
+import { ComplexNode, getMSTAdministration, isMST, IMSTNode,  } from "./complex-node";
 
 export interface IReference {
     $ref: string

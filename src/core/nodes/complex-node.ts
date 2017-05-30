@@ -4,21 +4,6 @@ import {
 } from "mobx"
 import { AbstractNode } from "./abstract-node"
 import { IType } from "../../types/type"
-import { typecheck } from "../../types/type-checker"
-import { walk, isMST } from "../mst-operations"
-import { IMiddleWareHandler } from "../action"
-import {
-    addHiddenFinalProp,
-    addReadOnlyProp,
-    extend,
-    fail,
-    IDisposer,
-    isMutable,
-    registerEventHandler
-} from "../../utils"
-import { IJsonPatch, joinJsonPath, splitJsonPath } from "../json-patch"
-import { getIdentifierAttribute } from "../../types/complex-types/object"
-import { ComplexType } from "../../types/complex-types/complex-type"
 
 export class ComplexNode extends AbstractNode  {
     type: ComplexType<any, any>
@@ -370,6 +355,14 @@ export class ComplexNode extends AbstractNode  {
     }
 }
 
+export interface IMSTNode {
+    readonly $treenode?: ComplexNode
+}
+
+export function isMST(value: any): value is IMSTNode {
+    return value && value.$treenode
+}
+
 export function getMSTAdministration(value: any): ComplexNode {
     if (isMST(value))
         return value.$treenode!
@@ -382,3 +375,19 @@ function assertComplexNode(thing: AbstractNode | null): ComplexNode {
         return thing
     return fail("Not a complex node: " + thing)
 }
+
+import { typecheck } from "../../types/type-checker"
+import { walk } from "../mst-operations"
+import { IMiddleWareHandler } from "../action"
+import {
+    addHiddenFinalProp,
+    addReadOnlyProp,
+    extend,
+    fail,
+    IDisposer,
+    isMutable,
+    registerEventHandler
+} from "../../utils"
+import { IJsonPatch, joinJsonPath, splitJsonPath } from "../json-patch"
+import { getIdentifierAttribute } from "../../types/complex-types/object"
+import { ComplexType } from "../../types/complex-types/complex-type"

@@ -146,7 +146,7 @@ export function onAction(target: IMSTNode, listener: (call: ISerializedActionCal
     })
 }
 
-import { getMSTAdministration, getRelativePathForNodes } from "./mst-node"
-import { ComplexNode } from "./nodes/complex-node"
-import { resolve, tryResolve, addMiddleware, IMSTNode, isMST,  } from "./mst-operations"
+import { getRelativePathForNodes } from "./nodes/abstract-node"
+import { ComplexNode, getMSTAdministration,  IMSTNode, isMST, } from "./nodes/complex-node"
+import { resolve, tryResolve, addMiddleware,  } from "./mst-operations"
 import { fail, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"

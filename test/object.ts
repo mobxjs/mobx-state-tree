@@ -44,7 +44,6 @@ const createTestFactories = () => {
 // === FACTORY TESTS ===
 test.only("it should create a factory", (t) => {
     const {Factory} = createTestFactories()
-    debugger;
     const snapshot = getSnapshot(Factory.create())
     t.deepEqual(snapshot, {to: 'world'})
     t.deepEqual((Factory.create() as any).toJSON(), {to: 'world'}) // toJSON is there as shortcut for getSnapshot(), primarily for debugging convenience

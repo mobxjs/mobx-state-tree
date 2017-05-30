@@ -73,6 +73,6 @@ export function typecheck(type: IType<any, any>, value: any): void {
 
 import { IType } from "./type"
 import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
-import { getMSTAdministration, isMST } from "../core/mst-node"
+import { getMSTAdministration, isMST } from "../core"
 import { isPrimitiveType } from "./primitives"
 import { OptionalValue } from "./utility-types/optional"
