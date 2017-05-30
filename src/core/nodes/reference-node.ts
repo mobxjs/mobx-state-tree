@@ -30,6 +30,10 @@ export class ReferenceNode extends ImmutableNode {
         // TODO: resolve reference!
         return this.value
     }
+
+    get snapshot() {
+        return "TODO"
+    }
 }
 
 //     @computed get get() {

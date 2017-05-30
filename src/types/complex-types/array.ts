@@ -3,7 +3,6 @@ import {
     getMSTAdministration,
     IJsonPatch,
     ComplexNode,
-    valueToSnapshot,
     AbstractNode
 } from "../../core"
 import { addHiddenFinalProp, identity, nothing, fail } from "../../utils"
@@ -95,8 +94,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     serialize(node: ComplexNode): any {
-        const target = node.target as IObservableArray<any>
-        return target.map(valueToSnapshot)
+        return node.getChildren().map(childNode => childNode.snapshot)
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
@@ -106,7 +104,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                 return void node.emitPatch({
                     op: "replace",
                     path: "" + change.index,
-                    value: valueToSnapshot(change.newValue)
+                    value:  node.getChildNode("" + change.index).snapshot
                 }, node)
             case "splice":
                 for (let i = change.index + change.removedCount - 1; i >= change.index; i--)
@@ -118,7 +116,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                     node.emitPatch({
                         op: "add",
                         path: "" + (change.index + i),
-                        value: valueToSnapshot(change.added[i])
+                        value: node.getChildNode("" + (change.index + i)).snapshot
                     }, node)
                 return
         }

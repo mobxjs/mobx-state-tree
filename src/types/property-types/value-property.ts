@@ -1,8 +1,9 @@
 import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
-import { getMSTAdministration, valueToSnapshot, escapeJsonPath, AbstractNode } from "../../core"
+import { getMSTAdministration, escapeJsonPath, AbstractNode } from "../../core"
 import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath } from "../type-checker"
+import { fail } from "../../utils"
 
 // TODO: move to better place, reuse
 function unbox(b: AbstractNode): any {
@@ -24,8 +25,11 @@ export class ValueProperty extends Property {
         extras.getAdministration(targetInstance, this.name).dehancer = unbox
     }
 
-    getNode(targetInstance: any): AbstractNode {
-        return targetInstance.$mobx.values[targetInstance] // TODO: blegh!
+    getValueNode(targetInstance: any): AbstractNode {
+        const node = targetInstance.$mobx.values[this.name].value // TODO: blegh!
+        if (!node)
+            return fail("Node not available")
+        return node
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
@@ -39,12 +43,12 @@ export class ValueProperty extends Property {
         node.emitPatch({
             op: "replace",
             path: escapeJsonPath(this.name),
-            value: valueToSnapshot(change.newValue)
+            value: this.getValueNode(change.object).snapshot
         }, node)
     }
 
     serialize(instance: any, snapshot: any) {
-        snapshot[this.name] = valueToSnapshot(instance[this.name])
+        snapshot[this.name] = this.getValueNode(instance).snapshot
     }
 
     deserialize(instance: any, snapshot: any) {

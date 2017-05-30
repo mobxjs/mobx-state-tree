@@ -1,6 +1,6 @@
 import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
-import { getMSTAdministration, ComplexNode, valueToSnapshot, escapeJsonPath, IJsonPatch, AbstractNode } from "../../core"
+import { getMSTAdministration, ComplexNode, escapeJsonPath, IJsonPatch, AbstractNode } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -98,7 +98,6 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                 break
             case "delete":
                 {
-                    const oldValue = change.object.get(change.name)
                     node.reconcileChildren(this.subType, [this.getChildNode(node, change.name)], [], [])
                 }
                 break
@@ -107,10 +106,9 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     serialize(node: ComplexNode): Object {
-        const target = node.target as ObservableMap<any>
         const res: {[key: string]: any} = {}
-        target.forEach((value, key) => {
-            res[key] = valueToSnapshot(value)
+        node.getChildren().forEach(childNode => {
+            res[childNode.subpath] = childNode.snapshot
         })
         return res
     }
@@ -123,7 +121,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                 return void node.emitPatch({
                     op: change.type === "add" ? "add" : "replace",
                     path: escapeJsonPath(change.name),
-                    value: valueToSnapshot(change.newValue)
+                    value: node.getChildNode(change.name).snapshot
                 }, node)
             case "delete":
                 return void node.emitPatch({

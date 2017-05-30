@@ -21,20 +21,6 @@ export function getMSTAdministration(value: any): ComplexNode {
         return fail("element has no Node")
 }
 
-export function valueToSnapshot(thing: any) {
-    if (thing instanceof Date) {
-        return {
-            $treetype: "Date",
-            time: thing.toJSON()
-        }
-    }
-    if (isMST(thing))
-        return getMSTAdministration(thing).snapshot
-    if (isSerializable(thing))
-        return thing
-    fail("Unable to convert value to snapshot.")
-}
-
 export function getRelativePathForNodes(base: ComplexNode, target: ComplexNode): string {
     // PRE condition target is (a child of) base!
     if (base.root !== target.root) fail(`Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`)

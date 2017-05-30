@@ -29,6 +29,10 @@ export class ImmutableNode extends AbstractNode  {
         return null
     }
 
+    get snapshot() {
+        return this.value
+    }
+
     setParent(newParent: ComplexNode, subpath: string): void {
         if (newParent !== this.parent)
             fail("Only complex types can be assigned to a new parent")

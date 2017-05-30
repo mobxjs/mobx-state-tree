@@ -151,7 +151,7 @@ export class ObjectType extends ComplexType<any, any> {
         const res: AbstractNode[] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
-                res.push(prop.getNode(node.target))
+                res.push(prop.getValueNode(node.target))
         })
         return res
     }
@@ -159,7 +159,7 @@ export class ObjectType extends ComplexType<any, any> {
     getChildNode(node: ComplexNode, key: string): AbstractNode {
         if (!(this.props[key] instanceof ValueProperty))
             return fail("Not a value property: " + key)
-        return (this.props[key] as ValueProperty).getNode(node.target)
+        return (this.props[key] as ValueProperty).getValueNode(node.target)
     }
 
     serialize(node: ComplexNode): any {

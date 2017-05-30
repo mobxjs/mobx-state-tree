@@ -43,6 +43,7 @@ export abstract class AbstractNode  {
         return r as ComplexNode
     }
 
+    abstract get snapshot(): any;
     abstract getValue(): any
     abstract isLeaf(): boolean
     abstract getChildren(): AbstractNode[]
