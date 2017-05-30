@@ -332,7 +332,7 @@ export function resolve(target: IMSTNode, path: string): IMSTNode | any {
     // TODO: give better error messages!
     // TODO: also accept path parts
     const node = getMSTAdministration(target).resolve(path)
-    return node ? node.target : undefined
+    return node ? node.getValue() : undefined
 }
 
 /**
@@ -347,7 +347,7 @@ export function tryResolve(target: IMSTNode, path: string): IMSTNode | any {
     const node = getMSTAdministration(target).resolve(path, false)
     if (node === undefined)
         return undefined
-    return node ? node.target : undefined
+    return node ? node.getValue() : undefined
 }
 
 export function getRelativePath(base: IMSTNode, target: IMSTNode): string {
@@ -417,7 +417,7 @@ export function walk(thing: IMSTNode, processor: (item: IMSTNode) => void) {
     const node = getMSTAdministration(thing)
     // tslint:disable-next-line:no_unused-variable
     node.getChildren().forEach((child) => {
-        if (isMST(child))
+        if (!child.isLeaf())
             walk(child, processor)
     })
     processor(node.target)

@@ -4,7 +4,7 @@ import {
     IJsonPatch,
     MSTAdministration,
     valueToSnapshot,
-    INode
+    AbstractNode
 } from "../../core"
 import { addHiddenFinalProp, identity, nothing, fail } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
@@ -52,11 +52,11 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         getMSTAdministration(instance).applySnapshot(snapshot)
     }
 
-    getChildren(node: MSTAdministration): any[] {
-        return (node.target as IObservableArray<any>).slice()
+    getChildren(node: MSTAdministration): AbstractNode[] {
+        return node.target.$mobx.values // Shooting ourselves in the foot. JS, why do you so temptingly allow this?!
     }
 
-    getChildMST(node: MSTAdministration, key: string): MSTAdministration | null {
+    getChildNode(node: MSTAdministration, key: string): AbstractNode {
         const index = parseInt(key, 10)
         if (index < node.target.length)
             return node.target.$mobx.values[index]
@@ -66,29 +66,28 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
         const node = getMSTAdministration(change.object)
         node.assertWritable()
+        const childNodes = this.getChildren(node)
 
         switch (change.type) {
             case "update":
                 if (change.newValue === change.object[change.index])
                     return null
                 change.newValue = new Box(
-                    node.reconcileChildren(this.subType, [change.object[change.index]], [change.newValue], [change.index])[0]
+                    node.reconcileChildren(this.subType, [childNodes[change.index]], [change.newValue], [change.index])[0]
                 )
                 break
             case "splice":
                 const {index, removedCount, added, object} = change
                 change.added = node.reconcileChildren(
                     this.subType,
-                    object.slice(index, index + removedCount),
+                    childNodes.slice(index, index + removedCount),
                     added,
                     added.map((_, i) => index + i)
                 ).map(x => new Box(x))
 
                 // update paths of remaining items
-                for (let i = index + removedCount; i < object.length; i++) {
-                    maybeMST(object[i], child => {
-                        child.setParent(node, "" + (i + added.length - removedCount))
-                    })
+                for (let i = index + removedCount; i < childNodes.length; i++) {
+                    childNodes[i].setParent(node, "" + (i + added.length - removedCount))
                 }
                 break
         }

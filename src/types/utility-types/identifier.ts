@@ -2,7 +2,7 @@ import { IReference, ReferenceNode } from '../../core/reference';
 import { ISimpleType, TypeFlags, Type, IType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
-import { ImmutableNode, MSTAdministration, INode } from "../../core"
+import { ImmutableNode, MSTAdministration, AbstractNode } from "../../core"
 import { string as stringType, number as numberType } from "../primitives"
 
 export class IdentifierType<T> extends Type<T, T> {
@@ -14,7 +14,7 @@ export class IdentifierType<T> extends Type<T, T> {
         super(`identifier(${identifierType.name})`)
     }
 
-    instantiate(parent: MSTAdministration, subpath: string, environment: any, snapshot: T): INode {
+    instantiate(parent: MSTAdministration, subpath: string, environment: any, snapshot: T): AbstractNode {
         typecheck(this.identifierType, snapshot)
         // TODO: assert parent.type is a model type!
         // TODO: return IdentifierNode

@@ -1,11 +1,11 @@
 import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
-import { getMSTAdministration, valueToSnapshot, escapeJsonPath, INode } from "../../core"
+import { getMSTAdministration, valueToSnapshot, escapeJsonPath, AbstractNode } from "../../core"
 import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath } from "../type-checker"
 
 // TODO: move to better place, reuse
-function unbox(b: INode): any {
+function unbox(b: AbstractNode): any {
     return b.getValue()
 }
 
@@ -24,13 +24,13 @@ export class ValueProperty extends Property {
         extras.getAdministration(targetInstance, this.name).dehancer = unbox
     }
 
-    getNode(targetInstance: any): INode {
+    getNode(targetInstance: any): AbstractNode {
         return targetInstance.$mobx.values[targetInstance] // TODO: blegh!
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getMSTAdministration(change.object)
-        change.newValue = node.reconcileChildren(this.type, [node.getChildMST(change.name)!], [change.newValue], [change.name])[0]
+        change.newValue = node.reconcileChildren(this.type, [node.getChildNode(change.name)!], [change.newValue], [change.name])[0]
         return change
     }
 

@@ -14,7 +14,7 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         super(name)
     }
 
-    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): INode {
+    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): AbstractNode {
         typecheck(this, snapshot)
         const instance = this.createNewInstance()
         // tslint:disable-next-line:no_unused-variable
@@ -43,8 +43,8 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     abstract applySnapshot(node: MSTAdministration, snapshot: any): void
     // TODO: Maybe optional could resolve to this if omitted?
     abstract getDefaultSnapshot(): any
-    abstract getChildren(node: MSTAdministration): any[]
-    abstract getChildMST(node: MSTAdministration, key: string): INode // TODO: rename to getChildNode
+    abstract getChildren(node: MSTAdministration): AbstractNode[]
+    abstract getChildNode(node: MSTAdministration, key: string): AbstractNode
     abstract serialize(node: MSTAdministration): any
     abstract applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IType<any, any>
@@ -66,6 +66,6 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
 }
 
 import { IMSTNode, isMST, getType, getMSTAdministration } from "../../core/mst-node"
-import { MSTAdministration, INode } from "../../core/mst-node-administration"
+import { MSTAdministration, AbstractNode } from "../../core/mst-node-administration"
 import { IJsonPatch } from "../../core/json-patch"
 import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getDefaultContext, typecheck } from "../type-checker"

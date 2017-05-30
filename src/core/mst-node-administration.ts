@@ -2,84 +2,93 @@ import {
     action, observable,
     computed, reaction
 } from "mobx"
-import { IType } from "../types/type"
+import { IComplexType, IType } from '../types/type';
 import { typecheck } from "../types/type-checker"
 
 let nextNodeId = 1
 
-// TODO: make node generic?
-export interface INode {
-    // readonly nodeId = ++nextNodeId
-    parent: MSTAdministration | null
-    subpath: string
-    type: IType<any, any>
-    getValue(): any
-    // getSnapshot(): any
+export abstract class AbstractNode  {
+    readonly nodeId = ++nextNodeId
+    readonly type: IType<any, any>
+    @observable protected _parent: MSTAdministration | null = null
+    @observable subpath: string = ""
+
+    // TODO: should have environment as well?
+    constructor(type: IType<any, any>, parent: MSTAdministration | null, subpath: string) {
+        this.type = type
+        this._parent = parent
+        this.subpath = subpath
+    }
+
+    /**
+     * Returnes (escaped) path representation as string
+     */
+    @computed public get path(): string {
+        if (!this.parent)
+            return ""
+        return this.parent.path + "/" + escapeJsonPath(this.subpath)
+    }
+
+    public get isRoot(): boolean {
+        return this.parent === null
+    }
+
+    public get parent(): MSTAdministration | null {
+        return this._parent
+    }
+
+    public get root(): MSTAdministration {
+        // future optimization: store root ref in the node and maintain it
+        let p, r: AbstractNode = this
+        while (p = r.parent)
+            r = p
+        return r as MSTAdministration
+    }
+
+    abstract getValue(): any
+    abstract isLeaf(): boolean
+    abstract getChildren(): AbstractNode[]
+    abstract getChildNode(name: string): AbstractNode | null
+    abstract setParent(newParent: MSTAdministration, subpath: string): void
 }
 
-// export abstract class AbstractNode implements INode {
-//     @observable parent: MSTAdministration | null = null
-//     @observable subpath: string = ""
-
-//     // TODO: should have environment as well?
-//     constructor(type: IType<any, any>, parent: MSTAdministration | null, subpath: string) {
-//         this.type = type
-//         this.parent = parent
-//         this.subpath = subpath
-//     }
-
-//     abstract value(): any
-// }
-
-export class ImmutableNode implements INode {
+export class ImmutableNode extends AbstractNode implements AbstractNode {
     constructor(
-        public readonly type: IType<any, any>,
-        public readonly parent: MSTAdministration | null,
-        public subpath: string,
+        type: IType<any, any>,
+        parent: MSTAdministration | null,
+        subpath: string,
         protected readonly value: any
     ) {
-
+        super(type, parent, subpath)
     }
 
     getValue() {
         return this.value
     }
 
-    // getSnapshot() {
-    //     return this.value
-    // }
+    isLeaf() {
+        return true
+    }
+
+    getChildren(): AbstractNode[] {
+        return EMPTY_ARRAY as any
+    }
+
+    getChildNode(name: string) {
+        return null
+    }
+
+    setParent(newParent: MSTAdministration, subpath: string): void {
+        if (newParent !== this.parent)
+            fail("Only complex types can be assigned to a new parent")
+        this.subpath = subpath
+    }
 }
 
-// export class WrappedNode implements INode {
-//     constructor(
-//         public readonly type: IType<any, any>,
-//         private readonly wrapped: INode
-//     ) {
-
-//     }
-
-//     get parent(): MSTAdministration | null {
-//         return this.wrapped.parent
-//     }
-//     set parent(v: MSTAdministration | null) {
-//         this.wrapped.parent = v
-//     }
-
-//     get subpath(): string {
-//         return this.wrapped.subpath
-//     }
-//     set subpath(v: string) {
-//         this.wrapped.subpath = v
-//     }
-// }
-
 // TODO: rename to ComplexNode
-export class MSTAdministration implements INode {
-    readonly nodeId = ++nextNodeId
-    @observable _parent: MSTAdministration | null = null
-    @observable subpath: string = ""
+export class MSTAdministration extends AbstractNode implements AbstractNode  {
+    type: ComplexType<any, any>
     readonly target: any
-    readonly type: ComplexType<any, any>
     isProtectionEnabled = true
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
@@ -91,12 +100,11 @@ export class MSTAdministration implements INode {
     private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     private readonly disposers: (() => void)[] = []
 
+    // TODO: reorder argumetns
     constructor(parent: MSTAdministration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
+        super(type, parent, subpath)
         if (!(type instanceof ComplexType)) fail("Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
-        this._parent = parent
-        this.subpath = subpath
-        this.type = type
         this.target = initialState
         this._environment = environment
 
@@ -117,29 +125,8 @@ export class MSTAdministration implements INode {
         return this.target
     }
 
-    /**
-     * Returnes (escaped) path representation as string
-     */
-    @computed public get path(): string {
-        if (!this.parent)
-            return ""
-        return this.parent.path + "/" + escapeJsonPath(this.subpath)
-    }
-
-    public get isRoot(): boolean {
-        return this._parent === null
-    }
-
-    public get parent() {
-        return this._parent
-    }
-
-    public get root() {
-        // future optimization: store root ref in the node and maintain it
-        let p, r: MSTAdministration = this
-        while (p = r.parent)
-            r = p
-        return r
+    isLeaf() {
+        return false
     }
 
     public get isAlive() {
@@ -205,7 +192,8 @@ export class MSTAdministration implements INode {
 
     @action public applyPatch(patch: IJsonPatch) {
         const parts = splitJsonPath(patch.path)
-        const node = this.resolvePath(parts.slice(0, -1))
+        const node = assertComplexNode(this.resolvePath(parts.slice(0, -1)))
+
         node.pseudoAction(() => {
             node.applyPatchLocally(parts[parts.length - 1], patch)
         })
@@ -256,7 +244,7 @@ export class MSTAdministration implements INode {
         this.disposers.unshift(disposer)
     }
 
-    reconcileChildren<T>(childType: IType<any, T>, oldNodes: INode[], newValues: T[], newPaths: (string|number)[]): T[] {
+    reconcileChildren<T>(childType: IType<any, T>, oldNodes: AbstractNode[], newValues: T[], newPaths: (string|number)[]): T[] {
         // optimization: overload for a single old / new value to avoid all the array allocations
         // optimization: skip reconciler for non-complex types
         const res = new Array(newValues.length)
@@ -324,31 +312,34 @@ export class MSTAdministration implements INode {
         return res
     }
 
-    resolve(pathParts: string): MSTAdministration;
-    resolve(pathParts: string, failIfResolveFails: boolean): MSTAdministration | undefined;
-    resolve(path: string, failIfResolveFails: boolean = true): MSTAdministration | undefined {
+    resolve(pathParts: string): AbstractNode;
+    resolve(pathParts: string, failIfResolveFails: boolean): AbstractNode | undefined;
+    resolve(path: string, failIfResolveFails: boolean = true): AbstractNode | undefined {
         return this.resolvePath(splitJsonPath(path), failIfResolveFails)
     }
 
-    resolvePath(pathParts: string[]): MSTAdministration;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean): MSTAdministration | undefined;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): MSTAdministration | undefined {
+    resolvePath(pathParts: string[]): AbstractNode;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean): AbstractNode | undefined;
+    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): AbstractNode | undefined {
         this.assertAlive()
         // counter part of getRelativePath
         // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
         // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
         // so we treat leading ../ apart...
-        let current: MSTAdministration | null = this
+        let current: AbstractNode | null = this
         for (let i = 0; i < pathParts.length; i++) {
             if (pathParts[i] === "") // '/bla' or 'a//b' splits to empty strings
-                current = current.root
+                current = current!.root
             else if (pathParts[i] === "..")
                 current = current!.parent
             else if (pathParts[i] === "." || pathParts[i] === "")
                 continue
-            else
-                current = current!.getChildMST(pathParts[i])
-            if (current === null) {
+            else if (current) {
+                current = current.getChildNode(pathParts[i])
+                continue
+            }
+
+            if (!current) {
                 if (failIfResolveFails)
                     return fail(`Could not resolve '${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
                 else
@@ -371,12 +362,12 @@ export class MSTAdministration implements INode {
         return registerEventHandler(this.middlewares, handler)
     }
 
-    getChildMST(subpath: string): MSTAdministration | null {
+    getChildNode(subpath: string): AbstractNode {
         this.assertAlive()
-        return this.type.getChildMST(this, subpath)
+        return this.type.getChildNode(this, subpath)
     }
 
-    getChildren(): INode[] {
+    getChildren(): AbstractNode[] {
         return this.type.getChildren(this)
     }
 
@@ -422,7 +413,7 @@ export class MSTAdministration implements INode {
             return
         else {
             this.fireHook("beforeDetach")
-            this._environment = this.root._environment // make backup of environment
+            this._environment = (this.root as MSTAdministration)._environment // make backup of environment
             this._isDetaching = true
             this.parent!.removeChild(this.subpath)
             this._parent = null
@@ -438,10 +429,17 @@ export class MSTAdministration implements INode {
     }
 
     toString(): string {
+        // TODO: move to abstract node
         const identifierAttr = getIdentifierAttribute(this.type)
         const identifier = identifierAttr ? `(${identifierAttr}: ${this.target[identifierAttr]})` : ""
         return `${this.type.name}@${this.path || "<root>"}${identifier}${this.isAlive ? "" : "[dead]"}`
     }
+}
+
+function assertComplexNode(thing: AbstractNode | null): MSTAdministration {
+    if (thing instanceof MSTAdministration)
+        return thing
+    return fail("Not a complex node: " + thing)
 }
 
 import { walk } from "./mst-operations"
@@ -450,12 +448,13 @@ import { IMiddleWareHandler } from "./action"
 import {
     addHiddenFinalProp,
     addReadOnlyProp,
+    EMPTY_ARRAY,
     extend,
     fail,
     IDisposer,
     isMutable,
     registerEventHandler
-} from "../utils"
+} from '../utils';
 import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
 import { getIdentifierAttribute } from "../types/complex-types/object"
 import { ComplexType } from "../types/complex-types/complex-type"

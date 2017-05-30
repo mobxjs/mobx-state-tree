@@ -24,7 +24,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.describe() + "?"
     }
 
-    instantiate(parent: MSTAdministration, subpath: string, environment: any, value: S): INode {
+    instantiate(parent: MSTAdministration, subpath: string, environment: any, value: S): AbstractNode {
         if (typeof value === "undefined") {
             const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
             const defaultSnapshot = isMST(defaultValue) ? getMSTAdministration(defaultValue).snapshot : defaultValue
@@ -59,5 +59,5 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): 
 }
 
 import { isMST, getMSTAdministration } from "../../core/mst-node"
-import { MSTAdministration, INode } from "../../core/mst-node-administration"
+import { MSTAdministration, AbstractNode } from "../../core/mst-node-administration"
 

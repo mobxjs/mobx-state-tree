@@ -15,7 +15,7 @@ import {
     isPlainObject
 } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
-import { MSTAdministration, getType, IMSTNode, getMSTAdministration, IJsonPatch, INode } from "../../core"
+import { MSTAdministration, getType, IMSTNode, getMSTAdministration, IJsonPatch, AbstractNode } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
@@ -147,16 +147,16 @@ export class ObjectType extends ComplexType<any, any> {
         }
     }
 
-    getChildren(node: MSTAdministration): any[] {
-        const res: INode[] = []
+    getChildren(node: MSTAdministration): AbstractNode[] {
+        const res: AbstractNode[] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
-                res.push(node.target[prop.name])
+                res.push(prop.getNode(node.target))
         })
         return res
     }
 
-    getChildMST(node: MSTAdministration, key: string): INode {
+    getChildNode(node: MSTAdministration, key: string): AbstractNode {
         if (!(this.props[key] instanceof ValueProperty))
             return fail("Not a value property: " + key)
         return (this.props[key] as ValueProperty).getNode(node.target)

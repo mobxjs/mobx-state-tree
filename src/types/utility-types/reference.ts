@@ -2,7 +2,7 @@ import { IReference, ReferenceNode } from '../../core/reference';
 import { ISimpleType, TypeFlags, Type, IType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
-import { ImmutableNode, MSTAdministration, INode } from "../../core"
+import { ImmutableNode, MSTAdministration, AbstractNode } from "../../core"
 
 export type ReferenceSnapshot = string | null | IReference
 
@@ -16,7 +16,7 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
         super(`reference(${targetType.name})`)
     }
 
-    instantiate(parent: MSTAdministration, subpath: string, environment: any, snapshot: ReferenceSnapshot): INode {
+    instantiate(parent: MSTAdministration, subpath: string, environment: any, snapshot: ReferenceSnapshot): AbstractNode {
         typecheck(this.targetType, snapshot)
         return new ReferenceNode(this, parent, subpath, snapshot)
     }

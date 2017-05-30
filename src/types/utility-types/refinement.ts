@@ -1,6 +1,6 @@
 import { IType, TypeFlags, Type } from "../type"
 import { fail } from "../../utils"
-import { isMST, getMSTAdministration, MSTAdministration, INode } from "../../core"
+import { isMST, getMSTAdministration, MSTAdministration, AbstractNode } from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export class Refinement extends Type<any, any> {
@@ -21,7 +21,7 @@ export class Refinement extends Type<any, any> {
         return this.name
     }
 
-    instantiate(parent: MSTAdministration, subpath: string, environment: any, value: any): INode {
+    instantiate(parent: MSTAdministration, subpath: string, environment: any, value: any): AbstractNode {
         // create the child type
         const inst = this.type.instantiate(parent, subpath, environment, value)
         const snapshot = isMST(inst) ? getMSTAdministration(inst).snapshot : inst

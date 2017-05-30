@@ -1,6 +1,6 @@
 import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
-import { getMSTAdministration, maybeMST, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch, INode } from "../../core"
+import { getMSTAdministration, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch, AbstractNode } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -55,11 +55,16 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         getMSTAdministration(instance).applySnapshot(snapshot)
     }
 
-    getChildren(node: MSTAdministration): any[] {
-        return (node.target as ObservableMap<any>).values()
+    getChildren(node: MSTAdministration): AbstractNode[] {
+        const res: AbstractNode[] = []
+        // Ignore all alarm bells to be able to read this:...
+        Object.keys(node.target.$mobx.values).forEach(key => {
+            res.push(node.target.$mobx.values[key].value)
+        })
+        return res
     }
 
-    getChildMST(node: MSTAdministration, key: string): INode {
+    getChildNode(node: MSTAdministration, key: string): AbstractNode {
         const childNode = node.target.$mobx.values[key]
         if (!childNode)
             fail("Not a child" + key)
@@ -82,7 +87,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                     const oldValue = change.object.get(change.name)
                     if (newValue === oldValue)
                         return null
-                    change.newValue = node.reconcileChildren(this.subType, [oldValue], [newValue], [change.name])[0]
+                    change.newValue = node.reconcileChildren(this.subType, [this.getChildNode(node, change.name)], [newValue], [change.name])[0]
                 }
                 break
             case "add":
@@ -94,7 +99,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
             case "delete":
                 {
                     const oldValue = change.object.get(change.name)
-                    node.reconcileChildren(this.subType, [oldValue], [], [])
+                    node.reconcileChildren(this.subType, [this.getChildNode(node, change.name)], [], [])
                 }
                 break
         }
@@ -144,35 +149,36 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     @action applySnapshot(node: MSTAdministration, snapshot: any): void {
         node.pseudoAction(() => {
             const target = node.target as ObservableMap<any>
-            const identifierAttr = getIdentifierAttribute(this.subType)
-            // Try to update snapshot smartly, by reusing instances under the same key as much as possible
-            const currentKeys: { [key: string]: boolean } = {}
-            target.keys().forEach(key => { currentKeys[key] = false })
-            Object.keys(snapshot).forEach(key => {
-                const item = snapshot[key]
-                if (identifierAttr && item && typeof item === "object" && key !== item[identifierAttr])
-                    fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${key}', but expected: '${item[identifierAttr]}'`)
-                // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
-                if (key in currentKeys && !isPrimitive(item)) {
-                    currentKeys[key] = true
-                    maybeMST(
-                        target.get(key),
-                        propertyNode => {
-                            // update existing instance
-                            propertyNode.applySnapshot(item)
-                        },
-                        () => {
-                            target.set(key, item)
-                        }
-                    )
-                } else {
-                    target.set(key, item)
-                }
-            })
-            Object.keys(currentKeys).forEach(key => {
-                if (currentKeys[key] === false)
-                    target.delete(key)
-            })
+            target.replace(snapshot)
+            // const identifierAttr = getIdentifierAttribute(this.subType)
+            // // Try to update snapshot smartly, by reusing instances under the same key as much as possible
+            // const currentKeys: { [key: string]: boolean } = {}
+            // target.keys().forEach(key => { currentKeys[key] = false })
+            // Object.keys(snapshot).forEach(key => {
+            //     const item = snapshot[key]
+            //     if (identifierAttr && item && typeof item === "object" && key !== item[identifierAttr])
+            //         fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${key}', but expected: '${item[identifierAttr]}'`)
+            //     // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
+            //     if (key in currentKeys && !isPrimitive(item)) {
+            //         currentKeys[key] = true
+            //         maybeMST(
+            //             target.get(key),
+            //             propertyNode => {
+            //                 // update existing instance
+            //                 propertyNode.applySnapshot(item)
+            //             },
+            //             () => {
+            //                 target.set(key, item)
+            //             }
+            //         )
+            //     } else {
+            //         target.set(key, item)
+            //     }
+            // })
+            // Object.keys(currentKeys).forEach(key => {
+            //     if (currentKeys[key] === false)
+            //         target.delete(key)
+            // })
         })
     }
 
