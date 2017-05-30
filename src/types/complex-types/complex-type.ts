@@ -43,8 +43,8 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     abstract applySnapshot(node: MSTAdministration, snapshot: any): void
     // TODO: Maybe optional could resolve to this if omitted?
     abstract getDefaultSnapshot(): any
-    abstract getChildMSTs(node: MSTAdministration): [string, MSTAdministration][]
-    abstract getChildMST(node: MSTAdministration, key: string): MSTAdministration | null
+    abstract getChildren(node: MSTAdministration): any[]
+    abstract getChildMST(node: MSTAdministration, key: string): INode // TODO: rename to getChildNode
     abstract serialize(node: MSTAdministration): any
     abstract applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IType<any, any>

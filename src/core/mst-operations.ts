@@ -1,6 +1,6 @@
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
-import { getMSTAdministration, IMSTNode, getRelativePathForNodes } from "./mst-node"
+import { getMSTAdministration, IMSTNode, getRelativePathForNodes, isMST } from "./mst-node"
 import { MSTAdministration } from "./mst-node-administration"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, fail } from "../utils"
@@ -416,8 +416,9 @@ export function getEnv(thing: IMSTNode): any {
 export function walk(thing: IMSTNode, processor: (item: IMSTNode) => void) {
     const node = getMSTAdministration(thing)
     // tslint:disable-next-line:no_unused-variable
-    node.getChildMSTs().forEach(([_, childNode]) => {
-        walk(childNode.target, processor)
+    node.getChildren().forEach((child) => {
+        if (isMST(child))
+            walk(child, processor)
     })
     processor(node.target)
 }

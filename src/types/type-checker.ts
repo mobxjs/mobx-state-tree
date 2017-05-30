@@ -24,7 +24,9 @@ function toErrorString(error: IValidationError): string {
 
     const pathPrefix = fullPath.length > 0 ? `at path "/${fullPath}" ` : ``
 
-    const currentTypename = maybeMST(value, node => `value of type ${node.type.name}:`, () => isPrimitive(value) ? "value" : "snapshot")
+    const currentTypename = isMST(value)
+        ? `value of type ${getMSTAdministration(value).type.name}:`
+        : isPrimitive(value) ? "value" : "snapshot"
     const isSnapshotCompatible = type && isMST(value) && type.is(getMSTAdministration(value).snapshot)
 
     return `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${type ? `to type: \`${type.name}\`` : ``}` +
@@ -71,6 +73,6 @@ export function typecheck(type: IType<any, any>, value: any): void {
 
 import { IType } from "./type"
 import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
-import { getMSTAdministration, isMST, maybeMST } from "../core/mst-node"
+import { getMSTAdministration, isMST } from "../core/mst-node"
 import { isPrimitiveType } from "./primitives"
 import { OptionalValue } from "./utility-types/optional"

@@ -376,8 +376,8 @@ export class MSTAdministration implements INode {
         return this.type.getChildMST(this, subpath)
     }
 
-    getChildMSTs(): [string, MSTAdministration][] {
-        return this.type.getChildMSTs(this)
+    getChildren(): INode[] {
+        return this.type.getChildren(this)
     }
 
     getChildType(key: string): IType<any, any> {

@@ -1,6 +1,6 @@
 import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
-import { getMSTAdministration, maybeMST, valueToSnapshot, escapeJsonPath, INode } from "../../core"
+import { getMSTAdministration, valueToSnapshot, escapeJsonPath, INode } from "../../core"
 import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath } from "../type-checker"
 
@@ -24,6 +24,10 @@ export class ValueProperty extends Property {
         extras.getAdministration(targetInstance, this.name).dehancer = unbox
     }
 
+    getNode(targetInstance: any): INode {
+        return targetInstance.$mobx.values[targetInstance] // TODO: blegh!
+    }
+
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getMSTAdministration(change.object)
         change.newValue = node.reconcileChildren(this.type, [node.getChildMST(change.name)!], [change.newValue], [change.name])[0]
@@ -44,11 +48,8 @@ export class ValueProperty extends Property {
     }
 
     deserialize(instance: any, snapshot: any) {
-        maybeMST(
-            instance[this.name],
-            propertyNode => { propertyNode.applySnapshot(snapshot[this.name]) },
-            () => { instance[this.name] = snapshot[this.name] }
-        )
+        // TODO: was a maybeMST here first...
+        instance[this.name] = snapshot[this.name]
     }
 
     validate(snapshot: any, context: IContext): IValidationResult {

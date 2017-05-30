@@ -2,11 +2,11 @@ import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArra
 import {
     getMSTAdministration,
     IJsonPatch,
-    maybeMST,
     MSTAdministration,
-    valueToSnapshot
+    valueToSnapshot,
+    INode
 } from "../../core"
-import { addHiddenFinalProp, identity, nothing } from "../../utils"
+import { addHiddenFinalProp, identity, nothing, fail } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
@@ -52,21 +52,15 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         getMSTAdministration(instance).applySnapshot(snapshot)
     }
 
-    getChildMSTs(node: MSTAdministration): [string, MSTAdministration][] {
-        const target = node.target as IObservableArray<any>
-        const res: [string, MSTAdministration][] = []
-        target.forEach((value, index) => {
-            maybeMST(value, childNode => { res.push(["" + index, childNode])})
-        })
-        return res
+    getChildren(node: MSTAdministration): any[] {
+        return (node.target as IObservableArray<any>).slice()
     }
 
     getChildMST(node: MSTAdministration, key: string): MSTAdministration | null {
-        const target = node.target as IObservableArray<any>
         const index = parseInt(key, 10)
-        if (index < target.length)
-            return maybeMST(target[index], identity, nothing)
-        return null
+        if (index < node.target.length)
+            return node.target.$mobx.values[index]
+        return fail("Not a child: " + key)
     }
 
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {

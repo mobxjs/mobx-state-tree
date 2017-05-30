@@ -1,6 +1,6 @@
 import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
-import { getMSTAdministration, maybeMST, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch } from "../../core"
+import { getMSTAdministration, maybeMST, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch, INode } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -55,19 +55,15 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         getMSTAdministration(instance).applySnapshot(snapshot)
     }
 
-    getChildMSTs(node: MSTAdministration): [string, MSTAdministration][] {
-        const res: [string, MSTAdministration][] = []
-        ; (node.target as ObservableMap<any>).forEach((value: any, key: string) => {
-            maybeMST(value, childNode => { res.push([key, childNode])})
-        })
-        return res
+    getChildren(node: MSTAdministration): any[] {
+        return (node.target as ObservableMap<any>).values()
     }
 
-    getChildMST(node: MSTAdministration, key: string): MSTAdministration | null {
-        const target = node.target as ObservableMap<any>
-        if (target.has(key))
-            return maybeMST(target.get(key), identity, nothing)
-        return null
+    getChildMST(node: MSTAdministration, key: string): INode {
+        const childNode = node.target.$mobx.values[key]
+        if (!childNode)
+            fail("Not a child" + key)
+        return childNode
     }
 
     willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {

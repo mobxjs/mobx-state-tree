@@ -15,7 +15,7 @@ import {
     isPlainObject
 } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
-import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, IJsonPatch } from "../../core"
+import { MSTAdministration, getType, IMSTNode, getMSTAdministration, IJsonPatch, INode } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
@@ -147,17 +147,19 @@ export class ObjectType extends ComplexType<any, any> {
         }
     }
 
-    getChildMSTs(node: MSTAdministration): [string, MSTAdministration][] {
-        const res: [string, MSTAdministration][] = []
+    getChildren(node: MSTAdministration): any[] {
+        const res: INode[] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
-                maybeMST(node.target[prop.name], propertyNode => res.push([prop.name, propertyNode]))
+                res.push(node.target[prop.name])
         })
         return res
     }
 
-    getChildMST(node: MSTAdministration, key: string): MSTAdministration | null {
-        return maybeMST(node.target[key], identity, nothing)
+    getChildMST(node: MSTAdministration, key: string): INode {
+        if (!(this.props[key] instanceof ValueProperty))
+            return fail("Not a value property: " + key)
+        return (this.props[key] as ValueProperty).getNode(node.target)
     }
 
     serialize(node: MSTAdministration): any {
