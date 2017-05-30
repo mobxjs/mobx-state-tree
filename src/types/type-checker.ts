@@ -1,8 +1,3 @@
-import { IType } from "./type"
-import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
-import { getMSTAdministration, isMST, maybeMST } from "../core/mst-node"
-import { isPrimitiveType } from "./primitives"
-import { OptionalValue } from "./utility-types/optional"
 
 export interface IContextEntry {
     path: string
@@ -73,3 +68,9 @@ export function typecheck(type: IType<any, any>, value: any): void {
         )
     }
 }
+
+import { IType } from "./type"
+import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
+import { getMSTAdministration, isMST, maybeMST } from "../core/mst-node"
+import { isPrimitiveType } from "./primitives"
+import { OptionalValue } from "./utility-types/optional"

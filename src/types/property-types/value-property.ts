@@ -16,17 +16,17 @@ export class ValueProperty extends Property {
 
     initializePrototype(proto: any) {
         observable.ref(proto, this.name, { value: undefined })
-        extras.getAdministration(proto, this.name).dehancer = unbox
     }
 
     initialize(targetInstance: any, snapshot: any) {
         const adm = getMSTAdministration(targetInstance)
         targetInstance[this.name] = this.type.instantiate(adm, this.name, adm._environment, snapshot[this.name])
+        extras.getAdministration(targetInstance, this.name).dehancer = unbox
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getMSTAdministration(change.object)
-        change.newValue = node.reconcileChildren(this.type, [change.object[change.name]], [change.newValue], [change.name])[0]
+        change.newValue = node.reconcileChildren(this.type, [node.getChildMST(change.name)!], [change.newValue], [change.name])[0]
         return change
     }
 

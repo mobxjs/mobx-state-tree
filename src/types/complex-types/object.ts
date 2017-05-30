@@ -14,8 +14,8 @@ import {
     hasOwnProperty,
     isPlainObject
 } from "../../utils"
-import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, IJsonPatch } from "../../core"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
+import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, IJsonPatch } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
@@ -76,9 +76,9 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     finalizeNewInstance(instance: IMSTNode, snapshot: any) {
+        this.forAllProps(prop => prop.initialize(instance, snapshot))
         intercept(instance, change => this.willChange(change) as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
-        this.forAllProps(prop => prop.initialize(instance, snapshot))
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {

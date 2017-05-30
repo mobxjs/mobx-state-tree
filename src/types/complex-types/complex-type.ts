@@ -1,7 +1,6 @@
 import { action } from "mobx"
 import { IType, Type } from "../type"
 import { addReadOnlyProp } from "../../utils"
-import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getDefaultContext, typecheck } from "../type-checker"
 
 function toJSON(this: IMSTNode) {
     return getMSTAdministration(this).snapshot
@@ -30,7 +29,7 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
             if (parent)
                 node.fireHook("afterAttach")
             sawException = false
-            return instance
+            return node
         } finally {
             if (sawException) {
                 // short-cut to die the instance, to avoid the snapshot computed starting to throw...
@@ -69,3 +68,4 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
 import { IMSTNode, isMST, getType, getMSTAdministration } from "../../core/mst-node"
 import { MSTAdministration, INode } from "../../core/mst-node-administration"
 import { IJsonPatch } from "../../core/json-patch"
+import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getDefaultContext, typecheck } from "../type-checker"

@@ -1,6 +1,3 @@
-import { splitJsonPath, joinJsonPath } from "./json-patch"
-import { IType } from "../types/type"
-
 export interface IMSTNode {
     readonly $treenode?: MSTAdministration
 }
@@ -58,7 +55,7 @@ export function valueToSnapshot(thing: any) {
 export function getRelativePathForNodes(base: MSTAdministration, target: MSTAdministration): string {
     // PRE condition target is (a child of) base!
     if (base.root !== target.root) fail(`Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`)
-    
+
     const baseParts = splitJsonPath(base.path)
     const targetParts = splitJsonPath(target.path)
     let common = 0
@@ -73,3 +70,6 @@ export function getRelativePathForNodes(base: MSTAdministration, target: MSTAdmi
 
 import { MSTAdministration } from "./mst-node-administration"
 import { isMutable, isSerializable, fail } from "../utils"
+import { splitJsonPath, joinJsonPath } from "./json-patch"
+import { IType } from "../types/type"
+

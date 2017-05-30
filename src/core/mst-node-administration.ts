@@ -4,20 +4,6 @@ import {
 } from "mobx"
 import { IType } from "../types/type"
 import { typecheck } from "../types/type-checker"
-import { isMST, getMSTAdministration } from "./mst-node"
-import { IMiddleWareHandler } from "./action"
-import {
-    addHiddenFinalProp,
-    addReadOnlyProp,
-    extend,
-    fail,
-    IDisposer,
-    isMutable,
-    registerEventHandler
-} from "../utils"
-import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
-import { getIdentifierAttribute } from "../types/complex-types/object"
-import { ComplexType } from "../types/complex-types/complex-type"
 
 let nextNodeId = 1
 
@@ -270,7 +256,7 @@ export class MSTAdministration implements INode {
         this.disposers.unshift(disposer)
     }
 
-    reconcileChildren<T>(childType: IType<any, T>, oldValues: T[], newValues: T[], newPaths: (string|number)[]): T[] {
+    reconcileChildren<T>(childType: IType<any, T>, oldNodes: INode[], newValues: T[], newPaths: (string|number)[]): T[] {
         // optimization: overload for a single old / new value to avoid all the array allocations
         // optimization: skip reconciler for non-complex types
         const res = new Array(newValues.length)
@@ -279,7 +265,8 @@ export class MSTAdministration implements INode {
         const identifierAttribute = getIdentifierAttribute(childType)
 
         // Investigate which values we could reconcile
-        oldValues.forEach(oldValue => {
+        oldNodes.forEach(oldNode => {
+            const oldValue = oldNode.getValue() // MWE: TODO: what about broken refs?
             if (!oldValue)
                 return
             if (identifierAttribute) {
@@ -296,6 +283,7 @@ export class MSTAdministration implements INode {
         newValues.forEach((newValue, index) => {
             const subPath = "" + newPaths[index]
             if (isMST(newValue)) {
+                // A tree node...
                 const childNode = getMSTAdministration(newValue)
                 childNode.assertAlive()
                 if (childNode.parent && (childNode.parent !== this || !oldValuesByNode[childNode.nodeId]))
@@ -306,6 +294,7 @@ export class MSTAdministration implements INode {
                 childNode.setParent(this, subPath)
                 res[index] = newValue
             } else if (identifierAttribute && isMutable(newValue)) {
+                // The snapshot of a tree node..
                 typecheck(childType, newValue)
 
                 // Try to reconcile based on id
@@ -318,13 +307,13 @@ export class MSTAdministration implements INode {
                     childNode.applySnapshot(newValue)
                     res[index] = existing
                 } else {
-                    res[index] = (childType as any).create(newValue, undefined, this, subPath) // any -> we don't want this typing public
+                    res[index] = childType.instantiate(this, subPath, undefined, newValue)
                 }
             } else {
                 typecheck(childType, newValue)
 
                 // create a fresh MST node
-                res[index] = (childType as any).create(newValue, undefined, this, subPath) // any -> we don't want this typing public
+                res[index] = childType.instantiate(this, subPath, undefined, newValue)
             }
         })
 
@@ -456,3 +445,17 @@ export class MSTAdministration implements INode {
 }
 
 import { walk } from "./mst-operations"
+import { isMST, getMSTAdministration } from "./mst-node"
+import { IMiddleWareHandler } from "./action"
+import {
+    addHiddenFinalProp,
+    addReadOnlyProp,
+    extend,
+    fail,
+    IDisposer,
+    isMutable,
+    registerEventHandler
+} from "../utils"
+import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "./json-patch"
+import { getIdentifierAttribute } from "../types/complex-types/object"
+import { ComplexType } from "../types/complex-types/complex-type"
