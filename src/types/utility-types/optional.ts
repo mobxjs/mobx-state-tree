@@ -1,6 +1,6 @@
 import {Type, IType, TypeFlags} from "../type"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { isMST, getMSTAdministration, ComplexNode, AbstractNode  } from "../../core"
+import { isComplexValue, getComplexNode, ComplexNode, AbstractNode  } from "../../core"
 
 export type IFunctionReturn<T> = () => T
 export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>
@@ -28,7 +28,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
     instantiate(parent: ComplexNode, subpath: string, environment: any, value: S): AbstractNode {
         if (typeof value === "undefined") {
             const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
-            const defaultSnapshot = isMST(defaultValue) ? getMSTAdministration(defaultValue).snapshot : defaultValue
+            const defaultSnapshot = isComplexValue(defaultValue) ? getComplexNode(defaultValue).snapshot : defaultValue
             return this.type.instantiate(parent, subpath, environment, defaultSnapshot)
         }
 
@@ -54,7 +54,7 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => 
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => T): IType<S, T>
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): IType<S, T> {
     const defaultValue = typeof defaultValueOrFunction === "function" ? defaultValueOrFunction() : defaultValueOrFunction
-    const defaultSnapshot = isMST(defaultValue) ? getMSTAdministration(defaultValue).snapshot : defaultValue
+    const defaultSnapshot = isComplexValue(defaultValue) ? getComplexNode(defaultValue).snapshot : defaultValue
     typecheck(type, defaultSnapshot)
     return new OptionalValue(type, defaultValueOrFunction)
 }

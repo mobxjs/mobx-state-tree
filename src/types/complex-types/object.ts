@@ -15,7 +15,7 @@ import {
     isPlainObject
 } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
-import { ComplexNode, getType, IMSTNode, getMSTAdministration, IJsonPatch, AbstractNode } from "../../core"
+import { ComplexNode, getType, IComplexValue, getComplexNode, IJsonPatch, AbstractNode } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
@@ -32,7 +32,7 @@ import { ActionProperty } from "../property-types/action-property"
 import { ViewProperty } from "../property-types/view-property"
 
 function objectTypeToString(this: any) {
-    return getMSTAdministration(this).toString()
+    return getComplexNode(this).toString()
 }
 
 export class ObjectType extends ComplexType<any, any> {
@@ -75,14 +75,14 @@ export class ObjectType extends ComplexType<any, any> {
         return instance as Object
     }
 
-    finalizeNewInstance(instance: IMSTNode, snapshot: any) {
+    finalizeNewInstance(instance: IComplexValue, snapshot: any) {
         this.forAllProps(prop => prop.initialize(instance, snapshot))
         intercept(instance, change => this.willChange(change) as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
-        const node = getMSTAdministration(change.object)
+        const node = getComplexNode(change.object)
         node.assertWritable()
 
         // TODO: assigning a new snapshot / MST to a property should result in a nice patch in itself

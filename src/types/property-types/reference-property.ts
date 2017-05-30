@@ -1,6 +1,6 @@
 import { Property } from "./property"
 import { addHiddenFinalProp } from "../../utils"
-import { getMSTAdministration, escapeJsonPath } from "../../core"
+import { getComplexNode, escapeJsonPath } from "../../core"
 import { IType } from "../type"
 // import { Reference } from "../../core/reference"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, getContextForPath } from "../type-checker"

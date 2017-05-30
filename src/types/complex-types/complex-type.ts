@@ -3,7 +3,7 @@ import { IType, Type } from "../type"
 import { addReadOnlyProp } from "../../utils"
 
 function toJSON(this: IMSTNode) {
-    return getMSTAdministration(this).snapshot
+    return getComplexNode(this).snapshot
 }
 
 /**
@@ -73,6 +73,6 @@ export function isMST(value: any): value is IMSTNode {
     return value && value.$treenode
 }
 
-import { getType, getMSTAdministration, AbstractNode, ComplexNode } from "../../core"
+import { getType, getComplexNode, AbstractNode, ComplexNode } from "../../core"
 import { IJsonPatch } from "../../core/json-patch"
 import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getDefaultContext, typecheck } from "../type-checker"

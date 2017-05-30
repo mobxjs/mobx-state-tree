@@ -56,8 +56,8 @@ export class ComplexNode extends AbstractNode  {
         if (this._isDetaching)
             return
 
-        walk(this.target, child => getMSTAdministration(child).aboutToDie())
-        walk(this.target, child => getMSTAdministration(child).finalizeDeath())
+        walk(this.target, child => getComplexNode(child).aboutToDie())
+        walk(this.target, child => getComplexNode(child).finalizeDeath())
     }
 
     public aboutToDie() {
@@ -181,17 +181,17 @@ export class ComplexNode extends AbstractNode  {
                 if (id)
                     oldValuesById[id] = oldValue
             }
-            if (isMST(oldValue)) {
-                oldValuesByNode[getMSTAdministration(oldValue).nodeId] = oldValue
+            if (isComplexValue(oldValue)) {
+                oldValuesByNode[getComplexNode(oldValue).nodeId] = oldValue
             }
         })
 
         // Prepare new values, try to reconcile
         newValues.forEach((newValue, index) => {
             const subPath = "" + newPaths[index]
-            if (isMST(newValue)) {
+            if (isComplexValue(newValue)) {
                 // A tree node...
-                const childNode = getMSTAdministration(newValue)
+                const childNode = getComplexNode(newValue)
                 childNode.assertAlive()
                 if (childNode.parent && (childNode.parent !== this || !oldValuesByNode[childNode.nodeId]))
                     return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subPath}', but it lives already at '${childNode.path}'`)
@@ -207,7 +207,7 @@ export class ComplexNode extends AbstractNode  {
                 // Try to reconcile based on id
                 const id = (newValue as any)[identifierAttribute]
                 const existing = oldValuesById[id]
-                const childNode = existing && getMSTAdministration(existing)
+                const childNode = existing && getComplexNode(existing)
                 if (existing && childNode.type.is(newValue)) {
                     oldValuesByNode[childNode.nodeId] = undefined
                     childNode.setParent(this, subPath)
@@ -226,7 +226,7 @@ export class ComplexNode extends AbstractNode  {
 
         // Kill non reconciled values
         for (let key in oldValuesByNode) if (oldValuesByNode[key])
-            getMSTAdministration(oldValuesByNode[key]).die()
+            getComplexNode(oldValuesByNode[key]).die()
 
         return res
     }
@@ -355,16 +355,16 @@ export class ComplexNode extends AbstractNode  {
     }
 }
 
-export interface IMSTNode {
+export interface IComplexValue {
     readonly $treenode?: ComplexNode
 }
 
-export function isMST(value: any): value is IMSTNode {
+export function isComplexValue(value: any): value is IComplexValue {
     return value && value.$treenode
 }
 
-export function getMSTAdministration(value: any): ComplexNode {
-    if (isMST(value))
+export function getComplexNode(value: IComplexValue): ComplexNode {
+    if (isComplexValue(value))
         return value.$treenode!
     else
         return fail("element has no Node")

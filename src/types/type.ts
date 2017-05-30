@@ -34,7 +34,7 @@ export interface IType<S, T> {
 
 export interface ISimpleType<T> extends IType<T, T> { }
 
-export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IMSTNode> { }
+export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IComplexValue> { }
 
 export function isType(value: any): value is IType<any, any> {
     return typeof value === "object" && value && value.isType === true
@@ -77,5 +77,5 @@ export abstract class Type<S, T> implements IType<S, T> {
 import { fail } from "../utils"
 import {  } from "../core/mst-node"
 import { IContext, IValidationResult } from "./type-checker"
-import { ComplexNode, AbstractNode, IMSTNode } from "../core"
+import { ComplexNode, AbstractNode, IComplexValue } from "../core"
 

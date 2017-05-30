@@ -1,6 +1,6 @@
 import { IType, TypeFlags, Type } from "../type"
 import { fail } from "../../utils"
-import { isMST, getMSTAdministration, ComplexNode, AbstractNode } from "../../core"
+import { isComplexValue, getComplexNode, ComplexNode, AbstractNode } from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export class Refinement extends Type<any, any> {
@@ -24,7 +24,7 @@ export class Refinement extends Type<any, any> {
     instantiate(parent: ComplexNode, subpath: string, environment: any, value: any): AbstractNode {
         // create the child type
         const inst = this.type.instantiate(parent, subpath, environment, value)
-        const snapshot = isMST(inst) ? getMSTAdministration(inst).snapshot : inst
+        const snapshot = isComplexValue(inst) ? getComplexNode(inst).snapshot : inst
 
         // check if pass the predicate
         if (!this.is(snapshot)) fail(`Value ${JSON.stringify(snapshot)} is not assignable to type ${this.name}`)

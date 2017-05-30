@@ -1,6 +1,6 @@
 import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe } from "mobx"
 import {
-    getMSTAdministration,
+    getComplexNode,
     IJsonPatch,
     ComplexNode,
     AbstractNode
@@ -11,7 +11,7 @@ import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getCo
 import { ComplexType } from "./complex-type"
 
 export function arrayToString(this: IObservableArray<any>) {
-    return `${getMSTAdministration(this)}(${this.length} items)`
+    return `${getComplexNode(this)}(${this.length} items)`
 }
 
 class Box {
@@ -48,7 +48,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     finalizeNewInstance(instance: IObservableArray<any>, snapshot: any) {
         intercept(instance, change => this.willChange(change) as any)
         observe(instance, this.didChange)
-        getMSTAdministration(instance).applySnapshot(snapshot)
+        getComplexNode(instance).applySnapshot(snapshot)
     }
 
     getChildren(node: ComplexNode): AbstractNode[] {
@@ -63,7 +63,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
-        const node = getMSTAdministration(change.object)
+        const node = getComplexNode(change.object)
         node.assertWritable()
         const childNodes = this.getChildren(node)
 
@@ -98,7 +98,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
-        const node = getMSTAdministration(change.object)
+        const node = getComplexNode(change.object)
         switch (change.type) {
             case "update":
                 return void node.emitPatch({

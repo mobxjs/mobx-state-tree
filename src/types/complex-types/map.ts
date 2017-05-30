@@ -1,6 +1,6 @@
 import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
-import { getMSTAdministration, ComplexNode, escapeJsonPath, IJsonPatch, AbstractNode } from "../../core"
+import { getComplexNode, ComplexNode, escapeJsonPath, IJsonPatch, AbstractNode } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -15,11 +15,11 @@ export interface IExtendedObservableMap<T> extends ObservableMap<T> {
 }
 
 export function mapToString(this: ObservableMap<any>) {
-    return `${getMSTAdministration(this)}(${this.size} items)`
+    return `${getComplexNode(this)}(${this.size} items)`
 }
 
 function put(this: ObservableMap<any>, value: any) {
-    const identifierAttr = getIdentifierAttribute((getMSTAdministration(this).type as MapType<any, any>).subType)
+    const identifierAttr = getIdentifierAttribute((getComplexNode(this).type as MapType<any, any>).subType)
     if (!(!!identifierAttr)) fail(`Map.put is only supported if the subtype has an idenfier attribute`)
     if (!(!!value)) fail(`Map.put cannot be used to set empty values`)
     this.set(value[identifierAttr!], value)
@@ -52,7 +52,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
         intercept(instance, c => this.willChange(c))
         observe(instance, this.didChange)
-        getMSTAdministration(instance).applySnapshot(snapshot)
+        getComplexNode(instance).applySnapshot(snapshot)
     }
 
     getChildren(node: ComplexNode): AbstractNode[] {
@@ -72,7 +72,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
-        const node = getMSTAdministration(change.object)
+        const node = getComplexNode(change.object)
         node.assertWritable()
 
         // Q: how to create a map that is not keyed by identifier, but contains objects with identifiers? Is that a use case? A: No, that is were reference maps should come into play...
@@ -114,7 +114,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     didChange(change: IMapChange<any>): void {
-        const node = getMSTAdministration(change.object)
+        const node = getComplexNode(change.object)
         switch (change.type) {
             case "update":
             case "add":

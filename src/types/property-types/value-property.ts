@@ -1,6 +1,6 @@
 import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
-import { getMSTAdministration, escapeJsonPath, AbstractNode } from "../../core"
+import { getComplexNode, escapeJsonPath, AbstractNode } from "../../core"
 import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath } from "../type-checker"
 import { fail } from "../../utils"
@@ -20,7 +20,7 @@ export class ValueProperty extends Property {
     }
 
     initialize(targetInstance: any, snapshot: any) {
-        const adm = getMSTAdministration(targetInstance)
+        const adm = getComplexNode(targetInstance)
         targetInstance[this.name] = this.type.instantiate(adm, this.name, adm._environment, snapshot[this.name])
         extras.getAdministration(targetInstance, this.name).dehancer = unbox
     }
@@ -33,13 +33,13 @@ export class ValueProperty extends Property {
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
-        const node = getMSTAdministration(change.object)
+        const node = getComplexNode(change.object)
         change.newValue = node.reconcileChildren(this.type, [node.getChildNode(change.name)!], [change.newValue], [change.name])[0]
         return change
     }
 
     didChange(change: IObjectChange) {
-        const node = getMSTAdministration(change.object)
+        const node = getComplexNode(change.object)
         node.emitPatch({
             op: "replace",
             path: escapeJsonPath(this.name),

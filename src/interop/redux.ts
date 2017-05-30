@@ -1,4 +1,4 @@
-import { isMST, IRawActionCall } from "../core"
+import { isComplexValue, IRawActionCall } from "../core"
 import { getSnapshot, applySnapshot, onSnapshot } from "../core/mst-operations"
 import { applyAction, onAction, ISerializedActionCall } from "../core/action"
 import { fail, extend } from "../utils"
@@ -17,7 +17,7 @@ export type MiddleWare =
         ((next: (action: IRawActionCall) => void) => void)
 
 export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxStore {
-    if (!isMST(model)) fail("Expected model object")
+    if (!isComplexValue(model)) fail("Expected model object")
     let store: IReduxStore = {
         getState : ()       => getSnapshot(model),
         dispatch : action   => {

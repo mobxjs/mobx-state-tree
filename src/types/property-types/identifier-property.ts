@@ -1,4 +1,4 @@
-import { getMSTAdministration } from "../../core"
+import { getComplexNode } from "../../core"
 import { extendObservable, observable, IObjectWillChange } from "mobx"
 import { Property } from "./property"
 import { isValidIdentifier, fail } from "../../utils"
@@ -24,7 +24,7 @@ export class IdentifierProperty extends Property {
         if (typeof identifier !== "number" && !isValidIdentifier(identifier))
             fail(`Not a valid identifier: '${identifier}`)
         typecheck(this.subtype, identifier)
-        const node = getMSTAdministration(change.object)
+        const node = getComplexNode(change.object)
         node.assertWritable()
         const oldValue = change.object[this.name]
         if (oldValue !== undefined && oldValue !== identifier)

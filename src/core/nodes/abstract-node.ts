@@ -43,29 +43,28 @@ export abstract class AbstractNode  {
         return r as ComplexNode
     }
 
+    getRelativePathTo(target: AbstractNode): string {
+        // PRE condition target is (a child of) base!
+        if (this.root !== target.root) fail(`Cannot calculate relative path: objects '${this}' and '${target}' are not part of the same object tree`)
+
+        const baseParts = splitJsonPath(this.path)
+        const targetParts = splitJsonPath(target.path)
+        let common = 0
+        for (; common < baseParts.length; common++) {
+            if (baseParts[common] !== targetParts[common])
+                break
+        }
+        // TODO: assert that no targetParts paths are "..", "." or ""!
+        return baseParts.slice(common).map(_ => "..").join("/")
+            + joinJsonPath(targetParts.slice(common))
+    }
+
     abstract get snapshot(): any;
     abstract getValue(): any
     abstract isLeaf(): boolean
     abstract getChildren(): AbstractNode[]
     abstract getChildNode(name: string): AbstractNode | null
     abstract setParent(newParent: ComplexNode, subpath: string): void
-}
-
-
-export function getRelativePathForNodes(base: ComplexNode, target: ComplexNode): string {
-    // PRE condition target is (a child of) base!
-    if (base.root !== target.root) fail(`Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`)
-
-    const baseParts = splitJsonPath(base.path)
-    const targetParts = splitJsonPath(target.path)
-    let common = 0
-    for (; common < baseParts.length; common++) {
-        if (baseParts[common] !== targetParts[common])
-            break
-    }
-    // TODO: assert that no targetParts paths are "..", "." or ""!
-    return baseParts.slice(common).map(_ => "..").join("/")
-        + joinJsonPath(targetParts.slice(common))
 }
 
 import { IType } from "../../types/type"

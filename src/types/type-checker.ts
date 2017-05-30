@@ -13,7 +13,7 @@ export interface IValidationError {
 export type IValidationResult = IValidationError[]
 
 const prettyPrintValue = (value: any) =>
-    isMST(value) ?
+    isComplexValue(value) ?
         "<" + value + ">" :
         "`" + JSON.stringify(value) + "`"
 
@@ -24,10 +24,10 @@ function toErrorString(error: IValidationError): string {
 
     const pathPrefix = fullPath.length > 0 ? `at path "/${fullPath}" ` : ``
 
-    const currentTypename = isMST(value)
-        ? `value of type ${getMSTAdministration(value).type.name}:`
+    const currentTypename = isComplexValue(value)
+        ? `value of type ${getComplexNode(value).type.name}:`
         : isPrimitive(value) ? "value" : "snapshot"
-    const isSnapshotCompatible = type && isMST(value) && type.is(getMSTAdministration(value).snapshot)
+    const isSnapshotCompatible = type && isComplexValue(value) && type.is(getComplexNode(value).snapshot)
 
     return `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${type ? `to type: \`${type.name}\`` : ``}` +
             (error.message ? ` (${error.message})` : "") +
@@ -73,6 +73,6 @@ export function typecheck(type: IType<any, any>, value: any): void {
 
 import { IType } from "./type"
 import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
-import { getMSTAdministration, isMST } from "../core"
+import { getComplexNode, isComplexValue } from "../core"
 import { isPrimitiveType } from "./primitives"
 import { OptionalValue } from "./utility-types/optional"

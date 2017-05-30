@@ -8,7 +8,7 @@ export type ISerializedActionCall = {
 
 export type IRawActionCall = {
     name: string;
-    object: any & IMSTNode,
+    object: any & IComplexValue,
     args: any[]
 }
 
@@ -48,8 +48,8 @@ function runMiddleWares(node: ComplexNode, baseCall: IRawActionCall): any {
 export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
 
-    const actionInvoker = function (this: IMSTNode) {
-        const adm = getMSTAdministration(this)
+    const actionInvoker = function (this: IComplexValue) {
+        const adm = getComplexNode(this)
         adm.assertAlive()
         if (adm.isRunningAction()) {
             // an action is already running in this tree, invoking this action does not emit a new action
@@ -76,15 +76,15 @@ export function createActionInvoker(name: string, fn: Function) {
     return createNamedFunction(name, actionInvoker)
 }
 
-function serializeArgument(adm: ComplexNode, actionName: string, index: number, arg: any): any {
+function serializeArgument(node: ComplexNode, actionName: string, index: number, arg: any): any {
     if (isPrimitive(arg))
         return arg
-    if (isMST(arg)) {
-        const targetNode = getMSTAdministration(arg)
-        if (adm.root !== targetNode.root)
+    if (isComplexValue(arg)) {
+        const targetNode = getComplexNode(arg)
+        if (node.root !== targetNode.root)
             throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
         return ({
-            $ref: getRelativePathForNodes(adm, getMSTAdministration(arg))
+            $ref: node.getRelativePathTo(getComplexNode(arg))
         })
     }
     if (typeof arg === "function")
@@ -122,11 +122,11 @@ function deserializeArgument(adm: ComplexNode, value: any): any {
  * @param {IActionCallOptions} [options]
  * @returns
  */
-export function applyAction(target: IMSTNode, action: ISerializedActionCall): any {
+export function applyAction(target: IComplexValue, action: ISerializedActionCall): any {
     const resolvedTarget = tryResolve(target, action.path || "")
     if (!resolvedTarget)
         return fail(`Invalid action path: ${action.path || ""}`)
-    const node = getMSTAdministration(resolvedTarget)
+    const node = getComplexNode(resolvedTarget)
     if(!(typeof resolvedTarget[action.name] === "function")) fail(`Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
@@ -134,19 +134,18 @@ export function applyAction(target: IMSTNode, action: ISerializedActionCall): an
     )
 }
 
-export function onAction(target: IMSTNode, listener: (call: ISerializedActionCall) => void): IDisposer {
+export function onAction(target: IComplexValue, listener: (call: ISerializedActionCall) => void): IDisposer {
     return addMiddleware(target, (rawCall, next) => {
-        const sourceNode = getMSTAdministration(rawCall.object)
+        const sourceNode = getComplexNode(rawCall.object)
         listener({
             name: rawCall.name,
-            path: getRelativePathForNodes(getMSTAdministration(target), sourceNode),
+            path: getComplexNode(target).getRelativePathTo(sourceNode),
             args: rawCall.args.map((arg: any, index: number) => serializeArgument(sourceNode, rawCall.name, index, arg))
         })
         return next(rawCall)
     })
 }
 
-import { getRelativePathForNodes } from "./nodes/abstract-node"
-import { ComplexNode, getMSTAdministration,  IMSTNode, isMST, } from "./nodes/complex-node"
+import { ComplexNode, getComplexNode,  IComplexValue, isComplexValue, } from "./nodes/complex-node"
 import { resolve, tryResolve, addMiddleware,  } from "./mst-operations"
 import { fail, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"
