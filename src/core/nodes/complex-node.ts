@@ -231,42 +231,6 @@ export class ComplexNode extends AbstractNode  {
         return res
     }
 
-    resolve(pathParts: string): AbstractNode;
-    resolve(pathParts: string, failIfResolveFails: boolean): AbstractNode | undefined;
-    resolve(path: string, failIfResolveFails: boolean = true): AbstractNode | undefined {
-        return this.resolvePath(splitJsonPath(path), failIfResolveFails)
-    }
-
-    resolvePath(pathParts: string[]): AbstractNode;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean): AbstractNode | undefined;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): AbstractNode | undefined {
-        this.assertAlive()
-        // counter part of getRelativePath
-        // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
-        // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
-        // so we treat leading ../ apart...
-        let current: AbstractNode | null = this
-        for (let i = 0; i < pathParts.length; i++) {
-            if (pathParts[i] === "") // '/bla' or 'a//b' splits to empty strings
-                current = current!.root
-            else if (pathParts[i] === "..")
-                current = current!.parent
-            else if (pathParts[i] === "." || pathParts[i] === "")
-                continue
-            else if (current) {
-                current = current.getChildNode(pathParts[i])
-                continue
-            }
-
-            if (!current) {
-                if (failIfResolveFails)
-                    return fail(`Could not resolve '${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
-                else
-                    return undefined
-            }
-        }
-        return current!
-    }
 
     isRunningAction(): boolean {
         if (this._isRunningAction)
@@ -348,7 +312,6 @@ export class ComplexNode extends AbstractNode  {
     }
 
     toString(): string {
-        // TODO: move to abstract node
         const identifierAttr = getIdentifierAttribute(this.type)
         const identifier = identifierAttr ? `(${identifierAttr}: ${this.target[identifierAttr]})` : ""
         return `${this.type.name}@${this.path || "<root>"}${identifier}${this.isAlive ? "" : "[dead]"}`
