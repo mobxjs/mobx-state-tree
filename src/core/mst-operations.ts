@@ -1,10 +1,26 @@
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
-import { getMSTAdministration, IMSTNode, getRelativePathForNodes, isMST } from "./mst-node"
+import { getMSTAdministration, getRelativePathForNodes } from "./mst-node"
 import { ComplexNode } from "./nodes/complex-node"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, fail } from "../utils"
 import { ISnapshottable, IType } from "../types/type"
+
+export interface IMSTNode {
+    readonly $treenode?: ComplexNode
+}
+
+export function getType<S, T>(object: IMSTNode): IType<S, T> {
+    return getMSTAdministration(object).type
+}
+
+export function getChildType(object: IMSTNode, child: string): IType<any, any> {
+    return getMSTAdministration(object).getChildType(child)
+}
+
+export function isMST(value: any): value is IMSTNode {
+    return value && value.$treenode
+}
 
 /**
  * TODO: update docs

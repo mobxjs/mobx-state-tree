@@ -5,8 +5,7 @@ import {
 import { AbstractNode } from "./abstract-node"
 import { IType } from "../../types/type"
 import { typecheck } from "../../types/type-checker"
-import { walk } from "../mst-operations"
-import { isMST, getMSTAdministration } from "../mst-node"
+import { walk, isMST } from "../mst-operations"
 import { IMiddleWareHandler } from "../action"
 import {
     addHiddenFinalProp,
@@ -369,6 +368,13 @@ export class ComplexNode extends AbstractNode  {
         const identifier = identifierAttr ? `(${identifierAttr}: ${this.target[identifierAttr]})` : ""
         return `${this.type.name}@${this.path || "<root>"}${identifier}${this.isAlive ? "" : "[dead]"}`
     }
+}
+
+export function getMSTAdministration(value: any): ComplexNode {
+    if (isMST(value))
+        return value.$treenode!
+    else
+        return fail("element has no Node")
 }
 
 function assertComplexNode(thing: AbstractNode | null): ComplexNode {
