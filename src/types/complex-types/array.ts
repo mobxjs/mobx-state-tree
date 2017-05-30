@@ -2,7 +2,6 @@ import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArra
 import {
     getComplexNode,
     IJsonPatch,
-    ComplexNode,
     AbstractNode
 } from "../../core"
 import { addHiddenFinalProp, identity, nothing, fail } from "../../utils"
@@ -51,11 +50,11 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         getComplexNode(instance).applySnapshot(snapshot)
     }
 
-    getChildren(node: ComplexNode): AbstractNode[] {
+    getChildren(node: AbstractNode): AbstractNode[] {
         return node.storedValue.$mobx.values // Shooting ourselves in the foot. JS, why do you so temptingly allow this?!
     }
 
-    getChildNode(node: ComplexNode, key: string): AbstractNode {
+    getChildNode(node: AbstractNode, key: string): AbstractNode {
         const index = parseInt(key, 10)
         if (index < node.storedValue.length)
             return node.storedValue.$mobx.values[index]
@@ -93,7 +92,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return change
     }
 
-    serialize(node: ComplexNode): any {
+    serialize(node: AbstractNode): any {
         return node.getChildren().map(childNode => childNode.snapshot)
     }
 
@@ -122,7 +121,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         }
     }
 
-    applyPatchLocally(node: ComplexNode, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: AbstractNode, subpath: string, patch: IJsonPatch): void {
         const target = node.storedValue as IObservableArray<any>
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
@@ -138,7 +137,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         }
     }
 
-    @action applySnapshot(node: ComplexNode, snapshot: any[]): void {
+    @action applySnapshot(node: AbstractNode, snapshot: any[]): void {
         node.pseudoAction(() => {
             const target = node.storedValue as IObservableArray<any>
             target.replace(snapshot)
@@ -165,7 +164,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return []
     }
 
-    removeChild(node: ComplexNode, subpath: string) {
+    removeChild(node: AbstractNode, subpath: string) {
         node.storedValue.splice(parseInt(subpath, 10), 1)
     }
 

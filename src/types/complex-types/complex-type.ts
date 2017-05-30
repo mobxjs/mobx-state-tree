@@ -1,6 +1,6 @@
-import { action } from "mobx"
+import { action, reaction } from "mobx"
 import { IType, Type } from "../type"
-import { addReadOnlyProp } from "../../utils"
+import { addReadOnlyProp, addHiddenFinalProp } from "../../utils"
 
 function toJSON(this: IMSTNode) {
     return getComplexNode(this).snapshot
@@ -14,11 +14,25 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         super(name)
     }
 
-    instantiate(parent: ComplexNode | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): AbstractNode {
+    instantiate(parent: AbstractNode | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): AbstractNode {
         typecheck(this, snapshot)
         const instance = this.createNewInstance()
         // tslint:disable-next-line:no_unused-variable
-        const node = new ComplexNode(parent, subpath, instance, this, environment)
+        const node = new AbstractNode(this, parent, subpath, environment, instance)
+
+        addHiddenFinalProp(instance, "$treenode", node)
+        // optimization: don't keep the snapshot by default alive with a reaction by default
+        // in prod mode. This saves lot of GC overhead (important for e.g. React Native)
+        // if the feature is not actively used
+        // downside; no structural sharing if getSnapshot is called incidently
+        const snapshotDisposer = reaction(() => node.snapshot, snapshot => {
+            node.emitSnapshot(snapshot)
+        })
+        snapshotDisposer.onError((e: any) => {
+            throw e
+        })
+        node.addDisposer(snapshotDisposer)
+
         let sawException = true
         try {
             node.pseudoAction(() => {
@@ -38,17 +52,21 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         }
     }
 
+    toSnapshot(node: AbstractNode) {
+        return this.serialize(node) // TODO: factor out
+    }
+
     abstract createNewInstance(): any
     abstract finalizeNewInstance(target: any, snapshot: any): void
-    abstract applySnapshot(node: ComplexNode, snapshot: any): void
+    abstract applySnapshot(node: AbstractNode, snapshot: any): void
     // TODO: Maybe optional could resolve to this if omitted?
     abstract getDefaultSnapshot(): any
-    abstract getChildren(node: ComplexNode): AbstractNode[]
-    abstract getChildNode(node: ComplexNode, key: string): AbstractNode
-    abstract serialize(node: ComplexNode): any
-    abstract applyPatchLocally(node: ComplexNode, subpath: string, patch: IJsonPatch): void
+    abstract getChildren(node: AbstractNode): AbstractNode[]
+    abstract getChildNode(node: AbstractNode, key: string): AbstractNode
+    abstract serialize(node: AbstractNode): any
+    abstract applyPatchLocally(node: AbstractNode, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IType<any, any>
-    abstract removeChild(node: ComplexNode, subpath: string): void
+    abstract removeChild(node: AbstractNode, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
 
     validate(value: any, context: IContext): IValidationResult {
@@ -66,13 +84,13 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
 }
 
 export interface IMSTNode {
-    readonly $treenode?: ComplexNode
+    readonly $treenode?: AbstractNode
 }
 
 export function isMST(value: any): value is IMSTNode {
     return value && value.$treenode
 }
 
-import { getType, getComplexNode, AbstractNode, ComplexNode } from "../../core"
+import { getType, getComplexNode, AbstractNode } from "../../core"
 import { IJsonPatch } from "../../core/json-patch"
 import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getDefaultContext, typecheck } from "../type-checker"

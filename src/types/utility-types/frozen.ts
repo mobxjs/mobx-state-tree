@@ -1,7 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { fail, isMutable, isSerializable, isPlainObject } from "../../utils"
-import { ImmutableNode, AbstractNode, ComplexNode } from '../../core'
+import { AbstractNode } from '../../core'
 
 function freeze(value: any) {
     Object.freeze(value)
@@ -28,10 +28,10 @@ export class Frozen<T> extends Type<T, T> {
         return "<any immutable value>"
     }
 
-    instantiate(parent: ComplexNode, subpath: string, environment: any, value: any): AbstractNode {
+    instantiate(parent: AbstractNode, subpath: string, environment: any, value: any): AbstractNode {
         if (!isSerializable(value)) fail("Given value should be serializable")
         // deep freeze the object/array
-        return new ImmutableNode(this, parent, subpath, isMutable(value) ? freeze(value) : value)
+        return new AbstractNode(this, parent, subpath, environment, isMutable(value) ? freeze(value) : value)
     }
 
     validate(value: any, context: IContext): IValidationResult {

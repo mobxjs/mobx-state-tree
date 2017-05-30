@@ -1,6 +1,6 @@
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
-import { ComplexNode, getComplexNode, IComplexValue } from "./nodes/complex-node"
+import { AbstractNode, getComplexNode, IComplexValue } from "./nodes/abstract-node"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, fail } from "../utils"
 import { ISnapshottable, IType } from "../types/type"
@@ -247,7 +247,7 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
  */
 export function hasParent(target: IComplexValue, depth: number = 1): boolean {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
-    let parent: ComplexNode | null = getComplexNode(target).parent
+    let parent: AbstractNode | null = getComplexNode(target).parent
     while (parent) {
         if (--depth === 0)
             return true
@@ -272,7 +272,7 @@ export function getParent<T>(target: IComplexValue, depth?: number): (T & ICompl
 export function getParent<T>(target: IComplexValue, depth = 1): (T & IComplexValue) {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let d = depth
-    let parent: ComplexNode | null = getComplexNode(target).parent
+    let parent: AbstractNode | null = getComplexNode(target).parent
     while (parent) {
         if (--d === 0)
             return parent.storedValue
@@ -424,8 +424,7 @@ export function walk(thing: IComplexValue, processor: (item: IComplexValue) => v
     const node = getComplexNode(thing)
     // tslint:disable-next-line:no_unused-variable
     node.getChildren().forEach((child) => {
-        if (!child.isLeaf())
-            walk(child, processor)
+        walk(child, processor)
     })
     processor(node.storedValue)
 }

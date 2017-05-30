@@ -1,7 +1,7 @@
 import {isType, IType, TypeFlags, Type} from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors, typecheck } from "../type-checker"
 import {fail} from "../../utils"
-import { ComplexNode, AbstractNode } from "../../core"
+import { AbstractNode } from "../../core"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
@@ -29,7 +29,7 @@ export class Union extends Type<any, any> {
         return "(" + this.types.map(factory => factory.describe()).join(" | ") + ")"
     }
 
-    instantiate(parent: ComplexNode, subpath: string, environment: any, value: any): AbstractNode {
+    instantiate(parent: AbstractNode, subpath: string, environment: any, value: any): AbstractNode {
 
         typecheck(this, value)
 

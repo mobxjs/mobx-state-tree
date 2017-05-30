@@ -22,16 +22,23 @@ export interface IType<S, T> {
     flags: TypeFlags
     is(thing: any): thing is S | T
     validate(thing: any, context: IContext): IValidationResult
-    // TODO: not all types need create?
     create(snapshot?: S, environment?: any): T
-    instantiate(parent: ComplexNode | null, subpath: string, environment: any, snapshot?: S): AbstractNode
-    readValue(storedValue: any): T
-    toSnapshot(storedValue: any): S
     isType: boolean
     describe(): string
     Type: T
     SnapshotType: S
     identifierAttribute: string | null
+
+    // Internal api's
+    instantiate(parent: AbstractNode | null, subpath: string, environment: any, snapshot?: S): AbstractNode
+    readValue(node: AbstractNode): T
+    toSnapshot(node: AbstractNode): S
+    applySnapshot(node: AbstractNode, snapshot: S): void
+    applyPatchLocally(node: AbstractNode, subpath: string, patch: IJsonPatch): void
+    getChildren(node: AbstractNode): AbstractNode[]
+    getChildNode(node: AbstractNode, key: string): AbstractNode
+    getChildType(key: string): IType<any, any>
+    removeChild(node: AbstractNode, subpath: string): void
 }
 
 export interface ISimpleType<T> extends IType<T, T> { }
@@ -50,8 +57,12 @@ export abstract class Type<S, T> implements IType<S, T> {
         this.name = name
     }
 
+    instantiate(parent: AbstractNode | null, subpath: string, environment: any, snapshot: S | undefined): AbstractNode {
+        typecheck(this, snapshot)
+        return new AbstractNode(this, parent, subpath, environment, snapshot)
+    }
+
     abstract flags: TypeFlags
-    abstract instantiate(parent: ComplexNode | null, subpath: string, environment: any, snapshot?: S): AbstractNode
     abstract validate(thing: any, context: IContext): IValidationResult
     abstract describe(): string
 
@@ -66,14 +77,37 @@ export abstract class Type<S, T> implements IType<S, T> {
         ).length === 0
     }
 
-    readValue(storedValue: any) {
-        return storedValue
+    readValue(node: AbstractNode) {
+        return node.storedValue
     }
 
-    toSnapshot(storedValue: any) {
-        return storedValue
+    toSnapshot(node: AbstractNode) {
+        return node.storedValue
     }
 
+    applySnapshot(node: AbstractNode, snapshot: S): void {
+        fail("Immutable types do not support applying snapshots")
+    }
+
+    applyPatchLocally(node: AbstractNode, subpath: string, patch: IJsonPatch): void {
+        fail("Immutable types do not support applying patches")
+    }
+
+    getChildren(node: AbstractNode): AbstractNode[] {
+        return EMPTY_ARRAY as any
+    }
+
+    getChildNode(node: AbstractNode, key: string): AbstractNode {
+        return fail(`No child '${key}' available in type: ${this.name}`)
+    }
+
+    getChildType(key: string): IType<any, any> {
+        return fail(`No child '${key}' available in type: ${this.name}`)
+    }
+
+    removeChild(node: AbstractNode, subpath: string): void {
+        return fail(`No child '${subpath}' available in type: ${this.name}`)
+    }
 
     get Type(): T {
         return fail("Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`")
@@ -85,8 +119,8 @@ export abstract class Type<S, T> implements IType<S, T> {
     abstract get identifierAttribute(): string | null
 }
 
-import { fail } from "../utils"
+import { EMPTY_ARRAY, fail } from '../utils';
 import {  } from "../core/mst-node"
-import { IContext, IValidationResult } from "./type-checker"
-import { ComplexNode, AbstractNode, IComplexValue } from "../core"
+import { IContext, IValidationResult, typecheck } from "./type-checker"
+import { AbstractNode, IComplexValue, IJsonPatch } from "../core"
 
