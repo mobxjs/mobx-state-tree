@@ -8,14 +8,16 @@ let nextNodeId = 1
 export abstract class AbstractNode  {
     readonly nodeId = ++nextNodeId
     readonly type: IType<any, any>
+    readonly storedValue: any
     @observable protected _parent: ComplexNode | null = null
     @observable subpath: string = ""
 
     // TODO: should have environment as well?
-    constructor(type: IType<any, any>, parent: ComplexNode | null, subpath: string) {
+    constructor(type: IType<any, any>, parent: ComplexNode | null, subpath: string, storedValue: any) {
         this.type = type
         this._parent = parent
         this.subpath = subpath
+        this.storedValue = storedValue
     }
 
     /**
@@ -95,12 +97,15 @@ export abstract class AbstractNode  {
         return current!
     }
 
+    getValue(): any {
+        return this.type.readValue(this.storedValue)
+    }
+
     toString(): string {
         return `${this.type.name}@${this.path || "<root>"}:${this.snapshot}`
     }
 
     abstract get snapshot(): any;
-    abstract getValue(): any
     abstract isLeaf(): boolean
     abstract getChildren(): AbstractNode[]
     abstract getChildNode(name: string): AbstractNode | null

@@ -1,8 +1,12 @@
-import { IReference, ReferenceNode } from '../../core';
 import { ISimpleType, TypeFlags, Type, IType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
 import { ImmutableNode, ComplexNode, AbstractNode } from "../../core"
+
+
+export interface IReference {
+    $ref: string
+}
 
 export type ReferenceSnapshot = string | null | IReference
 
@@ -18,7 +22,7 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
 
     instantiate(parent: ComplexNode, subpath: string, environment: any, snapshot: ReferenceSnapshot): AbstractNode {
         typecheck(this.targetType, snapshot)
-        return new ReferenceNode(this, parent, subpath, snapshot)
+        return new ImmutableNode(this, parent, subpath, snapshot)
     }
 
     describe() {
@@ -32,6 +36,10 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
 
     get identifierAttribute() {
         return null
+    }
+
+    readValue(storedValue: any) {
+        return "TODO"
     }
 }
 

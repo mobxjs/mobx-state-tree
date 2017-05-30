@@ -8,13 +8,9 @@ export class ImmutableNode extends AbstractNode  {
         type: IType<any, any>,
         parent: ComplexNode | null,
         subpath: string,
-        protected readonly value: any
+        value: any
     ) {
-        super(type, parent, subpath)
-    }
-
-    getValue() {
-        return this.value
+        super(type, parent, subpath, value)
     }
 
     isLeaf() {
@@ -30,7 +26,7 @@ export class ImmutableNode extends AbstractNode  {
     }
 
     get snapshot() {
-        return this.value
+        return this.type.toSnapshot(this.storedValue)
     }
 
     setParent(newParent: ComplexNode, subpath: string): void {

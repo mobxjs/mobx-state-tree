@@ -58,7 +58,7 @@ export function createActionInvoker(name: string, fn: Function) {
             // outer action, run middlewares and start the action!
             const call: IRawActionCall = {
                 name,
-                object: adm.target,
+                object: adm.storedValue,
                 args: argsToArray(arguments)
             }
             const root = adm.root
@@ -107,7 +107,7 @@ function deserializeArgument(adm: ComplexNode, value: any): any {
     if (typeof value === "object") {
         const keys = Object.keys(value)
         if (keys.length === 1 && keys[0] === "$ref")
-            return resolve(adm.target, value.$ref)
+            return resolve(adm.storedValue, value.$ref)
     }
     return value
 }

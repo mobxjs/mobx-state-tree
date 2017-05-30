@@ -25,6 +25,8 @@ export interface IType<S, T> {
     // TODO: not all types need create?
     create(snapshot?: S, environment?: any): T
     instantiate(parent: ComplexNode | null, subpath: string, environment: any, snapshot?: S): AbstractNode
+    readValue(storedValue: any): T
+    toSnapshot(storedValue: any): S
     isType: boolean
     describe(): string
     Type: T
@@ -63,6 +65,15 @@ export abstract class Type<S, T> implements IType<S, T> {
             [{ path: "", type: this }]
         ).length === 0
     }
+
+    readValue(storedValue: any) {
+        return storedValue
+    }
+
+    toSnapshot(storedValue: any) {
+        return storedValue
+    }
+
 
     get Type(): T {
         return fail("Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`")

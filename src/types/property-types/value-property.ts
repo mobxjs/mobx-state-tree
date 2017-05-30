@@ -5,7 +5,6 @@ import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath } from "../type-checker"
 import { fail } from "../../utils"
 
-// TODO: move to better place, reuse
 function unbox(b: AbstractNode): any {
     return b.getValue()
 }

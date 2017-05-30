@@ -58,14 +58,14 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     getChildren(node: ComplexNode): AbstractNode[] {
         const res: AbstractNode[] = []
         // Ignore all alarm bells to be able to read this:...
-        Object.keys(node.target.$mobx.values).forEach(key => {
-            res.push(node.target.$mobx.values[key].value)
+        Object.keys(node.storedValue.$mobx.values).forEach(key => {
+            res.push(node.storedValue.$mobx.values[key].value)
         })
         return res
     }
 
     getChildNode(node: ComplexNode, key: string): AbstractNode {
-        const childNode = node.target.$mobx.values[key]
+        const childNode = node.storedValue.$mobx.values[key]
         if (!childNode)
             fail("Not a child" + key)
         return childNode
@@ -132,7 +132,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     applyPatchLocally(node: ComplexNode, subpath: string, patch: IJsonPatch): void {
-        const target = node.target as ObservableMap<any>
+        const target = node.storedValue as ObservableMap<any>
         switch (patch.op) {
             case "add":
             case "replace":
@@ -146,7 +146,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
 
     @action applySnapshot(node: ComplexNode, snapshot: any): void {
         node.pseudoAction(() => {
-            const target = node.target as ObservableMap<any>
+            const target = node.storedValue as ObservableMap<any>
             target.replace(snapshot)
             // const identifierAttr = getIdentifierAttribute(this.subType)
             // // Try to update snapshot smartly, by reusing instances under the same key as much as possible
@@ -201,7 +201,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     removeChild(node: ComplexNode, subpath: string) {
-        (node.target as ObservableMap<any>).delete(subpath)
+        (node.storedValue as ObservableMap<any>).delete(subpath)
     }
 
     get identifierAttribute() {

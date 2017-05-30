@@ -151,7 +151,7 @@ export class ObjectType extends ComplexType<any, any> {
         const res: AbstractNode[] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
-                res.push(prop.getValueNode(node.target))
+                res.push(prop.getValueNode(node.storedValue))
         })
         return res
     }
@@ -159,25 +159,25 @@ export class ObjectType extends ComplexType<any, any> {
     getChildNode(node: ComplexNode, key: string): AbstractNode {
         if (!(this.props[key] instanceof ValueProperty))
             return fail("Not a value property: " + key)
-        return (this.props[key] as ValueProperty).getValueNode(node.target)
+        return (this.props[key] as ValueProperty).getValueNode(node.storedValue)
     }
 
     serialize(node: ComplexNode): any {
         const res = {}
-        this.forAllProps(prop => prop.serialize(node.target, res))
+        this.forAllProps(prop => prop.serialize(node.storedValue, res))
         return res
     }
 
     applyPatchLocally(node: ComplexNode, subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add")) fail(`object does not support operation ${patch.op}`)
-        node.target[subpath] = patch.value
+        node.storedValue[subpath] = patch.value
     }
 
     @action applySnapshot(node: ComplexNode, snapshot: any): void {
         // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed?
         node.pseudoAction(() => {
             for (let key in this.props)
-                this.props[key].deserialize(node.target, snapshot)
+                this.props[key].deserialize(node.storedValue, snapshot)
         })
     }
 
@@ -220,7 +220,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     removeChild(node: ComplexNode, subpath: string) {
-        node.target[subpath] = null
+        node.storedValue[subpath] = null
     }
 }
 

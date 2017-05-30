@@ -52,13 +52,13 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getChildren(node: ComplexNode): AbstractNode[] {
-        return node.target.$mobx.values // Shooting ourselves in the foot. JS, why do you so temptingly allow this?!
+        return node.storedValue.$mobx.values // Shooting ourselves in the foot. JS, why do you so temptingly allow this?!
     }
 
     getChildNode(node: ComplexNode, key: string): AbstractNode {
         const index = parseInt(key, 10)
-        if (index < node.target.length)
-            return node.target.$mobx.values[index]
+        if (index < node.storedValue.length)
+            return node.storedValue.$mobx.values[index]
         return fail("Not a child: " + key)
     }
 
@@ -123,7 +123,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     applyPatchLocally(node: ComplexNode, subpath: string, patch: IJsonPatch): void {
-        const target = node.target as IObservableArray<any>
+        const target = node.storedValue as IObservableArray<any>
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
             case "replace":
@@ -140,7 +140,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
     @action applySnapshot(node: ComplexNode, snapshot: any[]): void {
         node.pseudoAction(() => {
-            const target = node.target as IObservableArray<any>
+            const target = node.storedValue as IObservableArray<any>
             target.replace(snapshot)
         })
     }
@@ -166,7 +166,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     removeChild(node: ComplexNode, subpath: string) {
-        node.target.splice(parseInt(subpath, 10), 1)
+        node.storedValue.splice(parseInt(subpath, 10), 1)
     }
 
     get identifierAttribute() {

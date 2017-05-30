@@ -7,7 +7,7 @@ import { IType } from "../../types/type"
 
 export class ComplexNode extends AbstractNode  {
     type: ComplexType<any, any>
-    readonly target: any
+    readonly storedValue: any
     isProtectionEnabled = true
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
@@ -21,10 +21,9 @@ export class ComplexNode extends AbstractNode  {
 
     // TODO: reorder argumetns
     constructor(parent: ComplexNode | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
-        super(type, parent, subpath)
+        super(type, parent, subpath, initialState)
         if (!(type instanceof ComplexType)) fail("Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
-        this.target = initialState
         this._environment = environment
 
         // optimization: don't keep the snapshot by default alive with a reaction by default
@@ -40,10 +39,6 @@ export class ComplexNode extends AbstractNode  {
         this.addDisposer(snapshotDisposer)
     }
 
-    getValue() {
-        return this.target
-    }
-
     isLeaf() {
         return false
     }
@@ -56,8 +51,8 @@ export class ComplexNode extends AbstractNode  {
         if (this._isDetaching)
             return
 
-        walk(this.target, child => getComplexNode(child).aboutToDie())
-        walk(this.target, child => getComplexNode(child).finalizeDeath())
+        walk(this.storedValue, child => getComplexNode(child).aboutToDie())
+        walk(this.storedValue, child => getComplexNode(child).finalizeDeath())
     }
 
     public aboutToDie() {
@@ -80,7 +75,7 @@ export class ComplexNode extends AbstractNode  {
 
         // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
         // we could express this in a much nicer way
-        Object.defineProperty(this.target, "$mobx", {
+        Object.defineProperty(this.storedValue, "$mobx", {
             get() {
                 fail(`This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type '${self.type.name}') used to live at '${oldPath}'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead.`)
             }
@@ -164,6 +159,7 @@ export class ComplexNode extends AbstractNode  {
     }
 
     reconcileChildren<T>(childType: IType<any, T>, oldNodes: AbstractNode[], newValues: T[], newPaths: (string|number)[]): T[] {
+        // TODO: pick identifiers based on actual type instead of declared type
         // optimization: overload for a single old / new value to avoid all the array allocations
         // optimization: skip reconciler for non-complex types
         const res = new Array(newValues.length)
@@ -306,14 +302,14 @@ export class ComplexNode extends AbstractNode  {
     }
 
     fireHook(name: string) {
-        const fn = this.target[name]
+        const fn = this.storedValue[name]
         if (typeof fn === "function")
-            fn.apply(this.target)
+            fn.apply(this.storedValue)
     }
 
     toString(): string {
         const identifierAttr = getIdentifierAttribute(this.type)
-        const identifier = identifierAttr ? `(${identifierAttr}: ${this.target[identifierAttr]})` : ""
+        const identifier = identifierAttr ? `(${identifierAttr}: ${this.storedValue[identifierAttr]})` : ""
         return `${this.type.name}@${this.path || "<root>"}${identifier}${this.isAlive ? "" : "[dead]"}`
     }
 }

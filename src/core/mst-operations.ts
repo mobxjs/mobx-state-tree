@@ -275,7 +275,7 @@ export function getParent<T>(target: IComplexValue, depth = 1): (T & IComplexVal
     let parent: ComplexNode | null = getComplexNode(target).parent
     while (parent) {
         if (--d === 0)
-            return parent.target
+            return parent.storedValue
         parent = parent.parent
     }
     return fail(`Failed to find the parent of ${getComplexNode(target)} at depth ${depth}`)
@@ -291,7 +291,7 @@ export function getParent<T>(target: IComplexValue, depth = 1): (T & IComplexVal
 export function getRoot(target: IComplexValue): any & IComplexValue;
 export function getRoot<T>(target: IComplexValue): T & IComplexValue;
 export function getRoot(target: IComplexValue): IComplexValue {
-    return getComplexNode(target).root.target
+    return getComplexNode(target).root.storedValue
 }
 
 /**
@@ -427,7 +427,7 @@ export function walk(thing: IComplexValue, processor: (item: IComplexValue) => v
         if (!child.isLeaf())
             walk(child, processor)
     })
-    processor(node.target)
+    processor(node.storedValue)
 }
 
 // TODO: remove
