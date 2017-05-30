@@ -14,11 +14,11 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
         super(name)
     }
 
-    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): AbstractNode {
+    instantiate(parent: ComplexNode | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): AbstractNode {
         typecheck(this, snapshot)
         const instance = this.createNewInstance()
         // tslint:disable-next-line:no_unused-variable
-        const node = new MSTAdministration(parent, subpath, instance, this, environment)
+        const node = new ComplexNode(parent, subpath, instance, this, environment)
         let sawException = true
         try {
             node.pseudoAction(() => {
@@ -40,15 +40,15 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
 
     abstract createNewInstance(): any
     abstract finalizeNewInstance(target: any, snapshot: any): void
-    abstract applySnapshot(node: MSTAdministration, snapshot: any): void
+    abstract applySnapshot(node: ComplexNode, snapshot: any): void
     // TODO: Maybe optional could resolve to this if omitted?
     abstract getDefaultSnapshot(): any
-    abstract getChildren(node: MSTAdministration): AbstractNode[]
-    abstract getChildNode(node: MSTAdministration, key: string): AbstractNode
-    abstract serialize(node: MSTAdministration): any
-    abstract applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void
+    abstract getChildren(node: ComplexNode): AbstractNode[]
+    abstract getChildNode(node: ComplexNode, key: string): AbstractNode
+    abstract serialize(node: ComplexNode): any
+    abstract applyPatchLocally(node: ComplexNode, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IType<any, any>
-    abstract removeChild(node: MSTAdministration, subpath: string): void
+    abstract removeChild(node: ComplexNode, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
 
     validate(value: any, context: IContext): IValidationResult {
@@ -65,6 +65,6 @@ export abstract class ComplexType<S, T> extends Type<S, T> {
     }
 }
 
-import { IMSTNode, isMST, getType, getMSTAdministration, AbstractNode, MSTAdministration } from "../../core"
+import { IMSTNode, isMST, getType, getMSTAdministration, AbstractNode, ComplexNode } from "../../core"
 import { IJsonPatch } from "../../core/json-patch"
 import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getDefaultContext, typecheck } from "../type-checker"

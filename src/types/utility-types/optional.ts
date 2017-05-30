@@ -24,7 +24,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.describe() + "?"
     }
 
-    instantiate(parent: MSTAdministration, subpath: string, environment: any, value: S): AbstractNode {
+    instantiate(parent: ComplexNode, subpath: string, environment: any, value: S): AbstractNode {
         if (typeof value === "undefined") {
             const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
             const defaultSnapshot = isMST(defaultValue) ? getMSTAdministration(defaultValue).snapshot : defaultValue
@@ -58,5 +58,5 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): 
     return new OptionalValue(type, defaultValueOrFunction)
 }
 
-import { isMST, getMSTAdministration, MSTAdministration, AbstractNode  } from "../../core"
+import { isMST, getMSTAdministration, ComplexNode, AbstractNode  } from "../../core"
 

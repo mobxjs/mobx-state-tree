@@ -24,7 +24,7 @@ export interface IType<S, T> {
     validate(thing: any, context: IContext): IValidationResult
     // TODO: not all types need create?
     create(snapshot?: S, environment?: any): T
-    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot?: S): AbstractNode
+    instantiate(parent: ComplexNode | null, subpath: string, environment: any, snapshot?: S): AbstractNode
     isType: boolean
     describe(): string
     Type: T
@@ -49,7 +49,7 @@ export abstract class Type<S, T> implements IType<S, T> {
     }
 
     abstract flags: TypeFlags
-    abstract instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot?: S): AbstractNode
+    abstract instantiate(parent: ComplexNode | null, subpath: string, environment: any, snapshot?: S): AbstractNode
     abstract validate(thing: any, context: IContext): IValidationResult
     abstract describe(): string
 
@@ -77,5 +77,5 @@ export abstract class Type<S, T> implements IType<S, T> {
 import { fail } from "../utils"
 import {  } from "../core/mst-node"
 import { IContext, IValidationResult } from "./type-checker"
-import { MSTAdministration, AbstractNode, IMSTNode } from "../core"
+import { ComplexNode, AbstractNode, IMSTNode } from "../core"
 

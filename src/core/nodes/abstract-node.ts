@@ -1,6 +1,6 @@
 import {
-    action, observable,
-    computed, reaction
+    observable,
+    computed
 } from "mobx"
 
 let nextNodeId = 1
@@ -8,11 +8,11 @@ let nextNodeId = 1
 export abstract class AbstractNode  {
     readonly nodeId = ++nextNodeId
     readonly type: IType<any, any>
-    @observable protected _parent: MSTAdministration | null = null
+    @observable protected _parent: ComplexNode | null = null
     @observable subpath: string = ""
 
     // TODO: should have environment as well?
-    constructor(type: IType<any, any>, parent: MSTAdministration | null, subpath: string) {
+    constructor(type: IType<any, any>, parent: ComplexNode | null, subpath: string) {
         this.type = type
         this._parent = parent
         this.subpath = subpath
@@ -31,26 +31,25 @@ export abstract class AbstractNode  {
         return this.parent === null
     }
 
-    public get parent(): MSTAdministration | null {
+    public get parent(): ComplexNode | null {
         return this._parent
     }
 
-    public get root(): MSTAdministration {
+    public get root(): ComplexNode {
         // future optimization: store root ref in the node and maintain it
         let p, r: AbstractNode = this
         while (p = r.parent)
             r = p
-        return r as MSTAdministration
+        return r as ComplexNode
     }
 
     abstract getValue(): any
     abstract isLeaf(): boolean
     abstract getChildren(): AbstractNode[]
     abstract getChildNode(name: string): AbstractNode | null
-    abstract setParent(newParent: MSTAdministration, subpath: string): void
+    abstract setParent(newParent: ComplexNode, subpath: string): void
 }
 
-import { IComplexType, IType } from '../../types/type';
-import { typecheck } from "../../types/type-checker"
-import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "../json-patch"
-import { MSTAdministration } from "./complex-node"
+import { IType } from "../../types/type"
+import { escapeJsonPath } from "../json-patch"
+import { ComplexNode } from "./complex-node"

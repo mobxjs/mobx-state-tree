@@ -1,7 +1,7 @@
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { getMSTAdministration, IMSTNode, getRelativePathForNodes, isMST } from "./mst-node"
-import { MSTAdministration } from "./nodes/complex-node"
+import { ComplexNode } from "./nodes/complex-node"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, fail } from "../utils"
 import { ISnapshottable, IType } from "../types/type"
@@ -240,7 +240,7 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
  */
 export function hasParent(target: IMSTNode, depth: number = 1): boolean {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
-    let parent: MSTAdministration | null = getMSTAdministration(target).parent
+    let parent: ComplexNode | null = getMSTAdministration(target).parent
     while (parent) {
         if (--depth === 0)
             return true
@@ -265,7 +265,7 @@ export function getParent<T>(target: IMSTNode, depth?: number): (T & IMSTNode);
 export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let d = depth
-    let parent: MSTAdministration | null = getMSTAdministration(target).parent
+    let parent: ComplexNode | null = getMSTAdministration(target).parent
     while (parent) {
         if (--d === 0)
             return parent.target

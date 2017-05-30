@@ -11,7 +11,7 @@ export class Literal<T> extends Type<T, T> {
         this.value = value
     }
 
-    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: T): AbstractNode {
+    instantiate(parent: ComplexNode | null, subpath: string, environment: any, snapshot: T): AbstractNode {
         typecheck(this, snapshot)
         return new ImmutableNode(this, parent, subpath, this.value)
     }
@@ -37,4 +37,4 @@ export function literal<S>(value: S): ISimpleType<S> {
     return new Literal<S>(value)
 }
 
-import { ImmutableNode, AbstractNode, MSTAdministration } from '../../core';
+import { ImmutableNode, AbstractNode, ComplexNode } from '../../core';

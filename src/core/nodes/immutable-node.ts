@@ -1,12 +1,12 @@
 import { AbstractNode } from "./abstract-node"
 import { IType } from "../../types/type"
-import { MSTAdministration } from "./complex-node"
+import { ComplexNode } from "./complex-node"
 import { EMPTY_ARRAY, fail } from "../../utils"
 
 export class ImmutableNode extends AbstractNode  {
     constructor(
         type: IType<any, any>,
-        parent: MSTAdministration | null,
+        parent: ComplexNode | null,
         subpath: string,
         protected readonly value: any
     ) {
@@ -29,7 +29,7 @@ export class ImmutableNode extends AbstractNode  {
         return null
     }
 
-    setParent(newParent: MSTAdministration, subpath: string): void {
+    setParent(newParent: ComplexNode, subpath: string): void {
         if (newParent !== this.parent)
             fail("Only complex types can be assigned to a new parent")
         this.subpath = subpath

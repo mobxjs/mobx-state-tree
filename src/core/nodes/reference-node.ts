@@ -6,7 +6,7 @@ import { getIdentifierAttribute } from "../../types/complex-types/object"
 import { IType } from "../../types/type"
 import { typecheck } from "../../types/type-checker"
 import { resolve } from "../mst-operations"
-import { MSTAdministration } from "./complex-node";
+import { ComplexNode } from "./complex-node";
 
 export interface IReference {
     $ref: string
@@ -18,7 +18,7 @@ export class ReferenceNode extends ImmutableNode {
 
     constructor(
         public readonly type: IType<any, any>,
-        public readonly parent: MSTAdministration | null,
+        public readonly parent: ComplexNode | null,
         public subpath: string,
         protected readonly value: any
     ) {

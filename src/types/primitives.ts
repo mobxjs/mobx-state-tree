@@ -1,7 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "./type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
 import { isPrimitive, fail } from "../utils"
-import { ImmutableNode, MSTAdministration, AbstractNode } from "../core"
+import { ImmutableNode, ComplexNode, AbstractNode } from "../core"
 
 export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean
@@ -17,7 +17,7 @@ export class CoreType<T> extends Type<T, T> {
         return this.name
     }
 
-    instantiate(parent: MSTAdministration | null, subpath: string, environment: any, snapshot: T): AbstractNode {
+    instantiate(parent: ComplexNode | null, subpath: string, environment: any, snapshot: T): AbstractNode {
         if (!isPrimitive(snapshot)) fail(`Not a primitive: '${snapshot}'`)
         if (!this.checker(snapshot)) fail(`Value is not assignable to '` + this.name + `'`)
         return new ImmutableNode(this, parent, subpath, snapshot)

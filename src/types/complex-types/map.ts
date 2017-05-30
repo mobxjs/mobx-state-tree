@@ -1,6 +1,6 @@
 import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
-import { getMSTAdministration, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch, AbstractNode } from "../../core"
+import { getMSTAdministration, ComplexNode, valueToSnapshot, escapeJsonPath, IJsonPatch, AbstractNode } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -55,7 +55,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         getMSTAdministration(instance).applySnapshot(snapshot)
     }
 
-    getChildren(node: MSTAdministration): AbstractNode[] {
+    getChildren(node: ComplexNode): AbstractNode[] {
         const res: AbstractNode[] = []
         // Ignore all alarm bells to be able to read this:...
         Object.keys(node.target.$mobx.values).forEach(key => {
@@ -64,7 +64,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         return res
     }
 
-    getChildNode(node: MSTAdministration, key: string): AbstractNode {
+    getChildNode(node: ComplexNode, key: string): AbstractNode {
         const childNode = node.target.$mobx.values[key]
         if (!childNode)
             fail("Not a child" + key)
@@ -106,7 +106,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         return change
     }
 
-    serialize(node: MSTAdministration): Object {
+    serialize(node: ComplexNode): Object {
         const target = node.target as ObservableMap<any>
         const res: {[key: string]: any} = {}
         target.forEach((value, key) => {
@@ -133,7 +133,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         }
     }
 
-    applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: ComplexNode, subpath: string, patch: IJsonPatch): void {
         const target = node.target as ObservableMap<any>
         switch (patch.op) {
             case "add":
@@ -146,7 +146,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         }
     }
 
-    @action applySnapshot(node: MSTAdministration, snapshot: any): void {
+    @action applySnapshot(node: ComplexNode, snapshot: any): void {
         node.pseudoAction(() => {
             const target = node.target as ObservableMap<any>
             target.replace(snapshot)
@@ -202,7 +202,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         return {}
     }
 
-    removeChild(node: MSTAdministration, subpath: string) {
+    removeChild(node: ComplexNode, subpath: string) {
         (node.target as ObservableMap<any>).delete(subpath)
     }
 

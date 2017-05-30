@@ -15,7 +15,7 @@ import {
     isPlainObject
 } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType } from "../type"
-import { MSTAdministration, getType, IMSTNode, getMSTAdministration, IJsonPatch, AbstractNode } from "../../core"
+import { ComplexNode, getType, IMSTNode, getMSTAdministration, IJsonPatch, AbstractNode } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
@@ -147,7 +147,7 @@ export class ObjectType extends ComplexType<any, any> {
         }
     }
 
-    getChildren(node: MSTAdministration): AbstractNode[] {
+    getChildren(node: ComplexNode): AbstractNode[] {
         const res: AbstractNode[] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
@@ -156,24 +156,24 @@ export class ObjectType extends ComplexType<any, any> {
         return res
     }
 
-    getChildNode(node: MSTAdministration, key: string): AbstractNode {
+    getChildNode(node: ComplexNode, key: string): AbstractNode {
         if (!(this.props[key] instanceof ValueProperty))
             return fail("Not a value property: " + key)
         return (this.props[key] as ValueProperty).getNode(node.target)
     }
 
-    serialize(node: MSTAdministration): any {
+    serialize(node: ComplexNode): any {
         const res = {}
         this.forAllProps(prop => prop.serialize(node.target, res))
         return res
     }
 
-    applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: ComplexNode, subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add")) fail(`object does not support operation ${patch.op}`)
         node.target[subpath] = patch.value
     }
 
-    @action applySnapshot(node: MSTAdministration, snapshot: any): void {
+    @action applySnapshot(node: ComplexNode, snapshot: any): void {
         // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed?
         node.pseudoAction(() => {
             for (let key in this.props)
@@ -219,7 +219,7 @@ export class ObjectType extends ComplexType<any, any> {
         return {}
     }
 
-    removeChild(node: MSTAdministration, subpath: string) {
+    removeChild(node: ComplexNode, subpath: string) {
         node.target[subpath] = null
     }
 }

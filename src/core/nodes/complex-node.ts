@@ -1,14 +1,27 @@
 import {
-    action, observable,
+    action,
     computed, reaction
 } from "mobx"
 import { AbstractNode } from "./abstract-node"
-import { IComplexType, IType } from '../../types/type'
+import { IType } from "../../types/type"
 import { typecheck } from "../../types/type-checker"
+import { walk } from "../mst-operations"
+import { isMST, getMSTAdministration } from "../mst-node"
+import { IMiddleWareHandler } from "../action"
+import {
+    addHiddenFinalProp,
+    addReadOnlyProp,
+    extend,
+    fail,
+    IDisposer,
+    isMutable,
+    registerEventHandler
+} from "../../utils"
+import { IJsonPatch, joinJsonPath, splitJsonPath } from "../json-patch"
+import { getIdentifierAttribute } from "../../types/complex-types/object"
+import { ComplexType } from "../../types/complex-types/complex-type"
 
-
-// TODO: rename to ComplexNode
-export class MSTAdministration extends AbstractNode  {
+export class ComplexNode extends AbstractNode  {
     type: ComplexType<any, any>
     readonly target: any
     isProtectionEnabled = true
@@ -23,7 +36,7 @@ export class MSTAdministration extends AbstractNode  {
     private readonly disposers: (() => void)[] = []
 
     // TODO: reorder argumetns
-    constructor(parent: MSTAdministration | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
+    constructor(parent: ComplexNode | null, subpath: string, initialState: any, type: ComplexType<any, any>, environment: any) {
         super(type, parent, subpath)
         if (!(type instanceof ComplexType)) fail("Uh oh")
         addHiddenFinalProp(initialState, "$treenode", this)
@@ -130,7 +143,7 @@ export class MSTAdministration extends AbstractNode  {
         return registerEventHandler(this.patchSubscribers, onPatch)
     }
 
-    emitPatch(patch: IJsonPatch, source: MSTAdministration) {
+    emitPatch(patch: IJsonPatch, source: ComplexNode) {
         if (this.patchSubscribers.length) {
             const localizedPatch: IJsonPatch = extend({}, patch, {
                     path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
@@ -141,7 +154,7 @@ export class MSTAdministration extends AbstractNode  {
             this.parent.emitPatch(patch, source)
     }
 
-    setParent(newParent: MSTAdministration | null, subpath: string | null = null) {
+    setParent(newParent: ComplexNode | null, subpath: string | null = null) {
         if (this.parent === newParent && this.subpath === subpath)
             return
         if (this._parent && newParent && newParent !== this._parent) {
@@ -298,7 +311,7 @@ export class MSTAdministration extends AbstractNode  {
     }
 
     get isProtected(): boolean {
-        let cur: MSTAdministration | null = this
+        let cur: ComplexNode | null = this
         while (cur) {
             if (cur.isProtectionEnabled === false)
                 return false
@@ -335,7 +348,7 @@ export class MSTAdministration extends AbstractNode  {
             return
         else {
             this.fireHook("beforeDetach")
-            this._environment = (this.root as MSTAdministration)._environment // make backup of environment
+            this._environment = (this.root as ComplexNode)._environment // make backup of environment
             this._isDetaching = true
             this.parent!.removeChild(this.subpath)
             this._parent = null
@@ -358,26 +371,8 @@ export class MSTAdministration extends AbstractNode  {
     }
 }
 
-function assertComplexNode(thing: AbstractNode | null): MSTAdministration {
-    if (thing instanceof MSTAdministration)
+function assertComplexNode(thing: AbstractNode | null): ComplexNode {
+    if (thing instanceof ComplexNode)
         return thing
     return fail("Not a complex node: " + thing)
 }
-
-import { walk } from "../mst-operations"
-import { isMST, getMSTAdministration } from "../mst-node"
-import { IMiddleWareHandler } from "../action"
-import {
-    addHiddenFinalProp,
-    addReadOnlyProp,
-    EMPTY_ARRAY,
-    extend,
-    fail,
-    IDisposer,
-    isMutable,
-    registerEventHandler
-} from '../../utils';
-import { IJsonPatch, joinJsonPath, splitJsonPath, escapeJsonPath } from "../json-patch"
-import { getIdentifierAttribute } from "../../types/complex-types/object"
-import { ComplexType } from "../../types/complex-types/complex-type"
-

@@ -1,5 +1,5 @@
 export interface IMSTNode {
-    readonly $treenode?: MSTAdministration
+    readonly $treenode?: ComplexNode
 }
 
 export function getType<S, T>(object: IMSTNode): IType<S, T> {
@@ -14,7 +14,7 @@ export function isMST(value: any): value is IMSTNode {
     return value && value.$treenode
 }
 
-export function getMSTAdministration(value: any): MSTAdministration {
+export function getMSTAdministration(value: any): ComplexNode {
     if (isMST(value))
         return value.$treenode!
     else
@@ -35,7 +35,7 @@ export function valueToSnapshot(thing: any) {
     fail("Unable to convert value to snapshot.")
 }
 
-export function getRelativePathForNodes(base: MSTAdministration, target: MSTAdministration): string {
+export function getRelativePathForNodes(base: ComplexNode, target: ComplexNode): string {
     // PRE condition target is (a child of) base!
     if (base.root !== target.root) fail(`Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`)
 
@@ -51,7 +51,7 @@ export function getRelativePathForNodes(base: MSTAdministration, target: MSTAdmi
         + joinJsonPath(targetParts.slice(common))
 }
 
-import { MSTAdministration } from "./nodes/complex-node"
+import { ComplexNode } from "./nodes/complex-node"
 import { isMutable, isSerializable, fail } from "../utils"
 import { splitJsonPath, joinJsonPath } from "./json-patch"
 import { IType } from "../types/type"
