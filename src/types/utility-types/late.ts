@@ -32,7 +32,7 @@ export class Late<S, T> extends Type<S, T> {
         return this.subType.name
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         return this.subType.validate(value, context)
     }
 

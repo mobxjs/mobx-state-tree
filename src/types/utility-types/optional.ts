@@ -35,7 +35,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.instantiate(parent, subpath, environment, value)
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         // defaulted values can be skipped
         if (value === undefined || this.type.is(value)) {
             return typeCheckSuccess()

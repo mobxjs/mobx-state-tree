@@ -32,7 +32,7 @@ export class Refinement extends Type<any, any> {
         return inst
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (this.type.is(value) && this.predicate(value)) {
             return typeCheckSuccess()
         }

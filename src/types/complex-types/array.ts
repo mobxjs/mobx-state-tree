@@ -5,9 +5,8 @@ import {
     Node
 } from "../../core"
 import { addHiddenFinalProp, identity, nothing, fail } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType } from "../type"
+import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
-import { ComplexType } from "./complex-type"
 
 export function arrayToString(this: IObservableArray<any>) {
     return `${getComplexNode(this)}(${this.length} items)`
@@ -24,7 +23,7 @@ class Box {
 }
 
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
-    isArrayFactory = true
+    shouldAttachNode = true
     subType: IType<any, any>
     readonly flags = TypeFlags.Array
 
@@ -92,7 +91,11 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return change
     }
 
-    serialize(node: Node): any {
+    getValue(node: Node): any {
+        return node.storedValue
+    }
+
+    getSnapshot(node: Node): any {
         return node.getChildren().map(childNode => childNode.snapshot)
     }
 

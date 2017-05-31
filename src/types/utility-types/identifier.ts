@@ -25,7 +25,7 @@ export class IdentifierType<T> extends Type<T, T> {
         return `identifier(${this.identifierType})`
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         return typeCheckSuccess()
         // TODO:
     }

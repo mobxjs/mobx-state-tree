@@ -14,10 +14,9 @@ import {
     hasOwnProperty,
     isPlainObject
 } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType } from "../type"
+import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { getType, IComplexValue, getComplexNode, IJsonPatch, Node } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
-import { ComplexType } from "./complex-type"
 import { getPrimitiveFactoryFromValue } from "../primitives"
 import { optional } from "../utility-types/optional"
 // import { isReferenceFactory } from "../utility-types/reference"
@@ -36,7 +35,7 @@ function objectTypeToString(this: any) {
 }
 
 export class ObjectType extends ComplexType<any, any> {
-    isObjectFactory = true
+    shouldAttachNode = true
     readonly flags = TypeFlags.Object
 
     /**
@@ -161,8 +160,12 @@ export class ObjectType extends ComplexType<any, any> {
             return fail("Not a value property: " + key)
         return (this.props[key] as ValueProperty).getValueNode(node.storedValue)
     }
+    
+    getValue(node: Node): any {
+        return node.storedValue
+    }
 
-    serialize(node: Node): any {
+    getSnapshot(node: Node): any {
         const res = {}
         this.forAllProps(prop => prop.serialize(node.storedValue, res))
         return res

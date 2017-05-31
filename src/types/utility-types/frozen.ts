@@ -34,7 +34,7 @@ export class Frozen<T> extends Type<T, T> {
         return new Node(this, parent, subpath, environment, isMutable(value) ? freeze(value) : value)
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (!isSerializable(value)) {
             return typeCheckFailure(context, value)
         }

@@ -1,4 +1,4 @@
-import {action} from "mobx"
+import { action } from "mobx"
 
 export interface ISnapshottable<S> {}
 
@@ -31,8 +31,8 @@ export interface IType<S, T> {
 
     // Internal api's
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot?: S): Node
-    readValue(node: Node): T
-    toSnapshot(node: Node): S
+    getValue(node: Node): T
+    getSnapshot(node: Node): S
     applySnapshot(node: Node, snapshot: S): void
     applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void
     getChildren(node: Node): Node[]
@@ -49,25 +49,79 @@ export function isType(value: any): value is IType<any, any> {
     return typeof value === "object" && value && value.isType === true
 }
 
-export abstract class Type<S, T> implements IType<S, T> {
-    name: string
-    isType = true
+function toJSON(this: IMSTNode) {
+    return getComplexNode(this).snapshot
+}
+
+/**
+ * A complex type produces a MST node (Node in the state tree)
+ */
+export abstract class ComplexType<S, T> implements IType<S, T> {
+    readonly isType = true
+    readonly name: string
 
     constructor(name: string) {
         this.name = name
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S | undefined): Node {
+    @action create(snapshot?: S, environment?: any): T {
         typecheck(this, snapshot)
-        return new Node(this, parent, subpath, environment, snapshot)
+        return this.instantiate(null, "", environment, snapshot).getValue()
+    }
+
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): Node {
+        const instance = this.createNewInstance(snapshot)
+        // tslint:disable-next-line:no_unused-variable
+        const node = new Node(this, parent, subpath, environment, instance)
+
+        if (this.shouldAttachNode) addHiddenFinalProp(instance, "$treenode", node)
+
+        let sawException = true
+        try {
+            node.pseudoAction(() => {
+                this.finalizeNewInstance(instance, snapshot)
+            })
+            if (this.shouldAttachNode) addReadOnlyProp(instance, "toJSON", toJSON)
+            node.fireHook("afterCreate")
+            if (parent)
+                node.fireHook("afterAttach")
+            sawException = false
+            return node
+        } finally {
+            if (sawException) {
+                // short-cut to die the instance, to avoid the snapshot computed starting to throw...
+                (node as any)._isAlive = false
+            }
+        }
     }
 
     abstract flags: TypeFlags
-    abstract validate(thing: any, context: IContext): IValidationResult
+    abstract shouldAttachNode: boolean
     abstract describe(): string
 
-    @action create(snapshot?: S, environment?: any): T {
-        return this.instantiate(null, "", environment, snapshot).getValue()
+    abstract createNewInstance(snapshot: any): any
+    abstract finalizeNewInstance(target: any, snapshot: any): void
+    abstract applySnapshot(node: Node, snapshot: any): void
+    // TODO: Maybe optional could resolve to this if omitted?
+    abstract getDefaultSnapshot(): any
+    abstract getChildren(node: Node): Node[]
+    abstract getChildNode(node: Node, key: string): Node
+    abstract getValue(node: Node): T
+    abstract getSnapshot(node: Node): any
+    abstract applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void
+    abstract getChildType(key: string): IType<any, any>
+    abstract removeChild(node: Node, subpath: string): void
+    abstract isValidSnapshot(value: any, context: IContext): IValidationResult
+
+    validate(value: any = this.getDefaultSnapshot(), context: IContext): IValidationResult {
+        if (isMST(value)) {
+            return getType(value) === this ? typeCheckSuccess() : typeCheckFailure(context, value)
+            // it is tempting to compare snapshots, but in that case we should always clone on assignments...
+        }
+        return this.isValidSnapshot(
+            value,
+            context
+        )
     }
 
     is(value: any): value is S | T {
@@ -77,12 +131,49 @@ export abstract class Type<S, T> implements IType<S, T> {
         ).length === 0
     }
 
-    readValue(node: Node) {
+    get Type(): T {
+        return fail("Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`")
+    }
+    get SnapshotType(): S {
+        return fail("Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`")
+    }
+
+    abstract get identifierAttribute(): string | null
+}
+
+export interface IMSTNode {
+    readonly $treenode?: Node
+}
+
+export function isMST(value: any): value is IMSTNode {
+    return value && value.$treenode
+}
+
+export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T> {
+    shouldAttachNode = false
+
+    constructor(name: string) {
+        super(name)
+    }
+
+    getValue(node: Node) {
         return node.storedValue
     }
 
-    toSnapshot(node: Node) {
+    getSnapshot(node: Node) {
         return node.storedValue
+    }
+
+    getDefaultSnapshot(){
+        return undefined
+    }
+
+    createNewInstance(snapshot: S) {
+        return snapshot
+    }
+
+    finalizeNewInstance(target: T, snapshot: S) {
+
     }
 
     applySnapshot(node: Node, snapshot: S): void {
@@ -108,19 +199,11 @@ export abstract class Type<S, T> implements IType<S, T> {
     removeChild(node: Node, subpath: string): void {
         return fail(`No child '${subpath}' available in type: ${this.name}`)
     }
-
-    get Type(): T {
-        return fail("Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`")
-    }
-    get SnapshotType(): S {
-        return fail("Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`")
-    }
-
-    abstract get identifierAttribute(): string | null
 }
 
-import { EMPTY_ARRAY, fail } from '../utils';
-import {  } from "../core/mst-node"
-import { IContext, IValidationResult, typecheck } from "./type-checker"
+import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp } from "../utils";
+import { isComplexValue, getComplexNode } from "../core/node"
+import { IContext, IValidationResult, typecheck, typeCheckFailure, typeCheckSuccess } from "./type-checker"
 import { Node, IComplexValue, IJsonPatch } from "../core"
+import { getType } from "../core/mst-operations"
 

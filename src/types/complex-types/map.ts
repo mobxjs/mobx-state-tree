@@ -2,9 +2,8 @@ import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
 import { getComplexNode, escapeJsonPath, IJsonPatch, Node } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType } from "../type"
+import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
-import { ComplexType } from "./complex-type"
 
 interface IMapFactoryConfig {
     isMapFactory: true
@@ -27,7 +26,7 @@ function put(this: ObservableMap<any>, value: any) {
 }
 
 export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
-    isMapFactory = true
+    shouldAttachNode = true
     subType: IType<any, any>
     readonly flags = TypeFlags.Map
 
@@ -105,7 +104,11 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         return change
     }
 
-    serialize(node: Node): Object {
+    getValue(node: Node): any {
+        return node.storedValue
+    }
+
+    getSnapshot(node: Node): { [key: string]: any } {
         const res: {[key: string]: any} = {}
         node.getChildren().forEach(childNode => {
             res[childNode.subpath] = childNode.snapshot

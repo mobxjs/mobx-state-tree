@@ -1,7 +1,8 @@
 import {
     observable,
     computed,
-    action
+    action,
+    reaction
 } from "mobx"
 
 let nextNodeId = 1
@@ -31,6 +32,18 @@ export class Node  {
         this.subpath = subpath
         this.storedValue = storedValue
         this._environment = environment
+
+        // optimization: don't keep the snapshot by default alive with a reaction by default
+        // in prod mode. This saves lot of GC overhead (important for e.g. React Native)
+        // if the feature is not actively used
+        // downside; no structural sharing if getSnapshot is called incidently
+        const snapshotDisposer = reaction(() => this.snapshot, snapshot => {
+            this.emitSnapshot(snapshot)
+        })
+        snapshotDisposer.onError((e: any) => {
+            throw e
+        })
+        this.addDisposer(snapshotDisposer)
     }
 
     /**
@@ -111,7 +124,7 @@ export class Node  {
     }
 
     getValue(): any {
-        return this.type.readValue(this)
+        return this.type.getValue(this)
     }
 
     public get isAlive() {
@@ -163,7 +176,7 @@ export class Node  {
             return undefined
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         // Optimization: only freeze on dev builds
-        return Object.freeze(this.type.toSnapshot(this))
+        return Object.freeze(this.type.getSnapshot(this))
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
@@ -405,7 +418,7 @@ export function getComplexNode(value: IComplexValue): Node {
         return fail("element has no Node")
 }
 
-import { IType } from "../types/type"
+import { IType, ComplexType } from "../types/type"
 import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch } from "./json-patch"
 import { typecheck } from "../types/type-checker"
 import { walk } from "./mst-operations"
@@ -420,4 +433,3 @@ import {
     registerEventHandler
 } from "../utils"
 import { getIdentifierAttribute } from "../types/complex-types/object"
-import { ComplexType } from "../types/complex-types/complex-type"

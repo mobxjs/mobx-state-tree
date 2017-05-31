@@ -15,7 +15,7 @@ export class Literal<T> extends Type<T, T> {
         return JSON.stringify(this.value)
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (isPrimitive(value) && value === this.value) {
             return typeCheckSuccess()
         }

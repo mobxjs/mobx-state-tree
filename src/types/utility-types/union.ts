@@ -46,7 +46,7 @@ export class Union extends Type<any, any> {
         return applicableTypes[0].instantiate(parent, subpath, environment, value)
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (this.dispatcher !== null) {
             return this.dispatcher(value).validate(value, context)
         }

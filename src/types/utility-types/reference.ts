@@ -1,4 +1,4 @@
-import { ISimpleType, TypeFlags, Type, IType } from "../type"
+import { ISimpleType, TypeFlags, Type, IType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
 
@@ -32,8 +32,13 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
         return null
     }
 
-    readValue(storedValue: any) {
+    getValue(storedValue: any) {
         return "TODO"
+    }
+
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
+        // TODO: check if reference is valid
+        return typeCheckSuccess()
     }
 }
 

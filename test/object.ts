@@ -42,7 +42,7 @@ const createTestFactories = () => {
 }
 
 // === FACTORY TESTS ===
-test.only("it should create a factory", (t) => {
+test("it should create a factory", (t) => {
     debugger;
     const {Factory} = createTestFactories()
     const instance = Factory.create()

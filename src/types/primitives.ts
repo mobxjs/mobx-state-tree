@@ -23,7 +23,7 @@ export class CoreType<T> extends Type<T, T> {
         return new Node(this, parent, subpath, environment, snapshot)
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (isPrimitive(value) && this.checker(value)) {
             return typeCheckSuccess()
         }
