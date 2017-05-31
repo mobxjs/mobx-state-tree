@@ -1,6 +1,6 @@
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
-import { Node, getComplexNode, IComplexValue } from "./nodes/abstract-node"
+import { Node, getComplexNode, IComplexValue } from "./node"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, fail } from "../utils"
 import { ISnapshottable, IType } from "../types/type"

@@ -405,11 +405,11 @@ export function getComplexNode(value: IComplexValue): Node {
         return fail("element has no Node")
 }
 
-import { IType } from "../../types/type"
-import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch } from "../json-patch"
-import { typecheck } from "../../types/type-checker"
-import { walk } from "../mst-operations"
-import { IMiddleWareHandler } from "../action"
+import { IType } from "../types/type"
+import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch } from "./json-patch"
+import { typecheck } from "../types/type-checker"
+import { walk } from "./mst-operations"
+import { IMiddleWareHandler } from "./action"
 import {
     addHiddenFinalProp,
     addReadOnlyProp,
@@ -418,6 +418,6 @@ import {
     IDisposer,
     isMutable,
     registerEventHandler
-} from "../../utils"
-import { getIdentifierAttribute } from "../../types/complex-types/object"
-import { ComplexType } from "../../types/complex-types/complex-type"
+} from "../utils"
+import { getIdentifierAttribute } from "../types/complex-types/object"
+import { ComplexType } from "../types/complex-types/complex-type"

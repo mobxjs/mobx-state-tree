@@ -146,6 +146,6 @@ export function onAction(target: IComplexValue, listener: (call: ISerializedActi
     })
 }
 
-import { Node, getComplexNode,  IComplexValue, isComplexValue, } from "./nodes/abstract-node"
+import { Node, getComplexNode,  IComplexValue, isComplexValue, } from "./node"
 import { resolve, tryResolve, addMiddleware,  } from "./mst-operations"
 import { fail, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"
