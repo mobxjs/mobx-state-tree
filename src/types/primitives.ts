@@ -48,6 +48,8 @@ export const DatePrimitive: ISimpleType<Date> = new CoreType<Date>("Date", TypeF
     return node.storedValue.getTime()
 }
 
+// TODO: move null and undefined primitive to here (from maybe)
+
 export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     switch (typeof value) {
         case "string":

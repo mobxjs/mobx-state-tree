@@ -8,6 +8,7 @@ import {
 let nextNodeId = 1
 
 export class Node  {
+    // optimization: these fields make MST memory expensive for primitives. Most can be initialized lazily, or with EMPTY_ARRAY on prototype
     readonly nodeId = ++nextNodeId
     readonly type: IType<any, any>
     readonly storedValue: any
@@ -390,7 +391,7 @@ export class Node  {
     }
 
     fireHook(name: string) {
-        const fn = this.storedValue[name]
+        const fn = typeof this.storedValue === "object" && this.storedValue[name]
         if (typeof fn === "function")
             fn.apply(this.storedValue)
     }
@@ -402,11 +403,11 @@ export class Node  {
     }
 }
 
-
 export interface IComplexValue {
     readonly $treenode?: Node
 }
 
+// TODO: rename to isStateTreenode
 export function isComplexValue(value: any): value is IComplexValue {
     return value && value.$treenode
 }
@@ -416,6 +417,10 @@ export function getComplexNode(value: IComplexValue): Node {
         return value.$treenode!
     else
         return fail("element has no Node")
+}
+
+export function unbox(b: Node): any {
+    return b.getValue()
 }
 
 import { IType, ComplexType } from "../types/type"

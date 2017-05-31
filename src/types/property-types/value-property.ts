@@ -1,13 +1,12 @@
 import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
-import { getComplexNode, escapeJsonPath, Node } from "../../core"
+import { getComplexNode, escapeJsonPath, Node, unbox } from "../../core"
 import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath } from "../type-checker"
 import { fail } from "../../utils"
+import { literal } from '../utility-types/literal';
 
-function unbox(b: Node): any {
-    return b.getValue()
-}
+const undefinedType = literal(undefined)
 
 export class ValueProperty extends Property {
     constructor(propertyName: string, public type: IType<any, any>) {
@@ -15,7 +14,7 @@ export class ValueProperty extends Property {
     }
 
     initializePrototype(proto: any) {
-        observable.ref(proto, this.name, { value: undefined })
+        observable.ref(proto, this.name, { value: undefinedType.create(undefined) }) // TODO: undefined type should not be needed
     }
 
     initialize(targetInstance: any, snapshot: any) {

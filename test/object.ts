@@ -43,7 +43,6 @@ const createTestFactories = () => {
 
 // === FACTORY TESTS ===
 test("it should create a factory", (t) => {
-    debugger;
     const {Factory} = createTestFactories()
     const instance = Factory.create()
     const snapshot = getSnapshot(instance)

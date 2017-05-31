@@ -1,8 +1,9 @@
-import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe } from "mobx"
+import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe, extras } from "mobx"
 import {
     getComplexNode,
     IJsonPatch,
-    Node
+    Node,
+    unbox
 } from "../../core"
 import { addHiddenFinalProp, identity, nothing, fail } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
@@ -10,16 +11,6 @@ import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getCo
 
 export function arrayToString(this: IObservableArray<any>) {
     return `${getComplexNode(this)}(${this.length} items)`
-}
-
-class Box {
-    constructor(private value: any) {
-
-    }
-
-    get(): any {
-        return this.value
-    }
 }
 
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
@@ -38,7 +29,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
     createNewInstance() {
         const array = observable.shallowArray()
-        ; (array as any).$mobx.dehancer = (v: any) => v.get()
+        extras.getAdministration(array).dehancer = unbox
         addHiddenFinalProp(array, "toString", arrayToString)
         return array
     }
@@ -69,9 +60,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
             case "update":
                 if (change.newValue === change.object[change.index])
                     return null
-                change.newValue = new Box(
-                    node.reconcileChildren(this.subType, [childNodes[change.index]], [change.newValue], [change.index])[0]
-                )
+                change.newValue = node.reconcileChildren(this.subType, [childNodes[change.index]], [change.newValue], [change.index])[0]
                 break
             case "splice":
                 const {index, removedCount, added, object} = change
@@ -80,7 +69,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                     childNodes.slice(index, index + removedCount),
                     added,
                     added.map((_, i) => index + i)
-                ).map(x => new Box(x))
+                )
 
                 // update paths of remaining items
                 for (let i = index + removedCount; i < childNodes.length; i++) {
@@ -96,6 +85,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getSnapshot(node: Node): any {
+        node.storedValue.length // TODO: fix me, make sure array is observed. Yikes.
         return node.getChildren().map(childNode => childNode.snapshot)
     }
 
