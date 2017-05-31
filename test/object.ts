@@ -196,7 +196,6 @@ test("it should have computed properties", (t) => {
 
 test("it should throw if snapshot has computed properties", (t) => {
     const {ComputedFactory} = createTestFactories()
-
     const error = t.throws(() => {
         const doc = ComputedFactory.create({area: 3})
     }, `[mobx-state-tree] Error while converting \`{"area":3}\` to \`AnonymousModel\`:
@@ -340,10 +339,10 @@ test("it should consider primitives as proposed defaults", t => {
 
     const doc = Todo.create()
 
-    t.deepEqual(getSnapshot(doc), {id: 0, name: "Hello world", done: false, createdAt: {
-            $treetype: "Date",
-            time: now.toJSON()
-        }})
+    t.deepEqual(getSnapshot(doc),
+        {id: 0, name: "Hello world", done: false, createdAt: now.getTime()}
+    )
+
 })
 
 test("it should throw if a non-primitive value is provided and no default can be created", t => {

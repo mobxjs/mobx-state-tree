@@ -44,6 +44,10 @@ export const boolean: ISimpleType<boolean> = new CoreType<boolean>("boolean", Ty
 // tslint:disable-next-line:variable-name
 export const DatePrimitive: ISimpleType<Date> = new CoreType<Date>("Date", TypeFlags.Date, (v: any) => v instanceof Date)
 
+; (DatePrimitive as any).getSnapshot = function(node: Node) {
+    return node.storedValue.getTime()
+}
+
 export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     switch (typeof value) {
         case "string":

@@ -64,7 +64,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         this.name = name
     }
 
-    @action create(snapshot?: S, environment?: any): T {
+    @action create(snapshot: S = this.getDefaultSnapshot(), environment?: any): T {
         typecheck(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).getValue()
     }
@@ -113,7 +113,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     abstract removeChild(node: Node, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
 
-    validate(value: any = this.getDefaultSnapshot(), context: IContext): IValidationResult {
+    validate(value: any, context: IContext): IValidationResult {
         if (isMST(value)) {
             return getType(value) === this ? typeCheckSuccess() : typeCheckFailure(context, value)
             // it is tempting to compare snapshots, but in that case we should always clone on assignments...

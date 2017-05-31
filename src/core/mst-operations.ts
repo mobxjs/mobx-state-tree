@@ -1,9 +1,10 @@
+import { isMutable } from '../../lib/utils';
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { Node, getComplexNode, IComplexValue } from "./node"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, fail } from "../utils"
-import { ISnapshottable, IType } from "../types/type"
+import { ISnapshottable, IType, isMST } from "../types/type"
 
 export function getType<S, T>(object: IComplexValue): IType<S, T> {
     return getComplexNode(object).type
@@ -424,7 +425,8 @@ export function walk(thing: IComplexValue, processor: (item: IComplexValue) => v
     const node = getComplexNode(thing)
     // tslint:disable-next-line:no_unused-variable
     node.getChildren().forEach((child) => {
-        walk(child, processor)
+        if (isMST(child))
+            walk(child, processor)
     })
     processor(node.storedValue)
 }

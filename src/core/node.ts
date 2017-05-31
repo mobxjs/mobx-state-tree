@@ -283,7 +283,7 @@ export class Node  {
                 // Try to reconcile based on already existing nodes
                 oldValuesByNode[childNode.nodeId] = undefined
                 childNode.setParent(this, subPath)
-                res[index] = newValue
+                res[index] = childNode
             } else if (identifierAttribute && isMutable(newValue)) {
                 // The snapshot of a tree node..
                 typecheck(childType, newValue)
