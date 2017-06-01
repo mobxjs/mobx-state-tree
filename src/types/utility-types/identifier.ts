@@ -8,7 +8,7 @@ export class IdentifierType<T> extends Type<T, T> {
     readonly flags = TypeFlags.Identifier
 
     constructor(
-        private readonly identifierType: IType<T, T>,
+        public readonly identifierType: IType<T, T>,
     ) {
         super(`identifier(${identifierType.name})`)
     }

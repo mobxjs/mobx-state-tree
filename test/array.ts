@@ -24,7 +24,6 @@ const createTestFactories = () => {
 
 // === FACTORY TESTS ===
 test("it should create a factory", (t) => {
-    debugger;
     const {Factory} = createTestFactories()
 
     t.deepEqual(getSnapshot(Factory.create()), [])
@@ -320,9 +319,9 @@ test("it should reconciliate keyed instances correctly", (t) => {
     t.deepEqual(store.todos.map(todo => todo.done), [false, false, false])
     t.deepEqual(store.todos.map(todo => todo.id), ["1", "2", "3"])
 
-    const a = store.todos[0]
-    const b = store.todos[1]
-    const c = store.todos[2]
+    const coffee = store.todos[0]
+    const tea = store.todos[1]
+    const biscuit = store.todos[2]
 
     applySnapshot(store, {
         todos: [
@@ -337,9 +336,9 @@ test("it should reconciliate keyed instances correctly", (t) => {
     t.deepEqual(store.todos.map(todo => todo.done), [true, true, false, false])
     t.deepEqual(store.todos.map(todo => todo.id), ["2", "1", "4", "5"])
 
-    t.is(store.todos[0] === b, true)
-    t.is(store.todos[1] === a, true)
-    t.is(store.todos[2] === c, false)
+    t.is(store.todos[0] === tea, true)
+    t.is(store.todos[1] === coffee, true)
+    t.is(store.todos[2] === biscuit, false)
 })
 
 test("it correctly reconciliate when swapping", t => {

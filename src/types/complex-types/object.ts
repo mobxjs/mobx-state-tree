@@ -18,6 +18,7 @@ import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { getType, IComplexValue, getComplexNode, IJsonPatch, Node } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
+import { isIdentifierType, IdentifierType } from "../utility-types/identifier"
 import { optional } from "../utility-types/optional"
 // import { isReferenceFactory } from "../utility-types/reference"
 // import { isIdentifierFactory, IIdentifierDescriptor } from "../utility-types/identifier"
@@ -105,13 +106,13 @@ export class ObjectType extends ComplexType<any, any> {
             const { value } = descriptor
             if (value === null || undefined) {
                 fail("The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?")
-            // } else if (isIdentifierFactory(value)) {
-            //     if (this.identifierAttribute) fail(`Cannot define property '${key}' as object identifier, property '${this.identifierAttribute}' is already defined as identifier property`)
-            //     this.identifierAttribute = key
-            //     this.props[key] = new IdentifierProperty(key, (value as IIdentifierDescriptor<any>).primitiveType)
             } else if (isPrimitive(value)) {
                 const baseType = getPrimitiveFactoryFromValue(value)
                 this.props[key] = new ValueProperty(key, optional(baseType, value))
+            } else if (isIdentifierType(value)) {
+                if (this.identifierAttribute) fail(`Cannot define property '${key}' as object identifier, property '${this.identifierAttribute}' is already defined as identifier property`)
+                this.identifierAttribute = key
+                this.props[key] = new IdentifierProperty(key, (value as IdentifierType<any>).identifierType)
             } else if (isType(value)) {
                 this.props[key] = new ValueProperty(key, value)
             // } else if (isReferenceFactory(value)) {
@@ -160,7 +161,7 @@ export class ObjectType extends ComplexType<any, any> {
             return fail("Not a value property: " + key)
         return (this.props[key] as ValueProperty).getValueNode(node.storedValue)
     }
-    
+
     getValue(node: Node): any {
         return node.storedValue
     }
