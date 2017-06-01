@@ -140,9 +140,11 @@ export class Node  {
         if (this._isDetaching)
             return
 
-        walk(this.storedValue, child => getComplexNode(child).aboutToDie())
-        this.root.identifierCache.unregister(this)
-        walk(this.storedValue, child => getComplexNode(child).finalizeDeath())
+        if (isComplexValue(this.storedValue)) {
+            walk(this.storedValue, child => getComplexNode(child).aboutToDie())
+            this.root.identifierCache.unregister(this)
+            walk(this.storedValue, child => getComplexNode(child).finalizeDeath())
+        }
     }
 
     public aboutToDie() {
@@ -254,28 +256,50 @@ export class Node  {
         this.disposers.unshift(disposer)
     }
 
-    reconcileChildren<T>(childType: IType<any, T>, oldNodes: Node[], newValues: T[], newPaths: (string|number)[]): T[] {
+    // TODO: move reconcilation to separte file
+    reconcileChild(childType: IType<any, any>, oldNode: Node | null, newValue: any, newPath: string): Node {
+        if (oldNode && newValue === oldNode)
+            return oldNode
+        if (
+            oldNode &&
+            isComplexValue(oldNode.storedValue) &&
+            isMutable(newValue) &&
+            !isComplexValue(newValue) &&
+            (
+                !oldNode.type.identifierAttribute ||
+                oldNode.type.identifierAttribute && oldNode.identifier === newValue[oldNode.type.identifierAttribute]
+            ) &&
+            oldNode.type.is(newValue)
+        ) {
+            // we can reconcile
+            oldNode.applySnapshot(newValue)
+            return oldNode
+        }
+        if (oldNode)
+            oldNode.die()
+        if (isComplexValue(newValue)) {
+            const newNode = getComplexNode(newValue)
+            newNode.setParent(this, newPath)
+            return newNode
+        }
+        return childType.instantiate(this, newPath, undefined, newValue)
+    }
+
+    reconcileChildren<T>(childType: IType<any, T>, oldNodes: Node[], newValues: T[], newPaths: (string|number)[]): Node[] {
         // TODO: pick identifiers based on actual type instead of declared type
         // optimization: overload for a single old / new value to avoid all the array allocations
         // optimization: skip reconciler for non-complex types
         const res = new Array(newValues.length)
-        const oldValuesByNode: any = {}
-        const oldValuesById: any = {}
+        const oldNodesByNodeId: any = {}
+        const oldNodesByIdentifier: any = {}
         const identifierAttribute = getIdentifierAttribute(childType)
 
         // Investigate which values we could reconcile
         oldNodes.forEach(oldNode => {
-            const oldValue = oldNode.getValue() // MWE: TODO: what about broken refs?
-            if (!oldValue)
-                return
-            if (identifierAttribute) {
-                const id = (oldValue as any)[identifierAttribute]
-                if (id)
-                    oldValuesById[id] = oldValue
-            }
-            if (isComplexValue(oldValue)) {
-                oldValuesByNode[getComplexNode(oldValue).nodeId] = oldValue
-            }
+            const id = oldNode.identifier
+            if (id)
+                oldNodesByIdentifier[id] = oldNode
+            oldNodesByNodeId[oldNode.nodeId] = oldNode
         })
 
         // Prepare new values, try to reconcile
@@ -285,11 +309,11 @@ export class Node  {
                 // A tree node...
                 const childNode = getComplexNode(newValue)
                 childNode.assertAlive()
-                if (childNode.parent && (childNode.parent !== this || !oldValuesByNode[childNode.nodeId]))
+                if (childNode.parent && (childNode.parent !== this || !oldNodesByNodeId[childNode.nodeId]))
                     return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subPath}', but it lives already at '${childNode.path}'`)
 
                 // Try to reconcile based on already existing nodes
-                oldValuesByNode[childNode.nodeId] = undefined
+                oldNodesByNodeId[childNode.nodeId] = undefined
                 childNode.setParent(this, subPath)
                 res[index] = childNode
             } else if (identifierAttribute && isMutable(newValue)) {
@@ -298,12 +322,11 @@ export class Node  {
 
                 // Try to reconcile based on id
                 const id = (newValue as any)[identifierAttribute]
-                const existing = oldValuesById[id]
-                const childNode = existing && getComplexNode(existing)
-                if (existing && childNode.type.is(newValue)) {
-                    oldValuesByNode[childNode.nodeId] = undefined
-                    childNode.setParent(this, subPath)
-                    childNode.applySnapshot(newValue)
+                const existing = oldNodesByIdentifier[id]
+                if (existing && existing.type.is(newValue)) {
+                    oldNodesByNodeId[existing.nodeId] = undefined
+                    existing.setParent(this, subPath)
+                    existing.applySnapshot(newValue)
                     res[index] = existing
                 } else {
                     res[index] = childType.instantiate(this, subPath, undefined, newValue)
@@ -317,8 +340,8 @@ export class Node  {
         })
 
         // Kill non reconciled values
-        for (let key in oldValuesByNode) if (oldValuesByNode[key])
-            getComplexNode(oldValuesByNode[key]).die()
+        for (let key in oldNodesByNodeId) if (oldNodesByNodeId[key])
+            oldNodesByNodeId[key].die()
 
         return res
     }

@@ -88,18 +88,18 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                     const oldValue = change.object.get(change.name)
                     if (newValue === oldValue)
                         return null
-                    change.newValue = node.reconcileChildren(this.subType, [this.getChildNode(node, change.name)], [newValue], [change.name])[0]
+                    change.newValue = node.reconcileChild(this.subType, this.getChildNode(node, change.name), newValue, change.name)
                 }
                 break
             case "add":
                 {
                     const {newValue} = change
-                    change.newValue = node.reconcileChildren(this.subType, [], [newValue], [change.name])[0]
+                    change.newValue = node.reconcileChild(this.subType, null, newValue, change.name)
                 }
                 break
             case "delete":
                 {
-                    node.reconcileChildren(this.subType, [this.getChildNode(node, change.name)], [], [])
+                    this.getChildNode(node, change.name).die()
                 }
                 break
         }

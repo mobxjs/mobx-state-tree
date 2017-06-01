@@ -24,7 +24,9 @@ export class IdentifierCache {
     unregister(node: Node) {
         if (!node.identifier)
             return
-        this.cache[node.identifier].remove(node)
+        const set = this.cache[node.identifier]
+        if (set)
+            set.remove(node)
         // TODO: all cached items which have node as parent should not be dropped from the cache as well, and moved to the cache of node
     }
 
