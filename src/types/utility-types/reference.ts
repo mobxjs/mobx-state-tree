@@ -23,11 +23,6 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
         return this.name
     }
 
-    validate(value: any, context: IContext): IValidationResult {
-        return typeCheckSuccess()
-        // TODO:
-    }
-
     get identifierAttribute() {
         return null
     }

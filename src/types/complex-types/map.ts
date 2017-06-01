@@ -1,6 +1,6 @@
 import { getIdentifierAttribute } from "./object"
-import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
-import { getComplexNode, escapeJsonPath, IJsonPatch, Node } from "../../core"
+import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras } from "mobx"
+import { getComplexNode, escapeJsonPath, IJsonPatch, Node, unbox } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -42,6 +42,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     createNewInstance() {
         // const identifierAttr = getIdentifierAttribute(this.subType)
         const map = observable.shallowMap()
+        extras.getAdministration(map).dehancer = unbox
 
         addHiddenFinalProp(map, "put", put)
         addHiddenFinalProp(map, "toString", mapToString)

@@ -24,17 +24,17 @@ export class Refinement extends Type<any, any> {
     instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
         // create the child type
         const inst = this.type.instantiate(parent, subpath, environment, value)
-        const snapshot = isComplexValue(inst) ? getComplexNode(inst).snapshot : inst
-
-        // check if pass the predicate
-        if (!this.is(snapshot)) fail(`Value ${JSON.stringify(snapshot)} is not assignable to type ${this.name}`)
 
         return inst
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (this.type.is(value) && this.predicate(value)) {
-            return typeCheckSuccess()
+        if (this.type.is(value)){
+            const snapshot = isComplexValue(value) ? getComplexNode(value).snapshot : value
+
+            if (this.predicate(snapshot)) {
+                return typeCheckSuccess()
+            }
         }
         return typeCheckFailure(context, value)
     }
@@ -47,5 +47,9 @@ export class Refinement extends Type<any, any> {
 export function refinement<T>(name: string, type: IType<T, T>, predicate: (snapshot: T) => boolean): IType<T, T>
 export function refinement<S, T extends S, U extends S>(name: string, type: IType<S, T>, predicate: (snapshot: S) => snapshot is U): IType<S, U>
 export function refinement(name: string, type: IType<any, any>, predicate: (snapshot: any) => boolean): IType<any, any> {
+    // check if the subtype default value passes the predicate
+    const inst = type.create()
+    if (!predicate(isComplexValue(inst) ? getComplexNode(inst).snapshot : inst)) fail(`Default value for refinement type ` + name + ` does not pass the predicate.`)
+
     return new Refinement(name, type, predicate)
 }

@@ -14,7 +14,7 @@ export class ValueProperty extends Property {
     }
 
     initializePrototype(proto: any) {
-        observable.ref(proto, this.name, { value: undefinedType.create(undefined) }) // TODO: undefined type should not be needed
+        observable.ref(proto, this.name, { value: undefinedType.instantiate(null, "", null, undefined) }) // TODO: undefined type should not be needed
     }
 
     initialize(targetInstance: any, snapshot: any) {
@@ -26,7 +26,7 @@ export class ValueProperty extends Property {
     getValueNode(targetInstance: any): Node {
         const node = targetInstance.$mobx.values[this.name].value // TODO: blegh!
         if (!node)
-            return fail("Node not available")
+            return fail("Node not available for property " + this.name)
         return node
     }
 

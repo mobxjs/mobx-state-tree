@@ -41,7 +41,8 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getChildren(node: Node): Node[] {
-        return node.storedValue.$mobx.values // Shooting ourselves in the foot. JS, why do you so temptingly allow this?!
+        // TODO: Mapping only to ensure observability
+        return node.storedValue.map((item: any, idx: number) => node.storedValue.$mobx.values[idx]) // Shooting ourselves in the foot. JS, why do you so temptingly allow this?!
     }
 
     getChildNode(node: Node, key: string): Node {
@@ -85,7 +86,6 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getSnapshot(node: Node): any {
-        node.storedValue.length // TODO: fix me, make sure array is observed. Yikes.
         return node.getChildren().map(childNode => childNode.snapshot)
     }
 

@@ -2,7 +2,7 @@ import { reaction } from "mobx"
 import { types, getSnapshot, applySnapshot, unprotect } from "../src"
 import { test } from "ava"
 
-test("it should support generic relative paths", t => {
+test.skip("it should support generic relative paths", t => {
     const User = types.model({
         name: types.string
     })
@@ -37,7 +37,7 @@ test("it should support generic relative paths", t => {
     t.deepEqual(getSnapshot(store), {user: { $ref: "/users/18" }, "users": {"17": {name: "Michel"}, "18": {name: "Noa"}}} as any) // TODO: better typings
 })
 
-test("it should support prefixed paths in maps", t => {
+test.skip("it should support prefixed paths in maps", t => {
     const User = types.model({
         id: types.identifier(),
         name: types.string
@@ -69,7 +69,7 @@ test("it should support prefixed paths in maps", t => {
     t.deepEqual(getSnapshot(store), {user: "18", "users": {"17": {id: "17", name: "Michel"}, "18": {id: "18", name: "Noa"}}} as any) // TODO: better typings
 })
 
-test("it should support prefixed paths in arrays", t => {
+test.skip("it should support prefixed paths in arrays", t => {
     const User = types.model({
         id: types.identifier(),
         name: types.string
@@ -101,7 +101,7 @@ test("it should support prefixed paths in arrays", t => {
     t.deepEqual(getSnapshot(store), {user: "18", "users": [{id: "17", name: "Michel"}, {id: "18", name: "Noa"}]} as any) // TODO: better typings
 })
 
-test("identifiers are required", (t) => {
+test.skip("identifiers are required", (t) => {
     const Todo = types.model({
         id: types.identifier()
     })
@@ -113,7 +113,7 @@ test("identifiers are required", (t) => {
 at path "/id" value \`undefined\` is not assignable to type: \`string\` (The provided identifier is not valid).`)
 })
 
-test("identifiers cannot be modified", (t) => {
+test.skip("identifiers cannot be modified", (t) => {
     const Todo = types.model({
         id: types.identifier()
     })
@@ -126,7 +126,7 @@ test("identifiers cannot be modified", (t) => {
 at path "/id" value \`undefined\` is not assignable to type: \`string\` (The provided identifier is not valid).`)
 })
 
-test("it should resolve refs during creation, when using path", t => {
+test.skip("it should resolve refs during creation, when using path", t => {
     const values: number[] = []
     const Book = types.model({
         id: types.identifier(),
@@ -165,7 +165,7 @@ test("it should resolve refs during creation, when using path", t => {
     t.deepEqual(values, [4, 8])
 })
 
-test("it should resolve refs over late types", t => {
+test.skip("it should resolve refs over late types", t => {
     const Book = types.model({
         id: types.identifier(),
         price: types.number
@@ -191,7 +191,7 @@ test("it should resolve refs over late types", t => {
     t.is(s.entries.reduce((a, e) => a + e.price, 0), 4)
 })
 
-test("it should resolve refs during creation, when using generic reference", t => {
+test.skip("it should resolve refs during creation, when using generic reference", t => {
     const values: number[] = []
     const Book = types.model({
         id: types.identifier(),
@@ -230,7 +230,7 @@ test("it should resolve refs during creation, when using generic reference", t =
     t.deepEqual(values, [4])
 })
 
-test("identifiers should only support types.string and types.number", t => {
+test.skip("identifiers should only support types.string and types.number", t => {
     t.throws(
         () => types.model({
             id: types.identifier(types.model({}))
@@ -239,7 +239,7 @@ test("identifiers should only support types.string and types.number", t => {
     )
 })
 
-test("string identifiers should not accept numbers", t => {
+test.skip("string identifiers should not accept numbers", t => {
     const F = types.model({
         id: types.identifier()
     })
@@ -253,7 +253,7 @@ test("string identifiers should not accept numbers", t => {
     t.is(F2.is({ id: 4 }), false)
 })
 
-test("122 - identifiers should support numbers as well", t => {
+test.skip("122 - identifiers should support numbers as well", t => {
     const F = types.model({
         id: types.identifier(types.number)
     })
@@ -265,7 +265,7 @@ test("122 - identifiers should support numbers as well", t => {
     t.is(F.is({ id: "4" }), false)
 })
 
-test("self reference with a late type", t => {
+test.skip("self reference with a late type", t => {
     const values: string[] = []
     interface IBook {
         id: string,
