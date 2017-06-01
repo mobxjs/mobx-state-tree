@@ -14,6 +14,18 @@ export class IdentifierProperty extends ValueProperty {
         this.subtype = subtype
     }
 
+    initialize(targetInstance: any, snapshot: any) {
+        // TODO: don't inherit anymore, don't bother creating an observable for identifiers
+        // TODO: valuecheck
+        super.initialize(targetInstance, snapshot)
+        const node = getComplexNode(targetInstance) // TODO: rename getComplexNode => Node
+        const identifier = snapshot[this.name]
+        if (typeof identifier !== "number" && !isValidIdentifier(identifier))
+            fail(`Not a valid identifier: '${identifier}`)
+        typecheck(this.subtype, identifier)
+        node.identifier = identifier
+    }
+
     // initialize(target: any, snapshot: any) {
     //     extendObservable(target, {
     //         [this.name]: observable.ref(snapshot[this.name])
@@ -53,13 +65,13 @@ export class IdentifierProperty extends ValueProperty {
     //     return typeCheckSuccess()
     // }
 
-    // isValidIdentifier(identifier: any): boolean {
-    //     // TODO: MWE, I don't think this isValidIdentifier things makes sense.
-    //     // Who are we to decide? Maybe just rule out empty string
-    //     // Making types.identifier(types.refinement(types.string, (v) => coolCheck(v))) work would be great!
-    //     // On the other hand, this avoids problems with json paths, so maybe we should support all identifiers that don't require further escaping?
-    //     if (typeof identifier !== "number" && !isValidIdentifier(identifier))
-    //         return false
-    //     return this.subtype.is(identifier)
-    // }
+    isValidIdentifier(identifier: any): boolean {
+        // TODO: MWE, I don't think this isValidIdentifier things makes sense.
+        // Who are we to decide? Maybe just rule out empty string
+        // Making types.identifier(types.refinement(types.string, (v) => coolCheck(v))) work would be great!
+        // On the other hand, this avoids problems with json paths, so maybe we should support all identifiers that don't require further escaping?
+        if (typeof identifier !== "number" && !isValidIdentifier(identifier))
+            return false
+        return this.subtype.is(identifier)
+    }
 }

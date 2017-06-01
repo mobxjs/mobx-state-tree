@@ -111,7 +111,7 @@ export class ObjectType extends ComplexType<any, any> {
                 this.props[key] = new ValueProperty(key, optional(baseType, value))
             } else if (isIdentifierType(value)) {
                 if (this.identifierAttribute) fail(`Cannot define property '${key}' as object identifier, property '${this.identifierAttribute}' is already defined as identifier property`)
-                this.identifierAttribute = key
+                this.identifierAttribute = key // TODO: kill identifier attribute, not needed anymore
                 this.props[key] = new IdentifierProperty(key, (value as IdentifierType<any>).identifierType)
             } else if (isType(value)) {
                 this.props[key] = new ValueProperty(key, value)

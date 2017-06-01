@@ -15,7 +15,9 @@ export class Node  {
     @observable protected _parent: Node | null = null
     @observable subpath: string = ""
 
+    identifierCache = new IdentifierCache()
     isProtectionEnabled = true
+    identifier: string | undefined = undefined // not to be modified directly, only through model initialization
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
     private _isAlive = true // optimization: use binary flags for all these switches
@@ -30,6 +32,8 @@ export class Node  {
     constructor(type: IType<any, any>, parent: Node | null, subpath: string, environment: any, storedValue: any) {
         this.type = type
         this._parent = parent
+        if (parent)
+            parent.root.identifierCache.register(this)
         this.subpath = subpath
         this.storedValue = storedValue
         this._environment = environment
@@ -137,6 +141,7 @@ export class Node  {
             return
 
         walk(this.storedValue, child => getComplexNode(child).aboutToDie())
+        this.root.identifierCache.unregister(this)
         walk(this.storedValue, child => getComplexNode(child).finalizeDeath())
     }
 
@@ -238,6 +243,8 @@ export class Node  {
             this.die()
         } else {
             this._parent = newParent
+            if (newParent)
+                newParent.root.identifierCache.register(this)
             this.subpath = subpath || ""
             this.fireHook("afterAttach")
         }
@@ -383,6 +390,7 @@ export class Node  {
             this.fireHook("beforeDetach")
             this._environment = (this.root as Node)._environment // make backup of environment
             this._isDetaching = true
+            this.root.identifierCache.unregister(this)
             this.parent!.removeChild(this.subpath)
             this._parent = null
             this.subpath = ""
@@ -397,8 +405,7 @@ export class Node  {
     }
 
     toString(): string {
-        const identifierAttr = getIdentifierAttribute(this.type)
-        const identifier = identifierAttr ? `(${identifierAttr}: ${this.storedValue[identifierAttr]})` : ""
+        const identifier = this.identifier || ""
         return `${this.type.name}@${this.path || "<root>"}${identifier}${this.isAlive ? "" : "[dead]"}`
     }
 }
@@ -438,3 +445,4 @@ import {
     registerEventHandler
 } from "../utils"
 import { getIdentifierAttribute } from "../types/complex-types/object"
+import { IdentifierCache } from "./identifier-cache"
