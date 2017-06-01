@@ -6,16 +6,16 @@ new WebpackDevServer(webpack(config), {
   publicPath: config.output.publicPath,
   hot: true,
   historyApiFallback: true
-}).listen(3000, 'localhost', function (err, result) {
+}).listen(4000, 'localhost', function (err, result) {
   if (err) {
     console.log(err);
   }
 
-  console.log('Listening at localhost:3000');
+  console.log('Listening at localhost:4000');
 });
 
 var WebSocketServer = require('ws').Server;
-var wss = new WebSocketServer({ port: 3001 });
+var wss = new WebSocketServer({ port: 4001 });
 
 var connections = {}
 

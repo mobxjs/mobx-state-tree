@@ -8,7 +8,7 @@ import store from './stores/domain-state';
 import Canvas from './components/canvas';
 import syncStoreWithBackend from './stores/socket';
 
-const socket = new WebSocket("ws://localhost:3001");
+const socket = new WebSocket("ws://localhost:4001");
 
 // To support HMR of store, this ref holds the latest loaded store.
 const storeInstance = observable.box(null);

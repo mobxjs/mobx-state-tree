@@ -5,23 +5,22 @@ let subscription;
 export default function syncStoreWithBackend(socket, store) {
 
     // === SYNC PATCHES (recommended)
-    subscription = onPatch(store, (data) => {
+    // subscription = onPatch(store, (data) => {
+    //     socketSend(data)
+    // })
+
+    // onSocketMessage((data) => {
+    //     applyPatch(store, data)
+    // })
+
+    // === SYNC ACTIONS
+    subscription = onAction(store, (data) => {
         socketSend(data)
     })
 
     onSocketMessage((data) => {
-        applyPatch(store, data)
+        applyAction(store, data)
     })
-
-    // === SYNC ACTIONS
-    // subscription = onAction(store, (data, next) => {
-    //     socketSend(data)
-    //     return next()
-    // })
-
-    // onSocketMessage((data) => {
-    //     applyAction(store, data)
-    // })
 
     // === SYNC SNAPSNOTS
     // subscription = onSnapshot(store, (data) => {
