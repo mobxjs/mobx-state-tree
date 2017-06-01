@@ -15,10 +15,9 @@ const createTestFactories = () => {
             to: "world"
         }), {})
 
-    const Factory = types.optional(
-        types.array(
+    const Factory = types.array(
             ItemFactory
-        ), [])
+        )
 
     return {Factory, ItemFactory}
 }
