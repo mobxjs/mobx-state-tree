@@ -404,7 +404,7 @@ The above example: `selectedTodo: types.reference(Todo, "todos")` is namespaced,
 
 Generic references can point to any element of the correct type in the current tree, and are stored behind the scenes as JSON path. The above example could also have been configured as `selectedTodo: types.reference(Todo)` to create a generic reference.
 
-_Tip: It is recommended to use namespaced references; as those are more stable by since they always use immutable references and a preconfigured namespace._
+_Tip: It is recommended to use namespaced references; as those are more stable, since they always use immutable references and a preconfigured namespace._
 
 **Note: The exact semantics of references are still under investigation, and might change before MST 1.0. One of the two forms might be dropped_**
 
