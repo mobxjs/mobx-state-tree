@@ -30,7 +30,7 @@ export interface IType<S, T> {
     identifierAttribute: string | null
 
     // Internal api's
-    instantiate(declaredType: IType<any, any>, parent: Node | null, subpath: string, environment: any, snapshot?: S): Node
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot?: S): Node
     getValue(node: Node): T
     getSnapshot(node: Node): S
     applySnapshot(node: Node, snapshot: S): void
@@ -39,6 +39,7 @@ export interface IType<S, T> {
     getChildNode(node: Node, key: string): Node
     getChildType(key: string): IType<any, any>
     removeChild(node: Node, subpath: string): void
+    isAssignableFrom(type: IType<any, any>): boolean
 }
 
 export interface ISimpleType<T> extends IType<T, T> { }
@@ -66,13 +67,13 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     @action create(snapshot: S = this.getDefaultSnapshot(), environment?: any): T {
         typecheck(this, snapshot)
-        return this.instantiate(this, null, "", environment, snapshot).getValue()
+        return this.instantiate(null, "", environment, snapshot).getValue()
     }
 
-    instantiate(declaredType: IType<any, any>, parent: Node | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): Node {
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): Node {
         const instance = this.createNewInstance(snapshot)
         // tslint:disable-next-line:no_unused-variable
-        const node = new Node(declaredType, this, parent, subpath, environment, instance)
+        const node = new Node(this, parent, subpath, environment, instance)
 
         if (this.shouldAttachNode) addHiddenFinalProp(instance, "$treenode", node)
 
@@ -113,9 +114,14 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     abstract removeChild(node: Node, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
 
+
+    isAssignableFrom(type: IType<any, any>): boolean {
+        return type === this
+    }
+
     validate(value: any, context: IContext): IValidationResult {
         if (isMST(value)) {
-            return getDeclaredType(value) === this || getType(value) === this ? typeCheckSuccess() : typeCheckFailure(context, value)
+            return getType(value) === this || this.isAssignableFrom(getType(value)) ? typeCheckSuccess() : typeCheckFailure(context, value)
             // it is tempting to compare snapshots, but in that case we should always clone on assignments...
         }
         return this.isValidSnapshot(
@@ -205,5 +211,5 @@ import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp } from "../utils
 import { isComplexValue, getComplexNode } from "../core/node"
 import { IContext, IValidationResult, typecheck, typeCheckFailure, typeCheckSuccess } from "./type-checker"
 import { Node, IComplexValue, IJsonPatch } from "../core"
-import { getDeclaredType, getType } from "../core/mst-operations"
+import { getType } from "../core/mst-operations"
 

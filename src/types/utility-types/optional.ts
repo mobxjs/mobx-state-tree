@@ -25,15 +25,15 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.describe() + "?"
     }
 
-    instantiate(declaredType: IType<any, any>, parent: Node, subpath: string, environment: any, value: S): Node {
+    instantiate(parent: Node, subpath: string, environment: any, value: S): Node {
         if (typeof value === "undefined") {
             const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
             const defaultSnapshot = isComplexValue(defaultValue) ? getComplexNode(defaultValue).snapshot : defaultValue
             if(typeof this.defaultValue === "function") typecheck(this, defaultValue)
-            return this.type.instantiate(declaredType, parent, subpath, environment, defaultSnapshot)
+            return this.type.instantiate(parent, subpath, environment, defaultSnapshot)
         }
 
-        return this.type.instantiate(declaredType, parent, subpath, environment, value)
+        return this.type.instantiate(parent, subpath, environment, value)
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {

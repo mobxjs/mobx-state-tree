@@ -9,10 +9,6 @@ export function getType<S, T>(object: IComplexValue): IType<S, T> {
     return getComplexNode(object).type
 }
 
-export function getDeclaredType<S, T>(object: IComplexValue): IType<S, T> {
-    return getComplexNode(object).declaredType
-}
-
 export function getChildType(object: IComplexValue, child: string): IType<any, any> {
     return getComplexNode(object).getChildType(child)
 }

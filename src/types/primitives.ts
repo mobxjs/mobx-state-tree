@@ -17,8 +17,8 @@ export class CoreType<T> extends Type<T, T> {
         return this.name
     }
 
-    instantiate(declaredType: IType<any, any>, parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
-        return new Node(declaredType, this, parent, subpath, environment, snapshot)
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
+        return new Node(this, parent, subpath, environment, snapshot)
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {

@@ -24,8 +24,8 @@ export class Late<S, T> extends Type<S, T> {
         this.definition = definition
     }
 
-    instantiate(declaredType: IType<any, any>, parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
-        return this.subType.instantiate(declaredType, parent, subpath, environment, snapshot)
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
+        return this.subType.instantiate(parent, subpath, environment, snapshot)
     }
 
     describe() {
