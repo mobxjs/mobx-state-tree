@@ -1,4 +1,3 @@
-import { isMutable } from '../../lib/utils';
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { Node, getComplexNode, IComplexValue } from "./node"
