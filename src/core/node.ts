@@ -391,7 +391,7 @@ export class Node  {
     }
 
     fireHook(name: string) {
-        const fn = typeof this.storedValue === "object" && this.storedValue[name]
+        const fn = this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
         if (typeof fn === "function")
             fn.apply(this.storedValue)
     }

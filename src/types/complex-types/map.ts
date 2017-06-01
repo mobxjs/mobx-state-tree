@@ -55,19 +55,20 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     getChildren(node: Node): Node[] {
-        const res: Node[] = []
+        const res: Node[] = [];
         // Ignore all alarm bells to be able to read this:...
-        Object.keys(node.storedValue.$mobx.values).forEach(key => {
-            res.push(node.storedValue.$mobx.values[key].value)
+        (node.storedValue as ObservableMap<any>).keys().forEach(key => {
+            const childNode = node.storedValue._data[key].get()
+            if(childNode) res.push(childNode)
         })
         return res
     }
 
     getChildNode(node: Node, key: string): Node {
-        const childNode = node.storedValue.$mobx.values[key]
+        const childNode = node.storedValue._data[key]
         if (!childNode)
             fail("Not a child" + key)
-        return childNode
+        return childNode.get()
     }
 
     willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
