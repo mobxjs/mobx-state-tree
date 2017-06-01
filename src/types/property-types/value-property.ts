@@ -14,12 +14,12 @@ export class ValueProperty extends Property {
     }
 
     initializePrototype(proto: any) {
-        observable.ref(proto, this.name, { value: undefinedType.instantiate(null, "", null, undefined) }) // TODO: undefined type should not be needed
+        observable.ref(proto, this.name, { value: undefinedType.instantiate(undefinedType, null, "", null, undefined) }) // TODO: undefined type should not be needed
     }
 
     initialize(targetInstance: any, snapshot: any) {
         const adm = getComplexNode(targetInstance)
-        targetInstance[this.name] = this.type.instantiate(adm, this.name, adm._environment, snapshot[this.name])
+        targetInstance[this.name] = this.type.instantiate(this.type, adm, this.name, adm._environment, snapshot[this.name])
         extras.getAdministration(targetInstance, this.name).dehancer = unbox
     }
 

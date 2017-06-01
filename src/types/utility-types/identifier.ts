@@ -13,13 +13,14 @@ export class IdentifierType<T> extends Type<T, T> {
         super(`identifier(${identifierType.name})`)
     }
 
-    instantiate(parent: Node, subpath: string, environment: any, snapshot: T): Node {
-        typecheck(this.identifierType, snapshot)
-        // TODO: assert parent.type is a model type!
-        // TODO: return IdentifierNode
-        // TODO: check uniques in parent
-        return new Node(this, parent, subpath, environment, snapshot)
-    }
+    // TODO
+    // instantiate(parent: Node, subpath: string, environment: any, snapshot: T): Node {
+    //     typecheck(this.identifierType, snapshot)
+    //     // TODO: assert parent.type is a model type!
+    //     // TODO: return IdentifierNode
+    //     // TODO: check uniques in parent
+    //     return new Node(this, parent, subpath, environment, snapshot)
+    // }
 
     describe() {
         return `identifier(${this.identifierType})`

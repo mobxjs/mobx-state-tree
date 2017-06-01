@@ -11,6 +11,7 @@ export class Node  {
     // optimization: these fields make MST memory expensive for primitives. Most can be initialized lazily, or with EMPTY_ARRAY on prototype
     readonly nodeId = ++nextNodeId
     readonly type: IType<any, any>
+    readonly declaredType: IType<any, any>
     readonly storedValue: any
     @observable protected _parent: Node | null = null
     @observable subpath: string = ""
@@ -27,8 +28,9 @@ export class Node  {
     private readonly disposers: (() => void)[] = []
 
     // TODO: should have environment as well?
-    constructor(type: IType<any, any>, parent: Node | null, subpath: string, environment: any, storedValue: any) {
+    constructor(declaredType: IType<any, any>, type: IType<any, any>, parent: Node | null, subpath: string, environment: any, storedValue: any) {
         this.type = type
+        this.declaredType = declaredType
         this._parent = parent
         this.subpath = subpath
         this.storedValue = storedValue
@@ -299,13 +301,13 @@ export class Node  {
                     childNode.applySnapshot(newValue)
                     res[index] = existing
                 } else {
-                    res[index] = childType.instantiate(this, subPath, undefined, newValue)
+                    res[index] = childType.instantiate(this.declaredType, this, subPath, undefined, newValue)
                 }
             } else {
                 typecheck(childType, newValue)
 
                 // create a fresh MST node
-                res[index] = childType.instantiate(this, subPath, undefined, newValue)
+                res[index] = childType.instantiate(this.declaredType, this, subPath, undefined, newValue)
             }
         })
 

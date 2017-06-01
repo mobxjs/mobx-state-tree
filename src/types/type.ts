@@ -30,7 +30,7 @@ export interface IType<S, T> {
     identifierAttribute: string | null
 
     // Internal api's
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot?: S): Node
+    instantiate(declaredType: IType<any, any>, parent: Node | null, subpath: string, environment: any, snapshot?: S): Node
     getValue(node: Node): T
     getSnapshot(node: Node): S
     applySnapshot(node: Node, snapshot: S): void
@@ -66,13 +66,13 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     @action create(snapshot: S = this.getDefaultSnapshot(), environment?: any): T {
         typecheck(this, snapshot)
-        return this.instantiate(null, "", environment, snapshot).getValue()
+        return this.instantiate(this, null, "", environment, snapshot).getValue()
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): Node {
+    instantiate(declaredType: IType<any, any>, parent: Node | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): Node {
         const instance = this.createNewInstance(snapshot)
         // tslint:disable-next-line:no_unused-variable
-        const node = new Node(this, parent, subpath, environment, instance)
+        const node = new Node(declaredType, this, parent, subpath, environment, instance)
 
         if (this.shouldAttachNode) addHiddenFinalProp(instance, "$treenode", node)
 
@@ -115,7 +115,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     validate(value: any, context: IContext): IValidationResult {
         if (isMST(value)) {
-            return getType(value) === this ? typeCheckSuccess() : typeCheckFailure(context, value)
+            return getDeclaredType(value) === this || getType(value) === this ? typeCheckSuccess() : typeCheckFailure(context, value)
             // it is tempting to compare snapshots, but in that case we should always clone on assignments...
         }
         return this.isValidSnapshot(
@@ -205,5 +205,5 @@ import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp } from "../utils
 import { isComplexValue, getComplexNode } from "../core/node"
 import { IContext, IValidationResult, typecheck, typeCheckFailure, typeCheckSuccess } from "./type-checker"
 import { Node, IComplexValue, IJsonPatch } from "../core"
-import { getType } from "../core/mst-operations"
+import { getDeclaredType, getType } from "../core/mst-operations"
 

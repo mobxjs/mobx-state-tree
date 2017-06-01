@@ -21,9 +21,9 @@ export class Refinement extends Type<any, any> {
         return this.name
     }
 
-    instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
+    instantiate(declaredType: IType<any, any>, parent: Node, subpath: string, environment: any, value: any): Node {
         // create the child type
-        const inst = this.type.instantiate(parent, subpath, environment, value)
+        const inst = this.type.instantiate(declaredType, parent, subpath, environment, value)
 
         return inst
     }

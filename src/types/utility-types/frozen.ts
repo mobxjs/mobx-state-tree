@@ -28,11 +28,11 @@ export class Frozen<T> extends Type<T, T> {
         return "<any immutable value>"
     }
 
-    instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
-        if (!isSerializable(value)) fail("Given value should be serializable")
-        // deep freeze the object/array
-        return new Node(this, parent, subpath, environment, isMutable(value) ? freeze(value) : value)
-    }
+    // TODO
+    // instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
+    //     // deep freeze the object/array
+    //     return super.instantiate(parent, subpath, environment, isMutable(value) ? freeze(value) : value)
+    // }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (!isSerializable(value)) {

@@ -56,8 +56,8 @@ test("it should accept a function to provide dynamic values", t => {
     t.deepEqual(getSnapshot(Factory.create()), {a: 2})
 
     defaultValue = "hello world!"
-    const ex = t.throws(() => Factory.create())
-    t.deepEqual(ex.message, "[mobx-state-tree] Value is not assignable to \'number\'")
+    t.throws(() => Factory.create(), `[mobx-state-tree] Error while converting \`"hello world!\"\` to \`number\`:
+value \`"hello world!"\` is not assignable to type: \`number\`.`)
 })
 
 test.skip("it should be possible to create types on the fly", t => {

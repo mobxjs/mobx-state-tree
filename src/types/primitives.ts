@@ -1,4 +1,4 @@
-import { ISimpleType, TypeFlags, Type } from "./type"
+import { ISimpleType, TypeFlags, Type, IType } from "./type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
 import { isPrimitive, fail } from "../utils"
 import { Node } from "../core"
@@ -17,10 +17,8 @@ export class CoreType<T> extends Type<T, T> {
         return this.name
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
-        if (!isPrimitive(snapshot)) fail(`Not a primitive: '${snapshot}'`)
-        if (!this.checker(snapshot)) fail(`Value is not assignable to '` + this.name + `'`)
-        return new Node(this, parent, subpath, environment, snapshot)
+    instantiate(declaredType: IType<any, any>, parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
+        return new Node(declaredType, this, parent, subpath, environment, snapshot)
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
