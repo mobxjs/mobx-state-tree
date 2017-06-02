@@ -105,7 +105,5 @@ export function createNamedFunction(name: string, fn: Function) {
 }
 
 export function isValidIdentifier(identifier: any): boolean {
-    if (typeof identifier !== "string")
-        return false
-    return /^[a-z0-9_-]+$/i.test(identifier)
+    return isPrimitive(identifier) && isSerializable(identifier)
 }
