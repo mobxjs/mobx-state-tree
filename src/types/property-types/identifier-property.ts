@@ -20,7 +20,7 @@ export class IdentifierProperty extends ValueProperty {
         super.initialize(targetInstance, snapshot)
         const node = getComplexNode(targetInstance) // TODO: rename getComplexNode => Node
         const identifier = snapshot[this.name]
-        if (typeof identifier !== "number" && !isValidIdentifier(identifier))
+        if (!isValidIdentifier(identifier))
             fail(`Not a valid identifier: '${identifier}`)
         typecheck(this.subtype, identifier)
         node.identifier = identifier
@@ -70,7 +70,7 @@ export class IdentifierProperty extends ValueProperty {
         // Who are we to decide? Maybe just rule out empty string
         // Making types.identifier(types.refinement(types.string, (v) => coolCheck(v))) work would be great!
         // On the other hand, this avoids problems with json paths, so maybe we should support all identifiers that don't require further escaping?
-        if (typeof identifier !== "number" && !isValidIdentifier(identifier))
+        if (!isValidIdentifier(identifier))
             return false
         return this.subtype.is(identifier)
     }
