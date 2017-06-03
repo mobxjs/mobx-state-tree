@@ -160,10 +160,6 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     removeChild(node: Node, subpath: string) {
         node.storedValue.splice(parseInt(subpath, 10), 1)
     }
-
-    get identifierAttribute() {
-        return null
-    }
 }
 
 export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {

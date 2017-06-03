@@ -38,10 +38,6 @@ export class Refinement extends Type<any, any> {
         }
         return typeCheckFailure(context, value)
     }
-
-    get identifierAttribute() {
-        return this.type.identifierAttribute
-    }
 }
 
 export function refinement<T>(name: string, type: IType<T, T>, predicate: (snapshot: T) => boolean): IType<T, T>

@@ -27,7 +27,6 @@ export interface IType<S, T> {
     describe(): string
     Type: T
     SnapshotType: S
-    identifierAttribute: string | null
 
     // Internal api's
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot?: S): Node
@@ -143,8 +142,6 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     get SnapshotType(): S {
         return fail("Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`")
     }
-
-    abstract get identifierAttribute(): string | null
 }
 
 export interface IMSTNode {

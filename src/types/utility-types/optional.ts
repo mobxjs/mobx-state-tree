@@ -43,10 +43,6 @@ export class OptionalValue<S, T> extends Type<S, T> {
         }
         return typeCheckFailure(context, value)
     }
-
-    get identifierAttribute() {
-        return this.type.identifierAttribute
-    }
 }
 
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: S): IType<S, T>

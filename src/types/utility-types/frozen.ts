@@ -40,10 +40,6 @@ export class Frozen<T> extends Type<T, T> {
         }
         return typeCheckSuccess()
     }
-
-    get identifierAttribute() {
-        return null
-    }
 }
 
 export const frozen: ISimpleType<any> = new Frozen()

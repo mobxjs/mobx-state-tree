@@ -1,6 +1,5 @@
-import { getIdentifierAttribute } from "./object"
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras } from "mobx"
-import { getComplexNode, escapeJsonPath, IJsonPatch, Node, unbox } from "../../core"
+import { getComplexNode, escapeJsonPath, IJsonPatch, Node, unbox, isComplexValue } from "../../core"
 import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -18,10 +17,11 @@ export function mapToString(this: ObservableMap<any>) {
 }
 
 function put(this: ObservableMap<any>, value: any) {
-    const identifierAttr = getIdentifierAttribute((getComplexNode(this).type as MapType<any, any>).subType)
-    if (!(!!identifierAttr)) fail(`Map.put is only supported if the subtype has an idenfier attribute`)
     if (!(!!value)) fail(`Map.put cannot be used to set empty values`)
-    this.set(value[identifierAttr!], value)
+    if (!isComplexValue(value)) fail(`Map.put can only be used to store complex values`)
+    const id = getComplexNode(value).identifierAttribute!
+    if (!id) fail(`Map.put can only be used to store complex values that have an identifier type attribute`)
+    this.set(id, value)
     return this
 }
 
@@ -73,13 +73,9 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
+
         const node = getComplexNode(change.object)
         node.assertWritable()
-
-        // Q: how to create a map that is not keyed by identifier, but contains objects with identifiers? Is that a use case? A: No, that is were reference maps should come into play...
-        const identifierAttr = getIdentifierAttribute(node.type)
-        if (identifierAttr && change.newValue && typeof change.newValue === "object" && change.newValue[identifierAttr] !== change.name)
-            fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${change.name}', but expected: '${change.newValue[identifierAttr!]}'`)
 
         switch (change.type) {
             case "update":
@@ -89,12 +85,14 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                     if (newValue === oldValue)
                         return null
                     change.newValue = node.reconcileChild(this.subType, this.getChildNode(node, change.name), newValue, change.name)
+                    this.verifyIdentifier(change.name, change.newValue as Node)
                 }
                 break
             case "add":
                 {
                     const {newValue} = change
                     change.newValue = node.reconcileChild(this.subType, null, newValue, change.name)
+                    this.verifyIdentifier(change.name, change.newValue as Node)
                 }
                 break
             case "delete":
@@ -104,6 +102,12 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                 break
         }
         return change
+    }
+
+    private verifyIdentifier(expected: string, node: Node) {
+        const identifier = node.identifier
+        if (identifier !== null && identifier !== expected)
+            fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${expected}', but expected: '${identifier}'`)
     }
 
     getValue(node: Node): any {
@@ -153,35 +157,6 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         node.pseudoAction(() => {
             const target = node.storedValue as ObservableMap<any>
             target.replace(snapshot)
-            // const identifierAttr = getIdentifierAttribute(this.subType)
-            // // Try to update snapshot smartly, by reusing instances under the same key as much as possible
-            // const currentKeys: { [key: string]: boolean } = {}
-            // target.keys().forEach(key => { currentKeys[key] = false })
-            // Object.keys(snapshot).forEach(key => {
-            //     const item = snapshot[key]
-            //     if (identifierAttr && item && typeof item === "object" && key !== item[identifierAttr])
-            //         fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${key}', but expected: '${item[identifierAttr]}'`)
-            //     // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
-            //     if (key in currentKeys && !isPrimitive(item)) {
-            //         currentKeys[key] = true
-            //         maybeMST(
-            //             target.get(key),
-            //             propertyNode => {
-            //                 // update existing instance
-            //                 propertyNode.applySnapshot(item)
-            //             },
-            //             () => {
-            //                 target.set(key, item)
-            //             }
-            //         )
-            //     } else {
-            //         target.set(key, item)
-            //     }
-            // })
-            // Object.keys(currentKeys).forEach(key => {
-            //     if (currentKeys[key] === false)
-            //         target.delete(key)
-            // })
         })
     }
 
@@ -207,10 +182,6 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
 
     removeChild(node: Node, subpath: string) {
         (node.storedValue as ObservableMap<any>).delete(subpath)
-    }
-
-    get identifierAttribute() {
-        return null
     }
 }
 

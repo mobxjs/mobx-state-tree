@@ -30,10 +30,6 @@ export class IdentifierType<T> extends Type<T, T> {
         return typeCheckSuccess()
         // TODO:
     }
-
-    get identifierAttribute() {
-        return null // yep, only models have a identifierAttribute ;-)
-    }
 }
 
 // TODO: properly turn this into a factory, that reuses `types.string`?

@@ -21,10 +21,6 @@ export class Literal<T> extends Type<T, T> {
         }
         return typeCheckFailure(context, value)
     }
-
-    get identifierAttribute() {
-        return null
-    }
 }
 
 export function literal<S>(value: S): ISimpleType<S> {

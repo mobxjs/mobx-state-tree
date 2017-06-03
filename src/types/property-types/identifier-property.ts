@@ -23,7 +23,7 @@ export class IdentifierProperty extends ValueProperty {
         if (!isValidIdentifier(identifier))
             fail(`Not a valid identifier: '${identifier}`)
         typecheck(this.subtype, identifier)
-        node.identifier = identifier
+        node.identifierAttribute = this.name
     }
 
     // initialize(target: any, snapshot: any) {

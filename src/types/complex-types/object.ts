@@ -54,8 +54,6 @@ export class ObjectType extends ComplexType<any, any> {
         [key: string]: Property
     } = {}
 
-    identifierAttribute: string | null = null
-
     constructor(name: string, baseModel: Object, baseActions: Object) {
         super(name)
         Object.freeze(baseModel) // make sure nobody messes with it
@@ -95,6 +93,8 @@ export class ObjectType extends ComplexType<any, any> {
 
     parseModelProps() {
         const {baseModel, baseActions} = this
+        let alreadySeenIdentifierAttribute: string | null = null
+
         for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
             // TODO: check that hooks are not defined as part of baseModel
             const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
@@ -110,8 +110,8 @@ export class ObjectType extends ComplexType<any, any> {
                 const baseType = getPrimitiveFactoryFromValue(value)
                 this.props[key] = new ValueProperty(key, optional(baseType, value))
             } else if (isIdentifierType(value)) {
-                if (this.identifierAttribute) fail(`Cannot define property '${key}' as object identifier, property '${this.identifierAttribute}' is already defined as identifier property`)
-                this.identifierAttribute = key // TODO: kill identifier attribute, not needed anymore
+                if (alreadySeenIdentifierAttribute !== null) fail(`Cannot define property '${key}' as object identifier, property '${alreadySeenIdentifierAttribute}' is already defined as identifier property`)
+                alreadySeenIdentifierAttribute = key
                 this.props[key] = new IdentifierProperty(key, (value as IdentifierType<any>).identifierType)
             } else if (isType(value)) {
                 this.props[key] = new ValueProperty(key, value)
@@ -273,11 +273,4 @@ export function extend(...args: any[]) {
 
 export function isObjectFactory(type: any): boolean {
     return isType(type) && ((type as IType<any, any>).flags & TypeFlags.Object) > 0
-}
-
-export function getIdentifierAttribute(type: IType<any, any>): string | null {
-    if ( isObjectFactory(type) )
-        return type.identifierAttribute
-
-    return null
 }

@@ -35,10 +35,6 @@ export class Late<S, T> extends Type<S, T> {
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         return this.subType.validate(value, context)
     }
-
-    get identifierAttribute() {
-        return this.subType.identifierAttribute
-    }
 }
 
 export type ILateType<S, T> = () => IType<S, T>

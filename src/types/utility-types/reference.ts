@@ -1,3 +1,4 @@
+import { computed } from "mobx"
 import { ISimpleType, TypeFlags, Type, IType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
@@ -13,22 +14,21 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
     readonly flags = TypeFlags.Reference
 
     constructor(
-        private readonly targetType: IType<any, T>,
-        private readonly basePath: string
+        private readonly targetType: IType<any, T>
     ) {
         super(`reference(${targetType.name})`)
+    }
+
+    @computed get resolvedValue() {
+        return null
     }
 
     describe() {
         return this.name
     }
 
-    get identifierAttribute() {
-        return null
-    }
-
     getValue(storedValue: any) {
-        return "TODO"
+        return this.resolvedValue
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
@@ -41,11 +41,13 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
 // TODO: fix, references are not mentioned in type.describe...
 // TODO: make distinction between nullable and non-nullable refs?
 // TODO: verify ref is requird in non-nullable snapshos and vice versa
+// TODO support get / set
 export function reference<T>(factory: IType<any, T>): IType<{ $ref: string }, T | null>;
-export function reference<T>(factory: IType<any, T>, basePath: string): IType<string, T | null>;
-export function reference<T>(factory: IType<any, T>, basePath: string = ""): any {
+export function reference<T>(factory: IType<any, T>): any {
+    if (arguments.length === 2 && typeof arguments[1] === "string")
+        fail("References with base path are no longer supported. Please remove the base path.")
     // FIXME: IType return type is inconsistent with what is actually returned, however, results in the best type-inference results for objects...
-    return new ReferenceType(factory, basePath)
+    return new ReferenceType(factory)
 }
 
 export function isReferenceType(type: any): type is ReferenceType<any> {

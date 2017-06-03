@@ -64,13 +64,6 @@ export class Union extends Type<any, any> {
 
         return typeCheckSuccess()
     }
-
-    get identifierAttribute() {
-        const identifier0 = this.types[0].identifierAttribute
-        if (identifier0 && this.types.every(type => type.identifierAttribute === identifier0))
-            return identifier0
-        return null
-    }
 }
 
 export function union<SA, SB, TA, TB>(dispatch: ITypeDispatcher, A: IType<SA, TA>, B: IType<SB, TB>): IType<SA | SB, TA | TB>

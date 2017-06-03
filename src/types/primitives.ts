@@ -27,10 +27,6 @@ export class CoreType<T> extends Type<T, T> {
         }
         return typeCheckFailure(context, value)
     }
-
-    get identifierAttribute() {
-        return null
-    }
 }
 
 // tslint:disable-next-line:variable-name

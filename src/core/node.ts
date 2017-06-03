@@ -17,7 +17,7 @@ export class Node  {
 
     identifierCache = new IdentifierCache()
     isProtectionEnabled = true
-    identifier: string | undefined = undefined // not to be modified directly, only through model initialization
+    identifierAttribute: string | undefined = undefined // not to be modified directly, only through model initialization
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
     private _isAlive = true // optimization: use binary flags for all these switches
@@ -49,6 +49,10 @@ export class Node  {
             throw e
         })
         this.addDisposer(snapshotDisposer)
+    }
+
+    get identifier(): string | null {
+        return this.identifierAttribute ? this.storedValue[this.identifierAttribute] : null
     }
 
     /**
@@ -266,8 +270,8 @@ export class Node  {
             isMutable(newValue) &&
             !isComplexValue(newValue) &&
             (
-                !oldNode.type.identifierAttribute ||
-                oldNode.type.identifierAttribute && oldNode.identifier === newValue[oldNode.type.identifierAttribute]
+                !oldNode.identifierAttribute ||
+                oldNode.identifier === newValue[oldNode.identifierAttribute]
             ) &&
             oldNode.type.is(newValue)
         ) {
@@ -290,16 +294,27 @@ export class Node  {
         // optimization: overload for a single old / new value to avoid all the array allocations
         // optimization: skip reconciler for non-complex types
         const res = new Array(newValues.length)
-        const oldNodesByNodeId: any = {}
-        const oldNodesByIdentifier: any = {}
-        const identifierAttribute = getIdentifierAttribute(childType)
+        const nodesToBeKilled: { [nodeId: string]: Node | undefined } = {}
+        const oldNodesByIdentifier: {
+            [identifierAttribute: string]: {
+                [identifier: string]: Node
+            }
+        } = {}
 
-        // Investigate which values we could reconcile
+        function findReconcilationCandidates(snapshot: any): Node | null {
+            for (let attr in oldNodesByIdentifier) {
+                const id = snapshot[attr]
+                if ((typeof id === "string" || typeof id === "number") && oldNodesByIdentifier[attr][id])
+                    return oldNodesByIdentifier[attr][id]
+            }
+            return null
+        }
+
+        // Investigate which values we could reconcile, and mark them all as potentially dead
         oldNodes.forEach(oldNode => {
-            const id = oldNode.identifier
-            if (id)
-                oldNodesByIdentifier[id] = oldNode
-            oldNodesByNodeId[oldNode.nodeId] = oldNode
+            if (oldNode.identifierAttribute)
+                (oldNodesByIdentifier[oldNode.identifierAttribute] || (oldNodesByIdentifier[oldNode.identifierAttribute] = {}))[oldNode.identifier!] = oldNode
+            nodesToBeKilled[oldNode.nodeId] = oldNode
         })
 
         // Prepare new values, try to reconcile
@@ -309,39 +324,34 @@ export class Node  {
                 // A tree node...
                 const childNode = getComplexNode(newValue)
                 childNode.assertAlive()
-                if (childNode.parent && (childNode.parent !== this || !oldNodesByNodeId[childNode.nodeId]))
+                if (childNode.parent && (childNode.parent !== this || !nodesToBeKilled[childNode.nodeId]))
                     return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subPath}', but it lives already at '${childNode.path}'`)
 
                 // Try to reconcile based on already existing nodes
-                oldNodesByNodeId[childNode.nodeId] = undefined
+                nodesToBeKilled[childNode.nodeId] = undefined
                 childNode.setParent(this, subPath)
                 res[index] = childNode
-            } else if (identifierAttribute && isMutable(newValue)) {
-                // The snapshot of a tree node..
-                typecheck(childType, newValue)
-
-                // Try to reconcile based on id
-                const id = (newValue as any)[identifierAttribute]
-                const existing = oldNodesByIdentifier[id]
-                if (existing && existing.type.is(newValue)) {
-                    oldNodesByNodeId[existing.nodeId] = undefined
-                    existing.setParent(this, subPath)
-                    existing.applySnapshot(newValue)
-                    res[index] = existing
+            } else if (isMutable(newValue)) {
+                // The snapshot of a tree node, try to reconcile based on id
+                const reconcilationCandidate = findReconcilationCandidates(newValue)
+                if (reconcilationCandidate && reconcilationCandidate.type.is(newValue)) {
+                    nodesToBeKilled[reconcilationCandidate.nodeId] = undefined
+                    reconcilationCandidate.setParent(this, subPath)
+                    reconcilationCandidate.applySnapshot(newValue)
+                    res[index] = reconcilationCandidate
                 } else {
                     res[index] = childType.instantiate(this, subPath, undefined, newValue)
                 }
             } else {
-                typecheck(childType, newValue)
-
                 // create a fresh MST node
                 res[index] = childType.instantiate(this, subPath, undefined, newValue)
             }
         })
 
         // Kill non reconciled values
-        for (let key in oldNodesByNodeId) if (oldNodesByNodeId[key])
-            oldNodesByNodeId[key].die()
+        for (let key in nodesToBeKilled)
+            if (nodesToBeKilled[key] !== undefined)
+                nodesToBeKilled[key]!.die()
 
         return res
     }
@@ -467,5 +477,4 @@ import {
     isMutable,
     registerEventHandler
 } from "../utils"
-import { getIdentifierAttribute } from "../types/complex-types/object"
 import { IdentifierCache } from "./identifier-cache"
