@@ -43,7 +43,7 @@ test.skip("it should support prefixed paths in maps", t => {
         name: types.string
     })
     const UserStore = types.model({
-        user: types.reference(User, "users"),
+        user: types.reference(User),
         users: types.map(User)
     })
 
@@ -75,7 +75,7 @@ test.skip("it should support prefixed paths in arrays", t => {
         name: types.string
     })
     const UserStore = types.model({
-        user: types.reference(User, "/users"),
+        user: types.reference(User),
         users: types.array(User)
     })
 
@@ -133,7 +133,7 @@ test.skip("it should resolve refs during creation, when using path", t => {
         price: types.number
     })
     const BookEntry = types.model({
-        book: types.reference(Book, "../../books"),
+        book: types.reference(Book),
         get price() {
             return this.book.price * 2
         }
@@ -171,7 +171,7 @@ test.skip("it should resolve refs over late types", t => {
         price: types.number
     })
     const BookEntry = types.model({
-        book: types.reference(types.late(() => Book), "../../books"),
+        book: types.reference(types.late(() => Book)),
         get price() {
             return this.book.price * 2
         }
@@ -276,7 +276,7 @@ test.skip("self reference with a late type", t => {
     const Book = types.model("Book", {
       id: types.identifier(),
       genre: types.string ,
-      reference: types.reference(types.late<any, IBook>(() => Book), '../../books')
+      reference: types.reference(types.late<any, IBook>(() => Book))
     })
 
     const Store = types.model("Store", {

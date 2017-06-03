@@ -59,13 +59,13 @@ test.skip("it should allow array of pointer objects - 2", t => {
 
     const ref = Pointer(Todo).create() // Fails because ref is required
     store.selected.push(ref)
-    ref.value = store.todos[0] as any 
+    ref.value = store.todos[0] as any
 })
 
 test.skip("it should allow array of pointer objects - 3", t => {
     function Pointer<S, T>(Model: IType<S, T>, path: string) {
         return types.model({
-            value: types.reference(Model, path)
+            value: types.reference(Model)
         })
     }
 
@@ -95,7 +95,7 @@ test.skip("it should allow array of pointer objects - 3", t => {
 test.skip("it should allow array of pointer objects - 4", t => {
     function Pointer<S, T>(Model: IType<S, T>, path: string) {
         return types.model({
-            value: types.reference(Model, path)
+            value: types.reference(Model)
         })
     }
 
@@ -120,5 +120,5 @@ test.skip("it should allow array of pointer objects - 4", t => {
 
     const ref = Pointer(Todo, "/todos").create() // Fails because ref is required
     store.selected.push(ref)
-    ref.value = store.todos[0] as any 
+    ref.value = store.todos[0] as any
 })

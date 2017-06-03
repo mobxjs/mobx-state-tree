@@ -1,4 +1,5 @@
 import { computed } from "mobx"
+import { isComplexValue, Node } from '../../core';
 import { ISimpleType, TypeFlags, Type, IType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
@@ -19,16 +20,31 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
         super(`reference(${targetType.name})`)
     }
 
-    @computed get resolvedValue() {
-        return null
-    }
+    // TODO: inistiate should check if identifier is wellformed / node is of proper type and has an identifier
 
     describe() {
         return this.name
     }
 
-    getValue(storedValue: any) {
-        return this.resolvedValue
+    getValue(node: Node) {
+        // Optimization: should be cached on the node
+        if (isComplexValue(node.storedValue)) {
+            // reference was initialized with a real value
+            return node.storedValue
+        }
+        // reference was initialized with the identifier of the target
+        const target = node.root.identifierCache.resolve(this.targetType, node.storedValue)
+        if (!target)
+            return fail(`Failed to resolve reference of type ${this.targetType.name}: '${node.storedValue}' (in: ${node.path})`)
+        return target.getValue()
+    }
+
+    getSnapshot(node: Node): any {
+        if (isComplexValue(node.storedValue)) {
+            // TODO: should we chach whether target is actually in the tree?
+            return node.identifier
+        }
+        return node.storedValue
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
