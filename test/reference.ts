@@ -267,3 +267,53 @@ test.skip("self reference with a late type", t => {
 
     t.is((s as any).books[1].reference.genre, "thriller")
 })
+
+test.skip("when applying a snapshot, reference should resolve correctly if value added after", t => {
+
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Factory = types.model({
+        selected: types.reference(Box),
+        boxes: types.array(Box)
+    })
+
+    t.notThrows(() => Factory.create({
+        selected: 1,
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}]
+    }))
+})
+
+test.skip("it should fail when reference snapshot is ambiguous", t => {
+
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Arrow = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const BoxOrArrow = types.union(Box, Arrow)
+
+    const Factory = types.model({
+        selected: types.reference(BoxOrArrow),
+        boxes: types.array(Box),
+        arrows: types.array(Arrow)
+    })
+
+    const store = Factory.create({
+        selected: 1,
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}],
+        arrows: [{id: 2, name: "arrow"}]
+    })
+    unprotect(store)
+
+    t.notThrows(() => {
+        store.selected = store.boxes[1] // throws because it can't know if you mean a box or an arrow!
+    })
+})
