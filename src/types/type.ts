@@ -82,6 +82,9 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
                 this.finalizeNewInstance(instance, snapshot)
             })
             if (this.shouldAttachNode) addReadOnlyProp(instance, "toJSON", toJSON)
+            if (parent)
+                parent.root.identifierCache.register(node)
+
             node.fireHook("afterCreate")
             if (parent)
                 node.fireHook("afterAttach")

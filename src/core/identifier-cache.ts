@@ -1,3 +1,4 @@
+import { isComplexValue } from './';
 import { fail } from '../utils'
 import { observable, IObservableArray } from "mobx"
 import { IComplexType, IType } from '../types/type';
@@ -7,26 +8,32 @@ export class IdentifierCache {
     private cache: { [id: string]: IObservableArray<Node> } = {}
 
     register(node: Node) {
+        if (!isComplexValue(node.storedValue))
+            return
+
         const identifier = node.identifier
-        if (!identifier)
-            return
-        const set = this.cache[identifier] || (this.cache[identifier] = observable.shallowArray<Node>())
-        if (set.indexOf(node) !== -1)
-            return
-        set.forEach(otherNode => {
-            if (otherNode.type.isAssignableFrom(node.type))
-                fail(`An object with identifier '${identifier}' of a similar type is already part of this state tree. Wanted to add '${node.path}', which conflicts with '${otherNode.path}'`)
-        })
-        set.push(node)
+        if (identifier) {
+            const set = this.cache[identifier] || (this.cache[identifier] = observable.shallowArray<Node>())
+            if (set.indexOf(node) !== -1)
+                fail("Already registered")
+            set.forEach(otherNode => {
+                if (otherNode.type.isAssignableFrom(node.type))
+                    fail(`An object with identifier '${identifier}' of a similar type is already part of this state tree. Wanted to add '${node.path}', which conflicts with '${otherNode.path}'`)
+            })
+            set.push(node)
+        }
+
         // TODO: all items in node's cache should become part of this cache as well
     }
 
     unregister(node: Node) {
-        if (!node.identifier)
+        if (!isComplexValue(node.storedValue))
             return
-        const set = this.cache[node.identifier]
-        if (set)
-            set.remove(node)
+        if (node.identifier) {
+            const set = this.cache[node.identifier]
+            if (set)
+                set.remove(node)
+        }
         // TODO: all cached items which have node as parent should not be dropped from the cache as well, and moved to the cache of node
     }
 

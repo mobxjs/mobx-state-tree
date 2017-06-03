@@ -2,42 +2,7 @@ import { reaction } from "mobx"
 import { types, getSnapshot, applySnapshot, unprotect } from "../src"
 import { test } from "ava"
 
-test.skip("it should support generic relative paths", t => {
-    const User = types.model({
-        name: types.string
-    })
-    const UserStore = types.model({
-        user: types.reference(User),
-        users: types.map(User)
-    }, {
-        postCreate() {
-            unprotect(this)
-        }
-    })
-
-    const store = UserStore.create({
-        user: { $ref: "/users/17"},
-        users: {
-            "17": { name: "Michel" },
-            "18": { name: "Veria" }
-        }
-    })
-    unprotect(store)
-
-    t.is(store.users.get("17")!.name, "Michel")
-    t.is(store.users.get("18")!.name, "Veria")
-    t.is(store.user!.name, "Michel")
-
-    store.user = store.users.get("18")!
-    t.is(store.user.name, "Veria")
-
-    store.users.get("18")!.name = "Noa"
-    t.is(store.user.name, "Noa")
-
-    t.deepEqual(getSnapshot(store), {user: { $ref: "/users/18" }, "users": {"17": {name: "Michel"}, "18": {name: "Noa"}}} as any) // TODO: better typings
-})
-
-test.skip("it should support prefixed paths in maps", t => {
+test("it should support prefixed paths in maps", t => {
     const User = types.model({
         id: types.identifier(),
         name: types.string

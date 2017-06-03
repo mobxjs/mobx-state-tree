@@ -32,8 +32,6 @@ export class Node  {
     constructor(type: IType<any, any>, parent: Node | null, subpath: string, environment: any, storedValue: any) {
         this.type = type
         this._parent = parent
-        if (parent)
-            parent.root.identifierCache.register(this)
         this.subpath = subpath
         this.storedValue = storedValue
         this._environment = environment

@@ -46,7 +46,8 @@ export class ValueProperty extends Property {
     }
 
     serialize(instance: any, snapshot: any) {
-        instance[this.name] // TODO: FIXME, make sure the observable ref is used!
+        // TODO: FIXME, make sure the observable ref is used!
+        (extras.getAtom(instance, this.name) as any).reportObserved()
         snapshot[this.name] = this.getValueNode(instance).snapshot
     }
 
