@@ -313,7 +313,61 @@ test.skip("it should fail when reference snapshot is ambiguous", t => {
     })
     unprotect(store)
 
-    t.notThrows(() => {
+    t.throws(() => {
         store.selected = store.boxes[1] // throws because it can't know if you mean a box or an arrow!
     })
+})
+
+
+test.skip("it should support array of references", t => {
+
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Factory = types.model({
+        selected: types.array(types.reference(Box)),
+        boxes: types.array(Box)
+    })
+
+    const store = Factory.create({
+        selected: [],
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}]
+    })
+    unprotect(store)
+
+    t.notThrows(() => {
+        store.selected.push(store.boxes[0])
+    })
+
+    t.deepEqual<any>(getSnapshot(store.selected), [1])
+
+    t.notThrows(() => {
+        store.selected.push(store.boxes[1])
+    })
+
+    t.deepEqual<any>(getSnapshot(store.selected), [1, 2])
+})
+
+test.skip("it should restore array of references from snapshot", t => {
+
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Factory = types.model({
+        selected: types.array(types.reference(Box)),
+        boxes: types.array(Box)
+    })
+
+    const store = Factory.create({
+        selected: [1, 2],
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}]
+    })
+    unprotect(store)
+
+    t.deepEqual<any>(store.selected[0] === store.boxes[0], true)
+    t.deepEqual<any>(store.selected[1] === store.boxes[1], true)
 })
