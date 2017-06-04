@@ -11,7 +11,6 @@ test("it should throw if late doesnt received a function as parameter", t => {
 })
 
 test("it should accept a type and infer it correctly", t => {
-
     const Before = types.model({
         after: types.late(() => After)
     })

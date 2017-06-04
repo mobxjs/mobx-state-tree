@@ -3,6 +3,7 @@ import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typech
 import { isPrimitive, fail } from "../../utils"
 import { Node } from "../../core"
 import { string as stringType, number as numberType } from "../primitives"
+import { Late } from "./late"
 
 export class IdentifierType<T> extends Type<T, T> {
     readonly flags = TypeFlags.Identifier
@@ -45,5 +46,6 @@ export function identifier(baseType: IType<any, any> = stringType): any {
 }
 
 export function isIdentifierType(type: any): type is IdentifierType<any> {
-    return (type.flags & (TypeFlags.Identifier)) > 0
+    return (!(type instanceof Late)) && // yikes
+        (type.flags & (TypeFlags.Identifier)) > 0
 }

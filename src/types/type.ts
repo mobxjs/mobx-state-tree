@@ -144,6 +144,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         if (isComplexValue(newValue) && getComplexNode(newValue) === current)
             return current
         if (
+            current.type === this &&
             isMutable(newValue) &&
             !isComplexValue(newValue) &&
             (
