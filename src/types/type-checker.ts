@@ -13,9 +13,11 @@ export interface IValidationError {
 export type IValidationResult = IValidationError[]
 
 const prettyPrintValue = (value: any) =>
-    isComplexValue(value) ?
-        "<" + value + ">" :
-        "`" + JSON.stringify(value) + "`"
+    typeof value === "function"
+        ? `<function${value.name ? " " + value.name :""}>`
+        : isComplexValue(value)
+            ? `<${value}>`
+            : `\`${JSON.stringify(value)}\``
 
 function toErrorString(error: IValidationError): string {
     const { value } = error
@@ -60,6 +62,7 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
     return errors.reduce((a, i) => a.concat(i), [])
 }
 
+// TODO; typecheck should be invoked from: type.create and array / map / value.property will change
 export function typecheck(type: IType<any, any>, value: any): void {
     const errors = type.validate(value, [{ path: "", type }])
 

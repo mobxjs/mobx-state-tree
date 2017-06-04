@@ -2,7 +2,7 @@ import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
 import { getComplexNode, escapeJsonPath, Node, unbox } from "../../core"
 import { IType } from "../type"
-import { IContext, IValidationResult, getContextForPath } from "../type-checker"
+import { IContext, IValidationResult, getContextForPath, typecheck } from "../type-checker"
 import { fail } from "../../utils"
 import { literal } from '../utility-types/literal';
 
@@ -31,7 +31,8 @@ export class ValueProperty extends Property {
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
-        const node = getComplexNode(change.object) // TODO: extract to object property
+        const node = getComplexNode(change.object) // TODO: pass node in from object property
+        typecheck(this.type, change.newValue)
         change.newValue = this.type.reconcile(node.getChildNode(change.name), change.newValue)
         return change
     }
