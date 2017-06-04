@@ -424,8 +424,8 @@ export function walk(thing: IComplexValue, processor: (item: IComplexValue) => v
     const node = getComplexNode(thing)
     // tslint:disable-next-line:no_unused-variable
     node.getChildren().forEach((child) => {
-        if (isMST(child))
-            walk(child, processor)
+        if (isMST(child.storedValue))
+            walk(child.storedValue, processor)
     })
     processor(node.storedValue)
 }

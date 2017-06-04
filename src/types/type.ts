@@ -179,6 +179,7 @@ export interface IMSTNode {
     readonly $treenode?: Node
 }
 
+// TODO: duplicate with isComplexValue
 export function isMST(value: any): value is IMSTNode {
     return value && value.$treenode
 }
