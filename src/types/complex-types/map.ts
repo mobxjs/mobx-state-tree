@@ -1,6 +1,6 @@
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras } from "mobx"
 import { getComplexNode, escapeJsonPath, IJsonPatch, Node, unbox, isComplexValue } from "../../core"
-import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
+import { addHiddenFinalProp, fail, identity, isMutable, isPlainObject, isPrimitive, nothing } from '../../utils';
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 
@@ -18,10 +18,17 @@ export function mapToString(this: ObservableMap<any>) {
 
 function put(this: ObservableMap<any>, value: any) {
     if (!(!!value)) fail(`Map.put cannot be used to set empty values`)
-    if (!isComplexValue(value)) fail(`Map.put can only be used to store complex values`)
-    const id = getComplexNode(value).identifierAttribute!
-    if (!id) fail(`Map.put can only be used to store complex values that have an identifier type attribute`)
-    this.set(id, value)
+    let node: Node
+    if (isComplexValue(value)) {
+        node = getComplexNode(value)
+    } else if (isMutable(value)) {
+        const targetType = (getComplexNode(this).type as MapType<any, any>).subType
+        node = getComplexNode(targetType.create(value))
+    } else {
+        return fail(`Map.put can only be used to store complex values`)
+    }
+    if (!node.identifierAttribute) fail(`Map.put can only be used to store complex values that have an identifier type attribute`)
+    this.set(node.identifier!, node.getValue())
     return this
 }
 
@@ -105,7 +112,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     private verifyIdentifier(expected: string, node: Node) {
         const identifier = node.identifier
         if (identifier !== null && identifier !== expected)
-            fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${expected}', but expected: '${identifier}'`)
+            fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`)
     }
 
     getValue(node: Node): any {
@@ -154,7 +161,17 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     @action applySnapshot(node: Node, snapshot: any): void {
         node.pseudoAction(() => {
             const target = node.storedValue as ObservableMap<any>
-            target.replace(snapshot)
+            const currentKeys: { [key: string]: boolean } = {}
+            target.keys().forEach(key => { currentKeys[key] = false })
+            // Don't use target.replace, as it will throw all existing items first
+            Object.keys(snapshot).forEach(key => {
+                target.set(key, snapshot[key])
+                currentKeys[key] = true
+            })
+            Object.keys(currentKeys).forEach(key => {
+                if (currentKeys[key] === false)
+                    target.delete(key)
+            })
         })
     }
 

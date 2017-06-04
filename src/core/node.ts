@@ -408,7 +408,7 @@ export class Node  {
     }
 
     toString(): string {
-        const identifier = this.identifier || ""
+        const identifier = this.identifier ? `(id: ${this.identifier})` : ""
         return `${this.type.name}@${this.path || "<root>"}${identifier}${this.isAlive ? "" : "[dead]"}`
     }
 }
