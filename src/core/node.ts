@@ -247,7 +247,7 @@ export class Node  {
             this.die()
         } else {
             this._parent = newParent
-            if (newParent)
+            if (newParent && !this._parent)
                 newParent.root.identifierCache.register(this)
             this.subpath = subpath || ""
             this.fireHook("afterAttach")
@@ -293,6 +293,7 @@ export class Node  {
             if (isComplexValue(newValue)) {
                 // A tree node...
                 const childNode = getComplexNode(newValue)
+                // TODO: are these checks really needed?
                 childNode.assertAlive()
                 if (childNode.parent && (childNode.parent !== this || !nodesToBeKilled[childNode.nodeId]))
                     return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subPath}', but it lives already at '${childNode.path}'`)
@@ -304,11 +305,11 @@ export class Node  {
             } else if (isMutable(newValue)) {
                 // The snapshot of a tree node, try to reconcile based on id
                 const reconcilationCandidate = findReconcilationCandidates(newValue)
-                if (reconcilationCandidate && reconcilationCandidate.type.is(newValue)) {
+                if (reconcilationCandidate) {
+                    const childNode = childType.reconcile(reconcilationCandidate, newValue)
                     nodesToBeKilled[reconcilationCandidate.nodeId] = undefined
-                    reconcilationCandidate.setParent(this, subPath)
-                    reconcilationCandidate.applySnapshot(newValue)
-                    res[index] = reconcilationCandidate
+                    childNode.setParent(this, subPath)
+                    res[index] = childNode
                 } else {
                     res[index] = childType.instantiate(this, subPath, undefined, newValue)
                 }

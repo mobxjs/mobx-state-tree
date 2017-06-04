@@ -339,16 +339,6 @@ test("it should reconciliate keyed instances correctly", (t) => {
     t.is(store.todos[0] === tea, true)
     t.is(store.todos[1] === coffee, true)
     t.is(store.todos[2] === biscuit, false)
-
-    t.throws(() => {
-        applySnapshot(store, {
-            todos: [
-                { id: "2", task: "Tee", done: true},
-                { id: "1", task: "coffee", done: true},
-                { id: "2", task: "biscuit", done: false} // double identifier!
-            ]
-        })
-    }, /someexeception/)
 })
 
 test("it correctly reconciliate when swapping", t => {

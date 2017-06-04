@@ -72,8 +72,13 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
         return this.instantiate(current.parent, current.subpath, current._environment, newValue)
     }
 
+    isAssignableFrom(type: IType<any, any>): boolean {
+        return this.targetType.isAssignableFrom(type)
+    }
+
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         // TODO: check if reference is valid
+        // return (typeof value === "string" || typeof value === "string") ? typeCheckSuccess() : typeCheckFailure(value, context)
         return typeCheckSuccess()
     }
 }

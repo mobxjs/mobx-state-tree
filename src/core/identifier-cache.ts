@@ -15,7 +15,7 @@ export class IdentifierCache {
         if (identifier) {
             const set = this.cache[identifier] || (this.cache[identifier] = observable.shallowArray<Node>())
             if (set.indexOf(node) !== -1)
-                fail("Already registered")
+                fail(`Already registered`)
             set.forEach(otherNode => {
                 if (otherNode.type.isAssignableFrom(node.type))
                     fail(`An object with identifier '${identifier}' of a similar type is already part of this state tree. Wanted to add '${node.path}', which conflicts with '${otherNode.path}'`)
