@@ -73,7 +73,6 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
-
         const node = getComplexNode(change.object)
         node.assertWritable()
 
@@ -84,14 +83,13 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                     const oldValue = change.object.get(change.name)
                     if (newValue === oldValue)
                         return null
-                    change.newValue = node.reconcileChild(this.subType, this.getChildNode(node, change.name), newValue, change.name)
+                    change.newValue = this.subType.reconcile(node.getChildNode(change.name), change.newValue)
                     this.verifyIdentifier(change.name, change.newValue as Node)
                 }
                 break
             case "add":
                 {
-                    const {newValue} = change
-                    change.newValue = node.reconcileChild(this.subType, null, newValue, change.name)
+                    change.newValue = this.subType.instantiate(node, change.name, undefined, change.newValue)
                     this.verifyIdentifier(change.name, change.newValue as Node)
                 }
                 break

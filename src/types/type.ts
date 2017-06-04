@@ -30,6 +30,7 @@ export interface IType<S, T> {
 
     // Internal api's
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot?: S): Node
+    reconcile(current: Node, newValue: any): Node
     getValue(node: Node): T
     getSnapshot(node: Node): S
     applySnapshot(node: Node, snapshot: S): void
@@ -116,7 +117,6 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     abstract removeChild(node: Node, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
 
-
     isAssignableFrom(type: IType<any, any>): boolean {
         return type === this
     }
@@ -137,6 +137,33 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
             value,
             [{ path: "", type: this }]
         ).length === 0
+    }
+
+    reconcile(current: Node, newValue: any): Node {
+        // TODO: this.is... for all prepareNewVaues?
+        if (isComplexValue(newValue) && getComplexNode(newValue) === current)
+            return current
+        if (
+            isMutable(newValue) &&
+            !isComplexValue(newValue) &&
+            (
+                !current.identifierAttribute ||
+                current.identifier === newValue[current.identifierAttribute]
+            ) &&
+            this.is(newValue)
+        ) {
+            // we can reconcile
+            current.applySnapshot(newValue)
+            return current
+        }
+        current.die()
+        if (isComplexValue(newValue)) {
+            // newValue is a Node as well, move it here..
+            const newNode = getComplexNode(newValue)
+            newNode.setParent(current.parent, current.path)
+            return newNode
+        }
+        return this.instantiate(current.parent, current.path, current._environment, newValue)
     }
 
     get Type(): T {
@@ -202,12 +229,21 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
         return fail(`No child '${key}' available in type: ${this.name}`)
     }
 
+    reconcile(current: Node, newValue: any): Node {
+        // reconcile only if type and value are still the same
+        if (current.type === this && current.storedValue === newValue)
+            return current
+        const res = this.instantiate(current.parent, current.subpath, current._environment, newValue)
+        current.die()
+        return res
+    }
+
     removeChild(node: Node, subpath: string): void {
         return fail(`No child '${subpath}' available in type: ${this.name}`)
     }
 }
 
-import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp } from "../utils";
+import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp, isMutable } from "../utils";
 import { isComplexValue, getComplexNode } from "../core/node"
 import { IContext, IValidationResult, typecheck, typeCheckFailure, typeCheckSuccess } from "./type-checker"
 import { Node, IComplexValue, IJsonPatch } from "../core"

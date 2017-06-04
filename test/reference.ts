@@ -25,7 +25,7 @@ test("it should support prefixed paths in maps", t => {
     t.is(store.users.get("18")!.name as string, "Veria")
     t.is(store.user!.name as string, "Michel")
 
-    store.user =  store.users.get("18")!
+    store.user = store.users.get("18")!
     t.is(store.user.name as string, "Veria")
 
     store.users.get("18")!.name = "Noa"

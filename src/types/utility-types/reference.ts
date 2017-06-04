@@ -1,15 +1,22 @@
 import { computed } from "mobx"
-import { isComplexValue, Node } from '../../core';
+import { getComplexNode, isComplexValue, Node } from '../../core';
 import { ISimpleType, TypeFlags, Type, IType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
 
-
+// TODO: eleminate IReference stuff
 export interface IReference {
     $ref: string
 }
 
 export type ReferenceSnapshot = string | null | IReference
+
+class StoredReference {
+    constructor(
+        public mode: "identifier" | "object",
+        public value: any
+    ) {}
+}
 
 export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
     readonly flags = TypeFlags.Reference
@@ -27,24 +34,42 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
     }
 
     getValue(node: Node) {
-        // Optimization: should be cached on the node
-        if (isComplexValue(node.storedValue)) {
-            // reference was initialized with a real value
-            return node.storedValue
-        }
+        const ref = node.storedValue as StoredReference
+        if (ref.mode === "object")
+            return ref.value
+
         // reference was initialized with the identifier of the target
-        const target = node.root.identifierCache.resolve(this.targetType, node.storedValue)
+        const target = node.root.identifierCache.resolve(this.targetType, ref.value)
         if (!target)
-            return fail(`Failed to resolve reference of type ${this.targetType.name}: '${node.storedValue}' (in: ${node.path})`)
+            return fail(`Failed to resolve reference of type ${this.targetType.name}: '${ref.value}' (in: ${node.path})`)
         return target.getValue()
     }
 
     getSnapshot(node: Node): any {
-        if (isComplexValue(node.storedValue)) {
-            // TODO: should we chach whether target is actually in the tree?
-            return node.identifier
+        const ref = node.storedValue as StoredReference
+        switch (ref.mode) {
+            case "identifier":
+                return ref.value
+            case "object":
+                return getComplexNode(ref.value).identifier
         }
-        return node.storedValue
+    }
+
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
+        const isComplex = isComplexValue(snapshot)
+        return new Node(this, parent, subpath, environment, new StoredReference(
+            isComplex ? "object" : "identifier",
+            snapshot
+        ))
+    }
+
+    reconcile(current: Node, newValue: any): Node {
+        const targetMode = isComplexValue(newValue) ? "object" : "identifier"
+        const ref = current.storedValue as StoredReference
+        if (targetMode === ref.mode && ref.value === newValue)
+            return current
+        current.die()
+        return this.instantiate(current.parent, current.subpath, current._environment, newValue)
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {

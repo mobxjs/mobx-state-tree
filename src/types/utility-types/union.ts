@@ -1,7 +1,7 @@
 import {isType, IType, TypeFlags, Type} from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors, typecheck } from "../type-checker"
 import {fail} from "../../utils"
-import { Node, isComplexValue, getType } from "../../core"
+import { getComplexNode, getType, isComplexValue, Node } from '../../core';
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
@@ -34,9 +34,20 @@ export class Union extends Type<any, any> {
     }
 
     instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
+        return this.determineType(value).instantiate(parent, subpath, environment, value)
+    }
+
+    reconcile(current: Node, newValue: any): Node {
+        return this.determineType(newValue).reconcile(current, newValue)
+    }
+
+    determineType(value: any): IType<any, any> {
+        if (isComplexValue(value))
+            return getComplexNode(value).type
+
         // try the dispatcher, if defined
         if (this.dispatcher !== null) {
-            return this.dispatcher(value).instantiate(parent, subpath, environment, value)
+            return this.dispatcher(value)
         }
 
         // find the most accomodating type
@@ -44,7 +55,7 @@ export class Union extends Type<any, any> {
         if (applicableTypes.length > 1)
              return fail(`Ambiguos snapshot ${JSON.stringify(value)} for union ${this.name}. Please provide a dispatch in the union declaration.`)
 
-        return applicableTypes[0].instantiate(parent, subpath, environment, value)
+        return applicableTypes[0]
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {

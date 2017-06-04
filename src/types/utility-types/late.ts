@@ -28,6 +28,10 @@ export class Late<S, T> extends Type<S, T> {
         return this.subType.instantiate(parent, subpath, environment, snapshot)
     }
 
+    reconcile(current: Node, newValue: any): Node {
+        return this.subType.reconcile(current, newValue)
+    }
+
     describe() {
         return this.subType.name
     }

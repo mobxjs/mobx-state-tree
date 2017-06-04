@@ -20,20 +20,26 @@ export class OptionalValue<S, T> extends Type<S, T> {
     }
 
     describe() {
-        // return "(" + this.type.type.describe() + " = " + JSON.stringify(this.defaultValue) + ")"
-        // MWE: discuss a default value is not part of the type description? (unlike a literal)
         return this.type.describe() + "?"
     }
 
     instantiate(parent: Node, subpath: string, environment: any, value: S): Node {
         if (typeof value === "undefined") {
-            const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
+            const defaultValue = this.getDefaultValue()
             const defaultSnapshot = isComplexValue(defaultValue) ? getComplexNode(defaultValue).snapshot : defaultValue
-            if(typeof this.defaultValue === "function") typecheck(this, defaultValue)
             return this.type.instantiate(parent, subpath, environment, defaultSnapshot)
         }
-
         return this.type.instantiate(parent, subpath, environment, value)
+    }
+
+    reconcile(current: Node, newValue: any): Node {
+        return this.type.reconcile(current, this.type.is(newValue) ? newValue : this.getDefaultValue())
+    }
+
+    private getDefaultValue() {
+        const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
+        if (typeof this.defaultValue === "function") typecheck(this, defaultValue)
+        return defaultValue
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {

@@ -258,36 +258,8 @@ export class Node  {
         this.disposers.unshift(disposer)
     }
 
-    // TODO: move reconcilation to separte file
-    reconcileChild(childType: IType<any, any>, oldNode: Node | null, newValue: any, newPath: string): Node {
-        if (oldNode && newValue === oldNode)
-            return oldNode
-        if (
-            oldNode &&
-            isComplexValue(oldNode.storedValue) &&
-            isMutable(newValue) &&
-            !isComplexValue(newValue) &&
-            (
-                !oldNode.identifierAttribute ||
-                oldNode.identifier === newValue[oldNode.identifierAttribute]
-            ) &&
-            oldNode.type.is(newValue)
-        ) {
-            // we can reconcile
-            oldNode.applySnapshot(newValue)
-            return oldNode
-        }
-        if (oldNode)
-            oldNode.die()
-        if (isComplexValue(newValue)) {
-            const newNode = getComplexNode(newValue)
-            newNode.setParent(this, newPath)
-            return newNode
-        }
-        return childType.instantiate(this, newPath, undefined, newValue)
-    }
-
     reconcileChildren<T>(childType: IType<any, T>, oldNodes: Node[], newValues: T[], newPaths: (string|number)[]): Node[] {
+        // TODO: move to array, rewrite to use type.reconcile
         // TODO: pick identifiers based on actual type instead of declared type
         // optimization: overload for a single old / new value to avoid all the array allocations
         // optimization: skip reconciler for non-complex types

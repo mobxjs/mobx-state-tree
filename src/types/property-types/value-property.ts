@@ -31,8 +31,8 @@ export class ValueProperty extends Property {
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
-        const node = getComplexNode(change.object)
-        change.newValue = node.reconcileChild(this.type, node.getChildNode(change.name), change.newValue, change.name)
+        const node = getComplexNode(change.object) // TODO: extract to object property
+        change.newValue = this.type.reconcile(node.getChildNode(change.name), change.newValue)
         return change
     }
 
