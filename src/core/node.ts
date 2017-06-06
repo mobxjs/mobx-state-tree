@@ -258,7 +258,7 @@ export class Node  {
         this.disposers.unshift(disposer)
     }
 
-    reconcileChildren<T>(childType: IType<any, T>, oldNodes: Node[], newValues: T[], newPaths: (string|number)[]): Node[] {
+    reconcileChildren<T>(parent: Node, childType: IType<any, T>, oldNodes: Node[], newValues: T[], newPaths: (string|number)[]): Node[] {
         // TODO: move to array, rewrite to use type.reconcile
         // TODO: pick identifiers based on actual type instead of declared type
         // optimization: overload for a single old / new value to avoid all the array allocations
@@ -293,15 +293,20 @@ export class Node  {
             if (isComplexValue(newValue)) {
                 // A tree node...
                 const childNode = getComplexNode(newValue)
-                // TODO: are these checks really needed?
                 childNode.assertAlive()
-                if (childNode.parent && (childNode.parent !== this || !nodesToBeKilled[childNode.nodeId]))
-                    return fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${this.path}/${subPath}', but it lives already at '${childNode.path}'`)
-
-                // Try to reconcile based on already existing nodes
-                nodesToBeKilled[childNode.nodeId] = undefined
-                childNode.setParent(this, subPath)
-                res[index] = childNode
+                if (childNode.parent === parent) {
+                    // Came from this array already
+                    if (!nodesToBeKilled[childNode.nodeId]) {
+                        // this node is owned by this parent, but not in the reconcilable set, so it must be double
+                        fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${subPath}', but it lives already at '${childNode.path}'`)
+                    }
+                    nodesToBeKilled[childNode.nodeId] = undefined
+                    childNode.setParent(parent, subPath)
+                    res[index] = childNode // reuse node
+                } else {
+                    // Lives somewhere else (note that instantiate might still reconcile for complex types!)
+                    res[index] = childType.instantiate(this, subPath, undefined, newValue)
+                }
             } else if (isMutable(newValue)) {
                 // The snapshot of a tree node, try to reconcile based on id
                 const reconcilationCandidate = findReconcilationCandidates(newValue)
@@ -420,7 +425,7 @@ export interface IComplexValue {
 
 // TODO: rename to isStateTreenode
 export function isComplexValue(value: any): value is IComplexValue {
-    return value && value.$treenode
+    return !!(value && value.$treenode)
 }
 
 export function getComplexNode(value: IComplexValue): Node {

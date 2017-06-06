@@ -319,8 +319,7 @@ test.skip("it should fail when reference snapshot is ambiguous", t => {
 })
 
 
-test.skip("it should support array of references", t => {
-
+test("it should support array of references", t => {
     const Box = types.model({
         id: types.identifier(types.number),
         name: types.string

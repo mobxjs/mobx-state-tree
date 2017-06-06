@@ -61,11 +61,12 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
             case "update":
                 if (change.newValue === change.object[change.index])
                     return null
-                change.newValue = node.reconcileChildren(this.subType, [childNodes[change.index]], [change.newValue], [change.index])[0]
+                change.newValue = node.reconcileChildren(node, this.subType, [childNodes[change.index]], [change.newValue], [change.index])[0]
                 break
             case "splice":
-                const {index, removedCount, added, object} = change
+                const {index, removedCount, added} = change
                 change.added = node.reconcileChildren(
+                    node,
                     this.subType,
                     childNodes.slice(index, index + removedCount),
                     added,

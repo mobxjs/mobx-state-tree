@@ -29,7 +29,7 @@ export interface IType<S, T> {
     SnapshotType: S
 
     // Internal api's
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot?: S): Node
+    instantiate(parent: Node | null, subpath: string, environment: any, initialValue?: any): Node
     reconcile(current: Node, newValue: any): Node
     getValue(node: Node): T
     getSnapshot(node: Node): S
@@ -70,8 +70,15 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         return this.instantiate(null, "", environment, snapshot).getValue()
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any = this.getDefaultSnapshot()): Node {
-        const instance = this.createNewInstance(snapshot)
+    instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any = this.getDefaultSnapshot()): Node {
+        if (isComplexValue(initialValue)) {
+            const targetNode = getComplexNode(initialValue)
+            if (!targetNode.isRoot)
+                fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent ? parent.path : ""}/${subpath}', but it lives already at '${targetNode.path}'`)
+            targetNode.setParent(parent, subpath)
+            return targetNode
+        }
+        const instance = this.createNewInstance(initialValue)
         // tslint:disable-next-line:no_unused-variable
         const node = new Node(this, parent, subpath, environment, instance)
 
@@ -80,7 +87,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         let sawException = true
         try {
             node.pseudoAction(() => {
-                this.finalizeNewInstance(instance, snapshot)
+                this.finalizeNewInstance(instance, initialValue)
             })
             if (this.shouldAttachNode) addReadOnlyProp(instance, "toJSON", toJSON)
             if (parent)
@@ -151,7 +158,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
                 !current.identifierAttribute ||
                 current.identifier === newValue[current.identifierAttribute]
             ) &&
-            this.is(newValue)
+            this.is(newValue) // TODO: check not needed, we already now this is true?
         ) {
             // we can reconcile
             current.applySnapshot(newValue)
@@ -161,6 +168,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         if (isComplexValue(newValue)) {
             // newValue is a Node as well, move it here..
             const newNode = getComplexNode(newValue)
+            // TODO: check this.isAssignableFrom?
             newNode.setParent(current.parent, current.path)
             return newNode
         }
@@ -191,6 +199,8 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
         super(name)
     }
 
+    abstract instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any): Node;
+
     getValue(node: Node) {
         return node.storedValue
     }
@@ -199,7 +209,7 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
         return node.storedValue
     }
 
-    getDefaultSnapshot(){
+    getDefaultSnapshot() {
         return undefined
     }
 
