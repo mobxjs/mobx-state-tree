@@ -1,4 +1,4 @@
-import {types} from "../src"
+import {types, hasParent, tryResolve} from "../src"
 import {test} from "ava"
 
 const createTestFactories = () => {
@@ -22,7 +22,11 @@ const createTestFactories = () => {
 
     const DispatchPlane = types.union(snapshot => snapshot && "height" in snapshot ? Box : Square, Box, Square)
 
-    return {Box, Square, Cube, Plane, DispatchPlane, Heighed}
+    const Block = types.model("Block", {
+        list: types.array(Heighed)
+    })
+
+    return {Box, Square, Cube, Plane, DispatchPlane, Heighed, Block}
 }
 
 test("it should complain about no dispatch method", (t) => {
@@ -32,6 +36,17 @@ test("it should complain about no dispatch method", (t) => {
         Plane.create({width: 2, height: 2})
     }, `[mobx-state-tree] Error while converting \`{"width":2,"height":2}\` to \`Box | Square\`:
 snapshot \`{"width":2,"height":2}\` is not assignable to type: \`Box | Square\` (Multiple types are applicable and no dispatch method is defined for the union), expected an instance of \`Box | Square\` or a snapshot like \`({ width: number; height: number } | { width: number })\` instead.`)
+})
+
+test("it should have parent whenever creating or applying from a complex data structure to a model which has Union typed children", (t) => {
+    const {Block, Heighed} = createTestFactories()
+    const block = Block.create({
+      list: [{width: 2, height: 2}]
+    })
+
+    const child = tryResolve(block, "./list/0")
+
+    hasParent(child) ? t.pass() : t.fail()
 })
 
 test("it should complain about no dispatch method and multiple applicable types", (t) => {

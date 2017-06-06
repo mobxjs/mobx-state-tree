@@ -67,3 +67,4 @@ export abstract class Type<S, T> implements IType<S, T> {
 import { fail } from "../utils"
 import { IMSTNode } from "../core/mst-node"
 import { IContext, IValidationResult } from "./type-checker"
+import { MSTAdministration } from "../core/mst-node-administration"
