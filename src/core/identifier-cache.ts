@@ -1,8 +1,8 @@
-import { isStateTreeNode } from './';
-import { fail } from '../utils'
+import { isStateTreeNode } from "./"
+import { fail } from "../utils"
 import { observable, IObservableArray } from "mobx"
-import { IComplexType, IType } from '../types/type';
-import { Node } from './node'
+import { IType } from "../types/type"
+import { Node } from "./node"
 
 export class IdentifierCache {
     private cache: { [id: string]: IObservableArray<Node> } = {}

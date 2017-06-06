@@ -61,5 +61,3 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): 
     typecheck(type, defaultSnapshot)
     return new OptionalValue(type, defaultValueOrFunction)
 }
-
-

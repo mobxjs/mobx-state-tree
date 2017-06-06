@@ -1,6 +1,6 @@
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras } from "mobx"
 import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, unbox, isStateTreeNode } from "../../core"
-import { addHiddenFinalProp, fail, identity, isMutable, isPlainObject, isPrimitive, nothing } from '../../utils';
+import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 
@@ -63,11 +63,11 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     getChildren(node: Node): Node[] {
-        const res: Node[] = [];
+        const res: Node[] = []
         // Ignore all alarm bells to be able to read this:...
-        (node.storedValue as ObservableMap<any>).keys().forEach(key => {
+        ; (node.storedValue as ObservableMap<any>).keys().forEach(key => {
             const childNode = node.storedValue._data[key].get()
-            if(childNode) res.push(childNode)
+            if (childNode) res.push(childNode)
         })
         return res
     }

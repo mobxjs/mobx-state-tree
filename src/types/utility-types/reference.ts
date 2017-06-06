@@ -1,8 +1,7 @@
-import { computed } from "mobx"
-import { getStateTreeNode, isStateTreeNode, Node } from '../../core';
-import { ISimpleType, TypeFlags, Type, IType, ComplexType } from "../type"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
-import { isPrimitive, fail } from "../../utils"
+import { getStateTreeNode, isStateTreeNode, Node } from "../../core"
+import { TypeFlags, Type, IType } from "../type"
+import { IContext, IValidationResult, typeCheckSuccess } from "../type-checker"
+import { fail } from "../../utils"
 
 // TODO: eleminate IReference stuff
 export interface IReference {

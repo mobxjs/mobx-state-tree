@@ -149,6 +149,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     reconcile(current: Node, newValue: any): Node {
         // TODO: this.is... for all prepareNewVaues?
         if (isStateTreeNode(newValue) && getStateTreeNode(newValue) === current)
+            // the current node is the same as the new one
             return current
         if (
             current.type === this &&
@@ -159,11 +160,14 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
                 current.identifier === newValue[current.identifierAttribute]
             )
         ) {
+            // the newValue has no node, so can be treated like a snapshot
             // we can reconcile
             current.applySnapshot(newValue)
             return current
         }
+        // current node cannot be recycled in any way
         current.die()
+        // attempt to reuse the new one
         if (isStateTreeNode(newValue) && this.isAssignableFrom(getType(newValue))) {
             // newValue is a Node as well, move it here..
             const newNode = getStateTreeNode(newValue)
@@ -249,9 +253,8 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
     }
 }
 
-import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp, isMutable } from "../utils";
+import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp, isMutable } from "../utils"
 import { isStateTreeNode, getStateTreeNode } from "../core/node"
 import { IContext, IValidationResult, typecheck, typeCheckFailure, typeCheckSuccess } from "./type-checker"
 import { Node, IComplexValue, IJsonPatch } from "../core"
 import { getType } from "../core/mst-operations"
-

@@ -1,10 +1,8 @@
 import { getStateTreeNode } from "../../core"
-import { extendObservable, observable, IObjectWillChange } from "mobx"
-import { Property } from "./property"
 import { ValueProperty } from "./value-property"
 import { isValidIdentifier, fail } from "../../utils"
 import { IType } from "../type"
-import { typecheck, IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, getContextForPath } from "../type-checker"
+import { typecheck } from "../type-checker"
 
 export class IdentifierProperty extends ValueProperty {
     subtype: IType<any, any>

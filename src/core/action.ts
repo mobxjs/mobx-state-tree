@@ -127,7 +127,7 @@ export function applyAction(target: IComplexValue, action: ISerializedActionCall
     if (!resolvedTarget)
         return fail(`Invalid action path: ${action.path || ""}`)
     const node = getStateTreeNode(resolvedTarget)
-    if(!(typeof resolvedTarget[action.name] === "function")) fail(`Action '${action.name}' does not exist in '${node.path}'`)
+    if (!(typeof resolvedTarget[action.name] === "function")) fail(`Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
         action.args ? action.args.map(v => deserializeArgument(node, v)) : []

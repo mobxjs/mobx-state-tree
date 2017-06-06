@@ -234,7 +234,6 @@ test("122 - identifiers should support numbers as well", t => {
 })
 
 test.skip("self reference with a late type", t => {
-    const values: string[] = []
     interface IBook {
         id: string,
         genre: string,
@@ -320,7 +319,6 @@ test.skip("it should fail when reference snapshot is ambiguous", t => {
         store.selected = store.boxes[1] // throws because it can't know if you mean a box or an arrow!
     })
 })
-
 
 test("it should support array of references", t => {
     const Box = types.model({

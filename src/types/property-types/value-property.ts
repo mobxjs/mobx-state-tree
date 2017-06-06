@@ -4,7 +4,7 @@ import { getStateTreeNode, escapeJsonPath, Node, unbox } from "../../core"
 import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath, typecheck } from "../type-checker"
 import { fail } from "../../utils"
-import { literal } from '../utility-types/literal';
+import { literal } from "../utility-types/literal"
 
 const undefinedType = literal(undefined)
 

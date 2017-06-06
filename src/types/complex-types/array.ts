@@ -5,7 +5,7 @@ import {
     Node,
     unbox
 } from "../../core"
-import { addHiddenFinalProp, identity, nothing, fail } from "../../utils"
+import { addHiddenFinalProp, fail } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 
@@ -41,6 +41,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getChildren(node: Node): Node[] {
+        // tslint:disable-next-line:no-unused-expression
         node.storedValue.length // observe
         return node.storedValue.$mobx.values // Shooting ourselves in the foot. JS, why do you so temptingly allow this?! // Shooting ourselves in the foot. JS, why do you so temptingly allow this?!
     }

@@ -332,7 +332,6 @@ export class Node  {
         return res
     }
 
-
     isRunningAction(): boolean {
         if (this._isRunningAction)
             return true
@@ -438,13 +437,12 @@ export function unbox(b: Node): any {
     return b.getValue()
 }
 
-import { IType, ComplexType } from "../types/type"
+import { IType } from "../types/type"
 import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch } from "./json-patch"
 import { typecheck } from "../types/type-checker"
 import { walk } from "./mst-operations"
 import { IMiddleWareHandler } from "./action"
 import {
-    addHiddenFinalProp,
     addReadOnlyProp,
     extend,
     fail,

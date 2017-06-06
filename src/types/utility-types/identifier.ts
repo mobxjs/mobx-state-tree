@@ -1,6 +1,6 @@
-import { ISimpleType, TypeFlags, Type, IType } from "../type"
+import { TypeFlags, Type, IType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
-import { isPrimitive, fail } from "../../utils"
+import { fail } from "../../utils"
 import { Node, isStateTreeNode } from "../../core"
 import { string as stringType, number as numberType } from "../primitives"
 import { Late } from "./late"

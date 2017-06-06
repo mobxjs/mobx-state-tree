@@ -7,22 +7,18 @@ import {
     observe
 } from "mobx"
 import {
-    nothing,
     extend as extendObject,
-    fail, identity,
+    fail,
     isPrimitive,
     hasOwnProperty,
     isPlainObject
 } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { getType, IComplexValue, getStateTreeNode, IJsonPatch, Node } from "../../core"
-import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
+import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
-import { isIdentifierType, IdentifierType } from "../utility-types/identifier"
+import { isIdentifierType } from "../utility-types/identifier"
 import { optional } from "../utility-types/optional"
-// import { isReferenceFactory } from "../utility-types/reference"
-// import { isIdentifierFactory, IIdentifierDescriptor } from "../utility-types/identifier"
-import { Late } from "../utility-types/late"
 import { Property } from "../property-types/property"
 import { IdentifierProperty } from "../property-types/identifier-property"
 import { ComputedProperty } from "../property-types/computed-property"
