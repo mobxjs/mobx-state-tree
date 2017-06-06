@@ -138,7 +138,7 @@ store.removeTodo(0)
 ```
 
 
-Despite all that, you will see that the [API](api.md) is pretty straight forward!
+Despite all that, you will see that the [API](API.md) is pretty straight forward!
 
 ---
 
