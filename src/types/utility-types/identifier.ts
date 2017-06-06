@@ -1,9 +1,16 @@
 import { ISimpleType, TypeFlags, Type, IType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
-import { Node } from "../../core"
+import { Node, isComplexValue } from "../../core"
 import { string as stringType, number as numberType } from "../primitives"
 import { Late } from "./late"
+
+class Identifier {
+    constructor(public identifier: string|number) {}
+    toString() {
+        return `identifier(${this.identifier})`
+    }
+}
 
 export class IdentifierType<T> extends Type<T, T> {
     readonly flags = TypeFlags.Identifier
@@ -16,10 +23,15 @@ export class IdentifierType<T> extends Type<T, T> {
 
     instantiate(parent: Node, subpath: string, environment: any, snapshot: T): Node {
         typecheck(this.identifierType, snapshot)
-        // TODO: assert parent.type is a model type!
-        // TODO: return IdentifierNode
-        // TODO: check uniques in parent
+        if (!isComplexValue(parent.storedValue))
+            fail(`Identifier types can only be instantiated as direct child of a model type`)
         return new Node(this, parent, subpath, environment, snapshot)
+    }
+
+    reconcile(current: Node, newValue) {
+        if (current.storedValue !== newValue)
+            return fail(`Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`)
+        return current
     }
 
     describe() {
@@ -27,14 +39,13 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        return typeCheckSuccess()
-        // TODO:
+        if (this.identifierType.is(value)) {
+            return typeCheckSuccess()
+        }
+        return typeCheckFailure(context, value)
     }
 }
 
-// TODO: properly turn this into a factory, that reuses `types.string`?
-// See: https://github.com/mobxjs/mobx-state-tree/pull/65#issuecomment-289603441
-// todo: change to const `types.identifier`!
 export function identifier<T>(baseType: IType<T, T>): T;
 export function identifier(): string;
 export function identifier(baseType: IType<any, any> = stringType): any {

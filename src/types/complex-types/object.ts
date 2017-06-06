@@ -111,11 +111,9 @@ export class ObjectType extends ComplexType<any, any> {
             } else if (isIdentifierType(value)) {
                 if (alreadySeenIdentifierAttribute !== null) fail(`Cannot define property '${key}' as object identifier, property '${alreadySeenIdentifierAttribute}' is already defined as identifier property`)
                 alreadySeenIdentifierAttribute = key
-                this.props[key] = new IdentifierProperty(key, (value as IdentifierType<any>).identifierType)
+                this.props[key] = new IdentifierProperty(key, value)
             } else if (isType(value)) {
                 this.props[key] = new ValueProperty(key, value)
-            // } else if (isReferenceFactory(value)) {
-            //     this.props[key] = new ReferenceProperty(key, value.targetType, value.basePath)
             } else if (typeof value === "function") {
                 this.props[key] = new ViewProperty(key, value)
             } else if (typeof value === "object") {

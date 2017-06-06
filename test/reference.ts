@@ -34,7 +34,7 @@ test("it should support prefixed paths in maps", t => {
     t.deepEqual(getSnapshot(store), {user: "18", "users": {"17": {id: "17", name: "Michel"}, "18": {id: "18", name: "Noa"}}} as any) // TODO: better typings
 })
 
-test.skip("it should support prefixed paths in arrays", t => {
+test("it should support prefixed paths in arrays", t => {
     const User = types.model({
         id: types.identifier(),
         name: types.string
@@ -66,7 +66,7 @@ test.skip("it should support prefixed paths in arrays", t => {
     t.deepEqual(getSnapshot(store), {user: "18", "users": [{id: "17", name: "Michel"}, {id: "18", name: "Noa"}]} as any) // TODO: better typings
 })
 
-test.skip("identifiers are required", (t) => {
+test("identifiers are required", (t) => {
     const Todo = types.model({
         id: types.identifier()
     })
@@ -74,11 +74,13 @@ test.skip("identifiers are required", (t) => {
     t.is(Todo.is({}), false)
     t.is(Todo.is({ id: "x" }), true)
 
-    t.throws(() => Todo.create(), `[mobx-state-tree] Error while converting \`{}\` to \`AnonymousModel\`:
-at path "/id" value \`undefined\` is not assignable to type: \`string\` (The provided identifier is not valid).`)
+    t.throws(() => Todo.create(),
+        "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
+        "at path \"/id\" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier([object Object])` instead."
+    )
 })
 
-test.skip("identifiers cannot be modified", (t) => {
+test("identifiers cannot be modified", (t) => {
     const Todo = types.model({
         id: types.identifier()
     })
@@ -86,9 +88,10 @@ test.skip("identifiers cannot be modified", (t) => {
     const todo = Todo.create({ id: "x" })
     unprotect(todo)
 
-    t.throws(() => todo.id = "stuff", "[mobx-state-tree] It is not allowed to change the identifier of an object, got: 'stuff' but expected: 'x'")
-    t.throws(() => applySnapshot(todo, {}), `[mobx-state-tree] Error while converting \`{}\` to \`AnonymousModel\`:
-at path "/id" value \`undefined\` is not assignable to type: \`string\` (The provided identifier is not valid).`)
+    t.throws(() => todo.id = "stuff", "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed.")
+    t.throws(() => applySnapshot(todo, {}),
+        "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
+        "at path \"/id\" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier([object Object])` instead.")
 })
 
 test.skip("it should resolve refs during creation, when using path", t => {
@@ -130,7 +133,7 @@ test.skip("it should resolve refs during creation, when using path", t => {
     t.deepEqual(values, [4, 8])
 })
 
-test.skip("it should resolve refs over late types", t => {
+test("it should resolve refs over late types", t => {
     const Book = types.model({
         id: types.identifier(),
         price: types.number
@@ -195,7 +198,7 @@ test.skip("it should resolve refs during creation, when using generic reference"
     t.deepEqual(values, [4])
 })
 
-test.skip("identifiers should only support types.string and types.number", t => {
+test("identifiers should only support types.string and types.number", t => {
     t.throws(
         () => types.model({
             id: types.identifier(types.model({}))
@@ -204,7 +207,7 @@ test.skip("identifiers should only support types.string and types.number", t => 
     )
 })
 
-test.skip("string identifiers should not accept numbers", t => {
+test("string identifiers should not accept numbers", t => {
     const F = types.model({
         id: types.identifier()
     })
@@ -218,7 +221,7 @@ test.skip("string identifiers should not accept numbers", t => {
     t.is(F2.is({ id: 4 }), false)
 })
 
-test.skip("122 - identifiers should support numbers as well", t => {
+test("122 - identifiers should support numbers as well", t => {
     const F = types.model({
         id: types.identifier(types.number)
     })
@@ -268,7 +271,7 @@ test.skip("self reference with a late type", t => {
     t.is((s as any).books[1].reference.genre, "thriller")
 })
 
-test.skip("when applying a snapshot, reference should resolve correctly if value added after", t => {
+test("when applying a snapshot, reference should resolve correctly if value added after", t => {
 
     const Box = types.model({
         id: types.identifier(types.number),
