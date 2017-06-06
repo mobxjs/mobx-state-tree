@@ -39,6 +39,10 @@ export class Late<S, T> extends Type<S, T> {
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         return this.subType.validate(value, context)
     }
+
+    isAssignableFrom(type: IType<any, any>) {
+        return this.subType.isAssignableFrom(type)
+    }
 }
 
 export type ILateType<S, T> = () => IType<S, T>

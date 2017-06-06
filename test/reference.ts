@@ -233,7 +233,7 @@ test("122 - identifiers should support numbers as well", t => {
     t.is(F.is({ id: "4" }), false)
 })
 
-test.skip("self reference with a late type", t => {
+test("self reference with a late type", t => {
     interface IBook {
         id: string,
         genre: string,
@@ -350,7 +350,7 @@ test("it should support array of references", t => {
     t.deepEqual<any>(getSnapshot(store.selected), [1, 2])
 })
 
-test.skip("it should restore array of references from snapshot", t => {
+test("it should restore array of references from snapshot", t => {
 
     const Box = types.model({
         id: types.identifier(types.number),
