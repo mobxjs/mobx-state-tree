@@ -29,6 +29,25 @@ export function extend(a: any, ...b: any[]) {
     return a
 }
 
+export function extendKeepGetter<A, B>(a: A, b: B): A & B
+export function extendKeepGetter<A, B, C>(a: A, b: B, c: C): A & B & C
+export function extendKeepGetter<A, B, C, D>(a: A, b: B, c: C, d: D): A & B & C & D
+export function extendKeepGetter(a: any, ...b: any[]): any
+export function extendKeepGetter(a: any, ...b: any[]) {
+    for (let i = 0; i < b.length; i++) {
+        const current = b[i]
+        for (let key in current) {
+            const descriptor = Object.getOwnPropertyDescriptor(current, key)
+            if ("get" in descriptor) {
+                Object.defineProperty(a, key, descriptor)
+                continue
+            }
+            a[key] = current[key]
+        }
+    }
+    return a
+}
+
 export function isPlainObject(value: any) {
     if (value === null || typeof value !== "object")
         return false
