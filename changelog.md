@@ -1,3 +1,10 @@
+# 0.6.3
+
+Fixed issue with array/maps of union types @abruzzihraig
+Make types.extend support computed attributes @cpunion
+Fixed issue with map of primitive types and applySnapshot @pioh
+Better type declarations for union, up to 10 supported types
+
 # 0.6.2
 
 Fixed issue where arrays where not properly serialized as action argument
