@@ -157,21 +157,20 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
             (
                 !current.identifierAttribute ||
                 current.identifier === newValue[current.identifierAttribute]
-            ) &&
-            this.is(newValue) // TODO: check not needed, we already now this is true?
+            )
         ) {
             // we can reconcile
             current.applySnapshot(newValue)
             return current
         }
         current.die()
-        if (isStateTreeNode(newValue)) {
+        if (isStateTreeNode(newValue) && this.isAssignableFrom(getType(newValue))) {
             // newValue is a Node as well, move it here..
             const newNode = getStateTreeNode(newValue)
-            // TODO: check this.isAssignableFrom?
             newNode.setParent(current.parent, current.path)
             return newNode
         }
+        // nothing to do, we have to create a new node
         return this.instantiate(current.parent, current.path, current._environment, newValue)
     }
 
