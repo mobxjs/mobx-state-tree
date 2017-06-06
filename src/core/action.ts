@@ -49,7 +49,7 @@ export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
 
     const actionInvoker = function (this: IComplexValue) {
-        const adm = getComplexNode(this)
+        const adm = getStateTreeNode(this)
         adm.assertAlive()
         if (adm.isRunningAction()) {
             // an action is already running in this tree, invoking this action does not emit a new action
@@ -80,11 +80,11 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
     if (isPrimitive(arg))
         return arg
     if (isStateTreeNode(arg)) {
-        const targetNode = getComplexNode(arg)
+        const targetNode = getStateTreeNode(arg)
         if (node.root !== targetNode.root)
             throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
         return ({
-            $ref: node.getRelativePathTo(getComplexNode(arg))
+            $ref: node.getRelativePathTo(getStateTreeNode(arg))
         })
     }
     if (typeof arg === "function")
@@ -126,7 +126,7 @@ export function applyAction(target: IComplexValue, action: ISerializedActionCall
     const resolvedTarget = tryResolve(target, action.path || "")
     if (!resolvedTarget)
         return fail(`Invalid action path: ${action.path || ""}`)
-    const node = getComplexNode(resolvedTarget)
+    const node = getStateTreeNode(resolvedTarget)
     if(!(typeof resolvedTarget[action.name] === "function")) fail(`Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
@@ -136,16 +136,16 @@ export function applyAction(target: IComplexValue, action: ISerializedActionCall
 
 export function onAction(target: IComplexValue, listener: (call: ISerializedActionCall) => void): IDisposer {
     return addMiddleware(target, (rawCall, next) => {
-        const sourceNode = getComplexNode(rawCall.object)
+        const sourceNode = getStateTreeNode(rawCall.object)
         listener({
             name: rawCall.name,
-            path: getComplexNode(target).getRelativePathTo(sourceNode),
+            path: getStateTreeNode(target).getRelativePathTo(sourceNode),
             args: rawCall.args.map((arg: any, index: number) => serializeArgument(sourceNode, rawCall.name, index, arg))
         })
         return next(rawCall)
     })
 }
 
-import { Node, getComplexNode,  IComplexValue, isStateTreeNode } from "./node"
+import { Node, getStateTreeNode,  IComplexValue, isStateTreeNode } from "./node"
 import { resolve, tryResolve, addMiddleware  } from "./mst-operations"
 import { fail, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"

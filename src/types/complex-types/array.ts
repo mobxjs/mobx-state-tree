@@ -1,6 +1,6 @@
 import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe, extras } from "mobx"
 import {
-    getComplexNode,
+    getStateTreeNode,
     IJsonPatch,
     Node,
     unbox
@@ -10,7 +10,7 @@ import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 
 export function arrayToString(this: IObservableArray<any>) {
-    return `${getComplexNode(this)}(${this.length} items)`
+    return `${getStateTreeNode(this)}(${this.length} items)`
 }
 
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
@@ -37,7 +37,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     finalizeNewInstance(instance: IObservableArray<any>, snapshot: any) {
         intercept(instance, change => this.willChange(change) as any)
         observe(instance, this.didChange)
-        getComplexNode(instance).applySnapshot(snapshot)
+        getStateTreeNode(instance).applySnapshot(snapshot)
     }
 
     getChildren(node: Node): Node[] {
@@ -53,7 +53,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
-        const node = getComplexNode(change.object)
+        const node = getStateTreeNode(change.object)
         node.assertWritable()
         const childNodes = this.getChildren(node)
 
@@ -91,7 +91,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
-        const node = getComplexNode(change.object)
+        const node = getStateTreeNode(change.object)
         switch (change.type) {
             case "update":
                 return void node.emitPatch({

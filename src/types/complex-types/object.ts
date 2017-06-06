@@ -15,7 +15,7 @@ import {
     isPlainObject
 } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
-import { getType, IComplexValue, getComplexNode, IJsonPatch, Node } from "../../core"
+import { getType, IComplexValue, getStateTreeNode, IJsonPatch, Node } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
 import { isIdentifierType, IdentifierType } from "../utility-types/identifier"
@@ -31,7 +31,7 @@ import { ActionProperty } from "../property-types/action-property"
 import { ViewProperty } from "../property-types/view-property"
 
 function objectTypeToString(this: any) {
-    return getComplexNode(this).toString()
+    return getStateTreeNode(this).toString()
 }
 
 export class ObjectType extends ComplexType<any, any> {
@@ -79,7 +79,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
-        const node = getComplexNode(change.object)
+        const node = getStateTreeNode(change.object)
         node.assertWritable()
 
         // TODO: assigning a new snapshot / MST to a property should result in a nice patch in itself

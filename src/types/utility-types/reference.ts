@@ -1,5 +1,5 @@
 import { computed } from "mobx"
-import { getComplexNode, isStateTreeNode, Node } from '../../core';
+import { getStateTreeNode, isStateTreeNode, Node } from '../../core';
 import { ISimpleType, TypeFlags, Type, IType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
@@ -51,7 +51,7 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
             case "identifier":
                 return ref.value
             case "object":
-                return getComplexNode(ref.value).identifier
+                return getStateTreeNode(ref.value).identifier
         }
     }
 

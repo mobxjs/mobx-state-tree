@@ -143,9 +143,9 @@ export class Node  {
             return
 
         if (isStateTreeNode(this.storedValue)) {
-            walk(this.storedValue, child => getComplexNode(child).aboutToDie())
+            walk(this.storedValue, child => getStateTreeNode(child).aboutToDie())
             this.root.identifierCache.unregister(this)
-            walk(this.storedValue, child => getComplexNode(child).finalizeDeath())
+            walk(this.storedValue, child => getStateTreeNode(child).finalizeDeath())
         }
     }
 
@@ -292,7 +292,7 @@ export class Node  {
             const subPath = "" + newPaths[index]
             if (isStateTreeNode(newValue)) {
                 // A tree node...
-                const childNode = getComplexNode(newValue)
+                const childNode = getStateTreeNode(newValue)
                 childNode.assertAlive()
                 if (childNode.parent === parent) {
                     // Came from this array already
@@ -427,7 +427,7 @@ export function isStateTreeNode(value: any): value is IComplexValue {
     return !!(value && value.$treenode)
 }
 
-export function getComplexNode(value: IComplexValue): Node {
+export function getStateTreeNode(value: IComplexValue): Node {
     if (isStateTreeNode(value))
         return value.$treenode!
     else

@@ -1,4 +1,4 @@
-import { getComplexNode } from "../../core"
+import { getStateTreeNode } from "../../core"
 import { extendObservable, observable, IObjectWillChange } from "mobx"
 import { Property } from "./property"
 import { ValueProperty } from "./value-property"
@@ -18,7 +18,7 @@ export class IdentifierProperty extends ValueProperty {
         // TODO: don't inherit anymore, don't bother creating an observable for identifiers
         // TODO: valuecheck
         super.initialize(targetInstance, snapshot)
-        const node = getComplexNode(targetInstance) // TODO: rename getComplexNode => Node
+        const node = getStateTreeNode(targetInstance) // TODO: rename getStateTreeNode => Node
         const identifier = snapshot[this.name]
         if (!isValidIdentifier(identifier))
             fail(`Not a valid identifier: '${identifier}`)
@@ -37,7 +37,7 @@ export class IdentifierProperty extends ValueProperty {
     //     if (typeof identifier !== "number" && !isValidIdentifier(identifier))
     //         fail(`Not a valid identifier: '${identifier}`)
     //     typecheck(this.subtype, identifier)
-    //     const node = getComplexNode(change.object)
+    //     const node = getStateTreeNode(change.object)
     //     node.assertWritable()
     //     const oldValue = change.object[this.name]
     //     if (oldValue !== undefined && oldValue !== identifier)

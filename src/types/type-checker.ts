@@ -27,9 +27,9 @@ function toErrorString(error: IValidationError): string {
     const pathPrefix = fullPath.length > 0 ? `at path "/${fullPath}" ` : ``
 
     const currentTypename = isStateTreeNode(value)
-        ? `value of type ${getComplexNode(value).type.name}:`
+        ? `value of type ${getStateTreeNode(value).type.name}:`
         : isPrimitive(value) ? "value" : "snapshot"
-    const isSnapshotCompatible = type && isStateTreeNode(value) && type.is(getComplexNode(value).snapshot)
+    const isSnapshotCompatible = type && isStateTreeNode(value) && type.is(getStateTreeNode(value).snapshot)
 
     return `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${type ? `to type: \`${type.name}\`` : ``}` +
             (error.message ? ` (${error.message})` : "") +
@@ -76,6 +76,6 @@ export function typecheck(type: IType<any, any>, value: any): void {
 
 import { IType } from "./type"
 import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
-import { getComplexNode, isStateTreeNode } from "../core"
+import { getStateTreeNode, isStateTreeNode } from "../core"
 import { isPrimitiveType } from "./primitives"
 import { OptionalValue } from "./utility-types/optional"

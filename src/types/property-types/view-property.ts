@@ -1,6 +1,6 @@
 import { extras } from "mobx"
 import { addHiddenFinalProp, createNamedFunction } from "../../utils"
-import { IComplexValue, getComplexNode } from "../../core"
+import { IComplexValue, getStateTreeNode } from "../../core"
 import { Property } from "./property"
 import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getContextForPath } from "../type-checker"
 
@@ -28,7 +28,7 @@ export class ViewProperty extends Property {
 export function createViewInvoker(name: string, fn: Function) {
     const viewInvoker = function (this: IComplexValue) {
         const args = arguments
-        const adm = getComplexNode(this)
+        const adm = getStateTreeNode(this)
         adm.assertAlive()
         return extras.allowStateChanges(false, () => fn.apply(this, args))
     }

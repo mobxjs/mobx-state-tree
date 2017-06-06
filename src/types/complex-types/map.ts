@@ -1,5 +1,5 @@
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras } from "mobx"
-import { getComplexNode, escapeJsonPath, IJsonPatch, Node, unbox, isStateTreeNode } from "../../core"
+import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, unbox, isStateTreeNode } from "../../core"
 import { addHiddenFinalProp, fail, identity, isMutable, isPlainObject, isPrimitive, nothing } from '../../utils';
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -13,17 +13,17 @@ export interface IExtendedObservableMap<T> extends ObservableMap<T> {
 }
 
 export function mapToString(this: ObservableMap<any>) {
-    return `${getComplexNode(this)}(${this.size} items)`
+    return `${getStateTreeNode(this)}(${this.size} items)`
 }
 
 function put(this: ObservableMap<any>, value: any) {
     if (!(!!value)) fail(`Map.put cannot be used to set empty values`)
     let node: Node
     if (isStateTreeNode(value)) {
-        node = getComplexNode(value)
+        node = getStateTreeNode(value)
     } else if (isMutable(value)) {
-        const targetType = (getComplexNode(this).type as MapType<any, any>).subType
-        node = getComplexNode(targetType.create(value))
+        const targetType = (getStateTreeNode(this).type as MapType<any, any>).subType
+        node = getStateTreeNode(targetType.create(value))
     } else {
         return fail(`Map.put can only be used to store complex values`)
     }
@@ -59,7 +59,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
         intercept(instance, c => this.willChange(c))
         observe(instance, this.didChange)
-        getComplexNode(instance).applySnapshot(snapshot)
+        getStateTreeNode(instance).applySnapshot(snapshot)
     }
 
     getChildren(node: Node): Node[] {
@@ -80,7 +80,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
-        const node = getComplexNode(change.object)
+        const node = getStateTreeNode(change.object)
         node.assertWritable()
 
         switch (change.type) {
@@ -128,7 +128,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     didChange(change: IMapChange<any>): void {
-        const node = getComplexNode(change.object)
+        const node = getStateTreeNode(change.object)
         switch (change.type) {
             case "update":
             case "add":

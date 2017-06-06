@@ -51,7 +51,7 @@ export function isType(value: any): value is IType<any, any> {
 }
 
 function toJSON(this: IMSTNode) {
-    return getComplexNode(this).snapshot
+    return getStateTreeNode(this).snapshot
 }
 
 /**
@@ -72,7 +72,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any = this.getDefaultSnapshot()): Node {
         if (isStateTreeNode(initialValue)) {
-            const targetNode = getComplexNode(initialValue)
+            const targetNode = getStateTreeNode(initialValue)
             if (!targetNode.isRoot)
                 fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent ? parent.path : ""}/${subpath}', but it lives already at '${targetNode.path}'`)
             targetNode.setParent(parent, subpath)
@@ -148,7 +148,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     reconcile(current: Node, newValue: any): Node {
         // TODO: this.is... for all prepareNewVaues?
-        if (isStateTreeNode(newValue) && getComplexNode(newValue) === current)
+        if (isStateTreeNode(newValue) && getStateTreeNode(newValue) === current)
             return current
         if (
             current.type === this &&
@@ -167,7 +167,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         current.die()
         if (isStateTreeNode(newValue)) {
             // newValue is a Node as well, move it here..
-            const newNode = getComplexNode(newValue)
+            const newNode = getStateTreeNode(newValue)
             // TODO: check this.isAssignableFrom?
             newNode.setParent(current.parent, current.path)
             return newNode
@@ -251,7 +251,7 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
 }
 
 import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp, isMutable } from "../utils";
-import { isStateTreeNode, getComplexNode } from "../core/node"
+import { isStateTreeNode, getStateTreeNode } from "../core/node"
 import { IContext, IValidationResult, typecheck, typeCheckFailure, typeCheckSuccess } from "./type-checker"
 import { Node, IComplexValue, IJsonPatch } from "../core"
 import { getType } from "../core/mst-operations"

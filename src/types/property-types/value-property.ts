@@ -1,6 +1,6 @@
 import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
-import { getComplexNode, escapeJsonPath, Node, unbox } from "../../core"
+import { getStateTreeNode, escapeJsonPath, Node, unbox } from "../../core"
 import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath, typecheck } from "../type-checker"
 import { fail } from "../../utils"
@@ -18,7 +18,7 @@ export class ValueProperty extends Property {
     }
 
     initialize(targetInstance: any, snapshot: any) {
-        const adm = getComplexNode(targetInstance)
+        const adm = getStateTreeNode(targetInstance)
         targetInstance[this.name] = this.type.instantiate(adm, this.name, adm._environment, snapshot[this.name])
         extras.getAdministration(targetInstance, this.name).dehancer = unbox
     }
@@ -31,14 +31,14 @@ export class ValueProperty extends Property {
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
-        const node = getComplexNode(change.object) // TODO: pass node in from object property
+        const node = getStateTreeNode(change.object) // TODO: pass node in from object property
         typecheck(this.type, change.newValue)
         change.newValue = this.type.reconcile(node.getChildNode(change.name), change.newValue)
         return change
     }
 
     didChange(change: IObjectChange) {
-        const node = getComplexNode(change.object)
+        const node = getStateTreeNode(change.object)
         node.emitPatch({
             op: "replace",
             path: escapeJsonPath(this.name),
