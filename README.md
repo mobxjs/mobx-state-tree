@@ -1,7 +1,7 @@
 <p align="center">
 	   <img src="docs/logo.png" height="100">
     <h3 align="center">mobx-state-tree</h3>
-    <p align="center">_Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX_<p>
+    <p align="center"><i>Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX</i><p>
 </p>
 
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
@@ -394,6 +394,7 @@ console.log(storeInstance.selectedTodo.title)
 -   Identifiers are used to reconcile items inside arrays and maps wherever possible when applying snapshots
 -   The `map.put()` method can be used to simplify adding objects to maps that have identifiers
 
+TODO: when (not) to use identifiers
 
 #### References
 
@@ -633,6 +634,10 @@ Or, fancier:
 ```javascript
 const Temperature = types.union(...["Hot", "Cold"].map(types.literal))
 ```
+
+### Storing non-serializable data with models
+
+TODO
 
 # FAQ
 

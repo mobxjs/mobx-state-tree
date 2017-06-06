@@ -11,6 +11,10 @@ export class Literal<T> extends Type<T, T> {
         this.value = value
     }
 
+    instantiate(parent: Node, subpath: string, environment: any, snapshot: T): Node {
+        return new Node(this, parent, subpath, environment, snapshot)
+    }
+
     describe() {
         return JSON.stringify(this.value)
     }

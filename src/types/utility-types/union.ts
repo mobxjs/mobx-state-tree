@@ -42,9 +42,6 @@ export class Union extends Type<any, any> {
     }
 
     determineType(value: any): IType<any, any> {
-        if (isComplexValue(value))
-            return getComplexNode(value).type
-
         // try the dispatcher, if defined
         if (this.dispatcher !== null) {
             return this.dispatcher(value)
