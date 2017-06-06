@@ -15,7 +15,7 @@ export * from "./core/mst-operations"
 export * from "./core/json-patch"
 
 export {
-    isComplexValue,
+    isStateTreeNode,
     getType,
     getChildType,
     onAction,

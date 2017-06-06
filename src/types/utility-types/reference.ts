@@ -1,5 +1,5 @@
 import { computed } from "mobx"
-import { getComplexNode, isComplexValue, Node } from '../../core';
+import { getComplexNode, isStateTreeNode, Node } from '../../core';
 import { ISimpleType, TypeFlags, Type, IType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
@@ -56,7 +56,7 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
-        const isComplex = isComplexValue(snapshot)
+        const isComplex = isStateTreeNode(snapshot)
         return new Node(this, parent, subpath, environment, new StoredReference(
             isComplex ? "object" : "identifier",
             snapshot
@@ -64,7 +64,7 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
     }
 
     reconcile(current: Node, newValue: any): Node {
-        const targetMode = isComplexValue(newValue) ? "object" : "identifier"
+        const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
         const ref = current.storedValue as StoredReference
         if (targetMode === ref.mode && ref.value === newValue)
             return current

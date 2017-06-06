@@ -1,6 +1,6 @@
 import { IType, TypeFlags, Type } from "../type"
 import { fail } from "../../utils"
-import { isComplexValue, getComplexNode, Node } from "../../core"
+import { isStateTreeNode, getComplexNode, Node } from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export class Refinement extends Type<any, any> {
@@ -34,7 +34,7 @@ export class Refinement extends Type<any, any> {
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (this.type.is(value)) {
-            const snapshot = isComplexValue(value) ? getComplexNode(value).snapshot : value
+            const snapshot = isStateTreeNode(value) ? getComplexNode(value).snapshot : value
 
             if (this.predicate(snapshot)) {
                 return typeCheckSuccess()
@@ -49,7 +49,7 @@ export function refinement<S, T extends S, U extends S>(name: string, type: ITyp
 export function refinement(name: string, type: IType<any, any>, predicate: (snapshot: any) => boolean): IType<any, any> {
     // check if the subtype default value passes the predicate
     const inst = type.create()
-    if (!predicate(isComplexValue(inst) ? getComplexNode(inst).snapshot : inst)) fail(`Default value for refinement type ` + name + ` does not pass the predicate.`)
+    if (!predicate(isStateTreeNode(inst) ? getComplexNode(inst).snapshot : inst)) fail(`Default value for refinement type ` + name + ` does not pass the predicate.`)
 
     return new Refinement(name, type, predicate)
 }

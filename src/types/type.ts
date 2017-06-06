@@ -71,7 +71,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any = this.getDefaultSnapshot()): Node {
-        if (isComplexValue(initialValue)) {
+        if (isStateTreeNode(initialValue)) {
             const targetNode = getComplexNode(initialValue)
             if (!targetNode.isRoot)
                 fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent ? parent.path : ""}/${subpath}', but it lives already at '${targetNode.path}'`)
@@ -129,7 +129,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     validate(value: any, context: IContext): IValidationResult {
-        if (isMST(value)) {
+        if (isStateTreeNode(value)) {
             return getType(value) === this || this.isAssignableFrom(getType(value)) ? typeCheckSuccess() : typeCheckFailure(context, value)
             // it is tempting to compare snapshots, but in that case we should always clone on assignments...
         }
@@ -148,12 +148,12 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     reconcile(current: Node, newValue: any): Node {
         // TODO: this.is... for all prepareNewVaues?
-        if (isComplexValue(newValue) && getComplexNode(newValue) === current)
+        if (isStateTreeNode(newValue) && getComplexNode(newValue) === current)
             return current
         if (
             current.type === this &&
             isMutable(newValue) &&
-            !isComplexValue(newValue) &&
+            !isStateTreeNode(newValue) &&
             (
                 !current.identifierAttribute ||
                 current.identifier === newValue[current.identifierAttribute]
@@ -165,7 +165,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
             return current
         }
         current.die()
-        if (isComplexValue(newValue)) {
+        if (isStateTreeNode(newValue)) {
             // newValue is a Node as well, move it here..
             const newNode = getComplexNode(newValue)
             // TODO: check this.isAssignableFrom?
@@ -185,11 +185,6 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
 export interface IMSTNode {
     readonly $treenode?: Node
-}
-
-// TODO: duplicate with isComplexValue
-export function isMST(value: any): value is IMSTNode {
-    return value && value.$treenode
 }
 
 export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T> {
@@ -256,7 +251,7 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
 }
 
 import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp, isMutable } from "../utils";
-import { isComplexValue, getComplexNode } from "../core/node"
+import { isStateTreeNode, getComplexNode } from "../core/node"
 import { IContext, IValidationResult, typecheck, typeCheckFailure, typeCheckSuccess } from "./type-checker"
 import { Node, IComplexValue, IJsonPatch } from "../core"
 import { getType } from "../core/mst-operations"

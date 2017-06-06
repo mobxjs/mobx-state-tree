@@ -1,7 +1,7 @@
 import { ISimpleType, TypeFlags, Type, IType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
 import { isPrimitive, fail } from "../../utils"
-import { Node, isComplexValue } from "../../core"
+import { Node, isStateTreeNode } from "../../core"
 import { string as stringType, number as numberType } from "../primitives"
 import { Late } from "./late"
 
@@ -23,7 +23,7 @@ export class IdentifierType<T> extends Type<T, T> {
 
     instantiate(parent: Node, subpath: string, environment: any, snapshot: T): Node {
         typecheck(this.identifierType, snapshot)
-        if (!isComplexValue(parent.storedValue))
+        if (!isStateTreeNode(parent.storedValue))
             fail(`Identifier types can only be instantiated as direct child of a model type`)
         return new Node(this, parent, subpath, environment, snapshot)
     }

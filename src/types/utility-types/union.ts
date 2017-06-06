@@ -1,7 +1,7 @@
 import {isType, IType, TypeFlags, Type} from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors, typecheck } from "../type-checker"
 import {fail} from "../../utils"
-import { getComplexNode, getType, isComplexValue, Node } from '../../core';
+import { getComplexNode, getType, isStateTreeNode, Node } from '../../core';
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 

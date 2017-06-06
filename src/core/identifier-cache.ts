@@ -1,4 +1,4 @@
-import { isComplexValue } from './';
+import { isStateTreeNode } from './';
 import { fail } from '../utils'
 import { observable, IObservableArray } from "mobx"
 import { IComplexType, IType } from '../types/type';
@@ -8,7 +8,7 @@ export class IdentifierCache {
     private cache: { [id: string]: IObservableArray<Node> } = {}
 
     register(node: Node) {
-        if (!isComplexValue(node.storedValue))
+        if (!isStateTreeNode(node.storedValue))
             return
 
         const identifier = node.identifier
@@ -27,7 +27,7 @@ export class IdentifierCache {
     }
 
     unregister(node: Node) {
-        if (!isComplexValue(node.storedValue))
+        if (!isStateTreeNode(node.storedValue))
             return
         if (node.identifier) {
             const set = this.cache[node.identifier]

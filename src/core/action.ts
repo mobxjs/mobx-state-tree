@@ -79,7 +79,7 @@ export function createActionInvoker(name: string, fn: Function) {
 function serializeArgument(node: Node, actionName: string, index: number, arg: any): any {
     if (isPrimitive(arg))
         return arg
-    if (isComplexValue(arg)) {
+    if (isStateTreeNode(arg)) {
         const targetNode = getComplexNode(arg)
         if (node.root !== targetNode.root)
             throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
@@ -146,6 +146,6 @@ export function onAction(target: IComplexValue, listener: (call: ISerializedActi
     })
 }
 
-import { Node, getComplexNode,  IComplexValue, isComplexValue, } from "./node"
-import { resolve, tryResolve, addMiddleware,  } from "./mst-operations"
+import { Node, getComplexNode,  IComplexValue, isStateTreeNode } from "./node"
+import { resolve, tryResolve, addMiddleware  } from "./mst-operations"
 import { fail, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"

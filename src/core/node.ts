@@ -142,7 +142,7 @@ export class Node  {
         if (this._isDetaching)
             return
 
-        if (isComplexValue(this.storedValue)) {
+        if (isStateTreeNode(this.storedValue)) {
             walk(this.storedValue, child => getComplexNode(child).aboutToDie())
             this.root.identifierCache.unregister(this)
             walk(this.storedValue, child => getComplexNode(child).finalizeDeath())
@@ -290,7 +290,7 @@ export class Node  {
         // Prepare new values, try to reconcile
         newValues.forEach((newValue, index) => {
             const subPath = "" + newPaths[index]
-            if (isComplexValue(newValue)) {
+            if (isStateTreeNode(newValue)) {
                 // A tree node...
                 const childNode = getComplexNode(newValue)
                 childNode.assertAlive()
@@ -423,13 +423,12 @@ export interface IComplexValue {
     readonly $treenode?: Node
 }
 
-// TODO: rename to isStateTreenode
-export function isComplexValue(value: any): value is IComplexValue {
+export function isStateTreeNode(value: any): value is IComplexValue {
     return !!(value && value.$treenode)
 }
 
 export function getComplexNode(value: IComplexValue): Node {
-    if (isComplexValue(value))
+    if (isStateTreeNode(value))
         return value.$treenode!
     else
         return fail("element has no Node")

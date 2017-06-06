@@ -1,5 +1,5 @@
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras } from "mobx"
-import { getComplexNode, escapeJsonPath, IJsonPatch, Node, unbox, isComplexValue } from "../../core"
+import { getComplexNode, escapeJsonPath, IJsonPatch, Node, unbox, isStateTreeNode } from "../../core"
 import { addHiddenFinalProp, fail, identity, isMutable, isPlainObject, isPrimitive, nothing } from '../../utils';
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -19,7 +19,7 @@ export function mapToString(this: ObservableMap<any>) {
 function put(this: ObservableMap<any>, value: any) {
     if (!(!!value)) fail(`Map.put cannot be used to set empty values`)
     let node: Node
-    if (isComplexValue(value)) {
+    if (isStateTreeNode(value)) {
         node = getComplexNode(value)
     } else if (isMutable(value)) {
         const targetType = (getComplexNode(this).type as MapType<any, any>).subType
