@@ -429,10 +429,3 @@ export function walk(thing: IComplexValue, processor: (item: IComplexValue) => v
     })
     processor(node.storedValue)
 }
-
-// TODO: remove
-export function testActions<S, T>(factory: IType<S, IComplexValue>, initialState: S, ...actions: ISerializedActionCall[]): S {
-    const testInstance = factory.create(initialState) as T
-    applyActions(testInstance, actions)
-    return getSnapshot(testInstance) as S
-}
