@@ -371,3 +371,56 @@ test("it should restore array of references from snapshot", t => {
     t.deepEqual<any>(store.selected[0] === store.boxes[0], true)
     t.deepEqual<any>(store.selected[1] === store.boxes[1], true)
 })
+
+
+test("it should support map of references", t => {
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Factory = types.model({
+        selected: types.map(types.reference(Box)),
+        boxes: types.array(Box)
+    })
+
+    const store = Factory.create({
+        selected: {},
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}]
+    })
+    unprotect(store)
+
+    t.notThrows(() => {
+        store.selected.set("from", store.boxes[0])
+    })
+
+    t.deepEqual<any>(getSnapshot(store.selected), { from: 1 })
+
+    t.notThrows(() => {
+        store.selected.set("to", store.boxes[1])
+    })
+
+    t.deepEqual<any>(getSnapshot(store.selected), { from: 1, to: 2 })
+})
+
+test("it should restore map of references from snapshot", t => {
+
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Factory = types.model({
+        selected: types.map(types.reference(Box)),
+        boxes: types.array(Box)
+    })
+
+    const store = Factory.create({
+        selected: { from: 1, to: 2 },
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}]
+    })
+    unprotect(store)
+
+    t.deepEqual<any>(store.selected.get("from") === store.boxes[0], true)
+    t.deepEqual<any>(store.selected.get("to") === store.boxes[1], true)
+})
