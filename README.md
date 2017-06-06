@@ -291,7 +291,7 @@ Actions are replayable and are therefore constrained in several ways:
 - Trying to modify a node without using an action will throw an exception.
 - All action arguments should be serializable. Some arguments can be serialized automatically, such as relative paths to other nodes
 - Actions can only modify models that belong to the (sub)tree on which they are invoked
-- Actions are automatically bound the their instance, so it is save to pass actions around first class without binding or wrapping in arrow functions.
+- Actions are automatically bound the their instance, so it is safe to pass actions around first class without binding or wrapping in arrow functions.
 
 Useful methods:
 
