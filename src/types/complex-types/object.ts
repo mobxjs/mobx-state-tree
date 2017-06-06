@@ -9,6 +9,7 @@ import {
 import {
     nothing,
     extend as extendObject,
+    extendKeepGetter,
     fail, identity,
     isPrimitive,
     hasOwnProperty,
@@ -250,6 +251,12 @@ function getObjectFactoryBaseModel(item: any) {
     return isObjectFactory(type) ? (type as ObjectType).baseModel : {}
 }
 
+function getObjectFactoryBaseActions(item: any) {
+    let type = isType(item) ? item : getType(item)
+
+    return isObjectFactory(type) ? (type as ObjectType).baseActions : {}
+}
+
 export function extend<A, B, AA, BA>(name: string, a: IModelType<A, AA>, b: IModelType<B, BA>): IModelType<A & B, AA & BA>
 export function extend<A, B, C, AA, BA, CA>(name: string, a: IModelType<A, AA>, b: IModelType<B, BA>, c: IModelType<C, CA>): IModelType<A & B & C, AA & BA & CA>
 export function extend<A, B, AA, BA>(a: IModelType<A, AA>, b: IModelType<B, BA>): IModelType<A & B, AA & BA>
@@ -258,11 +265,9 @@ export function extend(...args: any[]) {
     console.warn("[mobx-state-tree] `extend` is an experimental feature and it's behavior will probably change in the future")
     const baseFactories = typeof args[0] === "string" ? args.slice(1) : args
     const factoryName = typeof args[0] === "string" ? args[0] : baseFactories.map(f => f.name).join("_")
-
-    return model(
-        factoryName,
-        extendObject.apply(null, [{}].concat(baseFactories.map(getObjectFactoryBaseModel)))
-    )
+    const properties = extendKeepGetter.apply(null, [{}].concat(baseFactories.map(getObjectFactoryBaseModel)))
+    const actions = extendObject.apply(null, [{}].concat(baseFactories.map(getObjectFactoryBaseActions)))
+    return model(factoryName, properties, actions)
 }
 
 export function isObjectFactory(type: any): boolean {
