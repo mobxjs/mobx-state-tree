@@ -28,8 +28,12 @@ export class Refinement extends Type<any, any> {
         return inst
     }
 
+    isAssignableFrom(type: IType<any, any>) {
+        return this.type.isAssignableFrom(type)
+    }
+
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (this.type.is(value)){
+        if (this.type.is(value)) {
             const snapshot = isComplexValue(value) ? getComplexNode(value).snapshot : value
 
             if (this.predicate(snapshot)) {

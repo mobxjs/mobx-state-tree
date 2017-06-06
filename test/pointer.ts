@@ -1,23 +1,22 @@
 import { test } from "ava"
 import { IType, getSnapshot, types, unprotect } from "../src"
 
-test.skip("it should allow array of pointer objects", t => {
-    function Pointer<S, T>(Model: IType<S, T>) {
-        return types.model({
-            value: types.reference(Model)
-        })
-    }
-
-    const Todo = types.model({
-        id: types.identifier(),
-        name: types.string
+function Pointer<S, T>(Model: IType<S, T>) {
+    return types.model({
+        value: types.reference(Model)
     })
+}
 
+const Todo = types.model({
+    id: types.identifier(),
+    name: types.string
+})
+
+test("it should allow array of pointer objects", t => {
     const AppStore = types.model({
         todos: types.array(Todo),
         selected: types.optional(types.array(Pointer(Todo)), [])
     })
-
 
     const store = AppStore.create({
         todos: [
@@ -26,23 +25,14 @@ test.skip("it should allow array of pointer objects", t => {
         ],
         selected: []
     })
+    unprotect(store)
 
     const ref = Pointer(Todo).create({ value: store.todos[0]}) // Fails because store.todos does not belongs to the same tree
     store.selected.push(ref)
+    t.is<any>(store.selected[0].value, store.todos[0])
 })
 
-test.skip("it should allow array of pointer objects - 2", t => {
-    function Pointer<S, T>(Model: IType<S, T>) {
-        return types.model({
-            value: types.reference(Model)
-        })
-    }
-
-    const Todo = types.model({
-        id: types.identifier(),
-        name: types.string
-    })
-
+test("it should allow array of pointer objects - 2", t => {
     const AppStore = types.model({
         todos: types.array(Todo),
         selected: types.optional(types.array(Pointer(Todo)), [])
@@ -56,27 +46,20 @@ test.skip("it should allow array of pointer objects - 2", t => {
         ],
         selected: []
     })
+    unprotect(store)
 
     const ref = Pointer(Todo).create() // Fails because ref is required
     store.selected.push(ref)
     ref.value = store.todos[0] as any
+    t.is<any>(store.selected[0].value, store.todos[0])
 })
 
-test.skip("it should allow array of pointer objects - 3", t => {
-    function Pointer<S, T>(Model: IType<S, T>, path: string) {
-        return types.model({
-            value: types.reference(Model)
-        })
-    }
+test("it should allow array of pointer objects - 3", t => {
 
-    const Todo = types.model({
-        id: types.identifier(),
-        name: types.string
-    })
 
     const AppStore = types.model({
         todos: types.array(Todo),
-        selected: types.optional(types.array(Pointer(Todo, "/todos")), [])
+        selected: types.optional(types.array(Pointer(Todo)), [])
     })
 
 
@@ -87,26 +70,17 @@ test.skip("it should allow array of pointer objects - 3", t => {
         ],
         selected: []
     })
+    unprotect(store)
 
-    const ref = Pointer(Todo, "/todos").create({ value: store.todos[0]}) // Fails because store.todos does not belongs to the same tree
+    const ref = Pointer(Todo).create({ value: store.todos[0]})
     store.selected.push(ref)
+    t.is<any>(store.selected[0].value, store.todos[0])
 })
 
-test.skip("it should allow array of pointer objects - 4", t => {
-    function Pointer<S, T>(Model: IType<S, T>, path: string) {
-        return types.model({
-            value: types.reference(Model)
-        })
-    }
-
-    const Todo = types.model({
-        id: types.identifier(),
-        name: types.string
-    })
-
+test("it should allow array of pointer objects - 4", t => {
     const AppStore = types.model({
         todos: types.array(Todo),
-        selected: types.optional(types.array(Pointer(Todo, "/todos")), [])
+        selected: types.optional(types.array(Pointer(Todo)), [])
     })
 
 
@@ -117,8 +91,10 @@ test.skip("it should allow array of pointer objects - 4", t => {
         ],
         selected: []
     })
+    unprotect(store)
 
-    const ref = Pointer(Todo, "/todos").create() // Fails because ref is required
+    const ref = Pointer(Todo).create() // Fails because ref is required
     store.selected.push(ref)
     ref.value = store.todos[0] as any
+    t.is<any>(ref.value, store.todos[0])
 })

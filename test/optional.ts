@@ -60,7 +60,7 @@ test("it should accept a function to provide dynamic values", t => {
 value \`"hello world!"\` is not assignable to type: \`number\`.`)
 })
 
-test.skip("it should be possible to create types on the fly", t => {
+test.skip("it should be possible to create complex types on the fly", t => {
     // TODO: enable again if TODOs in complex-type/object for parsing props are solved
     const Box = types.model({
         point: {

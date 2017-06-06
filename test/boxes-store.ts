@@ -75,8 +75,7 @@ function createStore() {
     })
 }
 
-// TODO: selection is wrong due to reference not working
-test.skip("store is deserialized correctly", (t) => {
+test("store is deserialized correctly", (t) => {
     const s = createStore();
     t.is(s.boxes.size, 2)
     t.is(s.arrows.length, 1)
@@ -86,8 +85,7 @@ test.skip("store is deserialized correctly", (t) => {
     t.deepEqual(s.boxes.values().map(b => b.isSelected), [false, true])
 })
 
-// TODO: x is not changing due to reference not working, so no patches emitted
-test.skip("store emits correct patch paths", (t) => {
+test("store emits correct patch paths", (t) => {
     const s = createStore();
     const recorder1 = recordPatches(s)
     const recorder2 = recordPatches(s.boxes)
