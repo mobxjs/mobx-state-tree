@@ -44,6 +44,7 @@ test("it should be possible to record & replay a simple action", t => {
 
 // Complex actions
 const Customer = types.model("Customer", {
+    id: types.identifier(types.number),
     name: types.string
 })
 
@@ -62,7 +63,7 @@ const OrderStore = types.model("OrderStore", {
 
 function createTestStore() {
     const store = OrderStore.create({
-        customers: [{ name: "Mattia" }],
+        customers: [{ id: 1, name: "Mattia" }],
         orders: [{
             customer: null
         }]
@@ -71,8 +72,7 @@ function createTestStore() {
     return store
 }
 
-// TODO: same here, customer is a reference.
-test.skip("it should be possible to pass a complex object", t => {
+test("it should be possible to pass a complex object", t => {
     const store = createTestStore()
     const recorder = recordActions(store)
 
@@ -82,10 +82,11 @@ test.skip("it should be possible to pass a complex object", t => {
     t.is(store.orders[0].customer, store.customers[0])
     t.deepEqual(getSnapshot(store) as any, {
         customers: [{
+            id: 1,
             name: "Mattia"
         }],
         orders: [{
-            customer: { $ref: "../../customers/0" }
+            customer: 1
         }]
     })
 
@@ -100,16 +101,15 @@ test.skip("it should be possible to pass a complex object", t => {
     t.deepEqual(getSnapshot(store2), getSnapshot(store))
 })
 
-// TODO: failing because customer is a reference
-test.skip("it should not be possible to set the wrong type", t => {
+test("it should not be possible to set the wrong type", t => {
     const store = createTestStore()
 
     t.throws(
         () => {
             store.orders[0].setCustomer(store.orders[0])
         }, // wrong type!
-        `[mobx-state-tree] Error while converting <Order@/orders/0> to \`Customer\`:
-value of type Order: <Order@/orders/0> is not assignable to type: \`Customer\`, expected an instance of \`Customer\` or a snapshot like \`{ name: string }\` instead.`
+        `[mobx-state-tree] Error while converting <Order@/orders/0> to \`reference(Customer)\`:
+value of type Order: <Order@/orders/0> is not assignable to type: \`reference(Customer)\`, expected an instance of \`reference(Customer)\` or a snapshot like \`reference(Customer)\` instead. (Note that a snapshot of the provided value is compatible with the targeted type)`
     )
 })
 
