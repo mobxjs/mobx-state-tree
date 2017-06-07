@@ -8,7 +8,7 @@ import "./types/complex-types/complex-type"
 // unescapeJsonPath
 
 export {
-    types, IType
+    types, IType, ISimpleType
 } from "./types"
 
 export * from "./core/mst-operations"
