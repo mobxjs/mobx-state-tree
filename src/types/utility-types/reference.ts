@@ -14,7 +14,15 @@ class StoredReference {
     constructor(
         public mode: "identifier" | "object",
         public value: any
-    ) {}
+    ) {
+        if (mode === "object") {
+            if (!isStateTreeNode(value))
+                return fail(`Can only store references to tree nodes, got: '${value}'`)
+            const targetNode = getStateTreeNode(value)
+            if (!targetNode.identifierAttribute)
+                return fail(`Can only store references with a defined identifier attribute.`)
+        }
+    }
 }
 
 export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {

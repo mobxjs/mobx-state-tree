@@ -47,7 +47,7 @@ export class IdentifierType<T> extends Type<T, T> {
 }
 
 export function identifier<T>(baseType: IType<T, T>): T;
-export function identifier(): string;
+export function identifier<T>(): T;
 export function identifier(baseType: IType<any, any> = stringType): any {
     // TODO: MWE: this seems contrived, let's not assert anything and support unions, refinements etc.
     if (baseType !== stringType && baseType !== numberType)

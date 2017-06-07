@@ -1,4 +1,4 @@
-import { reaction } from "mobx"
+import { reaction, autorun } from "mobx"
 import { types, getSnapshot, applySnapshot, unprotect } from "../src"
 import { test } from "ava"
 
@@ -94,7 +94,7 @@ test("identifiers cannot be modified", (t) => {
         "at path \"/id\" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier([object Object])` instead.")
 })
 
-test.skip("it should resolve refs during creation, when using path", t => {
+test("it should resolve refs during creation, when using path", t => {
     const values: number[] = []
     const Book = types.model({
         id: types.identifier(),
@@ -159,7 +159,7 @@ test("it should resolve refs over late types", t => {
     t.is(s.entries.reduce((a, e) => a + e.price, 0), 4)
 })
 
-test.skip("it should resolve refs during creation, when using generic reference", t => {
+test("it should resolve refs during creation, when using generic reference", t => {
     const values: number[] = []
     const Book = types.model({
         id: types.identifier(),
@@ -190,12 +190,12 @@ test.skip("it should resolve refs during creation, when using generic reference"
     t.is(s.entries[0].price, 4)
     t.is(s.entries.reduce((a, e) => a + e.price, 0), 4)
 
-    t.throws(
-        () => BookEntry.create({ book: s.books[0] }), // N.B. ref is initially not resolvable!
-        /the value should already be part of the same model tree/
-    )
+    const entry = BookEntry.create({ book: s.books[0] }) // can refer to book, even when not part of tree yet
 
-    t.deepEqual(values, [4])
+    t.deepEqual(getSnapshot(entry), { book: "3" })
+    s.entries.push(entry)
+
+    t.deepEqual(values, [4, 8])
 })
 
 test("identifiers should only support types.string and types.number", t => {
@@ -288,14 +288,14 @@ test("when applying a snapshot, reference should resolve correctly if value adde
     }))
 })
 
-test.skip("it should fail when reference snapshot is ambiguous", t => {
+test("it should fail when reference snapshot is ambiguous", t => {
 
-    const Box = types.model({
+    const Box = types.model("Box", {
         id: types.identifier(types.number),
         name: types.string
     })
 
-    const Arrow = types.model({
+    const Arrow = types.model("Arrow", {
         id: types.identifier(types.number),
         name: types.string
     })
@@ -309,15 +309,26 @@ test.skip("it should fail when reference snapshot is ambiguous", t => {
     })
 
     const store = Factory.create({
-        selected: 1,
+        selected: 2,
         boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}],
         arrows: [{id: 2, name: "arrow"}]
     })
-    unprotect(store)
 
     t.throws(() => {
-        store.selected = store.boxes[1] // throws because it can't know if you mean a box or an arrow!
-    })
+        store.selected // store.boxes[1] // throws because it can't know if you mean a box or an arrow!
+    }, "[mobx-state-tree] Cannot resolve a reference to type 'Arrow | Box' with id: '2' unambigously, there are multiple candidates: /boxes/1, /arrows/0")
+
+    unprotect(store)
+
+    // first update the reference, than create a new matching item! Ref becomes ambigous now...
+    store.selected = 1 as any
+
+    let err
+    autorun(() => store.selected).onError(e => err = e)
+
+    t.is(store.selected, store.boxes[0]) // unambigous identifier
+    store.arrows.push({ id: 1, name: "oops" })
+    t.is(err.message, "[mobx-state-tree] Cannot resolve a reference to type \'Arrow | Box\' with id: \'1\' unambigously, there are multiple candidates: /boxes/0, /arrows/1")
 })
 
 test("it should support array of references", t => {
@@ -351,7 +362,6 @@ test("it should support array of references", t => {
 })
 
 test("it should restore array of references from snapshot", t => {
-
     const Box = types.model({
         id: types.identifier(types.number),
         name: types.string

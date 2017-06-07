@@ -46,7 +46,7 @@ export class IdentifierCache {
             case 0: return null
             case 1: return matches[0]
             default:
-                return fail(`Cannot resolve identifier '${identifier}' unambigously, there are multiple candidates: ${matches.map(n => n.path).join(", ")}`)
+                return fail(`Cannot resolve a reference to type '${type.name}' with id: '${identifier}' unambigously, there are multiple candidates: ${matches.map(n => n.path).join(", ")}`)
         }
     }
 }
