@@ -40,22 +40,20 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getChildren(node: Node): Node[] {
-        // tslint:disable-next-line:no-unused-expression
-        node.storedValue.length // observe
-        return node.storedValue.$mobx.values // Shooting ourselves in the foot. JS, why do you so temptingly allow this?! // Shooting ourselves in the foot. JS, why do you so temptingly allow this?!
+        return node.storedValue.peek()
     }
 
     getChildNode(node: Node, key: string): Node {
         const index = parseInt(key, 10)
         if (index < node.storedValue.length)
-            return node.storedValue.$mobx.values[index]
+            return node.storedValue[index]
         return fail("Not a child: " + key)
     }
 
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
         const node = getStateTreeNode(change.object)
         node.assertWritable()
-        const childNodes = this.getChildren(node)
+        const childNodes = node.getChildren()
 
         switch (change.type) {
             case "update":

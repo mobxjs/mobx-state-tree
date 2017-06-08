@@ -56,10 +56,6 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
 
     // TODO: just pass in node
     finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
-        // extras.getAdministration(instance).dehancer = unbox
-        // extras.getAdministration(instance).dehancer = getStateTreeNode(instance).unbox
-        if (!isObservableMap(instance))
-            fail("oops)")
         extras.interceptReads(instance, getStateTreeNode(instance).unbox)
         intercept(instance, c => this.willChange(c))
         observe(instance, this.didChange)
@@ -67,20 +63,14 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     getChildren(node: Node): Node[] {
-        const res: Node[] = []
-        // Ignore all alarm bells to be able to read this:...
-        ; (node.storedValue as ObservableMap<any>).keys().forEach(key => {
-            const childNode = node.storedValue._data[key].get()
-            if (childNode) res.push(childNode)
-        })
-        return res
+        return (node.storedValue as ObservableMap<any>).values()
     }
 
     getChildNode(node: Node, key: string): Node {
-        const childNode = node.storedValue._data[key]
+        const childNode = node.storedValue.get(key)
         if (!childNode)
             fail("Not a child" + key)
-        return childNode.get()
+        return childNode
     }
 
     willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
@@ -106,7 +96,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                 break
             case "delete":
                 {
-                    this.getChildNode(node, change.name).die()
+                    node.getChildNode(change.name).die()
                 }
                 break
         }

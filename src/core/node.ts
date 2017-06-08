@@ -20,9 +20,9 @@ export class Node  {
     identifierAttribute: string | undefined = undefined // not to be modified directly, only through model initialization
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
+    private _autoUnbox = true // unboxing is disabled when reading child nodes
     private _isAlive = true // optimization: use binary flags for all these switches
     private _isDetaching = false
-    private _autoUnbox = true
 
     readonly middlewares: IMiddleWareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
@@ -349,11 +349,18 @@ export class Node  {
 
     getChildNode(subpath: string): Node {
         this.assertAlive()
-        return this.type.getChildNode(this, subpath)
+        this._autoUnbox = false
+        const res = this.type.getChildNode(this, subpath)
+        this._autoUnbox = true
+        return res
     }
 
     getChildren(): Node[] {
-        return this.type.getChildren(this)
+        this.assertAlive()
+        this._autoUnbox = false
+        const res = this.type.getChildren(this)
+        this._autoUnbox = true
+        return res
     }
 
     getChildType(key: string): IType<any, any> {
@@ -409,9 +416,9 @@ export class Node  {
     }
 
     unbox(childNode: Node): any {
-        // if (this._autoUnbox === true)
+        if (this._autoUnbox === true)
             return childNode.getValue()
-        // return childNode
+        return childNode
     }
 
     fireHook(name: string) {
