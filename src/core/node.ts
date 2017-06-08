@@ -22,6 +22,7 @@ export class Node  {
     _isRunningAction = false // only relevant for root
     private _isAlive = true // optimization: use binary flags for all these switches
     private _isDetaching = false
+    private _autoUnbox = true
 
     readonly middlewares: IMiddleWareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
@@ -35,6 +36,7 @@ export class Node  {
         this.subpath = subpath
         this.storedValue = storedValue
         this._environment = environment
+        this.unbox = this.unbox.bind(this)
 
         // optimization: don't keep the snapshot by default alive with a reaction by default
         // in prod mode. This saves lot of GC overhead (important for e.g. React Native)
@@ -406,6 +408,12 @@ export class Node  {
         }
     }
 
+    unbox(childNode: Node): any {
+        // if (this._autoUnbox === true)
+            return childNode.getValue()
+        // return childNode
+    }
+
     fireHook(name: string) {
         const fn = this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
         if (typeof fn === "function")
@@ -431,10 +439,6 @@ export function getStateTreeNode(value: IComplexValue): Node {
         return value.$treenode!
     else
         return fail("element has no Node")
-}
-
-export function unbox(b: Node): any {
-    return b.getValue()
 }
 
 import { IType } from "../types/type"

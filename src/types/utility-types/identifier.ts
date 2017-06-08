@@ -28,7 +28,7 @@ export class IdentifierType<T> extends Type<T, T> {
         return new Node(this, parent, subpath, environment, snapshot)
     }
 
-    reconcile(current: Node, newValue) {
+    reconcile(current: Node, newValue: any) {
         if (current.storedValue !== newValue)
             return fail(`Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`)
         return current

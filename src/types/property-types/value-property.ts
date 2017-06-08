@@ -1,6 +1,6 @@
 import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
-import { getStateTreeNode, escapeJsonPath, Node, unbox } from "../../core"
+import { getStateTreeNode, escapeJsonPath, Node } from "../../core"
 import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath, typecheck } from "../type-checker"
 import { fail } from "../../utils"
@@ -17,10 +17,10 @@ export class ValueProperty extends Property {
         observable.ref(proto, this.name, { value: undefinedType.instantiate(null, "", null, undefined) }) // TODO: undefined type should not be needed
     }
 
-    initialize(targetInstance: any, snapshot: any) {
-        const adm = getStateTreeNode(targetInstance)
-        targetInstance[this.name] = this.type.instantiate(adm, this.name, adm._environment, snapshot[this.name])
-        extras.getAdministration(targetInstance, this.name).dehancer = unbox
+    initialize(instance: any, snapshot: any) {
+        const node = getStateTreeNode(instance)
+        instance[this.name] = this.type.instantiate(node, this.name, node._environment, snapshot[this.name])
+        extras.interceptReads(instance, this.name, node.unbox)
     }
 
     getValueNode(targetInstance: any): Node {

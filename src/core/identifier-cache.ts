@@ -37,6 +37,7 @@ export class IdentifierCache {
         // TODO: all cached items which have node as parent should not be dropped from the cache as well, and moved to the cache of node
     }
 
+    // TOOD: expose a public api for this in mst-operations
     resolve(type: IType<any, any>, identifier: string): Node | null {
         const set = this.cache[identifier]
         if (!set)

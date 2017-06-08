@@ -2,8 +2,7 @@ import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArra
 import {
     getStateTreeNode,
     IJsonPatch,
-    Node,
-    unbox
+    Node
 } from "../../core"
 import { addHiddenFinalProp, fail } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
@@ -29,12 +28,12 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
     createNewInstance() {
         const array = observable.shallowArray()
-        extras.getAdministration(array).dehancer = unbox
         addHiddenFinalProp(array, "toString", arrayToString)
         return array
     }
 
     finalizeNewInstance(instance: IObservableArray<any>, snapshot: any) {
+        extras.getAdministration(instance).dehancer = getStateTreeNode(instance).unbox
         intercept(instance, change => this.willChange(change) as any)
         observe(instance, this.didChange)
         getStateTreeNode(instance).applySnapshot(snapshot)

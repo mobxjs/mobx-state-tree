@@ -1,5 +1,5 @@
-import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras } from "mobx"
-import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, unbox, isStateTreeNode } from "../../core"
+import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras, isObservableMap } from "mobx"
+import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, isStateTreeNode } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -49,14 +49,18 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     createNewInstance() {
         // const identifierAttr = getIdentifierAttribute(this.subType)
         const map = observable.shallowMap()
-        extras.getAdministration(map).dehancer = unbox
-
         addHiddenFinalProp(map, "put", put)
         addHiddenFinalProp(map, "toString", mapToString)
         return map
     }
 
+    // TODO: just pass in node
     finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
+        // extras.getAdministration(instance).dehancer = unbox
+        // extras.getAdministration(instance).dehancer = getStateTreeNode(instance).unbox
+        if (!isObservableMap(instance))
+            fail("oops)")
+        extras.interceptReads(instance, getStateTreeNode(instance).unbox)
         intercept(instance, c => this.willChange(c))
         observe(instance, this.didChange)
         getStateTreeNode(instance).applySnapshot(snapshot)
