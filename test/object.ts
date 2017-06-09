@@ -92,6 +92,20 @@ test("it should apply snapshots", (t) => {
     t.deepEqual(getSnapshot(doc), {to: 'universe'})
 })
 
+test("it should apply and accept null value for types.maybe(complexType)", (t) => {
+  const Item = types.model({
+    value: types.string
+  })
+  const Model = types.model({
+    item: types.maybe(Item)
+  })
+  const myModel = Model.create()
+  applySnapshot(myModel, {item: {value: "something"}})
+  applySnapshot(myModel, {item: null})
+
+  t.deepEqual(getSnapshot(myModel), {item: null})
+})
+
 test("it should return a snapshot", (t) => {
     const {Factory} = createTestFactories()
     const doc = Factory.create()
