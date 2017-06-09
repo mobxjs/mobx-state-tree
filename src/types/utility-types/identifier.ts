@@ -22,7 +22,6 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
-        typecheck(this.identifierType, snapshot)
         if (parent && !isStateTreeNode(parent.storedValue))
             fail(`Identifier types can only be instantiated as direct child of a model type`)
         return createNode(this, parent, subpath, environment, snapshot)

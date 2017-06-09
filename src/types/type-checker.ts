@@ -67,7 +67,6 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
     return errors.reduce((a, i) => a.concat(i), [])
 }
 
-// TODO; typecheck should be invoked from: type.create and array / map / value.property will change
 export function typecheck(type: IType<any, any>, value: any): void {
     const errors = type.validate(value, [{ path: "", type }])
 

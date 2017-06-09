@@ -1,6 +1,6 @@
 import { ISimpleType, TypeFlags, Type} from "../type"
 import { fail, isPrimitive } from "../../utils"
-import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { Node, createNode } from "../../core"
 
 export class Literal<T> extends Type<T, T> {
