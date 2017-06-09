@@ -2,7 +2,8 @@ import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArra
 import {
     getStateTreeNode,
     IJsonPatch,
-    Node
+    Node,
+    createNode
 } from "../../core"
 import { addHiddenFinalProp, fail } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
@@ -26,17 +27,22 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return this.subType.describe() + "[]"
     }
 
-    createNewInstance() {
+    createNewInstance = () => {
         const array = observable.shallowArray()
         addHiddenFinalProp(array, "toString", arrayToString)
         return array
     }
 
-    finalizeNewInstance(instance: IObservableArray<any>, snapshot: any) {
-        extras.getAdministration(instance).dehancer = getStateTreeNode(instance).unbox
+    finalizeNewInstance = (node: Node, snapshot: any) => {
+        const instance = node.storedValue as IObservableArray<any>;
+        extras.getAdministration(instance).dehancer = node.unbox;
         intercept(instance, change => this.willChange(change) as any)
         observe(instance, this.didChange)
-        getStateTreeNode(instance).applySnapshot(snapshot)
+        node.applySnapshot(snapshot)
+    }
+
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S): Node {
+        return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
     }
 
     getChildren(node: Node): Node[] {

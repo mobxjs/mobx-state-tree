@@ -1,4 +1,4 @@
-import { getStateTreeNode, isStateTreeNode, Node } from "../../core"
+import { getStateTreeNode, isStateTreeNode, Node, createNode } from "../../core"
 import { TypeFlags, Type, IType } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess } from "../type-checker"
 import { fail } from "../../utils"
@@ -64,7 +64,7 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
         const isComplex = isStateTreeNode(snapshot)
-        return new Node(this, parent, subpath, environment, new StoredReference(
+        return createNode(this, parent, subpath, environment, new StoredReference(
             isComplex ? "object" : "identifier",
             snapshot
         ))

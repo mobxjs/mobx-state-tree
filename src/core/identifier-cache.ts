@@ -8,7 +8,7 @@ export class IdentifierCache {
     private cache: { [id: string]: IObservableArray<Node> } = {}
 
     register(node: Node) {
-        if (!isStateTreeNode(node.storedValue))
+        if (node.identifier === null)
             return
 
         const identifier = node.identifier
@@ -27,7 +27,7 @@ export class IdentifierCache {
     }
 
     unregister(node: Node) {
-        if (!isStateTreeNode(node.storedValue))
+        if (node.identifier === null)
             return
         if (node.identifier) {
             const set = this.cache[node.identifier]

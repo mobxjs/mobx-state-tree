@@ -14,7 +14,7 @@ import {
     isPlainObject
 } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
-import { getType, IComplexValue, getStateTreeNode, IJsonPatch, Node } from "../../core"
+import { getType, IComplexValue, getStateTreeNode, IJsonPatch, Node, createNode } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
 import { isIdentifierType } from "../utility-types/identifier"
@@ -61,14 +61,19 @@ export class ObjectType extends ComplexType<any, any> {
         this.parseModelProps()
         this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
     }
+    
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
+        return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
+    }
 
-    createNewInstance() {
+    createNewInstance = () => {
         const instance = new this.modelConstructor()
         extendShallowObservable(instance, {})
         return instance as Object
     }
 
-    finalizeNewInstance(instance: IComplexValue, snapshot: any) {
+    finalizeNewInstance = (node: Node, snapshot: any) => {
+        const instance = node.storedValue as IComplexValue;
         this.forAllProps(prop => prop.initialize(instance, snapshot))
         intercept(instance, change => this.willChange(change) as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)

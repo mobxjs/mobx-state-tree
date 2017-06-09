@@ -1,5 +1,5 @@
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras, isObservableMap } from "mobx"
-import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, isStateTreeNode } from "../../core"
+import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, createNode, isStateTreeNode } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -41,12 +41,16 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         super(name)
         this.subType = subType
     }
+    
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S): Node {
+        return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
+    }
 
     describe() {
         return "Map<string, " + this.subType.describe() + ">"
     }
 
-    createNewInstance() {
+    createNewInstance = () => {
         // const identifierAttr = getIdentifierAttribute(this.subType)
         const map = observable.shallowMap()
         addHiddenFinalProp(map, "put", put)
@@ -54,12 +58,12 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         return map
     }
 
-    // TODO: just pass in node
-    finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
-        extras.interceptReads(instance, getStateTreeNode(instance).unbox)
+    finalizeNewInstance = (node: Node, snapshot: any) => {
+        const instance = node.storedValue as ObservableMap<any>;
+        extras.interceptReads(instance, node.unbox)
         intercept(instance, c => this.willChange(c))
         observe(instance, this.didChange)
-        getStateTreeNode(instance).applySnapshot(snapshot)
+        node.applySnapshot(snapshot)
     }
 
     getChildren(node: Node): Node[] {

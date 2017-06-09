@@ -448,6 +448,52 @@ export function getStateTreeNode(value: IComplexValue): Node {
         return fail("element has no Node")
 }
 
+function canAttachNode(value: any) {
+    return value && typeof value === "object" && !isStateTreeNode(value) && !Object.isFrozen(value)
+}
+
+function toJSON(this: IComplexValue) {
+  return getStateTreeNode(this).snapshot;
+}
+
+export function createNode<S, T>(type: IType<S, T>, parent: Node | null, subpath: string, environment: any, initialValue: any, createNewInstance: (initialValue: any) => T = identity, finalizeNewInstance: (node: Node, initialValue: any) => void = noop) {
+    if (isStateTreeNode(initialValue)) {
+        const targetNode = getStateTreeNode(initialValue)
+        if (!targetNode.isRoot)
+            fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent ? parent.path : ""}/${subpath}', but it lives already at '${targetNode.path}'`)
+        targetNode.setParent(parent, subpath)
+        return targetNode
+    }
+    const instance = createNewInstance(initialValue)
+    const canAttachTreeNode = canAttachNode(instance)
+    // tslint:disable-next-line:no_unused-variable
+    const node = new Node(type, parent, subpath, environment, instance)
+
+    if (canAttachTreeNode) addHiddenFinalProp(instance, "$treenode", node);
+
+    let sawException = true
+    try {
+        if (canAttachTreeNode) addReadOnlyProp(instance, "toJSON", toJSON);
+
+        node.pseudoAction(() => {
+            finalizeNewInstance(node, initialValue)
+        })
+        if (parent) 
+            parent.root.identifierCache.register(node)
+
+        node.fireHook("afterCreate")
+        if (parent)
+            node.fireHook("afterAttach")
+        sawException = false
+        return node
+    } finally {
+        if (sawException) {
+            // short-cut to die the instance, to avoid the snapshot computed starting to throw...
+            (node as any)._isAlive = false
+        }
+    }
+}
+
 import { IType } from "../types/type"
 import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch } from "./json-patch"
 import { typecheck } from "../types/type-checker"
@@ -455,10 +501,13 @@ import { walk } from "./mst-operations"
 import { IMiddleWareHandler } from "./action"
 import {
     addReadOnlyProp,
+    addHiddenFinalProp,
     extend,
     fail,
     IDisposer,
     isMutable,
-    registerEventHandler
+    registerEventHandler,
+    identity,
+    noop
 } from "../utils"
 import { IdentifierCache } from "./identifier-cache"

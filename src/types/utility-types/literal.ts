@@ -1,6 +1,7 @@
 import { ISimpleType, TypeFlags, Type} from "../type"
 import { fail, isPrimitive } from "../../utils"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import { Node, createNode } from "../../core"
 
 export class Literal<T> extends Type<T, T> {
     readonly value: any
@@ -11,8 +12,8 @@ export class Literal<T> extends Type<T, T> {
         this.value = value
     }
 
-    instantiate(parent: Node, subpath: string, environment: any, snapshot: T): Node {
-        return new Node(this, parent, subpath, environment, snapshot)
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
+        return createNode(this, parent, subpath, environment, snapshot)
     }
 
     describe() {
@@ -32,4 +33,3 @@ export function literal<S>(value: S): ISimpleType<S> {
     return new Literal<S>(value)
 }
 
-import { Node } from '../../core';

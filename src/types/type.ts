@@ -50,10 +50,6 @@ export function isType(value: any): value is IType<any, any> {
     return typeof value === "object" && value && value.isType === true
 }
 
-function toJSON(this: IMSTNode) {
-    return getStateTreeNode(this).snapshot
-}
-
 /**
  * A complex type produces a MST node (Node in the state tree)
  */
@@ -70,48 +66,11 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         return this.instantiate(null, "", environment, snapshot).getValue()
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any = this.getDefaultSnapshot()): Node {
-        if (isStateTreeNode(initialValue)) {
-            const targetNode = getStateTreeNode(initialValue)
-            if (!targetNode.isRoot)
-                fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent ? parent.path : ""}/${subpath}', but it lives already at '${targetNode.path}'`)
-            targetNode.setParent(parent, subpath)
-            return targetNode
-        }
-        const instance = this.createNewInstance(initialValue)
-        // tslint:disable-next-line:no_unused-variable
-        const node = new Node(this, parent, subpath, environment, instance)
-
-        if (this.shouldAttachNode) addHiddenFinalProp(instance, "$treenode", node)
-
-        let sawException = true
-        try {
-            node.pseudoAction(() => {
-                this.finalizeNewInstance(instance, initialValue)
-            })
-            if (this.shouldAttachNode) addReadOnlyProp(instance, "toJSON", toJSON)
-            if (parent)
-                parent.root.identifierCache.register(node)
-
-            node.fireHook("afterCreate")
-            if (parent)
-                node.fireHook("afterAttach")
-            sawException = false
-            return node
-        } finally {
-            if (sawException) {
-                // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-                (node as any)._isAlive = false
-            }
-        }
-    }
+    abstract instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any): Node
 
     abstract flags: TypeFlags
-    abstract shouldAttachNode: boolean
     abstract describe(): string
 
-    abstract createNewInstance(snapshot: any): any
-    abstract finalizeNewInstance(target: any, snapshot: any): void
     abstract applySnapshot(node: Node, snapshot: any): void
     // TODO: Maybe optional could resolve to this if omitted?
     abstract getDefaultSnapshot(): any
@@ -186,13 +145,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 }
 
-export interface IMSTNode {
-    readonly $treenode?: Node
-}
-
 export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T> {
-    shouldAttachNode = false
-
     constructor(name: string) {
         super(name)
     }
@@ -209,14 +162,6 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
 
     getDefaultSnapshot() {
         return undefined
-    }
-
-    createNewInstance(snapshot: S) {
-        return snapshot
-    }
-
-    finalizeNewInstance(target: T, snapshot: S) {
-
     }
 
     applySnapshot(node: Node, snapshot: S): void {

@@ -1,7 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "./type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
 import { isPrimitive, fail } from "../utils"
-import { Node } from "../core"
+import { Node, createNode } from "../core"
 
 export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean
@@ -18,7 +18,7 @@ export class CoreType<T> extends Type<T, T> {
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
-        return new Node(this, parent, subpath, environment, snapshot)
+        return createNode(this, parent, subpath, environment, snapshot)
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
