@@ -6,7 +6,7 @@ import {
     createNode
 } from "../../core"
 import { addHiddenFinalProp, fail } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
+import { IType, IComplexType, TypeFlags, isType, ComplexType, OMIT_FROM_SNAPSHOT } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 
 export function arrayToString(this: IObservableArray<any>) {
@@ -91,7 +91,10 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getSnapshot(node: Node): any {
-        return node.getChildren().map(childNode => childNode.snapshot)
+        return node
+          .getChildren()
+          .map(childNode => childNode.snapshot)
+          .filter(value => value !== OMIT_FROM_SNAPSHOT);
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {

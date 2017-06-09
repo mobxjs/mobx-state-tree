@@ -50,6 +50,11 @@ export function getContextForPath(context: IContext, path: string, type?: IType<
     return context.concat([{ path, type }])
 }
 
+export function popTypeFromContext(context: IContext): IContext {
+    const { path } = context[context.length - 1]
+    return context.slice(0, context.length - 1).concat([{ path }])
+}
+
 export function typeCheckSuccess(): IValidationResult {
     return EMPTY_ARRAY as any
 }

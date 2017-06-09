@@ -1,7 +1,7 @@
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras, isObservableMap } from "mobx"
 import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, createNode, isStateTreeNode } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
+import { IType, IComplexType, TypeFlags, isType, ComplexType, OMIT_FROM_SNAPSHOT } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 
 interface IMapFactoryConfig {
@@ -120,7 +120,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     getSnapshot(node: Node): { [key: string]: any } {
         const res: {[key: string]: any} = {}
         node.getChildren().forEach(childNode => {
-            res[childNode.subpath] = childNode.snapshot
+            if (childNode.snapshot !== OMIT_FROM_SNAPSHOT) res[childNode.subpath] = childNode.snapshot;
         })
         return res
     }

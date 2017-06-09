@@ -19,9 +19,9 @@ import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors } from
 import { getPrimitiveFactoryFromValue } from "../primitives"
 import { isIdentifierType } from "../utility-types/identifier"
 import { optional } from "../utility-types/optional"
+import { computed } from "../utility-types/computed"
 import { Property } from "../property-types/property"
 import { IdentifierProperty } from "../property-types/identifier-property"
-import { ComputedProperty } from "../property-types/computed-property"
 import { ValueProperty } from "../property-types/value-property"
 import { ActionProperty } from "../property-types/action-property"
 import { ViewProperty } from "../property-types/view-property"
@@ -99,7 +99,7 @@ export class ObjectType extends ComplexType<any, any> {
             // TODO: check that hooks are not defined as part of baseModel
             const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
             if ("get" in descriptor) {
-                this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
+                this.props[key] = new ValueProperty(key, computed(descriptor.get!, descriptor.set))
                 continue
             }
 

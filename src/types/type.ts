@@ -1,5 +1,7 @@
 import { action } from "mobx"
 
+export const OMIT_FROM_SNAPSHOT = Object.freeze({})
+
 export interface ISnapshottable<S> {}
 
 export enum TypeFlags {
@@ -14,7 +16,8 @@ export enum TypeFlags {
     Frozen  = 1 << 8,
     Optional = 1 << 9,
     Reference = 1 << 10,
-    Identifier = 1 << 11
+    Identifier = 1 << 11,
+    Computed = 1 << 12
 }
 
 export interface IType<S, T> {
