@@ -12,12 +12,13 @@ export interface IValidationError {
 }
 export type IValidationResult = IValidationError[]
 
-const prettyPrintValue = (value: any) =>
-    typeof value === "function"
+export function prettyPrintValue(value: any) {
+    return typeof value === "function"
         ? `<function${value.name ? " " + value.name :""}>`
         : isStateTreeNode(value)
             ? `<${value}>`
             : `\`${JSON.stringify(value)}\``
+}
 
 function toErrorString(error: IValidationError): string {
     const { value } = error

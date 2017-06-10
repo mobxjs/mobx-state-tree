@@ -474,3 +474,44 @@ test("it should support relative lookups", t => {
     t.is(resolveIdentifier(Node, n5, 4), n2.children[0])
     t.is(resolveIdentifier(Node, n2.children[0], 5), n5)
 })
+
+test("References are non-nullable by default", t => {
+    const Todo = types.model({
+        id: types.identifier(types.number)
+    })
+    const Store = types.model({
+        todo: types.maybe(Todo),
+        ref: types.reference(Todo),
+        maybeRef: types.maybe(types.reference(Todo))
+    })
+
+    t.is(Store.is({}), false)
+    t.is(Store.is({ ref: 3 }), true)
+    t.is(Store.is({ ref: null }), false)
+    t.is(Store.is({ ref: undefined }), false)
+    t.is(Store.is({ ref: 3, maybeRef: 3 }), true)
+    t.is(Store.is({ ref: 3, maybeRef: null }), true)
+    t.is(Store.is({ ref: 3, maybeRef: undefined }), true)
+
+    let store = Store.create({
+        todo: { id: 3 },
+        ref: 3
+    })
+    t.is(store.ref, store.todo)
+    t.is(store.maybeRef, null)
+
+    store = Store.create({
+        todo: { id: 3 },
+        ref: 4
+    })
+    unprotect(store)
+    t.is(store.maybeRef, null)
+    t.throws(() => store.ref, "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /ref)")
+    store.maybeRef = 3 as any
+    t.is(store.maybeRef, store.todo)
+    store.maybeRef = 4 as any
+    t.throws(() => store.maybeRef, "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /maybeRef)")
+    store.maybeRef = null
+    t.is(store.maybeRef, null)
+    t.throws(() => store.ref = null, "Bla")
+})
