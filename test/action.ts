@@ -49,7 +49,7 @@ const Customer = types.model("Customer", {
 })
 
 const Order = types.model("Order", {
-    customer: types.reference(Customer)
+    customer: types.maybe(types.reference(Customer))
 }, {
     setCustomer(customer) {
         this.customer = customer
@@ -108,8 +108,8 @@ test("it should not be possible to set the wrong type", t => {
         () => {
             store.orders[0].setCustomer(store.orders[0])
         }, // wrong type!
-        `[mobx-state-tree] Error while converting <Order@/orders/0> to \`reference(Customer)\`:
-value of type Order: <Order@/orders/0> is not assignable to type: \`reference(Customer)\`, expected an instance of \`reference(Customer)\` or a snapshot like \`reference(Customer)\` instead. (Note that a snapshot of the provided value is compatible with the targeted type)`
+"[mobx-state-tree] Error while converting <Order@/orders/0> to `reference(Customer) | null`:\n" +
+"value of type Order: <Order@/orders/0> is not assignable to type: `reference(Customer) | null`, expected an instance of `reference(Customer) | null` or a snapshot like `(reference(Customer) | null?)` instead."
     )
 })
 

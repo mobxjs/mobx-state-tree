@@ -513,5 +513,8 @@ test("References are non-nullable by default", t => {
     t.throws(() => store.maybeRef, "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /maybeRef)")
     store.maybeRef = null
     t.is(store.maybeRef, null)
-    t.throws(() => store.ref = null, "Bla")
+    t.throws(
+        () => store.ref = null,
+        "[mobx-state-tree] Error while converting `null` to `reference(AnonymousModel)`:\nvalue `null` is not assignable to type: `reference(AnonymousModel)` (Value '`null`' is not a valid reference. Expected a string or number.), expected an instance of `reference(AnonymousModel)` or a snapshot like `reference(AnonymousModel)` instead."
+    )
 })

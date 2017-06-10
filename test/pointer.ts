@@ -3,7 +3,7 @@ import { IType, getSnapshot, types, unprotect } from "../src"
 
 function Pointer<S, T>(Model: IType<S, T>) {
     return types.model({
-        value: types.reference(Model)
+        value: types.maybe(types.reference(Model))
     })
 }
 
@@ -48,7 +48,7 @@ test("it should allow array of pointer objects - 2", t => {
     })
     unprotect(store)
 
-    const ref = Pointer(Todo).create() // Fails because ref is required
+    const ref = Pointer(Todo).create()
     store.selected.push(ref)
     ref.value = store.todos[0] as any
     t.is<any>(store.selected[0].value, store.todos[0])
