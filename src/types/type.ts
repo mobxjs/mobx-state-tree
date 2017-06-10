@@ -110,7 +110,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     reconcile(current: Node, newValue: any): Node {
         // node does not supports snapshots
-        if (!this.snapshottable) {
+        if (!this.snapshottable) { // TODO: move to a separate variable to check?
             // reconcile only if type and value are still the same
             if (current.type === this && current.storedValue === newValue)
                 return current
