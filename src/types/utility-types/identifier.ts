@@ -35,7 +35,7 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 
     describe() {
-        return `identifier(${this.identifierType})`
+        return `identifier(${this.identifierType.describe()})`
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {

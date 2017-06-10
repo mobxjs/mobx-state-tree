@@ -76,7 +76,7 @@ test("identifiers are required", (t) => {
 
     t.throws(() => Todo.create(),
         "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
-        "at path \"/id\" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier([object Object])` instead."
+        "at path \"/id\" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead."
     )
 })
 
@@ -89,9 +89,9 @@ test("identifiers cannot be modified", (t) => {
     unprotect(todo)
 
     t.throws(() => todo.id = "stuff", "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed.")
-    t.throws(() => applySnapshot(todo, {}),
-        "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
-        "at path \"/id\" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier([object Object])` instead.")
+    t.throws(() => applySnapshot(todo, { id: "stuff" }),
+        "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
+     )
 })
 
 test("it should resolve refs during creation, when using path", t => {
@@ -514,7 +514,20 @@ test("References are non-nullable by default", t => {
     store.maybeRef = null
     t.is(store.maybeRef, null)
     t.throws(
-        () => store.ref = null,
+        () => store.ref = null as any,
         "[mobx-state-tree] Error while converting `null` to `reference(AnonymousModel)`:\nvalue `null` is not assignable to type: `reference(AnonymousModel)` (Value '`null`' is not a valid reference. Expected a string or number.), expected an instance of `reference(AnonymousModel)` or a snapshot like `reference(AnonymousModel)` instead."
     )
+})
+
+test("References are described properly", t => {
+    const Todo = types.model({
+        id: types.identifier(types.number)
+    })
+    const Store = types.model({
+        todo: types.maybe(Todo),
+        ref: types.reference(Todo),
+        maybeRef: types.maybe(types.reference(Todo))
+    })
+
+    t.is(Store.describe(), "{ todo: ({ id: identifier(number) } | null?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | null?) }")
 })

@@ -92,13 +92,11 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
     }
 }
 
-// TODO: fix, references are not mentioned in type.describe...
 // TODO support get / set
-export function reference<T>(factory: IType<any, T>): IType<{ $ref: string }, T | null>;
+export function reference<T>(factory: IType<any, T>): IType<string | number, T>
 export function reference<T>(factory: IType<any, T>): any {
     if (arguments.length === 2 && typeof arguments[1] === "string")
         fail("References with base path are no longer supported. Please remove the base path.")
-    // FIXME: IType return type is inconsistent with what is actually returned, however, results in the best type-inference results for objects...
     return new ReferenceType(factory)
 }
 
