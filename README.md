@@ -138,7 +138,7 @@ store.removeTodo(0)
 ```
 
 
-Despite all that, you will see that the [API](api.md) is pretty straight forward!
+Despite all that, you will see that the [API](API.md) is pretty straight forward!
 
 ---
 
@@ -191,7 +191,7 @@ An example:
 
 ```javascript
 const TodoStore = types.model("TodoStore", {      // 1
-    loaded: type.boolean                          // 2
+    loaded: types.boolean                         // 2
     endpoint: "http://localhost",                 // 3
     todos: types.array(Todo),                     // 4
     selectedTodo: types.reference(Todo, "todos"), // 5
@@ -211,7 +211,7 @@ const TodoStore = types.model("TodoStore", {      // 1
 })
 ```
 
-When defining a model, it is adviced to give the model a name for debugging purposes (see `// 1`).
+When defining a model, it is advised to give the model a name for debugging purposes (see `// 1`).
 A model takes two objects arguments, first all the properties, then the actions.
 
 The _properties_ argument is a key-value set where each key indicates the introduction of a property, and the value it's type. The following types are acceptable as type:
@@ -405,7 +405,7 @@ The above example: `selectedTodo: types.reference(Todo, "todos")` is namespaced,
 
 Generic references can point to any element of the correct type in the current tree, and are stored behind the scenes as JSON path. The above example could also have been configured as `selectedTodo: types.reference(Todo)` to create a generic reference.
 
-_Tip: It is recommended to use namespaced references; as those are more stable by since they always use immutable references and a preconfigured namespace._
+_Tip: It is recommended to use namespaced references; as those are more stable, since they always use immutable references and a preconfigured namespace._
 
 **Note: The exact semantics of references are still under investigation, and might change before MST 1.0. One of the two forms might be dropped_**
 

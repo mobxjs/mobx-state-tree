@@ -198,7 +198,7 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
     }
 }
 
-import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp, isMutable } from "../utils"
+import { EMPTY_ARRAY, fail, isMutable } from "../utils"
 import { isStateTreeNode, getStateTreeNode } from "../core/node"
 import { IContext, IValidationResult, typecheck, typeCheckFailure, typeCheckSuccess } from "./type-checker"
 import { Node, IComplexValue, IJsonPatch } from "../core"

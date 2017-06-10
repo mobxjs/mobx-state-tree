@@ -41,7 +41,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         super(name)
         this.subType = subType
     }
-    
+
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S): Node {
         return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
     }

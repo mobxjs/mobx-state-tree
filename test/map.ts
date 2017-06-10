@@ -18,7 +18,13 @@ const createTestFactories = () => {
             ItemFactory
         )
 
-    return {Factory, ItemFactory}
+    const PrimitiveMapFactory = types.model({
+            boolean: types.map(types.boolean),
+            string: types.map(types.string),
+            number: types.map(types.number)
+        }, {})
+
+    return {Factory, ItemFactory, PrimitiveMapFactory}
 }
 
 // === FACTORY TESTS ===
@@ -72,6 +78,21 @@ test("it should return a snapshot", (t) => {
     doc.set("hello", ItemFactory.create())
 
     t.deepEqual<any>(getSnapshot(doc), {hello: {to: "world"}})
+})
+
+test("it should be the same each time", (t) => {
+    const {PrimitiveMapFactory} = createTestFactories()
+    const data = {
+        string: {a: "a", b: ""},
+        boolean: {a: true, b: false},
+        number: {a: 0, b: 42, c: NaN}
+    }
+    const doc = PrimitiveMapFactory.create(data)
+    t.deepEqual<any>(getSnapshot(doc), data)
+    applySnapshot(doc, data)
+    t.deepEqual<any>(getSnapshot(doc), data)
+    applySnapshot(doc, data)
+    t.deepEqual<any>(getSnapshot(doc), data)
 })
 
 // === PATCHES TESTS ===

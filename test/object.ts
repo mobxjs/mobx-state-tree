@@ -29,6 +29,20 @@ const createTestFactories = () => {
         }
     })
 
+    const ComputedFactory2 = types.model({
+        props: types.map(types.number),
+        get area(){
+            return this.props.get('width') * this.props.get('height')
+        }
+    }, {
+        setWidth(value) {
+            this.props.set('width', value)
+        },
+        setHeight(value) {
+            this.props.set('height', value)
+        }
+    })
+
     const BoxFactory = types.model({
         width: 0,
         height: 0
@@ -38,7 +52,7 @@ const createTestFactories = () => {
         color: "#FFFFFF"
     })
 
-    return {Factory, ComputedFactory, BoxFactory, ColorFactory}
+    return {Factory, ComputedFactory, ComputedFactory2, BoxFactory, ColorFactory}
 }
 
 // === FACTORY TESTS ===
@@ -77,6 +91,20 @@ test("it should apply snapshots", (t) => {
     applySnapshot(doc, {to: 'universe'})
 
     t.deepEqual(getSnapshot(doc), {to: 'universe'})
+})
+
+test("it should apply and accept null value for types.maybe(complexType)", (t) => {
+  const Item = types.model({
+    value: types.string
+  })
+  const Model = types.model({
+    item: types.maybe(Item)
+  })
+  const myModel = Model.create()
+  applySnapshot(myModel, {item: {value: "something"}})
+  applySnapshot(myModel, {item: null})
+
+  t.deepEqual(getSnapshot(myModel), {item: null})
 })
 
 test("it should return a snapshot", (t) => {
@@ -249,6 +277,16 @@ test("it should compose factories", (t) => {
     const ComposedFactory = types.extend(BoxFactory, ColorFactory)
 
     t.deepEqual(getSnapshot(ComposedFactory.create()), {width: 0, height: 0, color: "#FFFFFF"})
+})
+
+test("it should compose factories with computed properties", (t) => {
+    const {ComputedFactory2, ColorFactory} = createTestFactories()
+    const ComposedFactory = types.extend(ColorFactory, ComputedFactory2)
+    const store = ComposedFactory.create({props: {width: 100, height: 200}})
+    t.deepEqual(getSnapshot(store), {props: {width: 100, height: 200}, color: "#FFFFFF"})
+    t.is(store.area, 20000)
+    t.is(typeof store.setWidth, 'function')
+    t.is(typeof store.setHeight, 'function')
 })
 
 
