@@ -1,4 +1,3 @@
-import { isStateTreeNode } from "./"
 import { fail } from "../utils"
 import { observable, IObservableArray } from "mobx"
 import { IType } from "../types/type"
@@ -11,9 +10,8 @@ export class IdentifierCache {
     }
 
     addNodeToCache(node: Node) {
-        const identifier = node.identifier
-        if (identifier) {
-            console.log("register", identifier)
+        if (node.identifierAttribute) {
+            const identifier = node.identifier!
             if (!this.cache.has(identifier)) {
                 this.cache.set(identifier, observable.shallowArray<Node>())
             }
@@ -32,8 +30,8 @@ export class IdentifierCache {
     }
 
     notifyDied(node: Node) {
-        if (node.identifier) {
-            const set = this.cache.get(node.identifier)
+        if (node.identifierAttribute) {
+            const set = this.cache.get(node.identifier!)
             if (set)
                 set.remove(node)
         }

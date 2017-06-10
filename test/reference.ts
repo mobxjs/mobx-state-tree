@@ -289,7 +289,6 @@ test("when applying a snapshot, reference should resolve correctly if value adde
 })
 
 test("it should fail when reference snapshot is ambiguous", t => {
-
     const Box = types.model("Box", {
         id: types.identifier(types.number),
         name: types.string
@@ -322,6 +321,7 @@ test("it should fail when reference snapshot is ambiguous", t => {
 
     // first update the reference, than create a new matching item! Ref becomes ambigous now...
     store.selected = 1 as any
+    t.is(store.selected, store.boxes[0]) // unambigous identifier
 
     let err
     autorun(() => store.selected).onError(e => err = e)

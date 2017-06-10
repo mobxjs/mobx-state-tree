@@ -75,8 +75,9 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
         const ref = current.storedValue as StoredReference
         if (targetMode === ref.mode && ref.value === newValue)
             return current
+        const newNode = this.instantiate(current.parent, current.subpath, current._environment, newValue)
         current.die()
-        return this.instantiate(current.parent, current.subpath, current._environment, newValue)
+        return newNode
     }
 
     isAssignableFrom(type: IType<any, any>): boolean {
