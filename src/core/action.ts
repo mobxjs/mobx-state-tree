@@ -107,7 +107,7 @@ function deserializeArgument(adm: Node, value: any): any {
     if (typeof value === "object") {
         const keys = Object.keys(value)
         if (keys.length === 1 && keys[0] === "$ref")
-            return resolve(adm.storedValue, value.$ref)
+            return resolvePath(adm.storedValue, value.$ref)
     }
     return value
 }
@@ -147,5 +147,5 @@ export function onAction(target: IComplexValue, listener: (call: ISerializedActi
 }
 
 import { Node, getStateTreeNode,  IComplexValue, isStateTreeNode } from "./node"
-import { resolve, tryResolve, addMiddleware  } from "./mst-operations"
+import { resolvePath, tryResolve, addMiddleware  } from "./mst-operations"
 import { fail, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"

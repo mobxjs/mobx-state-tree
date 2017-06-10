@@ -1,5 +1,5 @@
 import { reaction, autorun } from "mobx"
-import { types, getSnapshot, applySnapshot, unprotect } from "../src"
+import { types, getSnapshot, applySnapshot, unprotect, resolvePath, detach, resolveIdentifier } from "../src"
 import { test } from "ava"
 
 test("it should support prefixed paths in maps", t => {
@@ -382,7 +382,6 @@ test("it should restore array of references from snapshot", t => {
     t.deepEqual<any>(store.selected[1] === store.boxes[1], true)
 })
 
-
 test("it should support map of references", t => {
     const Box = types.model({
         id: types.identifier(types.number),
@@ -433,4 +432,45 @@ test("it should restore map of references from snapshot", t => {
 
     t.deepEqual<any>(store.selected.get("from") === store.boxes[0], true)
     t.deepEqual<any>(store.selected.get("to") === store.boxes[1], true)
+})
+
+test("it should support relative lookups", t => {
+    const Node = types.model({
+        id: types.identifier(types.number),
+        children: types.optional(types.array(types.late(() => Node)), [])
+    })
+
+    const root = Node.create({
+        id: 1,
+        children: [{
+            id: 2,
+            children: [{
+                id: 4
+            }]
+        }, {
+            id: 3
+        }]
+    })
+    unprotect(root)
+
+    t.deepEqual(getSnapshot(root), {"id":1,"children":[{"id":2,"children":[{"id":4,"children":[]}]},{"id":3,"children":[]}]})
+
+    t.is(resolveIdentifier(Node, root, 1), root)
+    t.is(resolveIdentifier(Node, root, 4), root.children[0].children[0])
+    t.is(resolveIdentifier(Node, root.children[0].children[0], 3), root.children[1])
+
+    const n2 = detach(root.children[0])
+    unprotect(n2)
+    t.is(resolveIdentifier(Node, n2, 2), n2)
+    t.is(resolveIdentifier(Node, root, 2), undefined)
+    t.is(resolveIdentifier(Node, root, 4), undefined)
+    t.is(resolveIdentifier(Node, n2, 3), undefined)
+    t.is(resolveIdentifier(Node, n2, 4), n2.children[0])
+    t.is(resolveIdentifier(Node, n2.children[0], 2), n2)
+
+    const n5 = Node.create({ id: 5 })
+    t.is(resolveIdentifier(Node, n5, 4), undefined)
+    n2.children.push(n5)
+    t.is(resolveIdentifier(Node, n5, 4), n2.children[0])
+    t.is(resolveIdentifier(Node, n2.children[0], 5), n5)
 })

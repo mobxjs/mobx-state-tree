@@ -46,7 +46,7 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
             return ref.value
 
         // reference was initialized with the identifier of the target
-        const target = node.root.identifierCache.resolve(this.targetType, ref.value)
+        const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
         if (!target)
             return fail(`Failed to resolve reference of type ${this.targetType.name}: '${ref.value}' (in: ${node.path})`)
         return target.getValue()

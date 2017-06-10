@@ -15,7 +15,7 @@ export class Node  {
     @observable protected _parent: Node | null = null
     @observable subpath: string = ""
 
-    identifierCache = new IdentifierCache()
+    identifierCache: IdentifierCache | undefined
     isProtectionEnabled = true
     identifierAttribute: string | undefined = undefined // not to be modified directly, only through model initialization
     _environment: any = undefined
@@ -146,7 +146,6 @@ export class Node  {
 
         if (isStateTreeNode(this.storedValue)) {
             walk(this.storedValue, child => getStateTreeNode(child).aboutToDie())
-            this.root.identifierCache.unregister(this)
             walk(this.storedValue, child => getStateTreeNode(child).finalizeDeath())
         }
     }
@@ -158,6 +157,7 @@ export class Node  {
 
     public finalizeDeath() {
         // invariant: not called directly but from "die"
+        this.root.identifierCache!.notifyDied(this)
         const self = this
         const oldPath = this.path
         addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
@@ -248,11 +248,12 @@ export class Node  {
         if (this.parent && !newParent) {
             this.die()
         } else {
-            this._parent = newParent
-            if (newParent && !this._parent)
-                newParent.root.identifierCache.register(this)
             this.subpath = subpath || ""
-            this.fireHook("afterAttach")
+            if (newParent && newParent !== this._parent) {
+                newParent.root.identifierCache!.mergeCache(this)
+                this._parent = newParent
+                this.fireHook("afterAttach")
+            }
         }
     }
 
@@ -407,7 +408,7 @@ export class Node  {
             this.fireHook("beforeDetach")
             this._environment = (this.root as Node)._environment // make backup of environment
             this._isDetaching = true
-            this.root.identifierCache.unregister(this)
+            this.identifierCache = this.root.identifierCache!.splitCache(this)
             this.parent!.removeChild(this.subpath)
             this._parent = null
             this.subpath = ""
@@ -468,7 +469,7 @@ export function createNode<S, T>(type: IType<S, T>, parent: Node | null, subpath
     const canAttachTreeNode = canAttachNode(instance)
     // tslint:disable-next-line:no_unused-variable
     const node = new Node(type, parent, subpath, environment, instance)
-
+    if (!parent) node.identifierCache = new IdentifierCache()
     if (canAttachTreeNode) addHiddenFinalProp(instance, "$treenode", node);
 
     let sawException = true
@@ -478,8 +479,10 @@ export function createNode<S, T>(type: IType<S, T>, parent: Node | null, subpath
         node.pseudoAction(() => {
             finalizeNewInstance(node, initialValue)
         })
-        if (parent) 
-            parent.root.identifierCache.register(node)
+        if (parent)
+            parent.root.identifierCache!.addNodeToCache(node)
+        else
+            node.identifierCache!.addNodeToCache(node)
 
         node.fireHook("afterCreate")
         if (parent)

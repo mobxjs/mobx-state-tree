@@ -5,41 +5,56 @@ import { IType } from "../types/type"
 import { Node } from "./node"
 
 export class IdentifierCache {
-    private cache: { [id: string]: IObservableArray<Node> } = {}
+    private cache = observable.map<IObservableArray<Node>>()
 
-    register(node: Node) {
-        if (node.identifier === null)
-            return
-
-        const identifier = node.identifier
-        if (identifier) {
-            const set = this.cache[identifier] || (this.cache[identifier] = observable.shallowArray<Node>())
-            if (set.indexOf(node) !== -1)
-                fail(`Already registered`)
-            set.forEach(otherNode => {
-                if (otherNode.type.isAssignableFrom(node.type))
-                    fail(`An object with identifier '${identifier}' of a similar type is already part of this state tree. Wanted to add '${node.path}', which conflicts with '${otherNode.path}'`)
-            })
-            set.push(node)
-        }
-
-        // TODO: all items in node's cache should become part of this cache as well
+    constructor() {
     }
 
-    unregister(node: Node) {
-        if (node.identifier === null)
-            return
+    addNodeToCache(node: Node) {
+        const identifier = node.identifier
+        if (identifier) {
+            console.log("register", identifier)
+            if (!this.cache.has(identifier)) {
+                this.cache.set(identifier, observable.shallowArray<Node>())
+            }
+            const set = this.cache.get(identifier)!
+            if (set.indexOf(node) !== -1)
+                fail(`Already registered`)
+            set.push(node)
+        }
+        return this
+    }
+
+    mergeCache(node: Node) {
+        node.identifierCache!.cache.values().forEach(nodes => nodes.forEach(child => {
+            this.addNodeToCache(child)
+        }))
+    }
+
+    notifyDied(node: Node) {
         if (node.identifier) {
-            const set = this.cache[node.identifier]
+            const set = this.cache.get(node.identifier)
             if (set)
                 set.remove(node)
         }
-        // TODO: all cached items which have node as parent should not be dropped from the cache as well, and moved to the cache of node
     }
 
-    // TOOD: expose a public api for this in mst-operations
+    splitCache(node: Node): IdentifierCache {
+        const res = new IdentifierCache()
+        const basePath = node.path
+        this.cache.values().forEach(nodes => {
+            for (let i = nodes.length - 1; i >= 0; i--) {
+                if (nodes[i].path.indexOf(basePath) === 0) {
+                    res.addNodeToCache(nodes[i])
+                    nodes.splice(i, 1)
+                }
+            }
+        })
+        return res
+    }
+
     resolve(type: IType<any, any>, identifier: string): Node | null {
-        const set = this.cache[identifier]
+        const set = this.cache.get(identifier)
         if (!set)
             return null
         const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))

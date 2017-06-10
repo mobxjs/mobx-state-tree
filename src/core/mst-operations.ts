@@ -3,7 +3,7 @@ import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { Node, getStateTreeNode, IComplexValue, isStateTreeNode } from "./node"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, fail } from "../utils"
-import { ISnapshottable, IType } from "../types/type"
+import { ISnapshottable, IType, isType } from "../types/type"
 
 export function getType<S, T>(object: IComplexValue): IType<S, T> {
     return getStateTreeNode(object).type
@@ -335,10 +335,17 @@ export function isRoot(target: IComplexValue): boolean {
  * @param {string} path - escaped json path
  * @returns {*}
  */
-export function resolve(target: IComplexValue, path: string): IComplexValue | any {
+export function resolvePath(target: IComplexValue, path: string): IComplexValue | any {
     // TODO: give better error messages!
     // TODO: also accept path parts
     const node = getStateTreeNode(target).resolve(path)
+    return node ? node.getValue() : undefined
+}
+
+export function resolveIdentifier(type: IType<any, any>, target: IComplexValue, identifier: string | number): any {
+    if (!isType(type))
+        fail("Expected a type as first argument")
+    const node = getStateTreeNode(target).root.identifierCache!.resolve(type, "" + identifier)
     return node ? node.getValue() : undefined
 }
 
