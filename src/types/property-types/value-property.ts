@@ -1,7 +1,7 @@
 import { observable, IObjectWillChange, IObjectChange, extras } from "mobx"
 import { Property } from "./property"
 import { getStateTreeNode, escapeJsonPath, Node } from "../../core"
-import { IType, OMIT_FROM_SNAPSHOT } from "../type"
+import { IType } from "../type"
 import { IContext, IValidationResult, getContextForPath, typecheck } from "../type-checker"
 import { fail } from "../../utils"
 import { literal } from "../utility-types/literal"
@@ -47,10 +47,12 @@ export class ValueProperty extends Property {
     }
 
     serialize(instance: any, snapshot: any) {
-        // TODO: FIXME, make sure the observable ref is used!
-        (extras.getAtom(instance, this.name) as any).reportObserved()
-        const childSnapshot = this.getValueNode(instance).snapshot
-        if (childSnapshot !== OMIT_FROM_SNAPSHOT) snapshot[this.name] = childSnapshot;
+        if (this.getValueNode(instance).type.snapshottable) {
+            // TODO: FIXME, make sure the observable ref is used!
+            (extras.getAtom(instance, this.name) as any).reportObserved()
+
+            snapshot[this.name] = this.getValueNode(instance).snapshot
+        }
     }
 
     deserialize(instance: any, snapshot: any) {

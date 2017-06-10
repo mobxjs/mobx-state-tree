@@ -4,6 +4,7 @@ import { isPrimitive, fail } from "../utils"
 import { Node, createNode } from "../core"
 
 export class CoreType<T> extends Type<T, T> {
+    readonly snapshottable = true
     readonly checker: (value: any) => boolean
     readonly flags: TypeFlags
 

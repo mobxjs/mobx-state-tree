@@ -1,7 +1,7 @@
-import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras, isObservableMap } from "mobx"
+import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras } from "mobx"
 import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, createNode, isStateTreeNode } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType, ComplexType, OMIT_FROM_SNAPSHOT } from "../type"
+import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
 
 interface IMapFactoryConfig {
@@ -33,15 +33,15 @@ function put(this: ObservableMap<any>, value: any) {
 }
 
 export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
-    shouldAttachNode = true
-    subType: IType<any, any>
+    readonly snapshottable = true
+    readonly subType: IType<any, any>
     readonly flags = TypeFlags.Map
 
     constructor(name: string, subType: IType<any, any>) {
         super(name)
         this.subType = subType
     }
-    
+
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S): Node {
         return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
     }
@@ -59,7 +59,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     finalizeNewInstance = (node: Node, snapshot: any) => {
-        const instance = node.storedValue as ObservableMap<any>;
+        const instance = node.storedValue as ObservableMap<any>
         extras.interceptReads(instance, node.unbox)
         intercept(instance, c => this.willChange(c))
         observe(instance, this.didChange)
@@ -120,7 +120,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     getSnapshot(node: Node): { [key: string]: any } {
         const res: {[key: string]: any} = {}
         node.getChildren().forEach(childNode => {
-            if (childNode.snapshot !== OMIT_FROM_SNAPSHOT) res[childNode.subpath] = childNode.snapshot;
+            if (childNode.type.snapshottable) res[childNode.subpath] = childNode.snapshot
         })
         return res
     }

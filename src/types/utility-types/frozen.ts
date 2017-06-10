@@ -1,7 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { fail, isMutable, isSerializable, isPlainObject, identity } from "../../utils"
-import { createNode, Node } from '../../core'
+import { isMutable, isSerializable, isPlainObject } from "../../utils"
+import { createNode, Node } from "../../core"
 
 function freeze(value: any) {
     Object.freeze(value)
@@ -18,7 +18,8 @@ function freeze(value: any) {
 }
 
 export class Frozen<T> extends Type<T, T> {
-    flags = TypeFlags.Frozen
+    readonly snapshottable = true
+    readonly flags = TypeFlags.Frozen
 
     constructor() {
         super("frozen")

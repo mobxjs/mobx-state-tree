@@ -1,5 +1,5 @@
 import { TypeFlags, Type, IType } from "../type"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { fail } from "../../utils"
 import { Node, createNode, isStateTreeNode } from "../../core"
 import { string as stringType, number as numberType } from "../primitives"
@@ -13,6 +13,7 @@ class Identifier {
 }
 
 export class IdentifierType<T> extends Type<T, T> {
+    readonly snapshottable = true
     readonly flags = TypeFlags.Identifier
 
     constructor(

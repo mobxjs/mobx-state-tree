@@ -26,6 +26,7 @@ class StoredReference {
 }
 
 export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
+    readonly snapshottable = true
     readonly flags = TypeFlags.Reference
 
     constructor(

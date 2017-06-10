@@ -1,34 +1,30 @@
-import { ISimpleType, TypeFlags, Type, OMIT_FROM_SNAPSHOT } from "../type";
+import { TypeFlags, Type } from "../type"
 import {
   IContext,
   IValidationResult,
   typeCheckSuccess,
   typeCheckFailure,
-  popTypeFromContext,
-  getContextForPath
-} from "../type-checker";
+  popTypeFromContext
+} from "../type-checker"
 import {
   fail,
-  isMutable,
-  isSerializable,
-  isPlainObject,
-  identity,
   noop
-} from "../../utils";
-import { createNode, Node } from "../../core";
+} from "../../utils"
+import { createNode, Node } from "../../core"
 
 export type ISetter<T> = ((value: any) => void) | undefined
 export type IGetter<T> = () => T
 
 export class Computed<T> extends Type<never, T> {
-  flags = TypeFlags.Computed;
+  readonly snapshottable = false
+  readonly flags = TypeFlags.Computed
 
   constructor(private getter: IGetter<T>, private setter: ISetter<T> = noop) {
-    super("computed");
+    super("computed")
   }
 
   describe() {
-    return "computed";
+    return "computed"
   }
 
   instantiate(
@@ -43,7 +39,7 @@ export class Computed<T> extends Type<never, T> {
       subpath,
       environment,
       undefined
-    );
+    )
   }
 
   getValue(node: Node) {
@@ -52,7 +48,7 @@ export class Computed<T> extends Type<never, T> {
   }
 
   getSnapshot(node: Node) {
-      return OMIT_FROM_SNAPSHOT;
+      return undefined
   }
 
   reconcile(current: Node, value: any) {
@@ -62,9 +58,9 @@ export class Computed<T> extends Type<never, T> {
 
   isValidSnapshot(value: any, context: IContext): IValidationResult {
     if (typeof value !== "undefined") {
-      return typeCheckFailure(popTypeFromContext(context), value, "Computed properties should not be provided in the snapshot");
+      return typeCheckFailure(popTypeFromContext(context), value, "Computed properties should not be provided in the snapshot")
     }
-    return typeCheckSuccess();
+    return typeCheckSuccess()
   }
 }
 

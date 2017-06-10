@@ -31,7 +31,7 @@ function objectTypeToString(this: any) {
 }
 
 export class ObjectType extends ComplexType<any, any> {
-    shouldAttachNode = true
+    readonly snapshottable = true
     readonly flags = TypeFlags.Object
 
     /**
@@ -61,7 +61,7 @@ export class ObjectType extends ComplexType<any, any> {
         this.parseModelProps()
         this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
     }
-    
+
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
         return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
     }
@@ -73,7 +73,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     finalizeNewInstance = (node: Node, snapshot: any) => {
-        const instance = node.storedValue as IComplexValue;
+        const instance = node.storedValue as IComplexValue
         this.forAllProps(prop => prop.initialize(instance, snapshot))
         intercept(instance, change => this.willChange(change) as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)

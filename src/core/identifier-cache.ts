@@ -1,4 +1,3 @@
-import { isStateTreeNode } from "./"
 import { fail } from "../utils"
 import { observable, IObservableArray } from "mobx"
 import { IType } from "../types/type"

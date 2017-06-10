@@ -1,14 +1,18 @@
 import { fail } from "../../utils"
 import { Type, IType, TypeFlags } from "../type"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { Node } from "../../core";
+import { IContext, IValidationResult } from "../type-checker"
+import { Node } from "../../core"
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>
     private _subType: IType<S, T> | null = null
 
-    get flags () {
+    get flags (): TypeFlags {
         return this.subType.flags
+    }
+
+    get snapshottable() {
+        return this.subType.snapshottable
     }
 
     get subType(): IType<S, T> {

@@ -1,7 +1,5 @@
 import { action } from "mobx"
 
-export const OMIT_FROM_SNAPSHOT = Object.freeze({})
-
 export interface ISnapshottable<S> {}
 
 export enum TypeFlags {
@@ -23,6 +21,7 @@ export enum TypeFlags {
 export interface IType<S, T> {
     name: string
     flags: TypeFlags
+    snapshottable: boolean
     is(thing: any): thing is S | T
     validate(thing: any, context: IContext): IValidationResult
     create(snapshot?: S, environment?: any): T
@@ -72,6 +71,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     abstract instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any): Node
 
     abstract flags: TypeFlags
+    abstract snapshottable: boolean
     abstract describe(): string
 
     abstract applySnapshot(node: Node, snapshot: any): void
@@ -109,6 +109,16 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     reconcile(current: Node, newValue: any): Node {
+        // node does not supports snapshots
+        if (!this.snapshottable) {
+            // reconcile only if type and value are still the same
+            if (current.type === this && current.storedValue === newValue)
+                return current
+            const res = this.instantiate(current.parent, current.subpath, current._environment, newValue)
+            current.die()
+            return res
+        }
+
         // TODO: this.is... for all prepareNewVaues?
         if (isStateTreeNode(newValue) && getStateTreeNode(newValue) === current)
             // the current node is the same as the new one
@@ -187,21 +197,12 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
         return fail(`No child '${key}' available in type: ${this.name}`)
     }
 
-    reconcile(current: Node, newValue: any): Node {
-        // reconcile only if type and value are still the same
-        if (current.type === this && current.storedValue === newValue)
-            return current
-        const res = this.instantiate(current.parent, current.subpath, current._environment, newValue)
-        current.die()
-        return res
-    }
-
     removeChild(node: Node, subpath: string): void {
         return fail(`No child '${subpath}' available in type: ${this.name}`)
     }
 }
 
-import { EMPTY_ARRAY, fail, addReadOnlyProp, addHiddenFinalProp, isMutable } from "../utils"
+import { EMPTY_ARRAY, fail, isMutable } from "../utils"
 import { isStateTreeNode, getStateTreeNode } from "../core/node"
 import { IContext, IValidationResult, typecheck, typeCheckFailure, typeCheckSuccess } from "./type-checker"
 import { Node, IComplexValue, IJsonPatch } from "../core"
