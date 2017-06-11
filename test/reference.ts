@@ -1,5 +1,5 @@
 import { reaction, autorun } from "mobx"
-import { types, getSnapshot, applySnapshot, unprotect, resolvePath, detach, resolveIdentifier } from "../src"
+import { types, getSnapshot, applySnapshot, unprotect, resolvePath, detach, resolveIdentifier, getRoot } from "../src"
 import { test } from "ava"
 
 test("it should support prefixed paths in maps", t => {
@@ -530,4 +530,84 @@ test("References are described properly", t => {
     })
 
     t.is(Store.describe(), "{ todo: ({ id: identifier(number) } | null?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | null?) }")
+})
+
+test("References in recursive structures", t => {
+    const Folder = types.model("Folder", {
+        id: types.identifier(),
+        name: types.string,
+        files: types.array(types.string)
+    })
+
+    const Tree = types.model("Tree", {
+        children: types.array(types.late(() => Tree)),
+        data: types.maybe(types.reference(Folder))
+    }, {
+        addFolder(data) {
+            const folder = Folder.create(data)
+            getRoot(this).objects.put(folder)
+            this.children.push(Tree.create({data: folder, children: []}))
+        }
+    })
+
+    const Storage = types.model("Storage", {
+        objects: types.map(Folder),
+        tree: Tree
+    })
+
+    const store = Storage.create({objects: {}, tree: {children: [], data: null}})
+
+    const folder = {id: "1", name: "Folder 1", files: ["a.jpg", "b.jpg"]}
+    store.tree.addFolder(folder)
+
+    t.deepEqual(getSnapshot(store), {
+        objects: {
+            "1": {
+                files: ["a.jpg", "b.jpg"],
+                id: "1",
+                name: "Folder 1"
+            }
+        },
+        tree: {
+            children: [ {
+                children: [],
+                data: "1"
+            }
+            ],
+            data: null
+        }
+    })
+    t.is(store.objects.get("1"), store.tree.children[0].data)
+
+    const folder2 = {id: "2", name: "Folder 2", files: ["c.jpg", "d.jpg"]}
+    store.tree.children[0].addFolder(folder2)
+
+    t.deepEqual(getSnapshot(store), {
+        objects: {
+            "1": {
+                files: ["a.jpg", "b.jpg"],
+                id: "1",
+                name: "Folder 1"
+            },
+            "2": {
+                files: ["c.jpg", "d.jpg"],
+                id: "2",
+                name: "Folder 2"
+            }
+        },
+        tree: {
+            children: [ {
+                children: [{
+                    children: [],
+                    data: "2"
+                }],
+                data: "1"
+            }
+            ],
+            data: null
+        }
+    })
+
+    t.is(store.objects.get("1"), store.tree.children[0].data)
+    t.is(store.objects.get("2"), store.tree.children[0].children[0].data)
 })
