@@ -1,13 +1,24 @@
+# 0.7.0
+
+The type system and internal administration has been refactoring, making the internals both simpler and more flexible.
+Things like references and identifiers are now first class types, making them much better composable.
+
+* **BREAKING** References with a predefined lookup path are no longer supported. Instead of that, identifiers are now looked up in the entire tree. For that reasons identifiers now have to be unique in the entire tree, per type.
+* **BREAKING** `resolve` is renamed to `resolvePath`
+* Introduced `resolveIdentifier(type, tree, identifier)` to find objects by identifier
+* **BREAKING** `types.reference` is by default non-nullable. For nullable identifiers, use `types.maybe(types.reference(X))`
+* Many, many improvements. Related open issues will be updated.
+
 # 0.6.3
 
-Fixed issue with array/maps of union types @abruzzihraig
-Make types.extend support computed attributes @cpunion
-Fixed issue with map of primitive types and applySnapshot @pioh
-Better type declarations for union, up to 10 supported types
+* Fixed issue with array/maps of union types @abruzzihraig
+* Make types.extend support computed attributes @cpunion
+* Fixed issue with map of primitive types and applySnapshot @pioh
+* Better type declarations for union, up to 10 supported types
 
 # 0.6.2
 
-Fixed issue where arrays where not properly serialized as action argument
+* Fixed issue where arrays where not properly serialized as action argument
 
 # 0.6.1
 
