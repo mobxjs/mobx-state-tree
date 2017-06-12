@@ -1,6 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "./type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
 import { isPrimitive, fail } from "../utils"
+import { Node, createNode } from "../core"
 
 export class CoreType<T> extends Type<T, T> {
     readonly checker: (value: any) => boolean
@@ -16,21 +17,15 @@ export class CoreType<T> extends Type<T, T> {
         return this.name
     }
 
-    create(value: any) {
-        if (!isPrimitive(value)) fail(`Not a primitive: '${value}'`)
-        if (!this.checker(value)) fail(`Value is not assignable to '` + this.name + `'`)
-        return value
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
+        return createNode(this, parent, subpath, environment, snapshot)
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (isPrimitive(value) && this.checker(value)) {
             return typeCheckSuccess()
         }
         return typeCheckFailure(context, value)
-    }
-
-    get identifierAttribute() {
-        return null
     }
 }
 
@@ -42,6 +37,12 @@ export const number: ISimpleType<number> = new CoreType<number>("number", TypeFl
 export const boolean: ISimpleType<boolean> = new CoreType<boolean>("boolean", TypeFlags.Boolean, (v: any) => typeof v === "boolean")
 // tslint:disable-next-line:variable-name
 export const DatePrimitive: ISimpleType<Date> = new CoreType<Date>("Date", TypeFlags.Date, (v: any) => v instanceof Date)
+
+; (DatePrimitive as any).getSnapshot = function(node: Node) {
+    return node.storedValue.getTime()
+}
+
+// TODO: move null and undefined primitive to here (from maybe)
 
 export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     switch (typeof value) {

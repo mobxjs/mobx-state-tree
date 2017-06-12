@@ -1,7 +1,7 @@
-import { isType, IType, TypeFlags, Type } from "../type"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors, typecheck } from "../type-checker"
-import { MSTAdministration } from "../../core/mst-node-administration"
-import { fail } from "../../utils"
+import {isType, IType, TypeFlags, Type} from "../type"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors } from "../type-checker"
+import {fail} from "../../utils"
+import { Node } from "../../core"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
@@ -25,16 +25,26 @@ export class Union extends Type<any, any> {
         this.types = types
     }
 
+    isAssignableFrom(type: IType<any, any>) {
+        return this.types.some(subType => subType.isAssignableFrom(type))
+    }
+
     describe() {
         return "(" + this.types.map(factory => factory.describe()).join(" | ") + ")"
     }
 
-    create(value: any, environment: any = undefined, parent: MSTAdministration | null = null, subpath: string = "") {
-        typecheck(this, value)
+    instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
+        return this.determineType(value).instantiate(parent, subpath, environment, value)
+    }
 
+    reconcile(current: Node, newValue: any): Node {
+        return this.determineType(newValue).reconcile(current, newValue)
+    }
+
+    determineType(value: any): IType<any, any> {
         // try the dispatcher, if defined
         if (this.dispatcher !== null) {
-            return (this.dispatcher(value) as any).create(value, environment, parent, subpath)
+            return this.dispatcher(value)
         }
 
         // find the most accomodating type
@@ -42,10 +52,10 @@ export class Union extends Type<any, any> {
         if (applicableTypes.length > 1)
              return fail(`Ambiguos snapshot ${JSON.stringify(value)} for union ${this.name}. Please provide a dispatch in the union declaration.`)
 
-        return (applicableTypes[0] as any).create(value, environment, parent, subpath)
+        return applicableTypes[0]
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (this.dispatcher !== null) {
             return this.dispatcher(value).validate(value, context)
         }
@@ -61,13 +71,6 @@ export class Union extends Type<any, any> {
         }
 
         return typeCheckSuccess()
-    }
-
-    get identifierAttribute() {
-        const identifier0 = this.types[0].identifierAttribute
-        if (identifier0 && this.types.every(type => type.identifierAttribute === identifier0))
-            return identifier0
-        return null
     }
 }
 

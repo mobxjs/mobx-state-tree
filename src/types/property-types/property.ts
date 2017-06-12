@@ -1,4 +1,4 @@
-import { IMSTNode } from "../../core/"
+import { IComplexValue } from "../../core/"
 import { IContext, IValidationResult } from "../type-checker"
 import { IObjectChange, IObjectWillChange } from "mobx"
 
@@ -8,7 +8,7 @@ export abstract class Property {
     }
 
     initializePrototype(prototype: any) { }
-    initialize(targetInstance: IMSTNode, snapshot: any) { }
+    initialize(targetInstance: IComplexValue, snapshot: any) { }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         return null
@@ -16,7 +16,7 @@ export abstract class Property {
 
     didChange(change: IObjectChange) { }
 
-    serialize(instance: IMSTNode, snapshot: any) { }
-    deserialize(instance: IMSTNode, snapshot: any) { }
+    serialize(instance: IComplexValue, snapshot: any) { }
+    deserialize(instance: IComplexValue, snapshot: any) { }
     abstract validate(snapshot: any, context: IContext): IValidationResult
 }

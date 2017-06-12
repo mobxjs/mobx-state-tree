@@ -32,7 +32,6 @@ test("it should throw if default value does not pass the predicate", t => {
         types.model({
             number: types.refinement("Number", types.number, s => typeof s === "number")
         })
-    })
-
-    t.is(error.message, "[mobx-state-tree] Value is not assignable to \'number\'")
+    }, `[mobx-state-tree] Error while converting \`undefined\` to \`number\`:
+value \`undefined\` is not assignable to type: \`number\`.`)
 })

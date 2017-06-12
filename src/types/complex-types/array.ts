@@ -1,22 +1,20 @@
-import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe } from "mobx"
+import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe, extras } from "mobx"
 import {
-    getMSTAdministration,
+    getStateTreeNode,
     IJsonPatch,
-    maybeMST,
-    MSTAdministration,
-    valueToSnapshot
+    Node,
+    createNode
 } from "../../core"
-import { addHiddenFinalProp, identity, nothing } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType } from "../type"
+import { addHiddenFinalProp, fail } from "../../utils"
+import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
-import { ComplexType } from "./complex-type"
 
 export function arrayToString(this: IObservableArray<any>) {
-    return `${getMSTAdministration(this)}(${this.length} items)`
+    return `${getStateTreeNode(this)}(${this.length} items)`
 }
 
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
-    isArrayFactory = true
+    shouldAttachNode = true
     subType: IType<any, any>
     readonly flags = TypeFlags.Array
 
@@ -29,78 +27,81 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return this.subType.describe() + "[]"
     }
 
-    createNewInstance() {
+    createNewInstance = () => {
         const array = observable.shallowArray()
         addHiddenFinalProp(array, "toString", arrayToString)
         return array
     }
 
-    finalizeNewInstance(instance: IObservableArray<any>, snapshot: any) {
+    finalizeNewInstance = (node: Node, snapshot: any) => {
+        const instance = node.storedValue as IObservableArray<any>;
+        extras.getAdministration(instance).dehancer = node.unbox;
         intercept(instance, change => this.willChange(change) as any)
         observe(instance, this.didChange)
-        getMSTAdministration(instance).applySnapshot(snapshot)
+        node.applySnapshot(snapshot)
     }
 
-    getChildMSTs(node: MSTAdministration): [string, MSTAdministration][] {
-        const target = node.target as IObservableArray<any>
-        const res: [string, MSTAdministration][] = []
-        target.forEach((value, index) => {
-            maybeMST(value, childNode => { res.push(["" + index, childNode])})
-        })
-        return res
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S): Node {
+        return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
     }
 
-    getChildMST(node: MSTAdministration, key: string): MSTAdministration | null {
-        const target = node.target as IObservableArray<any>
+    getChildren(node: Node): Node[] {
+        return node.storedValue.peek()
+    }
+
+    getChildNode(node: Node, key: string): Node {
         const index = parseInt(key, 10)
-        if (index < target.length)
-            return maybeMST(target[index], identity, nothing)
-        return null
+        if (index < node.storedValue.length)
+            return node.storedValue[index]
+        return fail("Not a child: " + key)
     }
 
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
-        const node = getMSTAdministration(change.object)
+        const node = getStateTreeNode(change.object)
         node.assertWritable()
+        const childNodes = node.getChildren()
 
         switch (change.type) {
             case "update":
                 if (change.newValue === change.object[change.index])
                     return null
-                change.newValue = node.reconcileChildren(this.subType, [change.object[change.index]], [change.newValue], [change.index])[0]
+                change.newValue = node.reconcileChildren(node, this.subType, [childNodes[change.index]], [change.newValue], [change.index])[0]
                 break
             case "splice":
-                const {index, removedCount, added, object} = change
+                const {index, removedCount, added} = change
                 change.added = node.reconcileChildren(
+                    node,
                     this.subType,
-                    object.slice(index, index + removedCount),
+                    childNodes.slice(index, index + removedCount),
                     added,
                     added.map((_, i) => index + i)
                 )
 
                 // update paths of remaining items
-                for (let i = index + removedCount; i < object.length; i++) {
-                    maybeMST(object[i], child => {
-                        child.setParent(node, "" + (i + added.length - removedCount))
-                    })
+                for (let i = index + removedCount; i < childNodes.length; i++) {
+                    childNodes[i].setParent(node, "" + (i + added.length - removedCount))
                 }
                 break
         }
         return change
     }
 
-    serialize(node: MSTAdministration): any {
-        const target = node.target as IObservableArray<any>
-        return target.map(valueToSnapshot)
+    getValue(node: Node): any {
+        return node.storedValue
+    }
+
+    getSnapshot(node: Node): any {
+        return node.getChildren().map(childNode => childNode.snapshot)
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
-        const node = getMSTAdministration(change.object)
+        const node = getStateTreeNode(change.object)
         switch (change.type) {
             case "update":
                 return void node.emitPatch({
                     op: "replace",
                     path: "" + change.index,
-                    value: valueToSnapshot(change.newValue)
+                    value:  node.getChildNode("" + change.index).snapshot
                 }, node)
             case "splice":
                 for (let i = change.index + change.removedCount - 1; i >= change.index; i--)
@@ -112,14 +113,14 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                     node.emitPatch({
                         op: "add",
                         path: "" + (change.index + i),
-                        value: valueToSnapshot(change.added[i])
+                        value: node.getChildNode("" + (change.index + i)).snapshot
                     }, node)
                 return
         }
     }
 
-    applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void {
-        const target = node.target as IObservableArray<any>
+    applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
+        const target = node.storedValue as IObservableArray<any>
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
             case "replace":
@@ -134,9 +135,9 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         }
     }
 
-    @action applySnapshot(node: MSTAdministration, snapshot: any[]): void {
+    @action applySnapshot(node: Node, snapshot: any[]): void {
         node.pseudoAction(() => {
-            const target = node.target as IObservableArray<any>
+            const target = node.storedValue as IObservableArray<any>
             target.replace(snapshot)
         })
     }
@@ -161,12 +162,8 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return []
     }
 
-    removeChild(node: MSTAdministration, subpath: string) {
-        node.target.splice(parseInt(subpath, 10), 1)
-    }
-
-    get identifierAttribute() {
-        return null
+    removeChild(node: Node, subpath: string) {
+        node.storedValue.splice(parseInt(subpath, 10), 1)
     }
 }
 

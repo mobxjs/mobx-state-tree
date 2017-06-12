@@ -1,5 +1,6 @@
 import {Type, IType, TypeFlags} from "../type"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import { isStateTreeNode, getStateTreeNode, Node  } from "../../core"
 
 export type IFunctionReturn<T> = () => T
 export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>
@@ -19,31 +20,34 @@ export class OptionalValue<S, T> extends Type<S, T> {
     }
 
     describe() {
-        // return "(" + this.type.type.describe() + " = " + JSON.stringify(this.defaultValue) + ")"
-        // MWE: discuss a default value is not part of the type description? (unlike a literal)
         return this.type.describe() + "?"
     }
 
-    create(value: any) {
+    instantiate(parent: Node, subpath: string, environment: any, value: S): Node {
         if (typeof value === "undefined") {
-            const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
-            const defaultSnapshot = isMST(defaultValue) ? getMSTAdministration(defaultValue).snapshot : defaultValue
-            return this.type.create(defaultSnapshot)
+            const defaultValue = this.getDefaultValue()
+            const defaultSnapshot = isStateTreeNode(defaultValue) ? getStateTreeNode(defaultValue).snapshot : defaultValue
+            return this.type.instantiate(parent, subpath, environment, defaultSnapshot)
         }
-
-        return this.type.create(value)
+        return this.type.instantiate(parent, subpath, environment, value)
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    reconcile(current: Node, newValue: any): Node {
+        return this.type.reconcile(current, this.type.is(newValue) ? newValue : this.getDefaultValue())
+    }
+
+    private getDefaultValue() {
+        const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
+        if (typeof this.defaultValue === "function") typecheck(this, defaultValue)
+        return defaultValue
+    }
+
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         // defaulted values can be skipped
         if (value === undefined || this.type.is(value)) {
             return typeCheckSuccess()
         }
         return typeCheckFailure(context, value)
-    }
-
-    get identifierAttribute() {
-        return this.type.identifierAttribute
     }
 }
 
@@ -53,9 +57,7 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => 
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => T): IType<S, T>
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): IType<S, T> {
     const defaultValue = typeof defaultValueOrFunction === "function" ? defaultValueOrFunction() : defaultValueOrFunction
-    const defaultSnapshot = isMST(defaultValue) ? getMSTAdministration(defaultValue).snapshot : defaultValue
+    const defaultSnapshot = isStateTreeNode(defaultValue) ? getStateTreeNode(defaultValue).snapshot : defaultValue
     typecheck(type, defaultSnapshot)
     return new OptionalValue(type, defaultValueOrFunction)
 }
-
-import {isMST, getMSTAdministration} from "../../core/mst-node"

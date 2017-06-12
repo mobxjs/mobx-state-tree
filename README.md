@@ -1,7 +1,7 @@
 <p align="center">
 	   <img src="docs/logo.png" height="100">
     <h3 align="center">mobx-state-tree</h3>
-    <p align="center">_Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX_<p>
+    <p align="center"><i>Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX</i><p>
 </p>
 
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
@@ -194,7 +194,7 @@ const TodoStore = types.model("TodoStore", {      // 1
     loaded: types.boolean                         // 2
     endpoint: "http://localhost",                 // 3
     todos: types.array(Todo),                     // 4
-    selectedTodo: types.reference(Todo, "todos"), // 5
+    selectedTodo: types.reference(Todo),          // 5
     get completedTodos() {                        // 6
         return this.todos.filter(t => t.done)
     },
@@ -369,7 +369,7 @@ const Todo = types.model({
 
 const TodoStore = types.model({
     todos: types.array(Todo),
-    selectedTodo: types.reference(Todo, "todos")
+    selectedTodo: types.reference(Todo)
 })
 
 // create a store with a normalized snapshot
@@ -390,23 +390,15 @@ console.log(storeInstance.selectedTodo.title)
 
 -   Each model can define zero or one `identifier()` properties
 -   The identifier property of an object cannot be modified after initialization
--   Identifiers should be unique within their parent collection (`array` or `map`)
+-   Each identifiers / type combination should be unique within the entire tree
 -   Identifiers are used to reconcile items inside arrays and maps wherever possible when applying snapshots
--   The `map.put()` method can be used to simplify adding objects to maps that have identifiers
-
+-   The `map.put()` method can be used to simplify adding objects that have identifiers to maps
+-   The primary goal of identifiers is not validation, but reconciliation and reference resolving. For this reason identifiers cannot be defined or updated after creation. If you want to check if some value just looks as an identifier, without providing the above semantics; use something like: `types.refinement(types.string, v => v.match(/someregex/))`
 
 #### References
 
-References can be defined in two ways, generic or namespaces.
-
-Namespaced references can only put to elements of the correct type, at a predefined location (namespace). Namespaced references always use the `identifier()` property of the targeted object.
-The above example: `selectedTodo: types.reference(Todo, "todos")` is namespaced, and resolves it's target in the collection on the relative path `"todos"`. (`"../todos"` can be used to identify a namespace one level higher in the tree etc.)
-
-Generic references can point to any element of the correct type in the current tree, and are stored behind the scenes as JSON path. The above example could also have been configured as `selectedTodo: types.reference(Todo)` to create a generic reference.
-
-_Tip: It is recommended to use namespaced references; as those are more stable, since they always use immutable references and a preconfigured namespace._
-
-**Note: The exact semantics of references are still under investigation, and might change before MST 1.0. One of the two forms might be dropped_**
+References are defined by mentioning the type they should resolve to. The targetted type should have exactly one attribute of the type `identifier()`.
+References are looked up through the entire tree, but per type. So identifiers need to be unique in the entire tree.
 
 ### Listening to observables, snapshots, patches or actions
 
@@ -504,7 +496,7 @@ These are the types available in MST. All types can be found in the `types` name
 
 Property types can only be used as direct member of a `types.model` type and not further composed (for now).
 * `types.identifier(subType?)` Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](#identifiers) for more details. `subType` should be either `types.string` or `types.number`, defaulting to the first if not specified.
-* `types.reference(targetType, basePath?)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
+* `types.reference(targetType)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
 
 ## LifeCycle hooks for `types.model`
 
@@ -634,7 +626,19 @@ Or, fancier:
 const Temperature = types.union(...["Hot", "Cold"].map(types.literal))
 ```
 
+### Storing non-serializable data with models
+
+TODO `types.localState`
+
 # FAQ
+
+### How does reconcilation work?
+
+* When applying snapshots, MST will always try to reuse existing object instances for snapshots with the same identifier (see `types.identifier()`).
+* If no identifier is specified, but the type of the snapshot is correct, MST will reconcile objects as well if they are stored in a specific model property or under the same map key.
+* In arrays, items without identifier are never reconciled
+
+If an object is reconciled, the consequence is that localState is preserved and `postCreate` / `attach` life-cycle hooks are not fired because applying a snapshot results just in an existing tree node being updated.
 
 ### Creating async processes
 

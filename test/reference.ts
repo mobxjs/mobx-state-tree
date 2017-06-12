@@ -1,41 +1,6 @@
-import { reaction } from "mobx"
-import { types, getSnapshot, applySnapshot, unprotect } from "../src"
+import { reaction, autorun } from "mobx"
+import { types, getSnapshot, applySnapshot, unprotect, resolvePath, detach, resolveIdentifier, getRoot } from "../src"
 import { test } from "ava"
-
-test("it should support generic relative paths", t => {
-    const User = types.model({
-        name: types.string
-    })
-    const UserStore = types.model({
-        user: types.reference(User),
-        users: types.map(User)
-    }, {
-        postCreate() {
-            unprotect(this)
-        }
-    })
-
-    const store = UserStore.create({
-        user: { $ref: "/users/17"},
-        users: {
-            "17": { name: "Michel" },
-            "18": { name: "Veria" }
-        }
-    })
-    unprotect(store)
-
-    t.is(store.users.get("17")!.name, "Michel")
-    t.is(store.users.get("18")!.name, "Veria")
-    t.is(store.user!.name, "Michel")
-
-    store.user = store.users.get("18")!
-    t.is(store.user.name, "Veria")
-
-    store.users.get("18")!.name = "Noa"
-    t.is(store.user.name, "Noa")
-
-    t.deepEqual(getSnapshot(store), {user: { $ref: "/users/18" }, "users": {"17": {name: "Michel"}, "18": {name: "Noa"}}} as any) // TODO: better typings
-})
 
 test("it should support prefixed paths in maps", t => {
     const User = types.model({
@@ -43,7 +8,7 @@ test("it should support prefixed paths in maps", t => {
         name: types.string
     })
     const UserStore = types.model({
-        user: types.reference(User, "users"),
+        user: types.reference(User),
         users: types.map(User)
     })
 
@@ -60,7 +25,7 @@ test("it should support prefixed paths in maps", t => {
     t.is(store.users.get("18")!.name as string, "Veria")
     t.is(store.user!.name as string, "Michel")
 
-    store.user =  store.users.get("18")!
+    store.user = store.users.get("18")!
     t.is(store.user.name as string, "Veria")
 
     store.users.get("18")!.name = "Noa"
@@ -75,7 +40,7 @@ test("it should support prefixed paths in arrays", t => {
         name: types.string
     })
     const UserStore = types.model({
-        user: types.reference(User, "/users"),
+        user: types.reference(User),
         users: types.array(User)
     })
 
@@ -109,8 +74,10 @@ test("identifiers are required", (t) => {
     t.is(Todo.is({}), false)
     t.is(Todo.is({ id: "x" }), true)
 
-    t.throws(() => Todo.create(), `[mobx-state-tree] Error while converting \`{}\` to \`AnonymousModel\`:
-at path "/id" value \`undefined\` is not assignable to type: \`string\` (The provided identifier is not valid).`)
+    t.throws(() => Todo.create(),
+        "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
+        "at path \"/id\" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead."
+    )
 })
 
 test("identifiers cannot be modified", (t) => {
@@ -121,9 +88,10 @@ test("identifiers cannot be modified", (t) => {
     const todo = Todo.create({ id: "x" })
     unprotect(todo)
 
-    t.throws(() => todo.id = "stuff", "[mobx-state-tree] It is not allowed to change the identifier of an object, got: 'stuff' but expected: 'x'")
-    t.throws(() => applySnapshot(todo, {}), `[mobx-state-tree] Error while converting \`{}\` to \`AnonymousModel\`:
-at path "/id" value \`undefined\` is not assignable to type: \`string\` (The provided identifier is not valid).`)
+    t.throws(() => todo.id = "stuff", "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed.")
+    t.throws(() => applySnapshot(todo, { id: "stuff" }),
+        "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
+     )
 })
 
 test("it should resolve refs during creation, when using path", t => {
@@ -133,7 +101,7 @@ test("it should resolve refs during creation, when using path", t => {
         price: types.number
     })
     const BookEntry = types.model({
-        book: types.reference(Book, "../../books"),
+        book: types.reference(Book),
         get price() {
             return this.book.price * 2
         }
@@ -171,7 +139,7 @@ test("it should resolve refs over late types", t => {
         price: types.number
     })
     const BookEntry = types.model({
-        book: types.reference(types.late(() => Book), "../../books"),
+        book: types.reference(types.late(() => Book)),
         get price() {
             return this.book.price * 2
         }
@@ -222,12 +190,12 @@ test("it should resolve refs during creation, when using generic reference", t =
     t.is(s.entries[0].price, 4)
     t.is(s.entries.reduce((a, e) => a + e.price, 0), 4)
 
-    t.throws(
-        () => BookEntry.create({ book: s.books[0] }), // N.B. ref is initially not resolvable!
-        /the value should already be part of the same model tree/
-    )
+    const entry = BookEntry.create({ book: s.books[0] }) // can refer to book, even when not part of tree yet
 
-    t.deepEqual(values, [4])
+    t.deepEqual(getSnapshot(entry), { book: "3" })
+    s.entries.push(entry)
+
+    t.deepEqual(values, [4, 8])
 })
 
 test("identifiers should only support types.string and types.number", t => {
@@ -266,7 +234,6 @@ test("122 - identifiers should support numbers as well", t => {
 })
 
 test("self reference with a late type", t => {
-    const values: string[] = []
     interface IBook {
         id: string,
         genre: string,
@@ -276,7 +243,7 @@ test("self reference with a late type", t => {
     const Book = types.model("Book", {
       id: types.identifier(),
       genre: types.string ,
-      reference: types.reference(types.late<any, IBook>(() => Book), '../../books')
+      reference: types.reference(types.late<any, IBook>(() => Book))
     })
 
     const Store = types.model("Store", {
@@ -301,4 +268,346 @@ test("self reference with a late type", t => {
     s.addBook(book2)
 
     t.is((s as any).books[1].reference.genre, "thriller")
+})
+
+test("when applying a snapshot, reference should resolve correctly if value added after", t => {
+
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Factory = types.model({
+        selected: types.reference(Box),
+        boxes: types.array(Box)
+    })
+
+    t.notThrows(() => Factory.create({
+        selected: 1,
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}]
+    }))
+})
+
+test("it should fail when reference snapshot is ambiguous", t => {
+    const Box = types.model("Box", {
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Arrow = types.model("Arrow", {
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const BoxOrArrow = types.union(Box, Arrow)
+
+    const Factory = types.model({
+        selected: types.reference(BoxOrArrow),
+        boxes: types.array(Box),
+        arrows: types.array(Arrow)
+    })
+
+    const store = Factory.create({
+        selected: 2,
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}],
+        arrows: [{id: 2, name: "arrow"}]
+    })
+
+    t.throws(() => {
+        store.selected // store.boxes[1] // throws because it can't know if you mean a box or an arrow!
+    }, "[mobx-state-tree] Cannot resolve a reference to type 'Arrow | Box' with id: '2' unambigously, there are multiple candidates: /boxes/1, /arrows/0")
+
+    unprotect(store)
+
+    // first update the reference, than create a new matching item! Ref becomes ambigous now...
+    store.selected = 1 as any
+    t.is(store.selected, store.boxes[0]) // unambigous identifier
+
+    let err
+    autorun(() => store.selected).onError(e => err = e)
+
+    t.is(store.selected, store.boxes[0]) // unambigous identifier
+    store.arrows.push({ id: 1, name: "oops" })
+    t.is(err.message, "[mobx-state-tree] Cannot resolve a reference to type \'Arrow | Box\' with id: \'1\' unambigously, there are multiple candidates: /boxes/0, /arrows/1")
+})
+
+test("it should support array of references", t => {
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Factory = types.model({
+        selected: types.array(types.reference(Box)),
+        boxes: types.array(Box)
+    })
+
+    const store = Factory.create({
+        selected: [],
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}]
+    })
+    unprotect(store)
+
+    t.notThrows(() => {
+        store.selected.push(store.boxes[0])
+    })
+
+    t.deepEqual<any>(getSnapshot(store.selected), [1])
+
+    t.notThrows(() => {
+        store.selected.push(store.boxes[1])
+    })
+
+    t.deepEqual<any>(getSnapshot(store.selected), [1, 2])
+})
+
+test("it should restore array of references from snapshot", t => {
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Factory = types.model({
+        selected: types.array(types.reference(Box)),
+        boxes: types.array(Box)
+    })
+
+    const store = Factory.create({
+        selected: [1, 2],
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}]
+    })
+    unprotect(store)
+
+    t.deepEqual<any>(store.selected[0] === store.boxes[0], true)
+    t.deepEqual<any>(store.selected[1] === store.boxes[1], true)
+})
+
+test("it should support map of references", t => {
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Factory = types.model({
+        selected: types.map(types.reference(Box)),
+        boxes: types.array(Box)
+    })
+
+    const store = Factory.create({
+        selected: {},
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}]
+    })
+    unprotect(store)
+
+    t.notThrows(() => {
+        store.selected.set("from", store.boxes[0])
+    })
+
+    t.deepEqual<any>(getSnapshot(store.selected), { from: 1 })
+
+    t.notThrows(() => {
+        store.selected.set("to", store.boxes[1])
+    })
+
+    t.deepEqual<any>(getSnapshot(store.selected), { from: 1, to: 2 })
+})
+
+test("it should restore map of references from snapshot", t => {
+
+    const Box = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Factory = types.model({
+        selected: types.map(types.reference(Box)),
+        boxes: types.array(Box)
+    })
+
+    const store = Factory.create({
+        selected: { from: 1, to: 2 },
+        boxes: [{id: 1, name: "hello"}, {id: 2, name: "world"}]
+    })
+    unprotect(store)
+
+    t.deepEqual<any>(store.selected.get("from") === store.boxes[0], true)
+    t.deepEqual<any>(store.selected.get("to") === store.boxes[1], true)
+})
+
+test("it should support relative lookups", t => {
+    const Node = types.model({
+        id: types.identifier(types.number),
+        children: types.optional(types.array(types.late(() => Node)), [])
+    })
+
+    const root = Node.create({
+        id: 1,
+        children: [{
+            id: 2,
+            children: [{
+                id: 4
+            }]
+        }, {
+            id: 3
+        }]
+    })
+    unprotect(root)
+
+    t.deepEqual(getSnapshot(root), {"id":1,"children":[{"id":2,"children":[{"id":4,"children":[]}]},{"id":3,"children":[]}]})
+
+    t.is(resolveIdentifier(Node, root, 1), root)
+    t.is(resolveIdentifier(Node, root, 4), root.children[0].children[0])
+    t.is(resolveIdentifier(Node, root.children[0].children[0], 3), root.children[1])
+
+    const n2 = detach(root.children[0])
+    unprotect(n2)
+    t.is(resolveIdentifier(Node, n2, 2), n2)
+    t.is(resolveIdentifier(Node, root, 2), undefined)
+    t.is(resolveIdentifier(Node, root, 4), undefined)
+    t.is(resolveIdentifier(Node, n2, 3), undefined)
+    t.is(resolveIdentifier(Node, n2, 4), n2.children[0])
+    t.is(resolveIdentifier(Node, n2.children[0], 2), n2)
+
+    const n5 = Node.create({ id: 5 })
+    t.is(resolveIdentifier(Node, n5, 4), undefined)
+    n2.children.push(n5)
+    t.is(resolveIdentifier(Node, n5, 4), n2.children[0])
+    t.is(resolveIdentifier(Node, n2.children[0], 5), n5)
+})
+
+test("References are non-nullable by default", t => {
+    const Todo = types.model({
+        id: types.identifier(types.number)
+    })
+    const Store = types.model({
+        todo: types.maybe(Todo),
+        ref: types.reference(Todo),
+        maybeRef: types.maybe(types.reference(Todo))
+    })
+
+    t.is(Store.is({}), false)
+    t.is(Store.is({ ref: 3 }), true)
+    t.is(Store.is({ ref: null }), false)
+    t.is(Store.is({ ref: undefined }), false)
+    t.is(Store.is({ ref: 3, maybeRef: 3 }), true)
+    t.is(Store.is({ ref: 3, maybeRef: null }), true)
+    t.is(Store.is({ ref: 3, maybeRef: undefined }), true)
+
+    let store = Store.create({
+        todo: { id: 3 },
+        ref: 3
+    })
+    t.is(store.ref, store.todo)
+    t.is(store.maybeRef, null)
+
+    store = Store.create({
+        todo: { id: 3 },
+        ref: 4
+    })
+    unprotect(store)
+    t.is(store.maybeRef, null)
+    t.throws(() => store.ref, "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /ref)")
+    store.maybeRef = 3 as any
+    t.is(store.maybeRef, store.todo)
+    store.maybeRef = 4 as any
+    t.throws(() => store.maybeRef, "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /maybeRef)")
+    store.maybeRef = null
+    t.is(store.maybeRef, null)
+    t.throws(
+        () => store.ref = null as any,
+        "[mobx-state-tree] Error while converting `null` to `reference(AnonymousModel)`:\nvalue `null` is not assignable to type: `reference(AnonymousModel)` (Value '`null`' is not a valid reference. Expected a string or number.), expected an instance of `reference(AnonymousModel)` or a snapshot like `reference(AnonymousModel)` instead."
+    )
+})
+
+test("References are described properly", t => {
+    const Todo = types.model({
+        id: types.identifier(types.number)
+    })
+    const Store = types.model({
+        todo: types.maybe(Todo),
+        ref: types.reference(Todo),
+        maybeRef: types.maybe(types.reference(Todo))
+    })
+
+    t.is(Store.describe(), "{ todo: ({ id: identifier(number) } | null?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | null?) }")
+})
+
+test("References in recursive structures", t => {
+    const Folder = types.model("Folder", {
+        id: types.identifier(),
+        name: types.string,
+        files: types.array(types.string)
+    })
+
+    const Tree = types.model("Tree", {
+        children: types.array(types.late(() => Tree)),
+        data: types.maybe(types.reference(Folder))
+    }, {
+        addFolder(data) {
+            const folder = Folder.create(data)
+            getRoot(this).objects.put(folder)
+            this.children.push(Tree.create({data: folder, children: []}))
+        }
+    })
+
+    const Storage = types.model("Storage", {
+        objects: types.map(Folder),
+        tree: Tree
+    })
+
+    const store = Storage.create({objects: {}, tree: {children: [], data: null}})
+
+    const folder = {id: "1", name: "Folder 1", files: ["a.jpg", "b.jpg"]}
+    store.tree.addFolder(folder)
+
+    t.deepEqual(getSnapshot(store), {
+        objects: {
+            "1": {
+                files: ["a.jpg", "b.jpg"],
+                id: "1",
+                name: "Folder 1"
+            }
+        },
+        tree: {
+            children: [ {
+                children: [],
+                data: "1"
+            }
+            ],
+            data: null
+        }
+    })
+    t.is(store.objects.get("1"), store.tree.children[0].data)
+
+    const folder2 = {id: "2", name: "Folder 2", files: ["c.jpg", "d.jpg"]}
+    store.tree.children[0].addFolder(folder2)
+
+    t.deepEqual(getSnapshot(store), {
+        objects: {
+            "1": {
+                files: ["a.jpg", "b.jpg"],
+                id: "1",
+                name: "Folder 1"
+            },
+            "2": {
+                files: ["c.jpg", "d.jpg"],
+                id: "2",
+                name: "Folder 2"
+            }
+        },
+        tree: {
+            children: [ {
+                children: [{
+                    children: [],
+                    data: "2"
+                }],
+                data: "1"
+            }
+            ],
+            data: null
+        }
+    })
+
+    t.is(store.objects.get("1"), store.tree.children[0].data)
+    t.is(store.objects.get("2"), store.tree.children[0].children[0].data)
 })

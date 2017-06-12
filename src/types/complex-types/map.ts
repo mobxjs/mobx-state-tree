@@ -1,10 +1,8 @@
-import { getIdentifierAttribute } from "./object"
-import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe } from "mobx"
-import { getMSTAdministration, maybeMST, MSTAdministration, valueToSnapshot, escapeJsonPath, IJsonPatch } from "../../core"
-import { identity, isPlainObject, nothing, isPrimitive, fail, addHiddenFinalProp } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType } from "../type"
+import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras, isObservableMap } from "mobx"
+import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, createNode, isStateTreeNode } from "../../core"
+import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
+import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
-import { ComplexType } from "./complex-type"
 
 interface IMapFactoryConfig {
     isMapFactory: true
@@ -15,19 +13,27 @@ export interface IExtendedObservableMap<T> extends ObservableMap<T> {
 }
 
 export function mapToString(this: ObservableMap<any>) {
-    return `${getMSTAdministration(this)}(${this.size} items)`
+    return `${getStateTreeNode(this)}(${this.size} items)`
 }
 
 function put(this: ObservableMap<any>, value: any) {
-    const identifierAttr = getIdentifierAttribute((getMSTAdministration(this).type as MapType<any, any>).subType)
-    if (!(!!identifierAttr)) fail(`Map.put is only supported if the subtype has an idenfier attribute`)
     if (!(!!value)) fail(`Map.put cannot be used to set empty values`)
-    this.set(value[identifierAttr!], value)
+    let node: Node
+    if (isStateTreeNode(value)) {
+        node = getStateTreeNode(value)
+    } else if (isMutable(value)) {
+        const targetType = (getStateTreeNode(this).type as MapType<any, any>).subType
+        node = getStateTreeNode(targetType.create(value))
+    } else {
+        return fail(`Map.put can only be used to store complex values`)
+    }
+    if (!node.identifierAttribute) fail(`Map.put can only be used to store complex values that have an identifier type attribute`)
+    this.set(node.identifier!, node.getValue())
     return this
 }
 
 export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
-    isMapFactory = true
+    shouldAttachNode = true
     subType: IType<any, any>
     readonly flags = TypeFlags.Map
 
@@ -36,48 +42,44 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         this.subType = subType
     }
 
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S): Node {
+        return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
+    }
+
     describe() {
         return "Map<string, " + this.subType.describe() + ">"
     }
 
-    createNewInstance() {
+    createNewInstance = () => {
         // const identifierAttr = getIdentifierAttribute(this.subType)
         const map = observable.shallowMap()
-
         addHiddenFinalProp(map, "put", put)
         addHiddenFinalProp(map, "toString", mapToString)
         return map
     }
 
-    finalizeNewInstance(instance: ObservableMap<any>, snapshot: any) {
+    finalizeNewInstance = (node: Node, snapshot: any) => {
+        const instance = node.storedValue as ObservableMap<any>;
+        extras.interceptReads(instance, node.unbox)
         intercept(instance, c => this.willChange(c))
         observe(instance, this.didChange)
-        getMSTAdministration(instance).applySnapshot(snapshot)
+        node.applySnapshot(snapshot)
     }
 
-    getChildMSTs(node: MSTAdministration): [string, MSTAdministration][] {
-        const res: [string, MSTAdministration][] = []
-        ; (node.target as ObservableMap<any>).forEach((value: any, key: string) => {
-            maybeMST(value, childNode => { res.push([key, childNode])})
-        })
-        return res
+    getChildren(node: Node): Node[] {
+        return (node.storedValue as ObservableMap<any>).values()
     }
 
-    getChildMST(node: MSTAdministration, key: string): MSTAdministration | null {
-        const target = node.target as ObservableMap<any>
-        if (target.has(key))
-            return maybeMST(target.get(key), identity, nothing)
-        return null
+    getChildNode(node: Node, key: string): Node {
+        const childNode = node.storedValue.get(key)
+        if (!childNode)
+            fail("Not a child" + key)
+        return childNode
     }
 
     willChange(change: IMapWillChange<any>): IMapWillChange<any> | null {
-        const node = getMSTAdministration(change.object)
+        const node = getStateTreeNode(change.object)
         node.assertWritable()
-
-        // Q: how to create a map that is not keyed by identifier, but contains objects with identifiers? Is that a use case? A: No, that is were reference maps should come into play...
-        const identifierAttr = getIdentifierAttribute(node.type)
-        if (identifierAttr && change.newValue && typeof change.newValue === "object" && change.newValue[identifierAttr] !== change.name)
-            fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${change.name}', but expected: '${change.newValue[identifierAttr!]}'`)
 
         switch (change.type) {
             case "update":
@@ -86,43 +88,52 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
                     const oldValue = change.object.get(change.name)
                     if (newValue === oldValue)
                         return null
-                    change.newValue = node.reconcileChildren(this.subType, [oldValue], [newValue], [change.name])[0]
+                    change.newValue = this.subType.reconcile(node.getChildNode(change.name), change.newValue)
+                    this.verifyIdentifier(change.name, change.newValue as Node)
                 }
                 break
             case "add":
                 {
-                    const {newValue} = change
-                    change.newValue = node.reconcileChildren(this.subType, [], [newValue], [change.name])[0]
+                    change.newValue = this.subType.instantiate(node, change.name, undefined, change.newValue)
+                    this.verifyIdentifier(change.name, change.newValue as Node)
                 }
                 break
             case "delete":
                 {
-                    const oldValue = change.object.get(change.name)
-                    node.reconcileChildren(this.subType, [oldValue], [], [])
+                    node.getChildNode(change.name).die()
                 }
                 break
         }
         return change
     }
 
-    serialize(node: MSTAdministration): Object {
-        const target = node.target as ObservableMap<any>
+    private verifyIdentifier(expected: string, node: Node) {
+        const identifier = node.identifier
+        if (identifier !== null && identifier !== expected)
+            fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`)
+    }
+
+    getValue(node: Node): any {
+        return node.storedValue
+    }
+
+    getSnapshot(node: Node): { [key: string]: any } {
         const res: {[key: string]: any} = {}
-        target.forEach((value, key) => {
-            res[key] = valueToSnapshot(value)
+        node.getChildren().forEach(childNode => {
+            res[childNode.subpath] = childNode.snapshot
         })
         return res
     }
 
     didChange(change: IMapChange<any>): void {
-        const node = getMSTAdministration(change.object)
+        const node = getStateTreeNode(change.object)
         switch (change.type) {
             case "update":
             case "add":
                 return void node.emitPatch({
                     op: change.type === "add" ? "add" : "replace",
                     path: escapeJsonPath(change.name),
-                    value: valueToSnapshot(change.newValue)
+                    value: node.getChildNode(change.name).snapshot
                 }, node)
             case "delete":
                 return void node.emitPatch({
@@ -132,8 +143,8 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         }
     }
 
-    applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void {
-        const target = node.target as ObservableMap<any>
+    applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
+        const target = node.storedValue as ObservableMap<any>
         switch (patch.op) {
             case "add":
             case "replace":
@@ -145,32 +156,14 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         }
     }
 
-    @action applySnapshot(node: MSTAdministration, snapshot: any): void {
+    @action applySnapshot(node: Node, snapshot: any): void {
         node.pseudoAction(() => {
-            const target = node.target as ObservableMap<any>
-            const identifierAttr = getIdentifierAttribute(this.subType)
-            // Try to update snapshot smartly, by reusing instances under the same key as much as possible
+            const target = node.storedValue as ObservableMap<any>
             const currentKeys: { [key: string]: boolean } = {}
             target.keys().forEach(key => { currentKeys[key] = false })
+            // Don't use target.replace, as it will throw all existing items first
             Object.keys(snapshot).forEach(key => {
-                const item = snapshot[key]
-                if (identifierAttr && item && typeof item === "object" && key !== item[identifierAttr])
-                    fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${key}', but expected: '${item[identifierAttr]}'`)
-                // if snapshot[key] is non-primitive, and this.get(key) has a Node, update it, instead of replace
-                if (key in currentKeys && !isPrimitive(item)) {
-                    maybeMST(
-                        target.get(key),
-                        propertyNode => {
-                            // update existing instance
-                            propertyNode.applySnapshot(item)
-                        },
-                        () => {
-                            target.set(key, item)
-                        }
-                    )
-                } else {
-                    target.set(key, item)
-                }
+                target.set(key, snapshot[key])
                 currentKeys[key] = true
             })
             Object.keys(currentKeys).forEach(key => {
@@ -200,12 +193,8 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         return {}
     }
 
-    removeChild(node: MSTAdministration, subpath: string) {
-        (node.target as ObservableMap<any>).delete(subpath)
-    }
-
-    get identifierAttribute() {
-        return null
+    removeChild(node: Node, subpath: string) {
+        (node.storedValue as ObservableMap<any>).delete(subpath)
     }
 }
 

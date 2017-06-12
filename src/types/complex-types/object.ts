@@ -7,37 +7,32 @@ import {
     observe
 } from "mobx"
 import {
-    nothing,
     extend as extendObject,
     extendKeepGetter,
-    fail, identity,
+    fail,
     isPrimitive,
     hasOwnProperty,
     isPlainObject
 } from "../../utils"
-import { MSTAdministration, maybeMST, getType, IMSTNode, getMSTAdministration, IJsonPatch } from "../../core"
-import { IType, IComplexType, TypeFlags, isType } from "../type"
-import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
-import { ComplexType } from "./complex-type"
+import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
+import { getType, IComplexValue, getStateTreeNode, IJsonPatch, Node, createNode } from "../../core"
+import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
+import { isIdentifierType } from "../utility-types/identifier"
 import { optional } from "../utility-types/optional"
-import { isReferenceFactory } from "../utility-types/reference"
-import { isIdentifierFactory, IIdentifierDescriptor } from "../utility-types/identifier"
-import { Late } from "../utility-types/late"
 import { Property } from "../property-types/property"
 import { IdentifierProperty } from "../property-types/identifier-property"
-import { ReferenceProperty } from "../property-types/reference-property"
 import { ComputedProperty } from "../property-types/computed-property"
 import { ValueProperty } from "../property-types/value-property"
 import { ActionProperty } from "../property-types/action-property"
 import { ViewProperty } from "../property-types/view-property"
 
 function objectTypeToString(this: any) {
-    return getMSTAdministration(this).toString()
+    return getStateTreeNode(this).toString()
 }
 
 export class ObjectType extends ComplexType<any, any> {
-    isObjectFactory = true
+    shouldAttachNode = true
     readonly flags = TypeFlags.Object
 
     /**
@@ -55,8 +50,6 @@ export class ObjectType extends ComplexType<any, any> {
         [key: string]: Property
     } = {}
 
-    identifierAttribute: string | null = null
-
     constructor(name: string, baseModel: Object, baseActions: Object) {
         super(name)
         Object.freeze(baseModel) // make sure nobody messes with it
@@ -70,20 +63,25 @@ export class ObjectType extends ComplexType<any, any> {
         this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
     }
 
-    createNewInstance() {
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
+        return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
+    }
+
+    createNewInstance = () => {
         const instance = new this.modelConstructor()
         extendShallowObservable(instance, {})
         return instance as Object
     }
 
-    finalizeNewInstance(instance: IMSTNode, snapshot: any) {
+    finalizeNewInstance = (node: Node, snapshot: any) => {
+        const instance = node.storedValue as IComplexValue;
+        this.forAllProps(prop => prop.initialize(instance, snapshot))
         intercept(instance, change => this.willChange(change) as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
-        this.forAllProps(prop => prop.initialize(instance, snapshot))
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
-        const node = getMSTAdministration(change.object)
+        const node = getStateTreeNode(change.object)
         node.assertWritable()
 
         // TODO: assigning a new snapshot / MST to a property should result in a nice patch in itself
@@ -96,6 +94,8 @@ export class ObjectType extends ComplexType<any, any> {
 
     parseModelProps() {
         const {baseModel, baseActions} = this
+        let alreadySeenIdentifierAttribute: string | null = null
+
         for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
             // TODO: check that hooks are not defined as part of baseModel
             const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
@@ -107,17 +107,15 @@ export class ObjectType extends ComplexType<any, any> {
             const { value } = descriptor
             if (value === null || undefined) {
                 fail("The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?")
-            } else if (isIdentifierFactory(value)) {
-                if (this.identifierAttribute) fail(`Cannot define property '${key}' as object identifier, property '${this.identifierAttribute}' is already defined as identifier property`)
-                this.identifierAttribute = key
-                this.props[key] = new IdentifierProperty(key, (value as IIdentifierDescriptor<any>).primitiveType)
             } else if (isPrimitive(value)) {
                 const baseType = getPrimitiveFactoryFromValue(value)
                 this.props[key] = new ValueProperty(key, optional(baseType, value))
+            } else if (isIdentifierType(value)) {
+                if (alreadySeenIdentifierAttribute !== null) fail(`Cannot define property '${key}' as object identifier, property '${alreadySeenIdentifierAttribute}' is already defined as identifier property`)
+                alreadySeenIdentifierAttribute = key
+                this.props[key] = new IdentifierProperty(key, value)
             } else if (isType(value)) {
                 this.props[key] = new ValueProperty(key, value)
-            } else if (isReferenceFactory(value)) {
-                this.props[key] = new ReferenceProperty(key, value.targetType, value.basePath)
             } else if (typeof value === "function") {
                 this.props[key] = new ViewProperty(key, value)
             } else if (typeof value === "object") {
@@ -148,35 +146,41 @@ export class ObjectType extends ComplexType<any, any> {
         }
     }
 
-    getChildMSTs(node: MSTAdministration): [string, MSTAdministration][] {
-        const res: [string, MSTAdministration][] = []
+    getChildren(node: Node): Node[] {
+        const res: Node[] = []
         this.forAllProps(prop => {
             if (prop instanceof ValueProperty)
-                maybeMST(node.target[prop.name], propertyNode => res.push([prop.name, propertyNode]))
+                res.push(prop.getValueNode(node.storedValue))
         })
         return res
     }
 
-    getChildMST(node: MSTAdministration, key: string): MSTAdministration | null {
-        return maybeMST(node.target[key], identity, nothing)
+    getChildNode(node: Node, key: string): Node {
+        if (!(this.props[key] instanceof ValueProperty))
+            return fail("Not a value property: " + key)
+        return (this.props[key] as ValueProperty).getValueNode(node.storedValue)
     }
 
-    serialize(node: MSTAdministration): any {
+    getValue(node: Node): any {
+        return node.storedValue
+    }
+
+    getSnapshot(node: Node): any {
         const res = {}
-        this.forAllProps(prop => prop.serialize(node.target, res))
+        this.forAllProps(prop => prop.serialize(node.storedValue, res))
         return res
     }
 
-    applyPatchLocally(node: MSTAdministration, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add")) fail(`object does not support operation ${patch.op}`)
-        node.target[subpath] = patch.value
+        node.storedValue[subpath] = patch.value
     }
 
-    @action applySnapshot(node: MSTAdministration, snapshot: any): void {
+    @action applySnapshot(node: Node, snapshot: any): void {
         // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed?
         node.pseudoAction(() => {
             for (let key in this.props)
-                this.props[key].deserialize(node.target, snapshot)
+                this.props[key].deserialize(node.storedValue, snapshot)
         })
     }
 
@@ -218,8 +222,8 @@ export class ObjectType extends ComplexType<any, any> {
         return {}
     }
 
-    removeChild(node: MSTAdministration, subpath: string) {
-        node.target[subpath] = null
+    removeChild(node: Node, subpath: string) {
+        node.storedValue[subpath] = null
     }
 }
 
@@ -272,11 +276,4 @@ export function extend(...args: any[]) {
 
 export function isObjectFactory(type: any): boolean {
     return isType(type) && ((type as IType<any, any>).flags & TypeFlags.Object) > 0
-}
-
-export function getIdentifierAttribute(type: IType<any, any>): string | null {
-    if ( isObjectFactory(type) )
-        return type.identifierAttribute
-
-    return null
 }

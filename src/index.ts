@@ -1,6 +1,6 @@
 // Fix some circular deps:
+import "./core/node"
 import "./types/type"
-import "./types/complex-types/complex-type"
 
 // TODO: things that should not be exposed (?)
 // TODO: add test to verify exposed api
@@ -15,7 +15,7 @@ export * from "./core/mst-operations"
 export * from "./core/json-patch"
 
 export {
-    isMST,
+    isStateTreeNode,
     getType,
     getChildType,
     onAction,

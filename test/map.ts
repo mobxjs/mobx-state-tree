@@ -14,10 +14,9 @@ const createTestFactories = () => {
             to: "world"
         })
 
-    const Factory = types.optional(
-        types.map(
+    const Factory = types.map(
             ItemFactory
-        ), {})
+        )
 
     const PrimitiveMapFactory = types.model({
             boolean: types.map(types.boolean),
@@ -214,11 +213,6 @@ test("it should support identifiers", (t) => {
 
     const a = store.todos.get("17")
 
-    t.throws(
-        () => applySnapshot(store.todos, { "17": { id: "18"} }),
-        "[mobx-state-tree] A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '17', but expected: '18'"
-    )
-
     applySnapshot(store.todos, { "16" : { id: "16"}, "17": { id: "17"}})
     t.is(a === store.todos.get("17"), true) // same instance still
 
@@ -228,4 +222,9 @@ test("it should support identifiers", (t) => {
     t.is(store.todos.get("19")!.id, "19")
 
     t.is("" + store.todos.get("19"), "AnonymousModel@/todos/19(id: 19)")
+
+    t.throws(
+        () => applySnapshot(store.todos, { "17": { id: "18"} }),
+        "[mobx-state-tree] A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '18', but expected: '17'"
+    )
 })

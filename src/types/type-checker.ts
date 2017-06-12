@@ -1,8 +1,3 @@
-import { IType } from "./type"
-import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
-import { getMSTAdministration, isMST, maybeMST } from "../core/mst-node"
-import { isPrimitiveType } from "./primitives"
-import { OptionalValue } from "./utility-types/optional"
 
 export interface IContextEntry {
     path: string
@@ -17,10 +12,13 @@ export interface IValidationError {
 }
 export type IValidationResult = IValidationError[]
 
-const prettyPrintValue = (value: any) =>
-    isMST(value) ?
-        "<" + value + ">" :
-        "`" + JSON.stringify(value) + "`"
+export function prettyPrintValue(value: any) {
+    return typeof value === "function"
+        ? `<function${value.name ? " " + value.name :""}>`
+        : isStateTreeNode(value)
+            ? `<${value}>`
+            : `\`${JSON.stringify(value)}\``
+}
 
 function toErrorString(error: IValidationError): string {
     const { value } = error
@@ -29,8 +27,10 @@ function toErrorString(error: IValidationError): string {
 
     const pathPrefix = fullPath.length > 0 ? `at path "/${fullPath}" ` : ``
 
-    const currentTypename = maybeMST(value, node => `value of type ${node.type.name}:`, () => isPrimitive(value) ? "value" : "snapshot")
-    const isSnapshotCompatible = type && isMST(value) && type.is(getMSTAdministration(value).snapshot)
+    const currentTypename = isStateTreeNode(value)
+        ? `value of type ${getStateTreeNode(value).type.name}:`
+        : isPrimitive(value) ? "value" : "snapshot"
+    const isSnapshotCompatible = type && isStateTreeNode(value) && type.is(getStateTreeNode(value).snapshot)
 
     return `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${type ? `to type: \`${type.name}\`` : ``}` +
             (error.message ? ` (${error.message})` : "") +
@@ -63,6 +63,7 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
     return errors.reduce((a, i) => a.concat(i), [])
 }
 
+// TODO; typecheck should be invoked from: type.create and array / map / value.property will change
 export function typecheck(type: IType<any, any>, value: any): void {
     const errors = type.validate(value, [{ path: "", type }])
 
@@ -73,3 +74,9 @@ export function typecheck(type: IType<any, any>, value: any): void {
         )
     }
 }
+
+import { IType } from "./type"
+import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
+import { getStateTreeNode, isStateTreeNode } from "../core"
+import { isPrimitiveType } from "./primitives"
+import { OptionalValue } from "./utility-types/optional"

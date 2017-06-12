@@ -1,6 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { fail, isMutable, isSerializable, isPlainObject } from "../../utils"
+import { fail, isMutable, isSerializable, isPlainObject, identity } from "../../utils"
+import { createNode, Node } from '../../core'
 
 function freeze(value: any) {
     Object.freeze(value)
@@ -27,21 +28,16 @@ export class Frozen<T> extends Type<T, T> {
         return "<any immutable value>"
     }
 
-    create(value: any) {
-        if (!isSerializable(value)) fail("Given value should be serializable")
+    instantiate(parent: Node | null, subpath: string, environment: any, value: any): Node {
         // deep freeze the object/array
-        return isMutable(value) ? freeze(value) : value
+        return createNode(this, parent, subpath, environment, isMutable(value) ? freeze(value) : value)
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (!isSerializable(value)) {
             return typeCheckFailure(context, value)
         }
         return typeCheckSuccess()
-    }
-
-    get identifierAttribute() {
-        return null
     }
 }
 

@@ -1,10 +1,17 @@
 import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
-import { getMSTAdministration, IMSTNode, getRelativePathForNodes } from "./mst-node"
-import { MSTAdministration } from "./mst-node-administration"
+import { Node, getStateTreeNode, IComplexValue, isStateTreeNode } from "./node"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, fail } from "../utils"
-import { ISnapshottable, IType } from "../types/type"
+import { ISnapshottable, IType, isType } from "../types/type"
+
+export function getType<S, T>(object: IComplexValue): IType<S, T> {
+    return getStateTreeNode(object).type
+}
+
+export function getChildType(object: IComplexValue, child: string): IType<any, any> {
+    return getStateTreeNode(object).getChildType(child)
+}
 
 /**
  * TODO: update docs
@@ -48,8 +55,8 @@ import { ISnapshottable, IType } from "../types/type"
  * @param {(action: IActionCall, next: () => void) => void} callback the middleware that should be invoked whenever an action is triggered.
  * @returns {IDisposer} function to remove the middleware
  */
-export function addMiddleware(target: IMSTNode, middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any): IDisposer {
-    const node = getMSTAdministration(target)
+export function addMiddleware(target: IComplexValue, middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any): IDisposer {
+    const node = getStateTreeNode(target)
     if (!node.isProtectionEnabled)
         console.warn("It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`")
     return node.addMiddleWare(middleware)
@@ -65,8 +72,8 @@ export function addMiddleware(target: IMSTNode, middleware: (action: IRawActionC
  * @param {(patch: IJsonPatch) => void} callback the callback that is invoked for each patch
  * @returns {IDisposer} function to remove the listener
  */
-export function onPatch(target: IMSTNode, callback: (patch: IJsonPatch) => void): IDisposer {
-    return getMSTAdministration(target).onPatch(callback)
+export function onPatch(target: IComplexValue, callback: (patch: IJsonPatch) => void): IDisposer {
+    return getStateTreeNode(target).onPatch(callback)
 }
 
 /**
@@ -82,7 +89,7 @@ export function onSnapshot<S>(target: ObservableMap<S>, callback: (snapshot: { [
 export function onSnapshot<S>(target: IObservableArray<S>, callback: (snapshot: S[]) => void): IDisposer;
 export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer;
 export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer {
-    return getMSTAdministration(target).onSnapshot(callback)
+    return getStateTreeNode(target).onSnapshot(callback)
 }
 
 /**
@@ -93,8 +100,8 @@ export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S)
  * @param {IJsonPatch} patch
  * @returns
  */
-export function applyPatch(target: IMSTNode, patch: IJsonPatch) {
-    return getMSTAdministration(target).applyPatch(patch)
+export function applyPatch(target: IComplexValue, patch: IJsonPatch) {
+    return getStateTreeNode(target).applyPatch(patch)
 }
 
 /**
@@ -104,8 +111,8 @@ export function applyPatch(target: IMSTNode, patch: IJsonPatch) {
  * @param {Object} target
  * @param {IJsonPatch[]} patches
  */
-export function applyPatches(target: IMSTNode, patches: IJsonPatch[]) {
-    const node = getMSTAdministration(target)
+export function applyPatches(target: IComplexValue, patches: IJsonPatch[]) {
+    const node = getStateTreeNode(target)
     runInAction(() => {
         patches.forEach(p => node.applyPatch(p))
     })
@@ -114,14 +121,14 @@ export function applyPatches(target: IMSTNode, patches: IJsonPatch[]) {
 export interface IPatchRecorder {
     patches: IJsonPatch[]
     stop(): any
-    replay(target: IMSTNode): any
+    replay(target: IComplexValue): any
 }
 
-export function recordPatches(subject: IMSTNode): IPatchRecorder {
+export function recordPatches(subject: IComplexValue): IPatchRecorder {
     let recorder = {
         patches: [] as IJsonPatch[],
         stop: () => disposer(),
-        replay: (target: IMSTNode) => {
+        replay: (target: IComplexValue) => {
             applyPatches(target, recorder.patches)
         }
     }
@@ -142,7 +149,7 @@ export function recordPatches(subject: IMSTNode): IPatchRecorder {
  * @param {IActionCall[]} actions
  * @param {IActionCallOptions} [options]
  */
-export function applyActions(target: IMSTNode, actions: ISerializedActionCall[]): void {
+export function applyActions(target: IComplexValue, actions: ISerializedActionCall[]): void {
     runInAction(() => {
         actions.forEach(action => applyAction(target, action))
     })
@@ -151,14 +158,14 @@ export function applyActions(target: IMSTNode, actions: ISerializedActionCall[])
 export interface IActionRecorder {
     actions: ISerializedActionCall[]
     stop(): any
-    replay(target: IMSTNode): any
+    replay(target: IComplexValue): any
 }
 
-export function recordActions(subject: IMSTNode): IActionRecorder {
+export function recordActions(subject: IComplexValue): IActionRecorder {
     let recorder = {
         actions: [] as ISerializedActionCall[],
         stop: () => disposer(),
-        replay: (target: IMSTNode) => {
+        replay: (target: IComplexValue) => {
             applyActions(target, recorder.actions)
         }
     }
@@ -186,21 +193,21 @@ export function recordActions(subject: IMSTNode): IActionRecorder {
  * todo.done = false // throws!
  * todo.toggle() // OK
  */
-export function protect(target: IMSTNode) {
+export function protect(target: IComplexValue) {
     // TODO: verify that no parent is unprotectd, as that would be a noop
-    getMSTAdministration(target).isProtectionEnabled = true
+    getStateTreeNode(target).isProtectionEnabled = true
 }
 
-export function unprotect(target: IMSTNode) {
+export function unprotect(target: IComplexValue) {
     // TODO: verify that any node in the given tree is unprotected
-    getMSTAdministration(target).isProtectionEnabled = false
+    getStateTreeNode(target).isProtectionEnabled = false
 }
 
 /**
  * Returns true if the object is in protected mode, @see protect
  */
-export function isProtected(target: IMSTNode): boolean {
-    return getMSTAdministration(target).isProtectionEnabled
+export function isProtected(target: IComplexValue): boolean {
+    return getStateTreeNode(target).isProtectionEnabled
 }
 
 /**
@@ -211,8 +218,8 @@ export function isProtected(target: IMSTNode): boolean {
  * @param {Object} snapshot
  * @returns
  */
-export function applySnapshot<S, T>(target: IMSTNode, snapshot: S) {
-    return getMSTAdministration(target).applySnapshot(snapshot)
+export function applySnapshot<S, T>(target: IComplexValue, snapshot: S) {
+    return getStateTreeNode(target).applySnapshot(snapshot)
 }
 
 /**
@@ -227,7 +234,7 @@ export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S };
 export function getSnapshot<S>(target: IObservableArray<S>): S[];
 export function getSnapshot<S>(target: ISnapshottable<S>): S;
 export function getSnapshot<S>(target: ISnapshottable<S>): S {
-    return getMSTAdministration(target).snapshot
+    return getStateTreeNode(target).snapshot
 }
 
 /**
@@ -238,9 +245,9 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
  * @param {number} depth = 1, how far should we look upward?
  * @returns {boolean}
  */
-export function hasParent(target: IMSTNode, depth: number = 1): boolean {
+export function hasParent(target: IComplexValue, depth: number = 1): boolean {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
-    let parent: MSTAdministration | null = getMSTAdministration(target).parent
+    let parent: Node | null = getStateTreeNode(target).parent
     while (parent) {
         if (--depth === 0)
             return true
@@ -260,18 +267,18 @@ export function hasParent(target: IMSTNode, depth: number = 1): boolean {
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent(target: IMSTNode, depth?: number): (any & IMSTNode);
-export function getParent<T>(target: IMSTNode, depth?: number): (T & IMSTNode);
-export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) {
+export function getParent(target: IComplexValue, depth?: number): (any & IComplexValue);
+export function getParent<T>(target: IComplexValue, depth?: number): (T & IComplexValue);
+export function getParent<T>(target: IComplexValue, depth = 1): (T & IComplexValue) {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let d = depth
-    let parent: MSTAdministration | null = getMSTAdministration(target).parent
+    let parent: Node | null = getStateTreeNode(target).parent
     while (parent) {
         if (--d === 0)
-            return parent.target
+            return parent.storedValue
         parent = parent.parent
     }
-    return fail(`Failed to find the parent of ${getMSTAdministration(target)} at depth ${depth}`)
+    return fail(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
 }
 
 /**
@@ -281,10 +288,10 @@ export function getParent<T>(target: IMSTNode, depth = 1): (T & IMSTNode) {
  * @param {Object} target
  * @returns {*}
  */
-export function getRoot(target: IMSTNode): any & IMSTNode;
-export function getRoot<T>(target: IMSTNode): T & IMSTNode;
-export function getRoot(target: IMSTNode): IMSTNode {
-    return getMSTAdministration(target).root.target
+export function getRoot(target: IComplexValue): any & IComplexValue;
+export function getRoot<T>(target: IComplexValue): T & IComplexValue;
+export function getRoot(target: IComplexValue): IComplexValue {
+    return getStateTreeNode(target).root.storedValue
 }
 
 /**
@@ -294,8 +301,8 @@ export function getRoot(target: IMSTNode): IMSTNode {
  * @param {Object} target
  * @returns {string}
  */
-export function getPath(target: IMSTNode): string {
-    return getMSTAdministration(target).path
+export function getPath(target: IComplexValue): string {
+    return getStateTreeNode(target).path
 }
 
 /**
@@ -305,8 +312,8 @@ export function getPath(target: IMSTNode): string {
  * @param {Object} target
  * @returns {string[]}
  */
-export function getPathParts(target: IMSTNode): string[] {
-    return splitJsonPath(getMSTAdministration(target).path)
+export function getPathParts(target: IComplexValue): string[] {
+    return splitJsonPath(getStateTreeNode(target).path)
 }
 
 /**
@@ -316,8 +323,8 @@ export function getPathParts(target: IMSTNode): string[] {
  * @param {Object} target
  * @returns {boolean}
  */
-export function isRoot(target: IMSTNode): boolean {
-    return getMSTAdministration(target).isRoot
+export function isRoot(target: IComplexValue): boolean {
+    return getStateTreeNode(target).isRoot
 }
 
 /**
@@ -328,11 +335,18 @@ export function isRoot(target: IMSTNode): boolean {
  * @param {string} path - escaped json path
  * @returns {*}
  */
-export function resolve(target: IMSTNode, path: string): IMSTNode | any {
+export function resolvePath(target: IComplexValue, path: string): IComplexValue | any {
     // TODO: give better error messages!
     // TODO: also accept path parts
-    const node = getMSTAdministration(target).resolve(path)
-    return node ? node.target : undefined
+    const node = getStateTreeNode(target).resolve(path)
+    return node ? node.getValue() : undefined
+}
+
+export function resolveIdentifier(type: IType<any, any>, target: IComplexValue, identifier: string | number): any {
+    if (!isType(type))
+        fail("Expected a type as first argument")
+    const node = getStateTreeNode(target).root.identifierCache!.resolve(type, "" + identifier)
+    return node ? node.getValue() : undefined
 }
 
 /**
@@ -343,15 +357,15 @@ export function resolve(target: IMSTNode, path: string): IMSTNode | any {
  * @param {string} path
  * @returns {*}
  */
-export function tryResolve(target: IMSTNode, path: string): IMSTNode | any {
-    const node = getMSTAdministration(target).resolve(path, false)
+export function tryResolve(target: IComplexValue, path: string): IComplexValue | any {
+    const node = getStateTreeNode(target).resolve(path, false)
     if (node === undefined)
         return undefined
-    return node ? node.target : undefined
+    return node ? node.getValue() : undefined
 }
 
-export function getRelativePath(base: IMSTNode, target: IMSTNode): string {
-    return getRelativePathForNodes(getMSTAdministration(base), getMSTAdministration(target))
+export function getRelativePath(base: IComplexValue, target: IComplexValue): string {
+    return getStateTreeNode(base).getRelativePathTo(getStateTreeNode(target))
 }
 
 /**
@@ -362,8 +376,8 @@ export function getRelativePath(base: IMSTNode, target: IMSTNode): string {
  * @param {T} source
  * @returns {T}
  */
-export function clone<T extends IMSTNode>(source: T, keepEnvironment: boolean | any = true): T {
-    const node = getMSTAdministration(source)
+export function clone<T extends IComplexValue>(source: T, keepEnvironment: boolean | any = true): T {
+    const node = getStateTreeNode(source)
     return node.type.create(
         node.snapshot,
         keepEnvironment === true
@@ -377,17 +391,17 @@ export function clone<T extends IMSTNode>(source: T, keepEnvironment: boolean | 
 /**
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
-export function detach<T extends IMSTNode>(thing: T): T {
+export function detach<T extends IComplexValue>(thing: T): T {
     // TODO: should throw if it cannot be removed from the parent? e.g. parent type wouldn't allow that
-    getMSTAdministration(thing).detach()
+    getStateTreeNode(thing).detach()
     return thing
 }
 
 /**
  * Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
  */
-export function destroy(thing: IMSTNode) {
-    const node = getMSTAdministration(thing)
+export function destroy(thing: IComplexValue) {
+    const node = getStateTreeNode(thing)
     // TODO: should throw if it cannot be removed from the parent? e.g. parent type wouldn't allow that
     if (node.isRoot)
         node.die()
@@ -395,16 +409,16 @@ export function destroy(thing: IMSTNode) {
         node.parent!.removeChild(node.subpath)
 }
 
-export function isAlive(thing: IMSTNode): boolean {
-    return getMSTAdministration(thing).isAlive
+export function isAlive(thing: IComplexValue): boolean {
+    return getStateTreeNode(thing).isAlive
 }
 
-export function addDisposer(thing: IMSTNode, disposer: () => void) {
-    getMSTAdministration(thing).addDisposer(disposer)
+export function addDisposer(thing: IComplexValue, disposer: () => void) {
+    getStateTreeNode(thing).addDisposer(disposer)
 }
 
-export function getEnv(thing: IMSTNode): any {
-    const node = getMSTAdministration(thing)
+export function getEnv(thing: IComplexValue): any {
+    const node = getStateTreeNode(thing)
     const env = node.root._environment
     if (!(!!env)) fail(`Node '${node}' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()`)
     return env
@@ -413,18 +427,12 @@ export function getEnv(thing: IMSTNode): any {
 /**
  * Performs a depth first walk through a tree
  */
-export function walk(thing: IMSTNode, processor: (item: IMSTNode) => void) {
-    const node = getMSTAdministration(thing)
+export function walk(thing: IComplexValue, processor: (item: IComplexValue) => void) {
+    const node = getStateTreeNode(thing)
     // tslint:disable-next-line:no_unused-variable
-    node.getChildMSTs().forEach(([_, childNode]) => {
-        walk(childNode.target, processor)
+    node.getChildren().forEach((child) => {
+        if (isStateTreeNode(child.storedValue))
+            walk(child.storedValue, processor)
     })
-    processor(node.target)
-}
-
-// TODO: remove
-export function testActions<S, T>(factory: IType<S, IMSTNode>, initialState: S, ...actions: ISerializedActionCall[]): S {
-    const testInstance = factory.create(initialState) as T
-    applyActions(testInstance, actions)
-    return getSnapshot(testInstance) as S
+    processor(node.storedValue)
 }

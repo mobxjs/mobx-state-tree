@@ -1,6 +1,6 @@
-import { IType, TypeFlags, Type } from "../type"
+import { IType, Type, TypeFlags } from "../type"
 import { fail } from "../../utils"
-import { isMST, getMSTAdministration } from "../../core"
+import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
 export class Refinement extends Type<any, any> {
@@ -21,26 +21,26 @@ export class Refinement extends Type<any, any> {
         return this.name
     }
 
-    create(value: any) {
+    instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
         // create the child type
-        const inst = this.type.create(value)
-        const snapshot = isMST(inst) ? getMSTAdministration(inst).snapshot : inst
-
-        // check if pass the predicate
-        if (!this.is(snapshot)) fail(`Value ${JSON.stringify(snapshot)} is not assignable to type ${this.name}`)
+        const inst = this.type.instantiate(parent, subpath, environment, value)
 
         return inst
     }
 
-    validate(value: any, context: IContext): IValidationResult {
-        if (this.type.is(value) && this.predicate(value)) {
-            return typeCheckSuccess()
-        }
-        return typeCheckFailure(context, value)
+    isAssignableFrom(type: IType<any, any>) {
+        return this.type.isAssignableFrom(type)
     }
 
-    get identifierAttribute() {
-        return this.type.identifierAttribute
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
+        if (this.type.is(value)) {
+            const snapshot = isStateTreeNode(value) ? getStateTreeNode(value).snapshot : value
+
+            if (this.predicate(snapshot)) {
+                return typeCheckSuccess()
+            }
+        }
+        return typeCheckFailure(context, value)
     }
 }
 
@@ -49,7 +49,7 @@ export function refinement<S, T extends S, U extends S>(name: string, type: ITyp
 export function refinement(name: string, type: IType<any, any>, predicate: (snapshot: any) => boolean): IType<any, any> {
     // check if the subtype default value passes the predicate
     const inst = type.create()
-    if (!predicate(isMST(inst) ? getMSTAdministration(inst).snapshot : inst)) fail(`Default value for refinement type ` + name + ` does not pass the predicate.`)
+    if (!predicate(isStateTreeNode(inst) ? getStateTreeNode(inst).snapshot : inst)) fail(`Default value for refinement type ` + name + ` does not pass the predicate.`)
 
     return new Refinement(name, type, predicate)
 }

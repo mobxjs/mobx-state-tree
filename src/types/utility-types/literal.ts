@@ -1,6 +1,7 @@
 import { ISimpleType, TypeFlags, Type} from "../type"
 import { fail, isPrimitive } from "../../utils"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import { Node, createNode } from "../../core"
 
 export class Literal<T> extends Type<T, T> {
     readonly value: any
@@ -11,24 +12,19 @@ export class Literal<T> extends Type<T, T> {
         this.value = value
     }
 
-    create(snapshot: any) {
-        typecheck(this, snapshot)
-        return this.value
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
+        return createNode(this, parent, subpath, environment, snapshot)
     }
 
     describe() {
         return JSON.stringify(this.value)
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (isPrimitive(value) && value === this.value) {
             return typeCheckSuccess()
         }
         return typeCheckFailure(context, value)
-    }
-
-    get identifierAttribute() {
-        return null
     }
 }
 
@@ -36,3 +32,4 @@ export function literal<S>(value: S): ISimpleType<S> {
     if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
     return new Literal<S>(value)
 }
+

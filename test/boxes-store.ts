@@ -31,14 +31,14 @@ export const Box = types.model("Box", {
 
 export const Arrow = types.model("Arrow", {
     id: types.identifier(),
-    from: types.reference(Box, "../../boxes"),
-    to: types.reference(Box, "../../boxes")
+    from: types.reference(Box),
+    to: types.reference(Box)
 })
 
 export const Store = types.model("Store", {
     boxes: types.map(Box),
     arrows: types.array(Arrow),
-    selection: types.reference(Box, "./boxes")
+    selection: types.reference(Box)
 }, {
     afterCreate() {
         unprotect(this)

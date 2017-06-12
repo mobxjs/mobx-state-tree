@@ -44,11 +44,12 @@ test("it should be possible to record & replay a simple action", t => {
 
 // Complex actions
 const Customer = types.model("Customer", {
+    id: types.identifier(types.number),
     name: types.string
 })
 
 const Order = types.model("Order", {
-    customer: types.reference(Customer)
+    customer: types.maybe(types.reference(Customer))
 }, {
     setCustomer(customer) {
         this.customer = customer
@@ -62,7 +63,7 @@ const OrderStore = types.model("OrderStore", {
 
 function createTestStore() {
     const store = OrderStore.create({
-        customers: [{ name: "Mattia" }],
+        customers: [{ id: 1, name: "Mattia" }],
         orders: [{
             customer: null
         }]
@@ -81,10 +82,11 @@ test("it should be possible to pass a complex object", t => {
     t.is(store.orders[0].customer, store.customers[0])
     t.deepEqual(getSnapshot(store) as any, {
         customers: [{
+            id: 1,
             name: "Mattia"
         }],
         orders: [{
-            customer: { $ref: "../../customers/0" }
+            customer: 1
         }]
     })
 
@@ -106,8 +108,8 @@ test("it should not be possible to set the wrong type", t => {
         () => {
             store.orders[0].setCustomer(store.orders[0])
         }, // wrong type!
-        `[mobx-state-tree] Error while converting <Order@/orders/0> to \`Customer\`:
-value of type Order: <Order@/orders/0> is not assignable to type: \`Customer\`, expected an instance of \`Customer\` or a snapshot like \`{ name: string }\` instead.`
+"[mobx-state-tree] Error while converting <Order@/orders/0> to `reference(Customer) | null`:\n" +
+"value of type Order: <Order@/orders/0> is not assignable to type: `reference(Customer) | null`, expected an instance of `reference(Customer) | null` or a snapshot like `(reference(Customer) | null?)` instead."
     )
 })
 
