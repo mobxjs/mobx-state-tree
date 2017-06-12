@@ -1,5 +1,5 @@
 import { ADD_TODO, DELETE_TODO, EDIT_TODO, COMPLETE_TODO, COMPLETE_ALL, CLEAR_COMPLETED } from '../constants/ActionTypes'
-import { types } from 'mobx-state-tree'
+import { types, destroy } from 'mobx-state-tree'
 
 const Todo = types.model({
     text: 'Learn Redux',
@@ -8,7 +8,7 @@ const Todo = types.model({
 })
 
 const TodoStore = types.model({
-    todos: types.array(Todo),
+    todos: types.optional(types.array(Todo), []),
 
     // utilities
     findTodoById: function (id) {
@@ -23,7 +23,8 @@ const TodoStore = types.model({
       })
     },
     [DELETE_TODO]({id}) {
-      this.todos.remove(this.findTodoById(id))
+      const todo = this.findTodoById(id)
+      this.todos.remove(todo)
     },
     [EDIT_TODO]({id, text}) {
       this.findTodoById(id).text = text

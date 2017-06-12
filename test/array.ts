@@ -202,6 +202,10 @@ test("paths shoud remain correct when splicing", t => {
 
     store.todos.splice(0, 1, {} as any, {} as any, {} as any)
     t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2"])
+
+    debugger;
+    store.todos.remove(store.todos[1])
+    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1"])
 })
 
 test("items should be reconciled correctly when splicing - 1", t => {

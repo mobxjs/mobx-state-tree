@@ -124,7 +124,3 @@ export function argsToArray(args: IArguments): any [] {
 export function createNamedFunction(name: string, fn: Function) {
     return new Function("f", `return function ${name}() { return f.apply(this, arguments)}`)(fn)
 }
-
-export function isValidIdentifier(identifier: any): boolean {
-    return isPrimitive(identifier) && isSerializable(identifier)
-}

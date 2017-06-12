@@ -28,14 +28,14 @@ export const Box = types.model("Box", {
 
 export const Arrow = types.model("Arrow", {
     id: types.identifier(),
-    from: types.reference(Box, "../../boxes"),
-    to: types.reference(Box, "../../boxes")
+    from: types.reference(Box),
+    to: types.reference(Box)
 })
 
 export const Store = types.model("Store", {
         boxes: types.map(Box),
         arrows: types.array(Arrow),
-        selection: types.reference(Box, "./boxes")
+        selection: types.maybe(types.reference(Box))
     }, {
         addBox(name, x, y) {
             const box = Box.create({ name, x, y, id: randomUuid() })
@@ -67,7 +67,7 @@ const store = Store.create({
     "arrows":[
         {"id":"7b5d33c1-5e12-4278-b1c5-e4ae05c036bd","from":"ce9131ee-f528-4952-a012-543780c5e66d","to":"14194d76-aa31-45c5-a00c-104cc550430f"}
     ],
-    "selection":""
+    "selection":null
 })
 
 export default store;
