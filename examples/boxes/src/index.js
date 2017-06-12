@@ -24,7 +24,7 @@ ReactDOM.render(
 
 function prepareStore(newStore) {
     storeInstance.set(newStore)
-    connectReduxDevtools(newStore)
+    connectReduxDevtools(require("remotedev"), newStore)
     syncStoreWithBackend(socket, newStore)
 }
 

@@ -4,7 +4,7 @@ import { Book } from "./BookStore"
 
 const CartEntry = types.model("CartEntry", {
         quantity: 0,
-        book: types.reference(Book, "../../../bookStore/books"),
+        book: types.reference(Book),
         get price() {
             return this.book.price * this.quantity
         },
