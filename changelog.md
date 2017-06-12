@@ -1,3 +1,7 @@
+# 0.7.1
+
+* Fixed `array.remove` not working
+
 # 0.7.0
 
 The type system and internal administration has been refactoring, making the internals both simpler and more flexible.
