@@ -7,8 +7,12 @@ export class Refinement extends Type<any, any> {
     readonly type: IType<any, any>
     readonly predicate: (v: any) => boolean
 
-    get flags () {
+    get flags (): TypeFlags {
         return this.type.flags
+    }
+
+    get snapshottable () {
+        return this.type.snapshottable
     }
 
     constructor(name: string, type: IType<any, any>, predicate: (v: any) => boolean) {

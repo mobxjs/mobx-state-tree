@@ -51,6 +51,11 @@ export function getContextForPath(context: IContext, path: string, type?: IType<
     return context.concat([{ path, type }])
 }
 
+export function popTypeFromContext(context: IContext): IContext {
+    const { path } = context[context.length - 1]
+    return context.slice(0, context.length - 1).concat([{ path }])
+}
+
 export function typeCheckSuccess(): IValidationResult {
     return EMPTY_ARRAY as any
 }
@@ -63,7 +68,6 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
     return errors.reduce((a, i) => a.concat(i), [])
 }
 
-// TODO; typecheck should be invoked from: type.create and array / map / value.property will change
 export function typecheck(type: IType<any, any>, value: any): void {
     const errors = type.validate(value, [{ path: "", type }])
 

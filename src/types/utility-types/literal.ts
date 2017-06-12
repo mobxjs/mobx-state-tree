@@ -1,9 +1,10 @@
 import { ISimpleType, TypeFlags, Type} from "../type"
 import { fail, isPrimitive } from "../../utils"
-import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { Node, createNode } from "../../core"
 
 export class Literal<T> extends Type<T, T> {
+    readonly snapshottable = true
     readonly value: any
     readonly flags = TypeFlags.Literal
 
@@ -32,4 +33,3 @@ export function literal<S>(value: S): ISimpleType<S> {
     if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
     return new Literal<S>(value)
 }
-

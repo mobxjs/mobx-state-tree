@@ -14,8 +14,8 @@ export function arrayToString(this: IObservableArray<any>) {
 }
 
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
-    shouldAttachNode = true
-    subType: IType<any, any>
+    readonly snapshottable = true
+    readonly subType: IType<any, any>
     readonly flags = TypeFlags.Array
 
     constructor(name: string, subType: IType<any, any>) {
@@ -34,8 +34,8 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     finalizeNewInstance = (node: Node, snapshot: any) => {
-        const instance = node.storedValue as IObservableArray<any>;
-        extras.getAdministration(instance).dehancer = node.unbox;
+        const instance = node.storedValue as IObservableArray<any>
+        extras.getAdministration(instance).dehancer = node.unbox
         intercept(instance, change => this.willChange(change) as any)
         observe(instance, this.didChange)
         node.applySnapshot(snapshot)
@@ -91,7 +91,10 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getSnapshot(node: Node): any {
-        return node.getChildren().map(childNode => childNode.snapshot)
+        return node
+          .getChildren()
+          .filter(childNode => childNode.type.snapshottable)
+          .map(childNode => childNode.snapshot)
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {

@@ -1,5 +1,5 @@
 import { TypeFlags, Type, IType } from "../type"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { fail } from "../../utils"
 import { Node, createNode, isStateTreeNode } from "../../core"
 import { string as stringType, number as numberType } from "../primitives"
@@ -13,6 +13,7 @@ class Identifier {
 }
 
 export class IdentifierType<T> extends Type<T, T> {
+    readonly snapshottable = true
     readonly flags = TypeFlags.Identifier
 
     constructor(
@@ -22,7 +23,6 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
-        typecheck(this.identifierType, snapshot)
         if (parent && !isStateTreeNode(parent.storedValue))
             fail(`Identifier types can only be instantiated as direct child of a model type`)
         return createNode(this, parent, subpath, environment, snapshot)

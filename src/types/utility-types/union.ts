@@ -6,6 +6,7 @@ import { Node } from "../../core"
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
 export class Union extends Type<any, any> {
+    readonly snapshottable = true // TODO: What to do for unions?
     readonly dispatcher: ITypeDispatcher | null = null
     readonly types: IType<any, any>[]
 

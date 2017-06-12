@@ -14,12 +14,14 @@ export enum TypeFlags {
     Frozen  = 1 << 8,
     Optional = 1 << 9,
     Reference = 1 << 10,
-    Identifier = 1 << 11
+    Identifier = 1 << 11,
+    Computed = 1 << 12
 }
 
 export interface IType<S, T> {
     name: string
     flags: TypeFlags
+    snapshottable: boolean
     is(thing: any): thing is S | T
     validate(thing: any, context: IContext): IValidationResult
     create(snapshot?: S, environment?: any): T
@@ -69,6 +71,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     abstract instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any): Node
 
     abstract flags: TypeFlags
+    abstract snapshottable: boolean
     abstract describe(): string
 
     abstract applySnapshot(node: Node, snapshot: any): void
@@ -106,6 +109,16 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     reconcile(current: Node, newValue: any): Node {
+        // node does not supports snapshots
+        if (!this.snapshottable) { // TODO: move to a separate variable to check?
+            // reconcile only if type and value are still the same
+            if (current.type === this && current.storedValue === newValue)
+                return current
+            const res = this.instantiate(current.parent, current.subpath, current._environment, newValue)
+            current.die()
+            return res
+        }
+
         // TODO: this.is... for all prepareNewVaues?
         if (isStateTreeNode(newValue) && getStateTreeNode(newValue) === current)
             // the current node is the same as the new one
@@ -182,15 +195,6 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
 
     getChildType(key: string): IType<any, any> {
         return fail(`No child '${key}' available in type: ${this.name}`)
-    }
-
-    reconcile(current: Node, newValue: any): Node {
-        // reconcile only if type and value are still the same
-        if (current.type === this && current.storedValue === newValue)
-            return current
-        const res = this.instantiate(current.parent, current.subpath, current._environment, newValue)
-        current.die()
-        return res
     }
 
     removeChild(node: Node, subpath: string): void {
