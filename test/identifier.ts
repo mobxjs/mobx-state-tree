@@ -16,3 +16,31 @@ test("#158 - #88 - Identifiers should accept any string character", t => {
         })
     })
 })
+
+test("#187 - identifiers should not break late types", t => {
+    t.notThrows(() => {
+        const MstNode = types.model("MstNode", {
+            value: types.number,
+            next: types.maybe(types.late(() => MstNode))
+        })
+    })
+})
+
+test("should throw if multiple identifiers provided", t => {
+    t.throws(() => {
+        const Model = types.model("Model", {
+            id: types.identifier(types.number),
+            pk: types.identifier(types.number)
+        })
+
+        Model.create({ id: 1, pk: 2})
+    }, `[mobx-state-tree] Cannot define property 'pk' as object identifier, property 'id' is already defined as identifier property`)
+})
+
+test("identifier should be used only on model types - no parent provided", t => {
+    t.throws(() => {
+        const Model = types.identifier(types.number)
+
+        Model.create(1)
+    }, `[mobx-state-tree] Identifier types can only be instantiated as direct child of a model type`)
+})

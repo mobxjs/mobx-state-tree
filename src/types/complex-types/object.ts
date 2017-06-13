@@ -18,14 +18,13 @@ import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { getType, IComplexValue, getStateTreeNode, IJsonPatch, Node, createNode } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
-import { isIdentifierType } from "../utility-types/identifier"
 import { optional } from "../utility-types/optional"
 import { Property } from "../property-types/property"
-import { IdentifierProperty } from "../property-types/identifier-property"
 import { ComputedProperty } from "../property-types/computed-property"
 import { ValueProperty } from "../property-types/value-property"
 import { ActionProperty } from "../property-types/action-property"
 import { ViewProperty } from "../property-types/view-property"
+import { isIdentifierType } from "../utility-types/identifier"
 
 function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
@@ -110,10 +109,6 @@ export class ObjectType extends ComplexType<any, any> {
             } else if (isPrimitive(value)) {
                 const baseType = getPrimitiveFactoryFromValue(value)
                 this.props[key] = new ValueProperty(key, optional(baseType, value))
-            } else if (isIdentifierType(value)) {
-                if (alreadySeenIdentifierAttribute !== null) fail(`Cannot define property '${key}' as object identifier, property '${alreadySeenIdentifierAttribute}' is already defined as identifier property`)
-                alreadySeenIdentifierAttribute = key
-                this.props[key] = new IdentifierProperty(key, value)
             } else if (isType(value)) {
                 this.props[key] = new ValueProperty(key, value)
             } else if (typeof value === "function") {
@@ -212,9 +207,7 @@ export class ObjectType extends ComplexType<any, any> {
             const prop = this.props[key]
             return prop instanceof ValueProperty
                 ? key + ": " + prop.type.describe()
-                : prop instanceof IdentifierProperty
-                    ? key + ": identifier"
-                    : ""
+                : ""
         }).filter(Boolean).join("; ") + " }"
     }
 

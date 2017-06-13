@@ -22,9 +22,13 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
+        if (!parent || !isStateTreeNode(parent.storedValue))
+            return fail(`Identifier types can only be instantiated as direct child of a model type`)
+
+        if (parent.identifierAttribute) fail(`Cannot define property '${subpath}' as object identifier, property '${parent.identifierAttribute}' is already defined as identifier property`)
+
         typecheck(this.identifierType, snapshot)
-        if (parent && !isStateTreeNode(parent.storedValue))
-            fail(`Identifier types can only be instantiated as direct child of a model type`)
+        parent.identifierAttribute = subpath
         return createNode(this, parent, subpath, environment, snapshot)
     }
 
@@ -46,7 +50,7 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 }
 
-export function identifier<T>(baseType: IType<T, T>): T;
+export function identifier<T>(baseType: IType<T, T>): IType<T, T>;
 export function identifier<T>(): T;
 export function identifier(baseType: IType<any, any> = stringType): any {
     // TODO: MWE: this seems contrived, let's not assert anything and support unions, refinements etc.
