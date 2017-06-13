@@ -15,7 +15,8 @@
     "coverage": "npm run build-tests && nyc ava && nyc report -r html && nyc report -r lcov",
     "build-docs": "npm run quick-build && documentation  build lib/index.js --github -f md -o API.md",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "clean": "rm -rf lib test-lib .nyc_output coverage"
+    "clean": "rm -rf lib test-lib .nyc_output coverage",
+    "precommit": "lint-staged"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,8 @@
     "concurrently": "^3.1.0",
     "coveralls": "^2.11.4",
     "documentation": "^4.0.0-beta9",
+    "husky": "^0.13.4",
+    "lint-staged": "^3.6.1",
     "mobx": "^3.1.15",
     "nyc": "^10.0.0",
     "prettier": "^1.4.4",
@@ -63,6 +66,12 @@
     ],
     "source": [
       "test-lib/src/**/*.js"
+    ]
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write --print-width 120 --tab-width 4 --no-semi",
+      "git add"
     ]
   }
 }
