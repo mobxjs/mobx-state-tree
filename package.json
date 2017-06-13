@@ -69,7 +69,7 @@
     ]
   },
   "lint-staged": {
-    "*.ts,*.js": [
+    "*.{ts,tsx,js,jsx}": [
       "prettier --write --print-width 120 --tab-width 4 --no-semi",
       "git add"
     ]
