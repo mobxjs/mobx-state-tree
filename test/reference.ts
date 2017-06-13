@@ -1,5 +1,5 @@
 import { reaction, autorun } from "mobx"
-import { types, getSnapshot, applySnapshot, unprotect, resolvePath, detach, resolveIdentifier, getRoot } from "../src"
+import { types, getSnapshot, applySnapshot, onPatch, applyPatch, unprotect, resolvePath, detach, resolveIdentifier, getRoot } from "../src"
 import { test } from "ava"
 
 test("it should support prefixed paths in maps", t => {
@@ -610,4 +610,113 @@ test("References in recursive structures", t => {
 
     t.is(store.objects.get("1"), store.tree.children[0].data)
     t.is(store.objects.get("2"), store.tree.children[0].children[0].data)
+})
+
+test("it should applyPatch references in array", t => {
+    const Item = types.model('Item', {
+        id: types.identifier(),
+        name: types.string
+    })
+
+    const Folder = types.model('Folder', {
+        id: types.identifier(),
+        objects: types.map(Item),
+        hovers: types.array(types.reference(Item))
+    }, {
+        addObject(item) {
+            this.objects.put(item)
+        },
+        addHover(item) {
+            this.hovers.push(item)
+        },
+        removeHover(item) {
+            this.hovers.remove(item)
+        }
+    })
+
+    const folder = Folder.create({id: 'folder 1', objects: {}, hovers: []})
+    folder.addObject({id: 'item 1', name: 'item name 1'})
+    const item = folder.objects.get('item 1')
+
+    const snapshot = getSnapshot(folder)
+    const newStore = Folder.create(snapshot)
+
+    onPatch(folder, (data) => {
+        applyPatch(newStore, data)
+    })
+
+    folder.addHover(item)
+
+    t.deepEqual(getSnapshot(newStore), {
+        id: 'folder 1',
+        objects: {
+            'item 1': {
+                id: 'item 1',
+                name: 'item name 1'
+            }
+        },
+        hovers: ['item 1']
+    })
+
+    folder.removeHover(item)
+
+    t.deepEqual(getSnapshot(newStore), {
+        id: 'folder 1',
+        objects: {
+            'item 1': {
+                id: 'item 1',
+                name: 'item name 1'
+            }
+        },
+        hovers: []
+    })
+})
+
+test("it should applySnapshot references in array", t => {
+    const Item = types.model('Item', {
+        id: types.identifier(),
+        name: types.string
+    })
+
+    const Folder = types.model('Folder', {
+        id: types.identifier(),
+        objects: types.map(Item),
+        hovers: types.array(types.reference(Item))
+    })
+
+    const folder = Folder.create({
+        id: 'folder 1',
+        objects: {
+            'item 1': {
+                id: 'item 1',
+                name: 'item name 1'
+            }
+        },
+        hovers: ['folder 1']
+    })
+    const snapshot = JSON.parse(JSON.stringify(getSnapshot(folder)))
+    t.deepEqual(snapshot, {
+        id: 'folder 1',
+        objects: {
+            'item 1': {
+                id: 'item 1',
+                name: 'item name 1'
+            }
+        },
+        hovers: ['folder 1']
+    })
+
+    snapshot.hovers = []
+    applySnapshot(folder, snapshot)
+
+    t.deepEqual(getSnapshot(folder), {
+        id: 'folder 1',
+        objects: {
+            'item 1': {
+                id: 'item 1',
+                name: 'item name 1'
+            }
+        },
+        hovers: []
+    })
 })
