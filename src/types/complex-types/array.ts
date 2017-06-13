@@ -1,10 +1,16 @@
-import { observable, IObservableArray, IArrayWillChange, IArrayWillSplice, IArrayChange, IArraySplice, action, intercept, observe, extras } from "mobx"
 import {
-    getStateTreeNode,
-    IJsonPatch,
-    Node,
-    createNode
-} from "../../core"
+    observable,
+    IObservableArray,
+    IArrayWillChange,
+    IArrayWillSplice,
+    IArrayChange,
+    IArraySplice,
+    action,
+    intercept,
+    observe,
+    extras
+} from "mobx"
+import { getStateTreeNode, IJsonPatch, Node, createNode } from "../../core"
 import { addHiddenFinalProp, fail } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
@@ -34,15 +40,23 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     finalizeNewInstance = (node: Node, snapshot: any) => {
-        const instance = node.storedValue as IObservableArray<any>;
-        extras.getAdministration(instance).dehancer = node.unbox;
+        const instance = node.storedValue as IObservableArray<any>
+        extras.getAdministration(instance).dehancer = node.unbox
         intercept(instance, change => this.willChange(change) as any)
         observe(instance, this.didChange)
         node.applySnapshot(snapshot)
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S): Node {
-        return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
+        return createNode(
+            this,
+            parent,
+            subpath,
+            environment,
+            snapshot,
+            this.createNewInstance,
+            this.finalizeNewInstance
+        )
     }
 
     getChildren(node: Node): Node[] {
@@ -51,8 +65,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
     getChildNode(node: Node, key: string): Node {
         const index = parseInt(key, 10)
-        if (index < node.storedValue.length)
-            return node.storedValue[index]
+        if (index < node.storedValue.length) return node.storedValue[index]
         return fail("Not a child: " + key)
     }
 
@@ -63,12 +76,17 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
         switch (change.type) {
             case "update":
-                if (change.newValue === change.object[change.index])
-                    return null
-                change.newValue = node.reconcileChildren(node, this.subType, [childNodes[change.index]], [change.newValue], [change.index])[0]
+                if (change.newValue === change.object[change.index]) return null
+                change.newValue = node.reconcileChildren(
+                    node,
+                    this.subType,
+                    [childNodes[change.index]],
+                    [change.newValue],
+                    [change.index]
+                )[0]
                 break
             case "splice":
-                const {index, removedCount, added} = change
+                const { index, removedCount, added } = change
                 change.added = node.reconcileChildren(
                     node,
                     this.subType,
@@ -98,23 +116,32 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         const node = getStateTreeNode(change.object)
         switch (change.type) {
             case "update":
-                return void node.emitPatch({
-                    op: "replace",
-                    path: "" + change.index,
-                    value:  node.getChildNode("" + change.index).snapshot
-                }, node)
+                return void node.emitPatch(
+                    {
+                        op: "replace",
+                        path: "" + change.index,
+                        value: node.getChildNode("" + change.index).snapshot
+                    },
+                    node
+                )
             case "splice":
                 for (let i = change.index + change.removedCount - 1; i >= change.index; i--)
-                    node.emitPatch({
-                        op: "remove",
-                        path: "" + i
-                    }, node)
+                    node.emitPatch(
+                        {
+                            op: "remove",
+                            path: "" + i
+                        },
+                        node
+                    )
                 for (let i = 0; i < change.addedCount; i++)
-                    node.emitPatch({
-                        op: "add",
-                        path: "" + (change.index + i),
-                        value: node.getChildNode("" + (change.index + i)).snapshot
-                    }, node)
+                    node.emitPatch(
+                        {
+                            op: "add",
+                            path: "" + (change.index + i),
+                            value: node.getChildNode("" + (change.index + i)).snapshot
+                        },
+                        node
+                    )
                 return
         }
     }
@@ -135,7 +162,8 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         }
     }
 
-    @action applySnapshot(node: Node, snapshot: any[]): void {
+    @action
+    applySnapshot(node: Node, snapshot: any[]): void {
         node.pseudoAction(() => {
             const target = node.storedValue as IObservableArray<any>
             target.replace(snapshot)
@@ -152,8 +180,8 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         }
 
         return flattenTypeErrors(
-            value.map(
-                (item, index) => this.subType.validate(item, getContextForPath(context, "" + index, this.subType))
+            value.map((item, index) =>
+                this.subType.validate(item, getContextForPath(context, "" + index, this.subType))
             )
         )
     }

@@ -6,28 +6,31 @@ import { test } from "ava"
 
 const randomUuid = () => Math.random()
 
-export const Box = types.model("Box", {
-    id: types.identifier(),
-    name: "",
-    x: 0,
-    y: 0,
-    get width() {
-        return this.name.length * 15
+export const Box = types.model(
+    "Box",
+    {
+        id: types.identifier(),
+        name: "",
+        x: 0,
+        y: 0,
+        get width() {
+            return this.name.length * 15
+        },
+        get isSelected() {
+            if (!hasParent(this)) return false
+            return getParent(getParent(this)).selection === this
+        }
     },
-    get isSelected() {
-        if (!hasParent(this))
-            return false
-        return getParent(getParent(this)).selection === this
+    {
+        move(dx, dy) {
+            this.x += dx
+            this.y += dy
+        },
+        setName(newName) {
+            this.name = newName
+        }
     }
-}, {
-    move(dx, dy) {
-        this.x += dx
-        this.y += dy
-    },
-    setName(newName) {
-        this.name = newName
-    }
-})
+)
 
 export const Arrow = types.model("Arrow", {
     id: types.identifier(),
@@ -35,48 +38,49 @@ export const Arrow = types.model("Arrow", {
     to: types.reference(Box)
 })
 
-export const Store = types.model("Store", {
-    boxes: types.map(Box),
-    arrows: types.array(Arrow),
-    selection: types.reference(Box)
-}, {
-    afterCreate() {
-        unprotect(this)
+export const Store = types.model(
+    "Store",
+    {
+        boxes: types.map(Box),
+        arrows: types.array(Arrow),
+        selection: types.reference(Box)
     },
-    addBox(name, x, y) {
-        const box = Box.create({ name, x, y, id: randomUuid() })
-        this.boxes.put(box)
-        return box
-    },
-    addArrow(from, to) {
-        this.arrows.push(Arrow.create({ id: randomUuid(), from, to }))
-    },
-    setSelection(selection) {
-        this.selection = selection
-    },
-    createBox(name, x, y, source) {
-        const box = this.addBox(name, x, y)
-        this.setSelection(box)
-        if (source)
-            this.addArrow(source.id, box.id)
+    {
+        afterCreate() {
+            unprotect(this)
+        },
+        addBox(name, x, y) {
+            const box = Box.create({ name, x, y, id: randomUuid() })
+            this.boxes.put(box)
+            return box
+        },
+        addArrow(from, to) {
+            this.arrows.push(Arrow.create({ id: randomUuid(), from, to }))
+        },
+        setSelection(selection) {
+            this.selection = selection
+        },
+        createBox(name, x, y, source) {
+            const box = this.addBox(name, x, y)
+            this.setSelection(box)
+            if (source) this.addArrow(source.id, box.id)
+        }
     }
-})
+)
 
 function createStore() {
     return Store.create({
-        "boxes": {
-            "cc": { "id": "cc", "name": "Rotterdam", "x": 100, "y": 100 },
-            "aa": { "id": "aa", "name": "Bratislava", "x": 650, "y": 300 }
+        boxes: {
+            cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
+            aa: { id: "aa", name: "Bratislava", x: 650, y: 300 }
         },
-        "arrows": [
-            { "id": "dd", "from": "cc", "to": "aa" }
-        ],
-        "selection": "aa"
+        arrows: [{ id: "dd", from: "cc", to: "aa" }],
+        selection: "aa"
     })
 }
 
-test("store is deserialized correctly", (t) => {
-    const s = createStore();
+test("store is deserialized correctly", t => {
+    const s = createStore()
     t.is(s.boxes.size, 2)
     t.is(s.arrows.length, 1)
     t.true(s.selection === s.boxes.get("aa"))
@@ -85,8 +89,8 @@ test("store is deserialized correctly", (t) => {
     t.deepEqual(s.boxes.values().map(b => b.isSelected), [false, true])
 })
 
-test("store emits correct patch paths", (t) => {
-    const s = createStore();
+test("store emits correct patch paths", t => {
+    const s = createStore()
     const recorder1 = recordPatches(s)
     const recorder2 = recordPatches(s.boxes)
     const recorder3 = recordPatches(s.boxes.get("cc")!)

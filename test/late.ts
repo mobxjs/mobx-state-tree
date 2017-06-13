@@ -2,7 +2,6 @@ import { types } from "../src"
 import { test } from "ava"
 
 test("it should throw if late doesnt received a function as parameter", t => {
-
     t.throws(() => {
         const Before = types.model({
             after: types.late(1 as any)
@@ -19,11 +18,10 @@ test("it should accept a type and infer it correctly", t => {
         name: types.maybe(types.string)
     })
 
-    t.notThrows(() => Before.create({ after: { name : "Hello, it's me."}}))
+    t.notThrows(() => Before.create({ after: { name: "Hello, it's me." } }))
 })
 
 test("late should allow circular references", t => {
-
     interface INode {
         childs: INode[]
     }
@@ -34,11 +32,10 @@ test("late should allow circular references", t => {
     })
 
     t.notThrows(() => Node.create())
-    t.notThrows(() => Node.create({ childs: [{}, { childs: []}]}))
+    t.notThrows(() => Node.create({ childs: [{}, { childs: [] }] }))
 })
 
 test("late should describe correctly circular references", t => {
-
     interface INode {
         childs: INode[]
     }

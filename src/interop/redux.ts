@@ -12,16 +12,16 @@ export interface IReduxStore extends IMiddleWareApi {
     subscribe(listener: (snapshot: any) => void): any
 }
 
-export type MiddleWare =
-    (middlewareApi: IMiddleWareApi) =>
-        ((next: (action: IRawActionCall) => void) => void)
+export type MiddleWare = (middlewareApi: IMiddleWareApi) => ((next: (action: IRawActionCall) => void) => void)
 
 export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxStore {
     if (!isStateTreeNode(model)) fail("Expected model object")
     let store: IReduxStore = {
-        getState : ()       => getSnapshot(model),
-        dispatch : action   => {
-            runMiddleWare(action, runners.slice(), (newAction: any) => applyAction(model, reduxActionToAction(newAction)))
+        getState: () => getSnapshot(model),
+        dispatch: action => {
+            runMiddleWare(action, runners.slice(), (newAction: any) =>
+                applyAction(model, reduxActionToAction(newAction))
+            )
         },
         subscribe: listener => onSnapshot(model, listener)
     }
@@ -41,10 +41,8 @@ function reduxActionToAction(action: any): IRawActionCall {
 function runMiddleWare(action: any, runners: any, next: any) {
     function n(retVal: any) {
         const f = runners.shift()
-        if (f)
-            f(n)(retVal)
-        else
-            next(retVal)
+        if (f) f(n)(retVal)
+        else next(retVal)
     }
     n(action)
 }
@@ -67,12 +65,10 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
 
     // Send changes to the remote monitor
     onAction(model, (action: ISerializedActionCall) => {
-        if (applyingSnapshot)
-            return
+        if (applyingSnapshot) return
         const copy: any = {}
         copy.type = action.name
-        if (action.args)
-            action.args.forEach((value, index) => copy[index] = value)
+        if (action.args) action.args.forEach((value, index) => (copy[index] = value))
         remotedev.send(copy, getSnapshot(model))
     })
 }

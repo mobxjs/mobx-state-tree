@@ -21,20 +21,20 @@ const createTestFactories = () => {
     return { Box, Square, Cube }
 }
 
-test("it should recognize a valid snapshot", (t) => {
+test("it should recognize a valid snapshot", t => {
     const { Box } = createTestFactories()
 
     t.deepEqual(Box.is({ width: 1, height: 2 }), true)
     t.deepEqual(Box.is({ width: 1, height: 2, depth: 3 }), true)
 })
 
-test("it should recognize an invalid snapshot", (t) => {
+test("it should recognize an invalid snapshot", t => {
     const { Box } = createTestFactories()
 
     t.deepEqual(Box.is({ width: "1", height: "2" }), false)
 })
 
-test("it should check valid nodes as well", (t) => {
+test("it should check valid nodes as well", t => {
     const { Box } = createTestFactories()
 
     const doc = Box.create()
@@ -42,7 +42,7 @@ test("it should check valid nodes as well", (t) => {
     t.deepEqual(Box.is(doc), true)
 })
 
-test("it should check invalid nodes as well", (t) => {
+test("it should check invalid nodes as well", t => {
     const { Box } = createTestFactories()
 
     const doc = Box.create()
@@ -50,21 +50,24 @@ test("it should check invalid nodes as well", (t) => {
     t.deepEqual(types.model({ anotherAttr: types.number }).is(doc), false)
 })
 
-test("it should do typescript type inference correctly", (t) => {
-    const A = types.model({
-        x: types.number,
-        y: types.maybe(types.string),
-        get z(): string { return "hi" },
-        set z(v: string) { }
-    }, {
-        method() {
-            const x: string = this.z + this.x + this.y
-            this.anotherMethod(x)
+test("it should do typescript type inference correctly", t => {
+    const A = types.model(
+        {
+            x: types.number,
+            y: types.maybe(types.string),
+            get z(): string {
+                return "hi"
+            },
+            set z(v: string) {}
         },
-        anotherMethod(x: string) {
-
+        {
+            method() {
+                const x: string = this.z + this.x + this.y
+                this.anotherMethod(x)
+            },
+            anotherMethod(x: string) {}
         }
-    })
+    )
 
     // factory is invokable
     const a = A.create({ x: 2, y: "7" })
@@ -165,8 +168,11 @@ test("#66 - it should pick the correct type of defaulted fields", t => {
     unprotect(a)
 
     t.is(a.name, "boo")
-    t.throws(() => a.name = 3 as any, `[mobx-state-tree] Error while converting \`3\` to \`string\`:
-value \`3\` is not assignable to type: \`string\`.`)
+    t.throws(
+        () => (a.name = 3 as any),
+        `[mobx-state-tree] Error while converting \`3\` to \`string\`:
+value \`3\` is not assignable to type: \`string\`.`
+    )
 })
 
 test("cannot create factories with null values", t => {
@@ -188,19 +194,20 @@ test("can create factories with maybe primitives", t => {
     t.is(F.is({ x: 3 }), false)
 
     t.is(F.create().x, null)
-    t.is(F.create({ x: undefined}).x, null)
-    t.is(F.create({ x: ""}).x, "")
-    t.is(F.create({ x: "3"}).x, "3")
+    t.is(F.create({ x: undefined }).x, null)
+    t.is(F.create({ x: "" }).x, "")
+    t.is(F.create({ x: "3" }).x, "3")
 })
 
 test("it is possible to refer to a type", t => {
-    const Todo = types.model({
-        title: types.string
-    }, {
-        setTitle(v: string) {
-
+    const Todo = types.model(
+        {
+            title: types.string
+        },
+        {
+            setTitle(v: string) {}
         }
-    })
+    )
 
     function x(): typeof Todo.Type {
         return Todo.create({ title: "test" }) as any // as any to make sure the type is not inferred accidentally
@@ -217,36 +224,46 @@ test("it is possible to refer to a type", t => {
 })
 
 test(".Type should not be callable", t => {
-    const Todo = types.model({
-        title: types.string
-    }, {
-        setTitle(v: string) {
-
+    const Todo = types.model(
+        {
+            title: types.string
+        },
+        {
+            setTitle(v: string) {}
         }
-    })
+    )
 
     t.throws(() => Todo.Type)
 })
 
 test(".SnapshotType should not be callable", t => {
-    const Todo = types.model({
-        title: types.string
-    }, {
-        setTitle(v: string) {
-
+    const Todo = types.model(
+        {
+            title: types.string
+        },
+        {
+            setTitle(v: string) {}
         }
-    })
+    )
 
     t.throws(() => Todo.SnapshotType)
 })
 
 test("types instances with compatible snapshots should not be interchangeable", t => {
-    const A = types.model("A", {}, {
-        doA() {}
-    })
-    const B = types.model("B", {}, {
-        doB() {}
-    })
+    const A = types.model(
+        "A",
+        {},
+        {
+            doA() {}
+        }
+    )
+    const B = types.model(
+        "B",
+        {},
+        {
+            doB() {}
+        }
+    )
     const C = types.model("C", {
         x: types.maybe(A)
     })
@@ -258,81 +275,98 @@ test("types instances with compatible snapshots should not be interchangeable", 
     const c = C.create()
     unprotect(c)
 
-    t.notThrows(() => { c.x = null })
-    t.notThrows(() => { c.x = {} as any })
-    t.notThrows(() => { c.x = A.create() })
+    t.notThrows(() => {
+        c.x = null
+    })
+    t.notThrows(() => {
+        c.x = {} as any
+    })
+    t.notThrows(() => {
+        c.x = A.create()
+    })
 
-    t.throws(
-        () => { c.x = B.create() as any },
-        /value of type B: <B@<root>> is not assignable to type: `A | null`/
-    )
+    t.throws(() => {
+        c.x = B.create() as any
+    }, /value of type B: <B@<root>> is not assignable to type: `A | null`/)
 })
 
 test("it handles complex types correctly", t => {
-    const Todo = types.model({
-        title: types.string
-    }, {
-        setTitle(v: string) {
-
-        }
-    })
-
-    const Store = types.model({
-        todos: types.map(Todo),
-        get amount() {
-            // double check, not available design time:
-            /// this.setAmount()
-            return this.todos.size
+    const Todo = types.model(
+        {
+            title: types.string
         },
-        getAmount(): number {
-            return this.todos.size + this.amount
+        {
+            setTitle(v: string) {}
         }
-    }, {
-        setAmount() {
-            const x: number = this.todos.size + this.amount + this.getAmount
+    )
+
+    const Store = types.model(
+        {
+            todos: types.map(Todo),
+            get amount() {
+                // double check, not available design time:
+                /// this.setAmount()
+                return this.todos.size
+            },
+            getAmount(): number {
+                return this.todos.size + this.amount
+            }
+        },
+        {
+            setAmount() {
+                const x: number = this.todos.size + this.amount + this.getAmount
+            }
         }
-    })
+    )
 
     t.is(true, true) // supress no asserts warning
 })
 
 test("it should provide detailed reasons why the value is not appicable", t => {
-    const Todo = types.model({
-        title: types.string
-    }, {
-        setTitle(v: string) {
-
-        }
-    })
-
-    const Store = types.model({
-        todos: types.map(Todo),
-        get amount() {
-            // double check, not available design time:
-            /// this.setAmount()
-            return this.todos.size
+    const Todo = types.model(
+        {
+            title: types.string
         },
-        getAmount(): number {
-            return this.todos.size + this.amount
+        {
+            setTitle(v: string) {}
         }
-    }, {
-        setAmount() {
-            const x: number = this.todos.size + this.amount + this.getAmount
-        }
-    })
+    )
 
-    t.throws(() => Store.create({
-        todos: {
-            "1":{
-                title: true,
-                setTitle: "hello"
+    const Store = types.model(
+        {
+            todos: types.map(Todo),
+            get amount() {
+                // double check, not available design time:
+                /// this.setAmount()
+                return this.todos.size
+            },
+            getAmount(): number {
+                return this.todos.size + this.amount
             }
         },
-        amount: 1,
-        getAmount: "hello"
-    }), `[mobx-state-tree] Error while converting \`{"todos":{"1":{"title":true,"setTitle":"hello"}},"amount":1,"getAmount":"hello"}\` to \`AnonymousModel\`:
+        {
+            setAmount() {
+                const x: number = this.todos.size + this.amount + this.getAmount
+            }
+        }
+    )
+
+    t.throws(
+        () =>
+            Store.create({
+                todos: {
+                    "1": {
+                        title: true,
+                        setTitle: "hello"
+                    }
+                },
+                amount: 1,
+                getAmount: "hello"
+            }),
+        `[mobx-state-tree] Error while converting \`{"todos":{"1":{"title":true,"setTitle":"hello"}},"amount":1,"getAmount":"hello"}\` to \`AnonymousModel\`:
 at path "/todos/1/title" value \`true\` is not assignable to type: \`string\`.
 at path "/todos/1/setTitle" value \`"hello"\` is not assignable  (Action properties should not be provided in the snapshot).
 at path "/amount" value \`1\` is not assignable  (Computed properties should not be provided in the snapshot).
-at path "/getAmount" value \`"hello"\` is not assignable  (View properties should not be provided in the snapshot).`)
+at path "/getAmount" value \`"hello"\` is not assignable  (View properties should not be provided in the snapshot).`
+    )
 })

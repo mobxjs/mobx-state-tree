@@ -25,8 +25,7 @@ export class ValueProperty extends Property {
 
     getValueNode(targetInstance: any): Node {
         const node = targetInstance.$mobx.values[this.name].value // TODO: blegh!
-        if (!node)
-            return fail("Node not available for property " + this.name)
+        if (!node) return fail("Node not available for property " + this.name)
         return node
     }
 
@@ -39,16 +38,19 @@ export class ValueProperty extends Property {
 
     didChange(change: IObjectChange) {
         const node = getStateTreeNode(change.object)
-        node.emitPatch({
-            op: "replace",
-            path: escapeJsonPath(this.name),
-            value: this.getValueNode(change.object).snapshot
-        }, node)
+        node.emitPatch(
+            {
+                op: "replace",
+                path: escapeJsonPath(this.name),
+                value: this.getValueNode(change.object).snapshot
+            },
+            node
+        )
     }
 
     serialize(instance: any, snapshot: any) {
         // TODO: FIXME, make sure the observable ref is used!
-        (extras.getAtom(instance, this.name) as any).reportObserved()
+        ;(extras.getAtom(instance, this.name) as any).reportObserved()
         snapshot[this.name] = this.getValueNode(instance).snapshot
     }
 

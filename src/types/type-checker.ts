@@ -1,4 +1,3 @@
-
 export interface IContextEntry {
     path: string
     type?: IType<any, any>
@@ -14,16 +13,14 @@ export type IValidationResult = IValidationError[]
 
 export function prettyPrintValue(value: any) {
     return typeof value === "function"
-        ? `<function${value.name ? " " + value.name :""}>`
-        : isStateTreeNode(value)
-            ? `<${value}>`
-            : `\`${JSON.stringify(value)}\``
+        ? `<function${value.name ? " " + value.name : ""}>`
+        : isStateTreeNode(value) ? `<${value}>` : `\`${JSON.stringify(value)}\``
 }
 
 function toErrorString(error: IValidationError): string {
     const { value } = error
     const type: IType<any, any> = error.context[error.context.length - 1].type as any
-    const fullPath = error.context.map(({path}) => path).filter(path => path.length > 0).join("/")
+    const fullPath = error.context.map(({ path }) => path).filter(path => path.length > 0).join("/")
 
     const pathPrefix = fullPath.length > 0 ? `at path "/${fullPath}" ` : ``
 
@@ -32,19 +29,25 @@ function toErrorString(error: IValidationError): string {
         : isPrimitive(value) ? "value" : "snapshot"
     const isSnapshotCompatible = type && isStateTreeNode(value) && type.is(getStateTreeNode(value).snapshot)
 
-    return `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${type ? `to type: \`${type.name}\`` : ``}` +
-            (error.message ? ` (${error.message})` : "") +
-            (type ?
-                (isPrimitiveType(type) || (type instanceof OptionalValue && isPrimitiveType((<OptionalValue<any, any>> type).type))
-                    ? `.`
-                    : (`, expected an instance of \`${type.name}\` or a snapshot like \`${type.describe()}\` instead.` +
-                        (isSnapshotCompatible ? " (Note that a snapshot of the provided value is compatible with the targeted type)" : "")
-                    )
-                ) : `.`)
+    return (
+        `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${type
+            ? `to type: \`${type.name}\``
+            : ``}` +
+        (error.message ? ` (${error.message})` : "") +
+        (type
+            ? isPrimitiveType(type) ||
+                  (type instanceof OptionalValue && isPrimitiveType((<OptionalValue<any, any>>type).type))
+              ? `.`
+              : `, expected an instance of \`${type.name}\` or a snapshot like \`${type.describe()}\` instead.` +
+                    (isSnapshotCompatible
+                        ? " (Note that a snapshot of the provided value is compatible with the targeted type)"
+                        : "")
+            : `.`)
+    )
 }
 
 export function getDefaultContext(type: IType<any, any>): IContext {
-    return [{ type, path: ""}]
+    return [{ type, path: "" }]
 }
 
 export function getContextForPath(context: IContext, path: string, type?: IType<any, any>): IContext {
@@ -70,7 +73,7 @@ export function typecheck(type: IType<any, any>, value: any): void {
     if (errors.length > 0) {
         fail(
             `Error while converting ${prettyPrintValue(value)} to \`${type.name}\`:\n` +
-            errors.map(toErrorString).join("\n")
+                errors.map(toErrorString).join("\n")
         )
     }
 }

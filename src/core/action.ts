@@ -1,14 +1,14 @@
 import { action as mobxAction, isObservable } from "mobx"
 
 export type ISerializedActionCall = {
-    name: string;
-    path?: string;
-    args?: any[];
+    name: string
+    path?: string
+    args?: any[]
 }
 
 export type IRawActionCall = {
-    name: string;
-    object: any & IComplexValue,
+    name: string
+    object: any & IComplexValue
     args: any[]
 }
 
@@ -32,15 +32,12 @@ function collectMiddlewareHandlers(node: Node): IMiddleWareHandler[] {
 function runMiddleWares(node: Node, baseCall: IRawActionCall): any {
     const handlers = collectMiddlewareHandlers(node)
     // Short circuit
-    if (!handlers.length)
-        return runRawAction(baseCall)
+    if (!handlers.length) return runRawAction(baseCall)
 
     function runNextMiddleware(call: IRawActionCall): any {
         const handler = handlers.shift() // Optimization: counter instead of shift is probably faster
-        if (handler)
-            return handler(call, runNextMiddleware)
-        else
-            return runRawAction(call)
+        if (handler) return handler(call, runNextMiddleware)
+        else return runRawAction(call)
     }
     return runNextMiddleware(baseCall)
 }
@@ -48,7 +45,7 @@ function runMiddleWares(node: Node, baseCall: IRawActionCall): any {
 export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
 
-    const actionInvoker = function (this: IComplexValue) {
+    const actionInvoker = function(this: IComplexValue) {
         const adm = getStateTreeNode(this)
         adm.assertAlive()
         if (adm.isRunningAction()) {
@@ -77,22 +74,32 @@ export function createActionInvoker(name: string, fn: Function) {
 }
 
 function serializeArgument(node: Node, actionName: string, index: number, arg: any): any {
-    if (isPrimitive(arg))
-        return arg
+    if (isPrimitive(arg)) return arg
     if (isStateTreeNode(arg)) {
         const targetNode = getStateTreeNode(arg)
         if (node.root !== targetNode.root)
-            throw new Error(`Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`)
-        return ({
+            throw new Error(
+                `Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`
+            )
+        return {
             $ref: node.getRelativePathTo(getStateTreeNode(arg))
-        })
+        }
     }
     if (typeof arg === "function")
-        throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a function`)
+        throw new Error(
+            `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a function`
+        )
     if (typeof arg === "object" && !isPlainObject(arg) && !Array.isArray(arg))
-        throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any && (arg as any).constructor) ? (arg as any).constructor.name : "Complex Object"}`)
+        throw new Error(
+            `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any) &&
+                (arg as any).constructor
+                ? (arg as any).constructor.name
+                : "Complex Object"}`
+        )
     if (isObservable(arg))
-        throw new Error(`Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received an mobx observable.`)
+        throw new Error(
+            `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received an mobx observable.`
+        )
     try {
         // Check if serializable, cycle free etc...
         // MWE: there must be a better way....
@@ -106,8 +113,7 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
 function deserializeArgument(adm: Node, value: any): any {
     if (typeof value === "object") {
         const keys = Object.keys(value)
-        if (keys.length === 1 && keys[0] === "$ref")
-            return resolvePath(adm.storedValue, value.$ref)
+        if (keys.length === 1 && keys[0] === "$ref") return resolvePath(adm.storedValue, value.$ref)
     }
     return value
 }
@@ -124,10 +130,10 @@ function deserializeArgument(adm: Node, value: any): any {
  */
 export function applyAction(target: IComplexValue, action: ISerializedActionCall): any {
     const resolvedTarget = tryResolve(target, action.path || "")
-    if (!resolvedTarget)
-        return fail(`Invalid action path: ${action.path || ""}`)
+    if (!resolvedTarget) return fail(`Invalid action path: ${action.path || ""}`)
     const node = getStateTreeNode(resolvedTarget)
-    if (!(typeof resolvedTarget[action.name] === "function")) fail(`Action '${action.name}' does not exist in '${node.path}'`)
+    if (!(typeof resolvedTarget[action.name] === "function"))
+        fail(`Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
         action.args ? action.args.map(v => deserializeArgument(node, v)) : []
@@ -146,6 +152,6 @@ export function onAction(target: IComplexValue, listener: (call: ISerializedActi
     })
 }
 
-import { Node, getStateTreeNode,  IComplexValue, isStateTreeNode } from "./node"
-import { resolvePath, tryResolve, addMiddleware  } from "./mst-operations"
+import { Node, getStateTreeNode, IComplexValue, isStateTreeNode } from "./node"
+import { resolvePath, tryResolve, addMiddleware } from "./mst-operations"
 import { fail, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"

@@ -7,23 +7,11 @@ import "./types/type"
 // escapeJsonPath
 // unescapeJsonPath
 
-export {
-    types, IType
-} from "./types"
+export { types, IType } from "./types"
 
 export * from "./core/mst-operations"
 export * from "./core/json-patch"
 
-export {
-    isStateTreeNode,
-    getType,
-    getChildType,
-    onAction,
-    applyAction
-} from "./core"
+export { isStateTreeNode, getType, getChildType, onAction, applyAction } from "./core"
 
-export {
-    asReduxStore,
-    IReduxStore,
-    connectReduxDevtools
-} from "./interop/redux"
+export { asReduxStore, IReduxStore, connectReduxDevtools } from "./interop/redux"

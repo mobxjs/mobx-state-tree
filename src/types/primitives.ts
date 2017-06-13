@@ -30,15 +30,30 @@ export class CoreType<T> extends Type<T, T> {
 }
 
 // tslint:disable-next-line:variable-name
-export const string: ISimpleType<string> = new CoreType<string>("string", TypeFlags.String, (v: any) => typeof v === "string")
+export const string: ISimpleType<string> = new CoreType<string>(
+    "string",
+    TypeFlags.String,
+    (v: any) => typeof v === "string"
+)
 // tslint:disable-next-line:variable-name
-export const number: ISimpleType<number> = new CoreType<number>("number", TypeFlags.Number, (v: any) => typeof v === "number")
+export const number: ISimpleType<number> = new CoreType<number>(
+    "number",
+    TypeFlags.Number,
+    (v: any) => typeof v === "number"
+)
 // tslint:disable-next-line:variable-name
-export const boolean: ISimpleType<boolean> = new CoreType<boolean>("boolean", TypeFlags.Boolean, (v: any) => typeof v === "boolean")
+export const boolean: ISimpleType<boolean> = new CoreType<boolean>(
+    "boolean",
+    TypeFlags.Boolean,
+    (v: any) => typeof v === "boolean"
+)
 // tslint:disable-next-line:variable-name
-export const DatePrimitive: ISimpleType<Date> = new CoreType<Date>("Date", TypeFlags.Date, (v: any) => v instanceof Date)
-
-; (DatePrimitive as any).getSnapshot = function(node: Node) {
+export const DatePrimitive: ISimpleType<Date> = new CoreType<Date>(
+    "Date",
+    TypeFlags.Date,
+    (v: any) => v instanceof Date
+)
+;(DatePrimitive as any).getSnapshot = function(node: Node) {
     return node.storedValue.getTime()
 }
 
@@ -53,8 +68,7 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
         case "boolean":
             return boolean
         case "object":
-            if (value instanceof Date)
-                return DatePrimitive
+            if (value instanceof Date) return DatePrimitive
     }
     return fail("Cannot determine primtive type from value " + value)
 }

@@ -15,7 +15,7 @@ import { literal } from "./utility-types/literal"
 import { maybe } from "./utility-types/maybe"
 import { refinement } from "./utility-types/refinement"
 import { frozen } from "./utility-types/frozen"
-import { boolean, DatePrimitive, number, string  } from "./primitives"
+import { boolean, DatePrimitive, number, string } from "./primitives"
 import { late } from "./utility-types/late"
 
 export { IType }

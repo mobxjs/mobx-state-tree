@@ -8,7 +8,7 @@ test("#158 - #88 - Identifiers should accept any string character", t => {
     })
 
     t.notThrows(() => {
-        ["coffee", "cof$fee", "cof|fee", "cof/fee"].forEach(id => {
+        ;["coffee", "cof$fee", "cof|fee", "cof/fee"].forEach(id => {
             Todo.create({
                 id: id,
                 title: "Get coffee"
@@ -33,19 +33,22 @@ test("should throw if multiple identifiers provided", t => {
             pk: types.identifier(types.number)
         })
 
-        Model.create({ id: 1, pk: 2})
+        Model.create({ id: 1, pk: 2 })
     }, `[mobx-state-tree] Cannot define property 'pk' as object identifier, property 'id' is already defined as identifier property`)
 })
 
 test("should throw if identifier of wrong type", t => {
-    t.throws(() => {
-        const Model = types.model("Model", {
-            id: types.identifier(types.number)
-        })
+    t.throws(
+        () => {
+            const Model = types.model("Model", {
+                id: types.identifier(types.number)
+            })
 
-        Model.create({ id: "1"})
-    }, `[mobx-state-tree] Error while converting \`{"id":"1"}\` to \`Model\`:
-at path "/id" value \`"1"\` is not assignable to type: \`identifier(number)\`, expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`)
+            Model.create({ id: "1" })
+        },
+        `[mobx-state-tree] Error while converting \`{"id":"1"}\` to \`Model\`:
+at path "/id" value \`"1"\` is not assignable to type: \`identifier(number)\`, expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`
+    )
 })
 
 test("identifier should be used only on model types - no parent provided", t => {

@@ -1,13 +1,8 @@
-import {
-    observable,
-    computed,
-    action,
-    reaction
-} from "mobx"
+import { observable, computed, action, reaction } from "mobx"
 
 let nextNodeId = 1
 
-export class Node  {
+export class Node {
     // optimization: these fields make MST memory expensive for primitives. Most can be initialized lazily, or with EMPTY_ARRAY on prototype
     readonly nodeId = ++nextNodeId
     readonly type: IType<any, any>
@@ -42,9 +37,12 @@ export class Node  {
         // in prod mode. This saves lot of GC overhead (important for e.g. React Native)
         // if the feature is not actively used
         // downside; no structural sharing if getSnapshot is called incidently
-        const snapshotDisposer = reaction(() => this.snapshot, snapshot => {
-            this.emitSnapshot(snapshot)
-        })
+        const snapshotDisposer = reaction(
+            () => this.snapshot,
+            snapshot => {
+                this.emitSnapshot(snapshot)
+            }
+        )
         snapshotDisposer.onError((e: any) => {
             throw e
         })
@@ -58,9 +56,9 @@ export class Node  {
     /**
      * Returnes (escaped) path representation as string
      */
-    @computed public get path(): string {
-        if (!this.parent)
-            return ""
+    @computed
+    public get path(): string {
+        if (!this.parent) return ""
         return this.parent.path + "/" + escapeJsonPath(this.subpath)
     }
 
@@ -74,36 +72,37 @@ export class Node  {
 
     public get root(): Node {
         // future optimization: store root ref in the node and maintain it
-        let p, r: Node = this
-        while (p = r.parent)
-            r = p
+        let p,
+            r: Node = this
+        while ((p = r.parent)) r = p
         return r as Node
     }
 
     getRelativePathTo(target: Node): string {
         // PRE condition target is (a child of) base!
-        if (this.root !== target.root) fail(`Cannot calculate relative path: objects '${this}' and '${target}' are not part of the same object tree`)
+        if (this.root !== target.root)
+            fail(
+                `Cannot calculate relative path: objects '${this}' and '${target}' are not part of the same object tree`
+            )
 
         const baseParts = splitJsonPath(this.path)
         const targetParts = splitJsonPath(target.path)
         let common = 0
         for (; common < baseParts.length; common++) {
-            if (baseParts[common] !== targetParts[common])
-                break
+            if (baseParts[common] !== targetParts[common]) break
         }
         // TODO: assert that no targetParts paths are "..", "." or ""!
-        return baseParts.slice(common).map(_ => "..").join("/")
-            + joinJsonPath(targetParts.slice(common))
+        return baseParts.slice(common).map(_ => "..").join("/") + joinJsonPath(targetParts.slice(common))
     }
 
-    resolve(pathParts: string): Node;
-    resolve(pathParts: string, failIfResolveFails: boolean): Node | undefined;
+    resolve(pathParts: string): Node
+    resolve(pathParts: string, failIfResolveFails: boolean): Node | undefined
     resolve(path: string, failIfResolveFails: boolean = true): Node | undefined {
         return this.resolvePath(splitJsonPath(path), failIfResolveFails)
     }
 
-    resolvePath(pathParts: string[]): Node;
-    resolvePath(pathParts: string[], failIfResolveFails: boolean): Node | undefined;
+    resolvePath(pathParts: string[]): Node
+    resolvePath(pathParts: string[], failIfResolveFails: boolean): Node | undefined
     resolvePath(pathParts: string[], failIfResolveFails: boolean = true): Node | undefined {
         // counter part of getRelativePath
         // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
@@ -111,12 +110,12 @@ export class Node  {
         // so we treat leading ../ apart...
         let current: Node | null = this
         for (let i = 0; i < pathParts.length; i++) {
-            if (pathParts[i] === "") // '/bla' or 'a//b' splits to empty strings
+            if (
+                pathParts[i] === "" // '/bla' or 'a//b' splits to empty strings
+            )
                 current = current!.root
-            else if (pathParts[i] === "..")
-                current = current!.parent
-            else if (pathParts[i] === "." || pathParts[i] === "")
-                continue
+            else if (pathParts[i] === "..") current = current!.parent
+            else if (pathParts[i] === "." || pathParts[i] === "") continue
             else if (current) {
                 current = current.getChildNode(pathParts[i])
                 continue
@@ -124,9 +123,12 @@ export class Node  {
 
             if (!current) {
                 if (failIfResolveFails)
-                    return fail(`Could not resolve '${pathParts[i]}' in '${joinJsonPath(pathParts.slice(0, i - 1))}', path of the patch does not resolve`)
-                else
-                    return undefined
+                    return fail(
+                        `Could not resolve '${pathParts[i]}' in '${joinJsonPath(
+                            pathParts.slice(0, i - 1)
+                        )}', path of the patch does not resolve`
+                    )
+                else return undefined
             }
         }
         return current!
@@ -141,8 +143,7 @@ export class Node  {
     }
 
     public die() {
-        if (this._isDetaching)
-            return
+        if (this._isDetaching) return
 
         if (isStateTreeNode(this.storedValue)) {
             walk(this.storedValue, child => getStateTreeNode(child).aboutToDie())
@@ -173,19 +174,25 @@ export class Node  {
         // we could express this in a much nicer way
         Object.defineProperty(this.storedValue, "$mobx", {
             get() {
-                fail(`This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type '${self.type.name}') used to live at '${oldPath}'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead.`)
+                fail(
+                    `This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type '${self
+                        .type
+                        .name}') used to live at '${oldPath}'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead.`
+                )
             }
         })
     }
 
     public assertAlive() {
         if (!this._isAlive)
-            fail(`${this} cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`)
+            fail(
+                `${this} cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`
+            )
     }
 
-    @computed public get snapshot() {
-        if (!this._isAlive)
-            return undefined
+    @computed
+    public get snapshot() {
+        if (!this._isAlive) return undefined
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         // Optimization: only freeze on dev builds
         return freeze(this.type.getSnapshot(this))
@@ -204,7 +211,8 @@ export class Node  {
         this.snapshotSubscribers.forEach((f: Function) => f(snapshot))
     }
 
-    @action public applyPatch(patch: IJsonPatch) {
+    @action
+    public applyPatch(patch: IJsonPatch) {
         const parts = splitJsonPath(patch.path)
         const node = this.resolvePath(parts.slice(0, -1))
 
@@ -225,25 +233,29 @@ export class Node  {
     emitPatch(patch: IJsonPatch, source: Node) {
         if (this.patchSubscribers.length) {
             const localizedPatch: IJsonPatch = extend({}, patch, {
-                    path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
-                })
+                path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
+            })
             this.patchSubscribers.forEach(f => f(localizedPatch))
         }
-        if (this.parent)
-            this.parent.emitPatch(patch, source)
+        if (this.parent) this.parent.emitPatch(patch, source)
     }
 
     setParent(newParent: Node | null, subpath: string | null = null) {
-        if (this.parent === newParent && this.subpath === subpath)
-            return
+        if (this.parent === newParent && this.subpath === subpath) return
         if (this._parent && newParent && newParent !== this._parent) {
-            fail(`A node cannot exists twice in the state tree. Failed to add ${this} to path '${newParent.path}/${subpath}'.`)
+            fail(
+                `A node cannot exists twice in the state tree. Failed to add ${this} to path '${newParent.path}/${subpath}'.`
+            )
         }
         if (!this._parent && newParent && newParent.root === this) {
-            fail(`A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`)
+            fail(
+                `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`
+            )
         }
         if (!this._parent && !!this._environment) {
-            fail(`A state tree that has been initialized with an environment cannot be made part of another state tree.`)
+            fail(
+                `A state tree that has been initialized with an environment cannot be made part of another state tree.`
+            )
         }
         if (this.parent && !newParent) {
             this.die()
@@ -261,7 +273,13 @@ export class Node  {
         this.disposers.unshift(disposer)
     }
 
-    reconcileChildren<T>(parent: Node, childType: IType<any, T>, oldNodes: Node[], newValues: T[], newPaths: (string|number)[]): Node[] {
+    reconcileChildren<T>(
+        parent: Node,
+        childType: IType<any, T>,
+        oldNodes: Node[],
+        newValues: T[],
+        newPaths: (string | number)[]
+    ): Node[] {
         // TODO: move to array, rewrite to use type.reconcile
         // TODO: pick identifiers based on actual type instead of declared type
         // optimization: overload for a single old / new value to avoid all the array allocations
@@ -286,7 +304,8 @@ export class Node  {
         // Investigate which values we could reconcile, and mark them all as potentially dead
         oldNodes.forEach(oldNode => {
             if (oldNode.identifierAttribute)
-                (oldNodesByIdentifier[oldNode.identifierAttribute] || (oldNodesByIdentifier[oldNode.identifierAttribute] = {}))[oldNode.identifier!] = oldNode
+                (oldNodesByIdentifier[oldNode.identifierAttribute] ||
+                    (oldNodesByIdentifier[oldNode.identifierAttribute] = {}))[oldNode.identifier!] = oldNode
             nodesToBeKilled[oldNode.nodeId] = oldNode
         })
 
@@ -301,7 +320,9 @@ export class Node  {
                     // Came from this array already
                     if (!nodesToBeKilled[childNode.nodeId]) {
                         // this node is owned by this parent, but not in the reconcilable set, so it must be double
-                        fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${subPath}', but it lives already at '${childNode.path}'`)
+                        fail(
+                            `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${subPath}', but it lives already at '${childNode.path}'`
+                        )
                     }
                     nodesToBeKilled[childNode.nodeId] = undefined
                     childNode.setParent(parent, subPath)
@@ -328,18 +349,14 @@ export class Node  {
         })
 
         // Kill non reconciled values
-        for (let key in nodesToBeKilled)
-            if (nodesToBeKilled[key] !== undefined)
-                nodesToBeKilled[key]!.die()
+        for (let key in nodesToBeKilled) if (nodesToBeKilled[key] !== undefined) nodesToBeKilled[key]!.die()
 
         return res
     }
 
     isRunningAction(): boolean {
-        if (this._isRunningAction)
-            return true
-        if (this.isRoot)
-            return false
+        if (this._isRunningAction) return true
+        if (this.isRoot) return false
         return this.parent!.isRunningAction()
     }
 
@@ -371,8 +388,7 @@ export class Node  {
     get isProtected(): boolean {
         let cur: Node | null = this
         while (cur) {
-            if (cur.isProtectionEnabled === false)
-                return false
+            if (cur.isProtectionEnabled === false) return false
             cur = cur.parent
         }
         return true
@@ -402,8 +418,7 @@ export class Node  {
 
     detach() {
         if (!this._isAlive) fail(`Error while detaching, node is not alive.`)
-        if (this.isRoot)
-            return
+        if (this.isRoot) return
         else {
             this.fireHook("beforeDetach")
             this._environment = (this.root as Node)._environment // make backup of environment
@@ -417,15 +432,13 @@ export class Node  {
     }
 
     unbox(childNode: Node): any {
-        if (this._autoUnbox === true)
-            return childNode.getValue()
+        if (this._autoUnbox === true) return childNode.getValue()
         return childNode
     }
 
     fireHook(name: string) {
         const fn = this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
-        if (typeof fn === "function")
-            fn.apply(this.storedValue)
+        if (typeof fn === "function") fn.apply(this.storedValue)
     }
 
     toString(): string {
@@ -443,10 +456,8 @@ export function isStateTreeNode(value: any): value is IComplexValue {
 }
 
 export function getStateTreeNode(value: IComplexValue): Node {
-    if (isStateTreeNode(value))
-        return value.$treenode!
-    else
-        return fail("element has no Node")
+    if (isStateTreeNode(value)) return value.$treenode!
+    else return fail("element has no Node")
 }
 
 function canAttachNode(value: any) {
@@ -454,14 +465,26 @@ function canAttachNode(value: any) {
 }
 
 function toJSON(this: IComplexValue) {
-  return getStateTreeNode(this).snapshot;
+    return getStateTreeNode(this).snapshot
 }
 
-export function createNode<S, T>(type: IType<S, T>, parent: Node | null, subpath: string, environment: any, initialValue: any, createNewInstance: (initialValue: any) => T = identity, finalizeNewInstance: (node: Node, initialValue: any) => void = noop) {
+export function createNode<S, T>(
+    type: IType<S, T>,
+    parent: Node | null,
+    subpath: string,
+    environment: any,
+    initialValue: any,
+    createNewInstance: (initialValue: any) => T = identity,
+    finalizeNewInstance: (node: Node, initialValue: any) => void = noop
+) {
     if (isStateTreeNode(initialValue)) {
         const targetNode = getStateTreeNode(initialValue)
         if (!targetNode.isRoot)
-            fail(`Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent ? parent.path : ""}/${subpath}', but it lives already at '${targetNode.path}'`)
+            fail(
+                `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent
+                    ? parent.path
+                    : ""}/${subpath}', but it lives already at '${targetNode.path}'`
+            )
         targetNode.setParent(parent, subpath)
         return targetNode
     }
@@ -470,29 +493,26 @@ export function createNode<S, T>(type: IType<S, T>, parent: Node | null, subpath
     // tslint:disable-next-line:no_unused-variable
     const node = new Node(type, parent, subpath, environment, instance)
     if (!parent) node.identifierCache = new IdentifierCache()
-    if (canAttachTreeNode) addHiddenFinalProp(instance, "$treenode", node);
+    if (canAttachTreeNode) addHiddenFinalProp(instance, "$treenode", node)
 
     let sawException = true
     try {
-        if (canAttachTreeNode) addReadOnlyProp(instance, "toJSON", toJSON);
+        if (canAttachTreeNode) addReadOnlyProp(instance, "toJSON", toJSON)
 
         node.pseudoAction(() => {
             finalizeNewInstance(node, initialValue)
         })
-        if (parent)
-            parent.root.identifierCache!.addNodeToCache(node)
-        else
-            node.identifierCache!.addNodeToCache(node)
+        if (parent) parent.root.identifierCache!.addNodeToCache(node)
+        else node.identifierCache!.addNodeToCache(node)
 
         node.fireHook("afterCreate")
-        if (parent)
-            node.fireHook("afterAttach")
+        if (parent) node.fireHook("afterAttach")
         sawException = false
         return node
     } finally {
         if (sawException) {
             // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-            (node as any)._isAlive = false
+            ;(node as any)._isAlive = false
         }
     }
 }

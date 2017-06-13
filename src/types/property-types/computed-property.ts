@@ -11,13 +11,22 @@ export class ComputedProperty extends Property {
         Object.defineProperty(
             proto,
             this.name,
-            computed(proto, this.name, { get: this.getter, set: this.setter, configurable: true, enumerable: false }) as any
+            computed(proto, this.name, {
+                get: this.getter,
+                set: this.setter,
+                configurable: true,
+                enumerable: false
+            }) as any
         )
     }
 
     validate(snapshot: any, context: IContext): IValidationResult {
-        if ( this.name in snapshot ) {
-            return typeCheckFailure(getContextForPath(context, this.name), snapshot[this.name], "Computed properties should not be provided in the snapshot")
+        if (this.name in snapshot) {
+            return typeCheckFailure(
+                getContextForPath(context, this.name),
+                snapshot[this.name],
+                "Computed properties should not be provided in the snapshot"
+            )
         }
 
         return typeCheckSuccess()

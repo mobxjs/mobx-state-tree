@@ -1,6 +1,6 @@
-import {Type, IType, TypeFlags} from "../type"
+import { Type, IType, TypeFlags } from "../type"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { isStateTreeNode, getStateTreeNode, Node  } from "../../core"
+import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
 
 export type IFunctionReturn<T> = () => T
 export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>
@@ -9,7 +9,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
     readonly type: IType<S, T>
     readonly defaultValue: IOptionalValue<S, T>
 
-    get flags () {
+    get flags() {
         return this.type.flags | TypeFlags.Optional
     }
 
@@ -26,7 +26,9 @@ export class OptionalValue<S, T> extends Type<S, T> {
     instantiate(parent: Node, subpath: string, environment: any, value: S): Node {
         if (typeof value === "undefined") {
             const defaultValue = this.getDefaultValue()
-            const defaultSnapshot = isStateTreeNode(defaultValue) ? getStateTreeNode(defaultValue).snapshot : defaultValue
+            const defaultSnapshot = isStateTreeNode(defaultValue)
+                ? getStateTreeNode(defaultValue).snapshot
+                : defaultValue
             return this.type.instantiate(parent, subpath, environment, defaultSnapshot)
         }
         return this.type.instantiate(parent, subpath, environment, value)
@@ -56,7 +58,9 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: T): IT
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => S): IType<S, T>
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => T): IType<S, T>
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): IType<S, T> {
-    const defaultValue = typeof defaultValueOrFunction === "function" ? defaultValueOrFunction() : defaultValueOrFunction
+    const defaultValue = typeof defaultValueOrFunction === "function"
+        ? defaultValueOrFunction()
+        : defaultValueOrFunction
     const defaultSnapshot = isStateTreeNode(defaultValue) ? getStateTreeNode(defaultValue).snapshot : defaultValue
     typecheck(type, defaultSnapshot)
     return new OptionalValue(type, defaultValueOrFunction)

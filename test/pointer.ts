@@ -19,15 +19,12 @@ test("it should allow array of pointer objects", t => {
     })
 
     const store = AppStore.create({
-        todos: [
-            { id: "1", name: "Hello"},
-            { id: "2", name: "World"}
-        ],
+        todos: [{ id: "1", name: "Hello" }, { id: "2", name: "World" }],
         selected: []
     })
     unprotect(store)
 
-    const ref = Pointer(Todo).create({ value: store.todos[0]}) // Fails because store.todos does not belongs to the same tree
+    const ref = Pointer(Todo).create({ value: store.todos[0] }) // Fails because store.todos does not belongs to the same tree
     store.selected.push(ref)
     t.is<any>(store.selected[0].value, store.todos[0])
 })
@@ -38,12 +35,8 @@ test("it should allow array of pointer objects - 2", t => {
         selected: types.optional(types.array(Pointer(Todo)), [])
     })
 
-
     const store = AppStore.create({
-        todos: [
-            { id: "1", name: "Hello"},
-            { id: "2", name: "World"}
-        ],
+        todos: [{ id: "1", name: "Hello" }, { id: "2", name: "World" }],
         selected: []
     })
     unprotect(store)
@@ -55,24 +48,18 @@ test("it should allow array of pointer objects - 2", t => {
 })
 
 test("it should allow array of pointer objects - 3", t => {
-
-
     const AppStore = types.model({
         todos: types.array(Todo),
         selected: types.optional(types.array(Pointer(Todo)), [])
     })
 
-
     const store = AppStore.create({
-        todos: [
-            { id: "1", name: "Hello"},
-            { id: "2", name: "World"}
-        ],
+        todos: [{ id: "1", name: "Hello" }, { id: "2", name: "World" }],
         selected: []
     })
     unprotect(store)
 
-    const ref = Pointer(Todo).create({ value: store.todos[0]})
+    const ref = Pointer(Todo).create({ value: store.todos[0] })
     store.selected.push(ref)
     t.is<any>(store.selected[0].value, store.todos[0])
 })
@@ -83,12 +70,8 @@ test("it should allow array of pointer objects - 4", t => {
         selected: types.optional(types.array(Pointer(Todo)), [])
     })
 
-
     const store = AppStore.create({
-        todos: [
-            { id: "1", name: "Hello"},
-            { id: "2", name: "World"}
-        ],
+        todos: [{ id: "1", name: "Hello" }, { id: "2", name: "World" }],
         selected: []
     })
     unprotect(store)

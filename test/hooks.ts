@@ -2,60 +2,64 @@ import { detach, types, destroy, addDisposer, unprotect } from "../src"
 import { test } from "ava"
 
 function createTestStore(listener) {
-    const Todo = types.model("Todo", {
-        title: ""
-    }, {
-        setTitle(newTitle) {
-            this.title = newTitle
+    const Todo = types.model(
+        "Todo",
+        {
+            title: ""
         },
-        afterCreate() {
-            listener("new todo: " + this.title)
-            addDisposer(this, () => {
-                listener("custom disposer 1 for " + this.title)
-            })
-            addDisposer(this, () => {
-                listener("custom disposer 2 for " + this.title)
-            })
-        },
-        beforeDestroy() {
-            listener("destroy todo: " + this.title)
-        },
-        afterAttach() {
-            listener("attach todo: " + this.title)
-        },
-        beforeDetach() {
-            listener("detach todo: " + this.title)
+        {
+            setTitle(newTitle) {
+                this.title = newTitle
+            },
+            afterCreate() {
+                listener("new todo: " + this.title)
+                addDisposer(this, () => {
+                    listener("custom disposer 1 for " + this.title)
+                })
+                addDisposer(this, () => {
+                    listener("custom disposer 2 for " + this.title)
+                })
+            },
+            beforeDestroy() {
+                listener("destroy todo: " + this.title)
+            },
+            afterAttach() {
+                listener("attach todo: " + this.title)
+            },
+            beforeDetach() {
+                listener("detach todo: " + this.title)
+            }
         }
-    })
+    )
 
-    const Store = types.model("Store", {
-        todos: types.array(Todo)
-    }, {
-        afterCreate() {
-            unprotect(this)
-            listener("new store: " + this.todos.length)
-            addDisposer(this, () => {
-                listener("custom disposer for store")
-            })
+    const Store = types.model(
+        "Store",
+        {
+            todos: types.array(Todo)
         },
-        beforeDestroy() {
-            listener("destroy store: " + this.todos.length)
-        },
-        afterAttach() {
-            listener("attach store: " + this.todos.length)
-        },
-        beforeDetach() {
-            listener("detach store: " + this.todos.length)
+        {
+            afterCreate() {
+                unprotect(this)
+                listener("new store: " + this.todos.length)
+                addDisposer(this, () => {
+                    listener("custom disposer for store")
+                })
+            },
+            beforeDestroy() {
+                listener("destroy store: " + this.todos.length)
+            },
+            afterAttach() {
+                listener("attach store: " + this.todos.length)
+            },
+            beforeDetach() {
+                listener("detach store: " + this.todos.length)
+            }
         }
-    })
+    )
 
     return {
         store: Store.create({
-            todos: [
-                { title: "Get coffee" },
-                { title: "Get biscuit" },
-                { title: "Give talk" }
-            ]
+            todos: [{ title: "Get coffee" }, { title: "Get biscuit" }, { title: "Give talk" }]
         }),
         Store,
         Todo
@@ -64,7 +68,7 @@ function createTestStore(listener) {
 
 test("it should trigger lifecycle hooks", t => {
     const events: string[] = []
-    const {store, Todo} = createTestStore(e => events.push(e))
+    const { store, Todo } = createTestStore(e => events.push(e))
 
     const talk = detach(store.todos[2])
     events.push("-")

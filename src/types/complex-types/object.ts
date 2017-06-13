@@ -1,19 +1,5 @@
-import {
-    action,
-    extendShallowObservable,
-    IObjectChange,
-    IObjectWillChange,
-    intercept,
-    observe
-} from "mobx"
-import {
-    extend as extendObject,
-    extendKeepGetter,
-    fail,
-    isPrimitive,
-    hasOwnProperty,
-    isPlainObject
-} from "../../utils"
+import { action, extendShallowObservable, IObjectChange, IObjectWillChange, intercept, observe } from "mobx"
+import { extend as extendObject, extendKeepGetter, fail, isPrimitive, hasOwnProperty, isPlainObject } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
 import { getType, IComplexValue, getStateTreeNode, IJsonPatch, Node, createNode } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors } from "../type-checker"
@@ -55,7 +41,7 @@ export class ObjectType extends ComplexType<any, any> {
         Object.freeze(baseActions)
         this.baseModel = baseModel
         this.baseActions = baseActions
-        if (!(/^\w[\w\d_]*$/.test(name))) fail(`Typename should be a valid identifier: ${name}`)
+        if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
         this.modelConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
         this.modelConstructor.prototype.toString = objectTypeToString
         this.parseModelProps()
@@ -63,7 +49,15 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
-        return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
+        return createNode(
+            this,
+            parent,
+            subpath,
+            environment,
+            snapshot,
+            this.createNewInstance,
+            this.finalizeNewInstance
+        )
     }
 
     createNewInstance = () => {
@@ -73,7 +67,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     finalizeNewInstance = (node: Node, snapshot: any) => {
-        const instance = node.storedValue as IComplexValue;
+        const instance = node.storedValue as IComplexValue
         this.forAllProps(prop => prop.initialize(instance, snapshot))
         intercept(instance, change => this.willChange(change) as any /* wait for typing fix in mobx */)
         observe(instance, this.didChange)
@@ -92,67 +86,69 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     parseModelProps() {
-        const {baseModel, baseActions} = this
+        const { baseModel, baseActions } = this
         let alreadySeenIdentifierAttribute: string | null = null
 
-        for (let key in baseModel) if (hasOwnProperty(baseModel, key)) {
-            // TODO: check that hooks are not defined as part of baseModel
-            const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
-            if ("get" in descriptor) {
-                this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
-                continue
-            }
+        for (let key in baseModel)
+            if (hasOwnProperty(baseModel, key)) {
+                // TODO: check that hooks are not defined as part of baseModel
+                const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
+                if ("get" in descriptor) {
+                    this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
+                    continue
+                }
 
-            const { value } = descriptor
-            if (value === null || undefined) {
-                fail("The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?")
-            } else if (isPrimitive(value)) {
-                const baseType = getPrimitiveFactoryFromValue(value)
-                this.props[key] = new ValueProperty(key, optional(baseType, value))
-            } else if (isType(value)) {
-                this.props[key] = new ValueProperty(key, value)
-            } else if (typeof value === "function") {
-                this.props[key] = new ViewProperty(key, value)
-            } else if (typeof value === "object") {
-                // if (!Array.isArray(value) && isPlainObject(value)) {
-                //     TODO: also check if the entire type is simple! (no identifiers and other complex types)
-                //     this.props[key] = new ValueProperty(key, createDefaultValueFactory(
-                //         createModelFactory(this.name + "__" + key, value),
-                //         () => value)
-                //     )
-                // } else {
+                const { value } = descriptor
+                if (value === null || undefined) {
+                    fail(
+                        "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
+                    )
+                } else if (isPrimitive(value)) {
+                    const baseType = getPrimitiveFactoryFromValue(value)
+                    this.props[key] = new ValueProperty(key, optional(baseType, value))
+                } else if (isType(value)) {
+                    this.props[key] = new ValueProperty(key, value)
+                } else if (typeof value === "function") {
+                    this.props[key] = new ViewProperty(key, value)
+                } else if (typeof value === "object") {
+                    // if (!Array.isArray(value) && isPlainObject(value)) {
+                    //     TODO: also check if the entire type is simple! (no identifiers and other complex types)
+                    //     this.props[key] = new ValueProperty(key, createDefaultValueFactory(
+                    //         createModelFactory(this.name + "__" + key, value),
+                    //         () => value)
+                    //     )
+                    // } else {
                     // TODO: in future also expand on `[Type]` and  `[{ x: 3 }]`
                     fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
-                // }
-            } else {
-                fail(`Unexpected value for property '${key}'`)
+                    // }
+                } else {
+                    fail(`Unexpected value for property '${key}'`)
+                }
             }
-        }
 
-        for (let key in baseActions) if (hasOwnProperty(baseActions, key)) {
-            const value = baseActions[key]
-            if (key in this.baseModel)
-                fail(`Property '${key}' was also defined as action. Actions and properties should not collide`)
-            if (typeof value === "function") {
-                this.props[key] = new ActionProperty(key, value)
-            } else {
-                fail(`Unexpected value for action '${key}'. Expected function, got ${typeof value}`)
+        for (let key in baseActions)
+            if (hasOwnProperty(baseActions, key)) {
+                const value = baseActions[key]
+                if (key in this.baseModel)
+                    fail(`Property '${key}' was also defined as action. Actions and properties should not collide`)
+                if (typeof value === "function") {
+                    this.props[key] = new ActionProperty(key, value)
+                } else {
+                    fail(`Unexpected value for action '${key}'. Expected function, got ${typeof value}`)
+                }
             }
-        }
     }
 
     getChildren(node: Node): Node[] {
         const res: Node[] = []
         this.forAllProps(prop => {
-            if (prop instanceof ValueProperty)
-                res.push(prop.getValueNode(node.storedValue))
+            if (prop instanceof ValueProperty) res.push(prop.getValueNode(node.storedValue))
         })
         return res
     }
 
     getChildNode(node: Node, key: string): Node {
-        if (!(this.props[key] instanceof ValueProperty))
-            return fail("Not a value property: " + key)
+        if (!(this.props[key] instanceof ValueProperty)) return fail("Not a value property: " + key)
         return (this.props[key] as ValueProperty).getValueNode(node.storedValue)
     }
 
@@ -171,11 +167,11 @@ export class ObjectType extends ComplexType<any, any> {
         node.storedValue[subpath] = patch.value
     }
 
-    @action applySnapshot(node: Node, snapshot: any): void {
+    @action
+    applySnapshot(node: Node, snapshot: any): void {
         // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed?
         node.pseudoAction(() => {
-            for (let key in this.props)
-                this.props[key].deserialize(node.storedValue, snapshot)
+            for (let key in this.props) this.props[key].deserialize(node.storedValue, snapshot)
         })
     }
 
@@ -188,11 +184,7 @@ export class ObjectType extends ComplexType<any, any> {
             return typeCheckFailure(context, value)
         }
 
-        return flattenTypeErrors(
-            Object.keys(this.props).map(
-                (path) => this.props[path].validate(value, context)
-            )
-        )
+        return flattenTypeErrors(Object.keys(this.props).map(path => this.props[path].validate(value, context)))
     }
 
     private forAllProps(fn: (o: Property) => void) {
@@ -203,12 +195,17 @@ export class ObjectType extends ComplexType<any, any> {
     describe() {
         // TODO: make proptypes responsible
         // optimization: cache
-        return "{ " + Object.keys(this.props).map(key => {
-            const prop = this.props[key]
-            return prop instanceof ValueProperty
-                ? key + ": " + prop.type.describe()
-                : ""
-        }).filter(Boolean).join("; ") + " }"
+        return (
+            "{ " +
+            Object.keys(this.props)
+                .map(key => {
+                    const prop = this.props[key]
+                    return prop instanceof ValueProperty ? key + ": " + prop.type.describe() : ""
+                })
+                .filter(Boolean)
+                .join("; ") +
+            " }"
+        )
     }
 
     getDefaultSnapshot(): any {
@@ -220,24 +217,29 @@ export class ObjectType extends ComplexType<any, any> {
     }
 }
 
-export type IModelProperties<T> = {
-    [K in keyof T]: IType<any, T[K]> | T[K]
-}
+export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }
 
 export type Snapshot<T> = {
     [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
 }
 
-export interface IModelType<T, A> extends IComplexType<Snapshot<T>, T & A> { }
+export interface IModelType<T, A> extends IComplexType<Snapshot<T>, T & A> {}
 
 export function model<T>(properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}>
 export function model<T>(name: string, properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}>
-export function model<T, A>(properties: IModelProperties<T> & ThisType<T>, operations: A & ThisType<T & A>): IModelType<T, A>
-export function model<T, A>(name: string, properties: IModelProperties<T> & ThisType<T>, operations: A & ThisType<T & A>): IModelType<T, A>
+export function model<T, A>(
+    properties: IModelProperties<T> & ThisType<T>,
+    operations: A & ThisType<T & A>
+): IModelType<T, A>
+export function model<T, A>(
+    name: string,
+    properties: IModelProperties<T> & ThisType<T>,
+    operations: A & ThisType<T & A>
+): IModelType<T, A>
 export function model(arg1: any, arg2?: any, arg3?: any) {
     let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
     let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
-    let actions: Object =  typeof arg1 === "string" ? arg3 : arg2
+    let actions: Object = typeof arg1 === "string" ? arg3 : arg2
 
     return new ObjectType(name, baseModel, actions || {})
 }
@@ -254,12 +256,27 @@ function getObjectFactoryBaseActions(item: any) {
     return isObjectFactory(type) ? (type as ObjectType).baseActions : {}
 }
 
-export function extend<A, B, AA, BA>(name: string, a: IModelType<A, AA>, b: IModelType<B, BA>): IModelType<A & B, AA & BA>
-export function extend<A, B, C, AA, BA, CA>(name: string, a: IModelType<A, AA>, b: IModelType<B, BA>, c: IModelType<C, CA>): IModelType<A & B & C, AA & BA & CA>
+export function extend<A, B, AA, BA>(
+    name: string,
+    a: IModelType<A, AA>,
+    b: IModelType<B, BA>
+): IModelType<A & B, AA & BA>
+export function extend<A, B, C, AA, BA, CA>(
+    name: string,
+    a: IModelType<A, AA>,
+    b: IModelType<B, BA>,
+    c: IModelType<C, CA>
+): IModelType<A & B & C, AA & BA & CA>
 export function extend<A, B, AA, BA>(a: IModelType<A, AA>, b: IModelType<B, BA>): IModelType<A & B, AA & BA>
-export function extend<A, B, C, AA, BA, CA>(a: IModelType<A, AA>, b: IModelType<B, BA>, c: IModelType<C, CA>): IModelType<A & B & C, AA & BA & CA>
+export function extend<A, B, C, AA, BA, CA>(
+    a: IModelType<A, AA>,
+    b: IModelType<B, BA>,
+    c: IModelType<C, CA>
+): IModelType<A & B & C, AA & BA & CA>
 export function extend(...args: any[]) {
-    console.warn("[mobx-state-tree] `extend` is an experimental feature and it's behavior will probably change in the future")
+    console.warn(
+        "[mobx-state-tree] `extend` is an experimental feature and it's behavior will probably change in the future"
+    )
     const baseFactories = typeof args[0] === "string" ? args.slice(1) : args
     const factoryName = typeof args[0] === "string" ? args[0] : baseFactories.map(f => f.name).join("_")
     const properties = extendKeepGetter.apply(null, [{}].concat(baseFactories.map(getObjectFactoryBaseModel)))

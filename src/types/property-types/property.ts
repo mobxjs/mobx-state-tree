@@ -7,16 +7,16 @@ export abstract class Property {
         // empty
     }
 
-    initializePrototype(prototype: any) { }
-    initialize(targetInstance: IComplexValue, snapshot: any) { }
+    initializePrototype(prototype: any) {}
+    initialize(targetInstance: IComplexValue, snapshot: any) {}
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         return null
     }
 
-    didChange(change: IObjectChange) { }
+    didChange(change: IObjectChange) {}
 
-    serialize(instance: IComplexValue, snapshot: any) { }
-    deserialize(instance: IComplexValue, snapshot: any) { }
+    serialize(instance: IComplexValue, snapshot: any) {}
+    deserialize(instance: IComplexValue, snapshot: any) {}
     abstract validate(snapshot: any, context: IContext): IValidationResult
 }

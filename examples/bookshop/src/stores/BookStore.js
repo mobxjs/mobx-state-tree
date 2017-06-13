@@ -8,7 +8,9 @@ export const Book = types.model("Book", {
     isAvailable: true
 })
 
-export const BookStore = types.model("BookStore", {
+export const BookStore = types.model(
+    "BookStore",
+    {
         isLoading: true,
         books: types.map(Book),
         get shop() {
@@ -17,13 +19,12 @@ export const BookStore = types.model("BookStore", {
         get sortedAvailableBooks() {
             return sortBooks(this.books.values())
         }
-    }, {
+    },
+    {
         loadBooks() {
-            this.shop.fetch("/books.json")
-                .then(this.receiveJson)
-                .catch(err => {
-                    console.error("Failed to load books ", err)
-                })
+            this.shop.fetch("/books.json").then(this.receiveJson).catch(err => {
+                console.error("Failed to load books ", err)
+            })
         },
         receiveJson(json) {
             this.updateBooks(json)
@@ -33,22 +34,15 @@ export const BookStore = types.model("BookStore", {
             this.isLoading = loading
         },
         updateBooks(json) {
-            this.books.values().forEach(book => book.isAvailable = false);
+            this.books.values().forEach(book => (book.isAvailable = false))
             json.forEach(bookJson => {
                 this.books.put(bookJson)
                 this.books.get(bookJson.id).isAvailable = true
-            });
+            })
         }
-})
+    }
+)
 
 function sortBooks(books) {
-    return books
-        .filter(b => b.isAvailable)
-        .sort((a, b) =>
-            a.name > b.name
-                ? 1
-                : a.name === b.name
-                    ? 0
-                    : -1
-        )
+    return books.filter(b => b.isAvailable).sort((a, b) => (a.name > b.name ? 1 : a.name === b.name ? 0 : -1))
 }

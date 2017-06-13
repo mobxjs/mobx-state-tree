@@ -1,47 +1,66 @@
-import { unprotect } from '../src/core/mst-operations';
-import {onSnapshot, onPatch, onAction, applyPatch, applyPatches, applyAction, applyActions, getPath, IJsonPatch, applySnapshot, getSnapshot, types} from "../src"
-import {test} from "ava"
-import {autorun} from "mobx"
+import { unprotect } from "../src/core/mst-operations"
+import {
+    onSnapshot,
+    onPatch,
+    onAction,
+    applyPatch,
+    applyPatches,
+    applyAction,
+    applyActions,
+    getPath,
+    IJsonPatch,
+    applySnapshot,
+    getSnapshot,
+    types
+} from "../src"
+import { test } from "ava"
+import { autorun } from "mobx"
 
-interface ITestSnapshot{
+interface ITestSnapshot {
     to: string
 }
 
-interface ITest{
+interface ITest {
     to: string
     setTo: (to: string) => void
 }
 
 const createTestFactories = () => {
-    const Factory = types.model({
-        to: 'world'
-    }, {
-        setTo(to) {
-            this.to = to
+    const Factory = types.model(
+        {
+            to: "world"
+        },
+        {
+            setTo(to) {
+                this.to = to
+            }
         }
-    })
+    )
 
     const ComputedFactory = types.model({
         width: 100,
         height: 200,
-        get area(){
+        get area() {
             return this.width * this.height
         }
     })
 
-    const ComputedFactory2 = types.model({
-        props: types.map(types.number),
-        get area(){
-            return this.props.get('width') * this.props.get('height')
-        }
-    }, {
-        setWidth(value) {
-            this.props.set('width', value)
+    const ComputedFactory2 = types.model(
+        {
+            props: types.map(types.number),
+            get area() {
+                return this.props.get("width") * this.props.get("height")
+            }
         },
-        setHeight(value) {
-            this.props.set('height', value)
+        {
+            setWidth(value) {
+                this.props.set("width", value)
+            },
+            setHeight(value) {
+                this.props.set("height", value)
+            }
         }
-    })
+    )
 
     const BoxFactory = types.model({
         width: 0,
@@ -52,71 +71,71 @@ const createTestFactories = () => {
         color: "#FFFFFF"
     })
 
-    return {Factory, ComputedFactory, ComputedFactory2, BoxFactory, ColorFactory}
+    return { Factory, ComputedFactory, ComputedFactory2, BoxFactory, ColorFactory }
 }
 
 // === FACTORY TESTS ===
-test("it should create a factory", (t) => {
-    const {Factory} = createTestFactories()
+test("it should create a factory", t => {
+    const { Factory } = createTestFactories()
     const instance = Factory.create()
     const snapshot = getSnapshot(instance)
-    t.deepEqual(snapshot, {to: 'world'})
-    t.deepEqual((Factory.create() as any).toJSON(), {to: 'world'}) // toJSON is there as shortcut for getSnapshot(), primarily for debugging convenience
+    t.deepEqual(snapshot, { to: "world" })
+    t.deepEqual((Factory.create() as any).toJSON(), { to: "world" }) // toJSON is there as shortcut for getSnapshot(), primarily for debugging convenience
     t.deepEqual(Factory.create().toString(), "AnonymousModel@<root>")
 })
 
-test("it should restore the state from the snapshot", (t) => {
-    const {Factory} = createTestFactories()
+test("it should restore the state from the snapshot", t => {
+    const { Factory } = createTestFactories()
 
-    t.deepEqual(getSnapshot(Factory.create({to: 'universe'})), { to: 'universe' })
+    t.deepEqual(getSnapshot(Factory.create({ to: "universe" })), { to: "universe" })
 })
 
 // === SNAPSHOT TESTS ===
-test("it should emit snapshots", (t) => {
-    const {Factory} = createTestFactories()
+test("it should emit snapshots", t => {
+    const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
 
     let snapshots: any[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
 
-    doc.to = 'universe'
+    doc.to = "universe"
 
-    t.deepEqual(snapshots, [{to: 'universe'}])
+    t.deepEqual(snapshots, [{ to: "universe" }])
 })
 
-test("it should apply snapshots", (t) => {
-    const {Factory} = createTestFactories()
+test("it should apply snapshots", t => {
+    const { Factory } = createTestFactories()
     const doc = Factory.create()
-    applySnapshot(doc, {to: 'universe'})
+    applySnapshot(doc, { to: "universe" })
 
-    t.deepEqual(getSnapshot(doc), {to: 'universe'})
+    t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
 
-test("it should apply and accept null value for types.maybe(complexType)", (t) => {
-  const Item = types.model({
-    value: types.string
-  })
-  const Model = types.model({
-    item: types.maybe(Item)
-  })
-  const myModel = Model.create()
-  applySnapshot(myModel, {item: {value: "something"}})
-  applySnapshot(myModel, {item: null})
+test("it should apply and accept null value for types.maybe(complexType)", t => {
+    const Item = types.model({
+        value: types.string
+    })
+    const Model = types.model({
+        item: types.maybe(Item)
+    })
+    const myModel = Model.create()
+    applySnapshot(myModel, { item: { value: "something" } })
+    applySnapshot(myModel, { item: null })
 
-  t.deepEqual(getSnapshot(myModel), {item: null})
+    t.deepEqual(getSnapshot(myModel), { item: null })
 })
 
-test("it should return a snapshot", (t) => {
-    const {Factory} = createTestFactories()
+test("it should return a snapshot", t => {
+    const { Factory } = createTestFactories()
     const doc = Factory.create()
 
-    t.deepEqual(getSnapshot(doc), {to: 'world'})
+    t.deepEqual(getSnapshot(doc), { to: "world" })
 })
 
 // === PATCHES TESTS ===
-test("it should emit patches", (t) => {
-    const {Factory} = createTestFactories()
+test("it should emit patches", t => {
+    const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
 
@@ -125,31 +144,32 @@ test("it should emit patches", (t) => {
 
     doc.to = "universe"
 
-    t.deepEqual(patches, [
-        {op: "replace", path: "/to", value: "universe"}
+    t.deepEqual(patches, [{ op: "replace", path: "/to", value: "universe" }])
+})
+
+test("it should apply a patch", t => {
+    const { Factory } = createTestFactories()
+    const doc = Factory.create()
+
+    applyPatch(doc, { op: "replace", path: "/to", value: "universe" })
+
+    t.deepEqual(getSnapshot(doc), { to: "universe" })
+})
+
+test("it should apply patches", t => {
+    const { Factory } = createTestFactories()
+    const doc = Factory.create()
+
+    applyPatches(doc, [
+        { op: "replace", path: "/to", value: "mars" },
+        { op: "replace", path: "/to", value: "universe" }
     ])
+
+    t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
 
-test("it should apply a patch", (t) => {
-    const {Factory} = createTestFactories()
-    const doc = Factory.create()
-
-    applyPatch(doc, {op: "replace", path: "/to", value: "universe"})
-
-    t.deepEqual(getSnapshot(doc), {to: 'universe'})
-})
-
-test("it should apply patches", (t) => {
-    const {Factory} = createTestFactories()
-    const doc = Factory.create()
-
-    applyPatches(doc, [{op: "replace", path: "/to", value: "mars"}, {op: "replace", path: "/to", value: "universe"}])
-
-    t.deepEqual(getSnapshot(doc), {to: 'universe'})
-})
-
-test("it should stop listening to patches patches", (t) => {
-    const {Factory} = createTestFactories()
+test("it should stop listening to patches patches", t => {
+    const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
 
@@ -162,56 +182,52 @@ test("it should stop listening to patches patches", (t) => {
 
     doc.to = "mweststrate"
 
-    t.deepEqual(patches, [
-        {op: "replace", path: "/to", value: "universe"}
-    ])
+    t.deepEqual(patches, [{ op: "replace", path: "/to", value: "universe" }])
 })
 
 // === ACTIONS TESTS ===
-test("it should call actions correctly", (t) => {
-    const {Factory} = createTestFactories()
+test("it should call actions correctly", t => {
+    const { Factory } = createTestFactories()
     const doc = Factory.create()
 
-    doc.setTo('universe')
+    doc.setTo("universe")
 
-    t.deepEqual(getSnapshot(doc), {to: 'universe'})
+    t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
 
-test("it should emit action calls", (t) => {
-    const {Factory} = createTestFactories()
+test("it should emit action calls", t => {
+    const { Factory } = createTestFactories()
     const doc = Factory.create()
 
     let actions: any[] = []
     onAction(doc, action => actions.push(action))
 
-    doc.setTo('universe')
+    doc.setTo("universe")
 
-    t.deepEqual(actions, [{name: "setTo", path: "", args: ["universe"]}])
+    t.deepEqual(actions, [{ name: "setTo", path: "", args: ["universe"] }])
 })
 
-test("it should apply action call", (t) => {
-    const {Factory} = createTestFactories()
+test("it should apply action call", t => {
+    const { Factory } = createTestFactories()
     const doc = Factory.create()
 
-    applyAction(doc, {name: "setTo", path: "", args: ["universe"]})
+    applyAction(doc, { name: "setTo", path: "", args: ["universe"] })
 
-    t.deepEqual(getSnapshot(doc), {to: 'universe'})
+    t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
 
-
-test("it should apply actions calls", (t) => {
-    const {Factory} = createTestFactories()
+test("it should apply actions calls", t => {
+    const { Factory } = createTestFactories()
     const doc = Factory.create()
 
-    applyActions(doc, [{name: "setTo", path: "", args: ["mars"]}, {name: "setTo", path: "", args: ["universe"]}])
+    applyActions(doc, [{ name: "setTo", path: "", args: ["mars"] }, { name: "setTo", path: "", args: ["universe"] }])
 
-    t.deepEqual(getSnapshot(doc), {to: 'universe'})
+    t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
-
 
 // === COMPUTED VALUES ===
-test("it should have computed properties", (t) => {
-    const {ComputedFactory} = createTestFactories()
+test("it should have computed properties", t => {
+    const { ComputedFactory } = createTestFactories()
     const doc = ComputedFactory.create()
     unprotect(doc)
 
@@ -221,22 +237,26 @@ test("it should have computed properties", (t) => {
     t.deepEqual(doc.area, 6)
 })
 
-test("it should throw if snapshot has computed properties", (t) => {
-    const {ComputedFactory} = createTestFactories()
-    const error = t.throws(() => {
-        const doc = ComputedFactory.create({area: 3})
-    }, `[mobx-state-tree] Error while converting \`{"area":3}\` to \`AnonymousModel\`:
-at path "/area" value \`3\` is not assignable  (Computed properties should not be provided in the snapshot).`)
+test("it should throw if snapshot has computed properties", t => {
+    const { ComputedFactory } = createTestFactories()
+    const error = t.throws(
+        () => {
+            const doc = ComputedFactory.create({ area: 3 })
+        },
+        `[mobx-state-tree] Error while converting \`{"area":3}\` to \`AnonymousModel\`:
+at path "/area" value \`3\` is not assignable  (Computed properties should not be provided in the snapshot).`
+    )
 })
 
-test("it should throw if a replaced object is read or written to", (t) => {
-    const Todo = types.model({
-        title: "test"
-    }, {
-        fn() {
-
+test("it should throw if a replaced object is read or written to", t => {
+    const Todo = types.model(
+        {
+            title: "test"
+        },
+        {
+            fn() {}
         }
-    })
+    )
     const Store = types.model({
         todo: Todo
     })
@@ -247,92 +267,80 @@ test("it should throw if a replaced object is read or written to", (t) => {
     unprotect(s)
 
     const todo = s.todo
-    s.todo = Todo.create({ title: "4"})
+    s.todo = Todo.create({ title: "4" })
 
     t.is(s.todo.title, "4")
 
-    const err = "[mobx-state-tree] This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type 'AnonymousModel') used to live at '/todo'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead."
+    const err =
+        "[mobx-state-tree] This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type 'AnonymousModel') used to live at '/todo'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead."
 
-    t.throws(
-        () => { todo.fn() },
-        "[mobx-state-tree] AnonymousModel@<root>[dead] cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value"
-    )
+    t.throws(() => {
+        todo.fn()
+    }, "[mobx-state-tree] AnonymousModel@<root>[dead] cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value")
 
-    t.throws(
-        () => {
-            todo.title
-        },
-        err
-    )
+    t.throws(() => {
+        todo.title
+    }, err)
 
-    t.throws(
-        () => { todo.title = "5"},
-        err
-    )
+    t.throws(() => {
+        todo.title = "5"
+    }, err)
 })
 
 // === COMPOSE FACTORY ===
-test("it should compose factories", (t) => {
-    const {BoxFactory, ColorFactory} = createTestFactories()
+test("it should compose factories", t => {
+    const { BoxFactory, ColorFactory } = createTestFactories()
     const ComposedFactory = types.extend(BoxFactory, ColorFactory)
 
-    t.deepEqual(getSnapshot(ComposedFactory.create()), {width: 0, height: 0, color: "#FFFFFF"})
+    t.deepEqual(getSnapshot(ComposedFactory.create()), { width: 0, height: 0, color: "#FFFFFF" })
 })
 
-test("it should compose factories with computed properties", (t) => {
-    const {ComputedFactory2, ColorFactory} = createTestFactories()
+test("it should compose factories with computed properties", t => {
+    const { ComputedFactory2, ColorFactory } = createTestFactories()
     const ComposedFactory = types.extend(ColorFactory, ComputedFactory2)
-    const store = ComposedFactory.create({props: {width: 100, height: 200}})
-    t.deepEqual(getSnapshot(store), {props: {width: 100, height: 200}, color: "#FFFFFF"})
+    const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
+    t.deepEqual(getSnapshot(store), { props: { width: 100, height: 200 }, color: "#FFFFFF" })
     t.is(store.area, 20000)
-    t.is(typeof store.setWidth, 'function')
-    t.is(typeof store.setHeight, 'function')
+    t.is(typeof store.setWidth, "function")
+    t.is(typeof store.setHeight, "function")
 })
-
 
 // === TYPE CHECKS ===
-test("it should check the type correctly", (t) => {
-    const {Factory} = createTestFactories()
+test("it should check the type correctly", t => {
+    const { Factory } = createTestFactories()
 
     const doc = Factory.create()
 
     t.deepEqual(Factory.is(doc), true)
     t.deepEqual(Factory.is([]), false)
     t.deepEqual(Factory.is({}), true)
-    t.deepEqual(Factory.is({to: 'mars'}), true)
-    t.deepEqual(Factory.is({wrongKey: true}), true)
-    t.deepEqual(Factory.is({to: 3 }), false)
+    t.deepEqual(Factory.is({ to: "mars" }), true)
+    t.deepEqual(Factory.is({ wrongKey: true }), true)
+    t.deepEqual(Factory.is({ to: 3 }), false)
 })
 
-test("it should require complex fields to be present", (t) => {
+test("it should require complex fields to be present", t => {
     t.is(types.model({ todo: types.model({}) }).is({}), false)
-    t.throws(
-        () => types.model({ todo: types.model({}) }).create(),
-        /is not assignable to type/
-    )
+    t.throws(() => types.model({ todo: types.model({}) }).create(), /is not assignable to type/)
 
     t.is(types.model({ todo: types.array(types.string) }).is({}), false) // TBD: or true?
-    t.throws(
-        () => types.model({ todo: types.array(types.string) }).create(),
-        /is not assignable to type/
-    )
+    t.throws(() => types.model({ todo: types.array(types.string) }).create(), /is not assignable to type/)
 
     t.is(types.model({ todo: types.map(types.string) }).is({}), false)
-    t.throws(
-        () => types.model({ todo: types.map(types.string) }).create(),
-        /is not assignable to type/
-    )
+    t.throws(() => types.model({ todo: types.map(types.string) }).create(), /is not assignable to type/)
 })
 
 // === VIEW FUNCTIONS ===
 
-test("view functions should be tracked", (t) => {
-    const model = types.model({
-        x: 3,
-        doubler() {
-            return this.x * 2
-        }
-    }).create()
+test("view functions should be tracked", t => {
+    const model = types
+        .model({
+            x: 3,
+            doubler() {
+                return this.x * 2
+            }
+        })
+        .create()
     unprotect(model)
 
     const values: number[] = []
@@ -344,17 +352,22 @@ test("view functions should be tracked", (t) => {
     t.deepEqual(values, [6, 14])
 })
 
-test("view functions should not be allowed to change state", (t) => {
-    const model = types.model({
-        x: 3,
-        doubler() {
-            this.x *= 2
-        }
-    }, {
-        anotherDoubler() {
-            this.x *= 2
-        }
-    }).create()
+test("view functions should not be allowed to change state", t => {
+    const model = types
+        .model(
+            {
+                x: 3,
+                doubler() {
+                    this.x *= 2
+                }
+            },
+            {
+                anotherDoubler() {
+                    this.x *= 2
+                }
+            }
+        )
+        .create()
 
     t.throws(
         () => model.doubler(),
@@ -376,15 +389,11 @@ test("it should consider primitives as proposed defaults", t => {
 
     const doc = Todo.create()
 
-    t.deepEqual(getSnapshot(doc),
-        {id: 0, name: "Hello world", done: false, createdAt: now.getTime()}
-    )
-
+    t.deepEqual(getSnapshot(doc), { id: 0, name: "Hello world", done: false, createdAt: now.getTime() })
 })
 
 test("it should throw if a non-primitive value is provided and no default can be created", t => {
     t.throws(() => {
-
         const Todo = types.model({
             complex: {
                 a: 1,

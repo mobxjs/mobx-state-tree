@@ -7,7 +7,7 @@ export class Refinement extends Type<any, any> {
     readonly type: IType<any, any>
     readonly predicate: (v: any) => boolean
 
-    get flags () {
+    get flags() {
         return this.type.flags
     }
 
@@ -45,11 +45,20 @@ export class Refinement extends Type<any, any> {
 }
 
 export function refinement<T>(name: string, type: IType<T, T>, predicate: (snapshot: T) => boolean): IType<T, T>
-export function refinement<S, T extends S, U extends S>(name: string, type: IType<S, T>, predicate: (snapshot: S) => snapshot is U): IType<S, U>
-export function refinement(name: string, type: IType<any, any>, predicate: (snapshot: any) => boolean): IType<any, any> {
+export function refinement<S, T extends S, U extends S>(
+    name: string,
+    type: IType<S, T>,
+    predicate: (snapshot: S) => snapshot is U
+): IType<S, U>
+export function refinement(
+    name: string,
+    type: IType<any, any>,
+    predicate: (snapshot: any) => boolean
+): IType<any, any> {
     // check if the subtype default value passes the predicate
     const inst = type.create()
-    if (!predicate(isStateTreeNode(inst) ? getStateTreeNode(inst).snapshot : inst)) fail(`Default value for refinement type ` + name + ` does not pass the predicate.`)
+    if (!predicate(isStateTreeNode(inst) ? getStateTreeNode(inst).snapshot : inst))
+        fail(`Default value for refinement type ` + name + ` does not pass the predicate.`)
 
     return new Refinement(name, type, predicate)
 }

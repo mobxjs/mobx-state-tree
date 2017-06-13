@@ -24,8 +24,7 @@ export function unescapeJsonPath(str: string) {
 
 export function joinJsonPath(path: string[]): string {
     // `/` refers to property with an empty name, while `` refers to root itself!
-    if (path.length === 0)
-        return ""
+    if (path.length === 0) return ""
     return "/" + path.map(escapeJsonPath).join("/")
 }
 

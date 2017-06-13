@@ -17,8 +17,12 @@ export class ViewProperty extends Property {
     }
 
     validate(snapshot: any, context: IContext): IValidationResult {
-        if ( this.name in snapshot ) {
-            return typeCheckFailure(getContextForPath(context, this.name), snapshot[this.name], "View properties should not be provided in the snapshot")
+        if (this.name in snapshot) {
+            return typeCheckFailure(
+                getContextForPath(context, this.name),
+                snapshot[this.name],
+                "View properties should not be provided in the snapshot"
+            )
         }
 
         return typeCheckSuccess()
@@ -26,7 +30,7 @@ export class ViewProperty extends Property {
 }
 
 export function createViewInvoker(name: string, fn: Function) {
-    const viewInvoker = function (this: IComplexValue) {
+    const viewInvoker = function(this: IComplexValue) {
         const args = arguments
         const adm = getStateTreeNode(this)
         adm.assertAlive()

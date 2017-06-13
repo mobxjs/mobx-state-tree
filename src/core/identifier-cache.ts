@@ -6,8 +6,7 @@ import { Node } from "./node"
 export class IdentifierCache {
     private cache = observable.map<IObservableArray<Node>>()
 
-    constructor() {
-    }
+    constructor() {}
 
     addNodeToCache(node: Node) {
         if (node.identifierAttribute) {
@@ -16,24 +15,24 @@ export class IdentifierCache {
                 this.cache.set(identifier, observable.shallowArray<Node>())
             }
             const set = this.cache.get(identifier)!
-            if (set.indexOf(node) !== -1)
-                fail(`Already registered`)
+            if (set.indexOf(node) !== -1) fail(`Already registered`)
             set.push(node)
         }
         return this
     }
 
     mergeCache(node: Node) {
-        node.identifierCache!.cache.values().forEach(nodes => nodes.forEach(child => {
-            this.addNodeToCache(child)
-        }))
+        node.identifierCache!.cache.values().forEach(nodes =>
+            nodes.forEach(child => {
+                this.addNodeToCache(child)
+            })
+        )
     }
 
     notifyDied(node: Node) {
         if (node.identifierAttribute) {
             const set = this.cache.get(node.identifier!)
-            if (set)
-                set.remove(node)
+            if (set) set.remove(node)
         }
     }
 
@@ -53,14 +52,19 @@ export class IdentifierCache {
 
     resolve(type: IType<any, any>, identifier: string): Node | null {
         const set = this.cache.get(identifier)
-        if (!set)
-            return null
+        if (!set) return null
         const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))
         switch (matches.length) {
-            case 0: return null
-            case 1: return matches[0]
+            case 0:
+                return null
+            case 1:
+                return matches[0]
             default:
-                return fail(`Cannot resolve a reference to type '${type.name}' with id: '${identifier}' unambigously, there are multiple candidates: ${matches.map(n => n.path).join(", ")}`)
+                return fail(
+                    `Cannot resolve a reference to type '${type.name}' with id: '${identifier}' unambigously, there are multiple candidates: ${matches
+                        .map(n => n.path)
+                        .join(", ")}`
+                )
         }
     }
 }

@@ -1,18 +1,18 @@
-var webpack = require('webpack');
+var webpack = require("webpack")
 
 module.exports = {
-    entry: './lib/index.js',
+    entry: "./lib/index.js",
     output: {
-        libraryTarget: 'umd',
-        library: 'mobxStateTree',
+        libraryTarget: "umd",
+        library: "mobxStateTree",
         path: __dirname,
-        filename: 'mobx-state-tree.umd.js'
+        filename: "mobx-state-tree.umd.js"
     },
     resolve: {
-        extensions: ['', '.js'],
+        extensions: ["", ".js"]
     },
     externals: {
-        mobx: 'mobx'
+        mobx: "mobx"
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({
@@ -22,4 +22,4 @@ module.exports = {
         }),
         require("webpack-fail-plugin")
     ]
-};
+}

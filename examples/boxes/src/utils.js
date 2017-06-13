@@ -1,5 +1,5 @@
-import {v4} from 'node-uuid';
+import { v4 } from "node-uuid"
 
 export function randomUuid() {
-    return v4();
+    return v4()
 }

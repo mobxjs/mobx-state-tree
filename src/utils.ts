@@ -2,7 +2,7 @@ declare const global: any
 
 export const EMPTY_ARRAY = Object.freeze([])
 
-export type IDisposer = () => void;
+export type IDisposer = () => void
 
 export function fail(message = "Illegal state"): never {
     throw new Error("[mobx-state-tree] " + message)
@@ -16,7 +16,7 @@ export function nothing(): null {
     return null
 }
 
-export function noop() {  }
+export function noop() {}
 
 export function extend<A, B>(a: A, b: B): A & B
 export function extend<A, B, C>(a: A, b: B, c: C): A & B & C
@@ -25,8 +25,7 @@ export function extend(a: any, ...b: any[]): any
 export function extend(a: any, ...b: any[]) {
     for (let i = 0; i < b.length; i++) {
         const current = b[i]
-        for (let key in current)
-            a[key] = current[key]
+        for (let key in current) a[key] = current[key]
     }
     return a
 }
@@ -51,8 +50,7 @@ export function extendKeepGetter(a: any, ...b: any[]) {
 }
 
 export function isPlainObject(value: any) {
-    if (value === null || typeof value !== "object")
-        return false
+    if (value === null || typeof value !== "object") return false
     const proto = Object.getPrototypeOf(value)
     return proto === Object.prototype || proto === null
 }
@@ -62,8 +60,7 @@ export function isMutable(value: any) {
 }
 
 export function isPrimitive(value: any): boolean {
-    if (value === null || value === undefined)
-        return true
+    if (value === null || value === undefined) return true
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean" || value instanceof Date)
         return true
     return false
@@ -122,8 +119,7 @@ export function registerEventHandler(handlers: Function[], handler: Function): I
     handlers.push(handler)
     return () => {
         const idx = handlers.indexOf(handler)
-        if (idx !== -1)
-            handlers.splice(idx, 1)
+        if (idx !== -1) handlers.splice(idx, 1)
     }
 }
 
@@ -132,10 +128,9 @@ export function hasOwnProperty(object: Object, propName: string) {
     return prototypeHasOwnProperty.call(object, propName)
 }
 
-export function argsToArray(args: IArguments): any [] {
+export function argsToArray(args: IArguments): any[] {
     const res = new Array(args.length)
-    for (let i = 0; i < args.length; i++)
-        res[i] = args[i]
+    for (let i = 0; i < args.length; i++) res[i] = args[i]
     return res
 }
 

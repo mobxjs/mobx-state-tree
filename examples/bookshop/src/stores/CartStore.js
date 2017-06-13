@@ -2,7 +2,9 @@ import { when, reaction } from "mobx"
 import { types, getParent, getSnapshot, applySnapshot } from "mobx-state-tree"
 import { Book } from "./BookStore"
 
-const CartEntry = types.model("CartEntry", {
+const CartEntry = types.model(
+    "CartEntry",
+    {
         quantity: 0,
         book: types.reference(Book),
         get price() {
@@ -11,22 +13,26 @@ const CartEntry = types.model("CartEntry", {
         get isValidBook() {
             return this.book.isAvailable
         }
-    }, {
+    },
+    {
         increaseQuantity(amount) {
             this.quantity += amount
         },
         setQuantity(amount) {
             this.quantity = amount
         }
-})
+    }
+)
 
-export const CartStore = types.model("CartStore", {
+export const CartStore = types.model(
+    "CartStore",
+    {
         entries: types.array(CartEntry),
         get shop() {
             return getParent(this)
         },
         get subTotal() {
-            return this.entries.reduce((sum, e) => (sum + e.price), 0)
+            return this.entries.reduce((sum, e) => sum + e.price, 0)
         },
         get hasDiscount() {
             return this.subTotal >= 100
@@ -40,17 +46,18 @@ export const CartStore = types.model("CartStore", {
         get canCheckout() {
             return this.entries.length > 0 && this.entries.every(entry => entry.quantity > 0 && entry.isValidBook)
         }
-    }, {
+    },
+    {
         afterAttach() {
             if (typeof window.localStorage !== "undefined") {
                 when(
                     () => !this.shop.isLoading,
                     () => {
-                        this.readFromLocalStorage();
+                        this.readFromLocalStorage()
                         reaction(
                             () => getSnapshot(this),
                             json => {
-                                window.localStorage.setItem('cart', JSON.stringify(json));
+                                window.localStorage.setItem("cart", JSON.stringify(json))
                             }
                         )
                     }
@@ -64,8 +71,7 @@ export const CartStore = types.model("CartStore", {
                 entry = this.entries[this.entries.length - 1]
             }
             entry.increaseQuantity(quantity)
-            if (notify)
-                this.shop.alert("Added to cart")
+            if (notify) this.shop.alert("Added to cart")
         },
         checkout() {
             const total = this.total
@@ -76,8 +82,8 @@ export const CartStore = types.model("CartStore", {
             this.entries.clear()
         },
         readFromLocalStorage() {
-            const cartData = window.localStorage.getItem('cart')
-            if (cartData)
-                applySnapshot(this, JSON.parse(cartData))
+            const cartData = window.localStorage.getItem("cart")
+            if (cartData) applySnapshot(this, JSON.parse(cartData))
         }
-})
+    }
+)

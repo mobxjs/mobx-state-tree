@@ -3,15 +3,15 @@ import { action } from "mobx"
 export interface ISnapshottable<S> {}
 
 export enum TypeFlags {
-    String  = 1 << 0,
-    Number  = 1 << 1,
+    String = 1 << 0,
+    Number = 1 << 1,
     Boolean = 1 << 2,
-    Date    = 1 << 3,
+    Date = 1 << 3,
     Literal = 1 << 4,
-    Array   = 1 << 5,
-    Map     = 1 << 6,
-    Object  = 1 << 7,
-    Frozen  = 1 << 8,
+    Array = 1 << 5,
+    Map = 1 << 6,
+    Object = 1 << 7,
+    Frozen = 1 << 8,
     Optional = 1 << 9,
     Reference = 1 << 10,
     Identifier = 1 << 11
@@ -42,9 +42,9 @@ export interface IType<S, T> {
     isAssignableFrom(type: IType<any, any>): boolean
 }
 
-export interface ISimpleType<T> extends IType<T, T> { }
+export interface ISimpleType<T> extends IType<T, T> {}
 
-export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IComplexValue> { }
+export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IComplexValue> {}
 
 export function isType(value: any): value is IType<any, any> {
     return typeof value === "object" && value && value.isType === true
@@ -61,7 +61,8 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         this.name = name
     }
 
-    @action create(snapshot: S = this.getDefaultSnapshot(), environment?: any): T {
+    @action
+    create(snapshot: S = this.getDefaultSnapshot(), environment?: any): T {
         typecheck(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).getValue()
     }
@@ -89,20 +90,16 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     validate(value: any, context: IContext): IValidationResult {
         if (isStateTreeNode(value)) {
-            return getType(value) === this || this.isAssignableFrom(getType(value)) ? typeCheckSuccess() : typeCheckFailure(context, value)
+            return getType(value) === this || this.isAssignableFrom(getType(value))
+                ? typeCheckSuccess()
+                : typeCheckFailure(context, value)
             // it is tempting to compare snapshots, but in that case we should always clone on assignments...
         }
-        return this.isValidSnapshot(
-            value,
-            context
-        )
+        return this.isValidSnapshot(value, context)
     }
 
     is(value: any): value is S | T {
-        return this.validate(
-            value,
-            [{ path: "", type: this }]
-        ).length === 0
+        return this.validate(value, [{ path: "", type: this }]).length === 0
     }
 
     reconcile(current: Node, newValue: any): Node {
@@ -114,10 +111,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
             current.type === this &&
             isMutable(newValue) &&
             !isStateTreeNode(newValue) &&
-            (
-                !current.identifierAttribute ||
-                current.identifier === newValue[current.identifierAttribute]
-            )
+            (!current.identifierAttribute || current.identifier === newValue[current.identifierAttribute])
         ) {
             // the newValue has no node, so can be treated like a snapshot
             // we can reconcile
@@ -138,10 +132,14 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     get Type(): T {
-        return fail("Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`")
+        return fail(
+            "Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`"
+        )
     }
     get SnapshotType(): S {
-        return fail("Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`")
+        return fail(
+            "Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`"
+        )
     }
 }
 
@@ -150,7 +148,7 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
         super(name)
     }
 
-    abstract instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any): Node;
+    abstract instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any): Node
 
     getValue(node: Node) {
         return node.storedValue
@@ -186,8 +184,7 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
 
     reconcile(current: Node, newValue: any): Node {
         // reconcile only if type and value are still the same
-        if (current.type === this && current.storedValue === newValue)
-            return current
+        if (current.type === this && current.storedValue === newValue) return current
         const res = this.instantiate(current.parent, current.subpath, current._environment, newValue)
         current.die()
         return res

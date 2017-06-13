@@ -1,4 +1,14 @@
-import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras, isObservableMap } from "mobx"
+import {
+    observable,
+    ObservableMap,
+    IMapChange,
+    IMapWillChange,
+    action,
+    intercept,
+    observe,
+    extras,
+    isObservableMap
+} from "mobx"
 import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, createNode, isStateTreeNode } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
@@ -17,7 +27,7 @@ export function mapToString(this: ObservableMap<any>) {
 }
 
 function put(this: ObservableMap<any>, value: any) {
-    if (!(!!value)) fail(`Map.put cannot be used to set empty values`)
+    if (!!!value) fail(`Map.put cannot be used to set empty values`)
     let node: Node
     if (isStateTreeNode(value)) {
         node = getStateTreeNode(value)
@@ -27,12 +37,13 @@ function put(this: ObservableMap<any>, value: any) {
     } else {
         return fail(`Map.put can only be used to store complex values`)
     }
-    if (!node.identifierAttribute) fail(`Map.put can only be used to store complex values that have an identifier type attribute`)
+    if (!node.identifierAttribute)
+        fail(`Map.put can only be used to store complex values that have an identifier type attribute`)
     this.set(node.identifier!, node.getValue())
     return this
 }
 
-export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
+export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
     shouldAttachNode = true
     subType: IType<any, any>
     readonly flags = TypeFlags.Map
@@ -43,7 +54,15 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S): Node {
-        return createNode(this, parent, subpath, environment, snapshot, this.createNewInstance, this.finalizeNewInstance)
+        return createNode(
+            this,
+            parent,
+            subpath,
+            environment,
+            snapshot,
+            this.createNewInstance,
+            this.finalizeNewInstance
+        )
     }
 
     describe() {
@@ -59,7 +78,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     finalizeNewInstance = (node: Node, snapshot: any) => {
-        const instance = node.storedValue as ObservableMap<any>;
+        const instance = node.storedValue as ObservableMap<any>
         extras.interceptReads(instance, node.unbox)
         intercept(instance, c => this.willChange(c))
         observe(instance, this.didChange)
@@ -72,8 +91,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
 
     getChildNode(node: Node, key: string): Node {
         const childNode = node.storedValue.get(key)
-        if (!childNode)
-            fail("Not a child" + key)
+        if (!childNode) fail("Not a child" + key)
         return childNode
     }
 
@@ -84,10 +102,9 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         switch (change.type) {
             case "update":
                 {
-                    const {newValue} = change
+                    const { newValue } = change
                     const oldValue = change.object.get(change.name)
-                    if (newValue === oldValue)
-                        return null
+                    if (newValue === oldValue) return null
                     change.newValue = this.subType.reconcile(node.getChildNode(change.name), change.newValue)
                     this.verifyIdentifier(change.name, change.newValue as Node)
                 }
@@ -110,7 +127,9 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     private verifyIdentifier(expected: string, node: Node) {
         const identifier = node.identifier
         if (identifier !== null && identifier !== expected)
-            fail(`A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`)
+            fail(
+                `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
+            )
     }
 
     getValue(node: Node): any {
@@ -118,7 +137,7 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     getSnapshot(node: Node): { [key: string]: any } {
-        const res: {[key: string]: any} = {}
+        const res: { [key: string]: any } = {}
         node.getChildren().forEach(childNode => {
             res[childNode.subpath] = childNode.snapshot
         })
@@ -130,16 +149,22 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         switch (change.type) {
             case "update":
             case "add":
-                return void node.emitPatch({
-                    op: change.type === "add" ? "add" : "replace",
-                    path: escapeJsonPath(change.name),
-                    value: node.getChildNode(change.name).snapshot
-                }, node)
+                return void node.emitPatch(
+                    {
+                        op: change.type === "add" ? "add" : "replace",
+                        path: escapeJsonPath(change.name),
+                        value: node.getChildNode(change.name).snapshot
+                    },
+                    node
+                )
             case "delete":
-                return void node.emitPatch({
-                    op: "remove",
-                    path: escapeJsonPath(change.name)
-                }, node)
+                return void node.emitPatch(
+                    {
+                        op: "remove",
+                        path: escapeJsonPath(change.name)
+                    },
+                    node
+                )
         }
     }
 
@@ -156,19 +181,21 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         }
     }
 
-    @action applySnapshot(node: Node, snapshot: any): void {
+    @action
+    applySnapshot(node: Node, snapshot: any): void {
         node.pseudoAction(() => {
             const target = node.storedValue as ObservableMap<any>
             const currentKeys: { [key: string]: boolean } = {}
-            target.keys().forEach(key => { currentKeys[key] = false })
+            target.keys().forEach(key => {
+                currentKeys[key] = false
+            })
             // Don't use target.replace, as it will throw all existing items first
             Object.keys(snapshot).forEach(key => {
                 target.set(key, snapshot[key])
                 currentKeys[key] = true
             })
             Object.keys(currentKeys).forEach(key => {
-                if (currentKeys[key] === false)
-                    target.delete(key)
+                if (currentKeys[key] === false) target.delete(key)
             })
         })
     }
@@ -183,8 +210,8 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
         }
 
         return flattenTypeErrors(
-            Object.keys(value).map(
-                (path) => this.subType.validate(value[path], getContextForPath(context, path, this.subType))
+            Object.keys(value).map(path =>
+                this.subType.validate(value[path], getContextForPath(context, path, this.subType))
             )
         )
     }
@@ -194,14 +221,14 @@ export class MapType<S, T> extends ComplexType<{[key: string]: S}, IExtendedObse
     }
 
     removeChild(node: Node, subpath: string) {
-        (node.storedValue as ObservableMap<any>).delete(subpath)
+        ;(node.storedValue as ObservableMap<any>).delete(subpath)
     }
 }
 
-export function map<S, T>(subtype: IType<S, T>): IComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
+export function map<S, T>(subtype: IType<S, T>): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
     return new MapType<S, T>(`map<string, ${subtype.name}>`, subtype)
 }
 
-export function isMapFactory<S, T>(type: any): type is IComplexType<{[key: string]: S}, IExtendedObservableMap<T>> {
+export function isMapFactory<S, T>(type: any): type is IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
     return isType(type) && ((type as IType<any, any>).flags & TypeFlags.Map) > 0
 }

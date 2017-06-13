@@ -16,8 +16,12 @@ export class ActionProperty extends Property {
     }
 
     validate(snapshot: any, context: IContext): IValidationResult {
-        if ( this.name in snapshot ) {
-            return typeCheckFailure(getContextForPath(context, this.name), snapshot[this.name], "Action properties should not be provided in the snapshot")
+        if (this.name in snapshot) {
+            return typeCheckFailure(
+                getContextForPath(context, this.name),
+                snapshot[this.name],
+                "Action properties should not be provided in the snapshot"
+            )
         }
 
         return typeCheckSuccess()

@@ -6,7 +6,7 @@ import { string as stringType, number as numberType } from "../primitives"
 import { Late } from "./late"
 
 class Identifier {
-    constructor(public identifier: string|number) {}
+    constructor(public identifier: string | number) {}
     toString() {
         return `identifier(${this.identifier})`
     }
@@ -15,9 +15,7 @@ class Identifier {
 export class IdentifierType<T> extends Type<T, T> {
     readonly flags = TypeFlags.Identifier
 
-    constructor(
-        public readonly identifierType: IType<T, T>,
-    ) {
+    constructor(public readonly identifierType: IType<T, T>) {
         super(`identifier(${identifierType.name})`)
     }
 
@@ -25,14 +23,19 @@ export class IdentifierType<T> extends Type<T, T> {
         if (!parent || !isStateTreeNode(parent.storedValue))
             return fail(`Identifier types can only be instantiated as direct child of a model type`)
 
-        if (parent.identifierAttribute) fail(`Cannot define property '${subpath}' as object identifier, property '${parent.identifierAttribute}' is already defined as identifier property`)
+        if (parent.identifierAttribute)
+            fail(
+                `Cannot define property '${subpath}' as object identifier, property '${parent.identifierAttribute}' is already defined as identifier property`
+            )
         parent.identifierAttribute = subpath
         return createNode(this, parent, subpath, environment, snapshot)
     }
 
     reconcile(current: Node, newValue: any) {
         if (current.storedValue !== newValue)
-            return fail(`Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`)
+            return fail(
+                `Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`
+            )
         return current
     }
 
@@ -45,8 +48,8 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 }
 
-export function identifier<T>(baseType: IType<T, T>): IType<T, T>;
-export function identifier<T>(): T;
+export function identifier<T>(baseType: IType<T, T>): IType<T, T>
+export function identifier<T>(): T
 export function identifier(baseType: IType<any, any> = stringType): any {
     // TODO: MWE: this seems contrived, let's not assert anything and support unions, refinements etc.
     if (baseType !== stringType && baseType !== numberType)
@@ -55,6 +58,7 @@ export function identifier(baseType: IType<any, any> = stringType): any {
 }
 
 export function isIdentifierType(type: any): type is IdentifierType<any> {
-    return (!(type instanceof Late)) && // yikes
-        (type.flags & (TypeFlags.Identifier)) > 0
+    return (
+        !(type instanceof Late) && (type.flags & TypeFlags.Identifier) > 0 // yikes
+    )
 }

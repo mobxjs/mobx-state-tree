@@ -55,10 +55,15 @@ export function getChildType(object: IComplexValue, child: string): IType<any, a
  * @param {(action: IActionCall, next: () => void) => void} callback the middleware that should be invoked whenever an action is triggered.
  * @returns {IDisposer} function to remove the middleware
  */
-export function addMiddleware(target: IComplexValue, middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any): IDisposer {
+export function addMiddleware(
+    target: IComplexValue,
+    middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any
+): IDisposer {
     const node = getStateTreeNode(target)
     if (!node.isProtectionEnabled)
-        console.warn("It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`")
+        console.warn(
+            "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
+        )
     return node.addMiddleWare(middleware)
 }
 
@@ -85,9 +90,9 @@ export function onPatch(target: IComplexValue, callback: (patch: IJsonPatch) => 
  * @param {(snapshot: any) => void} callback
  * @returns {IDisposer}
  */
-export function onSnapshot<S>(target: ObservableMap<S>, callback: (snapshot: { [key: string]: S }) => void): IDisposer;
-export function onSnapshot<S>(target: IObservableArray<S>, callback: (snapshot: S[]) => void): IDisposer;
-export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer;
+export function onSnapshot<S>(target: ObservableMap<S>, callback: (snapshot: { [key: string]: S }) => void): IDisposer
+export function onSnapshot<S>(target: IObservableArray<S>, callback: (snapshot: S[]) => void): IDisposer
+export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer
 export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer {
     return getStateTreeNode(target).onSnapshot(callback)
 }
@@ -132,7 +137,7 @@ export function recordPatches(subject: IComplexValue): IPatchRecorder {
             applyPatches(target, recorder.patches)
         }
     }
-    let disposer = onPatch(subject, (patch) => {
+    let disposer = onPatch(subject, patch => {
         recorder.patches.push(patch)
     })
     return recorder
@@ -230,9 +235,9 @@ export function applySnapshot<S, T>(target: IComplexValue, snapshot: S) {
  * @param {Object} target
  * @returns {*}
  */
-export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S };
-export function getSnapshot<S>(target: IObservableArray<S>): S[];
-export function getSnapshot<S>(target: ISnapshottable<S>): S;
+export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S }
+export function getSnapshot<S>(target: IObservableArray<S>): S[]
+export function getSnapshot<S>(target: ISnapshottable<S>): S
 export function getSnapshot<S>(target: ISnapshottable<S>): S {
     return getStateTreeNode(target).snapshot
 }
@@ -249,8 +254,7 @@ export function hasParent(target: IComplexValue, depth: number = 1): boolean {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let parent: Node | null = getStateTreeNode(target).parent
     while (parent) {
-        if (--depth === 0)
-            return true
+        if (--depth === 0) return true
         parent = parent.parent
     }
     return false
@@ -267,15 +271,14 @@ export function hasParent(target: IComplexValue, depth: number = 1): boolean {
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent(target: IComplexValue, depth?: number): (any & IComplexValue);
-export function getParent<T>(target: IComplexValue, depth?: number): (T & IComplexValue);
+export function getParent(target: IComplexValue, depth?: number): (any & IComplexValue)
+export function getParent<T>(target: IComplexValue, depth?: number): (T & IComplexValue)
 export function getParent<T>(target: IComplexValue, depth = 1): (T & IComplexValue) {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let d = depth
     let parent: Node | null = getStateTreeNode(target).parent
     while (parent) {
-        if (--d === 0)
-            return parent.storedValue
+        if (--d === 0) return parent.storedValue
         parent = parent.parent
     }
     return fail(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
@@ -288,8 +291,8 @@ export function getParent<T>(target: IComplexValue, depth = 1): (T & IComplexVal
  * @param {Object} target
  * @returns {*}
  */
-export function getRoot(target: IComplexValue): any & IComplexValue;
-export function getRoot<T>(target: IComplexValue): T & IComplexValue;
+export function getRoot(target: IComplexValue): any & IComplexValue
+export function getRoot<T>(target: IComplexValue): T & IComplexValue
 export function getRoot(target: IComplexValue): IComplexValue {
     return getStateTreeNode(target).root.storedValue
 }
@@ -343,8 +346,7 @@ export function resolvePath(target: IComplexValue, path: string): IComplexValue 
 }
 
 export function resolveIdentifier(type: IType<any, any>, target: IComplexValue, identifier: string | number): any {
-    if (!isType(type))
-        fail("Expected a type as first argument")
+    if (!isType(type)) fail("Expected a type as first argument")
     const node = getStateTreeNode(target).root.identifierCache!.resolve(type, "" + identifier)
     return node ? node.getValue() : undefined
 }
@@ -359,8 +361,7 @@ export function resolveIdentifier(type: IType<any, any>, target: IComplexValue, 
  */
 export function tryResolve(target: IComplexValue, path: string): IComplexValue | any {
     const node = getStateTreeNode(target).resolve(path, false)
-    if (node === undefined)
-        return undefined
+    if (node === undefined) return undefined
     return node ? node.getValue() : undefined
 }
 
@@ -380,11 +381,7 @@ export function clone<T extends IComplexValue>(source: T, keepEnvironment: boole
     const node = getStateTreeNode(source)
     return node.type.create(
         node.snapshot,
-        keepEnvironment === true
-            ? node.root._environment
-            : keepEnvironment === false
-                ? undefined
-                : keepEnvironment // it's an object or something else
+        keepEnvironment === true ? node.root._environment : keepEnvironment === false ? undefined : keepEnvironment // it's an object or something else
     ) as T
 }
 
@@ -403,10 +400,8 @@ export function detach<T extends IComplexValue>(thing: T): T {
 export function destroy(thing: IComplexValue) {
     const node = getStateTreeNode(thing)
     // TODO: should throw if it cannot be removed from the parent? e.g. parent type wouldn't allow that
-    if (node.isRoot)
-        node.die()
-    else
-        node.parent!.removeChild(node.subpath)
+    if (node.isRoot) node.die()
+    else node.parent!.removeChild(node.subpath)
 }
 
 export function isAlive(thing: IComplexValue): boolean {
@@ -420,7 +415,10 @@ export function addDisposer(thing: IComplexValue, disposer: () => void) {
 export function getEnv(thing: IComplexValue): any {
     const node = getStateTreeNode(thing)
     const env = node.root._environment
-    if (!(!!env)) fail(`Node '${node}' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()`)
+    if (!!!env)
+        fail(
+            `Node '${node}' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()`
+        )
     return env
 }
 
@@ -430,9 +428,8 @@ export function getEnv(thing: IComplexValue): any {
 export function walk(thing: IComplexValue, processor: (item: IComplexValue) => void) {
     const node = getStateTreeNode(thing)
     // tslint:disable-next-line:no_unused-variable
-    node.getChildren().forEach((child) => {
-        if (isStateTreeNode(child.storedValue))
-            walk(child.storedValue, processor)
+    node.getChildren().forEach(child => {
+        if (isStateTreeNode(child.storedValue)) walk(child.storedValue, processor)
     })
     processor(node.storedValue)
 }

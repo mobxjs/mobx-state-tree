@@ -1,5 +1,5 @@
 import { types, getEnv, clone, detach, unprotect } from "../src"
-import {test} from "ava"
+import { test } from "ava"
 
 const Todo = types.model({
     title: "test",
@@ -21,10 +21,7 @@ function createEnvironment() {
 test("it should be possible to use environments", t => {
     const env = createEnvironment()
 
-    const todo = Todo.create(
-        {},
-        env
-    )
+    const todo = Todo.create({}, env)
 
     t.is(todo.description, "TEST")
     env.useUppercase = false
@@ -34,10 +31,7 @@ test("it should be possible to use environments", t => {
 test("it should be possible to inherit environments", t => {
     const env = createEnvironment()
 
-    const store = Store.create(
-        { todos: [{}] },
-        env
-    )
+    const store = Store.create({ todos: [{}] }, env)
 
     t.is(store.todos[0].description, "TEST")
     env.useUppercase = false
@@ -55,10 +49,7 @@ test("getEnv throws in absence of env", t => {
 test("detach should preserve environment", t => {
     const env = createEnvironment()
 
-    const store = Store.create(
-        { todos: [{}] },
-        env
-    )
+    const store = Store.create({ todos: [{}] }, env)
     unprotect(store)
 
     const todo = detach(store.todos[0])
@@ -70,22 +61,19 @@ test("detach should preserve environment", t => {
 
 test("it is not possible to assign instance with environment to a tree", t => {
     const env = createEnvironment()
-    const store = Store.create(
-        { todos: [] },
-        env
-    )
+    const store = Store.create({ todos: [] }, env)
     const todo = Todo.create({}, env)
     unprotect(store)
-    t.throws(() => store.todos.push(todo), "[mobx-state-tree] A state tree that has been initialized with an environment cannot be made part of another state tree.")
+    t.throws(
+        () => store.todos.push(todo),
+        "[mobx-state-tree] A state tree that has been initialized with an environment cannot be made part of another state tree."
+    )
 })
 
 test("clone preserves environnment", t => {
     const env = createEnvironment()
 
-    const store = Store.create(
-        { todos: [{}] },
-        env
-    )
+    const store = Store.create({ todos: [{}] }, env)
 
     {
         const todo = clone(store.todos[0])
