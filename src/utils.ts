@@ -69,6 +69,24 @@ export function isPrimitive(value: any): boolean {
     return false
 }
 
+export function freeze<T>(value: T): T {
+    return isPrimitive(value) ? value : Object.freeze(value)
+}
+
+export function deepFreeze<T>(value: T): T {
+    freeze(value)
+
+    if (isPlainObject(value)) {
+        Object.keys(value).forEach(propKey => {
+            if (!Object.isFrozen(value[propKey])) {
+                deepFreeze(value[propKey])
+            }
+        })
+    }
+
+    return value
+}
+
 export function isSerializable(value: any) {
     return typeof value !== "function"
 }

@@ -188,7 +188,7 @@ export class Node  {
             return undefined
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         // Optimization: only freeze on dev builds
-        return Object.freeze(this.type.getSnapshot(this))
+        return freeze(this.type.getSnapshot(this))
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
@@ -511,6 +511,7 @@ import {
     isMutable,
     registerEventHandler,
     identity,
-    noop
+    noop,
+    freeze
 } from "../utils"
 import { IdentifierCache } from "./identifier-cache"

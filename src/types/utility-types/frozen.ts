@@ -1,21 +1,7 @@
 import { ISimpleType, TypeFlags, Type } from "../type"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { fail, isMutable, isSerializable, isPlainObject, identity } from "../../utils"
-import { createNode, Node } from '../../core'
-
-function freeze(value: any) {
-    Object.freeze(value)
-
-    if (isPlainObject(value)) {
-        Object.keys(value).forEach(propKey => {
-            if (!Object.isFrozen(value[propKey])) {
-                freeze(value[propKey])
-            }
-        })
-    }
-
-    return value
-}
+import { isMutable, isSerializable, deepFreeze } from "../../utils"
+import { createNode, Node } from "../../core"
 
 export class Frozen<T> extends Type<T, T> {
     flags = TypeFlags.Frozen
@@ -30,7 +16,7 @@ export class Frozen<T> extends Type<T, T> {
 
     instantiate(parent: Node | null, subpath: string, environment: any, value: any): Node {
         // deep freeze the object/array
-        return createNode(this, parent, subpath, environment, isMutable(value) ? freeze(value) : value)
+        return createNode(this, parent, subpath, environment, deepFreeze(value))
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
