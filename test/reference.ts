@@ -612,7 +612,7 @@ test("References in recursive structures", t => {
     t.is(store.objects.get("2"), store.tree.children[0].children[0].data)
 })
 
-test("References in array", t => {
+test("it should applyPatch references in array", t => {
     const Item = types.model('Item', {
         id: types.identifier(),
         name: types.string
@@ -661,6 +661,55 @@ test("References in array", t => {
     folder.removeHover(item)
 
     t.deepEqual(getSnapshot(newStore), {
+        id: 'folder 1',
+        objects: {
+            'item 1': {
+                id: 'item 1',
+                name: 'item name 1'
+            }
+        },
+        hovers: []
+    })
+})
+
+test("it should applySnapshot references in array", t => {
+    const Item = types.model('Item', {
+        id: types.identifier(),
+        name: types.string
+    })
+
+    const Folder = types.model('Folder', {
+        id: types.identifier(),
+        objects: types.map(Item),
+        hovers: types.array(types.reference(Item))
+    })
+
+    const folder = Folder.create({
+        id: 'folder 1',
+        objects: {
+            'item 1': {
+                id: 'item 1',
+                name: 'item name 1'
+            }
+        },
+        hovers: ['folder 1']
+    })
+    const snapshot = JSON.parse(JSON.stringify(getSnapshot(folder)))
+    t.deepEqual(snapshot, {
+        id: 'folder 1',
+        objects: {
+            'item 1': {
+                id: 'item 1',
+                name: 'item name 1'
+            }
+        },
+        hovers: ['folder 1']
+    })
+
+    snapshot.hovers = []
+    applySnapshot(folder, snapshot)
+
+    t.deepEqual(getSnapshot(folder), {
         id: 'folder 1',
         objects: {
             'item 1': {
