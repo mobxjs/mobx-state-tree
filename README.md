@@ -532,7 +532,7 @@ Property types can only be used as direct member of a `types.model` type and not
 | `getType(node)` | Returns the type of the given node |
 | `hasParent(node, depth=1)` | Returns `true` if the node has a parent at the given `depth` |
 | `isAlive(node)` | Returns `true` if the node hasn't died yet |
-| `isMST(value)` | Returns `true` if the value is a node of a mobx-state-tree |
+| `isStateTreeNode(value)` | Returns `true` if the value is a node of a mobx-state-tree |
 | `isProtected(value)` | Returns `true` if the given node is protected, see [actions](#actions) |
 | `isRoot(node)` | Returns true if the has no parents  |
 | `joinJsonPath(parts)` | Joins and escapes the given path parts into a json path |
