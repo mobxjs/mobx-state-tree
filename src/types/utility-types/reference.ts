@@ -44,7 +44,7 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
             return fail(
                 `Failed to resolve reference of type ${this.targetType.name}: '${ref.value}' (in: ${node.path})`
             )
-        return target.getValue()
+        return target.value
     }
 
     getSnapshot(node: Node): any {
@@ -87,10 +87,10 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
         return typeof value === "string" || typeof value === "number"
             ? typeCheckSuccess()
             : typeCheckFailure(
-                  context,
-                  value,
-                  `Value '${prettyPrintValue(value)}' is not a valid reference. Expected a string or number.`
-              )
+                context,
+                value,
+                `Value '${prettyPrintValue(value)}' is not a valid reference. Expected a string or number.`
+            )
     }
 }
 

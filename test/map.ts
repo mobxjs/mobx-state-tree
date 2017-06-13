@@ -231,3 +231,17 @@ test("it should support identifiers", t => {
         "[mobx-state-tree] A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '18', but expected: '17'"
     )
 })
+
+test("#184 - types.map().get(key) should not throw if key doesnt exists", t => {
+    const { Factory } = createTestFactories()
+
+    const doc = Factory.create({
+        hello: {
+            to: "world"
+        }
+    })
+
+    t.notThrows(() => {
+        doc.get("notexistingkey")
+    })
+})

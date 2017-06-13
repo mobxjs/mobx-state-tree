@@ -1,6 +1,6 @@
 import { action } from "mobx"
 
-export interface ISnapshottable<S> {}
+export interface ISnapshottable<S> { }
 
 export enum TypeFlags {
     String = 1 << 0,
@@ -42,9 +42,9 @@ export interface IType<S, T> {
     isAssignableFrom(type: IType<any, any>): boolean
 }
 
-export interface ISimpleType<T> extends IType<T, T> {}
+export interface ISimpleType<T> extends IType<T, T> { }
 
-export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IComplexValue> {}
+export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IComplexValue> { }
 
 export function isType(value: any): value is IType<any, any> {
     return typeof value === "object" && value && value.isType === true
@@ -64,7 +64,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     @action
     create(snapshot: S = this.getDefaultSnapshot(), environment?: any): T {
         typecheck(this, snapshot)
-        return this.instantiate(null, "", environment, snapshot).getValue()
+        return this.instantiate(null, "", environment, snapshot).value
     }
 
     abstract instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any): Node

@@ -342,13 +342,13 @@ export function resolvePath(target: IComplexValue, path: string): IComplexValue 
     // TODO: give better error messages!
     // TODO: also accept path parts
     const node = getStateTreeNode(target).resolve(path)
-    return node ? node.getValue() : undefined
+    return node ? node.value : undefined
 }
 
 export function resolveIdentifier(type: IType<any, any>, target: IComplexValue, identifier: string | number): any {
     if (!isType(type)) fail("Expected a type as first argument")
     const node = getStateTreeNode(target).root.identifierCache!.resolve(type, "" + identifier)
-    return node ? node.getValue() : undefined
+    return node ? node.value : undefined
 }
 
 /**
@@ -362,7 +362,7 @@ export function resolveIdentifier(type: IType<any, any>, target: IComplexValue, 
 export function tryResolve(target: IComplexValue, path: string): IComplexValue | any {
     const node = getStateTreeNode(target).resolve(path, false)
     if (node === undefined) return undefined
-    return node ? node.getValue() : undefined
+    return node ? node.value : undefined
 }
 
 export function getRelativePath(base: IComplexValue, target: IComplexValue): string {

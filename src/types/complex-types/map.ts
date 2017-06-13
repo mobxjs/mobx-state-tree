@@ -6,8 +6,7 @@ import {
     action,
     intercept,
     observe,
-    extras,
-    isObservableMap
+    extras
 } from "mobx"
 import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, createNode, isStateTreeNode } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
@@ -39,7 +38,7 @@ function put(this: ObservableMap<any>, value: any) {
     }
     if (!node.identifierAttribute)
         fail(`Map.put can only be used to store complex values that have an identifier type attribute`)
-    this.set(node.identifier!, node.getValue())
+    this.set(node.identifier!, node.value)
     return this
 }
 
@@ -221,7 +220,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 
     removeChild(node: Node, subpath: string) {
-        ;(node.storedValue as ObservableMap<any>).delete(subpath)
+        ; (node.storedValue as ObservableMap<any>).delete(subpath)
     }
 }
 

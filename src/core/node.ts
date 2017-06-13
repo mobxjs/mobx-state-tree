@@ -134,7 +134,9 @@ export class Node {
         return current!
     }
 
-    getValue(): any {
+    @computed
+    public get value() {
+        if (!this._isAlive) return undefined
         return this.type.getValue(this)
     }
 
@@ -432,7 +434,7 @@ export class Node {
     }
 
     unbox(childNode: Node): any {
-        if (this._autoUnbox === true) return childNode.getValue()
+        if (childNode && this._autoUnbox === true) return childNode.value
         return childNode
     }
 
@@ -512,7 +514,7 @@ export function createNode<S, T>(
     } finally {
         if (sawException) {
             // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-            ;(node as any)._isAlive = false
+            ; (node as any)._isAlive = false
         }
     }
 }
