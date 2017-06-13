@@ -37,6 +37,7 @@
     "documentation": "^4.0.0-beta9",
     "mobx": "^3.1.15",
     "nyc": "^10.0.0",
+    "prettier": "^1.4.4",
     "tape": "^4.6.0",
     "tslint": "^3.15.1",
     "typescript": "2.3.2",

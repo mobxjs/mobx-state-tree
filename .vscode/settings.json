@@ -2,7 +2,11 @@
 {
     "editor.insertSpaces": true,
     "editor.trimAutoWhitespace": true,
-    "editor.trimTrailingWhitespace": true,
     "tslint.configFile": "tslint.json",
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "prettier.semi": false,
+    "prettier.tabWidth": 4,
+    "prettier.printWidth": 100
 }
