@@ -630,7 +630,7 @@ test("References in array", t => {
             this.hovers.push(item)
         },
         removeHover(item) {
-            this.hovers = this.hovers.filter(i => i.id !== item.id)
+            this.hovers.remove(item)
         }
     })
 
