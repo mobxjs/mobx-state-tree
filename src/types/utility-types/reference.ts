@@ -44,6 +44,8 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
         if (ref.mode === "object")
             return ref.value
 
+        if (!node.isAlive)
+            return undefined
         // reference was initialized with the identifier of the target
         const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
         if (!target)
