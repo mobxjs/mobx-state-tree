@@ -37,6 +37,17 @@ test("should throw if multiple identifiers provided", t => {
     }, `[mobx-state-tree] Cannot define property 'pk' as object identifier, property 'id' is already defined as identifier property`)
 })
 
+test("should throw if identifier of wrong type", t => {
+    t.throws(() => {
+        const Model = types.model("Model", {
+            id: types.identifier(types.number)
+        })
+
+        Model.create({ id: "1"})
+    }, `[mobx-state-tree] Error while converting \`{"id":"1"}\` to \`Model\`:
+at path "/id" value \`"1"\` is not assignable to type: \`identifier(number)\`, expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`)
+})
+
 test("identifier should be used only on model types - no parent provided", t => {
     t.throws(() => {
         const Model = types.identifier(types.number)
