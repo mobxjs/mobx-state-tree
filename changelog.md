@@ -1,3 +1,8 @@
+# next
+
+* Fixed issue with types.map() with types.identifier(types.number) reported by @boatkorachal
+* Fixed issue with reconciler that affected types.map when node already existed at that key reported by @boatkorachal
+
 # 0.7.2
 
 * Fixed `cannot read property resolve of undefined` thanks to @cpunion for reporting, now value of dead nodes will be undefined.
