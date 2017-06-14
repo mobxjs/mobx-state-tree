@@ -1,6 +1,6 @@
 import { action } from "mobx"
 
-export interface ISnapshottable<S> { }
+export interface ISnapshottable<S> {}
 
 export enum TypeFlags {
     String = 1 << 0,
@@ -42,9 +42,9 @@ export interface IType<S, T> {
     isAssignableFrom(type: IType<any, any>): boolean
 }
 
-export interface ISimpleType<T> extends IType<T, T> { }
+export interface ISimpleType<T> extends IType<T, T> {}
 
-export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IComplexValue> { }
+export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IComplexValue> {}
 
 export function isType(value: any): value is IType<any, any> {
     return typeof value === "object" && value && value.isType === true
@@ -103,6 +103,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     reconcile(current: Node, newValue: any): Node {
+        const { parent, subpath } = current
         // TODO: this.is... for all prepareNewVaues?
         if (isStateTreeNode(newValue) && getStateTreeNode(newValue) === current)
             // the current node is the same as the new one
@@ -124,11 +125,11 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         if (isStateTreeNode(newValue) && this.isAssignableFrom(getType(newValue))) {
             // newValue is a Node as well, move it here..
             const newNode = getStateTreeNode(newValue)
-            newNode.setParent(current.parent, current.path)
+            newNode.setParent(parent, subpath)
             return newNode
         }
         // nothing to do, we have to create a new node
-        return this.instantiate(current.parent, current.path, current._environment, newValue)
+        return this.instantiate(parent, subpath, current._environment, newValue)
     }
 
     get Type(): T {

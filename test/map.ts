@@ -284,3 +284,36 @@ test("#192 - put should not throw when identifier is a number", t => {
 at path "/todo_id" value \`"1"\` is not assignable to type: \`identifier(number)\`, expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`
     )
 })
+
+test("#192 - map should not mess up keys when putting twice", t => {
+    const Todo = types.model("Todo", {
+        todo_id: types.identifier(types.number),
+        title: types.string
+    })
+
+    const TodoStore = types.model(
+        "TodoStore",
+        { todos: types.optional(types.map(Todo), {}) },
+        {
+            addTodo(todo) {
+                this.todos.put(todo)
+            }
+        }
+    )
+
+    const todoStore = TodoStore.create({})
+
+    todoStore.addTodo({
+        todo_id: 1,
+        title: "Test"
+    })
+
+    t.deepEqual(getSnapshot(todoStore.todos), { "1": { todo_id: 1, title: "Test" } })
+
+    todoStore.addTodo({
+        todo_id: 1,
+        title: "Test Edited"
+    })
+
+    t.deepEqual(getSnapshot(todoStore.todos), { "1": { todo_id: 1, title: "Test Edited" } })
+})
