@@ -1,17 +1,15 @@
-import {
-    observable,
-    ObservableMap,
-    IMapChange,
-    IMapWillChange,
-    action,
-    intercept,
-    observe,
-    extras
-} from "mobx"
+import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras } from "mobx"
 import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, createNode, isStateTreeNode } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
-import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
+import {
+    IContext,
+    IValidationResult,
+    typeCheckFailure,
+    flattenTypeErrors,
+    getContextForPath,
+    typecheck
+} from "../type-checker"
 
 interface IMapFactoryConfig {
     isMapFactory: true
@@ -104,12 +102,14 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                     const { newValue } = change
                     const oldValue = change.object.get(change.name)
                     if (newValue === oldValue) return null
+                    typecheck(this.subType, newValue)
                     change.newValue = this.subType.reconcile(node.getChildNode(change.name), change.newValue)
                     this.verifyIdentifier(change.name, change.newValue as Node)
                 }
                 break
             case "add":
                 {
+                    typecheck(this.subType, change.newValue)
                     change.newValue = this.subType.instantiate(node, change.name, undefined, change.newValue)
                     this.verifyIdentifier(change.name, change.newValue as Node)
                 }
@@ -125,7 +125,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
 
     private verifyIdentifier(expected: string, node: Node) {
         const identifier = node.identifier
-        if (identifier !== null && identifier !== expected)
+        if (identifier !== null && identifier != expected)
             fail(
                 `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
             )
@@ -220,7 +220,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 
     removeChild(node: Node, subpath: string) {
-        ; (node.storedValue as ObservableMap<any>).delete(subpath)
+        ;(node.storedValue as ObservableMap<any>).delete(subpath)
     }
 }
 

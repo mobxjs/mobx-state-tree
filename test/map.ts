@@ -245,3 +245,42 @@ test("#184 - types.map().get(key) should not throw if key doesnt exists", t => {
         doc.get("notexistingkey")
     })
 })
+
+test("#192 - put should not throw when identifier is a number", t => {
+    const Todo = types.model("Todo", {
+        todo_id: types.identifier(types.number),
+        title: types.string
+    })
+
+    const TodoStore = types.model(
+        "TodoStore",
+        {
+            todos: types.optional(types.map(Todo), {})
+        },
+        {
+            addTodo(todo) {
+                this.todos.put(todo)
+            }
+        }
+    )
+
+    const todoStore = TodoStore.create({})
+
+    t.notThrows(() => {
+        todoStore.addTodo({
+            todo_id: 1,
+            title: "Test"
+        })
+    })
+
+    t.throws(
+        () => {
+            todoStore.addTodo({
+                todo_id: "1",
+                title: "Test"
+            })
+        },
+        `[mobx-state-tree] Error while converting \`{"todo_id":"1","title":"Test"}\` to \`Todo\`:
+at path "/todo_id" value \`"1"\` is not assignable to type: \`identifier(number)\`, expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`
+    )
+})
