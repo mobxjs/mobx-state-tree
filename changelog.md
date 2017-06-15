@@ -1,5 +1,6 @@
 # next
 
+* Introduced the concept of volatile / local state in models. See #168, or [docs](https://github.com/mobxjs/mobx-state-tree/tree/master#volatile-state)
 * Fixed issue with types.map() with types.identifier(types.number) reported by @boatkorachal
 * Fixed issue with reconciler that affected types.map when node already existed at that key reported by @boatkorachal
 
