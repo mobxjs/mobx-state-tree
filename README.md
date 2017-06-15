@@ -25,6 +25,7 @@
   * [Patches](#patches)
   * [References and identifiers](#references-and-identifiers)
   * [Listening to observables, snapshots, patches or actions](#listening-to-observables-snapshots-patches-or-actions)
+  * [Volatile state](#volatile-state)
 * [Types overview](#types-overview)
 * [Api overview](#api-overview)
 * [Tips](#tips)
@@ -464,6 +465,42 @@ addMiddleware(storeInstance, (call, next) => {
 
 Finally, it is not only possible to be notified about snapshots, patches or actions.
 It is also possible to re-apply them by respectively `applySnapshot`, `applyPatch` or `applyAction`!
+
+## Volatile state
+
+MST models primarily aid in storing _persistable_ state. State that can be persisted, serialized, transferred, patched, replaced etc.
+However, sometimes you need to keep track of temporarily, non persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc. State which is needed for local purposes as long as the object is alive.
+
+Volatile state can be introduced by passing another object to `types.model`, between the *properties* and the *actions*. (If there are only two objects passed, MST will assume these to be properties and actions. In order for volatile state to be meaningful, you always need actions to operate on them).
+
+Volatile is preserved for the life-time of an object, and not reset when snapshots are applied etc. Note that the life time of an object depends on proper reconciliation, see below.
+
+Example of an object with volatile state. Note that volatile state here is used to track a XHR request, and clean up resources whenever it got disposed. Without volatile state this kind of information would need to be stored in an external WeakMap or similar.
+
+```javascript
+// pseudo code
+const Store = types.model({
+    todos: types.array(Todo),
+    get isLoading() {
+        return this.pendingRequest.state === "pending"
+    }
+}, {
+    pendingRequest: null
+}, {
+    afterCreate() {
+        this.pendingRequest = someXhrLib.createRequest("someEndpoint")
+    },
+    beforeDestroy() {
+        // abort the request, no longer interested
+        this.pendingRequest.abort()
+    }
+})
+```
+
+To initialize a volatile file, either:
+1. Supply a primitive value (`pendingRequest: null`)
+2. Use `afterCreate` to initialize the field (as done above)
+3. Use provide a function to produce the first value. Both the scope and first argument of that function will be the target instance. Requiring a function avoids accident sharing of a non-primitive value accross all instances of a type. Example: `pendingRequest: (instance) => someXhrLib.createRequest("http://endpoint/" + instance.id)`
 
 # Types overview
 
