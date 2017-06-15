@@ -14,7 +14,9 @@ export class ValueProperty extends Property {
     }
 
     initializePrototype(proto: any) {
-        observable.ref(proto, this.name, { value: undefinedType.instantiate(null, "", null, undefined) }) // TODO: undefined type should not be needed
+        observable.ref(proto, this.name, {
+            value: undefinedType.instantiate(null, "", null, undefined)
+        }) // TODO: undefined type should not be needed
     }
 
     initialize(instance: any, snapshot: any) {
@@ -55,7 +57,6 @@ export class ValueProperty extends Property {
     }
 
     deserialize(instance: any, snapshot: any) {
-        // TODO: was a maybeMST here first...
         instance[this.name] = snapshot[this.name]
     }
 

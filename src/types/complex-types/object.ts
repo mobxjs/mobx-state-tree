@@ -10,6 +10,7 @@ import { ComputedProperty } from "../property-types/computed-property"
 import { ValueProperty } from "../property-types/value-property"
 import { ActionProperty } from "../property-types/action-property"
 import { ViewProperty } from "../property-types/view-property"
+import { VolatileProperty } from "../property-types/volatile-property"
 import { isIdentifierType } from "../utility-types/identifier"
 
 function objectTypeToString(this: any) {
@@ -24,6 +25,7 @@ export class ObjectType extends ComplexType<any, any> {
      * The original object definition
      */
     baseModel: any
+    baseState: any
     baseActions: any
 
     modelConstructor: new () => any
@@ -35,14 +37,15 @@ export class ObjectType extends ComplexType<any, any> {
         [key: string]: Property
     } = {}
 
-    constructor(name: string, baseModel: Object, baseActions: Object) {
+    constructor(name: string, baseModel: Object, baseState: Object, baseActions: Object) {
         super(name)
         Object.freeze(baseModel) // make sure nobody messes with it
         Object.freeze(baseActions)
         this.baseModel = baseModel
+        this.baseState = baseState
         this.baseActions = baseActions
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
-        this.modelConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
+        this.modelConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript // TODO: use Object.defineProperty
         this.modelConstructor.prototype.toString = objectTypeToString
         this.parseModelProps()
         this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
@@ -86,8 +89,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     parseModelProps() {
-        const { baseModel, baseActions } = this
-        let alreadySeenIdentifierAttribute: string | null = null
+        const { baseModel, baseState, baseActions } = this
 
         for (let key in baseModel)
             if (hasOwnProperty(baseModel, key)) {
@@ -126,11 +128,23 @@ export class ObjectType extends ComplexType<any, any> {
                 }
             }
 
+        for (let key in baseState)
+            if (hasOwnProperty(baseState, key)) {
+                const value = baseState[key]
+                if (key in this.baseModel)
+                    fail(
+                        `Property '${key}' was also defined as local state. Local state fields and properties should not collide`
+                    )
+                this.props[key] = new VolatileProperty(key, value)
+            }
+
         for (let key in baseActions)
             if (hasOwnProperty(baseActions, key)) {
                 const value = baseActions[key]
                 if (key in this.baseModel)
                     fail(`Property '${key}' was also defined as action. Actions and properties should not collide`)
+                if (key in this.baseState)
+                    fail(`Property '${key}' was also defined as local state. Actions and state should not collide`)
                 if (typeof value === "function") {
                     this.props[key] = new ActionProperty(key, value)
                 } else {
@@ -236,12 +250,23 @@ export function model<T, A>(
     properties: IModelProperties<T> & ThisType<T>,
     operations: A & ThisType<T & A>
 ): IModelType<T, A>
-export function model(arg1: any, arg2?: any, arg3?: any) {
-    let name = typeof arg1 === "string" ? arg1 : "AnonymousModel"
-    let baseModel: Object = typeof arg1 === "string" ? arg2 : arg1
-    let actions: Object = typeof arg1 === "string" ? arg3 : arg2
-
-    return new ObjectType(name, baseModel, actions || {})
+export function model<T, S, A>(
+    properties: IModelProperties<T> & ThisType<T & S>,
+    volatileState: S & ThisType<T & S>,
+    operations: A & ThisType<T & A & S>
+): IModelType<T, A & S>
+export function model<T, S, A>(
+    name: string,
+    properties: IModelProperties<T> & ThisType<T & S>,
+    volatileState: S & ThisType<T & S>,
+    operations: A & ThisType<T & A & S>
+): IModelType<T, A & S>
+export function model(...args: any[]) {
+    const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+    const props = args.shift() || fail("types.model must specify properties")
+    const volatileState = (args.length > 1 && args.shift()) || {}
+    const actions = args.shift() || {}
+    return new ObjectType(name, props, volatileState, actions)
 }
 
 function getObjectFactoryBaseModel(item: any) {
