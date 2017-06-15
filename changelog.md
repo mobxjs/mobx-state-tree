@@ -1,14 +1,14 @@
 # next
 
 * Fixed issue with types.map() with types.identifier(types.number) reported by @boatkorachal
-* Fixed issue with reconciler that affected types.map when node already existed at that key reported by @boatkorachal
+* Fixed issue with reconciler that affected types.map when node already existed at that key reported by @boatkorachal [#191](https://github.com/mobxjs/mobx-state-tree/issues/191)
 
 # 0.7.2
 
-* Fixed `cannot read property resolve of undefined` thanks to @cpunion for reporting, now value of dead nodes will be undefined.
-* Fixed `[LateType] is not defined` thanks to @amir-arad for reporting, when using late as model property type
-* Fixed `Object.freeze can only be called on Object` thanks to @ds300 for reporting, when using MST on a ReactNative environment
-* Now the entire codebase is prettier! :D
+* Fixed `cannot read property resolve of undefined` thanks to @cpunion for reporting, now value of dead nodes will be undefined. [#186](https://github.com/mobxjs/mobx-state-tree/issues/186)
+* Fixed `[LateType] is not defined` thanks to @amir-arad for reporting, when using late as model property type [#187](https://github.com/mobxjs/mobx-state-tree/issues/187)
+* Fixed `Object.freeze can only be called on Object` thanks to @ds300 for reporting, when using MST on a ReactNative environment [#189](https://github.com/mobxjs/mobx-state-tree/issues/189)
+* Now the entire codebase is prettier! :D [#187](https://github.com/mobxjs/mobx-state-tree/issues/187)
 
 # 0.7.1
 
@@ -17,20 +17,21 @@
 # 0.7.0
 
 The type system and internal administration has been refactoring, making the internals both simpler and more flexible.
-Things like references and identifiers are now first class types, making them much better composable.
+Things like references and identifiers are now first class types, making them much better composable. [#152](https://github.com/mobxjs/mobx-state-tree/issues/152)
 
 * **BREAKING** References with a predefined lookup path are no longer supported. Instead of that, identifiers are now looked up in the entire tree. For that reasons identifiers now have to be unique in the entire tree, per type.
 * **BREAKING** `resolve` is renamed to `resolvePath`
 * Introduced `resolveIdentifier(type, tree, identifier)` to find objects by identifier
 * **BREAKING** `types.reference` is by default non-nullable. For nullable identifiers, use `types.maybe(types.reference(X))`
 * Many, many improvements. Related open issues will be updated.
+* **BREAKING** `isMST` is renamed to `isStateTreeNode`
 
 # 0.6.3
 
-* Fixed issue with array/maps of union types @abruzzihraig
-* Make types.extend support computed attributes @cpunion
-* Fixed issue with map of primitive types and applySnapshot @pioh
-* Better type declarations for union, up to 10 supported types
+* Fixed issue with array/maps of union types @abruzzihraig [#151](https://github.com/mobxjs/mobx-state-tree/issues/151)
+* Make types.extend support computed attributes @cpunion [#169](https://github.com/mobxjs/mobx-state-tree/issues/169)
+* Fixed issue with map of primitive types and applySnapshot @pioh [#155](https://github.com/mobxjs/mobx-state-tree/issues/155)
+* Better type declarations for union, up to 10 supported types 
 
 # 0.6.2
 
