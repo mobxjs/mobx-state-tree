@@ -232,6 +232,7 @@ export class ObjectType extends ComplexType<any, any> {
 }
 
 export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }
+export type IModelVolatileState<T> = { [K in keyof T]: ((self?: any) => T[K]) | T[K] }
 
 export type Snapshot<T> = {
     [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
@@ -252,13 +253,13 @@ export function model<T, A>(
 ): IModelType<T, A>
 export function model<T, S, A>(
     properties: IModelProperties<T> & ThisType<T & S>,
-    volatileState: S & ThisType<T & S>,
+    volatileState: IModelVolatileState<S> & ThisType<T & S>,
     operations: A & ThisType<T & A & S>
 ): IModelType<T, A & S>
 export function model<T, S, A>(
     name: string,
     properties: IModelProperties<T> & ThisType<T & S>,
-    volatileState: S & ThisType<T & S>,
+    volatileState: IModelVolatileState<S> & ThisType<T & S>,
     operations: A & ThisType<T & A & S>
 ): IModelType<T, A & S>
 export function model(...args: any[]) {

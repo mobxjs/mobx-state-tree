@@ -31,8 +31,6 @@ test("it should support volatiles", t => {
 })
 
 test("should warn about non primitive props should survive reconciliation", t => {
-    const a = new ArrayBuffer(10)
-
     t.throws(() => types.model({ id: types.identifier() }, { buf: {} }, {}), /Please provide an initializer/)
 })
 
