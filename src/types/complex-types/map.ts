@@ -88,7 +88,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
 
     getChildNode(node: Node, key: string): Node {
         const childNode = node.storedValue.get(key)
-        if (!childNode) fail("Not a child" + key)
+        if (!childNode) fail("Not a child " + key)
         return childNode
     }
 
