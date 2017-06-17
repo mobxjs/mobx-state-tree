@@ -1,6 +1,6 @@
 # Next
 
-* **BREAKING** Dropped types.extend in favor of types.compoase
+* **BREAKING** Dropped types.extend in favor of types.compose
 
 # 0.7.3
 
