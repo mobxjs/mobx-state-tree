@@ -1,3 +1,7 @@
+# Next
+
+* **BREAKING** Dropped types.extend in favor of types.compoase
+
 # 0.7.3
 
 * Introduced the concept of volatile / local state in models. See [#168](https://github.com/mobxjs/mobx-state-tree/issues/168), or [docs](https://github.com/mobxjs/mobx-state-tree/tree/master#volatile-state)
@@ -32,7 +36,7 @@ Things like references and identifiers are now first class types, making them mu
 * Fixed issue with array/maps of union types @abruzzihraig [#151](https://github.com/mobxjs/mobx-state-tree/issues/151)
 * Make types.extend support computed attributes @cpunion [#169](https://github.com/mobxjs/mobx-state-tree/issues/169)
 * Fixed issue with map of primitive types and applySnapshot @pioh [#155](https://github.com/mobxjs/mobx-state-tree/issues/155)
-* Better type declarations for union, up to 10 supported types 
+* Better type declarations for union, up to 10 supported types
 
 # 0.6.2
 

@@ -290,14 +290,14 @@ test("it should throw if a replaced object is read or written to", t => {
 // === COMPOSE FACTORY ===
 test("it should compose factories", t => {
     const { BoxFactory, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.extend(BoxFactory, ColorFactory)
+    const ComposedFactory = types.compose(BoxFactory, ColorFactory.properties, ColorFactory.actions)
 
     t.deepEqual(getSnapshot(ComposedFactory.create()), { width: 0, height: 0, color: "#FFFFFF" })
 })
 
 test("it should compose factories with computed properties", t => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.extend(ColorFactory, ComputedFactory2)
+    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2.properties, ComputedFactory2.actions)
     const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
     t.deepEqual(getSnapshot(store), { props: { width: 100, height: 200 }, color: "#FFFFFF" })
     t.is(store.area, 20000)
@@ -389,7 +389,12 @@ test("it should consider primitives as proposed defaults", t => {
 
     const doc = Todo.create()
 
-    t.deepEqual(getSnapshot(doc), { id: 0, name: "Hello world", done: false, createdAt: now.getTime() })
+    t.deepEqual(getSnapshot(doc), {
+        id: 0,
+        name: "Hello world",
+        done: false,
+        createdAt: now.getTime()
+    })
 })
 
 test("it should throw if a non-primitive value is provided and no default can be created", t => {
