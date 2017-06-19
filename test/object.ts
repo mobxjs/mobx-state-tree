@@ -305,6 +305,16 @@ test("it should compose factories with computed properties", t => {
     t.is(typeof store.setHeight, "function")
 })
 
+test("it should compose multiple types with computed properties", t => {
+    const { ComputedFactory2, ColorFactory } = createTestFactories()
+    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2)
+    const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
+    t.deepEqual(getSnapshot(store), { props: { width: 100, height: 200 }, color: "#FFFFFF" })
+    t.is(store.area, 20000)
+    t.is(typeof store.setWidth, "function")
+    t.is(typeof store.setHeight, "function")
+})
+
 test("methods get overridden by compose", t => {
     const A = types.model(
         {

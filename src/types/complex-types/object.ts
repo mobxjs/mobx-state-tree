@@ -273,6 +273,26 @@ export function model(...args: any[]) {
     return new ObjectType(name, props, volatileState, actions)
 }
 
+export function compose<T1, S1, A1, T2, S2, A2>(
+    name: string,
+    t1: IModelType<T1, S1, A1>,
+    t2: IModelType<T2, S2, A2>
+): IModelType<T1 & T2, S1 & S2, A1 & A2>
+export function compose<T1, S1, A1, T2, S2, A2>(
+    t1: IModelType<T1, S1, A1>,
+    t2: IModelType<T2, S2, A2>
+): IModelType<T1 & T2, S1 & S2, A1 & A2>
+export function compose<T1, S1, A1, T2, S2, A2>(
+    name: string,
+    t1: IModelType<T1, S1, A1>,
+    t2: IModelType<T2, S2, A2>
+): IModelType<T1 & T2, S1 & S2, A1 & A2>
+export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
+    name: string,
+    t1: IModelType<T1, S1, A1>,
+    t2: IModelType<T2, S2, A2>,
+    t3: IModelType<T3, S3, A3>
+): IModelType<T1 & T2 & T3, S1 & S2 & S3, A1 & A2 & A3> // ...and so forth...
 export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
     baseType: IModelType<BASE_T, BASE_S, BASE_A>,
     properties: IModelProperties<T> & ThisType<T & BASE_T>
@@ -306,8 +326,21 @@ export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
     volatileState: IModelVolatileState<S> & ThisType<BASE_T & T & BASE_S & S>,
     operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
 ): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
+    t1: IModelType<T1, S1, A1>,
+    t2: IModelType<T2, S2, A2>,
+    t3: IModelType<T3, S3, A3>
+): IModelType<T1 & T2 & T3, S1 & S2 & S3, A1 & A2 & A3> // ...and so forth...
 export function compose(...args: any[]) {
     const typeName = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+
+    if (args.every(arg => isType(arg))) {
+        // compose types
+        return (args as IModelType<any, any, any>[]).reduce((prev, cur) =>
+            compose(typeName, prev, cur.properties, cur.state, cur.actions)
+        )
+    }
+
     const baseType = args.shift()
     const props = args.shift() || fail("types.compose must specify properties or `{}`")
     const volatileState = (args.length > 1 && args.shift()) || {}

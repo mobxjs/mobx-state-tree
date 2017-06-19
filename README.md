@@ -529,6 +529,7 @@ These are the types available in MST. All types can be found in the `types` name
 * `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(null)), null)`.
 * `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
 * `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is immutable.
+* `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining it into a new one
 * `types.compose(name?, baseType, props, volatileState?, actions?)`, creates a new model type by taking an existing type and introducing additional properties, state and actions
 
 ## Property types
