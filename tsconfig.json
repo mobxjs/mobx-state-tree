@@ -4,7 +4,7 @@
         "target": "es5",
         "sourceMap": true,
         "declaration": true,
-        "module": "commonjs",
+        "module": "es2015",
         "removeComments": false,
         "outDir": "lib/",
         "noImplicitAny": true,
@@ -13,7 +13,8 @@
         "strictNullChecks": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
-        "noImplicitThis": true
+        "noImplicitThis": true,
+        "importHelpers": true
     },
     "files": [
         "src/index.ts"
