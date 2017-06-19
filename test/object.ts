@@ -305,6 +305,86 @@ test("it should compose factories with computed properties", t => {
     t.is(typeof store.setHeight, "function")
 })
 
+test("methods get overridden by compose", t => {
+    const A = types.model(
+        {
+            count: types.optional(types.number, 0)
+        },
+        {
+            increment() {
+                this.count += 1
+            }
+        }
+    )
+
+    const B = types.compose(
+        A,
+        {},
+        {
+            increment() {
+                this.count += 10
+            }
+        }
+    )
+
+    const store = B.create()
+    t.deepEqual(getSnapshot(store), { count: 0 })
+    t.is(store.count, 0)
+
+    store.increment()
+
+    t.is(store.count, 10)
+})
+
+test("compose should add new props", t => {
+    const A = types.model({
+        count: types.optional(types.number, 0)
+    })
+
+    const B = types.compose(A, {
+        called: types.optional(types.number, 0)
+    })
+
+    const store = B.create()
+    t.deepEqual(getSnapshot(store), { count: 0, called: 0 })
+    t.is(store.count, 0)
+})
+
+test("models should expose their actions to be used in a composable way", t => {
+    const A = types.model(
+        {
+            count: types.optional(types.number, 0)
+        },
+        {
+            increment() {
+                this.count += 1
+            }
+        }
+    )
+
+    const B = types.compose(
+        A,
+        {
+            called: types.optional(types.number, 0)
+        },
+        {
+            increment() {
+                A.actions.increment.apply(this, [])
+                this.called += 1
+            }
+        }
+    )
+
+    const store = B.create()
+    t.deepEqual(getSnapshot(store), { count: 0, called: 0 })
+    t.is(store.count, 0)
+
+    store.increment()
+
+    t.is(store.count, 1)
+    t.is(store.called, 1)
+})
+
 // === TYPE CHECKS ===
 test("it should check the type correctly", t => {
     const { Factory } = createTestFactories()
