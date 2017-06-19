@@ -529,6 +529,7 @@ These are the types available in MST. All types can be found in the `types` name
 * `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(null)), null)`.
 * `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
 * `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is immutable.
+* `types.compose(name?, baseType, props, volatileState?, actions?)`, creates a new model type by taking an existing type and introducing additional properties, state and actions
 
 ## Property types
 
@@ -623,31 +624,35 @@ Thanks to function hoisting in combination with `types.late`, this makes sure yo
 
 ### Simulate inheritance by using type composition
 
-There is no notion of inheritance in MST. The recommended approach is to keep an references to the original configuration of a model to compose it into a new one. (`types.extend` achieves this as well, but it might change or even be removed). So a classical animal inheritance could be expressed using composition as follows:
+There is no notion of inheritance in MST. The recommended approach is to keep an references to the original configuration of a model to compose it into a new one, for example by using `types.compose`. So a classical animal inheritance could be expressed using composition as follows:
 
 ```javascript
-const animalProperties: {
-    age: types.number,
-    sound: types.string
-}
-
-const animalActions = {
-    makeSound() {
-        console.log(this.sound)
+const Square = types.model(
+    "Square",
+    {
+        width: types.number,
+        surface() {
+            return this.width * this.width
+        }
     }
-}
-
-const Dog = types.model(
-    { ...animalProperties, sound: "woof" },
-    animalActions
 )
 
-const Cat = types.model(
-    { ...animalProperties, sound: "meaow" },
-    animalActions
+const Box = types.compose(
+    "Box",
+    Square, // Base type, copy properties, state and actions from this type
+    {
+        // new properties
+        volume() {
+            // super call
+            return Square.actions.surface.call(this) * this.width
+        }
+    },
+    { }, // new volatile state
+    { }, // new actions
 )
 
-const Animal = types.union(Dog, Cat)
+// no inheritance, but, union types and code reuse
+const Shape = types.union(Box, Square)
 ```
 
 ### Creating enumerations
@@ -663,10 +668,6 @@ Or, fancier:
 ```javascript
 const Temperature = types.union(...["Hot", "Cold"].map(types.literal))
 ```
-
-### Storing non-serializable data with models
-
-TODO `types.localState`
 
 # FAQ
 

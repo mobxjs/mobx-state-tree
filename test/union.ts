@@ -1,4 +1,4 @@
-import { types, hasParent, tryResolve } from "../src"
+import { types, hasParent, tryResolve, getSnapshot } from "../src"
 import { test } from "ava"
 
 const createTestFactories = () => {
@@ -49,7 +49,7 @@ test("it should have parent whenever creating or applying from a complex data st
 
     const child = tryResolve(block, "./list/0")
 
-    hasParent(child) ? t.pass() : t.fail()
+    t.is(hasParent(child), true)
 })
 
 test("it should complain about no dispatch method and multiple applicable types", t => {
@@ -111,4 +111,12 @@ test("it should compute exact union types - 2", t => {
 
     t.deepEqual(DispatchPlane.is(Box.create({ width: 3, height: 2 })), true)
     t.deepEqual(DispatchPlane.is(Square.create({ width: 3, height: 2 } as any)), true)
+})
+
+test("it should use dispatch to discriminate", t => {
+    const { Box, DispatchPlane, Square } = createTestFactories()
+
+    const a = DispatchPlane.create({ width: 3 })
+
+    t.deepEqual<any>(getSnapshot(a), { width: 3 })
 })

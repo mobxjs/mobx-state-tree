@@ -290,19 +290,99 @@ test("it should throw if a replaced object is read or written to", t => {
 // === COMPOSE FACTORY ===
 test("it should compose factories", t => {
     const { BoxFactory, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.extend(BoxFactory, ColorFactory)
+    const ComposedFactory = types.compose(BoxFactory, ColorFactory.properties, ColorFactory.actions)
 
     t.deepEqual(getSnapshot(ComposedFactory.create()), { width: 0, height: 0, color: "#FFFFFF" })
 })
 
 test("it should compose factories with computed properties", t => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.extend(ColorFactory, ComputedFactory2)
+    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2.properties, ComputedFactory2.actions)
     const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
     t.deepEqual(getSnapshot(store), { props: { width: 100, height: 200 }, color: "#FFFFFF" })
     t.is(store.area, 20000)
     t.is(typeof store.setWidth, "function")
     t.is(typeof store.setHeight, "function")
+})
+
+test("methods get overridden by compose", t => {
+    const A = types.model(
+        {
+            count: types.optional(types.number, 0)
+        },
+        {
+            increment() {
+                this.count += 1
+            }
+        }
+    )
+
+    const B = types.compose(
+        A,
+        {},
+        {
+            increment() {
+                this.count += 10
+            }
+        }
+    )
+
+    const store = B.create()
+    t.deepEqual(getSnapshot(store), { count: 0 })
+    t.is(store.count, 0)
+
+    store.increment()
+
+    t.is(store.count, 10)
+})
+
+test("compose should add new props", t => {
+    const A = types.model({
+        count: types.optional(types.number, 0)
+    })
+
+    const B = types.compose(A, {
+        called: types.optional(types.number, 0)
+    })
+
+    const store = B.create()
+    t.deepEqual(getSnapshot(store), { count: 0, called: 0 })
+    t.is(store.count, 0)
+})
+
+test("models should expose their actions to be used in a composable way", t => {
+    const A = types.model(
+        {
+            count: types.optional(types.number, 0)
+        },
+        {
+            increment() {
+                this.count += 1
+            }
+        }
+    )
+
+    const B = types.compose(
+        A,
+        {
+            called: types.optional(types.number, 0)
+        },
+        {
+            increment() {
+                A.actions.increment.apply(this, [])
+                this.called += 1
+            }
+        }
+    )
+
+    const store = B.create()
+    t.deepEqual(getSnapshot(store), { count: 0, called: 0 })
+    t.is(store.count, 0)
+
+    store.increment()
+
+    t.is(store.count, 1)
+    t.is(store.called, 1)
 })
 
 // === TYPE CHECKS ===
@@ -389,7 +469,12 @@ test("it should consider primitives as proposed defaults", t => {
 
     const doc = Todo.create()
 
-    t.deepEqual(getSnapshot(doc), { id: 0, name: "Hello world", done: false, createdAt: now.getTime() })
+    t.deepEqual(getSnapshot(doc), {
+        id: 0,
+        name: "Hello world",
+        done: false,
+        createdAt: now.getTime()
+    })
 })
 
 test("it should throw if a non-primitive value is provided and no default can be created", t => {

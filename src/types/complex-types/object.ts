@@ -1,7 +1,7 @@
 import { action, extendShallowObservable, IObjectChange, IObjectWillChange, intercept, observe } from "mobx"
-import { extend as extendObject, extendKeepGetter, fail, isPrimitive, hasOwnProperty, isPlainObject } from "../../utils"
+import { extendKeepGetter, fail, isPrimitive, hasOwnProperty, isPlainObject } from "../../utils"
 import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
-import { getType, IComplexValue, getStateTreeNode, IJsonPatch, Node, createNode } from "../../core"
+import { IComplexValue, getStateTreeNode, IJsonPatch, Node, createNode } from "../../core"
 import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
 import { optional } from "../utility-types/optional"
@@ -11,7 +11,6 @@ import { ValueProperty } from "../property-types/value-property"
 import { ActionProperty } from "../property-types/action-property"
 import { ViewProperty } from "../property-types/view-property"
 import { VolatileProperty } from "../property-types/volatile-property"
-import { isIdentifierType } from "../utility-types/identifier"
 
 function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
@@ -24,9 +23,9 @@ export class ObjectType extends ComplexType<any, any> {
     /**
      * The original object definition
      */
-    baseModel: any
-    baseState: any
-    baseActions: any
+    properties: any
+    state: any
+    actions: any
 
     modelConstructor: new () => any
 
@@ -41,9 +40,9 @@ export class ObjectType extends ComplexType<any, any> {
         super(name)
         Object.freeze(baseModel) // make sure nobody messes with it
         Object.freeze(baseActions)
-        this.baseModel = baseModel
-        this.baseState = baseState
-        this.baseActions = baseActions
+        this.properties = baseModel
+        this.state = baseState
+        this.actions = baseActions
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
         this.modelConstructor = new Function(`return function ${name} (){}`)() // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript // TODO: use Object.defineProperty
         this.modelConstructor.prototype.toString = objectTypeToString
@@ -89,12 +88,12 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     parseModelProps() {
-        const { baseModel, baseState, baseActions } = this
+        const { properties, state, actions } = this
 
-        for (let key in baseModel)
-            if (hasOwnProperty(baseModel, key)) {
+        for (let key in properties)
+            if (hasOwnProperty(properties, key)) {
                 // TODO: check that hooks are not defined as part of baseModel
-                const descriptor = Object.getOwnPropertyDescriptor(baseModel, key)
+                const descriptor = Object.getOwnPropertyDescriptor(properties, key)
                 if ("get" in descriptor) {
                     this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
                     continue
@@ -128,22 +127,22 @@ export class ObjectType extends ComplexType<any, any> {
                 }
             }
 
-        for (let key in baseState)
-            if (hasOwnProperty(baseState, key)) {
-                const value = baseState[key]
-                if (key in this.baseModel)
+        for (let key in state)
+            if (hasOwnProperty(state, key)) {
+                const value = state[key]
+                if (key in this.properties)
                     fail(
                         `Property '${key}' was also defined as local state. Local state fields and properties should not collide`
                     )
                 this.props[key] = new VolatileProperty(key, value)
             }
 
-        for (let key in baseActions)
-            if (hasOwnProperty(baseActions, key)) {
-                const value = baseActions[key]
-                if (key in this.baseModel)
+        for (let key in actions)
+            if (hasOwnProperty(actions, key)) {
+                const value = actions[key]
+                if (key in this.properties)
                     fail(`Property '${key}' was also defined as action. Actions and properties should not collide`)
-                if (key in this.baseState)
+                if (key in this.state)
                     fail(`Property '${key}' was also defined as local state. Actions and state should not collide`)
                 if (typeof value === "function") {
                     this.props[key] = new ActionProperty(key, value)
@@ -238,30 +237,34 @@ export type Snapshot<T> = {
     [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
 }
 
-export interface IModelType<T, A> extends IComplexType<Snapshot<T>, T & A> {}
+export interface IModelType<T, S, A> extends IComplexType<Snapshot<T>, T & S & A> {
+    properties: IModelProperties<T>
+    state: IModelVolatileState<S>
+    actions: A
+}
 
-export function model<T>(properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}>
-export function model<T>(name: string, properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}>
+export function model<T>(properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}, {}>
+export function model<T>(name: string, properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}, {}>
 export function model<T, A>(
     properties: IModelProperties<T> & ThisType<T>,
     operations: A & ThisType<T & A>
-): IModelType<T, A>
+): IModelType<T, {}, A>
 export function model<T, A>(
     name: string,
     properties: IModelProperties<T> & ThisType<T>,
     operations: A & ThisType<T & A>
-): IModelType<T, A>
+): IModelType<T, {}, A>
 export function model<T, S, A>(
     properties: IModelProperties<T> & ThisType<T & S>,
     volatileState: IModelVolatileState<S> & ThisType<T & S>,
     operations: A & ThisType<T & A & S>
-): IModelType<T, A & S>
+): IModelType<T, S, A>
 export function model<T, S, A>(
     name: string,
     properties: IModelProperties<T> & ThisType<T & S>,
     volatileState: IModelVolatileState<S> & ThisType<T & S>,
     operations: A & ThisType<T & A & S>
-): IModelType<T, A & S>
+): IModelType<T, S, A>
 export function model(...args: any[]) {
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
     const props = args.shift() || fail("types.model must specify properties")
@@ -270,46 +273,55 @@ export function model(...args: any[]) {
     return new ObjectType(name, props, volatileState, actions)
 }
 
-function getObjectFactoryBaseModel(item: any) {
-    let type = isType(item) ? item : getType(item)
-
-    return isObjectFactory(type) ? (type as ObjectType).baseModel : {}
-}
-
-function getObjectFactoryBaseActions(item: any) {
-    let type = isType(item) ? item : getType(item)
-
-    return isObjectFactory(type) ? (type as ObjectType).baseActions : {}
-}
-
-export function extend<A, B, AA, BA>(
+export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
+    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
+    properties: IModelProperties<T> & ThisType<T & BASE_T>
+): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
     name: string,
-    a: IModelType<A, AA>,
-    b: IModelType<B, BA>
-): IModelType<A & B, AA & BA>
-export function extend<A, B, C, AA, BA, CA>(
+    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
+    properties: IModelProperties<T> & ThisType<T & BASE_T>
+): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
+    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
+    properties: IModelProperties<T> & ThisType<T & BASE_T>,
+    operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
+): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
     name: string,
-    a: IModelType<A, AA>,
-    b: IModelType<B, BA>,
-    c: IModelType<C, CA>
-): IModelType<A & B & C, AA & BA & CA>
-export function extend<A, B, AA, BA>(a: IModelType<A, AA>, b: IModelType<B, BA>): IModelType<A & B, AA & BA>
-export function extend<A, B, C, AA, BA, CA>(
-    a: IModelType<A, AA>,
-    b: IModelType<B, BA>,
-    c: IModelType<C, CA>
-): IModelType<A & B & C, AA & BA & CA>
-export function extend(...args: any[]) {
-    console.warn(
-        "[mobx-state-tree] `extend` is an experimental feature and it's behavior will probably change in the future"
+    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
+    properties: IModelProperties<T> & ThisType<T & BASE_T>,
+    operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
+): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
+    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
+    properties: IModelProperties<T> & ThisType<T & BASE_T>,
+    volatileState: IModelVolatileState<S> & ThisType<BASE_T & T & BASE_S & S>,
+    operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
+): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
+    name: string,
+    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
+    properties: IModelProperties<T> & ThisType<T & BASE_T>,
+    volatileState: IModelVolatileState<S> & ThisType<BASE_T & T & BASE_S & S>,
+    operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
+): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+export function compose(...args: any[]) {
+    const typeName = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+    const baseType = args.shift()
+    const props = args.shift() || fail("types.compose must specify properties or `{}`")
+    const volatileState = (args.length > 1 && args.shift()) || {}
+    const actions = args.shift() || {}
+
+    if (!isObjectFactory(baseType)) return fail(`Only model types can be composed`)
+    return model(
+        typeName,
+        extendKeepGetter({}, baseType.properties, props),
+        extendKeepGetter({}, baseType.state, volatileState),
+        extendKeepGetter({}, baseType.actions, actions)
     )
-    const baseFactories = typeof args[0] === "string" ? args.slice(1) : args
-    const factoryName = typeof args[0] === "string" ? args[0] : baseFactories.map(f => f.name).join("_")
-    const properties = extendKeepGetter.apply(null, [{}].concat(baseFactories.map(getObjectFactoryBaseModel)))
-    const actions = extendObject.apply(null, [{}].concat(baseFactories.map(getObjectFactoryBaseActions)))
-    return model(factoryName, properties, actions)
 }
 
-export function isObjectFactory(type: any): boolean {
+export function isObjectFactory(type: any): type is ObjectType {
     return isType(type) && ((type as IType<any, any>).flags & TypeFlags.Object) > 0
 }
