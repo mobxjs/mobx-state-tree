@@ -213,5 +213,88 @@ console.log(getSnapshot(store))
 
 And because the nature of state is mutable, snapshot will be emitted whenever the state is mutated! To listen to those new snapshot, you can use `onSnapshot(store, snapshot => console.log(snapshot))` to log them as they are emitted!
 
+Note: The snapshot inspector of the playground is based `onSnapshot` as whell. The inspect function will read the current snapshot and listen for newer ones, and update the view showing you the new snapshots.
+
+## From snapshot to model
+As we just saw, getting a snapshot from a model instance is pretty easy, but would'nt be neat to be able to restore a model from a snapshot? The good news is that you can!
+
+That basically means that you can restore your objects with your custom methods by just knowing the type of the tree and its snapshot! You can perform this operation in two ways.
+
+The first one is by creating a new model instance, and pass in the snapshot as argument to create. That means that you will need to update all your store reference, if used in React components, to the new one.
+
+The second one avoid this problem by applying the snapshot to an existing model instance. Properties will be updated, but the store reference will remain the same. This way will trigger an operation called "reconciliation". We will speak later about this phase.
+
+```javascript
+// 1st
+const store = RootStore.create({
+    "users": {},
+    "todos": {
+        "1": {
+            "name": "Eat a cake",
+            "done": true
+        }
+    }
+})
+
+// 2nd
+applySnapshot(store, {
+    "users": {},
+    "todos": {
+        "1": {
+            "name": "Eat a cake",
+            "done": true
+        }
+    }
+})
+```
+[View sample in playground](https://goo.gl/eNycxT)
+
 ## Time travel
-WIP
+The ability of getting snapshot and apply them makes implementing time travel really easy in user-land. What you need to do is basically listen for snapshots, store them and reapply them as time travelling!
+
+A sample implementation would look like this:
+```javascript
+import { applySnapshot, onSnapshot } from "mobx-state-tree"
+
+var states = []
+var currentFrame = -1
+
+onSnapshot(store, snapshot => {
+    if (currentFrame === states.length - 1) {
+        currentFrame++
+        states.push(snapshot)
+    }
+})
+
+export function previousState() {
+    if (currentFrame === 0) return
+    currentFrame--
+    applySnapshot(store, states[currentFrame])
+}
+
+export function nextState() {
+    if (currentFrame === states.length - 1) return
+    currentFrame++
+    applySnapshot(store, states[currentFrame])
+}
+```
+
+Note: Time travel in playground is implemented in a pretty similar way
+
+## Getting to the UI
+MST loves MobX, and is fully compatible with it's autorun, reaction, observe, etc! You can use the mobx-react package to connect a MST store to a React component!
+More details can be found on the mobx-react package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to onSnapshot and update accordingly!
+
+```javascript
+const App = observer(props => <div>
+    <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
+    {props.store.todos.values().map(todo => 
+        <div>
+            <input type="checkbox" checked={todo.done} onChange={e => todo.toggle()} />
+            <input type="text" value={todo.name} onChange={e => todo.setName(e.target.value)} />
+        </div>
+    )}
+</div>
+)
+```
+[View sample in playground](https://goo.gl/V9dqv4)
