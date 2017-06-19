@@ -625,8 +625,34 @@ Thanks to function hoisting in combination with `types.late`, this makes sure yo
 
 There is no notion of inheritance in MST. The recommended approach is to keep an references to the original configuration of a model to compose it into a new one, for example by using `types.compose`. So a classical animal inheritance could be expressed using composition as follows:
 
-// TODO: types.compose + union example
+```javascript
+const Square = types.model(
+    "Square",
+    {
+        width: types.number,
+        surface() {
+            return this.width * this.width
+        }
+    }
+)
 
+const Box = types.compose(
+    "Box",
+    Square, // Base type, copy properties, state and actions from this type
+    {
+        // new properties
+        volume() {
+            // super call
+            return Square.actions.surface.call(this) * this.width
+        }
+    },
+    { }, // new volatile state
+    { }, // new actions
+)
+
+// no inheritance, but, union types and code reuse
+const Shape = types.union(Box, Square)
+```
 
 ### Creating enumerations
 
@@ -641,10 +667,6 @@ Or, fancier:
 ```javascript
 const Temperature = types.union(...["Hot", "Cold"].map(types.literal))
 ```
-
-### Storing non-serializable data with models
-
-TODO `types.localState`
 
 # FAQ
 
