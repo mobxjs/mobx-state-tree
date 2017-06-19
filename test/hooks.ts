@@ -8,9 +8,6 @@ function createTestStore(listener) {
             title: ""
         },
         {
-            setTitle(newTitle) {
-                this.title = newTitle
-            },
             afterCreate() {
                 listener("new todo: " + this.title)
                 addDisposer(this, () => {
@@ -47,13 +44,15 @@ function createTestStore(listener) {
             },
             beforeDestroy() {
                 listener("destroy store: " + this.todos.length)
-            },
+            }
+            /* TODO: Useless, store has no parent :/
             afterAttach() {
                 listener("attach store: " + this.todos.length)
             },
             beforeDetach() {
                 listener("detach store: " + this.todos.length)
             }
+            */
         }
     )
 

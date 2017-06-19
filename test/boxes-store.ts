@@ -1,10 +1,8 @@
 /**
  *  Based on examples/boxes/domain-state.js
  */
-import { types, getParent, hasParent, recordPatches, IJsonPatch, unprotect } from "../src"
+import { types, getParent, hasParent, recordPatches, IJsonPatch, unprotect, getSnapshot } from "../src"
 import { test } from "ava"
-
-const randomUuid = () => Math.random()
 
 export const Box = types.model(
     "Box",
@@ -49,21 +47,21 @@ export const Store = types.model(
         afterCreate() {
             unprotect(this)
         },
-        addBox(name, x, y) {
-            const box = Box.create({ name, x, y, id: randomUuid() })
+        addBox(id, name, x, y) {
+            const box = Box.create({ name, x, y, id })
             this.boxes.put(box)
             return box
         },
-        addArrow(from, to) {
-            this.arrows.push(Arrow.create({ id: randomUuid(), from, to }))
+        addArrow(id, from, to) {
+            this.arrows.push(Arrow.create({ id, from, to }))
         },
         setSelection(selection) {
             this.selection = selection
         },
-        createBox(name, x, y, source) {
-            const box = this.addBox(name, x, y)
+        createBox(id, name, x, y, source, arrowId) {
+            const box = this.addBox(id, name, x, y)
             this.setSelection(box)
-            if (source) this.addArrow(source.id, box.id)
+            if (source) this.addArrow(arrowId, source.id, box.id)
         }
     }
 )
@@ -99,4 +97,50 @@ test("store emits correct patch paths", t => {
     t.deepEqual(recorder1.patches, [{ op: "replace", path: "/boxes/cc/x", value: 217 } as IJsonPatch])
     t.deepEqual(recorder2.patches, [{ op: "replace", path: "/cc/x", value: 217 } as IJsonPatch])
     t.deepEqual(recorder3.patches, [{ op: "replace", path: "/x", value: 217 } as IJsonPatch])
+})
+
+test("box operations works correctly", t => {
+    const s = createStore()
+    s.createBox("a", "A", 0, 0, null, null)
+    s.createBox("b", "B", 100, 100, s.boxes.get("aa"), "aa2b")
+
+    t.deepEqual(getSnapshot(s), {
+        boxes: {
+            cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
+            aa: { id: "aa", name: "Bratislava", x: 650, y: 300 },
+            a: { id: "a", name: "A", x: 0, y: 0 },
+            b: { id: "b", name: "B", x: 100, y: 100 }
+        },
+        arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
+        selection: "b"
+    })
+
+    s.boxes.get("a")!.setName("I'm groot")
+
+    t.deepEqual(getSnapshot(s), {
+        boxes: {
+            cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
+            aa: { id: "aa", name: "Bratislava", x: 650, y: 300 },
+            a: { id: "a", name: "I'm groot", x: 0, y: 0 },
+            b: { id: "b", name: "B", x: 100, y: 100 }
+        },
+        arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
+        selection: "b"
+    })
+
+    s.boxes.get("a")!.move(50, 50)
+
+    t.deepEqual(getSnapshot(s), {
+        boxes: {
+            cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
+            aa: { id: "aa", name: "Bratislava", x: 650, y: 300 },
+            a: { id: "a", name: "I'm groot", x: 50, y: 50 },
+            b: { id: "b", name: "B", x: 100, y: 100 }
+        },
+        arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
+        selection: "b"
+    })
+
+    t.is(s.boxes.get("b")!.width, 15)
+    t.is(Box.create({ id: "hello" }).isSelected, false)
 })
