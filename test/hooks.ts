@@ -116,12 +116,10 @@ const Car = types.model(
     },
     {
         preProcessSnapshot(snapshot) {
-            snapshot.id = parseInt(snapshot.id) * 2
-            return snapshot
+            return { ...snapshot, id: parseInt(snapshot.id) * 2 }
         },
         postProcessSnapshot(snapshot) {
-            snapshot.id = "" + snapshot.id / 2
-            return snapshot
+            return { ...snapshot, id: "" + snapshot.id / 2 }
         }
     }
 )

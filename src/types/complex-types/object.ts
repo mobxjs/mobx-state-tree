@@ -50,17 +50,13 @@ export class ObjectType extends ComplexType<any, any> {
         this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
     }
 
-    create(snapshot: any = this.getDefaultSnapshot(), environment?: any): any {
-        return super.create(this.preProcessSnapshot(snapshot), environment)
-    }
-
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
         return createNode(
             this,
             parent,
             subpath,
             environment,
-            snapshot,
+            this.preProcessSnapshot(snapshot),
             this.createNewInstance,
             this.finalizeNewInstance
         )
@@ -210,11 +206,13 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (!isPlainObject(value)) {
-            return typeCheckFailure(context, value)
+        let snapshot = this.preProcessSnapshot(value)
+
+        if (!isPlainObject(snapshot)) {
+            return typeCheckFailure(context, snapshot)
         }
 
-        return flattenTypeErrors(Object.keys(this.props).map(path => this.props[path].validate(value, context)))
+        return flattenTypeErrors(Object.keys(this.props).map(path => this.props[path].validate(snapshot, context)))
     }
 
     private forAllProps(fn: (o: Property) => void) {
