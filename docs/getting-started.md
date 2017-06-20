@@ -4,6 +4,9 @@ The following tutorial will introduce yourself to the basics of mobx-state-tree 
 ## Prerequisites
 This tutorial assumes that you know the basics of how to use React, so if you don't know what React is and how to use it, you may read first [this tutorial](https://facebook.github.io/react/tutorial/tutorial.html).
 
+### Do I need to learn MobX?
+MST is heavily based on MobX, a basic understanding of the MobX library helps a lot when dealing with complex situations or connecting to React components, but if you don't know it, don't worry, MST itself did'nt require any MobX API.
+
 ## How to follow along the tutorial
 You can write the code for this tutorial in the browser, using the playground, or in your preferred code editor (e.g. VSCode).
 
@@ -298,3 +301,79 @@ const App = observer(props => <div>
 )
 ```
 [View sample in playground](https://goo.gl/V9dqv4)
+
+## Improving render performance
+If you have the React DevTools installed, using the "Highlight Updates" check you will see that the entire application will re-render whenever a todo is toggled or name is changed. That's a shame, and can cause performance issues if there are a lots of todos in our list!
+
+Thanks to the ability of MobX of emitting granular updates, fixing that becomes pretty easy! You just need to split the rendering of a Todo in another component to get only that component re-render whenever the todo data changes.
+
+```javascript
+const TodoView = observer(props => 
+        <div>
+            <input type="checkbox" checked={props.todo.done} onChange={e => props.todo.toggle()} />
+            <input type="text" value={props.todo.name} onChange={e => props.todo.setName(e.target.value)} />
+        </div>)
+
+const AppView = observer(props => 
+        <div>
+            <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
+            {props.store.todos.values().map(todo => <TodoView todo={todo} />)}
+        </div>
+)
+```
+[View sample in playground](https://goo.gl/8vVxeE)
+
+Basically each `observer` declare a React component that will re-render only if any of the observed data changes. Since our App component was observing everything, it was basically re-rendering whenever you changed something.
+
+Now that we have split those rendering logic out in a separate observer, the Todo will re-render only if that todo changes, and App will re-render only if a new todo is added/removed since it's observing only the length of the todo map.
+
+## Computed properties
+
+We now want to display the count of TODOs to be done in our application, to help users know how many TODOs are left. That means that we need to count the number of TODOs with "done" set to false. To do this, we just need to modify the RootStore, and add a getter inside the properties of the model that will count how many TODOs are left.
+
+```javascript
+const RootStore = types.model({
+    users: types.map(User),
+    todos: types.optional(types.map(Todo), {}),
+    get pendingCount() {
+        return this.todos.values().filter(todo => !todo.done).length
+    },
+    get completedCount() {
+        return this.todos.values().filter(todo => todo.done).length
+    }
+}, {
+    addTodo(id, name) {
+        this.todos.set(id, Todo.create({ name }))
+    }
+})
+```
+[View sample in playground](https://goo.gl/TyY6sZ)
+
+Those properties are called "computed" because they keep track of the changes of the observed fields and recompute automatically if any of that field changes. This allows performance savings; for example changing the name of a TODO won't affect the number of pending and completed count, so it wont trigger a recalculation of those counters.
+
+We can easily see that by creating an additional component in our application that observes the store and renders those counters. Using the React Dev Tools and tracing updates, you'll see that changing the name of a TODO won't re-render that counters, while checking completed or uncompleted will re-render the todo and the counters.
+
+```javascript
+const TodoCounterView = observer(props => 
+        <div>
+            {props.store.pendingCount} pending, {props.store.completedCount} completed
+        </div>
+)
+
+const AppView = observer(props => 
+        <div>
+            <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
+            {props.store.todos.values().map(todo => <TodoView todo={todo} />)}
+            <TodoCounterView store={props.store} />
+        </div>
+)
+```
+[View sample in playground](https://goo.gl/K1kFU7)
+
+If you're using the playground, you'll notice that computed properties won't appear in snapshots. Thats fine and intended, since those properties must be computed over the other properties of the tree, they can be reproduced by knowing just their definition. For the same reason, if you provide a computed value in a snapshot you'll end up having an error while applying it.
+
+## Model views
+WIP
+
+## Going further: References
+Ok, the basics of our TODO application are done! But as said when starting this tutorial, we want to be able to provide assingees for each of our todo!
