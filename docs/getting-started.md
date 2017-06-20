@@ -562,3 +562,10 @@ const AppView = observer(props =>
 )
 ```
 [View sample in playground](http://tinyurl.com/ybmwwny6)
+
+## References are safe!
+One neat feature of references, is that they will throw if you accidentally remove a model that is required by a computed! If you try to remove a user that's used by a reference, you'll get something like this:
+
+```
+[mobx-state-tree] Failed to resolve reference of type <late>: '1' (in: /todos/1/user)
+```
