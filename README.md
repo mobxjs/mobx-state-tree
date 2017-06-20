@@ -26,6 +26,7 @@
   * [References and identifiers](#references-and-identifiers)
   * [Listening to observables, snapshots, patches or actions](#listening-to-observables-snapshots-patches-or-actions)
   * [Volatile state](#volatile-state)
+  * [Dependency injection](#dependency-injection)
 * [Types overview](#types-overview)
 * [Api overview](#api-overview)
 * [Tips](#tips)
@@ -502,6 +503,49 @@ To initialize a volatile file, either:
 1. Supply a primitive value (`pendingRequest: null`)
 2. Use `afterCreate` to initialize the field (as done above)
 3. Use provide a function to produce the first value. Both the scope and first argument of that function will be the target instance. Requiring a function avoids accident sharing of a non-primitive value accross all instances of a type. Example: `pendingRequest: (instance) => someXhrLib.createRequest("http://endpoint/" + instance.id)`
+
+## Dependency injection
+
+When creating a new state tree it is possible to pass in environment specific data by passing an object as second argument to a `.create` call.
+This object should be (shallowly) immutable and can be accessed by any model in the tree by calling `getEnv(this)`.
+
+This is useful to inject environment or test specific utilities like a transport layer, loggers etc. This is a very useful to mock behavior in unit tests or provide instantiated utilties to models without requiring singleton modules.
+See also the (bookshop example)[https://github.com/mobxjs/mobx-state-tree/blob/a4f25de0c88acf0e239acb85e690e91147a8f0f0/examples/bookshop/src/stores/ShopStore.test.js#L9] for inspiration.
+
+```
+import { types, getEnv } from "mobx-state-tree"
+
+const Todo = types.model({
+    title: ""
+}, {
+    setTitle(newTitle) {
+        // grab injected logger and log
+        getEnv(this).logger.log("Changed title to: " + newTitle)
+        this.title = newTitle
+    }
+})
+
+const Store = types.model({
+    todos: types.array(Todo)
+})
+
+// setup logger and inject it when the store is created
+const logger = {
+    log(msg) {
+        console.log(msg)
+    }
+}
+
+const store = Store.create({
+    todos: [{ title: "Grab tea" }]
+}, {
+    logger: logger // inject logger to the tree
+})
+
+store.todos[0].setTitle("Grab coffee")
+// prints: Changed title to: Grab coffee
+```
+
 
 # Types overview
 
