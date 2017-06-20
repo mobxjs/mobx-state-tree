@@ -85,8 +85,8 @@ const User = types.model({
 const john = User.create()
 const eat = Todo.create()
 
-console.log("John:", JSON.stringify(john))
-console.log("Eat TODO:", JSON.stringify(eat))
+console.log("John:", john.toJSON())
+console.log("Eat TODO:", eat.toJSON())
 
 ```
 [View sample in playground](https://goo.gl/6xVqf8)
@@ -96,7 +96,7 @@ As you will see, using models ensures that all the fields defined will be always
 ```javascript
 const eat = Todo.create({ name: "eat" })
 
-console.log("Eat TODO:", JSON.stringify(eat)) // => will print {name: "eat", done: false}
+console.log("Eat TODO:", eat.toJSON()) // => will print {name: "eat", done: false}
 ```
 [View sample in playground](https://goo.gl/KmhmEP)
 
@@ -213,6 +213,8 @@ console.log(getSnapshot(store))
 }
 */
 ```
+
+Note: The `.toJSON()` you have used before in the tutorial is just a shortcut to `getSnapshot`!
 
 And because the nature of state is mutable, snapshot will be emitted whenever the state is mutated! To listen to those new snapshot, you can use `onSnapshot(store, snapshot => console.log(snapshot))` to log them as they are emitted!
 
@@ -373,7 +375,190 @@ const AppView = observer(props =>
 If you're using the playground, you'll notice that computed properties won't appear in snapshots. Thats fine and intended, since those properties must be computed over the other properties of the tree, they can be reproduced by knowing just their definition. For the same reason, if you provide a computed value in a snapshot you'll end up having an error while applying it.
 
 ## Model views
-WIP
+You may need to use the list of todos filtered by completion in various locations in your application. Even if accessing the list of todos and filter them every time may look a viable solution, if the filter logic is complex or changes over time you'll find out yourself that that's not a viable solution.
+
+MST solves that by providing the ability to declare model views. A model views is declared as function over the properties (first argument) of the model declaration. Model views can accept parameters and only read data from our store. If you try to change your store from a model view, MST will throw and prevent your from doing that.
+
+```javascript
+const RootStore = types.model({
+    users: types.map(User),
+    todos: types.optional(types.map(Todo), {}),
+    get pendingCount() {
+        return this.getTodosWhereDoneIs(false).length
+    },
+    get completedCount() {
+        return this.getTodosWhereDoneIs(true).length
+    },
+    getTodosWhereDoneIs(done) {
+        return this.todos.values().filter(todo => todo.done === done)
+    }
+}, {
+    addTodo(id, name) {
+        this.todos.set(id, Todo.create({ name }))
+    }
+})
+```
+[View sample in playground](https://goo.gl/LFYig4)
+
+Notice that the `getTodosWhereDoneIs` view can also be used outside of its model, for example it can be used inside views.
 
 ## Going further: References
 Ok, the basics of our TODO application are done! But as said when starting this tutorial, we want to be able to provide assingees for each of our todo!
+
+We will focus on the feature; to do that let's assume that the list of the users cames from an XHR request or other data sources. Feel free to either implement it or add to the todo application an user management part.
+
+First, we need to populate the users map. To do so, we will simply pass in some users when creating the users map.
+
+```javascript
+const store = RootStore.create({
+    "users": {
+        "1": {
+            name: "mweststrate"
+        },
+        "2": {
+            name: "mattiamanzati"
+        },
+        "3": {
+            name: "johndoe"
+        }
+    },
+    "todos": {
+        "1": {
+            "name": "Eat a cake",
+            "done": true
+        }
+    }
+})
+```
+[View sample in playground](https://goo.gl/TyR6jt)
+
+Now we need to change our Todo model to store the user assigned to that task. You could do that by storing the User map id, and provide a computed that resolves to the user (you can do it for exercise), but would end up being a copious amount of lines of code.
+
+MST supports references out of the box. That means that we can define a "user" attribute on the Todo model, that's a reference to an User. When getting the snapshot the value of that attribute will be the identifier of the User, while when reading it will resolve to the correct instance of the User model and when setting you could provide either the User model instance or the User identifier.
+
+### Identifiers
+In order to make our reference work, we first need to set up identifier in the targetted model Type of the reference. We need to tell MST which attribute is the identifier of the user.
+
+The identifier attribute cannot be mutated once the model instance has been created. That also means that if you try to apply a snapshot with a different identifier on that model, it will throw. On the other hand, providing identifier helps MST understand elements in maps and arrays, and allows to correctly reuse model instances in arrays/maps when possible.
+
+To define an identifier, you just need to define a property using the `types.identifier` type composer. For example, we want the identifier to be a string.
+
+```javascript
+const User = types.model({
+    id: types.identifier(types.string),
+    name: types.optional(types.string, "")
+})
+```
+
+As said before, identifiers are required upon creation of the element and cannot be mutated, so if you end up receiving an error like this, that's because you also need to provide ids for the users in the snapshot for the .create of the RootStore.
+
+```
+Error: [mobx-state-tree] Error while converting `{"users":{"1":{"name":"mweststrate"},"2":{"name":"mattiamanzati"},"3":{"name":"johndoe"}},"todos":{"1":{"name":"Eat a cake","done":true}}}` to `AnonymousModel`:
+at path "/users/1/id" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.
+at path "/users/2/id" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.
+at path "/users/3/id" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.
+```
+so we can easily fix that by providing a correct snapshot.
+```javascript
+const store = RootStore.create({
+    "users": {
+        "1": {
+            id: "1",
+            name: "mweststrate"
+        },
+        "2": {
+            id: "2",
+            name: "mattiamanzati"
+        },
+        "3": {
+            id: "3",
+            name: "johndoe"
+        }
+    },
+    "todos": {
+        "1": {
+            "name": "Eat a cake",
+            "done": true
+        }
+    }
+})
+```
+[View sample in playground](http://tinyurl.com/y89w4xnj)
+
+### How to define the reference
+The reference we are looking for can be easily defined as `types.reference(User)`. Sometimes this can lead to circular references that may use a type before it's declared. To postpone the resolution of the type, you can use `types.late(() => User)` instead of just `User` and that will hoist the type and defer its evaluation. The user assignee for the Todo could also be omitted, so we will use `types.maybe(...)` to allow the user property to be null and be initialized as null.
+
+```javascript
+const Todo = types.model({
+    name: types.optional(types.string, ""),
+    done: types.optional(types.boolean, false),
+    user: types.maybe(types.reference(types.late(() => User)))
+}, {
+    setName(newName) {
+        this.name = newName
+    },
+    toggle() {
+        this.done = !this.done
+    }
+})
+```
+[View sample in playground](http://tinyurl.com/yb48a6yn)
+
+### Setting a reference value
+The reference value can be set by providing either the identifier or a model instance. First of all, we need to define an action that allows to change the user of the todo.
+
+```javascript
+const Todo = types.model({
+    name: types.optional(types.string, ""),
+    done: types.optional(types.boolean, false),
+    user: types.maybe(types.reference(types.late(() => User)))
+}, {
+    setName(newName) {
+        this.name = newName
+    },
+    setUser(user) {
+        if (user === "") { // When selected value is empty, set as null
+            this.user = null
+        } else {
+            this.user = user
+        }
+    },
+    toggle() {
+        this.done = !this.done
+    }
+})
+```
+
+Now we need to edit our views to display a select along each todo, where the user can chose the assignee for that task. To do so, we will create a separate component (the UserPickerView) and use it inside the TodoView component to trigger the setUser call. That's it!
+
+```javascript
+const UserPickerView = observer(props => 
+    <select value={props.user ? props.user.id : ""} onChange={e => props.onChange(e.target.value)}>
+        <option value="">-none-</option>
+        {props.store.users.values().map(user => <option value={user.id}>{user.name}</option>)}
+    </select>
+)
+
+const TodoView = observer(props => 
+        <div>
+            <input type="checkbox" checked={props.todo.done} onChange={e => props.todo.toggle()} />
+            <input type="text" value={props.todo.name} onChange={e => props.todo.setName(e.target.value)} />
+            <UserPickerView user={props.todo.user} store={props.store} onChange={userId => props.todo.setUser(userId)} />
+        </div>
+)
+
+const TodoCounterView = observer(props => 
+        <div>
+            {props.store.pendingCount} pending, {props.store.completedCount} completed
+        </div>
+)
+
+const AppView = observer(props => 
+        <div>
+            <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
+            {props.store.todos.values().map(todo => <TodoView store={props.store} todo={todo} />)}
+            <TodoCounterView store={props.store} />
+        </div>
+)
+```
+[View sample in playground](http://tinyurl.com/ybmwwny6)
