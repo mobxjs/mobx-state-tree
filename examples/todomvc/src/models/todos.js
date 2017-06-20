@@ -23,7 +23,13 @@ const Todo = types.model(
 
 const TodoStore = types.model(
     {
-        todos: types.array(Todo)
+        todos: types.array(Todo),
+        get completedCount() {
+            return this.todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0)
+        },
+        get activeCount() {
+            return this.todos.length - this.completedCount
+        }
     },
     {
         // actions

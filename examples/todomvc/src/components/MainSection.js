@@ -26,7 +26,7 @@ export default observer(
             this.setState({ filter })
         }
 
-        renderToggleAll(completedCount) {
+        renderToggleAll() {
             const { store } = this.props
             if (store.todos.length > 0) {
                 return (
@@ -35,7 +35,7 @@ export default observer(
                             className="toggle-all"
                             id="toggle-all"
                             type="checkbox"
-                            checked={completedCount === store.todos.length}
+                            checked={store.completedCount === store.todos.length}
                             onChange={() => store.completeAll()}
                         />
                         <label htmlFor="toggle-all">Mark all as complete</label>
@@ -45,20 +45,11 @@ export default observer(
         }
 
         renderFooter(completedCount) {
-            const { todos } = this.props.store
+            const { store } = this.props
             const { filter } = this.state
-            const activeCount = todos.length - completedCount
 
-            if (todos.length) {
-                return (
-                    <Footer
-                        completedCount={completedCount}
-                        activeCount={activeCount}
-                        filter={filter}
-                        onClearCompleted={this.handleClearCompleted.bind(this)}
-                        onShow={this.handleShow.bind(this)}
-                    />
-                )
+            if (store.todos.length) {
+                return <Footer filter={filter} store={store} onShow={this.handleShow} />
             }
         }
 
@@ -67,15 +58,14 @@ export default observer(
             const { filter } = this.state
 
             const filteredTodos = todos.filter(TODO_FILTERS[filter])
-            const completedCount = todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0)
 
             return (
                 <section className="main">
-                    {this.renderToggleAll(completedCount)}
+                    {this.renderToggleAll()}
                     <ul className="todo-list">
                         {filteredTodos.map(todo => <TodoItem key={todo.id} todo={todo} />)}
                     </ul>
-                    {this.renderFooter(completedCount)}
+                    {this.renderFooter()}
                 </section>
             )
         }
