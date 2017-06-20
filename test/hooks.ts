@@ -126,6 +126,10 @@ const Car = types.model(
     }
 )
 
+const Factory = types.model({
+    car: Car
+})
+
 test("it should preprocess snapshots when creating", t => {
     const car = Car.create({ id: "1" })
     t.is(car.id, 2)
@@ -141,6 +145,25 @@ test("it should preprocess snapshots when updating", t => {
 test("it should postprocess snapshots when generating snapshot", t => {
     const car = Car.create({ id: "1" })
     t.is(car.id, 2)
-    debugger
     t.deepEqual(getSnapshot(car), { id: "1" })
+})
+
+test("it should preprocess snapshots when creating as property type", t => {
+    const f = Factory.create({
+        car: { id: "1" }
+    })
+    t.is(f.car.id, 2)
+})
+
+test("it should preprocess snapshots when updating", t => {
+    const f = Factory.create({ car: { id: "1" } })
+    t.is(f.car.id, 2)
+    applySnapshot(f, { car: { id: "6" } })
+    t.is(f.car.id, 12)
+})
+
+test("it should postprocess snapshots when generating snapshot", t => {
+    const f = Factory.create({ car: { id: "1" } })
+    t.is(f.car.id, 2)
+    t.deepEqual(getSnapshot(f), { car: { id: "1" } })
 })
