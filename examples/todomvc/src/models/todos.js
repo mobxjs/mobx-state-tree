@@ -2,9 +2,9 @@ import { types, destroy } from "mobx-state-tree"
 
 const Todo = types.model(
     {
-        text: "Learn Redux",
+        text: types.string,
         completed: false,
-        id: 0
+        id: types.identifier(types.number)
     },
     {
         remove() {
