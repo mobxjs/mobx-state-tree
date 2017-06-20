@@ -182,6 +182,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
 
     @action
     applySnapshot(node: Node, snapshot: any): void {
+        typecheck(this, snapshot)
         node.pseudoAction(() => {
             const target = node.storedValue as ObservableMap<any>
             const currentKeys: { [key: string]: boolean } = {}

@@ -513,7 +513,7 @@ This object should be (shallowly) immutable and can be accessed by any model in 
 This is useful to inject environment or test specific utilities like a transport layer, loggers etc. This is a very useful to mock behavior in unit tests or provide instantiated utilties to models without requiring singleton modules.
 See also the (bookshop example)[https://github.com/mobxjs/mobx-state-tree/blob/a4f25de0c88acf0e239acb85e690e91147a8f0f0/examples/bookshop/src/stores/ShopStore.test.js#L9] for inspiration.
 
-```
+```javascript
 import { types, getEnv } from "mobx-state-tree"
 
 const Todo = types.model({

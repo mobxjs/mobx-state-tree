@@ -1,4 +1,4 @@
-import { detach, types, destroy, addDisposer, unprotect } from "../src"
+import { addDisposer, destroy, detach, types, unprotect, getSnapshot, applySnapshot } from "../src"
 import { test } from "ava"
 
 function createTestStore(listener) {
@@ -108,4 +108,39 @@ test("it should trigger lifecycle hooks", t => {
         "custom disposer 1 for Give talk",
         "destroy todo: Give talk"
     ])
+})
+
+const Car = types.model(
+    {
+        id: types.number
+    },
+    {
+        preProcessSnapshot(snapshot) {
+            snapshot.id = parseInt(snapshot.id) * 2
+            return snapshot
+        },
+        postProcessSnapshot(snapshot) {
+            snapshot.id = "" + snapshot.id / 2
+            return snapshot
+        }
+    }
+)
+
+test("it should preprocess snapshots when creating", t => {
+    const car = Car.create({ id: "1" })
+    t.is(car.id, 2)
+})
+
+test("it should preprocess snapshots when updating", t => {
+    const car = Car.create({ id: "1" })
+    t.is(car.id, 2)
+    applySnapshot(car, { id: "6" })
+    t.is(car.id, 12)
+})
+
+test("it should postprocess snapshots when generating snapshot", t => {
+    const car = Car.create({ id: "1" })
+    t.is(car.id, 2)
+    debugger
+    t.deepEqual(getSnapshot(car), { id: "1" })
 })
