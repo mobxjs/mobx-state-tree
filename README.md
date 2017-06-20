@@ -15,6 +15,7 @@
 * [Installation](#installation)
 * [Philosophy & Overview](#philosophy--overview)
 * [MST overview for the impatient](#quick-overview-for-the-impatient)
+* [Getting Started](docs/getting-started.md)
 * [Concepts](#concepts)
   * [Trees, types and state](#trees-types-and-state)
   * [Creating models](#construction-models)
