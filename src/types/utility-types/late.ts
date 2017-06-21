@@ -1,5 +1,6 @@
 import { fail } from "../../utils"
-import { Type, IType, TypeFlags } from "../type"
+import { Type, IType } from "../type"
+import { TypeFlags } from "../type-flags"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { Node } from "../../core"
 
@@ -8,7 +9,7 @@ export class Late<S, T> extends Type<S, T> {
     private _subType: IType<S, T> | null = null
 
     get flags() {
-        return this.subType.flags
+        return this.subType.flags | TypeFlags.Late
     }
 
     get subType(): IType<S, T> {

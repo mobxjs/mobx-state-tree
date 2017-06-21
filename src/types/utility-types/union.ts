@@ -1,4 +1,5 @@
-import { isType, IType, TypeFlags, Type } from "../type"
+import { IType, Type } from "../type"
+import { isType, TypeFlags } from "../type-flags"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors } from "../type-checker"
 import { fail } from "../../utils"
 import { Node } from "../../core"
@@ -10,7 +11,7 @@ export class Union extends Type<any, any> {
     readonly types: IType<any, any>[]
 
     get flags() {
-        let result: TypeFlags = 0
+        let result: TypeFlags = TypeFlags.Union
 
         this.types.forEach(type => {
             result |= type.flags

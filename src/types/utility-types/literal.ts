@@ -1,4 +1,5 @@
-import { ISimpleType, TypeFlags, Type } from "../type"
+import { ISimpleType, Type } from "../type"
+import { TypeFlags } from "../type-flags"
 import { fail, isPrimitive } from "../../utils"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { Node, createNode } from "../../core"

@@ -1,21 +1,7 @@
 import { action } from "mobx"
+import { TypeFlags } from "./type-flags"
 
 export interface ISnapshottable<S> {}
-
-export enum TypeFlags {
-    String = 1 << 0,
-    Number = 1 << 1,
-    Boolean = 1 << 2,
-    Date = 1 << 3,
-    Literal = 1 << 4,
-    Array = 1 << 5,
-    Map = 1 << 6,
-    Object = 1 << 7,
-    Frozen = 1 << 8,
-    Optional = 1 << 9,
-    Reference = 1 << 10,
-    Identifier = 1 << 11
-}
 
 export interface IType<S, T> {
     name: string
@@ -45,10 +31,6 @@ export interface IType<S, T> {
 export interface ISimpleType<T> extends IType<T, T> {}
 
 export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IComplexValue> {}
-
-export function isType(value: any): value is IType<any, any> {
-    return typeof value === "object" && value && value.isType === true
-}
 
 /**
  * A complex type produces a MST node (Node in the state tree)

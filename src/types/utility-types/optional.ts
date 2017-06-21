@@ -1,4 +1,5 @@
-import { Type, IType, TypeFlags } from "../type"
+import { Type, IType } from "../type"
+import { TypeFlags } from "../type-flags"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
 

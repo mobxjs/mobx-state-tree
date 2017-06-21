@@ -12,7 +12,8 @@ import {
 } from "mobx"
 import { createNode, getStateTreeNode, IJsonPatch, Node } from "../../core"
 import { addHiddenFinalProp, fail } from "../../utils"
-import { ComplexType, IComplexType, isType, IType, TypeFlags } from "../type"
+import { ComplexType, IComplexType, IType } from "../type"
+import { TypeFlags } from "../type-flags"
 import {
     typecheck,
     flattenTypeErrors,
@@ -205,8 +206,4 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
 export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
     return new ArrayType<S, T>(subtype.name + "[]", subtype)
-}
-
-export function isArrayFactory<S, T>(type: any): type is IComplexType<S[], IObservableArray<T>> {
-    return isType(type) && ((type as IType<any, any>).flags & TypeFlags.Array) > 0
 }

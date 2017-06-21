@@ -1,5 +1,6 @@
 import { getStateTreeNode, isStateTreeNode, Node, createNode } from "../../core"
-import { TypeFlags, Type, IType } from "../type"
+import { Type, IType } from "../type"
+import { TypeFlags, isReferenceType } from "../type-flags"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, prettyPrintValue } from "../type-checker"
 import { fail } from "../../utils"
 
@@ -87,10 +88,10 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
         return typeof value === "string" || typeof value === "number"
             ? typeCheckSuccess()
             : typeCheckFailure(
-                context,
-                value,
-                `Value '${prettyPrintValue(value)}' is not a valid reference. Expected a string or number.`
-            )
+                  context,
+                  value,
+                  `Value '${prettyPrintValue(value)}' is not a valid reference. Expected a string or number.`
+              )
     }
 }
 
@@ -100,8 +101,4 @@ export function reference<T>(factory: IType<any, T>): any {
     if (arguments.length === 2 && typeof arguments[1] === "string")
         fail("References with base path are no longer supported. Please remove the base path.")
     return new ReferenceType(factory)
-}
-
-export function isReferenceType(type: any): type is ReferenceType<any> {
-    return (type.flags & TypeFlags.Reference) > 0
 }

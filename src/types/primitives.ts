@@ -1,4 +1,5 @@
-import { ISimpleType, TypeFlags, Type } from "./type"
+import { ISimpleType, Type } from "./type"
+import { TypeFlags } from "./type-flags"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
 import { isPrimitive, fail } from "../utils"
 import { Node, createNode } from "../core"
@@ -71,8 +72,4 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
             if (value instanceof Date) return DatePrimitive
     }
     return fail("Cannot determine primtive type from value " + value)
-}
-
-export function isPrimitiveType(type: any): type is CoreType<any> {
-    return (type.flags & (TypeFlags.String | TypeFlags.Number | TypeFlags.Boolean | TypeFlags.Date)) > 0
 }

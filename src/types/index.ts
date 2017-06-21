@@ -3,6 +3,8 @@ import { IObservableArray, ObservableMap, IAction } from "mobx"
 // tslint:disable-next-line:no_unused-variable
 import { IType, ISimpleType, IComplexType } from "./type"
 // tslint:disable-next-line:no_unused-variable
+import { TypeFlags } from "./type-flags"
+// tslint:disable-next-line:no_unused-variable
 import { map, IExtendedObservableMap } from "./complex-types/map"
 import { array } from "./complex-types/array"
 import { identifier } from "./utility-types/identifier"
@@ -18,7 +20,7 @@ import { frozen } from "./utility-types/frozen"
 import { boolean, DatePrimitive, number, string } from "./primitives"
 import { late } from "./utility-types/late"
 
-export { IType }
+export { IType, TypeFlags }
 
 export const types = {
     model,

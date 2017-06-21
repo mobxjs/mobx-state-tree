@@ -1,7 +1,8 @@
 import { observable, ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, extras } from "mobx"
 import { getStateTreeNode, escapeJsonPath, IJsonPatch, Node, createNode, isStateTreeNode } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
+import { IType, IComplexType, ComplexType } from "../type"
+import { TypeFlags } from "../type-flags"
 import {
     IContext,
     IValidationResult,
@@ -125,7 +126,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
 
     private verifyIdentifier(expected: string, node: Node) {
         const identifier = node.identifier
-        if (identifier !== null && identifier != expected)
+        if (identifier !== null && "" + identifier !== "" + expected)
             fail(
                 `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
             )
@@ -227,8 +228,4 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
 
 export function map<S, T>(subtype: IType<S, T>): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
     return new MapType<S, T>(`map<string, ${subtype.name}>`, subtype)
-}
-
-export function isMapFactory<S, T>(type: any): type is IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
-    return isType(type) && ((type as IType<any, any>).flags & TypeFlags.Map) > 0
 }

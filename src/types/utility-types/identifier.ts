@@ -1,9 +1,9 @@
-import { TypeFlags, Type, IType } from "../type"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, typecheck } from "../type-checker"
+import { Type, IType } from "../type"
+import { TypeFlags } from "../type-flags"
+import { IContext, IValidationResult } from "../type-checker"
 import { fail } from "../../utils"
 import { Node, createNode, isStateTreeNode } from "../../core"
 import { string as stringType, number as numberType } from "../primitives"
-import { Late } from "./late"
 
 class Identifier {
     constructor(public identifier: string | number) {}
@@ -55,10 +55,4 @@ export function identifier(baseType: IType<any, any> = stringType): any {
     if (baseType !== stringType && baseType !== numberType)
         fail(`Only 'types.number' and 'types.string' are acceptable as type specification for identifiers`)
     return new IdentifierType(baseType)
-}
-
-export function isIdentifierType(type: any): type is IdentifierType<any> {
-    return (
-        !(type instanceof Late) && (type.flags & TypeFlags.Identifier) > 0 // yikes
-    )
 }

@@ -1,14 +1,15 @@
-import { IType, Type, TypeFlags } from "../type"
+import { IType, Type } from "../type"
+import { TypeFlags } from "../type-flags"
 import { fail } from "../../utils"
 import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
-export class Refinement extends Type<any, any> {
+export class Refinement<S, T> extends Type<S, T> {
     readonly type: IType<any, any>
     readonly predicate: (v: any) => boolean
 
     get flags() {
-        return this.type.flags
+        return this.type.flags | TypeFlags.Refinement
     }
 
     constructor(name: string, type: IType<any, any>, predicate: (v: any) => boolean) {

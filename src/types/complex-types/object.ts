@@ -1,6 +1,7 @@
 import { action, extendShallowObservable, IObjectChange, IObjectWillChange, intercept, observe } from "mobx"
 import { extendKeepGetter, fail, hasOwnProperty, isPlainObject, isPrimitive } from "../../utils"
-import { ComplexType, IComplexType, isType, IType, TypeFlags } from "../type"
+import { ComplexType, IComplexType, IType } from "../type"
+import { TypeFlags, isType, isObjectType } from "../type-flags"
 import { createNode, getStateTreeNode, IComplexValue, IJsonPatch, Node } from "../../core"
 import { flattenTypeErrors, IContext, IValidationResult, typecheck, typeCheckFailure } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
@@ -361,15 +362,11 @@ export function compose(...args: any[]) {
     const volatileState = (args.length > 1 && args.shift()) || {}
     const actions = args.shift() || {}
 
-    if (!isObjectFactory(baseType)) return fail(`Only model types can be composed`)
+    if (!isObjectType(baseType)) return fail(`Only model types can be composed`)
     return model(
         typeName,
         extendKeepGetter({}, baseType.properties, props),
         extendKeepGetter({}, baseType.state, volatileState),
         extendKeepGetter({}, baseType.actions, actions)
     )
-}
-
-export function isObjectFactory(type: any): type is ObjectType {
-    return isType(type) && ((type as IType<any, any>).flags & TypeFlags.Object) > 0
 }

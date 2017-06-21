@@ -1,4 +1,5 @@
-import { ISimpleType, TypeFlags, Type } from "../type"
+import { ISimpleType, Type } from "../type"
+import { TypeFlags } from "../type-flags"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { isSerializable, deepFreeze } from "../../utils"
 import { createNode, Node } from "../../core"

@@ -35,7 +35,7 @@ function toErrorString(error: IValidationError): string {
             : ``}` +
         (error.message ? ` (${error.message})` : "") +
         (type
-            ? (type.flags & (TypeFlags.String | TypeFlags.Number | TypeFlags.Boolean | TypeFlags.Date)) > 0
+            ? isPrimitiveType(type)
               ? `.`
               : `, expected an instance of \`${type.name}\` or a snapshot like \`${type.describe()}\` instead.` +
                     (isSnapshotCompatible
@@ -77,8 +77,7 @@ export function typecheck(type: IType<any, any>, value: any): void {
     }
 }
 
-import { IType, TypeFlags } from "./type"
+import { IType } from "./type"
 import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
 import { getStateTreeNode, isStateTreeNode } from "../core"
-import { isPrimitiveType } from "./primitives"
-import { OptionalValue } from "./utility-types/optional"
+import { isPrimitiveType } from "./type-flags"
