@@ -1,6 +1,7 @@
-# Next
+# 0.8.0
 
-* **BREAKING** Dropped types.extend in favor of types.compose
+* **BREAKING** Dropped `types.extend` in favor of `types.compose`. See [#192](https://github.com/mobxjs/mobx-state-tree/issues/192)
+* Introduced the lifecycle hooks `preProcessSnapshot` and `postProcessSnapshot`. See [#203](https://github.com/mobxjs/mobx-state-tree/pull/203) / [#100](https://github.com/mobxjs/mobx-state-tree/issues/100)
 
 # 0.7.3
 
