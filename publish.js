@@ -6,6 +6,7 @@ module.exports = function(shell, npm, git) {
     npm("run", "_prepublish")
 
     var pkg = JSON.parse(shell.read("package.json"))
+    npm("run", "build")
 
     // Bump version number
     var nrs = pkg.version.split(".")

@@ -1,3 +1,7 @@
+# 0.8.1
+
+* Fixed issue in release script, rendering 0.8.0 useless
+
 # 0.8.0
 
 * **BREAKING** Dropped `types.extend` in favor of `types.compose`. See [#192](https://github.com/mobxjs/mobx-state-tree/issues/192)

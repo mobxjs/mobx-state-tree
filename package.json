@@ -7,7 +7,7 @@
   "module": "dist/mobx-state-tree.module.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run quick-build && cpr lib dist --delete-first --filter=.js && rollup -o rollup.log -c",
+    "build": "npm run quick-build && cpr lib dist --delete-first --filter=\\\\.js && rollup -c",
     "quick-build": "tsc",
     "rollup": "rollup -c",
     "build-tests": "tsc -p test/",
