@@ -21,22 +21,22 @@
 -   [detach](#detach)
 -   [destroy](#destroy)
 -   [walk](#walk)
+-   [applyAction](#applyaction)
 -   [escapeJsonPath](#escapejsonpath)
 -   [unescapeJsonPath](#unescapejsonpath)
--   [applyAction](#applyaction)
 -   [get](#get)
 -   [pseudoAction](#pseudoaction)
 -   [ComplexType](#complextype)
 
 ## props
 
-[lib/types/complex-types/object.js:26-26](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/types/complex-types/object.js#L26-L26 "Source code on GitHub")
+[lib/types/complex-types/object.js:27-27](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/types/complex-types/object.js#L27-L27 "Source code on GitHub")
 
 Parsed description of all properties
 
 ## addMiddleware
 
-[lib/core/mst-operations.js:49-54](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L49-L54 "Source code on GitHub")
+[lib/core/mst-operations.js:49-54](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L49-L54 "Source code on GitHub")
 
 TODO: update docs
 Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
@@ -80,7 +80,7 @@ Returns **IDisposer** function to remove the middleware
 
 ## onPatch
 
-[lib/core/mst-operations.js:65-67](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L65-L67 "Source code on GitHub")
+[lib/core/mst-operations.js:65-67](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L65-L67 "Source code on GitHub")
 
 Registers a function that will be invoked for each that as made to the provided model instance, or any of it's children.
 See 'patches' for more details. onPatch events are emitted immediately and will not await the end of a transaction.
@@ -95,7 +95,7 @@ Returns **IDisposer** function to remove the listener
 
 ## applyPatch
 
-[lib/core/mst-operations.js:79-81](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L79-L81 "Source code on GitHub")
+[lib/core/mst-operations.js:79-81](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L79-L81 "Source code on GitHub")
 
 Applies a JSON-patch to the given model instance or bails out if the patch couldn't be applied
 
@@ -106,7 +106,7 @@ Applies a JSON-patch to the given model instance or bails out if the patch could
 
 ## applyPatches
 
-[lib/core/mst-operations.js:89-94](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L89-L94 "Source code on GitHub")
+[lib/core/mst-operations.js:89-94](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L89-L94 "Source code on GitHub")
 
 Applies a number of JSON patches in a single MobX transaction
 TODO: merge with applyPatch
@@ -118,7 +118,7 @@ TODO: merge with applyPatch
 
 ## applyActions
 
-[lib/core/mst-operations.js:119-123](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L119-L123 "Source code on GitHub")
+[lib/core/mst-operations.js:119-123](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L119-L123 "Source code on GitHub")
 
 Applies a series of actions in a single MobX transaction.
 TODO: just merge with applyAction
@@ -133,7 +133,7 @@ Does not return any value
 
 ## protect
 
-[lib/core/mst-operations.js:155-158](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L155-L158 "Source code on GitHub")
+[lib/core/mst-operations.js:155-158](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L155-L158 "Source code on GitHub")
 
 By default it is allowed to both directly modify a model or through an action.
 However, in some cases you want to guarantee that the state tree is only modified through actions.
@@ -163,7 +163,7 @@ todo.toggle() // OK
 
 ## isProtected
 
-[lib/core/mst-operations.js:166-168](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L166-L168 "Source code on GitHub")
+[lib/core/mst-operations.js:166-168](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L166-L168 "Source code on GitHub")
 
 Returns true if the object is in protected mode, @see protect
 
@@ -173,7 +173,7 @@ Returns true if the object is in protected mode, @see protect
 
 ## applySnapshot
 
-[lib/core/mst-operations.js:177-179](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L177-L179 "Source code on GitHub")
+[lib/core/mst-operations.js:177-179](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L177-L179 "Source code on GitHub")
 
 Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
 
@@ -184,7 +184,7 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 
 ## hasParent
 
-[lib/core/mst-operations.js:191-202](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L191-L202 "Source code on GitHub")
+[lib/core/mst-operations.js:191-202](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L191-L202 "Source code on GitHub")
 
 Given a model instance, returns `true` if the object has a parent, that is, is part of another object, map or array
 
@@ -197,7 +197,7 @@ Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ## getPath
 
-[lib/core/mst-operations.js:226-228](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L226-L228 "Source code on GitHub")
+[lib/core/mst-operations.js:226-228](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L226-L228 "Source code on GitHub")
 
 Returns the path of the given object in the model tree
 
@@ -209,7 +209,7 @@ Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ## getPathParts
 
-[lib/core/mst-operations.js:236-238](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L236-L238 "Source code on GitHub")
+[lib/core/mst-operations.js:236-238](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L236-L238 "Source code on GitHub")
 
 Returns the path of the given object as unescaped string array
 
@@ -221,7 +221,7 @@ Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refere
 
 ## isRoot
 
-[lib/core/mst-operations.js:246-248](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L246-L248 "Source code on GitHub")
+[lib/core/mst-operations.js:246-248](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L246-L248 "Source code on GitHub")
 
 Returns true if the given object is the root of a model tree
 
@@ -233,7 +233,7 @@ Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ## resolvePath
 
-[lib/core/mst-operations.js:257-262](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L257-L262 "Source code on GitHub")
+[lib/core/mst-operations.js:257-262](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L257-L262 "Source code on GitHub")
 
 Resolves a path relatively to a given object.
 
@@ -246,7 +246,7 @@ Returns **any**
 
 ## tryResolve
 
-[lib/core/mst-operations.js:277-282](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L277-L282 "Source code on GitHub")
+[lib/core/mst-operations.js:277-282](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L277-L282 "Source code on GitHub")
 
 **Parameters**
 
@@ -257,7 +257,7 @@ Returns **any**
 
 ## clone
 
-[lib/core/mst-operations.js:294-299](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L294-L299 "Source code on GitHub")
+[lib/core/mst-operations.js:294-299](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L294-L299 "Source code on GitHub")
 
 **Parameters**
 
@@ -268,7 +268,7 @@ Returns **T**
 
 ## detach
 
-[lib/core/mst-operations.js:303-307](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L303-L307 "Source code on GitHub")
+[lib/core/mst-operations.js:303-307](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L303-L307 "Source code on GitHub")
 
 Removes a model element from the state tree, and let it live on as a new state tree
 
@@ -278,7 +278,7 @@ Removes a model element from the state tree, and let it live on as a new state t
 
 ## destroy
 
-[lib/core/mst-operations.js:311-318](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L311-L318 "Source code on GitHub")
+[lib/core/mst-operations.js:311-318](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L311-L318 "Source code on GitHub")
 
 Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
 
@@ -288,7 +288,7 @@ Removes a model element from the state tree, and mark it as end-of-life; the ele
 
 ## walk
 
-[lib/core/mst-operations.js:335-343](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/mst-operations.js#L335-L343 "Source code on GitHub")
+[lib/core/mst-operations.js:335-343](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/mst-operations.js#L335-L343 "Source code on GitHub")
 
 Performs a depth first walk through a tree
 
@@ -297,30 +297,9 @@ Performs a depth first walk through a tree
 -   `thing`  
 -   `processor`  
 
-## escapeJsonPath
-
-[lib/core/json-patch.js:7-9](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/json-patch.js#L7-L9 "Source code on GitHub")
-
-escape slashes and backslashes
-<http://tools.ietf.org/html/rfc6901>
-
-**Parameters**
-
--   `str`  
-
-## unescapeJsonPath
-
-[lib/core/json-patch.js:13-15](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/json-patch.js#L13-L15 "Source code on GitHub")
-
-unescape slashes and backslashes
-
-**Parameters**
-
--   `str`  
-
 ## applyAction
 
-[lib/core/action.js:107-115](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/action.js#L107-L115 "Source code on GitHub")
+[lib/core/action.js:107-115](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/action.js#L107-L115 "Source code on GitHub")
 
 Dispatches an Action on a model instance. All middlewares will be triggered.
 Returns the value of the last actoin
@@ -331,15 +310,36 @@ Returns the value of the last actoin
 -   `action` **IActionCall** 
 -   `options` **IActionCallOptions?** 
 
+## escapeJsonPath
+
+[lib/core/json-patch.js:7-9](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/json-patch.js#L7-L9 "Source code on GitHub")
+
+escape slashes and backslashes
+<http://tools.ietf.org/html/rfc6901>
+
+**Parameters**
+
+-   `str`  
+
+## unescapeJsonPath
+
+[lib/core/json-patch.js:13-15](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/json-patch.js#L13-L15 "Source code on GitHub")
+
+unescape slashes and backslashes
+
+**Parameters**
+
+-   `str`  
+
 ## get
 
-[lib/core/node.js:52-56](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/node.js#L52-L56 "Source code on GitHub")
+[lib/core/node.js:52-56](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/node.js#L52-L56 "Source code on GitHub")
 
 Returnes (escaped) path representation as string
 
 ## pseudoAction
 
-[lib/core/node.js:372-377](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/core/node.js#L372-L377 "Source code on GitHub")
+[lib/core/node.js:372-377](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/core/node.js#L372-L377 "Source code on GitHub")
 
 Pseudo action is an action that is not named, does not trigger middleware but does unlock the tree.
 Used for applying (initial) snapshots and patches
@@ -350,6 +350,6 @@ Used for applying (initial) snapshots and patches
 
 ## ComplexType
 
-[lib/types/type.js:24-91](https://github.com/mobxjs/mobx-state-tree/blob/b4df3d6893ffb38faed604f244b3518150e61ac5/lib/types/type.js#L24-L91 "Source code on GitHub")
+[lib/types/type.js:6-73](https://github.com/mobxjs/mobx-state-tree/blob/025977a4e239b4b746ecaf834043854313e78349/lib/types/type.js#L6-L73 "Source code on GitHub")
 
 A complex type produces a MST node (Node in the state tree)
