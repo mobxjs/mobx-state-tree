@@ -1,7 +1,7 @@
 node_modules
 *.log
 lib
+dist
 test-lib
 coverage
 .nyc_output
-mobx-state-tree.umd.js

@@ -2,6 +2,7 @@
 
 * **BREAKING** Dropped `types.extend` in favor of `types.compose`. See [#192](https://github.com/mobxjs/mobx-state-tree/issues/192)
 * Introduced the lifecycle hooks `preProcessSnapshot` and `postProcessSnapshot`. See [#203](https://github.com/mobxjs/mobx-state-tree/pull/203) / [#100](https://github.com/mobxjs/mobx-state-tree/issues/100)
+* Use rollup as bundler [#196](https://github.com/mobxjs/mobx-state-tree/pull/196)
 
 # 0.7.3
 

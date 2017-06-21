@@ -2,10 +2,12 @@
   "name": "mobx-state-tree",
   "version": "0.7.3",
   "description": "Opinionated, transactional, MobX powered state container",
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "main": "dist/mobx-state-tree.js",
+  "umd:main": "dist/mobx-state-tree.umd.js",
+  "module": "dist/mobx-state-tree.module.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run quick-build && npm run rollup",
+    "build": "npm run quick-build && cpr lib dist --filter=.js && npm run rollup",
     "quick-build": "tsc",
     "rollup": "rollup -c",
     "build-tests": "tsc -p test/",
@@ -28,13 +30,13 @@
     "url": "https://github.com/mobxjs/mobx-state-tree/issues"
   },
   "files": [
-    "lib/",
-    "mobx-state-tree.umd.js"
+    "dist/"
   ],
   "devDependencies": {
     "ava": "^0.19.0",
     "concurrently": "^3.1.0",
     "coveralls": "^2.11.4",
+    "cpr": "^2.1.0",
     "documentation": "^4.0.0-beta9",
     "husky": "^0.13.4",
     "lint-staged": "^3.6.1",
@@ -52,7 +54,6 @@
     "tslint": "^3.15.1",
     "typescript": "2.3.2"
   },
-  "dependencies": {},
   "peerDependencies": {
     "mobx": "^3.1.15"
   },
