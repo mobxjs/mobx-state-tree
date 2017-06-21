@@ -1,8 +1,8 @@
 import { action, extendShallowObservable, IObjectChange, IObjectWillChange, intercept, observe } from "mobx"
-import { extendKeepGetter, fail, isPrimitive, hasOwnProperty, isPlainObject } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
-import { IComplexValue, getStateTreeNode, IJsonPatch, Node, createNode } from "../../core"
-import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors } from "../type-checker"
+import { extendKeepGetter, fail, hasOwnProperty, isPlainObject, isPrimitive } from "../../utils"
+import { ComplexType, IComplexType, isType, IType, TypeFlags } from "../type"
+import { createNode, getStateTreeNode, IComplexValue, IJsonPatch, Node } from "../../core"
+import { flattenTypeErrors, IContext, IValidationResult, typecheck, typeCheckFailure } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
 import { optional } from "../utility-types/optional"
 import { Property } from "../property-types/property"
@@ -56,7 +56,7 @@ export class ObjectType extends ComplexType<any, any> {
             parent,
             subpath,
             environment,
-            snapshot,
+            this.preProcessSnapshot(snapshot),
             this.createNewInstance,
             this.finalizeNewInstance
         )
@@ -172,7 +172,7 @@ export class ObjectType extends ComplexType<any, any> {
     getSnapshot(node: Node): any {
         const res = {}
         this.forAllProps(prop => prop.serialize(node.storedValue, res))
-        return res
+        return this.postProcessSnapshot(res)
     }
 
     applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
@@ -182,10 +182,23 @@ export class ObjectType extends ComplexType<any, any> {
 
     @action
     applySnapshot(node: Node, snapshot: any): void {
-        // TODO:fix: all props should be processed when applying snapshot, and reset to default if needed?
+        const s = this.preProcessSnapshot(snapshot)
+        typecheck(this, s)
         node.pseudoAction(() => {
-            for (let key in this.props) this.props[key].deserialize(node.storedValue, snapshot)
+            for (let key in this.props) this.props[key].deserialize(node.storedValue, s)
         })
+    }
+
+    preProcessSnapshot(snapshot: any) {
+        if (typeof this.actions.preProcessSnapshot === "function")
+            return this.actions.preProcessSnapshot.call(null, snapshot)
+        return snapshot
+    }
+
+    postProcessSnapshot(snapshot: any) {
+        if (typeof this.actions.postProcessSnapshot === "function")
+            return this.actions.postProcessSnapshot.call(null, snapshot)
+        return snapshot
     }
 
     getChildType(key: string): IType<any, any> {
@@ -193,11 +206,13 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (!isPlainObject(value)) {
-            return typeCheckFailure(context, value)
+        let snapshot = this.preProcessSnapshot(value)
+
+        if (!isPlainObject(snapshot)) {
+            return typeCheckFailure(context, snapshot)
         }
 
-        return flattenTypeErrors(Object.keys(this.props).map(path => this.props[path].validate(value, context)))
+        return flattenTypeErrors(Object.keys(this.props).map(path => this.props[path].validate(snapshot, context)))
     }
 
     private forAllProps(fn: (o: Property) => void) {

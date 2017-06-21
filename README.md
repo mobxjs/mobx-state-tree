@@ -513,7 +513,7 @@ This object should be (shallowly) immutable and can be accessed by any model in 
 This is useful to inject environment or test specific utilities like a transport layer, loggers etc. This is a very useful to mock behavior in unit tests or provide instantiated utilties to models without requiring singleton modules.
 See also the (bookshop example)[https://github.com/mobxjs/mobx-state-tree/blob/a4f25de0c88acf0e239acb85e690e91147a8f0f0/examples/bookshop/src/stores/ShopStore.test.js#L9] for inspiration.
 
-```
+```javascript
 import { types, getEnv } from "mobx-state-tree"
 
 const Todo = types.model({
@@ -587,8 +587,10 @@ Property types can only be used as direct member of a `types.model` type and not
 
 | Hook            | Meaning                                                                                                                                                   |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `preProcessSnapshot` | Before creating an instance or before applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichtments, property renames etc. etc. This hook is not called for individual property updates or when applying patches. |
 | `afterCreate`   | Immediately after an instance is created and initial values are applied. Children will fire this event before parents                                     |
 | `afterAttach`   | As soon as the _direct_ parent is assigned (this node is attached to an other node)                                                                       |
+| `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot.
 | `beforeDetach`  | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used             |
 | `beforeDestroy` | Before the node is destroyed as a result of calling `destroy` or removing or replacing the node from the tree. Child destructors will fire before parents |
 

@@ -205,7 +205,6 @@ export class Node {
     }
 
     public applySnapshot(snapshot: any) {
-        typecheck(this.type, snapshot)
         return this.type.applySnapshot(this, snapshot)
     }
 
@@ -514,7 +513,7 @@ export function createNode<S, T>(
     } finally {
         if (sawException) {
             // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-            ; (node as any)._isAlive = false
+            ;(node as any)._isAlive = false
         }
     }
 }

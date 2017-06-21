@@ -10,10 +10,17 @@ import {
     observe,
     extras
 } from "mobx"
-import { getStateTreeNode, IJsonPatch, Node, createNode } from "../../core"
+import { createNode, getStateTreeNode, IJsonPatch, Node } from "../../core"
 import { addHiddenFinalProp, fail } from "../../utils"
-import { IType, IComplexType, TypeFlags, isType, ComplexType } from "../type"
-import { IContext, IValidationResult, typeCheckFailure, flattenTypeErrors, getContextForPath } from "../type-checker"
+import { ComplexType, IComplexType, isType, IType, TypeFlags } from "../type"
+import {
+    typecheck,
+    flattenTypeErrors,
+    getContextForPath,
+    IContext,
+    IValidationResult,
+    typeCheckFailure
+} from "../type-checker"
 
 export function arrayToString(this: IObservableArray<any>) {
     return `${getStateTreeNode(this)}(${this.length} items)`
@@ -164,6 +171,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
     @action
     applySnapshot(node: Node, snapshot: any[]): void {
+        typecheck(this, snapshot)
         node.pseudoAction(() => {
             const target = node.storedValue as IObservableArray<any>
             target.replace(snapshot)
