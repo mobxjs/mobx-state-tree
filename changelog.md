@@ -1,3 +1,7 @@
+# 0.8.2
+
+* Fixed issue in rollup module bundle
+
 # 0.8.1
 
 * Fixed issue in release script, rendering 0.8.0 useless
