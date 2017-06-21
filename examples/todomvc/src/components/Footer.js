@@ -12,9 +12,7 @@ const FILTER_TITLES = {
 export default observer(
     class Footer extends Component {
         static propTypes = {
-            store: PropTypes.object.isRequired,
-            filter: PropTypes.string.isRequired,
-            onShow: PropTypes.func.isRequired
+            store: PropTypes.object.isRequired
         }
 
         renderTodoCount() {
@@ -30,13 +28,14 @@ export default observer(
 
         renderFilterLink(filter) {
             const title = FILTER_TITLES[filter]
-            const { filter: selectedFilter, onShow } = this.props
+            const { store } = this.props
+            const selectedFilter = store.filter
 
             return (
                 <a
                     className={classnames({ selected: filter === selectedFilter })}
                     style={{ cursor: "pointer" }}
-                    onClick={() => onShow(filter)}
+                    onClick={() => store.setFilter(filter)}
                 >
                     {title}
                 </a>

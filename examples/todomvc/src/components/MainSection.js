@@ -1,14 +1,7 @@
 import React, { Component, PropTypes } from "react"
 import TodoItem from "./TodoItem"
 import Footer from "./Footer"
-import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from "../constants/TodoFilters"
 import { observer } from "mobx-react"
-
-const TODO_FILTERS = {
-    [SHOW_ALL]: () => true,
-    [SHOW_ACTIVE]: todo => !todo.completed,
-    [SHOW_COMPLETED]: todo => todo.completed
-}
 
 export default observer(
     class MainSection extends Component {
@@ -16,14 +9,8 @@ export default observer(
             store: PropTypes.object.isRequired
         }
 
-        state = { filter: SHOW_ALL }
-
         handleClearCompleted = () => {
             this.props.store.clearCompleted()
-        }
-
-        handleShow = filter => {
-            this.setState({ filter })
         }
 
         renderToggleAll() {
@@ -46,18 +33,14 @@ export default observer(
 
         renderFooter(completedCount) {
             const { store } = this.props
-            const { filter } = this.state
 
             if (store.todos.length) {
-                return <Footer filter={filter} store={store} onShow={this.handleShow} />
+                return <Footer store={store} />
             }
         }
 
         render() {
-            const { todos } = this.props.store
-            const { filter } = this.state
-
-            const filteredTodos = todos.filter(TODO_FILTERS[filter])
+            const { filteredTodos } = this.props.store
 
             return (
                 <section className="main">
