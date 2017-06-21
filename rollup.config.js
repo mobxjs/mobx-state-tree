@@ -1,4 +1,3 @@
-import progress from "rollup-plugin-progress"
 import filesize from "rollup-plugin-filesize"
 import resolve from "rollup-plugin-node-resolve"
 import uglify from "rollup-plugin-uglify"
@@ -12,7 +11,7 @@ export default [
         globals: {
             mobx: "mobx"
         },
-        plugins: [resolve(), progress(), filesize()]
+        plugins: [resolve(), filesize()]
     },
     {
         entry: "./lib/index.js",
@@ -23,7 +22,7 @@ export default [
         globals: {
             mobx: "mobx"
         },
-        plugins: [resolve(), uglify(), progress(), filesize()]
+        plugins: [resolve(), uglify(), filesize()]
     },
     {
         entry: "./lib/index.js",
@@ -33,6 +32,6 @@ export default [
         globals: {
             mobx: "mobx"
         },
-        plugins: [resolve(), progress(), filesize()]
+        plugins: [resolve(), filesize()]
     }
 ]
