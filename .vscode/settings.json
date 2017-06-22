@@ -9,5 +9,6 @@
     // Note, these settings should match lint-staged settings!
     "prettier.semi": false,
     "prettier.tabWidth": 4,
-    "prettier.printWidth": 100
+    "prettier.printWidth": 100,
+    "prettier.singleQuote": false
 }
