@@ -4,13 +4,6 @@ import { TypeFlags, isReferenceType } from "../type-flags"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, prettyPrintValue } from "../type-checker"
 import { fail } from "../../utils"
 
-// TODO: eleminate IReference stuff
-export interface IReference {
-    $ref: string
-}
-
-export type ReferenceSnapshot = string | null | IReference
-
 class StoredReference {
     constructor(public mode: "identifier" | "object", public value: any) {
         if (mode === "object") {
@@ -22,11 +15,10 @@ class StoredReference {
     }
 }
 
-export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
+export class ReferenceType<T> extends Type<string | number, T> {
     readonly flags = TypeFlags.Reference
 
     constructor(private readonly targetType: IType<any, T>) {
-        // TODO: check if targetType is object type? Or does that break late types? Do it in instantiate
         super(`reference(${targetType.name})`)
     }
 
@@ -95,7 +87,6 @@ export class ReferenceType<T> extends Type<ReferenceSnapshot, T> {
     }
 }
 
-// TODO support get / set
 export function reference<T>(factory: IType<any, T>): IType<string | number, T>
 export function reference<T>(factory: IType<any, T>): any {
     if (arguments.length === 2 && typeof arguments[1] === "string")

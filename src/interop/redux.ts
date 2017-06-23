@@ -35,7 +35,7 @@ function reduxActionToAction(action: any): IRawActionCall {
     return {
         name: action.type,
         args: [actionArgs]
-    } as any // TODO: restore functionality!
+    } as any
 }
 
 function runMiddleWare(action: any, runners: any, next: any) {

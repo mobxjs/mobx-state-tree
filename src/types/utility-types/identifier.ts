@@ -1,9 +1,9 @@
 import { Type, IType } from "../type"
 import { TypeFlags } from "../type-flags"
-import { IContext, IValidationResult } from "../type-checker"
+import { IContext, IValidationResult, typeCheckFailure } from "../type-checker"
 import { fail } from "../../utils"
 import { Node, createNode, isStateTreeNode } from "../../core"
-import { string as stringType, number as numberType } from "../primitives"
+import { string as stringType } from "../primitives"
 
 class Identifier {
     constructor(public identifier: string | number) {}
@@ -44,15 +44,14 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        return this.identifierType.validate(value, context)
+        if (value === undefined || value === null || typeof value === "string" || typeof value === "number")
+            return this.identifierType.validate(value, context)
+        return typeCheckFailure(context, value, "References should be a primitive value")
     }
 }
 
 export function identifier<T>(baseType: IType<T, T>): IType<T, T>
 export function identifier<T>(): T
 export function identifier(baseType: IType<any, any> = stringType): any {
-    // TODO: MWE: this seems contrived, let's not assert anything and support unions, refinements etc.
-    if (baseType !== stringType && baseType !== numberType)
-        fail(`Only 'types.number' and 'types.string' are acceptable as type specification for identifiers`)
     return new IdentifierType(baseType)
 }

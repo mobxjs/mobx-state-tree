@@ -40,15 +40,3 @@ at path "/number" value \`"givenStringInstead"\` is not assignable to type: \`po
 at path "/number" value \`-4\` is not assignable to type: \`positive number\`.`
     )
 })
-
-test("it should throw if default value does not pass the predicate", t => {
-    const error = t.throws(
-        () => {
-            types.model({
-                number: types.refinement("Number", types.number, s => typeof s === "number")
-            })
-        },
-        `[mobx-state-tree] Error while converting \`undefined\` to \`number\`:
-value \`undefined\` is not assignable to type: \`number\`.`
-    )
-})

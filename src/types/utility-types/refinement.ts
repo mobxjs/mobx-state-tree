@@ -56,10 +56,5 @@ export function refinement(
     type: IType<any, any>,
     predicate: (snapshot: any) => boolean
 ): IType<any, any> {
-    // check if the subtype default value passes the predicate
-    const inst = type.create()
-    if (!predicate(isStateTreeNode(inst) ? getStateTreeNode(inst).snapshot : inst))
-        fail(`Default value for refinement type ` + name + ` does not pass the predicate.`)
-
     return new Refinement(name, type, predicate)
 }

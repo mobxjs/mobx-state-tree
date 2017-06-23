@@ -6,48 +6,6 @@ export function getChildType(object: IComplexValue, child: string): IType<any, a
     return getStateTreeNode(object).getChildType(child)
 }
 
-/**
- * TODO: update docs
- * Registers middleware on a model instance that is invoked whenever one of it's actions is called, or an action on one of it's children.
- * Will only be invoked on 'root' actions, not on actions called from existing actions.
- *
- * The callback receives two parameter: the `action` parameter describes the action being invoked. The `next()` function can be used
- * to kick off the next middleware in the chain. Not invoking `next()` prevents the action from actually being executed!
- *
- * Action calls have the following signature:
- *
- * ```
- * export type IActionCall = {
- *    name: string;
- *    path?: string;
- *    args?: any[];
- * }
- * ```
- *
- * Example of a logging middleware:
- * ```
- * function logger(action, next) {
- *   console.dir(action)
- *   return next(action)
- * }
- *
- * onAction(myStore, logger)
- *
- * myStore.user.setAge(17)
- *
- * // emits:
- * {
- *    name: "setAge"
- *    path: "/user",
- *    args: [17]
- * }
- * ```
- *
- * @export
- * @param {Object} target model to intercept actions on
- * @param {(action: IActionCall, next: () => void) => void} callback the middleware that should be invoked whenever an action is triggered.
- * @returns {IDisposer} function to remove the middleware
- */
 export function addMiddleware(
     target: IComplexValue,
     middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any

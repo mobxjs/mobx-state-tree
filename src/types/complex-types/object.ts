@@ -13,6 +13,15 @@ import { ActionProperty } from "../property-types/action-property"
 import { ViewProperty } from "../property-types/view-property"
 import { VolatileProperty } from "../property-types/volatile-property"
 
+const HOOK_NAMES = [
+    "preProcessSnapshot",
+    "afterCreate",
+    "afterAttach",
+    "postProcessSnapshot",
+    "beforeDetach",
+    "beforeDestroy"
+]
+
 function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
 }
@@ -93,7 +102,11 @@ export class ObjectType extends ComplexType<any, any> {
 
         for (let key in properties)
             if (hasOwnProperty(properties, key)) {
-                // TODO: check that hooks are not defined as part of baseModel
+                if (HOOK_NAMES.indexOf(key) !== -1)
+                    console.warn(
+                        `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
+                    )
+
                 const descriptor = Object.getOwnPropertyDescriptor(properties, key)
                 if ("get" in descriptor) {
                     this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
@@ -113,16 +126,7 @@ export class ObjectType extends ComplexType<any, any> {
                 } else if (typeof value === "function") {
                     this.props[key] = new ViewProperty(key, value)
                 } else if (typeof value === "object") {
-                    // if (!Array.isArray(value) && isPlainObject(value)) {
-                    //     TODO: also check if the entire type is simple! (no identifiers and other complex types)
-                    //     this.props[key] = new ValueProperty(key, createDefaultValueFactory(
-                    //         createModelFactory(this.name + "__" + key, value),
-                    //         () => value)
-                    //     )
-                    // } else {
-                    // TODO: in future also expand on `[Type]` and  `[{ x: 3 }]`
                     fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
-                    // }
                 } else {
                     fail(`Unexpected value for property '${key}'`)
                 }
@@ -130,6 +134,11 @@ export class ObjectType extends ComplexType<any, any> {
 
         for (let key in state)
             if (hasOwnProperty(state, key)) {
+                if (HOOK_NAMES.indexOf(key) !== -1)
+                    console.warn(
+                        `Hook '${key}' was defined as local state. Hooks should be defined as part of the actions`
+                    )
+
                 const value = state[key]
                 if (key in this.properties)
                     fail(

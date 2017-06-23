@@ -44,7 +44,10 @@ test("it should support prefixed paths in maps", t => {
 
     t.deepEqual(
         getSnapshot(store),
-        { user: "18", users: { "17": { id: "17", name: "Michel" }, "18": { id: "18", name: "Noa" } } } as any
+        {
+            user: "18",
+            users: { "17": { id: "17", name: "Michel" }, "18": { id: "18", name: "Noa" } }
+        } as any
     ) // TODO: better typings
 })
 
@@ -214,11 +217,25 @@ test("it should resolve refs during creation, when using generic reference", t =
 test("identifiers should only support types.string and types.number", t => {
     t.throws(
         () =>
-            types.model({
-                id: types.identifier(types.model({}))
-            }),
-        "[mobx-state-tree] Only 'types.number' and 'types.string' are acceptable as type specification for identifiers"
+            types
+                .model({
+                    id: types.identifier(types.model({}))
+                })
+                .create({ id: {} }),
+        /References should be a primitive value/
     )
+})
+
+test("identifiers should support subtypes of types.string and types.number", t => {
+    debugger
+    const M = types.model({
+        id: types.identifier(types.refinement("Number greater then 5", types.number, n => n > 5))
+    })
+
+    t.is(M.is({}), false)
+    t.is(M.is({ id: "test" }), false)
+    t.is(M.is({ id: 6 }), true)
+    t.is(M.is({ id: 4 }), false)
 })
 
 test("string identifiers should not accept numbers", t => {

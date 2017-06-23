@@ -10,8 +10,8 @@ import {
     observe,
     extras
 } from "mobx"
-import { createNode, getStateTreeNode, IJsonPatch, Node } from "../../core"
-import { addHiddenFinalProp, fail } from "../../utils"
+import { createNode, getStateTreeNode, IJsonPatch, Node, isStateTreeNode } from "../../core"
+import { addHiddenFinalProp, fail, isMutable } from "../../utils"
 import { ComplexType, IComplexType, IType } from "../type"
 import { TypeFlags } from "../type-flags"
 import {
@@ -85,7 +85,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         switch (change.type) {
             case "update":
                 if (change.newValue === change.object[change.index]) return null
-                change.newValue = node.reconcileChildren(
+                change.newValue = reconcileArrayChildren(
                     node,
                     this.subType,
                     [childNodes[change.index]],
@@ -95,7 +95,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                 break
             case "splice":
                 const { index, removedCount, added } = change
-                change.added = node.reconcileChildren(
+                change.added = reconcileArrayChildren(
                     node,
                     this.subType,
                     childNodes.slice(index, index + removedCount),
@@ -206,4 +206,81 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
 export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
     return new ArrayType<S, T>(subtype.name + "[]", subtype)
+}
+
+function reconcileArrayChildren<T>(
+    parent: Node,
+    childType: IType<any, T>,
+    oldNodes: Node[],
+    newValues: T[],
+    newPaths: (string | number)[]
+): Node[] {
+    const res = new Array(newValues.length)
+    const nodesToBeKilled: { [nodeId: string]: Node | undefined } = {}
+    const oldNodesByIdentifier: {
+        [identifierAttribute: string]: {
+            [identifier: string]: Node
+        }
+    } = {}
+
+    function findReconcilationCandidates(snapshot: any): Node | null {
+        for (let attr in oldNodesByIdentifier) {
+            const id = snapshot[attr]
+            if ((typeof id === "string" || typeof id === "number") && oldNodesByIdentifier[attr][id])
+                return oldNodesByIdentifier[attr][id]
+        }
+        return null
+    }
+
+    // Investigate which values we could reconcile, and mark them all as potentially dead
+    oldNodes.forEach(oldNode => {
+        if (oldNode.identifierAttribute)
+            (oldNodesByIdentifier[oldNode.identifierAttribute] ||
+                (oldNodesByIdentifier[oldNode.identifierAttribute] = {}))[oldNode.identifier!] = oldNode
+        nodesToBeKilled[oldNode.nodeId] = oldNode
+    })
+
+    // Prepare new values, try to reconcile
+    newValues.forEach((newValue, index) => {
+        const subPath = "" + newPaths[index]
+        if (isStateTreeNode(newValue)) {
+            // A tree node...
+            const childNode = getStateTreeNode(newValue)
+            childNode.assertAlive()
+            if (childNode.parent === parent) {
+                // Came from this array already
+                if (!nodesToBeKilled[childNode.nodeId]) {
+                    // this node is owned by this parent, but not in the reconcilable set, so it must be double
+                    fail(
+                        `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${subPath}', but it lives already at '${childNode.path}'`
+                    )
+                }
+                nodesToBeKilled[childNode.nodeId] = undefined
+                childNode.setParent(parent, subPath)
+                res[index] = childNode // reuse node
+            } else {
+                // Lives somewhere else (note that instantiate might still reconcile for complex types!)
+                res[index] = childType.instantiate(parent, subPath, undefined, newValue)
+            }
+        } else if (isMutable(newValue)) {
+            // The snapshot of a tree node, try to reconcile based on id
+            const reconcilationCandidate = findReconcilationCandidates(newValue)
+            if (reconcilationCandidate) {
+                const childNode = childType.reconcile(reconcilationCandidate, newValue)
+                nodesToBeKilled[reconcilationCandidate.nodeId] = undefined
+                childNode.setParent(parent, subPath)
+                res[index] = childNode
+            } else {
+                res[index] = childType.instantiate(parent, subPath, undefined, newValue)
+            }
+        } else {
+            // create a fresh MST node
+            res[index] = childType.instantiate(parent, subPath, undefined, newValue)
+        }
+    })
+
+    // Kill non reconciled values
+    for (let key in nodesToBeKilled) if (nodesToBeKilled[key] !== undefined) nodesToBeKilled[key]!.die()
+
+    return res
 }

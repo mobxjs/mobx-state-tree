@@ -66,39 +66,6 @@ value \`"hello world!"\` is not assignable to type: \`number\`.`
     )
 })
 
-// COMMENTED to avoid coverage being weird
-// test.skip("it should be possible to create complex types on the fly", t => {
-//     // TODO: enable again if TODOs in complex-type/object for parsing props are solved
-//     const Box = types.model(
-//         {
-//             point: {
-//                 x: 10,
-//                 y: 10
-//             }
-//         },
-//         {
-//             afterCreate() {
-//                 unprotect(this)
-//             }
-//         }
-//     )
-
-//     const b1 = Box.create()
-//     const b2 = Box.create()
-//     const b3 = Box.create({ point: { x: 5 } })
-
-//     b2.point.x = 42
-//     b2.point.y = 52
-
-//     t.is(b1.point.x, 10)
-//     t.is(b1.point.y, 10)
-//     t.is(b2.point.x, 42)
-//     t.is(b2.point.y, 52)
-//     t.is(b3.point.x, 5)
-//     t.is(b3.point.y, 10)
-//     t.is("" + b1.point, "AnonymousModel__point@/point")
-// })
-
 test("Values should reset to default if omitted in snapshot", t => {
     const Store = types.model({
         todo: types.model({
