@@ -40,7 +40,7 @@ export function extendKeepGetter(a: any, ...b: any[]) {
         for (let key in current) {
             const descriptor = Object.getOwnPropertyDescriptor(current, key)
             if ("get" in descriptor) {
-                Object.defineProperty(a, key, descriptor)
+                Object.defineProperty(a, key, { ...descriptor, configurable: true })
                 continue
             }
             a[key] = current[key]

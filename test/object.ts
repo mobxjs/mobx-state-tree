@@ -395,6 +395,30 @@ test("models should expose their actions to be used in a composable way", t => {
     t.is(store.called, 1)
 })
 
+test("compose should be overwrite", t => {
+    const A = types.model({
+        name: "",
+        alias: "",
+        get displayName() {
+            return this.alias || this.name
+        }
+    })
+
+    const B = types.compose(A, {
+        type: "",
+        get displayName() {
+            return this.alias || this.name + this.type
+        }
+    })
+
+    const storeA = A.create({ name: "nameA", alias: "aliasA" })
+    const storeB = B.create({ name: "nameB", alias: "aliasB", type: "typeB" })
+    const storeC = B.create({ name: "nameC", type: "typeC" })
+    t.is(storeA.displayName, "aliasA")
+    t.is(storeB.displayName, "aliasB")
+    t.is(storeC.displayName, "nameCtypeC")
+})
+
 // === TYPE CHECKS ===
 test("it should check the type correctly", t => {
     const { Factory } = createTestFactories()
