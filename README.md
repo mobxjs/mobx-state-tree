@@ -400,6 +400,14 @@ console.log(storeInstance.selectedTodo.title)
 -   The `map.put()` method can be used to simplify adding objects that have identifiers to maps
 -   The primary goal of identifiers is not validation, but reconciliation and reference resolving. For this reason identifiers cannot be defined or updated after creation. If you want to check if some value just looks as an identifier, without providing the above semantics; use something like: `types.refinement(types.string, v => v.match(/someregex/))`
 
+_Tip: If you now the format of the identifiers in your application, leverage `types.refinement` to actively check this, for example the following definition enforces that identifiers of `Car` always start with the string `Car_`:_
+
+```javascript
+const Car = types.model("Car", {
+    id: types.identifier(types.refinement(types.string, identifier => identifier.indexOf("Car_") === 0))
+})
+```
+
 #### References
 
 References are defined by mentioning the type they should resolve to. The targetted type should have exactly one attribute of the type `identifier()`.
