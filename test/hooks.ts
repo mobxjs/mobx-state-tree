@@ -45,14 +45,6 @@ function createTestStore(listener) {
             beforeDestroy() {
                 listener("destroy store: " + this.todos.length)
             }
-            /* TODO: Useless, store has no parent :/
-            afterAttach() {
-                listener("attach store: " + this.todos.length)
-            },
-            beforeDetach() {
-                listener("detach store: " + this.todos.length)
-            }
-            */
         }
     )
 

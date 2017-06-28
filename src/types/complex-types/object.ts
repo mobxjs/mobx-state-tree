@@ -104,7 +104,6 @@ export class ObjectType extends ComplexType<any, any> {
         const node = getStateTreeNode(change.object)
         node.assertWritable()
 
-        // TODO: assigning a new snapshot / MST to a property should result in a nice patch in itself
         return this.props[change.name].willChange(change)
     }
 
@@ -322,7 +321,6 @@ export function model(...args: any[]) {
     return new ObjectType(name, props, volatileState, actions)
 }
 
-// TODO: use generic defualts
 export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
     t1: IModelType<T1, S1, A1>,
     t2: IModelType<T2, S2, A2>,

@@ -1,5 +1,7 @@
 import { unprotect } from "../src/core/mst-operations"
 import {
+    destroy,
+    detach,
     onSnapshot,
     onPatch,
     onAction,
@@ -158,7 +160,10 @@ test("it should apply patches", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
 
-    applyPatch(doc, [{ op: "replace", path: "/to", value: "mars" }, { op: "replace", path: "/to", value: "universe" }])
+    applyPatch(doc, [
+        { op: "replace", path: "/to", value: "mars" },
+        { op: "replace", path: "/to", value: "universe" }
+    ])
 
     t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
@@ -215,7 +220,10 @@ test("it should apply actions calls", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
 
-    applyAction(doc, [{ name: "setTo", path: "", args: ["mars"] }, { name: "setTo", path: "", args: ["universe"] }])
+    applyAction(doc, [
+        { name: "setTo", path: "", args: ["mars"] },
+        { name: "setTo", path: "", args: ["universe"] }
+    ])
 
     t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
@@ -292,7 +300,11 @@ test("it should compose factories", t => {
 
 test("it should compose factories with computed properties", t => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2.properties, ComputedFactory2.actions)
+    const ComposedFactory = types.compose(
+        ColorFactory,
+        ComputedFactory2.properties,
+        ComputedFactory2.actions
+    )
     const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
     t.deepEqual(getSnapshot(store), { props: { width: 100, height: 200 }, color: "#FFFFFF" })
     t.is(store.area, 20000)
@@ -433,10 +445,16 @@ test("it should require complex fields to be present", t => {
     t.throws(() => types.model({ todo: types.model({}) }).create(), /is not assignable to type/)
 
     t.is(types.model({ todo: types.array(types.string) }).is({}), false) // TBD: or true?
-    t.throws(() => types.model({ todo: types.array(types.string) }).create(), /is not assignable to type/)
+    t.throws(
+        () => types.model({ todo: types.array(types.string) }).create(),
+        /is not assignable to type/
+    )
 
     t.is(types.model({ todo: types.map(types.string) }).is({}), false)
-    t.throws(() => types.model({ todo: types.map(types.string) }).create(), /is not assignable to type/)
+    t.throws(
+        () => types.model({ todo: types.map(types.string) }).create(),
+        /is not assignable to type/
+    )
 })
 
 // === VIEW FUNCTIONS ===
@@ -515,4 +533,20 @@ test("it should throw if a non-primitive value is provided and no default can be
             }
         })
     })
+})
+
+test("it should not be possible to remove a node from a parent if it is required, see ", t => {
+    const A = types.model("A", { x: 3 })
+    const B = types.model("B", { a: A })
+
+    const b = B.create({ a: { x: 7 } })
+    unprotect(b)
+
+    t.throws(() => {
+        detach(b.a)
+    }, /Error while converting `null` to `A`/)
+
+    t.throws(() => {
+        destroy(b.a)
+    }, /Error while converting `null` to `A`/)
 })

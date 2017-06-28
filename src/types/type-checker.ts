@@ -27,7 +27,8 @@ function toErrorString(error: IValidationError): string {
     const currentTypename = isStateTreeNode(value)
         ? `value of type ${getStateTreeNode(value).type.name}:`
         : isPrimitive(value) ? "value" : "snapshot"
-    const isSnapshotCompatible = type && isStateTreeNode(value) && type.is(getStateTreeNode(value).snapshot)
+    const isSnapshotCompatible =
+        type && isStateTreeNode(value) && type.is(getStateTreeNode(value).snapshot)
 
     return (
         `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${type
@@ -49,7 +50,11 @@ export function getDefaultContext(type: IType<any, any>): IContext {
     return [{ type, path: "" }]
 }
 
-export function getContextForPath(context: IContext, path: string, type?: IType<any, any>): IContext {
+export function getContextForPath(
+    context: IContext,
+    path: string,
+    type?: IType<any, any>
+): IContext {
     return context.concat([{ path, type }])
 }
 
@@ -57,7 +62,11 @@ export function typeCheckSuccess(): IValidationResult {
     return EMPTY_ARRAY as any
 }
 
-export function typeCheckFailure(context: IContext, value: any, message?: string): IValidationResult {
+export function typeCheckFailure(
+    context: IContext,
+    value: any,
+    message?: string
+): IValidationResult {
     return [{ context, value, message }]
 }
 
@@ -65,7 +74,7 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
     return errors.reduce((a, i) => a.concat(i), [])
 }
 
-// TODO; typecheck should be invoked from: type.create and array / map / value.property will change
+// TODO; doublecheck: typecheck should only needed to be invoked from: type.create and array / map / value.property will change
 export function typecheck(type: IType<any, any>, value: any): void {
     const errors = type.validate(value, [{ path: "", type }])
 

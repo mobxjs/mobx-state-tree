@@ -13,7 +13,7 @@ export function addMiddleware(
     const node = getStateTreeNode(target)
     if (!node.isProtectionEnabled)
         console.warn(
-            'It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`'
+            "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
         )
     return node.addMiddleWare(middleware)
 }
@@ -150,13 +150,13 @@ export function recordActions(subject: IStateTreeNode): IActionRecorder {
  */
 export function protect(target: IStateTreeNode) {
     const node = getStateTreeNode(target)
-    if (!node.isRoot) fail('`protect` can only be invoked on root nodes')
+    if (!node.isRoot) fail("`protect` can only be invoked on root nodes")
     node.isProtectionEnabled = true
 }
 
 export function unprotect(target: IStateTreeNode) {
     const node = getStateTreeNode(target)
-    if (!node.isRoot) fail('`unprotect` can only be invoked on root nodes')
+    if (!node.isRoot) fail("`unprotect` can only be invoked on root nodes")
     node.isProtectionEnabled = false
 }
 
@@ -291,8 +291,6 @@ export function isRoot(target: IStateTreeNode): boolean {
  * @returns {*}
  */
 export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNode | any {
-    // TODO: give better error messages!
-    // TODO: also accept path parts
     const node = getStateTreeNode(target).resolve(path)
     return node ? node.value : undefined
 }
@@ -302,8 +300,8 @@ export function resolveIdentifier(
     target: IStateTreeNode,
     identifier: string | number
 ): any {
-    if (!isType(type)) fail('Expected a type as first argument')
-    const node = getStateTreeNode(target).root.identifierCache!.resolve(type, '' + identifier)
+    if (!isType(type)) fail("Expected a type as first argument")
+    const node = getStateTreeNode(target).root.identifierCache!.resolve(type, "" + identifier)
     return node ? node.value : undefined
 }
 
@@ -350,7 +348,6 @@ export function clone<T extends IStateTreeNode>(
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
 export function detach<T extends IStateTreeNode>(thing: T): T {
-    // TODO: should throw if it cannot be removed from the parent? e.g. parent type wouldn't allow that
     getStateTreeNode(thing).detach()
     return thing
 }
@@ -360,7 +357,6 @@ export function detach<T extends IStateTreeNode>(thing: T): T {
  */
 export function destroy(thing: IStateTreeNode) {
     const node = getStateTreeNode(thing)
-    // TODO: should throw if it cannot be removed from the parent? e.g. parent type wouldn't allow that
     if (node.isRoot) node.die()
     else node.parent!.removeChild(node.subpath)
 }
@@ -400,10 +396,10 @@ import {
     ISerializedActionCall,
     applyAction as baseApplyAction,
     onAction
-} from './action'
-import { runInAction, IObservableArray, ObservableMap } from 'mobx'
-import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from './node'
-import { IJsonPatch, splitJsonPath } from './json-patch'
-import { IDisposer, fail, asArray } from '../utils'
-import { ISnapshottable, IType } from '../types/type'
-import { isType } from '../types/type-flags'
+} from "./action"
+import { runInAction, IObservableArray, ObservableMap } from "mobx"
+import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"
+import { IJsonPatch, splitJsonPath } from "./json-patch"
+import { IDisposer, fail, asArray } from "../utils"
+import { ISnapshottable, IType } from "../types/type"
+import { isType } from "../types/type-flags"

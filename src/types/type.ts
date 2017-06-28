@@ -1,5 +1,5 @@
-import { action } from 'mobx'
-import { TypeFlags } from './type-flags'
+import { action } from "mobx"
+import { TypeFlags } from "./type-flags"
 
 export interface ISnapshottable<S> {}
 
@@ -46,7 +46,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     @action
     create(snapshot: S = this.getDefaultSnapshot(), environment?: any): T {
         typecheck(this, snapshot)
-        return this.instantiate(null, '', environment, snapshot).value
+        return this.instantiate(null, "", environment, snapshot).value
     }
 
     abstract instantiate(
@@ -60,7 +60,6 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     abstract describe(): string
 
     abstract applySnapshot(node: Node, snapshot: any): void
-    // TODO: Maybe optional could resolve to this if omitted?
     abstract getDefaultSnapshot(): any
     abstract getChildren(node: Node): Node[]
     abstract getChildNode(node: Node, key: string): Node
@@ -86,12 +85,11 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     is(value: any): value is S | T {
-        return this.validate(value, [{ path: '', type: this }]).length === 0
+        return this.validate(value, [{ path: "", type: this }]).length === 0
     }
 
     reconcile(current: Node, newValue: any): Node {
         const { parent, subpath } = current
-        // TODO: this.is... for all prepareNewVaues?
         if (isStateTreeNode(newValue) && getStateTreeNode(newValue) === current)
             // the current node is the same as the new one
             return current
@@ -122,12 +120,12 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     get Type(): T {
         return fail(
-            'Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`'
+            "Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`"
         )
     }
     get SnapshotType(): S {
         return fail(
-            'Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`'
+            "Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`"
         )
     }
 }
@@ -157,11 +155,11 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
     }
 
     applySnapshot(node: Node, snapshot: S): void {
-        fail('Immutable types do not support applying snapshots')
+        fail("Immutable types do not support applying snapshots")
     }
 
     applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
-        fail('Immutable types do not support applying patches')
+        fail("Immutable types do not support applying patches")
     }
 
     getChildren(node: Node): Node[] {
@@ -194,14 +192,14 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
     }
 }
 
-import { EMPTY_ARRAY, fail, isMutable } from '../utils'
-import { isStateTreeNode, getStateTreeNode } from '../core/node'
+import { EMPTY_ARRAY, fail, isMutable } from "../utils"
+import { isStateTreeNode, getStateTreeNode } from "../core/node"
 import {
     IContext,
     IValidationResult,
     typecheck,
     typeCheckFailure,
     typeCheckSuccess
-} from './type-checker'
-import { Node, IStateTreeNode, IJsonPatch } from '../core'
-import { getType } from '../core/mst-operations'
+} from "./type-checker"
+import { Node, IStateTreeNode, IJsonPatch } from "../core"
+import { getType } from "../core/mst-operations"

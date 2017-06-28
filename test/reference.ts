@@ -1,4 +1,4 @@
-import { reaction, autorun } from 'mobx'
+import { reaction, autorun } from "mobx"
 import {
     types,
     getSnapshot,
@@ -10,10 +10,10 @@ import {
     detach,
     resolveIdentifier,
     getRoot
-} from '../src'
-import { test } from 'ava'
+} from "../src"
+import { test } from "ava"
 
-test('it should support prefixed paths in maps', t => {
+test("it should support prefixed paths in maps", t => {
     const User = types.model({
         id: types.identifier(),
         name: types.string
@@ -24,34 +24,34 @@ test('it should support prefixed paths in maps', t => {
     })
 
     const store = UserStore.create({
-        user: '17',
+        user: "17",
         users: {
-            '17': { id: '17', name: 'Michel' },
-            '18': { id: '18', name: 'Veria' }
+            "17": { id: "17", name: "Michel" },
+            "18": { id: "18", name: "Veria" }
         }
     })
     unprotect(store)
 
-    t.is(store.users.get('17')!.name as string, 'Michel')
-    t.is(store.users.get('18')!.name as string, 'Veria')
-    t.is(store.user!.name as string, 'Michel')
+    t.is(store.users.get("17")!.name as string, "Michel")
+    t.is(store.users.get("18")!.name as string, "Veria")
+    t.is(store.user!.name as string, "Michel")
 
-    store.user = store.users.get('18')!
-    t.is(store.user.name as string, 'Veria')
+    store.user = store.users.get("18")!
+    t.is(store.user.name as string, "Veria")
 
-    store.users.get('18')!.name = 'Noa'
-    t.is(store.user.name as string, 'Noa')
+    store.users.get("18")!.name = "Noa"
+    t.is(store.user.name as string, "Noa")
 
     t.deepEqual(
         getSnapshot(store),
         {
-            user: '18',
-            users: { '17': { id: '17', name: 'Michel' }, '18': { id: '18', name: 'Noa' } }
+            user: "18",
+            users: { "17": { id: "17", name: "Michel" }, "18": { id: "18", name: "Noa" } }
         } as any
     ) // TODO: better typings
 })
 
-test('it should support prefixed paths in arrays', t => {
+test("it should support prefixed paths in arrays", t => {
     const User = types.model({
         id: types.identifier(),
         name: types.string
@@ -62,61 +62,61 @@ test('it should support prefixed paths in arrays', t => {
     })
 
     const store = UserStore.create({
-        user: '17',
-        users: [{ id: '17', name: 'Michel' }, { id: '18', name: 'Veria' }]
+        user: "17",
+        users: [{ id: "17", name: "Michel" }, { id: "18", name: "Veria" }]
     })
     unprotect(store)
 
-    t.is(store.users[0].name, 'Michel')
-    t.is(store.users[1].name, 'Veria')
-    t.is(store.user!.name, 'Michel')
+    t.is(store.users[0].name, "Michel")
+    t.is(store.users[1].name, "Veria")
+    t.is(store.user!.name, "Michel")
 
     store.user = store.users[1]
-    t.is(store.user.name, 'Veria')
+    t.is(store.user.name, "Veria")
 
-    store.users[1].name = 'Noa'
-    t.is(store.user.name, 'Noa')
+    store.users[1].name = "Noa"
+    t.is(store.user.name, "Noa")
 
     t.deepEqual(
         getSnapshot(store),
-        { user: '18', users: [{ id: '17', name: 'Michel' }, { id: '18', name: 'Noa' }] } as any
+        { user: "18", users: [{ id: "17", name: "Michel" }, { id: "18", name: "Noa" }] } as any
     ) // TODO: better typings
 })
 
-test('identifiers are required', t => {
+test("identifiers are required", t => {
     const Todo = types.model({
         id: types.identifier()
     })
 
     t.is(Todo.is({}), false)
-    t.is(Todo.is({ id: 'x' }), true)
+    t.is(Todo.is({ id: "x" }), true)
 
     t.throws(
         () => Todo.create(),
-        '[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n' +
+        "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
             'at path "/id" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
     )
 })
 
-test('identifiers cannot be modified', t => {
+test("identifiers cannot be modified", t => {
     const Todo = types.model({
         id: types.identifier()
     })
 
-    const todo = Todo.create({ id: 'x' })
+    const todo = Todo.create({ id: "x" })
     unprotect(todo)
 
     t.throws(
-        () => (todo.id = 'stuff'),
+        () => (todo.id = "stuff"),
         "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
     )
     t.throws(
-        () => applySnapshot(todo, { id: 'stuff' }),
+        () => applySnapshot(todo, { id: "stuff" }),
         "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
     )
 })
 
-test('it should resolve refs during creation, when using path', t => {
+test("it should resolve refs during creation, when using path", t => {
     const values: number[] = []
     const Book = types.model({
         id: types.identifier(),
@@ -134,7 +134,7 @@ test('it should resolve refs during creation, when using path', t => {
     })
 
     const s = Store.create({
-        books: [{ id: '3', price: 2 }]
+        books: [{ id: "3", price: 2 }]
     })
     unprotect(s)
 
@@ -152,7 +152,7 @@ test('it should resolve refs during creation, when using path', t => {
     t.deepEqual(values, [4, 8])
 })
 
-test('it should resolve refs over late types', t => {
+test("it should resolve refs over late types", t => {
     const Book = types.model({
         id: types.identifier(),
         price: types.number
@@ -169,7 +169,7 @@ test('it should resolve refs over late types', t => {
     })
 
     const s = Store.create({
-        books: [{ id: '3', price: 2 }]
+        books: [{ id: "3", price: 2 }]
     })
     unprotect(s)
 
@@ -178,7 +178,7 @@ test('it should resolve refs over late types', t => {
     t.is(s.entries.reduce((a, e) => a + e.price, 0), 4)
 })
 
-test('it should resolve refs during creation, when using generic reference', t => {
+test("it should resolve refs during creation, when using generic reference", t => {
     const values: number[] = []
     const Book = types.model({
         id: types.identifier(),
@@ -196,7 +196,7 @@ test('it should resolve refs during creation, when using generic reference', t =
     })
 
     const s = Store.create({
-        books: [{ id: '3', price: 2 }]
+        books: [{ id: "3", price: 2 }]
     })
     unprotect(s)
 
@@ -208,13 +208,13 @@ test('it should resolve refs during creation, when using generic reference', t =
 
     const entry = BookEntry.create({ book: s.books[0] }) // can refer to book, even when not part of tree yet
 
-    t.deepEqual(getSnapshot(entry), { book: '3' })
+    t.deepEqual(getSnapshot(entry), { book: "3" })
     s.entries.push(entry)
 
     t.deepEqual(values, [4, 8])
 })
 
-test('identifiers should only support types.string and types.number', t => {
+test("identifiers should only support types.string and types.number", t => {
     t.throws(
         () =>
             types
@@ -226,33 +226,33 @@ test('identifiers should only support types.string and types.number', t => {
     )
 })
 
-test('identifiers should support subtypes of types.string and types.number', t => {
+test("identifiers should support subtypes of types.string and types.number", t => {
     debugger
     const M = types.model({
-        id: types.identifier(types.refinement('Number greater then 5', types.number, n => n > 5))
+        id: types.identifier(types.refinement("Number greater then 5", types.number, n => n > 5))
     })
 
     t.is(M.is({}), false)
-    t.is(M.is({ id: 'test' }), false)
+    t.is(M.is({ id: "test" }), false)
     t.is(M.is({ id: 6 }), true)
     t.is(M.is({ id: 4 }), false)
 })
 
-test('string identifiers should not accept numbers', t => {
+test("string identifiers should not accept numbers", t => {
     const F = types.model({
         id: types.identifier()
     })
-    t.is(F.is({ id: '4' }), true)
+    t.is(F.is({ id: "4" }), true)
     t.is(F.is({ id: 4 }), false)
 
     const F2 = types.model({
         id: types.identifier(types.string)
     })
-    t.is(F2.is({ id: '4' }), true)
+    t.is(F2.is({ id: "4" }), true)
     t.is(F2.is({ id: 4 }), false)
 })
 
-test('122 - identifiers should support numbers as well', t => {
+test("122 - identifiers should support numbers as well", t => {
     const F = types.model({
         id: types.identifier(types.number)
     })
@@ -264,24 +264,24 @@ test('122 - identifiers should support numbers as well', t => {
     )
 
     t.is(F.is({ id: 4 }), true)
-    t.is(F.is({ id: '4' }), false)
+    t.is(F.is({ id: "4" }), false)
 })
 
-test('self reference with a late type', t => {
+test("self reference with a late type", t => {
     interface IBook {
         id: string
         genre: string
         reference: IBook
     }
 
-    const Book = types.model('Book', {
+    const Book = types.model("Book", {
         id: types.identifier(),
         genre: types.string,
         reference: types.reference(types.late<any, IBook>(() => Book))
     })
 
     const Store = types.model(
-        'Store',
+        "Store",
         {
             books: types.array(Book)
         },
@@ -293,21 +293,21 @@ test('self reference with a late type', t => {
     )
 
     const s = Store.create({
-        books: [{ id: '1', genre: 'thriller', reference: '' }]
+        books: [{ id: "1", genre: "thriller", reference: "" }]
     })
 
     const book2 = Book.create({
-        id: '2',
-        genre: 'romance',
+        id: "2",
+        genre: "romance",
         reference: s.books[0]
     })
 
     s.addBook(book2)
 
-    t.is((s as any).books[1].reference.genre, 'thriller')
+    t.is((s as any).books[1].reference.genre, "thriller")
 })
 
-test('when applying a snapshot, reference should resolve correctly if value added after', t => {
+test("when applying a snapshot, reference should resolve correctly if value added after", t => {
     const Box = types.model({
         id: types.identifier(types.number),
         name: types.string
@@ -321,18 +321,18 @@ test('when applying a snapshot, reference should resolve correctly if value adde
     t.notThrows(() =>
         Factory.create({
             selected: 1,
-            boxes: [{ id: 1, name: 'hello' }, { id: 2, name: 'world' }]
+            boxes: [{ id: 1, name: "hello" }, { id: 2, name: "world" }]
         })
     )
 })
 
-test('it should fail when reference snapshot is ambiguous', t => {
-    const Box = types.model('Box', {
+test("it should fail when reference snapshot is ambiguous", t => {
+    const Box = types.model("Box", {
         id: types.identifier(types.number),
         name: types.string
     })
 
-    const Arrow = types.model('Arrow', {
+    const Arrow = types.model("Arrow", {
         id: types.identifier(types.number),
         name: types.string
     })
@@ -347,8 +347,8 @@ test('it should fail when reference snapshot is ambiguous', t => {
 
     const store = Factory.create({
         selected: 2,
-        boxes: [{ id: 1, name: 'hello' }, { id: 2, name: 'world' }],
-        arrows: [{ id: 2, name: 'arrow' }]
+        boxes: [{ id: 1, name: "hello" }, { id: 2, name: "world" }],
+        arrows: [{ id: 2, name: "arrow" }]
     })
 
     t.throws(() => {
@@ -365,14 +365,14 @@ test('it should fail when reference snapshot is ambiguous', t => {
     autorun(() => store.selected).onError(e => (err = e))
 
     t.is(store.selected, store.boxes[0]) // unambigous identifier
-    store.arrows.push({ id: 1, name: 'oops' })
+    store.arrows.push({ id: 1, name: "oops" })
     t.is(
         err.message,
         "[mobx-state-tree] Cannot resolve a reference to type 'Arrow | Box' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
     )
 })
 
-test('it should support array of references', t => {
+test("it should support array of references", t => {
     const Box = types.model({
         id: types.identifier(types.number),
         name: types.string
@@ -385,7 +385,7 @@ test('it should support array of references', t => {
 
     const store = Factory.create({
         selected: [],
-        boxes: [{ id: 1, name: 'hello' }, { id: 2, name: 'world' }]
+        boxes: [{ id: 1, name: "hello" }, { id: 2, name: "world" }]
     })
     unprotect(store)
 
@@ -402,7 +402,7 @@ test('it should support array of references', t => {
     t.deepEqual<any>(getSnapshot(store.selected), [1, 2])
 })
 
-test('it should restore array of references from snapshot', t => {
+test("it should restore array of references from snapshot", t => {
     const Box = types.model({
         id: types.identifier(types.number),
         name: types.string
@@ -415,7 +415,7 @@ test('it should restore array of references from snapshot', t => {
 
     const store = Factory.create({
         selected: [1, 2],
-        boxes: [{ id: 1, name: 'hello' }, { id: 2, name: 'world' }]
+        boxes: [{ id: 1, name: "hello" }, { id: 2, name: "world" }]
     })
     unprotect(store)
 
@@ -423,7 +423,7 @@ test('it should restore array of references from snapshot', t => {
     t.deepEqual<any>(store.selected[1] === store.boxes[1], true)
 })
 
-test('it should support map of references', t => {
+test("it should support map of references", t => {
     const Box = types.model({
         id: types.identifier(types.number),
         name: types.string
@@ -436,24 +436,24 @@ test('it should support map of references', t => {
 
     const store = Factory.create({
         selected: {},
-        boxes: [{ id: 1, name: 'hello' }, { id: 2, name: 'world' }]
+        boxes: [{ id: 1, name: "hello" }, { id: 2, name: "world" }]
     })
     unprotect(store)
 
     t.notThrows(() => {
-        store.selected.set('from', store.boxes[0])
+        store.selected.set("from", store.boxes[0])
     })
 
     t.deepEqual<any>(getSnapshot(store.selected), { from: 1 })
 
     t.notThrows(() => {
-        store.selected.set('to', store.boxes[1])
+        store.selected.set("to", store.boxes[1])
     })
 
     t.deepEqual<any>(getSnapshot(store.selected), { from: 1, to: 2 })
 })
 
-test('it should restore map of references from snapshot', t => {
+test("it should restore map of references from snapshot", t => {
     const Box = types.model({
         id: types.identifier(types.number),
         name: types.string
@@ -466,15 +466,15 @@ test('it should restore map of references from snapshot', t => {
 
     const store = Factory.create({
         selected: { from: 1, to: 2 },
-        boxes: [{ id: 1, name: 'hello' }, { id: 2, name: 'world' }]
+        boxes: [{ id: 1, name: "hello" }, { id: 2, name: "world" }]
     })
     unprotect(store)
 
-    t.deepEqual<any>(store.selected.get('from') === store.boxes[0], true)
-    t.deepEqual<any>(store.selected.get('to') === store.boxes[1], true)
+    t.deepEqual<any>(store.selected.get("from") === store.boxes[0], true)
+    t.deepEqual<any>(store.selected.get("to") === store.boxes[1], true)
 })
 
-test('it should support relative lookups', t => {
+test("it should support relative lookups", t => {
     const Node = types.model({
         id: types.identifier(types.number),
         children: types.optional(types.array(types.late(() => Node)), [])
@@ -523,7 +523,7 @@ test('it should support relative lookups', t => {
     t.is(resolveIdentifier(Node, n2.children[0], 5), n5)
 })
 
-test('References are non-nullable by default', t => {
+test("References are non-nullable by default", t => {
     const Todo = types.model({
         id: types.identifier(types.number)
     })
@@ -573,7 +573,7 @@ test('References are non-nullable by default', t => {
     )
 })
 
-test('References are described properly', t => {
+test("References are described properly", t => {
     const Todo = types.model({
         id: types.identifier(types.number)
     })
@@ -585,19 +585,19 @@ test('References are described properly', t => {
 
     t.is(
         Store.describe(),
-        '{ todo: ({ id: identifier(number) } | null?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | null?) }'
+        "{ todo: ({ id: identifier(number) } | null?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | null?) }"
     )
 })
 
-test('References in recursive structures', t => {
-    const Folder = types.model('Folder', {
+test("References in recursive structures", t => {
+    const Folder = types.model("Folder", {
         id: types.identifier(),
         name: types.string,
         files: types.array(types.string)
     })
 
     const Tree = types.model(
-        'Tree',
+        "Tree",
         {
             children: types.array(types.late(() => Tree)),
             data: types.maybe(types.reference(Folder))
@@ -611,50 +611,50 @@ test('References in recursive structures', t => {
         }
     )
 
-    const Storage = types.model('Storage', {
+    const Storage = types.model("Storage", {
         objects: types.map(Folder),
         tree: Tree
     })
 
     const store = Storage.create({ objects: {}, tree: { children: [], data: null } })
 
-    const folder = { id: '1', name: 'Folder 1', files: ['a.jpg', 'b.jpg'] }
+    const folder = { id: "1", name: "Folder 1", files: ["a.jpg", "b.jpg"] }
     store.tree.addFolder(folder)
 
     t.deepEqual(getSnapshot(store), {
         objects: {
-            '1': {
-                files: ['a.jpg', 'b.jpg'],
-                id: '1',
-                name: 'Folder 1'
+            "1": {
+                files: ["a.jpg", "b.jpg"],
+                id: "1",
+                name: "Folder 1"
             }
         },
         tree: {
             children: [
                 {
                     children: [],
-                    data: '1'
+                    data: "1"
                 }
             ],
             data: null
         }
     })
-    t.is(store.objects.get('1'), store.tree.children[0].data)
+    t.is(store.objects.get("1"), store.tree.children[0].data)
 
-    const folder2 = { id: '2', name: 'Folder 2', files: ['c.jpg', 'd.jpg'] }
+    const folder2 = { id: "2", name: "Folder 2", files: ["c.jpg", "d.jpg"] }
     store.tree.children[0].addFolder(folder2)
 
     t.deepEqual(getSnapshot(store), {
         objects: {
-            '1': {
-                files: ['a.jpg', 'b.jpg'],
-                id: '1',
-                name: 'Folder 1'
+            "1": {
+                files: ["a.jpg", "b.jpg"],
+                id: "1",
+                name: "Folder 1"
             },
-            '2': {
-                files: ['c.jpg', 'd.jpg'],
-                id: '2',
-                name: 'Folder 2'
+            "2": {
+                files: ["c.jpg", "d.jpg"],
+                id: "2",
+                name: "Folder 2"
             }
         },
         tree: {
@@ -663,28 +663,28 @@ test('References in recursive structures', t => {
                     children: [
                         {
                             children: [],
-                            data: '2'
+                            data: "2"
                         }
                     ],
-                    data: '1'
+                    data: "1"
                 }
             ],
             data: null
         }
     })
 
-    t.is(store.objects.get('1'), store.tree.children[0].data)
-    t.is(store.objects.get('2'), store.tree.children[0].children[0].data)
+    t.is(store.objects.get("1"), store.tree.children[0].data)
+    t.is(store.objects.get("2"), store.tree.children[0].children[0].data)
 })
 
-test('it should applyPatch references in array', t => {
-    const Item = types.model('Item', {
+test("it should applyPatch references in array", t => {
+    const Item = types.model("Item", {
         id: types.identifier(),
         name: types.string
     })
 
     const Folder = types.model(
-        'Folder',
+        "Folder",
         {
             id: types.identifier(),
             objects: types.map(Item),
@@ -703,9 +703,9 @@ test('it should applyPatch references in array', t => {
         }
     )
 
-    const folder = Folder.create({ id: 'folder 1', objects: {}, hovers: [] })
-    folder.addObject({ id: 'item 1', name: 'item name 1' })
-    const item = folder.objects.get('item 1')
+    const folder = Folder.create({ id: "folder 1", objects: {}, hovers: [] })
+    folder.addObject({ id: "item 1", name: "item name 1" })
+    const item = folder.objects.get("item 1")
 
     const snapshot = getSnapshot(folder)
     const newStore = Folder.create(snapshot)
@@ -717,73 +717,73 @@ test('it should applyPatch references in array', t => {
     folder.addHover(item)
 
     t.deepEqual(getSnapshot(newStore), {
-        id: 'folder 1',
+        id: "folder 1",
         objects: {
-            'item 1': {
-                id: 'item 1',
-                name: 'item name 1'
+            "item 1": {
+                id: "item 1",
+                name: "item name 1"
             }
         },
-        hovers: ['item 1']
+        hovers: ["item 1"]
     })
 
     folder.removeHover(item)
 
     t.deepEqual(getSnapshot(newStore), {
-        id: 'folder 1',
+        id: "folder 1",
         objects: {
-            'item 1': {
-                id: 'item 1',
-                name: 'item name 1'
+            "item 1": {
+                id: "item 1",
+                name: "item name 1"
             }
         },
         hovers: []
     })
 })
 
-test('it should applySnapshot references in array', t => {
-    const Item = types.model('Item', {
+test("it should applySnapshot references in array", t => {
+    const Item = types.model("Item", {
         id: types.identifier(),
         name: types.string
     })
 
-    const Folder = types.model('Folder', {
+    const Folder = types.model("Folder", {
         id: types.identifier(),
         objects: types.map(Item),
         hovers: types.array(types.reference(Item))
     })
 
     const folder = Folder.create({
-        id: 'folder 1',
+        id: "folder 1",
         objects: {
-            'item 1': {
-                id: 'item 1',
-                name: 'item name 1'
+            "item 1": {
+                id: "item 1",
+                name: "item name 1"
             }
         },
-        hovers: ['folder 1']
+        hovers: ["folder 1"]
     })
     const snapshot = JSON.parse(JSON.stringify(getSnapshot(folder)))
     t.deepEqual(snapshot, {
-        id: 'folder 1',
+        id: "folder 1",
         objects: {
-            'item 1': {
-                id: 'item 1',
-                name: 'item name 1'
+            "item 1": {
+                id: "item 1",
+                name: "item name 1"
             }
         },
-        hovers: ['folder 1']
+        hovers: ["folder 1"]
     })
 
     snapshot.hovers = []
     applySnapshot(folder, snapshot)
 
     t.deepEqual(getSnapshot(folder), {
-        id: 'folder 1',
+        id: "folder 1",
         objects: {
-            'item 1': {
-                id: 'item 1',
-                name: 'item name 1'
+            "item 1": {
+                id: "item 1",
+                name: "item name 1"
             }
         },
         hovers: []
