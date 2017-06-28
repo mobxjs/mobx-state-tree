@@ -1,7 +1,12 @@
 # 0.9.0
 
 * **BREAKING** Removed `applyPatches` and `applyActions`. Use `applyPatch` resp. `applyAction`, as both will now also accept an array as argument
-* **BREAKING** `unprotect` and `protect` can only be applied at root nodes to avoid confusing scenarios
+* **BREAKING** `unprotect` and `protect` can only be applied at root nodes to avoid confusing scenarios Fixed [#180](https://github.com/mobxjs/mobx-state-tree/issues/180)
+* Fixed [#141](https://github.com/mobxjs/mobx-state-tree/issues/141), actions / views are no longer wrapped in dynamically generated functions for a better debugging experience
+* Small improvements to typings, fixed compilation issues with TypeScript 2.4.1.
+* Fixed issues where `compose` couldn't overwrite getters. [#209](https://github.com/mobxjs/mobx-state-tree/issues/209), by @homura
+* Fixed CDN links in readme
+* Added TodoMVC to the examples section
 
 # 0.8.2
 
