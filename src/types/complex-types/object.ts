@@ -81,7 +81,7 @@ export class ObjectType extends ComplexType<any, any> {
     finalizeNewInstance = (node: Node, snapshot: any) => {
         const instance = node.storedValue as IComplexValue
         this.forAllProps(prop => prop.initialize(instance, snapshot))
-        intercept(instance, change => this.willChange(change) as any /* wait for typing fix in mobx */)
+        intercept(instance, change => this.willChange(change))
         observe(instance, this.didChange)
     }
 

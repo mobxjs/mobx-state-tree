@@ -79,8 +79,8 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         const instance = node.storedValue as ObservableMap<any>
         extras.interceptReads(instance, node.unbox)
         intercept(instance, c => this.willChange(c))
-        observe(instance, this.didChange)
         node.applySnapshot(snapshot)
+        observe(instance, this.didChange)
     }
 
     getChildren(node: Node): Node[] {
