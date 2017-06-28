@@ -376,8 +376,8 @@ export class Node {
     }
 }
 
-export interface IStateTreeNode {
-    readonly $treenode?: Node
+export type IStateTreeNode = {
+    readonly $treenode?: any
 }
 
 export function isStateTreeNode(value: any): value is IStateTreeNode {
