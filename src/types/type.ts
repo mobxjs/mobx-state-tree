@@ -1,5 +1,5 @@
-import { action } from "mobx"
-import { TypeFlags } from "./type-flags"
+import { action } from 'mobx'
+import { TypeFlags } from './type-flags'
 
 export interface ISnapshottable<S> {}
 
@@ -30,7 +30,7 @@ export interface IType<S, T> {
 
 export interface ISimpleType<T> extends IType<T, T> {}
 
-export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IComplexValue> {}
+export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IStateTreeNode> {}
 
 /**
  * A complex type produces a MST node (Node in the state tree)
@@ -46,10 +46,15 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     @action
     create(snapshot: S = this.getDefaultSnapshot(), environment?: any): T {
         typecheck(this, snapshot)
-        return this.instantiate(null, "", environment, snapshot).value
+        return this.instantiate(null, '', environment, snapshot).value
     }
 
-    abstract instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any): Node
+    abstract instantiate(
+        parent: Node | null,
+        subpath: string,
+        environment: any,
+        initialValue: any
+    ): Node
 
     abstract flags: TypeFlags
     abstract describe(): string
@@ -81,7 +86,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     is(value: any): value is S | T {
-        return this.validate(value, [{ path: "", type: this }]).length === 0
+        return this.validate(value, [{ path: '', type: this }]).length === 0
     }
 
     reconcile(current: Node, newValue: any): Node {
@@ -94,7 +99,8 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
             current.type === this &&
             isMutable(newValue) &&
             !isStateTreeNode(newValue) &&
-            (!current.identifierAttribute || current.identifier === newValue[current.identifierAttribute])
+            (!current.identifierAttribute ||
+                current.identifier === newValue[current.identifierAttribute])
         ) {
             // the newValue has no node, so can be treated like a snapshot
             // we can reconcile
@@ -116,12 +122,12 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     get Type(): T {
         return fail(
-            "Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`"
+            'Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`'
         )
     }
     get SnapshotType(): S {
         return fail(
-            "Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`"
+            'Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`'
         )
     }
 }
@@ -131,7 +137,12 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
         super(name)
     }
 
-    abstract instantiate(parent: Node | null, subpath: string, environment: any, initialValue: any): Node
+    abstract instantiate(
+        parent: Node | null,
+        subpath: string,
+        environment: any,
+        initialValue: any
+    ): Node
 
     getValue(node: Node) {
         return node.storedValue
@@ -146,11 +157,11 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
     }
 
     applySnapshot(node: Node, snapshot: S): void {
-        fail("Immutable types do not support applying snapshots")
+        fail('Immutable types do not support applying snapshots')
     }
 
     applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
-        fail("Immutable types do not support applying patches")
+        fail('Immutable types do not support applying patches')
     }
 
     getChildren(node: Node): Node[] {
@@ -168,7 +179,12 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
     reconcile(current: Node, newValue: any): Node {
         // reconcile only if type and value are still the same
         if (current.type === this && current.storedValue === newValue) return current
-        const res = this.instantiate(current.parent, current.subpath, current._environment, newValue)
+        const res = this.instantiate(
+            current.parent,
+            current.subpath,
+            current._environment,
+            newValue
+        )
         current.die()
         return res
     }
@@ -178,8 +194,14 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
     }
 }
 
-import { EMPTY_ARRAY, fail, isMutable } from "../utils"
-import { isStateTreeNode, getStateTreeNode } from "../core/node"
-import { IContext, IValidationResult, typecheck, typeCheckFailure, typeCheckSuccess } from "./type-checker"
-import { Node, IComplexValue, IJsonPatch } from "../core"
-import { getType } from "../core/mst-operations"
+import { EMPTY_ARRAY, fail, isMutable } from '../utils'
+import { isStateTreeNode, getStateTreeNode } from '../core/node'
+import {
+    IContext,
+    IValidationResult,
+    typecheck,
+    typeCheckFailure,
+    typeCheckSuccess
+} from './type-checker'
+import { Node, IStateTreeNode, IJsonPatch } from '../core'
+import { getType } from '../core/mst-operations'

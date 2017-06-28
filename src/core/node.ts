@@ -376,15 +376,15 @@ export class Node {
     }
 }
 
-export interface IComplexValue {
+export interface IStateTreeNode {
     readonly $treenode?: Node
 }
 
-export function isStateTreeNode(value: any): value is IComplexValue {
+export function isStateTreeNode(value: any): value is IStateTreeNode {
     return !!(value && value.$treenode)
 }
 
-export function getStateTreeNode(value: IComplexValue): Node {
+export function getStateTreeNode(value: IStateTreeNode): Node {
     if (isStateTreeNode(value)) return value.$treenode!
     else return fail('element has no Node')
 }
@@ -393,7 +393,7 @@ function canAttachNode(value: any) {
     return value && typeof value === 'object' && !isStateTreeNode(value) && !Object.isFrozen(value)
 }
 
-function toJSON(this: IComplexValue) {
+function toJSON(this: IStateTreeNode) {
     return getStateTreeNode(this).snapshot
 }
 

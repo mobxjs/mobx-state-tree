@@ -30,7 +30,9 @@
     "bugs": {
         "url": "https://github.com/mobxjs/mobx-state-tree/issues"
     },
-    "files": ["dist/"],
+    "files": [
+        "dist/"
+    ],
     "devDependencies": {
         "ava": "^0.19.0",
         "concurrently": "^3.1.0",
@@ -50,7 +52,7 @@
         "tape": "^4.6.0",
         "tslib": "^1.7.1",
         "tslint": "^3.15.1",
-        "typescript": "2.3.2"
+        "typescript": "^2.4.1"
     },
     "peerDependencies": {
         "mobx": "^3.1.15"
@@ -65,8 +67,12 @@
         "state management"
     ],
     "ava": {
-        "files": ["test-lib/test/**/*.js"],
-        "source": ["test-lib/src/**/*.js"]
+        "files": [
+            "test-lib/test/**/*.js"
+        ],
+        "source": [
+            "test-lib/src/**/*.js"
+        ]
     },
     "lint-staged": {
         "*.{ts,tsx,js,jsx}": [

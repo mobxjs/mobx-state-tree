@@ -1,13 +1,13 @@
-export function getType<S, T>(object: IComplexValue): IType<S, T> {
+export function getType<S, T>(object: IStateTreeNode): IType<S, T> {
     return getStateTreeNode(object).type
 }
 
-export function getChildType(object: IComplexValue, child: string): IType<any, any> {
+export function getChildType(object: IStateTreeNode, child: string): IType<any, any> {
     return getStateTreeNode(object).getChildType(child)
 }
 
 export function addMiddleware(
-    target: IComplexValue,
+    target: IStateTreeNode,
     middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any
 ): IDisposer {
     const node = getStateTreeNode(target)
@@ -28,7 +28,7 @@ export function addMiddleware(
  * @param {(patch: IJsonPatch) => void} callback the callback that is invoked for each patch
  * @returns {IDisposer} function to remove the listener
  */
-export function onPatch(target: IComplexValue, callback: (patch: IJsonPatch) => void): IDisposer {
+export function onPatch(target: IStateTreeNode, callback: (patch: IJsonPatch) => void): IDisposer {
     return getStateTreeNode(target).onPatch(callback)
 }
 
@@ -65,7 +65,7 @@ export function onSnapshot<S>(
  * @param {IJsonPatch} patch
  * @returns
  */
-export function applyPatch(target: IComplexValue, patch: IJsonPatch | IJsonPatch[]) {
+export function applyPatch(target: IStateTreeNode, patch: IJsonPatch | IJsonPatch[]) {
     const node = getStateTreeNode(target)
     runInAction(() => {
         asArray(patch).forEach(p => node.applyPatch(p))
@@ -75,14 +75,14 @@ export function applyPatch(target: IComplexValue, patch: IJsonPatch | IJsonPatch
 export interface IPatchRecorder {
     patches: IJsonPatch[]
     stop(): any
-    replay(target: IComplexValue): any
+    replay(target: IStateTreeNode): any
 }
 
-export function recordPatches(subject: IComplexValue): IPatchRecorder {
+export function recordPatches(subject: IStateTreeNode): IPatchRecorder {
     let recorder = {
         patches: [] as IJsonPatch[],
         stop: () => disposer(),
-        replay: (target: IComplexValue) => {
+        replay: (target: IStateTreeNode) => {
             applyPatch(target, recorder.patches)
         }
     }
@@ -102,7 +102,7 @@ export function recordPatches(subject: IComplexValue): IPatchRecorder {
  * @param {IActionCallOptions} [options]
  */
 export function applyAction(
-    target: IComplexValue,
+    target: IStateTreeNode,
     actions: ISerializedActionCall | ISerializedActionCall[]
 ): void {
     runInAction(() => {
@@ -113,14 +113,14 @@ export function applyAction(
 export interface IActionRecorder {
     actions: ISerializedActionCall[]
     stop(): any
-    replay(target: IComplexValue): any
+    replay(target: IStateTreeNode): any
 }
 
-export function recordActions(subject: IComplexValue): IActionRecorder {
+export function recordActions(subject: IStateTreeNode): IActionRecorder {
     let recorder = {
         actions: [] as ISerializedActionCall[],
         stop: () => disposer(),
-        replay: (target: IComplexValue) => {
+        replay: (target: IStateTreeNode) => {
             applyAction(target, recorder.actions)
         }
     }
@@ -148,13 +148,13 @@ export function recordActions(subject: IComplexValue): IActionRecorder {
  * todo.done = false // throws!
  * todo.toggle() // OK
  */
-export function protect(target: IComplexValue) {
+export function protect(target: IStateTreeNode) {
     const node = getStateTreeNode(target)
     if (!node.isRoot) fail('`protect` can only be invoked on root nodes')
     node.isProtectionEnabled = true
 }
 
-export function unprotect(target: IComplexValue) {
+export function unprotect(target: IStateTreeNode) {
     const node = getStateTreeNode(target)
     if (!node.isRoot) fail('`unprotect` can only be invoked on root nodes')
     node.isProtectionEnabled = false
@@ -163,7 +163,7 @@ export function unprotect(target: IComplexValue) {
 /**
  * Returns true if the object is in protected mode, @see protect
  */
-export function isProtected(target: IComplexValue): boolean {
+export function isProtected(target: IStateTreeNode): boolean {
     return getStateTreeNode(target).isProtected
 }
 
@@ -175,7 +175,7 @@ export function isProtected(target: IComplexValue): boolean {
  * @param {Object} snapshot
  * @returns
  */
-export function applySnapshot<S, T>(target: IComplexValue, snapshot: S) {
+export function applySnapshot<S, T>(target: IStateTreeNode, snapshot: S) {
     return getStateTreeNode(target).applySnapshot(snapshot)
 }
 
@@ -202,7 +202,7 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
  * @param {number} depth = 1, how far should we look upward?
  * @returns {boolean}
  */
-export function hasParent(target: IComplexValue, depth: number = 1): boolean {
+export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let parent: Node | null = getStateTreeNode(target).parent
     while (parent) {
@@ -223,9 +223,9 @@ export function hasParent(target: IComplexValue, depth: number = 1): boolean {
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent(target: IComplexValue, depth?: number): (any & IComplexValue)
-export function getParent<T>(target: IComplexValue, depth?: number): (T & IComplexValue)
-export function getParent<T>(target: IComplexValue, depth = 1): (T & IComplexValue) {
+export function getParent(target: IStateTreeNode, depth?: number): (any & IStateTreeNode)
+export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStateTreeNode)
+export function getParent<T>(target: IStateTreeNode, depth = 1): (T & IStateTreeNode) {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let d = depth
     let parent: Node | null = getStateTreeNode(target).parent
@@ -243,9 +243,9 @@ export function getParent<T>(target: IComplexValue, depth = 1): (T & IComplexVal
  * @param {Object} target
  * @returns {*}
  */
-export function getRoot(target: IComplexValue): any & IComplexValue
-export function getRoot<T>(target: IComplexValue): T & IComplexValue
-export function getRoot(target: IComplexValue): IComplexValue {
+export function getRoot(target: IStateTreeNode): any & IStateTreeNode
+export function getRoot<T>(target: IStateTreeNode): T & IStateTreeNode
+export function getRoot(target: IStateTreeNode): IStateTreeNode {
     return getStateTreeNode(target).root.storedValue
 }
 
@@ -256,7 +256,7 @@ export function getRoot(target: IComplexValue): IComplexValue {
  * @param {Object} target
  * @returns {string}
  */
-export function getPath(target: IComplexValue): string {
+export function getPath(target: IStateTreeNode): string {
     return getStateTreeNode(target).path
 }
 
@@ -267,7 +267,7 @@ export function getPath(target: IComplexValue): string {
  * @param {Object} target
  * @returns {string[]}
  */
-export function getPathParts(target: IComplexValue): string[] {
+export function getPathParts(target: IStateTreeNode): string[] {
     return splitJsonPath(getStateTreeNode(target).path)
 }
 
@@ -278,7 +278,7 @@ export function getPathParts(target: IComplexValue): string[] {
  * @param {Object} target
  * @returns {boolean}
  */
-export function isRoot(target: IComplexValue): boolean {
+export function isRoot(target: IStateTreeNode): boolean {
     return getStateTreeNode(target).isRoot
 }
 
@@ -290,7 +290,7 @@ export function isRoot(target: IComplexValue): boolean {
  * @param {string} path - escaped json path
  * @returns {*}
  */
-export function resolvePath(target: IComplexValue, path: string): IComplexValue | any {
+export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNode | any {
     // TODO: give better error messages!
     // TODO: also accept path parts
     const node = getStateTreeNode(target).resolve(path)
@@ -299,7 +299,7 @@ export function resolvePath(target: IComplexValue, path: string): IComplexValue 
 
 export function resolveIdentifier(
     type: IType<any, any>,
-    target: IComplexValue,
+    target: IStateTreeNode,
     identifier: string | number
 ): any {
     if (!isType(type)) fail('Expected a type as first argument')
@@ -315,13 +315,13 @@ export function resolveIdentifier(
  * @param {string} path
  * @returns {*}
  */
-export function tryResolve(target: IComplexValue, path: string): IComplexValue | any {
+export function tryResolve(target: IStateTreeNode, path: string): IStateTreeNode | any {
     const node = getStateTreeNode(target).resolve(path, false)
     if (node === undefined) return undefined
     return node ? node.value : undefined
 }
 
-export function getRelativePath(base: IComplexValue, target: IComplexValue): string {
+export function getRelativePath(base: IStateTreeNode, target: IStateTreeNode): string {
     return getStateTreeNode(base).getRelativePathTo(getStateTreeNode(target))
 }
 
@@ -333,7 +333,7 @@ export function getRelativePath(base: IComplexValue, target: IComplexValue): str
  * @param {T} source
  * @returns {T}
  */
-export function clone<T extends IComplexValue>(
+export function clone<T extends IStateTreeNode>(
     source: T,
     keepEnvironment: boolean | any = true
 ): T {
@@ -349,7 +349,7 @@ export function clone<T extends IComplexValue>(
 /**
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
-export function detach<T extends IComplexValue>(thing: T): T {
+export function detach<T extends IStateTreeNode>(thing: T): T {
     // TODO: should throw if it cannot be removed from the parent? e.g. parent type wouldn't allow that
     getStateTreeNode(thing).detach()
     return thing
@@ -358,22 +358,22 @@ export function detach<T extends IComplexValue>(thing: T): T {
 /**
  * Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
  */
-export function destroy(thing: IComplexValue) {
+export function destroy(thing: IStateTreeNode) {
     const node = getStateTreeNode(thing)
     // TODO: should throw if it cannot be removed from the parent? e.g. parent type wouldn't allow that
     if (node.isRoot) node.die()
     else node.parent!.removeChild(node.subpath)
 }
 
-export function isAlive(thing: IComplexValue): boolean {
+export function isAlive(thing: IStateTreeNode): boolean {
     return getStateTreeNode(thing).isAlive
 }
 
-export function addDisposer(thing: IComplexValue, disposer: () => void) {
+export function addDisposer(thing: IStateTreeNode, disposer: () => void) {
     getStateTreeNode(thing).addDisposer(disposer)
 }
 
-export function getEnv(thing: IComplexValue): any {
+export function getEnv(thing: IStateTreeNode): any {
     const node = getStateTreeNode(thing)
     const env = node.root._environment
     if (!!!env)
@@ -386,7 +386,7 @@ export function getEnv(thing: IComplexValue): any {
 /**
  * Performs a depth first walk through a tree
  */
-export function walk(thing: IComplexValue, processor: (item: IComplexValue) => void) {
+export function walk(thing: IStateTreeNode, processor: (item: IStateTreeNode) => void) {
     const node = getStateTreeNode(thing)
     // tslint:disable-next-line:no_unused-variable
     node.getChildren().forEach(child => {
@@ -402,7 +402,7 @@ import {
     onAction
 } from './action'
 import { runInAction, IObservableArray, ObservableMap } from 'mobx'
-import { Node, getStateTreeNode, IComplexValue, isStateTreeNode } from './node'
+import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from './node'
 import { IJsonPatch, splitJsonPath } from './json-patch'
 import { IDisposer, fail, asArray } from '../utils'
 import { ISnapshottable, IType } from '../types/type'

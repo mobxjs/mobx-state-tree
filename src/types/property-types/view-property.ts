@@ -1,8 +1,14 @@
-import { extras } from "mobx"
-import { addHiddenFinalProp, createNamedFunction } from "../../utils"
-import { IComplexValue, getStateTreeNode } from "../../core"
-import { Property } from "./property"
-import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getContextForPath } from "../type-checker"
+import { extras } from 'mobx'
+import { addHiddenFinalProp, createNamedFunction } from '../../utils'
+import { IStateTreeNode, getStateTreeNode } from '../../core'
+import { Property } from './property'
+import {
+    IContext,
+    IValidationResult,
+    typeCheckFailure,
+    typeCheckSuccess,
+    getContextForPath
+} from '../type-checker'
 
 export class ViewProperty extends Property {
     invokeView: Function
@@ -21,7 +27,7 @@ export class ViewProperty extends Property {
             return typeCheckFailure(
                 getContextForPath(context, this.name),
                 snapshot[this.name],
-                "View properties should not be provided in the snapshot"
+                'View properties should not be provided in the snapshot'
             )
         }
 
@@ -30,7 +36,7 @@ export class ViewProperty extends Property {
 }
 
 export function createViewInvoker(name: string, fn: Function) {
-    const viewInvoker = function(this: IComplexValue) {
+    const viewInvoker = function(this: IStateTreeNode) {
         const args = arguments
         const adm = getStateTreeNode(this)
         adm.assertAlive()

@@ -1,4 +1,4 @@
-import { action as mobxAction, isObservable } from "mobx"
+import { action as mobxAction, isObservable } from 'mobx'
 
 export type ISerializedActionCall = {
     name: string
@@ -8,11 +8,14 @@ export type ISerializedActionCall = {
 
 export type IRawActionCall = {
     name: string
-    object: any & IComplexValue
+    object: any & IStateTreeNode
     args: any[]
 }
 
-export type IMiddleWareHandler = (actionCall: IRawActionCall, next: (actionCall: IRawActionCall) => any) => any
+export type IMiddleWareHandler = (
+    actionCall: IRawActionCall,
+    next: (actionCall: IRawActionCall) => any
+) => any
 
 function runRawAction(actioncall: IRawActionCall): any {
     return actioncall.object[actioncall.name].apply(actioncall.object, actioncall.args)
@@ -45,7 +48,7 @@ function runMiddleWares(node: Node, baseCall: IRawActionCall): any {
 export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
 
-    const actionInvoker = function(this: IComplexValue) {
+    const actionInvoker = function(this: IStateTreeNode) {
         const adm = getStateTreeNode(this)
         adm.assertAlive()
         if (adm.isRunningAction()) {
@@ -85,16 +88,16 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
             $ref: node.getRelativePathTo(getStateTreeNode(arg))
         }
     }
-    if (typeof arg === "function")
+    if (typeof arg === 'function')
         throw new Error(
             `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a function`
         )
-    if (typeof arg === "object" && !isPlainObject(arg) && !Array.isArray(arg))
+    if (typeof arg === 'object' && !isPlainObject(arg) && !Array.isArray(arg))
         throw new Error(
             `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any) &&
                 (arg as any).constructor
                 ? (arg as any).constructor.name
-                : "Complex Object"}`
+                : 'Complex Object'}`
         )
     if (isObservable(arg))
         throw new Error(
@@ -106,14 +109,16 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
         JSON.stringify(arg) // or throws
         return arg
     } catch (e) {
-        throw new Error(`Argument ${index} that was passed to action '${actionName}' is not serializable.`)
+        throw new Error(
+            `Argument ${index} that was passed to action '${actionName}' is not serializable.`
+        )
     }
 }
 
 function deserializeArgument(adm: Node, value: any): any {
-    if (typeof value === "object") {
+    if (typeof value === 'object') {
         const keys = Object.keys(value)
-        if (keys.length === 1 && keys[0] === "$ref") return resolvePath(adm.storedValue, value.$ref)
+        if (keys.length === 1 && keys[0] === '$ref') return resolvePath(adm.storedValue, value.$ref)
     }
     return value
 }
@@ -128,11 +133,11 @@ function deserializeArgument(adm: Node, value: any): any {
  * @param {IActionCallOptions} [options]
  * @returns
  */
-export function applyAction(target: IComplexValue, action: ISerializedActionCall): any {
-    const resolvedTarget = tryResolve(target, action.path || "")
-    if (!resolvedTarget) return fail(`Invalid action path: ${action.path || ""}`)
+export function applyAction(target: IStateTreeNode, action: ISerializedActionCall): any {
+    const resolvedTarget = tryResolve(target, action.path || '')
+    if (!resolvedTarget) return fail(`Invalid action path: ${action.path || ''}`)
     const node = getStateTreeNode(resolvedTarget)
-    if (!(typeof resolvedTarget[action.name] === "function"))
+    if (!(typeof resolvedTarget[action.name] === 'function'))
         fail(`Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
@@ -140,18 +145,30 @@ export function applyAction(target: IComplexValue, action: ISerializedActionCall
     )
 }
 
-export function onAction(target: IComplexValue, listener: (call: ISerializedActionCall) => void): IDisposer {
+export function onAction(
+    target: IStateTreeNode,
+    listener: (call: ISerializedActionCall) => void
+): IDisposer {
     return addMiddleware(target, (rawCall, next) => {
         const sourceNode = getStateTreeNode(rawCall.object)
         listener({
             name: rawCall.name,
             path: getStateTreeNode(target).getRelativePathTo(sourceNode),
-            args: rawCall.args.map((arg: any, index: number) => serializeArgument(sourceNode, rawCall.name, index, arg))
+            args: rawCall.args.map((arg: any, index: number) =>
+                serializeArgument(sourceNode, rawCall.name, index, arg)
+            )
         })
         return next(rawCall)
     })
 }
 
-import { Node, getStateTreeNode, IComplexValue, isStateTreeNode } from "./node"
-import { resolvePath, tryResolve, addMiddleware } from "./mst-operations"
-import { fail, isPlainObject, isPrimitive, argsToArray, createNamedFunction, IDisposer } from "../utils"
+import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from './node'
+import { resolvePath, tryResolve, addMiddleware } from './mst-operations'
+import {
+    fail,
+    isPlainObject,
+    isPrimitive,
+    argsToArray,
+    createNamedFunction,
+    IDisposer
+} from '../utils'

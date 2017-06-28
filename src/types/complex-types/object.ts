@@ -9,7 +9,7 @@ import {
 import { extendKeepGetter, fail, hasOwnProperty, isPlainObject, isPrimitive } from '../../utils'
 import { ComplexType, IComplexType, IType } from '../type'
 import { TypeFlags, isType, isObjectType } from '../type-flags'
-import { createNode, getStateTreeNode, IComplexValue, IJsonPatch, Node } from '../../core'
+import { createNode, getStateTreeNode, IStateTreeNode, IJsonPatch, Node } from '../../core'
 import {
     flattenTypeErrors,
     IContext,
@@ -92,7 +92,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     finalizeNewInstance = (node: Node, snapshot: any) => {
-        const instance = node.storedValue as IComplexValue
+        const instance = node.storedValue as IStateTreeNode
         this.forAllProps(prop => prop.initialize(instance, snapshot))
         intercept(instance, change => this.willChange(change))
         observe(instance, this.didChange)
@@ -295,28 +295,28 @@ export interface IModelType<T, S, A> extends IComplexType<Snapshot<T>, T & S & A
 export function model<T>(properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}, {}>
 export function model<T>(
     name: string,
-    properties: IModelProperties<T> & ThisType<T>
-): IModelType<T, {}, {}>
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T>
+): IModelType<T & IStateTreeNode, {}, {}>
 export function model<T, A>(
-    properties: IModelProperties<T> & ThisType<T>,
-    operations: A & ThisType<T & A>
-): IModelType<T, {}, A>
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T>,
+    operations: A & ThisType<IStateTreeNode & T & A>
+): IModelType<T & IStateTreeNode, {}, A>
 export function model<T, A>(
     name: string,
-    properties: IModelProperties<T> & ThisType<T>,
-    operations: A & ThisType<T & A>
-): IModelType<T, {}, A>
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T>,
+    operations: A & ThisType<IStateTreeNode & T & A>
+): IModelType<T & IStateTreeNode, {}, A>
 export function model<T, S, A>(
-    properties: IModelProperties<T> & ThisType<T & S>,
-    volatileState: IModelVolatileState<S> & ThisType<T & S>,
-    operations: A & ThisType<T & A & S>
-): IModelType<T, S, A>
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
+    volatileState: IModelVolatileState<S> & ThisType<IStateTreeNode & T & S>,
+    operations: A & ThisType<IStateTreeNode & T & A & S>
+): IModelType<T & IStateTreeNode, S, A>
 export function model<T, S, A>(
     name: string,
-    properties: IModelProperties<T> & ThisType<T & S>,
-    volatileState: IModelVolatileState<S> & ThisType<T & S>,
-    operations: A & ThisType<T & A & S>
-): IModelType<T, S, A>
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
+    volatileState: IModelVolatileState<S> & ThisType<IStateTreeNode & T & S>,
+    operations: A & ThisType<IStateTreeNode & T & A & S>
+): IModelType<T & IStateTreeNode, S, A>
 export function model(...args: any[]) {
     const name = typeof args[0] === 'string' ? args.shift() : 'AnonymousModel'
     const props = args.shift() || fail('types.model must specify properties')
@@ -330,60 +330,60 @@ export function compose<T1, S1, A1, T2, S2, A2>(
     name: string,
     t1: IModelType<T1, S1, A1>,
     t2: IModelType<T2, S2, A2>
-): IModelType<T1 & T2, S1 & S2, A1 & A2>
+): IModelType<IStateTreeNode & T1 & T2, S1 & S2, A1 & A2>
 export function compose<T1, S1, A1, T2, S2, A2>(
     t1: IModelType<T1, S1, A1>,
     t2: IModelType<T2, S2, A2>
-): IModelType<T1 & T2, S1 & S2, A1 & A2>
+): IModelType<IStateTreeNode & T1 & T2, S1 & S2, A1 & A2>
 export function compose<T1, S1, A1, T2, S2, A2>(
     name: string,
     t1: IModelType<T1, S1, A1>,
     t2: IModelType<T2, S2, A2>
-): IModelType<T1 & T2, S1 & S2, A1 & A2>
+): IModelType<IStateTreeNode & T1 & T2, S1 & S2, A1 & A2>
 export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
     name: string,
     t1: IModelType<T1, S1, A1>,
     t2: IModelType<T2, S2, A2>,
     t3: IModelType<T3, S3, A3>
-): IModelType<T1 & T2 & T3, S1 & S2 & S3, A1 & A2 & A3> // ...and so forth...
+): IModelType<IStateTreeNode & T1 & T2 & T3, S1 & S2 & S3, A1 & A2 & A3> // ...and so forth...
 export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
     baseType: IModelType<BASE_T, BASE_S, BASE_A>,
-    properties: IModelProperties<T> & ThisType<T & BASE_T>
-): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
-export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
-    name: string,
-    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
-    properties: IModelProperties<T> & ThisType<T & BASE_T>
-): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
-export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
-    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
-    properties: IModelProperties<T> & ThisType<T & BASE_T>,
-    operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
-): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>
+): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
 export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
     name: string,
     baseType: IModelType<BASE_T, BASE_S, BASE_A>,
-    properties: IModelProperties<T> & ThisType<T & BASE_T>,
-    operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
-): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>
+): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
 export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
     baseType: IModelType<BASE_T, BASE_S, BASE_A>,
-    properties: IModelProperties<T> & ThisType<T & BASE_T>,
-    volatileState: IModelVolatileState<S> & ThisType<BASE_T & T & BASE_S & S>,
-    operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
-): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>,
+    operations: A & ThisType<IStateTreeNode & BASE_T & T & BASE_S & S & BASE_A & A>
+): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
 export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
     name: string,
     baseType: IModelType<BASE_T, BASE_S, BASE_A>,
-    properties: IModelProperties<T> & ThisType<T & BASE_T>,
-    volatileState: IModelVolatileState<S> & ThisType<BASE_T & T & BASE_S & S>,
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>,
+    operations: A & ThisType<IStateTreeNode & BASE_T & T & BASE_S & S & BASE_A & A>
+): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
+export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
+    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>,
+    volatileState: IModelVolatileState<S> & ThisType<IStateTreeNode & BASE_T & T & BASE_S & S>,
+    operations: A & ThisType<IStateTreeNode & BASE_T & T & BASE_S & S & BASE_A & A>
+): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
+export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
+    name: string,
+    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>,
+    volatileState: IModelVolatileState<S> & ThisType<IStateTreeNode & BASE_T & T & BASE_S & S>,
     operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
-): IModelType<BASE_T & T, BASE_S & S, BASE_A & A>
+): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
 export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
     t1: IModelType<T1, S1, A1>,
     t2: IModelType<T2, S2, A2>,
     t3: IModelType<T3, S3, A3>
-): IModelType<T1 & T2 & T3, S1 & S2 & S3, A1 & A2 & A3> // ...and so forth...
+): IModelType<IStateTreeNode & T1 & T2 & T3, S1 & S2 & S3, A1 & A2 & A3> // ...and so forth...
 export function compose(...args: any[]) {
     const typeName = typeof args[0] === 'string' ? args.shift() : 'AnonymousModel'
 

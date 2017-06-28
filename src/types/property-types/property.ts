@@ -1,6 +1,6 @@
-import { IComplexValue } from "../../core/"
-import { IContext, IValidationResult } from "../type-checker"
-import { IObjectChange, IObjectWillChange } from "mobx"
+import { IStateTreeNode } from '../../core/'
+import { IContext, IValidationResult } from '../type-checker'
+import { IObjectChange, IObjectWillChange } from 'mobx'
 
 export abstract class Property {
     constructor(public name: string) {
@@ -8,7 +8,7 @@ export abstract class Property {
     }
 
     initializePrototype(prototype: any) {}
-    initialize(targetInstance: IComplexValue, snapshot: any) {}
+    initialize(targetInstance: IStateTreeNode, snapshot: any) {}
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         return null
@@ -16,7 +16,7 @@ export abstract class Property {
 
     didChange(change: IObjectChange) {}
 
-    serialize(instance: IComplexValue, snapshot: any) {}
-    deserialize(instance: IComplexValue, snapshot: any) {}
+    serialize(instance: IStateTreeNode, snapshot: any) {}
+    deserialize(instance: IStateTreeNode, snapshot: any) {}
     abstract validate(snapshot: any, context: IContext): IValidationResult
 }
