@@ -1,25 +1,38 @@
-import { action, extendShallowObservable, IObjectChange, IObjectWillChange, intercept, observe } from "mobx"
-import { extendKeepGetter, fail, hasOwnProperty, isPlainObject, isPrimitive } from "../../utils"
-import { ComplexType, IComplexType, IType } from "../type"
-import { TypeFlags, isType, isObjectType } from "../type-flags"
-import { createNode, getStateTreeNode, IComplexValue, IJsonPatch, Node } from "../../core"
-import { flattenTypeErrors, IContext, IValidationResult, typecheck, typeCheckFailure } from "../type-checker"
-import { getPrimitiveFactoryFromValue } from "../primitives"
-import { optional } from "../utility-types/optional"
-import { Property } from "../property-types/property"
-import { ComputedProperty } from "../property-types/computed-property"
-import { ValueProperty } from "../property-types/value-property"
-import { ActionProperty } from "../property-types/action-property"
-import { ViewProperty } from "../property-types/view-property"
-import { VolatileProperty } from "../property-types/volatile-property"
+import {
+    action,
+    extendShallowObservable,
+    IObjectChange,
+    IObjectWillChange,
+    intercept,
+    observe
+} from 'mobx'
+import { extendKeepGetter, fail, hasOwnProperty, isPlainObject, isPrimitive } from '../../utils'
+import { ComplexType, IComplexType, IType } from '../type'
+import { TypeFlags, isType, isObjectType } from '../type-flags'
+import { createNode, getStateTreeNode, IComplexValue, IJsonPatch, Node } from '../../core'
+import {
+    flattenTypeErrors,
+    IContext,
+    IValidationResult,
+    typecheck,
+    typeCheckFailure
+} from '../type-checker'
+import { getPrimitiveFactoryFromValue } from '../primitives'
+import { optional } from '../utility-types/optional'
+import { Property } from '../property-types/property'
+import { ComputedProperty } from '../property-types/computed-property'
+import { ValueProperty } from '../property-types/value-property'
+import { ActionProperty } from '../property-types/action-property'
+import { ViewProperty } from '../property-types/view-property'
+import { VolatileProperty } from '../property-types/volatile-property'
 
 const HOOK_NAMES = [
-    "preProcessSnapshot",
-    "afterCreate",
-    "afterAttach",
-    "postProcessSnapshot",
-    "beforeDetach",
-    "beforeDestroy"
+    'preProcessSnapshot',
+    'afterCreate',
+    'afterAttach',
+    'postProcessSnapshot',
+    'beforeDetach',
+    'beforeDestroy'
 ]
 
 function objectTypeToString(this: any) {
@@ -108,7 +121,7 @@ export class ObjectType extends ComplexType<any, any> {
                     )
 
                 const descriptor = Object.getOwnPropertyDescriptor(properties, key)
-                if ("get" in descriptor) {
+                if ('get' in descriptor) {
                     this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
                     continue
                 }
@@ -116,17 +129,19 @@ export class ObjectType extends ComplexType<any, any> {
                 const { value } = descriptor
                 if (value === null || undefined) {
                     fail(
-                        "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
+                        'The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?'
                     )
                 } else if (isPrimitive(value)) {
                     const baseType = getPrimitiveFactoryFromValue(value)
                     this.props[key] = new ValueProperty(key, optional(baseType, value))
                 } else if (isType(value)) {
                     this.props[key] = new ValueProperty(key, value)
-                } else if (typeof value === "function") {
+                } else if (typeof value === 'function') {
                     this.props[key] = new ViewProperty(key, value)
-                } else if (typeof value === "object") {
-                    fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
+                } else if (typeof value === 'object') {
+                    fail(
+                        `In property '${key}': base model's should not contain complex values: '${value}'`
+                    )
                 } else {
                     fail(`Unexpected value for property '${key}'`)
                 }
@@ -151,13 +166,19 @@ export class ObjectType extends ComplexType<any, any> {
             if (hasOwnProperty(actions, key)) {
                 const value = actions[key]
                 if (key in this.properties)
-                    fail(`Property '${key}' was also defined as action. Actions and properties should not collide`)
+                    fail(
+                        `Property '${key}' was also defined as action. Actions and properties should not collide`
+                    )
                 if (key in this.state)
-                    fail(`Property '${key}' was also defined as local state. Actions and state should not collide`)
-                if (typeof value === "function") {
+                    fail(
+                        `Property '${key}' was also defined as local state. Actions and state should not collide`
+                    )
+                if (typeof value === 'function') {
                     this.props[key] = new ActionProperty(key, value)
                 } else {
-                    fail(`Unexpected value for action '${key}'. Expected function, got ${typeof value}`)
+                    fail(
+                        `Unexpected value for action '${key}'. Expected function, got ${typeof value}`
+                    )
                 }
             }
     }
@@ -171,7 +192,7 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     getChildNode(node: Node, key: string): Node {
-        if (!(this.props[key] instanceof ValueProperty)) return fail("Not a value property: " + key)
+        if (!(this.props[key] instanceof ValueProperty)) return fail('Not a value property: ' + key)
         return (this.props[key] as ValueProperty).getValueNode(node.storedValue)
     }
 
@@ -186,7 +207,8 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
-        if (!(patch.op === "replace" || patch.op === "add")) fail(`object does not support operation ${patch.op}`)
+        if (!(patch.op === 'replace' || patch.op === 'add'))
+            fail(`object does not support operation ${patch.op}`)
         node.storedValue[subpath] = patch.value
     }
 
@@ -200,13 +222,13 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     preProcessSnapshot(snapshot: any) {
-        if (typeof this.actions.preProcessSnapshot === "function")
+        if (typeof this.actions.preProcessSnapshot === 'function')
             return this.actions.preProcessSnapshot.call(null, snapshot)
         return snapshot
     }
 
     postProcessSnapshot(snapshot: any) {
-        if (typeof this.actions.postProcessSnapshot === "function")
+        if (typeof this.actions.postProcessSnapshot === 'function')
             return this.actions.postProcessSnapshot.call(null, snapshot)
         return snapshot
     }
@@ -222,7 +244,9 @@ export class ObjectType extends ComplexType<any, any> {
             return typeCheckFailure(context, snapshot)
         }
 
-        return flattenTypeErrors(Object.keys(this.props).map(path => this.props[path].validate(snapshot, context)))
+        return flattenTypeErrors(
+            Object.keys(this.props).map(path => this.props[path].validate(snapshot, context))
+        )
     }
 
     private forAllProps(fn: (o: Property) => void) {
@@ -234,15 +258,15 @@ export class ObjectType extends ComplexType<any, any> {
         // TODO: make proptypes responsible
         // optimization: cache
         return (
-            "{ " +
+            '{ ' +
             Object.keys(this.props)
                 .map(key => {
                     const prop = this.props[key]
-                    return prop instanceof ValueProperty ? key + ": " + prop.type.describe() : ""
+                    return prop instanceof ValueProperty ? key + ': ' + prop.type.describe() : ''
                 })
                 .filter(Boolean)
-                .join("; ") +
-            " }"
+                .join('; ') +
+            ' }'
         )
     }
 
@@ -269,7 +293,10 @@ export interface IModelType<T, S, A> extends IComplexType<Snapshot<T>, T & S & A
 }
 
 export function model<T>(properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}, {}>
-export function model<T>(name: string, properties: IModelProperties<T> & ThisType<T>): IModelType<T, {}, {}>
+export function model<T>(
+    name: string,
+    properties: IModelProperties<T> & ThisType<T>
+): IModelType<T, {}, {}>
 export function model<T, A>(
     properties: IModelProperties<T> & ThisType<T>,
     operations: A & ThisType<T & A>
@@ -291,13 +318,14 @@ export function model<T, S, A>(
     operations: A & ThisType<T & A & S>
 ): IModelType<T, S, A>
 export function model(...args: any[]) {
-    const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
-    const props = args.shift() || fail("types.model must specify properties")
+    const name = typeof args[0] === 'string' ? args.shift() : 'AnonymousModel'
+    const props = args.shift() || fail('types.model must specify properties')
     const volatileState = (args.length > 1 && args.shift()) || {}
     const actions = args.shift() || {}
     return new ObjectType(name, props, volatileState, actions)
 }
 
+// TODO: use generic defualts
 export function compose<T1, S1, A1, T2, S2, A2>(
     name: string,
     t1: IModelType<T1, S1, A1>,
@@ -357,7 +385,7 @@ export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
     t3: IModelType<T3, S3, A3>
 ): IModelType<T1 & T2 & T3, S1 & S2 & S3, A1 & A2 & A3> // ...and so forth...
 export function compose(...args: any[]) {
-    const typeName = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+    const typeName = typeof args[0] === 'string' ? args.shift() : 'AnonymousModel'
 
     if (args.every(arg => isType(arg))) {
         // compose types
@@ -367,7 +395,7 @@ export function compose(...args: any[]) {
     }
 
     const baseType = args.shift()
-    const props = args.shift() || fail("types.compose must specify properties or `{}`")
+    const props = args.shift() || fail('types.compose must specify properties or `{}`')
     const volatileState = (args.length > 1 && args.shift()) || {}
     const actions = args.shift() || {}
 

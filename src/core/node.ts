@@ -1,4 +1,4 @@
-import { observable, computed, action, reaction } from "mobx"
+import { observable, computed, action, reaction } from 'mobx'
 
 let nextNodeId = 1
 
@@ -8,7 +8,7 @@ export class Node {
     readonly type: IType<any, any>
     readonly storedValue: any
     @observable protected _parent: Node | null = null
-    @observable subpath: string = ""
+    @observable subpath: string = ''
 
     identifierCache: IdentifierCache | undefined
     isProtectionEnabled = true
@@ -25,7 +25,13 @@ export class Node {
     private readonly disposers: (() => void)[] = []
 
     // TODO: should have environment as well?
-    constructor(type: IType<any, any>, parent: Node | null, subpath: string, environment: any, storedValue: any) {
+    constructor(
+        type: IType<any, any>,
+        parent: Node | null,
+        subpath: string,
+        environment: any,
+        storedValue: any
+    ) {
         this.type = type
         this._parent = parent
         this.subpath = subpath
@@ -58,8 +64,8 @@ export class Node {
      */
     @computed
     public get path(): string {
-        if (!this.parent) return ""
-        return this.parent.path + "/" + escapeJsonPath(this.subpath)
+        if (!this.parent) return ''
+        return this.parent.path + '/' + escapeJsonPath(this.subpath)
     }
 
     public get isRoot(): boolean {
@@ -92,7 +98,10 @@ export class Node {
             if (baseParts[common] !== targetParts[common]) break
         }
         // TODO: assert that no targetParts paths are "..", "." or ""!
-        return baseParts.slice(common).map(_ => "..").join("/") + joinJsonPath(targetParts.slice(common))
+        return (
+            baseParts.slice(common).map(_ => '..').join('/') +
+            joinJsonPath(targetParts.slice(common))
+        )
     }
 
     resolve(pathParts: string): Node
@@ -111,11 +120,11 @@ export class Node {
         let current: Node | null = this
         for (let i = 0; i < pathParts.length; i++) {
             if (
-                pathParts[i] === "" // '/bla' or 'a//b' splits to empty strings
+                pathParts[i] === '' // '/bla' or 'a//b' splits to empty strings
             )
                 current = current!.root
-            else if (pathParts[i] === "..") current = current!.parent
-            else if (pathParts[i] === "." || pathParts[i] === "") continue
+            else if (pathParts[i] === '..') current = current!.parent
+            else if (pathParts[i] === '.' || pathParts[i] === '') continue
             else if (current) {
                 current = current.getChildNode(pathParts[i])
                 continue
@@ -155,7 +164,7 @@ export class Node {
 
     public aboutToDie() {
         this.disposers.splice(0).forEach(f => f())
-        this.fireHook("beforeDestroy")
+        this.fireHook('beforeDestroy')
     }
 
     public finalizeDeath() {
@@ -163,18 +172,18 @@ export class Node {
         this.root.identifierCache!.notifyDied(this)
         const self = this
         const oldPath = this.path
-        addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
+        addReadOnlyProp(this, 'snapshot', this.snapshot) // kill the computed prop and just store the last snapshot
 
         this.patchSubscribers.splice(0)
         this.snapshotSubscribers.splice(0)
         this.patchSubscribers.splice(0)
         this._isAlive = false
         this._parent = null
-        this.subpath = ""
+        this.subpath = ''
 
         // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
         // we could express this in a much nicer way
-        Object.defineProperty(this.storedValue, "$mobx", {
+        Object.defineProperty(this.storedValue, '$mobx', {
             get() {
                 fail(
                     `This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type '${self
@@ -234,7 +243,7 @@ export class Node {
     emitPatch(patch: IJsonPatch, source: Node) {
         if (this.patchSubscribers.length) {
             const localizedPatch: IJsonPatch = extend({}, patch, {
-                path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
+                path: source.path.substr(this.path.length) + '/' + patch.path // calculate the relative path of the patch
             })
             this.patchSubscribers.forEach(f => f(localizedPatch))
         }
@@ -261,11 +270,11 @@ export class Node {
         if (this.parent && !newParent) {
             this.die()
         } else {
-            this.subpath = subpath || ""
+            this.subpath = subpath || ''
             if (newParent && newParent !== this._parent) {
                 newParent.root.identifierCache!.mergeCache(this)
                 this._parent = newParent
-                this.fireHook("afterAttach")
+                this.fireHook('afterAttach')
             }
         }
     }
@@ -306,12 +315,7 @@ export class Node {
     }
 
     get isProtected(): boolean {
-        let cur: Node | null = this
-        while (cur) {
-            if (cur.isProtectionEnabled === false) return false
-            cur = cur.parent
-        }
-        return true
+        return this.root.isProtectionEnabled
     }
 
     /**
@@ -328,7 +332,9 @@ export class Node {
     assertWritable() {
         this.assertAlive()
         if (!this.isRunningAction() && this.isProtected) {
-            fail(`Cannot modify '${this}', the object is protected and can only be modified by using an action.`)
+            fail(
+                `Cannot modify '${this}', the object is protected and can only be modified by using an action.`
+            )
         }
     }
 
@@ -340,13 +346,13 @@ export class Node {
         if (!this._isAlive) fail(`Error while detaching, node is not alive.`)
         if (this.isRoot) return
         else {
-            this.fireHook("beforeDetach")
+            this.fireHook('beforeDetach')
             this._environment = (this.root as Node)._environment // make backup of environment
             this._isDetaching = true
             this.identifierCache = this.root.identifierCache!.splitCache(this)
             this.parent!.removeChild(this.subpath)
             this._parent = null
-            this.subpath = ""
+            this.subpath = ''
             this._isDetaching = false
         }
     }
@@ -357,13 +363,16 @@ export class Node {
     }
 
     fireHook(name: string) {
-        const fn = this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
-        if (typeof fn === "function") fn.apply(this.storedValue)
+        const fn =
+            this.storedValue && typeof this.storedValue === 'object' && this.storedValue[name]
+        if (typeof fn === 'function') fn.apply(this.storedValue)
     }
 
     toString(): string {
-        const identifier = this.identifier ? `(id: ${this.identifier})` : ""
-        return `${this.type.name}@${this.path || "<root>"}${identifier}${this.isAlive ? "" : "[dead]"}`
+        const identifier = this.identifier ? `(id: ${this.identifier})` : ''
+        return `${this.type.name}@${this.path || '<root>'}${identifier}${this.isAlive
+            ? ''
+            : '[dead]'}`
     }
 }
 
@@ -377,11 +386,11 @@ export function isStateTreeNode(value: any): value is IComplexValue {
 
 export function getStateTreeNode(value: IComplexValue): Node {
     if (isStateTreeNode(value)) return value.$treenode!
-    else return fail("element has no Node")
+    else return fail('element has no Node')
 }
 
 function canAttachNode(value: any) {
-    return value && typeof value === "object" && !isStateTreeNode(value) && !Object.isFrozen(value)
+    return value && typeof value === 'object' && !isStateTreeNode(value) && !Object.isFrozen(value)
 }
 
 function toJSON(this: IComplexValue) {
@@ -403,7 +412,7 @@ export function createNode<S, T>(
             fail(
                 `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent
                     ? parent.path
-                    : ""}/${subpath}', but it lives already at '${targetNode.path}'`
+                    : ''}/${subpath}', but it lives already at '${targetNode.path}'`
             )
         targetNode.setParent(parent, subpath)
         return targetNode
@@ -413,11 +422,11 @@ export function createNode<S, T>(
     // tslint:disable-next-line:no_unused-variable
     const node = new Node(type, parent, subpath, environment, instance)
     if (!parent) node.identifierCache = new IdentifierCache()
-    if (canAttachTreeNode) addHiddenFinalProp(instance, "$treenode", node)
+    if (canAttachTreeNode) addHiddenFinalProp(instance, '$treenode', node)
 
     let sawException = true
     try {
-        if (canAttachTreeNode) addReadOnlyProp(instance, "toJSON", toJSON)
+        if (canAttachTreeNode) addReadOnlyProp(instance, 'toJSON', toJSON)
 
         node.pseudoAction(() => {
             finalizeNewInstance(node, initialValue)
@@ -425,8 +434,8 @@ export function createNode<S, T>(
         if (parent) parent.root.identifierCache!.addNodeToCache(node)
         else node.identifierCache!.addNodeToCache(node)
 
-        node.fireHook("afterCreate")
-        if (parent) node.fireHook("afterAttach")
+        node.fireHook('afterCreate')
+        if (parent) node.fireHook('afterAttach')
         sawException = false
         return node
     } finally {
@@ -437,11 +446,11 @@ export function createNode<S, T>(
     }
 }
 
-import { IType } from "../types/type"
-import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch } from "./json-patch"
-import { typecheck } from "../types/type-checker"
-import { walk } from "./mst-operations"
-import { IMiddleWareHandler } from "./action"
+import { IType } from '../types/type'
+import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch } from './json-patch'
+import { typecheck } from '../types/type-checker'
+import { walk } from './mst-operations'
+import { IMiddleWareHandler } from './action'
 import {
     addReadOnlyProp,
     addHiddenFinalProp,
@@ -453,5 +462,5 @@ import {
     identity,
     noop,
     freeze
-} from "../utils"
-import { IdentifierCache } from "./identifier-cache"
+} from '../utils'
+import { IdentifierCache } from './identifier-cache'

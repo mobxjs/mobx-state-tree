@@ -1,6 +1,7 @@
 # 0.9.0
 
-* Removed `applyPatches` and `applyActions`. Use `applyPatch` resp. `applyAction`, as both will now also accept an array as argument
+* **BREAKING** Removed `applyPatches` and `applyActions`. Use `applyPatch` resp. `applyAction`, as both will now also accept an array as argument
+* **BREAKING** `unprotect` and `protect` can only be applied at root nodes to avoid confusing scenarios
 
 # 0.8.2
 

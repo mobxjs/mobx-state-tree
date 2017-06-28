@@ -13,7 +13,7 @@ export function addMiddleware(
     const node = getStateTreeNode(target)
     if (!node.isProtectionEnabled)
         console.warn(
-            "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
+            'It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`'
         )
     return node.addMiddleWare(middleware)
 }
@@ -41,10 +41,19 @@ export function onPatch(target: IComplexValue, callback: (patch: IJsonPatch) => 
  * @param {(snapshot: any) => void} callback
  * @returns {IDisposer}
  */
-export function onSnapshot<S>(target: ObservableMap<S>, callback: (snapshot: { [key: string]: S }) => void): IDisposer
-export function onSnapshot<S>(target: IObservableArray<S>, callback: (snapshot: S[]) => void): IDisposer
+export function onSnapshot<S>(
+    target: ObservableMap<S>,
+    callback: (snapshot: { [key: string]: S }) => void
+): IDisposer
+export function onSnapshot<S>(
+    target: IObservableArray<S>,
+    callback: (snapshot: S[]) => void
+): IDisposer
 export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer
-export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer {
+export function onSnapshot<S>(
+    target: ISnapshottable<S>,
+    callback: (snapshot: S) => void
+): IDisposer {
     return getStateTreeNode(target).onSnapshot(callback)
 }
 
@@ -85,8 +94,6 @@ export function recordPatches(subject: IComplexValue): IPatchRecorder {
 
 /**
  * Applies a series of actions in a single MobX transaction.
- * TODO: just merge with applyAction
- *
  * Does not return any value
  *
  * @export
@@ -94,7 +101,10 @@ export function recordPatches(subject: IComplexValue): IPatchRecorder {
  * @param {IActionCall[]} actions
  * @param {IActionCallOptions} [options]
  */
-export function applyAction(target: IComplexValue, actions: ISerializedActionCall | ISerializedActionCall[]): void {
+export function applyAction(
+    target: IComplexValue,
+    actions: ISerializedActionCall | ISerializedActionCall[]
+): void {
     runInAction(() => {
         asArray(actions).forEach(action => baseApplyAction(target, action))
     })
@@ -139,20 +149,22 @@ export function recordActions(subject: IComplexValue): IActionRecorder {
  * todo.toggle() // OK
  */
 export function protect(target: IComplexValue) {
-    // TODO: verify that no parent is unprotectd, as that would be a noop
-    getStateTreeNode(target).isProtectionEnabled = true
+    const node = getStateTreeNode(target)
+    if (!node.isRoot) fail('`protect` can only be invoked on root nodes')
+    node.isProtectionEnabled = true
 }
 
 export function unprotect(target: IComplexValue) {
-    // TODO: verify that any node in the given tree is unprotected
-    getStateTreeNode(target).isProtectionEnabled = false
+    const node = getStateTreeNode(target)
+    if (!node.isRoot) fail('`unprotect` can only be invoked on root nodes')
+    node.isProtectionEnabled = false
 }
 
 /**
  * Returns true if the object is in protected mode, @see protect
  */
 export function isProtected(target: IComplexValue): boolean {
-    return getStateTreeNode(target).isProtectionEnabled
+    return getStateTreeNode(target).isProtected
 }
 
 /**
@@ -285,9 +297,13 @@ export function resolvePath(target: IComplexValue, path: string): IComplexValue 
     return node ? node.value : undefined
 }
 
-export function resolveIdentifier(type: IType<any, any>, target: IComplexValue, identifier: string | number): any {
-    if (!isType(type)) fail("Expected a type as first argument")
-    const node = getStateTreeNode(target).root.identifierCache!.resolve(type, "" + identifier)
+export function resolveIdentifier(
+    type: IType<any, any>,
+    target: IComplexValue,
+    identifier: string | number
+): any {
+    if (!isType(type)) fail('Expected a type as first argument')
+    const node = getStateTreeNode(target).root.identifierCache!.resolve(type, '' + identifier)
     return node ? node.value : undefined
 }
 
@@ -317,11 +333,16 @@ export function getRelativePath(base: IComplexValue, target: IComplexValue): str
  * @param {T} source
  * @returns {T}
  */
-export function clone<T extends IComplexValue>(source: T, keepEnvironment: boolean | any = true): T {
+export function clone<T extends IComplexValue>(
+    source: T,
+    keepEnvironment: boolean | any = true
+): T {
     const node = getStateTreeNode(source)
     return node.type.create(
         node.snapshot,
-        keepEnvironment === true ? node.root._environment : keepEnvironment === false ? undefined : keepEnvironment // it's an object or something else
+        keepEnvironment === true
+            ? node.root._environment
+            : keepEnvironment === false ? undefined : keepEnvironment // it's an object or something else
     ) as T
 }
 
@@ -374,10 +395,15 @@ export function walk(thing: IComplexValue, processor: (item: IComplexValue) => v
     processor(node.storedValue)
 }
 
-import { IRawActionCall, ISerializedActionCall, applyAction as baseApplyAction, onAction } from "./action"
-import { runInAction, IObservableArray, ObservableMap } from "mobx"
-import { Node, getStateTreeNode, IComplexValue, isStateTreeNode } from "./node"
-import { IJsonPatch, splitJsonPath } from "./json-patch"
-import { IDisposer, fail, asArray } from "../utils"
-import { ISnapshottable, IType } from "../types/type"
-import { isType } from "../types/type-flags"
+import {
+    IRawActionCall,
+    ISerializedActionCall,
+    applyAction as baseApplyAction,
+    onAction
+} from './action'
+import { runInAction, IObservableArray, ObservableMap } from 'mobx'
+import { Node, getStateTreeNode, IComplexValue, isStateTreeNode } from './node'
+import { IJsonPatch, splitJsonPath } from './json-patch'
+import { IDisposer, fail, asArray } from '../utils'
+import { ISnapshottable, IType } from '../types/type'
+import { isType } from '../types/type-flags'
