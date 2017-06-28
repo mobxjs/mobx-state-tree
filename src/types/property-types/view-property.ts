@@ -1,14 +1,14 @@
-import { extras } from 'mobx'
-import { addHiddenFinalProp, createNamedFunction } from '../../utils'
-import { IStateTreeNode, getStateTreeNode } from '../../core'
-import { Property } from './property'
+import { extras } from "mobx"
+import { addHiddenFinalProp } from "../../utils"
+import { IStateTreeNode, getStateTreeNode } from "../../core"
+import { Property } from "./property"
 import {
     IContext,
     IValidationResult,
     typeCheckFailure,
     typeCheckSuccess,
     getContextForPath
-} from '../type-checker'
+} from "../type-checker"
 
 export class ViewProperty extends Property {
     invokeView: Function
@@ -27,7 +27,7 @@ export class ViewProperty extends Property {
             return typeCheckFailure(
                 getContextForPath(context, this.name),
                 snapshot[this.name],
-                'View properties should not be provided in the snapshot'
+                "View properties should not be provided in the snapshot"
             )
         }
 
@@ -36,14 +36,10 @@ export class ViewProperty extends Property {
 }
 
 export function createViewInvoker(name: string, fn: Function) {
-    const viewInvoker = function(this: IStateTreeNode) {
+    return function(this: IStateTreeNode) {
         const args = arguments
         const adm = getStateTreeNode(this)
         adm.assertAlive()
         return extras.allowStateChanges(false, () => fn.apply(this, args))
     }
-
-    // This construction helps producing a better function name in the stack trace, but could be optimized
-    // away in prod builds, and `actionInvoker` be returned directly
-    return createNamedFunction(name, viewInvoker)
 }

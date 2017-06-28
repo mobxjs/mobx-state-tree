@@ -62,12 +62,22 @@ export function isPlainObject(value: any) {
 }
 
 export function isMutable(value: any) {
-    return value !== null && typeof value === "object" && !(value instanceof Date) && !(value instanceof RegExp)
+    return (
+        value !== null &&
+        typeof value === "object" &&
+        !(value instanceof Date) &&
+        !(value instanceof RegExp)
+    )
 }
 
 export function isPrimitive(value: any): boolean {
     if (value === null || value === undefined) return true
-    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean" || value instanceof Date)
+    if (
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean" ||
+        value instanceof Date
+    )
         return true
     return false
 }
@@ -138,8 +148,4 @@ export function argsToArray(args: IArguments): any[] {
     const res = new Array(args.length)
     for (let i = 0; i < args.length; i++) res[i] = args[i]
     return res
-}
-
-export function createNamedFunction(name: string, fn: Function) {
-    return new Function("f", `return function ${name}() { return f.apply(this, arguments)}`)(fn)
 }

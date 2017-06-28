@@ -1,4 +1,4 @@
-import { action as mobxAction, isObservable } from 'mobx'
+import { action as mobxAction, isObservable } from "mobx"
 
 export type ISerializedActionCall = {
     name: string
@@ -47,8 +47,7 @@ function runMiddleWares(node: Node, baseCall: IRawActionCall): any {
 
 export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
-
-    const actionInvoker = function(this: IStateTreeNode) {
+    return function(this: IStateTreeNode) {
         const adm = getStateTreeNode(this)
         adm.assertAlive()
         if (adm.isRunningAction()) {
@@ -70,10 +69,6 @@ export function createActionInvoker(name: string, fn: Function) {
             }
         }
     }
-
-    // This construction helps producing a better function name in the stack trace, but could be optimized
-    // away in prod builds, and `actionInvoker` be returned directly
-    return createNamedFunction(name, actionInvoker)
 }
 
 function serializeArgument(node: Node, actionName: string, index: number, arg: any): any {
@@ -88,16 +83,16 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
             $ref: node.getRelativePathTo(getStateTreeNode(arg))
         }
     }
-    if (typeof arg === 'function')
+    if (typeof arg === "function")
         throw new Error(
             `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a function`
         )
-    if (typeof arg === 'object' && !isPlainObject(arg) && !Array.isArray(arg))
+    if (typeof arg === "object" && !isPlainObject(arg) && !Array.isArray(arg))
         throw new Error(
             `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any) &&
                 (arg as any).constructor
                 ? (arg as any).constructor.name
-                : 'Complex Object'}`
+                : "Complex Object"}`
         )
     if (isObservable(arg))
         throw new Error(
@@ -116,9 +111,9 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
 }
 
 function deserializeArgument(adm: Node, value: any): any {
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
         const keys = Object.keys(value)
-        if (keys.length === 1 && keys[0] === '$ref') return resolvePath(adm.storedValue, value.$ref)
+        if (keys.length === 1 && keys[0] === "$ref") return resolvePath(adm.storedValue, value.$ref)
     }
     return value
 }
@@ -134,10 +129,10 @@ function deserializeArgument(adm: Node, value: any): any {
  * @returns
  */
 export function applyAction(target: IStateTreeNode, action: ISerializedActionCall): any {
-    const resolvedTarget = tryResolve(target, action.path || '')
-    if (!resolvedTarget) return fail(`Invalid action path: ${action.path || ''}`)
+    const resolvedTarget = tryResolve(target, action.path || "")
+    if (!resolvedTarget) return fail(`Invalid action path: ${action.path || ""}`)
     const node = getStateTreeNode(resolvedTarget)
-    if (!(typeof resolvedTarget[action.name] === 'function'))
+    if (!(typeof resolvedTarget[action.name] === "function"))
         fail(`Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
@@ -162,13 +157,6 @@ export function onAction(
     })
 }
 
-import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from './node'
-import { resolvePath, tryResolve, addMiddleware } from './mst-operations'
-import {
-    fail,
-    isPlainObject,
-    isPrimitive,
-    argsToArray,
-    createNamedFunction,
-    IDisposer
-} from '../utils'
+import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"
+import { resolvePath, tryResolve, addMiddleware } from "./mst-operations"
+import { fail, isPlainObject, isPrimitive, argsToArray, IDisposer } from "../utils"
