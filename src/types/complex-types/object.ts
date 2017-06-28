@@ -286,7 +286,7 @@ export type Snapshot<T> = {
     [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
 }
 
-export interface IModelType<T, S, A> extends IComplexType<Snapshot<T>, T & S & A> {
+export interface IModelType<T = {}, S = {}, A = {}> extends IComplexType<Snapshot<T>, T & S & A> {
     properties: IModelProperties<T>
     state: IModelVolatileState<S>
     actions: A
