@@ -1,4 +1,4 @@
-import { onSnapshot, onPatch, applyPatch, applyPatches, applySnapshot, getSnapshot, types, unprotect } from "../src"
+import { onSnapshot, onPatch, applyPatch, applySnapshot, getSnapshot, types, unprotect } from "../src"
 import { test } from "ava"
 
 interface ITestSnapshot {
@@ -175,7 +175,7 @@ test("it should apply patches", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
 
-    applyPatches(doc, [
+    applyPatch(doc, [
         { op: "add", path: "/hello", value: { to: "mars" } },
         { op: "replace", path: "/hello", value: { to: "universe" } }
     ])

@@ -1,3 +1,7 @@
+# 0.9.0
+
+* Removed `applyPatches` and `applyActions`. Use `applyPatch` resp. `applyAction`, as both will now also accept an array as argument
+
 # 0.8.2
 
 * Fixed issue in rollup module bundle

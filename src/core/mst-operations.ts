@@ -56,21 +56,10 @@ export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S)
  * @param {IJsonPatch} patch
  * @returns
  */
-export function applyPatch(target: IComplexValue, patch: IJsonPatch) {
-    return getStateTreeNode(target).applyPatch(patch)
-}
-
-/**
- * Applies a number of JSON patches in a single MobX transaction
- * TODO: merge with applyPatch
- * @export
- * @param {Object} target
- * @param {IJsonPatch[]} patches
- */
-export function applyPatches(target: IComplexValue, patches: IJsonPatch[]) {
+export function applyPatch(target: IComplexValue, patch: IJsonPatch | IJsonPatch[]) {
     const node = getStateTreeNode(target)
     runInAction(() => {
-        patches.forEach(p => node.applyPatch(p))
+        asArray(patch).forEach(p => node.applyPatch(p))
     })
 }
 
@@ -85,7 +74,7 @@ export function recordPatches(subject: IComplexValue): IPatchRecorder {
         patches: [] as IJsonPatch[],
         stop: () => disposer(),
         replay: (target: IComplexValue) => {
-            applyPatches(target, recorder.patches)
+            applyPatch(target, recorder.patches)
         }
     }
     let disposer = onPatch(subject, patch => {
@@ -105,9 +94,9 @@ export function recordPatches(subject: IComplexValue): IPatchRecorder {
  * @param {IActionCall[]} actions
  * @param {IActionCallOptions} [options]
  */
-export function applyActions(target: IComplexValue, actions: ISerializedActionCall[]): void {
+export function applyAction(target: IComplexValue, actions: ISerializedActionCall | ISerializedActionCall[]): void {
     runInAction(() => {
-        actions.forEach(action => applyAction(target, action))
+        asArray(actions).forEach(action => baseApplyAction(target, action))
     })
 }
 
@@ -122,7 +111,7 @@ export function recordActions(subject: IComplexValue): IActionRecorder {
         actions: [] as ISerializedActionCall[],
         stop: () => disposer(),
         replay: (target: IComplexValue) => {
-            applyActions(target, recorder.actions)
+            applyAction(target, recorder.actions)
         }
     }
     let disposer = onAction(subject, recorder.actions.push.bind(recorder.actions))
@@ -385,10 +374,10 @@ export function walk(thing: IComplexValue, processor: (item: IComplexValue) => v
     processor(node.storedValue)
 }
 
-import { IRawActionCall, ISerializedActionCall, applyAction, onAction } from "./action"
+import { IRawActionCall, ISerializedActionCall, applyAction as baseApplyAction, onAction } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { Node, getStateTreeNode, IComplexValue, isStateTreeNode } from "./node"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
-import { IDisposer, fail } from "../utils"
+import { IDisposer, fail, asArray } from "../utils"
 import { ISnapshottable, IType } from "../types/type"
 import { isType } from "../types/type-flags"

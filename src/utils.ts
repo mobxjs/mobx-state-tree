@@ -18,6 +18,12 @@ export function nothing(): null {
 
 export function noop() {}
 
+export function asArray<T>(val: undefined | null | T | T[]): T[] {
+    if (!val) return (EMPTY_ARRAY as any) as T[]
+    if (Array.isArray(val)) return val
+    return [val]
+}
+
 export function extend<A, B>(a: A, b: B): A & B
 export function extend<A, B, C>(a: A, b: B, c: C): A & B & C
 export function extend<A, B, C, D>(a: A, b: B, c: C, d: D): A & B & C & D

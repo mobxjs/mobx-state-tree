@@ -4,9 +4,7 @@ import {
     onPatch,
     onAction,
     applyPatch,
-    applyPatches,
     applyAction,
-    applyActions,
     getPath,
     IJsonPatch,
     applySnapshot,
@@ -160,10 +158,7 @@ test("it should apply patches", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
 
-    applyPatches(doc, [
-        { op: "replace", path: "/to", value: "mars" },
-        { op: "replace", path: "/to", value: "universe" }
-    ])
+    applyPatch(doc, [{ op: "replace", path: "/to", value: "mars" }, { op: "replace", path: "/to", value: "universe" }])
 
     t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
@@ -220,7 +215,7 @@ test("it should apply actions calls", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
 
-    applyActions(doc, [{ name: "setTo", path: "", args: ["mars"] }, { name: "setTo", path: "", args: ["universe"] }])
+    applyAction(doc, [{ name: "setTo", path: "", args: ["mars"] }, { name: "setTo", path: "", args: ["universe"] }])
 
     t.deepEqual(getSnapshot(doc), { to: "universe" })
 })

@@ -2,16 +2,11 @@
 import "./core/node"
 import "./types/type"
 
-// TODO: things that should not be exposed (?)
-// TODO: add test to verify exposed api
-// escapeJsonPath
-// unescapeJsonPath
-
 export { types, IType } from "./types"
 
 export * from "./core/mst-operations"
-export * from "./core/json-patch"
-
-export { isStateTreeNode, getType, getChildType, onAction, applyAction } from "./core"
+export { escapeJsonPath, unescapeJsonPath, IJsonPatch } from "./core/json-patch"
+export { onAction } from "./core/action"
+export { isStateTreeNode } from "./core/node"
 
 export { asReduxStore, IReduxStore, connectReduxDevtools } from "./interop/redux"

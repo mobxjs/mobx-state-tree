@@ -1,6 +1,6 @@
-import { isStateTreeNode, IRawActionCall } from "../core"
+import { isStateTreeNode } from "../core"
 import { getSnapshot, applySnapshot, onSnapshot } from "../core/mst-operations"
-import { applyAction, onAction, ISerializedActionCall } from "../core/action"
+import { applyAction, onAction, ISerializedActionCall, IRawActionCall } from "../core/action"
 import { fail, extend } from "../utils"
 
 export interface IMiddleWareApi {

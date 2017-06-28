@@ -1,7 +1,7 @@
 import { fail } from "../../utils"
 import { Type, IType } from "../type"
 import { TypeFlags } from "../type-flags"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import { IContext, IValidationResult } from "../type-checker"
 import { Node } from "../../core"
 
 export class Late<S, T> extends Type<S, T> {
@@ -52,7 +52,7 @@ export type ILateType<S, T> = () => IType<S, T>
 export function late<S, T>(type: ILateType<S, T>): IType<S, T>
 export function late<S, T>(name: string, type: ILateType<S, T>): IType<S, T>
 export function late<S, T>(nameOrType: any, maybeType?: ILateType<S, T>): IType<S, T> {
-    const name = typeof nameOrType === "string" ? nameOrType : "<late>"
+    const name = typeof nameOrType === "string" ? nameOrType : `late(${nameOrType.toString()})`
     const type = typeof nameOrType === "string" ? maybeType : nameOrType
     return new Late<S, T>(name, type)
 }

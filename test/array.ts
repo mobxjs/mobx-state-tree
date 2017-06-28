@@ -5,7 +5,6 @@ import {
     clone,
     isAlive,
     applyPatch,
-    applyPatches,
     getPath,
     applySnapshot,
     getSnapshot,
@@ -166,7 +165,7 @@ test("it should apply patches", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
 
-    applyPatches(doc, [
+    applyPatch(doc, [
         { op: "add", path: "/0", value: { to: "mars" } },
         { op: "replace", path: "/0", value: { to: "universe" } }
     ])
