@@ -514,6 +514,8 @@ To initialize a volatile file, either:
 2. Use `afterCreate` to initialize the field (as done above)
 3. Use provide a function to produce the first value. Both the scope and first argument of that function will be the target instance. Requiring a function avoids accident sharing of a non-primitive value accross all instances of a type. Example: `pendingRequest: (instance) => someXhrLib.createRequest("http://endpoint/" + instance.id)`
 
+_Tip: To strongly type volatile state using typescript, without initialzing the default yet, use a double cast: For example use `{ pendingRequest: null as any as Promise<Stuff> }` so that the type of `pendingRequest` will always be a promise (Note: make sure to initialize it in `afterCreate` hook or declare the type as `{ pendingRequest: null as any as (Promise<Stuff> | null) }`)_
+
 ## Dependency injection
 
 When creating a new state tree it is possible to pass in environment specific data by passing an object as second argument to a `.create` call.

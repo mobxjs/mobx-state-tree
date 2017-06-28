@@ -9,8 +9,8 @@ import {
     applySnapshot,
     getSnapshot,
     types
-} from "../src"
-import { test } from "ava"
+} from '../src'
+import { test } from 'ava'
 
 interface ITestSnapshot {
     to: string
@@ -23,7 +23,7 @@ interface ITest {
 const createTestFactories = () => {
     const ItemFactory = types.optional(
         types.model({
-            to: "world"
+            to: 'world'
         }),
         {}
     )
@@ -34,27 +34,27 @@ const createTestFactories = () => {
 }
 
 // === FACTORY TESTS ===
-test("it should create a factory", t => {
+test('it should create a factory', t => {
     const { Factory } = createTestFactories()
 
     t.deepEqual(getSnapshot(Factory.create()), [])
 })
 
-test("it should succeed if not optional and no default provided", t => {
+test('it should succeed if not optional and no default provided', t => {
     const Factory = types.array(types.string)
     t.deepEqual((Factory.create() as any).toJSON(), [])
 })
 
-test("it should restore the state from the snapshot", t => {
+test('it should restore the state from the snapshot', t => {
     const { Factory } = createTestFactories()
 
-    const instance = Factory.create([{ to: "universe" }])
-    t.deepEqual(getSnapshot(instance), [{ to: "universe" }])
-    t.is("" + instance, "AnonymousModel[]@<root>(1 items)")
+    const instance = Factory.create([{ to: 'universe' }])
+    t.deepEqual(getSnapshot(instance), [{ to: 'universe' }])
+    t.is('' + instance, 'AnonymousModel[]@<root>(1 items)')
 })
 
 // === SNAPSHOT TESTS ===
-test("it should emit snapshots", t => {
+test('it should emit snapshots', t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
@@ -64,30 +64,30 @@ test("it should emit snapshots", t => {
 
     doc.push(ItemFactory.create())
 
-    t.deepEqual(snapshots, [[{ to: "world" }]])
+    t.deepEqual(snapshots, [[{ to: 'world' }]])
 })
 
-test("it should apply snapshots", t => {
+test('it should apply snapshots', t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
 
-    applySnapshot(doc, [{ to: "universe" }])
+    applySnapshot(doc, [{ to: 'universe' }])
 
-    t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
+    t.deepEqual(getSnapshot(doc), [{ to: 'universe' }])
 })
 
-test("it should return a snapshot", t => {
+test('it should return a snapshot', t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
 
     doc.push(ItemFactory.create())
 
-    t.deepEqual(getSnapshot(doc), [{ to: "world" }])
+    t.deepEqual(getSnapshot(doc), [{ to: 'world' }])
 })
 
 // === PATCHES TESTS ===
-test("it should emit add patches", t => {
+test('it should emit add patches', t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
@@ -95,21 +95,21 @@ test("it should emit add patches", t => {
     let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
 
-    doc.push(ItemFactory.create({ to: "universe" }))
+    doc.push(ItemFactory.create({ to: 'universe' }))
 
-    t.deepEqual(patches, [{ op: "add", path: "/0", value: { to: "universe" } }])
+    t.deepEqual(patches, [{ op: 'add', path: '/0', value: { to: 'universe' } }])
 })
 
-test("it should apply a add patch", t => {
+test('it should apply a add patch', t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
 
-    applyPatch(doc, { op: "add", path: "/0", value: { to: "universe" } })
+    applyPatch(doc, { op: 'add', path: '/0', value: { to: 'universe' } })
 
-    t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
+    t.deepEqual(getSnapshot(doc), [{ to: 'universe' }])
 })
 
-test("it should emit update patches", t => {
+test('it should emit update patches', t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
@@ -119,21 +119,21 @@ test("it should emit update patches", t => {
     let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
 
-    doc[0] = ItemFactory.create({ to: "universe" })
+    doc[0] = ItemFactory.create({ to: 'universe' })
 
-    t.deepEqual(patches, [{ op: "replace", path: "/0", value: { to: "universe" } }])
+    t.deepEqual(patches, [{ op: 'replace', path: '/0', value: { to: 'universe' } }])
 })
 
-test("it should apply a update patch", t => {
+test('it should apply a update patch', t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
 
-    applyPatch(doc, { op: "replace", path: "/0", value: { to: "universe" } })
+    applyPatch(doc, { op: 'replace', path: '/0', value: { to: 'universe' } })
 
-    t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
+    t.deepEqual(getSnapshot(doc), [{ to: 'universe' }])
 })
 
-test("it should emit remove patches", t => {
+test('it should emit remove patches', t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
@@ -145,36 +145,36 @@ test("it should emit remove patches", t => {
 
     doc.splice(0)
 
-    t.deepEqual(patches, [{ op: "remove", path: "/0" }])
+    t.deepEqual(patches, [{ op: 'remove', path: '/0' }])
 })
 
-test("it should apply a remove patch", t => {
+test('it should apply a remove patch', t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
 
     doc.push(ItemFactory.create())
-    doc.push(ItemFactory.create({ to: "universe" }))
+    doc.push(ItemFactory.create({ to: 'universe' }))
 
-    applyPatch(doc, { op: "remove", path: "/0" })
+    applyPatch(doc, { op: 'remove', path: '/0' })
 
-    t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
+    t.deepEqual(getSnapshot(doc), [{ to: 'universe' }])
 })
 
-test("it should apply patches", t => {
+test('it should apply patches', t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
 
     applyPatch(doc, [
-        { op: "add", path: "/0", value: { to: "mars" } },
-        { op: "replace", path: "/0", value: { to: "universe" } }
+        { op: 'add', path: '/0', value: { to: 'mars' } },
+        { op: 'replace', path: '/0', value: { to: 'universe' } }
     ])
 
-    t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
+    t.deepEqual(getSnapshot(doc), [{ to: 'universe' }])
 })
 
 // === TYPE CHECKS ===
-test("it should check the type correctly", t => {
+test('it should check the type correctly', t => {
     const { Factory } = createTestFactories()
 
     const doc = Factory.create()
@@ -182,16 +182,16 @@ test("it should check the type correctly", t => {
     t.deepEqual(Factory.is(doc), true)
     t.deepEqual(Factory.is([]), true)
     t.deepEqual(Factory.is({}), false)
-    t.deepEqual(Factory.is([{ to: "mars" }]), true)
+    t.deepEqual(Factory.is([{ to: 'mars' }]), true)
     t.deepEqual(Factory.is([{ wrongKey: true }]), true)
     t.deepEqual(Factory.is([{ to: true }]), false)
 })
 
-test("paths shoud remain correct when splicing", t => {
+test('paths shoud remain correct when splicing', t => {
     const store = types
         .model({
             todos: types.array(
-                types.model("Task", {
+                types.model('Task', {
                     done: false
                 })
             )
@@ -201,33 +201,32 @@ test("paths shoud remain correct when splicing", t => {
         })
     unprotect(store)
 
-    t.deepEqual(store.todos.map(getPath), ["/todos/0"])
+    t.deepEqual(store.todos.map(getPath), ['/todos/0'])
 
     store.todos.push({} as any)
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1"])
+    t.deepEqual(store.todos.map(getPath), ['/todos/0', '/todos/1'])
 
     store.todos.unshift({} as any)
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2"])
+    t.deepEqual(store.todos.map(getPath), ['/todos/0', '/todos/1', '/todos/2'])
 
     store.todos.splice(0, 2)
-    t.deepEqual(store.todos.map(getPath), ["/todos/0"])
+    t.deepEqual(store.todos.map(getPath), ['/todos/0'])
 
     store.todos.splice(0, 1, {} as any, {} as any, {} as any)
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2"])
+    t.deepEqual(store.todos.map(getPath), ['/todos/0', '/todos/1', '/todos/2'])
 
-    debugger
     store.todos.remove(store.todos[1])
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1"])
+    t.deepEqual(store.todos.map(getPath), ['/todos/0', '/todos/1'])
 })
 
-test("items should be reconciled correctly when splicing - 1", t => {
-    const Task = types.model("Task", {
+test('items should be reconciled correctly when splicing - 1', t => {
+    const Task = types.model('Task', {
         x: types.string
     })
-    const a = Task.create({ x: "a" }),
-        b = Task.create({ x: "b" }),
-        c = Task.create({ x: "c" }),
-        d = Task.create({ x: "d" })
+    const a = Task.create({ x: 'a' }),
+        b = Task.create({ x: 'b' }),
+        c = Task.create({ x: 'c' }),
+        d = Task.create({ x: 'd' })
 
     const store = types
         .model({
@@ -259,17 +258,17 @@ test("items should be reconciled correctly when splicing - 1", t => {
     )
 
     store.todos.splice(0, 1, clone(a), clone(c), clone(d))
-    t.deepEqual(store.todos.map(_ => _.x), ["a", "c", "d"])
+    t.deepEqual(store.todos.map(_ => _.x), ['a', 'c', 'd'])
 })
 
-test("items should be reconciled correctly when splicing - 2", t => {
-    const Task = types.model("Task", {
+test('items should be reconciled correctly when splicing - 2', t => {
+    const Task = types.model('Task', {
         x: types.string
     })
-    const a = Task.create({ x: "a" }),
-        b = Task.create({ x: "b" }),
-        c = Task.create({ x: "c" }),
-        d = Task.create({ x: "d" })
+    const a = Task.create({ x: 'a' }),
+        b = Task.create({ x: 'b' }),
+        c = Task.create({ x: 'c' }),
+        d = Task.create({ x: 'd' })
 
     const store = types
         .model({
@@ -280,39 +279,45 @@ test("items should be reconciled correctly when splicing - 2", t => {
         })
     unprotect(store)
 
-    store.todos.splice(2, 1, { x: "e" }, { x: "f" })
+    store.todos.splice(2, 1, { x: 'e' }, { x: 'f' })
     // becomes, a, b, e, f, d
     t.is(store.todos.length, 5)
     t.true(store.todos[0] === a)
     t.true(store.todos[1] === b)
     t.true(store.todos[2] !== c)
-    t.is(store.todos[2].x, "e")
+    t.is(store.todos[2].x, 'e')
     t.true(store.todos[3] !== d)
-    t.is(store.todos[3].x, "f")
+    t.is(store.todos[3].x, 'f')
     t.true(store.todos[4] === d) // preserved and moved
-    t.is(store.todos[4].x, "d")
+    t.is(store.todos[4].x, 'd')
 
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2", "/todos/3", "/todos/4"])
+    t.deepEqual(store.todos.map(getPath), [
+        '/todos/0',
+        '/todos/1',
+        '/todos/2',
+        '/todos/3',
+        '/todos/4'
+    ])
 
-    store.todos.splice(1, 3, { x: "g" })
+    store.todos.splice(1, 3, { x: 'g' })
     // becomes a, g, d
     t.is(store.todos.length, 3)
     t.true(store.todos[0] === a)
-    t.is(store.todos[1].x, "g")
-    t.is(store.todos[2].x, "d")
+    t.is(store.todos[1].x, 'g')
+    t.is(store.todos[2].x, 'd')
     t.true(store.todos[1] !== b)
     t.true(store.todos[2] === d) // still original d
 
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2"])
+    t.deepEqual(store.todos.map(getPath), ['/todos/0', '/todos/1', '/todos/2'])
 })
 
-test("it should reconciliate keyed instances correctly", t => {
+test('it should reconciliate keyed instances correctly', t => {
     const Store = types.model({
         todos: types.optional(
             types.array(
-                types.model("Task", {
+                types.model('Task', {
                     id: types.identifier(),
-                    task: "",
+                    task: '',
                     done: false
                 })
             ),
@@ -322,15 +327,15 @@ test("it should reconciliate keyed instances correctly", t => {
 
     const store = Store.create({
         todos: [
-            { id: "1", task: "coffee", done: false },
-            { id: "2", task: "tea", done: false },
-            { id: "3", task: "biscuit", done: false }
+            { id: '1', task: 'coffee', done: false },
+            { id: '2', task: 'tea', done: false },
+            { id: '3', task: 'biscuit', done: false }
         ]
     })
 
-    t.deepEqual(store.todos.map(todo => todo.task), ["coffee", "tea", "biscuit"])
+    t.deepEqual(store.todos.map(todo => todo.task), ['coffee', 'tea', 'biscuit'])
     t.deepEqual(store.todos.map(todo => todo.done), [false, false, false])
-    t.deepEqual(store.todos.map(todo => todo.id), ["1", "2", "3"])
+    t.deepEqual(store.todos.map(todo => todo.id), ['1', '2', '3'])
 
     const coffee = store.todos[0]
     const tea = store.todos[1]
@@ -338,24 +343,24 @@ test("it should reconciliate keyed instances correctly", t => {
 
     applySnapshot(store, {
         todos: [
-            { id: "2", task: "Tee", done: true },
-            { id: "1", task: "coffee", done: true },
-            { id: "4", task: "biscuit", done: false },
-            { id: "5", task: "stuffz", done: false }
+            { id: '2', task: 'Tee', done: true },
+            { id: '1', task: 'coffee', done: true },
+            { id: '4', task: 'biscuit', done: false },
+            { id: '5', task: 'stuffz', done: false }
         ]
     })
 
-    t.deepEqual(store.todos.map(todo => todo.task), ["Tee", "coffee", "biscuit", "stuffz"])
+    t.deepEqual(store.todos.map(todo => todo.task), ['Tee', 'coffee', 'biscuit', 'stuffz'])
     t.deepEqual(store.todos.map(todo => todo.done), [true, true, false, false])
-    t.deepEqual(store.todos.map(todo => todo.id), ["2", "1", "4", "5"])
+    t.deepEqual(store.todos.map(todo => todo.id), ['2', '1', '4', '5'])
 
     t.is(store.todos[0] === tea, true)
     t.is(store.todos[1] === coffee, true)
     t.is(store.todos[2] === biscuit, false)
 })
 
-test("it correctly reconciliate when swapping", t => {
-    const Task = types.model("Task", {})
+test('it correctly reconciliate when swapping', t => {
+    const Task = types.model('Task', {})
     const Store = types.model({
         todos: types.optional(types.array(Task), [])
     })
@@ -369,11 +374,11 @@ test("it correctly reconciliate when swapping", t => {
     s.todos.replace([b, a])
     t.true(s.todos[0] === b)
     t.true(s.todos[1] === a)
-    t.deepEqual(s.todos.map(getPath), ["/todos/0", "/todos/1"])
+    t.deepEqual(s.todos.map(getPath), ['/todos/0', '/todos/1'])
 })
 
-test("it should not be allowed to add the same item twice to the same store", t => {
-    const Task = types.model("Task", {})
+test('it should not be allowed to add the same item twice to the same store', t => {
+    const Task = types.model('Task', {})
     const Store = types.model({
         todos: types.optional(types.array(Task), [])
     })

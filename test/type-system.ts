@@ -369,3 +369,71 @@ at path "/amount" value \`1\` is not assignable  (Computed properties should not
 at path "/getAmount" value \`"hello"\` is not assignable  (View properties should not be provided in the snapshot).`
     )
 })
+
+test('it should type compose correctly', t => {
+    const Car = types.model(
+        {
+            wheels: 3
+        },
+        { connection: (null as any) as Promise<any> },
+        {
+            drive() {},
+            afterCreate() {
+                this.connection = Promise.resolve(true)
+            }
+        }
+    )
+
+    const Logger = types.model(
+        {
+            logNode: 'test'
+        },
+        {
+            log(msg: string) {}
+        }
+    )
+
+    const LoggableCar = types.compose(Car, Logger)
+    const x = LoggableCar.create({ wheels: 3, logNode: 'test' /* compile error: x: 7  */ })
+
+    //x.test() // compile error
+    x.drive()
+    x.log('z')
+    x.connection.then(() => {})
+
+    t.pass()
+})
+
+test('it should extend types correctly', t => {
+    const Car = types.model(
+        {
+            wheels: 3
+        },
+        {
+            drive() {}
+        }
+    )
+
+    const LoggableCar = types.compose(
+        'LoggableCar',
+        Car,
+        {
+            logNode: 'test'
+        },
+        { connection: (null as any) as Promise<any> },
+        {
+            log(msg: string) {},
+            afterCreate() {
+                this.connection = Promise.resolve(true)
+            }
+        }
+    )
+    const x = LoggableCar.create({ wheels: 3, logNode: 'test' /* compile error: x: 7  */ })
+
+    // x.test() // compile error
+    x.drive()
+    x.log('z')
+    x.connection.then(() => {})
+
+    t.pass()
+})
