@@ -47,6 +47,18 @@ at path "/0/quantity" value \`undefined\` is not assignable to type: \`number\`.
     )
 })
 
+test("it should throw bouncing errors from its sub-type", t => {
+    const Row = types.model({
+        name: types.string,
+        quantity: types.number
+    })
+    const RowList = types.optional(types.array(Row), [])
+
+    const error = t.throws(() => {
+        RowList.create([{ name: "a", quantity: 1 }, { name: "b", quantity: "x" }])
+    }, /at path "\/1\/quantity" value `"x"` is not assignable to type: `number`/g)
+})
+
 test("it should accept a function to provide dynamic values", t => {
     let defaultValue: any = 1
     const Factory = types.model({
