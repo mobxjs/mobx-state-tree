@@ -32,7 +32,7 @@ export interface ISimpleType<T> extends IType<T, T> {}
 
 export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IStateTreeNode> {}
 
-/**
+/*
  * A complex type produces a MST node (Node in the state tree)
  */
 export abstract class ComplexType<S, T> implements IType<S, T> {

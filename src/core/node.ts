@@ -58,7 +58,7 @@ export class Node {
         return this.identifierAttribute ? this.storedValue[this.identifierAttribute] : null
     }
 
-    /**
+    /*
      * Returnes (escaped) path representation as string
      */
     @computed
@@ -317,7 +317,7 @@ export class Node {
         return this.root.isProtectionEnabled
     }
 
-    /**
+    /*
      * Pseudo action is an action that is not named, does not trigger middleware but does unlock the tree.
      * Used for applying (initial) snapshots and patches
      */

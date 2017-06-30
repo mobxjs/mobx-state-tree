@@ -1,7 +1,3 @@
-# props
-
-Parsed description of all properties
-
 # onPatch
 
 Registers a function that will be invoked for each that as made to the provided model instance, or any of it's children.
@@ -33,17 +29,6 @@ Does not return any value
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 -   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IActionCall>** 
--   `options` **\[IActionCallOptions]** 
-
-# applyAction
-
-Dispatches an Action on a model instance. All middlewares will be triggered.
-Returns the value of the last actoin
-
-**Parameters**
-
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `action` **IActionCall** 
 -   `options` **\[IActionCallOptions]** 
 
 # protect
@@ -202,20 +187,3 @@ unescape slashes and backslashes
 **Parameters**
 
 -   `str`  
-
-# get
-
-Returnes (escaped) path representation as string
-
-# pseudoAction
-
-Pseudo action is an action that is not named, does not trigger middleware but does unlock the tree.
-Used for applying (initial) snapshots and patches
-
-**Parameters**
-
--   `fn`  
-
-# ComplexType
-
-A complex type produces a MST node (Node in the state tree)

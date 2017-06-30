@@ -118,16 +118,6 @@ function deserializeArgument(adm: Node, value: any): any {
     return value
 }
 
-/**
- * Dispatches an Action on a model instance. All middlewares will be triggered.
- * Returns the value of the last actoin
- *
- * @export
- * @param {Object} target
- * @param {IActionCall} action
- * @param {IActionCallOptions} [options]
- * @returns
- */
 export function applyAction(target: IStateTreeNode, action: ISerializedActionCall): any {
     const resolvedTarget = tryResolve(target, action.path || "")
     if (!resolvedTarget) return fail(`Invalid action path: ${action.path || ""}`)

@@ -43,7 +43,7 @@ export class ObjectType extends ComplexType<any, any> {
     shouldAttachNode = true
     readonly flags = TypeFlags.Object
 
-    /**
+    /*
      * The original object definition
      */
     properties: any
@@ -52,7 +52,7 @@ export class ObjectType extends ComplexType<any, any> {
 
     modelConstructor: new () => any
 
-    /**
+    /*
      * Parsed description of all properties
      */
     private props: {
