@@ -91,7 +91,10 @@ export function deepFreeze<T>(value: T): T {
 
     if (isPlainObject(value)) {
         Object.keys(value).forEach(propKey => {
-            if (!Object.isFrozen((value as any)[propKey])) {
+            if (
+                !isPrimitive((value as any)[propKey]) &&
+                !Object.isFrozen((value as any)[propKey])
+            ) {
                 deepFreeze((value as any)[propKey])
             }
         })
