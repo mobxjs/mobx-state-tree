@@ -75,6 +75,7 @@ export class Node {
         return this._parent
     }
 
+    // TODO: make computed
     public get root(): Node {
         // future optimization: store root ref in the node and maintain it
         let p,
@@ -83,6 +84,7 @@ export class Node {
         return r as Node
     }
 
+    // TODO: lift logic outside this file
     getRelativePathTo(target: Node): string {
         // PRE condition target is (a child of) base!
         if (this.root !== target.root)
@@ -109,6 +111,7 @@ export class Node {
         return this.resolvePath(splitJsonPath(path), failIfResolveFails)
     }
 
+    // TODO: lift logic outside this file
     resolvePath(pathParts: string[]): Node
     resolvePath(pathParts: string[], failIfResolveFails: boolean): Node | undefined
     resolvePath(pathParts: string[], failIfResolveFails: boolean = true): Node | undefined {

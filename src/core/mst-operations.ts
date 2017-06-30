@@ -1,11 +1,70 @@
+/**
+ * Returns the _actual_ type of the given tree node. (Or throws)
+ *
+ * @export
+ * @param {IStateTreeNode} object
+ * @returns {IType<S, T>}
+ */
 export function getType<S, T>(object: IStateTreeNode): IType<S, T> {
     return getStateTreeNode(object).type
 }
 
+/**
+ * Returns the _declared_ type of the given sub property of an object, array or map.
+ *
+ * @example
+ * ```typescript
+ * const Box = types.model({ x: 0, y: 0 })
+ * const box = Box.create()
+ *
+ * console.log(getChildType(box, "x").name) // 'number'
+ * ```
+ *
+ * @export
+ * @param {IStateTreeNode} object
+ * @param {string} child
+ * @returns {IType<any, any>}
+ */
 export function getChildType(object: IStateTreeNode, child: string): IType<any, any> {
     return getStateTreeNode(object).getChildType(child)
 }
 
+/**
+ * Middleware can be used to intercept any action is invoked on the subtree where it is attached.
+ * If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
+ *
+ * It is allowed to attach multiple middlewares. The order in which middleware is invoked is inside-out:
+ * local middleware is invoked before parent middleware. On the same object, earlier attached middleware is run before later attached middleware.
+ *
+ * A middleware receives two arguments: 1. the description of the the call, 2: a function to invoke the next middleware in the chain.
+ * If `next()` is not invoked by your middleware, the action will be aborted and not actually executed.
+ *
+ * A call description looks like:
+ *
+ * ```
+ * {
+ *      name: string // name of the action
+ *      object: any & IStateTreeNode // the object on which the action was original invoked
+ *      args: any[] // the arguments of the action
+ * }
+ * ```
+ *
+ * An example of a build in middleware is the `onAction` method.
+ *
+ * @example
+ * ```typescript
+ * const store = SomeStore.create()
+ * const disposer = addMiddleWare(store, (call, next) => {
+ *   console.log(`action ${call.name} was invoked`)
+ *   next() // runs the next middleware (or the inteneded action if there is no middleware to run left)
+ * })
+ * ```
+ *
+ * @export
+ * @param {IStateTreeNode} target
+ * @param {(action: IRawActionCall, next: (call: IRawActionCall) => any) => any} middleware
+ * @returns {IDisposer}
+ */
 export function addMiddleware(
     target: IStateTreeNode,
     middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any
@@ -19,8 +78,8 @@ export function addMiddleware(
 }
 
 /**
- * Registers a function that will be invoked for each that as made to the provided model instance, or any of it's children.
- * See 'patches' for more details. onPatch events are emitted immediately and will not await the end of a transaction.
+ * Registers a function that will be invoked for each mutation that is applied to the provided model instance, or to any of its children.
+ * See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details. onPatch events are emitted immediately and will not await the end of a transaction.
  * Patches can be used to deep observe a model tree.
  *
  * @export
@@ -34,7 +93,8 @@ export function onPatch(target: IStateTreeNode, callback: (patch: IJsonPatch) =>
 
 /**
  * Registeres a function that is invoked whenever a new snapshot for the given model instance is available.
- * The listener will only be fire at the and a MobX (trans)action
+ * The listener will only be fire at the and of the current MobX (trans)action.
+ * See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
  *
  * @export
  * @param {Object} target
@@ -59,6 +119,9 @@ export function onSnapshot<S>(
 
 /**
  * Applies a JSON-patch to the given model instance or bails out if the patch couldn't be applied
+ * See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details.
+ *
+ * Can apply a single past, or an array of patches.
  *
  * @export
  * @param {Object} target
@@ -67,6 +130,7 @@ export function onSnapshot<S>(
  */
 export function applyPatch(target: IStateTreeNode, patch: IJsonPatch | IJsonPatch[]) {
     const node = getStateTreeNode(target)
+    // TODO: make sure only one pseudo action is emitted
     runInAction(() => {
         asArray(patch).forEach(p => node.applyPatch(p))
     })
@@ -78,6 +142,25 @@ export interface IPatchRecorder {
     replay(target: IStateTreeNode): any
 }
 
+/**
+ * Small abstraction around `onPatch` and `applyPatch`, attaches a patch listener to a tree and records all the patches.
+ * Returns an recorder object with the following signature:
+ *
+ * ```typescript
+ * export interface IPatchRecorder {
+ *      // the recorded patches
+ *      patches: IJsonPatch[]
+ *      // stop recording patches
+ *      stop(): any
+ *      // apply all the recorded patches on the given object
+ *      replay(target: IStateTreeNode): any
+ * }
+ * ```
+ *
+ * @export
+ * @param {IStateTreeNode} subject
+ * @returns {IPatchRecorder}
+ */
 export function recordPatches(subject: IStateTreeNode): IPatchRecorder {
     let recorder = {
         patches: [] as IJsonPatch[],
@@ -93,8 +176,9 @@ export function recordPatches(subject: IStateTreeNode): IPatchRecorder {
 }
 
 /**
- * Applies a series of actions in a single MobX transaction.
+ * Applies an action or a series of actions in a single MobX transaction.
  * Does not return any value
+ * Takes an action description as produced by the `onAction` middleware.
  *
  * @export
  * @param {Object} target
@@ -116,6 +200,25 @@ export interface IActionRecorder {
     replay(target: IStateTreeNode): any
 }
 
+/**
+ * Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted.
+ * Returns an recorder object with the following signature:
+ *
+ * ```typescript
+ * export interface IActionRecorder {
+ *      // the recorded actions
+ *      actions: IJsonPatch[]
+ *      // stop recording actions
+ *      stop(): any
+ *      // apply all the recorded actions on the given object
+ *      replay(target: IStateTreeNode): any
+ * }
+ * ```
+ *
+ * @export
+ * @param {IStateTreeNode} subject
+ * @returns {IPatchRecorder}
+ */
 export function recordActions(subject: IStateTreeNode): IActionRecorder {
     let recorder = {
         actions: [] as ISerializedActionCall[],
@@ -129,10 +232,25 @@ export function recordActions(subject: IStateTreeNode): IActionRecorder {
 }
 
 /**
- * By default it is allowed to both directly modify a model or through an action.
- * However, in some cases you want to guarantee that the state tree is only modified through actions.
- * So that replaying action will reflect everything that can possible have happened to your objects, or that every mutation passes through your action middleware etc.
- * To disable modifying data in the tree without action, simple call `protect(model)`. Protect protects the passed model an all it's children
+ * The inverse of `unprotect`
+ *
+ * @export
+ * @param {IStateTreeNode} target
+
+ *
+ */
+export function protect(target: IStateTreeNode) {
+    const node = getStateTreeNode(target)
+    if (!node.isRoot) fail("`protect` can only be invoked on root nodes")
+    node.isProtectionEnabled = true
+}
+
+/**
+ * By default it is not allowed to directly modify a model. Models can only be modified through actions.
+ * However, in some cases you don't care about the advantages (like replayability, tracability, etc) this yields.
+ * For example because you are building a PoC or don't have any middleware attached to your tree.
+ *
+ * In that case you can disable this protection by calling `unprotect` on the root of your tree.
  *
  * @example
  * const Todo = types.model({
@@ -148,12 +266,6 @@ export function recordActions(subject: IStateTreeNode): IActionRecorder {
  * todo.done = false // throws!
  * todo.toggle() // OK
  */
-export function protect(target: IStateTreeNode) {
-    const node = getStateTreeNode(target)
-    if (!node.isRoot) fail("`protect` can only be invoked on root nodes")
-    node.isProtectionEnabled = true
-}
-
 export function unprotect(target: IStateTreeNode) {
     const node = getStateTreeNode(target)
     if (!node.isRoot) fail("`unprotect` can only be invoked on root nodes")
