@@ -1,6 +1,12 @@
 import { Type, IType } from "../type"
 import { TypeFlags } from "../type-flags"
-import { IContext, IValidationResult, typecheck, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import {
+    IContext,
+    IValidationResult,
+    typecheck,
+    typeCheckSuccess,
+    typeCheckFailure
+} from "../type-checker"
 import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
 
 export type IFunctionReturn<T> = () => T
@@ -36,21 +42,27 @@ export class OptionalValue<S, T> extends Type<S, T> {
     }
 
     reconcile(current: Node, newValue: any): Node {
-        return this.type.reconcile(current, this.type.is(newValue) ? newValue : this.getDefaultValue())
+        return this.type.reconcile(
+            current,
+            this.type.is(newValue) ? newValue : this.getDefaultValue()
+        )
     }
 
     private getDefaultValue() {
-        const defaultValue = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
+        const defaultValue = typeof this.defaultValue === "function"
+            ? this.defaultValue()
+            : this.defaultValue
         if (typeof this.defaultValue === "function") typecheck(this, defaultValue)
         return defaultValue
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         // defaulted values can be skipped
-        if (value === undefined || this.type.is(value)) {
+        if (value === undefined) {
             return typeCheckSuccess()
         }
-        return typeCheckFailure(context, value)
+        // bounce validation to the sub-type
+        return this.type.validate(value, context)
     }
 }
 
@@ -62,7 +74,9 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): 
     const defaultValue = typeof defaultValueOrFunction === "function"
         ? defaultValueOrFunction()
         : defaultValueOrFunction
-    const defaultSnapshot = isStateTreeNode(defaultValue) ? getStateTreeNode(defaultValue).snapshot : defaultValue
+    const defaultSnapshot = isStateTreeNode(defaultValue)
+        ? getStateTreeNode(defaultValue).snapshot
+        : defaultValue
     typecheck(type, defaultSnapshot)
     return new OptionalValue(type, defaultValueOrFunction)
 }
