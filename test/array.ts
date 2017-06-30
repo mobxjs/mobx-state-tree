@@ -11,6 +11,7 @@ import {
     types
 } from '../src'
 import { test } from 'ava'
+import { observable } from 'mobx'
 
 interface ITestSnapshot {
     to: string
@@ -395,4 +396,15 @@ test('it should not be allowed to add the same item twice to the same store', t 
     t.throws(() => {
         s.todos.push(b, b)
     }, "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/2', but it lives already at '/todos/1'")
+})
+
+test('it should support observable arrays', t => {
+
+    const TestArray = types.array(types.number)
+
+    const testArray = TestArray.create(observable([1, 2]))
+
+    t.true(testArray[0] === 1)
+    t.true(testArray.length === 2)
+    t.true(Array.isArray(testArray.slice()))
 })

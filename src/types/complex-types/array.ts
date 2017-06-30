@@ -18,7 +18,7 @@ import {
     isStateTreeNode,
     IStateTreeNode
 } from "../../core"
-import { addHiddenFinalProp, fail, isMutable } from "../../utils"
+import { addHiddenFinalProp, fail, isMutable, isArray } from "../../utils"
 import { ComplexType, IComplexType, IType } from "../type"
 import { TypeFlags } from "../type-flags"
 import {
@@ -189,12 +189,12 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (!Array.isArray(value)) {
+        if (!isArray(value)) {
             return typeCheckFailure(context, value)
         }
 
         return flattenTypeErrors(
-            value.map((item, index) =>
+            value.map((item:any, index:any) =>
                 this.subType.validate(item, getContextForPath(context, "" + index, this.subType))
             )
         )

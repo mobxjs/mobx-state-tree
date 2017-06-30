@@ -1,3 +1,7 @@
+import {
+    isObservableArray
+} from 'mobx'
+
 declare const global: any
 
 export const EMPTY_ARRAY = Object.freeze([])
@@ -18,10 +22,14 @@ export function nothing(): null {
 
 export function noop() {}
 
+export function isArray(val: any): boolean {
+    return !!(Array.isArray(val) || isObservableArray(val)) as boolean
+}
+
 export function asArray<T>(val: undefined | null | T | T[]): T[] {
     if (!val) return (EMPTY_ARRAY as any) as T[]
-    if (Array.isArray(val)) return val
-    return [val]
+    if (isArray(val)) return val as T[]
+    return [val] as T[]
 }
 
 export function extend<A, B>(a: A, b: B): A & B
