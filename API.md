@@ -67,7 +67,8 @@ const Todo = types.model({
     }
 })
 
-const todo = new Todo()
+const todo = Todo.create()
+unprotect(todo)
 todo.done = true // OK
 protect(todo)
 todo.done = false // throws!

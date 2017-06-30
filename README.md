@@ -658,7 +658,7 @@ A _disposer_ is a function that cancels the effect it was created for.
 
 `types.optional` can takes as default function also a function, which will be invoked each time the default value is needed. This is useful to generate timestamps, identifiers or even complex objects:
 
-`createdDate: types.optional(types.date, () => new Date())`
+`createdDate: types.optional(types.Date, () => new Date())`
 
 ### `toJSON()` for debugging
 
