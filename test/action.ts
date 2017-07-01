@@ -1,4 +1,4 @@
-import { recordActions, types, getSnapshot, onAction } from "../src"
+import { recordActions, types, getSnapshot, onAction, applyPatch, applySnapshot } from "../src"
 import { test } from "ava"
 
 declare var Buffer
@@ -27,6 +27,7 @@ test("it should be possible to invoke a simple action", t => {
 test("it should be possible to record & replay a simple action", t => {
     const t1 = Task.create()
     const t2 = Task.create()
+
     t.is(t1.done, false)
     t.is(t2.done, false)
     const recorder = recordActions(t1)
@@ -39,6 +40,50 @@ test("it should be possible to record & replay a simple action", t => {
         { name: "toggle", path: "", args: [] },
         { name: "toggle", path: "", args: [] },
         { name: "toggle", path: "", args: [] }
+    ])
+
+    recorder.replay(t2)
+    t.is(t2.done, true)
+})
+
+test("applying patches should be recordable and replayable", t => {
+    const t1 = Task.create()
+    const t2 = Task.create()
+
+    const recorder = recordActions(t1)
+    t.is(t1.done, false)
+
+    applyPatch(t1, { op: "replace", path: "done", value: true })
+    t.is(t1.done, true)
+
+    t.deepEqual(recorder.actions, [
+        {
+            name: "$APPLY_PATCHES",
+            path: "",
+            args: [[{ op: "replace", path: "done", value: true }]]
+        }
+    ])
+
+    recorder.replay(t2)
+    t.is(t2.done, true)
+})
+
+test("applying snapshots should be recordable and replayable", t => {
+    const t1 = Task.create()
+    const t2 = Task.create()
+
+    const recorder = recordActions(t1)
+    t.is(t1.done, false)
+
+    applySnapshot(t1, { done: true })
+    t.is(t1.done, true)
+
+    t.deepEqual(recorder.actions, [
+        {
+            name: "$APPLY_SNAPSHOT",
+            path: "",
+            args: [{ done: true }]
+        }
     ])
 
     recorder.replay(t2)
@@ -103,7 +148,9 @@ test("it should be possible to pass a complex object", t => {
         ]
     })
 
-    t.deepEqual(recorder.actions, [{ name: "setCustomer", path: "/orders/0", args: [{ $ref: "../../customers/0" }] }])
+    t.deepEqual(recorder.actions, [
+        { name: "setCustomer", path: "/orders/0", args: [{ $ref: "../../customers/0" }] }
+    ])
 
     const store2 = createTestStore()
     recorder.replay(store2)
@@ -155,7 +202,9 @@ test("it should be possible to pass a complex plain object", t => {
     const recorder = recordActions(t1)
     ;(t1 as any).toggle({ bla: ["nuff", ["said"]] }) // nonsense, but serializable!
 
-    t.deepEqual(recorder.actions, [{ name: "toggle", path: "", args: [{ bla: ["nuff", ["said"]] }] }])
+    t.deepEqual(recorder.actions, [
+        { name: "toggle", path: "", args: [{ bla: ["nuff", ["said"]] }] }
+    ])
 
     recorder.replay(t2)
     t.is(t2.done, true)

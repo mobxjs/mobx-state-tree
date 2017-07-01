@@ -7,7 +7,7 @@ import {
     intercept,
     observe,
     extras
-} from 'mobx'
+} from "mobx"
 import {
     getStateTreeNode,
     escapeJsonPath,
@@ -16,10 +16,10 @@ import {
     createNode,
     isStateTreeNode,
     IStateTreeNode
-} from '../../core'
-import { addHiddenFinalProp, fail, isMutable, isPlainObject } from '../../utils'
-import { IType, IComplexType, ComplexType } from '../type'
-import { TypeFlags } from '../type-flags'
+} from "../../core"
+import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
+import { IType, IComplexType, ComplexType } from "../type"
+import { TypeFlags } from "../type-flags"
 import {
     IContext,
     IValidationResult,
@@ -27,7 +27,7 @@ import {
     flattenTypeErrors,
     getContextForPath,
     typecheck
-} from '../type-checker'
+} from "../type-checker"
 
 interface IMapFactoryConfig {
     isMapFactory: true
@@ -84,14 +84,14 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 
     describe() {
-        return 'Map<string, ' + this.subType.describe() + '>'
+        return "Map<string, " + this.subType.describe() + ">"
     }
 
     createNewInstance = () => {
         // const identifierAttr = getIdentifierAttribute(this.subType)
         const map = observable.shallowMap()
-        addHiddenFinalProp(map, 'put', put)
-        addHiddenFinalProp(map, 'toString', mapToString)
+        addHiddenFinalProp(map, "put", put)
+        addHiddenFinalProp(map, "toString", mapToString)
         return map
     }
 
@@ -109,7 +109,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
 
     getChildNode(node: Node, key: string): Node {
         const childNode = node.storedValue.get(key)
-        if (!childNode) fail('Not a child ' + key)
+        if (!childNode) fail("Not a child " + key)
         return childNode
     }
 
@@ -118,7 +118,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         node.assertWritable()
 
         switch (change.type) {
-            case 'update':
+            case "update":
                 {
                     const { newValue } = change
                     const oldValue = change.object.get(change.name)
@@ -131,7 +131,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                     this.verifyIdentifier(change.name, change.newValue as Node)
                 }
                 break
-            case 'add':
+            case "add":
                 {
                     typecheck(this.subType, change.newValue)
                     change.newValue = this.subType.instantiate(
@@ -143,7 +143,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                     this.verifyIdentifier(change.name, change.newValue as Node)
                 }
                 break
-            case 'delete':
+            case "delete":
                 {
                     node.getChildNode(change.name).die()
                 }
@@ -154,7 +154,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
 
     private verifyIdentifier(expected: string, node: Node) {
         const identifier = node.identifier
-        if (identifier !== null && '' + identifier !== '' + expected)
+        if (identifier !== null && "" + identifier !== "" + expected)
             fail(
                 `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
             )
@@ -175,20 +175,20 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     didChange(change: IMapChange<any>): void {
         const node = getStateTreeNode(change.object as IStateTreeNode)
         switch (change.type) {
-            case 'update':
-            case 'add':
+            case "update":
+            case "add":
                 return void node.emitPatch(
                     {
-                        op: change.type === 'add' ? 'add' : 'replace',
+                        op: change.type === "add" ? "add" : "replace",
                         path: escapeJsonPath(change.name),
                         value: node.getChildNode(change.name).snapshot
                     },
                     node
                 )
-            case 'delete':
+            case "delete":
                 return void node.emitPatch(
                     {
-                        op: 'remove',
+                        op: "remove",
                         path: escapeJsonPath(change.name)
                     },
                     node
@@ -199,11 +199,11 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
         const target = node.storedValue as ObservableMap<any>
         switch (patch.op) {
-            case 'add':
-            case 'replace':
+            case "add":
+            case "replace":
                 target.set(subpath, patch.value)
                 break
-            case 'remove':
+            case "remove":
                 target.delete(subpath)
                 break
         }
@@ -212,20 +212,18 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     @action
     applySnapshot(node: Node, snapshot: any): void {
         typecheck(this, snapshot)
-        node.pseudoAction(() => {
-            const target = node.storedValue as ObservableMap<any>
-            const currentKeys: { [key: string]: boolean } = {}
-            target.keys().forEach(key => {
-                currentKeys[key] = false
-            })
-            // Don't use target.replace, as it will throw all existing items first
-            Object.keys(snapshot).forEach(key => {
-                target.set(key, snapshot[key])
-                currentKeys[key] = true
-            })
-            Object.keys(currentKeys).forEach(key => {
-                if (currentKeys[key] === false) target.delete(key)
-            })
+        const target = node.storedValue as ObservableMap<any>
+        const currentKeys: { [key: string]: boolean } = {}
+        target.keys().forEach(key => {
+            currentKeys[key] = false
+        })
+        // Don't use target.replace, as it will throw all existing items first
+        Object.keys(snapshot).forEach(key => {
+            target.set(key, snapshot[key])
+            currentKeys[key] = true
+        })
+        Object.keys(currentKeys).forEach(key => {
+            if (currentKeys[key] === false) target.delete(key)
         })
     }
 

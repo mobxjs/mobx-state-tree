@@ -23,6 +23,8 @@ export class Node {
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
     private readonly disposers: (() => void)[] = []
+    applyPatches: (patches: IJsonPatch[]) => void
+    applySnapshot: (snapshot: any) => void
 
     constructor(
         type: IType<any, any>,
@@ -37,6 +39,19 @@ export class Node {
         this.storedValue = storedValue
         this._environment = environment
         this.unbox = this.unbox.bind(this)
+
+        // Optimization: this does not need to be done per instance
+        // if some pieces from createActionInvoker are extracted
+        this.applyPatches = createActionInvoker("$APPLY_PATCHES", (patches: IJsonPatch[]) => {
+            patches.forEach(patch => {
+                const parts = splitJsonPath(patch.path)
+                const node = this.resolvePath(parts.slice(0, -1))
+                node.applyPatchLocally(parts[parts.length - 1], patch)
+            })
+        }).bind(this.storedValue)
+        this.applySnapshot = createActionInvoker("$APPLY_SNAPSHOT", (snapshot: any) => {
+            return this.type.applySnapshot(this, snapshot)
+        }).bind(this.storedValue)
 
         // optimization: don't keep the snapshot by default alive with a reaction by default
         // in prod mode. This saves lot of GC overhead (important for e.g. React Native)
@@ -215,22 +230,8 @@ export class Node {
         return registerEventHandler(this.snapshotSubscribers, onChange)
     }
 
-    public applySnapshot(snapshot: any) {
-        return this.type.applySnapshot(this, snapshot)
-    }
-
     public emitSnapshot(snapshot: any) {
         this.snapshotSubscribers.forEach((f: Function) => f(snapshot))
-    }
-
-    @action
-    public applyPatch(patch: IJsonPatch) {
-        const parts = splitJsonPath(patch.path)
-        const node = this.resolvePath(parts.slice(0, -1))
-
-        node.pseudoAction(() => {
-            node.applyPatchLocally(parts[parts.length - 1], patch)
-        })
     }
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
@@ -320,17 +321,6 @@ export class Node {
         return this.root.isProtectionEnabled
     }
 
-    /*
-     * Pseudo action is an action that is not named, does not trigger middleware but does unlock the tree.
-     * Used for applying (initial) snapshots and patches
-     */
-    pseudoAction(fn: () => void) {
-        const inAction = this._isRunningAction
-        this._isRunningAction = true
-        fn()
-        this._isRunningAction = inAction
-    }
-
     assertWritable() {
         this.assertAlive()
         if (!this.isRunningAction() && this.isProtected) {
@@ -388,7 +378,7 @@ export function isStateTreeNode(value: any): value is IStateTreeNode {
 
 export function getStateTreeNode(value: IStateTreeNode): Node {
     if (isStateTreeNode(value)) return value.$treenode!
-    else return fail("element has no Node")
+    else return fail(`Value ${value} is no MST Node`)
 }
 
 function canAttachNode(value: any) {
@@ -430,9 +420,10 @@ export function createNode<S, T>(
     try {
         if (canAttachTreeNode) addReadOnlyProp(instance, "toJSON", toJSON)
 
-        node.pseudoAction(() => {
-            finalizeNewInstance(node, initialValue)
-        })
+        node._isRunningAction = true
+        finalizeNewInstance(node, initialValue)
+        node._isRunningAction = false
+
         if (parent) parent.root.identifierCache!.addNodeToCache(node)
         else node.identifierCache!.addNodeToCache(node)
 
@@ -452,7 +443,7 @@ import { IType } from "../types/type"
 import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch } from "./json-patch"
 import { typecheck } from "../types/type-checker"
 import { walk } from "./mst-operations"
-import { IMiddleWareHandler } from "./action"
+import { IMiddleWareHandler, createActionInvoker } from "./action"
 import {
     addReadOnlyProp,
     addHiddenFinalProp,

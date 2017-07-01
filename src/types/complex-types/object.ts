@@ -217,9 +217,7 @@ export class ObjectType extends ComplexType<any, any> {
     applySnapshot(node: Node, snapshot: any): void {
         const s = this.preProcessSnapshot(snapshot)
         typecheck(this, s)
-        node.pseudoAction(() => {
-            for (let key in this.props) this.props[key].deserialize(node.storedValue, s)
-        })
+        for (let key in this.props) this.props[key].deserialize(node.storedValue, s)
     }
 
     preProcessSnapshot(snapshot: any) {
