@@ -1,6 +1,6 @@
 # 0.9.1
 
-* Applying a snapshot or patches will now emit an action as well. The name of the emitted action will be `$APPLY_PATCHES`resp `APPLY_SNAPSHOT`. See [#017](https://github.com/mobxjs/mobx-state-tree/issues/107)
+* Applying a snapshot or patches will now emit an action as well. The name of the emitted action will be `@APPLY_PATCHES`resp `@APPLY_SNAPSHOT`. See [#107](https://github.com/mobxjs/mobx-state-tree/issues/107)
 
 # 0.9.0
 

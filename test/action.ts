@@ -58,7 +58,7 @@ test("applying patches should be recordable and replayable", t => {
 
     t.deepEqual(recorder.actions, [
         {
-            name: "$APPLY_PATCHES",
+            name: "@APPLY_PATCHES",
             path: "",
             args: [[{ op: "replace", path: "done", value: true }]]
         }
@@ -80,7 +80,7 @@ test("applying snapshots should be recordable and replayable", t => {
 
     t.deepEqual(recorder.actions, [
         {
-            name: "$APPLY_SNAPSHOT",
+            name: "@APPLY_SNAPSHOT",
             path: "",
             args: [{ done: true }]
         }

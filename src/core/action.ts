@@ -120,10 +120,10 @@ export function applyAction(target: IStateTreeNode, action: ISerializedActionCal
     const node = getStateTreeNode(resolvedTarget)
 
     // Reserved functions
-    if (action.name === "$APPLY_PATCHES") {
+    if (action.name === "@APPLY_PATCHES") {
         return applyPatch.call(null, resolvedTarget, action.args![0])
     }
-    if (action.name === "$APPLY_SNAPSHOT") {
+    if (action.name === "@APPLY_SNAPSHOT") {
         return applySnapshot.call(null, resolvedTarget, action.args![0])
     }
 

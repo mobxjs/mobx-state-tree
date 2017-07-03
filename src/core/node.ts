@@ -42,14 +42,14 @@ export class Node {
 
         // Optimization: this does not need to be done per instance
         // if some pieces from createActionInvoker are extracted
-        this.applyPatches = createActionInvoker("$APPLY_PATCHES", (patches: IJsonPatch[]) => {
+        this.applyPatches = createActionInvoker("@APPLY_PATCHES", (patches: IJsonPatch[]) => {
             patches.forEach(patch => {
                 const parts = splitJsonPath(patch.path)
                 const node = this.resolvePath(parts.slice(0, -1))
                 node.applyPatchLocally(parts[parts.length - 1], patch)
             })
         }).bind(this.storedValue)
-        this.applySnapshot = createActionInvoker("$APPLY_SNAPSHOT", (snapshot: any) => {
+        this.applySnapshot = createActionInvoker("@APPLY_SNAPSHOT", (snapshot: any) => {
             return this.type.applySnapshot(this, snapshot)
         }).bind(this.storedValue)
 
