@@ -33,7 +33,7 @@ export class CoreType<S, T> extends Type<S, T> {
         if (isPrimitive(value) && this.checker(value)) {
             return typeCheckSuccess()
         }
-        return typeCheckFailure(context, value)
+        return typeCheckFailure(context, value, `Value is not a ${this.name}`)
     }
 }
 

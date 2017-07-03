@@ -193,7 +193,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (!isArray(value)) {
-            return typeCheckFailure(context, value)
+            return typeCheckFailure(context, value, "Value is not an array")
         }
 
         return flattenTypeErrors(

@@ -246,7 +246,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (!isPlainObject(value)) {
-            return typeCheckFailure(context, value)
+            return typeCheckFailure(context, value, "Value is not a plain object")
         }
 
         return flattenTypeErrors(

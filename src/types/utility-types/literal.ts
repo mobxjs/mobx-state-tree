@@ -1,7 +1,12 @@
 import { ISimpleType, Type } from "../type"
 import { TypeFlags } from "../type-flags"
 import { fail, isPrimitive } from "../../utils"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import {
+    IContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure
+} from "../type-checker"
 import { Node, createNode } from "../../core"
 
 export class Literal<T> extends Type<T, T> {
@@ -25,7 +30,11 @@ export class Literal<T> extends Type<T, T> {
         if (isPrimitive(value) && value === this.value) {
             return typeCheckSuccess()
         }
-        return typeCheckFailure(context, value)
+        return typeCheckFailure(
+            context,
+            value,
+            `Value is not a literal ${JSON.stringify(this.value)}`
+        )
     }
 }
 

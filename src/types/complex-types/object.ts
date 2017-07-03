@@ -241,7 +241,7 @@ export class ObjectType extends ComplexType<any, any> {
         let snapshot = this.preProcessSnapshot(value)
 
         if (!isPlainObject(snapshot)) {
-            return typeCheckFailure(context, snapshot)
+            return typeCheckFailure(context, snapshot, "Value is not a plain object")
         }
 
         return flattenTypeErrors(

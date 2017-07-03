@@ -1,6 +1,12 @@
 import { extendObservable, IObjectWillChange } from "mobx"
 import { Property } from "./property"
-import { IContext, IValidationResult, getContextForPath, typeCheckFailure, typeCheckSuccess } from "../type-checker"
+import {
+    IContext,
+    IValidationResult,
+    getContextForPath,
+    typeCheckFailure,
+    typeCheckSuccess
+} from "../type-checker"
 import { fail } from "../../utils"
 
 export class VolatileProperty extends Property {
@@ -28,7 +34,7 @@ export class VolatileProperty extends Property {
             return typeCheckFailure(
                 getContextForPath(context, this.name),
                 snapshot[this.name],
-                "volatile state should not be provided in the snapshot"
+                "Volatile state should not be provided in the snapshot"
             )
         }
         return typeCheckSuccess()
