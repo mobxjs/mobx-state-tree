@@ -5,6 +5,7 @@ export type IJsonPatch = {
     op: "replace" | "add" | "remove"
     path: string
     value?: any
+    oldValue?: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
 }
 
 /**

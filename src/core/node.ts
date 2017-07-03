@@ -239,8 +239,17 @@ export class Node {
         this.type.applyPatchLocally(this, subpath, patch)
     }
 
-    public onPatch(onPatch: (patches: IJsonPatch) => void): IDisposer {
-        return registerEventHandler(this.patchSubscribers, onPatch)
+    public onPatch(onPatch: (patch: IJsonPatch) => void, includeOldValue: boolean): IDisposer {
+        return registerEventHandler(
+            this.patchSubscribers,
+            includeOldValue
+                ? onPatch
+                : (patch: IJsonPatch) => {
+                      const clone = { ...patch }
+                      delete clone.oldValue
+                      onPatch(clone)
+                  }
+        )
     }
 
     emitPatch(patch: IJsonPatch, source: Node) {

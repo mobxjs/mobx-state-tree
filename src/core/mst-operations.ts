@@ -88,10 +88,15 @@ export function addMiddleware(
  * @export
  * @param {Object} target the model instance from which to receive patches
  * @param {(patch: IJsonPatch) => void} callback the callback that is invoked for each patch
+ * @param {includeOldValue} boolean if oldValue is included in the patches, they can be inverted. However patches will become much bigger and might not be suitable for efficient transport
  * @returns {IDisposer} function to remove the listener
  */
-export function onPatch(target: IStateTreeNode, callback: (patch: IJsonPatch) => void): IDisposer {
-    return getStateTreeNode(target).onPatch(callback)
+export function onPatch(
+    target: IStateTreeNode,
+    callback: (patch: IJsonPatch) => void,
+    includeOldValue = false
+): IDisposer {
+    return getStateTreeNode(target).onPatch(callback, includeOldValue)
 }
 
 export function onSnapshot<S>(
