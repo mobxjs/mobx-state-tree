@@ -242,13 +242,7 @@ export class Node {
     public onPatch(onPatch: (patch: IJsonPatch) => void, includeOldValue: boolean): IDisposer {
         return registerEventHandler(
             this.patchSubscribers,
-            includeOldValue
-                ? onPatch
-                : (patch: IJsonPatch) => {
-                      const clone = { ...patch }
-                      delete clone.oldValue
-                      onPatch(clone)
-                  }
+            includeOldValue ? onPatch : (patch: IJsonPatch) => onPatch(stripPatch(patch))
         )
     }
 
@@ -455,8 +449,7 @@ export function createNode<S, T>(
 }
 
 import { IType } from "../types/type"
-import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch } from "./json-patch"
-import { typecheck } from "../types/type-checker"
+import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch, stripPatch } from "./json-patch"
 import { walk } from "./mst-operations"
 import { IMiddleWareHandler, createActionInvoker } from "./action"
 import {
@@ -465,7 +458,6 @@ import {
     extend,
     fail,
     IDisposer,
-    isMutable,
     registerEventHandler,
     identity,
     noop,
