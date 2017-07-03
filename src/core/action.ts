@@ -17,10 +17,6 @@ export type IMiddleWareHandler = (
     next: (actionCall: IRawActionCall) => any
 ) => any
 
-function runRawAction(actioncall: IRawActionCall): any {
-    return actioncall.object[actioncall.name].apply(actioncall.object, actioncall.args)
-}
-
 function collectMiddlewareHandlers(node: Node): IMiddleWareHandler[] {
     let handlers = node.middlewares.slice()
     let n: Node = node
@@ -32,15 +28,15 @@ function collectMiddlewareHandlers(node: Node): IMiddleWareHandler[] {
     return handlers
 }
 
-function runMiddleWares(node: Node, baseCall: IRawActionCall): any {
+function runMiddleWares(node: Node, baseCall: IRawActionCall, originalFn: Function): any {
     const handlers = collectMiddlewareHandlers(node)
     // Short circuit
-    if (!handlers.length) return runRawAction(baseCall)
+    if (!handlers.length) return originalFn.apply(baseCall.object, baseCall.args)
 
     function runNextMiddleware(call: IRawActionCall): any {
         const handler = handlers.shift() // Optimization: counter instead of shift is probably faster
         if (handler) return handler(call, runNextMiddleware)
-        else return runRawAction(call)
+        else return originalFn.apply(baseCall.object, baseCall.args)
     }
     return runNextMiddleware(baseCall)
 }
@@ -48,22 +44,22 @@ function runMiddleWares(node: Node, baseCall: IRawActionCall): any {
 export function createActionInvoker(name: string, fn: Function) {
     const action = mobxAction(name, fn)
     return function(this: IStateTreeNode) {
-        const adm = getStateTreeNode(this)
-        adm.assertAlive()
-        if (adm.isRunningAction()) {
+        const node = getStateTreeNode(this)
+        node.assertAlive()
+        if (node.isRunningAction()) {
             // an action is already running in this tree, invoking this action does not emit a new action
             return action.apply(this, arguments)
         } else {
             // outer action, run middlewares and start the action!
             const call: IRawActionCall = {
                 name,
-                object: adm.storedValue,
+                object: node.storedValue,
                 args: argsToArray(arguments)
             }
-            const root = adm.root
+            const root = node.root
             root._isRunningAction = true
             try {
-                return runMiddleWares(adm, call)
+                return runMiddleWares(node, call, action)
             } finally {
                 root._isRunningAction = false
             }
@@ -122,6 +118,15 @@ export function applyAction(target: IStateTreeNode, action: ISerializedActionCal
     const resolvedTarget = tryResolve(target, action.path || "")
     if (!resolvedTarget) return fail(`Invalid action path: ${action.path || ""}`)
     const node = getStateTreeNode(resolvedTarget)
+
+    // Reserved functions
+    if (action.name === "@APPLY_PATCHES") {
+        return applyPatch.call(null, resolvedTarget, action.args![0])
+    }
+    if (action.name === "@APPLY_SNAPSHOT") {
+        return applySnapshot.call(null, resolvedTarget, action.args![0])
+    }
+
     if (!(typeof resolvedTarget[action.name] === "function"))
         fail(`Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
@@ -148,5 +153,5 @@ export function onAction(
 }
 
 import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"
-import { resolvePath, tryResolve, addMiddleware } from "./mst-operations"
+import { resolvePath, tryResolve, addMiddleware, applyPatch, applySnapshot } from "./mst-operations"
 import { fail, isPlainObject, isPrimitive, argsToArray, IDisposer } from "../utils"

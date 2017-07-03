@@ -129,11 +129,7 @@ export function onSnapshot<S>(
  * @returns
  */
 export function applyPatch(target: IStateTreeNode, patch: IJsonPatch | IJsonPatch[]) {
-    const node = getStateTreeNode(target)
-    // TODO: make sure only one pseudo action is emitted
-    runInAction(() => {
-        asArray(patch).forEach(p => node.applyPatch(p))
-    })
+    getStateTreeNode(target).applyPatches(asArray(patch))
 }
 
 export interface IPatchRecorder {
