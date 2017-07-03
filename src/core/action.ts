@@ -1,4 +1,5 @@
 import { action as mobxAction, isObservable } from "mobx"
+import { isArray } from '../utils'
 
 export type ISerializedActionCall = {
     name: string
@@ -83,7 +84,7 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
         throw new Error(
             `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a function`
         )
-    if (typeof arg === "object" && !isPlainObject(arg) && !Array.isArray(arg))
+    if (typeof arg === "object" && !isPlainObject(arg) && !isArray(arg))
         throw new Error(
             `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any) &&
                 (arg as any).constructor

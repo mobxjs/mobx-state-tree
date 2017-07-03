@@ -5,3 +5,4 @@ dist
 test-lib
 coverage
 .nyc_output
+.idea
