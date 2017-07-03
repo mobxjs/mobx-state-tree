@@ -33,11 +33,14 @@ export function getChildType(object: IStateTreeNode, child: string): IType<any, 
  * Middleware can be used to intercept any action is invoked on the subtree where it is attached.
  * If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
  *
+ * [SandBox example](https://codesandbox.io/s/mQrqy8j73)
+ *
  * It is allowed to attach multiple middlewares. The order in which middleware is invoked is inside-out:
  * local middleware is invoked before parent middleware. On the same object, earlier attached middleware is run before later attached middleware.
  *
  * A middleware receives two arguments: 1. the description of the the call, 2: a function to invoke the next middleware in the chain.
- * If `next()` is not invoked by your middleware, the action will be aborted and not actually executed.
+ * If `next(call)` is not invoked by your middleware, the action will be aborted and not actually executed.
+ * Before passing the call to the next middleware using `next`, feel free to clone and modify the call description
  *
  * A call description looks like:
  *
@@ -56,7 +59,7 @@ export function getChildType(object: IStateTreeNode, child: string): IType<any, 
  * const store = SomeStore.create()
  * const disposer = addMiddleWare(store, (call, next) => {
  *   console.log(`action ${call.name} was invoked`)
- *   next() // runs the next middleware (or the inteneded action if there is no middleware to run left)
+ *   next(call) // runs the next middleware (or the inteneded action if there is no middleware to run left)
  * })
  * ```
  *
@@ -232,7 +235,6 @@ export function recordActions(subject: IStateTreeNode): IActionRecorder {
  *
  * @export
  * @param {IStateTreeNode} target
-
  *
  */
 export function protect(target: IStateTreeNode) {
