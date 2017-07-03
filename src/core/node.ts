@@ -382,7 +382,13 @@ export function getStateTreeNode(value: IStateTreeNode): Node {
 }
 
 function canAttachNode(value: any) {
-    return value && typeof value === "object" && !isStateTreeNode(value) && !Object.isFrozen(value)
+    return (
+        value &&
+        typeof value === "object" &&
+        !(value instanceof Date) &&
+        !isStateTreeNode(value) &&
+        !Object.isFrozen(value)
+    )
 }
 
 function toJSON(this: IStateTreeNode) {
