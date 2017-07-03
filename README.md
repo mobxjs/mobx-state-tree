@@ -220,12 +220,12 @@ const TodoStore = types.model("TodoStore", {      // 1
 When defining a model, it is advised to give the model a name for debugging purposes (see `// 1`).
 A model takes two objects arguments, first all the properties, then the actions.
 
-The _properties_ argument is a key-value set where each key indicates the introduction of a property, and the value it's type. The following types are acceptable as type:
+The _properties_ argument is a key-value set where each key indicates the introduction of a property, and the value its type. The following types are acceptable as type:
 
 1. A type. This can be a simple primitive type like `types.boolean`, see `// 2`, or a complex, possible earlier defined type (`// 4`)
 2. A primitive. Using a primitive as type as type is syntactic sugar for introducing an property with a default value. See `// 3`, `endpoint: "http://localhost"` is the same as `endpoint: types.optional(types.string, "http://localhost")`. The primitive type is inferred from the default value. Properties with a default value can be omitted in snapshots.
 3. A [computed property](https://mobx.js.org/refguide/computed-decorator.html), see `// 6`. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is allowed to provid a setter for a computed property as well. A setter should always invoke an action.
-4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but it's value can be tracked by Mobx nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
+4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but its value can be tracked by Mobx nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
 
 The _actions_ argument is a key-value set with actions that are available to manage the model. Only actions are allowed to manage models (including any contained objects).
 
@@ -301,8 +301,8 @@ Actions are replayable and are therefore constrained in several ways:
 
 Useful methods:
 
--   `onAction(model, listener)` listens to any action that is invoked on the model or any of it's descendants. See `onAction` for more details.
--   `addMiddleware(model, middleware)` listens to any action that is invoked on the model or any of it's descendants. See `addMiddleware` for more details.
+-   `onAction(model, listener)` listens to any action that is invoked on the model or any of its descendants. See `onAction` for more details.
+-   `addMiddleware(model, middleware)` listens to any action that is invoked on the model or any of its descendants. See `addMiddleware` for more details.
 -   `applyAction(model, action)` invokes an action on the model according to the given action description
 
 #### Action listeners versus middleware
@@ -358,13 +358,13 @@ Patches have the following signature:
 
 Useful methods:
 
--   `onPatch(model, listener)` attaches a patch listener  to the provided model, which will be invoked whenever the model or any of it's descendants is mutated
+-   `onPatch(model, listener)` attaches a patch listener  to the provided model, which will be invoked whenever the model or any of its descendants is mutated
 -   `applyPatch(model, patch)` applies a patch to the provided model
 
 ### References and identifiers
 
 References and identifiers are a first class concept in MST.
-This makes it possible to declare references and keeping the data normalized in the background, while you interect with it in a denormalized manner.
+This makes it possible to declare references and keeping the data normalized in the background, while you interact with it in a denormalized manner.
 
 Example:
 ```javascript
@@ -411,7 +411,7 @@ const Car = types.model("Car", {
 
 #### References
 
-References are defined by mentioning the type they should resolve to. The targetted type should have exactly one attribute of the type `identifier()`.
+References are defined by mentioning the type they should resolve to. The targeted type should have exactly one attribute of the type `identifier()`.
 References are looked up through the entire tree, but per type. So identifiers need to be unique in the entire tree.
 
 ### Listening to observables, snapshots, patches or actions
@@ -426,7 +426,7 @@ autorun(() => {
 })
 ```
 
-But since MST keeps immutable snapshots in te background, it is also possible to be notified when a new snapshot of the tree is available, similar to `.subscribe` on a redux store:
+But since MST keeps immutable snapshots in the background, it is also possible to be notified when a new snapshot of the tree is available, similar to `.subscribe` on a redux store:
 
 ```javascript
 onSnapshot(storeInstance, newSnapshot => {
@@ -522,7 +522,7 @@ _Tip: To strongly type volatile state using typescript, without initialzing the 
 When creating a new state tree it is possible to pass in environment specific data by passing an object as second argument to a `.create` call.
 This object should be (shallowly) immutable and can be accessed by any model in the tree by calling `getEnv(this)`.
 
-This is useful to inject environment or test specific utilities like a transport layer, loggers etc. This is a very useful to mock behavior in unit tests or provide instantiated utilties to models without requiring singleton modules.
+This is useful to inject environment or test specific utilities like a transport layer, loggers etc. This is a very useful to mock behavior in unit tests or provide instantiated utilities to models without requiring singleton modules.
 See also the (bookshop example)[https://github.com/mobxjs/mobx-state-tree/blob/a4f25de0c88acf0e239acb85e690e91147a8f0f0/examples/bookshop/src/stores/ShopStore.test.js#L9] for inspiration.
 
 ```javascript
@@ -599,7 +599,7 @@ Property types can only be used as direct member of a `types.model` type and not
 
 | Hook            | Meaning                                                                                                                                                   |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preProcessSnapshot` | Before creating an instance or before applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichtments, property renames etc. etc. This hook is not called for individual property updates. |
+| `preProcessSnapshot` | Before creating an instance or before applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. etc. This hook is not called for individual property updates. |
 | `afterCreate`   | Immediately after an instance is created and initial values are applied. Children will fire this event before parents                                     |
 | `afterAttach`   | As soon as the _direct_ parent is assigned (this node is attached to an other node)                                                                       |
 | `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot.
@@ -623,7 +623,7 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 | `clone(node, keepEnvironment?: true \| false \| newEnvironment)` | Creates a full clone of a certain node. By default preserves the same environment |
 | `connectReduxDevtools(removeDevModule, node)` | Connects a node to the redux development tools [example](https://github.com/mobxjs/mobx-state-tree/blob/b01fe97d427ca664f7ecc99349d10e58d08d2d98/examples/redux-todomvc/src/index.js)  |
 | `destroy(node)` | Kills a node, making it unusable. Removes it from any parent in the process |
-| `detach(node)` | Removes a node from it's current parent, and let's it live on as stand alone tree |
+| `detach(node)` | Removes a node from its current parent, and let's it live on as stand alone tree |
 | `getChildType(node, property?)` | Returns the declared type of the given property of a node. For arrays and maps `property` can be omitted as they all have the same type |
 | `getEnv(node)` | Returns the environment of the given node, see [environments](#environments) |
 | `getParent(node, depth=1)` | Returns the intermediate parent of the given node, or a higher one if `depth > 1` |
@@ -684,7 +684,7 @@ import { LateStore } from "./circular-dep"
 const Store = types.late(() => LateStore)
 ```
 
-Thanks to function hoisting in combination with `types.late`, this makes sure you can have circular dependencies between types accross files.
+Thanks to function hoisting in combination with `types.late`, this makes sure you can have circular dependencies between types across files.
 
 ### Simulate inheritance by using type composition
 
@@ -721,7 +721,7 @@ const Shape = types.union(Box, Square)
 
 ### Creating enumerations
 
-There is no built-in type for enumerations, but enumarations can simply be constructed by combining unions and literals:
+There is no built-in type for enumerations, but enumerations can simply be constructed by combining unions and literals:
 
 ```javascript
 const Temperature = types.union(types.literal("Hot"), types.literal("Cold"))
@@ -760,7 +760,7 @@ For, for example, local component state, vanilla MobX observables might often be
 
 TypeScript support is best effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we got pretty close! As MST uses the latest fancy typescript features it is recommended to use TypeScript 2.3 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
 
-When using models, you write interface along with it's property types that will be used to perform type checks at runtime.
+When using models, you write interface along with its property types that will be used to perform type checks at runtime.
 What about compile time? You can use TypeScript interfaces indeed to perform those checks, but that would require writing again all the properties and their actions!
 
 Good news? You don't need to write it twice! Using the `typeof` operator of TypeScript over the `.Type` property of a MST Type, will result in a valid TypeScript Type!
