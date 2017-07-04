@@ -38,6 +38,7 @@ test("correct api exposed", t => {
             "recordPatches",
             "resolveIdentifier",
             "resolvePath",
+            "revertPatch",
             "tryResolve",
             "types",
             "unescapeJsonPath",

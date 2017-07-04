@@ -13,7 +13,7 @@ function testPatches<T extends IType<any, any>>(
     unprotect(instance)
     fn(instance)
     recorder.stop()
-    t.deepEqual(recorder.patches, expectedPatches, "mismatach in patches")
+    t.deepEqual(recorder.cleanPatches, expectedPatches, "mismatch in patches")
     const clone = type.create(snapshot)
     recorder.replay(clone)
     t.deepEqual(
