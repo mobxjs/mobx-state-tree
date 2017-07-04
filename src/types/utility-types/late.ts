@@ -1,8 +1,8 @@
-import { fail } from '../../utils'
-import { Type, IType } from '../type'
-import { TypeFlags } from '../type-flags'
-import { IContext, IValidationResult } from '../type-checker'
-import { Node } from '../../core'
+import { fail } from "../../utils"
+import { Type, IType } from "../type"
+import { TypeFlags } from "../type-flags"
+import { IContext, IValidationResult } from "../type-checker"
+import { Node } from "../../core"
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>
@@ -21,9 +21,9 @@ export class Late<S, T> extends Type<S, T> {
 
     constructor(name: string, definition: () => IType<S, T>) {
         super(name)
-        if (!(typeof definition === 'function' && definition.length === 0))
+        if (!(typeof definition === "function" && definition.length === 0))
             fail(
-                'Invalid late type, expected a function with zero arguments that returns a type, got: ' +
+                "Invalid late type, expected a function with zero arguments that returns a type, got: " +
                     definition
             )
         this.definition = definition
@@ -52,10 +52,33 @@ export class Late<S, T> extends Type<S, T> {
 
 export type ILateType<S, T> = () => IType<S, T>
 
+/**
+ * Defines a type that gets implemented later. This is usefull when you have to deal with circular dependencies.
+ * Please notice that when defining circular dependencies TypeScript is'nt smart enought to inference them.
+ * You need to declare an interface to explicit the return type of the late parameter function.
+ * 
+ * ```typescript
+ *  interface INode {
+ *       childs: INode[]
+ *  }
+ *
+ *   // TypeScript is'nt smart enough to infer self referencing types.
+ *  const Node = types.model({
+ *       childs: types.optional(types.array(types.late<any, INode>(() => Node)), [])
+ *  })
+ * ```
+ * 
+ * @export
+ * @template S
+ * @template T
+ * @param {string} [name] The name to use for the type that will be returned.
+ * @param {ILateType<S, T>} type A function that returns the type that will be defined.
+ * @returns {IType<S, T>} 
+ */
 export function late<S = any, T = any>(type: ILateType<S, T>): IType<S, T>
 export function late<S = any, T = any>(name: string, type: ILateType<S, T>): IType<S, T>
 export function late<S, T>(nameOrType: any, maybeType?: ILateType<S, T>): IType<S, T> {
-    const name = typeof nameOrType === 'string' ? nameOrType : `late(${nameOrType.toString()})`
-    const type = typeof nameOrType === 'string' ? maybeType : nameOrType
+    const name = typeof nameOrType === "string" ? nameOrType : `late(${nameOrType.toString()})`
+    const type = typeof nameOrType === "string" ? maybeType : nameOrType
     return new Late<S, T>(name, type)
 }

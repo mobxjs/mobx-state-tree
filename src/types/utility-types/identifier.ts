@@ -44,12 +44,35 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (value === undefined || value === null || typeof value === "string" || typeof value === "number")
+        if (
+            value === undefined ||
+            value === null ||
+            typeof value === "string" ||
+            typeof value === "number"
+        )
             return this.identifierType.validate(value, context)
         return typeCheckFailure(context, value, "References should be a primitive value")
     }
 }
 
+/**
+ * Identifier are used to make references, lifecycle events and reconciling works.
+ * Inside a state tree, for each type can exist only one instance for each given identifier.
+ * For example there could'nt be 2 instances of user with id 1. If you need more, consider using references.
+ * Identifier can be used only as type property of a model. 
+ * This type accepts as parameter the value type of the identifier field that can be either string or number.
+ * 
+ * @example
+ *  const Todo = types.model("Todo", {
+ *      id: types.identifier(types.string),
+ *      title: types.string
+ *  })
+ * 
+ * @export
+ * @template T 
+ * @param {IType<T, T>} baseType 
+ * @returns {IType<T, T>} 
+ */
 export function identifier<T>(baseType: IType<T, T>): IType<T, T>
 export function identifier<T>(): T
 export function identifier(baseType: IType<any, any> = stringType): any {

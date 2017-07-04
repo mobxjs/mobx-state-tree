@@ -434,7 +434,7 @@ export function getRelativePath(base: IStateTreeNode, target: IStateTreeNode): s
 }
 
 /**
- *
+ * Returns a copy of the given state tree node
  *
  * @export
  * @template T

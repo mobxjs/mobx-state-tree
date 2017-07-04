@@ -7,6 +7,15 @@ import { fail } from "../../utils"
 
 const nullType = optional(literal(null), null)
 
+/**
+ * Maybe will make a type nullable, and also null by default. 
+ * 
+ * @export
+ * @template S 
+ * @template T 
+ * @param {IType<S, T>} type The type to make nullable
+ * @returns {(IType<S | null | undefined, T | null>)} 
+ */
 export function maybe<S, T>(type: IType<S, T>): IType<S | null | undefined, T | null> {
     if (type === frozen) {
         fail(
