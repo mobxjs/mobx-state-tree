@@ -1,5 +1,5 @@
 import { action as mobxAction, isObservable } from "mobx"
-import { isArray } from '../utils'
+import { isArray } from "../utils"
 
 export type ISerializedActionCall = {
     name: string
@@ -136,6 +136,16 @@ export function applyAction(target: IStateTreeNode, action: ISerializedActionCal
     )
 }
 
+/**
+ * Registers a function that will be invoked for each action that is called on the provided model instance, or to any of its children.
+ * See [actions](https://github.com/mobxjs/mobx-state-tree#actions) for more details. onAction events are emitted only for the outermost called action in the stack.
+ * Action can also be intercepted by middleware using addMiddleware to change the function call before it will be run.
+ * 
+ * @export
+ * @param {IStateTreeNode} target 
+ * @param {(call: ISerializedActionCall) => void} listener 
+ * @returns {IDisposer} 
+ */
 export function onAction(
     target: IStateTreeNode,
     listener: (call: ISerializedActionCall) => void

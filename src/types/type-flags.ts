@@ -34,15 +34,21 @@ export function isType(value: any): value is IType<any, any> {
     return typeof value === "object" && value && value.isType === true
 }
 
-export function isPrimitiveType(type: any): type is CoreType<any> {
-    return isType(type) && (type.flags & (TypeFlags.String | TypeFlags.Number | TypeFlags.Boolean | TypeFlags.Date)) > 0
+export function isPrimitiveType(type: any): type is CoreType<any, any> {
+    return (
+        isType(type) &&
+        (type.flags & (TypeFlags.String | TypeFlags.Number | TypeFlags.Boolean | TypeFlags.Date)) >
+            0
+    )
 }
 
 export function isArrayType<S, T>(type: any): type is IComplexType<S[], IObservableArray<T>> {
     return isType(type) && (type.flags & TypeFlags.Array) > 0
 }
 
-export function isMapType<S, T>(type: any): type is IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
+export function isMapType<S, T>(
+    type: any
+): type is IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
     return isType(type) && (type.flags & TypeFlags.Map) > 0
 }
 

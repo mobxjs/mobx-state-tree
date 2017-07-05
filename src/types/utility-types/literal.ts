@@ -1,13 +1,7 @@
 import { ISimpleType, Type } from "../type"
 import { TypeFlags } from "../type-flags"
 import { fail, isPrimitive } from "../../utils"
-import {
-    IContext,
-    IValidationResult,
-    typecheck,
-    typeCheckSuccess,
-    typeCheckFailure
-} from "../type-checker"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { Node, createNode } from "../../core"
 
 export class Literal<T> extends Type<T, T> {
@@ -47,6 +41,7 @@ export class Literal<T> extends Type<T, T> {
  * })
  * 
  * @export
+ * @alias types.literal
  * @template S 
  * @param {S} value The value to use in the strict equal check
  * @returns {ISimpleType<S>} 

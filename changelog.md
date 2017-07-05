@@ -2,6 +2,7 @@
 
 * Applying a snapshot or patches will now emit an action as well. The name of the emitted action will be `@APPLY_PATCHES`resp `@APPLY_SNAPSHOT`. See [#107](https://github.com/mobxjs/mobx-state-tree/issues/107)
 * Fixed issue where same Date instance could'nt be used two times in the same state tree [#229](https://github.com/mobxjs/mobx-state-tree/issues/229)
+* Fixed issue with reapplying snapshots to Date field resulting in snapshot typecheck error[#233](https://github.com/mobxjs/mobx-state-tree/issues/233)
 * Declaring `types.maybe(types.frozen)` will now result into an error [#224](https://github.com/mobxjs/mobx-state-tree/issues/224)
 * Added support for Mobx observable arrays in type checks [#221](https://github.com/mobxjs/mobx-state-tree/issues/221) (from [alessioscalici](https://github.com/alessioscalici))
 

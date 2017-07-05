@@ -55,6 +55,8 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 }
 
+export function identifier<T>(baseType: IType<T, T>): IType<T, T>
+export function identifier<T>(): T
 /**
  * Identifier are used to make references, lifecycle events and reconciling works.
  * Inside a state tree, for each type can exist only one instance for each given identifier.
@@ -69,12 +71,11 @@ export class IdentifierType<T> extends Type<T, T> {
  *  })
  * 
  * @export
+ * @alias types.identifier
  * @template T 
  * @param {IType<T, T>} baseType 
  * @returns {IType<T, T>} 
  */
-export function identifier<T>(baseType: IType<T, T>): IType<T, T>
-export function identifier<T>(): T
 export function identifier(baseType: IType<any, any> = stringType): any {
     return new IdentifierType(baseType)
 }

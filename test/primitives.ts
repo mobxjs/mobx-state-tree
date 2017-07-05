@@ -1,4 +1,4 @@
-import { types } from "../src"
+import { types, applySnapshot, getSnapshot } from "../src"
 import { test } from "ava"
 
 test("Date instance can be reused", t => {
@@ -32,4 +32,21 @@ test("Date instance can be reused", t => {
     t.notThrows(() => instance.push(object))
     t.is(instance.one.c, object.c)
     t.is(instance.index[0].c, object.c)
+})
+
+test("Date can be rehydrated using unix timestamp", t => {
+    const time = new Date()
+    const newTime = 6813823163
+
+    const Factory = types.model({
+        date: types.optional(types.Date, () => time)
+    })
+
+    const store = Factory.create()
+    t.is(store.date.getTime(), time.getTime())
+
+    applySnapshot(store, { date: newTime })
+
+    t.is(store.date.getTime(), newTime)
+    t.is(getSnapshot(store).date, newTime)
 })

@@ -3,7 +3,7 @@ import { test } from "ava"
 
 test("it should throw if late doesnt received a function as parameter", t => {
     t.throws(() => {
-        const Before = types.model({
+        types.model({
             after: types.late(1 as any)
         })
     })

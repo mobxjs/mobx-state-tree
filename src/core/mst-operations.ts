@@ -94,6 +94,15 @@ export function onPatch(target: IStateTreeNode, callback: (patch: IJsonPatch) =>
     return getStateTreeNode(target).onPatch(callback)
 }
 
+export function onSnapshot<S>(
+    target: ObservableMap<S>,
+    callback: (snapshot: { [key: string]: S }) => void
+): IDisposer
+export function onSnapshot<S>(
+    target: IObservableArray<S>,
+    callback: (snapshot: S[]) => void
+): IDisposer
+export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer
 /**
  * Registeres a function that is invoked whenever a new snapshot for the given model instance is available.
  * The listener will only be fire at the and of the current MobX (trans)action.
@@ -104,15 +113,6 @@ export function onPatch(target: IStateTreeNode, callback: (patch: IJsonPatch) =>
  * @param {(snapshot: any) => void} callback
  * @returns {IDisposer}
  */
-export function onSnapshot<S>(
-    target: ObservableMap<S>,
-    callback: (snapshot: { [key: string]: S }) => void
-): IDisposer
-export function onSnapshot<S>(
-    target: IObservableArray<S>,
-    callback: (snapshot: S[]) => void
-): IDisposer
-export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer
 export function onSnapshot<S>(
     target: ISnapshottable<S>,
     callback: (snapshot: S) => void
@@ -289,6 +289,9 @@ export function applySnapshot<S, T>(target: IStateTreeNode, snapshot: S) {
     return getStateTreeNode(target).applySnapshot(snapshot)
 }
 
+export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S }
+export function getSnapshot<S>(target: IObservableArray<S>): S[]
+export function getSnapshot<S>(target: ISnapshottable<S>): S
 /**
  * Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
  * structural sharing where possible. Doesn't require MobX transactions to be completed.
@@ -297,9 +300,6 @@ export function applySnapshot<S, T>(target: IStateTreeNode, snapshot: S) {
  * @param {Object} target
  * @returns {*}
  */
-export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S }
-export function getSnapshot<S>(target: IObservableArray<S>): S[]
-export function getSnapshot<S>(target: ISnapshottable<S>): S
 export function getSnapshot<S>(target: ISnapshottable<S>): S {
     return getStateTreeNode(target).snapshot
 }
@@ -322,6 +322,8 @@ export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
     return false
 }
 
+export function getParent(target: IStateTreeNode, depth?: number): (any & IStateTreeNode)
+export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStateTreeNode)
 /**
  * Returns the immediate parent of this object, or null.
  *
@@ -333,8 +335,6 @@ export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent(target: IStateTreeNode, depth?: number): (any & IStateTreeNode)
-export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStateTreeNode)
 export function getParent<T>(target: IStateTreeNode, depth = 1): (T & IStateTreeNode) {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let d = depth
@@ -346,6 +346,8 @@ export function getParent<T>(target: IStateTreeNode, depth = 1): (T & IStateTree
     return fail(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
 }
 
+export function getRoot(target: IStateTreeNode): any & IStateTreeNode
+export function getRoot<T>(target: IStateTreeNode): T & IStateTreeNode
 /**
  * Given an object in a model tree, returns the root object of that tree
  *
@@ -353,8 +355,6 @@ export function getParent<T>(target: IStateTreeNode, depth = 1): (T & IStateTree
  * @param {Object} target
  * @returns {*}
  */
-export function getRoot(target: IStateTreeNode): any & IStateTreeNode
-export function getRoot<T>(target: IStateTreeNode): T & IStateTreeNode
 export function getRoot(target: IStateTreeNode): IStateTreeNode {
     return getStateTreeNode(target).root.storedValue
 }
@@ -394,6 +394,7 @@ export function isRoot(target: IStateTreeNode): boolean {
 
 /**
  * Resolves a path relatively to a given object.
+ * Returns undefined if no value can be found.
  *
  * @export
  * @param {Object} target
@@ -405,6 +406,16 @@ export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNod
     return node ? node.value : undefined
 }
 
+/**
+ * Resolves a model instance given a root target, the type and the identifier you are searching for. 
+ * Returns undefined if no value can be found.
+ * 
+ * @export
+ * @param {IType<any, any>} type 
+ * @param {IStateTreeNode} target 
+ * @param {(string | number)} identifier 
+ * @returns {*} 
+ */
 export function resolveIdentifier(
     type: IType<any, any>,
     target: IStateTreeNode,
