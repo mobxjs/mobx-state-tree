@@ -115,7 +115,7 @@ Simply subscribing to the patch stream of a tree is another way to sync diffs wi
 
 (screenshot of patches being emitted)
 
-Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](github.com/mobxjs/mobx-react).
+Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](https://github.com/mobxjs/mobx-react).
 But even cooler; because it supports snapshots, middleware and replayable actions out of the box, it is even possible to replace a Redux store and reducer with a MobX state tree.
 This makes it even possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/redux-todomvc/src/index.js#L6).
 
@@ -205,7 +205,7 @@ const TodoStore = types.model("TodoStore", {      // 1
         return this.todos.filter(t => t.done)
     },
     findTodosByUser(user) {                       // 7
-        return this.todos.filter(t => t.assignee = user)
+        return this.todos.filter(t => t.assignee === user)
     }
 }, {
     addTodo(title) {
