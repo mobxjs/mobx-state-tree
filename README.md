@@ -355,11 +355,13 @@ Patches have the following signature:
 -   Patch listeners can be used to achieve deep observing
 -   The `path` attribute of a patch considers the relative path of the event from the place where the event listener is attached
 -   A single mutation can result in multiple patches, for example when splicing an array
+-   Patches can be reverse applied, which enables many powerful patterns like undo / redo
 
 Useful methods:
 
 -   `onPatch(model, listener)` attaches a patch listener  to the provided model, which will be invoked whenever the model or any of its descendants is mutated
--   `applyPatch(model, patch)` applies a patch to the provided model
+-   `applyPatch(model, patch)` applies a patch (or array of patches) to the provided model
+-   `revertPatch(model, patch)` reverse applies a patch (or array of patches) to the provided model, this replays the inverse of a set of patches to an model, which can be used to bring it back to it's original state
 
 ### References and identifiers
 
@@ -619,7 +621,7 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 | `addDisposer(node, () => void) ` | Function to be invoked whenever the target node is to be destroyed |
 | `addMiddleware(node, middleware: (actionDescription, next) => any)` | Attaches middleware to a node. See [actions](#actions). Returns disposer. |
 | `applyAction(node, actionDescription)` | Replays an action on the targeted node |
-| `applyPatch(node, jsonPatch)` | Applies a JSON patch to a node in the tree |
+| `applyPatch(node, jsonPatch)` | Applies a JSON patch or array of patches to a node in the tree |
 | `applySnapshot(node, snapshot)` | Updates a node with the given snapshot |
 | `asReduxStore(node)` | Wraps a node in a Redux store compatible api |
 | `clone(node, keepEnvironment?: true \| false \| newEnvironment)` | Creates a full clone of a certain node. By default preserves the same environment |
@@ -648,6 +650,7 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 | `recordActions(node)` | Creates a recorder that listens to all actions in the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
 | `recordPatches` | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree |
 | `resolve(node, path)` | Resolves a `path` (json path) relatively to the given `node` |
+| `revertPatch(node, jsonPatch)` | Inverse applies a JSON patch or array of patches to a node in the tree |
 | `splitJsonPath(path)` | Splits and unescapes the given json path into path parts |
 | `tryResolve(node, path)` | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
 | `unprotect(node)` | Unprotects a node, making it possible to directly modify any value in the subtree, without actions |

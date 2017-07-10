@@ -185,10 +185,10 @@ export interface IPatchRecorder {
  *      // the same set of recorded patches, but without undo information, making them smaller and compliant with json-patch spec
  *      cleanPatches: IJSonPatch[]
  *      // stop recording patches
- *      stop(): any
- *      // apply all the recorded patches on the given object
- *      replay(target: IStateTreeNode): any
- *      // reverse apply the recorded patches on the original subject
+ *      stop(target?: IStateTreeNode): any
+ *      // apply all the recorded patches on the given target (the original subject if omitted)
+ *      replay(target?: IStateTreeNode): any
+ *      // reverse apply the recorded patches on the given target  (the original subject if omitted)
  *      // stops the recorder if not already stopped
  *      undo(): void
  * }
@@ -211,7 +211,6 @@ export function recordPatches(subject: IStateTreeNode): IPatchRecorder {
             applyPatch(target || subject, recorder.patches)
         },
         undo(target?: IStateTreeNode) {
-            this.stop()
             revertPatch(subject || subject, this.patches)
         }
     }
@@ -257,7 +256,7 @@ export interface IActionRecorder {
  * ```typescript
  * export interface IActionRecorder {
  *      // the recorded actions
- *      actions: IJsonPatch[]
+ *      actions: ISerializedActionCall[]
  *      // stop recording actions
  *      stop(): any
  *      // apply all the recorded actions on the given object
@@ -458,14 +457,14 @@ export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNod
 }
 
 /**
- * Resolves a model instance given a root target, the type and the identifier you are searching for. 
+ * Resolves a model instance given a root target, the type and the identifier you are searching for.
  * Returns undefined if no value can be found.
- * 
+ *
  * @export
- * @param {IType<any, any>} type 
- * @param {IStateTreeNode} target 
- * @param {(string | number)} identifier 
- * @returns {*} 
+ * @param {IType<any, any>} type
+ * @param {IStateTreeNode} target
+ * @param {(string | number)} identifier
+ * @returns {*}
  */
 export function resolveIdentifier(
     type: IType<any, any>,
