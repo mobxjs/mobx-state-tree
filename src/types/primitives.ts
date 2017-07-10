@@ -37,24 +37,83 @@ export class CoreType<S, T> extends Type<S, T> {
     }
 }
 
+/**
+ * Creates a type that can only contain a string value.
+ * This type is used for string values by default
+ *
+ * @export
+ * @alias types.string
+ * @example
+ * ```javascript
+ * const Person = types.model({
+ *   firstName: types.string,
+ *   lastName: "Doe"
+ * })
+ * ```
+ */
 // tslint:disable-next-line:variable-name
 export const string: ISimpleType<string> = new CoreType<string, string>(
     "string",
     TypeFlags.String,
     (v: any) => typeof v === "string"
 )
+
+/**
+ * Creates a type that can only contain a numeric value.
+ * This type is used for numeric values by default
+ *
+ * @export
+ * @alias types.number
+ * @example
+ * ```javascript
+ * const Vector = types.model({
+ *   x: types.number,
+ *   y: 0
+ * })
+ * ```
+ */
 // tslint:disable-next-line:variable-name
 export const number: ISimpleType<number> = new CoreType<number, number>(
     "number",
     TypeFlags.Number,
     (v: any) => typeof v === "number"
 )
+
+/**
+ * Creates a type that can only contain a boolean value.
+ * This type is used for boolean values by default
+ *
+ * @export
+ * @alias types.boolean
+ * @example
+ * ```javascript
+ * const Thing = types.model({
+ *   isCool: types.boolean,
+ *   isAwesome: false
+ * })
+ * ```
+ */
 // tslint:disable-next-line:variable-name
 export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean>(
     "boolean",
     TypeFlags.Boolean,
     (v: any) => typeof v === "boolean"
 )
+
+/**
+ * Creates a type that can only contain a javascript Date value.
+ *
+ * @export
+ * @alias types.Date
+ * @example
+ * ```javascript
+ * const LogLine = types.model({
+ *   timestamp: types.Date,
+ * })
+ *
+ * LogLine.create({ timestamp: new Date() })
+ * ```
+ */
 // tslint:disable-next-line:variable-name
 export const DatePrimitive: IType<number, Date> = new CoreType<number, Date>(
     "Date",

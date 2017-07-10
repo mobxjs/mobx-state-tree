@@ -652,6 +652,10 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 | `tryResolve(node, path)` | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
 | `unprotect(node)` | Unprotects a node, making it possible to directly modify any value in the subtree, without actions |
 | `walk(startNode, (node) => void)` | Performs a depth-first walk through a tree |
+| `escapeJsonPath(path)` | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
+| `unescapeJsonPath(path)` | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
+| `resolveIdentifier(type, target, identifier)` | resolves an identifier of a given type in a model tree |
+| `resolvePath(target, path)` | resolves a JSON path, starting at the specified target |
 
 A _disposer_ is a function that cancels the effect it was created for.
 
