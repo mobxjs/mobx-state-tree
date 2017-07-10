@@ -5,16 +5,20 @@ export type IJsonPatch = {
     op: "replace" | "add" | "remove"
     path: string
     value?: any
+}
+
+export type IReversibleJsonPatch = IJsonPatch & {
     oldValue?: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
 }
 
-export function invertPatch(patch: IJsonPatch): IJsonPatch {
+export function invertPatch(patch: IReversibleJsonPatch): IReversibleJsonPatch {
     if (!("oldValue" in patch)) fail(`Patches without \`oldValue\` field cannot be inversed`)
     switch (patch.op) {
         case "add":
             return {
                 op: "remove",
-                path: patch.path
+                path: patch.path,
+                oldValue: patch.value
             }
         case "remove":
             return {
@@ -32,12 +36,12 @@ export function invertPatch(patch: IJsonPatch): IJsonPatch {
     }
 }
 
-export function stripPatch(patch: IJsonPatch) {
+export function stripPatch(patch: IReversibleJsonPatch): IJsonPatch {
     // strips `oldvalue` information from the patch, so that it becomes a patch conform the json-patch spec
     // this removes the ability to undo the patch
     const clone = { ...patch }
     delete clone.oldValue
-    return clone
+    return clone as any
 }
 
 /**

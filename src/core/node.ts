@@ -1,4 +1,4 @@
-import { observable, computed, action, reaction } from "mobx"
+import { observable, computed, reaction } from "mobx"
 
 let nextNodeId = 1
 
@@ -21,9 +21,9 @@ export class Node {
 
     readonly middlewares: IMiddleWareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
-    private readonly patchSubscribers: ((patches: IJsonPatch) => void)[] = []
+    private readonly patchSubscribers: ((patches: IReversibleJsonPatch) => void)[] = []
     private readonly disposers: (() => void)[] = []
-    applyPatches: (patches: IJsonPatch[]) => void
+    applyPatches: (patches: IReversibleJsonPatch[]) => void
     applySnapshot: (snapshot: any) => void
 
     constructor(
@@ -42,13 +42,16 @@ export class Node {
 
         // Optimization: this does not need to be done per instance
         // if some pieces from createActionInvoker are extracted
-        this.applyPatches = createActionInvoker("@APPLY_PATCHES", (patches: IJsonPatch[]) => {
-            patches.forEach(patch => {
-                const parts = splitJsonPath(patch.path)
-                const node = this.resolvePath(parts.slice(0, -1))
-                node.applyPatchLocally(parts[parts.length - 1], patch)
-            })
-        }).bind(this.storedValue)
+        this.applyPatches = createActionInvoker(
+            "@APPLY_PATCHES",
+            (patches: IReversibleJsonPatch[]) => {
+                patches.forEach(patch => {
+                    const parts = splitJsonPath(patch.path)
+                    const node = this.resolvePath(parts.slice(0, -1))
+                    node.applyPatchLocally(parts[parts.length - 1], patch)
+                })
+            }
+        ).bind(this.storedValue)
         this.applySnapshot = createActionInvoker("@APPLY_SNAPSHOT", (snapshot: any) => {
             return this.type.applySnapshot(this, snapshot)
         }).bind(this.storedValue)
@@ -234,21 +237,24 @@ export class Node {
         this.snapshotSubscribers.forEach((f: Function) => f(snapshot))
     }
 
-    applyPatchLocally(subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(subpath: string, patch: IReversibleJsonPatch): void {
         this.assertWritable()
         this.type.applyPatchLocally(this, subpath, patch)
     }
 
-    public onPatch(onPatch: (patch: IJsonPatch) => void, includeOldValue: boolean): IDisposer {
+    public onPatch(
+        onPatch: (patch: IReversibleJsonPatch) => void,
+        includeOldValue: boolean
+    ): IDisposer {
         return registerEventHandler(
             this.patchSubscribers,
-            includeOldValue ? onPatch : (patch: IJsonPatch) => onPatch(stripPatch(patch))
+            includeOldValue ? onPatch : (patch: IReversibleJsonPatch) => onPatch(stripPatch(patch))
         )
     }
 
-    emitPatch(patch: IJsonPatch, source: Node) {
+    emitPatch(patch: IReversibleJsonPatch, source: Node) {
         if (this.patchSubscribers.length) {
-            const localizedPatch: IJsonPatch = extend({}, patch, {
+            const localizedPatch: IReversibleJsonPatch = extend({}, patch, {
                 path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
             })
             this.patchSubscribers.forEach(f => f(localizedPatch))
@@ -449,7 +455,13 @@ export function createNode<S, T>(
 }
 
 import { IType } from "../types/type"
-import { escapeJsonPath, splitJsonPath, joinJsonPath, IJsonPatch, stripPatch } from "./json-patch"
+import {
+    escapeJsonPath,
+    splitJsonPath,
+    joinJsonPath,
+    IReversibleJsonPatch,
+    stripPatch
+} from "./json-patch"
 import { walk } from "./mst-operations"
 import { IMiddleWareHandler, createActionInvoker } from "./action"
 import {
