@@ -21,7 +21,12 @@ export class ValueProperty extends Property {
 
     initialize(instance: any, snapshot: any) {
         const node = getStateTreeNode(instance)
-        instance[this.name] = this.type.instantiate(node, this.name, node._environment, snapshot[this.name])
+        instance[this.name] = this.type.instantiate(
+            node,
+            this.name,
+            node._environment,
+            snapshot[this.name]
+        )
         extras.interceptReads(instance, this.name, node.unbox)
     }
 
@@ -44,7 +49,8 @@ export class ValueProperty extends Property {
             {
                 op: "replace",
                 path: escapeJsonPath(this.name),
-                value: this.getValueNode(change.object).snapshot
+                value: change.newValue.snapshot,
+                oldValue: change.oldValue ? change.oldValue.snapshot : undefined
             },
             node
         )
@@ -61,6 +67,9 @@ export class ValueProperty extends Property {
     }
 
     validate(snapshot: any, context: IContext): IValidationResult {
-        return this.type.validate(snapshot[this.name], getContextForPath(context, this.name, this.type))
+        return this.type.validate(
+            snapshot[this.name],
+            getContextForPath(context, this.name, this.type)
+        )
     }
 }

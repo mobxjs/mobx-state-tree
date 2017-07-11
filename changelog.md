@@ -1,3 +1,11 @@
+
+# 0.9.2
+
+Introduced the concept of reverse patches, see [#231](https://github.com/mobxjs/mobx-state-tree/pull/231/)
+* Introduced the `revertPatch` operation, that takes a patch or list of patches, and reverse applies it to the target.
+* `onPatch` now takes a second argument, `includeOldValue`, defaulting to `false`, which, if set to true, includes in the patch any value that is being overwritten as result of the patch. Setting this option to true produces patches that can be used with `revertPatch`
+* `patchRecorder` now introduces additional fields / methods to be able to reverse apply changes: `patchRecorder.cleanPatches`, `patchRecorder.undo`
+
 # 0.9.1
 
 * Applying a snapshot or patches will now emit an action as well. The name of the emitted action will be `@APPLY_PATCHES`resp `@APPLY_SNAPSHOT`. See [#107](https://github.com/mobxjs/mobx-state-tree/issues/107)

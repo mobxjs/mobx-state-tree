@@ -9,17 +9,25 @@ function testPatches<T extends IType<any, any>>(
     expectedPatches: IJsonPatch[]
 ) {
     const instance = type.create(snapshot)
+    const baseSnapshot = getSnapshot(instance)
     const recorder = recordPatches(instance)
     unprotect(instance)
     fn(instance)
     recorder.stop()
-    t.deepEqual(recorder.patches, expectedPatches, "mismatach in patches")
+    t.deepEqual(recorder.cleanPatches, expectedPatches, "mismatch in patches")
     const clone = type.create(snapshot)
     recorder.replay(clone)
     t.deepEqual(
         getSnapshot(clone),
         getSnapshot(instance),
         "reapplying patches didn't result in same clone"
+    )
+
+    recorder.undo()
+    t.deepEqual(
+        getSnapshot(instance),
+        baseSnapshot,
+        "reverting the patches didn't result in the same snapshot"
     )
 }
 

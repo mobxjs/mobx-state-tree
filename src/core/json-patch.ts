@@ -7,6 +7,43 @@ export type IJsonPatch = {
     value?: any
 }
 
+export type IReversibleJsonPatch = IJsonPatch & {
+    oldValue?: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
+}
+
+export function invertPatch(patch: IReversibleJsonPatch): IReversibleJsonPatch {
+    if (!("oldValue" in patch)) fail(`Patches without \`oldValue\` field cannot be inversed`)
+    switch (patch.op) {
+        case "add":
+            return {
+                op: "remove",
+                path: patch.path,
+                oldValue: patch.value
+            }
+        case "remove":
+            return {
+                op: "add",
+                path: patch.path,
+                value: patch.oldValue
+            }
+        case "replace":
+            return {
+                op: "replace",
+                path: patch.path,
+                value: patch.oldValue,
+                oldValue: patch.value
+            }
+    }
+}
+
+export function stripPatch(patch: IReversibleJsonPatch): IJsonPatch {
+    // strips `oldvalue` information from the patch, so that it becomes a patch conform the json-patch spec
+    // this removes the ability to undo the patch
+    const clone = { ...patch }
+    delete clone.oldValue
+    return clone as any
+}
+
 /**
  * escape slashes and backslashes
  * http://tools.ietf.org/html/rfc6901
@@ -36,3 +73,5 @@ export function splitJsonPath(path: string): string[] {
     // path '../../b/c -> .. .. b c
     return parts[0] === "" ? parts.slice(1) : parts
 }
+
+import { fail } from "../utils"
