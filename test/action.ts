@@ -165,8 +165,11 @@ test("it should not be possible to set the wrong type", t => {
         () => {
             store.orders[0].setCustomer(store.orders[0])
         }, // wrong type!
-        "[mobx-state-tree] Error while converting <Order@/orders/0> to `reference(Customer) | null`:\n" +
-            "value of type Order: <Order@/orders/0> is not assignable to type: `reference(Customer) | null`, expected an instance of `reference(Customer) | null` or a snapshot like `(reference(Customer) | null?)` instead."
+        err =>
+            err.message.includes("[mobx-state-tree]") &&
+            err.message.includes("Order@/orders/0") &&
+            err.message.includes("type Order") &&
+            err.message.includes("reference(Customer) | null")
     )
 })
 
@@ -174,9 +177,10 @@ test("it should not be possible to pass the element of another tree", t => {
     const store1 = createTestStore()
     const store2 = createTestStore()
 
-    t.throws(() => {
-        store1.orders[0].setCustomer(store2.customers[0])
-    }, "Argument 0 that was passed to action 'setCustomer' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead")
+    t.throws(
+        () => store1.orders[0].setCustomer(store2.customers[0]),
+        "Argument 0 that was passed to action 'setCustomer' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead"
+    )
 })
 
 test("it should not be possible to pass an unserializable object", t => {
