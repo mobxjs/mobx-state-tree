@@ -1,12 +1,7 @@
 import { ISimpleType, Type } from "../type"
 import { TypeFlags } from "../type-flags"
 import { fail, isPrimitive } from "../../utils"
-import {
-    IContext,
-    IValidationResult,
-    typeCheckSuccess,
-    typeCheckFailure
-} from "../type-checker"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { Node, createNode } from "../../core"
 
 export class Literal<T> extends Type<T, T> {
@@ -14,7 +9,7 @@ export class Literal<T> extends Type<T, T> {
     readonly flags = TypeFlags.Literal
 
     constructor(value: any) {
-        super("" + value)
+        super(JSON.stringify(value))
         this.value = value
     }
 
