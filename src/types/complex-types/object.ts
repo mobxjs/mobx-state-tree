@@ -39,6 +39,7 @@ function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
 }
 
+// TODO: rename to Model
 export class ObjectType extends ComplexType<any, any> {
     shouldAttachNode = true
     readonly flags = TypeFlags.Object
@@ -311,6 +312,14 @@ export function model<T = {}, S = {}, A = {}>(
     properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
     operations?: A & ThisType<IStateTreeNode & T & A & S>
 ): IModelType<T & IStateTreeNode, S, A>
+/**
+ * Creates a new model type by providing a name, properties, volatile state and actions.
+ *
+ * See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
+ *
+ * @export
+ * @alias types.model
+ */
 export function model(...args: any[]) {
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
     const props = args.shift() || fail("types.model must specify properties")
@@ -354,6 +363,24 @@ export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
     properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>,
     operations?: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
 ): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
+/**
+ * Composes a new model from one or more existing model types.
+ * This method can be invoked in two forms:
+ * 1. Given 2 or more model types, the types are composed into a new Type.
+ * 2. Given 1 model type, and additionally a set of properties, actions and volatile state, a new type is composed.
+ *
+ * Overloads:
+ *
+ * * `compose(...modelTypes)`
+ * * `compose(modelType, properties)`
+ * * `compose(modelType, properties, actions)`
+ * * `compose(modelType, properties, volatileState, actions)`
+ *
+ * [Example of form 2](https://github.com/mobxjs/mobx-state-tree#simulate-inheritance-by-using-type-composition)
+ *
+ * @export
+ * @alias types.model
+ */
 export function compose(...args: any[]) {
     const typeName = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
 

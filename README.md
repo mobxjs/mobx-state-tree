@@ -18,7 +18,7 @@
 * [Examples](#examples)
 * [Concepts](#concepts)
   * [Trees, types and state](#trees-types-and-state)
-  * [Creating models](#construction-models)
+  * [Creating models](#creating-models)
   * [Tree semantics in detail](#tree-semantis-in-detail)
   * [Composing trees](#composing-trees)
   * [Actions](#actions)
@@ -46,6 +46,10 @@
 * JSBin [playground](http://jsbin.com/petoxeheta/edit?html,js,console) (for non console based fiddles)
 
 Typescript typings are included in the packages. Use `module: "commonjs"` or `moduleResolution: "node"` to make sure they are picked up automatically in any consuming project.
+
+# Getting started
+
+See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial.
 
 # Philosophy & Overview
 

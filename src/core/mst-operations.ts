@@ -407,14 +407,14 @@ export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNod
 }
 
 /**
- * Resolves a model instance given a root target, the type and the identifier you are searching for. 
+ * Resolves a model instance given a root target, the type and the identifier you are searching for.
  * Returns undefined if no value can be found.
- * 
+ *
  * @export
- * @param {IType<any, any>} type 
- * @param {IStateTreeNode} target 
- * @param {(string | number)} identifier 
- * @returns {*} 
+ * @param {IType<any, any>} type
+ * @param {IStateTreeNode} target
+ * @param {(string | number)} identifier
+ * @returns {*}
  */
 export function resolveIdentifier(
     type: IType<any, any>,
@@ -445,11 +445,15 @@ export function getRelativePath(base: IStateTreeNode, target: IStateTreeNode): s
 }
 
 /**
- * Returns a copy of the given state tree node
+ * Returns a deep copy of the given state tree node as new tree.
+ * Short hand for `snapshot(x) = getType(x).create(getSnapshot(x))`
+ *
+ * _Tip: clone will create a literal copy, including the same identifiers. To modify identifiers etc during cloning, don't use clone but take a snapshot of the tree, modify it, and create new instance_
  *
  * @export
  * @template T
  * @param {T} source
+ * @param {boolean | any} keepEnvironment indicates whether the clone should inherit the same environment (`true`, the default), or not have an environment (`false`). If an object is passed in as second argument, that will act as the environment for the cloned tree.
  * @returns {T}
  */
 export function clone<T extends IStateTreeNode>(
