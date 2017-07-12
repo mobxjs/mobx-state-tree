@@ -116,7 +116,7 @@ export function lazy<S, T, TR>(
     replacementType?: IType<S, TR>
 ): Lazy<S, T, TR>
 export function lazy<S, T, TR>(...args: any[]): Lazy<S, T, TR> {
-    const name = typeof args[0] === "string" ? args.shift() : args[2].name
+    const name = typeof args[0] === "string" ? args.shift() : args[2] ? args[2].name : "frozen"
     const [shouldLoadPredicate, loadType, replacementType = frozen] = args
     return new Lazy(name, shouldLoadPredicate, loadType, replacementType)
 }
