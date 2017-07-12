@@ -19,6 +19,7 @@ import { refinement } from "./utility-types/refinement"
 import { frozen } from "./utility-types/frozen"
 import { boolean, DatePrimitive, number, string } from "./primitives"
 import { late } from "./utility-types/late"
+import { lazy, Lazy } from "./utility-types/lazy"
 
 export { IType, TypeFlags }
 
@@ -39,5 +40,6 @@ export const types = {
     array,
     frozen,
     identifier,
-    late
+    late,
+    lazy
 }

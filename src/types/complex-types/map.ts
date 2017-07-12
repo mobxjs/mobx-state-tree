@@ -261,6 +261,10 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     removeChild(node: Node, subpath: string) {
         ;(node.storedValue as ObservableMap<any>).delete(subpath)
     }
+
+    replaceChild(node: Node, subpath: string, newValue: any) {
+        ;(node.storedValue as ObservableMap<any>).set(subpath, newValue)
+    }
 }
 
 export function map<S, T>(

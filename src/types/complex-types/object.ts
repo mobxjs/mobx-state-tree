@@ -55,9 +55,7 @@ export class ObjectType extends ComplexType<any, any> {
     /*
      * Parsed description of all properties
      */
-    private props: {
-        [key: string]: Property
-    } = {}
+    private props: { [key: string]: Property } = {}
 
     constructor(name: string, baseModel: Object, baseState: Object, baseActions: Object) {
         super(name)
@@ -275,6 +273,10 @@ export class ObjectType extends ComplexType<any, any> {
 
     removeChild(node: Node, subpath: string) {
         node.storedValue[subpath] = null
+    }
+
+    replaceChild(node: Node, subpath: string, newValue: any) {
+        node.storedValue[subpath] = newValue
     }
 }
 
