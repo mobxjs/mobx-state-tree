@@ -59,6 +59,7 @@ test("correct types exposed", t => {
             "frozen",
             "identifier",
             "late",
+            "lazy",
             "literal",
             "map",
             "maybe",
