@@ -1,4 +1,8 @@
 
+# next
+
+* Fix `note that a snapshot is compatible` when assigning a type to an optional version of itself.
+
 # 0.9.2
 
 Introduced the concept of reverse patches, see [#231](https://github.com/mobxjs/mobx-state-tree/pull/231/)

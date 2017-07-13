@@ -49,9 +49,8 @@ export class OptionalValue<S, T> extends Type<S, T> {
     }
 
     private getDefaultValue() {
-        const defaultValue = typeof this.defaultValue === "function"
-            ? this.defaultValue()
-            : this.defaultValue
+        const defaultValue =
+            typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
         if (typeof this.defaultValue === "function") typecheck(this, defaultValue)
         return defaultValue
     }
@@ -64,6 +63,10 @@ export class OptionalValue<S, T> extends Type<S, T> {
         // bounce validation to the sub-type
         return this.type.validate(value, context)
     }
+
+    isAssignableFrom(type: IType<any, any>) {
+        return this.type.isAssignableFrom(type)
+    }
 }
 
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: S): IType<S, T>
@@ -71,9 +74,10 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: T): IT
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => S): IType<S, T>
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => T): IType<S, T>
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): IType<S, T> {
-    const defaultValue = typeof defaultValueOrFunction === "function"
-        ? defaultValueOrFunction()
-        : defaultValueOrFunction
+    const defaultValue =
+        typeof defaultValueOrFunction === "function"
+            ? defaultValueOrFunction()
+            : defaultValueOrFunction
     const defaultSnapshot = isStateTreeNode(defaultValue)
         ? getStateTreeNode(defaultValue).snapshot
         : defaultValue
