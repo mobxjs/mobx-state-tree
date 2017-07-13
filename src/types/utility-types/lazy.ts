@@ -50,7 +50,13 @@ export class Lazy<S, T, TR> extends Type<S, T | TR> {
                             if (!node.parent) return
                             if (!this.loadedType) return
 
-                            node.parent.replaceChild(node.subpath, type.create(node.snapshot))
+                            node.parent.applyPatches([
+                                {
+                                    op: "replace",
+                                    path: node.subpath,
+                                    value: node.snapshot
+                                }
+                            ])
                         })
                     })
                 )

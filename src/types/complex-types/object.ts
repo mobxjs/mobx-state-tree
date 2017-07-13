@@ -274,10 +274,6 @@ export class ObjectType extends ComplexType<any, any> {
     removeChild(node: Node, subpath: string) {
         node.storedValue[subpath] = null
     }
-
-    replaceChild(node: Node, subpath: string, newValue: any) {
-        node.storedValue[subpath] = newValue
-    }
 }
 
 export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }

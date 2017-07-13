@@ -25,7 +25,6 @@ export interface IType<S, T> {
     getChildNode(node: Node, key: string): Node
     getChildType(key: string): IType<any, any>
     removeChild(node: Node, subpath: string): void
-    replaceChild(node: Node, subpath: string, newValue: any): void
     isAssignableFrom(type: IType<any, any>): boolean
 }
 
@@ -69,7 +68,6 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     abstract applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IType<any, any>
     abstract removeChild(node: Node, subpath: string): void
-    abstract replaceChild(node: Node, subpath: string, newValue: any): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
 
     isAssignableFrom(type: IType<any, any>): boolean {
@@ -190,10 +188,6 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
     }
 
     removeChild(node: Node, subpath: string): void {
-        return fail(`No child '${subpath}' available in type: ${this.name}`)
-    }
-
-    replaceChild(node: Node, subpath: string, newValue: any): void {
         return fail(`No child '${subpath}' available in type: ${this.name}`)
     }
 }

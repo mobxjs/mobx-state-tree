@@ -25,7 +25,6 @@ export class Node {
     private readonly disposers: (() => void)[] = []
     applyPatches: (patches: IReversibleJsonPatch[]) => void
     applySnapshot: (snapshot: any) => void
-    replaceChild: (subpath: string, newValue: any) => void
 
     constructor(
         type: IType<any, any>,
@@ -56,12 +55,6 @@ export class Node {
         this.applySnapshot = createActionInvoker("@APPLY_SNAPSHOT", (snapshot: any) => {
             return this.type.applySnapshot(this, snapshot)
         }).bind(this.storedValue)
-        this.replaceChild = createActionInvoker(
-            "@REPLACE_NODE",
-            (subpath: string, newValue: any) => {
-                return this.type.replaceChild(this, subpath, newValue)
-            }
-        ).bind(this.storedValue)
 
         // optimization: don't keep the snapshot by default alive with a reaction by default
         // in prod mode. This saves lot of GC overhead (important for e.g. React Native)
