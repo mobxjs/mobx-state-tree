@@ -1,13 +1,20 @@
 import { getStateTreeNode, isStateTreeNode, Node, createNode } from "../../core"
 import { Type, IType } from "../type"
 import { TypeFlags, isReferenceType } from "../type-flags"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, prettyPrintValue } from "../type-checker"
+import {
+    IContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure,
+    prettyPrintValue
+} from "../type-checker"
 import { fail } from "../../utils"
 
 class StoredReference {
     constructor(public mode: "identifier" | "object", public value: any) {
         if (mode === "object") {
-            if (!isStateTreeNode(value)) return fail(`Can only store references to tree nodes, got: '${value}'`)
+            if (!isStateTreeNode(value))
+                return fail(`Can only store references to tree nodes, got: '${value}'`)
             const targetNode = getStateTreeNode(value)
             if (!targetNode.identifierAttribute)
                 return fail(`Can only store references with a defined identifier attribute.`)
@@ -35,7 +42,8 @@ export class ReferenceType<T> extends Type<string | number, T> {
         const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
         if (!target)
             return fail(
-                `Failed to resolve reference of type ${this.targetType.name}: '${ref.value}' (in: ${node.path})`
+                `Failed to resolve reference of type ${this.targetType
+                    .name}: '${ref.value}' (in: ${node.path})`
             )
         return target.value
     }
@@ -67,7 +75,12 @@ export class ReferenceType<T> extends Type<string | number, T> {
             const ref = current.storedValue as StoredReference
             if (targetMode === ref.mode && ref.value === newValue) return current
         }
-        const newNode = this.instantiate(current.parent, current.subpath, current._environment, newValue)
+        const newNode = this.instantiate(
+            current.parent,
+            current.subpath,
+            current._environment,
+            newValue
+        )
         current.die()
         return newNode
     }
@@ -82,12 +95,21 @@ export class ReferenceType<T> extends Type<string | number, T> {
             : typeCheckFailure(
                   context,
                   value,
-                  `Value '${prettyPrintValue(value)}' is not a valid reference. Expected a string or number.`
+                  `Value '${prettyPrintValue(
+                      value
+                  )}' is not a valid reference. Expected a string or number.`
               )
     }
 }
 
 export function reference<T>(factory: IType<any, T>): IType<string | number, T>
+/**
+ * Creates a reference to another type, which should have defined an identifier.
+ * See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
+ *
+ * @export
+ * @alias types.reference
+ */
 export function reference<T>(factory: IType<any, T>): any {
     if (arguments.length === 2 && typeof arguments[1] === "string")
         fail("References with base path are no longer supported. Please remove the base path.")

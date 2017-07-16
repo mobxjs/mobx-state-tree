@@ -1,3 +1,66 @@
+# types.map
+
+Creates a key based collection type who's children are all of a uniform declared type.
+If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
+
+This type will always produce [observable maps](https://mobx.js.org/refguide/map.html)
+
+**Parameters**
+
+-   `subtype` **IType&lt;S, T>** 
+
+**Examples**
+
+````javascript
+    ```javascript
+    const Todo = types.model({
+      id: types.identifier,
+      task: types.string
+    })
+
+    const TodoStore = types.model({
+      todos: types.map(Todo)
+    })
+
+    const s = TodoStore.create({ todos: [] })
+    s.todos.set(17, { task: "Grab coffee", id: 17 })
+    s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the identifier
+    console.log(s.todos.get(17)) // prints: "Grab coffee"
+    ```
+````
+
+Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;S>, IObservableArray&lt;T>>** 
+
+# types.array
+
+Creates a index based collection type who's children are all of a uniform declared type.
+
+This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
+
+**Parameters**
+
+-   `subtype` **IType&lt;S, T>** 
+
+**Examples**
+
+````javascript
+    ```javascript
+    const Todo = types.model({
+      task: types.string
+    })
+
+    const TodoStore = types.model({
+      todos: types.array(Todo)
+    })
+
+    const s = TodoStore.create({ todos: [] })
+    s.todos.push({ task: "Grab coffee" })
+    console.log(s.todos[0]) // prints: "Grab coffee"
+    ```
+````
+
+Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;S>, IObservableArray&lt;T>>** 
+
 # types.identifier
 
 Identifier are used to make references, lifecycle events and reconciling works.
@@ -20,6 +83,76 @@ const Todo = types.model("Todo", {
 ```
 
 Returns **IType&lt;T, T>** 
+
+# types.model
+
+Creates a new model type by providing a name, properties, volatile state and actions.
+
+See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
+
+# types.compose
+
+Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+
+1.  Given 2 or more model types, the types are composed into a new Type.
+2.  Given 1 model type, and additionally a set of properties, actions and volatile state, a new type is composed.
+
+Overloads:
+
+-   `compose(...modelTypes)`
+-   `compose(modelType, properties)`
+-   `compose(modelType, properties, actions)`
+-   `compose(modelType, properties, volatileState, actions)`
+
+[Example of form 2](https://github.com/mobxjs/mobx-state-tree#simulate-inheritance-by-using-type-composition)
+
+# types.reference
+
+Creates a reference to another type, which should have defined an identifier.
+See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
+
+**Parameters**
+
+-   `factory`  
+
+# types.union
+
+types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambigously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+
+**Parameters**
+
+-   `dispatchOrType` **(ITypeDispatcher | IType&lt;any, any>)** 
+-   `otherTypes` **...[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IType&lt;any, any>>** 
+
+Returns **IType&lt;any, any>** 
+
+# types.optional
+
+`types.optional` can be used to create a property with a default value.
+If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
+If `defaultValue` is a function, the function will be invoked for every new instance.
+Applying a snapshot in which the optional value is _not_ present, causes the value to be reset
+
+**Parameters**
+
+-   `type`  
+-   `defaultValueOrFunction`  
+
+**Examples**
+
+````javascript
+    ```javascript
+    const Todo = types.model({
+      title: types.optional(types.string, "Test"),
+      done: types.optional(types.boolean, false),
+      created: types.optional(types.Date, () => new Date())
+    })
+
+    // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
+    const todo = Todo.create({ title: "Get coffee "})
+    ```
+````
 
 # types.literal
 
@@ -52,9 +185,108 @@ Maybe will make a type nullable, and also null by default.
 
 Returns **(IType&lt;(S | null | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)), (T | null)>)** 
 
+# types.refinement
+
+`types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific then the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
+
+**Parameters**
+
+-   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `type` **IType&lt;T, T>** 
+-   `predicate`  
+
+Returns **IType&lt;T, T>** 
+
+# types.frozen
+
+Frozen can be used to story any value that is serializable in itself (that is valid JSON).
+Frozen values need to be immutable or treated as if immutable.
+Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
+
+This is useful to store complex, but immutable values like vectors etc. It can form a powerful bridge to parts of your application that should be immutable, or that assume data to be immutable.
+
+**Examples**
+
+````javascript
+    ```javascript
+    const GameCharacter = types.model({
+      name: string,
+      location: types.frozen
+    })
+
+    const hero = new GameCharacter({
+      name: "Mario",
+      location: { x: 7, y: 4 }
+    })
+
+    hero.location = { x: 10, y: 2 } // OK
+    hero.location.x = 7 // Not ok!
+    ```
+````
+
+# types.string
+
+Creates a type that can only contain a string value.
+This type is used for string values by default
+
+**Examples**
+
+````javascript
+    ```javascript
+    const Person = types.model({
+      firstName: types.string,
+      lastName: "Doe"
+    })
+    ```
+````
+
 # types.number
 
-`number` is a thing!
+Creates a type that can only contain a numeric value.
+This type is used for numeric values by default
+
+**Examples**
+
+````javascript
+    ```javascript
+    const Vector = types.model({
+      x: types.number,
+      y: 0
+    })
+    ```
+````
+
+# types.boolean
+
+Creates a type that can only contain a boolean value.
+This type is used for boolean values by default
+
+**Examples**
+
+````javascript
+    ```javascript
+    const Thing = types.model({
+      isCool: types.boolean,
+      isAwesome: false
+    })
+    ```
+````
+
+# types.Date
+
+Creates a type that can only contain a javascript Date value.
+
+**Examples**
+
+````javascript
+    ```javascript
+    const LogLine = types.model({
+      timestamp: types.Date,
+    })
+
+    LogLine.create({ timestamp: new Date() })
+    ```
+````
 
 # types.late
 
@@ -417,12 +649,15 @@ Returns **Any**
 
 # clone
 
-Returns a copy of the given state tree node
+Returns a deep copy of the given state tree node as new tree.
+Short hand for `snapshot(x) = getType(x).create(getSnapshot(x))`
+
+_Tip: clone will create a literal copy, including the same identifiers. To modify identifiers etc during cloning, don't use clone but take a snapshot of the tree, modify it, and create new instance_
 
 **Parameters**
 
 -   `source` **T** 
--   `keepEnvironment`  
+-   `keepEnvironment` **([boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | any)** indicates whether the clone should inherit the same environment (`true`, the default), or not have an environment (`false`). If an object is passed in as second argument, that will act as the environment for the cloned tree.
 
 Returns **T** 
 

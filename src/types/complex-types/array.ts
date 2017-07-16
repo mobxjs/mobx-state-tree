@@ -194,7 +194,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         }
 
         return flattenTypeErrors(
-            value.map((item:any, index:any) =>
+            value.map((item: any, index: any) =>
                 this.subType.validate(item, getContextForPath(context, "" + index, this.subType))
             )
         )
@@ -209,6 +209,30 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 }
 
+/**
+ * Creates a index based collection type who's children are all of a uniform declared type.
+ *
+ * This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
+ *
+ * @example
+ * ```javascript
+ * const Todo = types.model({
+ *   task: types.string
+ * })
+ *
+ * const TodoStore = types.model({
+ *   todos: types.array(Todo)
+ * })
+ *
+ * const s = TodoStore.create({ todos: [] })
+ * s.todos.push({ task: "Grab coffee" })
+ * console.log(s.todos[0]) // prints: "Grab coffee"
+ * ```
+ * @export
+ * @alias types.array
+ * @param {IType<S, T>} subtype
+ * @returns {IComplexType<S[], IObservableArray<T>>}
+ */
 export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
     return new ArrayType<S, T>(subtype.name + "[]", subtype)
 }

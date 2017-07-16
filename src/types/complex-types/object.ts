@@ -379,7 +379,7 @@ export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
  * [Example of form 2](https://github.com/mobxjs/mobx-state-tree#simulate-inheritance-by-using-type-composition)
  *
  * @export
- * @alias types.model
+ * @alias types.compose
  */
 export function compose(...args: any[]) {
     const typeName = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
