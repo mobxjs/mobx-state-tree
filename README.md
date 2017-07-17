@@ -19,7 +19,7 @@
 * [Concepts](#concepts)
   * [Trees, types and state](#trees-types-and-state)
   * [Creating models](#creating-models)
-  * [Tree semantics in detail](#tree-semantis-in-detail)
+  * [Tree semantics in detail](#tree-semantics-in-detail)
   * [Composing trees](#composing-trees)
   * [Actions](#actions)
   * [Snapshots](#snapshots)

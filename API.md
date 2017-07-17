@@ -647,6 +647,18 @@ Returns **Any**
 
 Returns **Any** 
 
+# getRelativePath
+
+Given two state tree nodes that are part of the same tree,
+returns the shortest jsonpath needed to navigate from the one to the other
+
+**Parameters**
+
+-   `base` **IStateTreeNode** 
+-   `target` **IStateTreeNode** 
+
+Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
 # clone
 
 Returns a deep copy of the given state tree node as new tree.
@@ -676,6 +688,61 @@ Removes a model element from the state tree, and mark it as end-of-life; the ele
 **Parameters**
 
 -   `thing`  
+
+# isAlive
+
+Returns true if the given state tree node is not killed yet.
+This means that the node is still a part of a tree, and that `destroy`
+has not been called. If a node is not alive anymore, the only thing one can do with it
+is requesting it's last path and snapshot
+
+**Parameters**
+
+-   `thing` **IStateTreeNode** 
+
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+
+# addDisposer
+
+Use this utility to register a function that should be called whenever the
+targeted state tree node is destroyed. This is a useful alternative to managing
+cleanup methods yourself using the `beforeDestroy` hook.
+
+**Parameters**
+
+-   `target` **IStateTreeNode** 
+-   `disposer`  
+
+**Examples**
+
+````javascript
+    ```javascript
+    const Todo = types.model({
+      title: types.string
+    }, {
+      afterCreate() {
+        const autoSaveDisposer = reaction(
+          () => getSnapshot(this),
+          snapshot => sendSnapshotToServerSomehow(snapshot)
+        )
+        // stop sending updates to server if this
+        // instance is destroyed
+        addDisposer(this, autoSaveDisposer)
+      }
+    })
+    ```
+````
+
+# getEnv
+
+Returns the environment of the current state tree. For more info on environments,
+see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
+
+**Parameters**
+
+-   `thing` **IStateTreeNode** 
+
+Returns **Any** 
 
 # walk
 
@@ -715,3 +782,37 @@ Action can also be intercepted by middleware using addMiddleware to change the f
 -   `listener`  
 
 Returns **IDisposer** 
+
+# isStateTreeNode
+
+Returns true if the given value is a node in a state tree.
+More precisely, that is, if the value is an instance of a
+`types.model`, `types.array` or `types.map`.
+
+**Parameters**
+
+-   `value` **Any** 
+
+# asReduxStore
+
+Creates a tiny proxy around a MST tree that conforms to the redux store api.
+This makes it possible to use MST inside a redux application.
+
+See the [redux-todomvc example](https://github.com/mobxjs/mobx-state-tree/blob/e9e804c8c43e1edde4aabbd52675544e2b3a905b/examples/redux-todomvc/src/index.js#L20) for more details.
+
+**Parameters**
+
+-   `model` **Any** 
+-   `middlewares` **...[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;MiddleWare>** 
+
+Returns **IReduxStore** 
+
+# connectReduxDevtools
+
+Connects a MST tree to the Redux devtools.
+See this [example](https://github.com/mobxjs/mobx-state-tree/blob/e9e804c8c43e1edde4aabbd52675544e2b3a905b/examples/redux-todomvc/src/index.js#L21) for a setup example.
+
+**Parameters**
+
+-   `remoteDevDep` **Any** 
+-   `model` **Any** 
