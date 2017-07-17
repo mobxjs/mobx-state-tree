@@ -539,8 +539,6 @@ export function addDisposer(target: IStateTreeNode, disposer: () => void) {
     getStateTreeNode(target).addDisposer(disposer)
 }
 
-export function getEnv<T>(thing: IStateTreeNode): T
-export function getEnv(thing: IStateTreeNode): any
 /**
  * Returns the environment of the current state tree. For more info on environments,
  * see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
@@ -549,7 +547,7 @@ export function getEnv(thing: IStateTreeNode): any
  * @param {IStateTreeNode} thing
  * @returns {*}
  */
-export function getEnv(thing: IStateTreeNode): any {
+export function getEnv<T = any>(thing: IStateTreeNode): T {
     const node = getStateTreeNode(thing)
     const env = node.root._environment
     if (!!!env)
