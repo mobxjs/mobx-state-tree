@@ -89,7 +89,9 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     reconcile(current: Node, newValue: any): Node {
-        const { parent, subpath } = current
+        if (current.snapshot === newValue)
+            // newValue is the current snapshot of the node, noop
+            return current
         if (isStateTreeNode(newValue) && getStateTreeNode(newValue) === current)
             // the current node is the same as the new one
             return current
@@ -106,6 +108,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
             return current
         }
         // current node cannot be recycled in any way
+        const { parent, subpath } = current
         current.die()
         // attempt to reuse the new one
         if (isStateTreeNode(newValue) && this.isAssignableFrom(getType(newValue))) {
