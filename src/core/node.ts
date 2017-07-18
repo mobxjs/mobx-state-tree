@@ -53,6 +53,9 @@ export class Node {
             }
         ).bind(this.storedValue)
         this.applySnapshot = createActionInvoker("@APPLY_SNAPSHOT", (snapshot: any) => {
+            // if the snapshot is the same as the current one, avoid performing a reconcile
+            if (snapshot === this.snapshot) return
+            // else, apply it by calling the type logic
             return this.type.applySnapshot(this, snapshot)
         }).bind(this.storedValue)
 
