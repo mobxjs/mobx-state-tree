@@ -215,3 +215,24 @@ test("action should be bound", t => {
     const f = task.toggle
     t.is(f(), true)
 })
+
+test("snapshot should be available and updated during an action", t => {
+    const Model = types.model(
+        {
+            x: types.number
+        },
+        {
+            inc() {
+                this.x += 1
+                const res = getSnapshot(this as any).x
+                this.x += 1
+                return res
+            }
+        }
+    )
+
+    const a = Model.create({ x: 2 })
+    t.is(a.inc(), 3)
+    t.is(a.x, 4)
+    t.is(getSnapshot(a).x, 4)
+})
