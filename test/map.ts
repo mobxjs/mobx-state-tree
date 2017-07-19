@@ -1,4 +1,12 @@
-import { onSnapshot, onPatch, applyPatch, applySnapshot, getSnapshot, types, unprotect } from "../src"
+import {
+    onSnapshot,
+    onPatch,
+    applyPatch,
+    applySnapshot,
+    getSnapshot,
+    types,
+    unprotect
+} from "../src"
 import { test } from "ava"
 
 interface ITestSnapshot {
@@ -316,4 +324,20 @@ test("#192 - map should not mess up keys when putting twice", t => {
     })
 
     t.deepEqual(getSnapshot(todoStore.todos), { "1": { todo_id: 1, title: "Test Edited" } })
+})
+
+test("it should not throw when removing a non existing item from a map", t => {
+    t.notThrows(() => {
+        const AppModel = types.model(
+            { myMap: types.optional(types.map(types.number), {}) },
+            {
+                something() {
+                    return this.myMap.delete("1020")
+                }
+            }
+        )
+
+        const store = AppModel.create()
+        t.is(store.something(), false)
+    })
 })

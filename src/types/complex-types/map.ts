@@ -145,7 +145,9 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                 break
             case "delete":
                 {
-                    node.getChildNode(change.name).die()
+                    if (node.storedValue.has(change.name)) {
+                        node.getChildNode(change.name).die()
+                    }
                 }
                 break
         }
