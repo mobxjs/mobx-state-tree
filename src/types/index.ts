@@ -1,7 +1,7 @@
 // tslint:disable-next-line:no_unused-variable
 import { IObservableArray, ObservableMap, IAction } from "mobx"
 // tslint:disable-next-line:no_unused-variable
-import { IType, ISimpleType, IComplexType } from "./type"
+import { IType, ISimpleType, IComplexType, ISnapshottable } from "./type"
 // tslint:disable-next-line:no_unused-variable
 import { TypeFlags } from "./type-flags"
 // tslint:disable-next-line:no_unused-variable
@@ -20,7 +20,7 @@ import { frozen } from "./utility-types/frozen"
 import { boolean, DatePrimitive, number, string } from "./primitives"
 import { late } from "./utility-types/late"
 
-export { IType, TypeFlags }
+export { IType, ISimpleType, IComplexType, IModelType, ISnapshottable, TypeFlags }
 
 export const types = {
     model,
