@@ -1,7 +1,9 @@
 
-# next
+# 0.9.3
 
-* Fix `note that a snapshot is compatible` when assigning a type to an optional version of itself.
+* Fix `note that a snapshot is compatible` when assigning a type to an optional version of itself
+* Fix error when deleting a non existing item from a map [#255](https://github.com/mobxjs/mobx-state-tree/issues/255)
+* Now all required TypeScript interfaces are exported in the main mobx-state-tree package [#256](https://github.com/mobxjs/mobx-state-tree/issues/256)
 
 # 0.9.2
 
