@@ -1,3 +1,17 @@
+
+# 0.9.3
+
+* Fix `note that a snapshot is compatible` when assigning a type to an optional version of itself
+* Fix error when deleting a non existing item from a map [#255](https://github.com/mobxjs/mobx-state-tree/issues/255)
+* Now all required TypeScript interfaces are exported in the main mobx-state-tree package [#256](https://github.com/mobxjs/mobx-state-tree/issues/256)
+
+# 0.9.2
+
+Introduced the concept of reverse patches, see [#231](https://github.com/mobxjs/mobx-state-tree/pull/231/)
+* Introduced the `revertPatch` operation, that takes a patch or list of patches, and reverse applies it to the target.
+* `onPatch` now takes a second argument, `includeOldValue`, defaulting to `false`, which, if set to true, includes in the patch any value that is being overwritten as result of the patch. Setting this option to true produces patches that can be used with `revertPatch`
+* `patchRecorder` now introduces additional fields / methods to be able to reverse apply changes: `patchRecorder.cleanPatches`, `patchRecorder.undo`
+
 # 0.9.1
 
 * Applying a snapshot or patches will now emit an action as well. The name of the emitted action will be `@APPLY_PATCHES`resp `@APPLY_SNAPSHOT`. See [#107](https://github.com/mobxjs/mobx-state-tree/issues/107)

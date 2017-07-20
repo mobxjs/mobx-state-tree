@@ -58,6 +58,10 @@ export class OptionalValue<S, T> extends Type<S, T> {
         // bounce validation to the sub-type
         return this.type.validate(value, context)
     }
+
+    isAssignableFrom(type: IType<any, any>) {
+        return this.type.isAssignableFrom(type)
+    }
 }
 
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: S): IType<S, T>

@@ -145,7 +145,9 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                 break
             case "delete":
                 {
-                    node.getChildNode(change.name).die()
+                    if (node.storedValue.has(change.name)) {
+                        node.getChildNode(change.name).die()
+                    }
                 }
                 break
         }
@@ -176,12 +178,22 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         const node = getStateTreeNode(change.object as IStateTreeNode)
         switch (change.type) {
             case "update":
+                return void node.emitPatch(
+                    {
+                        op: "replace",
+                        path: escapeJsonPath(change.name),
+                        value: change.newValue.snapshot,
+                        oldValue: change.oldValue ? change.oldValue.snapshot : undefined
+                    },
+                    node
+                )
             case "add":
                 return void node.emitPatch(
                     {
-                        op: change.type === "add" ? "add" : "replace",
+                        op: "add",
                         path: escapeJsonPath(change.name),
-                        value: node.getChildNode(change.name).snapshot
+                        value: change.newValue.snapshot,
+                        oldValue: undefined
                     },
                     node
                 )
@@ -189,7 +201,8 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                 return void node.emitPatch(
                     {
                         op: "remove",
-                        path: escapeJsonPath(change.name)
+                        path: escapeJsonPath(change.name),
+                        oldValue: change.oldValue.snapshot
                     },
                     node
                 )

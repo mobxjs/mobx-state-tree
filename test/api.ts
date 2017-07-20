@@ -36,6 +36,7 @@ const METHODS = [
     "recordPatches",
     "resolveIdentifier",
     "resolvePath",
+    "revertPatch",
     "tryResolve",
     "types",
     "unescapeJsonPath",
@@ -64,6 +65,9 @@ const TYPES = [
 ]
 
 test("correct api exposed", t => {
+    console.log(Object.keys(mst).sort())
+    console.log("---")
+    console.log(METHODS.sort())
     t.deepEqual(Object.keys(mst).sort(), METHODS.sort())
 })
 

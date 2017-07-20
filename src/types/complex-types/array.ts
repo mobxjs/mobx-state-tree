@@ -135,16 +135,18 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                     {
                         op: "replace",
                         path: "" + change.index,
-                        value: node.getChildNode("" + change.index).snapshot
+                        value: change.newValue.snapshot,
+                        oldValue: change.oldValue ? change.oldValue.snapshot : undefined
                     },
                     node
                 )
             case "splice":
-                for (let i = change.index + change.removedCount - 1; i >= change.index; i--)
+                for (let i = change.removedCount - 1; i >= 0; i--)
                     node.emitPatch(
                         {
                             op: "remove",
-                            path: "" + i
+                            path: "" + (change.index + i),
+                            oldValue: change.removed[i].snapshot
                         },
                         node
                     )
@@ -153,7 +155,8 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                         {
                             op: "add",
                             path: "" + (change.index + i),
-                            value: node.getChildNode("" + (change.index + i)).snapshot
+                            value: node.getChildNode("" + (change.index + i)).snapshot,
+                            oldValue: undefined
                         },
                         node
                     )
