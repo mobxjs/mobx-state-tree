@@ -16,7 +16,7 @@
     "watch": "tsc -p test && concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
     "_prepublish": "npm run build && npm run build-docs",
     "coverage": "npm run build-tests && nyc ava && nyc report -r html && nyc report -r lcov",
-    "build-docs": "npm run quick-build && documentation  build lib/index.js --sort-order alpha -f md -o API.md",
+    "build-docs": "npm run quick-build && documentation build lib/index.js --sort-order alpha -f md -o API.md.tmp && concat -o API.md docs/API_header.md API.md.tmp && rm API.md.tmp",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "clean": "rm -rf lib test-lib .nyc_output coverage",
     "precommit": "lint-staged"
@@ -34,7 +34,9 @@
     "dist/"
   ],
   "devDependencies": {
+    "@types/node": "^8.0.10",
     "ava": "^0.19.0",
+    "concat": "^1.0.3",
     "concurrently": "^3.1.0",
     "coveralls": "^2.11.4",
     "cpr": "^2.1.0",

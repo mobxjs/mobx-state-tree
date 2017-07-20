@@ -1,6 +1,5 @@
 import { IType, Type } from "../type"
 import { TypeFlags } from "../type-flags"
-import { fail } from "../../utils"
 import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 
@@ -45,12 +44,27 @@ export class Refinement<S, T> extends Type<S, T> {
     }
 }
 
-export function refinement<T>(name: string, type: IType<T, T>, predicate: (snapshot: T) => boolean): IType<T, T>
+export function refinement<T>(
+    name: string,
+    type: IType<T, T>,
+    predicate: (snapshot: T) => boolean
+): IType<T, T>
 export function refinement<S, T extends S, U extends S>(
     name: string,
     type: IType<S, T>,
     predicate: (snapshot: S) => snapshot is U
 ): IType<S, U>
+/**
+ * `types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific then the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
+ *
+ * @export
+ * @alias types.refinement
+ * @template T
+ * @param {string} name
+ * @param {IType<T, T>} type
+ * @param {(snapshot: T) => boolean} predicate
+ * @returns {IType<T, T>}
+ */
 export function refinement(
     name: string,
     type: IType<any, any>,

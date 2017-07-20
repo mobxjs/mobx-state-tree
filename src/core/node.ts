@@ -384,6 +384,15 @@ export type IStateTreeNode = {
     readonly $treenode?: any
 }
 
+/**
+ * Returns true if the given value is a node in a state tree.
+ * More precisely, that is, if the value is an instance of a
+ * `types.model`, `types.array` or `types.map`.
+ *
+ * @export
+ * @param {*} value
+ * @returns {value is IStateTreeNode}
+ */
 export function isStateTreeNode(value: any): value is IStateTreeNode {
     return !!(value && value.$treenode)
 }

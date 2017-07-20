@@ -1,74 +1,92 @@
 import * as mst from "../src"
 import { test } from "ava"
+import { readFileSync } from "fs"
+
+const METHODS = [
+    "addDisposer",
+    "addMiddleware",
+    "applyAction",
+    "applyPatch",
+    "applySnapshot",
+    "asReduxStore",
+    "clone",
+    "connectReduxDevtools",
+    "destroy",
+    "detach",
+    "escapeJsonPath",
+    "getChildType",
+    "getEnv",
+    "getParent",
+    "getPath",
+    "getPathParts",
+    "getRelativePath",
+    "getRoot",
+    "getSnapshot",
+    "getType",
+    "hasParent",
+    "isAlive",
+    "isProtected",
+    "isRoot",
+    "isStateTreeNode",
+    "onAction",
+    "onPatch",
+    "onSnapshot",
+    "protect",
+    "recordActions",
+    "recordPatches",
+    "resolveIdentifier",
+    "resolvePath",
+    "revertPatch",
+    "tryResolve",
+    "types",
+    "unescapeJsonPath",
+    "unprotect",
+    "walk"
+]
+
+const TYPES = [
+    "Date",
+    "array",
+    "boolean",
+    "compose",
+    "frozen",
+    "identifier",
+    "late",
+    "literal",
+    "map",
+    "maybe",
+    "model",
+    "number",
+    "optional",
+    "reference",
+    "refinement",
+    "string",
+    "union"
+]
 
 test("correct api exposed", t => {
-    t.deepEqual(
-        Object.keys(mst).sort(),
-        [
-            "addDisposer",
-            "addMiddleware",
-            "applyAction",
-            "applyPatch",
-            "applySnapshot",
-            "asReduxStore",
-            "clone",
-            "connectReduxDevtools",
-            "destroy",
-            "detach",
-            "escapeJsonPath",
-            "getChildType",
-            "getEnv",
-            "getParent",
-            "getPath",
-            "getPathParts",
-            "getRelativePath",
-            "getRoot",
-            "getSnapshot",
-            "getType",
-            "hasParent",
-            "isAlive",
-            "isProtected",
-            "isRoot",
-            "isStateTreeNode",
-            "onAction",
-            "onPatch",
-            "onSnapshot",
-            "protect",
-            "recordActions",
-            "recordPatches",
-            "resolveIdentifier",
-            "resolvePath",
-            "revertPatch",
-            "tryResolve",
-            "types",
-            "unescapeJsonPath",
-            "unprotect",
-            "walk"
-        ].sort()
-    )
+    console.log(Object.keys(mst).sort())
+    console.log("---")
+    console.log(METHODS.sort())
+    t.deepEqual(Object.keys(mst).sort(), METHODS.sort())
 })
 
 test("correct types exposed", t => {
-    t.deepEqual(
-        Object.keys(mst.types).sort(),
-        [
-            "Date",
-            "array",
-            "boolean",
-            "compose",
-            "frozen",
-            "identifier",
-            "late",
-            "literal",
-            "map",
-            "maybe",
-            "model",
-            "number",
-            "optional",
-            "reference",
-            "refinement",
-            "string",
-            "union"
-        ].sort()
-    )
+    t.deepEqual(Object.keys(mst.types).sort(), TYPES.sort())
+})
+
+test("all methods mentioned in readme.md", t => {
+    const readme = readFileSync(__dirname + "/../../README.md", "utf8")
+    const missing = TYPES.map(type => "types." + type)
+        .concat(METHODS)
+        .filter(identifier => readme.indexOf("`" + identifier) === -1)
+    t.deepEqual(missing, [])
+})
+
+test("all methods mentioned in api.md", t => {
+    const apimd = readFileSync(__dirname + "/../../API.md", "utf8")
+    const missing = TYPES.map(type => "types." + type)
+        .concat(METHODS)
+        .filter(identifier => apimd.indexOf("# " + identifier) === -1)
+    t.deepEqual(missing, [])
 })

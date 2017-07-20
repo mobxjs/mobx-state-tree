@@ -18,8 +18,8 @@
 * [Examples](#examples)
 * [Concepts](#concepts)
   * [Trees, types and state](#trees-types-and-state)
-  * [Creating models](#construction-models)
-  * [Tree semantics in detail](#tree-semantis-in-detail)
+  * [Creating models](#creating-models)
+  * [Tree semantics in detail](#tree-semantics-in-detail)
   * [Composing trees](#composing-trees)
   * [Actions](#actions)
   * [Snapshots](#snapshots)
@@ -46,6 +46,10 @@
 * JSBin [playground](http://jsbin.com/petoxeheta/edit?html,js,console) (for non console based fiddles)
 
 Typescript typings are included in the packages. Use `module: "commonjs"` or `moduleResolution: "node"` to make sure they are picked up automatically in any consuming project.
+
+# Getting started
+
+See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial.
 
 # Philosophy & Overview
 
@@ -113,13 +117,13 @@ Furthermore, actions are replayable and can be used as means to distribute chang
 Moreover; since changes can be detected on a fine grained level. JSON patches are supported out of the box.
 Simply subscribing to the patch stream of a tree is another way to sync diffs with for example back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
 
-(screenshot of patches being emitted)
+![patches](docs/patches.png)
 
 Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](https://github.com/mobxjs/mobx-react).
 But even cooler; because it supports snapshots, middleware and replayable actions out of the box, it is even possible to replace a Redux store and reducer with a MobX state tree.
 This makes it even possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/redux-todomvc/src/index.js#L6).
 
-(screenshot)
+![devtools](docs/reduxdevtools.png)
 
 Finally, MST has built-in support for references, identifiers, dependency injection, change recording and circular type definitions (even across files).
 Even fancier; it analyses liveleness of objects, failing early when you try to access accidentally cached information! (More on that later)
@@ -655,6 +659,10 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 | `tryResolve(node, path)` | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
 | `unprotect(node)` | Unprotects a node, making it possible to directly modify any value in the subtree, without actions |
 | `walk(startNode, (node) => void)` | Performs a depth-first walk through a tree |
+| `escapeJsonPath(path)` | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
+| `unescapeJsonPath(path)` | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
+| `resolveIdentifier(type, target, identifier)` | resolves an identifier of a given type in a model tree |
+| `resolvePath(target, path)` | resolves a JSON path, starting at the specified target |
 
 A _disposer_ is a function that cancels the effect it was created for.
 

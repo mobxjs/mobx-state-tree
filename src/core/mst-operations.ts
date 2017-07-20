@@ -80,6 +80,12 @@ export function addMiddleware(
     return node.addMiddleWare(middleware)
 }
 
+export function onPatch(target: IStateTreeNode, callback: (patch: IJsonPatch) => void): IDisposer
+export function onPatch(
+    target: IStateTreeNode,
+    callback: (patch: IReversibleJsonPatch) => void,
+    includeOldValue: true
+): IDisposer
 /**
  * Registers a function that will be invoked for each mutation that is applied to the provided model instance, or to any of its children.
  * See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details. onPatch events are emitted immediately and will not await the end of a transaction.
@@ -91,12 +97,6 @@ export function addMiddleware(
  * @param {includeOldValue} boolean if oldValue is included in the patches, they can be inverted. However patches will become much bigger and might not be suitable for efficient transport
  * @returns {IDisposer} function to remove the listener
  */
-export function onPatch(target: IStateTreeNode, callback: (patch: IJsonPatch) => void): IDisposer
-export function onPatch(
-    target: IStateTreeNode,
-    callback: (patch: IReversibleJsonPatch) => void,
-    includeOldValue: true
-): IDisposer
 export function onPatch(
     target: IStateTreeNode,
     callback: (patch: IJsonPatch) => void,
@@ -490,16 +490,29 @@ export function tryResolve(target: IStateTreeNode, path: string): IStateTreeNode
     return node ? node.value : undefined
 }
 
+/**
+ * Given two state tree nodes that are part of the same tree,
+ * returns the shortest jsonpath needed to navigate from the one to the other
+ *
+ * @export
+ * @param {IStateTreeNode} base
+ * @param {IStateTreeNode} target
+ * @returns {string}
+ */
 export function getRelativePath(base: IStateTreeNode, target: IStateTreeNode): string {
     return getStateTreeNode(base).getRelativePathTo(getStateTreeNode(target))
 }
 
 /**
- * Returns a copy of the given state tree node
+ * Returns a deep copy of the given state tree node as new tree.
+ * Short hand for `snapshot(x) = getType(x).create(getSnapshot(x))`
+ *
+ * _Tip: clone will create a literal copy, including the same identifiers. To modify identifiers etc during cloning, don't use clone but take a snapshot of the tree, modify it, and create new instance_
  *
  * @export
  * @template T
  * @param {T} source
+ * @param {boolean | any} keepEnvironment indicates whether the clone should inherit the same environment (`true`, the default), or not have an environment (`false`). If an object is passed in as second argument, that will act as the environment for the cloned tree.
  * @returns {T}
  */
 export function clone<T extends IStateTreeNode>(
@@ -532,15 +545,59 @@ export function destroy(thing: IStateTreeNode) {
     else node.parent!.removeChild(node.subpath)
 }
 
+/**
+ * Returns true if the given state tree node is not killed yet.
+ * This means that the node is still a part of a tree, and that `destroy`
+ * has not been called. If a node is not alive anymore, the only thing one can do with it
+ * is requesting it's last path and snapshot
+ *
+ * @export
+ * @param {IStateTreeNode} thing
+ * @returns {boolean}
+ */
 export function isAlive(thing: IStateTreeNode): boolean {
     return getStateTreeNode(thing).isAlive
 }
 
-export function addDisposer(thing: IStateTreeNode, disposer: () => void) {
-    getStateTreeNode(thing).addDisposer(disposer)
+/**
+ * Use this utility to register a function that should be called whenever the
+ * targeted state tree node is destroyed. This is a useful alternative to managing
+ * cleanup methods yourself using the `beforeDestroy` hook.
+ *
+ * @example
+ * ```javascript
+ * const Todo = types.model({
+ *   title: types.string
+ * }, {
+ *   afterCreate() {
+ *     const autoSaveDisposer = reaction(
+ *       () => getSnapshot(this),
+ *       snapshot => sendSnapshotToServerSomehow(snapshot)
+ *     )
+ *     // stop sending updates to server if this
+ *     // instance is destroyed
+ *     addDisposer(this, autoSaveDisposer)
+ *   }
+ * })
+ * ```
+ *
+ * @export
+ * @param {IStateTreeNode} target
+ * @param {() => void} disposer
+ */
+export function addDisposer(target: IStateTreeNode, disposer: () => void) {
+    getStateTreeNode(target).addDisposer(disposer)
 }
 
-export function getEnv(thing: IStateTreeNode): any {
+/**
+ * Returns the environment of the current state tree. For more info on environments,
+ * see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
+ *
+ * @export
+ * @param {IStateTreeNode} thing
+ * @returns {*}
+ */
+export function getEnv<T = any>(thing: IStateTreeNode): T {
     const node = getStateTreeNode(thing)
     const env = node.root._environment
     if (!!!env)

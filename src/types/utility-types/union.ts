@@ -1,6 +1,12 @@
 import { IType, Type } from "../type"
 import { isType, TypeFlags } from "../type-flags"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure, flattenTypeErrors } from "../type-checker"
+import {
+    IContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure,
+    flattenTypeErrors
+} from "../type-checker"
 import { fail } from "../../utils"
 import { Node } from "../../core"
 
@@ -218,7 +224,28 @@ export function union<SA, SB, SC, SD, SE, SF, SG, SH, SI, TA, TB, TC, TD, TE, TF
     I: IType<SI, TI>
 ): IType<SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
 
-export function union<SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ>(
+export function union<
+    SA,
+    SB,
+    SC,
+    SD,
+    SE,
+    SF,
+    SG,
+    SH,
+    SI,
+    SJ,
+    TA,
+    TB,
+    TC,
+    TD,
+    TE,
+    TF,
+    TG,
+    TH,
+    TI,
+    TJ
+>(
     dispatch: ITypeDispatcher,
     A: IType<SA, TA>,
     B: IType<SB, TB>,
@@ -230,8 +257,32 @@ export function union<SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ, TA, TB, TC, TD, TE
     H: IType<SH, TH>,
     I: IType<SI, TI>,
     J: IType<SJ, TJ>
-): IType<SA | SB | SC | SD | SE | SF | SG | SH | SI | SJ, TA | TB | TC | TD | TE | TF | TG | TH | TI | TJ>
-export function union<SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ>(
+): IType<
+    SA | SB | SC | SD | SE | SF | SG | SH | SI | SJ,
+    TA | TB | TC | TD | TE | TF | TG | TH | TI | TJ
+>
+export function union<
+    SA,
+    SB,
+    SC,
+    SD,
+    SE,
+    SF,
+    SG,
+    SH,
+    SI,
+    SJ,
+    TA,
+    TB,
+    TC,
+    TD,
+    TE,
+    TF,
+    TG,
+    TH,
+    TI,
+    TJ
+>(
     A: IType<SA, TA>,
     B: IType<SB, TB>,
     C: IType<SC, TC>,
@@ -242,7 +293,10 @@ export function union<SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ, TA, TB, TC, TD, TE
     H: IType<SH, TH>,
     I: IType<SI, TI>,
     J: IType<SJ, TJ>
-): IType<SA | SB | SC | SD | SE | SF | SG | SH | SI | SJ, TA | TB | TC | TD | TE | TF | TG | TH | TI | TJ>
+): IType<
+    SA | SB | SC | SD | SE | SF | SG | SH | SI | SJ,
+    TA | TB | TC | TD | TE | TF | TG | TH | TI | TJ
+>
 
 export function union(...types: IType<any, any>[]): IType<any, any>
 export function union(
@@ -250,6 +304,15 @@ export function union(
     ...otherTypes: IType<any, any>[]
 ): IType<any, any>
 
+/**
+ * types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambigously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+ *
+ * @export
+ * @alias types.union
+ * @param {(ITypeDispatcher | IType<any, any>)} dispatchOrType
+ * @param {...IType<any, any>[]} otherTypes
+ * @returns {IType<any, any>}
+ */
 export function union(
     dispatchOrType: ITypeDispatcher | IType<any, any>,
     ...otherTypes: IType<any, any>[]
