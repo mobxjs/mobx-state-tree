@@ -4,8 +4,14 @@
     "editor.trimAutoWhitespace": true,
     "tslint.configFile": "tslint.json",
     "typescript.tsdk": "node_modules/typescript/lib",
-    "editor.formatOnSave": true,
-    "editor.formatOnPaste": true,
+    "[typescript]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true
+    },
+    "[javascript]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true
+    },
     // Note, these settings should match lint-staged settings!
     "prettier.semi": false,
     "prettier.tabWidth": 4,
