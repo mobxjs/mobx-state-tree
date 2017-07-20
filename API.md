@@ -1,3 +1,7 @@
+# Mobx-State-Tree API reference guide
+
+_This reference guide lists all methods exposed by MST. Contributions like linguistic improvements, adding more details to the descriptions or additional examples are highly appreciated! Please note that the docs are generated from source. Most methods are declared in the [mst-operations.ts](https://github.com/mobxjs/mobx-state-tree/blob/master/src/core/mst-operations.ts) file._
+
 # types.map
 
 Creates a key based collection type who's children are all of a uniform declared type.
