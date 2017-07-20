@@ -142,11 +142,11 @@ export class Node {
         // so we treat leading ../ apart...
         let current: Node | null = this
         for (let i = 0; i < pathParts.length; i++) {
-            if (
-                pathParts[i] === "" // '/bla' or 'a//b' splits to empty strings
+            if (pathParts[i] === "") current = current!.root
+            else if (
+                pathParts[i] === ".." // '/bla' or 'a//b' splits to empty strings
             )
-                current = current!.root
-            else if (pathParts[i] === "..") current = current!.parent
+                current = current!.parent
             else if (pathParts[i] === "." || pathParts[i] === "") continue
             else if (current) {
                 current = current.getChildNode(pathParts[i])
