@@ -20,7 +20,15 @@ import { frozen } from "./utility-types/frozen"
 import { boolean, DatePrimitive, number, string } from "./primitives"
 import { late } from "./utility-types/late"
 
-export { IType, ISimpleType, IComplexType, IModelType, ISnapshottable, TypeFlags }
+export {
+    IType,
+    ISimpleType,
+    IComplexType,
+    IModelType,
+    ISnapshottable,
+    IExtendedObservableMap,
+    TypeFlags
+}
 
 export const types = {
     model,

@@ -2,7 +2,15 @@
 import "./core/node"
 import "./types/type"
 
-export { types, IType, ISimpleType, IComplexType, IModelType, ISnapshottable } from "./types"
+export {
+    types,
+    IType,
+    ISimpleType,
+    IComplexType,
+    IModelType,
+    ISnapshottable,
+    IExtendedObservableMap
+} from "./types"
 
 export * from "./core/mst-operations"
 export { escapeJsonPath, unescapeJsonPath, IJsonPatch } from "./core/json-patch"
