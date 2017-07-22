@@ -13,7 +13,7 @@ import { model, compose, IModelType } from "./complex-types/object"
 import { reference } from "./utility-types/reference"
 import { union } from "./utility-types/union"
 import { optional } from "./utility-types/optional"
-import { literal } from "./utility-types/literal"
+import { literal, undefinedType, nullType } from "./utility-types/literal"
 import { maybe } from "./utility-types/maybe"
 import { refinement } from "./utility-types/refinement"
 import { frozen } from "./utility-types/frozen"
@@ -47,5 +47,7 @@ export const types = {
     array,
     frozen,
     identifier,
-    late
+    late,
+    undefined: undefinedType,
+    null: nullType
 }

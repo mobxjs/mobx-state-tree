@@ -56,18 +56,17 @@ const TYPES = [
     "map",
     "maybe",
     "model",
+    "null",
     "number",
     "optional",
     "reference",
     "refinement",
     "string",
+    "undefined",
     "union"
 ]
 
 test("correct api exposed", t => {
-    console.log(Object.keys(mst).sort())
-    console.log("---")
-    console.log(METHODS.sort())
     t.deepEqual(Object.keys(mst).sort(), METHODS.sort())
 })
 

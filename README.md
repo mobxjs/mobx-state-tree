@@ -592,6 +592,8 @@ These are the types available in MST. All types can be found in the `types` name
 * `types.literal(value)` can be used to create a literal type, a type which only possible value is specifically that value, very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
 * `types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific then the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 * `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(null)), null)`.
+* `types.null` the type of `null`
+* `types.undefined` the type of `undefined`
 * `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
 * `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is immutable.
 * `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining it into a new one

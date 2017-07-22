@@ -179,6 +179,14 @@ const Person = types.model({
 
 Returns **ISimpleType&lt;S>** 
 
+# types.null
+
+The type of the value `null`
+
+# types.undefined
+
+The type of the value `undefined`
+
 # types.maybe
 
 Maybe will make a type nullable, and also null by default.

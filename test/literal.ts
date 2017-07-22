@@ -33,3 +33,34 @@ test("it should throw if a different type is given", t => {
 at path "/shouldBeOne" value \`2\` is not assignable to type: \`1\`, expected an instance of \`1\` or a snapshot like \`1\` instead.`
     )
 })
+
+test("it should support null type", t => {
+    const M = types.model({
+        nullish: types.null
+    })
+
+    t.is(
+        M.is({
+            nullish: null
+        }),
+        true
+    )
+    t.is(M.is({ nullish: undefined }), false)
+    t.is(M.is({ nullish: 17 }), false)
+})
+
+test("it should support undefined type", t => {
+    const M = types.model({
+        undefinedish: types.undefined
+    })
+
+    t.is(
+        M.is({
+            undefinedish: undefined
+        }),
+        true
+    )
+    t.is(M.is({}), true) // MWE: disputable, should be false?
+    t.is(M.is({ undefinedish: null }), false)
+    t.is(M.is({ undefinedish: 17 }), false)
+})

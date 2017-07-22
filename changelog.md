@@ -1,3 +1,6 @@
+# Next
+
+* Introduced `types.null` and `types.undefined`
 
 # 0.9.3
 
