@@ -50,19 +50,3 @@ export function literal<S>(value: S): ISimpleType<S> {
     if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
     return new Literal<S>(value)
 }
-
-/**
- * The type of the value `null`
- *
- * @export
- * @alias types.null
- */
-export const nullType = literal(null)
-
-/**
- * The type of the value `undefined`
- *
- * @export
- * @alias types.undefined
- */
-export const undefinedType = literal(undefined)

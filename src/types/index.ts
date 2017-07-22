@@ -13,11 +13,11 @@ import { model, compose, IModelType } from "./complex-types/object"
 import { reference } from "./utility-types/reference"
 import { union } from "./utility-types/union"
 import { optional } from "./utility-types/optional"
-import { literal, undefinedType, nullType } from "./utility-types/literal"
+import { literal } from "./utility-types/literal"
 import { maybe } from "./utility-types/maybe"
 import { refinement } from "./utility-types/refinement"
 import { frozen } from "./utility-types/frozen"
-import { boolean, DatePrimitive, number, string } from "./primitives"
+import { boolean, DatePrimitive, number, string, undefinedType, nullType } from "./primitives"
 import { late } from "./utility-types/late"
 
 export {

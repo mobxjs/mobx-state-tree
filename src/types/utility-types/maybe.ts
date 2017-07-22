@@ -1,5 +1,5 @@
 import { union } from "./union"
-import { nullType } from "./literal"
+import { nullType } from "../primitives"
 import { optional } from "./optional"
 import { IType } from "../type"
 import { frozen } from "./frozen"

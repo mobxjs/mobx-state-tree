@@ -101,6 +101,30 @@ export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean>(
 )
 
 /**
+ * The type of the value `null`
+ *
+ * @export
+ * @alias types.null
+ */
+export const nullType: ISimpleType<null> = new CoreType<null, null>(
+    "null",
+    TypeFlags.Null,
+    (v: any) => v === null
+)
+
+/**
+ * The type of the value `undefined`
+ *
+ * @export
+ * @alias types.undefined
+ */
+export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, undefined>(
+    "undefined",
+    TypeFlags.Undefined,
+    (v: any) => v === undefined
+)
+
+/**
  * Creates a type that can only contain a javascript Date value.
  *
  * @export
@@ -124,8 +148,6 @@ export const DatePrimitive: IType<number, Date> = new CoreType<number, Date>(
 ;(DatePrimitive as any).getSnapshot = function(node: Node) {
     return node.storedValue.getTime()
 }
-
-// TODO: move null and undefined primitive to here (from maybe)
 
 export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     switch (typeof value) {
