@@ -63,7 +63,8 @@ const TYPES = [
     "refinement",
     "string",
     "undefined",
-    "union"
+    "union",
+    "enumeration"
 ]
 
 test("correct api exposed", t => {
