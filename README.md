@@ -228,7 +228,7 @@ The _properties_ argument is a key-value set where each key indicates the introd
 
 1. A type. This can be a simple primitive type like `types.boolean`, see `// 2`, or a complex, possible earlier defined type (`// 4`)
 2. A primitive. Using a primitive as type as type is syntactic sugar for introducing an property with a default value. See `// 3`, `endpoint: "http://localhost"` is the same as `endpoint: types.optional(types.string, "http://localhost")`. The primitive type is inferred from the default value. Properties with a default value can be omitted in snapshots.
-3. A [computed property](https://mobx.js.org/refguide/computed-decorator.html), see `// 6`. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is allowed to provid a setter for a computed property as well. A setter should always invoke an action.
+3. A [computed property](https://mobx.js.org/refguide/computed-decorator.html), see `// 6`. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is allowed to provide a setter for a computed property as well. A setter should always invoke an action.
 4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but its value can be tracked by Mobx nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
 
 The _actions_ argument is a key-value set with actions that are available to manage the model. Only actions are allowed to manage models (including any contained objects).
