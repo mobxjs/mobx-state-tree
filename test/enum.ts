@@ -16,7 +16,9 @@ test("should support enums", t => {
     unprotect(l)
     l.color = "Red"
     t.is(TrafficLight.describe(), '{ color: ("Orange" | "Green" | "Red") }')
-    t.throws(() => (l.color = "Blue"), /Error while converting `"Blue"` to `Color`/)
+
+    // Note, any cast needed, compiler should correctly error otherwise
+    t.throws(() => (l.color = "Blue" as any), /Error while converting `"Blue"` to `Color`/)
 })
 
 test("should support anonymous enums", t => {
@@ -30,5 +32,10 @@ test("should support anonymous enums", t => {
     unprotect(l)
     l.color = "Red"
     t.is(TrafficLight.describe(), '{ color: ("Orange" | "Green" | "Red") }')
-    t.throws(() => (l.color = "Blue"), /Error while converting `"Blue"` to `Orange | Green | Red`/)
+
+    // Note, any cast needed, compiler should correctly error otherwise
+    t.throws(
+        () => (l.color = "Blue" as any),
+        /Error while converting `"Blue"` to `Orange | Green | Red`/
+    )
 })
