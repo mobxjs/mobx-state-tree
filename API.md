@@ -179,14 +179,6 @@ const Person = types.model({
 
 Returns **ISimpleType&lt;S>** 
 
-# types.null
-
-The type of the value `null`
-
-# types.undefined
-
-The type of the value `undefined`
-
 # types.maybe
 
 Maybe will make a type nullable, and also null by default.
@@ -284,6 +276,14 @@ This type is used for boolean values by default
     ```
 ````
 
+# types.null
+
+The type of the value `null`
+
+# types.undefined
+
+The type of the value `undefined`
+
 # types.Date
 
 Creates a type that can only contain a javascript Date value.
@@ -335,8 +335,6 @@ Can be used to create an string based enumeration.
 
 -   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** descriptive name of the enumeration (optional)
 -   `options` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** possible values this enumeration can have
--   `arg1`  
--   `arg2`  
 
 **Examples**
 

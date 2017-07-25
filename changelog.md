@@ -1,4 +1,4 @@
-# Next
+# 0.9.4
 
 * Introduced `types.null` and `types.undefined`
 * Introduced `types.enumeration(name?, options)`
