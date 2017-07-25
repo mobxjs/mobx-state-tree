@@ -80,28 +80,21 @@ export function asyncAction<A1>(
  */
 export function asyncAction(name: string, generator: Function) {
     // Implementation based on https://github.com/tj/co/blob/master/index.js
-    return function(this: any) {
+    const runId = ++generatorId
+    return createActionInvoker(name, function(this: any) {
         const ctx = this
         const args = arguments
         return new Promise(function(resolve, reject) {
-            const runId = ++generatorId
             let stepId = 0
-            // const gen = createActionInvoker(
-            //     `${name} - runid: ${runId} - init`,
-            //     generator.bind(ctx)
-            // ).apply(ctx, args)
             const gen = generator.apply(ctx, args)
             onFulfilled(undefined) // kick off the process
 
             function onFulfilled(res: any) {
                 let ret
                 try {
-                    // ret = createActionInvoker(
-                    //     `${name} - runid: ${runId} - yield ${stepId++}`,
-                    //     gen.next
-                    // ).call(gen, res)
-                    ret = gen.next(res)
+                    createActionInvoker(name, (r: any) => (ret = gen.next(r))).call(ctx, res)
                 } catch (e) {
+                    // TODO: 'end' event
                     return reject(e)
                 }
                 next(ret)
@@ -111,25 +104,26 @@ export function asyncAction(name: string, generator: Function) {
             function onRejected(err: any) {
                 let ret
                 try {
-                    ret = createActionInvoker(
-                        `${name} - runid: ${runId} - yield ${stepId++}`,
-                        gen.throw
-                    ).call(gen, err)
+                    createActionInvoker(name, (r: any) => (ret = gen.throw(r))).call(ctx, err)
                 } catch (e) {
+                    // TODO: 'end' event
                     return reject(e)
                 }
                 next(ret)
             }
 
             function next(ret: any) {
-                if (ret.done) return resolve(ret.value)
+                if (ret.done) {
+                    // TODO: 'end' event
+                    return createActionInvoker(name, (r: any) => resolve(r)).call(ctx, ret.value)
+                }
                 // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
                 if (!ret.value || typeof ret.value.then !== "function")
                     fail("Only promises can be yielded to `async`, got: " + ret)
                 return ret.value.then(onFulfilled, onRejected)
             }
         })
-    }
+    })
 }
 
 import { createActionInvoker } from "./action"

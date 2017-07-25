@@ -44,8 +44,23 @@ test.cb("can handle async actions", t => {
 
     debugger
     t1.fetchData("black").then((res: string) => {
+        t.is(res, "awake")
         t.deepEqual(coffees, ["getting coffee black", "drinking coffee"])
-        // TODO: deep equal events
+        t.deepEqual(filterRelevantStuff(events), [
+            {
+                args: ["black"],
+                asyncId: 0,
+                asyncMode: "none",
+                name: "fetchData"
+            }
+        ])
         t.end()
     })
 })
+
+function filterRelevantStuff(stuff: any): any {
+    return stuff.map(x => {
+        delete x.object
+        return x
+    })
+}
