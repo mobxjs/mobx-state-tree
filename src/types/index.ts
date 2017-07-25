@@ -19,6 +19,7 @@ import { refinement } from "./utility-types/refinement"
 import { frozen } from "./utility-types/frozen"
 import { boolean, DatePrimitive, number, string, undefinedType, nullType } from "./primitives"
 import { late } from "./utility-types/late"
+import { enumeration } from "./utility-types/enumeration"
 
 export {
     IType,
@@ -31,6 +32,7 @@ export {
 }
 
 export const types = {
+    enumeration,
     model,
     compose,
     reference,

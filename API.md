@@ -326,6 +326,30 @@ You need to declare an interface to explicit the return type of the late paramet
 
 Returns **IType&lt;S, T>** 
 
+# types.enumeration
+
+Can be used to create an string based enumeration.
+(note: this methods is just sugar for a union of string literals)
+
+**Parameters**
+
+-   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** descriptive name of the enumeration (optional)
+-   `options` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** possible values this enumeration can have
+-   `arg1`  
+-   `arg2`  
+
+**Examples**
+
+````javascript
+    ```javascript
+    const TrafficLight = types.model({
+      color: types.enum("Color", ["Red", "Orange", "Green"])
+    })
+    ```
+````
+
+Returns **ISimpleType&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** 
+
 # getType
 
 Returns the _actual_ type of the given tree node. (Or throws)

@@ -1,6 +1,7 @@
 # Next
 
 * Introduced `types.null` and `types.undefined`
+* Introduced `types.enumeration(name?, options)`
 
 # 0.9.3
 

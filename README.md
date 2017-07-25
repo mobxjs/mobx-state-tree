@@ -590,6 +590,7 @@ These are the types available in MST. All types can be found in the `types` name
 * `types.union(dispatcher?, types...)` create a union of multiple types. If the correct type cannot be inferred unambigously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 * `types.optional(type, defaultValue)` marks an value as being optional (in e.g. a model). If a value is not provided the `defaultValue` will be used instead. If `defaultValue` is a function, it will be evaluated. This can be used to generate for example id's or timestamps upon creation.
 * `types.literal(value)` can be used to create a literal type, a type which only possible value is specifically that value, very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
+* `types.enumeration(name?, options: string[])` creates an enumeration. This method is a shorthand for a union of string literals.
 * `types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific then the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 * `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(null)), null)`.
 * `types.null` the type of `null`
