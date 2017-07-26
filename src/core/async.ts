@@ -82,64 +82,72 @@ export function asyncAction(name: string, generator: Function) {
     // Implementation based on https://github.com/tj/co/blob/master/index.js
     const runId = ++generatorId
 
-    return createActionInvoker(
-        name,
-        function(this: any) {
-            const ctx = this
-            const args = arguments
+    return function asyncAction(this: any) {
+        const ctx = this
+        const args = arguments
 
-            function wrap(fn: any, mode: IActionAsyncMode, arg: any) {
-                createActionInvoker(name, fn, mode, runId).call(ctx, arg)
-            }
+        function wrap(fn: any, mode: IActionAsyncMode, arg: any) {
+            createActionInvoker(name, fn, mode, runId).call(ctx, arg)
+        }
 
-            return new Promise(function(resolve, reject) {
-                debugger
-                const gen = generator.apply(ctx, args)
-                onFulfilled(undefined) // kick off the process
+        return new Promise(function(resolve, reject) {
+            let gen: any
+            createActionInvoker(
+                name,
+                function asyncActionInit(this: any) {
+                    gen = generator.apply(this, arguments)
+                    onFulfilled(undefined) // kick off the process
+                },
+                "start",
+                runId
+            ).apply(ctx, args)
 
-                function onFulfilled(res: any) {
-                    let ret
-                    try {
-                        // prettier-ignore
-                        wrap((r: any) => { ret = gen.next(r) }, "yield", res)
-                    } catch (e) {
-                        // prettier-ignore
+            function onFulfilled(res: any) {
+                let ret
+                try {
+                    // prettier-ignore
+                    wrap((r: any) => { ret = gen.next(r) }, "yield", res)
+                } catch (e) {
+                    // prettier-ignore
+                    setImmediate(() => {
                         wrap((r: any) => { reject(e) }, "error", e)
-                        return
-                    }
-                    next(ret)
+                    })
                     return
                 }
+                next(ret)
+                return
+            }
 
-                function onRejected(err: any) {
-                    let ret
-                    try {
-                        // prettier-ignore
-                        wrap((r: any) => { ret = gen.throw(r) }, "yield", err) // or yieldError?
-                    } catch (e) {
-                        // prettier-ignore
+            function onRejected(err: any) {
+                let ret
+                try {
+                    // prettier-ignore
+                    wrap((r: any) => { ret = gen.throw(r) }, "yield", err) // or yieldError?
+                } catch (e) {
+                    // prettier-ignore
+                    setImmediate(() => {
                         wrap((r: any) => { reject(e) }, "error", e)
-                        return
-                    }
-                    next(ret)
+                    })
+                    return
                 }
+                next(ret)
+            }
 
-                function next(ret: any) {
-                    if (ret.done) {
-                        // prettier-ignore
+            function next(ret: any) {
+                if (ret.done) {
+                    // prettier-ignore
+                    setImmediate(() => {
                         wrap((r: any) => { resolve(r) }, "done", ret.value)
-                        return
-                    }
-                    // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
-                    if (!ret.value || typeof ret.value.then !== "function")
-                        fail("Only promises can be yielded to `async`, got: " + ret)
-                    return ret.value.then(onFulfilled, onRejected)
+                    })
+                    return
                 }
-            })
-        },
-        "start",
-        runId
-    )
+                // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
+                if (!ret.value || typeof ret.value.then !== "function")
+                    fail("Only promises can be yielded to `async`, got: " + ret)
+                return ret.value.then(onFulfilled, onRejected)
+            }
+        })
+    }
 }
 
 import { createActionInvoker, IActionAsyncMode } from "./action"

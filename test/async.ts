@@ -20,7 +20,7 @@ function testCoffeeTodo(
     t: CallbackTestContext & Context<any>,
     generator,
     shouldError: boolean,
-    resultValue: string,
+    resultValue: any,
     producedCoffees: string[],
     expectedEvents: any[]
 ) {
@@ -52,23 +52,16 @@ function testCoffeeTodo(
         t.end()
     }
 
-    debugger
-    t1
-        .fetchData("black")
-        .then(
-            r => {
-                t.is(shouldError, false, "Ended up in OK handler")
-                handleResult(r)
-            },
-            r => {
-                debugger
-                t.is(shouldError, true, "Ended up in ERROR handler")
-                handleResult(r)
-            }
-        )
-        .catch(e => {
-            debugger
-        })
+    t1.fetchData("black").then(
+        r => {
+            t.is(shouldError, false, "Ended up in OK handler")
+            handleResult(r)
+        },
+        r => {
+            t.is(shouldError, true, "Ended up in ERROR handler")
+            handleResult(r)
+        }
+    )
 }
 
 test.cb("can handle async actions", t => {
@@ -105,11 +98,10 @@ test.cb("can handle async actions", t => {
     )
 })
 
-test.cb.only("can handle erroring actions", t => {
+test.cb("can handle erroring actions", t => {
     testCoffeeTodo(
         t,
         function* fetchData(this: any, kind: string) {
-            debugger
             throw kind
         },
         true,
@@ -163,6 +155,62 @@ test.cb("can handle try catch", t => {
                 args: ["biscuit"],
                 asyncId: 3,
                 asyncMode: "done",
+                name: "fetchData"
+            }
+        ]
+    )
+})
+
+test.cb("empty sequence works", t => {
+    testCoffeeTodo(
+        t,
+        function* fetchData(this: any, kind: string) {},
+        false,
+        undefined,
+        [],
+        [
+            {
+                args: ["black"],
+                asyncId: 4,
+                asyncMode: "start",
+                name: "fetchData"
+            },
+            {
+                args: [undefined],
+                asyncId: 4,
+                asyncMode: "done",
+                name: "fetchData"
+            }
+        ]
+    )
+})
+
+test.cb("can handle throw from yielded promise works", t => {
+    testCoffeeTodo(
+        t,
+        function* fetchData(this: any, kind: string) {
+            yield delay(10, "x", true)
+        },
+        true,
+        "x",
+        [],
+        [
+            {
+                args: ["black"],
+                asyncId: 5,
+                asyncMode: "start",
+                name: "fetchData"
+            },
+            {
+                args: ["x"], // note, exceptions are yielded back to the generator first
+                asyncId: 5,
+                asyncMode: "yield",
+                name: "fetchData"
+            },
+            {
+                args: ["x"],
+                asyncId: 5,
+                asyncMode: "error",
                 name: "fetchData"
             }
         ]
