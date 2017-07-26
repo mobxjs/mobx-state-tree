@@ -2,7 +2,8 @@ import {
     unprotect,
     types,
     addMiddleware,
-    async
+    async,
+    recordActions
     // TODO: export IRawActionCall
 } from "../src"
 import { test, CallbackTestContext, Context } from "ava"
@@ -277,6 +278,71 @@ test.cb("typings", t => {
         t.is(x1, 23)
         t.is(x2, 24)
         t.end()
+    })
+})
+
+test.cb("typings", t => {
+    const M = types.model(
+        {
+            title: types.string
+        },
+        {
+            *a(x: string) {
+                yield delay(10, "x", false)
+                this.title = "7"
+                return 23
+            },
+            b: async(function*(this: any, y: string) {
+                yield delay(10, "x", false)
+                this.title = "zoom" // TODO: saddly this is still 'any'...
+                return 24
+            })
+        }
+    )
+
+    const m1 = M.create({ title: "test " })
+    const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
+    const resB = m1.b("z") // Arg typings are correct, TODO: Result is correctly promise, but incorrect generic arg
+
+    Promise.all([resA, resB]).then(([x1, x2]) => {
+        t.is(x1, 23)
+        t.is(x2, 24)
+        t.end()
+    })
+})
+
+test.cb("recordActions should only emit invocation", t => {
+    let calls = 0
+    const M = types.model(
+        {
+            title: types.string
+        },
+        {
+            *a(x: string) {
+                yield delay(10, "x", false)
+                calls++
+                return 23
+            }
+        }
+    )
+
+    const m1 = M.create({ title: "test " })
+    const recorder = recordActions(m1)
+    m1.a("x").then(() => {
+        recorder.stop()
+        t.deepEqual(recorder.actions, [
+            {
+                args: ["x"],
+                name: "a",
+                path: ""
+            }
+        ])
+        t.is(calls, 1)
+        recorder.replay(m1)
+        setTimeout(() => {
+            t.is(calls, 2)
+            t.end()
+        }, 50)
     })
 })
 

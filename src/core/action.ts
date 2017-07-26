@@ -82,6 +82,7 @@ export function createActionInvoker(
     }
 }
 
+// TODO: serializeArgument should not throw error, but indicate that the argument is unserializable and toString it or something
 function serializeArgument(node: Node, actionName: string, index: number, arg: any): any {
     if (isPrimitive(arg)) return arg
     if (isStateTreeNode(arg)) {
@@ -175,13 +176,15 @@ export function onAction(
 
     return addMiddleware(target, (rawCall, next) => {
         const sourceNode = getStateTreeNode(rawCall.object)
-        listener({
-            name: rawCall.name,
-            path: getStateTreeNode(target).getRelativePathTo(sourceNode),
-            args: rawCall.args.map((arg: any, index: number) =>
-                serializeArgument(sourceNode, rawCall.name, index, arg)
-            )
-        })
+        if (rawCall.asyncMode === "none" || rawCall.asyncMode === "start") {
+            listener({
+                name: rawCall.name,
+                path: getStateTreeNode(target).getRelativePathTo(sourceNode),
+                args: rawCall.args.map((arg: any, index: number) =>
+                    serializeArgument(sourceNode, rawCall.name, index, arg)
+                )
+            })
+        }
         return next(rawCall)
     })
 }
