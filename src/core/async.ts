@@ -108,7 +108,7 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
                 let ret
                 try {
                     // prettier-ignore
-                    wrap((r: any) => { ret = gen.throw(r) }, "yield", err) // or yieldError?
+                    wrap((r: any) => { ret = gen.throw(r) }, "yieldError", err) // or yieldError?
                 } catch (e) {
                     // prettier-ignore
                     setImmediate(() => {

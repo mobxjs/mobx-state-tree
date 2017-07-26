@@ -7,7 +7,7 @@ export type ISerializedActionCall = {
     args?: any[]
 }
 
-export type IActionAsyncMode = "none" | "start" | "yield" | "done" | "error"
+export type IActionAsyncMode = "none" | "invoke" | "yield" | "yieldError" | "return" | "throw"
 
 export type IRawActionCall = {
     /**
