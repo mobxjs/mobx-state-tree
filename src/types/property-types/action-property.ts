@@ -1,5 +1,5 @@
 import { addHiddenFinalProp, isGeneratorFunction } from "../../utils"
-import { createActionInvoker, async } from "../../core"
+import { createActionInvoker, createAsyncActionInvoker } from "../../core"
 import { Property } from "./property"
 import {
     IContext,
@@ -15,7 +15,7 @@ export class ActionProperty extends Property {
     constructor(name: string, fn: Function) {
         super(name)
         this.invokeAction = isGeneratorFunction(fn)
-            ? async(name, fn as any)
+            ? createAsyncActionInvoker(name, fn)
             : createActionInvoker(name, fn)
     }
 

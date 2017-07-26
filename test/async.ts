@@ -1,7 +1,8 @@
 import {
     unprotect,
     types,
-    addMiddleware
+    addMiddleware,
+    async
     // TODO: export IRawActionCall
 } from "../src"
 import { test, CallbackTestContext, Context } from "ava"
@@ -215,6 +216,68 @@ test.cb("can handle throw from yielded promise works", t => {
             }
         ]
     )
+})
+
+test.cb("'async' works", t => {
+    testCoffeeTodo(
+        t,
+        async(function* fetchData(this: any, kind: string) {
+            return (this.title = yield delay(10, "test", false))
+        }),
+        false,
+        "test",
+        ["test"],
+        [
+            {
+                args: ["black"],
+                asyncId: 6,
+                asyncMode: "start",
+                name: "fetchData"
+            },
+            {
+                args: ["test"],
+                asyncId: 6,
+                asyncMode: "yield",
+                name: "fetchData"
+            },
+            {
+                args: ["test"],
+                asyncId: 6,
+                asyncMode: "done",
+                name: "fetchData"
+            }
+        ]
+    )
+})
+
+test.cb("typings", t => {
+    const M = types.model(
+        {
+            title: types.string
+        },
+        {
+            *a(x: string) {
+                yield delay(10, "x", false)
+                this.title = "7"
+                return 23
+            },
+            b: async(function*(this: any, y: string) {
+                yield delay(10, "x", false)
+                this.title = "zoom" // TODO: saddly this is still 'any'...
+                return 24
+            })
+        }
+    )
+
+    const m1 = M.create({ title: "test " })
+    const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
+    const resB = m1.b("z") // Arg typings are correct, TODO: Result is correctly promise, but incorrect generic arg
+
+    Promise.all([resA, resB]).then(([x1, x2]) => {
+        t.is(x1, 23)
+        t.is(x2, 24)
+        t.end()
+    })
 })
 
 function filterRelevantStuff(stuff: any): any {
