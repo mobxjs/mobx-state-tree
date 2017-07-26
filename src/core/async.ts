@@ -81,50 +81,66 @@ export function asyncAction<A1>(
 export function asyncAction(name: string, generator: Function) {
     // Implementation based on https://github.com/tj/co/blob/master/index.js
     const runId = ++generatorId
-    return createActionInvoker(name, function(this: any) {
-        const ctx = this
-        const args = arguments
-        return new Promise(function(resolve, reject) {
-            let stepId = 0
-            const gen = generator.apply(ctx, args)
-            onFulfilled(undefined) // kick off the process
 
-            function onFulfilled(res: any) {
-                let ret
-                try {
-                    createActionInvoker(name, (r: any) => (ret = gen.next(r))).call(ctx, res)
-                } catch (e) {
-                    // TODO: 'end' event
-                    return reject(e)
-                }
-                next(ret)
-                return null
+    return createActionInvoker(
+        name,
+        function(this: any) {
+            const ctx = this
+            const args = arguments
+
+            function wrap(fn: any, mode: IActionAsyncMode, arg: any) {
+                createActionInvoker(name, fn, mode, runId).call(ctx, arg)
             }
 
-            function onRejected(err: any) {
-                let ret
-                try {
-                    createActionInvoker(name, (r: any) => (ret = gen.throw(r))).call(ctx, err)
-                } catch (e) {
-                    // TODO: 'end' event
-                    return reject(e)
-                }
-                next(ret)
-            }
+            return new Promise(function(resolve, reject) {
+                debugger
+                const gen = generator.apply(ctx, args)
+                onFulfilled(undefined) // kick off the process
 
-            function next(ret: any) {
-                if (ret.done) {
-                    // TODO: 'end' event
-                    return createActionInvoker(name, (r: any) => resolve(r)).call(ctx, ret.value)
+                function onFulfilled(res: any) {
+                    let ret
+                    try {
+                        // prettier-ignore
+                        wrap((r: any) => { ret = gen.next(r) }, "yield", res)
+                    } catch (e) {
+                        // prettier-ignore
+                        wrap((r: any) => { reject(e) }, "error", e)
+                        return
+                    }
+                    next(ret)
+                    return
                 }
-                // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
-                if (!ret.value || typeof ret.value.then !== "function")
-                    fail("Only promises can be yielded to `async`, got: " + ret)
-                return ret.value.then(onFulfilled, onRejected)
-            }
-        })
-    })
+
+                function onRejected(err: any) {
+                    let ret
+                    try {
+                        // prettier-ignore
+                        wrap((r: any) => { ret = gen.throw(r) }, "yield", err) // or yieldError?
+                    } catch (e) {
+                        // prettier-ignore
+                        wrap((r: any) => { reject(e) }, "error", e)
+                        return
+                    }
+                    next(ret)
+                }
+
+                function next(ret: any) {
+                    if (ret.done) {
+                        // prettier-ignore
+                        wrap((r: any) => { resolve(r) }, "done", ret.value)
+                        return
+                    }
+                    // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
+                    if (!ret.value || typeof ret.value.then !== "function")
+                        fail("Only promises can be yielded to `async`, got: " + ret)
+                    return ret.value.then(onFulfilled, onRejected)
+                }
+            })
+        },
+        "start",
+        runId
+    )
 }
 
-import { createActionInvoker } from "./action"
+import { createActionInvoker, IActionAsyncMode } from "./action"
 import { fail } from "../utils"

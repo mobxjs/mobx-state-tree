@@ -7,12 +7,14 @@ export type ISerializedActionCall = {
     args?: any[]
 }
 
+export type IActionAsyncMode = "none" | "start" | "yield" | "done" | "error"
+
 export type IRawActionCall = {
     /**
      * AsyncId indicates whether this action is part of an `async` based action. Id is zero if it isn't.
      */
     asyncId: number
-    asyncMode: "none" | "start" | "yield" | "end"
+    asyncMode: IActionAsyncMode
     name: string
     object: any & IStateTreeNode
     args: any[]
@@ -47,7 +49,12 @@ function runMiddleWares(node: Node, baseCall: IRawActionCall, originalFn: Functi
     return runNextMiddleware(baseCall)
 }
 
-export function createActionInvoker(name: string, fn: Function) {
+export function createActionInvoker(
+    name: string,
+    fn: Function,
+    asyncMode: IActionAsyncMode = "none",
+    asyncId: number = 0
+) {
     const action = mobxAction(name, fn)
     return function(this: IStateTreeNode) {
         const node = getStateTreeNode(this)
@@ -61,8 +68,8 @@ export function createActionInvoker(name: string, fn: Function) {
                 name,
                 object: node.storedValue,
                 args: argsToArray(arguments),
-                asyncId: 0,
-                asyncMode: "none"
+                asyncId,
+                asyncMode
             }
             const root = node.root
             root._isRunningAction = true
