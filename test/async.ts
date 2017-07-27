@@ -81,7 +81,7 @@ test.cb("can handle async actions", t => {
             {
                 args: ["black"],
                 asyncId: 1,
-                asyncMode: "start",
+                asyncMode: "invoke",
                 name: "fetchData"
             },
             {
@@ -93,7 +93,7 @@ test.cb("can handle async actions", t => {
             {
                 args: ["awake"],
                 asyncId: 1,
-                asyncMode: "done",
+                asyncMode: "return",
                 name: "fetchData"
             }
         ]
@@ -113,13 +113,13 @@ test.cb("can handle erroring actions", t => {
             {
                 args: ["black"],
                 asyncId: 2,
-                asyncMode: "start",
+                asyncMode: "invoke",
                 name: "fetchData"
             },
             {
                 args: ["black"],
                 asyncId: 2,
-                asyncMode: "error",
+                asyncMode: "throw",
                 name: "fetchData"
             }
         ]
@@ -144,19 +144,19 @@ test.cb("can handle try catch", t => {
             {
                 args: ["black"],
                 asyncId: 3,
-                asyncMode: "start",
+                asyncMode: "invoke",
                 name: "fetchData"
             },
             {
                 args: ["tea"],
                 asyncId: 3,
-                asyncMode: "yield",
+                asyncMode: "yieldError",
                 name: "fetchData"
             },
             {
                 args: ["biscuit"],
                 asyncId: 3,
-                asyncMode: "done",
+                asyncMode: "return",
                 name: "fetchData"
             }
         ]
@@ -174,13 +174,13 @@ test.cb("empty sequence works", t => {
             {
                 args: ["black"],
                 asyncId: 4,
-                asyncMode: "start",
+                asyncMode: "invoke",
                 name: "fetchData"
             },
             {
                 args: [undefined],
                 asyncId: 4,
-                asyncMode: "done",
+                asyncMode: "return",
                 name: "fetchData"
             }
         ]
@@ -200,19 +200,19 @@ test.cb("can handle throw from yielded promise works", t => {
             {
                 args: ["black"],
                 asyncId: 5,
-                asyncMode: "start",
+                asyncMode: "invoke",
                 name: "fetchData"
             },
             {
                 args: ["x"], // note, exceptions are yielded back to the generator first
                 asyncId: 5,
-                asyncMode: "yield",
+                asyncMode: "yieldError",
                 name: "fetchData"
             },
             {
                 args: ["x"],
                 asyncId: 5,
-                asyncMode: "error",
+                asyncMode: "throw",
                 name: "fetchData"
             }
         ]
@@ -232,7 +232,7 @@ test.cb("'async' works", t => {
             {
                 args: ["black"],
                 asyncId: 6,
-                asyncMode: "start",
+                asyncMode: "invoke",
                 name: "fetchData"
             },
             {
@@ -244,7 +244,7 @@ test.cb("'async' works", t => {
             {
                 args: ["test"],
                 asyncId: 6,
-                asyncMode: "done",
+                asyncMode: "return",
                 name: "fetchData"
             }
         ]

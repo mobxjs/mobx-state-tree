@@ -176,7 +176,7 @@ export function onAction(
 
     return addMiddleware(target, (rawCall, next) => {
         const sourceNode = getStateTreeNode(rawCall.object)
-        if (rawCall.asyncMode === "none" || rawCall.asyncMode === "start") {
+        if (rawCall.asyncMode === "none" || rawCall.asyncMode === "invoke") {
             listener({
                 name: rawCall.name,
                 path: getStateTreeNode(target).getRelativePathTo(sourceNode),

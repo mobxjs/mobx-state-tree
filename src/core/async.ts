@@ -41,17 +41,7 @@ export function asyncAction<A1>(
 ): (a1: A1) => Promise<any>
 
 /**
- * `async` takes a generator function and automatically wraps all parts of the process in actions. See the examples below.
- * `async` can be used both as decorator or to wrap functions.
- *
- * - It is important that `async should always be used with a generator function (recognizable as `function*` or `*name` syntax)
- * - Each yield statement should return a Promise. The generator function will continue as soon as the promise settles, with the settled value
- * - When the generator function finishes, you can return a normal value. The `async` wrapped function will always produce a promise delivering that value.
- *
- * `async` requires `Promise` and `generators` to be available on the target environment. Polyfill `Promise` if needed. Both TypeScript and Babel can compile generator functions down to ES5.
- *
- * @example
- * TODO
+ * See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
  *
  * @export
  * @alias async
@@ -84,7 +74,7 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
                     gen = generator.apply(this, arguments)
                     onFulfilled(undefined) // kick off the process
                 },
-                "start",
+                "invoke",
                 runId
             ).apply(ctx, args)
 
@@ -96,7 +86,7 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
                 } catch (e) {
                     // prettier-ignore
                     setImmediate(() => {
-                        wrap((r: any) => { reject(e) }, "error", e)
+                        wrap((r: any) => { reject(e) }, "throw", e)
                     })
                     return
                 }
@@ -112,7 +102,7 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
                 } catch (e) {
                     // prettier-ignore
                     setImmediate(() => {
-                        wrap((r: any) => { reject(e) }, "error", e)
+                        wrap((r: any) => { reject(e) }, "throw", e)
                     })
                     return
                 }
@@ -123,7 +113,7 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
                 if (ret.done) {
                     // prettier-ignore
                     setImmediate(() => {
-                        wrap((r: any) => { resolve(r) }, "done", ret.value)
+                        wrap((r: any) => { resolve(r) }, "return", ret.value)
                     })
                     return
                 }

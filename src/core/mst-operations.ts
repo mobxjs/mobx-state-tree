@@ -49,8 +49,12 @@ export function getChildType(object: IStateTreeNode, child: string): IType<any, 
  *      name: string // name of the action
  *      object: any & IStateTreeNode // the object on which the action was original invoked
  *      args: any[] // the arguments of the action
+ *      asyncMode: string
+ *      asyncId: number
  * }
  * ```
+ *
+ * The fields `asyncMode` and `asyncId` are explained in detail in the [asynchronous action](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md#asynchronous-actions-and-middleware) section.
  *
  * An example of a build in middleware is the `onAction` method.
  *
@@ -59,7 +63,7 @@ export function getChildType(object: IStateTreeNode, child: string): IType<any, 
  * const store = SomeStore.create()
  * const disposer = addMiddleWare(store, (call, next) => {
  *   console.log(`action ${call.name} was invoked`)
- *   next(call) // runs the next middleware (or the inteneded action if there is no middleware to run left)
+ *   next(call) // runs the next middleware (or the intended action if there is no middleware to run left)
  * })
  * ```
  *
