@@ -1,3 +1,7 @@
+# 0.9.5
+
+* Asynchronous actions are now a first class concept in mobx-state-tree. See the [docs](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md)
+
 # 0.9.4
 
 * Introduced `types.null` and `types.undefined`

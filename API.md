@@ -845,16 +845,6 @@ Action can also be intercepted by middleware using addMiddleware to change the f
 
 Returns **IDisposer** 
 
-# async
-
-See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
-
-**Parameters**
-
--   `asyncAction`  
-
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
-
 # isStateTreeNode
 
 Returns true if the given value is a node in a state tree.
