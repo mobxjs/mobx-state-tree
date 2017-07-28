@@ -93,10 +93,10 @@ store.todos[0].toggle()
 // prints: `{ todos: [{ title: "Get coffee", done: true }]}`
 ```
 
-By using the type information available; snapshots can be converted to living trees and vice versa with zero effort.
+By using the type information available, snapshots can be converted to living trees, and vice versa, with zero effort.
 Because of this, [time travelling](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/time.js) is supported out of the box, and tools like HMR are trivial to support [example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/boxes/src/stores/domain-state.js#L94).
 
-The type information is designed in such a way that it is used both at design- and run-time to verify type correctness (Design time type checking is TypeScript only atm, Flow PR's are welcome!)
+The type information is designed in such a way that it is used both at design- and run-time to verify type correctness (Design time type checking works in TypeScript only at the moment; Flow PR's are welcome!)
 
 ```
 [mobx-state-tree] Value '{\"todos\":[{\"turtle\":\"Get tea\"}]}' is not assignable to type: Store, expected an instance of Store or a snapshot like '{ todos: { title: string; done: boolean }[] }' instead.
@@ -108,28 +108,27 @@ _Runtime type error_
 
 _Designtime type error_
 
-Because state trees are living, mutable models actions are straight-forward to write; just modify local instance properties where appropiate. See `toggleTodo()` above or the examples below. It is not needed to produce a new state tree yourself, MST's snapshot functionality will derive one for you automatically.
+Because state trees are living, mutable models, actions are straight-forward to write; just modify local instance properties where appropiate. See `toggleTodo()` above or the examples below. It is not necessary to produce a new state tree yourself, MST's snapshot functionality will derive one for you automatically.
 
-Although mutable sounds scary to some, fear not; actions have many interesting properties.
+Although mutable sounds scary to some, fear not: actions have many interesting properties.
 By default trees can only be modified by using an action that belongs to the same subtree.
-Furthermore, actions are replayable and can be used as means to distribute changes ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
+Furthermore, actions are replayable and can be used to distribute changes ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
 
-Moreover; since changes can be detected on a fine grained level. JSON patches are supported out of the box.
-Simply subscribing to the patch stream of a tree is another way to sync diffs with for example back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
+Moreover, because changes can be detected on a fine grained level, JSON patches are supported out of the box.
+Simply subscribing to the patch stream of a tree is another way to sync diffs with, for example, back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/boxes/src/stores/socket.js)).
 
 ![patches](docs/patches.png)
 
 Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](https://github.com/mobxjs/mobx-react).
-But even cooler; because it supports snapshots, middleware and replayable actions out of the box, it is even possible to replace a Redux store and reducer with a MobX state tree.
+But even cooler: because it supports snapshots, middleware and replayable actions out of the box, it is even possible to replace a Redux store and reducer with a MobX state tree.
 This makes it even possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/redux-todomvc/src/index.js#L6).
 
 ![devtools](docs/reduxdevtools.png)
 
 Finally, MST has built-in support for references, identifiers, dependency injection, change recording and circular type definitions (even across files).
-Even fancier; it analyses liveleness of objects, failing early when you try to access accidentally cached information! (More on that later)
+Even fancier: it analyses liveliness of objects, failing early when you try to access accidentally cached information! (More on that later)
 
-A pretty unique feature of MST is that it offers livelyness guarantees; it will throw when reading or writing from objects that are for whatever reason
-no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
+A pretty unique feature of MST is that it offers liveliness guarantees; it will throw when reading or writing from objects that are for no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
 
 ```javascript
 const oldTodo = store.todos[0]
@@ -148,7 +147,7 @@ store.removeTodo(0)
 ```
 
 
-Despite all that, you will see that the [API](API.md) is pretty straight forward!
+Despite all that, you will see that the [API](API.md) is pretty straightforward!
 
 ---
 
@@ -162,7 +161,7 @@ mobx-state-tree "immutable trees" and "graph model" features talk, ["Next Genera
 # Examples
 
 * [Bookshop](https://github.com/mobxjs/mobx-state-tree/tree/master/examples/bookshop) Example webshop application with references, identifiers, routing, testing etc.
-* [Boxes](https://github.com/mobxjs/mobx-state-tree/tree/master/examples/boxes) Example app where on can draw, drag and drop boxes. With time travelling and multi client synchronization over websockets.
+* [Boxes](https://github.com/mobxjs/mobx-state-tree/tree/master/examples/boxes) Example app where one can draw, drag, and drop boxes. With time-travelling and multi-client synchronization over websockets.
 * [Redux TodoMVC](https://github.com/mobxjs/mobx-state-tree/tree/master/examples/redux-todomvc) Redux TodoMVC application, except that the reducers are replaced with a MST. Tip: open the Redux devtools; they will work!
 
 # Concepts
@@ -191,7 +190,7 @@ const coffeeTodo = Todo.create({
 
 The `types.model` type declaration is used to describe the shape of an object.
 Other built-in types include arrays, maps, primitives etc. See the [types overview](#types-overview).
-The type information will be used for both
+The type information will be used for both.
 
 
 ### Creating models
@@ -224,11 +223,11 @@ const TodoStore = types.model("TodoStore", {      // 1
 When defining a model, it is advised to give the model a name for debugging purposes (see `// 1`).
 A model takes two objects arguments, first all the properties, then the actions.
 
-The _properties_ argument is a key-value set where each key indicates the introduction of a property, and the value its type. The following types are acceptable as type:
+The _properties_ argument is a key-value set where each key indicates the introduction of a property, and the value its type. The following types are acceptable:
 
-1. A type. This can be a simple primitive type like `types.boolean`, see `// 2`, or a complex, possible earlier defined type (`// 4`)
+1. A type. This can be a simple primitive type like `types.boolean`, see `// 2`, or a complex, possibly pre-defined type (`// 4`)
 2. A primitive. Using a primitive as type as type is syntactic sugar for introducing an property with a default value. See `// 3`, `endpoint: "http://localhost"` is the same as `endpoint: types.optional(types.string, "http://localhost")`. The primitive type is inferred from the default value. Properties with a default value can be omitted in snapshots.
-3. A [computed property](https://mobx.js.org/refguide/computed-decorator.html), see `// 6`. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is allowed to provide a setter for a computed property as well. A setter should always invoke an action.
+3. A [computed property](https://mobx.js.org/refguide/computed-decorator.html), see `// 6`. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is possible to provide a setter for a computed property as well. A setter should always invoke an action.
 4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but its value can be tracked by Mobx nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
 
 The _actions_ argument is a key-value set with actions that are available to manage the model. Only actions are allowed to manage models (including any contained objects).
@@ -240,17 +239,17 @@ For that reason a comma between each member of a model is mandatory, unlike clas
 
 ### Tree semantics in detail
 
-MST trees have very specific semantics. These semantics purposefully constraint what you can do with MST. The reward for that are all kind of generic features out of the box like snapshots, replayability etc. If these constraints don't suit your app, you are probably better of using plain mobx with your own model classes. Which is perfectly fine as well.
+MST trees have very specific semantics. These semantics purposefully constrain what you can do with MST. The reward for that is all kinds of generic features out of the box like snapshots, replayability, etc... If these constraints don't suit your app, you are probably better of using plain mobx with your own model classes. Which is perfectly fine as well.
 
 1. Each object in a MST tree is concidered a _node_. Each primitive (and frozen) value is considered a _leaf_.
-1. MST has only tree types of nodes; _model_, _array_, and _map_.
-1. Every _node_ tree in a MST tree is a tree in itself. Any operation that can be invoked on the complete tree, can also be applied to only a sub tree.
-1. A node can exists exactly only _once_ in a tree. This ensures it has an unique, identifiable position.
+1. MST has only three types of nodes; _model_, _array_, and _map_.
+1. Every _node_ tree in a MST tree is a tree in itself. Any operation that can be invoked on the complete tree can also be applied to a sub tree.
+1. A node can only exist exactly _once_ in a tree. This ensures it has an unique, identifiable position.
 2. It is however possible to refer to another object in the _same_ tree by using _references_
-3. There is no limit to the amount of MST trees that live in an application. However, each node can live in exactly only one tree.
-4. All _leaves_ in the tree must be serializable; it is not possible to store for example functions in a MST.
-6. The only free form type in MST is frozen; with the requirement that frozen values are immutable so that the MST semantics can still be uphold.
-7. At any point in the tree it is possible to assign a snapshot to the tree instead of a concrete instance of the expect type. In that case an instance of the correc type, based on the snapshot, will be automatically created for you.
+3. There is no limit to the amount of MST trees that live in an application. However, each node can only live in exactly one tree.
+4. All _leaves_ in the tree must be serializable; it is not possible to store, for example, functions in a MST.
+6. The only free-form type in MST is frozen; with the requirement that frozen values are immutable so that the MST semantics can still be upheld.
+7. At any point in the tree it is possible to assign a snapshot to the tree instead of a concrete instance of the expect type. In that case an instance of the correct type, based on the snapshot, will be automatically created for you.
 8. Nodes in the MST tree will be reconciled (the exact same instance will be reused) when updating the tree by any means, based on their _identifier_ property. If there is no identifier property, instances won't be reconciled.
 9. If a node in the tree is replaced by another node, the original node will die and become unusable. This makes sure you are not accidentally holding on to stale objects anywhere in your application.
 10. If you want to create a new node based on an existing node in a tree, you can either `detach` that node, or `clone` it.
@@ -278,12 +277,12 @@ The _snapshot_ passed to the `create` method of a type will recursively be turne
 storeInstance.todos[0].setTitle("Chocolate instead plz")
 ```
 
-Since any node in a tree, is an tree in itself, any built-in method in MST can be invoked on any node in the tree, not just the root.
+Because any node in a tree is an tree in itself, any built-in method in MST can be invoked on any node in the tree, not just the root.
 This makes it possible to get a patch stream of a certain subtree, or to apply middleware to a certain subtree only.
 
 ### Actions
 
-By default, nodes can only be modified by one of their actions, or actions higher up in the tree.
+By default, nodes can only be modified by one of their actions, or by actions higher up in the tree.
 Actions can be defined by passing a second object to to `types.model`:
 
 ```javascript
@@ -301,7 +300,7 @@ Actions are replayable and are therefore constrained in several ways:
 - Trying to modify a node without using an action will throw an exception.
 - All action arguments should be serializable. Some arguments can be serialized automatically, such as relative paths to other nodes
 - Actions can only modify models that belong to the (sub)tree on which they are invoked
-- Actions are automatically bound the their instance, so it is safe to pass actions around first class without binding or wrapping in arrow functions.
+- Actions are automatically bound to their instance, so it is safe to pass actions around without binding them or wrapping them in arrow functions.
 
 Useful methods:
 
@@ -311,17 +310,17 @@ Useful methods:
 
 #### Action listeners versus middleware
 
-The difference between action listeners and middlewares is: Middleware can intercept the action that is about to be invoked, modify arguments, return types etc. Action listeners cannot intercept, but are only notified. Action listeners receive the action arguments in a serializable format, while middleware receive the raw arguments. (`onAction` is actually just a built-in middleware)
+The difference between action listeners and middleware is: Middleware can intercept the action that is about to be invoked, modify arguments, return types etc. Action listeners cannot intercept, and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receive the raw arguments. (`onAction` is actually just a built-in middleware)
 
 #### Disabling protected mode
 
-If the default protection of mobx-state-tree doesn't fit your use case. For example if you are not interested in replayable actions or hate the effort of writing actions to modify any field; `unprotect(tree)` will disable the protected mode of a tree, allowing anyone to directly modify the tree.
+This may be desired if the default protection of mobx-state-tree doesn't fit your use case. For example, if you are not interested in replayable actions, or hate the effort of writing actions to modify any field; `unprotect(tree)` will disable the protected mode of a tree, allowing anyone to directly modify the tree.
 
 ### Snapshots
 
-Snapshots are the immutable serialization in plain objects of a tree at a specific point in time.
+Snapshots are the immutable serialization, in plain objects, of a tree at a specific point in time.
 Snapshots can be inspected through `getSnapshot(node)`.
-Snapshots don't contain any type information and are stripped from all actions etc, so they are perfectly suitable for tranportation.
+Snapshots don't contain any type information and are stripped from all actions etc, so they are perfectly suitable for transportation.
 Requesting a snapshot is cheap, as MST always maintains a snapshot of each node in the background, and uses structural sharing
 
 ```javascript
@@ -335,7 +334,7 @@ Some interesting properties of snapshots:
 
 -   Snapshots are immutable
 -   Snapshots can be transported
--   Snapshots can be used to update / restore models to a certain state
+-   Snapshots can be used to update models or restore them to a particular state
 -   Snapshots are automatically converted to models when needed. So the two following statements are equivalent: `store.todos.push(Todo.create({ title: "test" }))` and `store.todos.push({ title: "test" })`.
 Useful methods:
 
@@ -345,7 +344,7 @@ Useful methods:
 
 ## Patches
 
-Modifying a model does not only result in a new snapshot, but also in a stream of [JSON-patches](http://jsonpatch.com/) describing which modifications are made.
+Modifying a model does not only result in a new snapshot, but also in a stream of [JSON-patches](http://jsonpatch.com/) describing which modifications were made.
 Patches have the following signature:
 
     export interface IJsonPatch {
@@ -357,20 +356,20 @@ Patches have the following signature:
 -   Patches are constructed according to JSON-Patch, RFC 6902
 -   Patches are emitted immediately when a mutation is made, and don't respect transaction boundaries (like snapshots)
 -   Patch listeners can be used to achieve deep observing
--   The `path` attribute of a patch considers the relative path of the event from the place where the event listener is attached
+-   The `path` attribute of a patch contains the path of the event, relative to the place where the event listener is attached
 -   A single mutation can result in multiple patches, for example when splicing an array
 -   Patches can be reverse applied, which enables many powerful patterns like undo / redo
 
 Useful methods:
 
--   `onPatch(model, listener)` attaches a patch listener  to the provided model, which will be invoked whenever the model or any of its descendants is mutated
+-   `onPatch(model, listener)` attaches a patch listener to the provided model, which will be invoked whenever the model or any of its descendants is mutated
 -   `applyPatch(model, patch)` applies a patch (or array of patches) to the provided model
--   `revertPatch(model, patch)` reverse applies a patch (or array of patches) to the provided model, this replays the inverse of a set of patches to an model, which can be used to bring it back to it's original state
+-   `revertPatch(model, patch)` reverse applies a patch (or array of patches) to the provided model. This replays the inverse of a set of patches to an model, which can be used to bring it back to it's original state
 
 ### References and identifiers
 
-References and identifiers are a first class concept in MST.
-This makes it possible to declare references and keeping the data normalized in the background, while you interact with it in a denormalized manner.
+References and identifiers are a first-class concept in MST.
+This makes it possible to declare references, and keep the data normalized in the background, while you interact with it in a denormalized manner.
 
 Example:
 ```javascript
@@ -403,11 +402,11 @@ console.log(storeInstance.selectedTodo.title)
 -   Each model can define zero or one `identifier()` properties
 -   The identifier property of an object cannot be modified after initialization
 -   Each identifiers / type combination should be unique within the entire tree
--   Identifiers are used to reconcile items inside arrays and maps wherever possible when applying snapshots
+-   Identifiers are used to reconcile items inside arrays and maps - wherever possible - when applying snapshots
 -   The `map.put()` method can be used to simplify adding objects that have identifiers to maps
 -   The primary goal of identifiers is not validation, but reconciliation and reference resolving. For this reason identifiers cannot be defined or updated after creation. If you want to check if some value just looks as an identifier, without providing the above semantics; use something like: `types.refinement(types.string, v => v.match(/someregex/))`
 
-_Tip: If you now the format of the identifiers in your application, leverage `types.refinement` to actively check this, for example the following definition enforces that identifiers of `Car` always start with the string `Car_`:_
+_Tip: If you know the format of the identifiers in your application, leverage `types.refinement` to actively check this, for example the following definition enforces that identifiers of `Car` always start with the string `Car_`:_
 
 ```javascript
 const Car = types.model("Car", {
@@ -432,7 +431,7 @@ autorun(() => {
 })
 ```
 
-But since MST keeps immutable snapshots in the background, it is also possible to be notified when a new snapshot of the tree is available, similar to `.subscribe` on a redux store:
+But, because MST keeps immutable snapshots in the background, it is also possible to be notified when a new snapshot of the tree is available. This is similar to `.subscribe` on a redux store:
 
 ```javascript
 onSnapshot(storeInstance, newSnapshot => {
@@ -440,7 +439,7 @@ onSnapshot(storeInstance, newSnapshot => {
 })
 ```
 
-However, sometimes it is more useful to precisely know what has changed rather than just receiving a complete new snapshot.
+However, sometimes it is more useful to precisely know what has changed, rather than just receiving a complete new snapshot.
 For that, MST supports json-patches out of the box
 
 ```javascript
@@ -484,19 +483,18 @@ addMiddleware(storeInstance, (call, next) => {
 
 A more extensive middleware example can be found in this [code sandbox](https://codesandbox.io/s/mQrqy8j73)
 
-Finally, it is not only possible to be notified about snapshots, patches or actions.
-It is also possible to re-apply them by respectively `applySnapshot`, `applyPatch` or `applyAction`!
+Finally, it is not only possible to be notified about snapshots, patches or actions; it is also possible to re-apply them by using `applySnapshot`, `applyPatch` or `applyAction`!
 
 ## Volatile state
 
 MST models primarily aid in storing _persistable_ state. State that can be persisted, serialized, transferred, patched, replaced etc.
-However, sometimes you need to keep track of temporarily, non persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc. State which is needed for local purposes as long as the object is alive.
+However, sometimes you need to keep track of temporary, non persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc - state which is needed for local purposes as long as the object is alive.
 
 Volatile state can be introduced by passing another object to `types.model`, between the *properties* and the *actions*. (If there are only two objects passed, MST will assume these to be properties and actions. In order for volatile state to be meaningful, you always need actions to operate on them).
 
 Volatile is preserved for the life-time of an object, and not reset when snapshots are applied etc. Note that the life time of an object depends on proper reconciliation, see below.
 
-Example of an object with volatile state. Note that volatile state here is used to track a XHR request, and clean up resources whenever it got disposed. Without volatile state this kind of information would need to be stored in an external WeakMap or similar.
+The following is an example of an object with volatile state. Note that volatile state here is used to track a XHR request, and clean up resources when it is disposed. Without volatile state this kind of information would need to be stored in an external WeakMap, or something similar.
 
 ```javascript
 // pseudo code
@@ -521,16 +519,16 @@ const Store = types.model({
 To initialize a volatile file, either:
 1. Supply a primitive value (`pendingRequest: null`)
 2. Use `afterCreate` to initialize the field (as done above)
-3. Use provide a function to produce the first value. Both the scope and first argument of that function will be the target instance. Requiring a function avoids accident sharing of a non-primitive value accross all instances of a type. Example: `pendingRequest: (instance) => someXhrLib.createRequest("http://endpoint/" + instance.id)`
+3. Provide a function to produce the first value. Both the scope and first argument of that function will be the target instance. Requiring a function avoids accidental sharing of a non-primitive value accross all instances of a type. Example: `pendingRequest: (instance) => someXhrLib.createRequest("http://endpoint/" + instance.id)`
 
-_Tip: To strongly type volatile state using typescript, without initialzing the default yet, use a double cast: For example use `{ pendingRequest: null as any as Promise<Stuff> }` so that the type of `pendingRequest` will always be a promise (Note: make sure to initialize it in `afterCreate` hook or declare the type as `{ pendingRequest: null as any as (Promise<Stuff> | null) }`)_
+_Tip: To strongly-type volatile state using Typescript, without initialzing the default yet, use a double cast: For example use `{ pendingRequest: null as any as Promise<Stuff> }` so that the type of `pendingRequest` will always be a promise (Note: make sure to initialize it in `afterCreate` hook or declare the type as `{ pendingRequest: null as any as (Promise<Stuff> | null) }`)_
 
 ## Dependency injection
 
-When creating a new state tree it is possible to pass in environment specific data by passing an object as second argument to a `.create` call.
+When creating a new state tree it is possible to pass in environment specific data by passing an object as the second argument to a `.create` call.
 This object should be (shallowly) immutable and can be accessed by any model in the tree by calling `getEnv(this)`.
 
-This is useful to inject environment or test specific utilities like a transport layer, loggers etc. This is a very useful to mock behavior in unit tests or provide instantiated utilities to models without requiring singleton modules.
+This is useful to inject environment, or test-specific utilities like a transport layer, loggers etc. This is a very useful to mock behavior in unit tests or provide instantiated utilities to models without requiring singleton modules.
 See also the (bookshop example)[https://github.com/mobxjs/mobx-state-tree/blob/a4f25de0c88acf0e239acb85e690e91147a8f0f0/examples/bookshop/src/stores/ShopStore.test.js#L9] for inspiration.
 
 ```javascript
@@ -587,9 +585,9 @@ These are the types available in MST. All types can be found in the `types` name
 
 ## Utility types
 
-* `types.union(dispatcher?, types...)` create a union of multiple types. If the correct type cannot be inferred unambigously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
-* `types.optional(type, defaultValue)` marks an value as being optional (in e.g. a model). If a value is not provided the `defaultValue` will be used instead. If `defaultValue` is a function, it will be evaluated. This can be used to generate for example id's or timestamps upon creation.
-* `types.literal(value)` can be used to create a literal type, a type which only possible value is specifically that value, very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
+* `types.union(dispatcher?, types...)` create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
+* `types.optional(type, defaultValue)` marks an value as being optional (in e.g. a model). If a value is not provided the `defaultValue` will be used instead. If `defaultValue` is a function, it will be evaluated. This can be used to generate, for example, IDs or timestamps upon creation.
+* `types.literal(value)` can be used to create a literal type, where the only possible value is specifically that value. This is very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
 * `types.enumeration(name?, options: string[])` creates an enumeration. This method is a shorthand for a union of string literals.
 * `types.refinement(name?, baseType, (snapshot) => boolean)` creates a type that is more specific then the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 * `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(null)), null)`.
@@ -597,12 +595,12 @@ These are the types available in MST. All types can be found in the `types` name
 * `types.undefined` the type of `undefined`
 * `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
 * `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is immutable.
-* `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining it into a new one
+* `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one
 * `types.compose(name?, baseType, props, volatileState?, actions?)`, creates a new model type by taking an existing type and introducing additional properties, state and actions
 
 ## Property types
 
-Property types can only be used as direct member of a `types.model` type and not further composed (for now).
+Property types can only be used as a direct member of a `types.model` type and not further composed (for now).
 * `types.identifier(subType?)` Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](#identifiers) for more details. `subType` should be either `types.string` or `types.number`, defaulting to the first if not specified.
 * `types.reference(targetType)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
 
@@ -610,12 +608,12 @@ Property types can only be used as direct member of a `types.model` type and not
 
 | Hook            | Meaning                                                                                                                                                   |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preProcessSnapshot` | Before creating an instance or before applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. etc. This hook is not called for individual property updates. |
+| `preProcessSnapshot` | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should bea _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. This hook is not called for individual property updates. |
 | `afterCreate`   | Immediately after an instance is created and initial values are applied. Children will fire this event before parents                                     |
 | `afterAttach`   | As soon as the _direct_ parent is assigned (this node is attached to an other node)                                                                       |
 | `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot.
 | `beforeDetach`  | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used             |
-| `beforeDestroy` | Before the node is destroyed as a result of calling `destroy` or removing or replacing the node from the tree. Child destructors will fire before parents |
+| `beforeDestroy` | Called before the node is destroyed, as a result of calling `destroy`, or by removing or replacing the node from the tree. Child destructors will fire before parents |
 
 Note, all hooks should be defined as actions.
 
@@ -628,39 +626,39 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 | `addDisposer(node, () => void) ` | Function to be invoked whenever the target node is to be destroyed |
 | `addMiddleware(node, middleware: (actionDescription, next) => any)` | Attaches middleware to a node. See [actions](#actions). Returns disposer. |
 | `applyAction(node, actionDescription)` | Replays an action on the targeted node |
-| `applyPatch(node, jsonPatch)` | Applies a JSON patch or array of patches to a node in the tree |
+| `applyPatch(node, jsonPatch)` | Applies a JSON patch, or array of patches, to a node in the tree |
 | `applySnapshot(node, snapshot)` | Updates a node with the given snapshot |
-| `asReduxStore(node)` | Wraps a node in a Redux store compatible api |
-| `clone(node, keepEnvironment?: true \| false \| newEnvironment)` | Creates a full clone of a certain node. By default preserves the same environment |
-| `connectReduxDevtools(removeDevModule, node)` | Connects a node to the redux development tools [example](https://github.com/mobxjs/mobx-state-tree/blob/b01fe97d427ca664f7ecc99349d10e58d08d2d98/examples/redux-todomvc/src/index.js)  |
-| `destroy(node)` | Kills a node, making it unusable. Removes it from any parent in the process |
-| `detach(node)` | Removes a node from its current parent, and let's it live on as stand alone tree |
-| `getChildType(node, property?)` | Returns the declared type of the given property of a node. For arrays and maps `property` can be omitted as they all have the same type |
-| `getEnv(node)` | Returns the environment of the given node, see [environments](#environments) |
-| `getParent(node, depth=1)` | Returns the intermediate parent of the given node, or a higher one if `depth > 1` |
-| `getPath(node)` | Returns the path of a certain node in the tree |
-| `getPathParts(node)` | Returns the path of a certain node in the tree, unescaped as separate parts |
-| `getRelativePath(base, target)` | Returns the short path which one could use to walk from node `base` to node `target`, assuming they are in the same tree. Up is represented as `../` |
+| `asReduxStore(node)` | Wraps a node in a Redux-store compatible API |
+| `clone(node, keepEnvironment?: true \| false \| newEnvironment)` | Creates a full clone of the given node. By default preserves the same environment |
+| `connectReduxDevtools(removeDevModule, node)` | Connects a node to the Redux development tools [example](https://github.com/mobxjs/mobx-state-tree/blob/b01fe97d427ca664f7ecc99349d10e58d08d2d98/examples/redux-todomvc/src/index.js)  |
+| `destroy(node)` | Kills `node`, making it unusable. Removes it from any parent in the process |
+| `detach(node)` | Removes `node` from its current parent, and lets it live on as standalone tree |
+| `getChildType(node, property?)` | Returns the declared type of the given `property` of `node`. For arrays and maps `property` can be omitted as they all have the same type |
+| `getEnv(node)` | Returns the environment of `node`, see [environments](#environments) |
+| `getParent(node, depth=1)` | Returns the intermediate parent of the `node`, or a higher one if `depth > 1` |
+| `getPath(node)` | Returns the path of `node` in the tree |
+| `getPathParts(node)` | Returns the path of `node` in the tree, unescaped as separate parts |
+| `getRelativePath(base, target)` | Returns the short path, which one could use to walk from node `base` to node `target`, assuming they are in the same tree. Up is represented as `../` |
 | `getRoot(node)` | Returns the root element of the tree containing `node` |
-| `getSnapshot(node)` | Returns the snapshot of provided node. See [snapshots](#snapshots) |
-| `getType(node)` | Returns the type of the given node |
-| `hasParent(node, depth=1)` | Returns `true` if the node has a parent at the given `depth` |
-| `isAlive(node)` | Returns `true` if the node hasn't died yet |
-| `isStateTreeNode(value)` | Returns `true` if the value is a node of a mobx-state-tree |
+| `getSnapshot(node)` | Returns the snapshot of the `node`. See [snapshots](#snapshots) |
+| `getType(node)` | Returns the type of `node` |
+| `hasParent(node, depth=1)` | Returns `true` if `node` has a parent at `depth` |
+| `isAlive(node)` | Returns `true` if `node` is alive |
+| `isStateTreeNode(value)` | Returns `true` if `value` is a node of a mobx-state-tree |
 | `isProtected(value)` | Returns `true` if the given node is protected, see [actions](#actions) |
-| `isRoot(node)` | Returns true if the has no parents  |
-| `joinJsonPath(parts)` | Joins and escapes the given path parts into a json path |
+| `isRoot(node)` | Returns true if `node` has no parents  |
+| `joinJsonPath(parts)` | Joins and escapes the given path `parts` into a JSON path |
 | `onAction(node, (actionDescription) => void` | A built-in middleware that calls the provided callback with an action description upon each invocation. Returns disposer |
 | `onPatch(node, (patch) => void)` | Attach a JSONPatch listener, that is invoked for each change in the tree. Returns disposer |
 | `onSnapshot` | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer |
 | `protect` | Protects an unprotected tree against modifications from outside actions |
-| `recordActions(node)` | Creates a recorder that listens to all actions in the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
+| `recordActions(node)` | Creates a recorder that listens to all actions in `node`. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
 | `recordPatches` | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree |
 | `resolve(node, path)` | Resolves a `path` (json path) relatively to the given `node` |
-| `revertPatch(node, jsonPatch)` | Inverse applies a JSON patch or array of patches to a node in the tree |
-| `splitJsonPath(path)` | Splits and unescapes the given json path into path parts |
+| `revertPatch(node, jsonPatch)` | Inverse applies a JSON patch or array of patches to `node` |
+| `splitJsonPath(path)` | Splits and unescapes the given JSON `path` into path parts |
 | `tryResolve(node, path)` | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
-| `unprotect(node)` | Unprotects a node, making it possible to directly modify any value in the subtree, without actions |
+| `unprotect(node)` | Unprotects `node`, making it possible to directly modify any value in the subtree, without actions |
 | `walk(startNode, (node) => void)` | Performs a depth-first walk through a tree |
 | `escapeJsonPath(path)` | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
 | `unescapeJsonPath(path)` | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
@@ -679,7 +677,7 @@ A _disposer_ is a function that cancels the effect it was created for.
 
 ### `toJSON()` for debugging
 
-For debugging you might want to use `getSnapshot(model)` to print the state of a model. But if you didn't import `getSnapshot` while debugging in some debugger; don't worry, `model.toJSON()` will produce the same snapshot. (For api consistency, this feature is not part of the typed api)
+For debugging you might want to use `getSnapshot(model)` to print the state of a model. But if you didn't import `getSnapshot` while debugging in some debugger; don't worry, `model.toJSON()` will produce the same snapshot. (For API consistency, this feature is not part of the typed API)
 
 ### Handle circular dependencies between files using `late`
 
@@ -700,11 +698,11 @@ import { LateStore } from "./circular-dep"
 const Store = types.late(() => LateStore)
 ```
 
-Thanks to function hoisting in combination with `types.late`, this makes sure you can have circular dependencies between types across files.
+Thanks to function hoisting in combination with `types.late`, this lets you have circular dependencies between types, across files.
 
 ### Simulate inheritance by using type composition
 
-There is no notion of inheritance in MST. The recommended approach is to keep an references to the original configuration of a model to compose it into a new one, for example by using `types.compose`. So a classical animal inheritance could be expressed using composition as follows:
+There is no notion of inheritance in MST. The recommended approach is to keep references to the original configuration of a model in order to compose it into a new one, for example by using `types.compose`. So a classical animal inheritance could be expressed using composition as follows:
 
 ```javascript
 const Square = types.model(
@@ -761,7 +759,7 @@ If an object is reconciled, the consequence is that localState is preserved and 
 
 ### Creating async processes
 
-For asynchronous processes, for each step that intends to modify a model you need a separate action. So for example one to kick off the process. And one to update the model. In a multi stage async process, consider postponing all updates until the last step is completed.
+For asynchronous processes, for each step that intends to modify a model you need a separate action. So for example one to kick off the process. And one to update the model. In a multi-stage async process, consider postponing all updates until the last step is completed.
 
 ### Using mobx and mobx-state-tree together
 
@@ -770,16 +768,16 @@ Yep, perfectly fine. No problem. Go on. `observer`, `autorun` etc will work as e
 ### Should all state of my app be stored in `mobx-state-tree`?
 No, or, not necessarily. An application can use both state trees and vanilla MobX observables at the same time.
 State trees are primarily designed to store your domain data, as this kind of state is often distributed and not very local.
-For, for example, local component state, vanilla MobX observables might often be simpler to use.
+For local component state, for example, vanilla MobX observables might often be simpler to use.
 
 ### TypeScript & MST
 
-TypeScript support is best effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we got pretty close! As MST uses the latest fancy typescript features it is recommended to use TypeScript 2.3 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
+TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is recommended to use TypeScript 2.3 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
 
-When using models, you write interface along with its property types that will be used to perform type checks at runtime.
-What about compile time? You can use TypeScript interfaces indeed to perform those checks, but that would require writing again all the properties and their actions!
+When using models, you write an interface, along with its property types, that will be used to perform type checks at runtime.
+What about compile time? You can use TypeScript interfaces to perform those checks, but that would require writing again all the properties and their actions!
 
-Good news? You don't need to write it twice! Using the `typeof` operator of TypeScript over the `.Type` property of a MST Type, will result in a valid TypeScript Type!
+Good news! You don't need to write it twice! Using the `typeof` operator of TypeScript over the `.Type` property of a MST Type will result in a valid TypeScript Type!
 
 ```typescript
 const Todo = types.model({
@@ -797,9 +795,9 @@ type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { 
 So far this might look a lot like an immutable state tree as found for example in Redux apps, but there are a few differences:
 
 -   like Redux, and unlike MobX, MST prescribes a very specific state architecture.
--   mobx-state-tree allow direct modification of any value in the tree, it is not needed to construct a new tree in your actions.
--   mobx-state-tree allows for fine grained and efficient observability on any point in the state tree.
--   mobx-state-tree generates json patches for any modification that is made.
+-   mobx-state-tree allows direct modification of any value in the tree; it is not necessary to construct a new tree in your actions.
+-   mobx-state-tree allows for fine-grained and efficient observation of any point in the state tree.
+-   mobx-state-tree generates JSON patches for any modification that is made.
 -   mobx-state-tree provides utilties to turn any MST tree into a valid Redux store.
 -   having multiple MSTs in a single application is perfectly fine.
 
