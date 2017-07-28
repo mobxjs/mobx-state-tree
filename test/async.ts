@@ -2,7 +2,6 @@ import {
     unprotect,
     types,
     addMiddleware,
-    async,
     recordActions
     // TODO: export IRawActionCall
 } from "../src"
@@ -219,12 +218,12 @@ test.cb("can handle throw from yielded promise works", t => {
     )
 })
 
-test.cb("'async' works", t => {
+test.cb.skip("'async' works", t => {
     testCoffeeTodo(
         t,
-        async(function* fetchData(this: any, kind: string) {
+        /* TODO: see #273 async*/ function* fetchData(this: any, kind: string) {
             return (this.title = yield delay(10, "test", false))
-        }),
+        },
         false,
         "test",
         ["test"],
@@ -262,11 +261,11 @@ test.cb("typings", t => {
                 this.title = "7"
                 return 23
             },
-            b: async(function*(this: any, y: string) {
+            b /* See: #273: async*/: function*(this: any, y: string) {
                 yield delay(10, "x", false)
                 this.title = "zoom" // TODO: saddly this is still 'any'...
                 return 24
-            })
+            }
         }
     )
 
@@ -292,11 +291,11 @@ test.cb("typings", t => {
                 this.title = "7"
                 return 23
             },
-            b: async(function*(this: any, y: string) {
+            b /*async TODO: see #273 */: function*(this: any, y: string) {
                 yield delay(10, "x", false)
                 this.title = "zoom" // TODO: saddly this is still 'any'...
                 return 24
-            })
+            }
         }
     )
 

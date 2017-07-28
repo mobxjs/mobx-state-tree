@@ -174,5 +174,4 @@ _Note: for middleware, it is extremely important that `next(action)` is called f
 ## Typescript tips
 
 When using generators, you will notice that the return type will be inferred incorrectly. (Usually: `any`). Note that the actual return type from an asynchronous action is `Promise<T>` where `T` is the type returned by the `return` statement(s).
-
-There is an `async` utility, that can help with improving the type inference, but usually it makes it worse. See also the [unit tests](https://github.com/mobxjs/mobx-state-tree/blob/6da7225bcb38eaf3a4517999d610c730040f39b7/test/async.ts#L253)
+For more questions or ideas, see also [#273](https://github.com/mobxjs/mobx-state-tree/issue/273)

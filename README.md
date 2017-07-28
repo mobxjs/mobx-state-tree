@@ -654,7 +654,6 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 | `applyPatch(node, jsonPatch)` | Applies a JSON patch or array of patches to a node in the tree |
 | `applySnapshot(node, snapshot)` | Updates a node with the given snapshot |
 | `asReduxStore(node)` | Wraps a node in a Redux store compatible api |
-| `async(function)` | Utility to declare an asynchronous function, see asynchronous actions |
 | `clone(node, keepEnvironment?: true \| false \| newEnvironment)` | Creates a full clone of a certain node. By default preserves the same environment |
 | `connectReduxDevtools(removeDevModule, node)` | Connects a node to the redux development tools [example](https://github.com/mobxjs/mobx-state-tree/blob/b01fe97d427ca664f7ecc99349d10e58d08d2d98/examples/redux-todomvc/src/index.js)  |
 | `destroy(node)` | Kills a node, making it unusable. Removes it from any parent in the process |
