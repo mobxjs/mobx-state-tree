@@ -1,14 +1,22 @@
-import { addHiddenFinalProp } from "../../utils"
-import { createActionInvoker } from "../../core"
+import { addHiddenFinalProp, isGeneratorFunction } from "../../utils"
+import { createActionInvoker, createAsyncActionInvoker } from "../../core"
 import { Property } from "./property"
-import { IContext, IValidationResult, typeCheckFailure, typeCheckSuccess, getContextForPath } from "../type-checker"
+import {
+    IContext,
+    IValidationResult,
+    typeCheckFailure,
+    typeCheckSuccess,
+    getContextForPath
+} from "../type-checker"
 
 export class ActionProperty extends Property {
     invokeAction: Function
 
     constructor(name: string, fn: Function) {
         super(name)
-        this.invokeAction = createActionInvoker(name, fn)
+        this.invokeAction = isGeneratorFunction(fn)
+            ? createAsyncActionInvoker(name, fn)
+            : createActionInvoker(name, fn)
     }
 
     initialize(target: any) {

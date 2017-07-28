@@ -1,6 +1,4 @@
-import {
-    isObservableArray
-} from 'mobx'
+import { isObservableArray } from "mobx"
 
 declare const global: any
 
@@ -86,6 +84,14 @@ export function isPrimitive(value: any): boolean {
         typeof value === "boolean" ||
         value instanceof Date
     )
+        return true
+    return false
+}
+
+export function isGeneratorFunction(value: any) {
+    const constructor = value.constructor
+    if (!constructor) return false
+    if ("GeneratorFunction" === constructor.name || "GeneratorFunction" === constructor.displayName)
         return true
     return false
 }

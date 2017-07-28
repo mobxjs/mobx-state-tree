@@ -400,7 +400,11 @@ A call description looks like:
          name: string // name of the action
          object: any & IStateTreeNode // the object on which the action was original invoked
          args: any[] // the arguments of the action
+         asyncMode: string
+         asyncId: number
     }
+
+The fields `asyncMode` and `asyncId` are explained in detail in the [asynchronous action](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md#asynchronous-actions-and-middleware) section.
 
 An example of a build in middleware is the `onAction` method.
 
@@ -416,7 +420,7 @@ An example of a build in middleware is the `onAction` method.
     const store = SomeStore.create()
     const disposer = addMiddleWare(store, (call, next) => {
       console.log(`action ${call.name} was invoked`)
-      next(call) // runs the next middleware (or the inteneded action if there is no middleware to run left)
+      next(call) // runs the next middleware (or the intended action if there is no middleware to run left)
     })
     ```
 ````
@@ -840,6 +844,16 @@ Action can also be intercepted by middleware using addMiddleware to change the f
 -   `listener`  
 
 Returns **IDisposer** 
+
+# async
+
+See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
+
+**Parameters**
+
+-   `asyncAction`  
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
 
 # isStateTreeNode
 

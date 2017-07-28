@@ -308,6 +308,29 @@ Useful methods:
 -   `addMiddleware(model, middleware)` listens to any action that is invoked on the model or any of its descendants. See `addMiddleware` for more details.
 -   `applyAction(model, action)` invokes an action on the model according to the given action description
 
+#### Asynchronous actions
+
+Asynchronous actions have first class support in MST and are described in more detail [here](docs/async-actions.md#asynchronous-actions-and-middleware).
+Asynchronous actions are written by using generators and always return a promise. A quick example to get the gist:
+
+```javascript
+*fetchProjects() { // <- note the star, this a generator function!
+    this.state = "pending"
+    try {
+        // ... yield can be used in async/await style
+        this.githubProjects = yield fetchGithubProjectsSomehow().then(
+        this.state = "done"
+    } catch (e) {
+        // ... including try/catch error handikng
+        console.error("Failed to fetch projects", error)
+        this.state = "error"
+    }
+    // The action will return a promise that resolves to the returned value
+    // (or rejects with anything thrown from the action)
+    return this.githubProjects.length
+}
+```
+
 #### Action listeners versus middleware
 
 The difference between action listeners and middleware is: Middleware can intercept the action that is about to be invoked, modify arguments, return types etc. Action listeners cannot intercept, and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receive the raw arguments. (`onAction` is actually just a built-in middleware)
@@ -759,7 +782,7 @@ If an object is reconciled, the consequence is that localState is preserved and 
 
 ### Creating async processes
 
-For asynchronous processes, for each step that intends to modify a model you need a separate action. So for example one to kick off the process. And one to update the model. In a multi-stage async process, consider postponing all updates until the last step is completed.
+See [creating asynchronous process](docs/async-actions.md).
 
 ### Using mobx and mobx-state-tree together
 

@@ -7,7 +7,14 @@ export type ISerializedActionCall = {
     args?: any[]
 }
 
+export type IActionAsyncMode = "none" | "invoke" | "yield" | "yieldError" | "return" | "throw"
+
 export type IRawActionCall = {
+    /**
+     * AsyncId indicates whether this action is part of an `async` based action. Id is zero if it isn't.
+     */
+    asyncId: number
+    asyncMode: IActionAsyncMode
     name: string
     object: any & IStateTreeNode
     args: any[]
@@ -42,7 +49,12 @@ function runMiddleWares(node: Node, baseCall: IRawActionCall, originalFn: Functi
     return runNextMiddleware(baseCall)
 }
 
-export function createActionInvoker(name: string, fn: Function) {
+export function createActionInvoker(
+    name: string,
+    fn: Function,
+    asyncMode: IActionAsyncMode = "none",
+    asyncId: number = 0
+) {
     const action = mobxAction(name, fn)
     return function(this: IStateTreeNode) {
         const node = getStateTreeNode(this)
@@ -55,7 +67,9 @@ export function createActionInvoker(name: string, fn: Function) {
             const call: IRawActionCall = {
                 name,
                 object: node.storedValue,
-                args: argsToArray(arguments)
+                args: argsToArray(arguments),
+                asyncId,
+                asyncMode
             }
             const root = node.root
             root._isRunningAction = true
@@ -68,6 +82,7 @@ export function createActionInvoker(name: string, fn: Function) {
     }
 }
 
+// TODO: serializeArgument should not throw error, but indicate that the argument is unserializable and toString it or something
 function serializeArgument(node: Node, actionName: string, index: number, arg: any): any {
     if (isPrimitive(arg)) return arg
     if (isStateTreeNode(arg)) {
@@ -140,29 +155,48 @@ export function applyAction(target: IStateTreeNode, action: ISerializedActionCal
  * Registers a function that will be invoked for each action that is called on the provided model instance, or to any of its children.
  * See [actions](https://github.com/mobxjs/mobx-state-tree#actions) for more details. onAction events are emitted only for the outermost called action in the stack.
  * Action can also be intercepted by middleware using addMiddleware to change the function call before it will be run.
- * 
+ *
  * @export
- * @param {IStateTreeNode} target 
- * @param {(call: ISerializedActionCall) => void} listener 
- * @returns {IDisposer} 
+ * @param {IStateTreeNode} target
+ * @param {(call: ISerializedActionCall) => void} listener
+ * @returns {IDisposer}
  */
 export function onAction(
     target: IStateTreeNode,
     listener: (call: ISerializedActionCall) => void
 ): IDisposer {
+    if (!isRoot(target))
+        console.warn(
+            "[mobx-state-tree] Warning: Attaching onAction listeners to non root nodes is dangerous: No events will be emitted for actions initiated higher up in the tree."
+        )
+    if (!isProtected(target))
+        console.warn(
+            "[mobx-state-tree] Warning: Attaching onAction listeners to non protected nodes is dangerous: No events will be emitted for direct modifications without action."
+        )
+
     return addMiddleware(target, (rawCall, next) => {
         const sourceNode = getStateTreeNode(rawCall.object)
-        listener({
-            name: rawCall.name,
-            path: getStateTreeNode(target).getRelativePathTo(sourceNode),
-            args: rawCall.args.map((arg: any, index: number) =>
-                serializeArgument(sourceNode, rawCall.name, index, arg)
-            )
-        })
+        if (rawCall.asyncMode === "none" || rawCall.asyncMode === "invoke") {
+            listener({
+                name: rawCall.name,
+                path: getStateTreeNode(target).getRelativePathTo(sourceNode),
+                args: rawCall.args.map((arg: any, index: number) =>
+                    serializeArgument(sourceNode, rawCall.name, index, arg)
+                )
+            })
+        }
         return next(rawCall)
     })
 }
 
 import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"
-import { resolvePath, tryResolve, addMiddleware, applyPatch, applySnapshot } from "./mst-operations"
+import {
+    resolvePath,
+    tryResolve,
+    addMiddleware,
+    applyPatch,
+    applySnapshot,
+    isRoot,
+    isProtected
+} from "./mst-operations"
 import { fail, isPlainObject, isPrimitive, argsToArray, IDisposer } from "../utils"
