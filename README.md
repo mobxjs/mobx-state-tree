@@ -318,10 +318,10 @@ Asynchronous actions are written by using generators and always return a promise
     this.state = "pending"
     try {
         // ... yield can be used in async/await style
-        this.githubProjects = yield fetchGithubProjectsSomehow().then(
+        this.githubProjects = yield fetchGithubProjectsSomehow()
         this.state = "done"
     } catch (e) {
-        // ... including try/catch error handikng
+        // ... including try/catch error handling
         console.error("Failed to fetch projects", error)
         this.state = "error"
     }
