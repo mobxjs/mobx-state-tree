@@ -70,8 +70,8 @@ export class ObjectType extends ComplexType<any, any> {
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
         // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
         // Although object.defineProperty on a real function could also be used, that name is not used everywhere, for example when logging an object to the Chrome console, so this works better:
-        this.modelConstructor = function() {}
-        Object.defineProperty(this.modelConstructor, 'name', {
+        this.modelConstructor = class { }
+        Object.defineProperty(this.modelConstructor, "name", {
             value: name,
             writable: false
         })
