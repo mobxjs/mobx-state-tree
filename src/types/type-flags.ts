@@ -54,7 +54,7 @@ export function isMapType<S, T>(
     return isType(type) && (type.flags & TypeFlags.Map) > 0
 }
 
-export function isObjectType(type: any): type is ObjectType {
+export function isObjectType(type: any): type is ObjectType<any, any> {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 

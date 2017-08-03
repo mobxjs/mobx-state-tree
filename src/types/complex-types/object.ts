@@ -5,11 +5,9 @@ import {
     IObjectWillChange,
     intercept,
     observe,
-    computed,
-    observable
+    computed
 } from "mobx"
 import {
-    extendKeepGetter,
     fail,
     hasOwnProperty,
     isPlainObject,
@@ -37,12 +35,9 @@ import {
 } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
 import { optional } from "../utility-types/optional"
+// TODO: eliminate property / value-property
 import { Property } from "../property-types/property"
-import { ComputedProperty } from "../property-types/computed-property"
 import { ValueProperty } from "../property-types/value-property"
-import { ActionProperty } from "../property-types/action-property"
-import { ViewProperty } from "../property-types/view-property"
-import { VolatileProperty } from "../property-types/volatile-property"
 
 const HOOK_NAMES = [
     "preProcessSnapshot",
@@ -66,6 +61,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
      */
     public readonly initializers: ((instance: any) => any)[]
     public readonly properties: { [K: string]: IType<any, any> }
+    private readonly parsedProperties: { [K: string]: ValueProperty } = {}
 
     modelConstructor: new () => any
 
@@ -87,12 +83,8 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         })
         const proto = this.modelConstructor.prototype
         proto.toString = objectTypeToString
-        // attach computeds on prototype
-        Object.keys(this.properties).forEach(key => {
-            observable.ref(proto, key, {
-                value: undefinedType.instantiate(null, "", null, undefined)
-            })
-        })
+        this.parseModelProps()
+        this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
     }
 
     actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A> {
@@ -159,6 +151,31 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         return new ObjectType(this.name, this.properties, this.initializers.concat(viewInitializer))
     }
 
+    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
+        return createNode(
+            this,
+            parent,
+            subpath,
+            environment,
+            this.preProcessSnapshot(snapshot),
+            this.createNewInstance,
+            this.finalizeNewInstance
+        )
+    }
+
+    createNewInstance = () => {
+        const instance = new this.modelConstructor()
+        extendShallowObservable(instance, {})
+        return instance as Object
+    }
+
+    finalizeNewInstance = (node: Node, snapshot: any) => {
+        const instance = node.storedValue as IStateTreeNode
+        this.forAllProps(prop => prop.initialize(instance, snapshot))
+        intercept(instance, change => this.willChange(change))
+        observe(instance, this.didChange)
+    }
+
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getStateTreeNode(change.object) // TODO: pass node in from object property
         typecheck(this.properties[change.name], change.newValue)
@@ -181,6 +198,138 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
             node
         )
     }
+
+    parseModelProps() {
+        const { properties } = this
+        for (let key in properties)
+            if (hasOwnProperty(properties, key)) {
+                if (HOOK_NAMES.indexOf(key) !== 1)
+                    console.warn(
+                        `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
+                    )
+
+                const descriptor = Object.getOwnPropertyDescriptor(properties, key)
+                if ("get" in descriptor) {
+                    fail("Getters are not supported as properties. Please use views instead")
+                }
+                const { value } = descriptor
+                if (value === null || undefined) {
+                    fail(
+                        "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
+                    )
+                } else if (isPrimitive(value)) {
+                    const baseType = getPrimitiveFactoryFromValue(value)
+                    this.parsedProperties[key] = new ValueProperty(key, optional(baseType, value))
+                } else if (isType(value)) {
+                    this.parsedProperties[key] = new ValueProperty(key, value)
+                } else if (typeof value === "function") {
+                    fail("Functions are not supported as properties, use views instead")
+                } else if (typeof value === "object") {
+                    fail(
+                        `In property '${key}': base model's should not contain complex values: '${value}'`
+                    )
+                } else {
+                    fail(`Unexpected value for property '${key}'`)
+                }
+            }
+    }
+
+    getChildren(node: Node): Node[] {
+        const res: Node[] = []
+        this.forAllProps(prop => {
+            if (prop instanceof ValueProperty) res.push(prop.getValueNode(node.storedValue))
+        })
+        return res
+    }
+
+    getChildNode(node: Node, key: string): Node {
+        if (!(this.parsedProperties[key] instanceof ValueProperty))
+            return fail("Not a value property: " + key)
+        return (this.parsedProperties[key] as ValueProperty).getValueNode(node.storedValue)
+    }
+
+    getValue(node: Node): any {
+        return node.storedValue
+    }
+
+    getSnapshot(node: Node): any {
+        const res = {}
+        this.forAllProps(prop => prop.serialize(node.storedValue, res))
+        return this.postProcessSnapshot(res)
+    }
+
+    applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
+        if (!(patch.op === "replace" || patch.op === "add"))
+            fail(`object does not support operation ${patch.op}`)
+        node.storedValue[subpath] = patch.value
+    }
+
+    @action
+    applySnapshot(node: Node, snapshot: any): void {
+        const s = this.preProcessSnapshot(snapshot)
+        typecheck(this, s)
+        for (let key in this.props) this.parsedProperties[key].deserialize(node.storedValue, s)
+    }
+
+    preProcessSnapshot(snapshot: any) {
+        // TODO: reimplement this using types
+        // if (typeof this.actions.preProcessSnapshot === "function")
+        // return this.actions.preProcessSnapshot.call(null, snapshot)
+        return snapshot
+    }
+
+    postProcessSnapshot(snapshot: any) {
+        // if (typeof this.actions.postProcessSnapshot === "function")
+        // return this.actions.postProcessSnapshot.call(null, snapshot)
+        return snapshot
+    }
+
+    getChildType(key: string): IType<any, any> {
+        return (this.parsedProperties[key] as ValueProperty).type
+    }
+
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
+        let snapshot = this.preProcessSnapshot(value)
+
+        if (!isPlainObject(snapshot)) {
+            return typeCheckFailure(context, snapshot)
+        }
+
+        return flattenTypeErrors(
+            Object.keys(this.props).map(path =>
+                this.parsedProperties[path].validate(snapshot, context)
+            )
+        )
+    }
+
+    private forAllProps(fn: (o: Property) => void) {
+        // optimization: persists keys or loop more efficiently
+        Object.keys(this.props).forEach(key => fn(this.parsedProperties[key]))
+    }
+
+    describe() {
+        // TODO: make proptypes responsible
+        // optimization: cache
+        return (
+            "{ " +
+            Object.keys(this.props)
+                .map(key => {
+                    const prop = this.parsedProperties[key]
+                    return prop instanceof ValueProperty ? key + ": " + prop.type.describe() : ""
+                })
+                .filter(Boolean)
+                .join("; ") +
+            " }"
+        )
+    }
+
+    getDefaultSnapshot(): any {
+        return {}
+    }
+
+    removeChild(node: Node, subpath: string) {
+        node.storedValue[subpath] = null
+    }
 }
 
 export interface IModelType<S, T> extends IType<S, T> {
@@ -190,4 +339,82 @@ export interface IModelType<S, T> extends IType<S, T> {
     ): IModelType<S & SP, T & TP>
     views<V extends Object>(fn: (self: T) => V): IModelType<S, T & V>
     actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A>
+}
+
+export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }
+export type IModelVolatileState<T> = { [K in keyof T]: ((self?: any) => T[K]) | T[K] }
+
+export type Snapshot<T> = {
+    [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
+}
+
+// TODO: add correct types
+export function model<T = {}, S = {}, A = {}>(
+    name: string,
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
+    operations?: A & ThisType<IStateTreeNode & T & A & S>
+): IModelType<T & IStateTreeNode, S & A>
+export function model<T = {}, S = {}, A = {}>(
+    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
+    operations?: A & ThisType<IStateTreeNode & T & A & S>
+): IModelType<T & IStateTreeNode, S & A>
+/**
+ * Creates a new model type by providing a name, properties, volatile state and actions.
+ *
+ * See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
+ *
+ * @export
+ * @alias types.model
+ */
+export function model(...args: any[]) {
+    const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+    const props = args.shift() || fail("types.model must specify properties")
+    const volatileState = (args.length > 1 && args.shift()) || {}
+    if (Object.keys(volatileState).length > 0)
+        return fail(
+            "calling model and declaring volatile state is no longer supported, please move to the new model syntax"
+        )
+    const actions = args.shift() || {}
+    if (Object.keys(actions).length > 0)
+        console.warn(
+            "The syntax model(name?, props, actions) is deprecated. use model(name?, props).actions(self => actions) instead."
+        )
+    return new ObjectType(name, props, [
+        () => {
+            return actions
+        }
+    ])
+}
+
+export function compose<T1, S1, T2, S2, T3, S3>(
+    t1: IModelType<T1, S1>,
+    t2: IModelType<T2, S2>,
+    t3?: IModelType<T3, S3>
+): IModelType<IStateTreeNode & T1 & T2 & T3, S1 & S2 & S3> // ...and so forth...
+export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
+    name: string,
+    t1: IModelType<T1, S1>,
+    t2: IModelType<T2, S2>,
+    t3?: IModelType<T3, S3>
+): IModelType<IStateTreeNode & T1 & T2 & T3, S1 & S2 & S3> // ...and so forth...
+/**
+ * Composes a new model from one or more existing model types.
+ * This method can be invoked in two forms:
+ * Given 2 or more model types, the types are composed into a new Type.
+ *
+ * @export
+ * @alias types.compose
+ */
+export function compose(...args: any[]): IModelType<any, any> {
+    const typeName: string = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+    return (args as ObjectType<any, any>[])
+        .reduce(
+            (prev, cur) =>
+                new ObjectType(
+                    "AnonymousType",
+                    Object.assign({}, prev.properties, cur.properties),
+                    prev.initializers.concat(cur.initializers)
+                )
+        )
+        .named(typeName)
 }
