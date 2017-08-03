@@ -22,7 +22,11 @@ export class Frozen<T> extends Type<T, T> {
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (!isSerializable(value)) {
-            return typeCheckFailure(context, value)
+            return typeCheckFailure(
+                context,
+                value,
+                "Value is not serializable and cannot be frozen"
+            )
         }
         return typeCheckSuccess()
     }

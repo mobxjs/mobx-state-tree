@@ -281,16 +281,12 @@ test("#192 - put should not throw when identifier is a number", t => {
         })
     })
 
-    t.throws(
-        () => {
-            todoStore.addTodo({
-                todo_id: "1",
-                title: "Test"
-            })
-        },
-        `[mobx-state-tree] Error while converting \`{"todo_id":"1","title":"Test"}\` to \`Todo\`:
-at path "/todo_id" value \`"1"\` is not assignable to type: \`identifier(number)\`, expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`
-    )
+    t.throws(() => {
+        todoStore.addTodo({
+            todo_id: "1",
+            title: "Test"
+        })
+    }, err => err.message.includes("[mobx-state-tree]") && err.message.includes("Todo") && err.message.includes("/todo_id") && err.message.includes('"1"') && err.message.includes("not assignable") && err.message.includes("identifier(number)"))
 })
 
 test("#192 - map should not mess up keys when putting twice", t => {

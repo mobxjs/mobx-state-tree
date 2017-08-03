@@ -36,6 +36,6 @@ test("should support anonymous enums", t => {
     // Note, any cast needed, compiler should correctly error otherwise
     t.throws(
         () => (l.color = "Blue" as any),
-        /Error while converting `"Blue"` to `Orange | Green | Red`/
+        /Error while converting `"Blue"` to `"Orange" | "Green" | "Red"`/
     )
 })

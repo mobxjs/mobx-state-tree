@@ -84,7 +84,7 @@ test("it should support prefixed paths in arrays", t => {
 })
 
 test("identifiers are required", t => {
-    const Todo = types.model({
+    const Todo = types.model("TodoTest", {
         id: types.identifier()
     })
 
@@ -93,8 +93,13 @@ test("identifiers are required", t => {
 
     t.throws(
         () => Todo.create(),
-        "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
-            'at path "/id" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
+        err =>
+            err.message.includes("[mobx-state-tree]") &&
+            err.message.includes("{}") &&
+            err.message.includes("TodoTest") &&
+            err.message.includes("undefined") &&
+            err.message.includes("identifier(string)") &&
+            err.message.includes("/id")
     )
 })
 
@@ -222,7 +227,12 @@ test("identifiers should only support types.string and types.number", t => {
                     id: types.identifier(types.model({ x: 1 }))
                 })
                 .create({ id: {} }),
-        /References should be a primitive value/
+        err =>
+            err.message.includes("[mobx-state-tree]") &&
+            err.message.includes("/id") &&
+            err.message.includes("not assignable") &&
+            err.message.includes("identifier") &&
+            err.message.includes("AnonymousModel")
     )
 })
 
@@ -524,10 +534,10 @@ test("it should support relative lookups", t => {
 })
 
 test("References are non-nullable by default", t => {
-    const Todo = types.model({
+    const Todo = types.model("TodoTest", {
         id: types.identifier(types.number)
     })
-    const Store = types.model({
+    const Store = types.model("StoreTest", {
         todo: types.maybe(Todo),
         ref: types.reference(Todo),
         maybeRef: types.maybe(types.reference(Todo))
@@ -556,20 +566,34 @@ test("References are non-nullable by default", t => {
     t.is(store.maybeRef, null)
     t.throws(
         () => store.ref,
-        "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /ref)"
+        err =>
+            err.message.includes("[mobx-state-tree]") &&
+            err.message.includes("reference") &&
+            err.message.includes("TodoTest") &&
+            err.message.includes("4") &&
+            err.message.includes("/ref")
     )
     store.maybeRef = 3 as any
     t.is(store.maybeRef, store.todo)
     store.maybeRef = 4 as any
     t.throws(
         () => store.maybeRef,
-        "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /maybeRef)"
+        err =>
+            err.message.includes("[mobx-state-tree]") &&
+            err.message.includes("reference") &&
+            err.message.includes("TodoTest") &&
+            err.message.includes("4") &&
+            err.message.includes("/maybeRef")
     )
     store.maybeRef = null
     t.is(store.maybeRef, null)
     t.throws(
         () => (store.ref = null as any),
-        "[mobx-state-tree] Error while converting `null` to `reference(AnonymousModel)`:\nvalue `null` is not assignable to type: `reference(AnonymousModel)` (Value '`null`' is not a valid reference. Expected a string or number.), expected an instance of `reference(AnonymousModel)` or a snapshot like `reference(AnonymousModel)` instead."
+        err =>
+            err.message.includes("[mobx-state-tree]") &&
+            err.message.includes("null") &&
+            err.message.includes("reference") &&
+            err.message.includes("TodoTest")
     )
 })
 

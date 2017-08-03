@@ -35,16 +35,11 @@ test("it should throw if default value is invalid snapshot", t => {
         quantity: types.number
     })
 
-    const error = t.throws(
-        () => {
-            types.model({
-                rows: types.optional(types.array(Row), [{}])
-            })
-        },
-        `[mobx-state-tree] Error while converting \`[{}]\` to \`AnonymousModel[]\`:
-at path "/0/name" value \`undefined\` is not assignable to type: \`string\`.
-at path "/0/quantity" value \`undefined\` is not assignable to type: \`number\`.`
-    )
+    const error = t.throws(() => {
+        types.model({
+            rows: types.optional(types.array(Row), [{}])
+        })
+    }, err => err.message.includes("[mobx-state-tree]") && err.message.includes("AnonymousModel[]") && err.message.includes("/0/name") && err.message.includes("/0/quantity"))
 })
 
 test("it should throw bouncing errors from its sub-type", t => {
@@ -73,8 +68,11 @@ test("it should accept a function to provide dynamic values", t => {
     defaultValue = "hello world!"
     t.throws(
         () => Factory.create(),
-        `[mobx-state-tree] Error while converting \`"hello world!\"\` to \`number\`:
-value \`"hello world!"\` is not assignable to type: \`number\`.`
+        err =>
+            err.message.includes("[mobx-state-tree]") &&
+            err.message.includes("hello world!") &&
+            err.message.includes("not assignable") &&
+            err.message.includes("number")
     )
 })
 

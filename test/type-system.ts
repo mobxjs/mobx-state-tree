@@ -1,5 +1,5 @@
-import { test } from 'ava'
-import { types, getSnapshot, unprotect } from '../src'
+import { test } from "ava"
+import { types, getSnapshot, unprotect } from "../src"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -21,20 +21,20 @@ const createTestFactories = () => {
     return { Box, Square, Cube }
 }
 
-test('it should recognize a valid snapshot', t => {
+test("it should recognize a valid snapshot", t => {
     const { Box } = createTestFactories()
 
     t.deepEqual(Box.is({ width: 1, height: 2 }), true)
     t.deepEqual(Box.is({ width: 1, height: 2, depth: 3 }), true)
 })
 
-test('it should recognize an invalid snapshot', t => {
+test("it should recognize an invalid snapshot", t => {
     const { Box } = createTestFactories()
 
-    t.deepEqual(Box.is({ width: '1', height: '2' }), false)
+    t.deepEqual(Box.is({ width: "1", height: "2" }), false)
 })
 
-test('it should check valid nodes as well', t => {
+test("it should check valid nodes as well", t => {
     const { Box } = createTestFactories()
 
     const doc = Box.create()
@@ -42,7 +42,7 @@ test('it should check valid nodes as well', t => {
     t.deepEqual(Box.is(doc), true)
 })
 
-test('it should check invalid nodes as well', t => {
+test("it should check invalid nodes as well", t => {
     const { Box } = createTestFactories()
 
     const doc = Box.create()
@@ -50,13 +50,13 @@ test('it should check invalid nodes as well', t => {
     t.deepEqual(types.model({ anotherAttr: types.number }).is(doc), false)
 })
 
-test('it should do typescript type inference correctly', t => {
+test("it should do typescript type inference correctly", t => {
     const A = types.model(
         {
             x: types.number,
             y: types.maybe(types.string),
             get z(): string {
-                return 'hi'
+                return "hi"
             },
             set z(v: string) {}
         },
@@ -70,7 +70,7 @@ test('it should do typescript type inference correctly', t => {
     )
 
     // factory is invokable
-    const a = A.create({ x: 2, y: '7' })
+    const a = A.create({ x: 2, y: "7" })
     unprotect(a)
 
     // property can be used as proper type
@@ -103,14 +103,14 @@ test('it should do typescript type inference correctly', t => {
     a.y = null
 
     const zz: string = a.z
-    a.z = 'test'
+    a.z = "test"
 
     b.sub.method()
 
     t.is(true, true) // supress no asserts warning
 })
 
-test('#66 - it should accept superfluous fields', t => {
+test("#66 - it should accept superfluous fields", t => {
     const Item = types.model({
         id: types.number,
         name: types.string
@@ -118,70 +118,73 @@ test('#66 - it should accept superfluous fields', t => {
 
     t.is(Item.is({}), false)
     t.is(Item.is({ id: 3 }), false)
-    t.is(Item.is({ id: 3, name: '' }), true)
-    t.is(Item.is({ id: 3, name: '', description: '' }), true)
+    t.is(Item.is({ id: 3, name: "" }), true)
+    t.is(Item.is({ id: 3, name: "", description: "" }), true)
 
-    const a = Item.create({ id: 3, name: '', description: 'bla' } as any)
+    const a = Item.create({ id: 3, name: "", description: "bla" } as any)
     t.is((a as any).description, undefined)
 })
 
-test('#66 - it should not require defaulted fields', t => {
+test("#66 - it should not require defaulted fields", t => {
     const Item = types.model({
         id: types.number,
-        name: types.optional(types.string, 'boo')
+        name: types.optional(types.string, "boo")
     })
 
     t.is(Item.is({}), false)
     t.is(Item.is({ id: 3 }), true)
-    t.is(Item.is({ id: 3, name: '' }), true)
-    t.is(Item.is({ id: 3, name: '', description: '' }), true)
+    t.is(Item.is({ id: 3, name: "" }), true)
+    t.is(Item.is({ id: 3, name: "", description: "" }), true)
 
-    const a = Item.create({ id: 3, description: 'bla' } as any)
+    const a = Item.create({ id: 3, description: "bla" } as any)
     t.is((a as any).description, undefined)
-    t.is(a.name, 'boo')
+    t.is(a.name, "boo")
 })
 
-test('#66 - it should be possible to omit defaulted fields', t => {
+test("#66 - it should be possible to omit defaulted fields", t => {
     const Item = types.model({
         id: types.number,
-        name: 'boo'
+        name: "boo"
     })
 
     t.is(Item.is({}), false)
     t.is(Item.is({ id: 3 }), true)
-    t.is(Item.is({ id: 3, name: '' }), true)
-    t.is(Item.is({ id: 3, name: '', description: '' }), true)
+    t.is(Item.is({ id: 3, name: "" }), true)
+    t.is(Item.is({ id: 3, name: "", description: "" }), true)
 
-    const a = Item.create({ id: 3, description: 'bla' } as any)
+    const a = Item.create({ id: 3, description: "bla" } as any)
     t.is((a as any).description, undefined)
-    t.is(a.name, 'boo')
+    t.is(a.name, "boo")
 })
 
-test('#66 - it should pick the correct type of defaulted fields', t => {
+test("#66 - it should pick the correct type of defaulted fields", t => {
     const Item = types.model({
         id: types.number,
-        name: 'boo'
+        name: "boo"
     })
 
     const a = Item.create({ id: 3 })
     unprotect(a)
 
-    t.is(a.name, 'boo')
+    t.is(a.name, "boo")
     t.throws(
         () => (a.name = 3 as any),
-        `[mobx-state-tree] Error while converting \`3\` to \`string\`:
-value \`3\` is not assignable to type: \`string\`.`
+        err =>
+            err.message.includes("[mobx-state-tree]") &&
+            err.message.includes("3") &&
+            err.message.includes("string") &&
+            err.message.includes("not assignable")
     )
 })
 
-test('cannot create factories with null values', t => {
+test("cannot create factories with null values", t => {
     t.throws(
         () => types.model({ x: null }),
         /The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe\(someType\)`?/
     )
 })
 
-test('can create factories with maybe primitives', t => {
+test("can create factories with maybe primitives", t => {
     const F = types.model({
         x: types.maybe(types.string)
     })
@@ -189,16 +192,16 @@ test('can create factories with maybe primitives', t => {
     t.is(F.is(undefined as any), false)
     t.is(F.is({}), true)
     t.is(F.is({ x: null }), true)
-    t.is(F.is({ x: 'test' }), true)
+    t.is(F.is({ x: "test" }), true)
     t.is(F.is({ x: 3 }), false)
 
     t.is(F.create().x, null)
     t.is(F.create({ x: undefined }).x, null)
-    t.is(F.create({ x: '' }).x, '')
-    t.is(F.create({ x: '3' }).x, '3')
+    t.is(F.create({ x: "" }).x, "")
+    t.is(F.create({ x: "3" }).x, "3")
 })
 
-test('it is possible to refer to a type', t => {
+test("it is possible to refer to a type", t => {
     const Todo = types.model(
         {
             title: types.string
@@ -209,20 +212,20 @@ test('it is possible to refer to a type', t => {
     )
 
     function x(): typeof Todo.Type {
-        return Todo.create({ title: 'test' }) as any // as any to make sure the type is not inferred accidentally
+        return Todo.create({ title: "test" }) as any // as any to make sure the type is not inferred accidentally
     }
 
     const z = x()
     unprotect(z)
 
-    z.setTitle('bla')
-    z.title = 'bla'
+    z.setTitle("bla")
+    z.title = "bla"
     // z.title = 3 // Test manual: should give compile error
 
     t.is(true, true) // supress no asserts warning
 })
 
-test('.Type should not be callable', t => {
+test(".Type should not be callable", t => {
     const Todo = types.model(
         {
             title: types.string
@@ -235,7 +238,7 @@ test('.Type should not be callable', t => {
     t.throws(() => Todo.Type)
 })
 
-test('.SnapshotType should not be callable', t => {
+test(".SnapshotType should not be callable", t => {
     const Todo = types.model(
         {
             title: types.string
@@ -248,22 +251,22 @@ test('.SnapshotType should not be callable', t => {
     t.throws(() => Todo.SnapshotType)
 })
 
-test('types instances with compatible snapshots should not be interchangeable', t => {
+test("types instances with compatible snapshots should not be interchangeable", t => {
     const A = types.model(
-        'A',
+        "A",
         {},
         {
             doA() {}
         }
     )
     const B = types.model(
-        'B',
+        "B",
         {},
         {
             doB() {}
         }
     )
-    const C = types.model('C', {
+    const C = types.model("C", {
         x: types.maybe(A)
     })
 
@@ -289,7 +292,7 @@ test('types instances with compatible snapshots should not be interchangeable', 
     }, /value of type B: <B@<root>> is not assignable to type: `A | null`/)
 })
 
-test('it handles complex types correctly', t => {
+test("it handles complex types correctly", t => {
     const Todo = types.model(
         {
             title: types.string
@@ -321,7 +324,7 @@ test('it handles complex types correctly', t => {
     t.is(true, true) // supress no asserts warning
 })
 
-test('it should provide detailed reasons why the value is not appicable', t => {
+test("it should provide detailed reasons why the value is not appicable", t => {
     const Todo = types.model(
         {
             title: types.string
@@ -332,6 +335,7 @@ test('it should provide detailed reasons why the value is not appicable', t => {
     )
 
     const Store = types.model(
+        "StoreTest",
         {
             todos: types.map(Todo),
             get amount() {
@@ -354,23 +358,28 @@ test('it should provide detailed reasons why the value is not appicable', t => {
         () =>
             Store.create({
                 todos: {
-                    '1': {
+                    "1": {
                         title: true,
-                        setTitle: 'hello'
+                        setTitle: "hello"
                     }
                 },
                 amount: 1,
-                getAmount: 'hello'
+                getAmount: "hello"
             }),
-        `[mobx-state-tree] Error while converting \`{"todos":{"1":{"title":true,"setTitle":"hello"}},"amount":1,"getAmount":"hello"}\` to \`AnonymousModel\`:
-at path "/todos/1/title" value \`true\` is not assignable to type: \`string\`.
-at path "/todos/1/setTitle" value \`"hello"\` is not assignable  (Action properties should not be provided in the snapshot).
-at path "/amount" value \`1\` is not assignable  (Computed properties should not be provided in the snapshot).
-at path "/getAmount" value \`"hello"\` is not assignable  (View properties should not be provided in the snapshot).`
+        err =>
+            err.message.includes("[mobx-state-tree]") &&
+            err.message.includes("StoreTest") &&
+            err.message.includes("/todos/1/title") &&
+            err.message.includes("/todos/1/setTitle") &&
+            err.message.includes("/amount") &&
+            err.message.includes("/getAmount") &&
+            err.message.toLowerCase().includes("action properties") &&
+            err.message.toLowerCase().includes("computed properties") &&
+            err.message.toLowerCase().includes("view properties")
     )
 })
 
-test('it should type compose correctly', t => {
+test("it should type compose correctly", t => {
     const Car = types.model(
         {
             wheels: 3
@@ -386,7 +395,7 @@ test('it should type compose correctly', t => {
 
     const Logger = types.model(
         {
-            logNode: 'test'
+            logNode: "test"
         },
         {
             log(msg: string) {}
@@ -394,17 +403,17 @@ test('it should type compose correctly', t => {
     )
 
     const LoggableCar = types.compose(Car, Logger)
-    const x = LoggableCar.create({ wheels: 3, logNode: 'test' /* compile error: x: 7  */ })
+    const x = LoggableCar.create({ wheels: 3, logNode: "test" /* compile error: x: 7  */ })
 
     //x.test() // compile error
     x.drive()
-    x.log('z')
+    x.log("z")
     x.connection.then(() => {})
 
     t.pass()
 })
 
-test('it should extend types correctly', t => {
+test("it should extend types correctly", t => {
     const Car = types.model(
         {
             wheels: 3
@@ -415,10 +424,10 @@ test('it should extend types correctly', t => {
     )
 
     const LoggableCar = types.compose(
-        'LoggableCar',
+        "LoggableCar",
         Car,
         {
-            logNode: 'test'
+            logNode: "test"
         },
         { connection: (null as any) as Promise<any> },
         {
@@ -428,11 +437,11 @@ test('it should extend types correctly', t => {
             }
         }
     )
-    const x = LoggableCar.create({ wheels: 3, logNode: 'test' /* compile error: x: 7  */ })
+    const x = LoggableCar.create({ wheels: 3, logNode: "test" /* compile error: x: 7  */ })
 
     // x.test() // compile error
     x.drive()
-    x.log('z')
+    x.log("z")
     x.connection.then(() => {})
 
     t.pass()

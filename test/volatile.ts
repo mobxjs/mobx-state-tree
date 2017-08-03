@@ -13,14 +13,17 @@ test("it should support volatiles", t => {
     )
     t.is(Todo.create().y, 7)
     t.is(Todo.is({ x: 3, y: 2 }), false)
-    t.throws(() => Todo.create({ y: 2 } as any), /volatile state should not be provided in the snapshot/)
+    t.throws(
+        () => Todo.create({ y: 2 } as any),
+        /volatile state should not be provided in the snapshot/i
+    )
     const x = Todo.create()
     t.throws(
         () =>
             applySnapshot(x, {
                 y: 3
             }),
-        /volatile state should not be provided in the snapshot/
+        /volatile state should not be provided in the snapshot/i
     )
     unprotect(x)
     x.y = 7
@@ -31,7 +34,10 @@ test("it should support volatiles", t => {
 })
 
 test("should warn about non primitive props should survive reconciliation", t => {
-    t.throws(() => types.model({ id: types.identifier() }, { buf: {} }, {}), /Please provide an initializer/)
+    t.throws(
+        () => types.model({ id: types.identifier() }, { buf: {} }, {}),
+        /Please provide an initializer/
+    )
 })
 
 test("volatiles should survive reconciliation", t => {
