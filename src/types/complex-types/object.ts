@@ -15,7 +15,7 @@ import {
     EMPTY_ARRAY,
     addHiddenFinalProp
 } from "../../utils"
-import { ComplexType, IComplexType, IType } from "../type"
+import { ComplexType, IComplexType, IType, ISnapshottable } from "../type"
 import { TypeFlags, isType, isObjectType } from "../type-flags"
 import {
     createNode,
@@ -332,7 +332,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     }
 }
 
-export interface IModelType<S, T> extends IType<S, T> {
+export interface IModelType<S, T> extends IComplexType<S, T> {
     named(newName: string): IModelType<S, T>
     props<SP, TP>(
         props: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
@@ -353,11 +353,11 @@ export function model<T = {}, S = {}, A = {}>(
     name: string,
     properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
     operations?: A & ThisType<IStateTreeNode & T & A & S>
-): IModelType<T & IStateTreeNode, S & A>
+): IModelType<Snapshot<T>, T & S & A & IStateTreeNode>
 export function model<T = {}, S = {}, A = {}>(
     properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
     operations?: A & ThisType<IStateTreeNode & T & A & S>
-): IModelType<T & IStateTreeNode, S & A>
+): IModelType<Snapshot<T>, T & S & A & IStateTreeNode>
 /**
  * Creates a new model type by providing a name, properties, volatile state and actions.
  *
