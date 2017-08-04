@@ -1,5 +1,6 @@
 import { start } from "./timer"
-import { createTreasure, createHeros, createMonsters, Treasure, Hero, Monster } from "../fixtures"
+import { Treasure, Hero, Monster } from "../fixtures/fixture-models"
+import { createTreasure, createHeros, createMonsters } from "../fixtures/fixture-data"
 
 export interface IScenario {
     /** The number of records. */

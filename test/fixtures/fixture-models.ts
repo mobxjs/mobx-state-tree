@@ -30,7 +30,7 @@ export const Monster = types.model("Monster", {
     warning: types.maybe(types.string),
     createdAt: types.maybe(types.Date),
     treasures: types.optional(types.array(Treasure), []),
-    eatenHeros: types.maybe(types.array(Hero)),
+    eatenHeroes: types.maybe(types.array(Hero)),
     hasFangs: types.optional(types.boolean, false),
     hasClaws: types.optional(types.boolean, false),
     hasWings: types.optional(types.boolean, false),
@@ -49,11 +49,11 @@ export const Monster = types.model("Monster", {
     },
 
     get isFlashingRed() {
-        return this.isAlive() && this.hp < this.maxHp && this.hp === 1
+        return this.isAlive && this.hp < this.maxHp && this.hp === 1
     },
 
     get weight() {
-        const victimWeight = this.eatenHeros ? this.eatenHeros.length : 0
+        const victimWeight = this.eatenHeroes ? this.eatenHeroes.length : 0
         const fangWeight = this.hasFangs ? 10 : 5
         const wingWeight = this.hasWings ? 12 : 4
 

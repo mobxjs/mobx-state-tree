@@ -19,7 +19,7 @@ export function createTreasure(count: number) {
 }
 
 // why yes i DID graduate high school, why do you ask?
-const rando = () => (Math.random() > 0.5 ? 1 : 0)
+export const rando = () => (Math.random() > 0.5 ? 1 : 0)
 
 const titles = ["Sir", "Lady", "Baron von", "Baroness", "Captain", "Dread", "Fancy"].sort(rando)
 const givenNames = ["Abe", "Beth", "Chuck", "Dora", "Ernie", "Fran", "Gary", "Haily"].sort(rando)
@@ -64,15 +64,15 @@ export function createHeros(count: number) {
  * @param treasureCount The number of small children to create.
  * @param heroCount The number of medium children to create.
  */
-export function createMonsters(count: number, treasureCount: number = 0, heroCount: number = 0) {
+export function createMonsters(count: number, treasureCount: number, heroCount: number) {
     const data: any[] = []
     let i = 0
     let even = true
     do {
         const treasures = createTreasure(treasureCount)
-        const eatenHeros = createHeros(heroCount)
+        const eatenHeroes = createHeros(heroCount)
         data.push({
-            id: `omg-${i}-run!!!`,
+            id: `omg-${i}-run!`,
             freestyle: `${wtf} ${wtf} ${wtf}${wtf} ${wtf} ${wtf}`,
             level: count % 100 + 1,
             hp: i % 2 === 0 ? 1 : 5 * i,
@@ -91,7 +91,7 @@ export function createMonsters(count: number, treasureCount: number = 0, heroCou
             fearsThieves: !even,
             stenchLevel: i % 5,
             treasures,
-            eatenHeros
+            eatenHeroes
         })
         even = !even
         i++
