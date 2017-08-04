@@ -1,6 +1,5 @@
 import { getSnapshot, IJsonPatch, IType, unprotect, recordPatches, types } from "../src"
 import { test, TestContext, Context } from "ava"
-
 function testPatches<T extends IType<any, any>>(
     t: TestContext & Context<any>,
     type: T,
@@ -22,7 +21,6 @@ function testPatches<T extends IType<any, any>>(
         getSnapshot(instance),
         "reapplying patches didn't result in same clone"
     )
-
     recorder.undo()
     t.deepEqual(
         getSnapshot(instance),
@@ -30,13 +28,11 @@ function testPatches<T extends IType<any, any>>(
         "reverting the patches didn't result in the same snapshot"
     )
 }
-
 const Node = types.model("Node", {
     id: types.identifier(types.number),
     text: "Hi",
     children: types.optional(types.array(types.late(() => Node)), [])
 })
-
 test("it should apply simple patch", t => {
     testPatches(
         t,
@@ -54,7 +50,6 @@ test("it should apply simple patch", t => {
         ]
     )
 })
-
 test("it should apply deep patches to arrays", t => {
     testPatches(
         t,
@@ -103,7 +98,6 @@ test("it should apply deep patches to arrays", t => {
         ]
     )
 })
-
 test("it should apply deep patches to arrays with object instances", t => {
     testPatches(
         t,
@@ -141,7 +135,6 @@ test("it should apply deep patches to arrays with object instances", t => {
         ]
     )
 })
-
 test("it should apply non flat patches", t => {
     testPatches(
         t,
@@ -177,7 +170,6 @@ test("it should apply non flat patches", t => {
         ]
     )
 })
-
 test("it should apply non flat patches with object instances", t => {
     testPatches(
         t,
@@ -210,7 +202,6 @@ test("it should apply non flat patches with object instances", t => {
         ]
     )
 })
-
 test("it should apply deep patches to arrays", t => {
     const NodeMap = types.model("NodeMap", {
         id: types.identifier(types.number),
@@ -283,7 +274,6 @@ test("it should apply deep patches to arrays", t => {
         ]
     )
 })
-
 test("it should apply deep patches to objects", t => {
     const NodeObject = types.model("NodeObject", {
         id: types.identifier(types.number),
