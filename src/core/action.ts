@@ -62,7 +62,8 @@ export function createActionInvoker(
         node.assertAlive()
         if (node.isRunningAction()) {
             // an action is already running in this tree, invoking this action does not emit a new action
-            return action.apply(target, arguments)
+            // Use null as fail fast against accidentally using 'this'
+            return action.apply(null, arguments)
         } else {
             // outer action, run middlewares and start the action!
             const call: IRawActionCall = {

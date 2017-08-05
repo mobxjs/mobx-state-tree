@@ -5,7 +5,8 @@ import {
     IObjectWillChange,
     intercept,
     observe,
-    computed
+    computed,
+    isComputed
 } from "mobx"
 import {
     fail,
@@ -94,6 +95,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A> {
         const actionInitializer = (self: T) => {
             const actions = fn(self)
+            // todo assert plain object
             if (actions && isPlainObject(actions)) {
                 Object.keys(actions).forEach(name => {
                     addHiddenFinalProp(self, name, createActionInvoker(self, name, actions[name]))
@@ -125,19 +127,30 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     views<V extends Object>(fn: (self: T) => V): IModelType<S, T & V> {
         const viewInitializer = (self: T) => {
             const views = fn(self)
+            // TODO: check view return
 
             Object.keys(views).forEach(key => {
                 // is this a computed property?
                 const descriptor = Object.getOwnPropertyDescriptor(views, key)
                 const { value } = descriptor
                 if ("get" in descriptor) {
-                    const tmp = {}
-                    Object.defineProperty(tmp, key, {
-                        get: descriptor.get,
-                        set: descriptor.set,
-                        enumerable: true
-                    })
-                    extendShallowObservable(self, tmp)
+                    // TODO: mobx currently does not allow redefining computes yet, pending #1121
+                    if (isComputed((self as any).$mobx.values[key])) {
+                        // TODO: use `isComputed(self, key)`, pending mobx #1120
+                        ;(self as any).$mobx.values[key] = computed(descriptor.get!, {
+                            name: key,
+                            setter: descriptor.set,
+                            context: self
+                        })
+                    } else {
+                        const tmp = {}
+                        Object.defineProperty(tmp, key, {
+                            get: descriptor.get,
+                            set: descriptor.set,
+                            enumerable: true
+                        })
+                        extendShallowObservable(self, tmp)
+                    }
                 } else if (typeof value === "function") {
                     // this is a view function, merge as is!
                     addHiddenFinalProp(self, key, value)
