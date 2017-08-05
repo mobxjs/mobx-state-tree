@@ -1,53 +1,56 @@
 import { addDisposer, destroy, detach, types, unprotect, getSnapshot, applySnapshot } from "../src"
 import { test } from "ava"
-
 function createTestStore(listener) {
-    const Todo = types.model(
-        "Todo",
-        {
+    const Todo = types
+        .model("Todo", {
             title: ""
-        },
-        {
-            afterCreate() {
-                listener("new todo: " + this.title)
-                addDisposer(this, () => {
-                    listener("custom disposer 1 for " + this.title)
+        })
+        .actions(self => {
+            function afterCreate() {
+                listener("new todo: " + self.title)
+                addDisposer(self, () => {
+                    listener("custom disposer 1 for " + self.title)
                 })
-                addDisposer(this, () => {
-                    listener("custom disposer 2 for " + this.title)
+                addDisposer(self, () => {
+                    listener("custom disposer 2 for " + self.title)
                 })
-            },
-            beforeDestroy() {
-                listener("destroy todo: " + this.title)
-            },
-            afterAttach() {
-                listener("attach todo: " + this.title)
-            },
-            beforeDetach() {
-                listener("detach todo: " + this.title)
             }
-        }
-    )
-
-    const Store = types.model(
-        "Store",
-        {
+            function beforeDestroy() {
+                listener("destroy todo: " + self.title)
+            }
+            function afterAttach() {
+                listener("attach todo: " + self.title)
+            }
+            function beforeDetach() {
+                listener("detach todo: " + self.title)
+            }
+            return {
+                afterCreate,
+                beforeDestroy,
+                afterAttach,
+                beforeDetach
+            }
+        })
+    const Store = types
+        .model("Store", {
             todos: types.array(Todo)
-        },
-        {
-            afterCreate() {
-                unprotect(this)
-                listener("new store: " + this.todos.length)
-                addDisposer(this, () => {
+        })
+        .actions(self => {
+            function afterCreate() {
+                unprotect(self)
+                listener("new store: " + self.todos.length)
+                addDisposer(self, () => {
                     listener("custom disposer for store")
                 })
-            },
-            beforeDestroy() {
-                listener("destroy store: " + this.todos.length)
             }
-        }
-    )
-
+            function beforeDestroy() {
+                listener("destroy store: " + self.todos.length)
+            }
+            return {
+                afterCreate,
+                beforeDestroy
+            }
+        })
     return {
         store: Store.create({
             todos: [{ title: "Get coffee" }, { title: "Get biscuit" }, { title: "Give talk" }]
@@ -56,11 +59,9 @@ function createTestStore(listener) {
         Todo
     }
 }
-
 test("it should trigger lifecycle hooks", t => {
     const events: string[] = []
     const { store, Todo } = createTestStore(e => events.push(e))
-
     const talk = detach(store.todos[2])
     events.push("-")
     store.todos.pop()
@@ -70,7 +71,6 @@ test("it should trigger lifecycle hooks", t => {
     events.push("---")
     destroy(store)
     destroy(talk)
-
     t.deepEqual(events, [
         "new todo: Get coffee",
         "attach todo: Get coffee",
@@ -101,57 +101,53 @@ test("it should trigger lifecycle hooks", t => {
         "destroy todo: Give talk"
     ])
 })
-
-const Car = types.model(
-    {
+const Car = types
+    .model({
         id: types.number
-    },
-    {
-        preProcessSnapshot(snapshot) {
+    })
+    .actions(self => {
+        // TODO: Move to a separate type
+        function preProcessSnapshot(snapshot) {
             return { ...snapshot, id: parseInt(snapshot.id) * 2 }
-        },
-        postProcessSnapshot(snapshot) {
+        }
+        function postProcessSnapshot(snapshot) {
             return { ...snapshot, id: "" + snapshot.id / 2 }
         }
-    }
-)
-
+        return {
+            preProcessSnapshot,
+            postProcessSnapshot
+        }
+    })
 const Factory = types.model({
     car: Car
 })
-
 test("it should preprocess snapshots when creating", t => {
     const car = Car.create({ id: "1" })
     t.is(car.id, 2)
 })
-
 test("it should preprocess snapshots when updating", t => {
     const car = Car.create({ id: "1" })
     t.is(car.id, 2)
     applySnapshot(car, { id: "6" })
     t.is(car.id, 12)
 })
-
 test("it should postprocess snapshots when generating snapshot", t => {
     const car = Car.create({ id: "1" })
     t.is(car.id, 2)
     t.deepEqual(getSnapshot(car), { id: "1" })
 })
-
 test("it should preprocess snapshots when creating as property type", t => {
     const f = Factory.create({
         car: { id: "1" }
     })
     t.is(f.car.id, 2)
 })
-
 test("it should preprocess snapshots when updating", t => {
     const f = Factory.create({ car: { id: "1" } })
     t.is(f.car.id, 2)
     applySnapshot(f, { car: { id: "6" } })
     t.is(f.car.id, 12)
 })
-
 test("it should postprocess snapshots when generating snapshot", t => {
     const f = Factory.create({ car: { id: "1" } })
     t.is(f.car.id, 2)

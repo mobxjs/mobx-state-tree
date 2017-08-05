@@ -7,7 +7,6 @@ import {
 } from "../src"
 import { test, CallbackTestContext, Context } from "ava"
 import { reaction } from "mobx"
-
 function delay<T>(time: number, value: T, shouldThrow = false): Promise<T> {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -16,7 +15,6 @@ function delay<T>(time: number, value: T, shouldThrow = false): Promise<T> {
         }, time)
     })
 }
-
 function testCoffeeTodo(
     t: CallbackTestContext & Context<any>,
     generator,
@@ -25,34 +23,24 @@ function testCoffeeTodo(
     producedCoffees: string[],
     expectedEvents: any[]
 ) {
-    const Todo = types.model(
-        {
-            title: "get coffee"
-        },
-        {
-            fetchData: generator
-        }
-    )
-
+    const Todo = types.model({
+        title: "get coffee"
+    })
     const events: any[] = []
     const coffees: string[] = []
     const t1 = Todo.create({})
     unprotect(t1)
-
     addMiddleware(t1, (c, next) => {
         events.push(c)
         return next(c)
     })
-
     reaction(() => t1.title, coffee => coffees.push(coffee))
-
     function handleResult(res) {
         t.is(res, resultValue)
         t.deepEqual(coffees, producedCoffees)
         t.deepEqual(filterRelevantStuff(events), expectedEvents)
         t.end()
     }
-
     t1.fetchData("black").then(
         r => {
             t.is(shouldError, false, "Ended up in OK handler")
@@ -64,7 +52,6 @@ function testCoffeeTodo(
         }
     )
 }
-
 test.cb("can handle async actions", t => {
     testCoffeeTodo(
         t,
@@ -98,7 +85,6 @@ test.cb("can handle async actions", t => {
         ]
     )
 })
-
 test.cb("can handle erroring actions", t => {
     testCoffeeTodo(
         t,
@@ -124,7 +110,6 @@ test.cb("can handle erroring actions", t => {
         ]
     )
 })
-
 test.cb("can handle try catch", t => {
     testCoffeeTodo(
         t,
@@ -161,7 +146,6 @@ test.cb("can handle try catch", t => {
         ]
     )
 })
-
 test.cb("empty sequence works", t => {
     testCoffeeTodo(
         t,
@@ -185,7 +169,6 @@ test.cb("empty sequence works", t => {
         ]
     )
 })
-
 test.cb("can handle throw from yielded promise works", t => {
     testCoffeeTodo(
         t,
@@ -203,7 +186,7 @@ test.cb("can handle throw from yielded promise works", t => {
                 name: "fetchData"
             },
             {
-                args: ["x"], // note, exceptions are yielded back to the generator first
+                args: ["x"],
                 asyncId: 5,
                 asyncMode: "yieldError",
                 name: "fetchData"
@@ -217,7 +200,6 @@ test.cb("can handle throw from yielded promise works", t => {
         ]
     )
 })
-
 test.cb.skip("'async' works", t => {
     testCoffeeTodo(
         t,
@@ -249,82 +231,70 @@ test.cb.skip("'async' works", t => {
         ]
     )
 })
-
 test.cb("typings", t => {
-    const M = types.model(
-        {
+    const M = types
+        .model({
             title: types.string
-        },
-        {
-            *a(x: string) {
+        })
+        .actions(self => {
+            function* a(x: string) {
                 yield delay(10, "x", false)
-                this.title = "7"
+                self.title = "7"
                 return 23
-            },
-            b /* See: #273: async*/: function*(this: any, y: string) {
-                yield delay(10, "x", false)
-                this.title = "zoom" // TODO: saddly this is still 'any'...
-                return 24
             }
-        }
-    )
-
+            return {
+                a
+            }
+        })
     const m1 = M.create({ title: "test " })
     const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
     const resB = m1.b("z") // Arg typings are correct, TODO: Result is correctly promise, but incorrect generic arg
-
     Promise.all([resA, resB]).then(([x1, x2]) => {
         t.is(x1, 23)
         t.is(x2, 24)
         t.end()
     })
 })
-
 test.cb("typings", t => {
-    const M = types.model(
-        {
+    const M = types
+        .model({
             title: types.string
-        },
-        {
-            *a(x: string) {
+        })
+        .actions(self => {
+            function* a(x: string) {
                 yield delay(10, "x", false)
-                this.title = "7"
+                self.title = "7"
                 return 23
-            },
-            b /*async TODO: see #273 */: function*(this: any, y: string) {
-                yield delay(10, "x", false)
-                this.title = "zoom" // TODO: saddly this is still 'any'...
-                return 24
             }
-        }
-    )
-
+            return {
+                a
+            }
+        })
     const m1 = M.create({ title: "test " })
     const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
     const resB = m1.b("z") // Arg typings are correct, TODO: Result is correctly promise, but incorrect generic arg
-
     Promise.all([resA, resB]).then(([x1, x2]) => {
         t.is(x1, 23)
         t.is(x2, 24)
         t.end()
     })
 })
-
 test.cb("recordActions should only emit invocation", t => {
     let calls = 0
-    const M = types.model(
-        {
+    const M = types
+        .model({
             title: types.string
-        },
-        {
-            *a(x: string) {
+        })
+        .actions(self => {
+            function* a(x: string) {
                 yield delay(10, "x", false)
                 calls++
                 return 23
             }
-        }
-    )
-
+            return {
+                a
+            }
+        })
     const m1 = M.create({ title: "test " })
     const recorder = recordActions(m1)
     m1.a("x").then(() => {
@@ -344,7 +314,6 @@ test.cb("recordActions should only emit invocation", t => {
         }, 50)
     })
 })
-
 function filterRelevantStuff(stuff: any): any {
     return stuff.map(x => {
         delete x.object
