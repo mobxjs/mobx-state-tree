@@ -1,5 +1,6 @@
 import { types } from "../src"
 import { test } from "ava"
+
 test("It should warn when using types.maybe(types.frozen)", t => {
     t.throws(
         () => types.maybe(types.frozen),

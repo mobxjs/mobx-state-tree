@@ -12,6 +12,7 @@ export function LateTodo1() {
         done: types.boolean
     })
 }
+
 test("circular test 1 should work", t => {
     const Store1 = types.late(LateStore1)
     const Store2 = types.late(LateStore2)

@@ -20,6 +20,7 @@ function createTestStore() {
         todos: [{ title: "Get coffee" }, { title: "Get biscuit" }]
     })
 }
+
 test("it should be possible to protect an object", t => {
     const store = createTestStore()
     unprotect(store)
@@ -33,6 +34,7 @@ test("it should be possible to protect an object", t => {
     store.todos[0].setTitle("B")
     t.is(store.todos[0].title, "B")
 })
+
 test("protect should protect against any update", t => {
     const store = createTestStore()
     t.notThrows(
@@ -49,6 +51,7 @@ test("protect should protect against any update", t => {
         store.todos[0].title = "test"
     }, "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action.")
 })
+
 test("protect should also protect children", t => {
     const store = createTestStore()
     t.throws(() => {
@@ -57,6 +60,7 @@ test("protect should also protect children", t => {
     store.todos[0].setTitle("B")
     t.is(store.todos[0].title, "B")
 })
+
 test("unprotected mode should be lost when attaching children", t => {
     const store = Store.create({ todos: [] })
     const t1 = Todo.create({ title: "hello" })
@@ -75,6 +79,7 @@ test("unprotected mode should be lost when attaching children", t => {
     store.todos[0].setTitle("C")
     t.is(store.todos[0].title, "C")
 })
+
 test("protected mode should be inherited when attaching children", t => {
     const store = Store.create({ todos: [] })
     unprotect(store)

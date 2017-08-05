@@ -89,6 +89,7 @@ function createStore() {
         selection: "aa"
     })
 }
+
 test("store is deserialized correctly", t => {
     const s = createStore()
     t.is(s.boxes.size, 2)
@@ -98,6 +99,7 @@ test("store is deserialized correctly", t => {
     t.is(s.arrows[0].to!.name, "Bratislava")
     t.deepEqual(s.boxes.values().map(b => b.isSelected), [false, true])
 })
+
 test("store emits correct patch paths", t => {
     const s = createStore()
     const recorder1 = recordPatches(s)
@@ -112,6 +114,7 @@ test("store emits correct patch paths", t => {
     ])
     t.deepEqual(recorder3.cleanPatches, [{ op: "replace", path: "/x", value: 217 } as IJsonPatch])
 })
+
 test("box operations works correctly", t => {
     const s = createStore()
     s.createBox("a", "A", 0, 0, null, null)

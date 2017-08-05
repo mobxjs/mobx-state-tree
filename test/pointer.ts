@@ -9,6 +9,7 @@ const Todo = types.model({
     id: types.identifier(),
     name: types.string
 })
+
 test("it should allow array of pointer objects", t => {
     const AppStore = types.model({
         todos: types.array(Todo),
@@ -23,6 +24,7 @@ test("it should allow array of pointer objects", t => {
     store.selected.push(ref)
     t.is<any>(store.selected[0].value, store.todos[0])
 })
+
 test("it should allow array of pointer objects - 2", t => {
     const AppStore = types.model({
         todos: types.array(Todo),
@@ -38,6 +40,7 @@ test("it should allow array of pointer objects - 2", t => {
     ref.value = store.todos[0] as any
     t.is<any>(store.selected[0].value, store.todos[0])
 })
+
 test("it should allow array of pointer objects - 3", t => {
     const AppStore = types.model({
         todos: types.array(Todo),
@@ -52,6 +55,7 @@ test("it should allow array of pointer objects - 3", t => {
     store.selected.push(ref)
     t.is<any>(store.selected[0].value, store.todos[0])
 })
+
 test("it should allow array of pointer objects - 4", t => {
     const AppStore = types.model({
         todos: types.array(Todo),

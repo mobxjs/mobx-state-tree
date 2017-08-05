@@ -1,5 +1,6 @@
 import { getSnapshot, types } from "../src"
 import { test } from "ava"
+
 test("it should allow if type and predicate is correct", t => {
     const Factory = types.model({
         number: types.refinement(
@@ -11,6 +12,7 @@ test("it should allow if type and predicate is correct", t => {
     const doc = Factory.create({ number: 42 })
     t.deepEqual<any>(getSnapshot(doc), { number: 42 })
 })
+
 test("it should throw if a correct type with failing predicate is given", t => {
     const Factory = types.model({
         number: types.refinement(

@@ -76,6 +76,7 @@ const createTestFactories = () => {
     return { Factory, ComputedFactory, ComputedFactory2, BoxFactory, ColorFactory }
 }
 // === FACTORY TESTS ===
+
 test("it should create a factory", t => {
     const { Factory } = createTestFactories()
     const instance = Factory.create()
@@ -84,11 +85,13 @@ test("it should create a factory", t => {
     t.deepEqual((Factory.create() as any).toJSON(), { to: "world" }) // toJSON is there as shortcut for getSnapshot(), primarily for debugging convenience
     t.deepEqual(Factory.create().toString(), "AnonymousModel@<root>")
 })
+
 test("it should restore the state from the snapshot", t => {
     const { Factory } = createTestFactories()
     t.deepEqual(getSnapshot(Factory.create({ to: "universe" })), { to: "universe" })
 })
 // === SNAPSHOT TESTS ===
+
 test("it should emit snapshots", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -98,12 +101,14 @@ test("it should emit snapshots", t => {
     doc.to = "universe"
     t.deepEqual(snapshots, [{ to: "universe" }])
 })
+
 test("it should apply snapshots", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     applySnapshot(doc, { to: "universe" })
     t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
+
 test("it should apply and accept null value for types.maybe(complexType)", t => {
     const Item = types.model({
         value: types.string
@@ -116,12 +121,14 @@ test("it should apply and accept null value for types.maybe(complexType)", t => 
     applySnapshot(myModel, { item: null })
     t.deepEqual(getSnapshot(myModel), { item: null })
 })
+
 test("it should return a snapshot", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     t.deepEqual(getSnapshot(doc), { to: "world" })
 })
 // === PATCHES TESTS ===
+
 test("it should emit patches", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -131,12 +138,14 @@ test("it should emit patches", t => {
     doc.to = "universe"
     t.deepEqual(patches, [{ op: "replace", path: "/to", value: "universe" }])
 })
+
 test("it should apply a patch", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     applyPatch(doc, { op: "replace", path: "/to", value: "universe" })
     t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
+
 test("it should apply patches", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -146,6 +155,7 @@ test("it should apply patches", t => {
     ])
     t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
+
 test("it should stop listening to patches patches", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -158,12 +168,14 @@ test("it should stop listening to patches patches", t => {
     t.deepEqual(patches, [{ op: "replace", path: "/to", value: "universe" }])
 })
 // === ACTIONS TESTS ===
+
 test("it should call actions correctly", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     doc.setTo("universe")
     t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
+
 test("it should emit action calls", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -172,12 +184,14 @@ test("it should emit action calls", t => {
     doc.setTo("universe")
     t.deepEqual(actions, [{ name: "setTo", path: "", args: ["universe"] }])
 })
+
 test("it should apply action call", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     applyAction(doc, { name: "setTo", path: "", args: ["universe"] })
     t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
+
 test("it should apply actions calls", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -188,6 +202,7 @@ test("it should apply actions calls", t => {
     t.deepEqual(getSnapshot(doc), { to: "universe" })
 })
 // === COMPUTED VALUES ===
+
 test("it should have computed properties", t => {
     const { ComputedFactory } = createTestFactories()
     const doc = ComputedFactory.create()
@@ -196,12 +211,14 @@ test("it should have computed properties", t => {
     doc.height = 2
     t.deepEqual(doc.area, 6)
 })
+
 test("it should throw if snapshot has computed properties", t => {
     const { ComputedFactory } = createTestFactories()
     const error = t.throws(() => {
         const doc = ComputedFactory.create({ area: 3 })
     }, `[mobx-state-tree] Error while converting \`{\"area\":3}\` to \`AnonymousModel\`:\nat path \"/area\" value \`3\` is not assignable  (Computed properties should not be provided in the snapshot).`)
 })
+
 test("it should throw if a replaced object is read or written to", t => {
     const Todo = types
         .model({
@@ -236,11 +253,13 @@ test("it should throw if a replaced object is read or written to", t => {
     }, err)
 })
 // === COMPOSE FACTORY ===
+
 test("it should compose factories", t => {
     const { BoxFactory, ColorFactory } = createTestFactories()
     const ComposedFactory = types.compose(BoxFactory, ColorFactory.properties, ColorFactory.actions)
     t.deepEqual(getSnapshot(ComposedFactory.create()), { width: 0, height: 0, color: "#FFFFFF" })
 })
+
 test("it should compose factories with computed properties", t => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
     const ComposedFactory = types.compose(
@@ -254,6 +273,7 @@ test("it should compose factories with computed properties", t => {
     t.is(typeof store.setWidth, "function")
     t.is(typeof store.setHeight, "function")
 })
+
 test("it should compose multiple types with computed properties", t => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
     const ComposedFactory = types.compose(ColorFactory, ComputedFactory2)
@@ -263,6 +283,7 @@ test("it should compose multiple types with computed properties", t => {
     t.is(typeof store.setWidth, "function")
     t.is(typeof store.setHeight, "function")
 })
+
 test("methods get overridden by compose", t => {
     const A = types
         .model({
@@ -291,6 +312,7 @@ test("methods get overridden by compose", t => {
     store.increment()
     t.is(store.count, 10)
 })
+
 test("compose should add new props", t => {
     const A = types.model({
         count: types.optional(types.number, 0)
@@ -302,6 +324,7 @@ test("compose should add new props", t => {
     t.deepEqual(getSnapshot(store), { count: 0, called: 0 })
     t.is(store.count, 0)
 })
+
 test("models should expose their actions to be used in a composable way", t => {
     const A = types
         .model({
@@ -334,6 +357,7 @@ test("models should expose their actions to be used in a composable way", t => {
     t.is(store.count, 1)
     t.is(store.called, 1)
 })
+
 test("compose should be overwrite", t => {
     const A = types
         .model({
@@ -359,6 +383,7 @@ test("compose should be overwrite", t => {
     t.is(storeC.displayName, "nameCtypeC")
 })
 // === TYPE CHECKS ===
+
 test("it should check the type correctly", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -369,6 +394,7 @@ test("it should check the type correctly", t => {
     t.deepEqual(Factory.is({ wrongKey: true }), true)
     t.deepEqual(Factory.is({ to: 3 }), false)
 })
+
 test("it should require complex fields to be present", t => {
     t.is(
         types
@@ -417,6 +443,7 @@ test("it should require complex fields to be present", t => {
     )
 })
 // === VIEW FUNCTIONS ===
+
 test("view functions should be tracked", t => {
     const model = types
         .model({
@@ -436,6 +463,7 @@ test("view functions should be tracked", t => {
     model.x = 7
     t.deepEqual(values, [6, 14])
 })
+
 test("view functions should not be allowed to change state", t => {
     const model = types
         .model({
@@ -459,6 +487,7 @@ test("view functions should not be allowed to change state", t => {
     model.anotherDoubler()
     t.is(model.x, 6)
 })
+
 test("it should consider primitives as proposed defaults", t => {
     const now = new Date()
     const Todo = types.model({
@@ -475,6 +504,7 @@ test("it should consider primitives as proposed defaults", t => {
         createdAt: now.getTime()
     })
 })
+
 test("it should throw if a non-primitive value is provided and no default can be created", t => {
     t.throws(() => {
         const Todo = types.model({
@@ -485,6 +515,7 @@ test("it should throw if a non-primitive value is provided and no default can be
         })
     })
 })
+
 test("it should not be possible to remove a node from a parent if it is required, see ", t => {
     const A = types.model("A", {
         x: 3

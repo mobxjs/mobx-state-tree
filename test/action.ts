@@ -15,12 +15,14 @@ const Task = types
             toggle
         }
     })
+
 test("it should be possible to invoke a simple action", t => {
     const t1 = Task.create()
     t.is(t1.done, false)
     t.is(t1.toggle(), true)
     t.is(t1.done, true)
 })
+
 test("it should be possible to record & replay a simple action", t => {
     const t1 = Task.create()
     const t2 = Task.create()
@@ -38,6 +40,7 @@ test("it should be possible to record & replay a simple action", t => {
     recorder.replay(t2)
     t.is(t2.done, true)
 })
+
 test("applying patches should be recordable and replayable", t => {
     const t1 = Task.create()
     const t2 = Task.create()
@@ -55,6 +58,7 @@ test("applying patches should be recordable and replayable", t => {
     recorder.replay(t2)
     t.is(t2.done, true)
 })
+
 test("applying snapshots should be recordable and replayable", t => {
     const t1 = Task.create()
     const t2 = Task.create()
@@ -105,6 +109,7 @@ function createTestStore() {
     onAction(store, () => {})
     return store
 }
+
 test("it should be possible to pass a complex object", t => {
     const store = createTestStore()
     const recorder = recordActions(store)
@@ -133,6 +138,7 @@ test("it should be possible to pass a complex object", t => {
     t.is(store2.orders[0].customer, store2.customers[0])
     t.deepEqual(getSnapshot(store2), getSnapshot(store))
 })
+
 test("it should not be possible to set the wrong type", t => {
     const store = createTestStore()
     t.throws(
@@ -143,6 +149,7 @@ test("it should not be possible to set the wrong type", t => {
             "value of type Order: <Order@/orders/0> is not assignable to type: `reference(Customer) | null`, expected an instance of `reference(Customer) | null` or a snapshot like `(reference(Customer) | null?)` instead."
     )
 })
+
 test("it should not be possible to pass the element of another tree", t => {
     const store1 = createTestStore()
     const store2 = createTestStore()
@@ -150,6 +157,7 @@ test("it should not be possible to pass the element of another tree", t => {
         store1.orders[0].setCustomer(store2.customers[0])
     }, "Argument 0 that was passed to action 'setCustomer' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead")
 })
+
 test("it should not be possible to pass an unserializable object", t => {
     const store = createTestStore()
     const circular = { a: null as any }
@@ -163,6 +171,7 @@ test("it should not be possible to pass an unserializable object", t => {
         "Argument 0 that was passed to action 'setCustomer' should be a primitive, model object or plain object, received a Buffer"
     )
 })
+
 test("it should be possible to pass a complex plain object", t => {
     const t1 = Task.create()
     const t2 = Task.create()
@@ -174,11 +183,13 @@ test("it should be possible to pass a complex plain object", t => {
     recorder.replay(t2)
     t.is(t2.done, true)
 })
+
 test("action should be bound", t => {
     const task = Task.create()
     const f = task.toggle
     t.is(f(), true)
 })
+
 test("snapshot should be available and updated during an action", t => {
     const Model = types
         .model({

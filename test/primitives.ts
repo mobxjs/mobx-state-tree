@@ -1,5 +1,6 @@
 import { types, applySnapshot, getSnapshot } from "../src"
 import { test } from "ava"
+
 test("Date instance can be reused", t => {
     const Model = types.model({
         a: types.model({
@@ -34,6 +35,7 @@ test("Date instance can be reused", t => {
     t.is(instance.one.c, object.c)
     t.is(instance.index[0].c, object.c)
 })
+
 test("Date can be rehydrated using unix timestamp", t => {
     const time = new Date()
     const newTime = 6813823163

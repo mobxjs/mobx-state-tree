@@ -1,5 +1,6 @@
 import { getSnapshot, applySnapshot, unprotect, types } from "../src"
 import { test } from "ava"
+
 test("it should avoid processing patch if is exactly the current one in applySnapshot", t => {
     let called = false
     const Model = types.model({
@@ -12,6 +13,7 @@ test("it should avoid processing patch if is exactly the current one in applySna
     applySnapshot(store, snapshot)
     t.is(getSnapshot(store), snapshot) // no new snapshot emitted
 })
+
 test("it should avoid processing patch if is exactly the current one in reconcile", t => {
     const Model = types.model({
         a: types.number,

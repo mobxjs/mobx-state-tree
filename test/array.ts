@@ -29,14 +29,17 @@ const createTestFactories = () => {
     return { Factory, ItemFactory }
 }
 // === FACTORY TESTS ===
+
 test("it should create a factory", t => {
     const { Factory } = createTestFactories()
     t.deepEqual(getSnapshot(Factory.create()), [])
 })
+
 test("it should succeed if not optional and no default provided", t => {
     const Factory = types.array(types.string)
     t.deepEqual((Factory.create() as any).toJSON(), [])
 })
+
 test("it should restore the state from the snapshot", t => {
     const { Factory } = createTestFactories()
     const instance = Factory.create([{ to: "universe" }])
@@ -44,6 +47,7 @@ test("it should restore the state from the snapshot", t => {
     t.is("" + instance, "AnonymousModel[]@<root>(1 items)")
 })
 // === SNAPSHOT TESTS ===
+
 test("it should emit snapshots", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -53,12 +57,14 @@ test("it should emit snapshots", t => {
     doc.push(ItemFactory.create())
     t.deepEqual(snapshots, [[{ to: "world" }]])
 })
+
 test("it should apply snapshots", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     applySnapshot(doc, [{ to: "universe" }])
     t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
 })
+
 test("it should return a snapshot", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -67,6 +73,7 @@ test("it should return a snapshot", t => {
     t.deepEqual(getSnapshot(doc), [{ to: "world" }])
 })
 // === PATCHES TESTS ===
+
 test("it should emit add patches", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -76,12 +83,14 @@ test("it should emit add patches", t => {
     doc.push(ItemFactory.create({ to: "universe" }))
     t.deepEqual(patches, [{ op: "add", path: "/0", value: { to: "universe" } }])
 })
+
 test("it should apply a add patch", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     applyPatch(doc, { op: "add", path: "/0", value: { to: "universe" } })
     t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
 })
+
 test("it should emit update patches", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -92,12 +101,14 @@ test("it should emit update patches", t => {
     doc[0] = ItemFactory.create({ to: "universe" })
     t.deepEqual(patches, [{ op: "replace", path: "/0", value: { to: "universe" } }])
 })
+
 test("it should apply a update patch", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     applyPatch(doc, { op: "replace", path: "/0", value: { to: "universe" } })
     t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
 })
+
 test("it should emit remove patches", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -108,6 +119,7 @@ test("it should emit remove patches", t => {
     doc.splice(0)
     t.deepEqual(patches, [{ op: "remove", path: "/0" }])
 })
+
 test("it should apply a remove patch", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -117,6 +129,7 @@ test("it should apply a remove patch", t => {
     applyPatch(doc, { op: "remove", path: "/0" })
     t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
 })
+
 test("it should apply patches", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -127,6 +140,7 @@ test("it should apply patches", t => {
     t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
 })
 // === TYPE CHECKS ===
+
 test("it should check the type correctly", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -137,6 +151,7 @@ test("it should check the type correctly", t => {
     t.deepEqual(Factory.is([{ wrongKey: true }]), true)
     t.deepEqual(Factory.is([{ to: true }]), false)
 })
+
 test("paths shoud remain correct when splicing", t => {
     const store = types
         .model({
@@ -162,6 +177,7 @@ test("paths shoud remain correct when splicing", t => {
     store.todos.remove(store.todos[1])
     t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1"])
 })
+
 test("items should be reconciled correctly when splicing - 1", t => {
     const Task = types.model("Task", {
         x: types.string
@@ -196,6 +212,7 @@ test("items should be reconciled correctly when splicing - 1", t => {
     store.todos.splice(0, 1, clone(a), clone(c), clone(d))
     t.deepEqual(store.todos.map(_ => _.x), ["a", "c", "d"])
 })
+
 test("items should be reconciled correctly when splicing - 2", t => {
     const Task = types.model("Task", {
         x: types.string
@@ -240,6 +257,7 @@ test("items should be reconciled correctly when splicing - 2", t => {
     t.true(store.todos[2] === d) // still original d
     t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2"])
 })
+
 test("it should reconciliate keyed instances correctly", t => {
     const Store = types.model({
         todos: types.optional(
@@ -281,6 +299,7 @@ test("it should reconciliate keyed instances correctly", t => {
     t.is(store.todos[1] === coffee, true)
     t.is(store.todos[2] === biscuit, false)
 })
+
 test("it correctly reconciliate when swapping", t => {
     const Task = types.model("Task", {})
     const Store = types.model({
@@ -296,6 +315,7 @@ test("it correctly reconciliate when swapping", t => {
     t.true(s.todos[1] === a)
     t.deepEqual(s.todos.map(getPath), ["/todos/0", "/todos/1"])
 })
+
 test("it should not be allowed to add the same item twice to the same store", t => {
     const Task = types.model("Task", {})
     const Store = types.model({
@@ -313,6 +333,7 @@ test("it should not be allowed to add the same item twice to the same store", t 
         s.todos.push(b, b)
     }, "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/2', but it lives already at '/todos/1'")
 })
+
 test("it should support observable arrays", t => {
     const TestArray = types.array(types.number)
     const testArray = TestArray.create(observable([1, 2]))

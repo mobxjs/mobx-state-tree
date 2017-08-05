@@ -12,6 +12,7 @@ import {
     getRoot
 } from "../src"
 import { test } from "ava"
+
 test("it should support prefixed paths in maps", t => {
     const User = types.model({
         id: types.identifier(),
@@ -44,6 +45,7 @@ test("it should support prefixed paths in maps", t => {
         } as any
     ) // TODO: better typings
 })
+
 test("it should support prefixed paths in arrays", t => {
     const User = types.model({
         id: types.identifier(),
@@ -70,6 +72,7 @@ test("it should support prefixed paths in arrays", t => {
         { user: "18", users: [{ id: "17", name: "Michel" }, { id: "18", name: "Noa" }] } as any
     ) // TODO: better typings
 })
+
 test("identifiers are required", t => {
     const Todo = types.model({
         id: types.identifier()
@@ -82,6 +85,7 @@ test("identifiers are required", t => {
             'at path "/id" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
     )
 })
+
 test("identifiers cannot be modified", t => {
     const Todo = types.model({
         id: types.identifier()
@@ -97,6 +101,7 @@ test("identifiers cannot be modified", t => {
         "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
     )
 })
+
 test("it should resolve refs during creation, when using path", t => {
     const values: number[] = []
     const Book = types.model({
@@ -130,6 +135,7 @@ test("it should resolve refs during creation, when using path", t => {
     t.is(s.entries.reduce((a, e) => a + e.price, 0), 8)
     t.deepEqual(values, [4, 8])
 })
+
 test("it should resolve refs over late types", t => {
     const Book = types.model({
         id: types.identifier(),
@@ -156,6 +162,7 @@ test("it should resolve refs over late types", t => {
     t.is(s.entries[0].price, 4)
     t.is(s.entries.reduce((a, e) => a + e.price, 0), 4)
 })
+
 test("it should resolve refs during creation, when using generic reference", t => {
     const values: number[] = []
     const Book = types.model({
@@ -188,6 +195,7 @@ test("it should resolve refs during creation, when using generic reference", t =
     s.entries.push(entry)
     t.deepEqual(values, [4, 8])
 })
+
 test("identifiers should only support types.string and types.number", t => {
     t.throws(() =>
         types
@@ -197,6 +205,7 @@ test("identifiers should only support types.string and types.number", t => {
             .create({ id: {} })
     )
 })
+
 test("identifiers should support subtypes of types.string and types.number", t => {
     debugger
     const M = types.model({
@@ -207,6 +216,7 @@ test("identifiers should support subtypes of types.string and types.number", t =
     t.is(M.is({ id: 6 }), true)
     t.is(M.is({ id: 4 }), false)
 })
+
 test("string identifiers should not accept numbers", t => {
     const F = types.model({
         id: types.identifier()
@@ -219,6 +229,7 @@ test("string identifiers should not accept numbers", t => {
     t.is(F2.is({ id: "4" }), true)
     t.is(F2.is({ id: 4 }), false)
 })
+
 test("122 - identifiers should support numbers as well", t => {
     const F = types.model({
         id: types.identifier(types.number)
@@ -232,6 +243,7 @@ test("122 - identifiers should support numbers as well", t => {
     t.is(F.is({ id: 4 }), true)
     t.is(F.is({ id: "4" }), false)
 })
+
 test("self reference with a late type", t => {
     interface IBook {
         id: string
@@ -266,6 +278,7 @@ test("self reference with a late type", t => {
     s.addBook(book2)
     t.is((s as any).books[1].reference.genre, "thriller")
 })
+
 test("when applying a snapshot, reference should resolve correctly if value added after", t => {
     const Box = types.model({
         id: types.identifier(types.number),
@@ -282,6 +295,7 @@ test("when applying a snapshot, reference should resolve correctly if value adde
         })
     )
 })
+
 test("it should fail when reference snapshot is ambiguous", t => {
     const Box = types.model("Box", {
         id: types.identifier(types.number),
@@ -318,6 +332,7 @@ test("it should fail when reference snapshot is ambiguous", t => {
         "[mobx-state-tree] Cannot resolve a reference to type 'Arrow | Box' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
     )
 })
+
 test("it should support array of references", t => {
     const Box = types.model({
         id: types.identifier(types.number),
@@ -341,6 +356,7 @@ test("it should support array of references", t => {
     })
     t.deepEqual<any>(getSnapshot(store.selected), [1, 2])
 })
+
 test("it should restore array of references from snapshot", t => {
     const Box = types.model({
         id: types.identifier(types.number),
@@ -358,6 +374,7 @@ test("it should restore array of references from snapshot", t => {
     t.deepEqual<any>(store.selected[0] === store.boxes[0], true)
     t.deepEqual<any>(store.selected[1] === store.boxes[1], true)
 })
+
 test("it should support map of references", t => {
     const Box = types.model({
         id: types.identifier(types.number),
@@ -381,6 +398,7 @@ test("it should support map of references", t => {
     })
     t.deepEqual<any>(getSnapshot(store.selected), { from: 1, to: 2 })
 })
+
 test("it should restore map of references from snapshot", t => {
     const Box = types.model({
         id: types.identifier(types.number),
@@ -398,6 +416,7 @@ test("it should restore map of references from snapshot", t => {
     t.deepEqual<any>(store.selected.get("from") === store.boxes[0], true)
     t.deepEqual<any>(store.selected.get("to") === store.boxes[1], true)
 })
+
 test("it should support relative lookups", t => {
     const Node = types.model({
         id: types.identifier(types.number),
@@ -441,6 +460,7 @@ test("it should support relative lookups", t => {
     t.is(resolveIdentifier(Node, n5, 4), n2.children[0])
     t.is(resolveIdentifier(Node, n2.children[0], 5), n5)
 })
+
 test("References are non-nullable by default", t => {
     const Todo = types.model({
         id: types.identifier(types.number)
@@ -487,6 +507,7 @@ test("References are non-nullable by default", t => {
         "[mobx-state-tree] Error while converting `null` to `reference(AnonymousModel)`:\nvalue `null` is not assignable to type: `reference(AnonymousModel)` (Value '`null`' is not a valid reference. Expected a string or number.), expected an instance of `reference(AnonymousModel)` or a snapshot like `reference(AnonymousModel)` instead."
     )
 })
+
 test("References are described properly", t => {
     const Todo = types.model({
         id: types.identifier(types.number)
@@ -501,6 +522,7 @@ test("References are described properly", t => {
         "{ todo: ({ id: identifier(number) } | null?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | null?) }"
     )
 })
+
 test("References in recursive structures", t => {
     const Folder = types.model("Folder", {
         id: types.identifier(),
@@ -581,6 +603,7 @@ test("References in recursive structures", t => {
     t.is(store.objects.get("1"), store.tree.children[0].data)
     t.is(store.objects.get("2"), store.tree.children[0].children[0].data)
 })
+
 test("it should applyPatch references in array", t => {
     const Item = types.model("Item", {
         id: types.identifier(),
@@ -639,6 +662,7 @@ test("it should applyPatch references in array", t => {
         hovers: []
     })
 })
+
 test("it should applySnapshot references in array", t => {
     const Item = types.model("Item", {
         id: types.identifier(),

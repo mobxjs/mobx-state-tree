@@ -1,5 +1,6 @@
 import { test } from "ava"
 import { getSnapshot, types, unprotect } from "../src"
+
 test("it should provide a default value, if no snapshot is provided", t => {
     const Row = types.model({
         name: "",
@@ -11,6 +12,7 @@ test("it should provide a default value, if no snapshot is provided", t => {
     const doc = Factory.create()
     t.deepEqual<any>(getSnapshot(doc), { rows: [{ name: "test", quantity: 0 }] })
 })
+
 test("it should use the snapshot if provided", t => {
     const Row = types.model({
         name: "",
@@ -22,6 +24,7 @@ test("it should use the snapshot if provided", t => {
     const doc = Factory.create({ rows: [{ name: "snapshot", quantity: 0 }] })
     t.deepEqual<any>(getSnapshot(doc), { rows: [{ name: "snapshot", quantity: 0 }] })
 })
+
 test("it should throw if default value is invalid snapshot", t => {
     const Row = types.model({
         name: types.string,
@@ -33,6 +36,7 @@ test("it should throw if default value is invalid snapshot", t => {
         })
     })
 })
+
 test("it should throw bouncing errors from its sub-type", t => {
     const Row = types.model({
         name: types.string,
@@ -43,6 +47,7 @@ test("it should throw bouncing errors from its sub-type", t => {
         RowList.create([{ name: "a", quantity: 1 }, { name: "b", quantity: "x" }])
     })
 })
+
 test("it should accept a function to provide dynamic values", t => {
     let defaultValue: any = 1
     const Factory = types.model({
@@ -58,6 +63,7 @@ test("it should accept a function to provide dynamic values", t => {
         'hello world!"` to `number`:\nvalue `"hello world!"` is not assignable to type: `number`.`);'
     )
 })
+
 test("Values should reset to default if omitted in snapshot", t => {
     const Store = types.model({
         todo: types.model({
@@ -74,6 +80,7 @@ test("Values should reset to default if omitted in snapshot", t => {
     t.is(store.todo.title, "stuff")
     t.is(store.todo.done, false)
 })
+
 test("a model is a valid default value, snapshot will be used", t => {
     const Row = types.model({
         name: "",

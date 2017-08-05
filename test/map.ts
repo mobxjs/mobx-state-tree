@@ -27,15 +27,18 @@ const createTestFactories = () => {
     return { Factory, ItemFactory, PrimitiveMapFactory }
 }
 // === FACTORY TESTS ===
+
 test("it should create a factory", t => {
     const { Factory } = createTestFactories()
     const snapshot = getSnapshot(Factory.create())
     t.deepEqual(snapshot, {})
 })
+
 test("it should succeed if not optional and no default provided", t => {
     const Factory = types.map(types.string)
     t.deepEqual(Factory.create().toJSON(), {})
 })
+
 test("it should restore the state from the snapshot", t => {
     const { Factory } = createTestFactories()
     const instance = Factory.create({ hello: { to: "world" } })
@@ -43,6 +46,7 @@ test("it should restore the state from the snapshot", t => {
     t.is("" + instance, "map<string, AnonymousModel>@<root>(1 items)")
 })
 // === SNAPSHOT TESTS ===
+
 test("it should emit snapshots", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -52,12 +56,14 @@ test("it should emit snapshots", t => {
     doc.set("hello", ItemFactory.create())
     t.deepEqual(snapshots, [{ hello: { to: "world" } }])
 })
+
 test("it should apply snapshots", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     applySnapshot(doc, { hello: { to: "universe" } })
     t.deepEqual<any>(getSnapshot(doc), { hello: { to: "universe" } })
 })
+
 test("it should return a snapshot", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -65,6 +71,7 @@ test("it should return a snapshot", t => {
     doc.set("hello", ItemFactory.create())
     t.deepEqual<any>(getSnapshot(doc), { hello: { to: "world" } })
 })
+
 test("it should be the same each time", t => {
     const { PrimitiveMapFactory } = createTestFactories()
     const data = {
@@ -80,6 +87,7 @@ test("it should be the same each time", t => {
     t.deepEqual<any>(getSnapshot(doc), data)
 })
 // === PATCHES TESTS ===
+
 test("it should emit add patches", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -89,12 +97,14 @@ test("it should emit add patches", t => {
     doc.set("hello", ItemFactory.create({ to: "universe" }))
     t.deepEqual(patches, [{ op: "add", path: "/hello", value: { to: "universe" } }])
 })
+
 test("it should apply a add patch", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     applyPatch(doc, { op: "add", path: "/hello", value: { to: "universe" } })
     t.deepEqual<any>(getSnapshot(doc), { hello: { to: "universe" } })
 })
+
 test("it should emit update patches", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -105,6 +115,7 @@ test("it should emit update patches", t => {
     doc.set("hello", ItemFactory.create({ to: "universe" }))
     t.deepEqual(patches, [{ op: "replace", path: "/hello", value: { to: "universe" } }])
 })
+
 test("it should apply a update patch", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -112,6 +123,7 @@ test("it should apply a update patch", t => {
     applyPatch(doc, { op: "replace", path: "/hello", value: { to: "universe" } })
     t.deepEqual<any>(getSnapshot(doc), { hello: { to: "universe" } })
 })
+
 test("it should emit remove patches", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -122,6 +134,7 @@ test("it should emit remove patches", t => {
     doc.delete("hello")
     t.deepEqual(patches, [{ op: "remove", path: "/hello" }])
 })
+
 test("it should apply a remove patch", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -130,6 +143,7 @@ test("it should apply a remove patch", t => {
     applyPatch(doc, { op: "remove", path: "/hello" })
     t.deepEqual(getSnapshot(doc), {})
 })
+
 test("it should apply patches", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
@@ -140,6 +154,7 @@ test("it should apply patches", t => {
     t.deepEqual<any>(getSnapshot(doc), { hello: { to: "universe" } })
 })
 // === TYPE CHECKS ===
+
 test("it should check the type correctly", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -150,6 +165,7 @@ test("it should check the type correctly", t => {
     t.deepEqual(Factory.is({ hello: { wrongKey: true } }), true)
     t.deepEqual(Factory.is({ hello: { to: true } }), false)
 })
+
 test("it should support identifiers", t => {
     const Store = types.model({
         todos: types.optional(
@@ -176,6 +192,7 @@ test("it should support identifiers", t => {
         "[mobx-state-tree] A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '18', but expected: '17'"
     )
 })
+
 test("#184 - types.map().get(key) should not throw if key doesnt exists", t => {
     const { Factory } = createTestFactories()
     const doc = Factory.create({
@@ -187,6 +204,7 @@ test("#184 - types.map().get(key) should not throw if key doesnt exists", t => {
         doc.get("notexistingkey")
     })
 })
+
 test("#192 - put should not throw when identifier is a number", t => {
     const Todo = types.model("Todo", {
         todo_id: types.identifier(types.number),
@@ -218,6 +236,7 @@ test("#192 - put should not throw when identifier is a number", t => {
         })
     }, `[mobx-state-tree] Error while converting \`{\"todo_id\":\"1\",\"title\":\"Test\"}\` to \`Todo\`:\nat path \"/todo_id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\`, expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`)
 })
+
 test("#192 - map should not mess up keys when putting twice", t => {
     const Todo = types.model("Todo", {
         todo_id: types.identifier(types.number),
@@ -247,6 +266,7 @@ test("#192 - map should not mess up keys when putting twice", t => {
     })
     t.deepEqual(getSnapshot(todoStore.todos), { "1": { todo_id: 1, title: "Test Edited" } })
 })
+
 test("it should not throw when removing a non existing item from a map", t => {
     t.notThrows(() => {
         const AppModel = types

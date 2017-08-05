@@ -17,6 +17,7 @@ function createEnvironment() {
         useUppercase: true
     }
 }
+
 test("it should be possible to use environments", t => {
     const env = createEnvironment()
     const todo = Todo.create({}, env)
@@ -24,6 +25,7 @@ test("it should be possible to use environments", t => {
     env.useUppercase = false
     t.is(todo.description, "test")
 })
+
 test("it should be possible to inherit environments", t => {
     const env = createEnvironment()
     const store = Store.create({ todos: [{}] }, env)
@@ -31,6 +33,7 @@ test("it should be possible to inherit environments", t => {
     env.useUppercase = false
     t.is(store.todos[0].description, "test")
 })
+
 test("getEnv throws in absence of env", t => {
     const todo = Todo.create()
     t.throws(
@@ -38,6 +41,7 @@ test("getEnv throws in absence of env", t => {
         "[mobx-state-tree] Node 'AnonymousModel@<root>' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()"
     )
 })
+
 test("detach should preserve environment", t => {
     const env = createEnvironment()
     const store = Store.create({ todos: [{}] }, env)
@@ -47,6 +51,7 @@ test("detach should preserve environment", t => {
     env.useUppercase = false
     t.is(todo.description, "test")
 })
+
 test("it is not possible to assign instance with environment to a tree", t => {
     const env = createEnvironment()
     const store = Store.create({ todos: [] }, env)
@@ -57,6 +62,7 @@ test("it is not possible to assign instance with environment to a tree", t => {
         "[mobx-state-tree] A state tree that has been initialized with an environment cannot be made part of another state tree."
     )
 })
+
 test("clone preserves environnment", t => {
     const env = createEnvironment()
     const store = Store.create({ todos: [{}] }, env)

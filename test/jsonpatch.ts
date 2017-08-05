@@ -33,6 +33,7 @@ const Node = types.model("Node", {
     text: "Hi",
     children: types.optional(types.array(types.late(() => Node)), [])
 })
+
 test("it should apply simple patch", t => {
     testPatches(
         t,
@@ -50,6 +51,7 @@ test("it should apply simple patch", t => {
         ]
     )
 })
+
 test("it should apply deep patches to arrays", t => {
     testPatches(
         t,
@@ -98,6 +100,7 @@ test("it should apply deep patches to arrays", t => {
         ]
     )
 })
+
 test("it should apply deep patches to arrays with object instances", t => {
     testPatches(
         t,
@@ -135,6 +138,7 @@ test("it should apply deep patches to arrays with object instances", t => {
         ]
     )
 })
+
 test("it should apply non flat patches", t => {
     testPatches(
         t,
@@ -170,6 +174,7 @@ test("it should apply non flat patches", t => {
         ]
     )
 })
+
 test("it should apply non flat patches with object instances", t => {
     testPatches(
         t,
@@ -202,6 +207,7 @@ test("it should apply non flat patches with object instances", t => {
         ]
     )
 })
+
 test("it should apply deep patches to arrays", t => {
     const NodeMap = types.model("NodeMap", {
         id: types.identifier(types.number),
@@ -274,6 +280,7 @@ test("it should apply deep patches to arrays", t => {
         ]
     )
 })
+
 test("it should apply deep patches to objects", t => {
     const NodeObject = types.model("NodeObject", {
         id: types.identifier(types.number),

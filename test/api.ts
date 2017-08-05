@@ -64,12 +64,15 @@ const TYPES = [
     "union",
     "enumeration"
 ]
+
 test("correct api exposed", t => {
     t.deepEqual(Object.keys(mst).sort(), METHODS.sort())
 })
+
 test("correct types exposed", t => {
     t.deepEqual(Object.keys(mst.types).sort(), TYPES.sort())
 })
+
 test("all methods mentioned in readme.md", t => {
     const readme = readFileSync(__dirname + "/../../README.md", "utf8")
     const missing = TYPES.map(type => "types." + type)
@@ -77,6 +80,7 @@ test("all methods mentioned in readme.md", t => {
         .filter(identifier => readme.indexOf("`" + identifier) === -1)
     t.deepEqual(missing, [])
 })
+
 test("all methods mentioned in api.md", t => {
     const apimd = readFileSync(__dirname + "/../../API.md", "utf8")
     const missing = TYPES.map(type => "types." + type)

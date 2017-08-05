@@ -16,20 +16,24 @@ const createTestFactories = () => {
     })
     return { Box, Square, Cube }
 }
+
 test("it should recognize a valid snapshot", t => {
     const { Box } = createTestFactories()
     t.deepEqual(Box.is({ width: 1, height: 2 }), true)
     t.deepEqual(Box.is({ width: 1, height: 2, depth: 3 }), true)
 })
+
 test("it should recognize an invalid snapshot", t => {
     const { Box } = createTestFactories()
     t.deepEqual(Box.is({ width: "1", height: "2" }), false)
 })
+
 test("it should check valid nodes as well", t => {
     const { Box } = createTestFactories()
     const doc = Box.create()
     t.deepEqual(Box.is(doc), true)
 })
+
 test("it should check invalid nodes as well", t => {
     const { Box } = createTestFactories()
     const doc = Box.create()
@@ -42,6 +46,7 @@ test("it should check invalid nodes as well", t => {
         false
     )
 })
+
 test("it should do typescript type inference correctly", t => {
     const A = types
         .model({
@@ -93,6 +98,7 @@ test("it should do typescript type inference correctly", t => {
     b.sub.method()
     t.is(true, true) // supress no asserts warning
 })
+
 test("#66 - it should accept superfluous fields", t => {
     const Item = types.model({
         id: types.number,
@@ -105,6 +111,7 @@ test("#66 - it should accept superfluous fields", t => {
     const a = Item.create({ id: 3, name: "", description: "bla" } as any)
     t.is((a as any).description, undefined)
 })
+
 test("#66 - it should not require defaulted fields", t => {
     const Item = types.model({
         id: types.number,
@@ -118,6 +125,7 @@ test("#66 - it should not require defaulted fields", t => {
     t.is((a as any).description, undefined)
     t.is(a.name, "boo")
 })
+
 test("#66 - it should be possible to omit defaulted fields", t => {
     const Item = types.model({
         id: types.number,
@@ -131,6 +139,7 @@ test("#66 - it should be possible to omit defaulted fields", t => {
     t.is((a as any).description, undefined)
     t.is(a.name, "boo")
 })
+
 test("#66 - it should pick the correct type of defaulted fields", t => {
     const Item = types.model({
         id: types.number,
@@ -144,6 +153,7 @@ test("#66 - it should pick the correct type of defaulted fields", t => {
         `[mobx-state-tree] Error while converting \`3\` to \`string\`:\nvalue \`3\` is not assignable to type: \`string\`.`
     )
 })
+
 test("cannot create factories with null values", t => {
     t.throws(() =>
         types.model({
@@ -151,6 +161,7 @@ test("cannot create factories with null values", t => {
         })
     )
 })
+
 test("can create factories with maybe primitives", t => {
     const F = types.model({
         x: types.maybe(types.string)
@@ -165,6 +176,7 @@ test("can create factories with maybe primitives", t => {
     t.is(F.create({ x: "" }).x, "")
     t.is(F.create({ x: "3" }).x, "3")
 })
+
 test("it is possible to refer to a type", t => {
     const Todo = types
         .model({
@@ -186,6 +198,7 @@ test("it is possible to refer to a type", t => {
     // z.title = 3 // Test manual: should give compile error
     t.is(true, true) // supress no asserts warning
 })
+
 test(".Type should not be callable", t => {
     const Todo = types
         .model({
@@ -199,6 +212,7 @@ test(".Type should not be callable", t => {
         })
     t.throws(() => Todo.Type)
 })
+
 test(".SnapshotType should not be callable", t => {
     const Todo = types
         .model({
@@ -212,6 +226,7 @@ test(".SnapshotType should not be callable", t => {
         })
     t.throws(() => Todo.SnapshotType)
 })
+
 test("types instances with compatible snapshots should not be interchangeable", t => {
     const A = types.model("A", {}).actions(self => {
         function doA() {}
@@ -246,6 +261,7 @@ test("types instances with compatible snapshots should not be interchangeable", 
         c.x = B.create() as any
     })
 })
+
 test("it handles complex types correctly", t => {
     const Todo = types
         .model({
@@ -281,6 +297,7 @@ test("it handles complex types correctly", t => {
         })
     t.is(true, true) // supress no asserts warning
 })
+
 test("it should provide detailed reasons why the value is not appicable", t => {
     const Todo = types
         .model({
@@ -329,6 +346,7 @@ test("it should provide detailed reasons why the value is not appicable", t => {
         `[mobx-state-tree] Error while converting \`{\"todos\":{\"1\":{\"title\":true,\"setTitle\":\"hello\"}},\"amount\":1,\"getAmount\":\"hello\"}\` to \`AnonymousModel\`:\nat path \"/todos/1/title\" value \`true\` is not assignable to type: \`string\`.\nat path \"/todos/1/setTitle\" value \`\"hello\"\` is not assignable  (Action properties should not be provided in the snapshot).\nat path \"/amount\" value \`1\` is not assignable  (Computed properties should not be provided in the snapshot).\nat path \"/getAmount\" value \`\"hello\"\` is not assignable  (View properties should not be provided in the snapshot).`
     )
 })
+
 test("it should type compose correctly", t => {
     const Car = types
         .model({
@@ -363,6 +381,7 @@ test("it should type compose correctly", t => {
     x.connection.then(() => {})
     t.pass()
 })
+
 test("it should extend types correctly", t => {
     const Car = types
         .model({
