@@ -131,16 +131,13 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
                 const descriptor = Object.getOwnPropertyDescriptor(views, key)
                 const { value } = descriptor
                 if ("get" in descriptor) {
-                    Object.defineProperty(
-                        this.modelConstructor.prototype,
-                        key,
-                        computed(this.modelConstructor.prototype, key, {
-                            get: descriptor.get,
-                            set: descriptor.set,
-                            configurable: true,
-                            enumerable: false
-                        }) as any
-                    )
+                    const tmp = {}
+                    Object.defineProperty(tmp, key, {
+                        get: descriptor.get,
+                        set: descriptor.set,
+                        enumerable: true
+                    })
+                    extendShallowObservable(self, tmp)
                 } else if (typeof value === "function") {
                     // this is a view function, merge as is!
                     addHiddenFinalProp(self, key, value)

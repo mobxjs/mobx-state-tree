@@ -59,8 +59,7 @@ test("it should accept a function to provide dynamic values", t => {
     defaultValue = "hello world!"
     t.throws(
         () => Factory.create(),
-        `[mobx-state-tree] Error while converting `,
-        'hello world!"` to `number`:\nvalue `"hello world!"` is not assignable to type: `number`.`);'
+        `[mobx-state-tree] Error while converting \`"hello world!"\` to \`number\`:\nvalue \`"hello world!"\` is not assignable to type: \`number\`.`
     )
 })
 
