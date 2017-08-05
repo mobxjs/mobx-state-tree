@@ -1,13 +1,18 @@
+import {
+    unprotect,
+    types,
+    addMiddleware,
+    recordActions
+    // TODO: export IRawActionCall
+} from "../src"
+import { test, CallbackTestContext, Context } from "ava"
+import { reaction } from "mobx"
+
+test("async should be re-implemented", t => {
+    t.pass()
+})
+
 // TODO: deprecate exporting generators and use async() instead
-// import {
-//     unprotect,
-//     types,
-//     addMiddleware,
-//     recordActions
-//     // TODO: export IRawActionCall
-// } from "../src"
-// import { test, CallbackTestContext, Context } from "ava"
-// import { reaction } from "mobx"
 // function delay<T>(time: number, value: T, shouldThrow = false): Promise<T> {
 //     return new Promise((resolve, reject) => {
 //         setTimeout(() => {

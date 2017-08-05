@@ -456,7 +456,7 @@ test("view functions should be tracked", t => {
     t.deepEqual(values, [6, 14])
 })
 
-test.only("view functions should not be allowed to change state", t => {
+test("view functions should not be allowed to change state", t => {
     const model = types
         .model({
             x: 3

@@ -184,26 +184,13 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     }
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
-        const node = getStateTreeNode(change.object) // TODO: pass node in from object property
-        typecheck(this.properties[change.name], change.newValue)
-        change.newValue = this.properties[change.name].reconcile(
-            node.getChildNode(change.name),
-            change.newValue
-        )
-        return change
+        const node = getStateTreeNode(change.object)
+        node.assertWritable()
+        return this.parsedProperties[change.name].willChange(change)
     }
 
-    didChange(change: IObjectChange) {
-        const node = getStateTreeNode(change.object)
-        node.emitPatch(
-            {
-                op: "replace",
-                path: escapeJsonPath(change.name),
-                value: change.newValue.snapshot,
-                oldValue: change.oldValue ? change.oldValue.snapshot : undefined
-            },
-            node
-        )
+    didChange = (change: IObjectChange) => {
+        this.parsedProperties[change.name].didChange(change)
     }
 
     parseModelProps() {
@@ -275,7 +262,9 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     applySnapshot(node: Node, snapshot: any): void {
         const s = this.preProcessSnapshot(snapshot)
         typecheck(this, s)
-        for (let key in this.props) this.parsedProperties[key].deserialize(node.storedValue, s)
+        this.forAllProps(prop => {
+            prop.deserialize(node.storedValue, s)
+        })
     }
 
     preProcessSnapshot(snapshot: any) {
@@ -303,7 +292,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         }
 
         return flattenTypeErrors(
-            Object.keys(this.props).map(path =>
+            Object.keys(this.parsedProperties).map(path =>
                 this.parsedProperties[path].validate(snapshot, context)
             )
         )
@@ -319,7 +308,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         // optimization: cache
         return (
             "{ " +
-            Object.keys(this.props)
+            Object.keys(this.parsedProperties)
                 .map(key => {
                     const prop = this.parsedProperties[key]
                     return prop instanceof ValueProperty ? key + ": " + prop.type.describe() : ""
