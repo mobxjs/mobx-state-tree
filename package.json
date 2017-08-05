@@ -34,8 +34,8 @@
     "dist/"
   ],
   "devDependencies": {
-    "@types/node": "^8.0.10",
-    "ava": "^0.19.0",
+    "@types/node": "^8.0.19",
+    "ava": "^0.19.1",
     "concat": "^1.0.3",
     "concurrently": "^3.1.0",
     "coveralls": "^2.11.4",
@@ -43,7 +43,7 @@
     "documentation": "^4.0.0-beta9",
     "husky": "^0.13.4",
     "lint-staged": "^3.6.1",
-    "mobx": "^3.1.15",
+    "mobx": "^3.2.2",
     "nyc": "^10.0.0",
     "prettier": "^1.4.4",
     "rollup": "^0.43.0",

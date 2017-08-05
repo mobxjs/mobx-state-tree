@@ -75,10 +75,14 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         this.properties = properties
         this.initializers = initializers ? initializers : EMPTY_ARRAY as any
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
+        this.createModelConstructor()
+    }
+
+    private createModelConstructor() {
         // Fancy trick to get a named constructor
         this.modelConstructor = class {}
         Object.defineProperty(this.modelConstructor, "name", {
-            value: name,
+            value: this.name,
             writable: false
         })
         const proto = this.modelConstructor.prototype
@@ -174,6 +178,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     finalizeNewInstance = (node: Node, snapshot: any) => {
         const instance = node.storedValue as IStateTreeNode
         this.forAllProps(prop => prop.initialize(instance, snapshot))
+        this.initializers.reduce((self, fn) => fn(self), instance)
         intercept(instance, change => this.willChange(change))
         observe(instance, this.didChange)
     }
@@ -205,7 +210,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         const { properties } = this
         for (let key in properties)
             if (hasOwnProperty(properties, key)) {
-                if (HOOK_NAMES.indexOf(key) !== 1)
+                if (HOOK_NAMES.indexOf(key) !== -1)
                     console.warn(
                         `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
                     )
@@ -306,7 +311,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
 
     private forAllProps(fn: (o: Property) => void) {
         // optimization: persists keys or loop more efficiently
-        Object.keys(this.props).forEach(key => fn(this.parsedProperties[key]))
+        Object.keys(this.parsedProperties).forEach(key => fn(this.parsedProperties[key]))
     }
 
     describe() {
@@ -334,14 +339,17 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     }
 }
 
-export interface IModelType<S, T> extends IComplexType<S, T> {
+export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
     named(newName: string): IModelType<S, T>
-    // props<SP, TP>(
-    //     props: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
-    // ): IModelType<S & SP, T & TP>
-    props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
-    views<V extends Object>(fn: (self: T) => V): IModelType<S, T & V>
-    actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A>
+    props<SP, TP>(
+        props: { [K in keyof TP]: IType<any, TP[K]> | TP[K] } &
+            { [K in keyof SP]: IType<SP[K], any> | SP[K] }
+    ): IModelType<S & Snapshot<SP>, T & TP>
+    //props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
+    views<V extends Object>(fn: (self: T & IStateTreeNode) => V): IModelType<S, T & V>
+    actions<A extends { [name: string]: Function }>(
+        fn: (self: T & IStateTreeNode) => A
+    ): IModelType<S, T & A>
 }
 
 export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }
