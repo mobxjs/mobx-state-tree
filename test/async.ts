@@ -23,9 +23,15 @@ function testCoffeeTodo(
     producedCoffees: string[],
     expectedEvents: any[]
 ) {
-    const Todo = types.model({
-        title: "get coffee"
-    })
+    const Todo = types
+        .model({
+            title: "get coffee"
+        })
+        .actions(self => ({
+            fetchData(x) {
+                return generator.call(self, x)
+            }
+        }))
     const events: any[] = []
     const coffees: string[] = []
     const t1 = Todo.create({})

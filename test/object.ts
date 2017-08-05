@@ -51,7 +51,7 @@ const createTestFactories = () => {
         })
         .views(self => ({
             get area() {
-                return self.props.get("width") * self.props.get("height")
+                return self.props.get("width")! * self.props.get("height")!
             }
         }))
         .actions(self => {
@@ -215,7 +215,7 @@ test("it should have computed properties", t => {
 test("it should throw if snapshot has computed properties", t => {
     const { ComputedFactory } = createTestFactories()
     const error = t.throws(() => {
-        const doc = ComputedFactory.create({ area: 3 })
+        const doc = ComputedFactory.create({ area: 3 } as any)
     }, `[mobx-state-tree] Error while converting \`{\"area\":3}\` to \`AnonymousModel\`:\nat path \"/area\" value \`3\` is not assignable  (Computed properties should not be provided in the snapshot).`)
 })
 
@@ -256,17 +256,13 @@ test("it should throw if a replaced object is read or written to", t => {
 
 test("it should compose factories", t => {
     const { BoxFactory, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(BoxFactory, ColorFactory.properties, ColorFactory.actions)
+    const ComposedFactory = types.compose(BoxFactory, ColorFactory)
     t.deepEqual(getSnapshot(ComposedFactory.create()), { width: 0, height: 0, color: "#FFFFFF" })
 })
 
 test("it should compose factories with computed properties", t => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(
-        ColorFactory,
-        ComputedFactory2.properties,
-        ComputedFactory2.actions
-    )
+    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2)
     const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
     t.deepEqual(getSnapshot(store), { props: { width: 100, height: 200 }, color: "#FFFFFF" })
     t.is(store.area, 20000)
@@ -297,15 +293,11 @@ test("methods get overridden by compose", t => {
                 increment
             }
         })
-    const B = types.compose(
-        A,
-        {},
-        {
-            increment() {
-                this.count += 10
-            }
+    const B = A.actions(self => ({
+        increment() {
+            self.count += 10
         }
-    )
+    }))
     const store = B.create()
     t.deepEqual(getSnapshot(store), { count: 0 })
     t.is(store.count, 0)
@@ -317,7 +309,7 @@ test("compose should add new props", t => {
     const A = types.model({
         count: types.optional(types.number, 0)
     })
-    const B = types.compose(A, {
+    const B = A.props({
         called: types.optional(types.number, 0)
     })
     const store = B.create()
@@ -338,18 +330,17 @@ test("models should expose their actions to be used in a composable way", t => {
                 increment
             }
         })
-    const B = types.compose(
-        A,
-        {
-            called: types.optional(types.number, 0)
-        },
-        {
+    const B = A.props({
+        called: types.optional(types.number, 0)
+    }).actions(self => {
+        const baseIncrement = self.increment
+        return {
             increment() {
-                A.actions.increment.apply(this, [])
-                this.called += 1
+                baseIncrement()
+                self.called += 1
             }
         }
-    )
+    })
     const store = B.create()
     t.deepEqual(getSnapshot(store), { count: 0, called: 0 })
     t.is(store.count, 0)
@@ -369,12 +360,13 @@ test("compose should be overwrite", t => {
                 return self.alias || self.name
             }
         }))
-    const B = types.compose(A, {
-        type: "",
+    const B = A.props({
+        type: ""
+    }).views(self => ({
         get displayName() {
-            return this.alias || this.name + this.type
+            return self.alias || self.name + self.type
         }
-    })
+    }))
     const storeA = A.create({ name: "nameA", alias: "aliasA" })
     const storeB = B.create({ name: "nameB", alias: "aliasB", type: "typeB" })
     const storeC = B.create({ name: "nameC", type: "typeC" })

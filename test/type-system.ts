@@ -94,7 +94,8 @@ test("it should do typescript type inference correctly", t => {
     const d: string = b.sub.y!
     a.y = null
     const zz: string = a.z
-    a.z = "test"
+    // Manual test not assignable:
+    // a.z = "test"
     b.sub.method()
     t.is(true, true) // supress no asserts warning
 })
@@ -277,19 +278,22 @@ test("it handles complex types correctly", t => {
         .model({
             todos: types.map(Todo)
         })
-        .views(self => ({
-            get amount() {
-                // double check, not available design time:
-                /// this.setAmount()
+        .views(self => {
+            function getActualAmount() {
                 return self.todos.size
-            },
-            getAmount(): number {
-                return self.todos.size + self.amount
             }
-        }))
+            return {
+                get amount() {
+                    return getActualAmount()
+                },
+                getAmount(): number {
+                    return self.todos.size + getActualAmount()
+                }
+            }
+        })
         .actions(self => {
             function setAmount() {
-                const x: number = self.todos.size + self.amount + self.getAmount
+                const x: number = self.todos.size + self.amount + self.getAmount()
             }
             return {
                 setAmount
@@ -315,17 +319,15 @@ test("it should provide detailed reasons why the value is not appicable", t => {
         })
         .views(self => ({
             get amount() {
-                // double check, not available design time:
-                /// this.setAmount()
                 return self.todos.size
             },
             getAmount(): number {
-                return self.todos.size + self.amount
+                return self.todos.size + self.todos.size
             }
         }))
         .actions(self => {
             function setAmount() {
-                const x: number = self.todos.size + self.amount + self.getAmount
+                const x: number = self.todos.size + self.amount + self.getAmount()
             }
             return {
                 setAmount
@@ -333,16 +335,18 @@ test("it should provide detailed reasons why the value is not appicable", t => {
         })
     t.throws(
         () =>
-            Store.create({
-                todos: {
-                    "1": {
-                        title: true,
-                        setTitle: "hello"
-                    }
-                },
-                amount: 1,
-                getAmount: "hello"
-            }),
+            Store.create(
+                {
+                    todos: {
+                        "1": {
+                            title: true,
+                            setTitle: "hello"
+                        }
+                    },
+                    amount: 1,
+                    getAmount: "hello"
+                } as any
+            ),
         `[mobx-state-tree] Error while converting \`{\"todos\":{\"1\":{\"title\":true,\"setTitle\":\"hello\"}},\"amount\":1,\"getAmount\":\"hello\"}\` to \`AnonymousModel\`:\nat path \"/todos/1/title\" value \`true\` is not assignable to type: \`string\`.\nat path \"/todos/1/setTitle\" value \`\"hello\"\` is not assignable  (Action properties should not be provided in the snapshot).\nat path \"/amount\" value \`1\` is not assignable  (Computed properties should not be provided in the snapshot).\nat path \"/getAmount\" value \`\"hello\"\` is not assignable  (View properties should not be provided in the snapshot).`
     )
 })
@@ -378,7 +382,7 @@ test("it should type compose correctly", t => {
     //x.test() // compile error
     x.drive()
     x.log("z")
-    x.connection.then(() => {})
+    //x.connection.then(() => {}) // compile error
     t.pass()
 })
 
@@ -393,24 +397,24 @@ test("it should extend types correctly", t => {
                 drive
             }
         })
-    const LoggableCar = types.compose(
-        "LoggableCar",
-        Car,
-        {
+    const Logger = types
+        .model("Logger")
+        .props({
             logNode: "test"
-        },
-        { connection: (null as any) as Promise<any> },
-        {
-            log(msg: string) {},
-            afterCreate() {
-                this.connection = Promise.resolve(true)
+        })
+        .actions(self => {
+            let connection: Promise<any>
+            return {
+                log(msg: string) {},
+                afterCreate() {
+                    connection = Promise.resolve(true)
+                }
             }
-        }
-    )
+        })
+    const LoggableCar = types.compose("LoggableCar", Car, Logger)
     const x = LoggableCar.create({ wheels: 3, logNode: "test" /* compile error: x: 7  */ })
     // x.test() // compile error
     x.drive()
     x.log("z")
-    x.connection.then(() => {})
     t.pass()
 })

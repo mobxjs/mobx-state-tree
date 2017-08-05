@@ -30,8 +30,8 @@ export interface IType<S, T> {
 
 export interface ISimpleType<T> extends IType<T, T> {}
 
-export interface IComplexType<S, T> extends IType<S, T> {
-    create(snapshot?: S, environment?: any): T & ISnapshottable<S> & IStateTreeNode
+export interface IComplexType<S, T> extends IType<S, T & IStateTreeNode> {
+    create(snapshot?: S, environment?: any): T & ISnapshottable<S>
 }
 
 /*

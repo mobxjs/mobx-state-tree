@@ -161,6 +161,8 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
             this.createNewInstance,
             this.finalizeNewInstance
         )
+        // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
+        // that pre-reserves all these fields for fast object-member lookups
     }
 
     createNewInstance = () => {
@@ -334,9 +336,10 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
 
 export interface IModelType<S, T> extends IComplexType<S, T> {
     named(newName: string): IModelType<S, T>
-    props<SP, TP>(
-        props: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
-    ): IModelType<S & SP, T & TP>
+    // props<SP, TP>(
+    //     props: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
+    // ): IModelType<S & SP, T & TP>
+    props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
     views<V extends Object>(fn: (self: T) => V): IModelType<S, T & V>
     actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A>
 }
@@ -348,16 +351,11 @@ export type Snapshot<T> = {
     [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
 }
 
-// TODO: add correct types
-export function model<T = {}, S = {}, A = {}>(
+export function model<T = {}>(
     name: string,
-    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
-    operations?: A & ThisType<IStateTreeNode & T & A & S>
-): IModelType<Snapshot<T>, T & S & A & IStateTreeNode>
-export function model<T = {}, S = {}, A = {}>(
-    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
-    operations?: A & ThisType<IStateTreeNode & T & A & S>
-): IModelType<Snapshot<T>, T & S & A & IStateTreeNode>
+    properties?: IModelProperties<T>
+): IModelType<Snapshot<T>, T>
+export function model<T = {}>(properties?: IModelProperties<T>): IModelType<Snapshot<T>, T>
 /**
  * Creates a new model type by providing a name, properties, volatile state and actions.
  *
@@ -368,35 +366,21 @@ export function model<T = {}, S = {}, A = {}>(
  */
 export function model(...args: any[]) {
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
-    const props = args.shift() || fail("types.model must specify properties")
-    const volatileState = (args.length > 1 && args.shift()) || {}
-    if (Object.keys(volatileState).length > 0)
-        return fail(
-            "calling model and declaring volatile state is no longer supported, please move to the new model syntax"
-        )
-    const actions = args.shift() || {}
-    if (Object.keys(actions).length > 0)
-        console.warn(
-            "The syntax model(name?, props, actions) is deprecated. use model(name?, props).actions(self => actions) instead."
-        )
-    return new ObjectType(name, props, [
-        () => {
-            return actions
-        }
-    ])
+    const props = args.shift() || {}
+    return new ObjectType(name, props, [])
 }
 
 export function compose<T1, S1, T2, S2, T3, S3>(
     t1: IModelType<T1, S1>,
     t2: IModelType<T2, S2>,
     t3?: IModelType<T3, S3>
-): IModelType<IStateTreeNode & T1 & T2 & T3, S1 & S2 & S3> // ...and so forth...
+): IModelType<T1 & T2 & T3, S1 & S2 & S3> // ...and so forth...
 export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
     name: string,
     t1: IModelType<T1, S1>,
     t2: IModelType<T2, S2>,
     t3?: IModelType<T3, S3>
-): IModelType<IStateTreeNode & T1 & T2 & T3, S1 & S2 & S3> // ...and so forth...
+): IModelType<T1 & T2 & T3, S1 & S2 & S3> // ...and so forth...
 /**
  * Composes a new model from one or more existing model types.
  * This method can be invoked in two forms:
@@ -406,6 +390,7 @@ export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
  * @alias types.compose
  */
 export function compose(...args: any[]): IModelType<any, any> {
+    // TODO: just join the base type names if no name is provided
     const typeName: string = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
     return (args as ObjectType<any, any>[])
         .reduce(
