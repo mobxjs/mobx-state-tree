@@ -64,12 +64,13 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
         const args = arguments
 
         function wrap(fn: any, mode: IActionAsyncMode, arg: any) {
-            createActionInvoker(name, fn, mode, runId).call(ctx, arg)
+            createActionInvoker(ctx, name, fn, mode, runId).call(ctx, arg)
         }
 
         return new Promise(function(resolve, reject) {
             let gen: any
             createActionInvoker(
+                ctx,
                 name,
                 function asyncActionInit(this: any) {
                     gen = generator.apply(this, arguments)

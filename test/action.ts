@@ -188,6 +188,7 @@ test("action should be bound", t => {
     const task = Task.create()
     const f = task.toggle
     t.is(f(), true)
+    t.is(task.done, true)
 })
 
 test("snapshot should be available and updated during an action", t => {

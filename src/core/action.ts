@@ -50,23 +50,24 @@ function runMiddleWares(node: Node, baseCall: IRawActionCall, originalFn: Functi
 }
 
 export function createActionInvoker(
+    target: IStateTreeNode,
     name: string,
     fn: Function,
     asyncMode: IActionAsyncMode = "none",
     asyncId: number = 0
 ) {
     const action = mobxAction(name, fn)
-    return function(this: IStateTreeNode) {
-        const node = getStateTreeNode(this)
+    return function() {
+        const node = getStateTreeNode(target)
         node.assertAlive()
         if (node.isRunningAction()) {
             // an action is already running in this tree, invoking this action does not emit a new action
-            return action.apply(this, arguments)
+            return action.apply(target, arguments)
         } else {
             // outer action, run middlewares and start the action!
             const call: IRawActionCall = {
                 name,
-                object: node.storedValue,
+                object: target,
                 args: argsToArray(arguments),
                 asyncId,
                 asyncMode

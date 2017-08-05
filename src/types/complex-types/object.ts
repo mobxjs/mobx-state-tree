@@ -96,7 +96,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
             const actions = fn(self)
             if (actions && isPlainObject(actions)) {
                 Object.keys(actions).forEach(name => {
-                    addHiddenFinalProp(self, name, createActionInvoker(name, actions[name]))
+                    addHiddenFinalProp(self, name, createActionInvoker(self, name, actions[name]))
                 })
             }
             return self
