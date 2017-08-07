@@ -15,23 +15,21 @@ This type will always produce [observable maps](https://mobx.js.org/refguide/map
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Todo = types.model({
-      id: types.identifier,
-      task: types.string
-    })
+```js
+const Todo = types.model({
+  id: types.identifier,
+  task: types.string
+})
 
-    const TodoStore = types.model({
-      todos: types.map(Todo)
-    })
+const TodoStore = types.model({
+  todos: types.map(Todo)
+})
 
-    const s = TodoStore.create({ todos: [] })
-    s.todos.set(17, { task: "Grab coffee", id: 17 })
-    s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the identifier
-    console.log(s.todos.get(17)) // prints: "Grab coffee"
-    ```
-````
+const s = TodoStore.create({ todos: [] })
+s.todos.set(17, { task: "Grab coffee", id: 17 })
+s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the identifier
+console.log(s.todos.get(17)) // prints: "Grab coffee"
+```
 
 Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;S>, IObservableArray&lt;T>>** 
 
@@ -47,21 +45,19 @@ This type will always produce [observable arrays](https://mobx.js.org/refguide/a
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Todo = types.model({
-      task: types.string
-    })
+```js
+const Todo = types.model({
+  task: types.string
+})
 
-    const TodoStore = types.model({
-      todos: types.array(Todo)
-    })
+const TodoStore = types.model({
+  todos: types.array(Todo)
+})
 
-    const s = TodoStore.create({ todos: [] })
-    s.todos.push({ task: "Grab coffee" })
-    console.log(s.todos[0]) // prints: "Grab coffee"
-    ```
-````
+const s = TodoStore.create({ todos: [] })
+s.todos.push({ task: "Grab coffee" })
+console.log(s.todos[0]) // prints: "Grab coffee"
+```
 
 Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;S>, IObservableArray&lt;T>>** 
 
@@ -79,7 +75,7 @@ This type accepts as parameter the value type of the identifier field that can b
 
 **Examples**
 
-```javascript
+```js
 const Todo = types.model("Todo", {
      id: types.identifier(types.string),
      title: types.string
@@ -145,18 +141,16 @@ Applying a snapshot in which the optional value is _not_ present, causes the val
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Todo = types.model({
-      title: types.optional(types.string, "Test"),
-      done: types.optional(types.boolean, false),
-      created: types.optional(types.Date, () => new Date())
-    })
+```js
+const Todo = types.model({
+  title: types.optional(types.string, "Test"),
+  done: types.optional(types.boolean, false),
+  created: types.optional(types.Date, () => new Date())
+})
 
-    // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
-    const todo = Todo.create({ title: "Get coffee "})
-    ```
-````
+// it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
+const todo = Todo.create({ title: "Get coffee "})
+```
 
 # types.literal
 
@@ -170,7 +164,7 @@ You can use literal to match exact strings for example the exact male or female 
 
 **Examples**
 
-```javascript
+```js
 const Person = types.model({
     name: types.string,
     gender: types.union(types.literal('male'), types.literal('female'))
@@ -211,22 +205,20 @@ This is useful to store complex, but immutable values like vectors etc. It can f
 
 **Examples**
 
-````javascript
-    ```javascript
-    const GameCharacter = types.model({
-      name: string,
-      location: types.frozen
-    })
+```js
+const GameCharacter = types.model({
+  name: string,
+  location: types.frozen
+})
 
-    const hero = new GameCharacter({
-      name: "Mario",
-      location: { x: 7, y: 4 }
-    })
+const hero = new GameCharacter({
+  name: "Mario",
+  location: { x: 7, y: 4 }
+})
 
-    hero.location = { x: 10, y: 2 } // OK
-    hero.location.x = 7 // Not ok!
-    ```
-````
+hero.location = { x: 10, y: 2 } // OK
+hero.location.x = 7 // Not ok!
+```
 
 # types.string
 
@@ -235,14 +227,12 @@ This type is used for string values by default
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Person = types.model({
-      firstName: types.string,
-      lastName: "Doe"
-    })
-    ```
-````
+```js
+const Person = types.model({
+  firstName: types.string,
+  lastName: "Doe"
+})
+```
 
 # types.number
 
@@ -251,14 +241,12 @@ This type is used for numeric values by default
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Vector = types.model({
-      x: types.number,
-      y: 0
-    })
-    ```
-````
+```js
+const Vector = types.model({
+  x: types.number,
+  y: 0
+})
+```
 
 # types.boolean
 
@@ -267,14 +255,12 @@ This type is used for boolean values by default
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Thing = types.model({
-      isCool: types.boolean,
-      isAwesome: false
-    })
-    ```
-````
+```js
+const Thing = types.model({
+  isCool: types.boolean,
+  isAwesome: false
+})
+```
 
 # types.null
 
@@ -290,15 +276,13 @@ Creates a type that can only contain a javascript Date value.
 
 **Examples**
 
-````javascript
-    ```javascript
-    const LogLine = types.model({
-      timestamp: types.Date,
-    })
+```js
+const LogLine = types.model({
+  timestamp: types.Date,
+})
 
-    LogLine.create({ timestamp: new Date() })
-    ```
-````
+LogLine.create({ timestamp: new Date() })
+```
 
 # types.late
 
@@ -338,13 +322,11 @@ Can be used to create an string based enumeration.
 
 **Examples**
 
-````javascript
-    ```javascript
-    const TrafficLight = types.model({
-      color: types.enum("Color", ["Red", "Orange", "Green"])
-    })
-    ```
-````
+```js
+const TrafficLight = types.model({
+  color: types.enum("Color", ["Red", "Orange", "Green"])
+})
+```
 
 Returns **ISimpleType&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** 
 
@@ -369,14 +351,12 @@ Returns the _declared_ type of the given sub property of an object, array or map
 
 **Examples**
 
-````javascript
-    ```typescript
-    const Box = types.model({ x: 0, y: 0 })
-    const box = Box.create()
+```js
+const Box = types.model({ x: 0, y: 0 })
+const box = Box.create()
 
-    console.log(getChildType(box, "x").name) // 'number'
-    ```
-````
+console.log(getChildType(box, "x").name) // 'number'
+```
 
 Returns **IType&lt;any, any>** 
 
@@ -396,13 +376,15 @@ Before passing the call to the next middleware using `next`, feel free to clone 
 
 A call description looks like:
 
-    {
-         name: string // name of the action
-         object: any & IStateTreeNode // the object on which the action was original invoked
-         args: any[] // the arguments of the action
-         asyncMode: string
-         asyncId: number
-    }
+```typescript
+{
+     name: string // name of the action
+     object: any & IStateTreeNode // the object on which the action was original invoked
+     args: any[] // the arguments of the action
+     asyncMode: string
+     asyncId: number
+}
+```
 
 The fields `asyncMode` and `asyncId` are explained in detail in the [asynchronous action](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md#asynchronous-actions-and-middleware) section.
 
@@ -415,15 +397,13 @@ An example of a build in middleware is the `onAction` method.
 
 **Examples**
 
-````javascript
-    ```typescript
-    const store = SomeStore.create()
-    const disposer = addMiddleWare(store, (call, next) => {
-      console.log(`action ${call.name} was invoked`)
-      next(call) // runs the next middleware (or the intended action if there is no middleware to run left)
-    })
-    ```
-````
+```js
+const store = SomeStore.create()
+const disposer = addMiddleWare(store, (call, next) => {
+  console.log(`action ${call.name} was invoked`)
+  next(call) // runs the next middleware (or the intended action if there is no middleware to run left)
+})
+```
 
 Returns **IDisposer** 
 
@@ -777,23 +757,21 @@ cleanup methods yourself using the `beforeDestroy` hook.
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Todo = types.model({
-      title: types.string
-    }, {
-      afterCreate() {
-        const autoSaveDisposer = reaction(
-          () => getSnapshot(this),
-          snapshot => sendSnapshotToServerSomehow(snapshot)
-        )
-        // stop sending updates to server if this
-        // instance is destroyed
-        addDisposer(this, autoSaveDisposer)
-      }
-    })
-    ```
-````
+```js
+const Todo = types.model({
+  title: types.string
+}, {
+  afterCreate() {
+    const autoSaveDisposer = reaction(
+      () => getSnapshot(this),
+      snapshot => sendSnapshotToServerSomehow(snapshot)
+    )
+    // stop sending updates to server if this
+    // instance is destroyed
+    addDisposer(this, autoSaveDisposer)
+  }
+})
+```
 
 # getEnv
 
