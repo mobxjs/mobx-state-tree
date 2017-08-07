@@ -29,7 +29,7 @@
   * [Volatile state](#volatile-state)
   * [Dependency injection](#dependency-injection)
 * [Types overview](#types-overview)
-  * [Lifecycle hooks](https://github.com/mobxjs/mobx-state-tree#lifecycle-hooks-for-typesmodel)
+  * [Lifecycle hooks](#lifecycle-hooks-for-typesmodel)
 * [Api overview](#api-overview)
 * [Tips](#tips)
 * [FAQ](#FAQ)
@@ -642,7 +642,7 @@ Note, all hooks should be defined as actions.
 
 # Api overview
 
-See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md) for more details.
+See the [full API docs](API.md) for more details.
 
 | signature | |
 | ---- | --- |
