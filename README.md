@@ -304,9 +304,9 @@ Actions are replayable and are therefore constrained in several ways:
 
 Useful methods:
 
--   `onAction(model, listener)` listens to any action that is invoked on the model or any of its descendants. See `onAction` for more details.
--   `addMiddleware(model, middleware)` listens to any action that is invoked on the model or any of its descendants. See `addMiddleware` for more details.
--   `applyAction(model, action)` invokes an action on the model according to the given action description
+-   [`onAction`](API.md#onaction) listens to any action that is invoked on the model or any of its descendants.
+-   [`addMiddleware`](API.md#addmiddleware) listens to any action that is invoked on the model or any of its descendants.
+-   [`applyAction`](API.md#applyaction) invokes an action on the model according to the given action description
 
 #### Asynchronous actions
 
@@ -337,7 +337,7 @@ The difference between action listeners and middleware is: Middleware can interc
 
 #### Disabling protected mode
 
-This may be desired if the default protection of mobx-state-tree doesn't fit your use case. For example, if you are not interested in replayable actions, or hate the effort of writing actions to modify any field; `unprotect(tree)` will disable the protected mode of a tree, allowing anyone to directly modify the tree.
+This may be desired if the default protection of `mobx-state-tree` doesn't fit your use case. For example, if you are not interested in replayable actions, or hate the effort of writing actions to modify any field; `unprotect(tree)` will disable the protected mode of a tree, allowing anyone to directly modify the tree.
 
 ### Snapshots
 
