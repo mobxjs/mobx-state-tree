@@ -98,7 +98,15 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
             // todo assert plain object
             if (actions && isPlainObject(actions)) {
                 Object.keys(actions).forEach(name => {
-                    addHiddenFinalProp(self, name, createActionInvoker(self, name, actions[name]))
+                    const action = actions[name]
+                    if ((action as any).isAsyncMSTAction === true)
+                        addHiddenFinalProp(self, name, action)
+                    else
+                        addHiddenFinalProp(
+                            self,
+                            name,
+                            createActionInvoker(self, name, actions[name])
+                        )
                 })
             }
             return self

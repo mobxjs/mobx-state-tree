@@ -8,6 +8,7 @@ const METHODS = [
     "applyPatch",
     "applySnapshot",
     "asReduxStore",
+    "async",
     "clone",
     "connectReduxDevtools",
     "destroy",

@@ -88,14 +88,6 @@ export function isPrimitive(value: any): boolean {
     return false
 }
 
-export function isGeneratorFunction(value: any) {
-    const constructor = value.constructor
-    if (!constructor) return false
-    if ("GeneratorFunction" === constructor.name || "GeneratorFunction" === constructor.displayName)
-        return true
-    return false
-}
-
 export function freeze<T>(value: T): T {
     return isPrimitive(value) ? value : Object.freeze(value)
 }

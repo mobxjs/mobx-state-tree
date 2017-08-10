@@ -98,18 +98,7 @@ See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) 
 
 Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
-
-1.  Given 2 or more model types, the types are composed into a new Type.
-2.  Given 1 model type, and additionally a set of properties, actions and volatile state, a new type is composed.
-
-Overloads:
-
--   `compose(...modelTypes)`
--   `compose(modelType, properties)`
--   `compose(modelType, properties, actions)`
--   `compose(modelType, properties, volatileState, actions)`
-
-[Example of form 2](https://github.com/mobxjs/mobx-state-tree#simulate-inheritance-by-using-type-composition)
+Given 2 or more model types, the types are composed into a new Type.
 
 # types.reference
 
@@ -844,6 +833,16 @@ Action can also be intercepted by middleware using addMiddleware to change the f
 -   `listener`  
 
 Returns **IDisposer** 
+
+# async
+
+See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
+
+**Parameters**
+
+-   `asyncAction`  
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
 
 # isStateTreeNode
 
