@@ -718,7 +718,7 @@ In the importing file
 ```javascript
 import { LateStore } from "./circular-dep"
 
-const Store = types.late(() => LateStore)
+const Store = types.late(LateStore)
 ```
 
 Thanks to function hoisting in combination with `types.late`, this lets you have circular dependencies between types, across files.
