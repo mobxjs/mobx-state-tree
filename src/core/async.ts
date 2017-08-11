@@ -50,7 +50,6 @@ export function asyncAction(asyncAction: any): any {
 
 let generatorId = 0
 
-// TODO: needs `self` argument and bind!
 export function createAsyncActionInvoker(name: string, generator: Function) {
     // Implementation based on https://github.com/tj/co/blob/master/index.js
     const runId = ++generatorId
@@ -60,7 +59,7 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
         const args = arguments
 
         function wrap(fn: any, mode: IActionAsyncMode, arg: any) {
-            createActionInvoker(ctx, name, fn, mode, runId).call(ctx, arg)
+            createActionInvoker(ctx, name, fn, mode, runId).call(null, arg)
         }
 
         return new Promise(function(resolve, reject) {
@@ -74,7 +73,7 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
                 },
                 "invoke",
                 runId
-            ).apply(ctx, args)
+            ).apply(null, args)
 
             function onFulfilled(res: any) {
                 let ret
@@ -122,6 +121,7 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
             }
         })
     }
+    // TODO: remove this again:
     ;(spawner as any).isAsyncMSTAction = true
     return spawner
 }

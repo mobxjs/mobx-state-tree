@@ -68,11 +68,11 @@ import { types, onSnapshot } from "mobx-state-tree"
 const Todo = types.model("Todo", {
     title: types.string,
     done: false
-}, {
+}).actions(self => ({
     toggle() {
-        this.done = !this.done
+        self.done = !self.done
     }
-})
+}))
 
 const Store = types.model("Store", {
     todos: types.array(Todo)
@@ -203,25 +203,26 @@ const TodoStore = types.model("TodoStore", {      // 1
     loaded: types.boolean                         // 2
     endpoint: "http://localhost",                 // 3
     todos: types.array(Todo),                     // 4
-    selectedTodo: types.reference(Todo),          // 5
+    selectedTodo: types.reference(Todo)           // 5
+}).views(self => ({
     get completedTodos() {                        // 6
-        return this.todos.filter(t => t.done)
+        return self.todos.filter(t => t.done)
     },
     findTodosByUser(user) {                       // 7
-        return this.todos.filter(t => t.assignee === user)
+        return self.todos.filter(t => t.assignee === user)
     }
-}, {
+})).actions(self => ({
     addTodo(title) {
-        this.todos.push({
+        self.todos.push({
             id: Math.random(),
             title
         })
     }
-})
+}))
 ```
 
 When defining a model, it is advised to give the model a name for debugging purposes (see `// 1`).
-A model takes two objects arguments, first all the properties, then the actions.
+A model takes additionally object argument defining the properties.
 
 The _properties_ argument is a key-value set where each key indicates the introduction of a property, and the value its type. The following types are acceptable:
 
@@ -230,7 +231,11 @@ The _properties_ argument is a key-value set where each key indicates the introd
 3. A [computed property](https://mobx.js.org/refguide/computed-decorator.html), see `// 6`. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is possible to provide a setter for a computed property as well. A setter should always invoke an action.
 4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but its value can be tracked by Mobx nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
 
-The _actions_ argument is a key-value set with actions that are available to manage the model. Only actions are allowed to manage models (including any contained objects).
+`types.model` creates a chainable model type, where each chained method produces a new type:
+* `.named(name)` clones the current type, but gives it a new name
+* `.props(props)` produces a new type, based on the current one, and adds / overrides the specified properties
+* `.actions(self => object literal with actions)` produces a new type, based on the current one, and adds / overrides the specified actions
+* `.views(self => object literal with view functions)` produces a new type, based on the current one, and adds / overrides the specified view functions
 
 It is also possible to define lifecycle hooks in the _actions_ object, these are actions with a predefined name that are run at a specific moment. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel).
 
@@ -283,24 +288,43 @@ This makes it possible to get a patch stream of a certain subtree, or to apply m
 ### Actions
 
 By default, nodes can only be modified by one of their actions, or by actions higher up in the tree.
-Actions can be defined by passing a second object to to `types.model`:
+Actions can be defined by passing returning an object from the action initializer function that was passed to `actions`.
+The initializer function is run for each instance, so that `self` is always bound to the current instance.
+Also, the closure of that function can be used to store so called _volatile_ state for the instance, or to create private functions that can anly
+be invoked from the actions, but not from the outside.
 
 ```javascript
 const Todo = types.model({
     title: types.string
-}, {
-    setTitle(newTitle) {
-        this.title = newTitle
+}).actions(self => {
+    function setTitle(newTitle) {
+        self.title = newTitle
+    }
+
+    return {
+        setTitle
     }
 })
+```
+
+Or, shorter if no local state or private functions are involved:
+
+```javascript
+const Todo = types.model({
+    title: types.string
+}).actions(self => ({ // note the `({`, we are returning an object literal
+    setTitle(newTitle) {
+        self.title = newTitle
+    }
+}))
 ```
 
 Actions are replayable and are therefore constrained in several ways:
 
 - Trying to modify a node without using an action will throw an exception.
-- All action arguments should be serializable. Some arguments can be serialized automatically, such as relative paths to other nodes
+- It's recommended to make sure action arguments are serializable. Some arguments can be serialized automatically, such as relative paths to other nodes
 - Actions can only modify models that belong to the (sub)tree on which they are invoked
-- Actions are automatically bound to their instance, so it is safe to pass actions around without binding them or wrapping them in arrow functions.
+- You cannot use `this` inside actions, instead, use `self`. This makes it safe to pass actions around without binding them or wrapping them in arrow functions.
 
 Useful methods:
 
@@ -314,21 +338,25 @@ Asynchronous actions have first class support in MST and are described in more d
 Asynchronous actions are written by using generators and always return a promise. A quick example to get the gist:
 
 ```javascript
-*fetchProjects() { // <- note the star, this a generator function!
-    this.state = "pending"
-    try {
-        // ... yield can be used in async/await style
-        this.githubProjects = yield fetchGithubProjectsSomehow()
-        this.state = "done"
-    } catch (e) {
-        // ... including try/catch error handling
-        console.error("Failed to fetch projects", error)
-        this.state = "error"
-    }
-    // The action will return a promise that resolves to the returned value
-    // (or rejects with anything thrown from the action)
-    return this.githubProjects.length
-}
+someModel.actions(self => {
+    const fetchProjects = async(function* () { // <- note the star, this a generator function!
+        self.state = "pending"
+        try {
+            // ... yield can be used in async/await style
+            self.githubProjects = yield fetchGithubProjectsSomehow()
+            self.state = "done"
+        } catch (e) {
+            // ... including try/catch error handling
+            console.error("Failed to fetch projects", error)
+            self.state = "error"
+        }
+        // The action will return a promise that resolves to the returned value
+        // (or rejects with anything thrown from the action)
+        return self.githubProjects.length
+    })
+
+    return { fetchProjects }
+})
 ```
 
 #### Action listeners versus middleware

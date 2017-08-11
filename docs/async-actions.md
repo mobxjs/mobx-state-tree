@@ -1,5 +1,7 @@
 # Creating asynchronous actions
 
+__Note: asynchronous actions are currently in flux, see [#273](https://github.com/mobxjs/mobx-state-tree/issues/273)__
+
 Asynchronous actions are a first class concept in Mobx-State-Tree. Modelling an asynchronous process can be done in two ways:
 1. Model each step of the process as separate action
 2. Use generators
@@ -15,29 +17,30 @@ const Store = types.model(
     {
 	    githubProjects: types.array(types.frozen),
         state: types.enum("pending", "done", "error")
-    },
+    }
+).actions(self => (
     {
         fetchProjects() {
-            this.githubProjects = []
-            this.state = "pending"
+            self.githubProjects = []
+            self.state = "pending"
             fetchGithubProjectsSomehow().then(
                 // when promise resolves invoke the appropiate action
                 // note that no binding is needed; MST actions will be bound
                 // automatically
-                this.fetchProjectsSuccess,
-                this.fetchProjectsError
+                self.fetchProjectsSuccess,
+                self.fetchProjectsError
             )
         },
         fetchProjectsSuccess(projects) {
-            this.state = "done"
-            this.githubProjects = projects
+            self.state = "done"
+            self.githubProjects = projects
         },
         fetchProjectsError(error) {
             console.error("Failed to fetch projects", error)
-            this.state = "error"
+            self.state = "error"
         }
     }
-)
+))
 ```
 
 This approach works fine and has great type inference, but comes with a few downsides:
@@ -52,27 +55,28 @@ For asynchronous processes, for each step that intends to modify a model you nee
 Generators might sound scary, but they are very suitable for expressing asynchronous process. The above example looks as follows when using generators:
 
 ```javascript
+import { async } from "mobx-state-tree"
+
 const Store = types.model(
     {
 	    githubProjects: types.array(types.frozen),
         state: types.enum("pending", "done", "error")
-    },
-    {
-        *fetchProjects() { // <- note the star, this a generator function!
-            this.githubProjects = []
-            this.state = "pending"
-            try {
-                // ... yield can be used in async/await style
-                this.githubProjects = yield fetchGithubProjectsSomehow()
-                this.state = "done"
-            } catch (e) {
-                // ... including try/catch error handling
-                console.error("Failed to fetch projects", error)
-                this.state = "error"
-            }
-        },
     }
-)
+).actions(self => ({
+    fetchProjects: async(function* () { // <- note the star, this a generator function!
+        self.githubProjects = []
+        self.state = "pending"
+        try {
+            // ... yield can be used in async/await style
+            self.githubProjects = yield fetchGithubProjectsSomehow()
+            self.state = "done"
+        } catch (e) {
+            // ... including try/catch error handling
+            console.error("Failed to fetch projects", error)
+            self.state = "error"
+        }
+    })
+})
 
 const store = Store.create({})
 // async actions will always return a promise resolving to the returned value
@@ -83,7 +87,7 @@ store.fetchProjects().then(() => {
 
 Creating asynchronous actions using generators works as follow:
 
-1. The action needs to be marked as generator, by prefix the name with `*`
+1. The action needs to be marked as generator, by prefix the name with `*` and wrapped in `async`
 2. The action can be paused by using a `yield` statement. Yield always needs to yield a `Promise`
 3. If the promise resolves, the resolved value will be returned from the `yield` statement, and the action will continue to run
 4. If the promise rejects, the action continues and the rejection reason will be thrown from the `yield` statement
@@ -101,6 +105,8 @@ Async/await can only be used in trees that are unprotected. Async / await is not
 Luckily, writing generators is very similar: `async function() {}` becomes `function* () {}`, and `await promise` becomes `yield promise`, and further behavior should be the same.
 
 ## Asynchronous actions and middleware
+
+__Note: these events are currently WIP, and might change soon__
 
 When processing asynchronous actions in middleware there are two properties relevant:
 
@@ -170,8 +176,3 @@ The following events will be emitted to all middleware:
 For more examples, see the [unit tests](https://github.com/mobxjs/mobx-state-tree/blob/master/test/async.ts).
 
 _Note: for middleware, it is extremely important that `next(action)` is called for asynchronous actions, otherwise the generator will remain in an unfinished state forever_
-
-## Typescript tips
-
-When using generators, you will notice that the return type will be inferred incorrectly. (Usually: `any`). Note that the actual return type from an asynchronous action is `Promise<T>` where `T` is the type returned by the `return` statement(s).
-For more questions or ideas, see also [#273](https://github.com/mobxjs/mobx-state-tree/issue/273)

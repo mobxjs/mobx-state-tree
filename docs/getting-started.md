@@ -125,7 +125,7 @@ const User = types.model({
 
 The types namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the API documentation for the whole list and their parameters.
 
-We can now use this knowledge to combine types and define the root type of our store that will hold users and todos. It will have a map of users and todos stored under the according key. 
+We can now use this knowledge to combine types and define the root type of our store that will hold users and todos. It will have a map of users and todos stored under the according key.
 
 Notice that the types.optional second argument is required as long you don't pass a value in the create method of the type. If you want, for example, to make the name or todos property required when calling create, just remove the types.optional function call and just pass the types.* included inside.
 
@@ -293,7 +293,7 @@ More details can be found on the mobx-react package documentation, but keep in m
 ```javascript
 const App = observer(props => <div>
     <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
-    {props.store.todos.values().map(todo => 
+    {props.store.todos.values().map(todo =>
         <div>
             <input type="checkbox" checked={todo.done} onChange={e => todo.toggle()} />
             <input type="text" value={todo.name} onChange={e => todo.setName(e.target.value)} />
@@ -310,13 +310,13 @@ If you have the React DevTools installed, using the "Highlight Updates" check yo
 Thanks to the ability of MobX to emit granular updates, fixing that becomes pretty easy! You just need to split the rendering of a Todo into another component to only re-render that component whenever the todo data changes.
 
 ```javascript
-const TodoView = observer(props => 
+const TodoView = observer(props =>
         <div>
             <input type="checkbox" checked={props.todo.done} onChange={e => props.todo.toggle()} />
             <input type="text" value={props.todo.name} onChange={e => props.todo.setName(e.target.value)} />
         </div>)
 
-const AppView = observer(props => 
+const AppView = observer(props =>
         <div>
             <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
             {props.store.todos.values().map(todo => <TodoView todo={todo} />)}
@@ -356,13 +356,13 @@ Those properties are called "computed" because they keep track of the changes of
 We can easily see that by creating an additional component in our application that observes the store and renders those counters. Using the React Dev Tools and tracing updates, you'll see that changing the name of a TODO won't re-render that counters, while checking completed or uncompleted will re-render the todo and the counters.
 
 ```javascript
-const TodoCounterView = observer(props => 
+const TodoCounterView = observer(props =>
         <div>
             {props.store.pendingCount} pending, {props.store.completedCount} completed
         </div>
 )
 
-const AppView = observer(props => 
+const AppView = observer(props =>
         <div>
             <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
             {props.store.todos.values().map(todo => <TodoView todo={todo} />)}
@@ -532,14 +532,14 @@ const Todo = types.model({
 Now we need to edit our views to display a select along with each todo, where the user can chose the assignee for that task. To do so, we will create a separate component (the UserPickerView) and use it inside the TodoView component to trigger the setUser call. That's it!
 
 ```javascript
-const UserPickerView = observer(props => 
+const UserPickerView = observer(props =>
     <select value={props.user ? props.user.id : ""} onChange={e => props.onChange(e.target.value)}>
         <option value="">-none-</option>
         {props.store.users.values().map(user => <option value={user.id}>{user.name}</option>)}
     </select>
 )
 
-const TodoView = observer(props => 
+const TodoView = observer(props =>
         <div>
             <input type="checkbox" checked={props.todo.done} onChange={e => props.todo.toggle()} />
             <input type="text" value={props.todo.name} onChange={e => props.todo.setName(e.target.value)} />
@@ -547,13 +547,13 @@ const TodoView = observer(props =>
         </div>
 )
 
-const TodoCounterView = observer(props => 
+const TodoCounterView = observer(props =>
         <div>
             {props.store.pendingCount} pending, {props.store.completedCount} completed
         </div>
 )
 
-const AppView = observer(props => 
+const AppView = observer(props =>
         <div>
             <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
             {props.store.todos.values().map(todo => <TodoView store={props.store} todo={todo} />)}
