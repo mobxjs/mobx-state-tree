@@ -541,38 +541,41 @@ Finally, it is not only possible to be notified about snapshots, patches or acti
 MST models primarily aid in storing _persistable_ state. State that can be persisted, serialized, transferred, patched, replaced etc.
 However, sometimes you need to keep track of temporary, non persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc - state which is needed for local purposes as long as the object is alive.
 
-Volatile state can be introduced by passing another object to `types.model`, between the *properties* and the *actions*. (If there are only two objects passed, MST will assume these to be properties and actions. In order for volatile state to be meaningful, you always need actions to operate on them).
+Volatile state (which is also private) can be introduced by creating variables in the close of the action initializer function.
 
-Volatile is preserved for the life-time of an object, and not reset when snapshots are applied etc. Note that the life time of an object depends on proper reconciliation, see below.
+Volatile is preserved for the life-time of an object, and not reset when snapshots are applied etc. Note that the life time of an object depends on proper reconciliation, see the [how does reconciliation work?](#how_does_reconciliation_work) section below.
 
 The following is an example of an object with volatile state. Note that volatile state here is used to track a XHR request, and clean up resources when it is disposed. Without volatile state this kind of information would need to be stored in an external WeakMap, or something similar.
 
 ```javascript
-// pseudo code
 const Store = types.model({
     todos: types.array(Todo),
-    get isLoading() {
-        return this.pendingRequest.state === "pending"
+    state: types.enum(["loading", "loaded", "error"])
+}).actions(self => {
+    const pendingRequest = null
+
+    function afterCreate() {
+        self.state = "loading"
+        pendingRequest = someXhrLib.createRequest("someEndpoint")
     }
-}, {
-    pendingRequest: null
-}, {
-    afterCreate() {
-        this.pendingRequest = someXhrLib.createRequest("someEndpoint")
-    },
-    beforeDestroy() {
+
+    function beforeDestroy() {
         // abort the request, no longer interested
-        this.pendingRequest.abort()
+        pendingRequest.abort()
+    }
+
+    return {
+        afterCreate,
+        beforeDestroy
     }
 })
 ```
 
-To initialize a volatile file, either:
-1. Supply a primitive value (`pendingRequest: null`)
-2. Use `afterCreate` to initialize the field (as done above)
-3. Provide a function to produce the first value. Both the scope and first argument of that function will be the target instance. Requiring a function avoids accidental sharing of a non-primitive value accross all instances of a type. Example: `pendingRequest: (instance) => someXhrLib.createRequest("http://endpoint/" + instance.id)`
+Some tips:
 
-_Tip: To strongly-type volatile state using Typescript, without initialzing the default yet, use a double cast: For example use `{ pendingRequest: null as any as Promise<Stuff> }` so that the type of `pendingRequest` will always be a promise (Note: make sure to initialize it in `afterCreate` hook or declare the type as `{ pendingRequest: null as any as (Promise<Stuff> | null) }`)_
+1. Note that multiple `actions` calls can be chained. This makes it possible to create multiple closures with their own protected volatile state.
+1. Although in the above example the `pendingRequest` could be initialized directly in the action initializer, it is recommended to do this in the `afterCreate` hook, which will only once the entire instance has been set up (there might be many action and property initializers for a single type).
+1. The above example doesn't actually use the promise. For how to properly handle promise results, see the [asynchronous actions](#asynchronous_actions) section.
 
 ## Dependency injection
 
@@ -587,13 +590,13 @@ import { types, getEnv } from "mobx-state-tree"
 
 const Todo = types.model({
     title: ""
-}, {
+}).actions(self => ({
     setTitle(newTitle) {
         // grab injected logger and log
-        getEnv(this).logger.log("Changed title to: " + newTitle)
-        this.title = newTitle
+        getEnv(self).logger.log("Changed title to: " + newTitle)
+        self.title = newTitle
     }
-})
+}))
 
 const Store = types.model({
     todos: types.array(Todo)
@@ -754,49 +757,53 @@ Thanks to function hoisting in combination with `types.late`, this lets you have
 
 ### Simulate inheritance by using type composition
 
-There is no notion of inheritance in MST. The recommended approach is to keep references to the original configuration of a model in order to compose it into a new one, for example by using `types.compose`. So a classical animal inheritance could be expressed using composition as follows:
+There is no notion of inheritance in MST. The recommended approach is to keep references to the original configuration of a model in order to compose it into a new one, for example by using `types.compose` (which combines two types) or producing fresh types using `.props|.views|.actions`. So a classical animal inheritance could be expressed using composition as follows:
 
 ```javascript
 const Square = types.model(
     "Square",
     {
-        width: types.number,
-        surface() {
-            return this.width * this.width
-        }
+        width: types.number
     }
-)
+).views(self => ({
+    surface() {
+        return self.width * self.width
+    }
+}))
 
-const Box = types.compose(
-    "Box",
-    Square, // Base type, copy properties, state and actions from this type
-    {
-        // new properties
-        volume() {
-            // super call
-            return Square.actions.surface.call(this) * this.width
-        }
-    },
-    { }, // new volatile state
-    { }, // new actions
-)
+// create a new type, based of Square
+const Box = Square.named("Box").views(self =>({
+    volume() {
+        // super call
+        return Square.actions.surface.call(this) * this.width
+    }
+}))
 
 // no inheritance, but, union types and code reuse
 const Shape = types.union(Box, Square)
 ```
 
-### Creating enumerations
-
-There is no built-in type for enumerations, but enumerations can simply be constructed by combining unions and literals:
+Similarly, compose can be used to simply mixin types:
 
 ```javascript
-const Temperature = types.union(types.literal("Hot"), types.literal("Cold"))
-```
+const baseSquare = types.model(
+    "Square",
+    {
+        width: types.number
+    }
+).views(self => ({
+    surface() {
+        return self.width * self.width
+    }
+}))
 
-Or, fancier:
+const creationLogger = types.model().actions(self => ({
+    afterCreate() {
+        console.log("Instantiated " + getType(self).name)
+    }
+}))
 
-```javascript
-const Temperature = types.union(...["Hot", "Cold"].map(types.literal))
+export const Square = types.compose(baseSquare, creationLogger)
 ```
 
 # FAQ
