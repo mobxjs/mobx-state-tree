@@ -212,3 +212,60 @@ test("snapshot should be available and updated during an action", t => {
     t.is(a.x, 4)
     t.is(getSnapshot(a).x, 4)
 })
+
+test("indirectly called private functions should be able to modify state", t => {
+    const Model = types
+        .model({
+            x: 3
+        })
+        .actions(self => {
+            function incrementBy(delta) {
+                self.x += delta
+            }
+
+            return {
+                inc() {
+                    incrementBy(1)
+                },
+                dec() {
+                    incrementBy(-1)
+                }
+            }
+        })
+
+    const cnt = Model.create()
+    t.is(cnt.x, 3)
+    cnt.dec()
+    t.is(cnt.x, 2)
+    t.is((cnt as any).incrementBy, undefined)
+})
+
+test("volatile state survives reonciliation", t => {
+    const Model = types.model({ x: 3 }).actions(self => {
+        let incrementor = 1
+        return {
+            setIncrementor(value: number) {
+                incrementor = value
+            },
+            inc() {
+                self.x += incrementor
+            }
+        }
+    })
+
+    const Store = types.model({
+        cnt: types.optional(Model, {})
+    })
+
+    const store = Store.create()
+    store.cnt.inc()
+    t.is(store.cnt.x, 4)
+    store.cnt.setIncrementor(3)
+    store.cnt.inc()
+    t.is(store.cnt.x, 7)
+
+    applySnapshot(store, { cnt: { x: 2 } })
+    t.is(store.cnt.x, 2)
+    store.cnt.inc()
+    t.is(store.cnt.x, 5) // incrementor was not lost
+})
