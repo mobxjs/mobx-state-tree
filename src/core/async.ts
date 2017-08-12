@@ -67,8 +67,8 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
             createActionInvoker(
                 ctx,
                 name,
-                function asyncActionInit(this: any) {
-                    gen = generator.apply(this, arguments)
+                function asyncActionInit() {
+                    gen = generator.apply(null, arguments)
                     onFulfilled(undefined) // kick off the process
                 },
                 "invoke",

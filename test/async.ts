@@ -55,6 +55,7 @@ function testCoffeeTodo(
         },
         r => {
             t.is(shouldError, true, "Ended up in ERROR handler")
+            console.error(r)
             handleResult(r)
         }
     )
@@ -213,38 +214,6 @@ test.cb("can handle throw from yielded promise works", t => {
     )
 })
 
-test.cb.skip("'async' works", t => {
-    testCoffeeTodo(
-        t,
-        /* TODO: see #273 async*/ function* fetchData(this: any, kind: string) {
-            return (this.title = yield delay(10, "test", false))
-        },
-        false,
-        "test",
-        ["test"],
-        [
-            {
-                args: ["black"],
-                asyncId: 6,
-                asyncMode: "invoke",
-                name: "fetchData"
-            },
-            {
-                args: ["test"],
-                asyncId: 6,
-                asyncMode: "yield",
-                name: "fetchData"
-            },
-            {
-                args: ["test"],
-                asyncId: 6,
-                asyncMode: "return",
-                name: "fetchData"
-            }
-        ]
-    )
-})
-
 test.cb("typings", t => {
     const M = types
         .model({
@@ -342,6 +311,34 @@ test.cb("recordActions should only emit invocation", t => {
             t.end()
         }, 50)
     })
+})
+
+test.cb.skip("can handle nested async actions", t => {
+    const uppercase = async(function* uppercase(value) {
+        return delay(20, value.toUpperCase())
+    })
+
+    testCoffeeTodo(
+        t,
+        function* fetchData(this: any, kind: string) {
+            this.title = yield uppercase("and drinking " + kind)
+            return this.title
+        },
+        false,
+        "getting coffee AND DRINKING BLACKING",
+        ["getting coffee AND DRINKING BLACKING"],
+        [
+            { args: ["black"], asyncId: 1, asyncMode: "invoke", name: "fetchData" },
+            { args: ["and drinking black"], asyncId: 2, asyncMode: "invoke", name: "uppercase" },
+            {
+                args: ["getting coffee AND DRINKING BLACKING"],
+                asyncId: 1,
+                asyncMode: "yield",
+                name: "fetchData"
+            },
+            { args: ["awake"], asyncId: 1, asyncMode: "return", name: "fetchData" }
+        ]
+    )
 })
 
 function filterRelevantStuff(stuff: any): any {
