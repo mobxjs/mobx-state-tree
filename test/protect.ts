@@ -1,4 +1,4 @@
-import { protect, unprotect, applySnapshot, types, isProtected } from "../src"
+import { protect, unprotect, applySnapshot, types, isProtected, getParent } from "../src"
 import { test } from "ava"
 const Todo = types
     .model("Todo", {
@@ -94,4 +94,27 @@ test("protected mode should be inherited when attaching children", t => {
     t.is(isProtected(t1), false)
     t.is(isProtected(store), false)
     t.is(store.todos[0].title, "world")
+})
+
+test("action cannot modify parent", t => {
+    const Child = types
+        .model("Child", {
+            x: 2
+        })
+        .actions(self => ({
+            setParentX() {
+                getParent(self).x += 1
+            }
+        }))
+
+    const Parent = types.model("Parent", {
+        x: 3,
+        child: Child
+    })
+
+    const p = Parent.create({ child: {} })
+    t.throws(
+        () => p.child.setParentX(),
+        "[mobx-state-tree] Cannot modify 'Parent@<root>', the object is protected and can only be modified by using an action."
+    )
 })

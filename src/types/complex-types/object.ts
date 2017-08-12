@@ -16,16 +16,15 @@ import {
     EMPTY_ARRAY,
     addHiddenFinalProp
 } from "../../utils"
-import { ComplexType, IComplexType, IType, ISnapshottable } from "../type"
-import { TypeFlags, isType, isObjectType } from "../type-flags"
+import { ComplexType, IComplexType, IType } from "../type"
+import { TypeFlags, isType } from "../type-flags"
 import {
     createNode,
     getStateTreeNode,
     IStateTreeNode,
     IJsonPatch,
     Node,
-    createActionInvoker,
-    escapeJsonPath
+    createActionInvoker
 } from "../../core"
 import {
     flattenTypeErrors,
@@ -98,15 +97,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
             // todo assert plain object
             if (actions && isPlainObject(actions)) {
                 Object.keys(actions).forEach(name => {
-                    const action = actions[name]
-                    if ((action as any).isAsyncMSTAction === true)
-                        addHiddenFinalProp(self, name, action)
-                    else
-                        addHiddenFinalProp(
-                            self,
-                            name,
-                            createActionInvoker(self, name, actions[name])
-                        )
+                    addHiddenFinalProp(self, name, createActionInvoker(self, name, actions[name]))
                 })
             }
             return self

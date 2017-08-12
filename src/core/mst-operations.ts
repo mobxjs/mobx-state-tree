@@ -74,7 +74,7 @@ export function getChildType(object: IStateTreeNode, child: string): IType<any, 
  */
 export function addMiddleware(
     target: IStateTreeNode,
-    middleware: (action: IRawActionCall, next: (call: IRawActionCall) => any) => any
+    middleware: (action: IMiddleWareEvent, next: (call: IMiddleWareEvent) => any) => any
 ): IDisposer {
     const node = getStateTreeNode(target)
     if (!node.isProtectionEnabled)
@@ -624,7 +624,7 @@ export function walk(thing: IStateTreeNode, processor: (item: IStateTreeNode) =>
 }
 
 import {
-    IRawActionCall,
+    IMiddleWareEvent,
     ISerializedActionCall,
     applyAction as baseApplyAction,
     onAction

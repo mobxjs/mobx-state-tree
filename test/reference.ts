@@ -537,17 +537,23 @@ test("References in recursive structures", t => {
         .actions(self => {
             function addFolder(data) {
                 const folder = Folder.create(data)
-                getRoot(self).objects.put(folder)
+                getRoot(self).putFolderHelper(folder)
                 self.children.push(Tree.create({ data: folder, children: [] }))
             }
             return {
                 addFolder
             }
         })
-    const Storage = types.model("Storage", {
-        objects: types.map(Folder),
-        tree: Tree
-    })
+    const Storage = types
+        .model("Storage", {
+            objects: types.map(Folder),
+            tree: Tree
+        })
+        .actions(self => ({
+            putFolderHelper(folder) {
+                self.objects.put(folder)
+            }
+        }))
     const store = Storage.create({ objects: {}, tree: { children: [], data: null } })
     const folder = { id: "1", name: "Folder 1", files: ["a.jpg", "b.jpg"] }
     store.tree.addFolder(folder)

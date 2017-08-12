@@ -7,22 +7,75 @@ export type ISerializedActionCall = {
     args?: any[]
 }
 
-export type IActionAsyncMode = "none" | "invoke" | "yield" | "yieldError" | "return" | "throw"
+export type IMiddlewareEventType =
+    | "action"
+    | "process_spawn"
+    | "process_yield"
+    | "process_yield_error"
+    | "process_return"
+    | "process_throw"
+    | "task_spawn"
 
-export type IRawActionCall = {
-    /**
-     * AsyncId indicates whether this action is part of an `async` based action. Id is zero if it isn't.
-     */
-    asyncId: number
-    asyncMode: IActionAsyncMode
+export type IMiddleWareEvent = {
+    type: IMiddlewareEventType
     name: string
-    object: any & IStateTreeNode
+    id: number
+    rootId: number
+    context: IStateTreeNode
     args: any[]
 }
 
+let nextActionId = 1
+let currentActionContext: IMiddleWareEvent | null = null
+
+export function getNextActionId() {
+    return nextActionId++
+}
+
+export function runWithActionContext(context: IMiddleWareEvent, fn: Function) {
+    const node = getStateTreeNode(context.context)
+    const baseIsRunningAction = node._isRunningAction
+    const prevContext = currentActionContext
+    node.assertAlive()
+    node._isRunningAction = true
+    currentActionContext = context
+    try {
+        return runMiddleWares(node, context, fn)
+    } finally {
+        currentActionContext = prevContext
+        node._isRunningAction = baseIsRunningAction
+    }
+}
+
+export function getActionContext(): IMiddleWareEvent {
+    if (!currentActionContext) return fail("Not running an action!")
+    return currentActionContext
+}
+
+export function createActionInvoker<T extends Function>(
+    target: IStateTreeNode,
+    name: string,
+    fn: T
+) {
+    return (mobxAction(name, function() {
+        const id = getNextActionId()
+        return runWithActionContext(
+            {
+                type: "action",
+                name,
+                id,
+                args: argsToArray(arguments),
+                context: target,
+                rootId: currentActionContext ? currentActionContext.rootId : id
+            },
+            fn
+        )
+    }) as any) as T
+}
+
 export type IMiddleWareHandler = (
-    actionCall: IRawActionCall,
-    next: (actionCall: IRawActionCall) => any
+    actionCall: IMiddleWareEvent,
+    next: (actionCall: IMiddleWareEvent) => any
 ) => any
 
 function collectMiddlewareHandlers(node: Node): IMiddleWareHandler[] {
@@ -36,52 +89,17 @@ function collectMiddlewareHandlers(node: Node): IMiddleWareHandler[] {
     return handlers
 }
 
-function runMiddleWares(node: Node, baseCall: IRawActionCall, originalFn: Function): any {
+function runMiddleWares(node: Node, baseCall: IMiddleWareEvent, originalFn: Function): any {
     const handlers = collectMiddlewareHandlers(node)
     // Short circuit
-    if (!handlers.length) return originalFn.apply(baseCall.object, baseCall.args)
+    if (!handlers.length) return originalFn.apply(baseCall.context, baseCall.args)
 
-    function runNextMiddleware(call: IRawActionCall): any {
+    function runNextMiddleware(call: IMiddleWareEvent): any {
         const handler = handlers.shift() // Optimization: counter instead of shift is probably faster
         if (handler) return handler(call, runNextMiddleware)
-        else return originalFn.apply(baseCall.object, baseCall.args)
+        else return originalFn.apply(baseCall.context, baseCall.args)
     }
     return runNextMiddleware(baseCall)
-}
-
-export function createActionInvoker(
-    target: IStateTreeNode,
-    name: string,
-    fn: Function,
-    asyncMode: IActionAsyncMode = "none",
-    asyncId: number = 0
-) {
-    const action = mobxAction(name, fn)
-    return function() {
-        const node = getStateTreeNode(target)
-        node.assertAlive()
-        if (node.isRunningAction()) {
-            // an action is already running in this tree, invoking this action does not emit a new action
-            // Use null as fail fast against accidentally using 'this'
-            return action.apply(null, arguments)
-        } else {
-            // outer action, run middlewares and start the action!
-            const call: IRawActionCall = {
-                name,
-                object: target,
-                args: argsToArray(arguments),
-                asyncId,
-                asyncMode
-            }
-            const root = node.root
-            root._isRunningAction = true
-            try {
-                return runMiddleWares(node, call, action)
-            } finally {
-                root._isRunningAction = false
-            }
-        }
-    }
 }
 
 // TODO: serializeArgument should not throw error, but indicate that the argument is unserializable and toString it or something
@@ -177,8 +195,8 @@ export function onAction(
         )
 
     return addMiddleware(target, (rawCall, next) => {
-        const sourceNode = getStateTreeNode(rawCall.object)
-        if (rawCall.asyncMode === "none" || rawCall.asyncMode === "invoke") {
+        const sourceNode = getStateTreeNode(rawCall.context)
+        if (rawCall.type === "action" && rawCall.id === rawCall.rootId) {
             listener({
                 name: rawCall.name,
                 path: getStateTreeNode(target).getRelativePathTo(sourceNode),

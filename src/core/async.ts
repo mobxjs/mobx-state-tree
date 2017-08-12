@@ -48,42 +48,56 @@ export function asyncAction(asyncAction: any): any {
     return createAsyncActionInvoker(asyncAction.name, asyncAction)
 }
 
-let generatorId = 0
-
 export function createAsyncActionInvoker(name: string, generator: Function) {
-    // Implementation based on https://github.com/tj/co/blob/master/index.js
-    const runId = ++generatorId
-
-    const spawner = function asyncAction(this: any) {
-        const ctx = this
+    return function processSpawner(this: any) {
+        // Implementation based on https://github.com/tj/co/blob/master/index.js
+        const runId = getNextActionId()
+        const baseContext = getActionContext()
         const args = arguments
 
-        function wrap(fn: any, mode: IActionAsyncMode, arg: any) {
-            createActionInvoker(ctx, name, fn, mode, runId).call(null, arg)
+        function wrap(fn: any, type: IMiddlewareEventType, arg: any) {
+            runWithActionContext(
+                {
+                    name,
+                    type,
+                    id: runId,
+                    args: [arg],
+                    context: baseContext.context,
+                    rootId: baseContext.rootId
+                },
+                fn
+            )
         }
 
         return new Promise(function(resolve, reject) {
             let gen: any
-            createActionInvoker(
-                ctx,
-                name,
+            runWithActionContext(
+                {
+                    name,
+                    type: "process_spawn",
+                    id: runId,
+                    args: argsToArray(args),
+                    context: baseContext.context,
+                    rootId: baseContext.rootId
+                },
                 function asyncActionInit() {
                     gen = generator.apply(null, arguments)
-                    onFulfilled(undefined) // kick off the process
-                },
-                "invoke",
-                runId
-            ).apply(null, args)
+                    onFulfilled(undefined, false) // kick off the process
+                }
+            )
 
-            function onFulfilled(res: any) {
+            function onFulfilled(res: any, wrapGenerator = true) {
                 let ret
                 try {
                     // prettier-ignore
-                    wrap((r: any) => { ret = gen.next(r) }, "yield", res)
+                    if (wrapGenerator)
+                        wrap((r: any) => { ret = gen.next(r) }, "process_yield", res)
+                    else
+                        ret = gen.next(res)
                 } catch (e) {
                     // prettier-ignore
                     setImmediate(() => {
-                        wrap((r: any) => { reject(e) }, "throw", e)
+                        wrap((r: any) => { reject(e) }, "process_throw", e)
                     })
                     return
                 }
@@ -95,11 +109,11 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
                 let ret
                 try {
                     // prettier-ignore
-                    wrap((r: any) => { ret = gen.throw(r) }, "yieldError", err) // or yieldError?
+                    wrap((r: any) => { ret = gen.throw(r) }, "process_yield_error", err) // or yieldError?
                 } catch (e) {
                     // prettier-ignore
                     setImmediate(() => {
-                        wrap((r: any) => { reject(e) }, "throw", e)
+                        wrap((r: any) => { reject(e) }, "process_throw", e)
                     })
                     return
                 }
@@ -110,7 +124,7 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
                 if (ret.done) {
                     // prettier-ignore
                     setImmediate(() => {
-                        wrap((r: any) => { resolve(r) }, "return", ret.value)
+                        wrap((r: any) => { resolve(r) }, "process_return", ret.value)
                     })
                     return
                 }
@@ -121,10 +135,12 @@ export function createAsyncActionInvoker(name: string, generator: Function) {
             }
         })
     }
-    // TODO: remove this again:
-    ;(spawner as any).isAsyncMSTAction = true
-    return spawner
 }
 
-import { createActionInvoker, IActionAsyncMode } from "./action"
-import { fail } from "../utils"
+import {
+    IMiddlewareEventType,
+    runWithActionContext,
+    getActionContext,
+    getNextActionId
+} from "./action"
+import { fail, argsToArray } from "../utils"
