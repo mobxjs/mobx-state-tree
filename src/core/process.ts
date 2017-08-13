@@ -1,10 +1,8 @@
 // based on: https://github.com/mobxjs/mobx-utils/blob/master/src/async-action.ts
 
-export function asyncAction<R>(generator: () => IterableIterator<any>): () => Promise<R>
-export function asyncAction<A1>(
-    generator: (a1: A1) => IterableIterator<any>
-): (a1: A1) => Promise<any> // Ideally we want to have R instead of Any, but cannot specify R without specifying A1 etc... 'any' as result is better then not specifying request args
-export function asyncAction<A1, A2, A3, A4, A5, A6, A7, A8>(
+export function process<R>(generator: () => IterableIterator<any>): () => Promise<R>
+export function process<A1>(generator: (a1: A1) => IterableIterator<any>): (a1: A1) => Promise<any> // Ideally we want to have R instead of Any, but cannot specify R without specifying A1 etc... 'any' as result is better then not specifying request args
+export function process<A1, A2, A3, A4, A5, A6, A7, A8>(
     generator: (
         a1: A1,
         a2: A2,
@@ -16,39 +14,37 @@ export function asyncAction<A1, A2, A3, A4, A5, A6, A7, A8>(
         a8: A8
     ) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7, a8: A8) => Promise<any>
-export function asyncAction<A1, A2, A3, A4, A5, A6, A7>(
+export function process<A1, A2, A3, A4, A5, A6, A7>(
     generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => Promise<any>
-export function asyncAction<A1, A2, A3, A4, A5, A6>(
+export function process<A1, A2, A3, A4, A5, A6>(
     generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => Promise<any>
-export function asyncAction<A1, A2, A3, A4, A5>(
+export function process<A1, A2, A3, A4, A5>(
     generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => Promise<any>
-export function asyncAction<A1, A2, A3, A4>(
+export function process<A1, A2, A3, A4>(
     generator: (a1: A1, a2: A2, a3: A3, a4: A4) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4) => Promise<any>
-export function asyncAction<A1, A2, A3>(
+export function process<A1, A2, A3>(
     generator: (a1: A1, a2: A2, a3: A3) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3) => Promise<any>
-export function asyncAction<A1, A2>(
+export function process<A1, A2>(
     generator: (a1: A1, a2: A2) => IterableIterator<any>
 ): (a1: A1, a2: A2) => Promise<any>
-export function asyncAction<A1>(
-    generator: (a1: A1) => IterableIterator<any>
-): (a1: A1) => Promise<any>
+export function process<A1>(generator: (a1: A1) => IterableIterator<any>): (a1: A1) => Promise<any>
 /**
  * See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
  *
  * @export
- * @alias async
+ * @alias process
  * @returns {Promise}
  */
-export function asyncAction(asyncAction: any): any {
-    return createAsyncActionInvoker(asyncAction.name, asyncAction)
+export function process(asyncAction: any): any {
+    return createProcessSpawner(asyncAction.name, asyncAction)
 }
 
-export function createAsyncActionInvoker(name: string, generator: Function) {
+export function createProcessSpawner(name: string, generator: Function) {
     return function processSpawner(this: any) {
         // Implementation based on https://github.com/tj/co/blob/master/index.js
         const runId = getNextActionId()

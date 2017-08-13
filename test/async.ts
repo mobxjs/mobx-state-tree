@@ -3,7 +3,7 @@ import {
     types,
     addMiddleware,
     recordActions,
-    async
+    process
     // TODO: export IRawActionCall
 } from "../src"
 import { test, CallbackTestContext, Context } from "ava"
@@ -31,7 +31,7 @@ function testCoffeeTodo(
             title: "get coffee"
         })
         .actions(self => ({
-            startFetch: async(generator(self))
+            startFetch: process(generator(self))
         }))
     const events: any[] = []
     const coffees: string[] = []
@@ -183,13 +183,13 @@ test.cb("typings", t => {
                 return 23
             }
 
-            const b = async(function* b(x: string) {
+            const b = process(function* b(x: string) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 24
             })
 
-            return { a: async(a), b }
+            return { a: process(a), b }
         })
     const m1 = M.create({ title: "test " })
     const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
@@ -213,14 +213,14 @@ test.cb("typings", t => {
                 return 23
             }
 
-            const b = async(function* b(x: string) {
+            const b = process(function* b(x: string) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 24
             })
 
             return {
-                a: async(a),
+                a: process(a),
                 b
             }
         })
@@ -247,7 +247,7 @@ test.cb("recordActions should only emit invocation", t => {
                 return 23
             }
             return {
-                a: async(a)
+                a: process(a)
             }
         })
     const m1 = M.create({ title: "test " })
@@ -271,7 +271,7 @@ test.cb("recordActions should only emit invocation", t => {
 })
 
 test.cb("can handle nested async actions", t => {
-    const uppercase = async(function* uppercase(value) {
+    const uppercase = process(function* uppercase(value) {
         const res = yield delay(20, value.toUpperCase())
         return res
     })

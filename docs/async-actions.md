@@ -173,6 +173,6 @@ The following events will be emitted to all middleware:
 ]
 ```
 
-For more examples, see the [unit tests](https://github.com/mobxjs/mobx-state-tree/blob/master/test/async.ts).
+For the middleware events that are generated, see the [unit tests](https://github.com/mobxjs/mobx-state-tree/blob/master/test/async.ts).
 
 _Note: for middleware, it is extremely important that `next(action)` is called for asynchronous actions, otherwise the generator will remain in an unfinished state forever_

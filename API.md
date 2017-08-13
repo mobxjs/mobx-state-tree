@@ -834,7 +834,7 @@ Action can also be intercepted by middleware using addMiddleware to change the f
 
 Returns **IDisposer** 
 
-# async
+# process
 
 See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
 
@@ -843,16 +843,6 @@ See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master
 -   `asyncAction`  
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
-
-# isStateTreeNode
-
-Returns true if the given value is a node in a state tree.
-More precisely, that is, if the value is an instance of a
-`types.model`, `types.array` or `types.map`.
-
-**Parameters**
-
--   `value` **Any** 
 
 # asReduxStore
 
@@ -877,3 +867,13 @@ See this [example](https://github.com/mobxjs/mobx-state-tree/blob/e9e804c8c43e1e
 
 -   `remoteDevDep` **Any** 
 -   `model` **Any** 
+
+# isStateTreeNode
+
+Returns true if the given value is a node in a state tree.
+More precisely, that is, if the value is an instance of a
+`types.model`, `types.array` or `types.map`.
+
+**Parameters**
+
+-   `value` **Any** 

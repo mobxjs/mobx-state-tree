@@ -683,7 +683,6 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 | `applyPatch(node, jsonPatch)` | Applies a JSON patch, or array of patches, to a node in the tree |
 | `applySnapshot(node, snapshot)` | Updates a node with the given snapshot |
 | `asReduxStore(node)` | Wraps a node in a Redux-store compatible API |
-| `async` | creates an asynchronous generator based process |
 | `clone(node, keepEnvironment?: true \| false \| newEnvironment)` | Creates a full clone of the given node. By default preserves the same environment |
 | `connectReduxDevtools(removeDevModule, node)` | Connects a node to the Redux development tools [example](https://github.com/mobxjs/mobx-state-tree/blob/b01fe97d427ca664f7ecc99349d10e58d08d2d98/examples/redux-todomvc/src/index.js)  |
 | `destroy(node)` | Kills `node`, making it unusable. Removes it from any parent in the process |
@@ -706,6 +705,7 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 | `onAction(node, (actionDescription) => void` | A built-in middleware that calls the provided callback with an action description upon each invocation. Returns disposer |
 | `onPatch(node, (patch) => void)` | Attach a JSONPatch listener, that is invoked for each change in the tree. Returns disposer |
 | `onSnapshot` | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer |
+| `process` | creates an asynchronous process based on a generator function |
 | `protect` | Protects an unprotected tree against modifications from outside actions |
 | `recordActions(node)` | Creates a recorder that listens to all actions in `node`. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
 | `recordPatches` | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree |
