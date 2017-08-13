@@ -270,31 +270,60 @@ test.cb("recordActions should only emit invocation", t => {
     })
 })
 
-test.cb.skip("can handle nested async actions", t => {
+test.cb("can handle nested async actions", t => {
     const uppercase = async(function* uppercase(value) {
-        return delay(20, value.toUpperCase())
+        const res = yield delay(20, value.toUpperCase())
+        return res
     })
 
     testCoffeeTodo(
         t,
         self =>
             function* fetchData(this: any, kind: string) {
-                self.title = yield uppercase("and drinking " + kind)
+                self.title = yield uppercase("drinking " + kind)
                 return self.title
             },
         false,
-        "getting coffee AND DRINKING BLACKING",
-        ["getting coffee AND DRINKING BLACKING"],
+        "DRINKING BLACK",
+        ["DRINKING BLACK"],
         [
-            { args: ["black"], asyncId: 1, asyncMode: "invoke", name: "fetchData" },
-            { args: ["and drinking black"], asyncId: 2, asyncMode: "invoke", name: "uppercase" },
+            { type: "action", name: "startFetch", id: 21, args: ["black"], rootId: 21 },
+            { name: "fetchData", type: "process_spawn", id: 22, args: ["black"], rootId: 21 },
             {
-                args: ["getting coffee AND DRINKING BLACKING"],
-                asyncId: 1,
-                asyncMode: "yield",
-                name: "fetchData"
+                name: "uppercase",
+                type: "process_spawn",
+                id: 23,
+                args: ["drinking black"],
+                rootId: 21
             },
-            { args: ["awake"], asyncId: 1, asyncMode: "return", name: "fetchData" }
+            {
+                name: "uppercase",
+                type: "process_yield",
+                id: 23,
+                args: ["DRINKING BLACK"],
+                rootId: 21
+            },
+            {
+                name: "uppercase",
+                type: "process_return",
+                id: 23,
+                args: ["DRINKING BLACK"],
+                rootId: 21
+            },
+            {
+                name: "fetchData",
+                type: "process_yield",
+                id: 22,
+                args: ["DRINKING BLACK"],
+                rootId: 21
+            },
+            {
+                name: "fetchData",
+                type: "process_return",
+                id: 22,
+                args: ["DRINKING BLACK"],
+                rootId: 21
+            }
         ]
     )
 })
