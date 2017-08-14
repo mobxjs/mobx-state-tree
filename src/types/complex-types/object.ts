@@ -52,6 +52,18 @@ function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
 }
 
+export type ObjectTypeConfig = {
+    name?: string
+    properties?: { [K: string]: IType<any, any> }
+    initializers?: ReadonlyArray<((instance: any) => any)>
+}
+
+const defaultObjectOptions = {
+    name: "AnonymousModel",
+    properties: {},
+    initializers: EMPTY_ARRAY
+}
+
 // TODO: rename to Model
 export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S, T> {
     readonly flags = TypeFlags.Object
@@ -65,17 +77,21 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
 
     modelConstructor: new () => any
 
-    constructor(
-        name: string,
-        properties: { [K: string]: IType<any, any> },
-        initializers?: ((instance: any) => any)[]
-    ) {
-        super(name)
-        Object.freeze(properties) // make sure nobody messes with it
-        this.properties = properties
-        this.initializers = initializers ? initializers : EMPTY_ARRAY as any
+    constructor(opts: ObjectTypeConfig) {
+        super(opts.name || defaultObjectOptions.name)
+        const name = opts.name || defaultObjectOptions.name
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
+        Object.assign(this, defaultObjectOptions, opts)
+        Object.freeze(this.properties) // make sure nobody messes with it
         this.createModelConstructor()
+    }
+
+    extend(opts: ObjectTypeConfig): ObjectType<any, any> {
+        return new ObjectType({
+            name: opts.name || this.name,
+            properties: Object.assign({}, this.properties, opts.properties),
+            initializers: this.initializers.concat((opts.initializers as any) || [])
+        })
     }
 
     private createModelConstructor() {
@@ -102,32 +118,23 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
             }
             return self
         }
-        return new ObjectType(
-            this.name,
-            this.properties,
-            this.initializers.concat(actionInitializer)
-        )
+        return this.extend({ initializers: [actionInitializer] })
     }
 
     named(name: string): IModelType<S, T> {
-        return new ObjectType(name, this.properties, this.initializers)
+        return this.extend({ name })
     }
 
     props<SP, TP>(
-        props: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
+        properties: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
     ): IModelType<S & SP, T & TP> {
-        return new ObjectType(
-            this.name,
-            Object.assign({} as any, this.properties, props),
-            this.initializers
-        )
+        return this.extend({ properties } as any)
     }
 
     views<V extends Object>(fn: (self: T) => V): IModelType<S, T & V> {
         const viewInitializer = (self: T) => {
             const views = fn(self)
             // TODO: check view return
-
             Object.keys(views).forEach(key => {
                 // is this a computed property?
                 const descriptor = Object.getOwnPropertyDescriptor(views, key)
@@ -157,11 +164,9 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
                     // TODO: throw!
                 }
             })
-
             return self
         }
-
-        return new ObjectType(this.name, this.properties, this.initializers.concat(viewInitializer))
+        return this.extend({ initializers: [viewInitializer] })
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
@@ -373,8 +378,8 @@ export function model<T = {}>(properties?: IModelProperties<T>): IModelType<Snap
  */
 export function model(...args: any[]) {
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
-    const props = args.shift() || {}
-    return new ObjectType(name, props, [])
+    const properties = args.shift() || {}
+    return new ObjectType({ name, properties })
 }
 
 export function compose<T1, S1, T2, S2, T3, S3>(
@@ -400,13 +405,12 @@ export function compose(...args: any[]): IModelType<any, any> {
     // TODO: just join the base type names if no name is provided
     const typeName: string = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
     return (args as ObjectType<any, any>[])
-        .reduce(
-            (prev, cur) =>
-                new ObjectType(
-                    "AnonymousType",
-                    Object.assign({}, prev.properties, cur.properties),
-                    prev.initializers.concat(cur.initializers)
-                )
+        .reduce((prev, cur) =>
+            prev.extend({
+                name: prev.name + "_" + cur.name,
+                properties: cur.properties,
+                initializers: cur.initializers
+            })
         )
         .named(typeName)
 }
