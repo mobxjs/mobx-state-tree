@@ -155,20 +155,23 @@ const store = RootStore.create({
 Note: You can add "inspect(store)" as the last line if you are using the playground. This will enable the view on the preview side the snapshot of the store. We will dive into it later.
 
 ## Modifying data
-MST tree nodes (model instances) can be modified using actions. Actions are colocated with your types and can be easily defined by passing another object as parameter of types.model containing the functions that modify that tree node.
+MST tree nodes (model instances) can be modified using actions. Actions are colocated with your types and can be easily defined by declaring `.actions` over your model type and passing it a functions that accept the model instance and returns an object with the functions that modify that tree node.
 
 For example, the following actions will be defined on the Todo type, and will allow you to toggle the done and set the name of the provided Todo instance.
 ```javascript
 const Todo = types.model({
     name: types.optional(types.string, ""),
     done: types.optional(types.boolean, false)
-}, {
-    setName(newName) {
-        this.name = newName
-    },
-    toggle() {
-        this.done = !this.done
+}).actions(self => {
+    function setName(newName) {
+        self.name = newName
     }
+
+    function toggle() {
+        self.done = !self.done
+    }
+
+    return {setName, toggle}
 })
 
 const User = types.model({
@@ -178,13 +181,17 @@ const User = types.model({
 const RootStore = types.model({
     users: types.map(User),
     todos: types.optional(types.map(Todo), {})
-}, {
-    addTodo(id, name) {
-        this.todos.set(id, Todo.create({ name }))
+}).actions(self => {
+    function addTodo(id, name) {
+        self.todos.set(id, Todo.create({ name }))
     }
+
+    return {addTodo}
 })
 ```
 [View sample in playground](https://goo.gl/Sj17Nq)
+
+Please notice the use of "self". Self is the object being constructed when an instance of your model is created. Thanks to the self object instance actions are "this-free", allowing you to be sure that they are correclty bound.
 
 Calling those actions is as simple as what you would do with plain JavaScript classes, you simply call them on a model instance!
 
@@ -331,22 +338,25 @@ Now that we have split the rendering logic out into a separate observer, the Tod
 
 ## Computed properties
 
-We now want to display the count of TODOs to be done in our application, to help users know how many TODOs are left. That means that we need to count the number of TODOs with "done" set to false. To do this, we just need to modify the RootStore, and add a getter inside the properties of the model that will count how many TODOs are left.
+We now want to display the count of TODOs to be done in our application, to help users know how many TODOs are left. That means that we need to count the number of TODOs with "done" set to false. To do this, we just need to modify the RootStore declaration, and add a getter property over our model by calling `.views` that will count how many TODOs are left.
 
 ```javascript
 const RootStore = types.model({
     users: types.map(User),
     todos: types.optional(types.map(Todo), {}),
+}).views(self => ({
     get pendingCount() {
-        return this.todos.values().filter(todo => !todo.done).length
+        return self.todos.values().filter(todo => !todo.done).length
     },
     get completedCount() {
-        return this.todos.values().filter(todo => todo.done).length
+        return self.todos.values().filter(todo => todo.done).length
     }
-}, {
+}).actions(self => {
     addTodo(id, name) {
-        this.todos.set(id, Todo.create({ name }))
+        self.todos.set(id, Todo.create({ name }))
     }
+
+    return {addTodo}
 })
 ```
 [View sample in playground](https://goo.gl/TyY6sZ)
@@ -382,20 +392,23 @@ MST solves that by providing the ability to declare model views. A model views i
 ```javascript
 const RootStore = types.model({
     users: types.map(User),
-    todos: types.optional(types.map(Todo), {}),
+    todos: types.optional(types.map(Todo), {})
+}).views(self => ({
     get pendingCount() {
-        return this.getTodosWhereDoneIs(false).length
+        return self.todos.values().filter(todo => !todo.done).length
     },
     get completedCount() {
-        return this.getTodosWhereDoneIs(true).length
+        return self.todos.values().filter(todo => todo.done).length
     },
     getTodosWhereDoneIs(done) {
-        return this.todos.values().filter(todo => todo.done === done)
+        return self.todos.values().filter(todo => todo.done === done)
     }
-}, {
+}).actions(self => {
     addTodo(id, name) {
-        this.todos.set(id, Todo.create({ name }))
+        self.todos.set(id, Todo.create({ name }))
     }
+
+    return {addTodo}
 })
 ```
 [View sample in playground](https://goo.gl/LFYig4)
@@ -493,13 +506,15 @@ const Todo = types.model({
     name: types.optional(types.string, ""),
     done: types.optional(types.boolean, false),
     user: types.maybe(types.reference(types.late(() => User)))
-}, {
-    setName(newName) {
-        this.name = newName
-    },
-    toggle() {
-        this.done = !this.done
+}).actions(self => {
+    function setName(newName) {
+        self.name = newName
     }
+    function toggle() {
+        self.done = !self.done
+    }
+
+    return {setName, toggle}
 })
 ```
 [View sample in playground](http://tinyurl.com/yb48a6yn)
@@ -512,20 +527,22 @@ const Todo = types.model({
     name: types.optional(types.string, ""),
     done: types.optional(types.boolean, false),
     user: types.maybe(types.reference(types.late(() => User)))
-}, {
-    setName(newName) {
-        this.name = newName
-    },
-    setUser(user) {
-        if (user === "") { // When selected value is empty, set as null
-            this.user = null
-        } else {
-            this.user = user
-        }
-    },
-    toggle() {
-        this.done = !this.done
+}).actions(self => {
+    function setName(newName) {
+        self.name = newName
     }
+    function setUser(user) {
+        if (user === "") { // When selected value is empty, set as null
+            self.user = null
+        } else {
+            self.user = user
+        }
+    }
+    function toggle() {
+        self.done = !self.done
+    }
+
+    return {setName, setUser, toggle}
 })
 ```
 
