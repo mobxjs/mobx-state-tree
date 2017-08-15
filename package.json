@@ -19,7 +19,8 @@
     "build-docs": "npm run quick-build && documentation build lib/index.js --sort-order alpha -f md -o API.md.tmp && concat -o API.md docs/API_header.md API.md.tmp && rm API.md.tmp",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "clean": "rm -rf lib test-lib .nyc_output coverage",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "example-tests": "yarn run build && cd examples/boxes && npm install ../../ && yarn jest && cd ../bookshop && npm install ../../ && CI=true npm test && cd ../todomvc && npm install ../../ && yarn jest && cd ../redux-todomvc && npm install ../../ && yarn jest"
   },
   "repository": {
     "type": "git",

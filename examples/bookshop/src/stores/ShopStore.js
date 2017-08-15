@@ -3,35 +3,35 @@ import { BookStore } from "./BookStore"
 import { CartStore } from "./CartStore"
 import { ViewStore } from "./ViewStore"
 
-export const ShopStore = types.model(
-    "ShopStore",
-    {
+export const ShopStore = types
+    .model("ShopStore", {
         bookStore: types.optional(BookStore, {
             books: {}
         }),
         cart: types.optional(CartStore, {
             entries: []
         }),
-        view: types.optional(ViewStore, {}),
+        view: types.optional(ViewStore, {})
+    })
+    .views(self => ({
         get fetch() {
-            return getEnv(this).fetch
+            return getEnv(self).fetch
         },
         get alert() {
-            return getEnv(this).alert
+            return getEnv(self).alert
         },
         get isLoading() {
-            return this.bookStore.isLoading
+            return self.bookStore.isLoading
         },
         get books() {
-            return this.bookStore.books
+            return self.bookStore.books
         },
         get sortedAvailableBooks() {
-            return this.bookStore.sortedAvailableBooks
+            return self.bookStore.sortedAvailableBooks
         }
-    },
-    {
+    }))
+    .actions(self => ({
         afterCreate() {
-            this.bookStore.loadBooks()
+            self.bookStore.loadBooks()
         }
-    }
-)
+    }))

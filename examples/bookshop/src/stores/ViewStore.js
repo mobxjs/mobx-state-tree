@@ -1,21 +1,23 @@
 import { types, getParent } from "mobx-state-tree"
 
-export const ViewStore = types.model(
-    {
+export const ViewStore = types
+    .model({
         page: "books",
-        selectedBookId: "",
+        selectedBookId: ""
+    })
+    .views(self => ({
         get shop() {
-            return getParent(this)
+            return getParent(self)
         },
         get isLoading() {
-            return this.shop.isLoading
+            return self.shop.isLoading
         },
         get currentUrl() {
-            switch (this.page) {
+            switch (self.page) {
                 case "books":
                     return "/"
                 case "book":
-                    return "/book/" + this.selectedBookId
+                    return "/book/" + self.selectedBookId
                 case "cart":
                     return "/cart"
                 default:
@@ -23,25 +25,26 @@ export const ViewStore = types.model(
             }
         },
         get selectedBook() {
-            return this.isLoading || !this.selectedBookId ? null : this.shop.books.get(this.selectedBookId)
+            return self.isLoading || !self.selectedBookId
+                ? null
+                : self.shop.books.get(self.selectedBookId)
         }
-    },
-    {
+    }))
+    .actions(self => ({
         openBooksPage() {
-            this.page = "books"
-            this.selectedBookId = ""
+            self.page = "books"
+            self.selectedBookId = ""
         },
         openBookPage(book) {
-            this.page = "book"
-            this.selectedBookId = book.id
+            self.page = "book"
+            self.selectedBookId = book.id
         },
         openBookPageById(id) {
-            this.page = "book"
-            this.selectedBookId = id
+            self.page = "book"
+            self.selectedBookId = id
         },
         openCartPage() {
-            this.page = "cart"
-            this.selectedBookId = ""
+            self.page = "cart"
+            self.selectedBookId = ""
         }
-    }
-)
+    }))
