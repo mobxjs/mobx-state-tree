@@ -1,4 +1,4 @@
-import { types, getParent } from "mobx-state-tree"
+import { types, getParent, process } from "mobx-state-tree"
 
 export const Book = types.model("Book", {
     id: types.identifier(),
@@ -21,27 +21,34 @@ export const BookStore = types
             return sortBooks(self.books.values())
         }
     }))
-    .actions(self => ({
-        loadBooks() {
-            self.shop.fetch("/books.json").then(self.receiveJson).catch(err => {
-                console.error("Failed to load books ", err)
-            })
-        },
-        receiveJson(json) {
-            self.updateBooks(json)
-            self.markLoading(false)
-        },
-        markLoading(loading) {
+    .actions(self => {
+        function markLoading(loading) {
             self.isLoading = loading
-        },
-        updateBooks(json) {
+        }
+
+        function updateBooks(json) {
             self.books.values().forEach(book => (book.isAvailable = false))
             json.forEach(bookJson => {
                 self.books.put(bookJson)
                 self.books.get(bookJson.id).isAvailable = true
             })
         }
-    }))
+
+        const loadBooks = process(function* loadBooks() {
+            try {
+                const json = yield self.shop.fetch("/books.json")
+                updateBooks(json)
+                markLoading(false)
+            } catch (err) {
+                console.error("Failed to load books ", err)
+            }
+        })
+
+        return {
+            updateBooks,
+            loadBooks
+        }
+    })
 
 function sortBooks(books) {
     return books
