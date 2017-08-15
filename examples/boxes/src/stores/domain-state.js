@@ -3,31 +3,31 @@ import { types, getSnapshot, applySnapshot, getParent, hasParent } from "mobx-st
 
 import { randomUuid } from "../utils"
 
-export const Box = types.model(
-    "Box",
-    {
+export const Box = types
+    .model("Box", {
         id: types.identifier(),
         name: "hal",
         x: 0,
-        y: 0,
+        y: 0
+    })
+    .views(self => ({
         get width() {
-            return this.name.length * 15
+            return self.name.length * 15
         },
         get isSelected() {
-            if (!hasParent(this)) return false
-            return getParent(this, 2).selection === this
+            if (!hasParent(self)) return false
+            return getParent(self, 2).selection === self
         }
-    },
-    {
+    }))
+    .actions(self => ({
         move(dx, dy) {
-            this.x += dx
-            this.y += dy
+            self.x += dx
+            self.y += dy
         },
         setName(newName) {
-            this.name = newName
+            self.name = newName
         }
-    }
-)
+    }))
 
 export const Arrow = types.model("Arrow", {
     id: types.identifier(),
@@ -35,32 +35,30 @@ export const Arrow = types.model("Arrow", {
     to: types.reference(Box)
 })
 
-export const Store = types.model(
-    "Store",
-    {
+export const Store = types
+    .model("Store", {
         boxes: types.map(Box),
         arrows: types.array(Arrow),
         selection: types.maybe(types.reference(Box))
-    },
-    {
+    })
+    .actions(self => ({
         addBox(name, x, y) {
             const box = Box.create({ name, x, y, id: randomUuid() })
-            this.boxes.put(box)
+            self.boxes.put(box)
             return box
         },
         addArrow(from, to) {
-            this.arrows.push({ id: randomUuid(), from, to })
+            self.arrows.push({ id: randomUuid(), from, to })
         },
         setSelection(selection) {
-            this.selection = selection
+            self.selection = selection
         },
         createBox(name, x, y, source) {
-            const box = this.addBox(name, x, y)
-            this.setSelection(box)
-            if (source) this.addArrow(source.id, box.id)
+            const box = self.addBox(name, x, y)
+            self.setSelection(box)
+            if (source) self.addArrow(source.id, box.id)
         }
-    }
-)
+    }))
 
 /*
     The store that holds our domain: boxes and arrows
@@ -99,7 +97,11 @@ window.store = store // for demo
 export function generateStuff(amount) {
     runInAction(() => {
         for (var i = 0; i < amount; i++) {
-            store.addBox("#" + i, Math.random() * window.innerWidth * 0.5, Math.random() * window.innerHeight)
+            store.addBox(
+                "#" + i,
+                Math.random() * window.innerWidth * 0.5,
+                Math.random() * window.innerHeight
+            )
         }
         const allBoxes = store.boxes.values()
         for (var i = 0; i < amount; i++) {
@@ -112,7 +114,7 @@ export function generateStuff(amount) {
 }
 
 /**
-    Save / Restore the state of the store while this module is hot reloaded
+    Save / Restore the state of the store while self module is hot reloaded
 */
 if (module.hot) {
     if (module.hot.data && module.hot.data.store) {

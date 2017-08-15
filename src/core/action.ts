@@ -143,7 +143,7 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
 }
 
 function deserializeArgument(adm: Node, value: any): any {
-    if (typeof value === "object") {
+    if (value && typeof value === "object") {
         const keys = Object.keys(value)
         if (keys.length === 1 && keys[0] === "$ref") return resolvePath(adm.storedValue, value.$ref)
     }
