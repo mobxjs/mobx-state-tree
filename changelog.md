@@ -1,3 +1,7 @@
+# 0.10.0
+
+* `preProcessSnapshot` hook is no longer a normal hook that can be defined as action. Instead, it should be defined on the type using `types.model(...).preProcessSnapshot(value => value)`
+
 # 0.9.5
 
 * Asynchronous actions are now a first class concept in mobx-state-tree. See the [docs](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md)

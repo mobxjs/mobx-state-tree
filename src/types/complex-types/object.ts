@@ -39,8 +39,9 @@ import { optional } from "../utility-types/optional"
 import { Property } from "../property-types/property"
 import { ValueProperty } from "../property-types/value-property"
 
+const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
+
 const HOOK_NAMES = [
-    "preProcessSnapshot",
     "afterCreate",
     "afterAttach",
     "postProcessSnapshot",
@@ -56,6 +57,7 @@ export type ObjectTypeConfig = {
     name?: string
     properties?: { [K: string]: IType<any, any> }
     initializers?: ReadonlyArray<((instance: any) => any)>
+    preProcessor?: (snapshot: any) => any
 }
 
 const defaultObjectOptions = {
@@ -74,6 +76,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     public readonly initializers: ((instance: any) => any)[]
     public readonly properties: { [K: string]: IType<any, any> }
     private readonly parsedProperties: { [K: string]: ValueProperty } = {}
+    private preProcessor: (snapshot: any) => any | undefined
 
     modelConstructor: new () => any
 
@@ -90,7 +93,8 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         return new ObjectType({
             name: opts.name || this.name,
             properties: Object.assign({}, this.properties, opts.properties),
-            initializers: this.initializers.concat((opts.initializers as any) || [])
+            initializers: this.initializers.concat((opts.initializers as any) || []),
+            preProcessor: opts.preProcessor || this.preProcessor
         })
     }
 
@@ -110,12 +114,15 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A> {
         const actionInitializer = (self: T) => {
             const actions = fn(self)
-            // todo assert plain object
-            if (actions && isPlainObject(actions)) {
-                Object.keys(actions).forEach(name => {
-                    addHiddenFinalProp(self, name, createActionInvoker(self, name, actions[name]))
-                })
-            }
+            if (!isPlainObject(actions))
+                fail(`actions initializer should return a plain object containing actions`)
+            Object.keys(actions).forEach(name => {
+                if (name === PRE_PROCESS_SNAPSHOT)
+                    fail(
+                        `Cannot define action '${PRE_PROCESS_SNAPSHOT}', it should be defined using 'type.preProcessSnapshot(fn)' instead`
+                    )
+                addHiddenFinalProp(self, name, createActionInvoker(self, name, actions[name]))
+            })
             return self
         }
         return this.extend({ initializers: [actionInitializer] })
@@ -161,12 +168,16 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
                     // this is a view function, merge as is!
                     addHiddenFinalProp(self, key, value)
                 } else {
-                    // TODO: throw!
+                    fail(`A view member should either be a function or getter based property`)
                 }
             })
             return self
         }
         return this.extend({ initializers: [viewInitializer] })
+    }
+
+    preProcessSnapshot<T>(preProcessor: (snapshot: T) => S): IModelType<S, T> {
+        return this.extend({ preProcessor })
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
@@ -175,7 +186,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
             parent,
             subpath,
             environment,
-            this.preProcessSnapshot(snapshot),
+            this.applySnapshotPreProcessor(snapshot),
             this.createNewInstance,
             this.finalizeNewInstance
         )
@@ -263,7 +274,9 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     getSnapshot(node: Node): any {
         const res = {}
         this.forAllProps(prop => prop.serialize(node.storedValue, res))
-        return this.postProcessSnapshot(res)
+        if (typeof node.storedValue.postProcessSnapshot === "function")
+            return node.storedValue.postProcessSnapshot.call(null, res)
+        return res
     }
 
     applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
@@ -274,7 +287,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
 
     @action
     applySnapshot(node: Node, snapshot: any): void {
-        const s = this.preProcessSnapshot(snapshot)
+        const s = this.applySnapshotPreProcessor(snapshot)
         typecheck(this, s)
         // TODO: check that there are no superfluos properties!
         this.forAllProps(prop => {
@@ -282,16 +295,8 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         })
     }
 
-    preProcessSnapshot(snapshot: any) {
-        // TODO: reimplement this using types
-        // if (typeof this.actions.preProcessSnapshot === "function")
-        // return this.actions.preProcessSnapshot.call(null, snapshot)
-        return snapshot
-    }
-
-    postProcessSnapshot(snapshot: any) {
-        // if (typeof this.actions.postProcessSnapshot === "function")
-        // return this.actions.postProcessSnapshot.call(null, snapshot)
+    applySnapshotPreProcessor(snapshot: any) {
+        if (this.preProcessor) return this.preProcessor.call(null, snapshot)
         return snapshot
     }
 
@@ -300,7 +305,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        let snapshot = this.preProcessSnapshot(value)
+        let snapshot = this.applySnapshotPreProcessor(value)
 
         if (!isPlainObject(snapshot)) {
             return typeCheckFailure(context, snapshot)
@@ -354,6 +359,7 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
     actions<A extends { [name: string]: Function }>(
         fn: (self: T & IStateTreeNode) => A
     ): IModelType<S, T & A>
+    preProcessSnapshot<T>(fn: (snapshot: T) => S): IModelType<S, T>
 }
 
 export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }

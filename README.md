@@ -660,9 +660,36 @@ Property types can only be used as a direct member of a `types.model` type and n
 
 ## LifeCycle hooks for `types.model`
 
+All of the below hooks can be created by returning an action with the given name, like:
+
+```javascript
+types.model("Todo", { done: true}).actions(self => ({
+    postCreate() {
+        console.log("Created a new todo!")
+    }
+}))
+```
+
+The exception to this rule is the `preProcessSnapshot` hook. Because it is needed before instantiating model elements, it needs to be defined on the type itself:
+
+```javascript
+types
+    .model("Todo", { done: true})
+    .preProcessSnapshot(snapshot => ({
+        // auto convert strings to booleans as part of preprocessing
+        done: snapshot.done === "true" ? true : snapshot.done === "false" ? false : snapshot.done
+    }))
+    .actions(self => ({
+        postCreate() {
+            console.log("Created a new todo!")
+        }
+    }))
+```
+
+
 | Hook            | Meaning                                                                                                                                                   |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preProcessSnapshot` | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should bea _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. This hook is not called for individual property updates. |
+| `preProcessSnapshot` | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should bea _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. This hook is not called for individual property updates. _Note that unlike the other hooks, this one is not created as part of the `actions` initializer, but directly on the type |
 | `afterCreate`   | Immediately after an instance is created and initial values are applied. Children will fire this event before parents                                     |
 | `afterAttach`   | As soon as the _direct_ parent is assigned (this node is attached to an other node)                                                                       |
 | `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot.

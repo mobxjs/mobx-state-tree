@@ -106,16 +106,13 @@ const Car = types
     .model({
         id: types.number
     })
+    .preProcessSnapshot((snapshot: any) => ({ ...snapshot, id: parseInt(snapshot.id) * 2 }))
     .actions(self => {
         // TODO: Move to a separate type
-        function preProcessSnapshot(snapshot) {
-            return { ...snapshot, id: parseInt(snapshot.id) * 2 }
-        }
         function postProcessSnapshot(snapshot) {
             return { ...snapshot, id: "" + snapshot.id / 2 }
         }
         return {
-            preProcessSnapshot,
             postProcessSnapshot
         }
     })
@@ -123,39 +120,39 @@ const Factory = types.model({
     car: Car
 })
 
-test.skip("it should preprocess snapshots when creating", t => {
+test("it should preprocess snapshots when creating", t => {
     const car = Car.create({ id: "1" })
     t.is(car.id, 2)
 })
 
-test.skip("it should preprocess snapshots when updating", t => {
+test("it should preprocess snapshots when updating", t => {
     const car = Car.create({ id: "1" })
     t.is(car.id, 2)
     applySnapshot(car, { id: "6" })
     t.is(car.id, 12)
 })
 
-test.skip("it should postprocess snapshots when generating snapshot", t => {
+test("it should postprocess snapshots when generating snapshot", t => {
     const car = Car.create({ id: "1" })
     t.is(car.id, 2)
     t.deepEqual(getSnapshot(car), { id: "1" })
 })
 
-test.skip("it should preprocess snapshots when creating as property type", t => {
+test("it should preprocess snapshots when creating as property type", t => {
     const f = Factory.create({
         car: { id: "1" }
     })
     t.is(f.car.id, 2)
 })
 
-test.skip("it should preprocess snapshots when updating", t => {
+test("it should preprocess snapshots when updating", t => {
     const f = Factory.create({ car: { id: "1" } })
     t.is(f.car.id, 2)
     applySnapshot(f, { car: { id: "6" } })
     t.is(f.car.id, 12)
 })
 
-test.skip("it should postprocess snapshots when generating snapshot", t => {
+test("it should postprocess snapshots when generating snapshot", t => {
     const f = Factory.create({ car: { id: "1" } })
     t.is(f.car.id, 2)
     t.deepEqual(getSnapshot(f), { car: { id: "1" } })
