@@ -316,7 +316,7 @@ function modTypesModelCall(node: ts.CallExpression, context: ts.TransformationCo
 }
 
 function runCodemod(fileNames: string[], options: ts.CompilerOptions): void {
-    const createMobxStateTreeMatcher = createModulePropertyImportMatcher("../src", "types")
+    const createMobxStateTreeMatcher = createModulePropertyImportMatcher("mobx-state-tree", "types")
 
     const transformer = <T extends ts.Node>(context: ts.TransformationContext) => (rootNode: T) => {
         // store the current sourceFile MST types matcher
@@ -355,6 +355,8 @@ function runCodemod(fileNames: string[], options: ts.CompilerOptions): void {
             fs.readFileSync(fileName).toString(),
             ts.ScriptTarget.Latest
         )
+        // log it
+        console.log("Running codemod over", fileName)
         // make the AST transforms
         const transformed = ts.transform(sourceFile, [transformer])
         // output the code
@@ -367,6 +369,7 @@ function runCodemod(fileNames: string[], options: ts.CompilerOptions): void {
             sourceFile
         )
         // copy the file to a backup
+        fs.writeFileSync(fileName + ".bak", fs.readFileSync(fileName).toString())
         fs.writeFileSync(fileName, result)
     }
 }

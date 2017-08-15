@@ -82,5 +82,8 @@
       "prettier --write --print-width 100 --tab-width 4 --no-semi",
       "git add"
     ]
+  },
+  "dependencies": {
+    "mst-codemod-to-0.10": "file:codemod"
   }
 }
