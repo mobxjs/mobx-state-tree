@@ -199,26 +199,29 @@ The most important type in MST is `types.model`, which can be used to describe t
 An example:
 
 ```javascript
-const TodoStore = types.model("TodoStore", {      // 1
-    loaded: types.boolean                         // 2
-    endpoint: "http://localhost",                 // 3
-    todos: types.array(Todo),                     // 4
-    selectedTodo: types.reference(Todo)           // 5
-}).views(self => ({
-    get completedTodos() {                        // 6
-        return self.todos.filter(t => t.done)
-    },
-    findTodosByUser(user) {                       // 7
-        return self.todos.filter(t => t.assignee === user)
-    }
-})).actions(self => ({
-    addTodo(title) {
-        self.todos.push({
-            id: Math.random(),
-            title
-        })
-    }
-}))
+const TodoStore = types
+    .model("TodoStore", {                             // 1
+        loaded: types.boolean                         // 2
+        endpoint: "http://localhost",                 // 3
+        todos: types.array(Todo),                     // 4
+        selectedTodo: types.reference(Todo)           // 5
+    })
+    .views(self => ({
+        get completedTodos() {                        // 6
+            return self.todos.filter(t => t.done)
+        },
+        findTodosByUser(user) {                       // 7
+            return self.todos.filter(t => t.assignee === user)
+        }
+    }))
+    .actions(self => ({
+        addTodo(title) {
+            self.todos.push({
+                id: Math.random(),
+                title
+            })
+        }
+    }))
 ```
 
 When defining a model, it is advised to give the model a name for debugging purposes (see `// 1`).
@@ -229,17 +232,46 @@ The _properties_ argument is a key-value set where each key indicates the introd
 1. A type. This can be a simple primitive type like `types.boolean`, see `// 2`, or a complex, possibly pre-defined type (`// 4`)
 2. A primitive. Using a primitive as type as type is syntactic sugar for introducing an property with a default value. See `// 3`, `endpoint: "http://localhost"` is the same as `endpoint: types.optional(types.string, "http://localhost")`. The primitive type is inferred from the default value. Properties with a default value can be omitted in snapshots.
 3. A [computed property](https://mobx.js.org/refguide/computed-decorator.html), see `// 6`. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is possible to provide a setter for a computed property as well. A setter should always invoke an action.
-4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but its value can be tracked by Mobx nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
+4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but its value can be tracked by MobX nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
 
 `types.model` creates a chainable model type, where each chained method produces a new type:
 * `.named(name)` clones the current type, but gives it a new name
 * `.props(props)` produces a new type, based on the current one, and adds / overrides the specified properties
 * `.actions(self => object literal with actions)` produces a new type, based on the current one, and adds / overrides the specified actions
 * `.views(self => object literal with view functions)` produces a new type, based on the current one, and adds / overrides the specified view functions
+* `.preProcessSnapshot(snapshot => snapshot)` can be used to pre-process the raw JSON before instantiating a new model. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel)
+
+Note that `views` and `actions` don't define actions and views directly, but rather they should be given a function.
+The function will be invoked when a new model instance is created. The instance will be passed in as the first and only argument. Typically called `self`.
+This has two advantages:
+1. All methods will always be bound correctly, and won't suffer from an unbound `this`
+2. The closure can be used to store private state or methods of the instance. See also [actions](#actions) and [volatile state](#volatile_state).
+
+Quick example:
+
+```javascript
+const TodoStore = types
+    .model("TodoStore", { /* props */ })
+    .actions(self => {
+        const instantiationTime = Date.now()
+
+        function addTodo(title) {
+            console.log(`Adding Todo ${title} after ${(Date.now() - instantiationTime) / 1000}s.`)
+            self.todos.push({
+                id: Math.random(),
+                title
+            })
+        }
+
+        return { addTodo }
+    })
+```
+
+It is perfectly fine to chain multiple `views`, `props` calls etc in arbitrary order. This can be a great way to structure complex types, mix-in utility functions etc. Each call in the chain creates a new, immutable type which can itself be stored and reused as part of other types, etc.
 
 It is also possible to define lifecycle hooks in the _actions_ object, these are actions with a predefined name that are run at a specific moment. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel).
 
-_Tip: Note that `{ action1() { }, action2() { }}` is ES6 syntax for `{ action1: function() { }, action2: function() { } }`, in other words; it's just an object literal.
+_Tip: `(self) => ({ action1() { }, action2() { }})` is ES6 syntax for `function (self) { return { action1: function() { }, action2: function() { } }}`, in other words; it's short way of directly returning an object literal.
 For that reason a comma between each member of a model is mandatory, unlike classes which are syntactically a totally different concept._
 
 ### Tree semantics in detail
@@ -295,28 +327,30 @@ be invoked from the actions, but not from the outside.
 
 ```javascript
 const Todo = types.model({
-    title: types.string
-}).actions(self => {
-    function setTitle(newTitle) {
-        self.title = newTitle
-    }
+        title: types.string
+    })
+    .actions(self => {
+        function setTitle(newTitle) {
+            self.title = newTitle
+        }
 
-    return {
-        setTitle
-    }
-})
+        return {
+            setTitle
+        }
+    })
 ```
 
 Or, shorter if no local state or private functions are involved:
 
 ```javascript
 const Todo = types.model({
-    title: types.string
-}).actions(self => ({ // note the `({`, we are returning an object literal
-    setTitle(newTitle) {
-        self.title = newTitle
-    }
-}))
+        title: types.string
+    })
+    .actions(self => ({ // note the `({`, we are returning an object literal
+        setTitle(newTitle) {
+            self.title = newTitle
+        }
+    }))
 ```
 
 Actions are replayable and are therefore constrained in several ways:
@@ -338,8 +372,10 @@ Asynchronous actions have first class support in MST and are described in more d
 Asynchronous actions are written by using generators and always return a promise. A quick example to get the gist:
 
 ```javascript
+import { types, process } from "mobx-state-tree"
+
 someModel.actions(self => {
-    const fetchProjects = async(function* () { // <- note the star, this a generator function!
+    const fetchProjects = process(function* () { // <- note the star, this a generator function!
         self.state = "pending"
         try {
             // ... yield can be used in async/await style
@@ -541,41 +577,42 @@ Finally, it is not only possible to be notified about snapshots, patches or acti
 MST models primarily aid in storing _persistable_ state. State that can be persisted, serialized, transferred, patched, replaced etc.
 However, sometimes you need to keep track of temporary, non persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc - state which is needed for local purposes as long as the object is alive.
 
-Volatile state (which is also private) can be introduced by creating variables in the close of the action initializer function.
+Volatile state (which is also private) can be introduced by creating variables inside any of the action initializer functions.
 
 Volatile is preserved for the life-time of an object, and not reset when snapshots are applied etc. Note that the life time of an object depends on proper reconciliation, see the [how does reconciliation work?](#how_does_reconciliation_work) section below.
 
-The following is an example of an object with volatile state. Note that volatile state here is used to track a XHR request, and clean up resources when it is disposed. Without volatile state this kind of information would need to be stored in an external WeakMap, or something similar.
+The following is an example of an object with volatile state. Note that volatile state here is used to track a XHR request, and clean up resources when it is disposed. Without volatile state this kind of information would need to be stored in an external WeakMap or something similar.
 
 ```javascript
 const Store = types.model({
-    todos: types.array(Todo),
-    state: types.enum(["loading", "loaded", "error"])
-}).actions(self => {
-    const pendingRequest = null
+        todos: types.array(Todo),
+        state: types.enum(["loading", "loaded", "error"])
+    })
+    .actions(self => {
+        const pendingRequest = null // a Promise
 
-    function afterCreate() {
-        self.state = "loading"
-        pendingRequest = someXhrLib.createRequest("someEndpoint")
-    }
+        function afterCreate() {
+            self.state = "loading"
+            pendingRequest = someXhrLib.createRequest("someEndpoint")
+        }
 
-    function beforeDestroy() {
-        // abort the request, no longer interested
-        pendingRequest.abort()
-    }
+        function beforeDestroy() {
+            // abort the request, no longer interested
+            pendingRequest.abort()
+        }
 
-    return {
-        afterCreate,
-        beforeDestroy
-    }
-})
+        return {
+            afterCreate,
+            beforeDestroy
+        }
+    })
 ```
 
 Some tips:
 
 1. Note that multiple `actions` calls can be chained. This makes it possible to create multiple closures with their own protected volatile state.
 1. Although in the above example the `pendingRequest` could be initialized directly in the action initializer, it is recommended to do this in the `afterCreate` hook, which will only once the entire instance has been set up (there might be many action and property initializers for a single type).
-1. The above example doesn't actually use the promise. For how to properly handle promise results, see the [asynchronous actions](#asynchronous_actions) section.
+1. The above example doesn't actually use the promise. For how to work with promises / asynchronous processes, see the [asynchronous actions](#asynchronous_actions) section above.
 
 ## Dependency injection
 
@@ -589,14 +626,15 @@ See also the (bookshop example)[https://github.com/mobxjs/mobx-state-tree/blob/a
 import { types, getEnv } from "mobx-state-tree"
 
 const Todo = types.model({
-    title: ""
-}).actions(self => ({
-    setTitle(newTitle) {
-        // grab injected logger and log
-        getEnv(self).logger.log("Changed title to: " + newTitle)
-        self.title = newTitle
-    }
-}))
+        title: ""
+    })
+    .actions(self => ({
+        setTitle(newTitle) {
+            // grab injected logger and log
+            getEnv(self).logger.log("Changed title to: " + newTitle)
+            self.title = newTitle
+        }
+    }))
 
 const Store = types.model({
     todos: types.array(Todo)
@@ -610,15 +648,15 @@ const logger = {
 }
 
 const store = Store.create({
-    todos: [{ title: "Grab tea" }]
-}, {
-    logger: logger // inject logger to the tree
-})
+        todos: [{ title: "Grab tea" }]
+    }, {
+        logger: logger // inject logger to the tree
+    }
+)
 
 store.todos[0].setTitle("Grab coffee")
 // prints: Changed title to: Grab coffee
 ```
-
 
 # Types overview
 
@@ -663,11 +701,13 @@ Property types can only be used as a direct member of a `types.model` type and n
 All of the below hooks can be created by returning an action with the given name, like:
 
 ```javascript
-types.model("Todo", { done: true}).actions(self => ({
-    postCreate() {
-        console.log("Created a new todo!")
-    }
-}))
+const Todo = types
+    .model("Todo", { done: true})
+    .actions(self => ({
+        postCreate() {
+            console.log("Created a new todo!")
+        }
+    }))
 ```
 
 The exception to this rule is the `preProcessSnapshot` hook. Because it is needed before instantiating model elements, it needs to be defined on the type itself:
@@ -689,7 +729,7 @@ types
 
 | Hook            | Meaning                                                                                                                                                   |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preProcessSnapshot` | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should bea _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. This hook is not called for individual property updates. _Note that unlike the other hooks, this one is not created as part of the `actions` initializer, but directly on the type |
+| `preProcessSnapshot` | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should bea _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. This hook is not called for individual property updates. _**Note that unlike the other hooks, this one is _not_ created as part of the `actions` initializer, but directly on the type!**_ |
 | `afterCreate`   | Immediately after an instance is created and initial values are applied. Children will fire this event before parents                                     |
 | `afterAttach`   | As soon as the _direct_ parent is assigned (this node is attached to an other node)                                                                       |
 | `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot.
@@ -704,48 +744,48 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 
 | signature | |
 | ---- | --- |
-| `addDisposer(node, () => void) ` | Function to be invoked whenever the target node is to be destroyed |
-| `addMiddleware(node, middleware: (actionDescription, next) => any)` | Attaches middleware to a node. See [actions](#actions). Returns disposer. |
-| `applyAction(node, actionDescription)` | Replays an action on the targeted node |
-| `applyPatch(node, jsonPatch)` | Applies a JSON patch, or array of patches, to a node in the tree |
-| `applySnapshot(node, snapshot)` | Updates a node with the given snapshot |
-| `asReduxStore(node)` | Wraps a node in a Redux-store compatible API |
-| `clone(node, keepEnvironment?: true \| false \| newEnvironment)` | Creates a full clone of the given node. By default preserves the same environment |
-| `connectReduxDevtools(removeDevModule, node)` | Connects a node to the Redux development tools [example](https://github.com/mobxjs/mobx-state-tree/blob/b01fe97d427ca664f7ecc99349d10e58d08d2d98/examples/redux-todomvc/src/index.js)  |
-| `destroy(node)` | Kills `node`, making it unusable. Removes it from any parent in the process |
-| `detach(node)` | Removes `node` from its current parent, and lets it live on as standalone tree |
-| `getChildType(node, property?)` | Returns the declared type of the given `property` of `node`. For arrays and maps `property` can be omitted as they all have the same type |
-| `getEnv(node)` | Returns the environment of `node`, see [environments](#environments) |
-| `getParent(node, depth=1)` | Returns the intermediate parent of the `node`, or a higher one if `depth > 1` |
-| `getPath(node)` | Returns the path of `node` in the tree |
-| `getPathParts(node)` | Returns the path of `node` in the tree, unescaped as separate parts |
-| `getRelativePath(base, target)` | Returns the short path, which one could use to walk from node `base` to node `target`, assuming they are in the same tree. Up is represented as `../` |
-| `getRoot(node)` | Returns the root element of the tree containing `node` |
-| `getSnapshot(node)` | Returns the snapshot of the `node`. See [snapshots](#snapshots) |
-| `getType(node)` | Returns the type of `node` |
-| `hasParent(node, depth=1)` | Returns `true` if `node` has a parent at `depth` |
-| `isAlive(node)` | Returns `true` if `node` is alive |
-| `isStateTreeNode(value)` | Returns `true` if `value` is a node of a mobx-state-tree |
-| `isProtected(value)` | Returns `true` if the given node is protected, see [actions](#actions) |
-| `isRoot(node)` | Returns true if `node` has no parents  |
-| `joinJsonPath(parts)` | Joins and escapes the given path `parts` into a JSON path |
-| `onAction(node, (actionDescription) => void` | A built-in middleware that calls the provided callback with an action description upon each invocation. Returns disposer |
-| `onPatch(node, (patch) => void)` | Attach a JSONPatch listener, that is invoked for each change in the tree. Returns disposer |
-| `onSnapshot` | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer |
-| `process` | creates an asynchronous process based on a generator function |
-| `protect` | Protects an unprotected tree against modifications from outside actions |
-| `recordActions(node)` | Creates a recorder that listens to all actions in `node`. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
-| `recordPatches` | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree |
-| `resolve(node, path)` | Resolves a `path` (json path) relatively to the given `node` |
-| `revertPatch(node, jsonPatch)` | Inverse applies a JSON patch or array of patches to `node` |
-| `splitJsonPath(path)` | Splits and unescapes the given JSON `path` into path parts |
-| `tryResolve(node, path)` | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
-| `unprotect(node)` | Unprotects `node`, making it possible to directly modify any value in the subtree, without actions |
-| `walk(startNode, (node) => void)` | Performs a depth-first walk through a tree |
-| `escapeJsonPath(path)` | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
-| `unescapeJsonPath(path)` | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
-| `resolveIdentifier(type, target, identifier)` | resolves an identifier of a given type in a model tree |
-| `resolvePath(target, path)` | resolves a JSON path, starting at the specified target |
+| `[addDisposer(node, () => void)`](API.md#adddisposer) | Function to be invoked whenever the target node is to be destroyed |
+| `[addMiddleware(node, middleware: (actionDescription, next) => any)`](API.md#addmiddleware) | Attaches middleware to a node. See [actions](#actions). Returns disposer. |
+| `[applyAction(node, actionDescription)`](API.md#applyaction) | Replays an action on the targeted node |
+| `[applyPatch(node, jsonPatch)`](API.md#applypatch) | Applies a JSON patch, or array of patches, to a node in the tree |
+| `[applySnapshot(node, snapshot)`](API.md#applysnapshot) | Updates a node with the given snapshot |
+| `[asReduxStore(node)`](API.md#asreduxstore) | Wraps a node in a Redux-store compatible API |
+| `[clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone) | Creates a full clone of the given node. By default preserves the same environment |
+| `[connectReduxDevtools(removeDevModule, node)`](API.md#connectreduxdevtools) | Connects a node to the Redux development tools [example](https://github.com/mobxjs/mobx-state-tree/blob/b01fe97d427ca664f7ecc99349d10e58d08d2d98/examples/redux-todomvc/src/index.js)  |
+| `[destroy(node)`](API.md#destroy) | Kills `node`, making it unusable. Removes it from any parent in the process |
+| `[detach(node)`](API.md#detach) | Removes `node` from its current parent, and lets it live on as standalone tree |
+| `[getChildType(node, property?)`](API.md#getchildtype) | Returns the declared type of the given `property` of `node`. For arrays and maps `property` can be omitted as they all have the same type |
+| `[getEnv(node)`](API.md#getenv) | Returns the environment of `node`, see [environments](#environments) |
+| `[getParent(node, depth=1)`](API.md#getparent) | Returns the intermediate parent of the `node`, or a higher one if `depth > 1` |
+| `[getPath(node)`](API.md#getpath) | Returns the path of `node` in the tree |
+| `[getPathParts(node)`](API.md#getpathparts) | Returns the path of `node` in the tree, unescaped as separate parts |
+| `[getRelativePath(base, target)`](API.md#getrelativepath) | Returns the short path, which one could use to walk from node `base` to node `target`, assuming they are in the same tree. Up is represented as `../` |
+| `[getRoot(node)`](API.md#getroot) | Returns the root element of the tree containing `node` |
+| `[getSnapshot(node)`](API.md#getsnapshot) | Returns the snapshot of the `node`. See [snapshots](#snapshots) |
+| `[getType(node)`](API.md#gettype) | Returns the type of `node` |
+| `[hasParent(node, depth=1)`](API.md#hasparent) | Returns `true` if `node` has a parent at `depth` |
+| `[isAlive(node)`](API.md#isalive) | Returns `true` if `node` is alive |
+| `[isStateTreeNode(value)`](API.md#isstatetreenode) | Returns `true` if `value` is a node of a mobx-state-tree |
+| `[isProtected(value)`](API.md#isprotected) | Returns `true` if the given node is protected, see [actions](#actions) |
+| `[isRoot(node)`](API.md#isroot) | Returns true if `node` has no parents  |
+| `[joinJsonPath(parts)`](API.md#joinjsonpath) | Joins and escapes the given path `parts` into a JSON path |
+| `[onAction(node, (actionDescription) => void)`](API.md#onaction) | A built-in middleware that calls the provided callback with an action description upon each invocation. Returns disposer |
+| `[onPatch(node, (patch) => void)`](API.md#onpatch) | Attach a JSONPatch listener, that is invoked for each change in the tree. Returns disposer |
+| `[onSnapshot(node, (snapshot) => void)`](API.md#onsnapshot) | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer |
+| `[process(generator)`](API.md#process) | creates an asynchronous process based on a generator function |
+| `[protect(node)`](API.md#protect) | Protects an unprotected tree against modifications from outside actions |
+| `[recordActions(node)`](API.md#recordactions) | Creates a recorder that listens to all actions in `node`. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
+| `[recordPatches(node)`](API.md#recordpatches) | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree |
+| `[resolve(node, path)`](API.md#resolve) | Resolves a `path` (json path) relatively to the given `node` |
+| `[revertPatch(node, jsonPatch)`](API.md#revertpatch) | Inverse applies a JSON patch or array of patches to `node` |
+| `[splitJsonPath(path)`](API.md#splitjsonpath) | Splits and unescapes the given JSON `path` into path parts |
+| `[tryResolve(node, path)`](API.md#tryresolve) | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
+| `[unprotect(node)`](API.md#unprotect) | Unprotects `node`, making it possible to directly modify any value in the subtree, without actions |
+| `[walk(startNode, (node) => void)`](API.md#walk) | Performs a depth-first walk through a tree |
+| `[escapeJsonPath(path)`](API.md#escapejsonpath) | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
+| `[unescapeJsonPath(path)`](API.md#unescapejsonpath) | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
+| `[resolveIdentifier(type, target, identifier)`](API.md#resolveidentifier) | resolves an identifier of a given type in a model tree |
+| `[resolvePath(target, path)`](API.md#resolvepath) | resolves a JSON path, starting at the specified target |
 
 A _disposer_ is a function that cancels the effect it was created for.
 
@@ -787,24 +827,36 @@ Thanks to function hoisting in combination with `types.late`, this lets you have
 There is no notion of inheritance in MST. The recommended approach is to keep references to the original configuration of a model in order to compose it into a new one, for example by using `types.compose` (which combines two types) or producing fresh types using `.props|.views|.actions`. So a classical animal inheritance could be expressed using composition as follows:
 
 ```javascript
-const Square = types.model(
-    "Square",
-    {
-        width: types.number
-    }
-).views(self => ({
-    surface() {
-        return self.width * self.width
-    }
-}))
+const Square = types
+    .model(
+        "Square",
+        {
+            width: types.number
+        }
+    )
+    .views(self => ({
+        surface() {
+            return self.width * self.width
+        }
+    }))
 
 // create a new type, based of Square
-const Box = Square.named("Box").views(self =>({
-    volume() {
-        // super call
-        return Square.actions.surface.call(this) * this.width
-    }
-}))
+const Box = Square
+    .named("Box")
+    .views(self =>{
+        // save the base implementation of surface
+        const superSurface = self.surface
+
+        return {
+            // super contrived override example!
+            surface() {
+                return superSurface() * 1
+            },
+            volume() {
+                return self.surface * self.width
+            }
+        }
+    }))
 
 // no inheritance, but, union types and code reuse
 const Shape = types.union(Box, Square)
@@ -813,24 +865,31 @@ const Shape = types.union(Box, Square)
 Similarly, compose can be used to simply mixin types:
 
 ```javascript
-const baseSquare = types.model(
-    "Square",
-    {
-        width: types.number
-    }
-).views(self => ({
-    surface() {
-        return self.width * self.width
-    }
-}))
-
-const creationLogger = types.model().actions(self => ({
+const CreationLogger = types.model().actions(self => ({
     afterCreate() {
         console.log("Instantiated " + getType(self).name)
     }
 }))
 
-export const Square = types.compose(baseSquare, creationLogger)
+const BaseSquare = types
+    .model({
+        width: types.number
+    })
+    .views(self => ({
+        surface() {
+            return self.width * self.width
+        }
+    }))
+
+export const LoggingSquare = types
+    .compose(
+        // combine a simple square model...
+        BaseSquare,
+        // ... with the logger type
+        CreationLogger
+    )
+    // ..and give it a nice name
+    .named("LoggingSquare")
 ```
 
 # FAQ
@@ -867,12 +926,14 @@ Good news! You don't need to write it twice! Using the `typeof` operator of Type
 
 ```typescript
 const Todo = types.model({
-    title: types.string
-}, {
-    setTitle(v: string) {
-        this.title = v
-    }
-})
+        title: types.string
+    })
+    .actions(self => ({
+        setTitle(v: string) {
+            this.title = v
+        }
+    }))
+
 type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { title: string; setTitle: (v: string) => void }
 ```
 

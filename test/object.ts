@@ -212,13 +212,6 @@ test("it should have computed properties", t => {
     t.deepEqual(doc.area, 6)
 })
 
-test.skip("it should throw if snapshot has computed properties", t => {
-    const { ComputedFactory } = createTestFactories()
-    t.throws(() => {
-        ComputedFactory.create({ area: 3 } as any)
-    }, `[mobx-state-tree] Error while converting \`{\"area\":3}\` to \`AnonymousModel\`:\nat path \"/area\" value \`3\` is not assignable  (Computed properties should not be provided in the snapshot).`)
-})
-
 test("it should throw if a replaced object is read or written to", t => {
     const Todo = types
         .model({

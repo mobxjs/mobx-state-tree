@@ -1,6 +1,7 @@
 # 0.10.0
 
-* `preProcessSnapshot` hook is no longer a normal hook that can be defined as action. Instead, it should be defined on the type using `types.model(...).preProcessSnapshot(value => value)`
+* ** BREAKING ** the syntax to define model types has been updated. See the [updated docs](https://github.com/mobxjs/mobx-state-tree#creating-models) or the original proposal:[#282](https://github.com/mobxjs/mobx-state-tree/pull/286)
+* ** BREAKING **`preProcessSnapshot` hook is no longer a normal hook that can be defined as action. Instead, it should be defined on the type using `types.model(...).preProcessSnapshot(value => value)`
 
 # 0.9.5
 
