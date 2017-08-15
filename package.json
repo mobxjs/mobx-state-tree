@@ -20,7 +20,7 @@
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "clean": "rm -rf lib test-lib .nyc_output coverage",
     "precommit": "lint-staged",
-    "example-tests": "yarn run build && cd examples/boxes && npm install ../../ && yarn jest && cd ../bookshop && npm install ../../ && CI=true yarn test && cd ../redux-todomvc && npm install ../../ && CI=true yarn test"
+    "example-tests": "yarn run build && cd examples/boxes && npm install ../../ && CI=true yarn test && cd ../bookshop && npm install ../../ && CI=true yarn test && cd ../redux-todomvc && npm install ../../ && CI=true yarn test"
   },
   "repository": {
     "type": "git",
