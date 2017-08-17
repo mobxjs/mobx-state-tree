@@ -8,10 +8,10 @@ This tutorial assumes that you know the basics of how to use React. If you don't
 MST is based heavily on MobX. A basic understanding of the MobX library will help when dealing with complex situations and how to  connect the data with React components. If you don't have MobX experience, don't worry, working with MST does not require any MobX API knowledge.
 
 ## How to follow this tutorial
-You can write the code for this tutorial in the browser, using the playground, or in your preferred code editor (e.g. VSCode).
+You can write the code for this tutorial in the browser, using the codesandbox playground, or in your preferred code editor (e.g. VSCode).
 
 ### Writing code in the browser
-[Here](https://mattiamanzati.github.io/mobx-state-tree-playground/) you will find a browser playground for MST. It provides a live preview of the React view. In addition, it allows you to browse through the performed actions and emitted snapshots and patches from your MST store. When opening the playground, you'll find the mobx, react and MST imports. In addition an import to the mobx-state-tree-playground package is set. That imports two functions that you can use to display your app in the preview of the playground. Inspect() will accept an MST store (we will see later what exactly is) and will display its snapshots, actions and patches. Render() accepts a React element and will render it into the preview window of the playground.
+For each example you'll fine a codesandbox playground link. You can start from the playgrond of each point and manually progress to the next tutorial step by using it! If you're stuck, feel free to have a sneak peak from the next playground link! :)
 
 ### Writing code in the editor
 Setting up the whole environment for a React project involve transpilers, bundlers, linters, etc... and setting them up may become very tedious and not fun. Thanks to `create-react-app` setting up all those tools became easy as typing a couple of lines in your terminal.
@@ -64,7 +64,7 @@ const User = types.model({
     name: ""
 })
 ```
-[View sample in playground](https://goo.gl/iGkvGH)
+[View sample in playground](https://codesandbox.io/s/98x2n959ky)
 
 The code above will create two types, a User and a Todo type, but as we said before, a tree model in MST consists of type information (and we just saw how to define them) and state (the instance data). So how do we create an instance of the Todo and User type?
 
@@ -89,7 +89,7 @@ console.log("John:", john.toJSON())
 console.log("Eat TODO:", eat.toJSON())
 
 ```
-[View sample in playground](https://goo.gl/6xVqf8)
+[View sample in playground](https://codesandbox.io/s/6jo1o9n9qk)
 
 As you will see, using models ensures that all the fields defined will be always present and defaulted to the predefined value. If you want to change that value when creating the model instance, you can simply pass an object with the values to use into the create function.
 
@@ -98,7 +98,7 @@ const eat = Todo.create({ name: "eat" })
 
 console.log("Eat TODO:", eat.toJSON()) // => will print {name: "eat", done: false}
 ```
-[View sample in playground](https://goo.gl/KmhmEP)
+[View sample in playground](https://codesandbox.io/s/ymqpj71oj9)
 
 ## Meeting types
 When playing with this feature and passing in values to the create method, you may encounter an error like this:
@@ -121,7 +121,7 @@ const User = types.model({
     name: types.optional(types.string, "")
 })
 ```
-[View sample in playground](https://goo.gl/QZkShZ)
+[View sample in playground](https://codesandbox.io/s/j27j41828v)
 
 The types namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the API documentation for the whole list and their parameters.
 
@@ -150,9 +150,7 @@ const store = RootStore.create({
     users: { } // users is required here because it's not marked as optional
 })
 ```
-[View sample in playground](https://goo.gl/Q8qffQ)
-
-Note: You can add "inspect(store)" as the last line if you are using the playground. This will enable the view on the preview side the snapshot of the store. We will dive into it later.
+[View sample in playground](https://codesandbox.io/s/5wyx1xvvj4)
 
 ## Modifying data
 MST tree nodes (model instances) can be modified using actions. Actions are colocated with your types and can be easily defined by declaring `.actions` over your model type and passing it a functions that accept the model instance and returns an object with the functions that modify that tree node.
@@ -189,7 +187,7 @@ const RootStore = types.model({
     return {addTodo}
 })
 ```
-[View sample in playground](https://goo.gl/Sj17Nq)
+[View sample in playground](https://codesandbox.io/s/928l6pw7pr)
 
 Please notice the use of "self". Self is the object being constructed when an instance of your model is created. Thanks to the self object instance actions are "this-free", allowing you to be sure that they are correclty bound.
 
@@ -199,7 +197,7 @@ Calling those actions is as simple as what you would do with plain JavaScript cl
 store.addTodo(1, "Eat a cake")
 store.todos.get(1).toggle()
 ```
-[View sample in playground](https://goo.gl/Sj17Nq)
+[View sample in playground](https://codesandbox.io/s/928l6pw7pr)
 
 ## Snapshots are awesome!
 Dealing with mutable data and objects makes it easy to change data on the fly, but on the other hand it makes testing hard. Immutable data makes that very easy.  Is there a way to have the best of both worlds? Nature is a great example of that. Beings are living and mutable, but we may eternalize nature's beauty by taking awesome snapshots. Can we do the same with the state of our application?
@@ -224,8 +222,6 @@ console.log(getSnapshot(store))
 Note: The `.toJSON()` you have used before in the tutorial is just a shortcut to `getSnapshot`!
 
 Because the nature of state is mutable, a snapshot will be emitted whenever the state is mutated! To listen to those new snapshot, you can use `onSnapshot(store, snapshot => console.log(snapshot))` to log them as they are emitted!
-
-Note: The snapshot inspector of the playground is based `onSnapshot` as well. The inspect function will read the current snapshot and listen for newer ones, and update the view showing you the new snapshots.
 
 ## From snapshot to model
 As we just saw, getting a snapshot from a model instance is pretty easy, but wouldn't it be neat to be able to restore a model from a snapshot? The good news is that you can!
@@ -259,7 +255,7 @@ applySnapshot(store, {
     }
 })
 ```
-[View sample in playground](https://goo.gl/eNycxT)
+[View sample in playground](https://codesandbox.io/s/xjm99kkopp)
 
 ## Time travel
 The ability of getting snapshots and applying them makes implementing time travel really easy in user-land. What you need to do is basically listen for snapshots, store them and reapply them to enable time travel!
@@ -291,8 +287,6 @@ export function nextState() {
 }
 ```
 
-Note: Time travel in the playground is implemented in a pretty similar way
-
 ## Getting to the UI
 MST loves MobX, and is fully compatible with it's autorun, reaction, observe, etc! You can use the mobx-react package to connect a MST store to a React component!
 More details can be found on the mobx-react package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to onSnapshot and update accordingly!
@@ -309,7 +303,7 @@ const App = observer(props => <div>
 </div>
 )
 ```
-[View sample in playground](https://goo.gl/V9dqv4)
+[View sample in playground](https://codesandbox.io/s/r54o5pp8z4)
 
 ## Improving render performance
 If you have the React DevTools installed, using the "Highlight Updates" check you will see that the entire application will re-render whenever a todo is toggled or name is changed. That's a shame, as this can cause performance issues if there are a lots of todos in our list!
@@ -330,7 +324,7 @@ const AppView = observer(props =>
         </div>
 )
 ```
-[View sample in playground](https://goo.gl/8vVxeE)
+[View sample in playground](https://codesandbox.io/s/m3rw1wll79)
 
 Basically each `observer` declaration will enable the React component to only re-render if any of it's observed data changes. Since our App component was observing everything, it was basically re-rendering whenever you changed something.
 
@@ -351,15 +345,15 @@ const RootStore = types.model({
     get completedCount() {
         return self.todos.values().filter(todo => todo.done).length
     }
-}).actions(self => {
-    addTodo(id, name) {
+})).actions(self => {
+    function addTodo(id, name) {
         self.todos.set(id, Todo.create({ name }))
     }
 
     return {addTodo}
 })
 ```
-[View sample in playground](https://goo.gl/TyY6sZ)
+[View sample in playground](https://codesandbox.io/s/x3qlr3xpjo)
 
 Those properties are called "computed" because they keep track of the changes of the observed fields and recompute automatically if anything used by that field changes. This allows for performance savings; for example changing the name of a TODO won't affect the number of pending and completed count, as such it wont trigger a recalculation of those counters.
 
@@ -380,9 +374,9 @@ const AppView = observer(props =>
         </div>
 )
 ```
-[View sample in playground](https://goo.gl/K1kFU7)
+[View sample in playground](https://codesandbox.io/s/x3qlr3xpjo)
 
-If you're using the playground, you'll notice that computed properties won't appear in snapshots. Thats fine and intended, since those properties must be computed over the other properties of the tree, they can be reproduced by knowing just their definition. For the same reason, if you provide a computed value in a snapshot you'll end up with an error when you attempt to apply it.
+If you're console.log your snapshot, you'll notice that computed properties won't appear in snapshots. Thats fine and intended, since those properties must be computed over the other properties of the tree, they can be reproduced by knowing just their definition. For the same reason, if you provide a computed value in a snapshot you'll end up with an error when you attempt to apply it.
 
 ## Model views
 You may need to use the list of todos filtered by completion in various locations in your application. Even if accessing the list of todos and filter them every time may look a viable solution, if the filter logic is complex or changes over time you'll find that it's not a viable solution.
@@ -403,15 +397,15 @@ const RootStore = types.model({
     getTodosWhereDoneIs(done) {
         return self.todos.values().filter(todo => todo.done === done)
     }
-}).actions(self => {
-    addTodo(id, name) {
+})).actions(self => {
+    function addTodo(id, name) {
         self.todos.set(id, Todo.create({ name }))
     }
 
     return {addTodo}
 })
 ```
-[View sample in playground](https://goo.gl/LFYig4)
+[View sample in playground](https://codesandbox.io/s/zkrkwj91p3)
 
 Notice that the `getTodosWhereDoneIs` view can also be used outside of its model, for example it can be used inside views.
 
@@ -443,7 +437,7 @@ const store = RootStore.create({
     }
 })
 ```
-[View sample in playground](https://goo.gl/TyR6jt)
+[View sample in playground](https://codesandbox.io/s/7zqlw3ro11)
 
 Now we need to change our Todo model to store the user assigned to that task. You could do that by storing the User map id, and provide a computed that resolves to the user (you can do it as an exercise), but that would end up being a copious amount of code.
 
@@ -496,7 +490,7 @@ const store = RootStore.create({
     }
 })
 ```
-[View sample in playground](http://tinyurl.com/y89w4xnj)
+[View sample in playground](https://codesandbox.io/s/mzvx6o7r0j)
 
 ### How to define the reference
 The reference we are looking for can be easily defined as `types.reference(User)`. Sometimes this can lead to circular references that may use a type before it's declared. To postpone the resolution of the type, you can use `types.late(() => User)` instead of just `User` and that will hoist the type and defer its evaluation. The user assignee for the Todo could also be omitted, so we will use `types.maybe(...)` to allow the user property to be null and be initialized as null.
@@ -517,7 +511,7 @@ const Todo = types.model({
     return {setName, toggle}
 })
 ```
-[View sample in playground](http://tinyurl.com/yb48a6yn)
+[View sample in playground](https://codesandbox.io/s/mzvx6o7r0j)
 
 ### Setting a reference value
 The reference value can be set by providing either the identifier or a model instance. First of all, we need to define an action that will allow you to change the user of the todo.
@@ -578,7 +572,7 @@ const AppView = observer(props =>
         </div>
 )
 ```
-[View sample in playground](http://tinyurl.com/ybmwwny6)
+[View sample in playground](https://codesandbox.io/s/mzvx6o7r0j)
 
 ## References are safe!
 One neat feature of references, is that they will throw if you accidentally remove a model that is required by a computed! If you try to remove a user that's used by a reference, you'll get something like this:
