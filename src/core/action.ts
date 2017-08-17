@@ -14,7 +14,7 @@ export type IMiddlewareEventType =
     | "process_yield_error"
     | "process_return"
     | "process_throw"
-    | "task_spawn"
+// | "task_spawn"
 
 export type IMiddleWareEvent = {
     type: IMiddlewareEventType

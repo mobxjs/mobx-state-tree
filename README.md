@@ -369,7 +369,7 @@ Useful methods:
 #### Asynchronous actions
 
 Asynchronous actions have first class support in MST and are described in more detail [here](docs/async-actions.md#asynchronous-actions-and-middleware).
-Asynchronous actions are written by using generators and always return a promise. For a real working example see the [bookshop sources]([example](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A quick example to get the gist:
+Asynchronous actions are written by using generators and always return a promise. For a real working example see the [bookshop sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A quick example to get the gist:
 
 ```javascript
 import { types, process } from "mobx-state-tree"
@@ -398,6 +398,8 @@ someModel.actions(self => {
 #### Action listeners versus middleware
 
 The difference between action listeners and middleware is: Middleware can intercept the action that is about to be invoked, modify arguments, return types etc. Action listeners cannot intercept, and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receive the raw arguments. (`onAction` is actually just a built-in middleware)
+
+For more details on creating middleware, see the [docs](docs/middleware.md)
 
 #### Disabling protected mode
 
@@ -568,7 +570,8 @@ addMiddleware(storeInstance, (call, next) => {
 })
 ```
 
-A more extensive middleware example can be found in this [code sandbox](https://codesandbox.io/s/mQrqy8j73)
+A more extensive middleware example can be found in this [code sandbox](https://codesandbox.io/s/mQrqy8j73).
+For more details on creating middleware and the exact specification of middleware events, see the [docs](docs/middleware.md)
 
 Finally, it is not only possible to be notified about snapshots, patches or actions; it is also possible to re-apply them by using `applySnapshot`, `applyPatch` or `applyAction`!
 
@@ -745,7 +748,7 @@ See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/AP
 | signature | |
 | ---- | --- |
 | [`addDisposer(node, () => void)`](API.md#adddisposer) | Function to be invoked whenever the target node is to be destroyed |
-| [`addMiddleware(node, middleware: (actionDescription, next) => any)`](API.md#addmiddleware) | Attaches middleware to a node. See [actions](#actions). Returns disposer. |
+| [`addMiddleware(node, middleware: (actionDescription, next) => any)`](API.md#addmiddleware) | Attaches middleware to a node. See [middleware](docs/middleware.md). Returns disposer. |
 | [`applyAction(node, actionDescription)`](API.md#applyaction) | Replays an action on the targeted node |
 | [`applyPatch(node, jsonPatch)`](API.md#applypatch) | Applies a JSON patch, or array of patches, to a node in the tree |
 | [`applySnapshot(node, snapshot)`](API.md#applysnapshot) | Updates a node with the given snapshot |
