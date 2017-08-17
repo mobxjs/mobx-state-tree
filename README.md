@@ -29,7 +29,7 @@
   * [Volatile state](#volatile-state)
   * [Dependency injection](#dependency-injection)
 * [Types overview](#types-overview)
-  * [Lifecycle hooks](https://github.com/mobxjs/mobx-state-tree#lifecycle-hooks-for-typesmodel)
+  * [Lifecycle hooks](#lifecycle-hooks-for-typesmodel)
 * [Api overview](#api-overview)
 * [Tips](#tips)
 * [FAQ](#FAQ)
@@ -362,9 +362,9 @@ Actions are replayable and are therefore constrained in several ways:
 
 Useful methods:
 
--   `onAction(model, listener)` listens to any action that is invoked on the model or any of its descendants. See `onAction` for more details.
--   `addMiddleware(model, middleware)` listens to any action that is invoked on the model or any of its descendants. See `addMiddleware` for more details.
--   `applyAction(model, action)` invokes an action on the model according to the given action description
+-   [`onAction`](API.md#onaction) listens to any action that is invoked on the model or any of its descendants.
+-   [`addMiddleware`](API.md#addmiddleware) listens to any action that is invoked on the model or any of its descendants.
+-   [`applyAction`](API.md#applyaction) invokes an action on the model according to the given action description
 
 #### Asynchronous actions
 
@@ -403,7 +403,7 @@ For more details on creating middleware, see the [docs](docs/middleware.md)
 
 #### Disabling protected mode
 
-This may be desired if the default protection of mobx-state-tree doesn't fit your use case. For example, if you are not interested in replayable actions, or hate the effort of writing actions to modify any field; `unprotect(tree)` will disable the protected mode of a tree, allowing anyone to directly modify the tree.
+This may be desired if the default protection of `mobx-state-tree` doesn't fit your use case. For example, if you are not interested in replayable actions, or hate the effort of writing actions to modify any field; `unprotect(tree)` will disable the protected mode of a tree, allowing anyone to directly modify the tree.
 
 ### Snapshots
 
@@ -743,7 +743,7 @@ Note, all hooks should be defined as actions.
 
 # Api overview
 
-See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md) for more details.
+See the [full API docs](API.md) for more details.
 
 | signature | |
 | ---- | --- |
@@ -820,7 +820,7 @@ In the importing file
 ```javascript
 import { LateStore } from "./circular-dep"
 
-const Store = types.late(() => LateStore)
+const Store = types.late(LateStore)
 ```
 
 Thanks to function hoisting in combination with `types.late`, this lets you have circular dependencies between types, across files.

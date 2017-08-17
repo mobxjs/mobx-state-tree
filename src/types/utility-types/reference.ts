@@ -95,9 +95,7 @@ export class ReferenceType<T> extends Type<string | number, T> {
             : typeCheckFailure(
                   context,
                   value,
-                  `Value '${prettyPrintValue(
-                      value
-                  )}' is not a valid reference. Expected a string or number.`
+                  "Value is not a valid identifier, which is a string or a number"
               )
     }
 }

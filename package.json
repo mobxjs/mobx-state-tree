@@ -12,6 +12,7 @@
     "rollup": "rollup -c",
     "build-tests": "tsc -p test/",
     "test": "npm run build-tests && ava && npm run test-cyclic",
+    "speedtest": "npm run build-tests && node --expose-gc test-lib/test/perf/report.js",
     "test-cyclic": "npm run build && node -e \"require('.')\"",
     "watch": "tsc -p test && concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
     "_prepublish": "npm run build && npm run build-docs",
@@ -71,7 +72,7 @@
   ],
   "ava": {
     "files": [
-      "test-lib/test/**/*.js"
+      "test-lib/test/*.js"
     ],
     "source": [
       "test-lib/src/**/*.js"

@@ -33,7 +33,8 @@ export class CoreType<S, T> extends Type<S, T> {
         if (isPrimitive(value) && this.checker(value)) {
             return typeCheckSuccess()
         }
-        return typeCheckFailure(context, value)
+        const typeName = this.name === "Date" ? "Date or a unix milliseconds timestamp" : this.name
+        return typeCheckFailure(context, value, `Value is not a ${typeName}`)
     }
 }
 

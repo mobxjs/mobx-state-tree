@@ -82,7 +82,7 @@ test("identifiers are required", t => {
     t.throws(
         () => Todo.create(),
         "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
-            'at path "/id" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
+            'at path "/id" value `undefined` is not assignable to type: `identifier(string)` (Value is not a string), expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
     )
 })
 
@@ -504,7 +504,8 @@ test("References are non-nullable by default", t => {
     t.is(store.maybeRef, null)
     t.throws(
         () => (store.ref = null as any),
-        "[mobx-state-tree] Error while converting `null` to `reference(AnonymousModel)`:\nvalue `null` is not assignable to type: `reference(AnonymousModel)` (Value '`null`' is not a valid reference. Expected a string or number.), expected an instance of `reference(AnonymousModel)` or a snapshot like `reference(AnonymousModel)` instead."
+        `[mobx-state-tree] Error while converting \`null\` to \`reference(AnonymousModel)\`:
+    value \`null\` is not assignable to type: \`reference(AnonymousModel)\` (Value is not a valid identifier, which is a string or a number), expected an instance of \`reference(AnonymousModel)\` or a snapshot like \`reference(AnonymousModel)\` instead.`
     )
 })
 

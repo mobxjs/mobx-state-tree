@@ -51,7 +51,11 @@ export class IdentifierType<T> extends Type<T, T> {
             typeof value === "number"
         )
             return this.identifierType.validate(value, context)
-        return typeCheckFailure(context, value, "References should be a primitive value")
+        return typeCheckFailure(
+            context,
+            value,
+            "Value is not a valid identifier, which is a string or a number"
+        )
     }
 }
 

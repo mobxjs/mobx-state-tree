@@ -23,8 +23,8 @@ test("it should throw if a correct type with failing predicate is given", t => {
     })
     t.throws(() => {
         Factory.create({ number: "givenStringInstead" })
-    }, `[mobx-state-tree] Error while converting \`{\"number\":\"givenStringInstead\"}\` to \`AnonymousModel\`:\nat path \"/number\" value \`\"givenStringInstead\"\` is not assignable to type: \`positive number\`.`)
+    }, `[mobx-state-tree] Error while converting \`{\"number\":\"givenStringInstead\"}\` to \`AnonymousModel\`:\nat path \"/number\" value \`\"givenStringInstead\"\` is not assignable to type: \`positive number\` (Value is not a number).`)
     t.throws(() => {
         Factory.create({ number: -4 })
-    }, `[mobx-state-tree] Error while converting \`{\"number\":-4}\` to \`AnonymousModel\`:\nat path \"/number\" value \`-4\` is not assignable to type: \`positive number\`.`)
+    }, `[mobx-state-tree] Error while converting \`{\"number\":-4}\` to \`AnonymousModel\`:\nat path \"/number\" value \`-4\` is not assignable to type: \`positive number\` (Value does not respect the refinement predicate).`)
 })
