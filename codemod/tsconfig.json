@@ -1,9 +1,0 @@
-{
-    "compilerOptions": {
-        "target": "es5",
-        "outDir": "./lib"
-    },
-    "files":[
-        "./src/index.ts"
-    ]
-}
