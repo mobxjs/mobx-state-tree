@@ -63,7 +63,9 @@ export class Node {
                 return this.type.applySnapshot(this, snapshot)
             }
         ).bind(this.storedValue)
+    }
 
+    setupSnapshotReaction() {
         // optimization: don't keep the snapshot by default alive with a reaction by default
         // in prod mode. This saves lot of GC overhead (important for e.g. React Native)
         // if the feature is not actively used
@@ -455,6 +457,7 @@ export function createNode<S, T>(
         node._isRunningAction = true
         finalizeNewInstance(node, initialValue)
         node._isRunningAction = false
+        node.setupSnapshotReaction()
 
         if (parent) parent.root.identifierCache!.addNodeToCache(node)
         else node.identifierCache!.addNodeToCache(node)

@@ -152,11 +152,6 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         })
         const proto = this.modelConstructor.prototype
         proto.toString = objectTypeToString
-        this.forAllProps((name, type) =>
-            observable.ref(this.modelConstructor.prototype, name, {
-                value: undefinedType.instantiate(null, "", null, undefined)
-            })
-        ) // TODO: undefined type should not be needed
     }
 
     actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A> {
@@ -256,9 +251,14 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     finalizeNewInstance = (node: Node, snapshot: any) => {
         const instance = node.storedValue as IStateTreeNode
         this.forAllProps((name, type) => {
-            node.storedValue[name] = type.instantiate(node, name, node._environment, snapshot[name])
+            extendShallowObservable(instance, {
+                [name]: observable.ref(
+                    type.instantiate(node, name, node._environment, snapshot[name])
+                )
+            })
             extras.interceptReads(node.storedValue, name, node.unbox)
         })
+
         this.initializers.reduce((self, fn) => fn(self), instance)
         intercept(instance, change => this.willChange(change))
         observe(instance, this.didChange)
