@@ -374,45 +374,12 @@ Returns **IType&lt;any, any>**
 Middleware can be used to intercept any action is invoked on the subtree where it is attached.
 If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
 
-[SandBox example](https://codesandbox.io/s/mQrqy8j73)
-
-It is allowed to attach multiple middlewares. The order in which middleware is invoked is inside-out:
-local middleware is invoked before parent middleware. On the same object, earlier attached middleware is run before later attached middleware.
-
-A middleware receives two arguments: 1. the description of the the call, 2: a function to invoke the next middleware in the chain.
-If `next(call)` is not invoked by your middleware, the action will be aborted and not actually executed.
-Before passing the call to the next middleware using `next`, feel free to clone and modify the call description
-
-A call description looks like:
-
-    {
-         name: string // name of the action
-         object: any & IStateTreeNode // the object on which the action was original invoked
-         args: any[] // the arguments of the action
-         asyncMode: string
-         asyncId: number
-    }
-
-The fields `asyncMode` and `asyncId` are explained in detail in the [asynchronous action](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md#asynchronous-actions-and-middleware) section.
-
-An example of a build in middleware is the `onAction` method.
+For more details, see the [middleware docs](docs/middleware.md)
 
 **Parameters**
 
 -   `target` **IStateTreeNode** 
 -   `middleware`  
-
-**Examples**
-
-````javascript
-    ```typescript
-    const store = SomeStore.create()
-    const disposer = addMiddleWare(store, (call, next) => {
-      console.log(`action ${call.name} was invoked`)
-      next(call) // runs the next middleware (or the intended action if there is no middleware to run left)
-    })
-    ```
-````
 
 Returns **IDisposer** 
 
@@ -844,6 +811,16 @@ See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
 
+# isStateTreeNode
+
+Returns true if the given value is a node in a state tree.
+More precisely, that is, if the value is an instance of a
+`types.model`, `types.array` or `types.map`.
+
+**Parameters**
+
+-   `value` **Any** 
+
 # asReduxStore
 
 Creates a tiny proxy around a MST tree that conforms to the redux store api.
@@ -867,13 +844,3 @@ See this [example](https://github.com/mobxjs/mobx-state-tree/blob/e9e804c8c43e1e
 
 -   `remoteDevDep` **Any** 
 -   `model` **Any** 
-
-# isStateTreeNode
-
-Returns true if the given value is a node in a state tree.
-More precisely, that is, if the value is an instance of a
-`types.model`, `types.array` or `types.map`.
-
-**Parameters**
-
--   `value` **Any** 
