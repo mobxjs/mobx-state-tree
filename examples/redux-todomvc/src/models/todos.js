@@ -14,43 +14,43 @@ const Todo = types.model({
     id: 0
 })
 
-const TodoStore = types.model(
-    {
-        todos: types.optional(types.array(Todo), []),
-
+const TodoStore = types
+    .model({
+        todos: types.optional(types.array(Todo), [])
+    })
+    .views(self => ({
         // utilities
         findTodoById: function(id) {
-            return this.todos.find(todo => todo.id === id)
+            return self.todos.find(todo => todo.id === id)
         }
-    },
-    {
+    }))
+    .actions(self => ({
         // actions
         [ADD_TODO]({ text }) {
-            const id = this.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
-            this.todos.unshift({
+            const id = self.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
+            self.todos.unshift({
                 id,
                 text
             })
         },
         [DELETE_TODO]({ id }) {
-            const todo = this.findTodoById(id)
-            this.todos.remove(todo)
+            const todo = self.findTodoById(id)
+            self.todos.remove(todo)
         },
         [EDIT_TODO]({ id, text }) {
-            this.findTodoById(id).text = text
+            self.findTodoById(id).text = text
         },
         [COMPLETE_TODO]({ id }) {
-            const todo = this.findTodoById(id)
+            const todo = self.findTodoById(id)
             todo.completed = !todo.completed
         },
         [COMPLETE_ALL]() {
-            const areAllMarked = this.todos.every(todo => todo.completed)
-            this.todos.forEach(todo => (todo.completed = !areAllMarked))
+            const areAllMarked = self.todos.every(todo => todo.completed)
+            self.todos.forEach(todo => (todo.completed = !areAllMarked))
         },
         [CLEAR_COMPLETED]() {
-            this.todos.replace(this.todos.filter(todo => todo.completed === false))
+            self.todos.replace(self.todos.filter(todo => todo.completed === false))
         }
-    }
-)
+    }))
 
 export default TodoStore

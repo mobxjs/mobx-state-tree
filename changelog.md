@@ -1,3 +1,20 @@
+# 0.10.0
+
+* **BREAKING** the syntax to define model types has been updated. See the [updated docs] (https://github.com/mobxjs/mobx-state-tree#creating-models) or the original proposal:[#282](https://github.com/mobxjs/mobx-state-tree/pull/286), but no worries, theres a codemod! :D
+* **BREAKING** `preProcessSnapshot` hook is no longer a normal hook that can be defined as action. Instead, it should be defined on the type using `types.model(...).preProcessSnapshot(value => value)`
+* **BREAKING** Asynchronous process should now be defined using `process`. See this [example](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25) or the [asynchronous action docs](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
+
+**How to run the codemod?**
+
+The codemod is provided as npm package command line tool. It has been written using the TypeScript parser, so it will succefully support either TS or regular JavaScript source files.
+
+To run the codemod, you need to first install it globally by `npm install -g mst-codemod-to-0.10`.
+After that, the `mst-codemod-to-0.10` command will be available in your command line.
+
+To perform the codemod, you need to call in your command line `mst-codemod-to-0.10` followed by the filename you want to codemod. A `.bak` file with the original source will be created for backup purposes, and the file you provided will be updated to the new syntax! Have fun!
+
+PS: You could also use `npx` instead of installing the codemod globally! :)
+
 # 0.9.5
 
 * Asynchronous actions are now a first class concept in mobx-state-tree. See the [docs](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md)

@@ -1,6 +1,6 @@
 {
   "name": "mobx-state-tree",
-  "version": "0.9.5",
+  "version": "0.10.0-rc.1",
   "description": "Opinionated, transactional, MobX powered state container",
   "main": "dist/mobx-state-tree.js",
   "umd:main": "dist/mobx-state-tree.umd.js",
@@ -12,6 +12,7 @@
     "rollup": "rollup -c",
     "build-tests": "tsc -p test/",
     "test": "npm run build-tests && ava && npm run test-cyclic",
+    "update-snapshots": "ava -u",
     "speedtest": "npm run build-tests && node --expose-gc test-lib/test/perf/report.js",
     "test-cyclic": "npm run build && node -e \"require('.')\"",
     "watch": "tsc -p test && concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
@@ -20,7 +21,8 @@
     "build-docs": "npm run quick-build && documentation build lib/index.js --sort-order alpha -f md -o API.md.tmp && concat -o API.md docs/API_header.md API.md.tmp && rm API.md.tmp",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "clean": "rm -rf lib test-lib .nyc_output coverage",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "example-tests": "yarn run build && cd examples/boxes && yarn install && npm install ../../ && CI=true yarn jest && cd ../bookshop && yarn install && npm install ../../ && CI=true yarn test && cd ../redux-todomvc && yarn install && npm install ../../ && CI=true yarn test"
   },
   "repository": {
     "type": "git",
@@ -35,8 +37,8 @@
     "dist/"
   ],
   "devDependencies": {
-    "@types/node": "^8.0.10",
-    "ava": "^0.19.0",
+    "@types/node": "^8.0.19",
+    "ava": "^0.19.1",
     "concat": "^1.0.3",
     "concurrently": "^3.1.0",
     "coveralls": "^2.11.4",
@@ -44,7 +46,7 @@
     "documentation": "^4.0.0-beta9",
     "husky": "^0.13.4",
     "lint-staged": "^3.6.1",
-    "mobx": "^3.1.15",
+    "mobx": "^3.2.2",
     "nyc": "^10.0.0",
     "prettier": "^1.4.4",
     "rollup": "^0.43.0",
@@ -55,7 +57,7 @@
     "tape": "^4.6.0",
     "tslib": "^1.7.1",
     "tslint": "^3.15.1",
-    "typescript": "^2.4.1"
+    "typescript": "^2.4.2"
   },
   "peerDependencies": {
     "mobx": "^3.1.15"
@@ -82,5 +84,8 @@
       "prettier --write --print-width 100 --tab-width 4 --no-semi",
       "git add"
     ]
+  },
+  "dependencies": {
+    "mst-codemod-to-0.10": "file:codemod"
   }
 }

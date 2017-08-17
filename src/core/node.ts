@@ -43,6 +43,7 @@ export class Node {
         // Optimization: this does not need to be done per instance
         // if some pieces from createActionInvoker are extracted
         this.applyPatches = createActionInvoker(
+            this.storedValue,
             "@APPLY_PATCHES",
             (patches: IReversibleJsonPatch[]) => {
                 patches.forEach(patch => {
@@ -52,12 +53,16 @@ export class Node {
                 })
             }
         ).bind(this.storedValue)
-        this.applySnapshot = createActionInvoker("@APPLY_SNAPSHOT", (snapshot: any) => {
-            // if the snapshot is the same as the current one, avoid performing a reconcile
-            if (snapshot === this.snapshot) return
-            // else, apply it by calling the type logic
-            return this.type.applySnapshot(this, snapshot)
-        }).bind(this.storedValue)
+        this.applySnapshot = createActionInvoker(
+            this.storedValue,
+            "@APPLY_SNAPSHOT",
+            (snapshot: any) => {
+                // if the snapshot is the same as the current one, avoid performing a reconcile
+                if (snapshot === this.snapshot) return
+                // else, apply it by calling the type logic
+                return this.type.applySnapshot(this, snapshot)
+            }
+        ).bind(this.storedValue)
 
         // optimization: don't keep the snapshot by default alive with a reaction by default
         // in prod mode. This saves lot of GC overhead (important for e.g. React Native)

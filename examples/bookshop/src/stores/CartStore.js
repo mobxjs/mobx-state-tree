@@ -2,60 +2,64 @@ import { when, reaction } from "mobx"
 import { types, getParent, getSnapshot, applySnapshot } from "mobx-state-tree"
 import { Book } from "./BookStore"
 
-const CartEntry = types.model(
-    "CartEntry",
-    {
+const CartEntry = types
+    .model("CartEntry", {
         quantity: 0,
-        book: types.reference(Book),
+        book: types.reference(Book)
+    })
+    .views(self => ({
         get price() {
-            return this.book.price * this.quantity
+            return self.book.price * self.quantity
         },
         get isValidBook() {
-            return this.book.isAvailable
+            return self.book.isAvailable
         }
-    },
-    {
+    }))
+    .actions(self => ({
         increaseQuantity(amount) {
-            this.quantity += amount
+            self.quantity += amount
         },
         setQuantity(amount) {
-            this.quantity = amount
+            self.quantity = amount
         }
-    }
-)
+    }))
 
-export const CartStore = types.model(
-    "CartStore",
-    {
-        entries: types.array(CartEntry),
+export const CartStore = types
+    .model("CartStore", {
+        entries: types.array(CartEntry)
+    })
+    .views(self => ({
         get shop() {
-            return getParent(this)
+            return getParent(self)
         },
         get subTotal() {
-            return this.entries.reduce((sum, e) => sum + e.price, 0)
+            return self.entries.reduce((sum, e) => sum + e.price, 0)
         },
         get hasDiscount() {
-            return this.subTotal >= 100
+            return self.subTotal >= 100
         },
         get discount() {
-            return this.subTotal * (this.hasDiscount ? 0.1 : 0)
+            return self.subTotal * (self.hasDiscount ? 0.1 : 0)
         },
         get total() {
-            return this.subTotal - this.discount
+            return self.subTotal - self.discount
         },
         get canCheckout() {
-            return this.entries.length > 0 && this.entries.every(entry => entry.quantity > 0 && entry.isValidBook)
+            return (
+                self.entries.length > 0 &&
+                self.entries.every(entry => entry.quantity > 0 && entry.isValidBook)
+            )
         }
-    },
-    {
+    }))
+    .actions(self => ({
         afterAttach() {
             if (typeof window.localStorage !== "undefined") {
                 when(
-                    () => !this.shop.isLoading,
+                    () => !self.shop.isLoading,
                     () => {
-                        this.readFromLocalStorage()
+                        self.readFromLocalStorage()
                         reaction(
-                            () => getSnapshot(this),
+                            () => getSnapshot(self),
                             json => {
                                 window.localStorage.setItem("cart", JSON.stringify(json))
                             }
@@ -65,25 +69,24 @@ export const CartStore = types.model(
             }
         },
         addBook(book, quantity = 1, notify = true) {
-            let entry = this.entries.find(entry => entry.book === book)
+            let entry = self.entries.find(entry => entry.book === book)
             if (!entry) {
-                this.entries.push({ book: book })
-                entry = this.entries[this.entries.length - 1]
+                self.entries.push({ book: book })
+                entry = self.entries[self.entries.length - 1]
             }
             entry.increaseQuantity(quantity)
-            if (notify) this.shop.alert("Added to cart")
+            if (notify) self.shop.alert("Added to cart")
         },
         checkout() {
-            const total = this.total
-            this.clear()
-            this.shop.alert(`Bought books for ${total} € !`)
+            const total = self.total
+            self.clear()
+            self.shop.alert(`Bought books for ${total} € !`)
         },
         clear() {
-            this.entries.clear()
+            self.entries.clear()
         },
         readFromLocalStorage() {
             const cartData = window.localStorage.getItem("cart")
-            if (cartData) applySnapshot(this, JSON.parse(cartData))
+            if (cartData) applySnapshot(self, JSON.parse(cartData))
         }
-    }
-)
+    }))

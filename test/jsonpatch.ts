@@ -1,6 +1,5 @@
 import { getSnapshot, IJsonPatch, IType, unprotect, recordPatches, types } from "../src"
 import { test, TestContext, Context } from "ava"
-
 function testPatches<T extends IType<any, any>>(
     t: TestContext & Context<any>,
     type: T,
@@ -22,7 +21,6 @@ function testPatches<T extends IType<any, any>>(
         getSnapshot(instance),
         "reapplying patches didn't result in same clone"
     )
-
     recorder.undo()
     t.deepEqual(
         getSnapshot(instance),
@@ -30,7 +28,6 @@ function testPatches<T extends IType<any, any>>(
         "reverting the patches didn't result in the same snapshot"
     )
 }
-
 const Node = types.model("Node", {
     id: types.identifier(types.number),
     text: "Hi",

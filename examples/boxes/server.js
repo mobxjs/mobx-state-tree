@@ -11,7 +11,7 @@ new WebpackDevServer(webpack(config), {
         console.log(err)
     }
 
-    console.log("Listening at localhost:4000")
+    console.log("\nListening at localhost:4000\n")
 })
 
 var WebSocketServer = require("ws").Server

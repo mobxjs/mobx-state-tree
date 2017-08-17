@@ -8,60 +8,59 @@ const TODO_FILTERS = {
     [SHOW_COMPLETED]: todo => todo.completed
 }
 
-const Todo = types.model(
-    {
+const Todo = types
+    .model({
         text: types.string,
         completed: false,
         id: types.identifier(types.number)
-    },
-    {
+    })
+    .actions(self => ({
         remove() {
-            destroy(this)
+            destroy(self)
         },
         edit(text) {
-            this.text = text
+            self.text = text
         },
         complete() {
-            this.completed = !this.completed
+            self.completed = !self.completed
         }
-    }
-)
+    }))
 
-const TodoStore = types.model(
-    {
+const TodoStore = types
+    .model({
         todos: types.array(Todo),
-        filter: types.optional(filterType, SHOW_ALL),
-
+        filter: types.optional(filterType, SHOW_ALL)
+    })
+    .views(self => ({
         get completedCount() {
-            return this.todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0)
+            return self.todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0)
         },
         get activeCount() {
-            return this.todos.length - this.completedCount
+            return self.todos.length - self.completedCount
         },
         get filteredTodos() {
-            return this.todos.filter(TODO_FILTERS[this.filter])
+            return self.todos.filter(TODO_FILTERS[self.filter])
         }
-    },
-    {
+    }))
+    .actions(self => ({
         // actions
         addTodo(text) {
-            const id = this.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
-            this.todos.unshift({
+            const id = self.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
+            self.todos.unshift({
                 id,
                 text
             })
         },
         completeAll() {
-            const areAllMarked = this.todos.every(todo => todo.completed)
-            this.todos.forEach(todo => (todo.completed = !areAllMarked))
+            const areAllMarked = self.todos.every(todo => todo.completed)
+            self.todos.forEach(todo => (todo.completed = !areAllMarked))
         },
         clearCompleted() {
-            this.todos.replace(this.todos.filter(todo => todo.completed === false))
+            self.todos.replace(self.todos.filter(todo => todo.completed === false))
         },
         setFilter(filter) {
-            this.filter = filter
+            self.filter = filter
         }
-    }
-)
+    }))
 
 export default TodoStore

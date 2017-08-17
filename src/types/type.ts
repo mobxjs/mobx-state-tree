@@ -30,7 +30,9 @@ export interface IType<S, T> {
 
 export interface ISimpleType<T> extends IType<T, T> {}
 
-export interface IComplexType<S, T> extends IType<S, T & ISnapshottable<S> & IStateTreeNode> {}
+export interface IComplexType<S, T> extends IType<S, T & IStateTreeNode> {
+    create(snapshot?: S, environment?: any): T & ISnapshottable<S>
+}
 
 /*
  * A complex type produces a MST node (Node in the state tree)
@@ -44,7 +46,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     @action
-    create(snapshot: S = this.getDefaultSnapshot(), environment?: any): T {
+    create(snapshot: S = this.getDefaultSnapshot(), environment?: any) {
         typecheck(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).value
     }

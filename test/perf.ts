@@ -3,7 +3,7 @@ import { smallScenario, mediumScenario, largeScenario } from "./perf/scenarios"
 import { start } from "./perf/timer"
 
 // TODO: Not sure how this should work. This feels super fragile.
-const TOO_SLOW_MS = 1000
+const TOO_SLOW_MS = 10000
 
 test.serial("performs well on small scenario", t => {
     t.true(smallScenario(10).elapsed < TOO_SLOW_MS)

@@ -11,69 +11,74 @@ import {
     getSnapshot
 } from "../src"
 import { test } from "ava"
-
-export const Box = types.model(
-    "Box",
-    {
+export const Box = types
+    .model("Box", {
         id: types.identifier(),
         name: "",
         x: 0,
-        y: 0,
+        y: 0
+    })
+    .views(self => ({
         get width() {
-            return this.name.length * 15
+            return self.name.length * 15
         },
         get isSelected() {
-            if (!hasParent(this)) return false
-            return getParent(getParent(this)).selection === this
+            if (!hasParent(self)) return false
+            return getParent(getParent(self)).selection === self
         }
-    },
-    {
-        move(dx, dy) {
-            this.x += dx
-            this.y += dy
-        },
-        setName(newName) {
-            this.name = newName
+    }))
+    .actions(self => {
+        function move(dx, dy) {
+            self.x += dx
+            self.y += dy
         }
-    }
-)
-
+        function setName(newName) {
+            self.name = newName
+        }
+        return {
+            move,
+            setName
+        }
+    })
 export const Arrow = types.model("Arrow", {
     id: types.identifier(),
     from: types.reference(Box),
     to: types.reference(Box)
 })
-
-export const Store = types.model(
-    "Store",
-    {
+export const Store = types
+    .model("Store", {
         boxes: types.map(Box),
         arrows: types.array(Arrow),
         selection: types.reference(Box)
-    },
-    {
-        afterCreate() {
-            unprotect(this)
-        },
-        addBox(id, name, x, y) {
-            const box = Box.create({ name, x, y, id })
-            this.boxes.put(box)
-            return box
-        },
-        addArrow(id, from, to) {
-            this.arrows.push(Arrow.create({ id, from, to }))
-        },
-        setSelection(selection) {
-            this.selection = selection
-        },
-        createBox(id, name, x, y, source, arrowId) {
-            const box = this.addBox(id, name, x, y)
-            this.setSelection(box)
-            if (source) this.addArrow(arrowId, source.id, box.id)
+    })
+    .actions(self => {
+        function afterCreate() {
+            unprotect(self)
         }
-    }
-)
-
+        function addBox(id, name, x, y) {
+            const box = Box.create({ name, x, y, id })
+            self.boxes.put(box)
+            return box
+        }
+        function addArrow(id, from, to) {
+            self.arrows.push(Arrow.create({ id, from, to }))
+        }
+        function setSelection(selection) {
+            self.selection = selection
+        }
+        function createBox(id, name, x, y, source, arrowId) {
+            const box = addBox(id, name, x, y)
+            setSelection(box)
+            if (source) addArrow(arrowId, source.id, box.id)
+        }
+        return {
+            afterCreate,
+            addBox,
+            addArrow,
+            setSelection,
+            createBox
+        }
+    })
 function createStore() {
     return Store.create({
         boxes: {
@@ -100,7 +105,6 @@ test("store emits correct patch paths", t => {
     const recorder1 = recordPatches(s)
     const recorder2 = recordPatches(s.boxes)
     const recorder3 = recordPatches(s.boxes.get("cc")!)
-
     s.arrows[0].from!.x += 117
     t.deepEqual(recorder1.cleanPatches, [
         { op: "replace", path: "/boxes/cc/x", value: 217 } as IJsonPatch
@@ -115,7 +119,6 @@ test("box operations works correctly", t => {
     const s = createStore()
     s.createBox("a", "A", 0, 0, null, null)
     s.createBox("b", "B", 100, 100, s.boxes.get("aa"), "aa2b")
-
     t.deepEqual(getSnapshot(s), {
         boxes: {
             cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
@@ -126,9 +129,7 @@ test("box operations works correctly", t => {
         arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
         selection: "b"
     })
-
     s.boxes.get("a")!.setName("I'm groot")
-
     t.deepEqual(getSnapshot(s), {
         boxes: {
             cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
@@ -139,9 +140,7 @@ test("box operations works correctly", t => {
         arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
         selection: "b"
     })
-
     s.boxes.get("a")!.move(50, 50)
-
     t.deepEqual(getSnapshot(s), {
         boxes: {
             cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
@@ -152,7 +151,6 @@ test("box operations works correctly", t => {
         arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
         selection: "b"
     })
-
     t.is(s.boxes.get("b")!.width, 15)
     t.is(Box.create({ id: "hello" }).isSelected, false)
 })

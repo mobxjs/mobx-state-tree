@@ -6,11 +6,9 @@ test("it should provide a default value, if no snapshot is provided", t => {
         name: "",
         quantity: 0
     })
-
     const Factory = types.model({
         rows: types.optional(types.array(Row), [{ name: "test" }])
     })
-
     const doc = Factory.create()
     t.deepEqual<any>(getSnapshot(doc), { rows: [{ name: "test", quantity: 0 }] })
 })
@@ -20,11 +18,9 @@ test("it should use the snapshot if provided", t => {
         name: "",
         quantity: 0
     })
-
     const Factory = types.model({
         rows: types.optional(types.array(Row), [{ name: "test" }])
     })
-
     const doc = Factory.create({ rows: [{ name: "snapshot", quantity: 0 }] })
     t.deepEqual<any>(getSnapshot(doc), { rows: [{ name: "snapshot", quantity: 0 }] })
 })
@@ -34,12 +30,11 @@ test("it should throw if default value is invalid snapshot", t => {
         name: types.string,
         quantity: types.number
     })
-
     const error = t.throws(() => {
         types.model({
             rows: types.optional(types.array(Row), [{}])
         })
-    }, err => err.message.includes("[mobx-state-tree]") && err.message.includes("AnonymousModel[]") && err.message.includes("/0/name") && err.message.includes("/0/quantity"))
+    })
 })
 
 test("it should throw bouncing errors from its sub-type", t => {
@@ -48,10 +43,9 @@ test("it should throw bouncing errors from its sub-type", t => {
         quantity: types.number
     })
     const RowList = types.optional(types.array(Row), [])
-
     const error = t.throws(() => {
         RowList.create([{ name: "a", quantity: 1 }, { name: "b", quantity: "x" }])
-    }, /at path "\/1\/quantity" value `"x"` is not assignable to type: `number`/g)
+    })
 })
 
 test("it should accept a function to provide dynamic values", t => {
@@ -59,20 +53,13 @@ test("it should accept a function to provide dynamic values", t => {
     const Factory = types.model({
         a: types.optional(types.number, () => defaultValue)
     })
-
     t.deepEqual(getSnapshot(Factory.create()), { a: 1 })
-
     defaultValue = 2
     t.deepEqual(getSnapshot(Factory.create()), { a: 2 })
-
     defaultValue = "hello world!"
     t.throws(
         () => Factory.create(),
-        err =>
-            err.message.includes("[mobx-state-tree]") &&
-            err.message.includes("hello world!") &&
-            err.message.includes("not assignable") &&
-            err.message.includes("number")
+        `[mobx-state-tree] Error while converting \`"hello world!"\` to \`number\`:\nvalue \`"hello world!"\` is not assignable to type: \`number\` (Value is not a number).`
     )
 })
 
@@ -86,12 +73,9 @@ test("Values should reset to default if omitted in snapshot", t => {
     })
     const store = Store.create({ todo: { id: "2" } })
     unprotect(store)
-
     store.todo.done = true
     t.is(store.todo.done, true)
-
     store.todo = { title: "stuff", id: "2" } as any
-
     t.is(store.todo.title, "stuff")
     t.is(store.todo.done, false)
 })
@@ -101,11 +85,9 @@ test("a model is a valid default value, snapshot will be used", t => {
         name: "",
         quantity: 0
     })
-
     const Factory = types.model({
         rows: types.optional(types.array(Row), types.array(Row).create())
     })
-
     const doc = Factory.create()
     t.deepEqual<any>(getSnapshot(doc), { rows: [] })
 })

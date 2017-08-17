@@ -15,7 +15,7 @@ export {
 export * from "./core/mst-operations"
 export { escapeJsonPath, unescapeJsonPath, IJsonPatch } from "./core/json-patch"
 export { onAction } from "./core/action"
-// export { asyncAction as async } from "./core/async"
+export { process } from "./core/process"
 export { isStateTreeNode, IStateTreeNode } from "./core/node"
 
 export { asReduxStore, IReduxStore, connectReduxDevtools } from "./interop/redux"

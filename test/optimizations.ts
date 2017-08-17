@@ -7,10 +7,8 @@ test("it should avoid processing patch if is exactly the current one in applySna
         a: types.number,
         b: types.string
     })
-
     const store = Model.create({ a: 1, b: "hello" })
     called = false
-
     const snapshot = getSnapshot(store)
     applySnapshot(store, snapshot)
     t.is(getSnapshot(store), snapshot) // no new snapshot emitted
@@ -21,14 +19,11 @@ test("it should avoid processing patch if is exactly the current one in reconcil
         a: types.number,
         b: types.string
     })
-
     const RootModel = types.model({
         a: Model
     })
-
     const store = RootModel.create({ a: { a: 1, b: "hello" } })
     unprotect(store)
-
     const snapshot = getSnapshot(store)
     store.a = snapshot.a
     t.is(getSnapshot(store.a), snapshot.a)

@@ -1,6 +1,6 @@
-import { IStateTreeNode } from '../../core/'
-import { IContext, IValidationResult } from '../type-checker'
-import { IObjectChange, IObjectWillChange } from 'mobx'
+import { IStateTreeNode } from "../../core/"
+import { IContext, IValidationResult } from "../type-checker"
+import { IObjectChange, IObjectWillChange } from "mobx"
 
 export abstract class Property {
     constructor(public name: string) {

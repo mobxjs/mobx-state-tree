@@ -1,7 +1,6 @@
 import * as mst from "../src"
 import { test } from "ava"
 import { readFileSync } from "fs"
-
 const METHODS = [
     "addDisposer",
     "addMiddleware",
@@ -31,6 +30,7 @@ const METHODS = [
     "onAction",
     "onPatch",
     "onSnapshot",
+    "process",
     "protect",
     "recordActions",
     "recordPatches",
@@ -43,7 +43,6 @@ const METHODS = [
     "unprotect",
     "walk"
 ]
-
 const TYPES = [
     "Date",
     "array",

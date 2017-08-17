@@ -4,12 +4,28 @@ import {
     IObjectChange,
     IObjectWillChange,
     intercept,
-    observe
+    observe,
+    computed,
+    isComputed
 } from "mobx"
-import { extendKeepGetter, fail, hasOwnProperty, isPlainObject, isPrimitive } from "../../utils"
+import {
+    fail,
+    hasOwnProperty,
+    isPlainObject,
+    isPrimitive,
+    EMPTY_ARRAY,
+    addHiddenFinalProp
+} from "../../utils"
 import { ComplexType, IComplexType, IType } from "../type"
-import { TypeFlags, isType, isObjectType } from "../type-flags"
-import { createNode, getStateTreeNode, IStateTreeNode, IJsonPatch, Node } from "../../core"
+import { TypeFlags, isType } from "../type-flags"
+import {
+    createNode,
+    getStateTreeNode,
+    IStateTreeNode,
+    IJsonPatch,
+    Node,
+    createActionInvoker
+} from "../../core"
 import {
     flattenTypeErrors,
     IContext,
@@ -19,15 +35,13 @@ import {
 } from "../type-checker"
 import { getPrimitiveFactoryFromValue } from "../primitives"
 import { optional } from "../utility-types/optional"
+// TODO: eliminate property / value-property
 import { Property } from "../property-types/property"
-import { ComputedProperty } from "../property-types/computed-property"
 import { ValueProperty } from "../property-types/value-property"
-import { ActionProperty } from "../property-types/action-property"
-import { ViewProperty } from "../property-types/view-property"
-import { VolatileProperty } from "../property-types/volatile-property"
+
+const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 
 const HOOK_NAMES = [
-    "preProcessSnapshot",
     "afterCreate",
     "afterAttach",
     "postProcessSnapshot",
@@ -39,45 +53,131 @@ function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
 }
 
+export type ObjectTypeConfig = {
+    name?: string
+    properties?: { [K: string]: IType<any, any> }
+    initializers?: ReadonlyArray<((instance: any) => any)>
+    preProcessor?: (snapshot: any) => any
+}
+
+const defaultObjectOptions = {
+    name: "AnonymousModel",
+    properties: {},
+    initializers: EMPTY_ARRAY
+}
+
 // TODO: rename to Model
-export class ObjectType extends ComplexType<any, any> {
-    shouldAttachNode = true
+export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S, T> {
     readonly flags = TypeFlags.Object
 
     /*
      * The original object definition
      */
-    properties: any
-    state: any
-    actions: any
+    public readonly initializers: ((instance: any) => any)[]
+    public readonly properties: { [K: string]: IType<any, any> }
+    private readonly parsedProperties: { [K: string]: ValueProperty } = {}
+    private preProcessor: (snapshot: any) => any | undefined
 
     modelConstructor: new () => any
 
-    /*
-     * Parsed description of all properties
-     */
-    private props: {
-        [key: string]: Property
-    } = {}
-
-    constructor(name: string, baseModel: Object, baseState: Object, baseActions: Object) {
-        super(name)
-        Object.freeze(baseModel) // make sure nobody messes with it
-        Object.freeze(baseActions)
-        this.properties = baseModel
-        this.state = baseState
-        this.actions = baseActions
+    constructor(opts: ObjectTypeConfig) {
+        super(opts.name || defaultObjectOptions.name)
+        const name = opts.name || defaultObjectOptions.name
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
-        // fancy trick to get a named function...., http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
-        // Although object.defineProperty on a real function could also be used, that name is not used everywhere, for example when logging an object to the Chrome console, so this works better:
-        this.modelConstructor = class { }
+        Object.assign(this, defaultObjectOptions, opts)
+        Object.freeze(this.properties) // make sure nobody messes with it
+        this.createModelConstructor()
+    }
+
+    extend(opts: ObjectTypeConfig): ObjectType<any, any> {
+        return new ObjectType({
+            name: opts.name || this.name,
+            properties: Object.assign({}, this.properties, opts.properties),
+            initializers: this.initializers.concat((opts.initializers as any) || []),
+            preProcessor: opts.preProcessor || this.preProcessor
+        })
+    }
+
+    private createModelConstructor() {
+        // Fancy trick to get a named constructor
+        this.modelConstructor = class {}
         Object.defineProperty(this.modelConstructor, "name", {
-            value: name,
+            value: this.name,
             writable: false
         })
-        this.modelConstructor.prototype.toString = objectTypeToString
+        const proto = this.modelConstructor.prototype
+        proto.toString = objectTypeToString
         this.parseModelProps()
         this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
+    }
+
+    actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A> {
+        const actionInitializer = (self: T) => {
+            const actions = fn(self)
+            if (!isPlainObject(actions))
+                fail(`actions initializer should return a plain object containing actions`)
+            Object.keys(actions).forEach(name => {
+                if (name === PRE_PROCESS_SNAPSHOT)
+                    fail(
+                        `Cannot define action '${PRE_PROCESS_SNAPSHOT}', it should be defined using 'type.preProcessSnapshot(fn)' instead`
+                    )
+                addHiddenFinalProp(self, name, createActionInvoker(self, name, actions[name]))
+            })
+            return self
+        }
+        return this.extend({ initializers: [actionInitializer] })
+    }
+
+    named(name: string): IModelType<S, T> {
+        return this.extend({ name })
+    }
+
+    props<SP, TP>(
+        properties: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
+    ): IModelType<S & SP, T & TP> {
+        return this.extend({ properties } as any)
+    }
+
+    views<V extends Object>(fn: (self: T) => V): IModelType<S, T & V> {
+        const viewInitializer = (self: T) => {
+            const views = fn(self)
+            // TODO: check view return
+            Object.keys(views).forEach(key => {
+                // is this a computed property?
+                const descriptor = Object.getOwnPropertyDescriptor(views, key)
+                const { value } = descriptor
+                if ("get" in descriptor) {
+                    // TODO: mobx currently does not allow redefining computes yet, pending #1121
+                    if (isComputed((self as any).$mobx.values[key])) {
+                        // TODO: use `isComputed(self, key)`, pending mobx #1120
+                        ;(self as any).$mobx.values[key] = computed(descriptor.get!, {
+                            name: key,
+                            setter: descriptor.set,
+                            context: self
+                        })
+                    } else {
+                        const tmp = {}
+                        Object.defineProperty(tmp, key, {
+                            get: descriptor.get,
+                            set: descriptor.set,
+                            enumerable: true
+                        })
+                        extendShallowObservable(self, tmp)
+                    }
+                } else if (typeof value === "function") {
+                    // this is a view function, merge as is!
+                    addHiddenFinalProp(self, key, value)
+                } else {
+                    fail(`A view member should either be a function or getter based property`)
+                }
+            })
+            return self
+        }
+        return this.extend({ initializers: [viewInitializer] })
+    }
+
+    preProcessSnapshot<T>(preProcessor: (snapshot: T) => S): IModelType<S, T> {
+        return this.extend({ preProcessor })
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
@@ -86,10 +186,12 @@ export class ObjectType extends ComplexType<any, any> {
             parent,
             subpath,
             environment,
-            this.preProcessSnapshot(snapshot),
+            this.applySnapshotPreProcessor(snapshot),
             this.createNewInstance,
             this.finalizeNewInstance
         )
+        // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
+        // that pre-reserves all these fields for fast object-member lookups
     }
 
     createNewInstance = () => {
@@ -101,6 +203,7 @@ export class ObjectType extends ComplexType<any, any> {
     finalizeNewInstance = (node: Node, snapshot: any) => {
         const instance = node.storedValue as IStateTreeNode
         this.forAllProps(prop => prop.initialize(instance, snapshot))
+        this.initializers.reduce((self, fn) => fn(self), instance)
         intercept(instance, change => this.willChange(change))
         observe(instance, this.didChange)
     }
@@ -108,17 +211,15 @@ export class ObjectType extends ComplexType<any, any> {
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getStateTreeNode(change.object)
         node.assertWritable()
-
-        return this.props[change.name].willChange(change)
+        return this.parsedProperties[change.name].willChange(change)
     }
 
     didChange = (change: IObjectChange) => {
-        this.props[change.name].didChange(change)
+        this.parsedProperties[change.name].didChange(change)
     }
 
     parseModelProps() {
-        const { properties, state, actions } = this
-
+        const { properties } = this
         for (let key in properties)
             if (hasOwnProperty(properties, key)) {
                 if (HOOK_NAMES.indexOf(key) !== -1)
@@ -128,10 +229,8 @@ export class ObjectType extends ComplexType<any, any> {
 
                 const descriptor = Object.getOwnPropertyDescriptor(properties, key)
                 if ("get" in descriptor) {
-                    this.props[key] = new ComputedProperty(key, descriptor.get!, descriptor.set)
-                    continue
+                    fail("Getters are not supported as properties. Please use views instead")
                 }
-
                 const { value } = descriptor
                 if (value === null || undefined) {
                     fail(
@@ -139,52 +238,17 @@ export class ObjectType extends ComplexType<any, any> {
                     )
                 } else if (isPrimitive(value)) {
                     const baseType = getPrimitiveFactoryFromValue(value)
-                    this.props[key] = new ValueProperty(key, optional(baseType, value))
+                    this.parsedProperties[key] = new ValueProperty(key, optional(baseType, value))
                 } else if (isType(value)) {
-                    this.props[key] = new ValueProperty(key, value)
+                    this.parsedProperties[key] = new ValueProperty(key, value)
                 } else if (typeof value === "function") {
-                    this.props[key] = new ViewProperty(key, value)
+                    fail("Functions are not supported as properties, use views instead")
                 } else if (typeof value === "object") {
                     fail(
                         `In property '${key}': base model's should not contain complex values: '${value}'`
                     )
                 } else {
                     fail(`Unexpected value for property '${key}'`)
-                }
-            }
-
-        for (let key in state)
-            if (hasOwnProperty(state, key)) {
-                if (HOOK_NAMES.indexOf(key) !== -1)
-                    console.warn(
-                        `Hook '${key}' was defined as local state. Hooks should be defined as part of the actions`
-                    )
-
-                const value = state[key]
-                if (key in this.properties)
-                    fail(
-                        `Property '${key}' was also defined as local state. Local state fields and properties should not collide`
-                    )
-                this.props[key] = new VolatileProperty(key, value)
-            }
-
-        for (let key in actions)
-            if (hasOwnProperty(actions, key)) {
-                const value = actions[key]
-                if (key in this.properties)
-                    fail(
-                        `Property '${key}' was also defined as action. Actions and properties should not collide`
-                    )
-                if (key in this.state)
-                    fail(
-                        `Property '${key}' was also defined as local state. Actions and state should not collide`
-                    )
-                if (typeof value === "function") {
-                    this.props[key] = new ActionProperty(key, value)
-                } else {
-                    fail(
-                        `Unexpected value for action '${key}'. Expected function, got ${typeof value}`
-                    )
                 }
             }
     }
@@ -198,8 +262,9 @@ export class ObjectType extends ComplexType<any, any> {
     }
 
     getChildNode(node: Node, key: string): Node {
-        if (!(this.props[key] instanceof ValueProperty)) return fail("Not a value property: " + key)
-        return (this.props[key] as ValueProperty).getValueNode(node.storedValue)
+        if (!(this.parsedProperties[key] instanceof ValueProperty))
+            return fail("Not a value property: " + key)
+        return (this.parsedProperties[key] as ValueProperty).getValueNode(node.storedValue)
     }
 
     getValue(node: Node): any {
@@ -209,7 +274,9 @@ export class ObjectType extends ComplexType<any, any> {
     getSnapshot(node: Node): any {
         const res = {}
         this.forAllProps(prop => prop.serialize(node.storedValue, res))
-        return this.postProcessSnapshot(res)
+        if (typeof node.storedValue.postProcessSnapshot === "function")
+            return node.storedValue.postProcessSnapshot.call(null, res)
+        return res
     }
 
     applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
@@ -220,42 +287,40 @@ export class ObjectType extends ComplexType<any, any> {
 
     @action
     applySnapshot(node: Node, snapshot: any): void {
-        const s = this.preProcessSnapshot(snapshot)
+        const s = this.applySnapshotPreProcessor(snapshot)
         typecheck(this, s)
-        for (let key in this.props) this.props[key].deserialize(node.storedValue, s)
+        // TODO: check that there are no superfluos properties!
+        this.forAllProps(prop => {
+            prop.deserialize(node.storedValue, s)
+        })
     }
 
-    preProcessSnapshot(snapshot: any) {
-        if (typeof this.actions.preProcessSnapshot === "function")
-            return this.actions.preProcessSnapshot.call(null, snapshot)
-        return snapshot
-    }
-
-    postProcessSnapshot(snapshot: any) {
-        if (typeof this.actions.postProcessSnapshot === "function")
-            return this.actions.postProcessSnapshot.call(null, snapshot)
+    applySnapshotPreProcessor(snapshot: any) {
+        if (this.preProcessor) return this.preProcessor.call(null, snapshot)
         return snapshot
     }
 
     getChildType(key: string): IType<any, any> {
-        return (this.props[key] as ValueProperty).type
+        return (this.parsedProperties[key] as ValueProperty).type
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        let snapshot = this.preProcessSnapshot(value)
+        let snapshot = this.applySnapshotPreProcessor(value)
 
         if (!isPlainObject(snapshot)) {
             return typeCheckFailure(context, snapshot, "Value is not a plain object")
         }
 
         return flattenTypeErrors(
-            Object.keys(this.props).map(path => this.props[path].validate(snapshot, context))
+            Object.keys(this.parsedProperties).map(path =>
+                this.parsedProperties[path].validate(snapshot, context)
+            )
         )
     }
 
     private forAllProps(fn: (o: Property) => void) {
         // optimization: persists keys or loop more efficiently
-        Object.keys(this.props).forEach(key => fn(this.props[key]))
+        Object.keys(this.parsedProperties).forEach(key => fn(this.parsedProperties[key]))
     }
 
     describe() {
@@ -263,9 +328,9 @@ export class ObjectType extends ComplexType<any, any> {
         // optimization: cache
         return (
             "{ " +
-            Object.keys(this.props)
+            Object.keys(this.parsedProperties)
                 .map(key => {
-                    const prop = this.props[key]
+                    const prop = this.parsedProperties[key]
                     return prop instanceof ValueProperty ? key + ": " + prop.type.describe() : ""
                 })
                 .filter(Boolean)
@@ -283,6 +348,20 @@ export class ObjectType extends ComplexType<any, any> {
     }
 }
 
+export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
+    named(newName: string): IModelType<S, T>
+    props<SP, TP>(
+        props: { [K in keyof TP]: IType<any, TP[K]> | TP[K] } &
+            { [K in keyof SP]: IType<SP[K], any> | SP[K] }
+    ): IModelType<S & Snapshot<SP>, T & TP>
+    //props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
+    views<V extends Object>(fn: (self: T & IStateTreeNode) => V): IModelType<S, T & V>
+    actions<A extends { [name: string]: Function }>(
+        fn: (self: T & IStateTreeNode) => A
+    ): IModelType<S, T & A>
+    preProcessSnapshot<T>(fn: (snapshot: T) => S): IModelType<S, T>
+}
+
 export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }
 export type IModelVolatileState<T> = { [K in keyof T]: ((self?: any) => T[K]) | T[K] }
 
@@ -290,32 +369,11 @@ export type Snapshot<T> = {
     [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
 }
 
-export interface IModelType<T = {}, S = {}, A = {}> extends IComplexType<Snapshot<T>, T & S & A> {
-    properties: IModelProperties<T>
-    state: IModelVolatileState<S>
-    actions: A
-}
-
-export function model<T = {}, S = {}, A = {}>(
+export function model<T = {}>(
     name: string,
-    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
-    volatileState: IModelVolatileState<S> & ThisType<IStateTreeNode & T & S>,
-    operations: A & ThisType<IStateTreeNode & T & A & S>
-): IModelType<T & IStateTreeNode, S, A>
-export function model<T = {}, S = {}, A = {}>(
-    name: string,
-    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
-    operations?: A & ThisType<IStateTreeNode & T & A & S>
-): IModelType<T & IStateTreeNode, S, A>
-export function model<T = {}, S = {}, A = {}>(
-    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
-    volatileState: IModelVolatileState<S> & ThisType<IStateTreeNode & T & S>,
-    operations: A & ThisType<IStateTreeNode & T & A & S>
-): IModelType<T & IStateTreeNode, S, A>
-export function model<T = {}, S = {}, A = {}>(
-    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & S>,
-    operations?: A & ThisType<IStateTreeNode & T & A & S>
-): IModelType<T & IStateTreeNode, S, A>
+    properties?: IModelProperties<T>
+): IModelType<Snapshot<T>, T>
+export function model<T = {}>(properties?: IModelProperties<T>): IModelType<Snapshot<T>, T>
 /**
  * Creates a new model type by providing a name, properties, volatile state and actions.
  *
@@ -326,85 +384,39 @@ export function model<T = {}, S = {}, A = {}>(
  */
 export function model(...args: any[]) {
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
-    const props = args.shift() || fail("types.model must specify properties")
-    const volatileState = (args.length > 1 && args.shift()) || {}
-    const actions = args.shift() || {}
-    return new ObjectType(name, props, volatileState, actions)
+    const properties = args.shift() || {}
+    return new ObjectType({ name, properties })
 }
 
+export function compose<T1, S1, T2, S2, T3, S3>(
+    t1: IModelType<T1, S1>,
+    t2: IModelType<T2, S2>,
+    t3?: IModelType<T3, S3>
+): IModelType<T1 & T2 & T3, S1 & S2 & S3> // ...and so forth...
 export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
-    t1: IModelType<T1, S1, A1>,
-    t2: IModelType<T2, S2, A2>,
-    t3?: IModelType<T3, S3, A3>
-): IModelType<IStateTreeNode & T1 & T2 & T3, S1 & S2 & S3, A1 & A2 & A3> // ...and so forth...
-export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
     name: string,
-    t1: IModelType<T1, S1, A1>,
-    t2: IModelType<T2, S2, A2>,
-    t3?: IModelType<T3, S3, A3>
-): IModelType<IStateTreeNode & T1 & T2 & T3, S1 & S2 & S3, A1 & A2 & A3> // ...and so forth...
-export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
-    name: string,
-    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
-    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>,
-    volatileState: IModelVolatileState<S> & ThisType<IStateTreeNode & BASE_T & T & BASE_S & S>,
-    operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
-): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
-export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
-    name: string,
-    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
-    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>,
-    operations?: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
-): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
-export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
-    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
-    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>,
-    volatileState: IModelVolatileState<S> & ThisType<IStateTreeNode & BASE_T & T & BASE_S & S>,
-    operations: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
-): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
-export function compose<BASE_T, BASE_S, BASE_A, T, S, A>(
-    baseType: IModelType<BASE_T, BASE_S, BASE_A>,
-    properties: IModelProperties<T> & ThisType<IStateTreeNode & T & BASE_T>,
-    operations?: A & ThisType<BASE_T & T & BASE_S & S & BASE_A & A>
-): IModelType<IStateTreeNode & BASE_T & T, BASE_S & S, BASE_A & A>
+    t1: IModelType<T1, S1>,
+    t2: IModelType<T2, S2>,
+    t3?: IModelType<T3, S3>
+): IModelType<T1 & T2 & T3, S1 & S2 & S3> // ...and so forth...
 /**
  * Composes a new model from one or more existing model types.
  * This method can be invoked in two forms:
- * 1. Given 2 or more model types, the types are composed into a new Type.
- * 2. Given 1 model type, and additionally a set of properties, actions and volatile state, a new type is composed.
- *
- * Overloads:
- *
- * * `compose(...modelTypes)`
- * * `compose(modelType, properties)`
- * * `compose(modelType, properties, actions)`
- * * `compose(modelType, properties, volatileState, actions)`
- *
- * [Example of form 2](https://github.com/mobxjs/mobx-state-tree#simulate-inheritance-by-using-type-composition)
+ * Given 2 or more model types, the types are composed into a new Type.
  *
  * @export
  * @alias types.compose
  */
-export function compose(...args: any[]) {
-    const typeName = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
-
-    if (args.every(arg => isType(arg))) {
-        // compose types
-        return (args as IModelType<any, any, any>[]).reduce((prev, cur) =>
-            compose(typeName, prev, cur.properties, cur.state, cur.actions)
+export function compose(...args: any[]): IModelType<any, any> {
+    // TODO: just join the base type names if no name is provided
+    const typeName: string = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+    return (args as ObjectType<any, any>[])
+        .reduce((prev, cur) =>
+            prev.extend({
+                name: prev.name + "_" + cur.name,
+                properties: cur.properties,
+                initializers: cur.initializers
+            })
         )
-    }
-
-    const baseType = args.shift()
-    const props = args.shift() || fail("types.compose must specify properties or `{}`")
-    const volatileState = (args.length > 1 && args.shift()) || {}
-    const actions = args.shift() || {}
-
-    if (!isObjectType(baseType)) return fail(`Only model types can be composed`)
-    return model(
-        typeName,
-        extendKeepGetter({}, baseType.properties, props),
-        extendKeepGetter({}, baseType.state, volatileState),
-        extendKeepGetter({}, baseType.actions, actions)
-    )
+        .named(typeName)
 }
