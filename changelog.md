@@ -1,3 +1,7 @@
+# 0.10.1
+
+Removed accidental dependency on the codemod
+
 # 0.10.0
 
 * **BREAKING** the syntax to define model types has been updated. See the [updated docs] (https://github.com/mobxjs/mobx-state-tree#creating-models) or the original proposal:[#282](https://github.com/mobxjs/mobx-state-tree/pull/286), but no worries, theres a codemod! :D
