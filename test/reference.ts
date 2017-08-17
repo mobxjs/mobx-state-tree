@@ -489,24 +489,14 @@ test("References are non-nullable by default", t => {
     })
     unprotect(store)
     t.is(store.maybeRef, null)
-    t.throws(
-        () => store.ref,
-        "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /ref)"
-    )
+    t.snapshot(t.throws(() => store.ref).message)
     store.maybeRef = 3 as any
     t.is(store.maybeRef, store.todo)
     store.maybeRef = 4 as any
-    t.throws(
-        () => store.maybeRef,
-        "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /maybeRef)"
-    )
+    t.snapshot(t.throws(() => store.maybeRef).message)
     store.maybeRef = null
     t.is(store.maybeRef, null)
-    t.throws(
-        () => (store.ref = null as any),
-        `[mobx-state-tree] Error while converting \`null\` to \`reference(AnonymousModel)\`:
-    value \`null\` is not assignable to type: \`reference(AnonymousModel)\` (Value is not a valid identifier, which is a string or a number), expected an instance of \`reference(AnonymousModel)\` or a snapshot like \`reference(AnonymousModel)\` instead.`
-    )
+    t.snapshot(t.throws(() => (store.ref = null as any)).message)
 })
 
 test("References are described properly", t => {

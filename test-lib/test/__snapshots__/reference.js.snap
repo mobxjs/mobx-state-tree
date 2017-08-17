@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`References are non-nullable by default 1`] = `"[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /ref)"`;
+
+exports[`References are non-nullable by default 2`] = `"[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /maybeRef)"`;
+
+exports[`References are non-nullable by default 3`] = `
+"[mobx-state-tree] Error while converting \`null\` to \`reference(AnonymousModel)\`:
+value \`null\` is not assignable to type: \`reference(AnonymousModel)\` (Value is not a valid identifier, which is a string or a number), expected an instance of \`reference(AnonymousModel)\` or a snapshot like \`reference(AnonymousModel)\` instead."
+`;
