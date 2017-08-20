@@ -231,7 +231,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
 
     createNewInstance = () => {
         const instance = observable.shallowObject(EMPTY_OBJECT)
-        instance.toString = objectTypeToString
+        addHiddenFinalProp(instance, "toString", objectTypeToString)
         return instance as Object
     }
 
