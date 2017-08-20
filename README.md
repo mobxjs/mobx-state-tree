@@ -29,7 +29,7 @@
   * [Volatile state](#volatile-state)
   * [Dependency injection](#dependency-injection)
 * [Types overview](#types-overview)
-  * [Lifecycle hooks](https://github.com/mobxjs/mobx-state-tree#lifecycle-hooks-for-typesmodel)
+  * [Lifecycle hooks](#lifecycle-hooks-for-typesmodel)
 * [Api overview](#api-overview)
 * [Tips](#tips)
 * [FAQ](#FAQ)
@@ -43,7 +43,6 @@
 * CDN: https://unpkg.com/mobx-state-tree@0.8.2/dist/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
 * Playground: [https://mattiamanzati.github.io/mobx-state-tree-playground/](https://mattiamanzati.github.io/mobx-state-tree-playground/) (with React UI, snapshots, patches and actions display)
 * CodeSandbox [TodoList demo](https://codesandbox.io/s/nZ26kGMD) fork for testing and bug reporting
-* JSBin [playground](http://jsbin.com/petoxeheta/edit?html,js,console) (for non console based fiddles)
 
 Typescript typings are included in the packages. Use `module: "commonjs"` or `moduleResolution: "node"` to make sure they are picked up automatically in any consuming project.
 
@@ -362,9 +361,9 @@ Actions are replayable and are therefore constrained in several ways:
 
 Useful methods:
 
--   `onAction(model, listener)` listens to any action that is invoked on the model or any of its descendants. See `onAction` for more details.
--   `addMiddleware(model, middleware)` listens to any action that is invoked on the model or any of its descendants. See `addMiddleware` for more details.
--   `applyAction(model, action)` invokes an action on the model according to the given action description
+-   [`onAction`](API.md#onaction) listens to any action that is invoked on the model or any of its descendants.
+-   [`addMiddleware`](API.md#addmiddleware) listens to any action that is invoked on the model or any of its descendants.
+-   [`applyAction`](API.md#applyaction) invokes an action on the model according to the given action description
 
 #### Asynchronous actions
 
@@ -403,7 +402,7 @@ For more details on creating middleware, see the [docs](docs/middleware.md)
 
 #### Disabling protected mode
 
-This may be desired if the default protection of mobx-state-tree doesn't fit your use case. For example, if you are not interested in replayable actions, or hate the effort of writing actions to modify any field; `unprotect(tree)` will disable the protected mode of a tree, allowing anyone to directly modify the tree.
+This may be desired if the default protection of `mobx-state-tree` doesn't fit your use case. For example, if you are not interested in replayable actions, or hate the effort of writing actions to modify any field; `unprotect(tree)` will disable the protected mode of a tree, allowing anyone to directly modify the tree.
 
 ### Snapshots
 
@@ -691,7 +690,6 @@ These are the types available in MST. All types can be found in the `types` name
 * `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
 * `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is immutable.
 * `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one
-* `types.compose(name?, baseType, props, volatileState?, actions?)`, creates a new model type by taking an existing type and introducing additional properties, state and actions
 
 ## Property types
 
@@ -743,7 +741,7 @@ Note, all hooks should be defined as actions.
 
 # Api overview
 
-See the [full API docs](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md) for more details.
+See the [full API docs](API.md) for more details.
 
 | signature | |
 | ---- | --- |
@@ -820,7 +818,7 @@ In the importing file
 ```javascript
 import { LateStore } from "./circular-dep"
 
-const Store = types.late(() => LateStore)
+const Store = types.late(LateStore)
 ```
 
 Thanks to function hoisting in combination with `types.late`, this lets you have circular dependencies between types, across files.

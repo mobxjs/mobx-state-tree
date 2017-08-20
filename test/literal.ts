@@ -11,18 +11,22 @@ test("it should allow only primitives", t => {
 
 test("it should fail if not optional and no default provided", t => {
     const Factory = types.literal("hello")
-    t.throws(() => {
-        Factory.create()
-    }, `[mobx-state-tree] Error while converting \`undefined\` to \`hello\`:\nvalue \`undefined\` is not assignable to type: \`hello\`, expected an instance of \`hello\` or a snapshot like \`\"hello\"\` instead.`)
+    t.snapshot(
+        t.throws(() => {
+            Factory.create()
+        }).message
+    )
 })
 
 test("it should throw if a different type is given", t => {
     const Factory = types.model("TestFactory", {
         shouldBeOne: types.literal(1)
     })
-    const error = t.throws(() => {
-        Factory.create({ shouldBeOne: 2 })
-    }, `[mobx-state-tree] Error while converting \`{\"shouldBeOne\":2}\` to \`TestFactory\`:\nat path \"/shouldBeOne\" value \`2\` is not assignable to type: \`1\`, expected an instance of \`1\` or a snapshot like \`1\` instead.`)
+    t.snapshot(
+        t.throws(() => {
+            Factory.create({ shouldBeOne: 2 })
+        }).message
+    )
 })
 
 test("it should support null type", t => {

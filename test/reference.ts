@@ -82,7 +82,7 @@ test("identifiers are required", t => {
     t.throws(
         () => Todo.create(),
         "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
-            'at path "/id" value `undefined` is not assignable to type: `identifier(string)`, expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
+            'at path "/id" value `undefined` is not assignable to type: `identifier(string)` (Value is not a string), expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
     )
 })
 
@@ -489,23 +489,14 @@ test("References are non-nullable by default", t => {
     })
     unprotect(store)
     t.is(store.maybeRef, null)
-    t.throws(
-        () => store.ref,
-        "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /ref)"
-    )
+    t.snapshot(t.throws(() => store.ref).message)
     store.maybeRef = 3 as any
     t.is(store.maybeRef, store.todo)
     store.maybeRef = 4 as any
-    t.throws(
-        () => store.maybeRef,
-        "[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /maybeRef)"
-    )
+    t.snapshot(t.throws(() => store.maybeRef).message)
     store.maybeRef = null
     t.is(store.maybeRef, null)
-    t.throws(
-        () => (store.ref = null as any),
-        "[mobx-state-tree] Error while converting `null` to `reference(AnonymousModel)`:\nvalue `null` is not assignable to type: `reference(AnonymousModel)` (Value '`null`' is not a valid reference. Expected a string or number.), expected an instance of `reference(AnonymousModel)` or a snapshot like `reference(AnonymousModel)` instead."
-    )
+    t.snapshot(t.throws(() => (store.ref = null as any)).message)
 })
 
 test("References are described properly", t => {

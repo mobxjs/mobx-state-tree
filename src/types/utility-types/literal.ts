@@ -9,7 +9,7 @@ export class Literal<T> extends Type<T, T> {
     readonly flags = TypeFlags.Literal
 
     constructor(value: any) {
-        super("" + value)
+        super(JSON.stringify(value))
         this.value = value
     }
 
@@ -25,7 +25,11 @@ export class Literal<T> extends Type<T, T> {
         if (isPrimitive(value) && value === this.value) {
             return typeCheckSuccess()
         }
-        return typeCheckFailure(context, value)
+        return typeCheckFailure(
+            context,
+            value,
+            `Value is not a literal ${JSON.stringify(this.value)}`
+        )
     }
 }
 

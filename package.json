@@ -1,6 +1,6 @@
 {
   "name": "mobx-state-tree",
-  "version": "0.10.0-rc.1",
+  "version": "0.10.1",
   "description": "Opinionated, transactional, MobX powered state container",
   "main": "dist/mobx-state-tree.js",
   "umd:main": "dist/mobx-state-tree.umd.js",
@@ -12,6 +12,8 @@
     "rollup": "rollup -c",
     "build-tests": "tsc -p test/",
     "test": "npm run build-tests && ava && npm run test-cyclic",
+    "update-snapshots": "ava -u",
+    "speedtest": "npm run build-tests && node --expose-gc test-lib/test/perf/report.js",
     "test-cyclic": "npm run build && node -e \"require('.')\"",
     "watch": "tsc -p test && concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
     "_prepublish": "npm run build && npm run build-docs",
@@ -71,7 +73,7 @@
   ],
   "ava": {
     "files": [
-      "test-lib/test/**/*.js"
+      "test-lib/test/*.js"
     ],
     "source": [
       "test-lib/src/**/*.js"
@@ -82,8 +84,5 @@
       "prettier --write --print-width 100 --tab-width 4 --no-semi",
       "git add"
     ]
-  },
-  "dependencies": {
-    "mst-codemod-to-0.10": "file:codemod"
   }
 }

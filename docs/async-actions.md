@@ -16,7 +16,7 @@ For example:
 
 ```javascript
 const Store = types.model({
-	    githubProjects: types.array(types.frozen),
+        githubProjects: types.array(types.frozen),
         state: types.enum("pending", "done", "error")
     })
     .actions(self => ({
@@ -56,7 +56,7 @@ Generators might sound scary, but they are very suitable for expressing asynchro
 import { process } from "mobx-state-tree"
 
 const Store = types.model({
-	    githubProjects: types.array(types.frozen),
+        githubProjects: types.array(types.frozen),
         state: types.enum("pending", "done", "error")
     })
     .actions(self => ({

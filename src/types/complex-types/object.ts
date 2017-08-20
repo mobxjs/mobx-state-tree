@@ -346,7 +346,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         let snapshot = this.applySnapshotPreProcessor(value)
 
         if (!isPlainObject(snapshot)) {
-            return typeCheckFailure(context, snapshot)
+            return typeCheckFailure(context, snapshot, "Value is not a plain object")
         }
 
         return flattenTypeErrors(

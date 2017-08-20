@@ -26,11 +26,13 @@ const createTestFactories = () => {
     return { Box, Square, Cube, Plane, DispatchPlane, Heighed, Block }
 }
 
-test("it should complain about no dispatch method", t => {
+test("it should complain about multiple applicable types no dispatch method", t => {
     const { Box, Plane, Square } = createTestFactories()
-    t.throws(() => {
-        Plane.create({ width: 2, height: 2 })
-    }, `[mobx-state-tree] Error while converting \`{\"width\":2,\"height\":2}\` to \`Box | Square\`:\nsnapshot \`{\"width\":2,\"height\":2}\` is not assignable to type: \`Box | Square\` (Multiple types are applicable and no dispatch method is defined for the union), expected an instance of \`Box | Square\` or a snapshot like \`({ width: number; height: number } | { width: number })\` instead.`)
+    t.snapshot(
+        t.throws(() => {
+            Plane.create({ width: 2, height: 2 })
+        }).message
+    )
 })
 
 test("it should have parent whenever creating or applying from a complex data structure to a model which has Union typed children", t => {
@@ -42,11 +44,13 @@ test("it should have parent whenever creating or applying from a complex data st
     t.is(hasParent(child), true)
 })
 
-test("it should complain about no dispatch method and multiple applicable types", t => {
+test("it should complain about no applicable types", t => {
     const { Heighed } = createTestFactories()
-    t.throws(() => {
-        Heighed.create({ height: 2 })
-    }, `[mobx-state-tree] Error while converting \`{\"height\":2}\` to \`Cube | Box\`:\nsnapshot \`{\"height\":2}\` is not assignable to type: \`Cube | Box\` (No type is applicable and no dispatch method is defined for the union), expected an instance of \`Cube | Box\` or a snapshot like \`({ width: number; height: number; depth: number } | { width: number; height: number })\` instead.\nat path \"/width\" value \`undefined\` is not assignable to type: \`number\`.\nat path \"/depth\" value \`undefined\` is not assignable to type: \`number\`.\nat path \"/width\" value \`undefined\` is not assignable to type: \`number\`.`)
+    t.snapshot(
+        t.throws(() => {
+            Heighed.create({ height: 2 })
+        }).message
+    )
 })
 
 test("it should be smart enough to discriminate by keys", t => {

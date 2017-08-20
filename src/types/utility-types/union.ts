@@ -77,14 +77,12 @@ export class Union extends Type<any, any> {
             return typeCheckFailure(
                 context,
                 value,
-                "Multiple types are applicable and no dispatch method is defined for the union"
+                "Multiple types are applicable for the union (hint: provide a dispatch function)"
             )
-        } else if (applicableTypes.length < 1) {
-            return typeCheckFailure(
-                context,
-                value,
-                "No type is applicable and no dispatch method is defined for the union"
-            ).concat(flattenTypeErrors(errors))
+        } else if (applicableTypes.length === 0) {
+            return typeCheckFailure(context, value, "No type is applicable for the union").concat(
+                flattenTypeErrors(errors)
+            )
         }
 
         return typeCheckSuccess()
