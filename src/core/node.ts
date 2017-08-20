@@ -38,9 +38,9 @@ export class Node {
         this.type = type
         this._parent = parent
         this.subpath = subpath
-        this.storedValue = createNewInstance(initialValue)
         this._environment = environment
         this.unbox = this.unbox.bind(this)
+        this.storedValue = createNewInstance(initialValue)
 
         const canAttachTreeNode = canAttachNode(this.storedValue)
 

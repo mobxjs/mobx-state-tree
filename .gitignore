@@ -6,5 +6,4 @@ test-lib
 coverage
 .nyc_output
 .idea
-yarn.lock
 package-lock.json
