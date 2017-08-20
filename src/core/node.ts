@@ -31,14 +31,18 @@ export class Node {
         parent: Node | null,
         subpath: string,
         environment: any,
-        storedValue: any
+        initialValue: any,
+        createNewInstance: (initialValue: any) => any = identity,
+        finalizeNewInstance: (node: Node, initialValue: any) => void = noop
     ) {
         this.type = type
         this._parent = parent
         this.subpath = subpath
-        this.storedValue = storedValue
         this._environment = environment
         this.unbox = this.unbox.bind(this)
+        this.storedValue = createNewInstance(initialValue)
+
+        const canAttachTreeNode = canAttachNode(this.storedValue)
 
         // Optimization: this does not need to be done per instance
         // if some pieces from createActionInvoker are extracted
@@ -63,6 +67,30 @@ export class Node {
                 return this.type.applySnapshot(this, snapshot)
             }
         ).bind(this.storedValue)
+
+        if (!parent) this.identifierCache = new IdentifierCache()
+        if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "$treenode", this)
+
+        let sawException = true
+        try {
+            if (canAttachTreeNode) addReadOnlyProp(this.storedValue, "toJSON", toJSON)
+
+            this._isRunningAction = true
+            finalizeNewInstance(this, initialValue)
+            this._isRunningAction = false
+
+            if (parent) parent.root.identifierCache!.addNodeToCache(this)
+            else this.identifierCache!.addNodeToCache(this)
+
+            this.fireHook("afterCreate")
+            if (parent) this.fireHook("afterAttach")
+            sawException = false
+        } finally {
+            if (sawException) {
+                // short-cut to die the instance, to avoid the snapshot computed starting to throw...
+                this._isAlive = false
+            }
+        }
 
         // optimization: don't keep the snapshot by default alive with a reaction by default
         // in prod mode. This saves lot of GC overhead (important for e.g. React Native)
@@ -147,11 +175,10 @@ export class Node {
         // so we treat leading ../ apart...
         let current: Node | null = this
         for (let i = 0; i < pathParts.length; i++) {
-            if (
-                pathParts[i] === "" // '/bla' or 'a//b' splits to empty strings
-            )
-                current = current!.root
-            else if (pathParts[i] === "..") current = current!.parent
+            if (pathParts[i] === "") current = current!.root
+            else if (pathParts[i] === "..")
+                // '/bla' or 'a//b' splits to empty strings
+                current = current!.parent
             else if (pathParts[i] === "." || pathParts[i] === "") continue
             else if (current) {
                 current = current.getChildNode(pathParts[i])
@@ -441,34 +468,16 @@ export function createNode<S, T>(
         targetNode.setParent(parent, subpath)
         return targetNode
     }
-    const instance = createNewInstance(initialValue)
-    const canAttachTreeNode = canAttachNode(instance)
     // tslint:disable-next-line:no_unused-variable
-    const node = new Node(type, parent, subpath, environment, instance)
-    if (!parent) node.identifierCache = new IdentifierCache()
-    if (canAttachTreeNode) addHiddenFinalProp(instance, "$treenode", node)
-
-    let sawException = true
-    try {
-        if (canAttachTreeNode) addReadOnlyProp(instance, "toJSON", toJSON)
-
-        node._isRunningAction = true
-        finalizeNewInstance(node, initialValue)
-        node._isRunningAction = false
-
-        if (parent) parent.root.identifierCache!.addNodeToCache(node)
-        else node.identifierCache!.addNodeToCache(node)
-
-        node.fireHook("afterCreate")
-        if (parent) node.fireHook("afterAttach")
-        sawException = false
-        return node
-    } finally {
-        if (sawException) {
-            // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-            ;(node as any)._isAlive = false
-        }
-    }
+    return new Node(
+        type,
+        parent,
+        subpath,
+        environment,
+        initialValue,
+        createNewInstance,
+        finalizeNewInstance
+    )
 }
 
 import { IType } from "../types/type"
