@@ -12,10 +12,10 @@ import {
 } from "mobx"
 import {
     fail,
-    hasOwnProperty,
     isPlainObject,
     isPrimitive,
     EMPTY_ARRAY,
+    EMPTY_OBJECT,
     addHiddenFinalProp
 } from "../../utils"
 import { ComplexType, IComplexType, IType } from "../type"
@@ -120,18 +120,16 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     private preProcessor: (snapshot: any) => any | undefined
     private readonly propertiesNames: string[]
 
-    modelConstructor: new () => any
-
     constructor(opts: ObjectTypeConfig) {
         super(opts.name || defaultObjectOptions.name)
         const name = opts.name || defaultObjectOptions.name
+        // TODO: this test still needed?
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
         Object.assign(this, defaultObjectOptions, opts)
         // ensures that any default value gets converted to its related type
         this.properties = toPropertiesObject(this.properties)
         this.propertiesNames = Object.keys(this.properties)
         Object.freeze(this.properties) // make sure nobody messes with it
-        this.createModelConstructor()
     }
 
     extend(opts: ObjectTypeConfig): ObjectType<any, any> {
@@ -141,17 +139,6 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
             initializers: this.initializers.concat((opts.initializers as any) || []),
             preProcessor: opts.preProcessor || this.preProcessor
         })
-    }
-
-    private createModelConstructor() {
-        // Fancy trick to get a named constructor
-        this.modelConstructor = class {}
-        Object.defineProperty(this.modelConstructor, "name", {
-            value: this.name,
-            writable: false
-        })
-        const proto = this.modelConstructor.prototype
-        proto.toString = objectTypeToString
     }
 
     actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A> {
@@ -243,8 +230,8 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     }
 
     createNewInstance = () => {
-        const instance = new this.modelConstructor()
-        extendShallowObservable(instance, {})
+        const instance = observable.shallowObject(EMPTY_OBJECT)
+        instance.toString = objectTypeToString
         return instance as Object
     }
 
