@@ -327,7 +327,6 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     applySnapshot(node: Node, snapshot: any): void {
         const s = this.applySnapshotPreProcessor(snapshot)
         typecheck(this, s)
-        // TODO: check that there are no superfluos properties!
         this.forAllProps((name, type) => {
             node.storedValue[name] = s[name]
         })
