@@ -364,7 +364,6 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     }
 
     describe() {
-        // TODO: make proptypes responsible
         // optimization: cache
         return (
             "{ " +
