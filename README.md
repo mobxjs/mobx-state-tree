@@ -737,7 +737,11 @@ types
 | `beforeDetach`  | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used             |
 | `beforeDestroy` | Called before the node is destroyed, as a result of calling `destroy`, or by removing or replacing the node from the tree. Child destructors will fire before parents |
 
-Note, all hooks should be defined as actions.
+Note, except for `preProcessSnapshot`, all hooks should be defined as actions.
+
+All hooks can be defined multiple times and can be composed automatically.
+
+
 
 # Api overview
 
@@ -791,6 +795,10 @@ See the [full API docs](API.md) for more details.
 A _disposer_ is a function that cancels the effect it was created for.
 
 # Tips
+
+### Generate MST models from JSON
+
+The following service can generate MST models based on JSON: https://transform.now.sh/json-to-mobx-state-tree
 
 ### `optionals` and default value functions
 
