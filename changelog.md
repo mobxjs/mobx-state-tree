@@ -4,7 +4,7 @@ Removed accidental dependency on the codemod
 
 # 0.10.0
 
-* **BREAKING** the syntax to define model types has been updated. See the [updated docs] (https://github.com/mobxjs/mobx-state-tree#creating-models) or the original proposal:[#282](https://github.com/mobxjs/mobx-state-tree/pull/286), but no worries, theres a codemod! :D
+* **BREAKING** the syntax to define model types has been updated. See the [updated docs](https://github.com/mobxjs/mobx-state-tree#creating-models) or the original proposal:[#282](https://github.com/mobxjs/mobx-state-tree/pull/286), but no worries, theres a codemod! :D
 * **BREAKING** `preProcessSnapshot` hook is no longer a normal hook that can be defined as action. Instead, it should be defined on the type using `types.model(...).preProcessSnapshot(value => value)`
 * **BREAKING** Asynchronous process should now be defined using `process`. See this [example](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25) or the [asynchronous action docs](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
 
