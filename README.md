@@ -577,7 +577,7 @@ Finally, it is not only possible to be notified about snapshots, patches or acti
 ## Volatile state
 
 MST models primarily aid in storing _persistable_ state. State that can be persisted, serialized, transferred, patched, replaced etc.
-However, sometimes you need to keep track of temporary, non persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc - state which is needed for local purposes as long as the object is alive.
+However, sometimes you need to keep track of temporary, non persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc. - state which is needed for local purposes as long as the object is alive.
 
 Volatile state (which is also private) can be introduced by creating variables inside any of the action initializer functions.
 
@@ -667,8 +667,8 @@ These are the types available in MST. All types can be found in the `types` name
 ## Complex types
 
 * `types.model(properties, actions)` Defines a "class like" type, with properties and actions to operate on the object.
-* `types.array(type)` Declares an array of the specified type
-* `types.map(type)` Declares an map of the specified type
+* `types.array(type)` Declares an array of the specified type.
+* `types.map(type)` Declares a map of the specified type.
 
 ## Primitive types
 
@@ -794,7 +794,7 @@ A _disposer_ is a function that cancels the effect it was created for.
 
 ### `optionals` and default value functions
 
-`types.optional` can takes as default function also a function, which will be invoked each time the default value is needed. This is useful to generate timestamps, identifiers or even complex objects:
+`types.optional` can take an optional function parameter which will be invoked each time a default value is needed. This is useful to generate timestamps, identifiers or even complex objects, for example:
 
 `createdDate: types.optional(types.date, () => new Date())`
 
@@ -899,7 +899,7 @@ export const LoggingSquare = types
 
 * When applying snapshots, MST will always try to reuse existing object instances for snapshots with the same identifier (see `types.identifier()`).
 * If no identifier is specified, but the type of the snapshot is correct, MST will reconcile objects as well if they are stored in a specific model property or under the same map key.
-* In arrays, items without identifier are never reconciled
+* In arrays, items without an identifier are never reconciled.
 
 If an object is reconciled, the consequence is that localState is preserved and `postCreate` / `attach` life-cycle hooks are not fired because applying a snapshot results just in an existing tree node being updated.
 
@@ -909,7 +909,7 @@ See [creating asynchronous process](docs/async-actions.md).
 
 ### Using mobx and mobx-state-tree together
 
-Yep, perfectly fine. No problem. Go on. `observer`, `autorun` etc will work as expected.
+Yep, perfectly fine. No problem. Go on. `observer`, `autorun` etc. will work as expected.
 
 ### Should all state of my app be stored in `mobx-state-tree`?
 No, or, not necessarily. An application can use both state trees and vanilla MobX observables at the same time.
@@ -942,12 +942,12 @@ type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { 
 
 So far this might look a lot like an immutable state tree as found for example in Redux apps, but there are a few differences:
 
--   like Redux, and unlike MobX, MST prescribes a very specific state architecture.
+-   Like Redux, and unlike MobX, MST prescribes a very specific state architecture.
 -   mobx-state-tree allows direct modification of any value in the tree; it is not necessary to construct a new tree in your actions.
 -   mobx-state-tree allows for fine-grained and efficient observation of any point in the state tree.
 -   mobx-state-tree generates JSON patches for any modification that is made.
--   mobx-state-tree provides utilties to turn any MST tree into a valid Redux store.
--   having multiple MSTs in a single application is perfectly fine.
+-   mobx-state-tree provides utilities to turn any MST tree into a valid Redux store.
+-   Having multiple MSTs in a single application is perfectly fine.
 
 
 ## Thanks!
