@@ -3,6 +3,7 @@ import { isObservableArray } from "mobx"
 declare const global: any
 
 export const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([])
+export const EMPTY_OBJECT: {} = Object.freeze({})
 
 export type IDisposer = () => void
 

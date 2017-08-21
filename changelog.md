@@ -1,6 +1,10 @@
+# 0.10.2
+
+* Object model instances no longer share a prototype.
+
 # 0.10.1
 
-Removed accidental dependency on the codemod
+* Removed accidental dependency on the codemod
 
 # 0.10.0
 

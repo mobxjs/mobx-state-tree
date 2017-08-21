@@ -140,6 +140,7 @@ test("box operations works correctly", t => {
         arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
         selection: "b"
     })
+    t.deepEqual(JSON.stringify(s), JSON.stringify(getSnapshot(s)))
     s.boxes.get("a")!.move(50, 50)
     t.deepEqual(getSnapshot(s), {
         boxes: {

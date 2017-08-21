@@ -73,7 +73,7 @@ export class Node {
 
         let sawException = true
         try {
-            if (canAttachTreeNode) addReadOnlyProp(this.storedValue, "toJSON", toJSON)
+            if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
 
             this._isRunningAction = true
             finalizeNewInstance(this, initialValue)
