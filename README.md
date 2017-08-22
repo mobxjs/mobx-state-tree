@@ -703,9 +703,9 @@ All of the below hooks can be created by returning an action with the given name
 
 ```javascript
 const Todo = types
-    .model("Todo", { done: true})
+    .model("Todo", { done: true })
     .actions(self => ({
-        postCreate() {
+        afterCreate() {
             console.log("Created a new todo!")
         }
     }))
@@ -715,13 +715,13 @@ The exception to this rule is the `preProcessSnapshot` hook. Because it is neede
 
 ```javascript
 types
-    .model("Todo", { done: true})
+    .model("Todo", { done: true })
     .preProcessSnapshot(snapshot => ({
         // auto convert strings to booleans as part of preprocessing
         done: snapshot.done === "true" ? true : snapshot.done === "false" ? false : snapshot.done
     }))
     .actions(self => ({
-        postCreate() {
+        afterCreate() {
             console.log("Created a new todo!")
         }
     }))
