@@ -157,3 +157,24 @@ test("it should postprocess snapshots when generating snapshot", t => {
     t.is(f.car.id, 2)
     t.deepEqual(getSnapshot(f), { car: { id: "1" } })
 })
+
+test("base hooks can be composed", t => {
+    const Todo = types.model("Todo", { title: "" }).actions(self => {
+        function afterCreate() {
+            listener("new todo: " + self.title)
+        }
+        function beforeDestroy() {
+            listener("destroy todo: " + self.title)
+        }
+        function afterAttach() {
+            listener("attach todo: " + self.title)
+        }
+        function beforeDetach() {
+            listener("detach todo: " + self.title)
+        }
+        return { afterCreate, beforeDestroy, afterAttach, beforeDetach }
+    })
+    const Store = types.model("Store", { todos: types.array(Todo) })
+})
+
+test("snapshot processors can be composed", t => {})
