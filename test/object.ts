@@ -82,7 +82,7 @@ test("it should create a factory", t => {
     const instance = Factory.create()
     const snapshot = getSnapshot(instance)
     t.deepEqual(snapshot, { to: "world" })
-    t.deepEqual((Factory.create() as any).toJSON(), { to: "world" }) // toJSON is there as shortcut for getSnapshot(), primarily for debugging convenience
+    t.deepEqual((Factory.create() as any).toJS(), { to: "world" }) // toJS is there as shortcut for getSnapshot(), primarily for debugging convenience
     t.deepEqual(Factory.create().toString(), "AnonymousModel@<root>")
 })
 
