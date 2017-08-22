@@ -48,7 +48,7 @@ Todo
 ## Creating our first model
 Central to MST (mobx-state-tree) is the concept of a living tree. The tree consists of mutable, but strictly protected objects enriched with runtime type information. In other words; each tree has a shape (type information) and state (data). From this living tree, immutable, structurally shared, snapshots are generated automatically.
 
-This means that in order to make our application work, we need to describe how our entities are shaped to MST. Knowing that, MST will be able to automatically generate all those bounties, and help us avoiding silly mistakes, like putting strings in price fields or booleans where an array is expected.
+This means that in order to make our application work, we need to describe how our entities are shaped to MST. Knowing that, MST will be able to automatically generate all those boundaries, and help us avoiding silly mistakes, like putting strings in price fields or booleans where an array is expected.
 
 The simplest way to define a model for an entity in MST, is by providing a sample data that will be used as defaults for it, and pass it to the types.model function.
 
