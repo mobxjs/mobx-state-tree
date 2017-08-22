@@ -1,3 +1,5 @@
+import { reaction } from "mobx"
+
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
  *
@@ -344,8 +346,8 @@ export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
     return false
 }
 
-export function getParent(target: IStateTreeNode, depth?: number): (any & IStateTreeNode)
-export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStateTreeNode)
+export function getParent(target: IStateTreeNode, depth?: number): any & IStateTreeNode
+export function getParent<T>(target: IStateTreeNode, depth?: number): T & IStateTreeNode
 /**
  * Returns the immediate parent of this object, or null.
  *
@@ -357,7 +359,7 @@ export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStat
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent<T>(target: IStateTreeNode, depth = 1): (T & IStateTreeNode) {
+export function getParent<T>(target: IStateTreeNode, depth = 1): T & IStateTreeNode {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let d = depth
     let parent: Node | null = getStateTreeNode(target).parent
@@ -579,6 +581,18 @@ export function getEnv<T = any>(thing: IStateTreeNode): T {
     return env
 }
 
+export function invariant(target: IStateTreeNode, guard: () => boolean, message: string): void
+export function invariant(guard: () => boolean, message: string): void
+export function invariant(target: any, guard: any, message?: any) {
+    if (arguments.length === 2) return invariant(getSelf(), arguments[0], arguments[1])
+    addDisposer(
+        target,
+        reaction(guard, guardResult => {
+            if (!guardResult) throw new Error("Invariant failed: " + message)
+        })
+    )
+}
+
 /**
  * Performs a depth first walk through a tree
  */
@@ -595,7 +609,8 @@ import {
     IMiddleWareEvent,
     ISerializedActionCall,
     applyAction as baseApplyAction,
-    onAction
+    onAction,
+    getSelf
 } from "./action"
 import { runInAction, IObservableArray, ObservableMap } from "mobx"
 import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"

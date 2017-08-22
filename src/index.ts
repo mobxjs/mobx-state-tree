@@ -14,7 +14,13 @@ export {
 
 export * from "./core/mst-operations"
 export { escapeJsonPath, unescapeJsonPath, IJsonPatch } from "./core/json-patch"
-export { onAction } from "./core/action"
+export {
+    onAction,
+    getSelf,
+    IMiddleWareEvent,
+    IMiddlewareEventType,
+    ISerializedActionCall
+} from "./core/action"
 export { process } from "./core/process"
 export { isStateTreeNode, IStateTreeNode } from "./core/node"
 
