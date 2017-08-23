@@ -122,7 +122,7 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
     if (typeof arg === "object" && !isPlainObject(arg) && !isArray(arg))
         throw new Error(
             `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any) &&
-                (arg as any).constructor
+            (arg as any).constructor
                 ? (arg as any).constructor.name
                 : "Complex Object"}`
         )
@@ -185,14 +185,19 @@ export function onAction(
     target: IStateTreeNode,
     listener: (call: ISerializedActionCall) => void
 ): IDisposer {
-    if (!isRoot(target))
-        console.warn(
-            "[mobx-state-tree] Warning: Attaching onAction listeners to non root nodes is dangerous: No events will be emitted for actions initiated higher up in the tree."
-        )
-    if (!isProtected(target))
-        console.warn(
-            "[mobx-state-tree] Warning: Attaching onAction listeners to non protected nodes is dangerous: No events will be emitted for direct modifications without action."
-        )
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (!isRoot(target))
+            console.warn(
+                "[mobx-state-tree] Warning: Attaching onAction listeners to non root nodes is dangerous: No events will be emitted for actions initiated higher up in the tree."
+            )
+        if (!isProtected(target))
+            console.warn(
+                "[mobx-state-tree] Warning: Attaching onAction listeners to non protected nodes is dangerous: No events will be emitted for direct modifications without action."
+            )
+    }
 
     return addMiddleware(target, (rawCall, next) => {
         const sourceNode = getStateTreeNode(rawCall.context)
