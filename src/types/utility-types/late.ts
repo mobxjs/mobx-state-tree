@@ -21,11 +21,6 @@ export class Late<S, T> extends Type<S, T> {
 
     constructor(name: string, definition: () => IType<S, T>) {
         super(name)
-        if (!(typeof definition === "function" && definition.length === 0))
-            fail(
-                "Invalid late type, expected a function with zero arguments that returns a type, got: " +
-                    definition
-            )
         this.definition = definition
     }
 
@@ -81,5 +76,13 @@ export function late<S = any, T = any>(name: string, type: ILateType<S, T>): ITy
 export function late<S, T>(nameOrType: any, maybeType?: ILateType<S, T>): IType<S, T> {
     const name = typeof nameOrType === "string" ? nameOrType : `late(${nameOrType.toString()})`
     const type = typeof nameOrType === "string" ? maybeType : nameOrType
+    // checks that the type is actually a late type
+    if (process.env.NODE_ENV !== "production") {
+        if (!(typeof type === "function" && type.length === 0))
+            fail(
+                "Invalid late type, expected a function with zero arguments that returns a type, got: " +
+                    type
+            )
+    }
     return new Late<S, T>(name, type)
 }

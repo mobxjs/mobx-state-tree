@@ -45,10 +45,13 @@ export function addMiddleware(
     middleware: (action: IMiddleWareEvent, next: (call: IMiddleWareEvent) => any) => any
 ): IDisposer {
     const node = getStateTreeNode(target)
-    if (!node.isProtectionEnabled)
-        console.warn(
-            "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
-        )
+    // warn if node is unprotected
+    if (process.env.NODE_ENV !== "production") {
+        if (!node.isProtectionEnabled)
+            console.warn(
+                "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
+            )
+    }
     return node.addMiddleWare(middleware)
 }
 
@@ -344,8 +347,8 @@ export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
     return false
 }
 
-export function getParent(target: IStateTreeNode, depth?: number): (any & IStateTreeNode)
-export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStateTreeNode)
+export function getParent(target: IStateTreeNode, depth?: number): any & IStateTreeNode
+export function getParent<T>(target: IStateTreeNode, depth?: number): T & IStateTreeNode
 /**
  * Returns the immediate parent of this object, or null.
  *
@@ -357,7 +360,7 @@ export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStat
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent<T>(target: IStateTreeNode, depth = 1): (T & IStateTreeNode) {
+export function getParent<T>(target: IStateTreeNode, depth = 1): T & IStateTreeNode {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let d = depth
     let parent: Node | null = getStateTreeNode(target).parent

@@ -20,7 +20,7 @@ import {
 } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isArray } from "../../utils"
 import { ComplexType, IComplexType, IType } from "../type"
-import { TypeFlags } from "../type-flags"
+import { TypeFlags, isType } from "../type-flags"
 import {
     typecheck,
     flattenTypeErrors,
@@ -237,6 +237,10 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
 export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
+    if (process.env.NODE_ENV !== "production") {
+        if (!isType(subtype))
+            fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")
+    }
     return new ArrayType<S, T>(subtype.name + "[]", subtype)
 }
 

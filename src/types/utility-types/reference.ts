@@ -1,6 +1,6 @@
 import { getStateTreeNode, isStateTreeNode, Node, createNode } from "../../core"
 import { Type, IType } from "../type"
-import { TypeFlags, isReferenceType } from "../type-flags"
+import { TypeFlags, isReferenceType, isType } from "../type-flags"
 import {
     IContext,
     IValidationResult,
@@ -108,8 +108,13 @@ export function reference<T>(factory: IType<any, T>): IType<string | number, T>
  * @export
  * @alias types.reference
  */
-export function reference<T>(factory: IType<any, T>): any {
-    if (arguments.length === 2 && typeof arguments[1] === "string")
-        fail("References with base path are no longer supported. Please remove the base path.")
-    return new ReferenceType(factory)
+export function reference<T>(subType: IType<any, T>): any {
+    // check that a type is given
+    if (process.env.NODE_ENV !== "production") {
+        if (!isType(subType))
+            fail("expected a mobx-state-tree type as first argument, got " + subType + " instead")
+        if (arguments.length === 2 && typeof arguments[1] === "string")
+            fail("References with base path are no longer supported. Please remove the base path.")
+    }
+    return new ReferenceType(subType)
 }
