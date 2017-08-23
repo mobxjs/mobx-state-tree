@@ -4,7 +4,7 @@ import uglify from "rollup-plugin-uglify"
 import replace from "rollup-plugin-replace"
 
 function getEnvVariables(production) {
-    return { "process.env.NODE_ENV": production ? '"production"' : "process.env.NODE_ENV" }
+    return { "process.env.NODE_ENV": production ? "'production'" : "'development'" }
 }
 
 export default [
@@ -16,7 +16,7 @@ export default [
         globals: {
             mobx: "mobx"
         },
-        plugins: [resolve(), replace(getEnvVariables(false)), filesize()]
+        plugins: [resolve(), filesize()]
     },
     {
         entry: "./lib/index.js",
@@ -37,6 +37,6 @@ export default [
         globals: {
             mobx: "mobx"
         },
-        plugins: [resolve(), replace(getEnvVariables(false)), filesize()]
+        plugins: [resolve(), filesize()]
     }
 ]
