@@ -231,7 +231,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         if (!currentPreprocessor) return this.extend({ preProcessor })
         else
             return this.extend({
-                preProcessor: snapshot => preProcessor(currentPreprocessor(snapshot))
+                preProcessor: snapshot => currentPreprocessor(preProcessor(snapshot))
             })
     }
 

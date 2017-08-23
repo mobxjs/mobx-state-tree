@@ -159,22 +159,88 @@ test("it should postprocess snapshots when generating snapshot", t => {
 })
 
 test("base hooks can be composed", t => {
-    const Todo = types.model("Todo", { title: "" }).actions(self => {
-        function afterCreate() {
-            listener("new todo: " + self.title)
-        }
-        function beforeDestroy() {
-            listener("destroy todo: " + self.title)
-        }
-        function afterAttach() {
-            listener("attach todo: " + self.title)
-        }
-        function beforeDetach() {
-            listener("detach todo: " + self.title)
-        }
-        return { afterCreate, beforeDestroy, afterAttach, beforeDetach }
-    })
+    const events: string[] = []
+    function listener(message) {
+        events.push(message)
+    }
+
+    const Todo = types
+        .model("Todo", { title: "" })
+        .actions(self => {
+            function afterCreate() {
+                listener("aftercreate1")
+            }
+            function beforeDestroy() {
+                listener("beforedestroy1")
+            }
+            function afterAttach() {
+                listener("afterattach1")
+            }
+            function beforeDetach() {
+                listener("beforedetach1")
+            }
+            return { afterCreate, beforeDestroy, afterAttach, beforeDetach }
+        })
+        .actions(self => {
+            function afterCreate() {
+                listener("aftercreate2")
+            }
+            function beforeDestroy() {
+                listener("beforedestroy2")
+            }
+            function afterAttach() {
+                listener("afterattach2")
+            }
+            function beforeDetach() {
+                listener("beforedetach2")
+            }
+            return { afterCreate, beforeDestroy, afterAttach, beforeDetach }
+        })
+
     const Store = types.model("Store", { todos: types.array(Todo) })
+
+    const store = Store.create({ todos: [] })
+    const todo = Todo.create()
+    unprotect(store)
+    store.todos.push(todo)
+    detach(todo)
+    destroy(todo)
+    t.deepEqual(events, [
+        "aftercreate1",
+        "aftercreate2",
+        "afterattach1",
+        "afterattach2",
+        "beforedetach1",
+        "beforedetach2",
+        "beforedestroy1",
+        "beforedestroy2"
+    ])
 })
 
-test("snapshot processors can be composed", t => {})
+test("snapshot processors can be composed", t => {
+    const X = types
+        .model({
+            x: 1
+        })
+        .actions(self => ({
+            postProcessSnapshot(s) {
+                s.x += 3
+                return s
+            }
+        }))
+        .preProcessSnapshot((s: any) => ({
+            x: s.x - 3
+        }))
+        .actions(self => ({
+            postProcessSnapshot(s) {
+                s.x *= 5
+                return s
+            }
+        }))
+        .preProcessSnapshot((s: any) => ({
+            x: s.x / 5
+        }))
+    const x = X.create({ x: 25 })
+    t.is(x.x, 2)
+    t.is(getSnapshot(x).x, 25)
+})
