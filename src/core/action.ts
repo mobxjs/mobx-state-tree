@@ -102,33 +102,23 @@ function runMiddleWares(node: Node, baseCall: IMiddleWareEvent, originalFn: Func
     return runNextMiddleware(baseCall)
 }
 
-// TODO: serializeArgument should not throw error, but indicate that the argument is unserializable and toString it or something
-function serializeArgument(node: Node, actionName: string, index: number, arg: any): any {
-    if (isPrimitive(arg)) return arg
-    if (isStateTreeNode(arg)) {
-        const targetNode = getStateTreeNode(arg)
-        if (node.root !== targetNode.root)
-            throw new Error(
-                `Argument ${index} that was passed to action '${actionName}' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead`
-            )
-        return {
-            $ref: node.getRelativePathTo(getStateTreeNode(arg))
-        }
+function serializeTheUnserializable(baseType: string) {
+    return {
+        $MST_UNSERIALIZABLE: true,
+        type: baseType
     }
-    if (typeof arg === "function")
-        throw new Error(
-            `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a function`
-        )
+}
+
+function serializeArgument(node: Node, actionName: string, index: number, arg: any): any {
+    if (arg instanceof Date) return { $MST_DATE: arg.getTime() }
+    if (isPrimitive(arg)) return arg
+    // We should not serialize MST nodes, even if we can, because we don't know if the receiving party can handle a raw snapshot instead of an
+    // MST type instance. So if one wants to serialize a MST node that was pass in, either explitly pass: 1: an id, 2: a (relative) path, 3: a snapshot
+    if (isStateTreeNode(arg)) return serializeTheUnserializable(`[MSTNode: ${getType(arg).name}]`)
+    if (typeof arg === "function") return serializeTheUnserializable(`[function]`)
     if (typeof arg === "object" && !isPlainObject(arg) && !isArray(arg))
-        throw new Error(
-            `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any) &&
-            (arg as any).constructor
-                ? (arg as any).constructor.name
-                : "Complex Object"}`
-        )
-    if (isObservable(arg))
-        throw new Error(
-            `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received an mobx observable.`
+        return serializeTheUnserializable(
+            `[object ${(arg && arg.constructor && arg.constructor.name) || "Object"}]`
         )
     try {
         // Check if serializable, cycle free etc...
@@ -136,17 +126,13 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
         JSON.stringify(arg) // or throws
         return arg
     } catch (e) {
-        throw new Error(
-            `Argument ${index} that was passed to action '${actionName}' is not serializable.`
-        )
+        return serializeTheUnserializable("" + e)
     }
 }
 
 function deserializeArgument(adm: Node, value: any): any {
-    if (value && typeof value === "object") {
-        const keys = Object.keys(value)
-        if (keys.length === 1 && keys[0] === "$ref") return resolvePath(adm.storedValue, value.$ref)
-    }
+    if (value && typeof value === "object" && "$MST_DATE" in value)
+        return new Date(value["$MST_DATE"])
     return value
 }
 
@@ -175,6 +161,10 @@ export function applyAction(target: IStateTreeNode, action: ISerializedActionCal
  * Registers a function that will be invoked for each action that is called on the provided model instance, or to any of its children.
  * See [actions](https://github.com/mobxjs/mobx-state-tree#actions) for more details. onAction events are emitted only for the outermost called action in the stack.
  * Action can also be intercepted by middleware using addMiddleware to change the function call before it will be run.
+ *
+ * Not all action arguments might be serializable. For unserializable arguments, a struct like `{ $MST_UNSERIALIZABLE: true, type: "someType" }` will be generated.
+ * MST Nodes are considered non-serializable as well (they could be serialized as there snapshot, but it is uncertain whether an replaying party will be able to handle such a non-instantiated snapshot).
+ * Rather, when using `onAction` middleware, one should consider in passing arguments which are 1: an id, 2: a (relative) path, or 3: a snapshot. Instead of a real MST node.
  *
  * @export
  * @param {IStateTreeNode} target
@@ -226,10 +216,10 @@ export function onAction(
 
 import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"
 import {
-    resolvePath,
     tryResolve,
     addMiddleware,
     applyPatch,
+    getType,
     applySnapshot,
     isRoot,
     isProtected
