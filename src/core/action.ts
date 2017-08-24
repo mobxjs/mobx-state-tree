@@ -28,6 +28,14 @@ export type IMiddleWareEvent = {
 let nextActionId = 1
 let currentActionContext: IMiddleWareEvent | null = null
 
+export function getSelf(): IStateTreeNode {
+    if (!currentActionContext || !currentActionContext.context)
+        return fail(
+            "MST is currently not running an action and `getSelf()` is not available. (Probably you should be passing `self` explicitly from the closure to the function you are invoking)"
+        )
+    return currentActionContext.context
+}
+
 export function getNextActionId() {
     return nextActionId++
 }
@@ -122,7 +130,7 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
     if (typeof arg === "object" && !isPlainObject(arg) && !isArray(arg))
         throw new Error(
             `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any) &&
-                (arg as any).constructor
+            (arg as any).constructor
                 ? (arg as any).constructor.name
                 : "Complex Object"}`
         )
