@@ -122,7 +122,7 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
     if (typeof arg === "object" && !isPlainObject(arg) && !isArray(arg))
         throw new Error(
             `Argument ${index} that was passed to action '${actionName}' should be a primitive, model object or plain object, received a ${(arg as any) &&
-                (arg as any).constructor
+            (arg as any).constructor
                 ? (arg as any).constructor.name
                 : "Complex Object"}`
         )
@@ -179,11 +179,13 @@ export function applyAction(target: IStateTreeNode, action: ISerializedActionCal
  * @export
  * @param {IStateTreeNode} target
  * @param {(call: ISerializedActionCall) => void} listener
+ * @param attachAfter {boolean} (default false) fires the listener *after* the action has executed instead of before.
  * @returns {IDisposer}
  */
 export function onAction(
     target: IStateTreeNode,
-    listener: (call: ISerializedActionCall) => void
+    listener: (call: ISerializedActionCall) => void,
+    attachAfter = false
 ): IDisposer {
     if (!isRoot(target))
         console.warn(
@@ -194,9 +196,9 @@ export function onAction(
             "[mobx-state-tree] Warning: Attaching onAction listeners to non protected nodes is dangerous: No events will be emitted for direct modifications without action."
         )
 
-    return addMiddleware(target, (rawCall, next) => {
-        const sourceNode = getStateTreeNode(rawCall.context)
+    function fireListener(rawCall: IMiddleWareEvent) {
         if (rawCall.type === "action" && rawCall.id === rawCall.rootId) {
+            const sourceNode = getStateTreeNode(rawCall.context)
             listener({
                 name: rawCall.name,
                 path: getStateTreeNode(target).getRelativePathTo(sourceNode),
@@ -205,8 +207,21 @@ export function onAction(
                 )
             })
         }
-        return next(rawCall)
-    })
+    }
+
+    return addMiddleware(
+        target,
+        attachAfter
+            ? function onActionMiddleware(rawCall, next) {
+                  const res = next(rawCall)
+                  fireListener(rawCall)
+                  return res
+              }
+            : function onActionMiddleware(rawCall, next) {
+                  fireListener(rawCall)
+                  return next(rawCall)
+              }
+    )
 }
 
 import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"

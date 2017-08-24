@@ -1,3 +1,9 @@
+# 0.10.3
+
+* `onAction` lister now supports an `attachAfter` parameter
+* ReduxDevTools connection is no longer one step behind [#287](https://github.com/mobxjs/mobx-state-tree/issues/287)
+
+
 # 0.10.2
 
 * Object model instances no longer share a prototype.
