@@ -42,13 +42,13 @@ import { optional } from "../utility-types/optional"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 
-const HOOK_NAMES = [
-    "afterCreate",
-    "afterAttach",
-    "postProcessSnapshot",
-    "beforeDetach",
-    "beforeDestroy"
-]
+const HOOK_NAMES = {
+    afterCreate: "afterCreate",
+    afterAttach: "afterAttach",
+    postProcessSnapshot: "postProcessSnapshot",
+    beforeDetach: "beforeDetach",
+    beforeDestroy: "beforeDestroy"
+}
 
 function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
@@ -71,8 +71,8 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
     // loop through properties and ensures that all items are types
     return Object.keys(properties).reduce((properties, key) => {
         // warn if user intended a HOOK
-        if (HOOK_NAMES.indexOf(key) !== -1)
-            console.warn(
+        if (key in HOOK_NAMES)
+            return fail(
                 `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
             )
 
@@ -151,10 +151,25 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
             Object.keys(actions).forEach(name => {
                 // warn if preprocessor was given
                 if (name === PRE_PROCESS_SNAPSHOT)
-                    fail(
+                    return fail(
                         `Cannot define action '${PRE_PROCESS_SNAPSHOT}', it should be defined using 'type.preProcessSnapshot(fn)' instead`
                     )
-                addHiddenFinalProp(self, name, createActionInvoker(self, name, actions[name]))
+
+                // apply hook composition
+                let action = actions[name]
+                let baseAction = (self as any)[name]
+                if (name in HOOK_NAMES && baseAction) {
+                    let specializedAction = action
+                    if (name === HOOK_NAMES.postProcessSnapshot)
+                        action = (snapshot: any) => specializedAction(baseAction(snapshot))
+                    else
+                        action = function() {
+                            baseAction.apply(null, arguments)
+                            specializedAction.apply(null, arguments)
+                        }
+                }
+
+                addHiddenFinalProp(self, name, createActionInvoker(self, name, action))
             })
             return self
         }
@@ -212,7 +227,12 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     }
 
     preProcessSnapshot<T>(preProcessor: (snapshot: T) => S): IModelType<S, T> {
-        return this.extend({ preProcessor })
+        const currentPreprocessor = this.preProcessor
+        if (!currentPreprocessor) return this.extend({ preProcessor })
+        else
+            return this.extend({
+                preProcessor: snapshot => currentPreprocessor(preProcessor(snapshot))
+            })
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
