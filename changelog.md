@@ -4,6 +4,7 @@
 * ReduxDevTools connection is no longer one step behind [#287](https://github.com/mobxjs/mobx-state-tree/issues/287)
 * The internal types `IMiddleWareEvent`, `IMiddlewareEventType`, `ISerializedActionCall` are now exposed (fixes [#315](https://github.com/mobxjs/mobx-state-tree/issues/315))
 * **BREAKING** `onAction` middleware no longer throws when encountering unserializable arguments. Rather, it serializes a struct like `{ $MST_UNSERIALIZABLE: true, type: "someType" }`. MST Nodes are no longer automatically serialized. Rather, one should either pass 1: an id, 2: a (relative) path, 3: a snapshot
+* Middleware is no longer run as part of the transaction of the targeted action
 
 # 0.10.2
 

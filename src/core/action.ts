@@ -57,7 +57,8 @@ export function createActionInvoker<T extends Function>(
     name: string,
     fn: T
 ) {
-    return (mobxAction(name, function() {
+    const wrappedFn = mobxAction(name, fn)
+    return function() {
         const id = getNextActionId()
         return runWithActionContext(
             {
@@ -68,9 +69,9 @@ export function createActionInvoker<T extends Function>(
                 context: target,
                 rootId: currentActionContext ? currentActionContext.rootId : id
             },
-            fn
+            wrappedFn
         )
-    }) as any) as T
+    }
 }
 
 export type IMiddleWareHandler = (
