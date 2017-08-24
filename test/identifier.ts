@@ -1,6 +1,53 @@
 import { test } from "ava"
 import { types } from "../src"
 
+test("#275 - Identifiers should check refinement", t => {
+    const Model = types.model(
+        "Model",
+        {
+            id: types.refinement(
+                "id",
+                types.string,
+                identifier => identifier.indexOf("Model_") === 0
+            )
+        },
+        {
+            setId(id) {
+                this.id = id
+            }
+        }
+    )
+    const ParentModel = types.model(
+        "ParentModel",
+        {
+            models: types.array(Model)
+        },
+        {
+            addModel(model) {
+                this.models.push(model)
+            }
+        }
+    )
+
+    t.throws(() => {
+        ParentModel.create({ models: [{ id: "WrongId_1" }] })
+    })
+
+    t.throws(() => {
+        const parentStore = ParentModel.create({ models: [] })
+        parentStore.addModel({ id: "WrongId_2" })
+    })
+
+    t.throws(() => {
+        const model = Model.create({ id: "Model_1" })
+        model.setId("WrongId_3")
+    })
+
+    t.throws(() => {
+        Model.create({ id: "WrongId_4" })
+    })
+})
+
 test("#158 - #88 - Identifiers should accept any string character", t => {
     const Todo = types.model("Todo", {
         id: types.identifier(types.string),
