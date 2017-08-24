@@ -2,7 +2,7 @@
 
 * `onAction` lister now supports an `attachAfter` parameter
 * ReduxDevTools connection is no longer one step behind [#287](https://github.com/mobxjs/mobx-state-tree/issues/287)
-
+* The internal types `IMiddleWareEvent`, `IMiddlewareEventType`, `ISerializedActionCall` are now exposed (fixes [#315](https://github.com/mobxjs/mobx-state-tree/issues/315))
 
 # 0.10.2
 
