@@ -29,29 +29,6 @@ export function getChildType(object: IStateTreeNode, child: string): IType<any, 
     return getStateTreeNode(object).getChildType(child)
 }
 
-/**
- * Middleware can be used to intercept any action is invoked on the subtree where it is attached.
- * If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
- *
- * For more details, see the [middleware docs](docs/middleware.md)
- *
- * @export
- * @param {IStateTreeNode} target
- * @param {(action: IRawActionCall, next: (call: IRawActionCall) => any) => any} middleware
- * @returns {IDisposer}
- */
-export function addMiddleware(
-    target: IStateTreeNode,
-    middleware: (action: IMiddleWareEvent, next: (call: IMiddleWareEvent) => any) => any
-): IDisposer {
-    const node = getStateTreeNode(target)
-    if (!node.isProtectionEnabled)
-        console.warn(
-            "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
-        )
-    return node.addMiddleWare(middleware)
-}
-
 export function onPatch(target: IStateTreeNode, callback: (patch: IJsonPatch) => void): IDisposer
 export function onPatch(
     target: IStateTreeNode,
@@ -344,8 +321,8 @@ export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
     return false
 }
 
-export function getParent(target: IStateTreeNode, depth?: number): (any & IStateTreeNode)
-export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStateTreeNode)
+export function getParent(target: IStateTreeNode, depth?: number): any & IStateTreeNode
+export function getParent<T>(target: IStateTreeNode, depth?: number): T & IStateTreeNode
 /**
  * Returns the immediate parent of this object, or null.
  *
@@ -357,7 +334,7 @@ export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStat
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent<T>(target: IStateTreeNode, depth = 1): (T & IStateTreeNode) {
+export function getParent<T>(target: IStateTreeNode, depth = 1): T & IStateTreeNode {
     if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     let d = depth
     let parent: Node | null = getStateTreeNode(target).parent

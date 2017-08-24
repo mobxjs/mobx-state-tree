@@ -18,7 +18,9 @@ export {
     onAction,
     IMiddleWareEvent,
     IMiddlewareEventType,
-    ISerializedActionCall
+    ISerializedActionCall,
+    IMiddleWareFilter,
+    IMiddleWareHandler
 } from "./core/action"
 export { process } from "./core/process"
 export { isStateTreeNode, IStateTreeNode } from "./core/node"

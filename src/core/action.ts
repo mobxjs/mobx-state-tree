@@ -74,12 +74,44 @@ export function createActionInvoker<T extends Function>(
     }
 }
 
+export type IMiddleWareFilter = (actionCall: IMiddleWareEvent) => boolean
+
+const defaultFilter: IMiddleWareFilter = () => true
+
 export type IMiddleWareHandler = (
     actionCall: IMiddleWareEvent,
     next: (actionCall: IMiddleWareEvent) => any
 ) => any
 
-function collectMiddlewareHandlers(node: Node): IMiddleWareHandler[] {
+/**
+ * Middleware can be used to intercept any action is invoked on the subtree where it is attached.
+ * If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
+ *
+ * For more details, see the [middleware docs](docs/middleware.md)
+ *
+ * @export
+ * @param {IStateTreeNode} target
+ * @param {(action: IRawActionCall) => boolean} filter optional argument, filter function to filter the calls that actually reach the middleware
+ * @param {(action: IRawActionCall, next: (call: IRawActionCall) => any) => any} middleware
+ * @returns {IDisposer}
+ */
+export function addMiddleware(
+    target: IStateTreeNode,
+    filter: IMiddleWareFilter,
+    middleware: IMiddleWareHandler
+): IDisposer
+export function addMiddleware(target: IStateTreeNode, middleware: IMiddleWareHandler): IDisposer
+export function addMiddleware(target, arg2, arg3?): IDisposer {
+    const node = getStateTreeNode(target)
+    if (!node.isProtectionEnabled)
+        console.warn(
+            "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
+        )
+    if (arguments.length === 2) return node.addMiddleWare(defaultFilter, arg2)
+    else return node.addMiddleWare(arg2, arg3)
+}
+
+function collectMiddlewareHandlers(node: Node, baseCall: IMiddleWareEvent): IMiddleWareHandler[] {
     let handlers = node.middlewares.slice()
     let n: Node = node
     // Find all middlewares. Optimization: cache this?
@@ -87,11 +119,11 @@ function collectMiddlewareHandlers(node: Node): IMiddleWareHandler[] {
         n = n.parent
         handlers = handlers.concat(n.middlewares)
     }
-    return handlers
+    return handlers.filter(config => config.filter(baseCall)).map(config => config.handler)
 }
 
 function runMiddleWares(node: Node, baseCall: IMiddleWareEvent, originalFn: Function): any {
-    const handlers = collectMiddlewareHandlers(node)
+    const handlers = collectMiddlewareHandlers(node, baseCall)
     // Short circuit
     if (!handlers.length) return originalFn.apply(baseCall.context, baseCall.args)
 
@@ -218,7 +250,6 @@ export function onAction(
 import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"
 import {
     tryResolve,
-    addMiddleware,
     applyPatch,
     getType,
     applySnapshot,
