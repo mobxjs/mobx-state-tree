@@ -1,5 +1,5 @@
 import { Type, IType } from "../type"
-import { TypeFlags } from "../type-flags"
+import { TypeFlags, isType } from "../type-flags"
 import { IContext, IValidationResult, typeCheckFailure } from "../type-checker"
 import { fail } from "../../utils"
 import { Node, createNode, isStateTreeNode } from "../../core"
@@ -81,5 +81,9 @@ export function identifier<T>(): T
  * @returns {IType<T, T>} 
  */
 export function identifier(baseType: IType<any, any> = stringType): any {
+    if (process.env.NODE_ENV !== "production") {
+        if (!isType(baseType))
+            fail("expected a mobx-state-tree type as first argument, got " + baseType + " instead")
+    }
     return new IdentifierType(baseType)
 }

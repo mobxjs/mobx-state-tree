@@ -1,3 +1,7 @@
+# next
+
+* Added dev-only checks, typecheck will be performed only in dev-mode and top-level API-calls will be checked.
+
 # 0.10.3
 
 * Redefining lifecycle hooks will now automatically compose them, implements [#252](https://github.com/mobxjs/mobx-state-tree/issues/252)

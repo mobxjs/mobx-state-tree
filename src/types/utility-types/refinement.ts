@@ -1,7 +1,8 @@
 import { IType, Type } from "../type"
-import { TypeFlags } from "../type-flags"
+import { TypeFlags, isType } from "../type-flags"
 import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import { fail } from "../../utils"
 
 export class Refinement<S, T> extends Type<S, T> {
     readonly type: IType<any, any>
@@ -76,5 +77,14 @@ export function refinement(
     type: IType<any, any>,
     predicate: (snapshot: any) => boolean
 ): IType<any, any> {
+    // ensures all parameters are correct
+    if (process.env.NODE_ENV !== "production") {
+        if (typeof name !== "string")
+            fail("expected a string as first argument, got " + name + " instead")
+        if (!isType(type))
+            fail("expected a mobx-state-tree type as second argument, got " + type + " instead")
+        if (typeof predicate !== "function")
+            fail("expected a function as third argument, got " + predicate + " instead")
+    }
     return new Refinement(name, type, predicate)
 }

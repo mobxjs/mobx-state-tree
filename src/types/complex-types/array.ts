@@ -20,7 +20,7 @@ import {
 } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isArray } from "../../utils"
 import { ComplexType, IComplexType, IType } from "../type"
-import { TypeFlags } from "../type-flags"
+import { TypeFlags, isType } from "../type-flags"
 import {
     typecheck,
     flattenTypeErrors,
@@ -91,6 +91,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
         switch (change.type) {
             case "update":
+                typecheck(this.subType, change.newValue)
                 if (change.newValue === change.object[change.index]) return null
                 change.newValue = reconcileArrayChildren(
                     node,
@@ -102,6 +103,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                 break
             case "splice":
                 const { index, removedCount, added } = change
+                added.forEach(newValue => typecheck(this.subType, newValue))
                 change.added = reconcileArrayChildren(
                     node,
                     this.subType,
@@ -237,6 +239,10 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
 export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
+    if (process.env.NODE_ENV !== "production") {
+        if (!isType(subtype))
+            fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")
+    }
     return new ArrayType<S, T>(subtype.name + "[]", subtype)
 }
 

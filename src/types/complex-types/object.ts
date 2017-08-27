@@ -451,6 +451,12 @@ export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
 export function compose(...args: any[]): IModelType<any, any> {
     // TODO: just join the base type names if no name is provided
     const typeName: string = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+    // check all parameters
+    if (process.env.NODE_ENV !== "production") {
+        args.forEach(type => {
+            if (!isType(type)) fail("expected a mobx-state-tree type, got " + type + " instead")
+        })
+    }
     return (args as ObjectType<any, any>[])
         .reduce((prev, cur) =>
             prev.extend({
