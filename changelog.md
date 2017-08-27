@@ -1,3 +1,7 @@
+# next
+
+* Added dev-only checks, typecheck will be performed only in dev-mode and top-level API-calls will be checked.
+
 # 0.10.2
 
 * Object model instances no longer share a prototype.
