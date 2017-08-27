@@ -91,6 +91,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
         switch (change.type) {
             case "update":
+                typecheck(this.subType, change.newValue)
                 if (change.newValue === change.object[change.index]) return null
                 change.newValue = reconcileArrayChildren(
                     node,
@@ -102,6 +103,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                 break
             case "splice":
                 const { index, removedCount, added } = change
+                added.forEach(newValue => typecheck(this.subType, newValue))
                 change.added = reconcileArrayChildren(
                     node,
                     this.subType,
