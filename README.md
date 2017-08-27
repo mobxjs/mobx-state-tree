@@ -792,6 +792,10 @@ A _disposer_ is a function that cancels the effect it was created for.
 
 # Tips
 
+### Building with production environment
+
+MobX-state-tree provides a lot of dev-only checks. They checks the correctness of function calls and perform runtime type-checks over your models. It is recommended to disable them in production builds. To do so, you should use webpack's DefinePlugin to set environment as production and remove them. More information could be found in the [official webpack guides](https://webpack.js.org/plugins/environment-plugin/#usage).
+
 ### `optionals` and default value functions
 
 `types.optional` can take an optional function parameter which will be invoked each time a default value is needed. This is useful to generate timestamps, identifiers or even complex objects, for example:
