@@ -856,7 +856,7 @@ const Square = types
 // create a new type, based of Square
 const Box = Square
     .named("Box")
-    .views(self =>{
+    .views(self => {
         // save the base implementation of surface
         const superSurface = self.surface
 
