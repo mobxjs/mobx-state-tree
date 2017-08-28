@@ -400,7 +400,7 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
     actions<A extends { [name: string]: Function }>(
         fn: (self: T & IStateTreeNode) => A
     ): IModelType<S, T & A>
-    preProcessSnapshot<T>(fn: (snapshot: T) => S): IModelType<S, T>
+    preProcessSnapshot<NS, T>(fn: (snapshot: NS) => S): IModelType<NS, T>
 }
 
 export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }
