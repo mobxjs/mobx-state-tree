@@ -569,7 +569,7 @@ export function walk(thing: IStateTreeNode, processor: (item: IStateTreeNode) =>
 }
 
 import {
-    IMiddleWareEvent,
+    IMiddlewareEvent,
     ISerializedActionCall,
     applyAction as baseApplyAction,
     onAction

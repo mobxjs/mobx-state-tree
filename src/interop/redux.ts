@@ -1,6 +1,6 @@
 import { isStateTreeNode } from "../core"
 import { getSnapshot, applySnapshot, onSnapshot } from "../core/mst-operations"
-import { applyAction, onAction, ISerializedActionCall, IMiddleWareEvent } from "../core/action"
+import { applyAction, onAction, ISerializedActionCall, IMiddlewareEvent } from "../core/action"
 import { fail, extend } from "../utils"
 
 export interface IMiddleWareApi {
@@ -14,7 +14,7 @@ export interface IReduxStore extends IMiddleWareApi {
 
 export type MiddleWare = (
     middlewareApi: IMiddleWareApi
-) => ((next: (action: IMiddleWareEvent) => void) => void)
+) => ((next: (action: IMiddlewareEvent) => void) => void)
 
 /**
  * Creates a tiny proxy around a MST tree that conforms to the redux store api.
@@ -42,7 +42,7 @@ export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxSt
     return store
 }
 
-function reduxActionToAction(action: any): IMiddleWareEvent {
+function reduxActionToAction(action: any): IMiddlewareEvent {
     const actionArgs = extend({}, action)
     delete actionArgs.type
     return {

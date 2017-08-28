@@ -16,11 +16,13 @@ export * from "./core/mst-operations"
 export { escapeJsonPath, unescapeJsonPath, IJsonPatch } from "./core/json-patch"
 export {
     onAction,
-    IMiddleWareEvent,
+    decorate,
+    addMiddleware,
+    IMiddlewareEvent,
     IMiddlewareEventType,
     ISerializedActionCall,
-    IMiddleWareFilter,
-    IMiddleWareHandler
+    IMiddlewareFilter,
+    IMiddlewareHandler
 } from "./core/action"
 export { process } from "./core/process"
 export { isStateTreeNode, IStateTreeNode } from "./core/node"

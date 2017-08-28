@@ -19,7 +19,7 @@ export class Node {
     private _isAlive = true // optimization: use binary flags for all these switches
     private _isDetaching = false
 
-    readonly middlewares: { filter: IMiddleWareFilter; handler: IMiddleWareHandler }[] = []
+    readonly middlewares: IMiddlewareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
     private readonly patchSubscribers: ((patches: IReversibleJsonPatch) => void)[] = []
     private readonly disposers: (() => void)[] = []
@@ -336,12 +336,8 @@ export class Node {
         return this.parent!.isRunningAction()
     }
 
-    addMiddleWare(filter: IMiddleWareFilter, handler: IMiddleWareHandler) {
-        const config = { filter, handler }
-        this.middlewares.push(config)
-        return () => {
-            remove(this.middlewares, config)
-        }
+    addMiddleWare(handler: IMiddlewareHandler) {
+        return registerEventHandler(this.middlewares, handler)
     }
 
     getChildNode(subpath: string): Node {
@@ -492,7 +488,7 @@ import {
     stripPatch
 } from "./json-patch"
 import { walk } from "./mst-operations"
-import { IMiddleWareFilter, IMiddleWareHandler, createActionInvoker } from "./action"
+import { IMiddlewareHandler, createActionInvoker } from "./action"
 import {
     addReadOnlyProp,
     addHiddenFinalProp,
@@ -502,7 +498,6 @@ import {
     registerEventHandler,
     identity,
     noop,
-    freeze,
-    remove
+    freeze
 } from "../utils"
 import { IdentifierCache } from "./identifier-cache"

@@ -317,6 +317,6 @@ export function union(
 ): IType<any, any> {
     const dispatcher = isType(dispatchOrType) ? null : dispatchOrType
     const types = isType(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
-    const name = types.map(type => type.name).join(" | ")
+    const name = "(" + types.map(type => type.name).join(" | ") + ")"
     return new Union(name, types, dispatcher)
 }

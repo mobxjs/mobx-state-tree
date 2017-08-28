@@ -1,4 +1,4 @@
-import { action as mobxAction, isObservable } from "mobx"
+import { action as mobxAction } from "mobx"
 import { isArray } from "../utils"
 
 export type ISerializedActionCall = {
@@ -16,7 +16,7 @@ export type IMiddlewareEventType =
     | "process_throw"
 // | "task_spawn"
 
-export type IMiddleWareEvent = {
+export type IMiddlewareEvent = {
     type: IMiddlewareEventType
     name: string
     id: number
@@ -26,13 +26,13 @@ export type IMiddleWareEvent = {
 }
 
 let nextActionId = 1
-let currentActionContext: IMiddleWareEvent | null = null
+let currentActionContext: IMiddlewareEvent | null = null
 
 export function getNextActionId() {
     return nextActionId++
 }
 
-export function runWithActionContext(context: IMiddleWareEvent, fn: Function) {
+export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const node = getStateTreeNode(context.context)
     const baseIsRunningAction = node._isRunningAction
     const prevContext = currentActionContext
@@ -47,7 +47,7 @@ export function runWithActionContext(context: IMiddleWareEvent, fn: Function) {
     }
 }
 
-export function getActionContext(): IMiddleWareEvent {
+export function getActionContext(): IMiddlewareEvent {
     if (!currentActionContext) return fail("Not running an action!")
     return currentActionContext
 }
@@ -58,6 +58,8 @@ export function createActionInvoker<T extends Function>(
     fn: T
 ) {
     const wrappedFn = mobxAction(name, fn)
+    ;(wrappedFn as any).$mst_middleware = (fn as any).$mst_middleware
+
     return function() {
         const id = getNextActionId()
         return runWithActionContext(
@@ -74,13 +76,11 @@ export function createActionInvoker<T extends Function>(
     }
 }
 
-export type IMiddleWareFilter = (actionCall: IMiddleWareEvent) => boolean
+export type IMiddlewareFilter = (actionCall: IMiddlewareEvent) => boolean
 
-const defaultFilter: IMiddleWareFilter = () => true
-
-export type IMiddleWareHandler = (
-    actionCall: IMiddleWareEvent,
-    next: (actionCall: IMiddleWareEvent) => any
+export type IMiddlewareHandler = (
+    actionCall: IMiddlewareEvent,
+    next: (actionCall: IMiddlewareEvent) => any
 ) => any
 
 /**
@@ -91,46 +91,58 @@ export type IMiddleWareHandler = (
  *
  * @export
  * @param {IStateTreeNode} target
- * @param {(action: IRawActionCall) => boolean} filter optional argument, filter function to filter the calls that actually reach the middleware
  * @param {(action: IRawActionCall, next: (call: IRawActionCall) => any) => any} middleware
  * @returns {IDisposer}
  */
-export function addMiddleware(
-    target: IStateTreeNode,
-    filter: IMiddleWareFilter,
-    middleware: IMiddleWareHandler
-): IDisposer
-export function addMiddleware(target: IStateTreeNode, middleware: IMiddleWareHandler): IDisposer
-export function addMiddleware(target, arg2, arg3?): IDisposer {
+export function addMiddleware(target: IStateTreeNode, middleware: IMiddlewareHandler): IDisposer {
     const node = getStateTreeNode(target)
     if (!node.isProtectionEnabled)
         console.warn(
             "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
         )
-    if (arguments.length === 2) return node.addMiddleWare(defaultFilter, arg2)
-    else return node.addMiddleWare(arg2, arg3)
+    return node.addMiddleWare(middleware)
 }
 
-function collectMiddlewareHandlers(node: Node, baseCall: IMiddleWareEvent): IMiddleWareHandler[] {
-    let handlers = node.middlewares.slice()
-    let n: Node = node
+export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn: T): T
+/**
+ * Binds middleware to a specific action
+ *
+ * @export
+ * @template T
+ * @param {IMiddlewareHandler} middleware
+ * @param Function} fn
+ * @returns the original function
+ */
+export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn: any) {
+    if (fn.$mst_middleware) fn.$mst_middleware.push(middleware)
+    else fn.$mst_middleware = [middleware]
+    return fn
+}
+
+function collectMiddlewareHandlers(
+    node: Node,
+    baseCall: IMiddlewareEvent,
+    fn: Function
+): IMiddlewareHandler[] {
+    let handlers: IMiddlewareHandler[] = (fn as any).$mst_middleware || []
+    let n: Node | null = node
     // Find all middlewares. Optimization: cache this?
-    while (n.parent) {
-        n = n.parent
+    while (n) {
         handlers = handlers.concat(n.middlewares)
+        n = n.parent
     }
-    return handlers.filter(config => config.filter(baseCall)).map(config => config.handler)
+    return handlers
 }
 
-function runMiddleWares(node: Node, baseCall: IMiddleWareEvent, originalFn: Function): any {
-    const handlers = collectMiddlewareHandlers(node, baseCall)
+function runMiddleWares(node: Node, baseCall: IMiddlewareEvent, originalFn: Function): any {
+    const handlers = collectMiddlewareHandlers(node, baseCall, originalFn)
     // Short circuit
-    if (!handlers.length) return originalFn.apply(baseCall.context, baseCall.args)
+    if (!handlers.length) return originalFn.apply(null, baseCall.args)
 
-    function runNextMiddleware(call: IMiddleWareEvent): any {
+    function runNextMiddleware(call: IMiddlewareEvent): any {
         const handler = handlers.shift() // Optimization: counter instead of shift is probably faster
         if (handler) return handler(call, runNextMiddleware)
-        else return originalFn.apply(baseCall.context, baseCall.args)
+        else return originalFn.apply(null, baseCall.args)
     }
     return runNextMiddleware(baseCall)
 }
@@ -219,7 +231,7 @@ export function onAction(
             "[mobx-state-tree] Warning: Attaching onAction listeners to non protected nodes is dangerous: No events will be emitted for direct modifications without action."
         )
 
-    function fireListener(rawCall: IMiddleWareEvent) {
+    function fireListener(rawCall: IMiddlewareEvent) {
         if (rawCall.type === "action" && rawCall.id === rawCall.rootId) {
             const sourceNode = getStateTreeNode(rawCall.context)
             listener({
