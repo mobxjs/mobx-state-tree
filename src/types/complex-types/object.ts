@@ -226,7 +226,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         return this.extend({ initializers: [viewInitializer] })
     }
 
-    preProcessSnapshot<T>(preProcessor: (snapshot: T) => S): IModelType<S, T> {
+    preProcessSnapshot(preProcessor: (snapshot: any) => S): IModelType<S, T> {
         const currentPreprocessor = this.preProcessor
         if (!currentPreprocessor) return this.extend({ preProcessor })
         else
@@ -400,7 +400,7 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
     actions<A extends { [name: string]: Function }>(
         fn: (self: T & IStateTreeNode) => A
     ): IModelType<S, T & A>
-    preProcessSnapshot<NS, T>(fn: (snapshot: NS) => S): IModelType<NS, T>
+    preProcessSnapshot(fn: (snapshot: any) => S): IModelType<S, T>
 }
 
 export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }
