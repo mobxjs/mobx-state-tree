@@ -10,11 +10,11 @@ export type ISerializedActionCall = {
 export type IMiddlewareEventType =
     | "action"
     | "process_spawn"
-    | "process_yield"
-    | "process_yield_error"
+    | "process_resume"
+    | "process_resume_error"
     | "process_return"
     | "process_throw"
-// | "task_spawn"
+// | "task_spawn TODO, see #273"
 
 export type IMiddlewareEvent = {
     type: IMiddlewareEventType
@@ -107,6 +107,19 @@ export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn:
 /**
  * Binds middleware to a specific action
  *
+ * @example
+ * type.actions(self => {
+ *   function takeA____() {
+ *       self.toilet.donate()
+ *       self.wipe()
+ *       self.wipe()
+ *       self.toilet.flush()
+ *   }
+ *   return {
+ *     takeA____: decorate(atomic, takeA____)
+ *   }
+ * })
+ *
  * @export
  * @template T
  * @param {IMiddlewareHandler} middleware
@@ -181,6 +194,7 @@ function deserializeArgument(adm: Node, value: any): any {
     return value
 }
 
+// todo: move to middlewares / onaction
 export function applyAction(target: IStateTreeNode, action: ISerializedActionCall): any {
     const resolvedTarget = tryResolve(target, action.path || "")
     if (!resolvedTarget) return fail(`Invalid action path: ${action.path || ""}`)

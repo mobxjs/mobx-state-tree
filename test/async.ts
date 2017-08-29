@@ -87,7 +87,7 @@ test.cb("can handle async actions", t => {
                 args: ["drinking coffee"],
                 id: 2,
                 rootId: 1,
-                type: "process_yield",
+                type: "process_resume",
                 name: "fetchData"
             },
             { args: ["awake"], id: 2, rootId: 1, type: "process_return", name: "fetchData" }
@@ -131,7 +131,7 @@ test.cb("can handle try catch", t => {
         [
             { type: "action", name: "startFetch", id: 5, args: ["black"], rootId: 5 },
             { name: "fetchData", type: "process_spawn", id: 6, args: ["black"], rootId: 5 },
-            { name: "fetchData", type: "process_yield_error", id: 6, args: ["tea"], rootId: 5 },
+            { name: "fetchData", type: "process_resume_error", id: 6, args: ["tea"], rootId: 5 },
             { name: "fetchData", type: "process_return", id: 6, args: ["biscuit"], rootId: 5 }
         ]
     )
@@ -165,7 +165,7 @@ test.cb("can handle throw from yielded promise works", t => {
         [
             { type: "action", name: "startFetch", id: 9, args: ["black"], rootId: 9 },
             { name: "fetchData", type: "process_spawn", id: 10, args: ["black"], rootId: 9 },
-            { name: "fetchData", type: "process_yield_error", id: 10, args: ["x"], rootId: 9 },
+            { name: "fetchData", type: "process_resume_error", id: 10, args: ["x"], rootId: 9 },
             { name: "fetchData", type: "process_throw", id: 10, args: ["x"], rootId: 9 }
         ]
     )
@@ -298,7 +298,7 @@ test.cb("can handle nested async actions", t => {
             },
             {
                 name: "uppercase",
-                type: "process_yield",
+                type: "process_resume",
                 id: 23,
                 args: ["DRINKING BLACK"],
                 rootId: 21
@@ -312,7 +312,7 @@ test.cb("can handle nested async actions", t => {
             },
             {
                 name: "fetchData",
-                type: "process_yield",
+                type: "process_resume",
                 id: 22,
                 args: ["DRINKING BLACK"],
                 rootId: 21
