@@ -21,9 +21,13 @@ export class Node {
 
     readonly middlewares: IMiddlewareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
-    private readonly patchSubscribers: ((patches: IReversibleJsonPatch) => void)[] = []
+    // TODO: split patches in two; patch and reversePatch
+    private readonly patchSubscribers: ((
+        patch: IJsonPatch,
+        reversePatch: IJsonPatch
+    ) => void)[] = []
     private readonly disposers: (() => void)[] = []
-    applyPatches: (patches: IReversibleJsonPatch[]) => void
+    applyPatches: (patches: IJsonPatch[]) => void
     applySnapshot: (snapshot: any) => void
 
     constructor(
@@ -49,7 +53,7 @@ export class Node {
         this.applyPatches = createActionInvoker(
             this.storedValue,
             "@APPLY_PATCHES",
-            (patches: IReversibleJsonPatch[]) => {
+            (patches: IJsonPatch[]) => {
                 patches.forEach(patch => {
                     const parts = splitJsonPath(patch.path)
                     const node = this.resolvePath(parts.slice(0, -1))
@@ -176,8 +180,9 @@ export class Node {
         let current: Node | null = this
         for (let i = 0; i < pathParts.length; i++) {
             if (pathParts[i] === "") current = current!.root
-            else if (pathParts[i] === "..")
-                // '/bla' or 'a//b' splits to empty strings
+            else if (
+                pathParts[i] === ".." // '/bla' or 'a//b' splits to empty strings
+            )
                 current = current!.parent
             else if (pathParts[i] === "." || pathParts[i] === "") continue
             else if (current) {
@@ -272,29 +277,24 @@ export class Node {
         this.snapshotSubscribers.forEach((f: Function) => f(snapshot))
     }
 
-    applyPatchLocally(subpath: string, patch: IReversibleJsonPatch): void {
+    applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.assertWritable()
         this.type.applyPatchLocally(this, subpath, patch)
     }
 
-    public onPatch(
-        onPatch: (patch: IReversibleJsonPatch) => void,
-        includeOldValue: boolean
-    ): IDisposer {
-        return registerEventHandler(
-            this.patchSubscribers,
-            includeOldValue ? onPatch : (patch: IReversibleJsonPatch) => onPatch(stripPatch(patch))
-        )
+    public onPatch(handler: (patch: IJsonPatch, reversePatch: IJsonPatch) => void): IDisposer {
+        return registerEventHandler(this.patchSubscribers, handler)
     }
 
-    emitPatch(patch: IReversibleJsonPatch, source: Node) {
+    emitPatch(basePatch: IReversibleJsonPatch, source: Node) {
         if (this.patchSubscribers.length) {
-            const localizedPatch: IReversibleJsonPatch = extend({}, patch, {
-                path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
+            const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, {
+                path: source.path.substr(this.path.length) + "/" + basePatch.path // calculate the relative path of the patch
             })
-            this.patchSubscribers.forEach(f => f(localizedPatch))
+            const [patch, reversePatch] = splitPatch(localizedPatch)
+            this.patchSubscribers.forEach(f => f(patch, reversePatch))
         }
-        if (this.parent) this.parent.emitPatch(patch, source)
+        if (this.parent) this.parent.emitPatch(basePatch, source)
     }
 
     setParent(newParent: Node | null, subpath: string | null = null) {
@@ -485,7 +485,9 @@ import {
     splitJsonPath,
     joinJsonPath,
     IReversibleJsonPatch,
-    stripPatch
+    stripPatch,
+    IJsonPatch,
+    splitPatch
 } from "./json-patch"
 import { walk } from "./mst-operations"
 import { IMiddlewareHandler, createActionInvoker } from "./action"

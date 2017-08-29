@@ -37,7 +37,6 @@ const METHODS = [
     "recordPatches",
     "resolveIdentifier",
     "resolvePath",
-    "revertPatch",
     "tryResolve",
     "types",
     "unescapeJsonPath",

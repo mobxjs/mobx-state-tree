@@ -8,17 +8,33 @@ export type IJsonPatch = {
 }
 
 export type IReversibleJsonPatch = IJsonPatch & {
-    oldValue?: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
+    oldValue: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
 }
 
-export function invertPatch(patch: IReversibleJsonPatch): IReversibleJsonPatch {
+export function splitPatch(patch: IReversibleJsonPatch): [IJsonPatch, IJsonPatch] {
     if (!("oldValue" in patch)) fail(`Patches without \`oldValue\` field cannot be inversed`)
+    return [stripPatch(patch), invertPatch(patch)]
+}
+
+export function stripPatch(patch: IReversibleJsonPatch): IJsonPatch {
+    // strips `oldvalue` information from the patch, so that it becomes a patch conform the json-patch spec
+    // this removes the ability to undo the patch
+    switch (patch.op) {
+        case "add":
+            return { op: "add", path: patch.path, value: patch.value }
+        case "remove":
+            return { op: "remove", path: patch.path }
+        case "replace":
+            return { op: "replace", path: patch.path, value: patch.value }
+    }
+}
+
+function invertPatch(patch: IReversibleJsonPatch): IJsonPatch {
     switch (patch.op) {
         case "add":
             return {
                 op: "remove",
-                path: patch.path,
-                oldValue: patch.value
+                path: patch.path
             }
         case "remove":
             return {
@@ -30,18 +46,9 @@ export function invertPatch(patch: IReversibleJsonPatch): IReversibleJsonPatch {
             return {
                 op: "replace",
                 path: patch.path,
-                value: patch.oldValue,
-                oldValue: patch.value
+                value: patch.oldValue
             }
     }
-}
-
-export function stripPatch(patch: IReversibleJsonPatch): IJsonPatch {
-    // strips `oldvalue` information from the patch, so that it becomes a patch conform the json-patch spec
-    // this removes the ability to undo the patch
-    const clone = { ...patch }
-    delete clone.oldValue
-    return clone as any
 }
 
 /**
