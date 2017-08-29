@@ -19,10 +19,8 @@ export {
     decorate,
     addMiddleware,
     IMiddlewareEvent,
-    IMiddlewareEventType,
-    ISerializedActionCall,
-    IMiddlewareFilter,
-    IMiddlewareHandler
+    IMiddlewareHandler,
+    IMiddlewareEventType
 } from "./core/action"
 export { process } from "./core/process"
 export { isStateTreeNode, IStateTreeNode } from "./core/node"

@@ -318,5 +318,17 @@ export function union(
     const dispatcher = isType(dispatchOrType) ? null : dispatchOrType
     const types = isType(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
     const name = "(" + types.map(type => type.name).join(" | ") + ")"
+
+    // check all options
+    if (process.env.NODE_ENV !== "production") {
+        types.forEach(type => {
+            if (!isType(type))
+                fail(
+                    "expected all possible types to be a mobx-state-tree type, got " +
+                        type +
+                        " instead"
+                )
+        })
+    }
     return new Union(name, types, dispatcher)
 }

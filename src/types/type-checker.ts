@@ -84,7 +84,15 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
 
 // TODO; doublecheck: typecheck should only needed to be invoked from: type.create and array / map / value.property will change
 export function typecheck(type: IType<any, any>, value: any): void {
-    const errors = type.validate(value, [{ path: "", type }])
+    // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
+    if (process.env.NODE_ENV === "production") return
+
+    const errors = type.validate(value, [
+        {
+            path: "",
+            type
+        }
+    ])
 
     if (errors.length > 0) {
         fail(

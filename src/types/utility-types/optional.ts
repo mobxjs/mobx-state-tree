@@ -1,7 +1,8 @@
 import { Type, IType } from "../type"
-import { TypeFlags } from "../type-flags"
+import { TypeFlags, isType } from "../type-flags"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess } from "../type-checker"
 import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
+import { fail } from "../../utils"
 
 export type IFunctionReturn<T> = () => T
 export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>
@@ -87,13 +88,17 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => 
  * @alias types.optional
  */
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): IType<S, T> {
-    const defaultValue =
-        typeof defaultValueOrFunction === "function"
-            ? defaultValueOrFunction()
-            : defaultValueOrFunction
-    const defaultSnapshot = isStateTreeNode(defaultValue)
-        ? getStateTreeNode(defaultValue).snapshot
-        : defaultValue
-    typecheck(type, defaultSnapshot)
+    if (process.env.NODE_ENV !== "production") {
+        if (!isType(type))
+            fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
+        const defaultValue =
+            typeof defaultValueOrFunction === "function"
+                ? defaultValueOrFunction()
+                : defaultValueOrFunction
+        const defaultSnapshot = isStateTreeNode(defaultValue)
+            ? getStateTreeNode(defaultValue).snapshot
+            : defaultValue
+        typecheck(type, defaultSnapshot)
+    }
     return new OptionalValue(type, defaultValueOrFunction)
 }

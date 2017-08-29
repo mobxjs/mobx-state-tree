@@ -76,8 +76,6 @@ export function createActionInvoker<T extends Function>(
     }
 }
 
-export type IMiddlewareFilter = (actionCall: IMiddlewareEvent) => boolean
-
 export type IMiddlewareHandler = (
     actionCall: IMiddlewareEvent,
     next: (actionCall: IMiddlewareEvent) => any
@@ -96,10 +94,12 @@ export type IMiddlewareHandler = (
  */
 export function addMiddleware(target: IStateTreeNode, middleware: IMiddlewareHandler): IDisposer {
     const node = getStateTreeNode(target)
-    if (!node.isProtectionEnabled)
-        console.warn(
-            "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
-        )
+    if (process.env.NODE_ENV !== "production") {
+        if (!node.isProtectionEnabled)
+            console.warn(
+                "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
+            )
+    }
     return node.addMiddleWare(middleware)
 }
 
@@ -163,7 +163,7 @@ function serializeArgument(node: Node, actionName: string, index: number, arg: a
     if (typeof arg === "function") return serializeTheUnserializable(`[function]`)
     if (typeof arg === "object" && !isPlainObject(arg) && !isArray(arg))
         return serializeTheUnserializable(
-            `[object ${(arg && arg.constructor && arg.constructor.name) || "Object"}]`
+            `[object ${(arg && arg.constructor && arg.constructor.name) || "Complex Object"}]`
         )
     try {
         // Check if serializable, cycle free etc...
@@ -222,14 +222,19 @@ export function onAction(
     listener: (call: ISerializedActionCall) => void,
     attachAfter = false
 ): IDisposer {
-    if (!isRoot(target))
-        console.warn(
-            "[mobx-state-tree] Warning: Attaching onAction listeners to non root nodes is dangerous: No events will be emitted for actions initiated higher up in the tree."
-        )
-    if (!isProtected(target))
-        console.warn(
-            "[mobx-state-tree] Warning: Attaching onAction listeners to non protected nodes is dangerous: No events will be emitted for direct modifications without action."
-        )
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (!isRoot(target))
+            console.warn(
+                "[mobx-state-tree] Warning: Attaching onAction listeners to non root nodes is dangerous: No events will be emitted for actions initiated higher up in the tree."
+            )
+        if (!isProtected(target))
+            console.warn(
+                "[mobx-state-tree] Warning: Attaching onAction listeners to non protected nodes is dangerous: No events will be emitted for direct modifications without action."
+            )
+    }
 
     function fireListener(rawCall: IMiddlewareEvent) {
         if (rawCall.type === "action" && rawCall.id === rawCall.rootId) {

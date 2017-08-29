@@ -2,10 +2,15 @@
 
 * `onAction` lister now supports an `attachAfter` parameter
 * ReduxDevTools connection is no longer one step behind [#287](https://github.com/mobxjs/mobx-state-tree/issues/287)
-* The internal types `IMiddleWareEvent`, `IMiddlewareEventType`, `ISerializedActionCall` are now exposed (fixes [#315](https://github.com/mobxjs/mobx-state-tree/issues/315))
 * **BREAKING** `onAction` middleware no longer throws when encountering unserializable arguments. Rather, it serializes a struct like `{ $MST_UNSERIALIZABLE: true, type: "someType" }`. MST Nodes are no longer automatically serialized. Rather, one should either pass 1: an id, 2: a (relative) path, 3: a snapshot
 * Middleware is no longer run as part of the transaction of the targeted action
 * `addMiddleware` now accepts an additional argument; a filter to filter out the calls to which the middleware should apply. This reduces the amount of boilerplate in writing middleware.
+
+# 0.10.3
+
+* **BREAKISH** Redefining lifecycle hooks will now automatically compose them, implements [#252](https://github.com/mobxjs/mobx-state-tree/issues/252)
+* Added dev-only checks, typecheck will be performed only in dev-mode and top-level API-calls will be checked.
+* The internal types `IMiddleWareEvent`, `IMiddlewareEventType`, `ISerializedActionCall` are now exposed (fixes [#315](https://github.com/mobxjs/mobx-state-tree/issues/315))
 
 # 0.10.2
 

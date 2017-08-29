@@ -51,6 +51,9 @@ export class Literal<T> extends Type<T, T> {
  * @returns {ISimpleType<S>}
  */
 export function literal<S>(value: S): ISimpleType<S> {
-    if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
+    // check that the given value is a primitive
+    if (process.env.NODE_ENV !== "production") {
+        if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
+    }
     return new Literal<S>(value)
 }

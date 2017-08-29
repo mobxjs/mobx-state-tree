@@ -704,3 +704,21 @@ test("it should applySnapshot references in array", t => {
         hovers: []
     })
 })
+
+test("array of references should work fine", t => {
+    const B = types.model("Block", { id: types.identifier(types.string) })
+
+    const S = types
+        .model("Store", { blocks: types.array(B), blockRefs: types.array(types.reference(B)) })
+        .actions(self => {
+            return {
+                order() {
+                    self.blockRefs.move(0, 1)
+                }
+            }
+        })
+
+    const a = S.create({ blocks: [{ id: "1" }, { id: "2" }], blockRefs: ["1", "2"] })
+
+    t.notThrows(() => a.order())
+})
