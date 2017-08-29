@@ -1,6 +1,7 @@
 import { isStateTreeNode } from "../core"
 import { getSnapshot, applySnapshot, onSnapshot } from "../core/mst-operations"
-import { applyAction, onAction, ISerializedActionCall, IMiddlewareEvent } from "../core/action"
+import { IMiddlewareEvent } from "../core/action"
+import { applyAction, onAction, ISerializedActionCall } from "../middlewares/on-action"
 import { fail, extend } from "../utils"
 
 export interface IMiddleWareApi {

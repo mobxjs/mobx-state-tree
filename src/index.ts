@@ -15,7 +15,6 @@ export {
 export * from "./core/mst-operations"
 export { escapeJsonPath, unescapeJsonPath, IJsonPatch } from "./core/json-patch"
 export {
-    onAction,
     decorate,
     addMiddleware,
     IMiddlewareEvent,
@@ -26,3 +25,10 @@ export { process } from "./core/process"
 export { isStateTreeNode, IStateTreeNode } from "./core/node"
 
 export { asReduxStore, IReduxStore, connectReduxDevtools } from "./interop/redux"
+export {
+    applyAction,
+    onAction,
+    IActionRecorder,
+    ISerializedActionCall,
+    recordActions
+} from "./middlewares/on-action"
