@@ -318,7 +318,7 @@ test("it should fail when reference snapshot is ambiguous", t => {
     })
     t.throws(() => {
         store.selected // store.boxes[1] // throws because it can't know if you mean a box or an arrow!
-    }, "[mobx-state-tree] Cannot resolve a reference to type 'Arrow | Box' with id: '2' unambigously, there are multiple candidates: /boxes/1, /arrows/0")
+    }, "[mobx-state-tree] Cannot resolve a reference to type '(Arrow | Box)' with id: '2' unambigously, there are multiple candidates: /boxes/1, /arrows/0")
     unprotect(store)
     // first update the reference, than create a new matching item! Ref becomes ambigous now...
     store.selected = 1 as any
@@ -329,7 +329,7 @@ test("it should fail when reference snapshot is ambiguous", t => {
     store.arrows.push({ id: 1, name: "oops" })
     t.is(
         err.message,
-        "[mobx-state-tree] Cannot resolve a reference to type 'Arrow | Box' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
+        "[mobx-state-tree] Cannot resolve a reference to type '(Arrow | Box)' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
     )
 })
 

@@ -1,6 +1,8 @@
 import { recordActions, types, getSnapshot, onAction, applyPatch, applySnapshot } from "../src"
 import { test } from "ava"
+
 declare var Buffer
+
 /// Simple action replay and invocation
 const Task = types
     .model({
@@ -76,11 +78,13 @@ test("applying snapshots should be recordable and replayable", t => {
     recorder.replay(t2)
     t.is(t2.done, true)
 })
+
 // Complex actions
 const Customer = types.model("Customer", {
     id: types.identifier(types.number),
     name: types.string
 })
+
 const Order = types
     .model("Order", {
         customer: types.maybe(types.reference(Customer))
@@ -89,14 +93,22 @@ const Order = types
         function setCustomer(customer) {
             self.customer = customer
         }
+
+        function noopSetCustomer(customer) {
+            // noop
+        }
+
         return {
-            setCustomer
+            setCustomer,
+            noopSetCustomer
         }
     })
+
 const OrderStore = types.model("OrderStore", {
     customers: types.array(Customer),
     orders: types.array(Order)
 })
+
 function createTestStore() {
     const store = OrderStore.create({
         customers: [{ id: 1, name: "Mattia" }],
@@ -110,7 +122,7 @@ function createTestStore() {
     return store
 }
 
-test("it should be possible to pass a complex object", t => {
+test("it should not be possible to pass a complex object", t => {
     const store = createTestStore()
     const recorder = recordActions(store)
     t.is(store.customers[0].name, "Mattia")
@@ -131,12 +143,12 @@ test("it should be possible to pass a complex object", t => {
         ]
     })
     t.deepEqual(recorder.actions, [
-        { name: "setCustomer", path: "/orders/0", args: [{ $ref: "../../customers/0" }] }
+        {
+            name: "setCustomer",
+            path: "/orders/0",
+            args: [{ $MST_UNSERIALIZABLE: true, type: "[MSTNode: Customer]" }]
+        }
     ])
-    const store2 = createTestStore()
-    recorder.replay(store2)
-    t.is(store2.orders[0].customer, store2.customers[0])
-    t.deepEqual(getSnapshot(store2), getSnapshot(store))
 })
 
 test("it should not be possible to set the wrong type", t => {
@@ -145,31 +157,61 @@ test("it should not be possible to set the wrong type", t => {
         () => {
             store.orders[0].setCustomer(store.orders[0])
         }, // wrong type!
-        "[mobx-state-tree] Error while converting <Order@/orders/0> to `reference(Customer) | null`:\n" +
-            "value of type Order: <Order@/orders/0> is not assignable to type: `reference(Customer) | null`, expected an instance of `reference(Customer) | null` or a snapshot like `(reference(Customer) | null?)` instead."
+        "[mobx-state-tree] Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n" +
+            "value of type Order: <Order@/orders/0> is not assignable to type: `(reference(Customer) | null)`, expected an instance of `(reference(Customer) | null)` or a snapshot like `(reference(Customer) | null?)` instead."
     )
 })
 
 test("it should not be possible to pass the element of another tree", t => {
     const store1 = createTestStore()
     const store2 = createTestStore()
-    t.throws(() => {
-        store1.orders[0].setCustomer(store2.customers[0])
-    }, "Argument 0 that was passed to action 'setCustomer' is a model that is not part of the same state tree. Consider passing a snapshot or some representative ID instead")
+    const recorder = recordActions(store2)
+    store2.orders[0].setCustomer(store1.customers[0])
+    t.deepEqual(recorder.actions, [
+        {
+            name: "setCustomer",
+            path: "/orders/0",
+            args: [
+                {
+                    $MST_UNSERIALIZABLE: true,
+                    type: "[MSTNode: Customer]"
+                }
+            ]
+        }
+    ])
 })
 
 test("it should not be possible to pass an unserializable object", t => {
     const store = createTestStore()
     const circular = { a: null as any }
     circular.a = circular
-    t.throws(
-        () => store.orders[0].setCustomer(circular),
-        "Argument 0 that was passed to action 'setCustomer' is not serializable."
-    )
-    t.throws(
-        () => store.orders[0].setCustomer(new Buffer("bla")),
-        "Argument 0 that was passed to action 'setCustomer' should be a primitive, model object or plain object, received a Buffer"
-    )
+    const recorder = recordActions(store)
+
+    store.orders[0].noopSetCustomer(circular)
+    store.orders[0].noopSetCustomer(new Buffer("bla"))
+
+    t.deepEqual(recorder.actions, [
+        {
+            args: [
+                {
+                    $MST_UNSERIALIZABLE: true,
+                    type: "TypeError: Converting circular structure to JSON"
+                }
+            ],
+            name: "noopSetCustomer",
+            path: "/orders/0"
+        },
+        {
+            args: [
+                {
+                    $MST_UNSERIALIZABLE: true,
+                    type: "[object Buffer]"
+                }
+            ],
+            name: "noopSetCustomer",
+            path: "/orders/0"
+        }
+    ])
 })
 
 test("it should be possible to pass a complex plain object", t => {

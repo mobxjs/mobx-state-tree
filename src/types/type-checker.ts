@@ -11,10 +11,18 @@ export interface IValidationError {
 }
 export type IValidationResult = IValidationError[]
 
+function safeStringify(value: any) {
+    try {
+        return JSON.stringify(value)
+    } catch (e) {
+        return `<Unserializable: ${e}>`
+    }
+}
+
 export function prettyPrintValue(value: any) {
     return typeof value === "function"
         ? `<function${value.name ? " " + value.name : ""}>`
-        : isStateTreeNode(value) ? `<${value}>` : `\`${JSON.stringify(value)}\``
+        : isStateTreeNode(value) ? `<${value}>` : `\`${safeStringify(value)}\``
 }
 
 function toErrorString(error: IValidationError): string {
@@ -39,9 +47,9 @@ function toErrorString(error: IValidationError): string {
             ? isPrimitiveType(type)
               ? `.`
               : `, expected an instance of \`${type.name}\` or a snapshot like \`${type.describe()}\` instead.` +
-                    (isSnapshotCompatible
-                        ? " (Note that a snapshot of the provided value is compatible with the targeted type)"
-                        : "")
+                (isSnapshotCompatible
+                    ? " (Note that a snapshot of the provided value is compatible with the targeted type)"
+                    : "")
             : `.`)
     )
 }
