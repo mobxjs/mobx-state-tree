@@ -218,7 +218,6 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
  * This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
  *
  * @example
- * ```javascript
  * const Todo = types.model({
  *   task: types.string
  * })
@@ -230,7 +229,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
  * const s = TodoStore.create({ todos: [] })
  * s.todos.push({ task: "Grab coffee" })
  * console.log(s.todos[0]) // prints: "Grab coffee"
- * ```
+ *
  * @export
  * @alias types.array
  * @param {IType<S, T>} subtype

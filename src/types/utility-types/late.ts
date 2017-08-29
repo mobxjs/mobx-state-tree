@@ -58,8 +58,8 @@ export function late<S = any, T = any>(name: string, type: ILateType<S, T>): ITy
  * Defines a type that gets implemented later. This is usefull when you have to deal with circular dependencies.
  * Please notice that when defining circular dependencies TypeScript is'nt smart enought to inference them.
  * You need to declare an interface to explicit the return type of the late parameter function.
- * 
- * ```typescript
+ *
+ * @example
  *  interface INode {
  *       childs: INode[]
  *  }
@@ -68,15 +68,14 @@ export function late<S = any, T = any>(name: string, type: ILateType<S, T>): ITy
  *  const Node = types.model({
  *       childs: types.optional(types.array(types.late<any, INode>(() => Node)), [])
  *  })
- * ```
- * 
+ *
  * @export
  * @alias types.late
  * @template S
  * @template T
  * @param {string} [name] The name to use for the type that will be returned.
  * @param {ILateType<S, T>} type A function that returns the type that will be defined.
- * @returns {IType<S, T>} 
+ * @returns {IType<S, T>}
  */
 export function late<S, T>(nameOrType: any, maybeType?: ILateType<S, T>): IType<S, T> {
     const name = typeof nameOrType === "string" ? nameOrType : `late(${nameOrType.toString()})`

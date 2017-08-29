@@ -272,7 +272,6 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
  * This type will always produce [observable maps](https://mobx.js.org/refguide/map.html)
  *
  * @example
- * ```javascript
  * const Todo = types.model({
  *   id: types.identifier,
  *   task: types.string
@@ -286,7 +285,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
  * s.todos.set(17, { task: "Grab coffee", id: 17 })
  * s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the identifier
  * console.log(s.todos.get(17)) // prints: "Grab coffee"
- * ```
+ *
  * @export
  * @alias types.map
  * @param {IType<S, T>} subtype

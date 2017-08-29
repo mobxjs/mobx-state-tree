@@ -54,11 +54,9 @@ export function enumeration(name: string, options: string[]): ISimpleType<string
  * (note: this methods is just sugar for a union of string literals)
  *
  * @example
- * ```javascript
  * const TrafficLight = types.model({
  *   color: types.enum("Color", ["Red", "Orange", "Green"])
  * })
- * ```
  *
  * @export
  * @alias types.enumeration

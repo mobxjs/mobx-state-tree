@@ -19,6 +19,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [ComplexType](#complextype-3)
 -   [ComplexType](#complextype-4)
 -   [connectReduxDevtools](#connectreduxdevtools)
+-   [decorate](#decorate)
 -   [destroy](#destroy)
 -   [detach](#detach)
 -   [escapeJsonPath](#escapejsonpath)
@@ -97,23 +98,21 @@ cleanup methods yourself using the `beforeDestroy` hook.
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Todo = types.model({
-      title: types.string
-    }, {
-      afterCreate() {
-        const autoSaveDisposer = reaction(
-          () => getSnapshot(this),
-          snapshot => sendSnapshotToServerSomehow(snapshot)
-        )
-        // stop sending updates to server if this
-        // instance is destroyed
-        addDisposer(this, autoSaveDisposer)
-      }
-    })
-    ```
-````
+```javascript
+const Todo = types.model({
+  title: types.string
+}, {
+  afterCreate() {
+    const autoSaveDisposer = reaction(
+      () => getSnapshot(this),
+      snapshot => sendSnapshotToServerSomehow(snapshot)
+    )
+    // stop sending updates to server if this
+    // instance is destroyed
+    addDisposer(this, autoSaveDisposer)
+  }
+})
+```
 
 ## addMiddleware
 
@@ -210,6 +209,34 @@ See this [example](https://github.com/mobxjs/mobx-state-tree/blob/e9e804c8c43e1e
 -   `remoteDevDep` **any** 
 -   `model` **any** 
 
+## decorate
+
+Binds middleware to a specific action
+
+**Parameters**
+
+-   `middleware` **IMiddlewareHandler** 
+-   `fn`  
+-   `Function`  } fn
+
+**Examples**
+
+```javascript
+type.actions(self => {
+  function takeA____() {
+      self.toilet.donate()
+      self.wipe()
+      self.wipe()
+      self.toilet.flush()
+  }
+  return {
+    takeA____: decorate(atomic, takeA____)
+  }
+})
+```
+
+Returns **any** the original function
+
 ## destroy
 
 Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
@@ -246,14 +273,12 @@ Returns the _declared_ type of the given sub property of an object, array or map
 
 **Examples**
 
-````javascript
-    ```typescript
-    const Box = types.model({ x: 0, y: 0 })
-    const box = Box.create()
+```javascript
+const Box = types.model({ x: 0, y: 0 })
+const box = Box.create()
 
-    console.log(getChildType(box, "x").name) // 'number'
-    ```
-````
+console.log(getChildType(box, "x").name) // 'number'
+```
 
 Returns **IType&lt;any, any>** 
 
@@ -409,10 +434,15 @@ Registers a function that will be invoked for each action that is called on the 
 See [actions](https://github.com/mobxjs/mobx-state-tree#actions) for more details. onAction events are emitted only for the outermost called action in the stack.
 Action can also be intercepted by middleware using addMiddleware to change the function call before it will be run.
 
+Not all action arguments might be serializable. For unserializable arguments, a struct like `{ $MST_UNSERIALIZABLE: true, type: "someType" }` will be generated.
+MST Nodes are considered non-serializable as well (they could be serialized as there snapshot, but it is uncertain whether an replaying party will be able to handle such a non-instantiated snapshot).
+Rather, when using `onAction` middleware, one should consider in passing arguments which are 1: an id, 2: a (relative) path, or 3: a snapshot. Instead of a real MST node.
+
 **Parameters**
 
 -   `target` **IStateTreeNode** 
 -   `listener`  
+-   `attachAfter`  {boolean} (default false) fires the listener _after_ the action has executed instead of before.
 
 Returns **IDisposer** 
 
@@ -467,7 +497,13 @@ The inverse of `unprotect`
 Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted.
 Returns an recorder object with the following signature:
 
-```typescript
+**Parameters**
+
+-   `subject` **IStateTreeNode** 
+
+**Examples**
+
+```javascript
 export interface IActionRecorder {
      // the recorded actions
      actions: ISerializedActionCall[]
@@ -478,10 +514,6 @@ export interface IActionRecorder {
 }
 ```
 
-**Parameters**
-
--   `subject` **IStateTreeNode** 
-
 Returns **IPatchRecorder** 
 
 ## recordPatches
@@ -489,7 +521,13 @@ Returns **IPatchRecorder**
 Small abstraction around `onPatch` and `applyPatch`, attaches a patch listener to a tree and records all the patches.
 Returns an recorder object with the following signature:
 
-```typescript
+**Parameters**
+
+-   `subject` **IStateTreeNode** 
+
+**Examples**
+
+```javascript
 export interface IPatchRecorder {
      // the recorded patches
      patches: IJsonPatch[]
@@ -497,6 +535,8 @@ export interface IPatchRecorder {
      cleanPatches: IJSonPatch[]
      // stop recording patches
      stop(target?: IStateTreeNode): any
+     // resume recording patches
+     resume()
      // apply all the recorded patches on the given target (the original subject if omitted)
      replay(target?: IStateTreeNode): any
      // reverse apply the recorded patches on the given target  (the original subject if omitted)
@@ -504,10 +544,6 @@ export interface IPatchRecorder {
      undo(): void
 }
 ```
-
-**Parameters**
-
--   `subject` **IStateTreeNode** 
 
 Returns **IPatchRecorder** 
 
@@ -594,21 +630,19 @@ This type will always produce [observable arrays](https://mobx.js.org/refguide/a
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Todo = types.model({
-      task: types.string
-    })
+```javascript
+const Todo = types.model({
+  task: types.string
+})
 
-    const TodoStore = types.model({
-      todos: types.array(Todo)
-    })
+const TodoStore = types.model({
+  todos: types.array(Todo)
+})
 
-    const s = TodoStore.create({ todos: [] })
-    s.todos.push({ task: "Grab coffee" })
-    console.log(s.todos[0]) // prints: "Grab coffee"
-    ```
-````
+const s = TodoStore.create({ todos: [] })
+s.todos.push({ task: "Grab coffee" })
+console.log(s.todos[0]) // prints: "Grab coffee"
+```
 
 Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;S>, IObservableArray&lt;T>>** 
 
@@ -619,14 +653,12 @@ This type is used for boolean values by default
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Thing = types.model({
-      isCool: types.boolean,
-      isAwesome: false
-    })
-    ```
-````
+```javascript
+const Thing = types.model({
+  isCool: types.boolean,
+  isAwesome: false
+})
+```
 
 ## types.compose
 
@@ -640,15 +672,13 @@ Creates a type that can only contain a javascript Date value.
 
 **Examples**
 
-````javascript
-    ```javascript
-    const LogLine = types.model({
-      timestamp: types.Date,
-    })
+```javascript
+const LogLine = types.model({
+  timestamp: types.Date,
+})
 
-    LogLine.create({ timestamp: new Date() })
-    ```
-````
+LogLine.create({ timestamp: new Date() })
+```
 
 ## types.enumeration
 
@@ -662,13 +692,11 @@ Can be used to create an string based enumeration.
 
 **Examples**
 
-````javascript
-    ```javascript
-    const TrafficLight = types.model({
-      color: types.enum("Color", ["Red", "Orange", "Green"])
-    })
-    ```
-````
+```javascript
+const TrafficLight = types.model({
+  color: types.enum("Color", ["Red", "Orange", "Green"])
+})
+```
 
 Returns **ISimpleType&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** 
 
@@ -682,22 +710,20 @@ This is useful to store complex, but immutable values like vectors etc. It can f
 
 **Examples**
 
-````javascript
-    ```javascript
-    const GameCharacter = types.model({
-      name: string,
-      location: types.frozen
-    })
+```javascript
+const GameCharacter = types.model({
+  name: string,
+  location: types.frozen
+})
 
-    const hero = new GameCharacter({
-      name: "Mario",
-      location: { x: 7, y: 4 }
-    })
+const hero = new GameCharacter({
+  name: "Mario",
+  location: { x: 7, y: 4 }
+})
 
-    hero.location = { x: 10, y: 2 } // OK
-    hero.location.x = 7 // Not ok!
-    ```
-````
+hero.location = { x: 10, y: 2 } // OK
+hero.location.x = 7 // Not ok!
+```
 
 ## types.identifier
 
@@ -728,8 +754,17 @@ Defines a type that gets implemented later. This is usefull when you have to dea
 Please notice that when defining circular dependencies TypeScript is'nt smart enought to inference them.
 You need to declare an interface to explicit the return type of the late parameter function.
 
-```typescript
- interface INode {
+**Parameters**
+
+-   `nameOrType`  
+-   `maybeType`  
+-   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** The name to use for the type that will be returned.
+-   `type` **ILateType&lt;S, T>** A function that returns the type that will be defined.
+
+**Examples**
+
+```javascript
+interface INode {
       childs: INode[]
  }
 
@@ -738,13 +773,6 @@ You need to declare an interface to explicit the return type of the late paramet
       childs: types.optional(types.array(types.late<any, INode>(() => Node)), [])
  })
 ```
-
-**Parameters**
-
--   `nameOrType`  
--   `maybeType`  
--   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** The name to use for the type that will be returned.
--   `type` **ILateType&lt;S, T>** A function that returns the type that will be defined.
 
 Returns **IType&lt;S, T>** 
 
@@ -782,23 +810,21 @@ This type will always produce [observable maps](https://mobx.js.org/refguide/map
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Todo = types.model({
-      id: types.identifier,
-      task: types.string
-    })
+```javascript
+const Todo = types.model({
+  id: types.identifier,
+  task: types.string
+})
 
-    const TodoStore = types.model({
-      todos: types.map(Todo)
-    })
+const TodoStore = types.model({
+  todos: types.map(Todo)
+})
 
-    const s = TodoStore.create({ todos: [] })
-    s.todos.set(17, { task: "Grab coffee", id: 17 })
-    s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the identifier
-    console.log(s.todos.get(17)) // prints: "Grab coffee"
-    ```
-````
+const s = TodoStore.create({ todos: [] })
+s.todos.set(17, { task: "Grab coffee", id: 17 })
+s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the identifier
+console.log(s.todos.get(17)) // prints: "Grab coffee"
+```
 
 Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;S>, IObservableArray&lt;T>>** 
 
@@ -829,14 +855,12 @@ This type is used for numeric values by default
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Vector = types.model({
-      x: types.number,
-      y: 0
-    })
-    ```
-````
+```javascript
+const Vector = types.model({
+  x: types.number,
+  y: 0
+})
+```
 
 ## types.optional
 
@@ -852,18 +876,16 @@ Applying a snapshot in which the optional value is _not_ present, causes the val
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Todo = types.model({
-      title: types.optional(types.string, "Test"),
-      done: types.optional(types.boolean, false),
-      created: types.optional(types.Date, () => new Date())
-    })
+```javascript
+const Todo = types.model({
+  title: types.optional(types.string, "Test"),
+  done: types.optional(types.boolean, false),
+  created: types.optional(types.Date, () => new Date())
+})
 
-    // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
-    const todo = Todo.create({ title: "Get coffee "})
-    ```
-````
+// it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
+const todo = Todo.create({ title: "Get coffee "})
+```
 
 ## types.reference
 
@@ -893,14 +915,12 @@ This type is used for string values by default
 
 **Examples**
 
-````javascript
-    ```javascript
-    const Person = types.model({
-      firstName: types.string,
-      lastName: "Doe"
-    })
-    ```
-````
+```javascript
+const Person = types.model({
+  firstName: types.string,
+  lastName: "Doe"
+})
+```
 
 ## types.undefined
 

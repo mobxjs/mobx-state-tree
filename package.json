@@ -43,7 +43,7 @@
     "concurrently": "^3.1.0",
     "coveralls": "^2.11.4",
     "cpr": "^2.1.0",
-    "documentation": "^4.0.0-beta9",
+    "documentation": "^5.2.2",
     "husky": "^0.13.4",
     "lint-staged": "^3.6.1",
     "mobx": "^3.2.2",

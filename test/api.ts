@@ -10,6 +10,7 @@ const METHODS = [
     "asReduxStore",
     "clone",
     "connectReduxDevtools",
+    "decorate",
     "destroy",
     "detach",
     "escapeJsonPath",

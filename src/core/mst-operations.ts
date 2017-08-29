@@ -13,12 +13,10 @@ export function getType<S, T>(object: IStateTreeNode): IType<S, T> {
  * Returns the _declared_ type of the given sub property of an object, array or map.
  *
  * @example
- * ```typescript
  * const Box = types.model({ x: 0, y: 0 })
  * const box = Box.create()
  *
  * console.log(getChildType(box, "x").name) // 'number'
- * ```
  *
  * @export
  * @param {IStateTreeNode} object
@@ -127,7 +125,7 @@ export interface IPatchRecorder {
  * Small abstraction around `onPatch` and `applyPatch`, attaches a patch listener to a tree and records all the patches.
  * Returns an recorder object with the following signature:
  *
- * ```typescript
+ * @example
  * export interface IPatchRecorder {
  *      // the recorded patches
  *      patches: IJsonPatch[]
@@ -135,27 +133,41 @@ export interface IPatchRecorder {
  *      cleanPatches: IJSonPatch[]
  *      // stop recording patches
  *      stop(target?: IStateTreeNode): any
+ *      // resume recording patches
+ *      resume()
  *      // apply all the recorded patches on the given target (the original subject if omitted)
  *      replay(target?: IStateTreeNode): any
  *      // reverse apply the recorded patches on the given target  (the original subject if omitted)
  *      // stops the recorder if not already stopped
  *      undo(): void
  * }
- * ```
  *
  * @export
  * @param {IStateTreeNode} subject
  * @returns {IPatchRecorder}
  */
 export function recordPatches(subject: IStateTreeNode): IPatchRecorder {
+    let disposer: IDisposer | null = null
+    function resume() {
+        if (disposer) return
+        disposer = onPatch(
+            subject,
+            patch => {
+                recorder.patches.push(patch)
+            },
+            true
+        )
+    }
     let recorder = {
         patches: [] as IReversibleJsonPatch[],
         get cleanPatches() {
             return this.patches.map(stripPatch)
         },
         stop() {
-            disposer()
+            if (disposer) disposer()
+            disposer = null
         },
+        resume,
         replay(target?: IStateTreeNode) {
             applyPatch(target || subject, recorder.patches)
         },
@@ -163,13 +175,7 @@ export function recordPatches(subject: IStateTreeNode): IPatchRecorder {
             revertPatch(subject || subject, this.patches)
         }
     }
-    let disposer = onPatch(
-        subject,
-        patch => {
-            recorder.patches.push(patch)
-        },
-        true
-    )
+    resume()
     return recorder
 }
 
@@ -202,7 +208,7 @@ export interface IActionRecorder {
  * Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted.
  * Returns an recorder object with the following signature:
  *
- * ```typescript
+ * @example
  * export interface IActionRecorder {
  *      // the recorded actions
  *      actions: ISerializedActionCall[]
@@ -211,7 +217,6 @@ export interface IActionRecorder {
  *      // apply all the recorded actions on the given object
  *      replay(target: IStateTreeNode): any
  * }
- * ```
  *
  * @export
  * @param {IStateTreeNode} subject
@@ -514,7 +519,6 @@ export function isAlive(thing: IStateTreeNode): boolean {
  * cleanup methods yourself using the `beforeDestroy` hook.
  *
  * @example
- * ```javascript
  * const Todo = types.model({
  *   title: types.string
  * }, {
@@ -528,7 +532,6 @@ export function isAlive(thing: IStateTreeNode): boolean {
  *     addDisposer(this, autoSaveDisposer)
  *   }
  * })
- * ```
  *
  * @export
  * @param {IStateTreeNode} target
