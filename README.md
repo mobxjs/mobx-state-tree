@@ -205,22 +205,26 @@ const TodoStore = types
         todos: types.array(Todo),                     // 4
         selectedTodo: types.reference(Todo)           // 5
     })
-    .views(self => ({
-        get completedTodos() {                        // 6
-            return self.todos.filter(t => t.done)
-        },
-        findTodosByUser(user) {                       // 7
-            return self.todos.filter(t => t.assignee === user)
-        }
-    }))
-    .actions(self => ({
-        addTodo(title) {
-            self.todos.push({
-                id: Math.random(),
-                title
-            })
-        }
-    }))
+    .views(self => {
+    	return {
+	    get completedTodos() {                    // 6
+	        return self.todos.filter(t => t.done)
+	    },
+	    findTodosByUser(user) {                   // 7
+	        return self.todos.filter(t => t.assignee === user)
+	    }
+	};
+    })
+    .actions(self => {
+        return {
+            addTodo(title) {
+                self.todos.push({
+                    id: Math.random(),
+                    title
+                })
+            }
+	};
+    })
 ```
 
 When defining a model, it is advised to give the model a name for debugging purposes (see `// 1`).
@@ -232,6 +236,9 @@ The _properties_ argument is a key-value set where each key indicates the introd
 2. A primitive. Using a primitive as type as type is syntactic sugar for introducing an property with a default value. See `// 3`, `endpoint: "http://localhost"` is the same as `endpoint: types.optional(types.string, "http://localhost")`. The primitive type is inferred from the default value. Properties with a default value can be omitted in snapshots.
 3. A [computed property](https://mobx.js.org/refguide/computed-decorator.html), see `// 6`. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is possible to provide a setter for a computed property as well. A setter should always invoke an action.
 4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but its value can be tracked by MobX nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
+
+_Tip: `(self) => ({ action1() { }, action2() { }})` is ES6 syntax for `function (self) { return { action1: function() { }, action2: function() { } }}`, in other words; it's short way of directly returning an object literal.
+For that reason a comma between each member of a model is mandatory, unlike classes which are syntactically a totally different concept._
 
 `types.model` creates a chainable model type, where each chained method produces a new type:
 * `.named(name)` clones the current type, but gives it a new name
@@ -270,8 +277,44 @@ It is perfectly fine to chain multiple `views`, `props` calls etc in arbitrary o
 
 It is also possible to define lifecycle hooks in the _actions_ object, these are actions with a predefined name that are run at a specific moment. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel).
 
-_Tip: `(self) => ({ action1() { }, action2() { }})` is ES6 syntax for `function (self) { return { action1: function() { }, action2: function() { } }}`, in other words; it's short way of directly returning an object literal.
-For that reason a comma between each member of a model is mandatory, unlike classes which are syntactically a totally different concept._
+TypeScript:
+
+TypeScript is supported, but you sometimes need to take into account where your typings are available.
+
+The code below will not compile: TypeScript will complain that `self.upperProp` is not a property. Computed properties are only available after `.views` is evaluated.
+
+```typescript
+const Example = types.model('Example', { prop: types.string }).views(self => ({
+  get upperProp(): string {
+    return self.prop.toUpperCase();
+  },
+  get twiceUpperProp(): string {
+    return self.upperProp + self.upperProp;
+  },
+}));
+```
+
+You can circumvent this situation by making helper functions, as demonstrated in the following code:
+
+```typescript
+const Example = types.model('Example', { prop: types.string }).views(self => {
+  function upperProp() {
+    return self.prop.toUpperCase();
+  }
+  function twiceUpperProp() {
+    return upperProp() + upperProp();
+  }
+
+  return {
+    get upperProp() {
+      return upperProp();
+    },
+    get twiceUpperProp() {
+      return twiceUpperProp();
+    },
+  };
+});
+```
 
 ### Tree semantics in detail
 
