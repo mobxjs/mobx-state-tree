@@ -284,6 +284,7 @@ test.cb("can handle nested async actions when using decorate", t => {
 function filterRelevantStuff(stuff: any): any {
     return stuff.map(x => {
         delete x.context
+        delete x.tree
         return x
     })
 }

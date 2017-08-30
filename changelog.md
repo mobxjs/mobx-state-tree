@@ -12,6 +12,7 @@
 * Introduced `decorate(middleware, action)` to easily attach middleware to a specific action
 * Handlers passed to `onPatch(handler: (patch, inversePatch) => void)` now receive as second argument the inverse patch of the emitted patch
 * `onAction` lister now supports an `attachAfter` parameter
+* Middleware events now also contain `parentId` (id of the causing action, `0` if none) and `tree` (the root of context)
 
 ### Fixes
 

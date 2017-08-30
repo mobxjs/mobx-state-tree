@@ -13,8 +13,10 @@ export type IMiddlewareEvent = {
     type: IMiddlewareEventType
     name: string
     id: number
+    parentId: number
     rootId: number
     context: IStateTreeNode
+    tree: IStateTreeNode
     args: any[]
 }
 
@@ -67,7 +69,9 @@ export function createActionInvoker<T extends Function>(
                 id,
                 args: argsToArray(arguments),
                 context: target,
-                rootId: currentActionContext ? currentActionContext.rootId : id
+                tree: getRoot(target),
+                rootId: currentActionContext ? currentActionContext.rootId : id,
+                parentId: currentActionContext ? currentActionContext.id : 0
             },
             wrappedFn
         )
@@ -155,3 +159,4 @@ function runMiddleWares(node: Node, baseCall: IMiddlewareEvent, originalFn: Func
 
 import { Node, getStateTreeNode, IStateTreeNode } from "./node"
 import { fail, argsToArray, IDisposer } from "../utils"
+import { getRoot } from "./mst-operations"

@@ -59,7 +59,9 @@ export function createProcessSpawner(name: string, generator: Function) {
                     type,
                     id: runId,
                     args: [arg],
+                    tree: baseContext.tree,
                     context: baseContext.context,
+                    parentId: baseContext.id,
                     rootId: baseContext.rootId
                 },
                 fn
@@ -80,7 +82,9 @@ export function createProcessSpawner(name: string, generator: Function) {
                     type: "process_spawn",
                     id: runId,
                     args: argsToArray(args),
+                    tree: baseContext.tree,
                     context: baseContext.context,
+                    parentId: baseContext.id,
                     rootId: baseContext.rootId
                 },
                 init

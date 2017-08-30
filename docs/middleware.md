@@ -21,7 +21,9 @@ export type IMiddleWareEvent = {
     type: IMiddlewareEventType
     name: string
     id: number
+    parentId: number
     rootId: number
+    tree: IStateTreeNode
     context: IStateTreeNode
     args: any[]
 }
@@ -57,9 +59,11 @@ _Note: for middleware, it is extremely important that `next(action)` is called f
 
 * `name` is the name of the action
 * `context` is the object on which the action was defined & invoked
+* `tree` is the root of the MST tree in which the action was fired (`tree === getRoot(context)`)
 * `args` are the original arguments passed to the action
 * `id` is a number that is unique per external action invocation.
-* `rootid` is the id of the action that spawned this action. If an action was not spawned by another action, but something external (user event etc), `id` and `rootId` will be eqal
+* `parentId` is the number of the action / process that called this action. `0` if it wasn't called by another action but directly from user code
+* `rootid` is the id of the action that spawned this action. If an action was not spawned by another action, but something external (user event etc), `id` and `rootId` will be equal (and `parentid` `0`)
 
 `type` Indicates which kind of event this is
 

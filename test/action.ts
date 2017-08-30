@@ -1,4 +1,12 @@
-import { recordActions, types, getSnapshot, onAction, applyPatch, applySnapshot } from "../src"
+import {
+    recordActions,
+    types,
+    getSnapshot,
+    onAction,
+    applyPatch,
+    applySnapshot,
+    addMiddleware
+} from "../src"
 import { test } from "ava"
 
 declare var Buffer
@@ -310,4 +318,45 @@ test("volatile state survives reonciliation", t => {
     t.is(store.cnt.x, 2)
     store.cnt.inc()
     t.is(store.cnt.x, 5) // incrementor was not lost
+})
+
+test("middleware events are correct", t => {
+    const A = types.model({}).actions(self => ({
+        a(x) {
+            return (self as any).b(x * 2)
+        },
+        b(y) {
+            return y + 1
+        }
+    }))
+
+    const a = A.create()
+    const events: any[] = []
+    addMiddleware(a, function(call, next) {
+        events.push(call)
+        return next(call)
+    })
+    a.a(7)
+    t.deepEqual(events, [
+        {
+            args: [7],
+            context: {},
+            id: 38,
+            name: "a",
+            parentId: 0,
+            rootId: 38,
+            tree: {},
+            type: "action"
+        },
+        {
+            args: [14],
+            context: {},
+            id: 39,
+            name: "b",
+            parentId: 38,
+            rootId: 38,
+            tree: {},
+            type: "action"
+        }
+    ])
 })
