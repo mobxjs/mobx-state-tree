@@ -177,6 +177,92 @@ Array [
 ]
 `;
 
+exports[`can handle nested async actions when using decorate 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 24,
+    "name": "startFetch",
+    "rootId": 24,
+    "type": "action",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 25,
+    "name": "fetchData",
+    "rootId": 24,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 25,
+    "name": "fetchData",
+    "rootId": 24,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "drinking black",
+    ],
+    "id": 26,
+    "name": "uppercase",
+    "rootId": 24,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 26,
+    "name": "uppercase",
+    "rootId": 24,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 26,
+    "name": "uppercase",
+    "rootId": 24,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 26,
+    "name": "uppercase",
+    "rootId": 24,
+    "type": "process_return",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 25,
+    "name": "fetchData",
+    "rootId": 24,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 25,
+    "name": "fetchData",
+    "rootId": 24,
+    "type": "process_return",
+  },
+]
+`;
+
 exports[`can handle throw from yielded promise works 1`] = `
 Array [
   Object {

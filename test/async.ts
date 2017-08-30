@@ -3,7 +3,8 @@ import {
     types,
     addMiddleware,
     recordActions,
-    process
+    process,
+    decorate
     // TODO: export IRawActionCall
 } from "../src"
 import { test, CallbackTestContext, Context } from "ava"
@@ -242,6 +243,42 @@ test.cb("can handle nested async actions", t => {
         "DRINKING BLACK",
         ["DRINKING BLACK"]
     )
+})
+
+test.cb("can handle nested async actions when using decorate", t => {
+    const events: [string, string][] = []
+
+    function middleware(call, next) {
+        events.push([call.type, call.name])
+        return next(call)
+    }
+
+    const uppercase = process(function* uppercase(value) {
+        const res = yield delay(20, value.toUpperCase())
+        return res
+    })
+
+    const Todo = types.model({}).actions(self => {
+        const act = process(function* act(value) {
+            return yield uppercase(value)
+        })
+
+        return {
+            act: decorate(middleware, act)
+        }
+    })
+
+    Todo.create().act("x").then(res => {
+        t.is(res, "X")
+        t.deepEqual(events, [
+            ["action", "act"],
+            ["process_spawn", "act"],
+            ["process_resume", "act"],
+            ["process_resume", "act"],
+            ["process_return", "act"]
+        ])
+        t.end()
+    })
 })
 
 function filterRelevantStuff(stuff: any): any {
