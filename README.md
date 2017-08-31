@@ -810,9 +810,9 @@ The following service can generate MST models based on JSON: https://transform.n
 
 `createdDate: types.optional(types.date, () => new Date())`
 
-### `toJSON()` for debugging
+### `toJS()` for debugging
 
-For debugging you might want to use `getSnapshot(model)` to print the state of a model. But if you didn't import `getSnapshot` while debugging in some debugger; don't worry, `model.toJSON()` will produce the same snapshot. (For API consistency, this feature is not part of the typed API)
+For debugging you might want to use `getSnapshot(model)` to print the state of a model. But if you didn't import `getSnapshot` while debugging in some debugger; don't worry, `model.toJS()` will produce the same snapshot. (For API consistency, this feature is not part of the typed API)
 
 ### Handle circular dependencies between files using `late`
 

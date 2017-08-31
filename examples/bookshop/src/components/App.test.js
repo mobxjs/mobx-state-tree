@@ -17,11 +17,11 @@ it("matches snapshot before and after loading", done => {
             <App />
         </Provider>
     )
-    let tree = app.toJSON()
+    let tree = app.toJS()
     expect(tree).toMatchSnapshot()
 
     setTimeout(() => {
-        let tree = app.toJSON()
+        let tree = app.toJS()
         expect(tree).toMatchSnapshot()
         done()
     }, 100)

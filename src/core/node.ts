@@ -77,7 +77,7 @@ export class Node {
 
         let sawException = true
         try {
-            if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
+            if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "toJS", toJS)
 
             this._isRunningAction = true
             finalizeNewInstance(this, initialValue)
@@ -443,7 +443,7 @@ function canAttachNode(value: any) {
     )
 }
 
-function toJSON(this: IStateTreeNode) {
+function toJS(this: IStateTreeNode) {
     return getStateTreeNode(this).snapshot
 }
 

@@ -85,8 +85,8 @@ const User = types.model({
 const john = User.create()
 const eat = Todo.create()
 
-console.log("John:", john.toJSON())
-console.log("Eat TODO:", eat.toJSON())
+console.log("John:", john.toJS())
+console.log("Eat TODO:", eat.toJS())
 
 ```
 [View sample in playground](https://codesandbox.io/s/6jo1o9n9qk)
@@ -96,7 +96,7 @@ As you will see, using models ensures that all the fields defined will be always
 ```javascript
 const eat = Todo.create({ name: "eat" })
 
-console.log("Eat TODO:", eat.toJSON()) // => will print {name: "eat", done: false}
+console.log("Eat TODO:", eat.toJS()) // => will print {name: "eat", done: false}
 ```
 [View sample in playground](https://codesandbox.io/s/ymqpj71oj9)
 
@@ -219,7 +219,7 @@ console.log(getSnapshot(store))
 */
 ```
 
-Note: The `.toJSON()` you have used before in the tutorial is just a shortcut to `getSnapshot`!
+Note: The `.toJS()` you have used before in the tutorial is just a shortcut to `getSnapshot`!
 
 Because the nature of state is mutable, a snapshot will be emitted whenever the state is mutated! To listen to those new snapshot, you can use `onSnapshot(store, snapshot => console.log(snapshot))` to log them as they are emitted!
 

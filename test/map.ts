@@ -36,7 +36,7 @@ test("it should create a factory", t => {
 
 test("it should succeed if not optional and no default provided", t => {
     const Factory = types.map(types.string)
-    t.deepEqual(Factory.create().toJSON(), {})
+    t.deepEqual(Factory.create().toJS(), {})
 })
 
 test("it should restore the state from the snapshot", t => {
