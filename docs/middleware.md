@@ -21,7 +21,9 @@ export type IMiddleWareEvent = {
     type: IMiddlewareEventType
     name: string
     id: number
+    parentId: number
     rootId: number
+    tree: IStateTreeNode
     context: IStateTreeNode
     args: any[]
 }
@@ -29,8 +31,8 @@ export type IMiddleWareEvent = {
 export type IMiddlewareEventType =
     | "action"
     | "process_spawn"
-    | "process_yield"
-    | "process_yield_error"
+    | "process_resume"
+    | "process_resume_error"
     | "process_return"
     | "process_throw"
 ```
@@ -57,17 +59,26 @@ _Note: for middleware, it is extremely important that `next(action)` is called f
 
 * `name` is the name of the action
 * `context` is the object on which the action was defined & invoked
+* `tree` is the root of the MST tree in which the action was fired (`tree === getRoot(context)`)
 * `args` are the original arguments passed to the action
 * `id` is a number that is unique per external action invocation.
-* `rootid` is the id of the action that spawned this action. If an action was not spawned by another action, but something external (user event etc), `id` and `rootId` will be eqal
+* `parentId` is the number of the action / process that called this action. `0` if it wasn't called by another action but directly from user code
+* `rootid` is the id of the action that spawned this action. If an action was not spawned by another action, but something external (user event etc), `id` and `rootId` will be equal (and `parentid` `0`)
 
 `type` Indicates which kind of event this is
 
 * `action`: this is a normal synchronous action invocation
 * `process_spawn`: The invocation / kickoff of a `process` block (see [asynchronous actions](async-actions.md))
-* `process_yield`: a promise that was returned from `yield` earlier has resolved. `args` contains the value it resolved to, and the action will now continue with that value
-* `process_yield_error`: a promise that was returned from `yield` earlier was rejected. `args` contains the rejection reason, and the action will now continue throwing that error into the generator
+* `process_resume`: a promise that was returned from `yield` earlier has resolved. `args` contains the value it resolved to, and the action will now continue with that value
+* `process_resume_error`: a promise that was returned from `yield` earlier was rejected. `args` contains the rejection reason, and the action will now continue throwing that error into the generator
 * `process_return`: the generator completed successfully. The promise returned by the action will resolve with the value found in `args`
 * `process_throw`: the generator threw an uncatched exception. The promise returned by the action will reject with the exception found in `args`
 
 To see how a bunch of calls from an asynchronous process look, see the [unit tests](https://github.com/mobxjs/mobx-state-tree/blob/09708ba86d04f433cc23fbcb6d1dc4db170f798e/test/async.ts#L289)
+
+A minimal, empty process will fire the following events if started as action:
+
+1. `action`: An `action` event will always be emitted if a process is exposed as action on a model)
+2. `process_spawn`: This is just the notification that a new generator was started
+3. `process_resume`: This will be emitted when the first "code block" is entered. (So, with zero yields there is one `process_resume`  still)
+4. `process_return`: The process has completed

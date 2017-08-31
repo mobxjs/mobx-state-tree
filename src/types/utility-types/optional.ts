@@ -75,7 +75,6 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => 
  * Applying a snapshot in which the optional value is _not_ present, causes the value to be reset
  *
  * @example
- * ```javascript
  * const Todo = types.model({
  *   title: types.optional(types.string, "Test"),
  *   done: types.optional(types.boolean, false),
@@ -84,7 +83,6 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => 
  *
  * // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
  * const todo = Todo.create({ title: "Get coffee "})
- * ```
  *
  * @export
  * @alias types.optional

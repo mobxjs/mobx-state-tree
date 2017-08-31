@@ -757,6 +757,7 @@ See the [full API docs](API.md) for more details.
 | [`asReduxStore(node)`](API.md#asreduxstore) | Wraps a node in a Redux-store compatible API |
 | [`clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone) | Creates a full clone of the given node. By default preserves the same environment |
 | [`connectReduxDevtools(removeDevModule, node)`](API.md#connectreduxdevtools) | Connects a node to the Redux development tools [example](https://github.com/mobxjs/mobx-state-tree/blob/b01fe97d427ca664f7ecc99349d10e58d08d2d98/examples/redux-todomvc/src/index.js)  |
+| [`decorate(middleware, function)`](API.md#decorate) | Attaches middleware to a specific action (or process) |
 | [`destroy(node)`](API.md#destroy) | Kills `node`, making it unusable. Removes it from any parent in the process |
 | [`detach(node)`](API.md#detach) | Removes `node` from its current parent, and lets it live on as standalone tree |
 | [`getChildType(node, property?)`](API.md#getchildtype) | Returns the declared type of the given `property` of `node`. For arrays and maps `property` can be omitted as they all have the same type |
@@ -776,13 +777,12 @@ See the [full API docs](API.md) for more details.
 | [`joinJsonPath(parts)`](API.md#joinjsonpath) | Joins and escapes the given path `parts` into a JSON path |
 | [`onAction(node, (actionDescription) => void)`](API.md#onaction) | A built-in middleware that calls the provided callback with an action description upon each invocation. Returns disposer |
 | [`onPatch(node, (patch) => void)`](API.md#onpatch) | Attach a JSONPatch listener, that is invoked for each change in the tree. Returns disposer |
-| [`onSnapshot(node, (snapshot) => void)`](API.md#onsnapshot) | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer |
+| [`onSnapshot(node, (snapshot, inverseSnapshot) => void)`](API.md#onsnapshot) | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer |
 | [`process(generator)`](API.md#process) | creates an asynchronous process based on a generator function |
 | [`protect(node)`](API.md#protect) | Protects an unprotected tree against modifications from outside actions |
 | [`recordActions(node)`](API.md#recordactions) | Creates a recorder that listens to all actions in `node`. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
 | [`recordPatches(node)`](API.md#recordpatches) | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree |
 | [`resolve(node, path)`](API.md#resolve) | Resolves a `path` (json path) relatively to the given `node` |
-| [`revertPatch(node, jsonPatch)`](API.md#revertpatch) | Inverse applies a JSON patch or array of patches to `node` |
 | [`splitJsonPath(path)`](API.md#splitjsonpath) | Splits and unescapes the given JSON `path` into path parts |
 | [`tryResolve(node, path)`](API.md#tryresolve) | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
 | [`unprotect(node)`](API.md#unprotect) | Unprotects `node`, making it possible to directly modify any value in the subtree, without actions |

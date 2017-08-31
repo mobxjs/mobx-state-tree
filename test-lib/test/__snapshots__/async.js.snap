@@ -1,0 +1,437 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`can handle async actions 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 1,
+    "name": "startFetch",
+    "parentId": 0,
+    "rootId": 1,
+    "type": "action",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 2,
+    "name": "fetchData",
+    "parentId": 1,
+    "rootId": 1,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 2,
+    "name": "fetchData",
+    "parentId": 1,
+    "rootId": 1,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "drinking coffee",
+    ],
+    "id": 2,
+    "name": "fetchData",
+    "parentId": 1,
+    "rootId": 1,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "awake",
+    ],
+    "id": 2,
+    "name": "fetchData",
+    "parentId": 1,
+    "rootId": 1,
+    "type": "process_return",
+  },
+]
+`;
+
+exports[`can handle erroring actions 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 3,
+    "name": "startFetch",
+    "parentId": 0,
+    "rootId": 3,
+    "type": "action",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 4,
+    "name": "fetchData",
+    "parentId": 3,
+    "rootId": 3,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 4,
+    "name": "fetchData",
+    "parentId": 3,
+    "rootId": 3,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 4,
+    "name": "fetchData",
+    "parentId": 3,
+    "rootId": 3,
+    "type": "process_throw",
+  },
+]
+`;
+
+exports[`can handle nested async actions 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 21,
+    "name": "startFetch",
+    "parentId": 0,
+    "rootId": 21,
+    "type": "action",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 22,
+    "name": "fetchData",
+    "parentId": 21,
+    "rootId": 21,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 22,
+    "name": "fetchData",
+    "parentId": 21,
+    "rootId": 21,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "drinking black",
+    ],
+    "id": 23,
+    "name": "uppercase",
+    "parentId": 22,
+    "rootId": 21,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 23,
+    "name": "uppercase",
+    "parentId": 22,
+    "rootId": 21,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 23,
+    "name": "uppercase",
+    "parentId": 22,
+    "rootId": 21,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 23,
+    "name": "uppercase",
+    "parentId": 22,
+    "rootId": 21,
+    "type": "process_return",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 22,
+    "name": "fetchData",
+    "parentId": 21,
+    "rootId": 21,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 22,
+    "name": "fetchData",
+    "parentId": 21,
+    "rootId": 21,
+    "type": "process_return",
+  },
+]
+`;
+
+exports[`can handle nested async actions when using decorate 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 24,
+    "name": "startFetch",
+    "rootId": 24,
+    "type": "action",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 25,
+    "name": "fetchData",
+    "rootId": 24,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 25,
+    "name": "fetchData",
+    "rootId": 24,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "drinking black",
+    ],
+    "id": 26,
+    "name": "uppercase",
+    "rootId": 24,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 26,
+    "name": "uppercase",
+    "rootId": 24,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 26,
+    "name": "uppercase",
+    "rootId": 24,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 26,
+    "name": "uppercase",
+    "rootId": 24,
+    "type": "process_return",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 25,
+    "name": "fetchData",
+    "rootId": 24,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 25,
+    "name": "fetchData",
+    "rootId": 24,
+    "type": "process_return",
+  },
+]
+`;
+
+exports[`can handle throw from yielded promise works 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 9,
+    "name": "startFetch",
+    "parentId": 0,
+    "rootId": 9,
+    "type": "action",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 10,
+    "name": "fetchData",
+    "parentId": 9,
+    "rootId": 9,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 10,
+    "name": "fetchData",
+    "parentId": 9,
+    "rootId": 9,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "x",
+    ],
+    "id": 10,
+    "name": "fetchData",
+    "parentId": 9,
+    "rootId": 9,
+    "type": "process_resume_error",
+  },
+  Object {
+    "args": Array [
+      "x",
+    ],
+    "id": 10,
+    "name": "fetchData",
+    "parentId": 9,
+    "rootId": 9,
+    "type": "process_throw",
+  },
+]
+`;
+
+exports[`can handle try catch 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 5,
+    "name": "startFetch",
+    "parentId": 0,
+    "rootId": 5,
+    "type": "action",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 6,
+    "name": "fetchData",
+    "parentId": 5,
+    "rootId": 5,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 6,
+    "name": "fetchData",
+    "parentId": 5,
+    "rootId": 5,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      "tea",
+    ],
+    "id": 6,
+    "name": "fetchData",
+    "parentId": 5,
+    "rootId": 5,
+    "type": "process_resume_error",
+  },
+  Object {
+    "args": Array [
+      "biscuit",
+    ],
+    "id": 6,
+    "name": "fetchData",
+    "parentId": 5,
+    "rootId": 5,
+    "type": "process_return",
+  },
+]
+`;
+
+exports[`empty sequence works 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 7,
+    "name": "startFetch",
+    "parentId": 0,
+    "rootId": 7,
+    "type": "action",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 8,
+    "name": "fetchData",
+    "parentId": 7,
+    "rootId": 7,
+    "type": "process_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 8,
+    "name": "fetchData",
+    "parentId": 7,
+    "rootId": 7,
+    "type": "process_resume",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 8,
+    "name": "fetchData",
+    "parentId": 7,
+    "rootId": 7,
+    "type": "process_return",
+  },
+]
+`;

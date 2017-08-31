@@ -1,6 +1,7 @@
 import { isStateTreeNode } from "../core"
 import { getSnapshot, applySnapshot, onSnapshot } from "../core/mst-operations"
-import { applyAction, onAction, ISerializedActionCall, IMiddleWareEvent } from "../core/action"
+import { IMiddlewareEvent } from "../core/action"
+import { applyAction, onAction, ISerializedActionCall } from "../middlewares/on-action"
 import { fail, extend } from "../utils"
 
 export interface IMiddleWareApi {
@@ -14,7 +15,7 @@ export interface IReduxStore extends IMiddleWareApi {
 
 export type MiddleWare = (
     middlewareApi: IMiddleWareApi
-) => ((next: (action: IMiddleWareEvent) => void) => void)
+) => ((next: (action: IMiddlewareEvent) => void) => void)
 
 /**
  * Creates a tiny proxy around a MST tree that conforms to the redux store api.
@@ -42,7 +43,7 @@ export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxSt
     return store
 }
 
-function reduxActionToAction(action: any): IMiddleWareEvent {
+function reduxActionToAction(action: any): IMiddlewareEvent {
     const actionArgs = extend({}, action)
     delete actionArgs.type
     return {
@@ -85,11 +86,15 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
     })
 
     // Send changes to the remote monitor
-    onAction(model, (action: ISerializedActionCall) => {
-        if (applyingSnapshot) return
-        const copy: any = {}
-        copy.type = action.name
-        if (action.args) action.args.forEach((value, index) => (copy[index] = value))
-        remotedev.send(copy, getSnapshot(model))
-    })
+    onAction(
+        model,
+        (action: ISerializedActionCall) => {
+            if (applyingSnapshot) return
+            const copy: any = {}
+            copy.type = action.name
+            if (action.args) action.args.forEach((value, index) => (copy[index] = value))
+            remotedev.send(copy, getSnapshot(model))
+        },
+        true
+    )
 }

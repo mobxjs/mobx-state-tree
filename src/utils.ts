@@ -141,11 +141,15 @@ export function addReadOnlyProp(object: any, propName: string, value: any) {
     })
 }
 
+export function remove<T>(collection: T[], item: T) {
+    const idx = collection.indexOf(item)
+    if (idx !== -1) collection.splice(idx, 1)
+}
+
 export function registerEventHandler(handlers: Function[], handler: Function): IDisposer {
     handlers.push(handler)
     return () => {
-        const idx = handlers.indexOf(handler)
-        if (idx !== -1) handlers.splice(idx, 1)
+        remove(handlers, handler)
     }
 }
 

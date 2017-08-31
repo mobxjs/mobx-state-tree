@@ -40,7 +40,6 @@ export class Frozen<T> extends Type<T, T> {
  * This is useful to store complex, but immutable values like vectors etc. It can form a powerful bridge to parts of your application that should be immutable, or that assume data to be immutable.
  *
  * @example
- * ```javascript
  * const GameCharacter = types.model({
  *   name: string,
  *   location: types.frozen
@@ -53,8 +52,6 @@ export class Frozen<T> extends Type<T, T> {
  *
  * hero.location = { x: 10, y: 2 } // OK
  * hero.location.x = 7 // Not ok!
- * ```
- *
  *
  * @alias types.frozen
  */

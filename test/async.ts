@@ -3,7 +3,8 @@ import {
     types,
     addMiddleware,
     recordActions,
-    process
+    process,
+    decorate
     // TODO: export IRawActionCall
 } from "../src"
 import { test, CallbackTestContext, Context } from "ava"
@@ -23,8 +24,7 @@ function testCoffeeTodo(
     generator: (self: any) => (x: string) => IterableIterator<any>,
     shouldError: boolean,
     resultValue: any,
-    producedCoffees: string[],
-    expectedEvents: any[]
+    producedCoffees: string[]
 ) {
     const Todo = types
         .model({
@@ -47,11 +47,7 @@ function testCoffeeTodo(
         t.is(res, resultValue)
         t.deepEqual(coffees, producedCoffees)
         const filtered = filterRelevantStuff(events)
-        t.deepEqual(
-            filtered,
-            expectedEvents,
-            "Wrong events, expected\n" + JSON.stringify(filtered, null, 2)
-        )
+        t.snapshot(filtered, "Wrong events, expected\n" + JSON.stringify(filtered, null, 2))
         t.end()
     }
 
@@ -79,19 +75,7 @@ test.cb("can handle async actions", t => {
             },
         false,
         "awake",
-        ["getting coffee black", "drinking coffee"],
-        [
-            { args: ["black"], id: 1, rootId: 1, type: "action", name: "startFetch" },
-            { args: ["black"], id: 2, rootId: 1, type: "process_spawn", name: "fetchData" },
-            {
-                args: ["drinking coffee"],
-                id: 2,
-                rootId: 1,
-                type: "process_yield",
-                name: "fetchData"
-            },
-            { args: ["awake"], id: 2, rootId: 1, type: "process_return", name: "fetchData" }
-        ]
+        ["getting coffee black", "drinking coffee"]
     )
 })
 
@@ -104,12 +88,7 @@ test.cb("can handle erroring actions", t => {
             },
         true,
         "black",
-        [],
-        [
-            { type: "action", name: "startFetch", id: 3, args: ["black"], rootId: 3 },
-            { name: "fetchData", type: "process_spawn", id: 4, args: ["black"], rootId: 3 },
-            { name: "fetchData", type: "process_throw", id: 4, args: ["black"], rootId: 3 }
-        ]
+        []
     )
 })
 
@@ -127,29 +106,12 @@ test.cb("can handle try catch", t => {
             },
         false,
         "biscuit",
-        ["tea"],
-        [
-            { type: "action", name: "startFetch", id: 5, args: ["black"], rootId: 5 },
-            { name: "fetchData", type: "process_spawn", id: 6, args: ["black"], rootId: 5 },
-            { name: "fetchData", type: "process_yield_error", id: 6, args: ["tea"], rootId: 5 },
-            { name: "fetchData", type: "process_return", id: 6, args: ["biscuit"], rootId: 5 }
-        ]
+        ["tea"]
     )
 })
 
 test.cb("empty sequence works", t => {
-    testCoffeeTodo(
-        t,
-        self => function* fetchData(this: any, kind: string) {},
-        false,
-        undefined,
-        [],
-        [
-            { type: "action", name: "startFetch", id: 7, args: ["black"], rootId: 7 },
-            { name: "fetchData", type: "process_spawn", id: 8, args: ["black"], rootId: 7 },
-            { name: "fetchData", type: "process_return", id: 8, args: [undefined], rootId: 7 }
-        ]
-    )
+    testCoffeeTodo(t, self => function* fetchData(this: any, kind: string) {}, false, undefined, [])
 })
 
 test.cb("can handle throw from yielded promise works", t => {
@@ -161,13 +123,7 @@ test.cb("can handle throw from yielded promise works", t => {
             },
         true,
         "x",
-        [],
-        [
-            { type: "action", name: "startFetch", id: 9, args: ["black"], rootId: 9 },
-            { name: "fetchData", type: "process_spawn", id: 10, args: ["black"], rootId: 9 },
-            { name: "fetchData", type: "process_yield_error", id: 10, args: ["x"], rootId: 9 },
-            { name: "fetchData", type: "process_throw", id: 10, args: ["x"], rootId: 9 }
-        ]
+        []
     )
 })
 
@@ -285,52 +241,50 @@ test.cb("can handle nested async actions", t => {
             },
         false,
         "DRINKING BLACK",
-        ["DRINKING BLACK"],
-        [
-            { type: "action", name: "startFetch", id: 21, args: ["black"], rootId: 21 },
-            { name: "fetchData", type: "process_spawn", id: 22, args: ["black"], rootId: 21 },
-            {
-                name: "uppercase",
-                type: "process_spawn",
-                id: 23,
-                args: ["drinking black"],
-                rootId: 21
-            },
-            {
-                name: "uppercase",
-                type: "process_yield",
-                id: 23,
-                args: ["DRINKING BLACK"],
-                rootId: 21
-            },
-            {
-                name: "uppercase",
-                type: "process_return",
-                id: 23,
-                args: ["DRINKING BLACK"],
-                rootId: 21
-            },
-            {
-                name: "fetchData",
-                type: "process_yield",
-                id: 22,
-                args: ["DRINKING BLACK"],
-                rootId: 21
-            },
-            {
-                name: "fetchData",
-                type: "process_return",
-                id: 22,
-                args: ["DRINKING BLACK"],
-                rootId: 21
-            }
-        ]
+        ["DRINKING BLACK"]
     )
+})
+
+test.cb("can handle nested async actions when using decorate", t => {
+    const events: [string, string][] = []
+
+    function middleware(call, next) {
+        events.push([call.type, call.name])
+        return next(call)
+    }
+
+    const uppercase = process(function* uppercase(value) {
+        const res = yield delay(20, value.toUpperCase())
+        return res
+    })
+
+    const Todo = types.model({}).actions(self => {
+        const act = process(function* act(value) {
+            return yield uppercase(value)
+        })
+
+        return {
+            act: decorate(middleware, act)
+        }
+    })
+
+    Todo.create().act("x").then(res => {
+        t.is(res, "X")
+        t.deepEqual(events, [
+            ["action", "act"],
+            ["process_spawn", "act"],
+            ["process_resume", "act"],
+            ["process_resume", "act"],
+            ["process_return", "act"]
+        ])
+        t.end()
+    })
 })
 
 function filterRelevantStuff(stuff: any): any {
     return stuff.map(x => {
         delete x.context
+        delete x.tree
         return x
     })
 }

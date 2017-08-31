@@ -11,10 +11,18 @@ export interface IValidationError {
 }
 export type IValidationResult = IValidationError[]
 
+function safeStringify(value: any) {
+    try {
+        return JSON.stringify(value)
+    } catch (e) {
+        return `<Unserializable: ${e}>`
+    }
+}
+
 export function prettyPrintValue(value: any) {
     return typeof value === "function"
         ? `<function${value.name ? " " + value.name : ""}>`
-        : isStateTreeNode(value) ? `<${value}>` : `\`${JSON.stringify(value)}\``
+        : isStateTreeNode(value) ? `<${value}>` : `\`${safeStringify(value)}\``
 }
 
 function toErrorString(error: IValidationError): string {
