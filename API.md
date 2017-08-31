@@ -190,14 +190,6 @@ Returns **T**
 
 ## ComplexType
 
-## ComplexType
-
-## ComplexType
-
-## ComplexType
-
-## ComplexType
-
 ## connectReduxDevtools
 
 Connects a MST tree to the Redux devtools.
@@ -580,22 +572,6 @@ Returns **any**
 -   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 Returns **any** 
-
-## Type
-
-## Type
-
-## Type
-
-## Type
-
-## Type
-
-## Type
-
-## Type
-
-## Type
 
 ## Type
 
