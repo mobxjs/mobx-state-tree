@@ -277,45 +277,6 @@ It is perfectly fine to chain multiple `views`, `props` calls etc in arbitrary o
 
 It is also possible to define lifecycle hooks in the _actions_ object, these are actions with a predefined name that are run at a specific moment. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel).
 
-TypeScript:
-
-TypeScript is supported, but you sometimes need to take into account where your typings are available.
-
-The code below will not compile: TypeScript will complain that `self.upperProp` is not a property. Computed properties are only available after `.views` is evaluated.
-
-```typescript
-const Example = types.model('Example', { prop: types.string }).views(self => ({
-  get upperProp(): string {
-    return self.prop.toUpperCase();
-  },
-  get twiceUpperProp(): string {
-    return self.upperProp + self.upperProp;
-  },
-}));
-```
-
-You can circumvent this situation by making helper functions, as demonstrated in the following code:
-
-```typescript
-const Example = types.model('Example', { prop: types.string }).views(self => {
-  function upperProp() {
-    return self.prop.toUpperCase();
-  }
-  function twiceUpperProp() {
-    return upperProp() + upperProp();
-  }
-
-  return {
-    get upperProp() {
-      return upperProp();
-    },
-    get twiceUpperProp() {
-      return twiceUpperProp();
-    },
-  };
-});
-```
-
 ### Tree semantics in detail
 
 MST trees have very specific semantics. These semantics purposefully constrain what you can do with MST. The reward for that is all kinds of generic features out of the box like snapshots, replayability, etc... If these constraints don't suit your app, you are probably better of using plain mobx with your own model classes. Which is perfectly fine as well.
@@ -991,6 +952,64 @@ const Todo = types.model({
     }))
 
 type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { title: string; setTitle: (v: string) => void }
+```
+
+Sometimes you'll need to take into account where your typings are available and where they aren't. The code below will not compile: TypeScript will complain that `self.upperProp` is not a known property. Computed properties are only available after `.views` is evaluated.
+
+```typescript
+const Example = types
+  .model('Example', {
+    prop: types.string,
+  })
+  .views(self => ({
+    get upperProp(): string {
+      return self.prop.toUpperCase();
+    },
+    get twiceUpperProp(): string {
+      return self.upperProp + self.upperProp;
+    },
+  }));
+```
+
+You can circumvent this situation by decaring the views in two steps:
+
+```typescript
+const Example = types
+  .model('Example', { prop: types.string })
+  .views(self => ({
+    get upperProp(): string {
+      return self.prop.toUpperCase();
+    },
+  }))
+  .views(self => ({
+    get twiceUpperProp(): string {
+      return self.upperProp + self.upperProp;
+    },
+  }));
+```
+
+Another approach would be to use helper functions, as demonstrated in the following code. This definition allows for circular references, but is more verbose.
+
+```typescript
+const Example = types
+  .model('Example', { prop: types.string })
+  .views(self => {
+    function upperProp(): string {
+      return self.prop.toUpperCase();
+    }
+    function twiceUpperProp(): string {
+      return upperProp() + upperProp();
+    }
+
+    return {
+      get upperProp(): string {
+        return upperProp();
+      },
+      get twiceUpperProp(): string {
+        return twiceUpperProp();
+      },
+    };
+  });
 ```
 
 ### How does MST compare to Redux
