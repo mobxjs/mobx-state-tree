@@ -588,7 +588,7 @@ The following is an example of an object with volatile state. Note that volatile
 ```javascript
 const Store = types.model({
         todos: types.array(Todo),
-        state: types.enum(["loading", "loaded", "error"])
+        state: types.enumeration("State", ["loading", "loaded", "error"])
     })
     .actions(self => {
         const pendingRequest = null // a Promise
