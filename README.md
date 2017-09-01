@@ -943,7 +943,7 @@ const Todo = types.model({
     })
     .actions(self => ({
         setTitle(v: string) {
-            this.title = v
+            self.title = v
         }
     }))
 
