@@ -98,7 +98,7 @@ test("it should emit add patches", t => {
     t.deepEqual(patches, [{ op: "add", path: "/hello", value: { to: "universe" } }])
 })
 
-test("it should apply a add patch", t => {
+test("it should apply an add patch", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     applyPatch(doc, { op: "add", path: "/hello", value: { to: "universe" } })
@@ -116,7 +116,7 @@ test("it should emit update patches", t => {
     t.deepEqual(patches, [{ op: "replace", path: "/hello", value: { to: "universe" } }])
 })
 
-test("it should apply a update patch", t => {
+test("it should apply an update patch", t => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)

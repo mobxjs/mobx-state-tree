@@ -102,7 +102,7 @@ export function applyPatch(target: IStateTreeNode, patch: IJsonPatch | IJsonPatc
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
         if (typeof patch !== "object")
-            fail("expected second argument to be a object or array, got " + patch + " instead")
+            fail("expected second argument to be an object or array, got " + patch + " instead")
     }
     getStateTreeNode(target).applyPatches(asArray(patch))
 }

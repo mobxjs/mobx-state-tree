@@ -213,7 +213,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 }
 
 /**
- * Creates a index based collection type who's children are all of a uniform declared type.
+ * Creates an index based collection type who's children are all of a uniform declared type.
  *
  * This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
  *

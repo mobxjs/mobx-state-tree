@@ -601,7 +601,7 @@ Returns **any**
 
 ## types.array
 
-Creates a index based collection type who's children are all of a uniform declared type.
+Creates an index based collection type who's children are all of a uniform declared type.
 
 This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
 
@@ -879,7 +879,7 @@ See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tr
 
 ## types.refinement
 
-`types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific then the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
+`types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 
 **Parameters**
 

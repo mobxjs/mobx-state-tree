@@ -77,7 +77,7 @@ export function applyAction(
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
         if (typeof actions !== "object")
-            fail("expected second argument to be a object or array, got " + actions + " instead")
+            fail("expected second argument to be an object or array, got " + actions + " instead")
     }
     runInAction(() => {
         asArray(actions).forEach(action => baseApplyAction(target, action))
