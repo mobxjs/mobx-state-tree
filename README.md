@@ -244,7 +244,7 @@ Note that `views` and `actions` don't define actions and views directly, but rat
 The function will be invoked when a new model instance is created. The instance will be passed in as the first and only argument. Typically called `self`.
 This has two advantages:
 1. All methods will always be bound correctly, and won't suffer from an unbound `this`
-2. The closure can be used to store private state or methods of the instance. See also [actions](#actions) and [volatile state](#volatile_state).
+2. The closure can be used to store private state or methods of the instance. See also [actions](#actions) and [volatile state](#volatile-state).
 
 Quick example:
 
