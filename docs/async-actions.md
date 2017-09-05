@@ -17,7 +17,7 @@ For example:
 ```javascript
 const Store = types.model({
         githubProjects: types.array(types.frozen),
-        state: types.enum("pending", "done", "error")
+        state: types.enumeration("State", ["pending", "done", "error"])
     })
     .actions(self => ({
         fetchProjects() {
@@ -57,7 +57,7 @@ import { process } from "mobx-state-tree"
 
 const Store = types.model({
         githubProjects: types.array(types.frozen),
-        state: types.enum("pending", "done", "error")
+        state: types.enumeration("State", ["pending", "done", "error"])
     })
     .actions(self => ({
         fetchProjects: process(function* fetchProjects() { // <- note the star, this a generator function!

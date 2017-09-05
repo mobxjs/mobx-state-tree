@@ -675,7 +675,7 @@ Can be used to create an string based enumeration.
 
 ```javascript
 const TrafficLight = types.model({
-  color: types.enum("Color", ["Red", "Orange", "Green"])
+  color: types.enumeration("Color", ["Red", "Orange", "Green"])
 })
 ```
 
