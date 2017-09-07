@@ -8,8 +8,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/mobxjs/mobx.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-**DISCLAIMER: Docs are still being worked on, so if you are confused at any point; we hope to see you back soon, or feel free to open issue or join the gitter channel**
-
 # Contents
 
 * [Installation](#installation)
@@ -34,6 +32,7 @@
 * [Tips](#tips)
 * [FAQ](#FAQ)
 * [Full Api Docs](API.md)
+* [Built-in / example middlewares](middleware/README.md)
 * [Changelog](changelog.md)
 
 # Installation
@@ -906,6 +905,18 @@ export const LoggingSquare = types
 ```
 
 # FAQ
+
+### When not to use MST?
+
+MST makes state management very tangible by offering access to snapshots, patches and by providing interceptable actions.
+Also it fixes the `this` problem.
+All these features have the downside that they incur a little runtime overhead.
+Although in many places the MST core can still be optimized significantly, there will always be a constant overhead.
+If you have a performance critical application that handles huge amounts of mutable data, you will probably be better
+off by using 'raw' mobx.
+Which has predicatable and well known performance charasteristics, and has much less overhead.
+
+Likewise, if your application is mainly dealing with stateless information (such as a logging system) MST doesn't add much values.
 
 ### How does reconcilation work?
 
