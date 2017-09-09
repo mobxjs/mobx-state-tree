@@ -1,4 +1,4 @@
-const mst = require("mobx-state-tree")
+const mst = require("..")
 const test = require("ava").test
 const sinon = require("sinon")
 
