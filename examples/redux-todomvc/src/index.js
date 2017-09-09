@@ -5,7 +5,7 @@ import "todomvc-app-css/index.css"
 
 import { Provider } from "react-redux"
 import todosFactory from "./models/todos"
-import { asReduxStore, connectReduxDevtools } from "mobx-state-tree"
+import { asReduxStore, connectReduxDevtools } from "mobx-state-tree/middleware/redux"
 
 const initialState = {
     todos: [

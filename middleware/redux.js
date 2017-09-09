@@ -1,21 +1,4 @@
-import { isStateTreeNode } from "../core"
-import { getSnapshot, applySnapshot, onSnapshot } from "../core/mst-operations"
-import { IMiddlewareEvent } from "../core/action"
-import { applyAction, onAction, ISerializedActionCall } from "../middlewares/on-action"
-import { fail, extend } from "../utils"
-
-export interface IMiddleWareApi {
-    getState: () => any
-    dispatch: (action: any) => void
-}
-
-export interface IReduxStore extends IMiddleWareApi {
-    subscribe(listener: (snapshot: any) => void): any
-}
-
-export type MiddleWare = (
-    middlewareApi: IMiddleWareApi
-) => ((next: (action: IMiddlewareEvent) => void) => void)
+const mst = require("mobx-state-tree")
 
 /**
  * Creates a tiny proxy around a MST tree that conforms to the redux store api.
@@ -28,32 +11,32 @@ export type MiddleWare = (
  * @param {...MiddleWare[]} middlewares
  * @returns {IReduxStore}
  */
-export function asReduxStore(model: any, ...middlewares: MiddleWare[]): IReduxStore {
-    if (!isStateTreeNode(model)) fail("Expected model object")
-    let store: IReduxStore = {
-        getState: () => getSnapshot(model),
+module.exports.asReduxStore = function(model, ...middlewares) {
+    if (!mst.isStateTreeNode(model)) throw new Error("Expected model object")
+    let store = {
+        getState: () => mst.getSnapshot(model),
         dispatch: action => {
-            runMiddleWare(action, runners.slice(), (newAction: any) =>
-                applyAction(model, reduxActionToAction(newAction))
+            runMiddleWare(action, runners.slice(), newAction =>
+                mst.applyAction(model, reduxActionToAction(newAction))
             )
         },
-        subscribe: listener => onSnapshot(model, listener)
+        subscribe: listener => mst.onSnapshot(model, listener)
     }
     let runners = middlewares.map(mw => mw(store))
     return store
 }
 
-function reduxActionToAction(action: any): IMiddlewareEvent {
-    const actionArgs = extend({}, action)
+function reduxActionToAction(action) {
+    const actionArgs = Object.assign({}, action)
     delete actionArgs.type
     return {
         name: action.type,
         args: [actionArgs]
-    } as any
+    }
 }
 
-function runMiddleWare(action: any, runners: any, next: any) {
-    function n(retVal: any) {
+function runMiddleWare(action, runners, next) {
+    function n(retVal) {
         const f = runners.shift()
         if (f) f(n)(retVal)
         else next(retVal)
@@ -69,31 +52,31 @@ function runMiddleWare(action: any, runners: any, next: any) {
  * @param {*} remoteDevDep
  * @param {*} model
  */
-export function connectReduxDevtools(remoteDevDep: any, model: any) {
+module.exports.connectReduxDevtools = function connectReduxDevtools(remoteDevDep, model) {
     // Connect to the monitor
     const remotedev = remoteDevDep.connectViaExtension()
     let applyingSnapshot = false
 
     // Subscribe to change state (if need more than just logging)
-    remotedev.subscribe((message: any) => {
+    remotedev.subscribe(message => {
         // Helper when only time travelling needed
         const state = remoteDevDep.extractState(message)
         if (state) {
             applyingSnapshot = true
-            applySnapshot(model, state)
+            mst.applySnapshot(model, state)
             applyingSnapshot = false
         }
     })
 
     // Send changes to the remote monitor
-    onAction(
+    mst.onAction(
         model,
-        (action: ISerializedActionCall) => {
+        action => {
             if (applyingSnapshot) return
-            const copy: any = {}
+            const copy = {}
             copy.type = action.name
             if (action.args) action.args.forEach((value, index) => (copy[index] = value))
-            remotedev.send(copy, getSnapshot(model))
+            remotedev.send(copy, mst.getSnapshot(model))
         },
         true
     )
