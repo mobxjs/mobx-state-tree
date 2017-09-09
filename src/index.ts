@@ -24,7 +24,6 @@ export {
 export { process } from "./core/process"
 export { isStateTreeNode, IStateTreeNode } from "./core/node"
 
-export { asReduxStore, IReduxStore, connectReduxDevtools } from "./interop/redux"
 export {
     applyAction,
     onAction,

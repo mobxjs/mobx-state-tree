@@ -753,9 +753,7 @@ See the [full API docs](API.md) for more details.
 | [`applyAction(node, actionDescription)`](API.md#applyaction) | Replays an action on the targeted node |
 | [`applyPatch(node, jsonPatch)`](API.md#applypatch) | Applies a JSON patch, or array of patches, to a node in the tree |
 | [`applySnapshot(node, snapshot)`](API.md#applysnapshot) | Updates a node with the given snapshot |
-| [`asReduxStore(node)`](API.md#asreduxstore) | Wraps a node in a Redux-store compatible API |
 | [`clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone) | Creates a full clone of the given node. By default preserves the same environment |
-| [`connectReduxDevtools(removeDevModule, node)`](API.md#connectreduxdevtools) | Connects a node to the Redux development tools [example](https://github.com/mobxjs/mobx-state-tree/blob/b01fe97d427ca664f7ecc99349d10e58d08d2d98/examples/redux-todomvc/src/index.js)  |
 | [`decorate(middleware, function)`](API.md#decorate) | Attaches middleware to a specific action (or process) |
 | [`destroy(node)`](API.md#destroy) | Kills `node`, making it unusable. Removes it from any parent in the process |
 | [`detach(node)`](API.md#detach) | Removes `node` from its current parent, and lets it live on as standalone tree |
