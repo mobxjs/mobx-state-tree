@@ -1,4 +1,4 @@
-import { asReduxStore, getSnapshot } from "mobx-state-tree"
+import { asReduxStore, getSnapshot } from "mobx-state-tree/middleware/redux"
 import TodoStore from "./todos"
 import * as types from "../constants/ActionTypes"
 
