@@ -2,7 +2,6 @@ import ReactDOM from "react-dom"
 import React from "react"
 import { observable } from "mobx"
 import { observer } from "mobx-react"
-import { connectReduxDevtools } from "mobx-state-tree"
 
 import store from "./stores/domain-state"
 import Canvas from "./components/canvas"
@@ -21,7 +20,6 @@ ReactDOM.render(<App />, document.getElementById("root"))
 
 function prepareStore(newStore) {
     storeInstance.set(newStore)
-    connectReduxDevtools(require("remotedev"), newStore)
     syncStoreWithBackend(socket, newStore)
 }
 

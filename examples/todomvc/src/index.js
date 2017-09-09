@@ -2,7 +2,7 @@ import React from "react"
 import { render } from "react-dom"
 import App from "./components/App"
 import "todomvc-app-css/index.css"
-import { connectReduxDevtools } from "mobx-state-tree"
+import { connectReduxDevtools } from "mobx-state-tree/middleware/redux"
 
 import TodoStore from "./models/todos"
 
