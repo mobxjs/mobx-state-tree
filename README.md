@@ -318,8 +318,8 @@ This makes it possible to get a patch stream of a certain subtree, or to apply m
 ### Actions
 
 By default, nodes can only be modified by one of their actions, or by actions higher up in the tree.
-Actions can be defined by passing returning an object from the action initializer function that was passed to `actions`.
-The initializer function is run for each instance, so that `self` is always bound to the current instance.
+Actions can be defined by returning an object from the action initializer function that was passed to `actions`.
+The initializer function is executed for each instance, so that `self` is always bound to the current instance.
 Also, the closure of that function can be used to store so called _volatile_ state for the instance, or to create private functions that can anly
 be invoked from the actions, but not from the outside.
 
