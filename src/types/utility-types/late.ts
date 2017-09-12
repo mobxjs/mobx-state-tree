@@ -50,8 +50,8 @@ export type ILateType<S, T> = () => IType<S, T>
 export function late<S = any, T = any>(type: ILateType<S, T>): IType<S, T>
 export function late<S = any, T = any>(name: string, type: ILateType<S, T>): IType<S, T>
 /**
- * Defines a type that gets implemented later. This is usefull when you have to deal with circular dependencies.
- * Please notice that when defining circular dependencies TypeScript is'nt smart enought to inference them.
+ * Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies.
+ * Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
  * You need to declare an interface to explicit the return type of the late parameter function.
  *
  * @example

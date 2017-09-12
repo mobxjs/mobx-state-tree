@@ -303,7 +303,7 @@ export function union(
 ): IType<any, any>
 
 /**
- * types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambigously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+ * types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
  *
  * @export
  * @alias types.union

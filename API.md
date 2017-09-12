@@ -435,7 +435,7 @@ Returns **IDisposer** function to remove the listener
 
 ## onSnapshot
 
-Registeres a function that is invoked whenever a new snapshot for the given model instance is available.
+Registers a function that is invoked whenever a new snapshot for the given model instance is available.
 The listener will only be fire at the and of the current MobX (trans)action.
 See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
 
@@ -682,9 +682,9 @@ hero.location.x = 7 // Not ok!
 
 ## types.identifier
 
-Identifier are used to make references, lifecycle events and reconciling works.
+Identifiers are used to make references, lifecycle events and reconciling works.
 Inside a state tree, for each type can exist only one instance for each given identifier.
-For example there could'nt be 2 instances of user with id 1. If you need more, consider using references.
+For example there couldn't be 2 instances of user with id 1. If you need more, consider using references.
 Identifier can be used only as type property of a model.
 This type accepts as parameter the value type of the identifier field that can be either string or number.
 
@@ -705,8 +705,8 @@ Returns **IType&lt;T, T>**
 
 ## types.late
 
-Defines a type that gets implemented later. This is usefull when you have to deal with circular dependencies.
-Please notice that when defining circular dependencies TypeScript is'nt smart enought to inference them.
+Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies.
+Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
 You need to declare an interface to explicit the return type of the late parameter function.
 
 **Parameters**
@@ -882,7 +882,7 @@ The type of the value `undefined`
 
 ## types.union
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambigously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
 
 **Parameters**
 
@@ -902,7 +902,7 @@ unescape slashes and backslashes
 ## unprotect
 
 By default it is not allowed to directly modify a model. Models can only be modified through actions.
-However, in some cases you don't care about the advantages (like replayability, tracability, etc) this yields.
+However, in some cases you don't care about the advantages (like replayability, traceability, etc) this yields.
 For example because you are building a PoC or don't have any middleware attached to your tree.
 
 In that case you can disable this protection by calling `unprotect` on the root of your tree.

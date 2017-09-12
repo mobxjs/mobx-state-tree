@@ -1,5 +1,5 @@
 <p align="center">
-	   <img src="docs/logo.png" height="100">
+       <img src="docs/logo.png" height="100">
     <h3 align="center">mobx-state-tree</h3>
     <p align="center"><i>Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX</i><p>
 </p>
@@ -106,7 +106,7 @@ _Runtime type error_
 
 _Designtime type error_
 
-Because state trees are living, mutable models, actions are straight-forward to write; just modify local instance properties where appropiate. See `toggleTodo()` above or the examples below. It is not necessary to produce a new state tree yourself, MST's snapshot functionality will derive one for you automatically.
+Because state trees are living, mutable models, actions are straight-forward to write; just modify local instance properties where appropriate. See `toggleTodo()` above or the examples below. It is not necessary to produce a new state tree yourself, MST's snapshot functionality will derive one for you automatically.
 
 Although mutable sounds scary to some, fear not: actions have many interesting properties.
 By default trees can only be modified by using an action that belongs to the same subtree.
@@ -150,7 +150,7 @@ Despite all that, you will see that the [API](API.md) is pretty straightforward!
 ---
 
 Another way to look at mobx-state-tree is to consider it, as argued by Daniel Earwicker, to be ["React, but for data"](http://danielearwicker.github.io/json_mobx_Like_React_but_for_Data_Part_2_.html).
-Like React, MST consists of composable components, called *models*, which capture a small piece of state. They are instantiated from props (snapshots) and after that manage and protect their own internal state (using actions). Moreover, when applying snapshots, tree nodes are reconciled as much as possible. There is even a context-like mechanism, called environments, to pass information to deep descendants.
+Like React, MST consists of composable components, called *models*, which captures a small piece of state. They are instantiated from props (snapshots) and after that manage and protect their own internal state (using actions). Moreover, when applying snapshots, tree nodes are reconciled as much as possible. There is even a context-like mechanism, called environments, to pass information to deep descendants.
 
 An introduction to the philosophy can be watched [here](https://youtu.be/ta8QKmNRXZM?t=21m52s). [Slides](https://immer-mutable-state.surge.sh/). Or, as [markdown](https://github.com/mweststrate/reactive2016-slides/blob/master/slides.md) to read it quickly.
 
@@ -228,7 +228,7 @@ A model takes additionally object argument defining the properties.
 The _properties_ argument is a key-value set where each key indicates the introduction of a property, and the value its type. The following types are acceptable:
 
 1. A type. This can be a simple primitive type like `types.boolean`, see `// 2`, or a complex, possibly pre-defined type (`// 4`)
-2. A primitive. Using a primitive as type as type is syntactic sugar for introducing an property with a default value. See `// 3`, `endpoint: "http://localhost"` is the same as `endpoint: types.optional(types.string, "http://localhost")`. The primitive type is inferred from the default value. Properties with a default value can be omitted in snapshots.
+2. A primitive. Using a primitive as type is syntactic sugar for introducing a property with a default value. See `// 3`, `endpoint: "http://localhost"` is the same as `endpoint: types.optional(types.string, "http://localhost")`. The primitive type is inferred from the default value. Properties with a default value can be omitted in snapshots.
 3. A [computed property](https://mobx.js.org/refguide/computed-decorator.html), see `// 6`. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is possible to provide a setter for a computed property as well. A setter should always invoke an action.
 4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but its value can be tracked by MobX nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
 
@@ -274,17 +274,17 @@ For that reason a comma between each member of a model is mandatory, unlike clas
 
 ### Tree semantics in detail
 
-MST trees have very specific semantics. These semantics purposefully constrain what you can do with MST. The reward for that is all kinds of generic features out of the box like snapshots, replayability, etc... If these constraints don't suit your app, you are probably better of using plain mobx with your own model classes. Which is perfectly fine as well.
+MST trees have very specific semantics. This semantics purposefully constrain what you can do with MST. The reward for that is all kinds of generic features out of the box like snapshots, replayability, etc... If these constraints don't suit your app, you are probably better of using plain mobx with your own model classes. Which is perfectly fine as well.
 
-1. Each object in a MST tree is concidered a _node_. Each primitive (and frozen) value is considered a _leaf_.
+1. Each object in a MST tree is considered a _node_. Each primitive (and frozen) value is considered a _leaf_.
 1. MST has only three types of nodes; _model_, _array_, and _map_.
 1. Every _node_ tree in a MST tree is a tree in itself. Any operation that can be invoked on the complete tree can also be applied to a sub tree.
-1. A node can only exist exactly _once_ in a tree. This ensures it has an unique, identifiable position.
+1. A node can only exist exactly _once_ in a tree. This ensures it has a unique, identifiable position.
 2. It is however possible to refer to another object in the _same_ tree by using _references_
 3. There is no limit to the amount of MST trees that live in an application. However, each node can only live in exactly one tree.
 4. All _leaves_ in the tree must be serializable; it is not possible to store, for example, functions in a MST.
 6. The only free-form type in MST is frozen; with the requirement that frozen values are immutable so that the MST semantics can still be upheld.
-7. At any point in the tree it is possible to assign a snapshot to the tree instead of a concrete instance of the expect type. In that case an instance of the correct type, based on the snapshot, will be automatically created for you.
+7. At any point in the tree it is possible to assign a snapshot to the tree instead of a concrete instance of the expected type. In that case an instance of the correct type, based on the snapshot, will be automatically created for you.
 8. Nodes in the MST tree will be reconciled (the exact same instance will be reused) when updating the tree by any means, based on their _identifier_ property. If there is no identifier property, instances won't be reconciled.
 9. If a node in the tree is replaced by another node, the original node will die and become unusable. This makes sure you are not accidentally holding on to stale objects anywhere in your application.
 10. If you want to create a new node based on an existing node in a tree, you can either `detach` that node, or `clone` it.
@@ -320,7 +320,7 @@ This makes it possible to get a patch stream of a certain subtree, or to apply m
 By default, nodes can only be modified by one of their actions, or by actions higher up in the tree.
 Actions can be defined by returning an object from the action initializer function that was passed to `actions`.
 The initializer function is executed for each instance, so that `self` is always bound to the current instance.
-Also, the closure of that function can be used to store so called _volatile_ state for the instance, or to create private functions that can anly
+Also, the closure of that function can be used to store so called _volatile_ state for the instance, or to create private functions that can only
 be invoked from the actions, but not from the outside.
 
 ```javascript
@@ -451,7 +451,7 @@ Useful methods:
 
 -   `onPatch(model, listener)` attaches a patch listener to the provided model, which will be invoked whenever the model or any of its descendants is mutated
 -   `applyPatch(model, patch)` applies a patch (or array of patches) to the provided model
--   `revertPatch(model, patch)` reverse applies a patch (or array of patches) to the provided model. This replays the inverse of a set of patches to an model, which can be used to bring it back to it's original state
+-   `revertPatch(model, patch)` reverse applies a patch (or array of patches) to the provided model. This replays the inverse of a set of patches to a model, which can be used to bring it back to its original state
 
 ### References and identifiers
 
@@ -576,7 +576,7 @@ Finally, it is not only possible to be notified about snapshots, patches or acti
 ## Volatile state
 
 MST models primarily aid in storing _persistable_ state. State that can be persisted, serialized, transferred, patched, replaced etc.
-However, sometimes you need to keep track of temporary, non persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc. - state which is needed for local purposes as long as the object is alive.
+However, sometimes you need to keep track of temporary, non-persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc. - state which is needed for local purposes as long as the object is alive.
 
 Volatile state (which is also private) can be introduced by creating variables inside any of the action initializer functions.
 
@@ -729,7 +729,7 @@ types
 
 | Hook            | Meaning                                                                                                                                                   |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preProcessSnapshot` | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be a _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. This hook is not called for individual property updates. _**Note 1: Unlike the other hooks, this one is _not_ created as part of the `actions` initializer, but directly on the type!**_ _**Note 2: The `preProcessSnapshot` transformation must be pure; it is should not modify it's original input argument!**_ |
+| `preProcessSnapshot` | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be a _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. This hook is not called for individual property updates. _**Note 1: Unlike the other hooks, this one is _not_ created as part of the `actions` initializer, but directly on the type!**_ _**Note 2: The `preProcessSnapshot` transformation must be pure; it is should not modify its original input argument!**_ |
 | `afterCreate`   | Immediately after an instance is created and initial values are applied. Children will fire this event before parents                                     |
 | `afterAttach`   | As soon as the _direct_ parent is assigned (this node is attached to an other node)                                                                       |
 | `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot.
@@ -795,7 +795,7 @@ A _disposer_ is a function that cancels the effect it was created for.
 
 ### Building with production environment
 
-MobX-state-tree provides a lot of dev-only checks. They checks the correctness of function calls and perform runtime type-checks over your models. It is recommended to disable them in production builds. To do so, you should use webpack's DefinePlugin to set environment as production and remove them. More information could be found in the [official webpack guides](https://webpack.js.org/plugins/environment-plugin/#usage).
+MobX-state-tree provides a lot of dev-only checks. They check the correctness of function calls and perform runtime type-checks over your models. It is recommended to disable them in production builds. To do so, you should use webpack's DefinePlugin to set environment as production and remove them. More information could be found in the [official webpack guides](https://webpack.js.org/plugins/environment-plugin/#usage).
 
 ### Generate MST models from JSON
 
@@ -912,11 +912,11 @@ All these features have the downside that they incur a little runtime overhead.
 Although in many places the MST core can still be optimized significantly, there will always be a constant overhead.
 If you have a performance critical application that handles huge amounts of mutable data, you will probably be better
 off by using 'raw' mobx.
-Which has predicatable and well known performance charasteristics, and has much less overhead.
+Which has predictable and well-known performance characteristics, and has much less overhead.
 
 Likewise, if your application is mainly dealing with stateless information (such as a logging system) MST doesn't add much values.
 
-### How does reconcilation work?
+### How does reconciliation work?
 
 * When applying snapshots, MST will always try to reuse existing object instances for snapshots with the same identifier (see `types.identifier()`).
 * If no identifier is specified, but the type of the snapshot is correct, MST will reconcile objects as well if they are stored in a specific model property or under the same map key.
