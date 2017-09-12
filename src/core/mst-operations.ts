@@ -62,7 +62,7 @@ export function onSnapshot<S>(
 ): IDisposer
 export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer
 /**
- * Registeres a function that is invoked whenever a new snapshot for the given model instance is available.
+ * Registers a function that is invoked whenever a new snapshot for the given model instance is available.
  * The listener will only be fire at the and of the current MobX (trans)action.
  * See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
  *
@@ -201,7 +201,7 @@ export function protect(target: IStateTreeNode) {
 
 /**
  * By default it is not allowed to directly modify a model. Models can only be modified through actions.
- * However, in some cases you don't care about the advantages (like replayability, tracability, etc) this yields.
+ * However, in some cases you don't care about the advantages (like replayability, traceability, etc) this yields.
  * For example because you are building a PoC or don't have any middleware attached to your tree.
  *
  * In that case you can disable this protection by calling `unprotect` on the root of your tree.
