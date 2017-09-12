@@ -274,7 +274,7 @@ For that reason a comma between each member of a model is mandatory, unlike clas
 
 ### Tree semantics in detail
 
-MST trees have very specific semantics. This semantics purposefully constrain what you can do with MST. The reward for that is all kinds of generic features out of the box like snapshots, replayability, etc... If these constraints don't suit your app, you are probably better of using plain mobx with your own model classes. Which is perfectly fine as well.
+MST trees have very specific semantics. These semantics purposefully constrain what you can do with MST. The reward for that is all kinds of generic features out of the box like snapshots, replayability, etc... If these constraints don't suit your app, you are probably better of using plain mobx with your own model classes. Which is perfectly fine as well.
 
 1. Each object in a MST tree is considered a _node_. Each primitive (and frozen) value is considered a _leaf_.
 1. MST has only three types of nodes; _model_, _array_, and _map_.
