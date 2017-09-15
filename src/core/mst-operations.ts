@@ -13,12 +13,10 @@ export function getType<S, T>(object: IStateTreeNode): IType<S, T> {
  * Returns the _declared_ type of the given sub property of an object, array or map.
  *
  * @example
- * ```typescript
  * const Box = types.model({ x: 0, y: 0 })
  * const box = Box.create()
  *
  * console.log(getChildType(box, "x").name) // 'number'
- * ```
  *
  * @export
  * @param {IStateTreeNode} object
@@ -30,51 +28,28 @@ export function getChildType(object: IStateTreeNode, child: string): IType<any, 
 }
 
 /**
- * Middleware can be used to intercept any action is invoked on the subtree where it is attached.
- * If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
- *
- * For more details, see the [middleware docs](docs/middleware.md)
- *
- * @export
- * @param {IStateTreeNode} target
- * @param {(action: IRawActionCall, next: (call: IRawActionCall) => any) => any} middleware
- * @returns {IDisposer}
- */
-export function addMiddleware(
-    target: IStateTreeNode,
-    middleware: (action: IMiddleWareEvent, next: (call: IMiddleWareEvent) => any) => any
-): IDisposer {
-    const node = getStateTreeNode(target)
-    if (!node.isProtectionEnabled)
-        console.warn(
-            "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
-        )
-    return node.addMiddleWare(middleware)
-}
-
-export function onPatch(target: IStateTreeNode, callback: (patch: IJsonPatch) => void): IDisposer
-export function onPatch(
-    target: IStateTreeNode,
-    callback: (patch: IReversibleJsonPatch) => void,
-    includeOldValue: true
-): IDisposer
-/**
  * Registers a function that will be invoked for each mutation that is applied to the provided model instance, or to any of its children.
  * See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details. onPatch events are emitted immediately and will not await the end of a transaction.
  * Patches can be used to deep observe a model tree.
  *
  * @export
  * @param {Object} target the model instance from which to receive patches
- * @param {(patch: IJsonPatch) => void} callback the callback that is invoked for each patch
+ * @param {(patch: IJsonPatch, reversePatch) => void} callback the callback that is invoked for each patch. The reversePatch is a patch that would actually undo the emitted patch
  * @param {includeOldValue} boolean if oldValue is included in the patches, they can be inverted. However patches will become much bigger and might not be suitable for efficient transport
  * @returns {IDisposer} function to remove the listener
  */
 export function onPatch(
     target: IStateTreeNode,
-    callback: (patch: IJsonPatch) => void,
-    includeOldValue = false
+    callback: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
 ): IDisposer {
-    return getStateTreeNode(target).onPatch(callback, includeOldValue)
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (typeof callback !== "function")
+            fail("expected second argument to be a function, got " + callback + " instead")
+    }
+    return getStateTreeNode(target).onPatch(callback)
 }
 
 export function onSnapshot<S>(
@@ -87,7 +62,7 @@ export function onSnapshot<S>(
 ): IDisposer
 export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer
 /**
- * Registeres a function that is invoked whenever a new snapshot for the given model instance is available.
+ * Registers a function that is invoked whenever a new snapshot for the given model instance is available.
  * The listener will only be fire at the and of the current MobX (trans)action.
  * See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
  *
@@ -100,6 +75,13 @@ export function onSnapshot<S>(
     target: ISnapshottable<S>,
     callback: (snapshot: S) => void
 ): IDisposer {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (typeof callback !== "function")
+            fail("expected second argument to be a function, got " + callback + " instead")
+    }
     return getStateTreeNode(target).onSnapshot(callback)
 }
 
@@ -115,32 +97,19 @@ export function onSnapshot<S>(
  * @returns
  */
 export function applyPatch(target: IStateTreeNode, patch: IJsonPatch | IJsonPatch[]) {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (typeof patch !== "object")
+            fail("expected second argument to be an object or array, got " + patch + " instead")
+    }
     getStateTreeNode(target).applyPatches(asArray(patch))
 }
 
-/**
- * The inverse function of apply patch.
- * Given a patch or set of patches, restores the target to the state before the patches where produced.
- * The inverse patch is computed, and all the patches are applied in reverse order, basically 'rewinding' the target,
- * so that conceptually the following holds for any set of patches:
- *
- * `getSnapshot(x) === getSnapshot(revertPatch(applyPatches(x, patches), patches))`
- *
- * Note: Reverting patches will generate a new set of patches as side effect of applying the patches.
- * Note: only patches that include `oldValue` information are suitable for reverting. Such patches can be generated by passing `true` as second argument when attaching an `onPatch` listener.
- */
-export function revertPatch(
-    target: IStateTreeNode,
-    patch: IReversibleJsonPatch | IReversibleJsonPatch[]
-) {
-    const patches = asArray(patch).map(invertPatch)
-    patches.reverse() // inverse apply them in reverse order!
-    getStateTreeNode(target).applyPatches(patches)
-}
-
 export interface IPatchRecorder {
-    patches: ReadonlyArray<IReversibleJsonPatch>
-    cleanPatches: ReadonlyArray<IJsonPatch>
+    patches: ReadonlyArray<IJsonPatch>
+    inversePatches: ReadonlyArray<IJsonPatch>
     stop(): any
     replay(target?: IStateTreeNode): any
     undo(target?: IStateTreeNode): void
@@ -150,105 +119,65 @@ export interface IPatchRecorder {
  * Small abstraction around `onPatch` and `applyPatch`, attaches a patch listener to a tree and records all the patches.
  * Returns an recorder object with the following signature:
  *
- * ```typescript
+ * @example
  * export interface IPatchRecorder {
  *      // the recorded patches
  *      patches: IJsonPatch[]
- *      // the same set of recorded patches, but without undo information, making them smaller and compliant with json-patch spec
- *      cleanPatches: IJSonPatch[]
+ *      // the inverse of the recorded patches
+ *      inversePatches: IJsonPatch[]
  *      // stop recording patches
  *      stop(target?: IStateTreeNode): any
+ *      // resume recording patches
+ *      resume()
  *      // apply all the recorded patches on the given target (the original subject if omitted)
  *      replay(target?: IStateTreeNode): any
  *      // reverse apply the recorded patches on the given target  (the original subject if omitted)
  *      // stops the recorder if not already stopped
  *      undo(): void
  * }
- * ```
  *
  * @export
  * @param {IStateTreeNode} subject
  * @returns {IPatchRecorder}
  */
 export function recordPatches(subject: IStateTreeNode): IPatchRecorder {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(subject))
+            fail(
+                "expected first argument to be a mobx-state-tree node, got " + subject + " instead"
+            )
+    }
+
+    let disposer: IDisposer | null = null
+    function resume() {
+        if (disposer) return
+        disposer = onPatch(subject, (patch, inversePatch) => {
+            recorder.rawPatches.push([patch, inversePatch])
+        })
+    }
+
     let recorder = {
-        patches: [] as IReversibleJsonPatch[],
-        get cleanPatches() {
-            return this.patches.map(stripPatch)
+        rawPatches: [] as [IJsonPatch, IJsonPatch][],
+        get patches() {
+            return this.rawPatches.map(([a]) => a)
+        },
+        get inversePatches() {
+            return this.rawPatches.map(([_, b]) => b)
         },
         stop() {
-            disposer()
+            if (disposer) disposer()
+            disposer = null
         },
+        resume,
         replay(target?: IStateTreeNode) {
             applyPatch(target || subject, recorder.patches)
         },
         undo(target?: IStateTreeNode) {
-            revertPatch(subject || subject, this.patches)
+            applyPatch(target || subject, recorder.inversePatches.slice().reverse())
         }
     }
-    let disposer = onPatch(
-        subject,
-        patch => {
-            recorder.patches.push(patch)
-        },
-        true
-    )
-    return recorder
-}
-
-/**
- * Applies an action or a series of actions in a single MobX transaction.
- * Does not return any value
- * Takes an action description as produced by the `onAction` middleware.
- *
- * @export
- * @param {Object} target
- * @param {IActionCall[]} actions
- * @param {IActionCallOptions} [options]
- */
-export function applyAction(
-    target: IStateTreeNode,
-    actions: ISerializedActionCall | ISerializedActionCall[]
-): void {
-    runInAction(() => {
-        asArray(actions).forEach(action => baseApplyAction(target, action))
-    })
-}
-
-export interface IActionRecorder {
-    actions: ReadonlyArray<ISerializedActionCall>
-    stop(): any
-    replay(target: IStateTreeNode): any
-}
-
-/**
- * Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted.
- * Returns an recorder object with the following signature:
- *
- * ```typescript
- * export interface IActionRecorder {
- *      // the recorded actions
- *      actions: ISerializedActionCall[]
- *      // stop recording actions
- *      stop(): any
- *      // apply all the recorded actions on the given object
- *      replay(target: IStateTreeNode): any
- * }
- * ```
- *
- * @export
- * @param {IStateTreeNode} subject
- * @returns {IPatchRecorder}
- */
-export function recordActions(subject: IStateTreeNode): IActionRecorder {
-    let recorder = {
-        actions: [] as ISerializedActionCall[],
-        stop: () => disposer(),
-        replay: (target: IStateTreeNode) => {
-            applyAction(target, recorder.actions)
-        }
-    }
-    let disposer = onAction(subject, recorder.actions.push.bind(recorder.actions))
+    resume()
     return recorder
 }
 
@@ -260,6 +189,11 @@ export function recordActions(subject: IStateTreeNode): IActionRecorder {
  *
  */
 export function protect(target: IStateTreeNode) {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
     const node = getStateTreeNode(target)
     if (!node.isRoot) fail("`protect` can only be invoked on root nodes")
     node.isProtectionEnabled = true
@@ -267,7 +201,7 @@ export function protect(target: IStateTreeNode) {
 
 /**
  * By default it is not allowed to directly modify a model. Models can only be modified through actions.
- * However, in some cases you don't care about the advantages (like replayability, tracability, etc) this yields.
+ * However, in some cases you don't care about the advantages (like replayability, traceability, etc) this yields.
  * For example because you are building a PoC or don't have any middleware attached to your tree.
  *
  * In that case you can disable this protection by calling `unprotect` on the root of your tree.
@@ -287,6 +221,11 @@ export function protect(target: IStateTreeNode) {
  * todo.toggle() // OK
  */
 export function unprotect(target: IStateTreeNode) {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
     const node = getStateTreeNode(target)
     if (!node.isRoot) fail("`unprotect` can only be invoked on root nodes")
     node.isProtectionEnabled = false
@@ -308,6 +247,11 @@ export function isProtected(target: IStateTreeNode): boolean {
  * @returns
  */
 export function applySnapshot<S, T>(target: IStateTreeNode, snapshot: S) {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
     return getStateTreeNode(target).applySnapshot(snapshot)
 }
 
@@ -323,6 +267,11 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S
  * @returns {*}
  */
 export function getSnapshot<S>(target: ISnapshottable<S>): S {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
     return getStateTreeNode(target).snapshot
 }
 
@@ -335,7 +284,14 @@ export function getSnapshot<S>(target: ISnapshottable<S>): S {
  * @returns {boolean}
  */
 export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
-    if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (typeof depth !== "number")
+            fail("expected second argument to be a number, got " + depth + " instead")
+        if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
+    }
     let parent: Node | null = getStateTreeNode(target).parent
     while (parent) {
         if (--depth === 0) return true
@@ -344,8 +300,8 @@ export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
     return false
 }
 
-export function getParent(target: IStateTreeNode, depth?: number): (any & IStateTreeNode)
-export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStateTreeNode)
+export function getParent(target: IStateTreeNode, depth?: number): any & IStateTreeNode
+export function getParent<T>(target: IStateTreeNode, depth?: number): T & IStateTreeNode
 /**
  * Returns the immediate parent of this object, or null.
  *
@@ -357,8 +313,15 @@ export function getParent<T>(target: IStateTreeNode, depth?: number): (T & IStat
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent<T>(target: IStateTreeNode, depth = 1): (T & IStateTreeNode) {
-    if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
+export function getParent<T>(target: IStateTreeNode, depth = 1): T & IStateTreeNode {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (typeof depth !== "number")
+            fail("expected second argument to be a number, got " + depth + " instead")
+        if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
+    }
     let d = depth
     let parent: Node | null = getStateTreeNode(target).parent
     while (parent) {
@@ -378,6 +341,11 @@ export function getRoot<T>(target: IStateTreeNode): T & IStateTreeNode
  * @returns {*}
  */
 export function getRoot(target: IStateTreeNode): IStateTreeNode {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
     return getStateTreeNode(target).root.storedValue
 }
 
@@ -389,6 +357,11 @@ export function getRoot(target: IStateTreeNode): IStateTreeNode {
  * @returns {string}
  */
 export function getPath(target: IStateTreeNode): string {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
     return getStateTreeNode(target).path
 }
 
@@ -400,6 +373,11 @@ export function getPath(target: IStateTreeNode): string {
  * @returns {string[]}
  */
 export function getPathParts(target: IStateTreeNode): string[] {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
     return splitJsonPath(getStateTreeNode(target).path)
 }
 
@@ -411,6 +389,11 @@ export function getPathParts(target: IStateTreeNode): string[] {
  * @returns {boolean}
  */
 export function isRoot(target: IStateTreeNode): boolean {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
     return getStateTreeNode(target).isRoot
 }
 
@@ -424,6 +407,13 @@ export function isRoot(target: IStateTreeNode): boolean {
  * @returns {*}
  */
 export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNode | any {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (typeof path !== "string")
+            fail("expected second argument to be a number, got " + path + " instead")
+    }
     const node = getStateTreeNode(target).resolve(path)
     return node ? node.value : undefined
 }
@@ -443,7 +433,17 @@ export function resolveIdentifier(
     target: IStateTreeNode,
     identifier: string | number
 ): any {
-    if (!isType(type)) fail("Expected a type as first argument")
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isType(type))
+            fail("expected first argument to be a mobx-state-tree type, got " + type + " instead")
+        if (!isStateTreeNode(target))
+            fail(
+                "expected second argument to be a mobx-state-tree node, got " + target + " instead"
+            )
+        if (!(typeof identifier === "string" || typeof identifier === "number"))
+            fail("expected third argument to be a string or number, got " + identifier + " instead")
+    }
     const node = getStateTreeNode(target).root.identifierCache!.resolve(type, "" + identifier)
     return node ? node.value : undefined
 }
@@ -457,6 +457,13 @@ export function resolveIdentifier(
  * @returns {*}
  */
 export function tryResolve(target: IStateTreeNode, path: string): IStateTreeNode | any {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (typeof path !== "string")
+            fail("expected second argument to be a string, got " + path + " instead")
+    }
     const node = getStateTreeNode(target).resolve(path, false)
     if (node === undefined) return undefined
     return node ? node.value : undefined
@@ -472,6 +479,16 @@ export function tryResolve(target: IStateTreeNode, path: string): IStateTreeNode
  * @returns {string}
  */
 export function getRelativePath(base: IStateTreeNode, target: IStateTreeNode): string {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail(
+                "expected second argument to be a mobx-state-tree node, got " + target + " instead"
+            )
+
+        if (!isStateTreeNode(base))
+            fail("expected first argument to be a mobx-state-tree node, got " + base + " instead")
+    }
     return getStateTreeNode(base).getRelativePathTo(getStateTreeNode(target))
 }
 
@@ -491,28 +508,43 @@ export function clone<T extends IStateTreeNode>(
     source: T,
     keepEnvironment: boolean | any = true
 ): T {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(source))
+            fail("expected first argument to be a mobx-state-tree node, got " + source + " instead")
+    }
     const node = getStateTreeNode(source)
     return node.type.create(
         node.snapshot,
         keepEnvironment === true
             ? node.root._environment
-            : keepEnvironment === false ? undefined : keepEnvironment // it's an object or something else
-    ) as T
+            : keepEnvironment === false ? undefined : keepEnvironment
+    ) as T // it's an object or something else
 }
 
 /**
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
-export function detach<T extends IStateTreeNode>(thing: T): T {
-    getStateTreeNode(thing).detach()
-    return thing
+export function detach<T extends IStateTreeNode>(target: T): T {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
+    getStateTreeNode(target).detach()
+    return target
 }
 
 /**
  * Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
  */
-export function destroy(thing: IStateTreeNode) {
-    const node = getStateTreeNode(thing)
+export function destroy(target: IStateTreeNode) {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
+    const node = getStateTreeNode(target)
     if (node.isRoot) node.die()
     else node.parent!.removeChild(node.subpath)
 }
@@ -524,11 +556,16 @@ export function destroy(thing: IStateTreeNode) {
  * is requesting it's last path and snapshot
  *
  * @export
- * @param {IStateTreeNode} thing
+ * @param {IStateTreeNode} target
  * @returns {boolean}
  */
-export function isAlive(thing: IStateTreeNode): boolean {
-    return getStateTreeNode(thing).isAlive
+export function isAlive(target: IStateTreeNode): boolean {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
+    return getStateTreeNode(target).isAlive
 }
 
 /**
@@ -537,7 +574,6 @@ export function isAlive(thing: IStateTreeNode): boolean {
  * cleanup methods yourself using the `beforeDestroy` hook.
  *
  * @example
- * ```javascript
  * const Todo = types.model({
  *   title: types.string
  * }, {
@@ -551,13 +587,19 @@ export function isAlive(thing: IStateTreeNode): boolean {
  *     addDisposer(this, autoSaveDisposer)
  *   }
  * })
- * ```
  *
  * @export
  * @param {IStateTreeNode} target
  * @param {() => void} disposer
  */
 export function addDisposer(target: IStateTreeNode, disposer: () => void) {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (typeof disposer !== "function")
+            fail("expected second argument to be a function, got " + disposer + " instead")
+    }
     getStateTreeNode(target).addDisposer(disposer)
 }
 
@@ -566,11 +608,16 @@ export function addDisposer(target: IStateTreeNode, disposer: () => void) {
  * see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
  *
  * @export
- * @param {IStateTreeNode} thing
+ * @param {IStateTreeNode} target
  * @returns {*}
  */
-export function getEnv<T = any>(thing: IStateTreeNode): T {
-    const node = getStateTreeNode(thing)
+export function getEnv<T = any>(target: IStateTreeNode): T {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
+    const node = getStateTreeNode(target)
     const env = node.root._environment
     if (!!!env)
         fail(
@@ -582,8 +629,15 @@ export function getEnv<T = any>(thing: IStateTreeNode): T {
 /**
  * Performs a depth first walk through a tree
  */
-export function walk(thing: IStateTreeNode, processor: (item: IStateTreeNode) => void) {
-    const node = getStateTreeNode(thing)
+export function walk(target: IStateTreeNode, processor: (item: IStateTreeNode) => void) {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (typeof processor !== "function")
+            fail("expected second argument to be a function, got " + processor + " instead")
+    }
+    const node = getStateTreeNode(target)
     // tslint:disable-next-line:no_unused-variable
     node.getChildren().forEach(child => {
         if (isStateTreeNode(child.storedValue)) walk(child.storedValue, processor)
@@ -591,21 +645,9 @@ export function walk(thing: IStateTreeNode, processor: (item: IStateTreeNode) =>
     processor(node.storedValue)
 }
 
-import {
-    IMiddleWareEvent,
-    ISerializedActionCall,
-    applyAction as baseApplyAction,
-    onAction
-} from "./action"
-import { runInAction, IObservableArray, ObservableMap } from "mobx"
+import { IObservableArray, ObservableMap } from "mobx"
 import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"
-import {
-    IJsonPatch,
-    IReversibleJsonPatch,
-    splitJsonPath,
-    invertPatch,
-    stripPatch
-} from "./json-patch"
+import { IJsonPatch, splitJsonPath } from "./json-patch"
 import { IDisposer, fail, asArray } from "../utils"
 import { ISnapshottable, IType } from "../types/type"
 import { isType } from "../types/type-flags"

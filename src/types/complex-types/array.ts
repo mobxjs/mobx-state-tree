@@ -20,7 +20,7 @@ import {
 } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isArray } from "../../utils"
 import { ComplexType, IComplexType, IType } from "../type"
-import { TypeFlags } from "../type-flags"
+import { TypeFlags, isType } from "../type-flags"
 import {
     typecheck,
     flattenTypeErrors,
@@ -213,12 +213,11 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 }
 
 /**
- * Creates a index based collection type who's children are all of a uniform declared type.
+ * Creates an index based collection type who's children are all of a uniform declared type.
  *
  * This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
  *
  * @example
- * ```javascript
  * const Todo = types.model({
  *   task: types.string
  * })
@@ -230,13 +229,17 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
  * const s = TodoStore.create({ todos: [] })
  * s.todos.push({ task: "Grab coffee" })
  * console.log(s.todos[0]) // prints: "Grab coffee"
- * ```
+ *
  * @export
  * @alias types.array
  * @param {IType<S, T>} subtype
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
 export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
+    if (process.env.NODE_ENV !== "production") {
+        if (!isType(subtype))
+            fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")
+    }
     return new ArrayType<S, T>(subtype.name + "[]", subtype)
 }
 
@@ -279,6 +282,13 @@ function reconcileArrayChildren<T>(
 
     // Prepare new values, try to reconcile
     newValues.forEach((newValue, index) => {
+        // for some reason, instead of newValue we got a node, fallback to the storedValue
+        // TODO: https://github.com/mobxjs/mobx-state-tree/issues/340#issuecomment-325581681
+        if (newValue instanceof Node) newValue = newValue.storedValue
+
+        // ensure the value is valid-ish
+        typecheck(childType, newValue)
+
         const subPath = "" + newPaths[index]
         if (isStateTreeNode(newValue)) {
             // A tree node...

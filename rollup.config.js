@@ -1,6 +1,11 @@
 import filesize from "rollup-plugin-filesize"
 import resolve from "rollup-plugin-node-resolve"
 import uglify from "rollup-plugin-uglify"
+import replace from "rollup-plugin-replace"
+
+function getEnvVariables(production) {
+    return { "process.env.NODE_ENV": production ? "'production'" : "'development'" }
+}
 
 export default [
     {
@@ -22,7 +27,7 @@ export default [
         globals: {
             mobx: "mobx"
         },
-        plugins: [resolve(), uglify(), filesize()]
+        plugins: [resolve(), replace(getEnvVariables(true)), uglify(), filesize()]
     },
     {
         entry: "./lib/index.js",

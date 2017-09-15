@@ -106,13 +106,11 @@ test("store emits correct patch paths", t => {
     const recorder2 = recordPatches(s.boxes)
     const recorder3 = recordPatches(s.boxes.get("cc")!)
     s.arrows[0].from!.x += 117
-    t.deepEqual(recorder1.cleanPatches, [
+    t.deepEqual(recorder1.patches, [
         { op: "replace", path: "/boxes/cc/x", value: 217 } as IJsonPatch
     ])
-    t.deepEqual(recorder2.cleanPatches, [
-        { op: "replace", path: "/cc/x", value: 217 } as IJsonPatch
-    ])
-    t.deepEqual(recorder3.cleanPatches, [{ op: "replace", path: "/x", value: 217 } as IJsonPatch])
+    t.deepEqual(recorder2.patches, [{ op: "replace", path: "/cc/x", value: 217 } as IJsonPatch])
+    t.deepEqual(recorder3.patches, [{ op: "replace", path: "/x", value: 217 } as IJsonPatch])
 })
 
 test("box operations works correctly", t => {
@@ -140,6 +138,7 @@ test("box operations works correctly", t => {
         arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
         selection: "b"
     })
+    t.deepEqual(JSON.stringify(s), JSON.stringify(getSnapshot(s)))
     s.boxes.get("a")!.move(50, 50)
     t.deepEqual(getSnapshot(s), {
         boxes: {

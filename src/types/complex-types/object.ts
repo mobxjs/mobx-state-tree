@@ -6,14 +6,16 @@ import {
     intercept,
     observe,
     computed,
-    isComputed
+    isComputed,
+    observable,
+    extras
 } from "mobx"
 import {
     fail,
-    hasOwnProperty,
     isPlainObject,
     isPrimitive,
     EMPTY_ARRAY,
+    EMPTY_OBJECT,
     addHiddenFinalProp
 } from "../../utils"
 import { ComplexType, IComplexType, IType } from "../type"
@@ -24,30 +26,29 @@ import {
     IStateTreeNode,
     IJsonPatch,
     Node,
-    createActionInvoker
+    createActionInvoker,
+    escapeJsonPath
 } from "../../core"
 import {
     flattenTypeErrors,
     IContext,
     IValidationResult,
     typecheck,
-    typeCheckFailure
+    typeCheckFailure,
+    getContextForPath
 } from "../type-checker"
-import { getPrimitiveFactoryFromValue } from "../primitives"
+import { getPrimitiveFactoryFromValue, undefinedType } from "../primitives"
 import { optional } from "../utility-types/optional"
-// TODO: eliminate property / value-property
-import { Property } from "../property-types/property"
-import { ValueProperty } from "../property-types/value-property"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 
-const HOOK_NAMES = [
-    "afterCreate",
-    "afterAttach",
-    "postProcessSnapshot",
-    "beforeDetach",
-    "beforeDestroy"
-]
+const HOOK_NAMES = {
+    afterCreate: "afterCreate",
+    afterAttach: "afterAttach",
+    postProcessSnapshot: "postProcessSnapshot",
+    beforeDetach: "beforeDetach",
+    beforeDestroy: "beforeDestroy"
+}
 
 function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
@@ -66,6 +67,47 @@ const defaultObjectOptions = {
     initializers: EMPTY_ARRAY
 }
 
+function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T]: IType<any, T> } {
+    // loop through properties and ensures that all items are types
+    return Object.keys(properties).reduce((properties, key) => {
+        // warn if user intended a HOOK
+        if (key in HOOK_NAMES)
+            return fail(
+                `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
+            )
+
+        // the user intended to use a view
+        const descriptor = Object.getOwnPropertyDescriptor(properties, key)
+        if ("get" in descriptor) {
+            fail("Getters are not supported as properties. Please use views instead")
+        }
+        // undefined and null are not valid
+        const { value } = descriptor
+        if (value === null || undefined) {
+            fail(
+                "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
+            )
+            // its a primitive, convert to its type
+        } else if (isPrimitive(value)) {
+            return Object.assign({}, properties, {
+                [key]: optional(getPrimitiveFactoryFromValue(value), value)
+            })
+            // its already a type
+        } else if (isType(value)) {
+            return properties
+            // its a function, maybe the user wanted a view?
+        } else if (typeof value === "function") {
+            fail("Functions are not supported as properties, use views instead")
+            // no other complex values
+        } else if (typeof value === "object") {
+            fail(`In property '${key}': base model's should not contain complex values: '${value}'`)
+            // WTF did you passed in mate?
+        } else {
+            fail(`Unexpected value for property '${key}'`)
+        }
+    }, properties as any)
+}
+
 // TODO: rename to Model
 export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S, T> {
     readonly flags = TypeFlags.Object
@@ -75,18 +117,19 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
      */
     public readonly initializers: ((instance: any) => any)[]
     public readonly properties: { [K: string]: IType<any, any> }
-    private readonly parsedProperties: { [K: string]: ValueProperty } = {}
     private preProcessor: (snapshot: any) => any | undefined
-
-    modelConstructor: new () => any
+    private readonly propertiesNames: string[]
 
     constructor(opts: ObjectTypeConfig) {
         super(opts.name || defaultObjectOptions.name)
         const name = opts.name || defaultObjectOptions.name
+        // TODO: this test still needed?
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
         Object.assign(this, defaultObjectOptions, opts)
+        // ensures that any default value gets converted to its related type
+        this.properties = toPropertiesObject(this.properties)
+        this.propertiesNames = Object.keys(this.properties)
         Object.freeze(this.properties) // make sure nobody messes with it
-        this.createModelConstructor()
     }
 
     extend(opts: ObjectTypeConfig): ObjectType<any, any> {
@@ -98,30 +141,35 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         })
     }
 
-    private createModelConstructor() {
-        // Fancy trick to get a named constructor
-        this.modelConstructor = class {}
-        Object.defineProperty(this.modelConstructor, "name", {
-            value: this.name,
-            writable: false
-        })
-        const proto = this.modelConstructor.prototype
-        proto.toString = objectTypeToString
-        this.parseModelProps()
-        this.forAllProps(prop => prop.initializePrototype(this.modelConstructor.prototype))
-    }
-
     actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A> {
         const actionInitializer = (self: T) => {
             const actions = fn(self)
+            // check if return is correct
             if (!isPlainObject(actions))
                 fail(`actions initializer should return a plain object containing actions`)
+            // bind actions to the object created
             Object.keys(actions).forEach(name => {
+                // warn if preprocessor was given
                 if (name === PRE_PROCESS_SNAPSHOT)
-                    fail(
+                    return fail(
                         `Cannot define action '${PRE_PROCESS_SNAPSHOT}', it should be defined using 'type.preProcessSnapshot(fn)' instead`
                     )
-                addHiddenFinalProp(self, name, createActionInvoker(self, name, actions[name]))
+
+                // apply hook composition
+                let action = actions[name]
+                let baseAction = (self as any)[name]
+                if (name in HOOK_NAMES && baseAction) {
+                    let specializedAction = action
+                    if (name === HOOK_NAMES.postProcessSnapshot)
+                        action = (snapshot: any) => specializedAction(baseAction(snapshot))
+                    else
+                        action = function() {
+                            baseAction.apply(null, arguments)
+                            specializedAction.apply(null, arguments)
+                        }
+                }
+
+                addHiddenFinalProp(self, name, createActionInvoker(self, name, action))
             })
             return self
         }
@@ -141,7 +189,9 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     views<V extends Object>(fn: (self: T) => V): IModelType<S, T & V> {
         const viewInitializer = (self: T) => {
             const views = fn(self)
-            // TODO: check view return
+            // check views return
+            if (!isPlainObject(views))
+                fail(`views initializer should return a plain object containing views`)
             Object.keys(views).forEach(key => {
                 // is this a computed property?
                 const descriptor = Object.getOwnPropertyDescriptor(views, key)
@@ -176,8 +226,13 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         return this.extend({ initializers: [viewInitializer] })
     }
 
-    preProcessSnapshot<T>(preProcessor: (snapshot: T) => S): IModelType<S, T> {
-        return this.extend({ preProcessor })
+    preProcessSnapshot(preProcessor: (snapshot: any) => S): IModelType<S, T> {
+        const currentPreprocessor = this.preProcessor
+        if (!currentPreprocessor) return this.extend({ preProcessor })
+        else
+            return this.extend({
+                preProcessor: snapshot => currentPreprocessor(preProcessor(snapshot))
+            })
     }
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
@@ -195,14 +250,22 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     }
 
     createNewInstance = () => {
-        const instance = new this.modelConstructor()
-        extendShallowObservable(instance, {})
+        const instance = observable.shallowObject(EMPTY_OBJECT)
+        addHiddenFinalProp(instance, "toString", objectTypeToString)
         return instance as Object
     }
 
     finalizeNewInstance = (node: Node, snapshot: any) => {
         const instance = node.storedValue as IStateTreeNode
-        this.forAllProps(prop => prop.initialize(instance, snapshot))
+        this.forAllProps((name, type) => {
+            extendShallowObservable(instance, {
+                [name]: observable.ref(
+                    type.instantiate(node, name, node._environment, snapshot[name])
+                )
+            })
+            extras.interceptReads(node.storedValue, name, node.unbox)
+        })
+
         this.initializers.reduce((self, fn) => fn(self), instance)
         intercept(instance, change => this.willChange(change))
         observe(instance, this.didChange)
@@ -210,61 +273,39 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getStateTreeNode(change.object)
+        const type = this.properties[change.name]
         node.assertWritable()
-        return this.parsedProperties[change.name].willChange(change)
+        typecheck(type, change.newValue)
+        change.newValue = type.reconcile(node.getChildNode(change.name), change.newValue)
+        return change
     }
 
     didChange = (change: IObjectChange) => {
-        this.parsedProperties[change.name].didChange(change)
-    }
-
-    parseModelProps() {
-        const { properties } = this
-        for (let key in properties)
-            if (hasOwnProperty(properties, key)) {
-                if (HOOK_NAMES.indexOf(key) !== -1)
-                    console.warn(
-                        `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
-                    )
-
-                const descriptor = Object.getOwnPropertyDescriptor(properties, key)
-                if ("get" in descriptor) {
-                    fail("Getters are not supported as properties. Please use views instead")
-                }
-                const { value } = descriptor
-                if (value === null || undefined) {
-                    fail(
-                        "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
-                    )
-                } else if (isPrimitive(value)) {
-                    const baseType = getPrimitiveFactoryFromValue(value)
-                    this.parsedProperties[key] = new ValueProperty(key, optional(baseType, value))
-                } else if (isType(value)) {
-                    this.parsedProperties[key] = new ValueProperty(key, value)
-                } else if (typeof value === "function") {
-                    fail("Functions are not supported as properties, use views instead")
-                } else if (typeof value === "object") {
-                    fail(
-                        `In property '${key}': base model's should not contain complex values: '${value}'`
-                    )
-                } else {
-                    fail(`Unexpected value for property '${key}'`)
-                }
-            }
+        const node = getStateTreeNode(change.object)
+        node.emitPatch(
+            {
+                op: "replace",
+                path: escapeJsonPath(change.name),
+                value: change.newValue.snapshot,
+                oldValue: change.oldValue ? change.oldValue.snapshot : undefined
+            },
+            node
+        )
     }
 
     getChildren(node: Node): Node[] {
         const res: Node[] = []
-        this.forAllProps(prop => {
-            if (prop instanceof ValueProperty) res.push(prop.getValueNode(node.storedValue))
+        this.forAllProps((name, type) => {
+            res.push(this.getChildNode(node, name))
         })
         return res
     }
 
     getChildNode(node: Node, key: string): Node {
-        if (!(this.parsedProperties[key] instanceof ValueProperty))
-            return fail("Not a value property: " + key)
-        return (this.parsedProperties[key] as ValueProperty).getValueNode(node.storedValue)
+        if (!(key in this.properties)) return fail("Not a value property: " + key)
+        const childNode = node.storedValue.$mobx.values[key].value // TODO: blegh!
+        if (!childNode) return fail("Node not available for property " + key)
+        return childNode
     }
 
     getValue(node: Node): any {
@@ -272,8 +313,12 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     }
 
     getSnapshot(node: Node): any {
-        const res = {}
-        this.forAllProps(prop => prop.serialize(node.storedValue, res))
+        const res = {} as any
+        this.forAllProps((name, type) => {
+            // TODO: FIXME, make sure the observable ref is used!
+            ;(extras.getAtom(node.storedValue, name) as any).reportObserved()
+            res[name] = this.getChildNode(node, name).snapshot
+        })
         if (typeof node.storedValue.postProcessSnapshot === "function")
             return node.storedValue.postProcessSnapshot.call(null, res)
         return res
@@ -289,9 +334,8 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     applySnapshot(node: Node, snapshot: any): void {
         const s = this.applySnapshotPreProcessor(snapshot)
         typecheck(this, s)
-        // TODO: check that there are no superfluos properties!
-        this.forAllProps(prop => {
-            prop.deserialize(node.storedValue, s)
+        this.forAllProps((name, type) => {
+            node.storedValue[name] = s[name]
         })
     }
 
@@ -301,7 +345,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     }
 
     getChildType(key: string): IType<any, any> {
-        return (this.parsedProperties[key] as ValueProperty).type
+        return this.properties[key]
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
@@ -312,28 +356,25 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         }
 
         return flattenTypeErrors(
-            Object.keys(this.parsedProperties).map(path =>
-                this.parsedProperties[path].validate(snapshot, context)
+            this.propertiesNames.map(key =>
+                this.properties[key].validate(
+                    snapshot[key],
+                    getContextForPath(context, key, this.properties[key])
+                )
             )
         )
     }
 
-    private forAllProps(fn: (o: Property) => void) {
-        // optimization: persists keys or loop more efficiently
-        Object.keys(this.parsedProperties).forEach(key => fn(this.parsedProperties[key]))
+    private forAllProps(fn: (name: string, type: IType<any, any>) => void) {
+        this.propertiesNames.forEach(key => fn(key, this.properties[key]))
     }
 
     describe() {
-        // TODO: make proptypes responsible
         // optimization: cache
         return (
             "{ " +
-            Object.keys(this.parsedProperties)
-                .map(key => {
-                    const prop = this.parsedProperties[key]
-                    return prop instanceof ValueProperty ? key + ": " + prop.type.describe() : ""
-                })
-                .filter(Boolean)
+            this.propertiesNames
+                .map(key => key + ": " + this.properties[key].describe())
                 .join("; ") +
             " }"
         )
@@ -359,7 +400,7 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
     actions<A extends { [name: string]: Function }>(
         fn: (self: T & IStateTreeNode) => A
     ): IModelType<S, T & A>
-    preProcessSnapshot<T>(fn: (snapshot: T) => S): IModelType<S, T>
+    preProcessSnapshot(fn: (snapshot: any) => S): IModelType<S, T>
 }
 
 export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }
@@ -410,6 +451,12 @@ export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
 export function compose(...args: any[]): IModelType<any, any> {
     // TODO: just join the base type names if no name is provided
     const typeName: string = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+    // check all parameters
+    if (process.env.NODE_ENV !== "production") {
+        args.forEach(type => {
+            if (!isType(type)) fail("expected a mobx-state-tree type, got " + type + " instead")
+        })
+    }
     return (args as ObjectType<any, any>[])
         .reduce((prev, cur) =>
             prev.extend({

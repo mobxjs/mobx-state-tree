@@ -45,12 +45,10 @@ export class CoreType<S, T> extends Type<S, T> {
  * @export
  * @alias types.string
  * @example
- * ```javascript
  * const Person = types.model({
  *   firstName: types.string,
  *   lastName: "Doe"
  * })
- * ```
  */
 // tslint:disable-next-line:variable-name
 export const string: ISimpleType<string> = new CoreType<string, string>(
@@ -66,12 +64,10 @@ export const string: ISimpleType<string> = new CoreType<string, string>(
  * @export
  * @alias types.number
  * @example
- * ```javascript
  * const Vector = types.model({
  *   x: types.number,
  *   y: 0
  * })
- * ```
  */
 // tslint:disable-next-line:variable-name
 export const number: ISimpleType<number> = new CoreType<number, number>(
@@ -87,12 +83,10 @@ export const number: ISimpleType<number> = new CoreType<number, number>(
  * @export
  * @alias types.boolean
  * @example
- * ```javascript
  * const Thing = types.model({
  *   isCool: types.boolean,
  *   isAwesome: false
  * })
- * ```
  */
 // tslint:disable-next-line:variable-name
 export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean>(
@@ -131,13 +125,11 @@ export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, und
  * @export
  * @alias types.Date
  * @example
- * ```javascript
  * const LogLine = types.model({
  *   timestamp: types.Date,
  * })
  *
  * LogLine.create({ timestamp: new Date() })
- * ```
  */
 // tslint:disable-next-line:variable-name
 export const DatePrimitive: IType<number, Date> = new CoreType<number, Date>(

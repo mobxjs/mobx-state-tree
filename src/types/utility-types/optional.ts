@@ -1,7 +1,8 @@
 import { Type, IType } from "../type"
-import { TypeFlags } from "../type-flags"
+import { TypeFlags, isType } from "../type-flags"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess } from "../type-checker"
 import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
+import { fail } from "../../utils"
 
 export type IFunctionReturn<T> = () => T
 export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>
@@ -43,9 +44,8 @@ export class OptionalValue<S, T> extends Type<S, T> {
     }
 
     private getDefaultValue() {
-        const defaultValue = typeof this.defaultValue === "function"
-            ? this.defaultValue()
-            : this.defaultValue
+        const defaultValue =
+            typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
         if (typeof this.defaultValue === "function") typecheck(this, defaultValue)
         return defaultValue
     }
@@ -75,7 +75,6 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => 
  * Applying a snapshot in which the optional value is _not_ present, causes the value to be reset
  *
  * @example
- * ```javascript
  * const Todo = types.model({
  *   title: types.optional(types.string, "Test"),
  *   done: types.optional(types.boolean, false),
@@ -84,18 +83,22 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => 
  *
  * // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
  * const todo = Todo.create({ title: "Get coffee "})
- * ```
  *
  * @export
  * @alias types.optional
  */
 export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): IType<S, T> {
-    const defaultValue = typeof defaultValueOrFunction === "function"
-        ? defaultValueOrFunction()
-        : defaultValueOrFunction
-    const defaultSnapshot = isStateTreeNode(defaultValue)
-        ? getStateTreeNode(defaultValue).snapshot
-        : defaultValue
-    typecheck(type, defaultSnapshot)
+    if (process.env.NODE_ENV !== "production") {
+        if (!isType(type))
+            fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
+        const defaultValue =
+            typeof defaultValueOrFunction === "function"
+                ? defaultValueOrFunction()
+                : defaultValueOrFunction
+        const defaultSnapshot = isStateTreeNode(defaultValue)
+            ? getStateTreeNode(defaultValue).snapshot
+            : defaultValue
+        typecheck(type, defaultSnapshot)
+    }
     return new OptionalValue(type, defaultValueOrFunction)
 }

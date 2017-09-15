@@ -19,11 +19,15 @@ export class Node {
     private _isAlive = true // optimization: use binary flags for all these switches
     private _isDetaching = false
 
-    readonly middlewares: IMiddleWareHandler[] = []
+    readonly middlewares: IMiddlewareHandler[] = []
     private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
-    private readonly patchSubscribers: ((patches: IReversibleJsonPatch) => void)[] = []
+    // TODO: split patches in two; patch and reversePatch
+    private readonly patchSubscribers: ((
+        patch: IJsonPatch,
+        reversePatch: IJsonPatch
+    ) => void)[] = []
     private readonly disposers: (() => void)[] = []
-    applyPatches: (patches: IReversibleJsonPatch[]) => void
+    applyPatches: (patches: IJsonPatch[]) => void
     applySnapshot: (snapshot: any) => void
 
     constructor(
@@ -31,21 +35,25 @@ export class Node {
         parent: Node | null,
         subpath: string,
         environment: any,
-        storedValue: any
+        initialValue: any,
+        createNewInstance: (initialValue: any) => any = identity,
+        finalizeNewInstance: (node: Node, initialValue: any) => void = noop
     ) {
         this.type = type
         this._parent = parent
         this.subpath = subpath
-        this.storedValue = storedValue
         this._environment = environment
         this.unbox = this.unbox.bind(this)
+        this.storedValue = createNewInstance(initialValue)
+
+        const canAttachTreeNode = canAttachNode(this.storedValue)
 
         // Optimization: this does not need to be done per instance
         // if some pieces from createActionInvoker are extracted
         this.applyPatches = createActionInvoker(
             this.storedValue,
             "@APPLY_PATCHES",
-            (patches: IReversibleJsonPatch[]) => {
+            (patches: IJsonPatch[]) => {
                 patches.forEach(patch => {
                     const parts = splitJsonPath(patch.path)
                     const node = this.resolvePath(parts.slice(0, -1))
@@ -63,6 +71,30 @@ export class Node {
                 return this.type.applySnapshot(this, snapshot)
             }
         ).bind(this.storedValue)
+
+        if (!parent) this.identifierCache = new IdentifierCache()
+        if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "$treenode", this)
+
+        let sawException = true
+        try {
+            if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
+
+            this._isRunningAction = true
+            finalizeNewInstance(this, initialValue)
+            this._isRunningAction = false
+
+            if (parent) parent.root.identifierCache!.addNodeToCache(this)
+            else this.identifierCache!.addNodeToCache(this)
+
+            this.fireHook("afterCreate")
+            if (parent) this.fireHook("afterAttach")
+            sawException = false
+        } finally {
+            if (sawException) {
+                // short-cut to die the instance, to avoid the snapshot computed starting to throw...
+                this._isAlive = false
+            }
+        }
 
         // optimization: don't keep the snapshot by default alive with a reaction by default
         // in prod mode. This saves lot of GC overhead (important for e.g. React Native)
@@ -147,11 +179,11 @@ export class Node {
         // so we treat leading ../ apart...
         let current: Node | null = this
         for (let i = 0; i < pathParts.length; i++) {
-            if (
-                pathParts[i] === "" // '/bla' or 'a//b' splits to empty strings
+            if (pathParts[i] === "") current = current!.root
+            else if (
+                pathParts[i] === ".." // '/bla' or 'a//b' splits to empty strings
             )
-                current = current!.root
-            else if (pathParts[i] === "..") current = current!.parent
+                current = current!.parent
             else if (pathParts[i] === "." || pathParts[i] === "") continue
             else if (current) {
                 current = current.getChildNode(pathParts[i])
@@ -245,29 +277,24 @@ export class Node {
         this.snapshotSubscribers.forEach((f: Function) => f(snapshot))
     }
 
-    applyPatchLocally(subpath: string, patch: IReversibleJsonPatch): void {
+    applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.assertWritable()
         this.type.applyPatchLocally(this, subpath, patch)
     }
 
-    public onPatch(
-        onPatch: (patch: IReversibleJsonPatch) => void,
-        includeOldValue: boolean
-    ): IDisposer {
-        return registerEventHandler(
-            this.patchSubscribers,
-            includeOldValue ? onPatch : (patch: IReversibleJsonPatch) => onPatch(stripPatch(patch))
-        )
+    public onPatch(handler: (patch: IJsonPatch, reversePatch: IJsonPatch) => void): IDisposer {
+        return registerEventHandler(this.patchSubscribers, handler)
     }
 
-    emitPatch(patch: IReversibleJsonPatch, source: Node) {
+    emitPatch(basePatch: IReversibleJsonPatch, source: Node) {
         if (this.patchSubscribers.length) {
-            const localizedPatch: IReversibleJsonPatch = extend({}, patch, {
-                path: source.path.substr(this.path.length) + "/" + patch.path // calculate the relative path of the patch
+            const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, {
+                path: source.path.substr(this.path.length) + "/" + basePatch.path // calculate the relative path of the patch
             })
-            this.patchSubscribers.forEach(f => f(localizedPatch))
+            const [patch, reversePatch] = splitPatch(localizedPatch)
+            this.patchSubscribers.forEach(f => f(patch, reversePatch))
         }
-        if (this.parent) this.parent.emitPatch(patch, source)
+        if (this.parent) this.parent.emitPatch(basePatch, source)
     }
 
     setParent(newParent: Node | null, subpath: string | null = null) {
@@ -309,8 +336,7 @@ export class Node {
         return this.parent!.isRunningAction()
     }
 
-    addMiddleWare(handler: IMiddleWareHandler) {
-        // TODO: check / warn if not protected?
+    addMiddleWare(handler: IMiddlewareHandler) {
         return registerEventHandler(this.middlewares, handler)
     }
 
@@ -441,34 +467,16 @@ export function createNode<S, T>(
         targetNode.setParent(parent, subpath)
         return targetNode
     }
-    const instance = createNewInstance(initialValue)
-    const canAttachTreeNode = canAttachNode(instance)
     // tslint:disable-next-line:no_unused-variable
-    const node = new Node(type, parent, subpath, environment, instance)
-    if (!parent) node.identifierCache = new IdentifierCache()
-    if (canAttachTreeNode) addHiddenFinalProp(instance, "$treenode", node)
-
-    let sawException = true
-    try {
-        if (canAttachTreeNode) addReadOnlyProp(instance, "toJSON", toJSON)
-
-        node._isRunningAction = true
-        finalizeNewInstance(node, initialValue)
-        node._isRunningAction = false
-
-        if (parent) parent.root.identifierCache!.addNodeToCache(node)
-        else node.identifierCache!.addNodeToCache(node)
-
-        node.fireHook("afterCreate")
-        if (parent) node.fireHook("afterAttach")
-        sawException = false
-        return node
-    } finally {
-        if (sawException) {
-            // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-            ;(node as any)._isAlive = false
-        }
-    }
+    return new Node(
+        type,
+        parent,
+        subpath,
+        environment,
+        initialValue,
+        createNewInstance,
+        finalizeNewInstance
+    )
 }
 
 import { IType } from "../types/type"
@@ -477,10 +485,12 @@ import {
     splitJsonPath,
     joinJsonPath,
     IReversibleJsonPatch,
-    stripPatch
+    stripPatch,
+    IJsonPatch,
+    splitPatch
 } from "./json-patch"
 import { walk } from "./mst-operations"
-import { IMiddleWareHandler, createActionInvoker } from "./action"
+import { IMiddlewareHandler, createActionInvoker } from "./action"
 import {
     addReadOnlyProp,
     addHiddenFinalProp,

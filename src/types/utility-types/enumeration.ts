@@ -1,6 +1,7 @@
 import { ISimpleType } from "../type"
 import { union } from "./union"
 import { literal } from "./literal"
+import { fail } from "../../utils"
 
 // strongly typed enumeration forms (if there is a nicer way to do this in TS, PR welcome!
 // signatures are generated using following script:
@@ -54,11 +55,9 @@ export function enumeration(name: string, options: string[]): ISimpleType<string
  * (note: this methods is just sugar for a union of string literals)
  *
  * @example
- * ```javascript
  * const TrafficLight = types.model({
- *   color: types.enum("Color", ["Red", "Orange", "Green"])
+ *   color: types.enumeration("Color", ["Red", "Orange", "Green"])
  * })
- * ```
  *
  * @export
  * @alias types.enumeration
@@ -68,6 +67,13 @@ export function enumeration(name: string, options: string[]): ISimpleType<string
  */
 export function enumeration(name: string | string[], options?: any): ISimpleType<any> {
     const realOptions: string[] = typeof name === "string" ? options! : name
+    // check all options
+    if (process.env.NODE_ENV !== "production") {
+        realOptions.forEach(option => {
+            if (typeof option !== "string")
+                fail("expected all options to be string, got " + type + " instead")
+        })
+    }
     const type = union(...realOptions.map(option => literal("" + option)))
     if (typeof name === "string") type.name = name
     return type

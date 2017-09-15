@@ -303,7 +303,7 @@ export function union(
 ): IType<any, any>
 
 /**
- * types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambigously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+ * types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
  *
  * @export
  * @alias types.union
@@ -317,6 +317,18 @@ export function union(
 ): IType<any, any> {
     const dispatcher = isType(dispatchOrType) ? null : dispatchOrType
     const types = isType(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
-    const name = types.map(type => type.name).join(" | ")
+    const name = "(" + types.map(type => type.name).join(" | ") + ")"
+
+    // check all options
+    if (process.env.NODE_ENV !== "production") {
+        types.forEach(type => {
+            if (!isType(type))
+                fail(
+                    "expected all possible types to be a mobx-state-tree type, got " +
+                        type +
+                        " instead"
+                )
+        })
+    }
     return new Union(name, types, dispatcher)
 }
