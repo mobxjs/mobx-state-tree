@@ -316,6 +316,26 @@ test("it correctly reconciliate when swapping", t => {
     t.deepEqual(s.todos.map(getPath), ["/todos/0", "/todos/1"])
 })
 
+test("it correctly reconciliate when swapping using snapshots", t => {
+    const Task = types.model("Task", {})
+    const Store = types.model({
+        todos: types.optional(types.array(Task), [])
+    })
+    const s = Store.create()
+    unprotect(s)
+    const a = Task.create()
+    const b = Task.create()
+    s.todos.push(a, b)
+    s.todos.replace([getSnapshot(b), getSnapshot(a)])
+    t.true(s.todos[0] === b)
+    t.true(s.todos[1] === a)
+    t.deepEqual(s.todos.map(getPath), ["/todos/0", "/todos/1"])
+    s.todos.push({})
+    t.true(s.todos[0] === b)
+    t.true(s.todos[1] === a)
+    t.deepEqual(s.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2"])
+})
+
 test("it should not be allowed to add the same item twice to the same store", t => {
     const Task = types.model("Task", {})
     const Store = types.model({
