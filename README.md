@@ -834,7 +834,7 @@ Thanks to function hoisting in combination with `types.late`, this lets you have
 
 ### Simulate inheritance by using type composition
 
-There is no notion of inheritance in MST. The recommended approach is to keep references to the original configuration of a model in order to compose it into a new one, for example by using `types.compose` (which combines two types) or producing fresh types using `.props|.views|.actions`. So a classical animal inheritance could be expressed using composition as follows:
+There is no notion of inheritance in MST. The recommended approach is to keep references to the original configuration of a model in order to compose it into a new one, for example by using `types.compose` (which combines two types) or producing fresh types using `.props|.views|.actions`. An example of classical inheritance could be expressed using composition as follows:
 
 ```javascript
 const Square = types
