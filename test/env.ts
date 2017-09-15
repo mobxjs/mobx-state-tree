@@ -60,7 +60,7 @@ test("it is not possible to assign instance with a different environment than th
     unprotect(store)
     t.throws(
         () => store.todos.push(todo),
-        "[mobx-state-tree] A state tree cannot be made part of another state tree as long as they have different environments."
+        "[mobx-state-tree] A state tree cannot be made part of another state tree as long as their environments are different."
     )
 })
 
