@@ -18,7 +18,7 @@ import {
     isStateTreeNode,
     IStateTreeNode
 } from "../../core"
-import { addHiddenFinalProp, fail, isMutable, isArray } from "../../utils"
+import { addHiddenFinalProp, fail, isMutable, isArray, isPlainObject } from "../../utils"
 import { ComplexType, IComplexType, IType } from "../type"
 import { TypeFlags, isType } from "../type-flags"
 import {
@@ -250,85 +250,116 @@ function reconcileArrayChildren<T>(
     newValues: T[],
     newPaths: (string | number)[]
 ): Node[] {
-    const res = new Array(newValues.length)
-    const nodesToBeKilled: { [nodeId: string]: Node | undefined } = {}
-    const oldNodesByIdentifier: {
-        [identifierAttribute: string]: {
-            [identifier: string]: Node
-        }
-    } = {}
+    let oldNode: Node,
+        newValue: any,
+        hasNewNode = false,
+        oldMatch: Node | undefined = undefined
 
-    function findReconcilationCandidates(snapshot: any): Node | null {
-        for (let attr in oldNodesByIdentifier) {
-            const id = snapshot[attr]
-            if (
-                (typeof id === "string" || typeof id === "number") &&
-                oldNodesByIdentifier[attr][id]
-            )
-                return oldNodesByIdentifier[attr][id]
-        }
-        return null
-    }
+    for (let i = 0; ; i++) {
+        oldNode = oldNodes[i]
+        newValue = newValues[i]
 
-    // Investigate which values we could reconcile, and mark them all as potentially dead
-    oldNodes.forEach(oldNode => {
-        if (oldNode.identifierAttribute)
-            (oldNodesByIdentifier[oldNode.identifierAttribute] ||
-                (oldNodesByIdentifier[oldNode.identifierAttribute] = {}))[
-                oldNode.identifier!
-            ] = oldNode
-        nodesToBeKilled[oldNode.nodeId] = oldNode
-    })
-
-    // Prepare new values, try to reconcile
-    newValues.forEach((newValue, index) => {
         // for some reason, instead of newValue we got a node, fallback to the storedValue
         // TODO: https://github.com/mobxjs/mobx-state-tree/issues/340#issuecomment-325581681
         if (newValue instanceof Node) newValue = newValue.storedValue
 
-        // ensure the value is valid-ish
-        typecheck(childType, newValue)
+        hasNewNode = i <= newValues.length - 1
 
-        const subPath = "" + newPaths[index]
-        if (isStateTreeNode(newValue)) {
-            // A tree node...
-            const childNode = getStateTreeNode(newValue)
-            childNode.assertAlive()
-            if (childNode.parent === parent) {
-                // Came from this array already
-                if (!nodesToBeKilled[childNode.nodeId]) {
-                    // this node is owned by this parent, but not in the reconcilable set, so it must be double
-                    fail(
-                        `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${subPath}', but it lives already at '${childNode.path}'`
-                    )
-                }
-                nodesToBeKilled[childNode.nodeId] = undefined
-                childNode.setParent(parent, subPath)
-                res[index] = childNode // reuse node
-            } else {
-                // Lives somewhere else (note that instantiate might still reconcile for complex types!)
-                res[index] = childType.instantiate(parent, subPath, undefined, newValue)
+        // both are empty, end
+        if (!oldNode && !hasNewNode) {
+            break
+            // new one does not exists, old one dies
+        } else if (!hasNewNode) {
+            oldNode.die()
+            oldNodes.splice(i, 1)
+            i--
+            // there is no old node, create it
+        } else if (!oldNode) {
+            // check if already belongs to the same parent. if so, avoid pushing item in. only swapping can occur.
+            if (isStateTreeNode(newValue) && getStateTreeNode(newValue).parent === parent) {
+                // this node is owned by this parent, but not in the reconcilable set, so it must be double
+                fail(
+                    `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${newPaths[
+                        i
+                    ]}', but it lives already at '${getStateTreeNode(newValue).path}'`
+                )
             }
-        } else if (isMutable(newValue)) {
-            // The snapshot of a tree node, try to reconcile based on id
-            const reconcilationCandidate = findReconcilationCandidates(newValue)
-            if (reconcilationCandidate) {
-                const childNode = childType.reconcile(reconcilationCandidate, newValue)
-                nodesToBeKilled[reconcilationCandidate.nodeId] = undefined
-                childNode.setParent(parent, subPath)
-                res[index] = childNode
-            } else {
-                res[index] = childType.instantiate(parent, subPath, undefined, newValue)
-            }
+            oldNodes.splice(i, 0, valueAsNode(childType, parent, "" + newPaths[i], newValue))
+            // both are the same, reconcile
+        } else if (areSame(oldNode, newValue)) {
+            oldNodes[i] = valueAsNode(childType, parent, "" + newPaths[i], newValue, oldNode)
+            // nothing to do, try to reorder
         } else {
-            // create a fresh MST node
-            res[index] = childType.instantiate(parent, subPath, undefined, newValue)
+            oldMatch = undefined
+
+            // find a possible candidate to reuse
+            for (let j = i; j < oldNodes.length; j++) {
+                if (areSame(oldNodes[j], newValue)) {
+                    oldMatch = oldNodes.splice(j, 1)[0]
+                    break
+                }
+            }
+
+            oldNodes.splice(
+                i,
+                0,
+                valueAsNode(childType, parent, "" + newPaths[i], newValue, oldMatch)
+            )
         }
-    })
+    }
 
-    // Kill non reconciled values
-    for (let key in nodesToBeKilled)
-        if (nodesToBeKilled[key] !== undefined) nodesToBeKilled[key]!.die()
+    return oldNodes
+}
 
-    return res
+// convert a value to a node at given parent and subpath. attempts to reuse old node if possible and given
+function valueAsNode(
+    childType: IType<any, any>,
+    parent: Node,
+    subpath: string,
+    newValue: any,
+    oldNode?: Node
+) {
+    // ensure the value is valid-ish
+    typecheck(childType, newValue)
+
+    // the new value has a MST node
+    if (isStateTreeNode(newValue)) {
+        const childNode = getStateTreeNode(newValue)
+        childNode.assertAlive()
+
+        // the node lives here
+        if (childNode.parent !== null && childNode.parent === parent) {
+            childNode.setParent(parent, subpath)
+            if (oldNode && oldNode !== childNode) oldNode.die()
+            return childNode
+        }
+    }
+    // there is old node and new one is a value/snapshot
+    if (oldNode) {
+        const childNode = childType.reconcile(oldNode, newValue)
+        childNode.setParent(parent, subpath)
+        return childNode
+    }
+    // nothing to do, create from scratch
+    const childNode = childType.instantiate(parent, subpath, parent._environment, newValue)
+    return childNode
+}
+
+// given a value
+function areSame(oldNode: Node, newValue: any) {
+    // the new value has the same node
+    if (isStateTreeNode(newValue)) {
+        return getStateTreeNode(newValue) === oldNode
+    }
+    // the provided value is the snapshot of the old node
+    if (isMutable(newValue) && oldNode.snapshot === newValue) return true
+    // new value is a snapshot with the correct identifier
+    if (
+        oldNode.identifier !== null &&
+        oldNode.identifierAttribute &&
+        isPlainObject(newValue) &&
+        newValue[oldNode.identifierAttribute] === oldNode.identifier
+    )
+        return true
+    return false
 }
