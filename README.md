@@ -423,6 +423,7 @@ Some interesting properties of snapshots:
 -   Snapshots can be transported
 -   Snapshots can be used to update models or restore them to a particular state
 -   Snapshots are automatically converted to models when needed. So the two following statements are equivalent: `store.todos.push(Todo.create({ title: "test" }))` and `store.todos.push({ title: "test" })`.
+
 Useful methods:
 
 -   `getSnapshot(model)`: returns a snapshot representing the current state of the model
