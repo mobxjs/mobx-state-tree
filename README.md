@@ -806,7 +806,7 @@ The following service can generate MST models based on JSON: https://transform.n
 
 `types.optional` can take an optional function parameter which will be invoked each time a default value is needed. This is useful to generate timestamps, identifiers or even complex objects, for example:
 
-`createdDate: types.optional(types.date, () => new Date())`
+`createdDate: types.optional(types.Date, () => new Date())`
 
 ### `toJSON()` for debugging
 
