@@ -423,6 +423,7 @@ Some interesting properties of snapshots:
 -   Snapshots can be transported
 -   Snapshots can be used to update models or restore them to a particular state
 -   Snapshots are automatically converted to models when needed. So the two following statements are equivalent: `store.todos.push(Todo.create({ title: "test" }))` and `store.todos.push({ title: "test" })`.
+
 Useful methods:
 
 -   `getSnapshot(model)`: returns a snapshot representing the current state of the model
@@ -621,7 +622,7 @@ When creating a new state tree it is possible to pass in environment specific da
 This object should be (shallowly) immutable and can be accessed by any model in the tree by calling `getEnv(this)`.
 
 This is useful to inject environment, or test-specific utilities like a transport layer, loggers etc. This is a very useful to mock behavior in unit tests or provide instantiated utilities to models without requiring singleton modules.
-See also the (bookshop example)[https://github.com/mobxjs/mobx-state-tree/blob/a4f25de0c88acf0e239acb85e690e91147a8f0f0/examples/bookshop/src/stores/ShopStore.test.js#L9] for inspiration.
+See also the [bookshop example](https://github.com/mobxjs/mobx-state-tree/blob/a4f25de0c88acf0e239acb85e690e91147a8f0f0/examples/bookshop/src/stores/ShopStore.test.js#L9) for inspiration.
 
 ```javascript
 import { types, getEnv } from "mobx-state-tree"
