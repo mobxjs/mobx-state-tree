@@ -1,6 +1,6 @@
 # 0.12.0
 
-* **BREAKING** The redux utilities are no longer part of the core package, but need to be imported from `mobx/middleware/redux`.
+* **BREAKING** The redux utilities are no longer part of the core package, but need to be imported from `mobx-state-tree/middleware/redux`.
 
 # 0.11.0
 
