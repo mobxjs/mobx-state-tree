@@ -767,7 +767,7 @@ This type will always produce [observable maps](https://mobx.js.org/refguide/map
 
 ```javascript
 const Todo = types.model({
-  id: types.identifier,
+  id: types.identifier(types.number),
   task: types.string
 })
 
@@ -775,10 +775,11 @@ const TodoStore = types.model({
   todos: types.map(Todo)
 })
 
-const s = TodoStore.create({ todos: [] })
+const s = TodoStore.create({ todos: {} })
+unprotect(s)
 s.todos.set(17, { task: "Grab coffee", id: 17 })
 s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the identifier
-console.log(s.todos.get(17)) // prints: "Grab coffee"
+console.log(s.todos.get(17).task) // prints: "Grab coffee"
 ```
 
 Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;S>, IObservableArray&lt;T>>** 
