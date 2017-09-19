@@ -59,8 +59,8 @@ test("it possible to assign instance with the same environment as the parent to 
     unprotect(store)
     store.todos.push(todo)
     t.true(store.todos.length === 1)
-    t.true(getEnv(store.todos) === getEnv(store.todos[0])
-    t.true(getEnv(todo) === getEnv(store.todos[0])
+    t.true(getEnv(store.todos) === getEnv(store.todos[0]))
+    t.true(getEnv(todo) === getEnv(store.todos[0]))
 })
 
 test("it is not possible to assign instance with a different environment than the parent to a tree", t => {
