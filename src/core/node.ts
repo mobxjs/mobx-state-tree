@@ -239,6 +239,7 @@ export class Node {
         this.patchSubscribers.splice(0)
         this._isAlive = false
         this._parent = null
+        this.subpath = ""
 
         // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
         // we could express this in a much nicer way
