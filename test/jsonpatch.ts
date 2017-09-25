@@ -343,3 +343,19 @@ test("it should apply deep patches to objects", t => {
         ]
     )
 })
+
+test("it should correctly escape/unescape json patches", t => {
+    const AppStore = types.model({
+        items: types.map(types.frozen)
+    })
+
+    testPatches(
+        t,
+        AppStore,
+        { items: {} },
+        store => {
+            store.items.set("with/slash~tilde", 1)
+        },
+        [{ op: "add", path: "/items/with~0slash~1tilde", value: 1 }]
+    )
+})

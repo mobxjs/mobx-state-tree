@@ -63,7 +63,7 @@ export function escapeJsonPath(str: string) {
  * unescape slashes and backslashes
  */
 export function unescapeJsonPath(str: string) {
-    return str.replace(/~0/g, "\\").replace(/~1/g, "~")
+    return str.replace(/~0/g, "/").replace(/~1/g, "~")
 }
 
 export function joinJsonPath(path: string[]): string {
