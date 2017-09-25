@@ -299,20 +299,22 @@ export class Node {
 
     setParent(newParent: Node | null, subpath: string | null = null) {
         if (this.parent === newParent && this.subpath === subpath) return
-        if (this._parent && newParent && newParent !== this._parent) {
-            fail(
-                `A node cannot exists twice in the state tree. Failed to add ${this} to path '${newParent.path}/${subpath}'.`
-            )
-        }
-        if (!this._parent && newParent && newParent.root === this) {
-            fail(
-                `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`
-            )
-        }
-        if (!this._parent && !!this._environment) {
-            fail(
-                `A state tree that has been initialized with an environment cannot be made part of another state tree.`
-            )
+        if (newParent) {
+            if (this._parent && newParent !== this._parent) {
+                fail(
+                    `A node cannot exists twice in the state tree. Failed to add ${this} to path '${newParent.path}/${subpath}'.`
+                )
+            }
+            if (!this._parent && newParent.root === this) {
+                fail(
+                    `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`
+                )
+            }
+            if (!this._parent && !!this._environment && this._environment !== newParent._environment) {
+                fail(
+                    `A state tree cannot be made part of another state tree as long as their environments are different.`
+                )
+            }
         }
         if (this.parent && !newParent) {
             this.die()

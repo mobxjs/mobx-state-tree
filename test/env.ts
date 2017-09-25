@@ -52,14 +52,26 @@ test("detach should preserve environment", t => {
     t.is(todo.description, "test")
 })
 
-test("it is not possible to assign instance with environment to a tree", t => {
+test("it possible to assign instance with the same environment as the parent to a tree", t => {
     const env = createEnvironment()
     const store = Store.create({ todos: [] }, env)
     const todo = Todo.create({}, env)
     unprotect(store)
+    store.todos.push(todo)
+    t.true(store.todos.length === 1)
+    t.true(getEnv(store.todos) === getEnv(store.todos[0]))
+    t.true(getEnv(todo) === getEnv(store.todos[0]))
+})
+
+test("it is not possible to assign instance with a different environment than the parent to a tree", t => {
+    const env1 = createEnvironment()
+    const env2 = createEnvironment()
+    const store = Store.create({ todos: [] }, env1)
+    const todo = Todo.create({}, env2)
+    unprotect(store)
     t.throws(
         () => store.todos.push(todo),
-        "[mobx-state-tree] A state tree that has been initialized with an environment cannot be made part of another state tree."
+        "[mobx-state-tree] A state tree cannot be made part of another state tree as long as their environments are different."
     )
 })
 
