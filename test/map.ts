@@ -283,7 +283,7 @@ test("it should not throw when removing a non existing item from a map", t => {
     })
 })
 
-test.cb("it should get map keys from reversePatch when deleted an item from a nested map", t => {
+test("it should get map keys from reversePatch when deleted an item from a nested map", t => {
     const AppModel = types
         .model({
             value: types.map(types.map(types.map(types.number)))
@@ -296,7 +296,6 @@ test.cb("it should get map keys from reversePatch when deleted an item from a ne
     const store = AppModel.create({ value: { a: { b: { c: 10 } } } })
     onPatch(store, (patch, reversePatch) => {
         t.deepEqual(reversePatch.value, { b: { c: 10 } })
-        t.end()
     })
     store.remove("a")
 })
