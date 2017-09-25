@@ -204,22 +204,26 @@ const TodoStore = types
         todos: types.array(Todo),                     // 4
         selectedTodo: types.reference(Todo)           // 5
     })
-    .views(self => ({
-        get completedTodos() {                        // 6
-            return self.todos.filter(t => t.done)
-        },
-        findTodosByUser(user) {                       // 7
-            return self.todos.filter(t => t.assignee === user)
-        }
-    }))
-    .actions(self => ({
-        addTodo(title) {
-            self.todos.push({
-                id: Math.random(),
-                title
-            })
-        }
-    }))
+    .views(self => {
+    	return {
+	    get completedTodos() {                    // 6
+	        return self.todos.filter(t => t.done)
+	    },
+	    findTodosByUser(user) {                   // 7
+	        return self.todos.filter(t => t.assignee === user)
+	    }
+	};
+    })
+    .actions(self => {
+        return {
+            addTodo(title) {
+                self.todos.push({
+                    id: Math.random(),
+                    title
+                })
+            }
+	};
+    })
 ```
 
 When defining a model, it is advised to give the model a name for debugging purposes (see `// 1`).
@@ -231,6 +235,9 @@ The _properties_ argument is a key-value set where each key indicates the introd
 2. A primitive. Using a primitive as type is syntactic sugar for introducing a property with a default value. See `// 3`, `endpoint: "http://localhost"` is the same as `endpoint: types.optional(types.string, "http://localhost")`. The primitive type is inferred from the default value. Properties with a default value can be omitted in snapshots.
 3. A [computed property](https://mobx.js.org/refguide/computed-decorator.html), see `// 6`. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is possible to provide a setter for a computed property as well. A setter should always invoke an action.
 4. A view function (see `// 7`). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but its value can be tracked by MobX nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.
+
+_Tip: `(self) => ({ action1() { }, action2() { }})` is ES6 syntax for `function (self) { return { action1: function() { }, action2: function() { } }}`, in other words; it's short way of directly returning an object literal.
+For that reason a comma between each member of a model is mandatory, unlike classes which are syntactically a totally different concept._
 
 `types.model` creates a chainable model type, where each chained method produces a new type:
 * `.named(name)` clones the current type, but gives it a new name
@@ -268,9 +275,6 @@ const TodoStore = types
 It is perfectly fine to chain multiple `views`, `props` calls etc in arbitrary order. This can be a great way to structure complex types, mix-in utility functions etc. Each call in the chain creates a new, immutable type which can itself be stored and reused as part of other types, etc.
 
 It is also possible to define lifecycle hooks in the _actions_ object, these are actions with a predefined name that are run at a specific moment. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel).
-
-_Tip: `(self) => ({ action1() { }, action2() { }})` is ES6 syntax for `function (self) { return { action1: function() { }, action2: function() { } }}`, in other words; it's short way of directly returning an object literal.
-For that reason a comma between each member of a model is mandatory, unlike classes which are syntactically a totally different concept._
 
 ### Tree semantics in detail
 
@@ -958,6 +962,64 @@ const Todo = types.model({
     }))
 
 type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { title: string; setTitle: (v: string) => void }
+```
+
+Sometimes you'll need to take into account where your typings are available and where they aren't. The code below will not compile: TypeScript will complain that `self.upperProp` is not a known property. Computed properties are only available after `.views` is evaluated.
+
+```typescript
+const Example = types
+  .model('Example', {
+    prop: types.string,
+  })
+  .views(self => ({
+    get upperProp(): string {
+      return self.prop.toUpperCase();
+    },
+    get twiceUpperProp(): string {
+      return self.upperProp + self.upperProp;
+    },
+  }));
+```
+
+You can circumvent this situation by decaring the views in two steps:
+
+```typescript
+const Example = types
+  .model('Example', { prop: types.string })
+  .views(self => ({
+    get upperProp(): string {
+      return self.prop.toUpperCase();
+    },
+  }))
+  .views(self => ({
+    get twiceUpperProp(): string {
+      return self.upperProp + self.upperProp;
+    },
+  }));
+```
+
+Another approach would be to use helper functions, as demonstrated in the following code. This definition allows for circular references, but is more verbose.
+
+```typescript
+const Example = types
+  .model('Example', { prop: types.string })
+  .views(self => {
+    function upperProp(): string {
+      return self.prop.toUpperCase();
+    }
+    function twiceUpperProp(): string {
+      return upperProp() + upperProp();
+    }
+
+    return {
+      get upperProp(): string {
+        return upperProp();
+      },
+      get twiceUpperProp(): string {
+        return twiceUpperProp();
+      },
+    };
+  });
 ```
 
 ### How does MST compare to Redux
