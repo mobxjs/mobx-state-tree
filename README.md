@@ -586,7 +586,7 @@ However, sometimes you need to keep track of temporary, non-persistable state. T
 
 Volatile state (which is also private) can be introduced by creating variables inside any of the action initializer functions.
 
-Volatile is preserved for the life-time of an object, and not reset when snapshots are applied etc. Note that the life time of an object depends on proper reconciliation, see the [how does reconciliation work?](#how_does_reconciliation_work) section below.
+Volatile is preserved for the life-time of an object, and not reset when snapshots are applied etc. Note that the life time of an object depends on proper reconciliation, see the [how does reconciliation work?](#how-does-reconciliation-work) section below.
 
 The following is an example of an object with volatile state. Note that volatile state here is used to track a XHR request, and clean up resources when it is disposed. Without volatile state this kind of information would need to be stored in an external WeakMap or something similar.
 
@@ -619,7 +619,7 @@ Some tips:
 
 1. Note that multiple `actions` calls can be chained. This makes it possible to create multiple closures with their own protected volatile state.
 1. Although in the above example the `pendingRequest` could be initialized directly in the action initializer, it is recommended to do this in the `afterCreate` hook, which will only once the entire instance has been set up (there might be many action and property initializers for a single type).
-1. The above example doesn't actually use the promise. For how to work with promises / asynchronous processes, see the [asynchronous actions](#asynchronous_actions) section above.
+1. The above example doesn't actually use the promise. For how to work with promises / asynchronous processes, see the [asynchronous actions](#asynchronous-actions) section above.
 
 ## Dependency injection
 
