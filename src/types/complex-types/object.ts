@@ -39,6 +39,7 @@ import {
 } from "../type-checker"
 import { getPrimitiveFactoryFromValue, undefinedType } from "../primitives"
 import { optional } from "../utility-types/optional"
+import { createProcessSpawner } from "../../core/process"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 
@@ -174,6 +175,16 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
             return self
         }
         return this.extend({ initializers: [actionInitializer] })
+    }
+
+    processes<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A> {
+        return this.actions((self: T) => {
+            const actions = fn(self)
+            Object.keys(actions).forEach((name: string) => {
+                actions[name] = createProcessSpawner(name, actions[name])
+            })
+            return actions
+        })
     }
 
     named(name: string): IModelType<S, T> {
@@ -398,6 +409,9 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
     //props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
     views<V extends Object>(fn: (self: T & IStateTreeNode) => V): IModelType<S, T & V>
     actions<A extends { [name: string]: Function }>(
+        fn: (self: T & IStateTreeNode) => A
+    ): IModelType<S, T & A>
+    processes<A extends { [name: string]: Function }>(
         fn: (self: T & IStateTreeNode) => A
     ): IModelType<S, T & A>
     preProcessSnapshot(fn: (snapshot: any) => S): IModelType<S, T>
