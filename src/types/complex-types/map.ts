@@ -143,13 +143,6 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                     this.verifyIdentifier(change.name, change.newValue as Node)
                 }
                 break
-            case "delete":
-                {
-                    if (node.storedValue.has(change.name)) {
-                        node.getChildNode(change.name).die()
-                    }
-                }
-                break
         }
         return change
     }
@@ -198,11 +191,15 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                     node
                 )
             case "delete":
+                // a node got deleted, get the old snapshot and make the node die
+                const oldSnapshot = change.oldValue.snapshot
+                change.oldValue.die()
+                // emit the patch
                 return void node.emitPatch(
                     {
                         op: "remove",
                         path: escapeJsonPath(change.name),
-                        oldValue: change.oldValue.snapshot
+                        oldValue: oldSnapshot
                     },
                     node
                 )

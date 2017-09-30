@@ -310,7 +310,11 @@ export class Node {
                     `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`
                 )
             }
-            if (!this._parent && !!this._environment && this._environment !== newParent._environment) {
+            if (
+                !this._parent &&
+                !!this._environment &&
+                this._environment !== newParent._environment
+            ) {
                 fail(
                     `A state tree cannot be made part of another state tree as long as their environments are different.`
                 )

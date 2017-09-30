@@ -295,7 +295,8 @@ test("it should get map keys from reversePatch when deleted an item from a neste
         }))
     const store = AppModel.create({ value: { a: { b: { c: 10 } } } })
     onPatch(store, (patch, reversePatch) => {
-        t.deepEqual(reversePatch.value, { b: { c: 10 } })
+        t.deepEqual(patch, { op: "remove", path: "/value/a" })
+        t.deepEqual(reversePatch, { op: "add", path: "/value/a", value: { b: { c: 10 } } })
     })
     store.remove("a")
 })
