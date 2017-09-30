@@ -2,6 +2,11 @@ import { action as mobxAction } from "mobx"
 
 export type IMiddlewareEventType =
     | "action"
+    | "flow_spawn"
+    | "flow_resume"
+    | "flow_resume_error"
+    | "flow_return"
+    | "flow_throw"
     | "process_spawn"
     | "process_resume"
     | "process_resume_error"

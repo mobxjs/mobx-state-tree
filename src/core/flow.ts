@@ -51,7 +51,7 @@ export function createFlowSpawner(name: string, generator: Function) {
         const args = arguments
 
         function wrap(fn: any, type: IMiddlewareEventType, arg: any) {
-            fn.$mst_middleware = (spawner as any).$mst_middleware // pick up any middleware attached to the process
+            fn.$mst_middleware = (spawner as any).$mst_middleware // pick up any middleware attached to the flow
             runWithActionContext(
                 {
                     name,
@@ -71,14 +71,14 @@ export function createFlowSpawner(name: string, generator: Function) {
             let gen: any
             const init = function asyncActionInit() {
                 gen = generator.apply(null, arguments)
-                onFulfilled(undefined) // kick off the process
+                onFulfilled(undefined) // kick off the flow
             }
             ;(init as any).$mst_middleware = (spawner as any).$mst_middleware
 
             runWithActionContext(
                 {
                     name,
-                    type: "process_spawn",
+                    type: "flow_spawn",
                     id: runId,
                     args: argsToArray(args),
                     tree: baseContext.tree,
@@ -93,11 +93,11 @@ export function createFlowSpawner(name: string, generator: Function) {
                 let ret
                 try {
                     // prettier-ignore
-                    wrap((r: any) => { ret = gen.next(r) }, "process_resume", res)
+                    wrap((r: any) => { ret = gen.next(r) }, "flow_resume", res)
                 } catch (e) {
                     // prettier-ignore
                     setImmediate(() => {
-                        wrap((r: any) => { reject(e) }, "process_throw", e)
+                        wrap((r: any) => { reject(e) }, "flow_throw", e)
                     })
                     return
                 }
@@ -109,11 +109,11 @@ export function createFlowSpawner(name: string, generator: Function) {
                 let ret
                 try {
                     // prettier-ignore
-                    wrap((r: any) => { ret = gen.throw(r) }, "process_resume_error", err) // or yieldError?
+                    wrap((r: any) => { ret = gen.throw(r) }, "flow_resume_error", err) // or yieldError?
                 } catch (e) {
                     // prettier-ignore
                     setImmediate(() => {
-                        wrap((r: any) => { reject(e) }, "process_throw", e)
+                        wrap((r: any) => { reject(e) }, "flow_throw", e)
                     })
                     return
                 }
@@ -124,7 +124,7 @@ export function createFlowSpawner(name: string, generator: Function) {
                 if (ret.done) {
                     // prettier-ignore
                     setImmediate(() => {
-                        wrap((r: any) => { resolve(r) }, "process_return", ret.value)
+                        wrap((r: any) => { resolve(r) }, "flow_return", ret.value)
                     })
                     return
                 }
