@@ -21,7 +21,7 @@ export {
     IMiddlewareHandler,
     IMiddlewareEventType
 } from "./core/action"
-export { process } from "./core/process"
+export { flow } from "./core/flow"
 export { isStateTreeNode, IStateTreeNode } from "./core/node"
 
 export {
