@@ -36,6 +36,7 @@ const METHODS = [
     "resolveIdentifier",
     "resolvePath",
     "tryResolve",
+    "typecheck",
     "types",
     "unescapeJsonPath",
     "unprotect",

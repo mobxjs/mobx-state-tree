@@ -9,7 +9,8 @@ export {
     IComplexType,
     IModelType,
     ISnapshottable,
-    IExtendedObservableMap
+    IExtendedObservableMap,
+    typecheckPublic as typecheck
 } from "./types"
 
 export * from "./core/mst-operations"

@@ -1,6 +1,11 @@
-# 1.0.0
+# 1.0.1
 
 * `getEnv` will return an empty object instead of throwing when a tree was initialized without environment
+* exposed `typecheck(type, value)` as public api (will ignore environment flags)
+
+# 1.0.0
+
+No changes
 
 # 0.12.0
 

@@ -86,13 +86,20 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
 export function typecheck(type: IType<any, any>, value: any): void {
     // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
     if (process.env.NODE_ENV === "production") return
+    typecheckPublic(type, value)
+}
 
-    const errors = type.validate(value, [
-        {
-            path: "",
-            type
-        }
-    ])
+/**
+ * Run's the typechecker on the given type.
+ * Throws if the given value is not according the provided type specification.
+ *
+ * @alias typecheck
+ * @export
+ * @param {IType<any, any>} type
+ * @param {*} value
+ */
+export function typecheckPublic(type: IType<any, any>, value: any): void {
+    const errors = type.validate(value, [{ path: "", type }])
 
     if (errors.length > 0) {
         fail(
