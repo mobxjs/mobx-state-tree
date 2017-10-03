@@ -243,6 +243,7 @@ export class Node {
 
         // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
         // we could express this in a much nicer way
+        // TODO: should be possible to obtain id's still...
         Object.defineProperty(this.storedValue, "$mobx", {
             get() {
                 fail(
