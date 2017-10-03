@@ -139,6 +139,75 @@ if (timeTraveller.canUndo)
 // etc
 ```
 
+---
+
+# UndoManager
+
+The `UndoManager` model is quite similar to the `TimeTraveller`. However, it has a few unique features.
+Because it records patches instead of snapshots, it is better capable in dealing with concurrency and asynchronous processes.
+These improvements make it actually useful to implement end-user undo / redo:
+
+Differences with `TimeTraveller`:
+
+1. An undo state is only comitted if the process is finished. An ongoing process cannot be undone
+2. `undo` reverts the whole process, it doesn't just go back to the snapshots
+3. Failing processes do not add an undo state, rather they are rolled back automatically
+4. Multiple concurrent processes only undo their own changes, not the changes caused by other actions like snapshots would
+5. `UndoManager.withoutUndo(() => { /* stuff */ })` can be used to not record undo states for certain actions. E.g. when receiving changes from the server.
+
+`UndoManager` exposes the following api:
+
+* `canUndo: boolean`
+* `canRedo: boolean`
+* `undo()`
+* `redo()`
+* `history: { patches: [], inversePatches [] }[]`: array with all recorded states
+* `withoutUndo(() => { /* stuff */ })` can be used to not record undo states for certain actions
+
+For an in-depth explanation why undo / redo should be patch based, and not based on snapshots, see the second half of the React Next talk: [MobX-state-tree, React but for data](https://www.youtube.com/watch?v=xfC_xEA8Z1M&index=6&list=PLMYVq3z1QxSqq6D7jxVdqttOX7H_Brq8Z)
+
+Setup again is very similar to `TimeTraveller`.
+`UndoManager` automatically records all the actions in a tree it is part of, and no further target needs to be specified.
+
+```javascript
+import UndoManager from "mobx-state-tree/middleware/UndoManager"
+
+export const Store = types
+    .model({
+        todos: types.array(Todo),
+        history: types.optional(UndoManager, {})
+    })
+
+const store = Store.create()
+
+// later:
+if (store.history.canUndo)
+    store.history.undo()
+// etc
+```
+
+To record the changes in another tree, use the following setup:
+
+```javascript
+import UndoManager from "mobx-state-tree/middleware/UndoManager"
+
+export const Store = types
+    .model({
+        todos: types.array(Todo),
+
+    })
+
+const store = Store.create()
+const undoManager = UndoManager.create({}, { targetStore: store })
+
+// later:
+if (undoManager.canUndo)
+    undoManager.undo()
+// etc
+```
+
+---
+
 # redux
 
 The Redux 'middleware' is not literally middleware, but provides two useful methods for Redux interoperability:

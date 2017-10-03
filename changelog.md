@@ -3,6 +3,7 @@
 * `getEnv` will return an empty object instead of throwing when a tree was initialized without environment
 * exposed `typecheck(type, value)` as public api (will ignore environment flags)
 * Introduced `createActionTrackingMiddleware` to simplify the creation of middleware that support complex async processes
+* Added the middlewares `atomic` and types `TimeTraveller`, `UndoManager`. Check out the [docs](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/middleware.md)!
 
 # 1.0.0
 
