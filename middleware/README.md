@@ -6,7 +6,7 @@ The source of each middleware can be found in this github directory, you are enc
 The middlewares are bundled separately to keep the core package small, and can be included using:
 
 
-```
+```javascript
 import MiddleWarename from "mobx-state-tree/middleware/middlewarename"
 ```
 
@@ -25,7 +25,7 @@ The middlewares must be written in valid ES5. `.spec` files will be run automati
 
 This is the most basic of middlewares: It logs all _direct_ action invocations. Example:
 
-```
+```javascript
 import logger from "mobx-state-tree/middleware/simple-action-logger"
 
 // .. type definitions ...
@@ -43,6 +43,47 @@ store.todos[0].setTitle("hello world")
 ```
 
 For a more sophisticated logger, see [process-logger](#process-logger) which also logs process invocations and continuations
+
+---
+
+# atomic
+
+This middleware rolls back if an (asynchronous) action process fails.
+
+The exception itself is not eaten, but any modifications that are made during the (async) action will be rollback, by reverse applying any pending patches. Can be connected to a model by using either `addMiddleware` or `decoratore`
+
+Example:
+
+```javascript
+import { types, addMiddleware, process } from "mobx-state-tree"
+import atomic form "mobx-state-tree/middleware/atomic"
+
+const TestModel = types
+    .model({
+        z: 1
+    })
+    .actions(self => {
+        addMiddleware(self, atomic)
+
+        return {
+            inc: process(function*(x) {
+                yield delay(2)
+                self.z += x
+                yield delay(2)
+                self.z += x
+                throw "Oops"
+            })
+        }
+    })
+
+const m = TestModel.create()
+m.inc(3).catch(error => {
+    t.is(error, "Oops")
+    t.is(m.z, 1) // Not 7! The change was rolled back
+})
+```
+
+---
 
 # redux
 
