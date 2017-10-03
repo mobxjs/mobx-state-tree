@@ -1,4 +1,4 @@
-import { types, destroy } from "mobx-state-tree"
+import { types, destroy, getRoot } from "mobx-state-tree"
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from "../constants/TodoFilters"
 
 const filterType = types.union(...[SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE].map(types.literal))
@@ -16,7 +16,7 @@ const Todo = types
     })
     .actions(self => ({
         remove() {
-            destroy(self)
+            getRoot(self).removeTodo(self)
         },
         edit(text) {
             self.text = text
@@ -50,6 +50,9 @@ const TodoStore = types
                 id,
                 text
             })
+        },
+        removeTodo(todo) {
+            destroy(todo)
         },
         completeAll() {
             const areAllMarked = self.todos.every(todo => todo.completed)
