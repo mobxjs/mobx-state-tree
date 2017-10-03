@@ -2,7 +2,7 @@ const mst = require("..")
 const test = require("ava").test
 const sinon = require("sinon")
 
-const logger = require("./simple-action-logger")
+const logger = require("./simple-action-logger").default
 
 test.beforeEach(t => {
     t.context.log = console.log
