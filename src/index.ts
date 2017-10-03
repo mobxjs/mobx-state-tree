@@ -32,3 +32,5 @@ export {
     ISerializedActionCall,
     recordActions
 } from "./middlewares/on-action"
+
+export { createActionTrackingMiddleware } from "./middlewares/create-action-tracking-middleware"

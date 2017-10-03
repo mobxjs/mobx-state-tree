@@ -7,6 +7,7 @@ const METHODS = [
     "applyAction",
     "applyPatch",
     "applySnapshot",
+    "createActionTrackingMiddleware",
     "clone",
     "decorate",
     "destroy",
