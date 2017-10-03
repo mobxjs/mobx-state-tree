@@ -1,3 +1,7 @@
+# 1.0.0
+
+* `getEnv` will return an empty object instead of throwing when a tree was initialized without environment
+
 # 0.12.0
 
 * **BREAKING** The redux utilities are no longer part of the core package, but need to be imported from `mobx-state-tree/middleware/redux`.
