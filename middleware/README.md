@@ -85,6 +85,60 @@ m.inc(3).catch(error => {
 
 ---
 
+# TimeTraveller
+
+This built in model can be used as stand alone store or as part of your state tree and adds time travelling capabilities.
+It records all emitted snapshots by a tree and exposes the following methods / views:
+
+* `canUndo: boolean`
+* `canRedo: boolean`
+* `undo()`
+* `redo()`
+* `history`: array with all recorded states
+
+The state of the TimeTraveller itself is stored in a Mobx state tree, meaning that you can freely snapshot your state including its history. This means that it is possible to store your app state including the undo stack in for example local storage.  (but beware that stringify-ing will not benefit from structural sharing).
+
+Usage inside a state tree:
+
+```javascript
+import TimeTraveller from "mobx-state-tree/middleware/TimeTraveller"
+
+export const Store = types
+    .model({
+        todos: types.array(Todo),
+        history: types.optional(TimeTraveller, { targetPath: "../todos" })
+    })
+
+const store = Store.create()
+
+// later:
+if (store.history.canUndo)
+    store.history.undo()
+// etc
+```
+
+Note that the `targetPath` is a path relative to the `TimeTraveller` instance that will indicate which part of the tree will be snapshotted. Please make sure the targetPath doesn't point to a parent of the time traveller, as that would start recording it's own history..... In other words, `targetPath: "../"` -> Boom💥
+
+To instantiate the `TimeTraveller` as a stand-alone state tree, pass in the the store through context:
+
+```javascript
+import TimeTraveller from "mobx-state-tree/middleware/TimeTraveller"
+
+export const Store = types
+    .model({
+        todos: types.array(Todo),
+
+    })
+
+const store = Store.create()
+const timeTraveller = TimeTraveller.create({}, { targetStore: store })
+
+// later:
+if (timeTraveller.canUndo)
+    timeTraveller.undo()
+// etc
+```
+
 # redux
 
 The Redux 'middleware' is not literally middleware, but provides two useful methods for Redux interoperability:
