@@ -1,14 +1,10 @@
-import React, { Component, PropTypes } from "react"
+import React, { Component } from "react"
 import TodoItem from "./TodoItem"
 import Footer from "./Footer"
 import { observer } from "mobx-react"
 
 export default observer(
     class MainSection extends Component {
-        static propTypes = {
-            store: PropTypes.object.isRequired
-        }
-
         handleClearCompleted = () => {
             this.props.store.clearCompleted()
         }

@@ -1,3 +1,14 @@
+# 1.0.1
+
+* `getEnv` will return an empty object instead of throwing when a tree was initialized without environment
+* exposed `typecheck(type, value)` as public api (will ignore environment flags)
+* Introduced `createActionTrackingMiddleware` to simplify the creation of middleware that support complex async processes
+* Added the middlewares `atomic` and types `TimeTraveller`, `UndoManager`. Check out the [docs](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/middleware.md)!
+
+# 1.0.0
+
+No changes
+
 # 0.12.0
 
 * **BREAKING** The redux utilities are no longer part of the core package, but need to be imported from `mobx-state-tree/middleware/redux`.

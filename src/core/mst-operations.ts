@@ -607,6 +607,8 @@ export function addDisposer(target: IStateTreeNode, disposer: () => void) {
  * Returns the environment of the current state tree. For more info on environments,
  * see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
  *
+ * Returns an empty environment if the tree wasn't initialized with an environment
+ *
  * @export
  * @param {IStateTreeNode} target
  * @returns {*}
@@ -619,10 +621,7 @@ export function getEnv<T = any>(target: IStateTreeNode): T {
     }
     const node = getStateTreeNode(target)
     const env = node.root._environment
-    if (!!!env)
-        fail(
-            `Node '${node}' is not part of state tree that was initialized with an environment. Environment can be passed as second argumentt to .create()`
-        )
+    if (!!!env) return EMPTY_OBJECT as T
     return env
 }
 
@@ -648,6 +647,6 @@ export function walk(target: IStateTreeNode, processor: (item: IStateTreeNode) =
 import { IObservableArray, ObservableMap } from "mobx"
 import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"
 import { IJsonPatch, splitJsonPath } from "./json-patch"
-import { IDisposer, fail, asArray } from "../utils"
+import { asArray, EMPTY_OBJECT, fail, IDisposer } from "../utils"
 import { ISnapshottable, IType } from "../types/type"
 import { isType } from "../types/type-flags"

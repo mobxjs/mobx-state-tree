@@ -20,6 +20,7 @@ import { frozen } from "./utility-types/frozen"
 import { boolean, DatePrimitive, number, string, undefinedType, nullType } from "./primitives"
 import { late } from "./utility-types/late"
 import { enumeration } from "./utility-types/enumeration"
+import { typecheckPublic } from "./type-checker"
 
 export {
     IType,
@@ -28,7 +29,8 @@ export {
     IModelType,
     ISnapshottable,
     IExtendedObservableMap,
-    TypeFlags
+    TypeFlags,
+    typecheckPublic
 }
 
 export const types = {

@@ -1,14 +1,10 @@
-import React, { Component, PropTypes } from "react"
+import React, { Component } from "react"
 import classnames from "classnames"
 import TodoTextInput from "./TodoTextInput"
 import { observer } from "mobx-react"
 
 export default observer(
     class TodoItem extends Component {
-        static propTypes = {
-            todo: PropTypes.object.isRequired
-        }
-
         state = {
             editing: false
         }

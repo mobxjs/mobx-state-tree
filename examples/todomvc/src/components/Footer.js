@@ -1,4 +1,4 @@
-import React, { PropTypes, Component } from "react"
+import React, { Component } from "react"
 import classnames from "classnames"
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from "../constants/TodoFilters"
 import { observer } from "mobx-react"
@@ -11,10 +11,6 @@ const FILTER_TITLES = {
 
 export default observer(
     class Footer extends Component {
-        static propTypes = {
-            store: PropTypes.object.isRequired
-        }
-
         renderTodoCount() {
             const { activeCount } = this.props.store
             const itemWord = activeCount === 1 ? "item" : "items"
