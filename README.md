@@ -127,7 +127,7 @@ This makes it even possible to connect the Redux devtools to MST. See the [Redux
 Finally, MST has built-in support for references, identifiers, dependency injection, change recording and circular type definitions (even across files).
 Even fancier: it analyses liveliness of objects, failing early when you try to access accidentally cached information! (More on that later)
 
-A pretty unique feature of MST is that it offers liveliness guarantees; it will throw when reading or writing from objects that are for no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
+A pretty unique feature of MST is that it offers liveliness guarantees; it will throw when reading or writing from objects that are no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
 
 ```javascript
 const oldTodo = store.todos[0]
