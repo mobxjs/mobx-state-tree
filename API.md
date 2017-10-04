@@ -597,6 +597,7 @@ Returns **any**
 
 Run's the typechecker on the given type.
 Throws if the given value is not according the provided type specification.
+Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
 
 **Parameters**
 

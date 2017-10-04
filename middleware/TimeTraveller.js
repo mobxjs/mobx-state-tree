@@ -49,7 +49,7 @@ const TimeTraveller = types
                 // TODO: check if targetStore doesn't contain self
                 // if (contains(targetStore, self)) throw new Error("TimeTraveller shouldn't be recording itself. Please specify a sibling as taret, not some parent")
                 // start listening to changes
-                snapshotDisposer = onSnapshot(targetStore, todos => self.addUndoState(todos))
+                snapshotDisposer = onSnapshot(targetStore, snapshot => self.addUndoState(snapshot))
                 // record an initial state if no known
                 if (self.history.length === 0) self.addUndoState(getSnapshot(targetStore))
             },

@@ -1,9 +1,20 @@
 # 1.0.1
 
-* `getEnv` will return an empty object instead of throwing when a tree was initialized without environment
-* exposed `typecheck(type, value)` as public api (will ignore environment flags)
-* Introduced `createActionTrackingMiddleware` to simplify the creation of middleware that support complex async processes
+
+### Features
+
 * Added the middlewares `atomic` and types `TimeTraveller`, `UndoManager`. Check out the [docs](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/middleware.md)!
+* Introduced `createActionTrackingMiddleware` to simplify the creation of middleware that support complex async processes
+* exposed `typecheck(type, value)` as public api (will ignore environment flags)
+
+### Improvements
+
+* `getEnv` will return an empty object instead of throwing when a tree was initialized without environment
+* Fixed issue where patches generated for nested maps were incorrect (#396)
+* Fixed the escaping of (back)slashes in JSON paths (#405)
+* Improved the algorithm that reconcile items in an array (#384)
+* Assigning a node that has an environment to a parent is now allowed, as long as the environment is strictly the same (#387)
+* Many minor documentation improvements. Thanks everybody who created a PR!
 
 # 1.0.0
 
