@@ -148,7 +148,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return this.cloneAndEnhance({ initializers: [actionInitializer] })
     }
 
-    instantiateActions(self, actions) {
+    instantiateActions(self: T, actions: { [name: string]: Function }) {
         // check if return is correct
         if (!isPlainObject(actions))
             fail(`actions initializer should return a plain object containing actions`)
@@ -212,7 +212,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return this.cloneAndEnhance({ initializers: [viewInitializer] })
     }
 
-    instantiateViews(self, views) {
+    instantiateViews(self: T, views: Object) {
         // check views return
         if (!isPlainObject(views))
             fail(`views initializer should return a plain object containing views`)
