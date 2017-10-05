@@ -54,7 +54,7 @@ function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
 }
 
-export type ObjectTypeConfig = {
+export type ModelTypeConfig = {
     name?: string
     properties?: { [K: string]: IType<any, any> }
     initializers?: ReadonlyArray<((instance: any) => any)>
@@ -108,8 +108,7 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
     }, properties as any)
 }
 
-// TODO: rename to Model
-export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S, T> {
+export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, T> {
     readonly flags = TypeFlags.Object
 
     /*
@@ -120,7 +119,7 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
     private preProcessor: (snapshot: any) => any | undefined
     private readonly propertiesNames: string[]
 
-    constructor(opts: ObjectTypeConfig) {
+    constructor(opts: ModelTypeConfig) {
         super(opts.name || defaultObjectOptions.name)
         const name = opts.name || defaultObjectOptions.name
         // TODO: this test still needed?
@@ -132,8 +131,8 @@ export class ObjectType<S, T> extends ComplexType<S, T> implements IModelType<S,
         Object.freeze(this.properties) // make sure nobody messes with it
     }
 
-    extend(opts: ObjectTypeConfig): ObjectType<any, any> {
-        return new ObjectType({
+    extend(opts: ModelTypeConfig): ModelType<any, any> {
+        return new ModelType({
             name: opts.name || this.name,
             properties: Object.assign({}, this.properties, opts.properties),
             initializers: this.initializers.concat((opts.initializers as any) || []),
@@ -426,7 +425,7 @@ export function model<T = {}>(properties?: IModelProperties<T>): IModelType<Snap
 export function model(...args: any[]) {
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
     const properties = args.shift() || {}
-    return new ObjectType({ name, properties })
+    return new ModelType({ name, properties })
 }
 
 export function compose<T1, S1, T2, S2, T3, S3>(
@@ -457,7 +456,7 @@ export function compose(...args: any[]): IModelType<any, any> {
             if (!isType(type)) fail("expected a mobx-state-tree type, got " + type + " instead")
         })
     }
-    return (args as ObjectType<any, any>[])
+    return (args as ModelType<any, any>[])
         .reduce((prev, cur) =>
             prev.extend({
                 name: prev.name + "_" + cur.name,

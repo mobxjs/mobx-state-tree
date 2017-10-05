@@ -9,7 +9,7 @@ import { map, IExtendedObservableMap } from "./complex-types/map"
 import { array } from "./complex-types/array"
 import { identifier } from "./utility-types/identifier"
 // tslint:disable-next-line:no_unused-variable
-import { model, compose, IModelType } from "./complex-types/object"
+import { model, compose, IModelType } from "./complex-types/model"
 import { reference } from "./utility-types/reference"
 import { union } from "./utility-types/union"
 import { optional } from "./utility-types/optional"
