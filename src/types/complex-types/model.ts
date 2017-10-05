@@ -131,7 +131,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         Object.freeze(this.properties) // make sure nobody messes with it
     }
 
-    extend(opts: ModelTypeConfig): ModelType<any, any> {
+    cloneAndEnhance(opts: ModelTypeConfig): ModelType<any, any> {
         return new ModelType({
             name: opts.name || this.name,
             properties: Object.assign({}, this.properties, opts.properties),
@@ -142,94 +142,116 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
 
     actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A> {
         const actionInitializer = (self: T) => {
-            const actions = fn(self)
-            // check if return is correct
-            if (!isPlainObject(actions))
-                fail(`actions initializer should return a plain object containing actions`)
-            // bind actions to the object created
-            Object.keys(actions).forEach(name => {
-                // warn if preprocessor was given
-                if (name === PRE_PROCESS_SNAPSHOT)
-                    return fail(
-                        `Cannot define action '${PRE_PROCESS_SNAPSHOT}', it should be defined using 'type.preProcessSnapshot(fn)' instead`
-                    )
-
-                // apply hook composition
-                let action = actions[name]
-                let baseAction = (self as any)[name]
-                if (name in HOOK_NAMES && baseAction) {
-                    let specializedAction = action
-                    if (name === HOOK_NAMES.postProcessSnapshot)
-                        action = (snapshot: any) => specializedAction(baseAction(snapshot))
-                    else
-                        action = function() {
-                            baseAction.apply(null, arguments)
-                            specializedAction.apply(null, arguments)
-                        }
-                }
-
-                addHiddenFinalProp(self, name, createActionInvoker(self, name, action))
-            })
+            this.instantiateActions(self, fn(self))
             return self
         }
-        return this.extend({ initializers: [actionInitializer] })
+        return this.cloneAndEnhance({ initializers: [actionInitializer] })
+    }
+
+    instantiateActions(self, actions) {
+        // check if return is correct
+        if (!isPlainObject(actions))
+            fail(`actions initializer should return a plain object containing actions`)
+        // bind actions to the object created
+        Object.keys(actions).forEach(name => {
+            // warn if preprocessor was given
+            if (name === PRE_PROCESS_SNAPSHOT)
+                return fail(
+                    `Cannot define action '${PRE_PROCESS_SNAPSHOT}', it should be defined using 'type.preProcessSnapshot(fn)' instead`
+                )
+
+            // apply hook composition
+            let action = actions[name]
+            let baseAction = (self as any)[name]
+            if (name in HOOK_NAMES && baseAction) {
+                let specializedAction = action
+                if (name === HOOK_NAMES.postProcessSnapshot)
+                    action = (snapshot: any) => specializedAction(baseAction(snapshot))
+                else
+                    action = function() {
+                        baseAction.apply(null, arguments)
+                        specializedAction.apply(null, arguments)
+                    }
+            }
+
+            addHiddenFinalProp(self, name, createActionInvoker(self, name, action))
+        })
     }
 
     named(name: string): IModelType<S, T> {
-        return this.extend({ name })
+        return this.cloneAndEnhance({ name })
     }
 
     props<SP, TP>(
         properties: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
     ): IModelType<S & SP, T & TP> {
-        return this.extend({ properties } as any)
+        return this.cloneAndEnhance({ properties } as any)
+    }
+
+    extend<A extends { [name: string]: Function } = {}, V extends Object = {}>(
+        fn: (self: T & IStateTreeNode) => { actions?: A; views?: V }
+    ): IModelType<S, T & A & V> {
+        const initializer = (self: T) => {
+            const { actions, views, ...rest } = fn(self)
+            for (let key in rest)
+                fail(
+                    `The \`extend\` function should return an object with fields 'actions' and / or  'views'. Found invalid key '${key}'`
+                )
+            if (views) this.instantiateViews(self, views)
+            if (actions) this.instantiateActions(self, actions)
+            return self
+        }
+        return this.cloneAndEnhance({ initializers: [initializer] })
     }
 
     views<V extends Object>(fn: (self: T) => V): IModelType<S, T & V> {
         const viewInitializer = (self: T) => {
-            const views = fn(self)
-            // check views return
-            if (!isPlainObject(views))
-                fail(`views initializer should return a plain object containing views`)
-            Object.keys(views).forEach(key => {
-                // is this a computed property?
-                const descriptor = Object.getOwnPropertyDescriptor(views, key)
-                const { value } = descriptor
-                if ("get" in descriptor) {
-                    // TODO: mobx currently does not allow redefining computes yet, pending #1121
-                    if (isComputed((self as any).$mobx.values[key])) {
-                        // TODO: use `isComputed(self, key)`, pending mobx #1120
-                        ;(self as any).$mobx.values[key] = computed(descriptor.get!, {
-                            name: key,
-                            setter: descriptor.set,
-                            context: self
-                        })
-                    } else {
-                        const tmp = {}
-                        Object.defineProperty(tmp, key, {
-                            get: descriptor.get,
-                            set: descriptor.set,
-                            enumerable: true
-                        })
-                        extendShallowObservable(self, tmp)
-                    }
-                } else if (typeof value === "function") {
-                    // this is a view function, merge as is!
-                    addHiddenFinalProp(self, key, value)
-                } else {
-                    fail(`A view member should either be a function or getter based property`)
-                }
-            })
+            this.instantiateViews(self, fn(self))
             return self
         }
-        return this.extend({ initializers: [viewInitializer] })
+        return this.cloneAndEnhance({ initializers: [viewInitializer] })
+    }
+
+    instantiateViews(self, views) {
+        // check views return
+        if (!isPlainObject(views))
+            fail(`views initializer should return a plain object containing views`)
+        Object.keys(views).forEach(key => {
+            // is this a computed property?
+            const descriptor = Object.getOwnPropertyDescriptor(views, key)
+            const { value } = descriptor
+            if ("get" in descriptor) {
+                // TODO: mobx currently does not allow redefining computes yet, pending #1121
+                if (isComputed((self as any).$mobx.values[key])) {
+                    // TODO: use `isComputed(self, key)`, pending mobx #1120
+                    ;(self as any).$mobx.values[key] = computed(descriptor.get!, {
+                        name: key,
+                        setter: descriptor.set,
+                        context: self
+                    })
+                } else {
+                    const tmp = {}
+                    Object.defineProperty(tmp, key, {
+                        get: descriptor.get,
+                        set: descriptor.set,
+                        enumerable: true
+                    })
+                    extendShallowObservable(self, tmp)
+                }
+            } else if (typeof value === "function") {
+                // this is a view function, merge as is!
+                addHiddenFinalProp(self, key, value)
+            } else {
+                fail(`A view member should either be a function or getter based property`)
+            }
+        })
     }
 
     preProcessSnapshot(preProcessor: (snapshot: any) => S): IModelType<S, T> {
         const currentPreprocessor = this.preProcessor
-        if (!currentPreprocessor) return this.extend({ preProcessor })
+        if (!currentPreprocessor) return this.cloneAndEnhance({ preProcessor })
         else
-            return this.extend({
+            return this.cloneAndEnhance({
                 preProcessor: snapshot => currentPreprocessor(preProcessor(snapshot))
             })
     }
@@ -399,6 +421,9 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
     actions<A extends { [name: string]: Function }>(
         fn: (self: T & IStateTreeNode) => A
     ): IModelType<S, T & A>
+    extend<A extends { [name: string]: Function } = {}, V extends Object = {}>(
+        fn: (self: T & IStateTreeNode) => { actions?: A; views?: V }
+    ): IModelType<S, T & A & V>
     preProcessSnapshot(fn: (snapshot: any) => S): IModelType<S, T>
 }
 
@@ -458,7 +483,7 @@ export function compose(...args: any[]): IModelType<any, any> {
     }
     return (args as ModelType<any, any>[])
         .reduce((prev, cur) =>
-            prev.extend({
+            prev.cloneAndEnhance({
                 name: prev.name + "_" + cur.name,
                 properties: cur.properties,
                 initializers: cur.initializers

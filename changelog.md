@@ -1,3 +1,7 @@
+# 1.0.2
+
+* Introduced `modelType.extend` which allows creating views and actions with shared state.
+
 # 1.0.1
 
 
