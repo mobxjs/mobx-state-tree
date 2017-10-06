@@ -1036,6 +1036,55 @@ const Example = types
   });
 ```
 
+#### Known Typescript Issue 5938
+
+Theres a known issue with typescript and interfaces as described by: https://github.com/Microsoft/TypeScript/issues/5938
+
+This rears its ugly head if you try to define a model such as:
+
+```typescript
+import { types } from "mobx-state-tree"
+
+export const Todo = types.model({
+    title: types.string
+});
+
+export type ITodo = typeof Todo.Type
+```
+
+And you have your tsconfig.json settings set to:
+
+```json
+{
+  "compilerOptions": {
+    ...
+    "declaration": true,    
+    "noUnusedLocals": true
+    ...
+  }
+}
+```
+
+Then you will get errors such as:
+
+> error TS4023: Exported variable 'Todo' has or is using name 'IModelType' from external module "..." but cannot be named.
+
+Until Microsoft fixes this issue the solution is to re-export IModelType:
+
+```typescript
+import { types, IModelType } from "mobx-state-tree"
+
+export type __IModelType = IModelType<any,any>;
+
+export const Todo = types.model({
+    title: types.string
+});
+
+export type ITodo = typeof Todo.Type
+```
+
+It aint pretty, but it works.
+
 ### How does MST compare to Redux
 
 So far this might look a lot like an immutable state tree as found for example in Redux apps, but there are a few differences:
