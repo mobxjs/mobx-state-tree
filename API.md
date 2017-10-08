@@ -21,6 +21,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [destroy](#destroy)
 -   [detach](#detach)
 -   [escapeJsonPath](#escapejsonpath)
+-   [flow](#flow)
 -   [getChildType](#getchildtype)
 -   [getEnv](#getenv)
 -   [getParent](#getparent)
@@ -235,6 +236,16 @@ escape slashes and backslashes
 
 -   `str`  
 
+## flow
+
+See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
+
+**Parameters**
+
+-   `asyncAction`  
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
+
 ## getChildType
 
 Returns the _declared_ type of the given sub property of an object, array or map.
@@ -448,13 +459,16 @@ Returns **IDisposer**
 
 ## process
 
-See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
-
 **Parameters**
 
 -   `asyncAction`  
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
+
+**Meta**
+
+-   **deprecated**: has been renamed to `flow()`. See <https://github.com/mobxjs/mobx-state-tree/issues/399> for more information.
+
 
 ## protect
 

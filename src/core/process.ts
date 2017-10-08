@@ -41,7 +41,6 @@ export function process<A1, A2, A3, A4, A5, A6, A7, A8>(
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7, a8: A8) => Promise<any>
 /**
  * @deprecated has been renamed to `flow()`. See https://github.com/mobxjs/mobx-state-tree/issues/399 for more information.
- * See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
  *
  * @export
  * @alias process
@@ -55,9 +54,6 @@ export function process(asyncAction: any): any {
     return createProcessSpawner(asyncAction.name, asyncAction)
 }
 
-/**
- * @deprecated has been renamed to `createFlowSpawner()`. See https://github.com/mobxjs/mobx-state-tree/issues/399 for more information.
- */
 export function createProcessSpawner(name: string, generator: Function) {
     deprecated(
         "process",
