@@ -32,11 +32,11 @@ export type IMiddleWareEvent = {
 
 export type IMiddlewareEventType =
     | "action"
-    | "process_spawn"
-    | "process_resume"
-    | "process_resume_error"
-    | "process_return"
-    | "process_throw"
+    | "flow_spawn"
+    | "flow_resume"
+    | "flow_resume_error"
+    | "flow_return"
+    | "flow_throw"
 ```
 
 A very simple middleware that just logs the invocation of actions will look like:
