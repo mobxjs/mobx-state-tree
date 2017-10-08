@@ -375,10 +375,10 @@ Asynchronous actions have first class support in MST and are described in more d
 Asynchronous actions are written by using generators and always return a promise. For a real working example see the [bookshop sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A quick example to get the gist:
 
 ```javascript
-import { types, process } from "mobx-state-tree"
+import { types, flow } from "mobx-state-tree"
 
 someModel.actions(self => {
-    const fetchProjects = process(function* () { // <- note the star, this a generator function!
+    const fetchProjects = flow(function* () { // <- note the star, this a generator function!
         self.state = "pending"
         try {
             // ... yield can be used in async/await style
@@ -619,7 +619,7 @@ Some tips:
 
 1. Note that multiple `actions` calls can be chained. This makes it possible to create multiple closures with their own protected volatile state.
 1. Although in the above example the `pendingRequest` could be initialized directly in the action initializer, it is recommended to do this in the `afterCreate` hook, which will only once the entire instance has been set up (there might be many action and property initializers for a single type).
-1. The above example doesn't actually use the promise. For how to work with promises / asynchronous processes, see the [asynchronous actions](#asynchronous-actions) section above.
+1. The above example doesn't actually use the promise. For how to work with promises / asynchronous flows, see the [asynchronous actions](#asynchronous-actions) section above.
 
 ## Dependency injection
 
@@ -760,9 +760,10 @@ See the [full API docs](API.md) for more details.
 | [`applyPatch(node, jsonPatch)`](API.md#applypatch) | Applies a JSON patch, or array of patches, to a node in the tree |
 | [`applySnapshot(node, snapshot)`](API.md#applysnapshot) | Updates a node with the given snapshot |
 | [`clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone) | Creates a full clone of the given node. By default preserves the same environment |
-| [`decorate(middleware, function)`](API.md#decorate) | Attaches middleware to a specific action (or process) |
+| [`decorate(middleware, function)`](API.md#decorate) | Attaches middleware to a specific action (or flow) |
 | [`destroy(node)`](API.md#destroy) | Kills `node`, making it unusable. Removes it from any parent in the process |
 | [`detach(node)`](API.md#detach) | Removes `node` from its current parent, and lets it live on as standalone tree |
+| [`flow(generator)`](API.md#flow) | creates an asynchronous flow based on a generator function |
 | [`getChildType(node, property?)`](API.md#getchildtype) | Returns the declared type of the given `property` of `node`. For arrays and maps `property` can be omitted as they all have the same type |
 | [`getEnv(node)`](API.md#getenv) | Returns the environment of `node`, see [environments](#environments) |
 | [`getParent(node, depth=1)`](API.md#getparent) | Returns the intermediate parent of the `node`, or a higher one if `depth > 1` |
@@ -781,7 +782,7 @@ See the [full API docs](API.md) for more details.
 | [`onAction(node, (actionDescription) => void)`](API.md#onaction) | A built-in middleware that calls the provided callback with an action description upon each invocation. Returns disposer |
 | [`onPatch(node, (patch) => void)`](API.md#onpatch) | Attach a JSONPatch listener, that is invoked for each change in the tree. Returns disposer |
 | [`onSnapshot(node, (snapshot, inverseSnapshot) => void)`](API.md#onsnapshot) | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer |
-| [`process(generator)`](API.md#process) | creates an asynchronous process based on a generator function |
+| [`process(generator)`](API.md#process) | `DEPRECATED` – replaced with [flow](API.md#flow) |
 | [`protect(node)`](API.md#protect) | Protects an unprotected tree against modifications from outside actions |
 | [`recordActions(node)`](API.md#recordactions) | Creates a recorder that listens to all actions in `node`. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
 | [`recordPatches(node)`](API.md#recordpatches) | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree |
@@ -930,9 +931,9 @@ Likewise, if your application is mainly dealing with stateless information (such
 
 If an object is reconciled, the consequence is that localState is preserved and `postCreate` / `attach` life-cycle hooks are not fired because applying a snapshot results just in an existing tree node being updated.
 
-### Creating async processes
+### Creating async flows
 
-See [creating asynchronous process](docs/async-actions.md).
+See [creating asynchronous flow](docs/async-actions.md).
 
 ### Using mobx and mobx-state-tree together
 

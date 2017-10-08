@@ -20,7 +20,7 @@ Array [
     "name": "fetchData",
     "parentId": 1,
     "rootId": 1,
-    "type": "process_spawn",
+    "type": "flow_spawn",
   },
   Object {
     "args": Array [
@@ -30,7 +30,7 @@ Array [
     "name": "fetchData",
     "parentId": 1,
     "rootId": 1,
-    "type": "process_resume",
+    "type": "flow_resume",
   },
   Object {
     "args": Array [
@@ -40,7 +40,7 @@ Array [
     "name": "fetchData",
     "parentId": 1,
     "rootId": 1,
-    "type": "process_resume",
+    "type": "flow_resume",
   },
   Object {
     "args": Array [
@@ -50,7 +50,7 @@ Array [
     "name": "fetchData",
     "parentId": 1,
     "rootId": 1,
-    "type": "process_return",
+    "type": "flow_return",
   },
 ]
 `;
@@ -75,7 +75,7 @@ Array [
     "name": "fetchData",
     "parentId": 3,
     "rootId": 3,
-    "type": "process_spawn",
+    "type": "flow_spawn",
   },
   Object {
     "args": Array [
@@ -85,7 +85,7 @@ Array [
     "name": "fetchData",
     "parentId": 3,
     "rootId": 3,
-    "type": "process_resume",
+    "type": "flow_resume",
   },
   Object {
     "args": Array [
@@ -95,7 +95,7 @@ Array [
     "name": "fetchData",
     "parentId": 3,
     "rootId": 3,
-    "type": "process_throw",
+    "type": "flow_throw",
   },
 ]
 `;
@@ -120,7 +120,7 @@ Array [
     "name": "fetchData",
     "parentId": 21,
     "rootId": 21,
-    "type": "process_spawn",
+    "type": "flow_spawn",
   },
   Object {
     "args": Array [
@@ -130,7 +130,7 @@ Array [
     "name": "fetchData",
     "parentId": 21,
     "rootId": 21,
-    "type": "process_resume",
+    "type": "flow_resume",
   },
   Object {
     "args": Array [
@@ -140,7 +140,7 @@ Array [
     "name": "uppercase",
     "parentId": 22,
     "rootId": 21,
-    "type": "process_spawn",
+    "type": "flow_spawn",
   },
   Object {
     "args": Array [
@@ -150,7 +150,7 @@ Array [
     "name": "uppercase",
     "parentId": 22,
     "rootId": 21,
-    "type": "process_resume",
+    "type": "flow_resume",
   },
   Object {
     "args": Array [
@@ -160,7 +160,7 @@ Array [
     "name": "uppercase",
     "parentId": 22,
     "rootId": 21,
-    "type": "process_resume",
+    "type": "flow_resume",
   },
   Object {
     "args": Array [
@@ -170,7 +170,7 @@ Array [
     "name": "uppercase",
     "parentId": 22,
     "rootId": 21,
-    "type": "process_return",
+    "type": "flow_return",
   },
   Object {
     "args": Array [
@@ -180,7 +180,7 @@ Array [
     "name": "fetchData",
     "parentId": 21,
     "rootId": 21,
-    "type": "process_resume",
+    "type": "flow_resume",
   },
   Object {
     "args": Array [
@@ -190,7 +190,7 @@ Array [
     "name": "fetchData",
     "parentId": 21,
     "rootId": 21,
-    "type": "process_return",
+    "type": "flow_return",
   },
 ]
 `;
@@ -301,7 +301,7 @@ Array [
     "name": "fetchData",
     "parentId": 9,
     "rootId": 9,
-    "type": "process_spawn",
+    "type": "flow_spawn",
   },
   Object {
     "args": Array [
@@ -311,7 +311,7 @@ Array [
     "name": "fetchData",
     "parentId": 9,
     "rootId": 9,
-    "type": "process_resume",
+    "type": "flow_resume",
   },
   Object {
     "args": Array [
@@ -321,7 +321,7 @@ Array [
     "name": "fetchData",
     "parentId": 9,
     "rootId": 9,
-    "type": "process_resume_error",
+    "type": "flow_resume_error",
   },
   Object {
     "args": Array [
@@ -331,7 +331,7 @@ Array [
     "name": "fetchData",
     "parentId": 9,
     "rootId": 9,
-    "type": "process_throw",
+    "type": "flow_throw",
   },
 ]
 `;
@@ -356,7 +356,7 @@ Array [
     "name": "fetchData",
     "parentId": 5,
     "rootId": 5,
-    "type": "process_spawn",
+    "type": "flow_spawn",
   },
   Object {
     "args": Array [
@@ -366,7 +366,7 @@ Array [
     "name": "fetchData",
     "parentId": 5,
     "rootId": 5,
-    "type": "process_resume",
+    "type": "flow_resume",
   },
   Object {
     "args": Array [
@@ -376,7 +376,7 @@ Array [
     "name": "fetchData",
     "parentId": 5,
     "rootId": 5,
-    "type": "process_resume_error",
+    "type": "flow_resume_error",
   },
   Object {
     "args": Array [
@@ -386,7 +386,7 @@ Array [
     "name": "fetchData",
     "parentId": 5,
     "rootId": 5,
-    "type": "process_return",
+    "type": "flow_return",
   },
 ]
 `;
@@ -411,7 +411,7 @@ Array [
     "name": "fetchData",
     "parentId": 7,
     "rootId": 7,
-    "type": "process_spawn",
+    "type": "flow_spawn",
   },
   Object {
     "args": Array [
@@ -421,7 +421,7 @@ Array [
     "name": "fetchData",
     "parentId": 7,
     "rootId": 7,
-    "type": "process_resume",
+    "type": "flow_resume",
   },
   Object {
     "args": Array [
@@ -431,7 +431,7 @@ Array [
     "name": "fetchData",
     "parentId": 7,
     "rootId": 7,
-    "type": "process_return",
+    "type": "flow_return",
   },
 ]
 `;
