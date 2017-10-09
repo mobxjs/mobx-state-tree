@@ -153,5 +153,5 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
         case "object":
             if (value instanceof Date) return DatePrimitive
     }
-    return fail("Cannot determine primtive type from value " + value)
+    return fail("Cannot determine primitive type from value " + value)
 }
