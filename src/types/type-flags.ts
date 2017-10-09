@@ -1,7 +1,7 @@
 import { IType, IComplexType } from "./type"
 import { CoreType } from "./primitives"
 import { IExtendedObservableMap } from "./complex-types/map"
-import { ObjectType } from "./complex-types/object"
+import { ModelType } from "./complex-types/model"
 import { IdentifierType } from "./utility-types/identifier"
 import { ReferenceType } from "./utility-types/reference"
 import { Refinement } from "./utility-types/refinement"
@@ -54,7 +54,7 @@ export function isMapType<S, T>(
     return isType(type) && (type.flags & TypeFlags.Map) > 0
 }
 
-export function isObjectType(type: any): type is ObjectType<any, any> {
+export function isObjectType(type: any): type is ModelType<any, any> {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 

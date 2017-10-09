@@ -7,14 +7,12 @@ import {
     onAction,
     applyPatch,
     applyAction,
-    getPath,
-    IJsonPatch,
     applySnapshot,
     getSnapshot,
     types
 } from "../src"
 import { test } from "ava"
-import { autorun } from "mobx"
+import { autorun, observable, reaction } from "mobx"
 interface ITestSnapshot {
     to: string
 }
@@ -515,4 +513,40 @@ test("it should not be possible to remove a node from a parent if it is required
     t.throws(() => {
         destroy(b.a)
     }, /Error while converting `null` to `A`/)
+})
+
+test("it should be possible to share states between views and actions using enhance", t => {
+    const A = types.model({}).extend(self => {
+        const localState = observable(3)
+        return {
+            views: {
+                get x() {
+                    return localState.get()
+                }
+            },
+            actions: {
+                setX(value) {
+                    localState.set(value)
+                }
+            }
+        }
+    })
+
+    let x = 0
+    let a = A.create()
+    const d = reaction(
+        () => a.x,
+        v => {
+            x = v
+        }
+    )
+    a.setX(7)
+    t.is(a.x, 7)
+    t.is(x, 7)
+    d()
+})
+
+test("It should throw if any other key is returned from extend", t => {
+    const A = types.model({}).extend(() => ({ stuff() {} } as any))
+    t.throws(() => A.create(), /stuff/)
 })
