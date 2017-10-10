@@ -17,10 +17,8 @@ For the exact description of all middleware events offered by MST, see the [api 
 # Contributing
 
 Feel free to contribute to these middlewares and improve them on your experience.
-The middlewares must be written in valid ES5. ES imports / exports are allowed.
-This assumes the middlewares will be packed by the consuming application, by using e.g. webpack.
-This might sound a bit aggressive, but it makes sure mobx-state-tree can be properly rolled up when depending on it.
-`.spec` files will be run automatically and individually and can leverage babel.
+The middlewares must be written in TypeScript.
+Any additional test for your middleware should be written inside the test folder
 
 ---
 

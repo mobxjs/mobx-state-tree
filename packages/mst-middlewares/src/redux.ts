@@ -1,4 +1,4 @@
-const mst = require("mobx-state-tree")
+import * as mst from "mobx-state-tree"
 
 /**
  * Creates a tiny proxy around a MST tree that conforms to the redux store api.
@@ -11,7 +11,7 @@ const mst = require("mobx-state-tree")
  * @param {...MiddleWare[]} middlewares
  * @returns {IReduxStore}
  */
-module.exports.asReduxStore = function(model, ...middlewares) {
+export const asReduxStore = function(model: mst.IStateTreeNode, ...middlewares) {
     if (!mst.isStateTreeNode(model)) throw new Error("Expected model object")
     let store = {
         getState: () => mst.getSnapshot(model),
@@ -52,7 +52,7 @@ function runMiddleWare(action, runners, next) {
  * @param {*} remoteDevDep
  * @param {*} model
  */
-module.exports.connectReduxDevtools = function connectReduxDevtools(remoteDevDep, model) {
+export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep, model) {
     // Connect to the monitor
     const remotedev = remoteDevDep.connectViaExtension()
     let applyingSnapshot = false
@@ -73,7 +73,7 @@ module.exports.connectReduxDevtools = function connectReduxDevtools(remoteDevDep
         model,
         action => {
             if (applyingSnapshot) return
-            const copy = {}
+            const copy: any = {}
             copy.type = action.name
             if (action.args) action.args.forEach((value, index) => (copy[index] = value))
             remotedev.send(copy, mst.getSnapshot(model))

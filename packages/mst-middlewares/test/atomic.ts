@@ -1,6 +1,5 @@
-require("babel-polyfill")
 import { test } from "ava"
-import atomic from "./atomic"
+import atomic from "../src/atomic"
 import { types, addMiddleware, process } from "mobx-state-tree"
 
 function delay(time) {

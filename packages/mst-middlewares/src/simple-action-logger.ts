@@ -1,5 +1,3 @@
-"use strict"
-
 import { getPath } from "mobx-state-tree"
 
 export default function simpleActionLogger(call, next) {
