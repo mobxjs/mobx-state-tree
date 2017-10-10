@@ -9,7 +9,8 @@
 		"clean": "lerna clean",
 		"build": "lerna run build",
 		"test": "lerna run test",
-		"precommit": "lint-staged"
+		"precommit": "lint-staged",
+		"coverage": "lerna run coverage"
 	},
 	"lint-staged": {
 		"*.{ts,tsx,js,jsx}": [
