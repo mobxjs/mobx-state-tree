@@ -947,17 +947,18 @@ In that case you can disable this protection by calling `unprotect` on the root 
 
 ```javascript
 const Todo = types.model({
-    done: false,
+    done: false
+}).actions(self => ({ 
     toggle() {
-        this.done = !this.done
+        self.done = !self.done
     }
-})
+}))
 
 const todo = new Todo()
-todo.done = true // OK
-protect(todo)
-todo.done = false // throws!
+todo.done = true // throws!
 todo.toggle() // OK
+unprotect(todo)
+todo.done = false // OK
 ```
 
 ## walk
