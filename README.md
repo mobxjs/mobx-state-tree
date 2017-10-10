@@ -9,17 +9,19 @@
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/mobxjs/mobx.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Introduction blog post [The curious case of MobX state tree](https://medium.com/@mweststrate/the-curious-case-of-mobx-state-tree-7b4e22d461f)
 
 > Mobx and MST are amazing pieces of software, for me it is the missing brick when you build React based apps. Thanks for the great work!
 
 Nicolas Galle [full post](https://medium.com/@nicolasgall/i-started-to-use-react-last-year-and-i-loved-it-1ce8d53fec6a)
 
 
+Introduction blog post [The curious case of MobX state tree](https://medium.com/@mweststrate/the-curious-case-of-mobx-state-tree-7b4e22d461f)
+
 # Contents
 
 * [Installation](#installation)
 * [Getting Started](docs/getting-started.md)
+* [Talks & blogs](#talks--blogs)
 * [Philosophy & Overview](#philosophy--overview)
 * [Examples](#examples)
 * [Concepts](#concepts)
@@ -56,6 +58,13 @@ Typescript typings are included in the packages. Use `module: "commonjs"` or `mo
 # Getting started
 
 See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial.
+
+# Talks & blogs
+
+* Talk React Europe 2017: [Next generation state management](https://www.youtube.com/watch?v=rwqwwn_46kA)
+* Talk ReactNext 2017: [React, but for Data](https://www.youtube.com/watch?v=xfC_xEA8Z1M&index=6&list=PLMYVq3z1QxSqq6D7jxVdqttOX7H_Brq8Z) ([slides](http://react-next-2017-slides.surge.sh/#1), [demo](https://codesandbox.io/s/8y4p23j32j))
+* Talk ReactJSDay Verona 2017: [Immutable or immutable? Both!]() ([slides](https://mweststrate.github.io/reactjsday2017-presentation/index.html#1), [demo](https://github.com/mweststrate/reatjsday2017-demo))
+* Talk ReactiveConf 2016: [Immer-mutable state management](https://www.youtube.com/watch?v=Ql8KUUUOHNc&list=PLa2ZZ09WYepMCRRGCRPhTYuTCat4TiDlX&index=30)
 
 # Philosophy & Overview
 
@@ -1078,7 +1087,7 @@ And you have your tsconfig.json settings set to:
 {
   "compilerOptions": {
     ...
-    "declaration": true,    
+    "declaration": true,
     "noUnusedLocals": true
     ...
   }
