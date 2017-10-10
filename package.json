@@ -1,12 +1,20 @@
 {
 	"devDependencies": {
 		"lerna": "^2.2.0",
-		"husky": "^0.13.4"
+		"husky": "^0.13.4",
+		"prettier": "^1.4.4",
+		"lint-staged": "^3.6.1"
 	},
 	"scripts": {
 		"clean": "lerna clean",
 		"build": "lerna run build",
 		"test": "lerna run test",
-		"precommit": "lerna run precommit"
+		"precommit": "lint-staged"
+	},
+	"lint-staged": {
+		"*.{ts,tsx,js,jsx}": [
+			"prettier --write --print-width 100 --tab-width 4 --no-semi",
+			"git add"
+		]
 	}
 }

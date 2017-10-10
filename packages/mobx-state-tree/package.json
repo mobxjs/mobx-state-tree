@@ -20,8 +20,7 @@
     "coverage": "npm run build-tests && nyc ava && nyc report -r html && nyc report -r lcov",
     "build-docs": "npm run quick-build && documentation build lib/index.js --sort-order alpha -f md -o ../../API.md.tmp && concat -o ../../API.md ../../docs/API_header.md ../../API.md.tmp && rm ../../API.md.tmp",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "clean": "rm -rf lib test-lib .nyc_output coverage",
-    "precommit": "lint-staged"
+    "clean": "rm -rf lib test-lib .nyc_output coverage"
   },
   "repository": {
     "type": "git",
@@ -44,10 +43,8 @@
     "coveralls": "^2.11.4",
     "cpr": "^2.1.0",
     "documentation": "^5.2.2",
-    "lint-staged": "^3.6.1",
     "mobx": "^3.2.2",
     "nyc": "^10.0.0",
-    "prettier": "^1.4.4",
     "rollup": "^0.43.0",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-filesize": "^1.3.2",
@@ -78,12 +75,6 @@
     ],
     "source": [
       "test-lib/src/**/*.js"
-    ]
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "prettier --write --print-width 100 --tab-width 4 --no-semi",
-      "git add"
     ]
   }
 }
