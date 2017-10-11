@@ -1,5 +1,5 @@
 import React from "react"
-import TestUtils from "react-addons-test-utils"
+import TestUtils from "react-dom/test-utils"
 import Footer from "./Footer"
 import { SHOW_ALL, SHOW_ACTIVE } from "../constants/TodoFilters"
 
