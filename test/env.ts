@@ -49,7 +49,7 @@ test("detach should preserve environment", t => {
     t.is(todo.description, "test")
 })
 
-test("it possible to assign instance with the same environment as the parent to a tree", t => {
+test("it is possible to assign instance with the same environment as the parent to a tree", t => {
     const env = createEnvironment()
     const store = Store.create({ todos: [] }, env)
     const todo = Todo.create({}, env)
@@ -72,7 +72,7 @@ test("it is not possible to assign instance with a different environment than th
     )
 })
 
-test("it possible to set a value inside a map of a map when using the same environment", t => {
+test("it is possible to set a value inside a map of a map when using the same environment", t => {
     const env = createEnvironment()
     const EmptyModel = types.model({})
     const MapOfEmptyModel = types.model({
