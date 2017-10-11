@@ -49,7 +49,7 @@ test("detach should preserve environment", t => {
     t.is(todo.description, "test")
 })
 
-test("it possible to assign instance with the same environment as the parent to a tree", t => {
+test("it is possible to assign instance with the same environment as the parent to a tree", t => {
     const env = createEnvironment()
     const store = Store.create({ todos: [] }, env)
     const todo = Todo.create({}, env)
@@ -70,6 +70,32 @@ test("it is not possible to assign instance with a different environment than th
         () => store.todos.push(todo),
         "[mobx-state-tree] A state tree cannot be made part of another state tree as long as their environments are different."
     )
+})
+
+test("it is possible to set a value inside a map of a map when using the same environment", t => {
+    const env = createEnvironment()
+    const EmptyModel = types.model({})
+    const MapOfEmptyModel = types.model({
+        map: types.map(EmptyModel)
+    })
+    const MapOfMapOfEmptyModel = types.model({
+        map: types.map(MapOfEmptyModel)
+    })
+    const mapOfMap = MapOfMapOfEmptyModel.create(
+        {
+            map: {
+                whatever: {
+                    map: {}
+                }
+            }
+        },
+        env
+    )
+    unprotect(mapOfMap)
+    // this should not throw
+    mapOfMap.map.get("whatever")!.map.set("1234", EmptyModel.create({}, env))
+    t.true(getEnv(mapOfMap) === env)
+    t.true(getEnv(mapOfMap.map.get("whatever")!.map.get("1234")!) === env)
 })
 
 test("clone preserves environnment", t => {
