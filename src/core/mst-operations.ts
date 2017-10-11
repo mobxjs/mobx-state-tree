@@ -208,17 +208,18 @@ export function protect(target: IStateTreeNode) {
  *
  * @example
  * const Todo = types.model({
- *     done: false,
+ *     done: false
+ * }).actions(self => ({
  *     toggle() {
- *         this.done = !this.done
+ *         self.done = !self.done
  *     }
- * })
+ * }))
  *
- * const todo = new Todo()
- * todo.done = true // OK
- * protect(todo)
- * todo.done = false // throws!
- * todo.toggle() // OK
+ * const todo = Todo.create()
+ * todo.done = true // throws! 
+ * todo.toggle() // OK 
+ * unprotect(todo) 
+ * todo.done = false // OK 
  */
 export function unprotect(target: IStateTreeNode) {
     // check all arguments
