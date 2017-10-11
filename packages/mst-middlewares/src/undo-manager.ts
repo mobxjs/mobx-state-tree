@@ -5,8 +5,12 @@ import {
     addMiddleware,
     applyPatch,
     getRoot,
-    createActionTrackingMiddleware
+    createActionTrackingMiddleware,
+    IStateTreeNode,
+    IModelType,
+    ISnapshottable
 } from "mobx-state-tree"
+import { IObservableArray } from "mobx"
 
 const Entry = types.model("UndoManagerEntry", {
     patches: types.frozen,
@@ -28,9 +32,9 @@ const UndoManager = types
     }))
     .actions(self => {
         let skipping = false
-        let targetStore
+        let targetStore: IStateTreeNode
         let replaying = false
-        let middlewareDisposer
+        let middlewareDisposer: () => void
 
         const undoRedoMiddleware = createActionTrackingMiddleware({
             filter: call => skipping === false && call.context !== self, // don't undo / redo undo redo :)
@@ -38,13 +42,13 @@ const UndoManager = types
             onResume: (call, recorder) => recorder.resume(),
             onSuspend: (call, recorder) => recorder.stop(),
             onSuccess: (call, recorder) => {
-                self.addUndoState(recorder)
+                ;(self as any).addUndoState(recorder)
             },
             onFail: (call, recorder) => recorder.undo()
         })
 
         return {
-            addUndoState(recorder) {
+            addUndoState(recorder: any) {
                 if (replaying) {
                     // skip recording if this state was caused by undo / redo
                     return
@@ -82,7 +86,7 @@ const UndoManager = types
                 self.undoIdx++
                 replaying = false
             },
-            withoutUndo(fn) {
+            withoutUndo(fn: () => any) {
                 try {
                     skipping = true
                     return fn()

@@ -5,8 +5,11 @@ import {
     getSnapshot,
     getEnv,
     resolvePath,
-    getPath
+    getPath,
+    ISnapshottable,
+    IModelType
 } from "mobx-state-tree"
+import { IObservableArray } from "mobx"
 
 const TimeTraveller = types
     .model("TimeTraveller", {
@@ -23,12 +26,12 @@ const TimeTraveller = types
         }
     }))
     .actions(self => {
-        let targetStore
-        let snapshotDisposer
+        let targetStore: any
+        let snapshotDisposer: any
         let skipNextUndoState = false
 
         return {
-            addUndoState(todos) {
+            addUndoState(todos: any) {
                 if (skipNextUndoState) {
                     // skip recording if this state was caused by undo / redo
                     skipNextUndoState = false
@@ -49,9 +52,11 @@ const TimeTraveller = types
                 // TODO: check if targetStore doesn't contain self
                 // if (contains(targetStore, self)) throw new Error("TimeTraveller shouldn't be recording itself. Please specify a sibling as taret, not some parent")
                 // start listening to changes
-                snapshotDisposer = onSnapshot(targetStore, snapshot => self.addUndoState(snapshot))
+                snapshotDisposer = onSnapshot(targetStore, snapshot =>
+                    (self as any).addUndoState(snapshot)
+                )
                 // record an initial state if no known
-                if (self.history.length === 0) self.addUndoState(getSnapshot(targetStore))
+                if (self.history.length === 0) (self as any).addUndoState(getSnapshot(targetStore))
             },
             beforeDestroy() {
                 snapshotDisposer()
