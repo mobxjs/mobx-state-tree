@@ -1,3 +1,7 @@
+# next
+
+* Every MST middleware is now shipped in a separate package named `mst-middlewares`. They are now written in TypeScript and fully transpiled to ES5 to avoid problems with uglifyjs in create-react-app bundling.
+
 # 1.0.2
 
 * Introduced `modelType.extend` which allows creating views and actions with shared state.

@@ -7,7 +7,7 @@ The middlewares are bundled separately to keep the core package small, and can b
 
 
 ```javascript
-import MiddleWarename from "mobx-state-tree/middleware/middlewarename"
+import {MiddlewareName} from "mst-middlewares"
 ```
 
 The middlewares serve as example and are supported on a best effort bases. The goal of these middlewares is that if they are critical to your system, you can simply copy paste them and further tailor them towards your specific needs.
@@ -27,7 +27,7 @@ Any additional test for your middleware should be written inside the test folder
 This is the most basic of middlewares: It logs all _direct_ action invocations. Example:
 
 ```javascript
-import logger from "mobx-state-tree/middleware/simple-action-logger"
+import {simpleActionLogger} from "mst-middlewares"
 
 // .. type definitions ...
 
@@ -57,7 +57,7 @@ Example:
 
 ```javascript
 import { types, addMiddleware, process } from "mobx-state-tree"
-import atomic form "mobx-state-tree/middleware/atomic"
+import {atomic} form "mst-middlewares"
 
 const TestModel = types
     .model({
@@ -102,7 +102,7 @@ The state of the TimeTraveller itself is stored in a Mobx state tree, meaning th
 Usage inside a state tree:
 
 ```javascript
-import TimeTraveller from "mobx-state-tree/middleware/TimeTraveller"
+import {TimeTraveller} from "mst-middleware"
 
 export const Store = types
     .model({
@@ -123,7 +123,7 @@ Note that the `targetPath` is a path relative to the `TimeTraveller` instance th
 To instantiate the `TimeTraveller` as a stand-alone state tree, pass in the the store through context:
 
 ```javascript
-import TimeTraveller from "mobx-state-tree/middleware/TimeTraveller"
+import {TimeTraveller} from "mst-middlewares"
 
 export const Store = types
     .model({
@@ -171,7 +171,7 @@ Setup again is very similar to `TimeTraveller`.
 `UndoManager` automatically records all the actions in a tree it is part of, and no further target needs to be specified.
 
 ```javascript
-import UndoManager from "mobx-state-tree/middleware/UndoManager"
+import {UndoManager} from "mst-middlewares"
 
 export const Store = types
     .model({
@@ -190,7 +190,7 @@ if (store.history.canUndo)
 To record the changes in another tree, use the following setup:
 
 ```javascript
-import UndoManager from "mobx-state-tree/middleware/UndoManager"
+import {UndoManager} from "mst-middlewares"
 
 export const Store = types
     .model({
