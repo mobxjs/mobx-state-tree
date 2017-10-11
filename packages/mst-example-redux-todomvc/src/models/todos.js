@@ -6,7 +6,7 @@ import {
     COMPLETE_ALL,
     CLEAR_COMPLETED
 } from "../constants/ActionTypes"
-import { types, destroy } from "mobx-state-tree"
+import { types } from "mobx-state-tree"
 
 const Todo = types.model({
     text: "Learn Redux",

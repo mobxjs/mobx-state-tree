@@ -1,4 +1,4 @@
-import { types, destroy, getRoot } from "mobx-state-tree"
+import { types, getRoot, destroy } from "mobx-state-tree"
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from "../constants/TodoFilters"
 
 const filterType = types.union(...[SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE].map(types.literal))
