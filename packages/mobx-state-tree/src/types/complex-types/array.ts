@@ -256,14 +256,13 @@ function reconcileArrayChildren<T>(
         oldMatch: Node | undefined = undefined
 
     for (let i = 0; ; i++) {
+        hasNewNode = i <= newValues.length - 1
         oldNode = oldNodes[i]
-        newValue = newValues[i]
+        newValue = hasNewNode ? newValues[i] : undefined
 
         // for some reason, instead of newValue we got a node, fallback to the storedValue
         // TODO: https://github.com/mobxjs/mobx-state-tree/issues/340#issuecomment-325581681
         if (newValue instanceof Node) newValue = newValue.storedValue
-
-        hasNewNode = i <= newValues.length - 1
 
         // both are empty, end
         if (!oldNode && !hasNewNode) {
