@@ -102,4 +102,56 @@ test("it can time travel same store and persist state", t => {
     t.is(tt2.canRedo, false)
 })
 
+const Mutable = types.union(
+    types.string,
+    types.boolean,
+    types.number,
+    types.map(types.late(() => Mutable)),
+    types.array(types.late(() => Mutable))
+)
+test("it can time travel with Mutable object", t => {
+    const M = types
+        .model({
+            mutable: Mutable
+        })
+        .actions(self => ({
+            setProp(k, v) {
+                self.mutable.set(k, v)
+            }
+        }))
+
+    const store = M.create({ mutable: {} })
+    const undoMgr = UndoManager.create({}, { targetStore: store })
+    const m = store.mutable
+
+    t.deepEqual(m.toJSON(), {})
+    t.is(undoMgr.canUndo, false)
+    t.is(undoMgr.canRedo, false)
+    t.is(undoMgr.history.length, 0)
+
+    store.setProp("foo", 1)
+    t.deepEqual(m.toJSON(), { foo: 1 })
+    t.is(undoMgr.canUndo, true)
+    t.is(undoMgr.canRedo, false)
+    t.is(undoMgr.history.length, 1)
+
+    store.setProp("foo", {})
+    t.deepEqual(m.toJSON(), { foo: {} })
+    t.is(undoMgr.canUndo, true)
+    t.is(undoMgr.canRedo, false)
+    t.is(undoMgr.history.length, 2)
+
+    undoMgr.undo()
+    t.deepEqual(m.toJSON(), { foo: 1 })
+    t.is(undoMgr.canUndo, true)
+    t.is(undoMgr.canRedo, true)
+    t.is(undoMgr.history.length, 2)
+
+    undoMgr.undo()
+    t.deepEqual(m.toJSON(), {})
+    t.is(undoMgr.canUndo, false)
+    t.is(undoMgr.canRedo, true)
+    t.is(undoMgr.history.length, 2)
+})
+
 // TODO: add test for async and interleaved processes
