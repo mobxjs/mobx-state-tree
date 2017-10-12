@@ -9,10 +9,19 @@
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/mobxjs/mobx.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+
+> Mobx and MST are amazing pieces of software, for me it is the missing brick when you build React based apps. Thanks for the great work!
+
+Nicolas Galle [full post](https://medium.com/@nicolasgall/i-started-to-use-react-last-year-and-i-loved-it-1ce8d53fec6a)
+
+
+Introduction blog post [The curious case of MobX state tree](https://medium.com/@mweststrate/the-curious-case-of-mobx-state-tree-7b4e22d461f)
+
 # Contents
 
 * [Installation](#installation)
 * [Getting Started](docs/getting-started.md)
+* [Talks & blogs](#talks--blogs)
 * [Philosophy & Overview](#philosophy--overview)
 * [Examples](#examples)
 * [Concepts](#concepts)
@@ -38,8 +47,8 @@
 
 # Installation
 
-* NPM: `npm install mobx-state-tree --save`
-* Yarn: `yarn add mobx-state-tree`
+* NPM: `npm install mobx mobx-state-tree --save`
+* Yarn: `yarn add mobx mobx-state-tree`
 * CDN: https://unpkg.com/mobx-state-tree@0.8.2/dist/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
 * Playground: [https://mattiamanzati.github.io/mobx-state-tree-playground/](https://mattiamanzati.github.io/mobx-state-tree-playground/) (with React UI, snapshots, patches and actions display)
 * CodeSandbox [TodoList demo](https://codesandbox.io/s/nZ26kGMD) fork for testing and bug reporting
@@ -49,6 +58,14 @@ Typescript typings are included in the packages. Use `module: "commonjs"` or `mo
 # Getting started
 
 See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial.
+
+# Talks & blogs
+
+* Talk React Europe 2017: [Next generation state management](https://www.youtube.com/watch?v=rwqwwn_46kA)
+* Talk ReactNext 2017: [React, but for Data](https://www.youtube.com/watch?v=xfC_xEA8Z1M&index=6&list=PLMYVq3z1QxSqq6D7jxVdqttOX7H_Brq8Z) ([slides](http://react-next-2017-slides.surge.sh/#1), [demo](https://codesandbox.io/s/8y4p23j32j))
+* Talk ReactJSDay Verona 2017: [Immutable or immutable? Both!]() ([slides](https://mweststrate.github.io/reactjsday2017-presentation/index.html#1), [demo](https://github.com/mweststrate/reatjsday2017-demo))
+* Talk React Alicante 2017: [Mutable or Immutable? Let's do both!]() ([slides](https://mattiamanzati.github.io/slides-react-alicante-2017/#2))
+* Talk ReactiveConf 2016: [Immer-mutable state management](https://www.youtube.com/watch?v=Ql8KUUUOHNc&list=PLa2ZZ09WYepMCRRGCRPhTYuTCat4TiDlX&index=30)
 
 # Philosophy & Overview
 
@@ -127,7 +144,7 @@ This makes it even possible to connect the Redux devtools to MST. See the [Redux
 Finally, MST has built-in support for references, identifiers, dependency injection, change recording and circular type definitions (even across files).
 Even fancier: it analyses liveliness of objects, failing early when you try to access accidentally cached information! (More on that later)
 
-A pretty unique feature of MST is that it offers liveliness guarantees; it will throw when reading or writing from objects that are for no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
+A pretty unique feature of MST is that it offers liveliness guarantees; it will throw when reading or writing from objects that are no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
 
 ```javascript
 const oldTodo = store.todos[0]
@@ -619,7 +636,29 @@ Some tips:
 
 1. Note that multiple `actions` calls can be chained. This makes it possible to create multiple closures with their own protected volatile state.
 1. Although in the above example the `pendingRequest` could be initialized directly in the action initializer, it is recommended to do this in the `afterCreate` hook, which will only once the entire instance has been set up (there might be many action and property initializers for a single type).
+
 1. The above example doesn't actually use the promise. For how to work with promises / asynchronous flows, see the [asynchronous actions](#asynchronous-actions) section above.
+
+1. It is possible to share volatile state between views and actions by using `extend`. `.extend` works like a combination of `.actions` and `.views` and should return an object with a `actions` and `views` field:
+
+```javascript
+const Todo =  types.model({}).extend(self => {
+    let localState = 3
+
+    return {
+        views: {
+            get x() {
+                return localState
+            }
+        },
+        actions: {
+            setX(value) {
+                localState = x
+            }
+        }
+    }
+})
+```
 
 ## Dependency injection
 
@@ -759,6 +798,7 @@ See the [full API docs](API.md) for more details.
 | [`applyAction(node, actionDescription)`](API.md#applyaction) | Replays an action on the targeted node |
 | [`applyPatch(node, jsonPatch)`](API.md#applypatch) | Applies a JSON patch, or array of patches, to a node in the tree |
 | [`applySnapshot(node, snapshot)`](API.md#applysnapshot) | Updates a node with the given snapshot |
+| [`createActionTrackingMiddleware`](API.md#createactiontrackingmiddleware) | Utility to make writing middleware that track async actions less cumbersome |
 | [`clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone) | Creates a full clone of the given node. By default preserves the same environment |
 | [`decorate(middleware, function)`](API.md#decorate) | Attaches middleware to a specific action (or flow) |
 | [`destroy(node)`](API.md#destroy) | Kills `node`, making it unusable. Removes it from any parent in the process |
@@ -788,6 +828,7 @@ See the [full API docs](API.md) for more details.
 | [`recordPatches(node)`](API.md#recordpatches) | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree |
 | [`resolve(node, path)`](API.md#resolve) | Resolves a `path` (json path) relatively to the given `node` |
 | [`splitJsonPath(path)`](API.md#splitjsonpath) | Splits and unescapes the given JSON `path` into path parts |
+| [`typecheck(type, value)`](API.md#typecheck) | Typechecks a value against a type. Throws on errors. Use this if you need typechecks even in a production build. |
 | [`tryResolve(node, path)`](API.md#tryresolve) | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
 | [`unprotect(node)`](API.md#unprotect) | Unprotects `node`, making it possible to directly modify any value in the subtree, without actions |
 | [`walk(startNode, (node) => void)`](API.md#walk) | Performs a depth-first walk through a tree |
@@ -944,6 +985,10 @@ No, or, not necessarily. An application can use both state trees and vanilla Mob
 State trees are primarily designed to store your domain data, as this kind of state is often distributed and not very local.
 For local component state, for example, vanilla MobX observables might often be simpler to use.
 
+### Can I use Hot Module Reloading?
+
+Yes, with MST it is pretty straight forward to setup hot reloading for your store definitions, while preserving state. See the [todomvc example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/todomvc/src/index.js#L60-L68)
+
 ### TypeScript & MST
 
 TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is recommended to use TypeScript 2.3 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
@@ -1023,6 +1068,55 @@ const Example = types
     };
   });
 ```
+
+#### Known Typescript Issue 5938
+
+Theres a known issue with typescript and interfaces as described by: https://github.com/Microsoft/TypeScript/issues/5938
+
+This rears its ugly head if you try to define a model such as:
+
+```typescript
+import { types } from "mobx-state-tree"
+
+export const Todo = types.model({
+    title: types.string
+});
+
+export type ITodo = typeof Todo.Type
+```
+
+And you have your tsconfig.json settings set to:
+
+```json
+{
+  "compilerOptions": {
+    ...
+    "declaration": true,
+    "noUnusedLocals": true
+    ...
+  }
+}
+```
+
+Then you will get errors such as:
+
+> error TS4023: Exported variable 'Todo' has or is using name 'IModelType' from external module "..." but cannot be named.
+
+Until Microsoft fixes this issue the solution is to re-export IModelType:
+
+```typescript
+import { types, IModelType } from "mobx-state-tree"
+
+export type __IModelType = IModelType<any,any>;
+
+export const Todo = types.model({
+    title: types.string
+});
+
+export type ITodo = typeof Todo.Type
+```
+
+It aint pretty, but it works.
 
 ### How does MST compare to Redux
 

@@ -1,6 +1,6 @@
 language: node_js
-script: npm run build && npm run coverage && npm run example-tests
+script: npm run bootstrap && npm run build && npm run test && npm run coverage
 after_success:
-  - cat ./coverage/lcov.info|./node_modules/coveralls/bin/coveralls.js
+  - cat ./packages/mobx-state-tree/coverage/lcov.info|./packages/mobx-state-tree/node_modules/coveralls/bin/coveralls.js
 node_js:
   - "6.10.1"

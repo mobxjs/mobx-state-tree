@@ -1,0 +1,34 @@
+{
+  "name": "mst-middlewares",
+  "version": "1.0.0",
+  "description": "The MST package ships with some prebuilt middlewares, which serves mainly as examples on how to write your own middleware. The source of each middleware can be found in this github directory, you are encouraged to read them!",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "tsc -p test/ && ava",
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "mobx-state-tree": "^1.0.1",
+    "mobx": "^3.3.1",
+    "typescript": "^2.4.2",
+    "sinon": "^4.0.1"
+  },
+  "peerDependencies": {
+    "mobx-state-tree": "^1.0.1",
+    "mobx": "^3.3.1"
+  },
+  "files": [
+    "lib"
+  ],
+  "ava": {
+    "files": [
+      "test-lib/test/*.js"
+    ],
+    "source": [
+      "test-lib/src/**/*.js"
+    ]
+  }
+}

@@ -1,3 +1,33 @@
+# next
+
+* Every MST middleware is now shipped in a separate package named `mst-middlewares`. They are now written in TypeScript and fully transpiled to ES5 to avoid problems with uglifyjs in create-react-app bundling.
+
+# 1.0.2
+
+* Introduced `modelType.extend` which allows creating views and actions with shared state.
+
+# 1.0.1
+
+
+### Features
+
+* Added the middlewares `atomic` and types `TimeTraveller`, `UndoManager`. Check out the [docs](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/middleware.md)!
+* Introduced `createActionTrackingMiddleware` to simplify the creation of middleware that support complex async processes
+* exposed `typecheck(type, value)` as public api (will ignore environment flags)
+
+### Improvements
+
+* `getEnv` will return an empty object instead of throwing when a tree was initialized without environment
+* Fixed issue where patches generated for nested maps were incorrect (#396)
+* Fixed the escaping of (back)slashes in JSON paths (#405)
+* Improved the algorithm that reconcile items in an array (#384)
+* Assigning a node that has an environment to a parent is now allowed, as long as the environment is strictly the same (#387)
+* Many minor documentation improvements. Thanks everybody who created a PR!
+
+# 1.0.0
+
+No changes
+
 # 0.12.0
 
 * **BREAKING** The redux utilities are no longer part of the core package, but need to be imported from `mobx-state-tree/middleware/redux`.

@@ -17,6 +17,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [ComplexType](#complextype-2)
 -   [ComplexType](#complextype-3)
 -   [ComplexType](#complextype-4)
+-   [createActionTrackingMiddleware](#createactiontrackingmiddleware)
 -   [decorate](#decorate)
 -   [destroy](#destroy)
 -   [detach](#detach)
@@ -59,6 +60,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [Type](#type-6)
 -   [Type](#type-7)
 -   [Type](#type-8)
+-   [typecheck](#typecheck)
 -   [types.array](#typesarray)
 -   [types.boolean](#typesboolean)
 -   [types.compose](#typescompose)
@@ -183,6 +185,22 @@ Returns **T**
 
 ## ComplexType
 
+## createActionTrackingMiddleware
+
+Convenience utility to create action based middleware that supports async processes more easily.
+All hooks are called for both synchronous and asynchronous actions. Except that either `onSuccess` or `onFail` is called
+
+The create middleware tracks the process of an action (assuming it passes the `filter`).
+`onResume` can return any value, which will be passed as second argument to any other hook. This makes it possible to keep state during a process.
+
+See the `atomic` middleware for an example
+
+**Parameters**
+
+-   `hooks`  
+
+Returns **IMiddlewareHandler** 
+
 ## decorate
 
 Binds middleware to a specific action
@@ -270,6 +288,8 @@ Returns **IType&lt;any, any>**
 
 Returns the environment of the current state tree. For more info on environments,
 see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
+
+Returns an empty environment if the tree wasn't initialized with an environment
 
 **Parameters**
 
@@ -586,6 +606,17 @@ Returns **any**
 ## Type
 
 ## Type
+
+## typecheck
+
+Run's the typechecker on the given type.
+Throws if the given value is not according the provided type specification.
+Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
+
+**Parameters**
+
+-   `type` **IType&lt;any, any>** 
+-   `value` **any** 
 
 ## types.array
 
