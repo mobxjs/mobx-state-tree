@@ -268,8 +268,12 @@ export class Node {
     public get snapshot() {
         if (!this._isAlive) return undefined
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
-        // Optimization: only freeze on dev builds
-        return freeze(this.type.getSnapshot(this))
+        const snapshot = this.type.getSnapshot(this)
+        // avoid any external modification in dev mode
+        if (process.env.NODE_ENV !== "production") {
+            return freeze(snapshot)
+        }
+        return snapshot
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
