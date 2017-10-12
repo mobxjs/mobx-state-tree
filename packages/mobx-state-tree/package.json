@@ -1,0 +1,80 @@
+{
+  "name": "mobx-state-tree",
+  "version": "1.0.1",
+  "description": "Opinionated, transactional, MobX powered state container",
+  "main": "dist/mobx-state-tree.js",
+  "umd:main": "dist/mobx-state-tree.umd.js",
+  "module": "dist/mobx-state-tree.module.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "npm run quick-build && cpr lib dist --delete-first --filter=\\\\.js && rollup -c",
+    "quick-build": "tsc",
+    "rollup": "rollup -c",
+    "build-tests": "tsc -p test/",
+    "test": "npm run build-tests && ava && npm run test-cyclic",
+    "update-snapshots": "ava -u",
+    "speedtest": "npm run build-tests && node --expose-gc test-lib/test/perf/report.js",
+    "test-cyclic": "npm run build && node -e \"require('.')\"",
+    "watch": "tsc -p test && concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
+    "_prepublish": "npm run build && npm run build-docs",
+    "coverage": "npm run build-tests && nyc ava && nyc report -r html && nyc report -r lcov",
+    "build-docs": "npm run quick-build && documentation build lib/index.js --sort-order alpha -f md -o ../../API.md.tmp && concat -o ../../API.md ../../docs/API_header.md ../../API.md.tmp && rm ../../API.md.tmp",
+    "lint": "tslint -c tslint.json 'src/**/*.ts'",
+    "clean": "rm -rf lib test-lib .nyc_output coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobxjs/mobx-state-tree.git"
+  },
+  "author": "Michel Weststrate",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mobxjs/mobx-state-tree/issues"
+  },
+  "files": [
+    "dist/",
+    "middleware/"
+  ],
+  "devDependencies": {
+    "@types/node": "^8.0.19",
+    "ava": "^0.19.1",
+    "concat": "^1.0.3",
+    "concurrently": "^3.1.0",
+    "coveralls": "^2.11.4",
+    "cpr": "^2.1.0",
+    "documentation": "^5.2.2",
+    "mobx": "^3.2.2",
+    "nyc": "^10.0.0",
+    "rollup": "^0.43.0",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-filesize": "^1.3.2",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-replace": "^1.1.1",
+    "rollup-plugin-uglify": "^2.0.1",
+    "sinon": "^3.2.1",
+    "tape": "^4.6.0",
+    "tslib": "^1.7.1",
+    "tslint": "^3.15.1",
+    "typescript": "^2.4.2"
+  },
+  "peerDependencies": {
+    "mobx": "^3.1.15"
+  },
+  "keywords": [
+    "mobx",
+    "mobx-state-tree",
+    "promise",
+    "reactive",
+    "frp",
+    "functional-reactive-programming",
+    "state management"
+  ],
+  "ava": {
+    "files": [
+      "test-lib/test/*.js"
+    ],
+    "source": [
+      "test-lib/src/**/*.js"
+    ]
+  }
+}
