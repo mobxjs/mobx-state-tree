@@ -58,16 +58,19 @@ export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: 
 
     // Subscribe to change state (if need more than just logging)
     remotedev.subscribe((message: any) => {
+        if (message.type === "DISPATCH") {
+            handleMonitorActions(remotedev, model, message)
+            return
+        }
         // Helper when only time travelling needed
         const state = remoteDevDep.extractState(message)
         if (state) {
-            applyingSnapshot = true
-            mst.applySnapshot(model, state)
-            applyingSnapshot = false
+            applySnapshot(model, state)
         }
     })
 
-    remotedev.init(model.toJSON())
+    const initialState = model.toJSON()
+    remotedev.init(initialState)
 
     // Send changes to the remote monitor
     mst.onAction(model, action => {
@@ -77,4 +80,33 @@ export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: 
         if (action.args) action.args.forEach((value, index) => (copy[index] = value))
         remotedev.send(copy, mst.getSnapshot(model))
     })
+
+    function handleMonitorActions(remotedev: any, model: any, message: any) {
+        switch (message.payload.type) {
+            case "RESET":
+                applySnapshot(model, initialState)
+                return remotedev.init(initialState)
+            case "COMMIT":
+                return remotedev.init(model.toJSON())
+            case "ROLLBACK":
+                return remotedev.init(remoteDevDep.extractState(message))
+            case "JUMP_TO_STATE":
+            case "JUMP_TO_ACTION":
+                applySnapshot(model, remoteDevDep.extractState(message))
+                return
+            case "IMPORT_STATE":
+                const nextLiftedState = message.payload.nextLiftedState
+                const computedStates = nextLiftedState.computedStates
+                applySnapshot(model, computedStates[computedStates.length - 1].state)
+                remotedev.send(null, nextLiftedState)
+                return
+            default:
+        }
+    }
+
+    function applySnapshot(model: any, state: any) {
+        applyingSnapshot = true
+        mst.applySnapshot(model, state)
+        applyingSnapshot = false
+    }
 }
