@@ -67,6 +67,8 @@ export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: 
         }
     })
 
+    remotedev.init(model.toJSON())
+
     // Send changes to the remote monitor
     mst.onAction(model, action => {
         if (applyingSnapshot) return
