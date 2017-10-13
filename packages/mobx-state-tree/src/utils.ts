@@ -164,14 +164,17 @@ export function argsToArray(args: IArguments): any[] {
     return res
 }
 
-const deprecationIds: any = {}
-export function deprecated(id: string, message: string): void {
+export type DeprecatedFunction = Function & { ids?: { [id: string]: true } }
+let deprecated: DeprecatedFunction = function() {}
+deprecated = function(id: string, message: string): void {
     // skip if running production
     if (process.env.NODE_ENV === "production") return
     // warn if hasn't been warned before
-    if (deprecationIds[id] === undefined) {
+    if (deprecated.ids && !deprecated.ids.hasOwnProperty(id)) {
         console.warn("[Deprecation Warning] mobx-state-tree\n\n" + message)
     }
     // mark as warned to avoid duplicate warn message
-    deprecationIds[id] = true
+    if (deprecated.ids) deprecated.ids[id] = true
 }
+deprecated.ids = {}
+export { deprecated }
