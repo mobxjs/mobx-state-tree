@@ -410,7 +410,7 @@ const RootStore = types.model({
 Notice that the `getTodosWhereDoneIs` view can also be used outside of its model, for example it can be used inside views.
 
 ## Going further: References
-Ok, the basics of our TODO application are done! But as I said when starting this tutorial, we want to be able to provide assingees for each of our todos!
+Ok, the basics of our TODO application are done! But as I said when starting this tutorial, we want to be able to provide assignees for each of our todos!
 
 We will focus on this feature; to do that let's assume that the list of the users cames from an XHR request or other data sources. Feel free to either implement it or add to the todo application a user management feature.
 
