@@ -73,13 +73,17 @@ export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: 
     remotedev.init(initialState)
 
     // Send changes to the remote monitor
-    mst.onAction(model, action => {
-        if (applyingSnapshot) return
-        const copy: any = {}
-        copy.type = action.name
-        if (action.args) action.args.forEach((value, index) => (copy[index] = value))
-        remotedev.send(copy, mst.getSnapshot(model))
-    })
+    mst.onAction(
+        model,
+        action => {
+            if (applyingSnapshot) return
+            const copy: any = {}
+            copy.type = action.name
+            if (action.args) action.args.forEach((value, index) => (copy[index] = value))
+            remotedev.send(copy, mst.getSnapshot(model))
+        },
+        true
+    )
 
     function handleMonitorActions(remotedev: any, model: any, message: any) {
         switch (message.payload.type) {
