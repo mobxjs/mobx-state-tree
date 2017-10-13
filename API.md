@@ -100,17 +100,17 @@ cleanup methods yourself using the `beforeDestroy` hook.
 ```javascript
 const Todo = types.model({
   title: types.string
-}, {
+}).actions(self => ({
   afterCreate() {
     const autoSaveDisposer = reaction(
-      () => getSnapshot(this),
+      () => getSnapshot(self),
       snapshot => sendSnapshotToServerSomehow(snapshot)
     )
     // stop sending updates to server if this
     // instance is destroyed
-    addDisposer(this, autoSaveDisposer)
+    addDisposer(self, autoSaveDisposer)
   }
-})
+}))
 ```
 
 ## addMiddleware
@@ -702,7 +702,7 @@ const GameCharacter = types.model({
   location: types.frozen
 })
 
-const hero = new GameCharacter({
+const hero = GameCharacter.create({
   name: "Mario",
   location: { x: 7, y: 4 }
 })
@@ -947,17 +947,18 @@ In that case you can disable this protection by calling `unprotect` on the root 
 
 ```javascript
 const Todo = types.model({
-    done: false,
+    done: false
+}).actions(self => ({
     toggle() {
-        this.done = !this.done
+        self.done = !self.done
     }
-})
+}))
 
-const todo = new Todo()
-todo.done = true // OK
-protect(todo)
-todo.done = false // throws!
+const todo = Todo.create()
+todo.done = true // throws!
 todo.toggle() // OK
+unprotect(todo)
+todo.done = false // OK
 ```
 
 ## walk
