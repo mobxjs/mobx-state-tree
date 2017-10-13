@@ -131,7 +131,7 @@ By default trees can only be modified by using an action that belongs to the sam
 Furthermore, actions are replayable and can be used to distribute changes ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-boxes/src/stores/socket.js)).
 
 Moreover, because changes can be detected on a fine grained level, JSON patches are supported out of the box.
-Simply subscribing to the patch stream of a tree is another way to sync diffs with, for example, back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-/boxes/src/stores/socket.js)).
+Simply subscribing to the patch stream of a tree is another way to sync diffs with, for example, back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-boxes/src/stores/socket.js)).
 
 ![patches](docs/patches.png)
 
@@ -176,9 +176,9 @@ mobx-state-tree "immutable trees" and "graph model" features talk, ["Next Genera
 
 # Examples
 
-* [Bookshop](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-/bookshop) Example webshop application with references, identifiers, routing, testing etc.
-* [Boxes](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-/boxes) Example app where one can draw, drag, and drop boxes. With time-travelling and multi-client synchronization over websockets.
-* [Redux TodoMVC](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-/redux-todomvc) Redux TodoMVC application, except that the reducers are replaced with a MST. Tip: open the Redux devtools; they will work!
+* [Bookshop](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-bookshop) Example webshop application with references, identifiers, routing, testing etc.
+* [Boxes](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-boxes) Example app where one can draw, drag, and drop boxes. With time-travelling and multi-client synchronization over websockets.
+* [Redux TodoMVC](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-redux-todomvc) Redux TodoMVC application, except that the reducers are replaced with a MST. Tip: open the Redux devtools; they will work!
 
 # Concepts
 
