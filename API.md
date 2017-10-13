@@ -437,6 +437,31 @@ Rather, when using `onAction` middleware, one should consider in passing argumen
 -   `listener`  
 -   `attachAfter`  {boolean} (default false) fires the listener _after_ the action has executed instead of before.
 
+**Examples**
+
+```javascript
+const Todo = types.model({
+  task: types.string
+})
+
+const TodoStore = types.model({
+  todos: types.array(Todo)
+}).actions(self => ({
+  add(todo) {
+    self.todos.push(todo);
+  }
+}))
+
+const s = TodoStore.create({ todos: [] })
+
+let disposer = onAction(s, (call) => {
+  console.log(call);
+})
+
+s.add({ task: "Grab a coffee" })
+// Logs: { name: "add", path: "", args: [{ task: "Grab a coffee" }] }
+```
+
 Returns **IDisposer** 
 
 ## onPatch
@@ -626,6 +651,7 @@ const TodoStore = types.model({
 })
 
 const s = TodoStore.create({ todos: [] })
+unprotect(s) // needed to allow modifying outside of an action
 s.todos.push({ task: "Grab coffee" })
 console.log(s.todos[0]) // prints: "Grab coffee"
 ```
