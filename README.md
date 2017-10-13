@@ -984,7 +984,7 @@ For local component state, for example, vanilla MobX observables might often be 
 
 ### Can I use Hot Module Reloading?
 
-Yes, with MST it is pretty straight forward to setup hot reloading for your store definitions, while preserving state. See the [todomvc example](https://github.com/mobxjs/mobx-state-tree/blob/master/examples/todomvc/src/index.js#L60-L68)
+Yes, with MST it is pretty straight forward to setup hot reloading for your store definitions, while preserving state. See the [todomvc example](https://github.com/mobxjs/mobx-state-tree/blob/745904101fdaeb51f16f40ebb80cd7fecf742572/packages/mst-example-todomvc/src/index.js#L60-L64)
 
 ### TypeScript & MST
 
