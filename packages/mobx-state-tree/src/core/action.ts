@@ -7,11 +7,6 @@ export type IMiddlewareEventType =
     | "flow_resume_error"
     | "flow_return"
     | "flow_throw"
-    | "process_spawn"
-    | "process_resume"
-    | "process_resume_error"
-    | "process_return"
-    | "process_throw"
 // | "task_spawn TODO, see #273"
 
 export type IMiddlewareEvent = {
