@@ -60,12 +60,6 @@ export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: 
     remotedev.subscribe((message: any) => {
         if (message.type === "DISPATCH") {
             handleMonitorActions(remotedev, model, message)
-            return
-        }
-        // Helper when only time travelling needed
-        const state = remoteDevDep.extractState(message)
-        if (state) {
-            applySnapshot(model, state)
         }
     })
 
