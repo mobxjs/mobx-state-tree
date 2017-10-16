@@ -7,7 +7,7 @@
 [![npm version](https://badge.fury.io/js/mobx-state-tree.svg)](https://badge.fury.io/js/mobx-state-tree)
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
-[![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/mobxjs/mobx.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/mobxjs/mobx-state-tree](https://badges.gitter.im/mobxjs/mobx-state-tree.svg)](https://gitter.im/mobxjs/mobx-state-tree?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 > Mobx and MST are amazing pieces of software, for me it is the missing brick when you build React based apps. Thanks for the great work!
@@ -18,8 +18,6 @@ Nicolas Galle [full post](https://medium.com/@nicolasgall/i-started-to-use-react
 Introduction blog post [The curious case of MobX state tree](https://medium.com/@mweststrate/the-curious-case-of-mobx-state-tree-7b4e22d461f)
 
 # Contents
-
-[![Join the chat at https://gitter.im/mobx-state-tree/Lobby](https://badges.gitter.im/mobx-state-tree/Lobby.svg)](https://gitter.im/mobx-state-tree/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 * [Installation](#installation)
 * [Getting Started](docs/getting-started.md)
