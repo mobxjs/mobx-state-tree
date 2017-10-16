@@ -19,6 +19,8 @@ Introduction blog post [The curious case of MobX state tree](https://medium.com/
 
 # Contents
 
+[![Join the chat at https://gitter.im/mobx-state-tree/Lobby](https://badges.gitter.im/mobx-state-tree/Lobby.svg)](https://gitter.im/mobx-state-tree/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 * [Installation](#installation)
 * [Getting Started](docs/getting-started.md)
 * [Talks & blogs](#talks--blogs)
