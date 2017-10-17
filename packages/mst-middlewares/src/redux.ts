@@ -58,21 +58,53 @@ export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: 
 
     // Subscribe to change state (if need more than just logging)
     remotedev.subscribe((message: any) => {
-        // Helper when only time travelling needed
-        const state = remoteDevDep.extractState(message)
-        if (state) {
-            applyingSnapshot = true
-            mst.applySnapshot(model, state)
-            applyingSnapshot = false
+        if (message.type === "DISPATCH") {
+            handleMonitorActions(remotedev, model, message)
         }
     })
 
+    const initialState = mst.getSnapshot(model)
+    remotedev.init(initialState)
+
     // Send changes to the remote monitor
-    mst.onAction(model, action => {
-        if (applyingSnapshot) return
-        const copy: any = {}
-        copy.type = action.name
-        if (action.args) action.args.forEach((value, index) => (copy[index] = value))
-        remotedev.send(copy, mst.getSnapshot(model))
-    })
+    mst.onAction(
+        model,
+        action => {
+            if (applyingSnapshot) return
+            const copy: any = {}
+            copy.type = action.name
+            if (action.args) action.args.forEach((value, index) => (copy[index] = value))
+            remotedev.send(copy, mst.getSnapshot(model))
+        },
+        true
+    )
+
+    function handleMonitorActions(remotedev: any, model: any, message: any) {
+        switch (message.payload.type) {
+            case "RESET":
+                applySnapshot(model, initialState)
+                return remotedev.init(initialState)
+            case "COMMIT":
+                return remotedev.init(mst.getSnapshot(model))
+            case "ROLLBACK":
+                return remotedev.init(remoteDevDep.extractState(message))
+            case "JUMP_TO_STATE":
+            case "JUMP_TO_ACTION":
+                applySnapshot(model, remoteDevDep.extractState(message))
+                return
+            case "IMPORT_STATE":
+                const nextLiftedState = message.payload.nextLiftedState
+                const computedStates = nextLiftedState.computedStates
+                applySnapshot(model, computedStates[computedStates.length - 1].state)
+                remotedev.send(null, nextLiftedState)
+                return
+            default:
+        }
+    }
+
+    function applySnapshot(model: any, state: any) {
+        applyingSnapshot = true
+        mst.applySnapshot(model, state)
+        applyingSnapshot = false
+    }
 }
