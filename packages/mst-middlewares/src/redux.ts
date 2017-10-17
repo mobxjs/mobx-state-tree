@@ -63,7 +63,7 @@ export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: 
         }
     })
 
-    const initialState = model.toJSON()
+    const initialState = mst.getSnapshot(model)
     remotedev.init(initialState)
 
     // Send changes to the remote monitor
@@ -85,7 +85,7 @@ export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: 
                 applySnapshot(model, initialState)
                 return remotedev.init(initialState)
             case "COMMIT":
-                return remotedev.init(model.toJSON())
+                return remotedev.init(mst.getSnapshot(model))
             case "ROLLBACK":
                 return remotedev.init(remoteDevDep.extractState(message))
             case "JUMP_TO_STATE":
