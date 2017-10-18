@@ -14,9 +14,10 @@ import {
     createNode,
     getStateTreeNode,
     IJsonPatch,
-    Node,
+    INode,
     isStateTreeNode,
-    IStateTreeNode
+    IStateTreeNode,
+    isNode
 } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isArray, isPlainObject } from "../../utils"
 import { ComplexType, IComplexType, IType } from "../type"
@@ -54,7 +55,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return array
     }
 
-    finalizeNewInstance = (node: Node, snapshot: any) => {
+    finalizeNewInstance = (node: INode, snapshot: any) => {
         const instance = node.storedValue as IObservableArray<any>
         extras.getAdministration(instance).dehancer = node.unbox
         intercept(instance, change => this.willChange(change) as any)
@@ -62,7 +63,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         observe(instance, this.didChange)
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: S): INode {
         return createNode(
             this,
             parent,
@@ -74,11 +75,11 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         )
     }
 
-    getChildren(node: Node): Node[] {
+    getChildren(node: INode): INode[] {
         return node.storedValue.peek()
     }
 
-    getChildNode(node: Node, key: string): Node {
+    getChildNode(node: INode, key: string): INode {
         const index = parseInt(key, 10)
         if (index < node.storedValue.length) return node.storedValue[index]
         return fail("Not a child: " + key)
@@ -119,11 +120,11 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return change
     }
 
-    getValue(node: Node): any {
+    getValue(node: INode): any {
         return node.storedValue
     }
 
-    getSnapshot(node: Node): any {
+    getSnapshot(node: INode): any {
         return node.getChildren().map(childNode => childNode.snapshot)
     }
 
@@ -164,7 +165,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         }
     }
 
-    applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void {
         const target = node.storedValue as IObservableArray<any>
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
@@ -181,7 +182,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     @action
-    applySnapshot(node: Node, snapshot: any[]): void {
+    applySnapshot(node: INode, snapshot: any[]): void {
         typecheck(this, snapshot)
         const target = node.storedValue as IObservableArray<any>
         target.replace(snapshot)
@@ -207,7 +208,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return []
     }
 
-    removeChild(node: Node, subpath: string) {
+    removeChild(node: INode, subpath: string) {
         node.storedValue.splice(parseInt(subpath, 10), 1)
     }
 }
@@ -245,16 +246,16 @@ export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservable
 }
 
 function reconcileArrayChildren<T>(
-    parent: Node,
+    parent: INode,
     childType: IType<any, T>,
-    oldNodes: Node[],
+    oldNodes: INode[],
     newValues: T[],
     newPaths: (string | number)[]
-): Node[] {
-    let oldNode: Node,
+): INode[] {
+    let oldNode: INode,
         newValue: any,
         hasNewNode = false,
-        oldMatch: Node | undefined = undefined
+        oldMatch: INode | undefined = undefined
 
     for (let i = 0; ; i++) {
         hasNewNode = i <= newValues.length - 1
@@ -263,7 +264,7 @@ function reconcileArrayChildren<T>(
 
         // for some reason, instead of newValue we got a node, fallback to the storedValue
         // TODO: https://github.com/mobxjs/mobx-state-tree/issues/340#issuecomment-325581681
-        if (newValue instanceof Node) newValue = newValue.storedValue
+        if (isNode(newValue)) newValue = newValue.storedValue
 
         // both are empty, end
         if (!oldNode && !hasNewNode) {
@@ -314,10 +315,10 @@ function reconcileArrayChildren<T>(
 // convert a value to a node at given parent and subpath. attempts to reuse old node if possible and given
 function valueAsNode(
     childType: IType<any, any>,
-    parent: Node,
+    parent: INode,
     subpath: string,
     newValue: any,
-    oldNode?: Node
+    oldNode?: INode
 ) {
     // ensure the value is valid-ish
     typecheck(childType, newValue)
@@ -346,7 +347,7 @@ function valueAsNode(
 }
 
 // given a value
-function areSame(oldNode: Node, newValue: any) {
+function areSame(oldNode: INode, newValue: any) {
     // the new value has the same node
     if (isStateTreeNode(newValue)) {
         return getStateTreeNode(newValue) === oldNode

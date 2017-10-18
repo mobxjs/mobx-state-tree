@@ -2,7 +2,7 @@ import { ISimpleType, IType, Type } from "./type"
 import { TypeFlags } from "./type-flags"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
 import { isPrimitive, fail, identity } from "../utils"
-import { Node, createNode } from "../core"
+import { INode, createNode } from "../core"
 
 export class CoreType<S, T> extends Type<S, T> {
     readonly checker: (value: any) => boolean
@@ -25,7 +25,7 @@ export class CoreType<S, T> extends Type<S, T> {
         return this.name
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: T): INode {
         return createNode(this, parent, subpath, environment, snapshot, this.initializer)
     }
 
@@ -138,7 +138,7 @@ export const DatePrimitive: IType<number, Date> = new CoreType<number, Date>(
     (v: any) => typeof v === "number" || v instanceof Date,
     (v: number | Date) => (v instanceof Date ? v : new Date(v))
 )
-;(DatePrimitive as any).getSnapshot = function(node: Node) {
+;(DatePrimitive as any).getSnapshot = function(node: INode) {
     return node.storedValue.getTime()
 }
 

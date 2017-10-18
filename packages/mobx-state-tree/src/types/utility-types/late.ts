@@ -2,7 +2,7 @@ import { fail } from "../../utils"
 import { Type, IType } from "../type"
 import { TypeFlags } from "../type-flags"
 import { IContext, IValidationResult } from "../type-checker"
-import { Node } from "../../core"
+import { INode } from "../../core"
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>
@@ -24,11 +24,11 @@ export class Late<S, T> extends Type<S, T> {
         this.definition = definition
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
         return this.subType.instantiate(parent, subpath, environment, snapshot)
     }
 
-    reconcile(current: Node, newValue: any): Node {
+    reconcile(current: INode, newValue: any): INode {
         return this.subType.reconcile(current, newValue)
     }
 

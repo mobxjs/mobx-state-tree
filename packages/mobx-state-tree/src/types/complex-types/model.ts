@@ -25,7 +25,7 @@ import {
     getStateTreeNode,
     IStateTreeNode,
     IJsonPatch,
-    Node,
+    INode,
     createActionInvoker,
     escapeJsonPath
 } from "../../core"
@@ -261,7 +261,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             })
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
         return createNode(
             this,
             parent,
@@ -281,7 +281,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return instance as Object
     }
 
-    finalizeNewInstance = (node: Node, snapshot: any) => {
+    finalizeNewInstance = (node: INode, snapshot: any) => {
         const instance = node.storedValue as IStateTreeNode
         this.forAllProps((name, type) => {
             extendShallowObservable(instance, {
@@ -319,26 +319,26 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         )
     }
 
-    getChildren(node: Node): Node[] {
-        const res: Node[] = []
+    getChildren(node: INode): INode[] {
+        const res: INode[] = []
         this.forAllProps((name, type) => {
             res.push(this.getChildNode(node, name))
         })
         return res
     }
 
-    getChildNode(node: Node, key: string): Node {
+    getChildNode(node: INode, key: string): INode {
         if (!(key in this.properties)) return fail("Not a value property: " + key)
         const childNode = node.storedValue.$mobx.values[key].value // TODO: blegh!
         if (!childNode) return fail("Node not available for property " + key)
         return childNode
     }
 
-    getValue(node: Node): any {
+    getValue(node: INode): any {
         return node.storedValue
     }
 
-    getSnapshot(node: Node): any {
+    getSnapshot(node: INode): any {
         const res = {} as any
         this.forAllProps((name, type) => {
             // TODO: FIXME, make sure the observable ref is used!
@@ -350,14 +350,14 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return res
     }
 
-    applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add"))
             fail(`object does not support operation ${patch.op}`)
         node.storedValue[subpath] = patch.value
     }
 
     @action
-    applySnapshot(node: Node, snapshot: any): void {
+    applySnapshot(node: INode, snapshot: any): void {
         const s = this.applySnapshotPreProcessor(snapshot)
         typecheck(this, s)
         this.forAllProps((name, type) => {
@@ -410,7 +410,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return {}
     }
 
-    removeChild(node: Node, subpath: string) {
+    removeChild(node: INode, subpath: string) {
         node.storedValue[subpath] = null
     }
 }

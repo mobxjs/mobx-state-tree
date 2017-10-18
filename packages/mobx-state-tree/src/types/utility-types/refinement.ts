@@ -1,6 +1,6 @@
 import { IType, Type } from "../type"
 import { TypeFlags, isType } from "../type-flags"
-import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
+import { isStateTreeNode, getStateTreeNode, INode } from "../../core"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { fail } from "../../utils"
 
@@ -29,7 +29,7 @@ export class Refinement<S, T> extends Type<S, T> {
         return this.name
     }
 
-    instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
+    instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
         // create the child type
         const inst = this.type.instantiate(parent, subpath, environment, value)
 

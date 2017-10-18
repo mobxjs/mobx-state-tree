@@ -2,7 +2,7 @@ import { ISimpleType, Type } from "../type"
 import { TypeFlags } from "../type-flags"
 import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { isSerializable, deepFreeze } from "../../utils"
-import { createNode, Node } from "../../core"
+import { createNode, INode } from "../../core"
 
 export class Frozen<T> extends Type<T, T> {
     flags = TypeFlags.Frozen
@@ -15,7 +15,7 @@ export class Frozen<T> extends Type<T, T> {
         return "<any immutable value>"
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, value: any): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, value: any): INode {
         // deep freeze the object/array only in dev mode
         const finalValue = process.env.NODE_ENV !== "production" ? deepFreeze(value) : value
         // create the node

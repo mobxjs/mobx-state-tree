@@ -8,7 +8,7 @@ import {
     flattenTypeErrors
 } from "../type-checker"
 import { fail } from "../../utils"
-import { Node } from "../../core"
+import { INode } from "../../core"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
@@ -40,11 +40,11 @@ export class Union extends Type<any, any> {
         return "(" + this.types.map(factory => factory.describe()).join(" | ") + ")"
     }
 
-    instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
+    instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
         return this.determineType(value).instantiate(parent, subpath, environment, value)
     }
 
-    reconcile(current: Node, newValue: any): Node {
+    reconcile(current: INode, newValue: any): INode {
         return this.determineType(newValue).reconcile(current, newValue)
     }
 

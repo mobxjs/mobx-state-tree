@@ -2,7 +2,7 @@ import { Type, IType } from "../type"
 import { TypeFlags, isType } from "../type-flags"
 import { IContext, IValidationResult, typeCheckFailure } from "../type-checker"
 import { fail } from "../../utils"
-import { Node, createNode, isStateTreeNode } from "../../core"
+import { INode, createNode, isStateTreeNode } from "../../core"
 import { string as stringType } from "../primitives"
 
 class Identifier {
@@ -19,7 +19,7 @@ export class IdentifierType<T> extends Type<T, T> {
         super(`identifier(${identifierType.name})`)
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: T): INode {
         if (!parent || !isStateTreeNode(parent.storedValue))
             return fail(`Identifier types can only be instantiated as direct child of a model type`)
 
@@ -31,7 +31,7 @@ export class IdentifierType<T> extends Type<T, T> {
         return createNode(this, parent, subpath, environment, snapshot)
     }
 
-    reconcile(current: Node, newValue: any) {
+    reconcile(current: INode, newValue: any) {
         if (current.storedValue !== newValue)
             return fail(
                 `Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`

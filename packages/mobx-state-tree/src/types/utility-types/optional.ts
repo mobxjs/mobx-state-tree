@@ -1,7 +1,7 @@
 import { Type, IType } from "../type"
 import { TypeFlags, isType } from "../type-flags"
 import { IContext, IValidationResult, typecheck, typeCheckSuccess } from "../type-checker"
-import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
+import { isStateTreeNode, getStateTreeNode, INode } from "../../core"
 import { fail } from "../../utils"
 
 export type IFunctionReturn<T> = () => T
@@ -25,7 +25,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.describe() + "?"
     }
 
-    instantiate(parent: Node, subpath: string, environment: any, value: S): Node {
+    instantiate(parent: INode, subpath: string, environment: any, value: S): INode {
         if (typeof value === "undefined") {
             const defaultValue = this.getDefaultValue()
             const defaultSnapshot = isStateTreeNode(defaultValue)
@@ -36,7 +36,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.instantiate(parent, subpath, environment, value)
     }
 
-    reconcile(current: Node, newValue: any): Node {
+    reconcile(current: INode, newValue: any): INode {
         return this.type.reconcile(
             current,
             this.type.is(newValue) ? newValue : this.getDefaultValue()

@@ -12,7 +12,7 @@ import {
     getStateTreeNode,
     escapeJsonPath,
     IJsonPatch,
-    Node,
+    INode,
     createNode,
     isStateTreeNode,
     IStateTreeNode
@@ -43,7 +43,7 @@ export function mapToString(this: ObservableMap<any>) {
 
 function put(this: ObservableMap<any>, value: any) {
     if (!!!value) fail(`Map.put cannot be used to set empty values`)
-    let node: Node
+    let node: INode
     if (isStateTreeNode(value)) {
         node = getStateTreeNode(value)
     } else if (isMutable(value)) {
@@ -71,7 +71,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         this.subType = subType
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: S): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: S): INode {
         return createNode(
             this,
             parent,
@@ -95,7 +95,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         return map
     }
 
-    finalizeNewInstance = (node: Node, snapshot: any) => {
+    finalizeNewInstance = (node: INode, snapshot: any) => {
         const instance = node.storedValue as ObservableMap<any>
         extras.interceptReads(instance, node.unbox)
         intercept(instance, c => this.willChange(c))
@@ -103,11 +103,11 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         observe(instance, this.didChange)
     }
 
-    getChildren(node: Node): Node[] {
+    getChildren(node: INode): INode[] {
         return (node.storedValue as ObservableMap<any>).values()
     }
 
-    getChildNode(node: Node, key: string): Node {
+    getChildNode(node: INode, key: string): INode {
         const childNode = node.storedValue.get(key)
         if (!childNode) fail("Not a child " + key)
         return childNode
@@ -128,7 +128,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                         node.getChildNode(change.name),
                         change.newValue
                     )
-                    this.verifyIdentifier(change.name, change.newValue as Node)
+                    this.verifyIdentifier(change.name, change.newValue as INode)
                 }
                 break
             case "add":
@@ -140,14 +140,14 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                         undefined,
                         change.newValue
                     )
-                    this.verifyIdentifier(change.name, change.newValue as Node)
+                    this.verifyIdentifier(change.name, change.newValue as INode)
                 }
                 break
         }
         return change
     }
 
-    private verifyIdentifier(expected: string, node: Node) {
+    private verifyIdentifier(expected: string, node: INode) {
         const identifier = node.identifier
         if (identifier !== null && "" + identifier !== "" + expected)
             fail(
@@ -155,11 +155,11 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
             )
     }
 
-    getValue(node: Node): any {
+    getValue(node: INode): any {
         return node.storedValue
     }
 
-    getSnapshot(node: Node): { [key: string]: any } {
+    getSnapshot(node: INode): { [key: string]: any } {
         const res: { [key: string]: any } = {}
         node.getChildren().forEach(childNode => {
             res[childNode.subpath] = childNode.snapshot
@@ -206,7 +206,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         }
     }
 
-    applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void {
         const target = node.storedValue as ObservableMap<any>
         switch (patch.op) {
             case "add":
@@ -220,7 +220,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 
     @action
-    applySnapshot(node: Node, snapshot: any): void {
+    applySnapshot(node: INode, snapshot: any): void {
         typecheck(this, snapshot)
         const target = node.storedValue as ObservableMap<any>
         const currentKeys: { [key: string]: boolean } = {}
@@ -257,7 +257,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         return {}
     }
 
-    removeChild(node: Node, subpath: string) {
+    removeChild(node: INode, subpath: string) {
         ;(node.storedValue as ObservableMap<any>).delete(subpath)
     }
 }
