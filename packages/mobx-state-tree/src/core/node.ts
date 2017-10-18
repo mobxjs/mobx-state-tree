@@ -417,7 +417,7 @@ export class Node extends ImmutableNode implements INode {
         patch: IJsonPatch,
         reversePatch: IJsonPatch
     ) => void)[] = []
-    private readonly disposers: (() => void)[] = []
+    private disposers: (() => void)[]
     // applyPatches: (patches: IJsonPatch[]) => void
     // applySnapshot: (snapshot: any) => void
 
@@ -459,6 +459,8 @@ export class Node extends ImmutableNode implements INode {
     }
 
     preboot() {
+        this.disposers = []
+
         // Optimization: this does not need to be done per instance
         // if some pieces from createActionInvoker are extracted
         this.applyPatches = createActionInvoker(
