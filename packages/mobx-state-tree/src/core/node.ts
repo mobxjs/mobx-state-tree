@@ -410,13 +410,10 @@ export class ImmutableNode implements INode {
 }
 
 export class Node extends ImmutableNode implements INode {
-    readonly middlewares: IMiddlewareHandler[] = []
-    private readonly snapshotSubscribers: ((snapshot: any) => void)[] = []
+    middlewares: IMiddlewareHandler[]
+    private snapshotSubscribers: ((snapshot: any) => void)[]
     // TODO: split patches in two; patch and reversePatch
-    private readonly patchSubscribers: ((
-        patch: IJsonPatch,
-        reversePatch: IJsonPatch
-    ) => void)[] = []
+    private patchSubscribers: ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)[]
     private disposers: (() => void)[]
     // applyPatches: (patches: IJsonPatch[]) => void
     // applySnapshot: (snapshot: any) => void
@@ -460,6 +457,9 @@ export class Node extends ImmutableNode implements INode {
 
     preboot() {
         this.disposers = []
+        this.middlewares = []
+        this.snapshotSubscribers = []
+        this.patchSubscribers = []
 
         // Optimization: this does not need to be done per instance
         // if some pieces from createActionInvoker are extracted
