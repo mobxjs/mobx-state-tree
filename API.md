@@ -512,7 +512,9 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 **Meta**
 
--   **deprecated**: has been renamed to `flow()`. See <https://github.com/mobxjs/mobx-state-tree/issues/399> for more information.
+-   **deprecated**: has been renamed to `flow()`.
+    See <https://github.com/mobxjs/mobx-state-tree/issues/399> for more information.
+    Note that the middleware event type prefixes starting with `process` now start with `flow`.
 
 
 ## protect

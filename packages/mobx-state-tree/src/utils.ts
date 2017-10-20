@@ -171,7 +171,7 @@ deprecated = function(id: string, message: string): void {
     if (process.env.NODE_ENV === "production") return
     // warn if hasn't been warned before
     if (deprecated.ids && !deprecated.ids.hasOwnProperty(id)) {
-        console.warn("[Deprecation Warning] mobx-state-tree\n\n" + message)
+        console.warn("[mobx-state-tree] Deprecation warning: " + message)
     }
     // mark as warned to avoid duplicate warn message
     if (deprecated.ids) deprecated.ids[id] = true

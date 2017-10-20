@@ -17,7 +17,7 @@ function createDeprecationListener() {
         console.warn = originalWarn
         // test for correct log message
         t.true(spyWarn.called)
-        t.regex(spyWarn.getCall(0).args[0], /Deprecation Warning/)
+        t.regex(spyWarn.getCall(0).args[0], /Deprecation warning:/)
     }
 }
 

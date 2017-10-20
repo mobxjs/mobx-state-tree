@@ -7,6 +7,10 @@
     Refer to `flow.ts` for any further changes to this implementation.
 */
 
+const DEPRECATION_MESSAGE =
+    "See https://github.com/mobxjs/mobx-state-tree/issues/399 for more information. " +
+    "Note that the middleware event types starting with `process` now start with `flow`."
+
 export function process<R>(generator: () => IterableIterator<any>): () => Promise<R>
 export function process<A1>(generator: (a1: A1) => IterableIterator<any>): (a1: A1) => Promise<any>
 export function process<A1, A2>(
@@ -40,24 +44,23 @@ export function process<A1, A2, A3, A4, A5, A6, A7, A8>(
     ) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7, a8: A8) => Promise<any>
 /**
- * @deprecated has been renamed to `flow()`. See https://github.com/mobxjs/mobx-state-tree/issues/399 for more information.
+ * @deprecated has been renamed to `flow()`. 
+ * See https://github.com/mobxjs/mobx-state-tree/issues/399 for more information.
+ * Note that the middleware event types starting with `process` now start with `flow`.
  *
  * @export
  * @alias process
  * @returns {Promise}
  */
 export function process(asyncAction: any): any {
-    deprecated(
-        "process",
-        "`process()` has been renamed to `flow()`. See https://github.com/mobxjs/mobx-state-tree/issues/399 for more information."
-    )
+    deprecated("process", "`process()` has been renamed to `flow()`. " + DEPRECATION_MESSAGE)
     return flow(asyncAction)
 }
 
 export function createProcessSpawner(name: string, generator: Function) {
     deprecated(
         "process",
-        "`createProcessSpawner()` has been renamed to `createFlowSpawner()`. See https://github.com/mobxjs/mobx-state-tree/issues/399 for more information."
+        "`createProcessSpawner()` has been renamed to `createFlowSpawner()`. " + DEPRECATION_MESSAGE
     )
     return createFlowSpawner(name, generator)
 }
