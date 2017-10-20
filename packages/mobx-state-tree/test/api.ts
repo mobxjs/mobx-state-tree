@@ -13,6 +13,7 @@ const METHODS = [
     "destroy",
     "detach",
     "escapeJsonPath",
+    "flow",
     "getChildType",
     "getEnv",
     "getParent",
@@ -30,7 +31,7 @@ const METHODS = [
     "onAction",
     "onPatch",
     "onSnapshot",
-    "process",
+    "process", // DEPRECATED
     "protect",
     "recordActions",
     "recordPatches",

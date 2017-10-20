@@ -1,6 +1,8 @@
 # next
 
 * Every MST middleware is now shipped in a separate package named `mst-middlewares`. They are now written in TypeScript and fully transpiled to ES5 to avoid problems with uglifyjs in create-react-app bundling.
+* Rename `process` to `flow`. Deprecate `process`.
+* **BREAKING** Rename middleware event type prefixes starting with `process` to now start with `flow`.
 
 # 1.0.2
 

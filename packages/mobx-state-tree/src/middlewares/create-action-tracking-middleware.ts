@@ -61,13 +61,13 @@ export function createActionTrackingMiddleware<T = any>(hooks: {
                     return next(call)
                 }
             }
-            case "process_spawn": {
+            case "flow_spawn": {
                 const root = runningActions.get(call.rootId)!
                 root.async = true
                 return next(call)
             }
-            case "process_resume":
-            case "process_resume_error": {
+            case "flow_resume":
+            case "flow_resume_error": {
                 const root = runningActions.get(call.rootId)!
                 hooks.onResume(call, root.context)
                 try {
@@ -76,13 +76,13 @@ export function createActionTrackingMiddleware<T = any>(hooks: {
                     hooks.onSuspend(call, root.context)
                 }
             }
-            case "process_throw": {
+            case "flow_throw": {
                 const root = runningActions.get(call.rootId)!
                 runningActions.delete(call.id)
                 hooks.onFail(call, root.context, call.args[0])
                 return next(call)
             }
-            case "process_return": {
+            case "flow_return": {
                 const root = runningActions.get(call.rootId)!
                 runningActions.delete(call.id)
                 hooks.onSuccess(call, root.context, call.args[0])

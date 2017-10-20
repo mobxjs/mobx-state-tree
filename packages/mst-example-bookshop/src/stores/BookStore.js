@@ -1,4 +1,4 @@
-import { types, getParent, process } from "mobx-state-tree"
+import { types, getParent, flow } from "mobx-state-tree"
 
 export const Book = types.model("Book", {
     id: types.identifier(),
@@ -34,7 +34,7 @@ export const BookStore = types
             })
         }
 
-        const loadBooks = process(function* loadBooks() {
+        const loadBooks = flow(function* loadBooks() {
             try {
                 const json = yield self.shop.fetch("/books.json")
                 updateBooks(json)
