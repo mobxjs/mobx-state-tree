@@ -47,7 +47,7 @@ export class Frozen<T> extends Type<T, T> {
  *   location: types.frozen
  * })
  *
- * const hero = new GameCharacter({
+ * const hero = GameCharacter.create({
  *   name: "Mario",
  *   location: { x: 7, y: 4 }
  * })

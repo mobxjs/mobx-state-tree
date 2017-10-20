@@ -577,17 +577,17 @@ export function isAlive(target: IStateTreeNode): boolean {
  * @example
  * const Todo = types.model({
  *   title: types.string
- * }, {
+ * }).actions(self => ({
  *   afterCreate() {
  *     const autoSaveDisposer = reaction(
- *       () => getSnapshot(this),
+ *       () => getSnapshot(self),
  *       snapshot => sendSnapshotToServerSomehow(snapshot)
  *     )
  *     // stop sending updates to server if this
  *     // instance is destroyed
- *     addDisposer(this, autoSaveDisposer)
+ *     addDisposer(self, autoSaveDisposer)
  *   }
- * })
+ * }))
  *
  * @export
  * @param {IStateTreeNode} target

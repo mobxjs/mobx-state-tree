@@ -101,17 +101,17 @@ cleanup methods yourself using the `beforeDestroy` hook.
 ```javascript
 const Todo = types.model({
   title: types.string
-}, {
+}).actions(self => ({
   afterCreate() {
     const autoSaveDisposer = reaction(
-      () => getSnapshot(this),
+      () => getSnapshot(self),
       snapshot => sendSnapshotToServerSomehow(snapshot)
     )
     // stop sending updates to server if this
     // instance is destroyed
-    addDisposer(this, autoSaveDisposer)
+    addDisposer(self, autoSaveDisposer)
   }
-})
+}))
 ```
 
 ## addMiddleware
@@ -448,6 +448,31 @@ Rather, when using `onAction` middleware, one should consider in passing argumen
 -   `listener`  
 -   `attachAfter`  {boolean} (default false) fires the listener _after_ the action has executed instead of before.
 
+**Examples**
+
+```javascript
+const Todo = types.model({
+  task: types.string
+})
+
+const TodoStore = types.model({
+  todos: types.array(Todo)
+}).actions(self => ({
+  add(todo) {
+    self.todos.push(todo);
+  }
+}))
+
+const s = TodoStore.create({ todos: [] })
+
+let disposer = onAction(s, (call) => {
+  console.log(call);
+})
+
+s.add({ task: "Grab a coffee" })
+// Logs: { name: "add", path: "", args: [{ task: "Grab a coffee" }] }
+```
+
 Returns **IDisposer** 
 
 ## onPatch
@@ -640,6 +665,7 @@ const TodoStore = types.model({
 })
 
 const s = TodoStore.create({ todos: [] })
+unprotect(s) // needed to allow modifying outside of an action
 s.todos.push({ task: "Grab coffee" })
 console.log(s.todos[0]) // prints: "Grab coffee"
 ```
@@ -716,7 +742,7 @@ const GameCharacter = types.model({
   location: types.frozen
 })
 
-const hero = new GameCharacter({
+const hero = GameCharacter.create({
   name: "Mario",
   location: { x: 7, y: 4 }
 })
@@ -961,17 +987,18 @@ In that case you can disable this protection by calling `unprotect` on the root 
 
 ```javascript
 const Todo = types.model({
-    done: false,
+    done: false
+}).actions(self => ({
     toggle() {
-        this.done = !this.done
+        self.done = !self.done
     }
-})
+}))
 
-const todo = new Todo()
-todo.done = true // OK
-protect(todo)
-todo.done = false // throws!
+const todo = Todo.create()
+todo.done = true // throws!
 todo.toggle() // OK
+unprotect(todo)
+todo.done = false // OK
 ```
 
 ## walk

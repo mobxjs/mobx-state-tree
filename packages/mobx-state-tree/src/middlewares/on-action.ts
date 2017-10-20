@@ -151,6 +151,28 @@ export function recordActions(subject: IStateTreeNode): IActionRecorder {
  * MST Nodes are considered non-serializable as well (they could be serialized as there snapshot, but it is uncertain whether an replaying party will be able to handle such a non-instantiated snapshot).
  * Rather, when using `onAction` middleware, one should consider in passing arguments which are 1: an id, 2: a (relative) path, or 3: a snapshot. Instead of a real MST node.
  *
+ * @example
+ * const Todo = types.model({
+ *   task: types.string
+ * })
+ * 
+ * const TodoStore = types.model({
+ *   todos: types.array(Todo)
+ * }).actions(self => ({
+ *   add(todo) {
+ *     self.todos.push(todo);
+ *   }
+ * }))
+ * 
+ * const s = TodoStore.create({ todos: [] })
+ * 
+ * let disposer = onAction(s, (call) => {
+ *   console.log(call);
+ * })
+ * 
+ * s.add({ task: "Grab a coffee" }) 
+ * // Logs: { name: "add", path: "", args: [{ task: "Grab a coffee" }] }
+ * 
  * @export
  * @param {IStateTreeNode} target
  * @param {(call: ISerializedActionCall) => void} listener
