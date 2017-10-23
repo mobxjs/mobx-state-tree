@@ -927,7 +927,7 @@ See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tr
 
 ## types.refinement
 
-`types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
+`types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer than 5.
 
 **Parameters**
 
