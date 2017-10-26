@@ -1,3 +1,89 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`matches snapshot before and after loading 1`] = `
+<div>
+  <div
+    className="App"
+  >
+    <div
+      className="App-header"
+    >
+      <img
+        alt="logo"
+        className="App-logo"
+        src="logo.svg"
+      />
+      <h2>
+        Welcome to the React MobX Book shop!
+      </h2>
+    </div>
+    <ul
+      className="App-menu"
+    >
+      <li>
+        <a
+          onClick={[Function]}
+        >
+          Available books
+        </a>
+      </li>
+      <li>
+        <a
+          onClick={[Function]}
+        >
+          Your cart
+        </a>
+      </li>
+    </ul>
+    <h1>
+      Loading...
+    </h1>
+  </div>
+</div>
+`;
+
+exports[`matches snapshot before and after loading 2`] = `
+<div>
+  <div
+    className="App"
+  >
+    <div
+      className="App-header"
+    >
+      <img
+        alt="logo"
+        className="App-logo"
+        src="logo.svg"
+      />
+      <h2>
+        Welcome to the React MobX Book shop!
+      </h2>
+    </div>
+    <ul
+      className="App-menu"
+    >
+      <li>
+        <a
+          onClick={[Function]}
+        >
+          Available books
+        </a>
+      </li>
+      <li>
+        <a
+          onClick={[Function]}
+        >
+          Your cart
+        </a>
+      </li>
+    </ul>
+    <h1>
+      Loading...
+    </h1>
+  </div>
+</div>
+`;
+
 exports[`test matches snapshot before and after loading 1`] = `
 <div>
   <div
@@ -80,7 +166,7 @@ exports[`test matches snapshot before and after loading 2`] = `
           <a
             href="/book/978-1857995879"
             onClick={[Function]}>
-            Sophie\'s World : The Greek Philosophers
+            Sophie's World : The Greek Philosophers
           </a>
         </li>
         <li>

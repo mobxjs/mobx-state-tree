@@ -1,8 +1,19 @@
-# next
+# 1.1.0
 
+### Improvements
+
+* The concept of process (asynchronous actions) has been renamed to flows. (Mainly to avoid issues with bundlers)
+* We changed to a lerna setup which allows separately distributing middleware and testing examples with more ease
 * Every MST middleware is now shipped in a separate package named `mst-middlewares`. They are now written in TypeScript and fully transpiled to ES5 to avoid problems with uglifyjs in create-react-app bundling.
-* Rename `process` to `flow`. Deprecate `process`.
-* **BREAKING** Rename middleware event type prefixes starting with `process` to now start with `flow`.
+* Introduced `createActionTrackingMiddleware`, this significantly simplifies writing middleware for common scenarios. Especially middleware that deals with asynchronous actions (flows)
+* Renamed `process` to `flow`. Deprecated `process`.
+* **BREAKING** As a result some middleware event names have also been changed. If you have custom middlewares this change might affect you. Rename middleware event type prefixes starting with `process` to now start with `flow`.
+
+### Fixes
+
+* Fixed nested maps + environments not working correctly, [#447](https://github.com/mobxjs/mobx-state-tree/pull/447) by @xaviergonz
+* Improved typescript typings for enumerations, up to 50 values are now supported [#424](https://github.com/mobxjs/mobx-state-tree/pull/447) by @danielduwaer
+
 
 # 1.0.2
 

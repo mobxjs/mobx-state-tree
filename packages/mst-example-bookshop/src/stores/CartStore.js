@@ -53,7 +53,7 @@ export const CartStore = types
     }))
     .actions(self => ({
         afterAttach() {
-            if (typeof window.localStorage !== "undefined") {
+            if (typeof window !== "undefined" && window.localStorage) {
                 when(
                     () => !self.shop.isLoading,
                     () => {

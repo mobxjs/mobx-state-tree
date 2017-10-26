@@ -8,10 +8,11 @@
 	"scripts": {
 		"clean": "lerna clean",
 		"build": "lerna run build",
-		"test": "lerna run test",
+		"test": "CI=true lerna run test",
 		"precommit": "lint-staged",
 		"coverage": "lerna run coverage",
-		"bootstrap": "lerna bootstrap"
+		"bootstrap": "lerna bootstrap --hoist",
+		"release": "lerna publish"
 	},
 	"lint-staged": {
 		"*.{ts,tsx,js,jsx}": [
