@@ -90,6 +90,8 @@ Creating asynchronous actions using generators works as follow:
 4. If the promise rejects, the action continues and the rejection reason will be thrown from the `yield` statement
 5. Invoking the asynchronous action returns a promise. That will resolve with the return value of the function, or rejected with any exception that escapes from the asynchronous actions.
 
+> Note: `flow()` is available in `v1.1.0` and above. If you see an error message like: `_mobxStateTree.flow is not a function`, check your version and upgrade if necessary.
+
 Using generators is syntactically clean.
 But the main advantage is that they receive first class support from MST.
 Middleware (see below) can implement specific behavior for asynchronous actions.
