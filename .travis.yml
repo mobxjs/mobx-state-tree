@@ -1,5 +1,14 @@
 language: node_js
-script: npm run bootstrap && npm run build && npm run test && npm run coverage
+sudo: required
+before_install: # if "install" is overridden
+  # Repo for Yarn
+  - sudo apt-key adv --fetch-keys http://dl.yarnpkg.com/debian/pubkey.gpg
+  - echo "deb http://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+  - sudo apt-get update -qq
+  - sudo apt-get install -y -qq yarn=1.2.1-1
+cache:
+  yarn: true
+script: yarn run bootstrap && yarn run build && yarn run test && yarn run coverage
 after_success:
   - cat ./packages/mobx-state-tree/coverage/lcov.info|./packages/mobx-state-tree/node_modules/coveralls/bin/coveralls.js
 node_js:
