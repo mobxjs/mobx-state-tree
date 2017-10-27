@@ -10,6 +10,7 @@
 		"clean": "lerna clean",
 		"build": "lerna run build",
 		"test": "CI=true lerna run test",
+		"precommit": "lint-staged",
 		"coverage": "lerna run coverage",
 		"bootstrap": "lerna bootstrap --hoist",
 		"release": "lerna publish"

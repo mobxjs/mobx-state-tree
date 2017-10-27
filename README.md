@@ -1129,6 +1129,13 @@ So far this might look a lot like an immutable state tree as found for example i
 -   mobx-state-tree provides utilities to turn any MST tree into a valid Redux store.
 -   Having multiple MSTs in a single application is perfectly fine.
 
+## Contributing
+
+1. Clone this repository
+2. Run `yarn run bootstrap` and `yarn run build` once.
+3. Extensive pull requests are best discussed in an issue first
+3. Have fun!
+
 
 ## Thanks!
 
