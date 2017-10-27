@@ -1,5 +1,6 @@
 {
-	"devDependencies": {
+	"private": true,
+	"dependencies": {
 		"lerna": "^2.4.0",
 		"husky": "^0.13.4",
 		"prettier": "^1.4.4",
@@ -9,11 +10,13 @@
 		"clean": "lerna clean",
 		"build": "lerna run build",
 		"test": "CI=true lerna run test",
-		"precommit": "lint-staged",
 		"coverage": "lerna run coverage",
 		"bootstrap": "lerna bootstrap --hoist",
 		"release": "lerna publish"
 	},
+	"workspaces": [
+		"packages/*"
+	],
 	"lint-staged": {
 		"*.{ts,tsx,js,jsx}": [
 			"prettier --write --print-width 100 --tab-width 4 --no-semi",

@@ -1,4 +1,6 @@
-exports[`test it should be able to move boxes - 1 1`] = `
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`it should be able to move boxes - 1 1`] = `
 Object {
   "id": "1",
   "name": "test",
@@ -7,7 +9,7 @@ Object {
 }
 `;
 
-exports[`test it should be able to move boxes - 1 2`] = `
+exports[`it should be able to move boxes - 1 2`] = `
 Object {
   "id": "1",
   "name": "test",
@@ -16,7 +18,7 @@ Object {
 }
 `;
 
-exports[`test it should be able to move boxes - 2 1`] = `
+exports[`it should be able to move boxes - 2 1`] = `
 Object {
   "id": "1",
   "name": "test",
