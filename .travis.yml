@@ -3,7 +3,7 @@ sudo: required
 before_install: # if "install" is overridden
   # we don't want the default yarn version
   - which yarn
-  - npm remove -g yarn
+  - sudo rm `which yarn`
   # Repo for Yarn
   - sudo apt-key adv --fetch-keys http://dl.yarnpkg.com/debian/pubkey.gpg
   - echo "deb http://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
