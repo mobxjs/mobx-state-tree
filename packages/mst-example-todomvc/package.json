@@ -1,6 +1,6 @@
 {
   "name": "mst-example-todomvc",
-  "version": "0.0.1",
+  "version": "1.1.0",
   "private": true,
   "devDependencies": {
     "react-scripts": "^1.0.14"
@@ -9,8 +9,8 @@
     "classnames": "^2.2.5",
     "mobx": "^3.3.0",
     "mobx-react": "^4.3.3",
-    "mobx-state-tree": "^1.0.1",
-    "mst-middlewares": "^1.0.0",
+    "mobx-state-tree": "^1.1.0",
+    "mst-middlewares": "^1.1.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "remotedev": "^0.2.7",
