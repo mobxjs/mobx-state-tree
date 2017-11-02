@@ -8,7 +8,10 @@ import {
     createActionTrackingMiddleware,
     IStateTreeNode,
     IModelType,
-    ISnapshottable
+    ISnapshottable,
+    IMiddlewareEvent,
+    IPatchRecorder,
+    IJsonPatch
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
@@ -35,16 +38,74 @@ const UndoManager = types
         let targetStore: IStateTreeNode
         let replaying = false
         let middlewareDisposer: () => void
+        let grouping = false
+        let groupRecorder: any = {
+            patches: [] as ReadonlyArray<IJsonPatch>,
+            inversePatches: [] as ReadonlyArray<IJsonPatch>
+        }
+        let recordingActionId: any = null
+        let recordingActionLevel = 0
 
+        const startRecordAction = (call: IMiddlewareEvent): any => {
+            // level for the case that actions have the same name
+            recordingActionLevel++
+            const actionId = call.name + recordingActionLevel
+            recordingActionId = actionId
+            return {
+                recorder: recordPatches(call.tree),
+                actionId
+            }
+        }
+        const stopRecordingAction = (recorder: IPatchRecorder): void => {
+            recordingActionId = null
+            if (grouping) return cachePatchForGroup(recorder)
+            ;(self as any).addUndoState(recorder)
+        }
+        const cachePatchForGroup = (recorder: IPatchRecorder): void => {
+            groupRecorder = {
+                patches: groupRecorder.patches.concat(recorder.patches),
+                inversePatches: groupRecorder.inversePatches.concat(recorder.patches)
+            }
+        }
         const undoRedoMiddleware = createActionTrackingMiddleware({
             filter: call => skipping === false && call.context !== self, // don't undo / redo undo redo :)
-            onStart: call => recordPatches(call.tree),
-            onResume: (call, recorder) => recorder.resume(),
-            onSuspend: (call, recorder) => recorder.stop(),
-            onSuccess: (call, recorder) => {
-                ;(self as any).addUndoState(recorder)
+            onStart: call => {
+                if (!recordingActionId) {
+                    return startRecordAction(call)
+                }
             },
-            onFail: (call, recorder) => recorder.undo()
+            onResume: (
+                call,
+                { recorder, actionId }: { recorder: any; actionId: any } = {
+                    recorder: undefined,
+                    actionId: undefined
+                }
+            ) => recorder && recorder.resume(),
+            onSuspend: (
+                call,
+                { recorder, actionId }: { recorder: any; actionId: any } = {
+                    recorder: undefined,
+                    actionId: undefined
+                }
+            ) => recorder && recorder.stop(),
+            onSuccess: (
+                call,
+                { recorder, actionId }: { recorder: any; actionId: any } = {
+                    recorder: undefined,
+                    actionId: undefined
+                }
+            ) => {
+                if (recordingActionId === actionId) {
+                    stopRecordingAction(recorder)
+                }
+            },
+            onFail: (
+                call,
+                { recorder, actionId }: { recorder: any; actionId: any } = {
+                    recorder: undefined,
+                    actionId: undefined
+                }
+            ) => recorder && recorder.undo()
         })
 
         return {
@@ -93,6 +154,15 @@ const UndoManager = types
                 } finally {
                     skipping = false
                 }
+            },
+            startGroup(fn: () => any) {
+                grouping = true
+                return fn()
+            },
+            endGroup() {
+                grouping = false
+                ;(self as any).addUndoState(groupRecorder)
+                groupRecorder = { patches: [], inversePatches: [] }
             }
         }
     })
