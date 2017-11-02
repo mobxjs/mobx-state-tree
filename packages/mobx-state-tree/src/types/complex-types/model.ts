@@ -439,7 +439,7 @@ export type Snapshot<T> = {
     [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
 }
 
-export function model<T = {}>(
+export function model<S = {}, T extends S = S>(
     name: string,
     properties?: IModelProperties<T>
 ): IModelType<Snapshot<T>, T>
