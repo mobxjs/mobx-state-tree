@@ -230,7 +230,7 @@ That basically means that you can restore your objects with your custom methods 
 
 First is by creating a new model instance, and pass in the snapshot as argument to create. That means that you will need to update all your store references, if used in React components, to the new one.
 
-The second option avoids this refrence problem by applying the snapshot to an existing model instance. Properties will be updated, but the store reference will remain the same. This will trigger an operation called "reconciliation". We will speak later about this phase.
+The second option avoids this reference problem by applying the snapshot to an existing model instance. Properties will be updated, but the store reference will remain the same. This will trigger an operation called "reconciliation". We will speak later about this phase.
 
 ```javascript
 // 1st
