@@ -159,7 +159,8 @@ const UndoManager = types
                 grouping = true
                 return fn()
             },
-            endGroup() {
+            endGroup(fn: () => any) {
+                if (fn) fn()
                 grouping = false
                 ;(self as any).addUndoState(groupRecorder)
                 groupRecorder = { patches: [], inversePatches: [] }
