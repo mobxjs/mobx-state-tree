@@ -198,7 +198,7 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
 }
 
 import { EMPTY_ARRAY, fail, isMutable } from "../utils"
-import { isStateTreeNode, getStateTreeNode } from "../core/node"
+import { isStateTreeNode, getStateTreeNode } from "../core/node/node-utils"
 import {
     IContext,
     IValidationResult,
@@ -206,5 +206,6 @@ import {
     typeCheckFailure,
     typeCheckSuccess
 } from "./type-checker"
-import { INode, IStateTreeNode, IJsonPatch } from "../core"
+import { INode, IStateTreeNode } from "../core/node/node-utils"
+import { IJsonPatch } from "../core/json-patch"
 import { getType } from "../core/mst-operations"
