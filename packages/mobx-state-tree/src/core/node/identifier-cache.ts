@@ -1,8 +1,3 @@
-import { fail } from "../../utils"
-import { observable, IObservableArray } from "mobx"
-import { IType } from "../../types/type"
-import { INode } from "./node-utils"
-
 export class IdentifierCache {
     private cache = observable.map<IObservableArray<INode>>()
 
@@ -68,3 +63,8 @@ export class IdentifierCache {
         }
     }
 }
+
+import { fail } from "../../utils"
+import { observable, IObservableArray } from "mobx"
+import { IType } from "../type"
+import { INode } from "./node-utils"

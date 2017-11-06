@@ -100,7 +100,7 @@ export function toJSON(this: IStateTreeNode) {
     return getStateTreeNode(this).snapshot
 }
 
-import { IType } from "../../types/type"
+import { IType } from "../type"
 import { IdentifierCache } from "./identifier-cache"
 import { IJsonPatch, IReversibleJsonPatch } from "../json-patch"
 import { IDisposer, fail } from "../../utils"

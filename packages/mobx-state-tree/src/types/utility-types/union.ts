@@ -1,14 +1,16 @@
-import { IType, Type } from "../type"
-import { isType, TypeFlags } from "../type-flags"
 import {
     IContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    flattenTypeErrors
-} from "../type-checker"
+    flattenTypeErrors,
+    isType,
+    TypeFlags,
+    IType,
+    Type,
+    INode
+} from "../../core"
 import { fail } from "../../utils"
-import { INode } from "../../core"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 

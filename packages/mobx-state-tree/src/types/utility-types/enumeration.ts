@@ -1,4 +1,4 @@
-import { ISimpleType } from "../type"
+import { ISimpleType } from "../../core"
 import { union } from "./union"
 import { literal } from "./literal"
 import { fail } from "../../utils"

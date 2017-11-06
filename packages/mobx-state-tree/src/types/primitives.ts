@@ -1,8 +1,16 @@
-import { ISimpleType, IType, Type } from "./type"
-import { TypeFlags } from "./type-flags"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "./type-checker"
 import { isPrimitive, fail, identity } from "../utils"
-import { INode, createNode } from "../core"
+import {
+    INode,
+    createNode,
+    ISimpleType,
+    IType,
+    Type,
+    TypeFlags,
+    IContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure
+} from "../core"
 
 export class CoreType<S, T> extends Type<S, T> {
     readonly checker: (value: any) => boolean

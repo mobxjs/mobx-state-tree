@@ -1,8 +1,7 @@
 import { union } from "./union"
 import { nullType } from "../primitives"
 import { optional } from "./optional"
-import { IType } from "../type"
-import { isType } from "../type-flags"
+import { IType, isType } from "../../core"
 import { frozen } from "./frozen"
 import { fail } from "../../utils"
 

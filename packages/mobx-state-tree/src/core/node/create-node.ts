@@ -56,4 +56,4 @@ import { canAttachNode, isStateTreeNode, getStateTreeNode, INode } from "./node-
 import { identity, noop, fail } from "../../utils"
 import { ObjectNode } from "./object-node"
 import { ScalarNode } from "./scalar-node"
-import { IType } from "../../types/index"
+import { IType } from "../type"

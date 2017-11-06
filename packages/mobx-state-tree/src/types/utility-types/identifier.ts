@@ -1,8 +1,16 @@
-import { Type, IType } from "../type"
-import { TypeFlags, isType } from "../type-flags"
-import { IContext, IValidationResult, typeCheckFailure } from "../type-checker"
 import { fail } from "../../utils"
-import { INode, createNode, isStateTreeNode } from "../../core"
+import {
+    INode,
+    createNode,
+    isStateTreeNode,
+    Type,
+    IType,
+    TypeFlags,
+    isType,
+    IContext,
+    IValidationResult,
+    typeCheckFailure
+} from "../../core"
 import { string as stringType } from "../primitives"
 
 class Identifier {

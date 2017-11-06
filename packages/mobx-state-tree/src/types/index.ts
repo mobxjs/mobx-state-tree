@@ -1,9 +1,7 @@
 // tslint:disable-next-line:no_unused-variable
 import { IObservableArray, ObservableMap, IAction } from "mobx"
 // tslint:disable-next-line:no_unused-variable
-import { IType, ISimpleType, IComplexType, ISnapshottable } from "./type"
-// tslint:disable-next-line:no_unused-variable
-import { TypeFlags } from "./type-flags"
+import { ISimpleType, IComplexType, IType } from "../core"
 // tslint:disable-next-line:no_unused-variable
 import { map, IExtendedObservableMap } from "./complex-types/map"
 import { array } from "./complex-types/array"
@@ -20,18 +18,8 @@ import { frozen } from "./utility-types/frozen"
 import { boolean, DatePrimitive, number, string, undefinedType, nullType } from "./primitives"
 import { late } from "./utility-types/late"
 import { enumeration } from "./utility-types/enumeration"
-import { typecheckPublic } from "./type-checker"
 
-export {
-    IType,
-    ISimpleType,
-    IComplexType,
-    IModelType,
-    ISnapshottable,
-    IExtendedObservableMap,
-    TypeFlags,
-    typecheckPublic
-}
+export { IModelType, IExtendedObservableMap }
 
 export const types = {
     enumeration,

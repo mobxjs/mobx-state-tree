@@ -1,8 +1,15 @@
-import { ISimpleType, Type } from "../type"
-import { TypeFlags } from "../type-flags"
 import { fail, isPrimitive } from "../../utils"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { INode, createNode } from "../../core"
+import {
+    INode,
+    createNode,
+    ISimpleType,
+    Type,
+    TypeFlags,
+    IContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure
+} from "../../core"
 
 export class Literal<T> extends Type<T, T> {
     readonly value: any

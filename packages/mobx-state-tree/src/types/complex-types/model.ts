@@ -18,8 +18,6 @@ import {
     EMPTY_OBJECT,
     addHiddenFinalProp
 } from "../../utils"
-import { ComplexType, IComplexType, IType } from "../type"
-import { TypeFlags, isType } from "../type-flags"
 import {
     createNode,
     getStateTreeNode,
@@ -27,16 +25,19 @@ import {
     IJsonPatch,
     INode,
     createActionInvoker,
-    escapeJsonPath
-} from "../../core"
-import {
+    escapeJsonPath,
+    ComplexType,
+    IComplexType,
+    IType,
+    TypeFlags,
+    isType,
     flattenTypeErrors,
     IContext,
     IValidationResult,
     typecheck,
     typeCheckFailure,
     getContextForPath
-} from "../type-checker"
+} from "../../core"
 import { getPrimitiveFactoryFromValue, undefinedType } from "../primitives"
 import { optional } from "../utility-types/optional"
 

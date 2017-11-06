@@ -1,13 +1,19 @@
-import { getStateTreeNode, isStateTreeNode, INode, createNode } from "../../core"
-import { Type, IType } from "../type"
-import { TypeFlags, isReferenceType, isType } from "../type-flags"
 import {
+    getStateTreeNode,
+    isStateTreeNode,
+    INode,
+    createNode,
+    Type,
+    IType,
+    TypeFlags,
+    isReferenceType,
+    isType,
     IContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
     prettyPrintValue
-} from "../type-checker"
+} from "../../core"
 import { fail } from "../../utils"
 
 class StoredReference {

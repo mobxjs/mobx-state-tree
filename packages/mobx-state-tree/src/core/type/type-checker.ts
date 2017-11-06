@@ -114,6 +114,6 @@ export function typecheckPublic(type: IType<any, any>, value: any): void {
 }
 
 import { IType } from "./type"
-import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
-import { getStateTreeNode, isStateTreeNode } from "../core"
+import { fail, EMPTY_ARRAY, isPrimitive } from "../../utils"
+import { getStateTreeNode, isStateTreeNode } from "../node/node-utils"
 import { isPrimitiveType } from "./type-flags"

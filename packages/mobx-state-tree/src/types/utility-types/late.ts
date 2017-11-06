@@ -1,8 +1,5 @@
 import { fail } from "../../utils"
-import { Type, IType } from "../type"
-import { TypeFlags } from "../type-flags"
-import { IContext, IValidationResult } from "../type-checker"
-import { INode } from "../../core"
+import { INode, Type, IType, TypeFlags, IContext, IValidationResult } from "../../core"
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>

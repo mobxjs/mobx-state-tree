@@ -1,7 +1,16 @@
-import { IType, Type } from "../type"
-import { TypeFlags, isType } from "../type-flags"
-import { isStateTreeNode, getStateTreeNode, INode } from "../../core"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
+import {
+    isStateTreeNode,
+    getStateTreeNode,
+    INode,
+    IType,
+    Type,
+    IContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure,
+    TypeFlags,
+    isType
+} from "../../core"
 import { fail } from "../../utils"
 
 export class Refinement<S, T> extends Type<S, T> {

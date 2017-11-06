@@ -1,4 +1,5 @@
 export * from "./node"
+export * from "./type"
 export { createActionInvoker } from "./action"
 export * from "./json-patch"
 export * from "./mst-operations"

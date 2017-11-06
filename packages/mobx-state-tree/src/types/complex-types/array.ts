@@ -17,19 +17,20 @@ import {
     INode,
     isStateTreeNode,
     IStateTreeNode,
-    isNode
-} from "../../core"
-import { addHiddenFinalProp, fail, isMutable, isArray, isPlainObject } from "../../utils"
-import { ComplexType, IComplexType, IType } from "../type"
-import { TypeFlags, isType } from "../type-flags"
-import {
+    isNode,
     typecheck,
     flattenTypeErrors,
     getContextForPath,
     IContext,
     IValidationResult,
-    typeCheckFailure
-} from "../type-checker"
+    typeCheckFailure,
+    ComplexType,
+    IComplexType,
+    IType,
+    TypeFlags,
+    isType
+} from "../../core"
+import { addHiddenFinalProp, fail, isMutable, isArray, isPlainObject } from "../../utils"
 
 export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
     return `${getStateTreeNode(this)}(${this.length} items)`

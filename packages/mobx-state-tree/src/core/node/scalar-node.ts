@@ -360,5 +360,5 @@ import {
     freeze,
     IDisposer
 } from "../../utils"
-import { IType } from "../../types/type"
+import { IType } from "../type"
 import { IMiddlewareHandler } from "../action"

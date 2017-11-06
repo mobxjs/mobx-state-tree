@@ -15,19 +15,19 @@ import {
     INode,
     createNode,
     isStateTreeNode,
-    IStateTreeNode
-} from "../../core"
-import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
-import { IType, IComplexType, ComplexType } from "../type"
-import { TypeFlags } from "../type-flags"
-import {
+    IStateTreeNode,
+    IType,
+    IComplexType,
+    ComplexType,
+    TypeFlags,
     IContext,
     IValidationResult,
     typeCheckFailure,
     flattenTypeErrors,
     getContextForPath,
     typecheck
-} from "../type-checker"
+} from "../../core"
+import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
 
 interface IMapFactoryConfig {
     isMapFactory: true

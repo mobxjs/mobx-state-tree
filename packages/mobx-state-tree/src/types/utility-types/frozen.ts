@@ -1,8 +1,15 @@
-import { ISimpleType, Type } from "../type"
-import { TypeFlags } from "../type-flags"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { isSerializable, deepFreeze } from "../../utils"
-import { createNode, INode } from "../../core"
+import {
+    createNode,
+    INode,
+    ISimpleType,
+    Type,
+    IContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure,
+    TypeFlags
+} from "../../core"
 
 export class Frozen<T> extends Type<T, T> {
     flags = TypeFlags.Frozen

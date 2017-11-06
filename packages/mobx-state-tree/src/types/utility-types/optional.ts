@@ -1,7 +1,16 @@
-import { Type, IType } from "../type"
-import { TypeFlags, isType } from "../type-flags"
-import { IContext, IValidationResult, typecheck, typeCheckSuccess } from "../type-checker"
-import { isStateTreeNode, getStateTreeNode, INode } from "../../core"
+import {
+    isStateTreeNode,
+    getStateTreeNode,
+    INode,
+    Type,
+    IType,
+    TypeFlags,
+    isType,
+    IContext,
+    IValidationResult,
+    typecheck,
+    typeCheckSuccess
+} from "../../core"
 import { fail } from "../../utils"
 
 export type IFunctionReturn<T> = () => T
