@@ -42,7 +42,7 @@ Introduction blog post [The curious case of MobX state tree](https://medium.com/
 * [Tips](#tips)
 * [FAQ](#FAQ)
 * [Full Api Docs](API.md)
-* [Built-in / example middlewares](middleware/README.md)
+* [Built-in / example middlewares](packages/mst-middlewares/README.md)
 * [Changelog](changelog.md)
 
 # Installation
