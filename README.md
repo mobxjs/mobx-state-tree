@@ -305,7 +305,7 @@ MST trees have very specific semantics. These semantics purposefully constrain w
 2. It is however possible to refer to another object in the _same_ tree by using _references_
 3. There is no limit to the amount of MST trees that live in an application. However, each node can only live in exactly one tree.
 4. All _leaves_ in the tree must be serializable; it is not possible to store, for example, functions in a MST.
-6. The only free-form type in MST is frozen; with the requirement that frozen values are immutable so that the MST semantics can still be upheld.
+6. The only free-form type in MST is frozen; with the requirement that frozen values are immutable and serializable so that the MST semantics can still be upheld.
 7. At any point in the tree it is possible to assign a snapshot to the tree instead of a concrete instance of the expected type. In that case an instance of the correct type, based on the snapshot, will be automatically created for you.
 8. Nodes in the MST tree will be reconciled (the exact same instance will be reused) when updating the tree by any means, based on their _identifier_ property. If there is no identifier property, instances won't be reconciled.
 9. If a node in the tree is replaced by another node, the original node will die and become unusable. This makes sure you are not accidentally holding on to stale objects anywhere in your application.
