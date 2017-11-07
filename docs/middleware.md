@@ -1,6 +1,6 @@
 # Middleware
 
-MST ships with a small set of [pre-built / example middlewares](../middleware/README.md)
+MST ships with a small set of [pre-built / example middlewares](../packages/mst-middlewares/README.md)
 
 Middleware can be used to intercept any action is invoked on the subtree where it is attached.
 If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
