@@ -35,6 +35,7 @@ const UndoManager = types
     }))
     .actions(self => {
         let skipping = false
+        let flagSkipping = false
         let targetStore: IStateTreeNode
         let replaying = false
         let middlewareDisposer: () => void
@@ -48,6 +49,7 @@ const UndoManager = types
 
         const startRecordAction = (call: IMiddlewareEvent): any => {
             // level for the case that actions have the same name
+            skipping = flagSkipping
             recordingActionLevel++
             const actionId = call.name + recordingActionLevel
             recordingActionId = actionId
@@ -58,8 +60,11 @@ const UndoManager = types
         }
         const stopRecordingAction = (recorder: IPatchRecorder): void => {
             recordingActionId = null
-            if (grouping) return cachePatchForGroup(recorder)
-            ;(self as any).addUndoState(recorder)
+            if (!skipping) {
+                if (grouping) return cachePatchForGroup(recorder)
+                ;(self as any).addUndoState(recorder)
+            }
+            skipping = flagSkipping
         }
         const cachePatchForGroup = (recorder: IPatchRecorder): void => {
             groupRecorder = {
@@ -68,7 +73,8 @@ const UndoManager = types
             }
         }
         const undoRedoMiddleware = createActionTrackingMiddleware({
-            filter: call => skipping === false && call.context !== self, // don't undo / redo undo redo :)
+            // the flagSkipping === false check is mainly a performance optimisation
+            filter: call => flagSkipping === false && call.context !== self, // don't undo / redo undo redo :)
             onStart: call => {
                 if (!recordingActionId) {
                     return startRecordAction(call)
@@ -150,9 +156,10 @@ const UndoManager = types
             withoutUndo(fn: () => any) {
                 try {
                     skipping = true
+                    flagSkipping = true
                     return fn()
                 } finally {
-                    skipping = false
+                    flagSkipping = false
                 }
             },
             startGroup(fn: () => any) {
