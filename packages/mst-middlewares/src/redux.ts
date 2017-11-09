@@ -53,7 +53,7 @@ function runMiddleWare(action: any, runners: any[], next: any) {
  */
 export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: any, model: any) {
     // Connect to the monitor
-    const remotedev = remoteDevDep.connectViaExtension()
+    const remotedev = remoteDevDep.connectViaExtension({name: mst.getType(model).name})
     let applyingSnapshot = false
 
     // Subscribe to change state (if need more than just logging)
