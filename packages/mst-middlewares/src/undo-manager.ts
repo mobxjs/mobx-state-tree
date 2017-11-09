@@ -166,7 +166,7 @@ const UndoManager = types
                 grouping = true
                 return fn()
             },
-            endGroup(fn: () => any) {
+            stopGroup(fn: () => any) {
                 if (fn) fn()
                 grouping = false
                 ;(self as any).addUndoState(groupRecorder)

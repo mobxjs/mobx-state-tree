@@ -177,67 +177,139 @@ if (timeTraveller.canUndo)
 
 # UndoManager
 
-The `UndoManager` model is quite similar to the `TimeTraveller`. However, it has a few unique features.
-Because it records patches instead of snapshots, it is better capable in dealing with concurrency and asynchronous processes.
-These improvements make it actually useful to implement end-user undo / redo:
+The `UndoManager` is the more fine grained `TimeTraveller`.
+Because it records patches instead of snapshots, it is better at dealing with concurrent and asynchronous processes.
+The differences to the `TimeTraveller` make it useful to implement end-user undo / redo.
 
-Differences with `TimeTraveller`:
+For an in-depth explanation why undo / redo should be patch, not snapshot, based, check out the second half of the React Next talk:
+[MobX-state-tree, React but for data](https://www.youtube.com/watch?v=xfC_xEA8Z1M&index=6&list=PLMYVq3z1QxSqq6D7jxVdqttOX7H_Brq8Z)
 
-1. An undo state is only comitted if the process is finished. An ongoing process cannot be undone
-2. `undo` reverts the whole process, it doesn't just go back to the snapshots
-3. Failing processes do not add an undo state, rather they are rolled back automatically
-4. Multiple concurrent processes only undo their own changes, not the changes caused by other actions like snapshots would
-5. `UndoManager.withoutUndo(() => { /* stuff */ })` can be used to not record undo states for certain actions. E.g. when receiving changes from the server.
+Differences to the `TimeTraveller`:
 
-`UndoManager` exposes the following api:
+1. It records patches for actions / processes, not snapshots. It's therefore using less memory.
+2. `undo` / `redo` applies all inverted patches / patches for a recorded action / process instead of snapshots.
+3. An undo state is only comitted to the history if the action / process is finished. Ongoing processes can't be undone.
+4. Failing processes do not add an undo state.
+5. Multiple concurrent processes only undo their own changes and don't touch the changes caused by other actions - unlike snapshots would.
 
+API:
+
+* `history: { patches: [], inversePatches [] }[]`
 * `canUndo: boolean`
 * `canRedo: boolean`
 * `undo()`
 * `redo()`
-* `history: { patches: [], inversePatches [] }[]`: array with all recorded states
-* `withoutUndo(() => { /* stuff */ })` can be used to not record undo states for certain actions
+* `withoutUndo(() => fn)` patches for actions / processes within the fn are not recorded.
+* `startGroup(() => fn)` can be used to start a group, all patches within a group are saved as one history entry.
+* `stopGroup()` can be used to stop the recording of patches for the grouped history entry.
 
-For an in-depth explanation why undo / redo should be patch based, and not based on snapshots, see the second half of the React Next talk: [MobX-state-tree, React but for data](https://www.youtube.com/watch?v=xfC_xEA8Z1M&index=6&list=PLMYVq3z1QxSqq6D7jxVdqttOX7H_Brq8Z)
+Setup and API usage examples:
 
-Setup again is very similar to `TimeTraveller`.
-`UndoManager` automatically records all the actions in a tree it is part of, and no further target needs to be specified.
+The setup is very similar to the one of the `TimeTraveller`.
+The `UndoManager` automatically records all the actions within the tree it is attached to.
 
+If you want the history to be a part of your store:
 ```javascript
 import {UndoManager} from "mst-middlewares"
 
-export const Store = types
-    .model({
-        todos: types.array(Todo),
-        history: types.optional(UndoManager, {})
-    })
+export const Store = types.model({
+    persons: types.array(PersonModel),
+    history: types.optional(UndoManager, {})
+})
 
 const store = Store.create()
-
-// later:
-if (store.history.canUndo)
-    store.history.undo()
-// etc
 ```
 
-To record the changes in another tree, use the following setup:
-
+To record the changes in another tree:
 ```javascript
 import {UndoManager} from "mst-middlewares"
 
-export const Store = types
-    .model({
-        todos: types.array(Todo),
-
-    })
+export const Store = types.model({
+    todos: types.array(Todo),
+})
 
 const store = Store.create()
 const undoManager = UndoManager.create({}, { targetStore: store })
+```
 
-// later:
-if (undoManager.canUndo)
-    undoManager.undo()
-// etc
+Undo/ Redo:
+```js
+import {undoManager, store} from './Store'
+
+// if the undoManger is created within another tree
+const undo1 = () => undoManager.canUndo && undoManager.undo()
+const redo1 = () => undoManager.canRedo && undoManager.redo()
+
+// if the undoManger is created within the same tree
+const undo2 = () => store.history.canUndo && store.history.undo()
+const redo2 = () => store.history.canRedo && store.history.redo()
+```
+
+WithoutUndo within a react component:
+```js
+import {store, undoManger} from '../Store'
+...
+setPersonName = () => {
+    // the action addPerson wont be saved onto the history, you could add more than one action.
+    undoManger.withoutUndo(() => store.setPersonName('firstName', 'lastName'))
+}
+
+render() {
+    return (
+        <div onClick={this.setPersonName}>
+            SetPersonName
+        </div>
+    )
+}
+...
+```
+
+WithoutUndo declarative:
+```javascript
+import {undoManger} from '../Store'
+import {types} from 'mobx-state-tree'
+
+const PersonModel = types.model('PersonModel', {
+    firstName: types.string,
+    lastName: types.string
+}).actions(self => {
+    return {
+        // setPersonName won't be recorded onto the history in general
+        setPersonName: (firstName, lastName) => undoManger.withoutUndo(() => {
+            self.firstName = firstName
+            self.lastName = lastName
+        })
+    }
+})
+
+const StoreModel = types.model('StoreModel', {
+    persons: types.map(PersonModel)
+}).actions(self => ({
+    addPerson(firstName, lastName) {
+        persons.put({ firstName, lastName })
+    }
+}))
+
+export const Store = StoreModel.create({});
+export const undoManager = UndoManager.create({}, { targetStore: Store });
+```
+
+StartGroup, EndGroup
+```
+...
+handleStop = (mousePosition, { dx, dy }) => {
+  this.stopTrackingDrag();
+  undoManager.endGroup();
+}
+
+handleDrag = (mousePosition, { dx, dy }) => {
+  const { view, parentNode } = this.props;
+  // only one history entry will be created for the whole dragging
+  undoManager.startGroup(() =>
+    parentNode.moveSelectedNodes({ dx: dx / view.zoom, dy: dy / view.zoom })
+  );
+}
+...
 ```
 
 ---
