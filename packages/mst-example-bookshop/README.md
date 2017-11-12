@@ -11,7 +11,7 @@
 Related talks using this project:
 
 * [React Amsterdam 2017 talk: Divide and Conquer](https://www.youtube.com/watch?v=3J9EJrvqOiM)
-* React Europe talk: Next generation state managament (TODO: link)
+* [React Europe 2017 talk: Next generation state managament](https://www.youtube.com/watch?v=rwqwwn_46kA)
 
 Based on create-react-app
 
