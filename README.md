@@ -1011,6 +1011,13 @@ const Todo = types.model({
 type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { title: string; setTitle: (v: string) => void }
 ```
 
+Due the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes alot of CPU time and freeze vscode (or others)
+A partial solution for this is to turn the `.Type` into an interface.
+```ts
+type ITodoType = typeof Todo.Type;
+interface ITodo extends ITodoType {};
+```
+   
 Sometimes you'll need to take into account where your typings are available and where they aren't. The code below will not compile: TypeScript will complain that `self.upperProp` is not a known property. Computed properties are only available after `.views` is evaluated.
 
 ```typescript
