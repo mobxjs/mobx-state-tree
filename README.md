@@ -732,7 +732,7 @@ These are the types available in MST. All types can be found in the `types` name
 * `types.null` the type of `null`
 * `types.undefined` the type of `undefined`
 * `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
-* `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is immutable.
+* `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is **immutable** and **serializable**.
 * `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one
 
 ## Property types

@@ -36,10 +36,12 @@ export class Frozen<T> extends Type<T, T> {
 
 /**
  * Frozen can be used to story any value that is serializable in itself (that is valid JSON).
- * Frozen values need to be immutable or treated as if immutable.
+ * Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
  * Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
  *
  * This is useful to store complex, but immutable values like vectors etc. It can form a powerful bridge to parts of your application that should be immutable, or that assume data to be immutable.
+ *
+ * Note: if you want to store free-form state that is mutable, or not serializeable, consider using volatile state instead.
  *
  * @example
  * const GameCharacter = types.model({
