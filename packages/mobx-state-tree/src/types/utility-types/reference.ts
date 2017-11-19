@@ -1,17 +1,12 @@
-import { getStateTreeNode, isStateTreeNode, Node, createNode } from "../../core"
+import { createNode, getStateTreeNode, isStateTreeNode, IStateTreeNode, Node } from "../../core"
 import { Type, IType } from "../type"
 import { TypeFlags, isReferenceType, isType } from "../type-flags"
-import {
-    IContext,
-    IValidationResult,
-    typeCheckSuccess,
-    typeCheckFailure,
-    prettyPrintValue
-} from "../type-checker"
+import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
 import { fail } from "../../utils"
+import { action } from "mobx"
 
 class StoredReference {
-    constructor(public mode: "identifier" | "object", public value: any) {
+    constructor(public readonly mode: "identifier" | "object", public readonly value: any) {
         if (mode === "object") {
             if (!isStateTreeNode(value))
                 return fail(`Can only store references to tree nodes, got: '${value}'`)
@@ -25,8 +20,15 @@ class StoredReference {
 export class ReferenceType<T> extends Type<string | number, T> {
     readonly flags = TypeFlags.Reference
 
-    constructor(private readonly targetType: IType<any, T>) {
+    constructor(
+        private readonly targetType: IType<any, T>,
+        private readonly options?: ReferenceOptions<T>
+    ) {
         super(`reference(${targetType.name})`)
+    }
+
+    get isCustomReference() {
+        return !!this.options
     }
 
     describe() {
@@ -34,18 +36,24 @@ export class ReferenceType<T> extends Type<string | number, T> {
     }
 
     getValue(node: Node) {
-        const ref = node.storedValue as StoredReference
-        if (ref.mode === "object") return ref.value
-
         if (!node.isAlive) return undefined
-        // reference was initialized with the identifier of the target
-        const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
-        if (!target)
-            return fail(
-                `Failed to resolve reference of type ${this.targetType
-                    .name}: '${ref.value}' (in: ${node.path})`
-            )
-        return target.value
+        const ref = node.storedValue as StoredReference
+
+        if (!this.isCustomReference) {
+            // id already resolved, return
+            if (ref.mode === "object") return ref.value
+
+            // reference was initialized with the identifier of the target
+            const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
+            if (!target)
+                return fail(
+                    `Failed to resolve reference of type ${this.targetType
+                        .name}: '${ref.value}' (in: ${node.path})`
+                )
+            return target.value
+        } else {
+            return this.options!.get(ref.value, node.parent ? node.parent.storedValue : null)
+        }
     }
 
     getSnapshot(node: Node): any {
@@ -60,15 +68,30 @@ export class ReferenceType<T> extends Type<string | number, T> {
 
     instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
         const isComplex = isStateTreeNode(snapshot)
-        return createNode(
-            this,
-            parent,
-            subpath,
-            environment,
-            new StoredReference(isComplex ? "object" : "identifier", snapshot)
-        )
+        if (!this.isCustomReference)
+            return createNode(
+                this,
+                parent,
+                subpath,
+                environment,
+                new StoredReference(isComplex ? "object" : "identifier", snapshot)
+            )
+        else
+            return createNode(
+                this,
+                parent,
+                subpath,
+                environment,
+                new StoredReference(
+                    "identifier",
+                    isComplex
+                        ? this.options!.set(snapshot, parent ? parent.storedValue : null)
+                        : snapshot
+                )
+            )
     }
 
+    @action
     reconcile(current: Node, newValue: any): Node {
         const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
         if (isReferenceType(current.type)) {
@@ -100,7 +123,15 @@ export class ReferenceType<T> extends Type<string | number, T> {
     }
 }
 
-export function reference<T>(factory: IType<any, T>): IType<string | number, T>
+export type ReferenceOptions<T> = {
+    get(identifier: string | number, parent: IStateTreeNode | null): T
+    set(value: T, parent: IStateTreeNode | null): string | number
+}
+
+export function reference<T>(
+    factory: IType<any, T>,
+    options?: ReferenceOptions<T>
+): IType<string | number, T>
 /**
  * Creates a reference to another type, which should have defined an identifier.
  * See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
@@ -108,7 +139,7 @@ export function reference<T>(factory: IType<any, T>): IType<string | number, T>
  * @export
  * @alias types.reference
  */
-export function reference<T>(subType: IType<any, T>): any {
+export function reference<T>(subType: IType<any, T>, options?: ReferenceOptions<T>): any {
     // check that a type is given
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subType))
@@ -116,5 +147,5 @@ export function reference<T>(subType: IType<any, T>): any {
         if (arguments.length === 2 && typeof arguments[1] === "string")
             fail("References with base path are no longer supported. Please remove the base path.")
     }
-    return new ReferenceType(subType)
+    return new ReferenceType(subType, options)
 }
