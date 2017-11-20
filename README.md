@@ -49,7 +49,7 @@ Introduction blog post [The curious case of MobX state tree](https://medium.com/
 
 * NPM: `npm install mobx mobx-state-tree --save`
 * Yarn: `yarn add mobx mobx-state-tree`
-* CDN: https://unpkg.com/mobx-state-tree@0.8.2/dist/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
+* CDN: https://unpkg.com/mobx-state-tree@1.1.0/dist/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
 * Playground: [https://mattiamanzati.github.io/mobx-state-tree-playground/](https://mattiamanzati.github.io/mobx-state-tree-playground/) (with React UI, snapshots, patches and actions display)
 * CodeSandbox [TodoList demo](https://codesandbox.io/s/nZ26kGMD) fork for testing and bug reporting
 
