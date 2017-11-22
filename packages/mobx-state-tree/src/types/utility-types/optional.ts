@@ -4,7 +4,6 @@ import {
     INode,
     Type,
     IType,
-    TypeFlags,
     isType,
     IContext,
     IValidationResult,
@@ -19,10 +18,6 @@ export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<
 export class OptionalValue<S, T> extends Type<S, T> {
     readonly type: IType<S, T>
     readonly defaultValue: IOptionalValue<S, T>
-
-    get flags() {
-        return this.type.flags | TypeFlags.Optional
-    }
 
     constructor(type: IType<S, T>, defaultValue: IOptionalValue<S, T>) {
         super(type.name)
@@ -110,8 +105,4 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): 
         typecheck(type, defaultSnapshot)
     }
     return new OptionalValue(type, defaultValueOrFunction)
-}
-
-export function isOptionalType(type: any): type is OptionalValue<any, any> {
-    return isType(type) && (type.flags & TypeFlags.Optional) > 0
 }

@@ -19,14 +19,12 @@ import {
     IType,
     IComplexType,
     ComplexType,
-    TypeFlags,
     IContext,
     IValidationResult,
     typeCheckFailure,
     flattenTypeErrors,
     getContextForPath,
-    typecheck,
-    isType
+    typecheck
 } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
 
@@ -65,7 +63,6 @@ function put(this: ObservableMap<any>, value: any) {
 export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
     shouldAttachNode = true
     subType: IType<any, any>
-    readonly flags = TypeFlags.Map
 
     constructor(name: string, subType: IType<any, any>) {
         super(name)
@@ -294,10 +291,4 @@ export function map<S, T>(
     subtype: IType<S, T>
 ): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
     return new MapType<S, T>(`map<string, ${subtype.name}>`, subtype)
-}
-
-export function isMapType<S, T>(
-    type: any
-): type is IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
-    return isType(type) && (type.flags & TypeFlags.Map) > 0
 }

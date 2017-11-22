@@ -5,7 +5,6 @@ import {
     isStateTreeNode,
     Type,
     IType,
-    TypeFlags,
     isType,
     IContext,
     IValidationResult,
@@ -21,8 +20,6 @@ class Identifier {
 }
 
 export class IdentifierType<T> extends Type<T, T> {
-    readonly flags = TypeFlags.Identifier
-
     constructor(public readonly identifierType: IType<T, T>) {
         super(`identifier(${identifierType.name})`)
     }
@@ -94,8 +91,4 @@ export function identifier(baseType: IType<any, any> = stringType): any {
             fail("expected a mobx-state-tree type as first argument, got " + baseType + " instead")
     }
     return new IdentifierType(baseType)
-}
-
-export function isIdentifierType(type: any): type is IdentifierType<any> {
-    return isType(type) && (type.flags & TypeFlags.Identifier) > 0
 }
