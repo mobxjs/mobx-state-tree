@@ -25,7 +25,8 @@ import {
     typeCheckFailure,
     flattenTypeErrors,
     getContextForPath,
-    typecheck
+    typecheck,
+    isType
 } from "../../core"
 import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
 
@@ -293,4 +294,10 @@ export function map<S, T>(
     subtype: IType<S, T>
 ): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
     return new MapType<S, T>(`map<string, ${subtype.name}>`, subtype)
+}
+
+export function isMapType<S, T>(
+    type: any
+): type is IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
+    return isType(type) && (type.flags & TypeFlags.Map) > 0
 }

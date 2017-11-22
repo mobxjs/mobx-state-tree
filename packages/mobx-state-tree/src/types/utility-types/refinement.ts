@@ -120,3 +120,7 @@ export function refinement(...args: any[]): IType<any, any> {
     }
     return new Refinement(name, type, predicate, message)
 }
+
+export function isRefinementType(type: any): type is Refinement<any, any> {
+    return (type.flags & TypeFlags.Refinement) > 0
+}

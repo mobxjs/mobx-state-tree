@@ -365,3 +365,7 @@ function areSame(oldNode: INode, newValue: any) {
         return true
     return false
 }
+
+export function isArrayType<S, T>(type: any): type is IComplexType<S[], IObservableArray<T>> {
+    return isType(type) && (type.flags & TypeFlags.Array) > 0
+}

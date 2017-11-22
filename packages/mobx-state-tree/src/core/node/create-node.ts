@@ -51,7 +51,6 @@ export function isNode(value: any): value is INode {
     return value instanceof ScalarNode || value instanceof ObjectNode
 }
 
-import { observable, computed, reaction } from "mobx"
 import { canAttachNode, isStateTreeNode, getStateTreeNode, INode } from "./node-utils"
 import { identity, noop, fail } from "../../utils"
 import { ObjectNode } from "./object-node"

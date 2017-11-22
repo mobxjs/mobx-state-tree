@@ -6,13 +6,11 @@ import {
     Type,
     IType,
     TypeFlags,
-    isReferenceType,
     isType,
     IContext,
     IValidationResult,
     typeCheckSuccess,
-    typeCheckFailure,
-    prettyPrintValue
+    typeCheckFailure
 } from "../../core"
 import { fail } from "../../utils"
 
@@ -123,4 +121,8 @@ export function reference<T>(subType: IType<any, T>): any {
             fail("References with base path are no longer supported. Please remove the base path.")
     }
     return new ReferenceType(subType)
+}
+
+export function isReferenceType(type: any): type is ReferenceType<any> {
+    return (type.flags & TypeFlags.Reference) > 0
 }

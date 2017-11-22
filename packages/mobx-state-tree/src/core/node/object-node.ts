@@ -1,3 +1,6 @@
+import { reaction } from "mobx"
+import { ScalarNode } from "./scalar-node"
+
 export class ObjectNode extends ScalarNode implements INode {
     middlewares: IMiddlewareHandler[]
     private snapshotSubscribers: ((snapshot: any) => void)[]
@@ -154,8 +157,6 @@ export class ObjectNode extends ScalarNode implements INode {
     }
 }
 
-import { reaction } from "mobx"
-import { ScalarNode } from "./scalar-node"
 import { INode, isStateTreeNode, getStateTreeNode } from "./node-utils"
 import { IJsonPatch, IReversibleJsonPatch, splitJsonPath, splitPatch } from "../json-patch"
 import { IType } from "../type"

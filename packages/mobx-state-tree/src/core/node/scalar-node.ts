@@ -1,3 +1,5 @@
+import { observable, action, computed } from "mobx"
+
 let nextNodeId = 1
 export class ScalarNode implements INode {
     // optimization: these fields make MST memory expensive for primitives. Most can be initialized lazily, or with EMPTY_ARRAY on prototype
@@ -341,7 +343,6 @@ export class ScalarNode implements INode {
     }
 }
 
-import { observable, action, computed } from "mobx"
 import { INode, toJSON } from "./node-utils"
 import { IdentifierCache } from "./identifier-cache"
 import {

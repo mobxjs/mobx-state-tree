@@ -111,3 +111,7 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): 
     }
     return new OptionalValue(type, defaultValueOrFunction)
 }
+
+export function isOptionalType(type: any): type is OptionalValue<any, any> {
+    return isType(type) && (type.flags & TypeFlags.Optional) > 0
+}

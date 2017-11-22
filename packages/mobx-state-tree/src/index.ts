@@ -1,6 +1,7 @@
 // Fix some circular deps:
-import "./core/node"
-import "./types/type"
+import "./core/type/type"
+import "./core/node/object-node"
+import "./core/node/scalar-node"
 
 export { types, IModelType, IExtendedObservableMap } from "./types"
 

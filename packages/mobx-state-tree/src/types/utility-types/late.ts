@@ -1,5 +1,5 @@
 import { fail } from "../../utils"
-import { INode, Type, IType, TypeFlags, IContext, IValidationResult } from "../../core"
+import { INode, Type, IType, TypeFlags, IContext, IValidationResult, isType } from "../../core"
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>
@@ -81,4 +81,8 @@ export function late<S, T>(nameOrType: any, maybeType?: ILateType<S, T>): IType<
             )
     }
     return new Late<S, T>(name, type)
+}
+
+export function isLateType(type: any): type is Late<any, any> {
+    return isType(type) && (type.flags & TypeFlags.Late) > 0
 }

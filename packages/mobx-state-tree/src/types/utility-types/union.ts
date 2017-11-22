@@ -334,3 +334,7 @@ export function union(
     }
     return new Union(name, types, dispatcher)
 }
+
+export function isUnionType(type: any): type is Union {
+    return (type.flags & TypeFlags.Union) > 0
+}

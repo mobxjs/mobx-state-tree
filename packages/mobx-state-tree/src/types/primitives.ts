@@ -1,15 +1,16 @@
+import { Type } from "../core/type/type"
 import { isPrimitive, fail, identity } from "../utils"
 import {
     INode,
     createNode,
     ISimpleType,
     IType,
-    Type,
     TypeFlags,
     IContext,
     IValidationResult,
     typeCheckSuccess,
-    typeCheckFailure
+    typeCheckFailure,
+    isType
 } from "../core"
 
 export class CoreType<S, T> extends Type<S, T> {
@@ -162,4 +163,12 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
             if (value instanceof Date) return DatePrimitive
     }
     return fail("Cannot determine primitive type from value " + value)
+}
+
+export function isPrimitiveType(type: any): type is CoreType<any, any> {
+    return (
+        isType(type) &&
+        (type.flags & (TypeFlags.String | TypeFlags.Number | TypeFlags.Boolean | TypeFlags.Date)) >
+            0
+    )
 }

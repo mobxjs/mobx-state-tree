@@ -8,7 +8,8 @@ import {
     IContext,
     IValidationResult,
     typeCheckSuccess,
-    typeCheckFailure
+    typeCheckFailure,
+    isType
 } from "../../core"
 
 export class Literal<T> extends Type<T, T> {
@@ -63,4 +64,8 @@ export function literal<S>(value: S): ISimpleType<S> {
         if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
     }
     return new Literal<S>(value)
+}
+
+export function isLiteralType(type: any): type is Literal<any> {
+    return isType(type) && (type.flags & TypeFlags.Literal) > 0
 }

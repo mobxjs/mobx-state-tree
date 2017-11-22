@@ -79,7 +79,7 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
                 )
 
             // the user intended to use a view
-            const descriptor = Object.getOwnPropertyDescriptor(properties, key)
+            const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if ("get" in descriptor) {
                 fail("Getters are not supported as properties. Please use views instead")
             }
@@ -181,6 +181,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             }
 
             addHiddenFinalProp(self, name, createActionInvoker(self, name, action))
+            return
         })
     }
 
@@ -224,7 +225,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             fail(`views initializer should return a plain object containing views`)
         Object.keys(views).forEach(key => {
             // is this a computed property?
-            const descriptor = Object.getOwnPropertyDescriptor(views, key)
+            const descriptor = Object.getOwnPropertyDescriptor(views, key)!
             const { value } = descriptor
             if ("get" in descriptor) {
                 // TODO: mobx currently does not allow redefining computes yet, pending #1121
@@ -496,4 +497,8 @@ export function compose(...args: any[]): IModelType<any, any> {
             })
         )
         .named(typeName)
+}
+
+export function isObjectType(type: any): type is ModelType<any, any> {
+    return isType(type) && (type.flags & TypeFlags.Object) > 0
 }

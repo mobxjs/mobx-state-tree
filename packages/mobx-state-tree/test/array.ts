@@ -316,7 +316,7 @@ test("it correctly reconciliate when swapping", t => {
     t.deepEqual(s.todos.map(getPath), ["/todos/0", "/todos/1"])
 })
 
-test("it correctly reconciliate when swapping using snapshots", t => {
+test.only("it correctly reconciliate when swapping using snapshots", t => {
     const Task = types.model("Task", {})
     const Store = types.model({
         todos: types.optional(types.array(Task), [])
