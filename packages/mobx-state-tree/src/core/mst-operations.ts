@@ -1,3 +1,20 @@
+import { IObservableArray, ObservableMap } from "mobx"
+import {
+    INode,
+    getStateTreeNode,
+    IStateTreeNode,
+    isStateTreeNode,
+    IJsonPatch,
+    splitJsonPath,
+    asArray,
+    EMPTY_OBJECT,
+    fail,
+    IDisposer,
+    ISnapshottable,
+    IType,
+    isType
+} from "../internal"
+
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
  *
@@ -216,10 +233,10 @@ export function protect(target: IStateTreeNode) {
  * }))
  *
  * const todo = Todo.create()
- * todo.done = true // throws! 
- * todo.toggle() // OK 
- * unprotect(todo) 
- * todo.done = false // OK 
+ * todo.done = true // throws!
+ * todo.toggle() // OK
+ * unprotect(todo)
+ * todo.done = false // OK
  */
 export function unprotect(target: IStateTreeNode) {
     // check all arguments
@@ -644,9 +661,3 @@ export function walk(target: IStateTreeNode, processor: (item: IStateTreeNode) =
     })
     processor(node.storedValue)
 }
-
-import { IObservableArray, ObservableMap } from "mobx"
-import { INode, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"
-import { IJsonPatch, splitJsonPath } from "./json-patch"
-import { asArray, EMPTY_OBJECT, fail, IDisposer } from "../utils"
-import { ISnapshottable, IType, isType } from "./type"

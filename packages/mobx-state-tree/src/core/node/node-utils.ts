@@ -1,3 +1,13 @@
+import {
+    IType,
+    IdentifierCache,
+    IReversibleJsonPatch,
+    IJsonPatch,
+    IDisposer,
+    fail,
+    IMiddlewareHandler
+} from "../../internal"
+
 export interface INode {
     readonly type: IType<any, any>
 
@@ -99,9 +109,3 @@ export function canAttachNode(value: any) {
 export function toJSON(this: IStateTreeNode) {
     return getStateTreeNode(this).snapshot
 }
-
-import { IType } from "../type"
-import { IdentifierCache } from "./identifier-cache"
-import { IJsonPatch, IReversibleJsonPatch } from "../json-patch"
-import { IDisposer, fail } from "../../utils"
-import { IMiddlewareHandler } from "../action"

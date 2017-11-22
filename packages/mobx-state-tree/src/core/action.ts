@@ -1,5 +1,15 @@
 import { action as mobxAction } from "mobx"
 
+import {
+    INode,
+    getStateTreeNode,
+    IStateTreeNode,
+    fail,
+    argsToArray,
+    IDisposer,
+    getRoot
+} from "../internal"
+
 export type IMiddlewareEventType =
     | "action"
     | "process_spawn"
@@ -156,7 +166,3 @@ function runMiddleWares(node: INode, baseCall: IMiddlewareEvent, originalFn: Fun
     }
     return runNextMiddleware(baseCall)
 }
-
-import { INode, getStateTreeNode, IStateTreeNode } from "./node"
-import { fail, argsToArray, IDisposer } from "../utils"
-import { getRoot } from "./mst-operations"

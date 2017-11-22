@@ -1,16 +1,25 @@
 import { runInAction } from "mobx"
 
-import { INode, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "../core/node"
-import { addMiddleware, IMiddlewareEvent } from "../core/action"
 import {
+    INode,
+    getStateTreeNode,
+    IStateTreeNode,
+    isStateTreeNode,
+    addMiddleware,
+    IMiddlewareEvent,
     tryResolve,
     applyPatch,
     getType,
     applySnapshot,
     isRoot,
-    isProtected
-} from "../core/mst-operations"
-import { fail, isPlainObject, isPrimitive, IDisposer, isArray, asArray } from "../utils"
+    isProtected,
+    fail,
+    isPlainObject,
+    isPrimitive,
+    IDisposer,
+    isArray,
+    asArray
+} from "../internal"
 
 export type ISerializedActionCall = {
     name: string
@@ -155,7 +164,7 @@ export function recordActions(subject: IStateTreeNode): IActionRecorder {
  * const Todo = types.model({
  *   task: types.string
  * })
- * 
+ *
  * const TodoStore = types.model({
  *   todos: types.array(Todo)
  * }).actions(self => ({
@@ -163,16 +172,16 @@ export function recordActions(subject: IStateTreeNode): IActionRecorder {
  *     self.todos.push(todo);
  *   }
  * }))
- * 
+ *
  * const s = TodoStore.create({ todos: [] })
- * 
+ *
  * let disposer = onAction(s, (call) => {
  *   console.log(call);
  * })
- * 
- * s.add({ task: "Grab a coffee" }) 
+ *
+ * s.add({ task: "Grab a coffee" })
  * // Logs: { name: "add", path: "", args: [{ task: "Grab a coffee" }] }
- * 
+ *
  * @export
  * @param {IStateTreeNode} target
  * @param {(call: ISerializedActionCall) => void} listener

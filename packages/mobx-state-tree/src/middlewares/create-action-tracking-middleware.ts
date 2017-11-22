@@ -1,4 +1,4 @@
-import { IMiddlewareEvent, IMiddlewareHandler } from "../core/action"
+import { IMiddlewareEvent, IMiddlewareHandler } from "../internal"
 
 /**
  * Convenience utility to create action based middleware that supports async processes more easily.

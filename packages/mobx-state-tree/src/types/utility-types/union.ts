@@ -7,9 +7,9 @@ import {
     isType,
     IType,
     Type,
-    INode
-} from "../../core"
-import { fail } from "../../utils"
+    INode,
+    fail
+} from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 

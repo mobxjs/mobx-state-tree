@@ -1,6 +1,8 @@
-import { Type } from "../core/type/type"
-import { isPrimitive, fail, identity } from "../utils"
 import {
+    Type,
+    isPrimitive,
+    fail,
+    identity,
     INode,
     createNode,
     ISimpleType,
@@ -9,7 +11,7 @@ import {
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure
-} from "../core"
+} from "../internal"
 
 export class CoreType<S, T> extends Type<S, T> {
     readonly checker: (value: any) => boolean

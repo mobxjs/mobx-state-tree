@@ -1,4 +1,23 @@
-import { observable, action, computed } from "mobx"
+import { observable, computed } from "mobx"
+
+import {
+    INode,
+    toJSON,
+    IdentifierCache,
+    escapeJsonPath,
+    splitJsonPath,
+    IJsonPatch,
+    IReversibleJsonPatch,
+    joinJsonPath,
+    EMPTY_ARRAY,
+    noop,
+    addHiddenFinalProp,
+    fail,
+    freeze,
+    IDisposer,
+    IType,
+    IMiddlewareHandler
+} from "../../internal"
 
 let nextNodeId = 1
 export class ScalarNode implements INode {
@@ -342,24 +361,3 @@ export class ScalarNode implements INode {
         throw fail(`ImmutableNode does not support the addDisposer operation`)
     }
 }
-
-import { INode, toJSON } from "./node-utils"
-import { IdentifierCache } from "./identifier-cache"
-import {
-    escapeJsonPath,
-    splitJsonPath,
-    IJsonPatch,
-    IReversibleJsonPatch,
-    joinJsonPath
-} from "../json-patch"
-import {
-    EMPTY_ARRAY,
-    noop,
-    identity,
-    addHiddenFinalProp,
-    fail,
-    freeze,
-    IDisposer
-} from "../../utils"
-import { IType } from "../type"
-import { IMiddlewareHandler } from "../action"

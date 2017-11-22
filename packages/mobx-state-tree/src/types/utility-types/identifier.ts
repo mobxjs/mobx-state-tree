@@ -1,5 +1,5 @@
-import { fail } from "../../utils"
 import {
+    fail,
     INode,
     createNode,
     isStateTreeNode,
@@ -8,9 +8,9 @@ import {
     isType,
     IContext,
     IValidationResult,
-    typeCheckFailure
-} from "../../core"
-import { string as stringType } from "../primitives"
+    typeCheckFailure,
+    string as stringType
+} from "../../internal"
 
 class Identifier {
     constructor(public identifier: string | number) {}

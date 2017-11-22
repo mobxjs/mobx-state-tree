@@ -1,5 +1,24 @@
 import { reaction } from "mobx"
-import { ScalarNode } from "./scalar-node"
+import {
+    ScalarNode,
+    INode,
+    isStateTreeNode,
+    getStateTreeNode,
+    IJsonPatch,
+    IReversibleJsonPatch,
+    splitJsonPath,
+    splitPatch,
+    IType,
+    IDisposer,
+    extend,
+    noop,
+    fail,
+    registerEventHandler,
+    addReadOnlyProp,
+    walk,
+    IMiddlewareHandler,
+    createActionInvoker
+} from "../../internal"
 
 export class ObjectNode extends ScalarNode implements INode {
     middlewares: IMiddlewareHandler[]
@@ -156,10 +175,3 @@ export class ObjectNode extends ScalarNode implements INode {
         this.type.applyPatchLocally(this, subpath, patch)
     }
 }
-
-import { INode, isStateTreeNode, getStateTreeNode } from "./node-utils"
-import { IJsonPatch, IReversibleJsonPatch, splitJsonPath, splitPatch } from "../json-patch"
-import { IType } from "../type"
-import { IDisposer, extend, noop, fail, registerEventHandler, addReadOnlyProp } from "../../utils"
-import { walk } from "../mst-operations"
-import { IMiddlewareHandler, createActionInvoker } from "../action"

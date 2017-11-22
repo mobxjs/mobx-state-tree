@@ -1,5 +1,22 @@
 import { action } from "mobx"
 
+import {
+    EMPTY_ARRAY,
+    fail,
+    isMutable,
+    isStateTreeNode,
+    getStateTreeNode,
+    IContext,
+    IValidationResult,
+    typecheck,
+    typeCheckFailure,
+    typeCheckSuccess,
+    INode,
+    IStateTreeNode,
+    IJsonPatch,
+    getType
+} from "../../internal"
+
 export interface ISnapshottable<S> {}
 
 export interface IType<S, T> {
@@ -197,16 +214,3 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
 export function isType(value: any): value is IType<any, any> {
     return typeof value === "object" && value && value.isType === true
 }
-
-import { EMPTY_ARRAY, fail, isMutable } from "../../utils"
-import { isStateTreeNode, getStateTreeNode } from "../node/node-utils"
-import {
-    IContext,
-    IValidationResult,
-    typecheck,
-    typeCheckFailure,
-    typeCheckSuccess
-} from "./type-checker"
-import { INode, IStateTreeNode } from "../node/node-utils"
-import { IJsonPatch } from "../json-patch"
-import { getType } from "../mst-operations"

@@ -1,5 +1,6 @@
-import { fail, isPrimitive } from "../../utils"
 import {
+    fail,
+    isPrimitive,
     INode,
     createNode,
     ISimpleType,
@@ -8,7 +9,7 @@ import {
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure
-} from "../../core"
+} from "../../internal"
 
 export class Literal<T> extends Type<T, T> {
     readonly value: any

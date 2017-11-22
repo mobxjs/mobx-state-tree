@@ -24,9 +24,12 @@ import {
     typeCheckFailure,
     flattenTypeErrors,
     getContextForPath,
-    typecheck
-} from "../../core"
-import { addHiddenFinalProp, fail, isMutable, isPlainObject } from "../../utils"
+    typecheck,
+    addHiddenFinalProp,
+    fail,
+    isMutable,
+    isPlainObject
+} from "../../internal"
 
 interface IMapFactoryConfig {
     isMapFactory: true

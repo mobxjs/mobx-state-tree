@@ -1,5 +1,6 @@
-import { isSerializable, deepFreeze } from "../../utils"
 import {
+    isSerializable,
+    deepFreeze,
     createNode,
     INode,
     ISimpleType,
@@ -8,7 +9,7 @@ import {
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure
-} from "../../core"
+} from "../../internal"
 
 export class Frozen<T> extends Type<T, T> {
     constructor() {

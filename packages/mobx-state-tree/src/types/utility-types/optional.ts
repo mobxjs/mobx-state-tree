@@ -8,9 +8,9 @@ import {
     IContext,
     IValidationResult,
     typecheck,
-    typeCheckSuccess
-} from "../../core"
-import { fail } from "../../utils"
+    typeCheckSuccess,
+    fail
+} from "../../internal"
 
 export type IFunctionReturn<T> = () => T
 export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>

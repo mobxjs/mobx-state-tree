@@ -16,9 +16,7 @@ import {
     isPrimitive,
     EMPTY_ARRAY,
     EMPTY_OBJECT,
-    addHiddenFinalProp
-} from "../../utils"
-import {
+    addHiddenFinalProp,
     createNode,
     getStateTreeNode,
     IStateTreeNode,
@@ -35,10 +33,10 @@ import {
     IValidationResult,
     typecheck,
     typeCheckFailure,
-    getContextForPath
-} from "../../core"
-import { getPrimitiveFactoryFromValue } from "../primitives"
-import { optional } from "../utility-types/optional"
+    getContextForPath,
+    getPrimitiveFactoryFromValue,
+    optional
+} from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 

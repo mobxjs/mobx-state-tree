@@ -9,9 +9,9 @@ import {
     IContext,
     IValidationResult,
     typeCheckSuccess,
-    typeCheckFailure
-} from "../../core"
-import { fail } from "../../utils"
+    typeCheckFailure,
+    fail
+} from "../../internal"
 
 class StoredReference {
     constructor(public mode: "identifier" | "object", public value: any) {

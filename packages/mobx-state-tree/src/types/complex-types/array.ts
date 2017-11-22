@@ -27,9 +27,13 @@ import {
     ComplexType,
     IComplexType,
     IType,
-    isType
-} from "../../core"
-import { addHiddenFinalProp, fail, isMutable, isArray, isPlainObject } from "../../utils"
+    isType,
+    addHiddenFinalProp,
+    fail,
+    isMutable,
+    isArray,
+    isPlainObject
+} from "../../internal"
 
 export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
     return `${getStateTreeNode(this)}(${this.length} items)`

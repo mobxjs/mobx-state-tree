@@ -1,36 +1,86 @@
-// Fix some circular deps:
-import "./core/type/type"
-import "./core/node/object-node"
-import "./core/node/scalar-node"
+/** all code is initially loaded through internal, to avoid circular dep issues */
+import "./internal"
 
-export { types, IModelType, IExtendedObservableMap } from "./types"
+// tslint:disable-next-line:no_unused-variable
+import { IObservableArray, ObservableMap, IAction } from "mobx"
+
+// tslint:disable-next-line:no_unused-variable
+import {
+    ISimpleType,
+    IComplexType,
+    IType,
+    map,
+    IExtendedObservableMap,
+    array,
+    identifier,
+    model,
+    compose,
+    IModelType,
+    reference,
+    union,
+    optional,
+    literal,
+    maybe,
+    refinement,
+    frozen,
+    boolean,
+    DatePrimitive,
+    number,
+    string,
+    undefinedType,
+    nullType,
+    late,
+    enumeration
+} from "./internal"
+
+export const types = {
+    enumeration,
+    model,
+    compose,
+    reference,
+    union,
+    optional,
+    literal,
+    maybe,
+    refinement,
+    string,
+    boolean,
+    number,
+    Date: DatePrimitive,
+    map,
+    array,
+    frozen,
+    identifier,
+    late,
+    undefined: undefinedType,
+    null: nullType
+}
+
+export * from "./core/mst-operations"
 
 export {
+    IModelType,
+    IExtendedObservableMap,
     IType,
     ISimpleType,
     IComplexType,
     ISnapshottable,
-    typecheckPublic as typecheck
-} from "./core/type"
-
-export * from "./core/mst-operations"
-export { escapeJsonPath, unescapeJsonPath, IJsonPatch } from "./core/json-patch"
-export {
+    typecheckPublic as typecheck,
+    escapeJsonPath,
+    unescapeJsonPath,
+    IJsonPatch,
     decorate,
     addMiddleware,
     IMiddlewareEvent,
     IMiddlewareHandler,
-    IMiddlewareEventType
-} from "./core/action"
-export { process } from "./core/process"
-export { isStateTreeNode, IStateTreeNode } from "./core/node"
-
-export {
+    IMiddlewareEventType,
+    process,
+    isStateTreeNode,
+    IStateTreeNode,
     applyAction,
     onAction,
     IActionRecorder,
     ISerializedActionCall,
-    recordActions
-} from "./middlewares/on-action"
-
-export { createActionTrackingMiddleware } from "./middlewares/create-action-tracking-middleware"
+    recordActions,
+    createActionTrackingMiddleware
+} from "./internal"

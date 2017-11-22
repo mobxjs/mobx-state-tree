@@ -8,9 +8,9 @@ import {
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    isType
-} from "../../core"
-import { fail } from "../../utils"
+    isType,
+    fail
+} from "../../internal"
 
 export class Refinement<S, T> extends Type<S, T> {
     readonly type: IType<any, any>

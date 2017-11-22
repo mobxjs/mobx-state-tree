@@ -1,3 +1,16 @@
+import {
+    canAttachNode,
+    isStateTreeNode,
+    getStateTreeNode,
+    INode,
+    identity,
+    noop,
+    fail,
+    ObjectNode,
+    ScalarNode,
+    IType
+} from "../../internal"
+
 export function createNode<S, T>(
     type: IType<S, T>,
     parent: INode | null,
@@ -50,9 +63,3 @@ export function createNode<S, T>(
 export function isNode(value: any): value is INode {
     return value instanceof ScalarNode || value instanceof ObjectNode
 }
-
-import { canAttachNode, isStateTreeNode, getStateTreeNode, INode } from "./node-utils"
-import { identity, noop, fail } from "../../utils"
-import { ObjectNode } from "./object-node"
-import { ScalarNode } from "./scalar-node"
-import { IType } from "../type"

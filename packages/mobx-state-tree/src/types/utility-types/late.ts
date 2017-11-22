@@ -1,5 +1,4 @@
-import { fail } from "../../utils"
-import { INode, Type, IType, IContext, IValidationResult } from "../../core"
+import { fail, INode, Type, IType, IContext, IValidationResult } from "../../internal"
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>
