@@ -32,7 +32,8 @@ import {
     fail,
     isMutable,
     isArray,
-    isPlainObject
+    isPlainObject,
+    TypeFlags
 } from "../../internal"
 
 export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
@@ -42,6 +43,7 @@ export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     shouldAttachNode = true
     subType: IType<any, any>
+    readonly flags = TypeFlags.Array
 
     constructor(name: string, subType: IType<any, any>) {
         super(name)
@@ -366,4 +368,8 @@ function areSame(oldNode: INode, newValue: any) {
     )
         return true
     return false
+}
+
+export function isArrayType<S, T>(type: any): type is IComplexType<S[], IObservableArray<T>> {
+    return isType(type) && (type.flags & TypeFlags.Array) > 0
 }

@@ -7,22 +7,27 @@ import {
     createNode,
     ISimpleType,
     IType,
+    TypeFlags,
     IContext,
     IValidationResult,
     typeCheckSuccess,
-    typeCheckFailure
+    typeCheckFailure,
+    isType
 } from "../internal"
 
 export class CoreType<S, T> extends Type<S, T> {
     readonly checker: (value: any) => boolean
+    readonly flags: TypeFlags
     readonly initializer: (v: any) => any
 
     constructor(
-        name: string,
-        checker: (value: any) => boolean,
+        name: any,
+        flags: TypeFlags,
+        checker: any,
         initializer: (v: any) => any = identity
     ) {
         super(name)
+        this.flags = flags
         this.checker = checker
         this.initializer = initializer
     }
@@ -59,6 +64,7 @@ export class CoreType<S, T> extends Type<S, T> {
 // tslint:disable-next-line:variable-name
 export const string: ISimpleType<string> = new CoreType<string, string>(
     "string",
+    TypeFlags.String,
     (v: any) => typeof v === "string"
 )
 
@@ -77,6 +83,7 @@ export const string: ISimpleType<string> = new CoreType<string, string>(
 // tslint:disable-next-line:variable-name
 export const number: ISimpleType<number> = new CoreType<number, number>(
     "number",
+    TypeFlags.Number,
     (v: any) => typeof v === "number"
 )
 
@@ -95,6 +102,7 @@ export const number: ISimpleType<number> = new CoreType<number, number>(
 // tslint:disable-next-line:variable-name
 export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean>(
     "boolean",
+    TypeFlags.Boolean,
     (v: any) => typeof v === "boolean"
 )
 
@@ -104,7 +112,11 @@ export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean>(
  * @export
  * @alias types.null
  */
-export const nullType: ISimpleType<null> = new CoreType<null, null>("null", (v: any) => v === null)
+export const nullType: ISimpleType<null> = new CoreType<null, null>(
+    "null",
+    TypeFlags.Null,
+    (v: any) => v === null
+)
 
 /**
  * The type of the value `undefined`
@@ -114,6 +126,7 @@ export const nullType: ISimpleType<null> = new CoreType<null, null>("null", (v: 
  */
 export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, undefined>(
     "undefined",
+    TypeFlags.Undefined,
     (v: any) => v === undefined
 )
 
@@ -132,6 +145,7 @@ export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, und
 // tslint:disable-next-line:variable-name
 export const DatePrimitive: IType<number, Date> = new CoreType<number, Date>(
     "Date",
+    TypeFlags.Date,
     (v: any) => typeof v === "number" || v instanceof Date,
     (v: number | Date) => (v instanceof Date ? v : new Date(v))
 )
@@ -154,5 +168,9 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
 }
 
 export function isPrimitiveType(type: any): type is CoreType<any, any> {
-    return type instanceof CoreType // TODO: literal should also be here?!
+    return (
+        isType(type) &&
+        (type.flags & (TypeFlags.String | TypeFlags.Number | TypeFlags.Boolean | TypeFlags.Date)) >
+            0
+    )
 }

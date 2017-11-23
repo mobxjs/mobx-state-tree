@@ -5,6 +5,7 @@ import {
     createNode,
     Type,
     IType,
+    TypeFlags,
     isType,
     IContext,
     IValidationResult,
@@ -26,6 +27,8 @@ class StoredReference {
 }
 
 export class ReferenceType<T> extends Type<string | number, T> {
+    readonly flags = TypeFlags.Reference
+
     constructor(private readonly targetType: IType<any, T>) {
         super(`reference(${targetType.name})`)
     }
@@ -72,7 +75,7 @@ export class ReferenceType<T> extends Type<string | number, T> {
 
     reconcile(current: INode, newValue: any): INode {
         const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
-        if (this === current.type) {
+        if (isReferenceType(current.type)) {
             const ref = current.storedValue as StoredReference
             if (targetMode === ref.mode && ref.value === newValue) return current
         }
@@ -118,4 +121,8 @@ export function reference<T>(subType: IType<any, T>): any {
             fail("References with base path are no longer supported. Please remove the base path.")
     }
     return new ReferenceType(subType)
+}
+
+export function isReferenceType(type: any): type is ReferenceType<any> {
+    return (type.flags & TypeFlags.Reference) > 0
 }

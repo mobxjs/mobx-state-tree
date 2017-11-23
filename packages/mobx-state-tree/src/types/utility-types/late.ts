@@ -1,8 +1,21 @@
-import { fail, INode, Type, IType, IContext, IValidationResult } from "../../internal"
+import {
+    fail,
+    INode,
+    Type,
+    IType,
+    IContext,
+    IValidationResult,
+    TypeFlags,
+    isType
+} from "../../internal"
 
 export class Late<S, T> extends Type<S, T> {
     readonly definition: () => IType<S, T>
     private _subType: IType<S, T> | null = null
+
+    get flags() {
+        return this.subType.flags | TypeFlags.Late
+    }
 
     get subType(): IType<S, T> {
         if (this._subType === null) {
@@ -76,4 +89,8 @@ export function late<S, T>(nameOrType: any, maybeType?: ILateType<S, T>): IType<
             )
     }
     return new Late<S, T>(name, type)
+}
+
+export function isLateType(type: any): type is Late<any, any> {
+    return isType(type) && (type.flags & TypeFlags.Late) > 0
 }

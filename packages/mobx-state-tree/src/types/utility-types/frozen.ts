@@ -8,10 +8,14 @@ import {
     IContext,
     IValidationResult,
     typeCheckSuccess,
-    typeCheckFailure
+    typeCheckFailure,
+    TypeFlags,
+    isType
 } from "../../internal"
 
 export class Frozen<T> extends Type<T, T> {
+    flags = TypeFlags.Frozen
+
     constructor() {
         super("frozen")
     }
@@ -63,3 +67,7 @@ export class Frozen<T> extends Type<T, T> {
  * @alias types.frozen
  */
 export const frozen: ISimpleType<any> = new Frozen()
+
+export function isFrozenType(type: any): type is Frozen<any> {
+    return isType(type) && (type.flags & TypeFlags.Frozen) > 0
+}

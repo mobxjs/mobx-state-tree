@@ -27,6 +27,7 @@ import {
     ComplexType,
     IComplexType,
     IType,
+    TypeFlags,
     isType,
     flattenTypeErrors,
     IContext,
@@ -68,7 +69,7 @@ const defaultObjectOptions = {
 function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T]: IType<any, T> } {
     // loop through properties and ensures that all items are types
     return Object.keys(properties).reduce(
-        (acc, key) => {
+        (properties, key) => {
             // warn if user intended a HOOK
             if (key in HOOK_NAMES)
                 return fail(
@@ -76,7 +77,7 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
                 )
 
             // the user intended to use a view
-            const descriptor = Object.getOwnPropertyDescriptor(acc, key)!
+            const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if ("get" in descriptor) {
                 fail("Getters are not supported as properties. Please use views instead")
             }
@@ -88,12 +89,12 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
                 )
                 // its a primitive, convert to its type
             } else if (isPrimitive(value)) {
-                return Object.assign({}, acc, {
+                return Object.assign({}, properties, {
                     [key]: optional(getPrimitiveFactoryFromValue(value), value)
                 })
                 // its already a type
             } else if (isType(value)) {
-                return acc
+                return properties
                 // its a function, maybe the user wanted a view?
             } else if (typeof value === "function") {
                 fail("Functions are not supported as properties, use views instead")
@@ -112,6 +113,8 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
 }
 
 export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, T> {
+    readonly flags = TypeFlags.Object
+
     /*
      * The original object definition
      */
@@ -418,7 +421,7 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
         props: { [K in keyof TP]: IType<any, TP[K]> | TP[K] } &
             { [K in keyof SP]: IType<SP[K], any> | SP[K] }
     ): IModelType<S & Snapshot<SP>, T & TP>
-    // props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
+    //props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
     views<V extends Object>(fn: (self: T & IStateTreeNode) => V): IModelType<S, T & V>
     actions<A extends { [name: string]: Function }>(
         fn: (self: T & IStateTreeNode) => A
@@ -492,4 +495,8 @@ export function compose(...args: any[]): IModelType<any, any> {
             })
         )
         .named(typeName)
+}
+
+export function isObjectType(type: any): type is ModelType<any, any> {
+    return isType(type) && (type.flags & TypeFlags.Object) > 0
 }

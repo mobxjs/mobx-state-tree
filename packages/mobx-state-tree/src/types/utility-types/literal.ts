@@ -5,14 +5,17 @@ import {
     createNode,
     ISimpleType,
     Type,
+    TypeFlags,
     IContext,
     IValidationResult,
     typeCheckSuccess,
-    typeCheckFailure
+    typeCheckFailure,
+    isType
 } from "../../internal"
 
 export class Literal<T> extends Type<T, T> {
     readonly value: any
+    readonly flags = TypeFlags.Literal
 
     constructor(value: any) {
         super(JSON.stringify(value))
@@ -62,4 +65,8 @@ export function literal<S>(value: S): ISimpleType<S> {
         if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
     }
     return new Literal<S>(value)
+}
+
+export function isLiteralType(type: any): type is Literal<any> {
+    return isType(type) && (type.flags & TypeFlags.Literal) > 0
 }

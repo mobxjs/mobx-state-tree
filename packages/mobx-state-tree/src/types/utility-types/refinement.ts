@@ -9,13 +9,18 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    fail
+    fail,
+    TypeFlags
 } from "../../internal"
 
 export class Refinement<S, T> extends Type<S, T> {
     readonly type: IType<any, any>
     readonly predicate: (v: any) => boolean
     readonly message: (v: any) => string
+
+    get flags() {
+        return this.type.flags | TypeFlags.Refinement
+    }
 
     constructor(
         name: string,
@@ -114,4 +119,8 @@ export function refinement(...args: any[]): IType<any, any> {
             fail("expected a function as fourth argument, got " + message + " instead")
     }
     return new Refinement(name, type, predicate, message)
+}
+
+export function isRefinementType(type: any): type is Refinement<any, any> {
+    return (type.flags & TypeFlags.Refinement) > 0
 }

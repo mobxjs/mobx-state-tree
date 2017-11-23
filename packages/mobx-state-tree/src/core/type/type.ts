@@ -17,10 +17,31 @@ import {
     getType
 } from "../../internal"
 
+export enum TypeFlags {
+    String = 1 << 0,
+    Number = 1 << 1,
+    Boolean = 1 << 2,
+    Date = 1 << 3,
+    Literal = 1 << 4,
+    Array = 1 << 5,
+    Map = 1 << 6,
+    Object = 1 << 7,
+    Frozen = 1 << 8,
+    Optional = 1 << 9,
+    Reference = 1 << 10,
+    Identifier = 1 << 11,
+    Late = 1 << 12,
+    Refinement = 1 << 13,
+    Union = 1 << 14,
+    Null = 1 << 15,
+    Undefined = 1 << 16
+}
+
 export interface ISnapshottable<S> {}
 
 export interface IType<S, T> {
     name: string
+    flags: TypeFlags
     is(thing: any): thing is S | T
     validate(thing: any, context: IContext): IValidationResult
     create(snapshot?: S, environment?: any): T
@@ -73,6 +94,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         initialValue: any
     ): INode
 
+    abstract flags: TypeFlags
     abstract describe(): string
 
     abstract applySnapshot(node: INode, snapshot: any): void

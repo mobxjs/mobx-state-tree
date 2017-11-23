@@ -5,6 +5,7 @@ import {
     typeCheckFailure,
     flattenTypeErrors,
     isType,
+    TypeFlags,
     IType,
     Type,
     INode,
@@ -16,6 +17,16 @@ export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 export class Union extends Type<any, any> {
     readonly dispatcher: ITypeDispatcher | null = null
     readonly types: IType<any, any>[]
+
+    get flags() {
+        let result: TypeFlags = TypeFlags.Union
+
+        this.types.forEach(type => {
+            result |= type.flags
+        })
+
+        return result
+    }
 
     constructor(name: string, types: IType<any, any>[], dispatcher: ITypeDispatcher | null) {
         super(name)
@@ -322,4 +333,8 @@ export function union(
         })
     }
     return new Union(name, types, dispatcher)
+}
+
+export function isUnionType(type: any): type is Union {
+    return (type.flags & TypeFlags.Union) > 0
 }
