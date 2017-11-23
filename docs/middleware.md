@@ -1,6 +1,6 @@
 # Middleware
 
-MST ships with a smal set of [pre-built / example middlewares](../middleware/README.md)
+MST ships with a small set of [pre-built / example middlewares](../packages/mst-middlewares/README.md)
 
 Middleware can be used to intercept any action is invoked on the subtree where it is attached.
 If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
@@ -32,11 +32,11 @@ export type IMiddleWareEvent = {
 
 export type IMiddlewareEventType =
     | "action"
-    | "process_spawn"
-    | "process_resume"
-    | "process_resume_error"
-    | "process_return"
-    | "process_throw"
+    | "flow_spawn"
+    | "flow_resume"
+    | "flow_resume_error"
+    | "flow_return"
+    | "flow_throw"
 ```
 
 A very simple middleware that just logs the invocation of actions will look like:
@@ -70,17 +70,17 @@ _Note: for middleware, it is extremely important that `next(action)` is called f
 `type` Indicates which kind of event this is
 
 * `action`: this is a normal synchronous action invocation
-* `process_spawn`: The invocation / kickoff of a `process` block (see [asynchronous actions](async-actions.md))
-* `process_resume`: a promise that was returned from `yield` earlier has resolved. `args` contains the value it resolved to, and the action will now continue with that value
-* `process_resume_error`: a promise that was returned from `yield` earlier was rejected. `args` contains the rejection reason, and the action will now continue throwing that error into the generator
-* `process_return`: the generator completed successfully. The promise returned by the action will resolve with the value found in `args`
-* `process_throw`: the generator threw an uncatched exception. The promise returned by the action will reject with the exception found in `args`
+* `flow_spawn`: The invocation / kickoff of a `process` block (see [asynchronous actions](async-actions.md))
+* `flow_resume`: a promise that was returned from `yield` earlier has resolved. `args` contains the value it resolved to, and the action will now continue with that value
+* `flow_resume_error`: a promise that was returned from `yield` earlier was rejected. `args` contains the rejection reason, and the action will now continue throwing that error into the generator
+* `flow_return`: the generator completed successfully. The promise returned by the action will resolve with the value found in `args`
+* `flow_throw`: the generator threw an uncatched exception. The promise returned by the action will reject with the exception found in `args`
 
 To see how a bunch of calls from an asynchronous process look, see the [unit tests](https://github.com/mobxjs/mobx-state-tree/blob/09708ba86d04f433cc23fbcb6d1dc4db170f798e/test/async.ts#L289)
 
 A minimal, empty process will fire the following events if started as action:
 
 1. `action`: An `action` event will always be emitted if a process is exposed as action on a model)
-2. `process_spawn`: This is just the notification that a new generator was started
-3. `process_resume`: This will be emitted when the first "code block" is entered. (So, with zero yields there is one `process_resume`  still)
-4. `process_return`: The process has completed
+2. `flow_spawn`: This is just the notification that a new generator was started
+3. `flow_resume`: This will be emitted when the first "code block" is entered. (So, with zero yields there is one `flow_resume`  still)
+4. `flow_return`: The process has completed

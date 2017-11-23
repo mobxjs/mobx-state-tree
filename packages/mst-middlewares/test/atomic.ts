@@ -1,6 +1,6 @@
 import { test } from "ava"
 import atomic from "../src/atomic"
-import { types, addMiddleware, process } from "mobx-state-tree"
+import { types, addMiddleware, flow } from "mobx-state-tree"
 
 function delay(time) {
     return new Promise(resolve => {
@@ -23,14 +23,14 @@ const TestModel = types
                 self.z += x
                 throw "Oops"
             },
-            incProcess: process(function*(x) {
+            incProcess: flow(function*(x) {
                 yield delay(2)
                 self.z += x
                 yield delay(2)
                 self.z += x
                 return self.z
             }),
-            throwingProcess: process(function*(x) {
+            throwingProcess: flow(function*(x) {
                 yield delay(2)
                 self.z += x
                 yield delay(2)

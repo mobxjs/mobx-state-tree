@@ -3,7 +3,7 @@ import {
     types,
     addMiddleware,
     recordActions,
-    process,
+    flow,
     decorate
     // TODO: export IRawActionCall
 } from "../src"
@@ -31,7 +31,7 @@ function testCoffeeTodo(
             title: "get coffee"
         })
         .actions(self => ({
-            startFetch: process(generator(self))
+            startFetch: flow(generator(self))
         }))
     const events: any[] = []
     const coffees: string[] = []
@@ -139,13 +139,13 @@ test.cb("typings", t => {
                 return 23
             }
 
-            const b = process(function* b(x: string) {
+            const b = flow(function* b(x: string) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 24
             })
 
-            return { a: process(a), b }
+            return { a: flow(a), b }
         })
     const m1 = M.create({ title: "test " })
     const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
@@ -169,14 +169,14 @@ test.cb("typings", t => {
                 return 23
             }
 
-            const b = process(function* b(x: string) {
+            const b = flow(function* b(x: string) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 24
             })
 
             return {
-                a: process(a),
+                a: flow(a),
                 b
             }
         })
@@ -203,7 +203,7 @@ test.cb("recordActions should only emit invocation", t => {
                 return 23
             }
             return {
-                a: process(a)
+                a: flow(a)
             }
         })
     const m1 = M.create({ title: "test " })
@@ -227,7 +227,7 @@ test.cb("recordActions should only emit invocation", t => {
 })
 
 test.cb("can handle nested async actions", t => {
-    const uppercase = process(function* uppercase(value) {
+    const uppercase = flow(function* uppercase(value) {
         const res = yield delay(20, value.toUpperCase())
         return res
     })
@@ -253,13 +253,13 @@ test.cb("can handle nested async actions when using decorate", t => {
         return next(call)
     }
 
-    const uppercase = process(function* uppercase(value) {
+    const uppercase = flow(function* uppercase(value) {
         const res = yield delay(20, value.toUpperCase())
         return res
     })
 
     const Todo = types.model({}).actions(self => {
-        const act = process(function* act(value) {
+        const act = flow(function* act(value) {
             return yield uppercase(value)
         })
 
@@ -274,10 +274,10 @@ test.cb("can handle nested async actions when using decorate", t => {
             t.is(res, "X")
             t.deepEqual(events, [
                 ["action", "act"],
-                ["process_spawn", "act"],
-                ["process_resume", "act"],
-                ["process_resume", "act"],
-                ["process_return", "act"]
+                ["flow_spawn", "act"],
+                ["flow_resume", "act"],
+                ["flow_resume", "act"],
+                ["flow_return", "act"]
             ])
             t.end()
         })

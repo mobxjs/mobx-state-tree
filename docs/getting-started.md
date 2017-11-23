@@ -230,7 +230,7 @@ That basically means that you can restore your objects with your custom methods 
 
 First is by creating a new model instance, and pass in the snapshot as argument to create. That means that you will need to update all your store references, if used in React components, to the new one.
 
-The second option avoids this refrence problem by applying the snapshot to an existing model instance. Properties will be updated, but the store reference will remain the same. This will trigger an operation called "reconciliation". We will speak later about this phase.
+The second option avoids this reference problem by applying the snapshot to an existing model instance. Properties will be updated, but the store reference will remain the same. This will trigger an operation called "reconciliation". We will speak later about this phase.
 
 ```javascript
 // 1st
@@ -540,7 +540,7 @@ const Todo = types.model({
 })
 ```
 
-Now we need to edit our views to display a select along with each todo, where the user can chose the assignee for that task. To do so, we will create a separate component (the UserPickerView) and use it inside the TodoView component to trigger the setUser call. That's it!
+Now we need to edit our views to display a select along with each todo, where the user can choose the assignee for that task. To do so, we will create a separate component (the UserPickerView) and use it inside the TodoView component to trigger the setUser call. That's it!
 
 ```javascript
 const UserPickerView = observer(props =>
@@ -582,4 +582,4 @@ One neat feature of references, is that they will throw if you accidentally remo
 ```
 
 ## Next up
-In part 2 of this tutorial, we will discover how to use MST lifecycle hooks and local state to fetch user data from an XHR endpoint, and see how envinronments will help dealing with dependency injection of the parameters needed to fetch our endpoint. We will implement auto-save using mobx helpers and learn more about patches and actions event streams.
+In part 2 of this tutorial, we will discover how to use MST lifecycle hooks and local state to fetch user data from an XHR endpoint, and see how environments will help dealing with dependency injection of the parameters needed to fetch our endpoint. We will implement auto-save using mobx helpers and learn more about patches and actions event streams.

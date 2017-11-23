@@ -75,6 +75,7 @@ export {
     process,
     isStateTreeNode,
     IStateTreeNode,
+    flow,
     applyAction,
     onAction,
     IActionRecorder,

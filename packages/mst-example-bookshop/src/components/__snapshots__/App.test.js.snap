@@ -1,28 +1,36 @@
-exports[`test matches snapshot before and after loading 1`] = `
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`matches snapshot before and after loading 1`] = `
 <div>
   <div
-    className="App">
+    className="App"
+  >
     <div
-      className="App-header">
+      className="App-header"
+    >
       <img
         alt="logo"
         className="App-logo"
-        src="logo.svg" />
+        src="logo.svg"
+      />
       <h2>
         Welcome to the React MobX Book shop!
       </h2>
     </div>
     <ul
-      className="App-menu">
+      className="App-menu"
+    >
       <li>
         <a
-          onClick={[Function]}>
+          onClick={[Function]}
+        >
           Available books
         </a>
       </li>
       <li>
         <a
-          onClick={[Function]}>
+          onClick={[Function]}
+        >
           Your cart
         </a>
       </li>
@@ -34,37 +42,44 @@ exports[`test matches snapshot before and after loading 1`] = `
 </div>
 `;
 
-exports[`test matches snapshot before and after loading 2`] = `
+exports[`matches snapshot before and after loading 2`] = `
 <div>
   <div
-    className="App">
+    className="App"
+  >
     <div
-      className="App-header">
+      className="App-header"
+    >
       <img
         alt="logo"
         className="App-logo"
-        src="logo.svg" />
+        src="logo.svg"
+      />
       <h2>
         Welcome to the React MobX Book shop!
       </h2>
     </div>
     <ul
-      className="App-menu">
+      className="App-menu"
+    >
       <li>
         <a
-          onClick={[Function]}>
+          onClick={[Function]}
+        >
           Available books
         </a>
       </li>
       <li>
         <a
-          onClick={[Function]}>
+          onClick={[Function]}
+        >
           Your cart
         </a>
       </li>
     </ul>
     <section
-      className="Page-books">
+      className="Page-books"
+    >
       <h1>
         Available books
       </h1>
@@ -72,28 +87,32 @@ exports[`test matches snapshot before and after loading 2`] = `
         <li>
           <a
             href="/book/978-1933988177"
-            onClick={[Function]}>
+            onClick={[Function]}
+          >
             Lucene in Action, Second Edition
           </a>
         </li>
         <li>
           <a
             href="/book/978-1857995879"
-            onClick={[Function]}>
-            Sophie\'s World : The Greek Philosophers
+            onClick={[Function]}
+          >
+            Sophie's World : The Greek Philosophers
           </a>
         </li>
         <li>
           <a
             href="/book/978-0641723445"
-            onClick={[Function]}>
+            onClick={[Function]}
+          >
             The Lightning Thief
           </a>
         </li>
         <li>
           <a
             href="/book/978-1423103349"
-            onClick={[Function]}>
+            onClick={[Function]}
+          >
             The Sea of Monsters
           </a>
         </li>

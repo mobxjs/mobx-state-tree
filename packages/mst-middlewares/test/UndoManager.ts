@@ -1,6 +1,6 @@
 import { test } from "ava"
 import { UndoManager } from "../src"
-import { types, addMiddleware, process, clone } from "mobx-state-tree"
+import { types, addMiddleware, flow, clone } from "mobx-state-tree"
 
 const TestModel = types
     .model({
