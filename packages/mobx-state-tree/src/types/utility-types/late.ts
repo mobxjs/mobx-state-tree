@@ -17,6 +17,10 @@ export class Late<S, T> extends Type<S, T> {
         return this.subType.flags | TypeFlags.Late
     }
 
+    get shouldAttachNode() {
+        return this.subType.shouldAttachNode
+    }
+
     get subType(): IType<S, T> {
         if (this._subType === null) {
             this._subType = this.definition()

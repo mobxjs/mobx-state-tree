@@ -14,6 +14,7 @@ import {
 } from "../../internal"
 
 export class Frozen<T> extends Type<T, T> {
+    readonly shouldAttachNode = false
     flags = TypeFlags.Frozen
 
     constructor() {

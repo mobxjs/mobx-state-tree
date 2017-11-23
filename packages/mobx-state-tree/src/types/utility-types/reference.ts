@@ -27,6 +27,7 @@ class StoredReference {
 }
 
 export class ReferenceType<T> extends Type<string | number, T> {
+    readonly shouldAttachNode = true
     readonly flags = TypeFlags.Reference
 
     constructor(private readonly targetType: IType<any, T>) {

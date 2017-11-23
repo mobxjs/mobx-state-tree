@@ -24,6 +24,10 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.flags | TypeFlags.Optional
     }
 
+    get shouldAttachNode() {
+        return this.type.shouldAttachNode
+    }
+
     constructor(type: IType<S, T>, defaultValue: IOptionalValue<S, T>) {
         super(type.name)
         this.type = type
