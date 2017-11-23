@@ -1,18 +1,16 @@
-import { fail } from "../utils"
 import { observable, IObservableArray } from "mobx"
-import { IType } from "../types/type"
-import { Node } from "./node"
+import { fail, IType, INode } from "../../internal"
 
 export class IdentifierCache {
-    private cache = observable.map<IObservableArray<Node>>()
+    private cache = observable.map<IObservableArray<INode>>()
 
     constructor() {}
 
-    addNodeToCache(node: Node) {
+    addNodeToCache(node: INode) {
         if (node.identifierAttribute) {
             const identifier = node.identifier!
             if (!this.cache.has(identifier)) {
-                this.cache.set(identifier, observable.shallowArray<Node>())
+                this.cache.set(identifier, observable.shallowArray<INode>())
             }
             const set = this.cache.get(identifier)!
             if (set.indexOf(node) !== -1) fail(`Already registered`)
@@ -21,7 +19,7 @@ export class IdentifierCache {
         return this
     }
 
-    mergeCache(node: Node) {
+    mergeCache(node: INode) {
         node.identifierCache!.cache.values().forEach(nodes =>
             nodes.forEach(child => {
                 this.addNodeToCache(child)
@@ -29,14 +27,14 @@ export class IdentifierCache {
         )
     }
 
-    notifyDied(node: Node) {
+    notifyDied(node: INode) {
         if (node.identifierAttribute) {
             const set = this.cache.get(node.identifier!)
             if (set) set.remove(node)
         }
     }
 
-    splitCache(node: Node): IdentifierCache {
+    splitCache(node: INode): IdentifierCache {
         const res = new IdentifierCache()
         const basePath = node.path
         this.cache.values().forEach(nodes => {
@@ -50,7 +48,7 @@ export class IdentifierCache {
         return res
     }
 
-    resolve(type: IType<any, any>, identifier: string): Node | null {
+    resolve(type: IType<any, any>, identifier: string): INode | null {
         const set = this.cache.get(identifier)
         if (!set) return null
         const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))

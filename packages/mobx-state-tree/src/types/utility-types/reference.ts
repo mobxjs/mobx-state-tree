@@ -1,14 +1,18 @@
-import { getStateTreeNode, isStateTreeNode, Node, createNode } from "../../core"
-import { Type, IType } from "../type"
-import { TypeFlags, isReferenceType, isType } from "../type-flags"
 import {
+    getStateTreeNode,
+    isStateTreeNode,
+    INode,
+    createNode,
+    Type,
+    IType,
+    TypeFlags,
+    isType,
     IContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    prettyPrintValue
-} from "../type-checker"
-import { fail } from "../../utils"
+    fail
+} from "../../internal"
 
 class StoredReference {
     constructor(public mode: "identifier" | "object", public value: any) {
@@ -33,7 +37,7 @@ export class ReferenceType<T> extends Type<string | number, T> {
         return this.name
     }
 
-    getValue(node: Node) {
+    getValue(node: INode) {
         const ref = node.storedValue as StoredReference
         if (ref.mode === "object") return ref.value
 
@@ -48,7 +52,7 @@ export class ReferenceType<T> extends Type<string | number, T> {
         return target.value
     }
 
-    getSnapshot(node: Node): any {
+    getSnapshot(node: INode): any {
         const ref = node.storedValue as StoredReference
         switch (ref.mode) {
             case "identifier":
@@ -58,7 +62,7 @@ export class ReferenceType<T> extends Type<string | number, T> {
         }
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
         const isComplex = isStateTreeNode(snapshot)
         return createNode(
             this,
@@ -69,7 +73,7 @@ export class ReferenceType<T> extends Type<string | number, T> {
         )
     }
 
-    reconcile(current: Node, newValue: any): Node {
+    reconcile(current: INode, newValue: any): INode {
         const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
         if (isReferenceType(current.type)) {
             const ref = current.storedValue as StoredReference
@@ -117,4 +121,8 @@ export function reference<T>(subType: IType<any, T>): any {
             fail("References with base path are no longer supported. Please remove the base path.")
     }
     return new ReferenceType(subType)
+}
+
+export function isReferenceType(type: any): type is ReferenceType<any> {
+    return (type.flags & TypeFlags.Reference) > 0
 }

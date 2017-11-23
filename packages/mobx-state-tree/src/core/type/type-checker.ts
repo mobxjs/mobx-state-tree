@@ -1,3 +1,13 @@
+import {
+    IType,
+    fail,
+    EMPTY_ARRAY,
+    isPrimitive,
+    getStateTreeNode,
+    isStateTreeNode,
+    isPrimitiveType
+} from "../../internal"
+
 export interface IContextEntry {
     path: string
     type?: IType<any, any>
@@ -112,8 +122,3 @@ export function typecheckPublic(type: IType<any, any>, value: any): void {
         )
     }
 }
-
-import { IType } from "./type"
-import { fail, EMPTY_ARRAY, isPrimitive } from "../utils"
-import { getStateTreeNode, isStateTreeNode } from "../core"
-import { isPrimitiveType } from "./type-flags"

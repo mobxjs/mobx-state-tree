@@ -1,5 +1,15 @@
 import { action as mobxAction } from "mobx"
 
+import {
+    INode,
+    getStateTreeNode,
+    IStateTreeNode,
+    fail,
+    argsToArray,
+    IDisposer,
+    getRoot
+} from "../internal"
+
 export type IMiddlewareEventType =
     | "action"
     | "flow_spawn"
@@ -130,12 +140,12 @@ export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn:
 }
 
 function collectMiddlewareHandlers(
-    node: Node,
+    node: INode,
     baseCall: IMiddlewareEvent,
     fn: Function
 ): IMiddlewareHandler[] {
     let handlers: IMiddlewareHandler[] = (fn as any).$mst_middleware || []
-    let n: Node | null = node
+    let n: INode | null = node
     // Find all middlewares. Optimization: cache this?
     while (n) {
         handlers = handlers.concat(n.middlewares)
@@ -144,7 +154,7 @@ function collectMiddlewareHandlers(
     return handlers
 }
 
-function runMiddleWares(node: Node, baseCall: IMiddlewareEvent, originalFn: Function): any {
+function runMiddleWares(node: INode, baseCall: IMiddlewareEvent, originalFn: Function): any {
     const handlers = collectMiddlewareHandlers(node, baseCall, originalFn)
     // Short circuit
     if (!handlers.length) return originalFn.apply(null, baseCall.args)
@@ -156,7 +166,3 @@ function runMiddleWares(node: Node, baseCall: IMiddlewareEvent, originalFn: Func
     }
     return runNextMiddleware(baseCall)
 }
-
-import { Node, getStateTreeNode, IStateTreeNode } from "./node"
-import { fail, argsToArray, IDisposer } from "../utils"
-import { getRoot } from "./mst-operations"

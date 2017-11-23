@@ -1,7 +1,4 @@
-import { ISimpleType } from "../type"
-import { union } from "./union"
-import { literal } from "./literal"
-import { fail } from "../../utils"
+import { ISimpleType, union, literal, fail } from "../../internal"
 
 // strongly typed enumeration forms (if there is a nicer way to do this in TS, PR welcome!
 // signatures are generated using following script:
