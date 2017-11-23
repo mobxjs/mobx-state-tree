@@ -56,8 +56,6 @@ export const types = {
     null: nullType
 }
 
-export * from "./core/mst-operations"
-
 export {
     IModelType,
     IExtendedObservableMap,
@@ -84,3 +82,5 @@ export {
     recordActions,
     createActionTrackingMiddleware
 } from "./internal"
+
+export * from "./core/mst-operations"

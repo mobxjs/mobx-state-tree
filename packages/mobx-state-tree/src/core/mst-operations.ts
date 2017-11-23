@@ -1,19 +1,4 @@
 import { IObservableArray, ObservableMap } from "mobx"
-import {
-    INode,
-    getStateTreeNode,
-    IStateTreeNode,
-    isStateTreeNode,
-    IJsonPatch,
-    splitJsonPath,
-    asArray,
-    EMPTY_OBJECT,
-    fail,
-    IDisposer,
-    ISnapshottable,
-    IType,
-    isType
-} from "../internal"
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -661,3 +646,19 @@ export function walk(target: IStateTreeNode, processor: (item: IStateTreeNode) =
     })
     processor(node.storedValue)
 }
+
+import {
+    INode,
+    getStateTreeNode,
+    IStateTreeNode,
+    isStateTreeNode,
+    IJsonPatch,
+    splitJsonPath,
+    asArray,
+    EMPTY_OBJECT,
+    fail,
+    IDisposer,
+    ISnapshottable,
+    IType,
+    isType
+} from "../internal"
