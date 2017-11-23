@@ -33,9 +33,8 @@ export function createNode<S, T>(
     }
 
     const storedValue = createNewInstance(initialValue)
-    const canAttachTreeNode = canAttachNode(storedValue)
 
-    if (canAttachTreeNode) {
+    if (type.shouldAttachNode) {
         // tslint:disable-next-line:no_unused-variable
         return new ObjectNode(
             type,
@@ -44,7 +43,7 @@ export function createNode<S, T>(
             environment,
             initialValue,
             storedValue,
-            canAttachTreeNode,
+            type.shouldAttachNode,
             finalizeNewInstance
         )
     }
@@ -55,7 +54,7 @@ export function createNode<S, T>(
         environment,
         initialValue,
         storedValue,
-        canAttachTreeNode,
+        type.shouldAttachNode,
         finalizeNewInstance
     )
 }

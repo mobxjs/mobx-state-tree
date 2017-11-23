@@ -14,6 +14,7 @@ import {
 } from "../../internal"
 
 export class Literal<T> extends Type<T, T> {
+    readonly shouldAttachNode = false
     readonly value: any
     readonly flags = TypeFlags.Literal
 

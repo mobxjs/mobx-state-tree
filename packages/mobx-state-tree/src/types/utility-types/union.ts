@@ -28,6 +28,10 @@ export class Union extends Type<any, any> {
         return result
     }
 
+    get shouldAttachNode() {
+        return this.types.some(type => type.shouldAttachNode)
+    }
+
     constructor(name: string, types: IType<any, any>[], dispatcher: ITypeDispatcher | null) {
         super(name)
         this.dispatcher = dispatcher

@@ -62,6 +62,7 @@ export interface IType<S, T> {
     getChildType(key: string): IType<any, any>
     removeChild(node: INode, subpath: string): void
     isAssignableFrom(type: IType<any, any>): boolean
+    shouldAttachNode: boolean
 }
 
 export interface ISimpleType<T> extends IType<T, T> {}
@@ -107,6 +108,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     abstract getChildType(key: string): IType<any, any>
     abstract removeChild(node: INode, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
+    abstract shouldAttachNode: boolean
 
     isAssignableFrom(type: IType<any, any>): boolean {
         return type === this

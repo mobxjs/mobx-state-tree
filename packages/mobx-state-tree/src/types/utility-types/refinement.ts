@@ -22,6 +22,10 @@ export class Refinement<S, T> extends Type<S, T> {
         return this.type.flags | TypeFlags.Refinement
     }
 
+    get shouldAttachNode() {
+        return this.type.shouldAttachNode
+    }
+
     constructor(
         name: string,
         type: IType<any, any>,

@@ -16,6 +16,7 @@ import {
 } from "../internal"
 
 export class CoreType<S, T> extends Type<S, T> {
+    readonly shouldAttachNode = false
     readonly checker: (value: any) => boolean
     readonly flags: TypeFlags
     readonly initializer: (v: any) => any

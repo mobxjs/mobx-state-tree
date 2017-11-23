@@ -114,6 +114,7 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
 
 export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, T> {
     readonly flags = TypeFlags.Object
+    shouldAttachNode = true
 
     /*
      * The original object definition

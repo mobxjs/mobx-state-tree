@@ -21,6 +21,7 @@ class Identifier {
 }
 
 export class IdentifierType<T> extends Type<T, T> {
+    readonly shouldAttachNode = false
     readonly flags = TypeFlags.Identifier
 
     constructor(public readonly identifierType: IType<T, T>) {
