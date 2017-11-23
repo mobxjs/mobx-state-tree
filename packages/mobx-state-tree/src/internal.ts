@@ -3,8 +3,8 @@
 /**
  * Imports that matter in order
  */
-export * from "./core/node/object-node"
 export * from "./core/node/scalar-node"
+export * from "./core/node/object-node"
 export * from "./core/type/type"
 
 /**
@@ -29,9 +29,9 @@ export * from "./types/utility-types/literal"
 export * from "./types/utility-types/refinement"
 export * from "./types/utility-types/enumeration"
 export * from "./types/utility-types/union"
+export * from "./types/utility-types/optional"
 export * from "./types/utility-types/maybe"
 export * from "./types/utility-types/late"
 export * from "./types/utility-types/frozen"
 export * from "./types/utility-types/reference"
 export * from "./types/utility-types/identifier"
-export * from "./types/utility-types/optional"

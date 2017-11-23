@@ -154,5 +154,5 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
 }
 
 export function isPrimitiveType(type: any): type is CoreType<any, any> {
-    return type instanceof CoreType
+    return type instanceof CoreType // TODO: literal should also be here?!
 }
