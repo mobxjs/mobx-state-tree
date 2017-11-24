@@ -27,95 +27,16 @@ class StoredReference {
     }
 }
 
-export class ReferenceType<T> extends Type<string | number, T> {
-    readonly shouldAttachNode = true
+export abstract class BaseReferenceType<T> extends Type<string | number, T> {
+    readonly shouldAttachNode = false
     readonly flags = TypeFlags.Reference
 
-    constructor(
-        private readonly targetType: IType<any, T>,
-        private readonly options?: ReferenceOptions<T>
-    ) {
+    constructor(protected readonly targetType: IType<any, T>) {
         super(`reference(${targetType.name})`)
-    }
-
-    get isCustomReference() {
-        return !!this.options
     }
 
     describe() {
         return this.name
-    }
-
-    getValue(node: INode) {
-        if (!node.isAlive) return undefined
-        const ref = node.storedValue as StoredReference
-
-        if (!this.isCustomReference) {
-            // id already resolved, return
-            if (ref.mode === "object") return ref.value
-
-            // reference was initialized with the identifier of the target
-            const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
-            if (!target)
-                return fail(
-                    `Failed to resolve reference of type ${this.targetType
-                        .name}: '${ref.value}' (in: ${node.path})`
-                )
-            return target.value
-        } else {
-            return this.options!.get(ref.value, node.parent ? node.parent.storedValue : null)
-        }
-    }
-
-    getSnapshot(node: INode): any {
-        const ref = node.storedValue as StoredReference
-        switch (ref.mode) {
-            case "identifier":
-                return ref.value
-            case "object":
-                return getStateTreeNode(ref.value).identifier
-        }
-    }
-
-    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
-        const isComplex = isStateTreeNode(snapshot)
-        if (!this.isCustomReference)
-            return createNode(
-                this,
-                parent,
-                subpath,
-                environment,
-                new StoredReference(isComplex ? "object" : "identifier", snapshot)
-            )
-        else
-            return createNode(
-                this,
-                parent,
-                subpath,
-                environment,
-                new StoredReference(
-                    "identifier",
-                    isComplex
-                        ? this.options!.set(snapshot, parent ? parent.storedValue : null)
-                        : snapshot
-                )
-            )
-    }
-
-    reconcile(current: INode, newValue: any): INode {
-        const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
-        if (isReferenceType(current.type)) {
-            const ref = current.storedValue as StoredReference
-            if (targetMode === ref.mode && ref.value === newValue) return current
-        }
-        const newNode = this.instantiate(
-            current.parent,
-            current.subpath,
-            current._environment,
-            newValue
-        )
-        current.die()
-        return newNode
     }
 
     isAssignableFrom(type: IType<any, any>): boolean {
@@ -130,6 +51,104 @@ export class ReferenceType<T> extends Type<string | number, T> {
                   value,
                   "Value is not a valid identifier, which is a string or a number"
               )
+    }
+}
+
+export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
+    constructor(targetType: IType<any, T>) {
+        super(targetType)
+    }
+
+    getValue(node: INode) {
+        if (!node.isAlive) return undefined
+        const ref = node.storedValue as StoredReference
+
+        // id already resolved, return
+        if (ref.mode === "object") return ref.value
+
+        // reference was initialized with the identifier of the target
+        const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
+        if (!target)
+            return fail(
+                `Failed to resolve reference of type ${this.targetType
+                    .name}: '${ref.value}' (in: ${node.path})`
+            )
+        return target.value
+    }
+
+    getSnapshot(node: INode): any {
+        const ref = node.storedValue as StoredReference
+        switch (ref.mode) {
+            case "identifier":
+                return ref.value
+            case "object":
+                return getStateTreeNode(ref.value).identifier
+        }
+    }
+
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
+        return createNode(
+            this,
+            parent,
+            subpath,
+            environment,
+            new StoredReference(isStateTreeNode(snapshot) ? "object" : "identifier", snapshot)
+        )
+    }
+
+    reconcile(current: INode, newValue: any): INode {
+        if (current.type === this) {
+            const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
+            const ref = current.storedValue as StoredReference
+            if (targetMode === ref.mode && ref.value === newValue) return current
+        }
+        const newNode = this.instantiate(
+            current.parent,
+            current.subpath,
+            current._environment,
+            newValue
+        )
+        current.die()
+        return newNode
+    }
+}
+
+export class CustomReferenceType<T> extends BaseReferenceType<T> {
+    constructor(targetType: IType<any, T>, private readonly options: ReferenceOptions<T>) {
+        super(targetType)
+    }
+
+    getValue(node: INode) {
+        if (!node.isAlive) return undefined
+        return this.options.get(node.storedValue, node.parent ? node.parent.storedValue : null)
+    }
+
+    getSnapshot(node: INode): any {
+        return node.storedValue
+    }
+
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
+        const identifier = isStateTreeNode(snapshot)
+            ? this.options.set(snapshot as T, parent ? parent.storedValue : null)
+            : snapshot
+        return createNode(this, parent, subpath, environment, identifier)
+    }
+
+    reconcile(current: INode, snapshot: any): INode {
+        const newIdentifier = isStateTreeNode(snapshot)
+            ? this.options.set(snapshot as T, current ? current.storedValue : null)
+            : snapshot
+        if (current.type === this) {
+            if (current.storedValue === newIdentifier) return current
+        }
+        const newNode = this.instantiate(
+            current.parent,
+            current.subpath,
+            current._environment,
+            newIdentifier
+        )
+        current.die()
+        return newNode
     }
 }
 
@@ -157,9 +176,10 @@ export function reference<T>(subType: IType<any, T>, options?: ReferenceOptions<
         if (arguments.length === 2 && typeof arguments[1] === "string")
             fail("References with base path are no longer supported. Please remove the base path.")
     }
-    return new ReferenceType(subType, options)
+    if (options) return new CustomReferenceType(subType, options)
+    else return new IdentifierReferenceType(subType)
 }
 
-export function isReferenceType(type: any): type is ReferenceType<any> {
+export function isReferenceType(type: any): type is BaseReferenceType<any> {
     return (type.flags & TypeFlags.Reference) > 0
 }

@@ -12,6 +12,7 @@ import {
 import { test } from "ava"
 
 test("it should support custom references", t => {
+    debugger
     const User = types.model({
         id: types.identifier(),
         name: types.string
