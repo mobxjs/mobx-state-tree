@@ -1,9 +1,19 @@
-import { createNode, getStateTreeNode, isStateTreeNode, IStateTreeNode, Node } from "../../core"
-import { Type, IType } from "../type"
-import { TypeFlags, isReferenceType, isType } from "../type-flags"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { fail } from "../../utils"
-import { action } from "mobx"
+import {
+    getStateTreeNode,
+    isStateTreeNode,
+    INode,
+    createNode,
+    Type,
+    IType,
+    TypeFlags,
+    isType,
+    IContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure,
+    fail
+} from "../../internal"
+import { IStateTreeNode } from "../../index"
 
 class StoredReference {
     constructor(public readonly mode: "identifier" | "object", public readonly value: any) {
@@ -18,6 +28,7 @@ class StoredReference {
 }
 
 export class ReferenceType<T> extends Type<string | number, T> {
+    readonly shouldAttachNode = true
     readonly flags = TypeFlags.Reference
 
     constructor(
@@ -35,7 +46,7 @@ export class ReferenceType<T> extends Type<string | number, T> {
         return this.name
     }
 
-    getValue(node: Node) {
+    getValue(node: INode) {
         if (!node.isAlive) return undefined
         const ref = node.storedValue as StoredReference
 
@@ -56,7 +67,7 @@ export class ReferenceType<T> extends Type<string | number, T> {
         }
     }
 
-    getSnapshot(node: Node): any {
+    getSnapshot(node: INode): any {
         const ref = node.storedValue as StoredReference
         switch (ref.mode) {
             case "identifier":
@@ -66,7 +77,7 @@ export class ReferenceType<T> extends Type<string | number, T> {
         }
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
         const isComplex = isStateTreeNode(snapshot)
         if (!this.isCustomReference)
             return createNode(
@@ -91,8 +102,7 @@ export class ReferenceType<T> extends Type<string | number, T> {
             )
     }
 
-    @action
-    reconcile(current: Node, newValue: any): Node {
+    reconcile(current: INode, newValue: any): INode {
         const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
         if (isReferenceType(current.type)) {
             const ref = current.storedValue as StoredReference
@@ -148,4 +158,8 @@ export function reference<T>(subType: IType<any, T>, options?: ReferenceOptions<
             fail("References with base path are no longer supported. Please remove the base path.")
     }
     return new ReferenceType(subType, options)
+}
+
+export function isReferenceType(type: any): type is ReferenceType<any> {
+    return (type.flags & TypeFlags.Reference) > 0
 }

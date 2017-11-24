@@ -1,3 +1,5 @@
+import { fail } from "../internal"
+
 // https://tools.ietf.org/html/rfc6902
 // http://jsonpatch.com/
 
@@ -80,5 +82,3 @@ export function splitJsonPath(path: string): string[] {
     // path '../../b/c -> .. .. b c
     return parts[0] === "" ? parts.slice(1) : parts
 }
-
-import { fail } from "../utils"

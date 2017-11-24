@@ -15,7 +15,7 @@
     "update-snapshots": "ava -u",
     "speedtest": "npm run build-tests && node --expose-gc test-lib/test/perf/report.js",
     "test-cyclic": "npm run build && node -e \"require('.')\"",
-    "watch": "tsc -p test && concurrently --kill-others --names 'build-tests,test-runner' 'tsc --watch -p test' --raw  'ava --watch'",
+    "watch": "(tsc -p test --skipLibCheck || true) && concurrently --kill-others --names 'build-tests,test-runner' 'tsc --skipLibCheck --watch -p test' --raw  'ava --watch'",
     "_prepublish": "npm run build && npm run build-docs",
     "coverage": "npm run build-tests && nyc ava && nyc report -r html && nyc report -r lcov",
     "build-docs": "npm run quick-build && documentation build lib/index.js --sort-order alpha -f md -o ../../API.md.tmp && concat -o ../../API.md ../../docs/API_header.md ../../API.md.tmp && rm ../../API.md.tmp",

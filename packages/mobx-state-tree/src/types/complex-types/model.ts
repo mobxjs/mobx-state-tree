@@ -16,29 +16,28 @@ import {
     isPrimitive,
     EMPTY_ARRAY,
     EMPTY_OBJECT,
-    addHiddenFinalProp
-} from "../../utils"
-import { ComplexType, IComplexType, IType } from "../type"
-import { TypeFlags, isType } from "../type-flags"
-import {
+    addHiddenFinalProp,
     createNode,
     getStateTreeNode,
     IStateTreeNode,
     IJsonPatch,
-    Node,
+    INode,
     createActionInvoker,
-    escapeJsonPath
-} from "../../core"
-import {
+    escapeJsonPath,
+    ComplexType,
+    IComplexType,
+    IType,
+    TypeFlags,
+    isType,
     flattenTypeErrors,
     IContext,
     IValidationResult,
     typecheck,
     typeCheckFailure,
-    getContextForPath
-} from "../type-checker"
-import { getPrimitiveFactoryFromValue, undefinedType } from "../primitives"
-import { optional } from "../utility-types/optional"
+    getContextForPath,
+    getPrimitiveFactoryFromValue,
+    optional
+} from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 
@@ -78,7 +77,7 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
                 )
 
             // the user intended to use a view
-            const descriptor = Object.getOwnPropertyDescriptor(properties, key)
+            const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if ("get" in descriptor) {
                 fail("Getters are not supported as properties. Please use views instead")
             }
@@ -115,6 +114,7 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
 
 export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, T> {
     readonly flags = TypeFlags.Object
+    shouldAttachNode = true
 
     /*
      * The original object definition
@@ -180,6 +180,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             }
 
             addHiddenFinalProp(self, name, createActionInvoker(self, name, action))
+            return
         })
     }
 
@@ -223,7 +224,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             fail(`views initializer should return a plain object containing views`)
         Object.keys(views).forEach(key => {
             // is this a computed property?
-            const descriptor = Object.getOwnPropertyDescriptor(views, key)
+            const descriptor = Object.getOwnPropertyDescriptor(views, key)!
             const { value } = descriptor
             if ("get" in descriptor) {
                 // TODO: mobx currently does not allow redefining computes yet, pending #1121
@@ -261,7 +262,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             })
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: any): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
         return createNode(
             this,
             parent,
@@ -281,7 +282,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return instance as Object
     }
 
-    finalizeNewInstance = (node: Node, snapshot: any) => {
+    finalizeNewInstance = (node: INode, snapshot: any) => {
         const instance = node.storedValue as IStateTreeNode
         this.forAllProps((name, type) => {
             extendShallowObservable(instance, {
@@ -319,26 +320,26 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         )
     }
 
-    getChildren(node: Node): Node[] {
-        const res: Node[] = []
+    getChildren(node: INode): INode[] {
+        const res: INode[] = []
         this.forAllProps((name, type) => {
             res.push(this.getChildNode(node, name))
         })
         return res
     }
 
-    getChildNode(node: Node, key: string): Node {
+    getChildNode(node: INode, key: string): INode {
         if (!(key in this.properties)) return fail("Not a value property: " + key)
         const childNode = node.storedValue.$mobx.values[key].value // TODO: blegh!
         if (!childNode) return fail("Node not available for property " + key)
         return childNode
     }
 
-    getValue(node: Node): any {
+    getValue(node: INode): any {
         return node.storedValue
     }
 
-    getSnapshot(node: Node): any {
+    getSnapshot(node: INode): any {
         const res = {} as any
         this.forAllProps((name, type) => {
             // TODO: FIXME, make sure the observable ref is used!
@@ -350,14 +351,14 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return res
     }
 
-    applyPatchLocally(node: Node, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add"))
             fail(`object does not support operation ${patch.op}`)
         node.storedValue[subpath] = patch.value
     }
 
     @action
-    applySnapshot(node: Node, snapshot: any): void {
+    applySnapshot(node: INode, snapshot: any): void {
         const s = this.applySnapshotPreProcessor(snapshot)
         typecheck(this, s)
         this.forAllProps((name, type) => {
@@ -410,7 +411,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return {}
     }
 
-    removeChild(node: Node, subpath: string) {
+    removeChild(node: INode, subpath: string) {
         node.storedValue[subpath] = null
     }
 }
@@ -495,4 +496,8 @@ export function compose(...args: any[]): IModelType<any, any> {
             })
         )
         .named(typeName)
+}
+
+export function isObjectType(type: any): type is ModelType<any, any> {
+    return isType(type) && (type.flags & TypeFlags.Object) > 0
 }

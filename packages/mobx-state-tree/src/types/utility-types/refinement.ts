@@ -1,8 +1,17 @@
-import { IType, Type } from "../type"
-import { TypeFlags, isType } from "../type-flags"
-import { isStateTreeNode, getStateTreeNode, Node } from "../../core"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { fail } from "../../utils"
+import {
+    isStateTreeNode,
+    getStateTreeNode,
+    INode,
+    IType,
+    Type,
+    IContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure,
+    isType,
+    fail,
+    TypeFlags
+} from "../../internal"
 
 export class Refinement<S, T> extends Type<S, T> {
     readonly type: IType<any, any>
@@ -11,6 +20,10 @@ export class Refinement<S, T> extends Type<S, T> {
 
     get flags() {
         return this.type.flags | TypeFlags.Refinement
+    }
+
+    get shouldAttachNode() {
+        return this.type.shouldAttachNode
     }
 
     constructor(
@@ -29,7 +42,7 @@ export class Refinement<S, T> extends Type<S, T> {
         return this.name
     }
 
-    instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
+    instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
         // create the child type
         const inst = this.type.instantiate(parent, subpath, environment, value)
 
@@ -110,4 +123,8 @@ export function refinement(...args: any[]): IType<any, any> {
             fail("expected a function as fourth argument, got " + message + " instead")
     }
     return new Refinement(name, type, predicate, message)
+}
+
+export function isRefinementType(type: any): type is Refinement<any, any> {
+    return (type.flags & TypeFlags.Refinement) > 0
 }

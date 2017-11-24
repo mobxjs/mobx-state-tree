@@ -1,3 +1,5 @@
+import { IObservableArray, ObservableMap } from "mobx"
+
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
  *
@@ -216,10 +218,10 @@ export function protect(target: IStateTreeNode) {
  * }))
  *
  * const todo = Todo.create()
- * todo.done = true // throws! 
- * todo.toggle() // OK 
- * unprotect(todo) 
- * todo.done = false // OK 
+ * todo.done = true // throws!
+ * todo.toggle() // OK
+ * unprotect(todo)
+ * todo.done = false // OK
  */
 export function unprotect(target: IStateTreeNode) {
     // check all arguments
@@ -293,7 +295,7 @@ export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
             fail("expected second argument to be a number, got " + depth + " instead")
         if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     }
-    let parent: Node | null = getStateTreeNode(target).parent
+    let parent: INode | null = getStateTreeNode(target).parent
     while (parent) {
         if (--depth === 0) return true
         parent = parent.parent
@@ -324,7 +326,7 @@ export function getParent<T>(target: IStateTreeNode, depth = 1): T & IStateTreeN
         if (depth < 0) fail(`Invalid depth: ${depth}, should be >= 1`)
     }
     let d = depth
-    let parent: Node | null = getStateTreeNode(target).parent
+    let parent: INode | null = getStateTreeNode(target).parent
     while (parent) {
         if (--d === 0) return parent.storedValue
         parent = parent.parent
@@ -645,9 +647,18 @@ export function walk(target: IStateTreeNode, processor: (item: IStateTreeNode) =
     processor(node.storedValue)
 }
 
-import { IObservableArray, ObservableMap } from "mobx"
-import { Node, getStateTreeNode, IStateTreeNode, isStateTreeNode } from "./node"
-import { IJsonPatch, splitJsonPath } from "./json-patch"
-import { asArray, EMPTY_OBJECT, fail, IDisposer } from "../utils"
-import { ISnapshottable, IType } from "../types/type"
-import { isType } from "../types/type-flags"
+import {
+    INode,
+    getStateTreeNode,
+    IStateTreeNode,
+    isStateTreeNode,
+    IJsonPatch,
+    splitJsonPath,
+    asArray,
+    EMPTY_OBJECT,
+    fail,
+    IDisposer,
+    ISnapshottable,
+    IType,
+    isType
+} from "../internal"

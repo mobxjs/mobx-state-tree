@@ -1,10 +1,20 @@
-import { ISimpleType, Type } from "../type"
-import { TypeFlags } from "../type-flags"
-import { fail, isPrimitive } from "../../utils"
-import { IContext, IValidationResult, typeCheckSuccess, typeCheckFailure } from "../type-checker"
-import { Node, createNode } from "../../core"
+import {
+    fail,
+    isPrimitive,
+    INode,
+    createNode,
+    ISimpleType,
+    Type,
+    TypeFlags,
+    IContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure,
+    isType
+} from "../../internal"
 
 export class Literal<T> extends Type<T, T> {
+    readonly shouldAttachNode = false
     readonly value: any
     readonly flags = TypeFlags.Literal
 
@@ -13,7 +23,7 @@ export class Literal<T> extends Type<T, T> {
         this.value = value
     }
 
-    instantiate(parent: Node | null, subpath: string, environment: any, snapshot: T): Node {
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: T): INode {
         return createNode(this, parent, subpath, environment, snapshot)
     }
 
@@ -56,4 +66,8 @@ export function literal<S>(value: S): ISimpleType<S> {
         if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
     }
     return new Literal<S>(value)
+}
+
+export function isLiteralType(type: any): type is Literal<any> {
+    return isType(type) && (type.flags & TypeFlags.Literal) > 0
 }

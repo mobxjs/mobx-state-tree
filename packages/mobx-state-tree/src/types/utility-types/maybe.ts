@@ -1,10 +1,4 @@
-import { union } from "./union"
-import { nullType } from "../primitives"
-import { optional } from "./optional"
-import { IType } from "../type"
-import { isType } from "../type-flags"
-import { frozen } from "./frozen"
-import { fail } from "../../utils"
+import { union, nullType, optional, IType, isType, frozen, fail } from "../../internal"
 
 const optionalNullType = optional(nullType, null)
 

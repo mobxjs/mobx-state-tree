@@ -1,14 +1,16 @@
-import { IType, Type } from "../type"
-import { isType, TypeFlags } from "../type-flags"
 import {
     IContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    flattenTypeErrors
-} from "../type-checker"
-import { fail } from "../../utils"
-import { Node } from "../../core"
+    flattenTypeErrors,
+    isType,
+    TypeFlags,
+    IType,
+    Type,
+    INode,
+    fail
+} from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
@@ -26,6 +28,10 @@ export class Union extends Type<any, any> {
         return result
     }
 
+    get shouldAttachNode() {
+        return this.types.some(type => type.shouldAttachNode)
+    }
+
     constructor(name: string, types: IType<any, any>[], dispatcher: ITypeDispatcher | null) {
         super(name)
         this.dispatcher = dispatcher
@@ -40,11 +46,11 @@ export class Union extends Type<any, any> {
         return "(" + this.types.map(factory => factory.describe()).join(" | ") + ")"
     }
 
-    instantiate(parent: Node, subpath: string, environment: any, value: any): Node {
+    instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
         return this.determineType(value).instantiate(parent, subpath, environment, value)
     }
 
-    reconcile(current: Node, newValue: any): Node {
+    reconcile(current: INode, newValue: any): INode {
         return this.determineType(newValue).reconcile(current, newValue)
     }
 
@@ -331,4 +337,8 @@ export function union(
         })
     }
     return new Union(name, types, dispatcher)
+}
+
+export function isUnionType(type: any): type is Union {
+    return (type.flags & TypeFlags.Union) > 0
 }
