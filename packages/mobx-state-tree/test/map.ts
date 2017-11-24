@@ -187,10 +187,12 @@ test("it should support identifiers", t => {
     store.todos.put({ id: "19" })
     t.is(store.todos.get("19")!.id, "19")
     t.is("" + store.todos.get("19"), "AnonymousModel@/todos/19(id: 19)")
-    t.throws(
-        () => applySnapshot(store.todos, { "17": { id: "18" } }),
-        "[mobx-state-tree] A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '18', but expected: '17'"
-    )
+    if (process.env.NODE_ENV === "development") {
+        t.throws(
+            () => applySnapshot(store.todos, { "17": { id: "18" } }),
+            "[mobx-state-tree] A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '18', but expected: '17'"
+        )
+    }
 })
 
 test("#184 - types.map().get(key) should not throw if key doesnt exists", t => {
@@ -229,9 +231,11 @@ test("#192 - put should not throw when identifier is a number", t => {
             title: "Test"
         })
     })
-    t.throws(() => {
-        todoStore.addTodo({ todo_id: "1", title: "Test" })
-    }, `[mobx-state-tree] Error while converting \`{\"todo_id\":\"1\",\"title\":\"Test\"}\` to \`Todo\`:\nat path \"/todo_id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\` (Value is not a number), expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`)
+    if (process.env.NODE_ENV === "development") {
+        t.throws(() => {
+            todoStore.addTodo({ todo_id: "1", title: "Test" })
+        }, `[mobx-state-tree] Error while converting \`{\"todo_id\":\"1\",\"title\":\"Test\"}\` to \`Todo\`:\nat path \"/todo_id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\` (Value is not a number), expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`)
+    }
 })
 
 test("#192 - map should not mess up keys when putting twice", t => {

@@ -13,15 +13,17 @@ test("it should accept any serializable value", t => {
     t.deepEqual<any>(getSnapshot(doc), { value: { a: 1, b: 2 } })
 })
 
-test("it should throw if value is not serializable", t => {
-    const Factory = types.model({
-        value: types.frozen
+if (process.env.NODE_ENV === "development") {
+    test("it should throw if value is not serializable", t => {
+        const Factory = types.model({
+            value: types.frozen
+        })
+
+        const doc: any = Factory.create()
+        unprotect(doc)
+
+        t.throws(() => {
+            doc.value = function IAmUnserializable() {}
+        }, /Error while converting <function IAmUnserializable> to `frozen`/)
     })
-
-    const doc: any = Factory.create()
-    unprotect(doc)
-
-    t.throws(() => {
-        doc.value = function IAmUnserializable() {}
-    }, /Error while converting <function IAmUnserializable> to `frozen`/)
-})
+}

@@ -1,33 +1,35 @@
 import { types } from "../src"
 import { test } from "ava"
 
-test("it should allow only primitives", t => {
-    const error = t.throws(() => {
-        types.model({
-            complexArg: types.literal({ a: 1 })
-        })
-    }, "[mobx-state-tree] Literal types can be built only on top of primitives")
-})
-
-test("it should fail if not optional and no default provided", t => {
-    const Factory = types.literal("hello")
-    t.snapshot(
-        t.throws(() => {
-            Factory.create()
-        }).message
-    )
-})
-
-test("it should throw if a different type is given", t => {
-    const Factory = types.model("TestFactory", {
-        shouldBeOne: types.literal(1)
+if (process.env.NODE_ENV === "development") {
+    test("it should allow only primitives", t => {
+        const error = t.throws(() => {
+            types.model({
+                complexArg: types.literal({ a: 1 })
+            })
+        }, "[mobx-state-tree] Literal types can be built only on top of primitives")
     })
-    t.snapshot(
-        t.throws(() => {
-            Factory.create({ shouldBeOne: 2 })
-        }).message
-    )
-})
+
+    test("it should fail if not optional and no default provided", t => {
+        const Factory = types.literal("hello")
+        t.snapshot(
+            t.throws(() => {
+                Factory.create()
+            }).message
+        )
+    })
+
+    test("it should throw if a different type is given", t => {
+        const Factory = types.model("TestFactory", {
+            shouldBeOne: types.literal(1)
+        })
+        t.snapshot(
+            t.throws(() => {
+                Factory.create({ shouldBeOne: 2 })
+            }).message
+        )
+    })
+}
 
 test("it should support null type", t => {
     const M = types.model({

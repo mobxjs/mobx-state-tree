@@ -70,34 +70,36 @@ test("it should support prefixed paths in arrays", t => {
     } as any) // TODO: better typings
 })
 
-test("identifiers are required", t => {
-    const Todo = types.model({
-        id: types.identifier()
+if (process.env.NODE_ENV === "development") {
+    test("identifiers are required", t => {
+        const Todo = types.model({
+            id: types.identifier()
+        })
+        t.is(Todo.is({}), false)
+        t.is(Todo.is({ id: "x" }), true)
+        t.throws(
+            () => Todo.create(),
+            "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
+                'at path "/id" value `undefined` is not assignable to type: `identifier(string)` (Value is not a string), expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
+        )
     })
-    t.is(Todo.is({}), false)
-    t.is(Todo.is({ id: "x" }), true)
-    t.throws(
-        () => Todo.create(),
-        "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n" +
-            'at path "/id" value `undefined` is not assignable to type: `identifier(string)` (Value is not a string), expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
-    )
-})
 
-test("identifiers cannot be modified", t => {
-    const Todo = types.model({
-        id: types.identifier()
+    test("identifiers cannot be modified", t => {
+        const Todo = types.model({
+            id: types.identifier()
+        })
+        const todo = Todo.create({ id: "x" })
+        unprotect(todo)
+        t.throws(
+            () => (todo.id = "stuff"),
+            "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
+        )
+        t.throws(
+            () => applySnapshot(todo, { id: "stuff" }),
+            "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
+        )
     })
-    const todo = Todo.create({ id: "x" })
-    unprotect(todo)
-    t.throws(
-        () => (todo.id = "stuff"),
-        "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
-    )
-    t.throws(
-        () => applySnapshot(todo, { id: "stuff" }),
-        "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
-    )
-})
+}
 
 test("it should resolve refs during creation, when using path", t => {
     const values: number[] = []
@@ -485,15 +487,17 @@ test("References are non-nullable by default", t => {
         ref: 4
     })
     unprotect(store)
-    t.is(store.maybeRef, null)
-    t.snapshot(t.throws(() => store.ref).message)
-    store.maybeRef = 3 as any
-    t.is(store.maybeRef, store.todo)
-    store.maybeRef = 4 as any
-    t.snapshot(t.throws(() => store.maybeRef).message)
-    store.maybeRef = null
-    t.is(store.maybeRef, null)
-    t.snapshot(t.throws(() => (store.ref = null as any)).message)
+    if (process.env.NODE_ENV === "development") {
+        t.is(store.maybeRef, null)
+        t.snapshot(t.throws(() => store.ref).message)
+        store.maybeRef = 3 as any
+        t.is(store.maybeRef, store.todo)
+        store.maybeRef = 4 as any
+        t.snapshot(t.throws(() => store.maybeRef).message)
+        store.maybeRef = null
+        t.is(store.maybeRef, null)
+        t.snapshot(t.throws(() => (store.ref = null as any)).message)
+    }
 })
 
 test("References are described properly", t => {

@@ -159,16 +159,18 @@ test("it should not be possible to pass a complex object", t => {
     ])
 })
 
-test("it should not be possible to set the wrong type", t => {
-    const store = createTestStore()
-    t.throws(
-        () => {
-            store.orders[0].setCustomer(store.orders[0])
-        }, // wrong type!
-        "[mobx-state-tree] Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n" +
-            "value of type Order: <Order@/orders/0> is not assignable to type: `(reference(Customer) | null)`, expected an instance of `(reference(Customer) | null)` or a snapshot like `(reference(Customer) | null?)` instead."
-    )
-})
+if (process.env.NODE_ENV === "development") {
+    test("it should not be possible to set the wrong type", t => {
+        const store = createTestStore()
+        t.throws(
+            () => {
+                store.orders[0].setCustomer(store.orders[0])
+            }, // wrong type!
+            "[mobx-state-tree] Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n" +
+                "value of type Order: <Order@/orders/0> is not assignable to type: `(reference(Customer) | null)`, expected an instance of `(reference(Customer) | null)` or a snapshot like `(reference(Customer) | null?)` instead."
+        )
+    })
+}
 
 test("it should not be possible to pass the element of another tree", t => {
     const store1 = createTestStore()
@@ -341,20 +343,20 @@ test("middleware events are correct", t => {
         {
             args: [7],
             context: {},
-            id: 38,
+            id: process.env.NODE_ENV === "development" ? 38 : 35,
             name: "a",
             parentId: 0,
-            rootId: 38,
+            rootId: process.env.NODE_ENV === "development" ? 38 : 35,
             tree: {},
             type: "action"
         },
         {
             args: [14],
             context: {},
-            id: 39,
+            id: process.env.NODE_ENV === "development" ? 39 : 36,
             name: "b",
-            parentId: 38,
-            rootId: 38,
+            parentId: process.env.NODE_ENV === "development" ? 38 : 35,
+            rootId: process.env.NODE_ENV === "development" ? 38 : 35,
             tree: {},
             type: "action"
         }
