@@ -30,6 +30,7 @@ Introduction blog post [The curious case of MobX state tree](https://medium.com/
   * [Tree semantics in detail](#tree-semantics-in-detail)
   * [Composing trees](#composing-trees)
   * [Actions](#actions)
+  * [Views](#views)
   * [Snapshots](#snapshots)
   * [Patches](#patches)
   * [References and identifiers](#references-and-identifiers)
@@ -424,6 +425,44 @@ For more details on creating middleware, see the [docs](docs/middleware.md)
 #### Disabling protected mode
 
 This may be desired if the default protection of `mobx-state-tree` doesn't fit your use case. For example, if you are not interested in replayable actions, or hate the effort of writing actions to modify any field; `unprotect(tree)` will disable the protected mode of a tree, allowing anyone to directly modify the tree.
+
+### Views
+
+Any fact that can be derived from your state is called a "view" or "derivation".
+See the [Mobx concepts & principles](https://mobx.js.org/intro/concepts.html) for some background.
+
+Views come in two flavors. Views with arguments and views without arguments. The latter are called computed values, based on the [computed](https://mobx.js.org/refguide/computed-decorator.html) concept in mobx. They main difference between the two is that computed properties create an explicit caching point, but further they work the same and any other computed value or Mobx based reaction like [`@observer`](https://mobx.js.org/refguide/observer-component.html) components can react to them. Computed values are defined using _getter_ functions.
+
+Example:
+
+```javascript
+import { autorun } from "mobx"
+
+const UserStore = types
+    .model({
+        users: types.array(User)
+    })
+    .views(self => ({
+        get amountOfChildren() {
+            return users.filter(user => user.age < 18).length
+        },
+        amountOfPeopleOlderThan(age) {
+            return users.filter(user => user.age > age).length
+        }
+    }))
+
+const userStore = UserStore.create(/* */)
+
+// Every time the userStore is updated in a relevant way, log messages will be printed
+autorun(() => {
+    console.log("There are now ", userStore.amountOfChildren, " children"
+})
+autorun(() => {
+    console.log("There are now ", userStore.amountOfPeopleOlderThan(75), " pretty old people"
+})
+```
+
+If you want to share volatile state between views and actions, use `.extend` instead of `.views` + `.actions`, see the [volatile state](#volatile-state) section.
 
 ### Snapshots
 
@@ -1017,7 +1056,7 @@ A partial solution for this is to turn the `.Type` into an interface.
 type ITodoType = typeof Todo.Type;
 interface ITodo extends ITodoType {};
 ```
-   
+
 Sometimes you'll need to take into account where your typings are available and where they aren't. The code below will not compile: TypeScript will complain that `self.upperProp` is not a known property. Computed properties are only available after `.views` is evaluated.
 
 ```typescript
