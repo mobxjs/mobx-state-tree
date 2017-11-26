@@ -431,7 +431,7 @@ This may be desired if the default protection of `mobx-state-tree` doesn't fit y
 Any fact that can be derived from your state is called a "view" or "derivation".
 See the [Mobx concepts & principles](https://mobx.js.org/intro/concepts.html) for some background.
 
-Views come in two flavors. Views with arguments and views without arguments. The latter are called computed values, based on the [computed](https://mobx.js.org/refguide/computed-decorator.html) concept in mobx. They main difference between the two is that computed properties create an explicit caching point, but further they work the same and any other computed value or Mobx based reaction like [`@observer`](https://mobx.js.org/refguide/observer-component.html) components can react to them. Computed values are defined using _getter_ functions.
+Views come in two flavors. Views with arguments and views without arguments. The latter are called computed values, based on the [computed](https://mobx.js.org/refguide/computed-decorator.html) concept in mobx. The main difference between the two is that computed properties create an explicit caching point, but further they work the same and any other computed value or Mobx based reaction like [`@observer`](https://mobx.js.org/refguide/observer-component.html) components can react to them. Computed values are defined using _getter_ functions.
 
 Example:
 
