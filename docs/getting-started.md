@@ -381,7 +381,7 @@ If you're console.log your snapshot, you'll notice that computed properties won'
 ## Model views
 You may need to use the list of todos filtered by completion in various locations in your application. Even if accessing the list of todos and filter them every time may look a viable solution, if the filter logic is complex or changes over time you'll find that it's not a viable solution.
 
-MST solves that by providing the ability to declare model views. A model views is declared as a function over the properties (first argument) of the model declaration. Model views can accept parameters and only read data from our store. If you try to change your store from a model view, MST will throw and prevent your from doing so.
+MST solves that by providing the ability to declare model views. A model views is declared as a function over the properties (first argument) of the model declaration. Model views can accept parameters and only read data from our store. If you try to change your store from a model view, MST will throw and prevent you from doing so.
 
 ```javascript
 const RootStore = types.model({
