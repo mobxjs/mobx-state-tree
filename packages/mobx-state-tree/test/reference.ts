@@ -719,7 +719,6 @@ test("it should applySnapshot references in array", t => {
 })
 
 test("array of references should work fine", t => {
-    debugger
     const B = types.model("Block", { id: types.identifier(types.string) })
 
     const S = types

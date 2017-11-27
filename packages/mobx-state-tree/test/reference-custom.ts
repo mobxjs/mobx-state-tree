@@ -1,4 +1,4 @@
-import { reaction } from "mobx"
+import { reaction, when } from "mobx"
 import {
     types,
     recordPatches,
@@ -7,12 +7,61 @@ import {
     applyPatch,
     unprotect,
     getRoot,
-    onSnapshot
+    onSnapshot,
+    flow
 } from "../src"
 import { test } from "ava"
 
-test("it should support custom references", t => {
-    debugger
+test("it should support custom references - basics", t => {
+    const User = types.model({
+        id: types.identifier(),
+        name: types.string
+    })
+
+    const UserByNameReference = types.maybe(
+        types.reference(User, {
+            // given an identifier, find the user
+            get(identifier /* string */, parent: any /*Store*/) {
+                return parent.users.find(u => u.name === identifier) || null
+            },
+            // given a user, produce the identifier that should be stored
+            set(value /* User */) {
+                return value.name
+            }
+        })
+    )
+
+    const Store = types.model({
+        users: types.array(User),
+        selection: UserByNameReference
+    })
+
+    const s = Store.create({
+        users: [{ id: "1", name: "Michel" }, { id: "2", name: "Mattia" }],
+        selection: "Mattia"
+    })
+    unprotect(s)
+
+    t.is(s.selection!.name, "Mattia")
+    t.true(s.selection === s.users[1])
+    t.is((getSnapshot(s) as any).selection, "Mattia")
+
+    s.selection = s.users[0]
+
+    t.is(s.selection.name, "Michel")
+    t.true(s.selection === s.users[0])
+    t.is((getSnapshot(s) as any).selection, "Michel")
+    ;(s as any).selection = null
+    t.is((getSnapshot(s) as any).selection, null)
+
+    applySnapshot(s, { ...getSnapshot(s), selection: "Mattia" })
+    t.is(s.selection, s.users[1])
+
+    applySnapshot(s, { ...getSnapshot(s), selection: "Unknown" })
+    t.is(s.selection, null)
+})
+
+test("it should support custom references - adv", t => {
     const User = types.model({
         id: types.identifier(),
         name: types.string
@@ -85,4 +134,74 @@ test("it should support custom references", t => {
     t.snapshot(r)
     t.snapshot(p.patches)
     t.snapshot(p.inversePatches)
+})
+
+test.cb("it should support dynamic loading", t => {
+    const events: string[] = []
+
+    const User = types.model({
+        name: types.string,
+        age: 0
+    })
+
+    const UserByNameReference = types.maybe(
+        types.reference(User, {
+            get(identifier /* string */, parent: any /*Store*/) {
+                return parent.getOrLoadUser(identifier)
+            },
+            set(value /* User */) {
+                return value.name
+            }
+        })
+    )
+
+    const Store = types
+        .model({
+            users: types.array(User),
+            selection: UserByNameReference
+        })
+        .actions(self => ({
+            loadUser: flow(function* loadUser(name) {
+                events.push("loading " + name)
+                self.users.push({ name } as any)
+                yield new Promise(resolve => {
+                    setTimeout(resolve, 200)
+                })
+                events.push("loaded " + name)
+                const user = (self.users.find(u => u.name === name).age = name.length * 3) // wonderful!
+            })
+        }))
+        .views(self => ({
+            // Important: a view so that the reference will automatically react to the reference being changed!
+            getOrLoadUser(name) {
+                const user = self.users.find(u => u.name === name) || null
+                if (!user) {
+                    /*
+                        TODO: this is ugly, but workaround the idea that views should be side effect free.
+                        We need a more elegant solution..
+                    */
+                    setImmediate(() => self.loadUser(name))
+                }
+                return user
+            }
+        }))
+
+    const s = Store.create({
+        users: [],
+        selection: "Mattia"
+    })
+    unprotect(s)
+
+    t.deepEqual(events, [])
+    t.is(s.users.length, 0)
+    t.is(s.selection, null)
+
+    when(
+        () => s.users.length === 1 && s.users[0].age === 18 && s.users[0].name === "Mattia",
+        () => {
+            t.is(s.selection, s.users[0])
+            t.deepEqual(events, ["loading Mattia", "loaded Mattia"])
+            t.end()
+        }
+    )
 })
