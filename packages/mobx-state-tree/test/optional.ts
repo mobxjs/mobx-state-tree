@@ -25,28 +25,32 @@ test("it should use the snapshot if provided", t => {
     t.deepEqual<any>(getSnapshot(doc), { rows: [{ name: "snapshot", quantity: 0 }] })
 })
 
-test("it should throw if default value is invalid snapshot", t => {
-    const Row = types.model({
-        name: types.string,
-        quantity: types.number
-    })
-    const error = t.throws(() => {
-        types.model({
-            rows: types.optional(types.array(Row), [{}])
+if (process.env.NODE_ENV === "development") {
+    test("it should throw if default value is invalid snapshot", t => {
+        const Row = types.model({
+            name: types.string,
+            quantity: types.number
+        })
+        const error = t.throws(() => {
+            types.model({
+                rows: types.optional(types.array(Row), [{}])
+            })
         })
     })
-})
+}
 
-test("it should throw bouncing errors from its sub-type", t => {
-    const Row = types.model({
-        name: types.string,
-        quantity: types.number
+if (process.env.NODE_ENV === "development") {
+    test("it should throw bouncing errors from its sub-type", t => {
+        const Row = types.model({
+            name: types.string,
+            quantity: types.number
+        })
+        const RowList = types.optional(types.array(Row), [])
+        const error = t.throws(() => {
+            RowList.create([{ name: "a", quantity: 1 }, { name: "b", quantity: "x" }])
+        })
     })
-    const RowList = types.optional(types.array(Row), [])
-    const error = t.throws(() => {
-        RowList.create([{ name: "a", quantity: 1 }, { name: "b", quantity: "x" }])
-    })
-})
+}
 
 test("it should accept a function to provide dynamic values", t => {
     let defaultValue: any = 1
@@ -57,10 +61,12 @@ test("it should accept a function to provide dynamic values", t => {
     defaultValue = 2
     t.deepEqual(getSnapshot(Factory.create()), { a: 2 })
     defaultValue = "hello world!"
-    t.throws(
-        () => Factory.create(),
-        `[mobx-state-tree] Error while converting \`"hello world!"\` to \`number\`:\nvalue \`"hello world!"\` is not assignable to type: \`number\` (Value is not a number).`
-    )
+    if (process.env.NODE_ENV === "development") {
+        t.throws(
+            () => Factory.create(),
+            `[mobx-state-tree] Error while converting \`"hello world!"\` to \`number\`:\nvalue \`"hello world!"\` is not assignable to type: \`number\` (Value is not a number).`
+        )
+    }
 })
 
 test("Values should reset to default if omitted in snapshot", t => {

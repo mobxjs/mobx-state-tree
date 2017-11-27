@@ -26,14 +26,16 @@ const createTestFactories = () => {
     return { Box, Square, Cube, Plane, DispatchPlane, Heighed, Block }
 }
 
-test("it should complain about multiple applicable types no dispatch method", t => {
-    const { Box, Plane, Square } = createTestFactories()
-    t.snapshot(
-        t.throws(() => {
-            Plane.create({ width: 2, height: 2 })
-        }).message
-    )
-})
+if (process.env.NODE_ENV === "development") {
+    test("it should complain about multiple applicable types no dispatch method", t => {
+        const { Box, Plane, Square } = createTestFactories()
+        t.snapshot(
+            t.throws(() => {
+                Plane.create({ width: 2, height: 2 })
+            }).message
+        )
+    })
+}
 
 test("it should have parent whenever creating or applying from a complex data structure to a model which has Union typed children", t => {
     const { Block, Heighed } = createTestFactories()
@@ -44,14 +46,16 @@ test("it should have parent whenever creating or applying from a complex data st
     t.is(hasParent(child), true)
 })
 
-test("it should complain about no applicable types", t => {
-    const { Heighed } = createTestFactories()
-    t.snapshot(
-        t.throws(() => {
-            Heighed.create({ height: 2 })
-        }).message
-    )
-})
+if (process.env.NODE_ENV === "development") {
+    test("it should complain about no applicable types", t => {
+        const { Heighed } = createTestFactories()
+        t.snapshot(
+            t.throws(() => {
+                Heighed.create({ height: 2 })
+            }).message
+        )
+    })
+}
 
 test("it should be smart enough to discriminate by keys", t => {
     const { Box, Plane, Square } = createTestFactories()

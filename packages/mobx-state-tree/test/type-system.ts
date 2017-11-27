@@ -149,10 +149,12 @@ test("#66 - it should pick the correct type of defaulted fields", t => {
     const a = Item.create({ id: 3 })
     unprotect(a)
     t.is(a.name, "boo")
-    t.throws(
-        () => (a.name = 3 as any),
-        `[mobx-state-tree] Error while converting \`3\` to \`string\`:\nvalue \`3\` is not assignable to type: \`string\` (Value is not a string).`
-    )
+    if (process.env.NODE_ENV === "development") {
+        t.throws(
+            () => (a.name = 3 as any),
+            `[mobx-state-tree] Error while converting \`3\` to \`string\`:\nvalue \`3\` is not assignable to type: \`string\` (Value is not a string).`
+        )
+    }
 })
 
 test("cannot create factories with null values", t => {
@@ -302,53 +304,55 @@ test("it handles complex types correctly", t => {
     t.is(true, true) // supress no asserts warning
 })
 
-test("it should provide detailed reasons why the value is not appicable", t => {
-    const Todo = types
-        .model({
-            title: types.string
-        })
-        .actions(self => {
-            function setTitle(v: string) {}
-            return {
-                setTitle
-            }
-        })
-    const Store = types
-        .model({
-            todos: types.map(Todo)
-        })
-        .views(self => ({
-            get amount() {
-                return self.todos.size
-            },
-            getAmount(): number {
-                return self.todos.size + self.todos.size
-            }
-        }))
-        .actions(self => {
-            function setAmount() {
-                const x: number = self.todos.size + self.amount + self.getAmount()
-            }
-            return {
-                setAmount
-            }
-        })
-    t.throws(
-        () =>
-            Store.create({
-                todos: { "1": { title: true, setTitle: "hello" } },
-                amount: 1,
-                getAmount: "hello"
-            } as any),
-        `[mobx-state-tree] Error while converting \`{"todos":{"1":{"title":true,"setTitle":"hello"}},"amount":1,"getAmount":"hello"}\` to \`AnonymousModel\`:
+if (process.env.NODE_ENV === "development") {
+    test("it should provide detailed reasons why the value is not appicable", t => {
+        const Todo = types
+            .model({
+                title: types.string
+            })
+            .actions(self => {
+                function setTitle(v: string) {}
+                return {
+                    setTitle
+                }
+            })
+        const Store = types
+            .model({
+                todos: types.map(Todo)
+            })
+            .views(self => ({
+                get amount() {
+                    return self.todos.size
+                },
+                getAmount(): number {
+                    return self.todos.size + self.todos.size
+                }
+            }))
+            .actions(self => {
+                function setAmount() {
+                    const x: number = self.todos.size + self.amount + self.getAmount()
+                }
+                return {
+                    setAmount
+                }
+            })
+        t.throws(
+            () =>
+                Store.create({
+                    todos: { "1": { title: true, setTitle: "hello" } },
+                    amount: 1,
+                    getAmount: "hello"
+                } as any),
+            `[mobx-state-tree] Error while converting \`{"todos":{"1":{"title":true,"setTitle":"hello"}},"amount":1,"getAmount":"hello"}\` to \`AnonymousModel\`:
 at path "/todos/1/title" value \`true\` is not assignable to type: \`string\` (Value is not a string).`
 
-        // MWE: TODO: Ideally (like in MST =< 0.9):
-        // at path "/todos/1/setTitle" value \`"hello"\` is not assignable  (Action properties should not be provided in the snapshot).
-        // at path "/amount" value \`1\` is not assignable  (Computed properties should not be provided in the snapshot).
-        // at path "/getAmount" value \`"hello"\` is not assignable  (View properties should not be provided in the snapshot).`
-    )
-})
+            // MWE: TODO: Ideally (like in MST =< 0.9):
+            // at path "/todos/1/setTitle" value \`"hello"\` is not assignable  (Action properties should not be provided in the snapshot).
+            // at path "/amount" value \`1\` is not assignable  (Computed properties should not be provided in the snapshot).
+            // at path "/getAmount" value \`"hello"\` is not assignable  (View properties should not be provided in the snapshot).`
+        )
+    })
+}
 
 test("it should type compose correctly", t => {
     const Car = types

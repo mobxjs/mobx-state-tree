@@ -4,12 +4,13 @@
 		"lerna": "^2.4.0",
 		"husky": "^0.13.4",
 		"prettier": "^1.4.4",
-		"lint-staged": "^3.6.1"
+		"lint-staged": "^3.6.1",
+		"cross-env":"^5.1.1"
 	},
 	"scripts": {
 		"clean": "lerna clean",
 		"build": "lerna run build",
-		"test": "CI=true lerna run test",
+		"test": "cross-env CI=true lerna run test",
 		"precommit": "lint-staged",
 		"coverage": "lerna run coverage",
 		"bootstrap": "lerna bootstrap --hoist",

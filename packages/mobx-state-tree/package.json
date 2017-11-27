@@ -11,7 +11,7 @@
     "quick-build": "tsc",
     "rollup": "rollup -c",
     "build-tests": "tsc -p test/",
-    "test": "npm run build-tests && ava && npm run test-cyclic",
+    "test": "npm run build-tests && cross-env NODE_ENV=development ava && cross-env NODE_ENV=production ava && npm run test-cyclic",
     "update-snapshots": "ava -u",
     "speedtest": "npm run build-tests && node --expose-gc test-lib/test/perf/report.js",
     "test-cyclic": "npm run build && node -e \"require('.')\"",
@@ -54,7 +54,8 @@
     "tape": "^4.6.0",
     "tslib": "^1.7.1",
     "tslint": "^3.15.1",
-    "typescript": "^2.4.2"
+    "typescript": "^2.4.2",
+    "cross-env":"^5.1.1"
   },
   "peerDependencies": {
     "mobx": "^3.1.15"
