@@ -1074,7 +1074,7 @@ const Example = types
   }));
 ```
 
-You can circumvent this situation by decaring the views in two steps:
+You can circumvent this situation by declaring the views in two steps:
 
 ```typescript
 const Example = types
