@@ -568,6 +568,44 @@ const Car = types.model("Car", {
 References are defined by mentioning the type they should resolve to. The targeted type should have exactly one attribute of the type `identifier()`.
 References are looked up through the entire tree, but per type. So identifiers need to be unique in the entire tree.
 
+#### Customizable references
+
+The default implementation uses the `identifier` cache to resolve references (See [`resolveIdentifier`](API.md#resolveIdentifier)).
+However, it also possible to override the resolve logic, and provide your own custom resolve logic.
+This makes it also possible to for example trigger a data fetch when trying to resolve the reference ([example](https://github.com/mobxjs/mobx-state-tree/blob/cdb3298a5621c3229b3856bb469327da6deb31ea/packages/mobx-state-tree/test/reference-custom.ts#L150)).
+
+Example:
+
+```javascript
+const User = types.model({
+    id: types.identifier(),
+    name: types.string
+})
+
+const UserByNameReference = types.maybe(
+    types.reference(User, {
+        // given an identifier, find the user
+        get(identifier /* string */, parent: any /*Store*/) {
+            return parent.users.find(u => u.name === identifier) || null
+        },
+        // given a user, produce the identifier that should be stored
+        set(value /* User */) {
+            return value.name
+        }
+    })
+)
+
+const Store = types.model({
+    users: types.array(User),
+    selection: UserByNameReference
+})
+
+const s = Store.create({
+    users: [{ id: "1", name: "Michel" }, { id: "2", name: "Mattia" }],
+    selection: "Mattia"
+})
+```
+
 ### Listening to observables, snapshots, patches or actions
 
 MST is powered by MobX. This means that it is immediately compatible with `observer` components, or reactions like `autorun`:
