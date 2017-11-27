@@ -2,7 +2,6 @@
 
 exports[`it should support custom references 1`] = `
 Array [
-  null,
   "1",
   "2",
   "1",

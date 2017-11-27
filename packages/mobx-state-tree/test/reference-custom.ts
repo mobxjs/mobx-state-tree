@@ -81,7 +81,7 @@ test("it should support custom references", t => {
     s.users.put({ id: "3", name: "Michel" })
     t.is(s.selection.id, "3")
 
-    t.snapshot(ids) // N.B. the first `null` is a bug in mobx, but only pops up when not using a proper action wrapper
+    t.snapshot(ids)
     t.snapshot(r)
     t.snapshot(p.patches)
     t.snapshot(p.inversePatches)

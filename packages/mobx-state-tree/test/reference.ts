@@ -206,7 +206,6 @@ test("identifiers should only support types.string and types.number", t => {
 })
 
 test("identifiers should support subtypes of types.string and types.number", t => {
-    debugger
     const M = types.model({
         id: types.identifier(types.refinement("Number greater then 5", types.number, n => n > 5))
     })
@@ -679,7 +678,7 @@ test("it should applySnapshot references in array", t => {
                 name: "item name 1"
             }
         },
-        hovers: ["folder 1"]
+        hovers: ["item 1"]
     })
     const snapshot = JSON.parse(JSON.stringify(getSnapshot(folder)))
     t.deepEqual(snapshot, {
@@ -690,7 +689,7 @@ test("it should applySnapshot references in array", t => {
                 name: "item name 1"
             }
         },
-        hovers: ["folder 1"]
+        hovers: ["item 1"]
     })
     snapshot.hovers = []
     applySnapshot(folder, snapshot)
@@ -704,9 +703,23 @@ test("it should applySnapshot references in array", t => {
         },
         hovers: []
     })
+
+    snapshot.hovers = ["item 1"]
+    applySnapshot(folder, snapshot)
+    t.deepEqual(getSnapshot(folder), {
+        id: "folder 1",
+        objects: {
+            "item 1": {
+                id: "item 1",
+                name: "item name 1"
+            }
+        },
+        hovers: ["item 1"]
+    })
 })
 
 test("array of references should work fine", t => {
+    debugger
     const B = types.model("Block", { id: types.identifier(types.string) })
 
     const S = types
