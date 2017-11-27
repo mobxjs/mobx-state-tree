@@ -2,7 +2,7 @@ import { spy } from "sinon"
 import { test, TestContext } from "ava"
 import { deprecated } from "../src/utils"
 import { flow, createFlowSpawner } from "../src/core/flow"
-import { process, createProcessSpawner } from "../src/core/process"
+import { process as mstProcess, createProcessSpawner } from "../src/core/process"
 
 function createDeprecationListener() {
     // clear previous deprecation dedupe keys
@@ -15,9 +15,11 @@ function createDeprecationListener() {
     return function isDeprecated(t: TestContext) {
         // replace original implementation
         console.warn = originalWarn
-        // test for correct log message
-        t.true(spyWarn.called)
-        t.regex(spyWarn.getCall(0).args[0], /Deprecation warning:/)
+        // test for correct log message, if in development
+        if (process.env.NODE_ENV === "development") {
+            t.true(spyWarn.called)
+            t.regex(spyWarn.getCall(0).args[0], /Deprecation warning:/)
+        }
     }
 }
 
@@ -27,7 +29,7 @@ test("`process` should mirror `flow`", t => {
     const generator = function*() {}
 
     const flowResult = flow(generator)
-    const processResult = process(generator)
+    const processResult = mstProcess(generator)
 
     t.is(processResult.name, flowResult.name)
 

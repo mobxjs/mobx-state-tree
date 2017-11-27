@@ -378,53 +378,55 @@ test("it should check the type correctly", t => {
     t.deepEqual(Factory.is({ to: 3 }), false)
 })
 
-test("it should require complex fields to be present", t => {
-    t.is(
-        types
-            .model({
-                todo: types.model({})
-            })
-            .is({}),
-        false
-    )
-    t.throws(() =>
-        types
-            .model({
-                todo: types.model({})
-            })
-            .create()
-    )
-    t.is(
-        types
-            .model({
-                todo: types.array(types.string)
-            })
-            .is({}),
-        false
-    ) // TBD: or true?
-    t.throws(() =>
-        types
-            .model({
-                todo: types.array(types.string)
-            })
-            .create()
-    )
-    t.is(
-        types
-            .model({
-                todo: types.map(types.string)
-            })
-            .is({}),
-        false
-    )
-    t.throws(() =>
-        types
-            .model({
-                todo: types.map(types.string)
-            })
-            .create()
-    )
-})
+if (process.env.NODE_ENV === "development") {
+    test("it should require complex fields to be present", t => {
+        t.is(
+            types
+                .model({
+                    todo: types.model({})
+                })
+                .is({}),
+            false
+        )
+        t.throws(() =>
+            types
+                .model({
+                    todo: types.model({})
+                })
+                .create()
+        )
+        t.is(
+            types
+                .model({
+                    todo: types.array(types.string)
+                })
+                .is({}),
+            false
+        ) // TBD: or true?
+        t.throws(() =>
+            types
+                .model({
+                    todo: types.array(types.string)
+                })
+                .create()
+        )
+        t.is(
+            types
+                .model({
+                    todo: types.map(types.string)
+                })
+                .is({}),
+            false
+        )
+        t.throws(() =>
+            types
+                .model({
+                    todo: types.map(types.string)
+                })
+                .create()
+        )
+    })
+}
 // === VIEW FUNCTIONS ===
 
 test("view functions should be tracked", t => {
@@ -499,21 +501,23 @@ test("it should throw if a non-primitive value is provided and no default can be
     })
 })
 
-test("it should not be possible to remove a node from a parent if it is required, see ", t => {
-    const A = types.model("A", { x: 3 })
-    const B = types.model("B", { a: A })
+if (process.env.NODE_ENV === "development") {
+    test("it should not be possible to remove a node from a parent if it is required, see ", t => {
+        const A = types.model("A", { x: 3 })
+        const B = types.model("B", { a: A })
 
-    const b = B.create({ a: { x: 7 } })
-    unprotect(b)
+        const b = B.create({ a: { x: 7 } })
+        unprotect(b)
 
-    t.throws(() => {
-        detach(b.a)
-    }, /Error while converting `null` to `A`/)
+        t.throws(() => {
+            detach(b.a)
+        }, /Error while converting `null` to `A`/)
 
-    t.throws(() => {
-        destroy(b.a)
-    }, /Error while converting `null` to `A`/)
-})
+        t.throws(() => {
+            destroy(b.a)
+        }, /Error while converting `null` to `A`/)
+    })
+}
 
 test("it should be possible to share states between views and actions using enhance", t => {
     const A = types.model({}).extend(self => {

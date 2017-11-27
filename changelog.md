@@ -1,3 +1,12 @@
+# 1.1.1
+
+### Improvements
+
+* Fixed an issue where nodes where not always created correctly, see #534. Should fix #513 and #531.
+* All tests are now run in both PROD and non PROD configurations, after running into some bugs that only occurred in production builds.
+* Some internal optimizations have been applied (and many more will follow). Like having internal leaner node for immutable data. See #474
+* A lot of minor improvements on the docs
+
 # 1.1.0
 
 ### Improvements
