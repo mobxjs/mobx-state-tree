@@ -194,15 +194,36 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return this.cloneAndEnhance({ properties } as any)
     }
 
-    extend<A extends { [name: string]: Function } = {}, V extends Object = {}>(
-        fn: (self: T & IStateTreeNode) => { actions?: A; views?: V }
-    ): IModelType<S, T & A & V> {
+    volatile<TP>(fn: (self: T) => TP): IModelType<S, T & TP> {
+        const stateInitializer = (self: T) => {
+            this.instantiateVolatileState(self, fn(self))
+            return self
+        }
+        return this.cloneAndEnhance({ initializers: [stateInitializer] })
+    }
+
+    instantiateVolatileState(self: T, state: Object) {
+        // check views return
+        if (!isPlainObject(state))
+            fail(`state initializer should return a plain object containing views`)
+        // TODO: typecheck & namecheck members of state?
+        extendShallowObservable(self, state)
+    }
+
+    extend<
+        A extends { [name: string]: Function } = {},
+        V extends Object = {},
+        VS extends Object = {}
+    >(
+        fn: (self: T & IStateTreeNode) => { actions?: A; views?: V; state?: VS }
+    ): IModelType<S, T & A & V & VS> {
         const initializer = (self: T) => {
-            const { actions, views, ...rest } = fn(self)
+            const { actions, views, state, ...rest } = fn(self)
             for (let key in rest)
                 fail(
-                    `The \`extend\` function should return an object with fields 'actions' and / or  'views'. Found invalid key '${key}'`
+                    `The \`extend\` function should return an object with a subset of the fields 'actions', 'views' and 'state'. Found invalid key '${key}'`
                 )
+            if (state) this.instantiateVolatileState(self, state)
             if (views) this.instantiateViews(self, views)
             if (actions) this.instantiateActions(self, actions)
             return self
@@ -290,7 +311,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
                     type.instantiate(node, name, node._environment, snapshot[name])
                 )
             })
-            extras.interceptReads(node.storedValue, name, node.unbox)
+            extras.interceptReads(instance, name, node.unbox)
         })
 
         this.initializers.reduce((self, fn) => fn(self), instance)
@@ -300,10 +321,13 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
 
     willChange(change: IObjectWillChange): IObjectWillChange | null {
         const node = getStateTreeNode(change.object)
-        const type = this.properties[change.name]
         node.assertWritable()
-        typecheck(type, change.newValue)
-        change.newValue = type.reconcile(node.getChildNode(change.name), change.newValue)
+        const type = this.properties[change.name]
+        // only properties are typed, state are stored as-is references
+        if (type) {
+            typecheck(type, change.newValue)
+            change.newValue = type.reconcile(node.getChildNode(change.name), change.newValue)
+        }
         return change
     }
 
@@ -427,9 +451,14 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
     actions<A extends { [name: string]: Function }>(
         fn: (self: T & IStateTreeNode) => A
     ): IModelType<S, T & A>
-    extend<A extends { [name: string]: Function } = {}, V extends Object = {}>(
-        fn: (self: T & IStateTreeNode) => { actions?: A; views?: V }
-    ): IModelType<S, T & A & V>
+    volatile<TP>(fn: (self: T) => TP): IModelType<S, T & TP>
+    extend<
+        A extends { [name: string]: Function } = {},
+        V extends Object = {},
+        VS extends Object = {}
+    >(
+        fn: (self: T & IStateTreeNode) => { actions?: A; views?: V; state?: VS }
+    ): IModelType<S, T & A & V & VS>
     preProcessSnapshot(fn: (snapshot: any) => S): IModelType<S, T>
 }
 
