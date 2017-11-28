@@ -37,5 +37,5 @@ test("it logs", t => {
 
     store.todos[0].setTitle("hello world")
 
-    t.deepEqual((console.log as any).args, [["[MST action call] /todos/0/setTitle"]])
+    t.deepEqual((console.log as any).args, [["[MST] /todos/0/setTitle"]])
 })

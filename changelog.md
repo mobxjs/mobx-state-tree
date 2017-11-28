@@ -1,4 +1,8 @@
-#1.2.1
+# next
+
+* Implemented `actionLogger` middleware, which logs most events for async actions
+
+# 1.2.1
 
 * 1.2.0 didn't seem to be released correctly...
 
