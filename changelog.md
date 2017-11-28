@@ -1,3 +1,7 @@
+#1.2.1
+
+* 1.2.0 didn't seem to be released correctly...
+
 # 1.2.0
 
 * Introduced customizable reference types. See the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.

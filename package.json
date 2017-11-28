@@ -14,7 +14,7 @@
 		"precommit": "lint-staged",
 		"coverage": "lerna run coverage",
 		"bootstrap": "lerna bootstrap --hoist",
-		"release": "lerna publish"
+		"release": "yarn build && lerna publish"
 	},
 	"workspaces": [
 		"packages/*"
