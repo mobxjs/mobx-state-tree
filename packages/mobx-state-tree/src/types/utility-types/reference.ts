@@ -13,9 +13,10 @@ import {
     typeCheckFailure,
     fail
 } from "../../internal"
+import { IStateTreeNode } from "../../index"
 
 class StoredReference {
-    constructor(public mode: "identifier" | "object", public value: any) {
+    constructor(public readonly mode: "identifier" | "object", public readonly value: any) {
         if (mode === "object") {
             if (!isStateTreeNode(value))
                 return fail(`Can only store references to tree nodes, got: '${value}'`)
@@ -26,11 +27,10 @@ class StoredReference {
     }
 }
 
-export class ReferenceType<T> extends Type<string | number, T> {
-    readonly shouldAttachNode = true
+export abstract class BaseReferenceType<T> extends Type<string | number, T> {
     readonly flags = TypeFlags.Reference
 
-    constructor(private readonly targetType: IType<any, T>) {
+    constructor(protected readonly targetType: IType<any, T>) {
         super(`reference(${targetType.name})`)
     }
 
@@ -38,11 +38,35 @@ export class ReferenceType<T> extends Type<string | number, T> {
         return this.name
     }
 
+    isAssignableFrom(type: IType<any, any>): boolean {
+        return this.targetType.isAssignableFrom(type)
+    }
+
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
+        return typeof value === "string" || typeof value === "number"
+            ? typeCheckSuccess()
+            : typeCheckFailure(
+                  context,
+                  value,
+                  "Value is not a valid identifier, which is a string or a number"
+              )
+    }
+}
+
+export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
+    readonly shouldAttachNode = true
+
+    constructor(targetType: IType<any, T>) {
+        super(targetType)
+    }
+
     getValue(node: INode) {
+        if (!node.isAlive) return undefined
         const ref = node.storedValue as StoredReference
+
+        // id already resolved, return
         if (ref.mode === "object") return ref.value
 
-        if (!node.isAlive) return undefined
         // reference was initialized with the identifier of the target
         const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
         if (!target)
@@ -64,19 +88,18 @@ export class ReferenceType<T> extends Type<string | number, T> {
     }
 
     instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
-        const isComplex = isStateTreeNode(snapshot)
         return createNode(
             this,
             parent,
             subpath,
             environment,
-            new StoredReference(isComplex ? "object" : "identifier", snapshot)
+            new StoredReference(isStateTreeNode(snapshot) ? "object" : "identifier", snapshot)
         )
     }
 
     reconcile(current: INode, newValue: any): INode {
-        const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
-        if (isReferenceType(current.type)) {
+        if (current.type === this) {
+            const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
             const ref = current.storedValue as StoredReference
             if (targetMode === ref.mode && ref.value === newValue) return current
         }
@@ -89,23 +112,58 @@ export class ReferenceType<T> extends Type<string | number, T> {
         current.die()
         return newNode
     }
+}
 
-    isAssignableFrom(type: IType<any, any>): boolean {
-        return this.targetType.isAssignableFrom(type)
+export class CustomReferenceType<T> extends BaseReferenceType<T> {
+    readonly shouldAttachNode = false
+
+    constructor(targetType: IType<any, T>, private readonly options: ReferenceOptions<T>) {
+        super(targetType)
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
-        return typeof value === "string" || typeof value === "number"
-            ? typeCheckSuccess()
-            : typeCheckFailure(
-                  context,
-                  value,
-                  "Value is not a valid identifier, which is a string or a number"
-              )
+    getValue(node: INode) {
+        if (!node.isAlive) return undefined
+        return this.options.get(node.storedValue, node.parent ? node.parent.storedValue : null)
+    }
+
+    getSnapshot(node: INode): any {
+        return node.storedValue
+    }
+
+    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
+        const identifier = isStateTreeNode(snapshot)
+            ? this.options.set(snapshot as T, parent ? parent.storedValue : null)
+            : snapshot
+        return createNode(this, parent, subpath, environment, identifier)
+    }
+
+    reconcile(current: INode, snapshot: any): INode {
+        const newIdentifier = isStateTreeNode(snapshot)
+            ? this.options.set(snapshot as T, current ? current.storedValue : null)
+            : snapshot
+        if (current.type === this) {
+            if (current.storedValue === newIdentifier) return current
+        }
+        const newNode = this.instantiate(
+            current.parent,
+            current.subpath,
+            current._environment,
+            newIdentifier
+        )
+        current.die()
+        return newNode
     }
 }
 
-export function reference<T>(factory: IType<any, T>): IType<string | number, T>
+export type ReferenceOptions<T> = {
+    get(identifier: string | number, parent: IStateTreeNode | null): T
+    set(value: T, parent: IStateTreeNode | null): string | number
+}
+
+export function reference<T>(
+    factory: IType<any, T>,
+    options?: ReferenceOptions<T>
+): IType<string | number, T>
 /**
  * Creates a reference to another type, which should have defined an identifier.
  * See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
@@ -113,7 +171,7 @@ export function reference<T>(factory: IType<any, T>): IType<string | number, T>
  * @export
  * @alias types.reference
  */
-export function reference<T>(subType: IType<any, T>): any {
+export function reference<T>(subType: IType<any, T>, options?: ReferenceOptions<T>): any {
     // check that a type is given
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subType))
@@ -121,9 +179,10 @@ export function reference<T>(subType: IType<any, T>): any {
         if (arguments.length === 2 && typeof arguments[1] === "string")
             fail("References with base path are no longer supported. Please remove the base path.")
     }
-    return new ReferenceType(subType)
+    if (options) return new CustomReferenceType(subType, options)
+    else return new IdentifierReferenceType(subType)
 }
 
-export function isReferenceType(type: any): type is ReferenceType<any> {
+export function isReferenceType(type: any): type is BaseReferenceType<any> {
     return (type.flags & TypeFlags.Reference) > 0
 }
