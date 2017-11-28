@@ -730,12 +730,40 @@ const Todo =  types.model({}).extend(self => {
         },
         actions: {
             setX(value) {
-                localState = x
+                localState = value
             }
         }
     }
 })
 ```
+
+### model.volatile
+
+In many cases it is useful to have volatile state that is _observable_ (in terms of Mobx observables) and _readable_ from outside the instance.
+In that case, in the above example, `localState` could have been declared as `const localState = observable.box(3)`.
+Since this is such a common pattern, there is a shorthand to declare such properties, and the example above could be rewritten to:
+
+```javascript
+const Todo =  types.model({})
+    .volatile(self => ({
+        localState: 3
+    }))
+    .actions(self => ({
+        setX(value) {
+            self.localState = value
+        }
+    }))
+```
+
+The object that is returned from the `volatile` initializer function can contain any piece of data, and will result in an instance property with the same name. Volatile properties have the following characteristics:
+
+1. The can be read from outside the model (if you want hidden volatile state, keep the state in your closure as shown in the previous section)
+2. The volatile properties will be only observable be [observable _references_](https://mobx.js.org/refguide/modifiers.html). Values assigned to them will be unmodified and not automatically converted to deep observable structures.
+3. Like normal properties, they can only be modified through actions
+5. Volatile props will not show up in snapshots, and cannot be updated by applying snapshots
+5. Volatile props is preserved during the lifecycle of an instance. See also [reconciliation](#reconciliation)
+4. Changes in volatile props won't show up in the patch or snapshot stream
+4. It is currently not supported to define getters / setters in the object returned by `volatile`
 
 ## Dependency injection
 
