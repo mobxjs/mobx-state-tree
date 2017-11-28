@@ -8,6 +8,14 @@ import {
     IMiddlewareHandler
 } from "../../internal"
 
+export enum NodeLifeCycle {
+    INITIALIZING, // setting up
+    CREATED, // afterCreate has run
+    FINALIZED, // afterAttach has run
+    DETACHING, // being detached from the tree
+    DEAD // no coming back from this one
+}
+
 export interface INode {
     readonly type: IType<any, any>
 
@@ -18,6 +26,7 @@ export interface INode {
     readonly parent: INode | null
     readonly root: INode
     subpath: string
+    state: NodeLifeCycle
 
     isRunningAction(): boolean
     _isRunningAction: boolean
@@ -55,6 +64,7 @@ export interface INode {
     unbox(childNode: INode): any
     detach(): void
 
+    finalizeCreation(): void
     die(): void
     aboutToDie(): void
     finalizeDeath(): void

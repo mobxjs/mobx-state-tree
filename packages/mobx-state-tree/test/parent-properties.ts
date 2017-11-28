@@ -7,11 +7,13 @@ const ChildModel = types
         parentEnvIsNullAfterCreate: false,
         parentPropertyIsNullAfterAttach: false
     })
-    .views(self => ({
-        get parent() {
-            return getParent(self)
+    .views(self => {
+        return {
+            get parent() {
+                return getParent(self)
+            }
         }
-    }))
+    })
     .actions(self => ({
         afterCreate() {
             self.parentPropertyIsNullAfterCreate = typeof self.parent.fetch === "undefined"
@@ -22,9 +24,15 @@ const ChildModel = types
         }
     }))
 
-const ParentModel = types.model("Parent", {}).props({
-    child: types.optional(ChildModel, {})
-})
+const ParentModel = types
+    .model("Parent", {
+        child: types.optional(ChildModel, {})
+    })
+    .views(self => ({
+        get fetch() {
+            return getEnv(self).fetch
+        }
+    }))
 
 test("Parent property does not have value during child's afterCreate() event", t => {
     const mockFetcher = () => Promise.resolve(true)

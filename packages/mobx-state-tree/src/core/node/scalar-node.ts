@@ -16,18 +16,11 @@ import {
     freeze,
     IDisposer,
     IType,
-    IMiddlewareHandler
+    IMiddlewareHandler,
+    NodeLifeCycle
 } from "../../internal"
 
 let nextNodeId = 1
-
-export enum NodeLifeCycle {
-    INITIALIZING, // setting up
-    CREATED, // afterCreate has run
-    FINALIZED, // afterAttach has run
-    DETACHING, // being detached from the tree
-    DEAD // no coming back from this one
-}
 
 export class ScalarNode implements INode {
     // optimization: these fields make MST memory expensive for primitives. Most can be initialized lazily, or with EMPTY_ARRAY on prototype
@@ -43,7 +36,7 @@ export class ScalarNode implements INode {
     identifierAttribute: string | undefined = undefined // not to be modified directly, only through model initialization
     _environment: any = undefined
     protected _autoUnbox = true // unboxing is disabled when reading child nodes
-    protected state = NodeLifeCycle.INITIALIZING
+    state = NodeLifeCycle.INITIALIZING
 
     middlewares = EMPTY_ARRAY as IMiddlewareHandler[]
 
@@ -81,7 +74,7 @@ export class ScalarNode implements INode {
             else this.identifierCache!.addNodeToCache(this)
 
             this.fireHook("afterCreate")
-            if (parent) this.fireHook("afterAttach")
+            this.state = NodeLifeCycle.CREATED
             sawException = false
         } finally {
             if (sawException) {
@@ -316,6 +309,23 @@ export class ScalarNode implements INode {
 
     emitPatch(basePatch: IReversibleJsonPatch, source: INode) {
         throw fail(`ImmutableNode does not support the emitPatch operation`)
+    }
+
+    finalizeCreation() {
+        // goal: afterCreate hooks runs depth-first. After attach runs parent first, so on afterAttach the parent has completed already
+        if (this.state === NodeLifeCycle.CREATED) {
+            if (this.parent) {
+                if (this.parent.state !== NodeLifeCycle.FINALIZED) {
+                    // parent not ready yet, postpone
+                    return
+                }
+                this.fireHook("afterAttach")
+            }
+            this.state = NodeLifeCycle.FINALIZED
+            for (let child of this.getChildren()) {
+                child.finalizeCreation()
+            }
+        }
     }
 
     finalizeDeath() {
