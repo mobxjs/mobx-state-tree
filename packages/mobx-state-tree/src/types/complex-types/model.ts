@@ -332,6 +332,10 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     }
 
     didChange = (change: IObjectChange) => {
+        if (!this.properties[change.name]) {
+            // don't emit patches for volatile state
+            return
+        }
         const node = getStateTreeNode(change.object)
         node.emitPatch(
             {
