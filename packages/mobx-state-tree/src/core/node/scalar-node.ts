@@ -20,6 +20,15 @@ import {
 } from "../../internal"
 
 let nextNodeId = 1
+
+export enum NodeLifeCycle {
+    INITIALIZING, // setting up
+    CREATED, // afterCreate has run
+    FINALIZED, // afterAttach has run
+    DETACHING, // being detached from the tree
+    DEAD // no coming back from this one
+}
+
 export class ScalarNode implements INode {
     // optimization: these fields make MST memory expensive for primitives. Most can be initialized lazily, or with EMPTY_ARRAY on prototype
     readonly nodeId = ++nextNodeId
@@ -34,8 +43,7 @@ export class ScalarNode implements INode {
     identifierAttribute: string | undefined = undefined // not to be modified directly, only through model initialization
     _environment: any = undefined
     protected _autoUnbox = true // unboxing is disabled when reading child nodes
-    protected _isAlive = true // optimization: use binary flags for all these switches
-    protected _isDetaching = false
+    protected state = NodeLifeCycle.INITIALIZING
 
     middlewares = EMPTY_ARRAY as IMiddlewareHandler[]
 
@@ -78,7 +86,7 @@ export class ScalarNode implements INode {
         } finally {
             if (sawException) {
                 // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-                this._isAlive = false
+                this.state = NodeLifeCycle.DEAD
             }
         }
     }
@@ -216,13 +224,13 @@ export class ScalarNode implements INode {
 
     @computed
     public get value(): any {
-        if (!this._isAlive) return undefined
+        if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
 
     @computed
     public get snapshot() {
-        if (!this._isAlive) return undefined
+        if (!this.isAlive) return undefined
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         const snapshot = this.type.getSnapshot(this)
         // avoid any external modification in dev mode
@@ -243,11 +251,11 @@ export class ScalarNode implements INode {
     }
 
     public get isAlive() {
-        return this._isAlive
+        return this.state !== NodeLifeCycle.DEAD
     }
 
     public assertAlive() {
-        if (!this._isAlive)
+        if (!this.isAlive)
             fail(
                 `${this} cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`
             )
@@ -343,17 +351,17 @@ export class ScalarNode implements INode {
     }
 
     detach() {
-        if (!this._isAlive) fail(`Error while detaching, node is not alive.`)
+        if (!this.isAlive) fail(`Error while detaching, node is not alive.`)
         if (this.isRoot) return
         else {
             this.fireHook("beforeDetach")
             this._environment = (this.root as INode)._environment // make backup of environment
-            this._isDetaching = true
+            this.state = NodeLifeCycle.DETACHING
             this.identifierCache = this.root.identifierCache!.splitCache(this)
             this.parent!.removeChild(this.subpath)
             this._parent = null
             this.subpath = ""
-            this._isDetaching = false
+            this.state = NodeLifeCycle.FINALIZED
         }
     }
 
