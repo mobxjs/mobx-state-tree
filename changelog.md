@@ -1,4 +1,4 @@
-# 1.2.0 (next)
+# 1.2.0
 
 * Introduced customizable reference types. See the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
 * Introduced `model.volatile` to more easily declare and reuse volatile instance state. Volatile state can contain arbitrary data, is shallowly observable and, like props, cannot be modified without actions. See [`model.volatile`](https://github.com/mobxjs/mobx-state-tree#model-volatile) for more details.
