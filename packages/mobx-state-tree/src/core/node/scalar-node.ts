@@ -16,10 +16,12 @@ import {
     freeze,
     IDisposer,
     IType,
-    IMiddlewareHandler
+    IMiddlewareHandler,
+    NodeLifeCycle
 } from "../../internal"
 
 let nextNodeId = 1
+
 export class ScalarNode implements INode {
     // optimization: these fields make MST memory expensive for primitives. Most can be initialized lazily, or with EMPTY_ARRAY on prototype
     readonly nodeId = ++nextNodeId
@@ -34,8 +36,7 @@ export class ScalarNode implements INode {
     identifierAttribute: string | undefined = undefined // not to be modified directly, only through model initialization
     _environment: any = undefined
     protected _autoUnbox = true // unboxing is disabled when reading child nodes
-    protected _isAlive = true // optimization: use binary flags for all these switches
-    protected _isDetaching = false
+    state = NodeLifeCycle.INITIALIZING
 
     middlewares = EMPTY_ARRAY as IMiddlewareHandler[]
 
@@ -73,12 +74,12 @@ export class ScalarNode implements INode {
             else this.identifierCache!.addNodeToCache(this)
 
             this.fireHook("afterCreate")
-            if (parent) this.fireHook("afterAttach")
+            this.state = NodeLifeCycle.CREATED
             sawException = false
         } finally {
             if (sawException) {
                 // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-                this._isAlive = false
+                this.state = NodeLifeCycle.DEAD
             }
         }
     }
@@ -216,13 +217,13 @@ export class ScalarNode implements INode {
 
     @computed
     public get value(): any {
-        if (!this._isAlive) return undefined
+        if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
 
     @computed
     public get snapshot() {
-        if (!this._isAlive) return undefined
+        if (!this.isAlive) return undefined
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         const snapshot = this.type.getSnapshot(this)
         // avoid any external modification in dev mode
@@ -243,11 +244,11 @@ export class ScalarNode implements INode {
     }
 
     public get isAlive() {
-        return this._isAlive
+        return this.state !== NodeLifeCycle.DEAD
     }
 
     public assertAlive() {
-        if (!this._isAlive)
+        if (!this.isAlive)
             fail(
                 `${this} cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`
             )
@@ -310,6 +311,23 @@ export class ScalarNode implements INode {
         throw fail(`ImmutableNode does not support the emitPatch operation`)
     }
 
+    finalizeCreation() {
+        // goal: afterCreate hooks runs depth-first. After attach runs parent first, so on afterAttach the parent has completed already
+        if (this.state === NodeLifeCycle.CREATED) {
+            if (this.parent) {
+                if (this.parent.state !== NodeLifeCycle.FINALIZED) {
+                    // parent not ready yet, postpone
+                    return
+                }
+                this.fireHook("afterAttach")
+            }
+            this.state = NodeLifeCycle.FINALIZED
+            for (let child of this.getChildren()) {
+                child.finalizeCreation()
+            }
+        }
+    }
+
     finalizeDeath() {
         throw fail(`ImmutableNode does not support the finalizeDeath operation`)
     }
@@ -343,17 +361,17 @@ export class ScalarNode implements INode {
     }
 
     detach() {
-        if (!this._isAlive) fail(`Error while detaching, node is not alive.`)
+        if (!this.isAlive) fail(`Error while detaching, node is not alive.`)
         if (this.isRoot) return
         else {
             this.fireHook("beforeDetach")
             this._environment = (this.root as INode)._environment // make backup of environment
-            this._isDetaching = true
+            this.state = NodeLifeCycle.DETACHING
             this.identifierCache = this.root.identifierCache!.splitCache(this)
             this.parent!.removeChild(this.subpath)
             this._parent = null
             this.subpath = ""
-            this._isDetaching = false
+            this.state = NodeLifeCycle.FINALIZED
         }
     }
 

@@ -17,7 +17,8 @@ import {
     addReadOnlyProp,
     walk,
     IMiddlewareHandler,
-    createActionInvoker
+    createActionInvoker,
+    NodeLifeCycle
 } from "../../internal"
 
 export class ObjectNode extends ScalarNode implements INode {
@@ -98,7 +99,7 @@ export class ObjectNode extends ScalarNode implements INode {
     }
 
     public die() {
-        if (this._isDetaching) return
+        if (this.state === NodeLifeCycle.DETACHING) return
 
         if (isStateTreeNode(this.storedValue)) {
             walk(this.storedValue, child => getStateTreeNode(child).aboutToDie())
@@ -121,7 +122,7 @@ export class ObjectNode extends ScalarNode implements INode {
         this.patchSubscribers.splice(0)
         this.snapshotSubscribers.splice(0)
         this.patchSubscribers.splice(0)
-        this._isAlive = false
+        this.state = NodeLifeCycle.DEAD
         this._parent = null
         this.subpath = ""
 

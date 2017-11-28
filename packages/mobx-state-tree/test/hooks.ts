@@ -74,12 +74,12 @@ test("it should trigger lifecycle hooks", t => {
     destroy(talk)
     t.deepEqual(events, [
         "new todo: Get coffee",
-        "attach todo: Get coffee",
         "new todo: Get biscuit",
-        "attach todo: Get biscuit",
         "new todo: Give talk",
-        "attach todo: Give talk",
         "new store: 3",
+        "attach todo: Get coffee",
+        "attach todo: Get biscuit",
+        "attach todo: Give talk",
         "detach todo: Give talk",
         "-",
         "custom disposer 2 for Get biscuit",

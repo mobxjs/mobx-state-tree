@@ -34,29 +34,30 @@ export function createNode<S, T>(
 
     const storedValue = createNewInstance(initialValue)
 
-    if (type.shouldAttachNode) {
-        // tslint:disable-next-line:no_unused-variable
-        return new ObjectNode(
-            type,
-            parent,
-            subpath,
-            environment,
-            initialValue,
-            storedValue,
-            type.shouldAttachNode,
-            finalizeNewInstance
-        )
-    }
-    return new ScalarNode(
-        type,
-        parent,
-        subpath,
-        environment,
-        initialValue,
-        storedValue,
-        type.shouldAttachNode,
-        finalizeNewInstance
-    )
+    const node = type.shouldAttachNode
+        ? new ObjectNode(
+              type,
+              parent,
+              subpath,
+              environment,
+              initialValue,
+              storedValue,
+              type.shouldAttachNode,
+              finalizeNewInstance
+          )
+        : new ScalarNode(
+              type,
+              parent,
+              subpath,
+              environment,
+              initialValue,
+              storedValue,
+              type.shouldAttachNode,
+              finalizeNewInstance
+          )
+
+    node.finalizeCreation()
+    return node
 }
 
 export function isNode(value: any): value is INode {
