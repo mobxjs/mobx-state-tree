@@ -8,7 +8,7 @@ import {
     // TODO: export IRawActionCall
 } from "../src"
 import { test, CallbackTestContext, Context } from "ava"
-import { reaction } from "mobx"
+import { reaction, useStrict } from "mobx"
 
 function delay<T>(time: number, value: T, shouldThrow = false): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -26,6 +26,7 @@ function testCoffeeTodo(
     resultValue: any,
     producedCoffees: string[]
 ) {
+    useStrict(true)
     const Todo = types
         .model({
             title: "get coffee"
@@ -48,6 +49,7 @@ function testCoffeeTodo(
         t.deepEqual(coffees, producedCoffees)
         const filtered = filterRelevantStuff(events)
         t.snapshot(filtered, "Wrong events, expected\n" + JSON.stringify(filtered, null, 2))
+        useStrict(false)
         t.end()
     }
 
