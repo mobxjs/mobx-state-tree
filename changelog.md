@@ -1,4 +1,8 @@
-# 1.2.0 (next)
+# 1.3.0
+
+* Slightly changed the order in which life cycle hooks are fired. `afterAttach` will no fire first on the parent, then on the children. So, unlike `afterCreate`, in `afterAttach` one can assume in `afterAttach that the parent has completely initialized.
+
+# 1.2.0
 
 * Introduced customizable reference types. See the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
 * Introduced `model.volatile` to more easily declare and reuse volatile instance state. Volatile state can contain arbitrary data, is shallowly observable and, like props, cannot be modified without actions. See [`model.volatile`](https://github.com/mobxjs/mobx-state-tree#model-volatile) for more details.
