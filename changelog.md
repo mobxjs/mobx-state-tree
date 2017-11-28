@@ -1,6 +1,11 @@
-# 1.3.0
+# next
 
+* Implemented `actionLogger` middleware, which logs most events for async actions
 * Slightly changed the order in which life cycle hooks are fired. `afterAttach` will no fire first on the parent, then on the children. So, unlike `afterCreate`, in `afterAttach` one can assume in `afterAttach that the parent has completely initialized.
+
+# 1.2.1
+
+* 1.2.0 didn't seem to be released correctly...
 
 # 1.2.0
 

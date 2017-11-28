@@ -40,10 +40,43 @@ mst.addMiddleware(store, logger)
 store.todos[0].setTitle("hello world")
 
 // Prints:
-[MST action call] /todos/0/setTitle
+[MST] /todos/0/setTitle
 ```
 
-For a more sophisticated logger, see [process-logger](#process-logger) which also logs process invocations and continuations
+For a more sophisticated logger, see [action-logger](#action-logger) which also logs process invocations and continuations
+
+---
+
+# action-logger
+
+This is a little more sophisticated middlewares: It logs all _direct_ action invocations and also every flow that spawns, returns or throws. Example:
+
+```javascript
+import {actionLogger} from "mst-middlewares"
+
+// .. type definitions ...
+
+const store = Store.create({
+    todos: [{ title: "test " }]
+})
+
+mst.addMiddleware(store, logger)
+
+store.todos[0].setTitle("hello world")
+```
+
+This will print something like `[MST] <root action id> <action type> - <path to action>
+
+```
+[MST] #5 action - /todos/0/setTitle
+[MST] #5 flow_spawn - /todos/0/setTitle
+[MST] #5 flow_spawn - /todos/0/helper2
+[MST] #5 flow_return - /todos/0/helper2
+[MST] #5 flow_return - /todos/0/setTitle
+```
+
+The number (`"#5"`) indicates the id of the original action invocation that lead directly or indirectly to the flow being spawned.
+For more details on the meaning of the action types see the [middleware docs](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/middleware.md).
 
 ---
 
