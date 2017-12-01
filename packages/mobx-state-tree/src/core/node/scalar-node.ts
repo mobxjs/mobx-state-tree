@@ -20,15 +20,12 @@ import {
     NodeLifeCycle
 } from "../../internal"
 
-let nextNodeId = 1
-
 export class ScalarNode implements INode {
-    // optimization: these fields make MST memory expensive for primitives. Most can be initialized lazily, or with EMPTY_ARRAY on prototype
-    readonly nodeId = ++nextNodeId
     readonly type: IType<any, any>
     readonly storedValue: any
-    @observable protected _parent: INode | null = null
     @observable subpath: string = ""
+
+    @observable private /*TODO private readonly */ _parent: INode | null
     _isRunningAction = false // only relevant for root
 
     identifierCache: IdentifierCache | undefined
@@ -51,6 +48,7 @@ export class ScalarNode implements INode {
         finalizeNewInstance: (node: INode, initialValue: any) => void = noop
     ) {
         this.type = type
+        this.storedValue = storedValue
         this._parent = parent
         this.subpath = subpath
         this.storedValue = storedValue
