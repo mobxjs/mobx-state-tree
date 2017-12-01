@@ -191,6 +191,7 @@ Differences to the `TimeTraveller`:
 3. An undo state is only comitted to the history if the action / process is finished. Ongoing processes can't be undone.
 4. Failing processes do not add an undo state.
 5. Multiple concurrent processes only undo their own changes and don't touch the changes caused by other actions - unlike snapshots would.
+6. Can be used declaratively within the models.
 
 API:
 
@@ -200,6 +201,7 @@ API:
 * `undo()`
 * `redo()`
 * `withoutUndo(() => fn)` patches for actions / processes within the fn are not recorded.
+* `withoutUndoFlow(fn*)` patches the fn* are not recorded.
 * `startGroup(() => fn)` can be used to start a group, all patches within a group are saved as one history entry.
 * `stopGroup()` can be used to stop the recording of patches for the grouped history entry.
 
@@ -213,44 +215,70 @@ If you want the history to be a part of your store:
 import {UndoManager} from "mst-middlewares"
 
 export const Store = types.model({
-    persons: types.array(PersonModel),
+    todos: types.array(Todo),
     history: types.optional(UndoManager, {})
+}).actions(self => {
+    // you could create your undoManger anywhere but before your first needed action within the undoManager
+    setUndoManager(self)
+
+    return {
+        addTodo(todo) {
+            self.todos.put(todo)
+        }
+        // to use the undoManager to wrap the afterCreate action
+        // of the StoreModel it's necessary to set it within the store model like above
+        // afterCreate: () => undoManager.withoutUndo(() => { action() })
+    }
 })
 
+export let undoManager = {}
+export const setUndoManager = (targetStore) => { undoManager = targetStore.history }
 const store = Store.create()
 ```
 
-To record the changes in another tree:
+To record the changes into a separate tree:
 ```javascript
 import {UndoManager} from "mst-middlewares"
 
 export const Store = types.model({
     todos: types.array(Todo),
+}).actions(self => {
+    // you could create your undoManger anywhere but before your first needed action within the undoManager
+    setUndoManager(self)
+
+    return {
+        addTodo(todo) {
+            self.todos.put(todo)
+        }
+        // to use the undoManager to wrap the afterCreate action
+        // of the StoreModel it's necessary to set it within the store model like above
+        // afterCreate: () => undoManager.withoutUndo(() => { action() })
+    }
 })
 
+export let undoManager = {}
+export const setUndoManager = (targetStore) => { undoManager = UndoManager.create({}, { targetStore }) }
 const store = Store.create()
-const undoManager = UndoManager.create({}, { targetStore: store })
 ```
+
 
 Undo/ Redo:
 ```js
-import {undoManager, store} from './Store'
+import {undoManager} from '../Store'
 
 // if the undoManger is created within another tree
-const undo1 = () => undoManager.canUndo && undoManager.undo()
-const redo1 = () => undoManager.canRedo && undoManager.redo()
-
-// if the undoManger is created within the same tree
-const undo2 = () => store.history.canUndo && store.history.undo()
-const redo2 = () => store.history.canRedo && store.history.redo()
+const undo = () => undoManager.canUndo && undoManager.undo()
+const redo = () => undoManager.canRedo && undoManager.redo()
 ```
 
-WithoutUndo within a react component:
+WithoutUndo - within a react component:
 ```js
-import {store, undoManger} from '../Store'
+import {undoManger} from '../Store'
+
 ...
+
 setPersonName = () => {
-    // the action addPerson wont be saved onto the history, you could add more than one action.
+    // the action setPersonName won't be saved onto the history, you could add more than one action.
     undoManger.withoutUndo(() => store.setPersonName('firstName', 'lastName'))
 }
 
@@ -261,21 +289,22 @@ render() {
         </div>
     )
 }
+
 ...
 ```
 
-WithoutUndo declarative:
+WithoutUndo  - declarative:
 ```javascript
-import {undoManger} from '../Store'
 import {types} from 'mobx-state-tree'
+import {UndoManager} from 'mst-middlewares'
 
 const PersonModel = types.model('PersonModel', {
     firstName: types.string,
     lastName: types.string
 }).actions(self => {
     return {
-        // setPersonName won't be recorded onto the history in general
-        setPersonName: (firstName, lastName) => undoManger.withoutUndo(() => {
+        // setPersonName won't be recorded anymore in general
+        setPersonName: (firstName, lastName) => undoManager.withoutUndo(() => {
             self.firstName = firstName
             self.lastName = lastName
         })
@@ -284,18 +313,56 @@ const PersonModel = types.model('PersonModel', {
 
 const StoreModel = types.model('StoreModel', {
     persons: types.map(PersonModel)
-}).actions(self => ({
-    addPerson(firstName, lastName) {
-        persons.put({ firstName, lastName })
+}).actions(self => {
+    setUndoManager(self)
+
+    return {
+        addPerson(firstName, lastName) {
+            persons.put({ firstName, lastName })
+        }
     }
-}))
+})
 
-export const Store = StoreModel.create({});
-export const undoManager = UndoManager.create({}, { targetStore: Store });
+
+export let undoManager = {}
+export const setUndoManager = (targetStore) => { undoManager = UndoManager.create({}, { targetStore }) }
+export const Store = StoreModel.create({})
 ```
 
-StartGroup, EndGroup
+WithoutUndoFlow - declarative:
+```js
+import {undoManager} from './Store/'
+
+...
+
+.actions(self => {
+    function updateBooks(json) {
+        self.books.values().forEach(book => (book.isAvailable = false))
+        json.forEach(bookJson => {
+            self.books.put(bookJson)
+            self.books.get(bookJson.id).isAvailable = true
+        })
+    }
+
+    function* loadBooks() {
+        try {
+          const json = yield self.shop.fetch("/books.json")
+          updateBooks(json)
+        } catch (err) {
+          console.error("Failed to load books ", err)
+        }
+    }
+
+    return {
+        loadBooks: () => undoManager.withoutUndoFlow(loadBooks)()
+        // same as: undoManager.withoutUndo(() => flow(loadBooks))()
+    }
+})
 ```
+
+StartGroup, EndGroup - within a react  component:
+```js
+import {undoManager} from '../Store'
 ...
 handleStop = (mousePosition, { dx, dy }) => {
   this.stopTrackingDrag();
@@ -305,6 +372,7 @@ handleStop = (mousePosition, { dx, dy }) => {
 handleDrag = (mousePosition, { dx, dy }) => {
   const { view, parentNode } = this.props;
   // only one history entry will be created for the whole dragging
+  // therefore all patches will be merged to one history entry while the group is active
   undoManager.startGroup(() =>
     parentNode.moveSelectedNodes({ dx: dx / view.zoom, dy: dy / view.zoom })
   );

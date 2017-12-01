@@ -1,5 +1,6 @@
 import {
     types,
+    flow,
     getEnv,
     recordPatches,
     addMiddleware,
@@ -161,6 +162,14 @@ const UndoManager = types
                 } finally {
                     flagSkipping = false
                 }
+            },
+            withoutUndoFlow(generatorFn: () => any) {
+                return flow(function*() {
+                    skipping = true
+                    flagSkipping = true
+                    yield* generatorFn()
+                    flagSkipping = false
+                })
             },
             startGroup(fn: () => any) {
                 grouping = true
