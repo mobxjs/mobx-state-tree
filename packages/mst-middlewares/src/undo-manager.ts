@@ -167,8 +167,9 @@ const UndoManager = types
                 return flow(function*() {
                     skipping = true
                     flagSkipping = true
-                    yield* generatorFn()
+                    const result = yield* generatorFn()
                     flagSkipping = false
+                    return result
                 })
             },
             startGroup(fn: () => any) {
