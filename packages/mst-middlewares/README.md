@@ -360,13 +360,13 @@ import {undoManager} from './Store/'
 })
 ```
 
-StartGroup, EndGroup - within a react  component:
+StartGroup, StopGroup - within a react  component:
 ```js
 import {undoManager} from '../Store'
 ...
 handleStop = (mousePosition, { dx, dy }) => {
   this.stopTrackingDrag();
-  undoManager.endGroup();
+  undoManager.stopGroup();
 }
 
 handleDrag = (mousePosition, { dx, dy }) => {
