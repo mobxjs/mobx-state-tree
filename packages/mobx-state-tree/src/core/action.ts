@@ -8,7 +8,9 @@ import {
     argsToArray,
     IDisposer,
     getRoot,
-    EMPTY_ARRAY
+    EMPTY_ARRAY,
+    getObjectStateTreeNode,
+    ObjectNode
 } from "../internal"
 
 export type IMiddlewareEventType =
@@ -44,7 +46,7 @@ export function getNextActionId() {
 }
 
 export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
-    const node = getStateTreeNode(context.context)
+    const node = getObjectStateTreeNode(context.context)
     const baseIsRunningAction = node._isRunningAction
     const prevContext = currentActionContext
     node.assertAlive()
@@ -101,7 +103,7 @@ export function createActionInvoker<T extends Function>(
  * @returns {IDisposer}
  */
 export function addMiddleware(target: IStateTreeNode, middleware: IMiddlewareHandler): IDisposer {
-    const node = getStateTreeNode(target)
+    const node = getObjectStateTreeNode(target)
     if (process.env.NODE_ENV !== "production") {
         if (!node.isProtectionEnabled)
             console.warn(
@@ -141,12 +143,12 @@ export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn:
 }
 
 function collectMiddlewareHandlers(
-    node: INode,
+    node: ObjectNode,
     baseCall: IMiddlewareEvent,
     fn: Function
 ): IMiddlewareHandler[] {
     let handlers: IMiddlewareHandler[] = (fn as any).$mst_middleware || EMPTY_ARRAY
-    let n: INode | null = node
+    let n: ObjectNode | null = node
     // Find all middlewares. Optimization: cache this?
     while (n) {
         if (n.middlewares) handlers = handlers.concat(n.middlewares)
@@ -155,7 +157,7 @@ function collectMiddlewareHandlers(
     return handlers
 }
 
-function runMiddleWares(node: INode, baseCall: IMiddlewareEvent, originalFn: Function): any {
+function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn: Function): any {
     const handlers = collectMiddlewareHandlers(node, baseCall, originalFn)
     // Short circuit
     if (!handlers.length) return originalFn.apply(null, baseCall.args)

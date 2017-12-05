@@ -24,7 +24,10 @@ import {
     addHiddenFinalProp,
     toJSON,
     joinJsonPath,
-    freeze
+    freeze,
+    IStateTreeNode,
+    resolvePath,
+    resolveNodeByPathParts
 } from "../../internal"
 
 let nextNodeId = 1
@@ -34,7 +37,7 @@ export class ObjectNode implements INode {
     readonly type: IType<any, any>
     readonly storedValue: any
     @observable subpath: string = ""
-    @observable protected _parent: INode | null = null
+    @observable protected _parent: ObjectNode | null = null
     _isRunningAction = false // only relevant for root
 
     identifierCache: IdentifierCache | undefined
@@ -55,7 +58,7 @@ export class ObjectNode implements INode {
 
     constructor(
         type: IType<any, any>,
-        parent: INode | null,
+        parent: ObjectNode | null,
         subpath: string,
         environment: any,
         initialValue: any,
@@ -121,20 +124,19 @@ export class ObjectNode implements INode {
         return this.parent === null
     }
 
-    public get parent(): INode | null {
+    public get parent(): ObjectNode | null {
         return this._parent
     }
 
-    // TODO: make computed
-    public get root(): INode {
-        // future optimization: store root ref in the node and maintain it
+    // Optimization: make computed
+    public get root(): ObjectNode {
         let p,
-            r: INode = this
+            r: ObjectNode = this
         while ((p = r.parent)) r = p
-        return r as INode
+        return r
     }
 
-    setParent(newParent: INode | null, subpath: string | null = null) {
+    setParent(newParent: ObjectNode | null, subpath: string | null = null) {
         if (this.parent === newParent && this.subpath === subpath) return
         if (newParent) {
             if (this._parent && newParent !== this._parent) {
@@ -167,68 +169,6 @@ export class ObjectNode implements INode {
                 this.fireHook("afterAttach")
             }
         }
-    }
-
-    // TODO: lift logic outside this file
-    getRelativePathTo(target: INode): string {
-        // PRE condition target is (a child of) base!
-        if (this.root !== target.root)
-            fail(
-                `Cannot calculate relative path: objects '${this}' and '${target}' are not part of the same object tree`
-            )
-
-        const baseParts = splitJsonPath(this.path)
-        const targetParts = splitJsonPath(target.path)
-        let common = 0
-        for (; common < baseParts.length; common++) {
-            if (baseParts[common] !== targetParts[common]) break
-        }
-        // TODO: assert that no targetParts paths are "..", "." or ""!
-        return (
-            baseParts
-                .slice(common)
-                .map(_ => "..")
-                .join("/") + joinJsonPath(targetParts.slice(common))
-        )
-    }
-
-    resolve(pathParts: string): INode
-    resolve(pathParts: string, failIfResolveFails: boolean): INode | undefined
-    resolve(path: string, failIfResolveFails: boolean = true): INode | undefined {
-        return this.resolvePath(splitJsonPath(path), failIfResolveFails)
-    }
-
-    // TODO: lift logic outside this file
-    resolvePath(pathParts: string[]): INode
-    resolvePath(pathParts: string[], failIfResolveFails: boolean): INode | undefined
-    resolvePath(pathParts: string[], failIfResolveFails: boolean = true): INode | undefined {
-        // counter part of getRelativePath
-        // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
-        // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
-        // so we treat leading ../ apart...
-        let current: INode | null = this
-        for (let i = 0; i < pathParts.length; i++) {
-            if (pathParts[i] === "") current = current!.root
-            else if (pathParts[i] === "..") current = current!.parent
-            else if (pathParts[i] === "." || pathParts[i] === "")
-                // '/bla' or 'a//b' splits to empty strings
-                continue
-            else if (current) {
-                current = current.getChildNode(pathParts[i])
-                continue
-            }
-
-            if (!current) {
-                if (failIfResolveFails)
-                    return fail(
-                        `Could not resolve '${pathParts[i]}' in '${joinJsonPath(
-                            pathParts.slice(0, i - 1)
-                        )}', path of the patch does not resolve`
-                    )
-                else return undefined
-            }
-        }
-        return current!
     }
 
     fireHook(name: string) {
@@ -337,7 +277,7 @@ export class ObjectNode implements INode {
             }
             this.state = NodeLifeCycle.FINALIZED
             for (let child of this.getChildren()) {
-                child.finalizeCreation()
+                if (child instanceof ObjectNode) child.finalizeCreation()
             }
         }
     }
@@ -347,7 +287,7 @@ export class ObjectNode implements INode {
         if (this.isRoot) return
         else {
             this.fireHook("beforeDetach")
-            this._environment = (this.root as INode)._environment // make backup of environment
+            this._environment = this.root._environment // make backup of environment
             this.state = NodeLifeCycle.DETACHING
             this.identifierCache = this.root.identifierCache!.splitCache(this)
             this.parent!.removeChild(this.subpath)
@@ -371,8 +311,8 @@ export class ObjectNode implements INode {
             (patches: IJsonPatch[]) => {
                 patches.forEach(patch => {
                     const parts = splitJsonPath(patch.path)
-                    const node = this.resolvePath(parts.slice(0, -1))
-                    node.applyPatchLocally(parts[parts.length - 1], patch)
+                    const node = resolveNodeByPathParts(this, parts.slice(0, -1))
+                    ;(node as ObjectNode).applyPatchLocally(parts[parts.length - 1], patch)
                 })
             }
         ).bind(this.storedValue)
@@ -392,8 +332,15 @@ export class ObjectNode implements INode {
         if (this.state === NodeLifeCycle.DETACHING) return
 
         if (isStateTreeNode(this.storedValue)) {
-            walk(this.storedValue, child => getStateTreeNode(child).aboutToDie())
-            walk(this.storedValue, child => getStateTreeNode(child).finalizeDeath())
+            // optimization: don't use walk, but getChildNodes for more efficiency
+            walk(this.storedValue, child => {
+                const node = getStateTreeNode(child)
+                if (node instanceof ObjectNode) node.aboutToDie()
+            })
+            walk(this.storedValue, child => {
+                const node = getStateTreeNode(child)
+                if (node instanceof ObjectNode) node.finalizeDeath()
+            })
         }
     }
 
@@ -465,4 +412,9 @@ export class ObjectNode implements INode {
         this.assertWritable()
         this.type.applyPatchLocally(this, subpath, patch)
     }
+}
+
+export function getObjectStateTreeNode(value: IStateTreeNode): ObjectNode {
+    if (isStateTreeNode(value) && value.$treenode instanceof ObjectNode) return value.$treenode
+    else return fail(`Value ${value} is no MST Object Node`)
 }

@@ -1,12 +1,4 @@
-import {
-    IType,
-    IdentifierCache,
-    IReversibleJsonPatch,
-    IJsonPatch,
-    IDisposer,
-    fail,
-    IMiddlewareHandler
-} from "../../internal"
+import { IType, fail, ObjectNode, splitJsonPath, joinJsonPath } from "../../internal"
 
 export enum NodeLifeCycle {
     INITIALIZING, // setting up
@@ -20,68 +12,19 @@ export interface INode {
     readonly type: IType<any, any>
 
     readonly storedValue: any
-    readonly _environment: any
     readonly path: string
     readonly isRoot: boolean
-    readonly parent: INode | null
-    readonly root: INode
+    readonly parent: ObjectNode | null
+    readonly root: ObjectNode
     subpath: string
-    state: NodeLifeCycle
-
-    isRunningAction(): boolean
-    _isRunningAction: boolean
-    isProtectionEnabled: boolean
-    isProtected: boolean
-    assertWritable(): void
-
-    identifier: string | null
 
     isAlive: boolean
     assertAlive(): void
 
-    identifierAttribute: string | undefined
-    identifierCache: IdentifierCache | undefined
-
     readonly value: any
     readonly snapshot: any
 
-    resolve(pathParts: string): INode
-    resolve(pathParts: string, failIfResolveFails: boolean): INode | undefined
-    resolve(path: string, failIfResolveFails?: boolean): INode | undefined
-
-    resolvePath(pathParts: string[]): INode
-    resolvePath(pathParts: string[], failIfResolveFails: boolean): INode | undefined
-    resolvePath(pathParts: string[], failIfResolveFails?: boolean): INode | undefined
-
-    getRelativePathTo(target: INode): string
-    setParent(newParent: INode | null, subpath: string | null): void
-
-    getChildNode(subpath: string): INode
-    getChildren(): INode[]
-    getChildType(key: string): IType<any, any>
-    removeChild(subpath: string): void
-
-    unbox(childNode: INode): any
-    detach(): void
-
-    finalizeCreation(): void
     die(): void
-    aboutToDie(): void
-    finalizeDeath(): void
-
-    emitPatch(basePatch: IReversibleJsonPatch, source: INode): void
-
-    readonly middlewares: IMiddlewareHandler[]
-
-    addMiddleWare(handler: IMiddlewareHandler): IDisposer
-
-    applyPatchLocally(subpath: string, patch: IJsonPatch): void
-    onPatch(handler: (patch: IJsonPatch, reversePatch: IJsonPatch) => void): IDisposer
-    applyPatches(patches: IJsonPatch[]): void
-
-    applySnapshot(snapshot: any): void
-    onSnapshot(onChange: (snapshot: any) => void): IDisposer
-    addDisposer(disposer: () => void): void
 }
 
 export type IStateTreeNode = {
@@ -118,4 +61,81 @@ export function canAttachNode(value: any) {
 
 export function toJSON(this: IStateTreeNode) {
     return getStateTreeNode(this).snapshot
+}
+
+export function getRelativePathBetweenNodes(base: INode, target: INode): string {
+    // PRE condition target is (a child of) base!
+    if (base.root !== target.root)
+        fail(
+            `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
+        )
+
+    const baseParts = splitJsonPath(base.path)
+    const targetParts = splitJsonPath(target.path)
+    let common = 0
+    for (; common < baseParts.length; common++) {
+        if (baseParts[common] !== targetParts[common]) break
+    }
+    // TODO: assert that no targetParts paths are "..", "." or ""!
+    return (
+        baseParts
+            .slice(common)
+            .map(_ => "..")
+            .join("/") + joinJsonPath(targetParts.slice(common))
+    )
+}
+
+export function resolveNodeByPath(base: INode, pathParts: string): INode
+export function resolveNodeByPath(
+    base: INode,
+    pathParts: string,
+    failIfResolveFails: boolean
+): INode | undefined
+export function resolveNodeByPath(
+    base: INode,
+    path: string,
+    failIfResolveFails: boolean = true
+): INode | undefined {
+    return resolveNodeByPathParts(base, splitJsonPath(path), failIfResolveFails)
+}
+
+export function resolveNodeByPathParts(base: INode, pathParts: string[]): INode
+export function resolveNodeByPathParts(
+    base: INode,
+    pathParts: string[],
+    failIfResolveFails: boolean
+): INode | undefined
+export function resolveNodeByPathParts(
+    base: INode,
+    pathParts: string[],
+    failIfResolveFails: boolean = true
+): INode | undefined {
+    // counter part of getRelativePath
+    // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
+    // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
+    // so we treat leading ../ apart...
+    let current: INode | null = base
+    for (let i = 0; i < pathParts.length; i++) {
+        if (pathParts[i] === "") current = current!.root
+        else if (pathParts[i] === "..") current = current!.parent
+        else if (pathParts[i] === "." || pathParts[i] === "")
+            // '/bla' or 'a//b' splits to empty strings
+            continue
+        else if (current) {
+            if (current instanceof ObjectNode) current = current.getChildNode(pathParts[i])
+            else return fail(`Illegal state`)
+            continue
+        }
+
+        if (!current) {
+            if (failIfResolveFails)
+                return fail(
+                    `Could not resolve '${pathParts[i]}' in '${joinJsonPath(
+                        pathParts.slice(0, i - 1)
+                    )}', path of the patch does not resolve`
+                )
+            else return undefined
+        }
+    }
+    return current!
 }
