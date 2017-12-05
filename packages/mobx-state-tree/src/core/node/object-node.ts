@@ -413,8 +413,3 @@ export class ObjectNode implements INode {
         this.type.applyPatchLocally(this, subpath, patch)
     }
 }
-
-export function getObjectStateTreeNode(value: IStateTreeNode): ObjectNode {
-    if (isStateTreeNode(value) && value.$treenode instanceof ObjectNode) return value.$treenode
-    else return fail(`Value ${value} is no MST Object Node`)
-}

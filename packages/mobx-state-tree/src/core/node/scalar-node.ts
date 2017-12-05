@@ -20,7 +20,7 @@ export class ScalarNode implements INode {
 
     private readonly _parent: ObjectNode | null
 
-    private readonly _environment: any = undefined
+    readonly _environment: any = undefined
     private _autoUnbox = true // unboxing is disabled when reading child nodes
     private state = NodeLifeCycle.INITIALIZING
 

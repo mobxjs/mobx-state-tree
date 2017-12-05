@@ -11,7 +11,8 @@ import {
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    fail
+    fail,
+    ObjectNode
 } from "../../internal"
 import { IStateTreeNode } from "../../index"
 
@@ -87,7 +88,12 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         }
     }
 
-    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
+    instantiate(
+        parent: ObjectNode | null,
+        subpath: string,
+        environment: any,
+        snapshot: any
+    ): INode {
         return createNode(
             this,
             parent,
@@ -130,7 +136,12 @@ export class CustomReferenceType<T> extends BaseReferenceType<T> {
         return node.storedValue
     }
 
-    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
+    instantiate(
+        parent: ObjectNode | null,
+        subpath: string,
+        environment: any,
+        snapshot: any
+    ): INode {
         const identifier = isStateTreeNode(snapshot)
             ? this.options.set(snapshot as T, parent ? parent.storedValue : null)
             : snapshot

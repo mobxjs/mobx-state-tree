@@ -1,7 +1,5 @@
 import {
-    canAttachNode,
     isStateTreeNode,
-    getStateTreeNode,
     INode,
     identity,
     noop,
@@ -11,9 +9,10 @@ import {
     IType
 } from "../../internal"
 
+// TODO: split into object and scalar node?
 export function createNode<S, T>(
     type: IType<S, T>,
-    parent: INode | null,
+    parent: ObjectNode | null,
     subpath: string,
     environment: any,
     initialValue: any,
@@ -21,7 +20,7 @@ export function createNode<S, T>(
     finalizeNewInstance: (node: INode, initialValue: any) => void = noop
 ) {
     if (isStateTreeNode(initialValue)) {
-        const targetNode = getStateTreeNode(initialValue)
+        const targetNode = initialValue.$treenode as ObjectNode
         if (!targetNode.isRoot)
             fail(
                 `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent
@@ -34,30 +33,30 @@ export function createNode<S, T>(
 
     const storedValue = createNewInstance(initialValue)
 
-    const node = type.shouldAttachNode
-        ? new ObjectNode(
-              type,
-              parent,
-              subpath,
-              environment,
-              initialValue,
-              storedValue,
-              type.shouldAttachNode,
-              finalizeNewInstance
-          )
-        : new ScalarNode(
-              type,
-              parent,
-              subpath,
-              environment,
-              initialValue,
-              storedValue,
-              type.shouldAttachNode,
-              finalizeNewInstance
-          )
-
-    node.finalizeCreation()
-    return node
+    if (type.shouldAttachNode) {
+        const node = new ObjectNode(
+            type,
+            parent,
+            subpath,
+            environment,
+            initialValue,
+            storedValue,
+            type.shouldAttachNode,
+            finalizeNewInstance
+        )
+        node.finalizeCreation()
+        return node
+    }
+    return new ScalarNode(
+        type,
+        parent,
+        subpath,
+        environment,
+        initialValue,
+        storedValue,
+        type.shouldAttachNode,
+        finalizeNewInstance
+    )
 }
 
 export function isNode(value: any): value is INode {

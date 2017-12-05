@@ -33,7 +33,8 @@ import {
     isMutable,
     isArray,
     isPlainObject,
-    TypeFlags
+    TypeFlags,
+    ObjectNode
 } from "../../internal"
 
 export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
@@ -60,7 +61,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return array
     }
 
-    finalizeNewInstance = (node: INode, snapshot: any) => {
+    finalizeNewInstance = (node: ObjectNode, snapshot: any) => {
         const instance = node.storedValue as IObservableArray<any>
         extras.getAdministration(instance).dehancer = node.unbox
         intercept(instance, change => this.willChange(change) as any)
@@ -68,7 +69,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         observe(instance, this.didChange)
     }
 
-    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: S): INode {
+    instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: S): INode {
         return createNode(
             this,
             parent,
@@ -80,11 +81,11 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         )
     }
 
-    getChildren(node: INode): INode[] {
+    getChildren(node: ObjectNode): INode[] {
         return node.storedValue.peek()
     }
 
-    getChildNode(node: INode, key: string): INode {
+    getChildNode(node: ObjectNode, key: string): INode {
         const index = parseInt(key, 10)
         if (index < node.storedValue.length) return node.storedValue[index]
         return fail("Not a child: " + key)
@@ -125,11 +126,11 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return change
     }
 
-    getValue(node: INode): any {
+    getValue(node: ObjectNode): any {
         return node.storedValue
     }
 
-    getSnapshot(node: INode): any {
+    getSnapshot(node: ObjectNode): any {
         return node.getChildren().map(childNode => childNode.snapshot)
     }
 
@@ -170,7 +171,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         }
     }
 
-    applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: ObjectNode, subpath: string, patch: IJsonPatch): void {
         const target = node.storedValue as IObservableArray<any>
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
@@ -187,7 +188,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     @action
-    applySnapshot(node: INode, snapshot: any[]): void {
+    applySnapshot(node: ObjectNode, snapshot: any[]): void {
         typecheck(this, snapshot)
         const target = node.storedValue as IObservableArray<any>
         target.replace(snapshot)
@@ -213,7 +214,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return []
     }
 
-    removeChild(node: INode, subpath: string) {
+    removeChild(node: ObjectNode, subpath: string) {
         node.storedValue.splice(parseInt(subpath, 10), 1)
     }
 }
@@ -251,7 +252,7 @@ export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservable
 }
 
 function reconcileArrayChildren<T>(
-    parent: INode,
+    parent: ObjectNode,
     childType: IType<any, T>,
     oldNodes: INode[],
     newValues: T[],
@@ -320,7 +321,7 @@ function reconcileArrayChildren<T>(
 // convert a value to a node at given parent and subpath. attempts to reuse old node if possible and given
 function valueAsNode(
     childType: IType<any, any>,
-    parent: INode,
+    parent: ObjectNode,
     subpath: string,
     newValue: any,
     oldNode?: INode
@@ -361,6 +362,7 @@ function areSame(oldNode: INode, newValue: any) {
     if (isMutable(newValue) && oldNode.snapshot === newValue) return true
     // new value is a snapshot with the correct identifier
     if (
+        oldNode instanceof ObjectNode &&
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&

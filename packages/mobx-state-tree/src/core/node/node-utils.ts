@@ -10,20 +10,20 @@ export enum NodeLifeCycle {
 
 export interface INode {
     readonly type: IType<any, any>
-
     readonly storedValue: any
     readonly path: string
     readonly isRoot: boolean
     readonly parent: ObjectNode | null
     readonly root: ObjectNode
+    readonly _environment: any
     subpath: string
 
     isAlive: boolean
-    assertAlive(): void
-
     readonly value: any
     readonly snapshot: any
 
+    assertAlive(): void
+    setParent(newParent: ObjectNode | null, subpath?: string | null): void
     die(): void
 }
 
@@ -44,7 +44,7 @@ export function isStateTreeNode(value: any): value is IStateTreeNode {
     return !!(value && value.$treenode)
 }
 
-export function getStateTreeNode(value: IStateTreeNode): INode {
+export function getStateTreeNode(value: IStateTreeNode): ObjectNode {
     if (isStateTreeNode(value)) return value.$treenode!
     else return fail(`Value ${value} is no MST Node`)
 }
@@ -63,7 +63,7 @@ export function toJSON(this: IStateTreeNode) {
     return getStateTreeNode(this).snapshot
 }
 
-export function getRelativePathBetweenNodes(base: INode, target: INode): string {
+export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode): string {
     // PRE condition target is (a child of) base!
     if (base.root !== target.root)
         fail(
@@ -85,28 +85,28 @@ export function getRelativePathBetweenNodes(base: INode, target: INode): string 
     )
 }
 
-export function resolveNodeByPath(base: INode, pathParts: string): INode
+export function resolveNodeByPath(base: ObjectNode, pathParts: string): INode
 export function resolveNodeByPath(
-    base: INode,
+    base: ObjectNode,
     pathParts: string,
     failIfResolveFails: boolean
 ): INode | undefined
 export function resolveNodeByPath(
-    base: INode,
+    base: ObjectNode,
     path: string,
     failIfResolveFails: boolean = true
 ): INode | undefined {
     return resolveNodeByPathParts(base, splitJsonPath(path), failIfResolveFails)
 }
 
-export function resolveNodeByPathParts(base: INode, pathParts: string[]): INode
+export function resolveNodeByPathParts(base: ObjectNode, pathParts: string[]): INode
 export function resolveNodeByPathParts(
-    base: INode,
+    base: ObjectNode,
     pathParts: string[],
     failIfResolveFails: boolean
 ): INode | undefined
 export function resolveNodeByPathParts(
-    base: INode,
+    base: ObjectNode,
     pathParts: string[],
     failIfResolveFails: boolean = true
 ): INode | undefined {

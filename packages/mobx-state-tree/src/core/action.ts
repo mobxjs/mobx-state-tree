@@ -1,7 +1,5 @@
 import { action as mobxAction } from "mobx"
-
 import {
-    INode,
     getStateTreeNode,
     IStateTreeNode,
     fail,
@@ -9,7 +7,6 @@ import {
     IDisposer,
     getRoot,
     EMPTY_ARRAY,
-    getObjectStateTreeNode,
     ObjectNode
 } from "../internal"
 
@@ -46,7 +43,7 @@ export function getNextActionId() {
 }
 
 export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
-    const node = getObjectStateTreeNode(context.context)
+    const node = getStateTreeNode(context.context)
     const baseIsRunningAction = node._isRunningAction
     const prevContext = currentActionContext
     node.assertAlive()
@@ -103,7 +100,7 @@ export function createActionInvoker<T extends Function>(
  * @returns {IDisposer}
  */
 export function addMiddleware(target: IStateTreeNode, middleware: IMiddlewareHandler): IDisposer {
-    const node = getObjectStateTreeNode(target)
+    const node = getStateTreeNode(target)
     if (process.env.NODE_ENV !== "production") {
         if (!node.isProtectionEnabled)
             console.warn(

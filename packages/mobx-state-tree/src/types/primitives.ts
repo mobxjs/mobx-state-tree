@@ -12,7 +12,8 @@ import {
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    isType
+    isType,
+    ObjectNode
 } from "../internal"
 
 export class CoreType<S, T> extends Type<S, T> {
@@ -37,7 +38,7 @@ export class CoreType<S, T> extends Type<S, T> {
         return this.name
     }
 
-    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: T): INode {
+    instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: T): INode {
         return createNode(this, parent, subpath, environment, snapshot, this.initializer)
     }
 

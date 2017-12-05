@@ -14,7 +14,8 @@ import {
     INode,
     IStateTreeNode,
     IJsonPatch,
-    getType
+    getType,
+    ObjectNode
 } from "../../internal"
 
 export enum TypeFlags {
@@ -128,7 +129,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         return this.validate(value, [{ path: "", type: this }]).length === 0
     }
 
-    reconcile(current: INode, newValue: any): INode {
+    reconcile(current: ObjectNode, newValue: any): INode {
         if (current.snapshot === newValue)
             // newValue is the current snapshot of the node, noop
             return current

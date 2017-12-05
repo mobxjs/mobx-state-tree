@@ -26,7 +26,7 @@ export function getType<S, T>(object: IStateTreeNode): IType<S, T> {
  * @returns {IType<any, any>}
  */
 export function getChildType(object: IStateTreeNode, child: string): IType<any, any> {
-    return getObjectStateTreeNode(object).getChildType(child)
+    return getStateTreeNode(object).getChildType(child)
 }
 
 /**
@@ -51,7 +51,7 @@ export function onPatch(
         if (typeof callback !== "function")
             fail("expected second argument to be a function, got " + callback + " instead")
     }
-    return getObjectStateTreeNode(target).onPatch(callback)
+    return getStateTreeNode(target).onPatch(callback)
 }
 
 export function onSnapshot<S>(
@@ -84,7 +84,7 @@ export function onSnapshot<S>(
         if (typeof callback !== "function")
             fail("expected second argument to be a function, got " + callback + " instead")
     }
-    return getObjectStateTreeNode(target).onSnapshot(callback)
+    return getStateTreeNode(target).onSnapshot(callback)
 }
 
 /**
@@ -106,7 +106,7 @@ export function applyPatch(target: IStateTreeNode, patch: IJsonPatch | IJsonPatc
         if (typeof patch !== "object")
             fail("expected second argument to be an object or array, got " + patch + " instead")
     }
-    getObjectStateTreeNode(target).applyPatches(asArray(patch))
+    getStateTreeNode(target).applyPatches(asArray(patch))
 }
 
 export interface IPatchRecorder {
@@ -196,7 +196,7 @@ export function protect(target: IStateTreeNode) {
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
-    const node = getObjectStateTreeNode(target)
+    const node = getStateTreeNode(target)
     if (!node.isRoot) fail("`protect` can only be invoked on root nodes")
     node.isProtectionEnabled = true
 }
@@ -229,7 +229,7 @@ export function unprotect(target: IStateTreeNode) {
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
-    const node = getObjectStateTreeNode(target)
+    const node = getStateTreeNode(target)
     if (!node.isRoot) fail("`unprotect` can only be invoked on root nodes")
     node.isProtectionEnabled = false
 }
@@ -238,7 +238,7 @@ export function unprotect(target: IStateTreeNode) {
  * Returns true if the object is in protected mode, @see protect
  */
 export function isProtected(target: IStateTreeNode): boolean {
-    return getObjectStateTreeNode(target).isProtected
+    return getStateTreeNode(target).isProtected
 }
 
 /**
@@ -255,7 +255,7 @@ export function applySnapshot<S, T>(target: IStateTreeNode, snapshot: S) {
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
-    return getObjectStateTreeNode(target).applySnapshot(snapshot)
+    return getStateTreeNode(target).applySnapshot(snapshot)
 }
 
 export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S }
@@ -417,7 +417,7 @@ export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNod
         if (typeof path !== "string")
             fail("expected second argument to be a number, got " + path + " instead")
     }
-    const node = resolveNodeByPath(getObjectStateTreeNode(target), path)
+    const node = resolveNodeByPath(getStateTreeNode(target), path)
     return node ? node.value : undefined
 }
 
@@ -534,7 +534,7 @@ export function detach<T extends IStateTreeNode>(target: T): T {
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
-    getObjectStateTreeNode(target).detach()
+    getStateTreeNode(target).detach()
     return target
 }
 
@@ -547,7 +547,7 @@ export function destroy(target: IStateTreeNode) {
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
-    const node = getObjectStateTreeNode(target)
+    const node = getStateTreeNode(target)
     if (node.isRoot) node.die()
     else node.parent!.removeChild(node.subpath)
 }
@@ -603,7 +603,7 @@ export function addDisposer(target: IStateTreeNode, disposer: () => void) {
         if (typeof disposer !== "function")
             fail("expected second argument to be a function, got " + disposer + " instead")
     }
-    getObjectStateTreeNode(target).addDisposer(disposer)
+    getStateTreeNode(target).addDisposer(disposer)
 }
 
 /**
@@ -639,7 +639,7 @@ export function walk(target: IStateTreeNode, processor: (item: IStateTreeNode) =
         if (typeof processor !== "function")
             fail("expected second argument to be a function, got " + processor + " instead")
     }
-    const node = getObjectStateTreeNode(target)
+    const node = getStateTreeNode(target)
     // tslint:disable-next-line:no_unused-variable
     node.getChildren().forEach(child => {
         if (isStateTreeNode(child.storedValue)) walk(child.storedValue, processor)
@@ -661,7 +661,6 @@ import {
     ISnapshottable,
     IType,
     isType,
-    getObjectStateTreeNode,
     resolveNodeByPath,
     getRelativePathBetweenNodes
 } from "../internal"
