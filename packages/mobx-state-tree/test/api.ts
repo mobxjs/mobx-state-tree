@@ -42,7 +42,9 @@ const METHODS = [
     "types",
     "unescapeJsonPath",
     "unprotect",
-    "walk"
+    "walk",
+    "CoreType",
+    "TypeFlags"
 ]
 const TYPES = [
     "Date",
