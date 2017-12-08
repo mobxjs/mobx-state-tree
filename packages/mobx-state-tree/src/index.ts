@@ -57,6 +57,7 @@ export const types = {
 }
 
 export {
+    CoreType,
     IModelType,
     IExtendedObservableMap,
     IType,
