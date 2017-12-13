@@ -89,7 +89,7 @@ The exception itself is not eaten, but any modifications that are made during th
 Example:
 
 ```javascript
-import { types, addMiddleware, process } from "mobx-state-tree"
+import { types, addMiddleware, flow } from "mobx-state-tree"
 import {atomic} form "mst-middlewares"
 
 const TestModel = types
@@ -100,7 +100,7 @@ const TestModel = types
         addMiddleware(self, atomic)
 
         return {
-            inc: process(function*(x) {
+            inc: flow(function*(x) {
                 yield delay(2)
                 self.z += x
                 yield delay(2)
