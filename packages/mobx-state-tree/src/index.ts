@@ -57,6 +57,8 @@ export const types = {
 }
 
 export {
+    CoreType,
+    TypeFlags,
     IModelType,
     IExtendedObservableMap,
     IType,

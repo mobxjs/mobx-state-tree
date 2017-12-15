@@ -546,6 +546,8 @@ console.log(storeInstance.selectedTodo.title)
 // prints "Get coffee"
 ```
 
+For a custom-
+
 #### Identifiers
 
 -   Each model can define zero or one `identifier()` properties
@@ -605,6 +607,8 @@ const s = Store.create({
     selection: "Mattia"
 })
 ```
+
+See DatePrimitive in `src/types/pprimitive.ts` for using `CoreType` (and `TypeFlags`) to create a custom primitive type that can be used with types.reference
 
 ### Listening to observables, snapshots, patches or actions
 
