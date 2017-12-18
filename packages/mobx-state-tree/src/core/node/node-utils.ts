@@ -63,6 +63,8 @@ export function toJSON(this: IStateTreeNode) {
     return getStateTreeNode(this).snapshot
 }
 
+const doubleDot = (_: any) => ".."
+
 export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode): string {
     // PRE condition target is (a child of) base!
     if (base.root !== target.root)
@@ -80,7 +82,7 @@ export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode
     return (
         baseParts
             .slice(common)
-            .map(_ => "..")
+            .map(doubleDot)
             .join("/") + joinJsonPath(targetParts.slice(common))
     )
 }
