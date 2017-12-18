@@ -402,7 +402,7 @@ someModel.actions(self => {
             // ... yield can be used in async/await style
             self.githubProjects = yield fetchGithubProjectsSomehow()
             self.state = "done"
-        } catch (e) {
+        } catch (error) {
             // ... including try/catch error handling
             console.error("Failed to fetch projects", error)
             self.state = "error"
