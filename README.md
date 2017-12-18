@@ -455,10 +455,10 @@ const userStore = UserStore.create(/* */)
 
 // Every time the userStore is updated in a relevant way, log messages will be printed
 autorun(() => {
-    console.log("There are now ", userStore.amountOfChildren, " children"
+    console.log("There are now ", userStore.amountOfChildren, " children")
 })
 autorun(() => {
-    console.log("There are now ", userStore.amountOfPeopleOlderThan(75), " pretty old people"
+    console.log("There are now ", userStore.amountOfPeopleOlderThan(75), " pretty old people")
 })
 ```
 
@@ -571,8 +571,8 @@ References are looked up through the entire tree, but per type. So identifiers n
 #### Customizable references
 
 The default implementation uses the `identifier` cache to resolve references (See [`resolveIdentifier`](API.md#resolveIdentifier)).
-However, it also possible to override the resolve logic, and provide your own custom resolve logic.
-This makes it also possible to for example trigger a data fetch when trying to resolve the reference ([example](https://github.com/mobxjs/mobx-state-tree/blob/cdb3298a5621c3229b3856bb469327da6deb31ea/packages/mobx-state-tree/test/reference-custom.ts#L150)).
+However, it is also possible to override the resolve logic, and provide your own custom resolve logic.
+This also makes it possible to, for example, trigger a data fetch when trying to resolve the reference ([example](https://github.com/mobxjs/mobx-state-tree/blob/cdb3298a5621c3229b3856bb469327da6deb31ea/packages/mobx-state-tree/test/reference-custom.ts#L150)).
 
 Example:
 
