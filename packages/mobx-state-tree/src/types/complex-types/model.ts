@@ -343,12 +343,13 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             return
         }
         const node = getStateTreeNode(change.object)
+        const oldValue = change.oldValue ? change.oldValue.snapshot : undefined
         node.emitPatch(
             {
                 op: "replace",
                 path: escapeJsonPath(change.name),
                 value: change.newValue.snapshot,
-                oldValue: change.oldValue ? change.oldValue.snapshot : undefined
+                oldValue
             },
             node
         )

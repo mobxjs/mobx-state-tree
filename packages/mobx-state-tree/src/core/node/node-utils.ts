@@ -22,7 +22,6 @@ export interface INode {
     readonly value: any
     readonly snapshot: any
 
-    assertAlive(): void
     setParent(newParent: ObjectNode | null, subpath?: string | null): void
     die(): void
 }

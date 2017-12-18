@@ -63,7 +63,6 @@ export class ScalarNode implements INode {
     /*
      * Returnes (escaped) path representation as string
      */
-    @computed
     public get path(): string {
         if (!this.parent) return ""
         return this.parent.path + "/" + escapeJsonPath(this.subpath)
@@ -89,16 +88,11 @@ export class ScalarNode implements INode {
         this.subpath = subpath || ""
     }
 
-    @computed
     public get value(): any {
-        if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
 
-    @computed
     public get snapshot() {
-        if (!this.isAlive) return undefined
-        // advantage of using computed for a snapshot is that nicely respects transactions etc.
         const snapshot = this.type.getSnapshot(this)
         // avoid any external modification in dev mode
         if (process.env.NODE_ENV !== "production") {
@@ -109,13 +103,6 @@ export class ScalarNode implements INode {
 
     public get isAlive() {
         return this.state !== NodeLifeCycle.DEAD
-    }
-
-    public assertAlive() {
-        if (!this.isAlive)
-            fail(
-                `${this} cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`
-            )
     }
 
     unbox(childNode: INode): any {
