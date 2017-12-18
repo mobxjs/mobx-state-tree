@@ -417,7 +417,7 @@ export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNod
         if (typeof path !== "string")
             fail("expected second argument to be a number, got " + path + " instead")
     }
-    const node = getStateTreeNode(target).resolve(path)
+    const node = resolveNodeByPath(getStateTreeNode(target), path)
     return node ? node.value : undefined
 }
 
@@ -467,7 +467,7 @@ export function tryResolve(target: IStateTreeNode, path: string): IStateTreeNode
         if (typeof path !== "string")
             fail("expected second argument to be a string, got " + path + " instead")
     }
-    const node = getStateTreeNode(target).resolve(path, false)
+    const node = resolveNodeByPath(getStateTreeNode(target), path, false)
     if (node === undefined) return undefined
     return node ? node.value : undefined
 }
@@ -492,7 +492,7 @@ export function getRelativePath(base: IStateTreeNode, target: IStateTreeNode): s
         if (!isStateTreeNode(base))
             fail("expected first argument to be a mobx-state-tree node, got " + base + " instead")
     }
-    return getStateTreeNode(base).getRelativePathTo(getStateTreeNode(target))
+    return getRelativePathBetweenNodes(getStateTreeNode(base), getStateTreeNode(target))
 }
 
 /**
@@ -660,5 +660,7 @@ import {
     IDisposer,
     ISnapshottable,
     IType,
-    isType
+    isType,
+    resolveNodeByPath,
+    getRelativePathBetweenNodes
 } from "../internal"

@@ -18,7 +18,8 @@ import {
     isPrimitive,
     IDisposer,
     isArray,
-    asArray
+    asArray,
+    getRelativePathBetweenNodes
 } from "../internal"
 
 export type ISerializedActionCall = {
@@ -212,7 +213,7 @@ export function onAction(
             const sourceNode = getStateTreeNode(rawCall.context)
             listener({
                 name: rawCall.name,
-                path: getStateTreeNode(target).getRelativePathTo(sourceNode),
+                path: getRelativePathBetweenNodes(getStateTreeNode(target), sourceNode),
                 args: rawCall.args.map((arg: any, index: number) =>
                     serializeArgument(sourceNode, rawCall.name, index, arg)
                 )

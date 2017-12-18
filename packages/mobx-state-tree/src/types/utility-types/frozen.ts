@@ -10,7 +10,8 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     TypeFlags,
-    isType
+    isType,
+    ObjectNode
 } from "../../internal"
 
 export class Frozen<T> extends Type<T, T> {
@@ -25,7 +26,7 @@ export class Frozen<T> extends Type<T, T> {
         return "<any immutable value>"
     }
 
-    instantiate(parent: INode | null, subpath: string, environment: any, value: any): INode {
+    instantiate(parent: ObjectNode | null, subpath: string, environment: any, value: any): INode {
         // deep freeze the object/array only in dev mode
         const finalValue = process.env.NODE_ENV !== "production" ? deepFreeze(value) : value
         // create the node

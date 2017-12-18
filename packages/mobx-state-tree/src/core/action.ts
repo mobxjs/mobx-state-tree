@@ -1,13 +1,13 @@
 import { action as mobxAction } from "mobx"
-
 import {
-    INode,
     getStateTreeNode,
     IStateTreeNode,
     fail,
     argsToArray,
     IDisposer,
-    getRoot
+    getRoot,
+    EMPTY_ARRAY,
+    ObjectNode
 } from "../internal"
 
 export type IMiddlewareEventType =
@@ -140,27 +140,28 @@ export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn:
 }
 
 function collectMiddlewareHandlers(
-    node: INode,
+    node: ObjectNode,
     baseCall: IMiddlewareEvent,
     fn: Function
 ): IMiddlewareHandler[] {
-    let handlers: IMiddlewareHandler[] = (fn as any).$mst_middleware || []
-    let n: INode | null = node
+    let handlers: IMiddlewareHandler[] = (fn as any).$mst_middleware || EMPTY_ARRAY
+    let n: ObjectNode | null = node
     // Find all middlewares. Optimization: cache this?
     while (n) {
-        handlers = handlers.concat(n.middlewares)
+        if (n.middlewares) handlers = handlers.concat(n.middlewares)
         n = n.parent
     }
     return handlers
 }
 
-function runMiddleWares(node: INode, baseCall: IMiddlewareEvent, originalFn: Function): any {
+function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn: Function): any {
     const handlers = collectMiddlewareHandlers(node, baseCall, originalFn)
     // Short circuit
     if (!handlers.length) return originalFn.apply(null, baseCall.args)
+    let index = 0
 
     function runNextMiddleware(call: IMiddlewareEvent): any {
-        const handler = handlers.shift() // Optimization: counter instead of shift is probably faster
+        const handler = handlers[index++]
         if (handler) return handler(call, runNextMiddleware)
         else return originalFn.apply(null, baseCall.args)
     }

@@ -10,7 +10,8 @@ import {
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    isType
+    isType,
+    ObjectNode
 } from "../../internal"
 
 export class Literal<T> extends Type<T, T> {
@@ -23,7 +24,7 @@ export class Literal<T> extends Type<T, T> {
         this.value = value
     }
 
-    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: T): INode {
+    instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: T): INode {
         return createNode(this, parent, subpath, environment, snapshot)
     }
 

@@ -1,16 +1,16 @@
 import { observable, IObservableArray } from "mobx"
-import { fail, IType, INode } from "../../internal"
+import { fail, IType, ObjectNode } from "../../internal"
 
 export class IdentifierCache {
-    private cache = observable.map<IObservableArray<INode>>()
+    private cache = observable.map<IObservableArray<ObjectNode>>()
 
     constructor() {}
 
-    addNodeToCache(node: INode) {
+    addNodeToCache(node: ObjectNode) {
         if (node.identifierAttribute) {
             const identifier = node.identifier!
             if (!this.cache.has(identifier)) {
-                this.cache.set(identifier, observable.shallowArray<INode>())
+                this.cache.set(identifier, observable.shallowArray<ObjectNode>())
             }
             const set = this.cache.get(identifier)!
             if (set.indexOf(node) !== -1) fail(`Already registered`)
@@ -19,7 +19,7 @@ export class IdentifierCache {
         return this
     }
 
-    mergeCache(node: INode) {
+    mergeCache(node: ObjectNode) {
         node.identifierCache!.cache.values().forEach(nodes =>
             nodes.forEach(child => {
                 this.addNodeToCache(child)
@@ -27,14 +27,14 @@ export class IdentifierCache {
         )
     }
 
-    notifyDied(node: INode) {
+    notifyDied(node: ObjectNode) {
         if (node.identifierAttribute) {
             const set = this.cache.get(node.identifier!)
             if (set) set.remove(node)
         }
     }
 
-    splitCache(node: INode): IdentifierCache {
+    splitCache(node: ObjectNode): IdentifierCache {
         const res = new IdentifierCache()
         const basePath = node.path
         this.cache.values().forEach(nodes => {
@@ -48,7 +48,7 @@ export class IdentifierCache {
         return res
     }
 
-    resolve(type: IType<any, any>, identifier: string): INode | null {
+    resolve(type: IType<any, any>, identifier: string): ObjectNode | null {
         const set = this.cache.get(identifier)
         if (!set) return null
         const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))
