@@ -224,14 +224,14 @@ const TodoStore = types
         selectedTodo: types.reference(Todo)           // 5
     })
     .views(self => {
-    	return {
-	    get completedTodos() {                    // 6
-	        return self.todos.filter(t => t.done)
-	    },
-	    findTodosByUser(user) {                   // 7
-	        return self.todos.filter(t => t.assignee === user)
-	    }
-	};
+        return {
+            get completedTodos() {                    // 6
+                return self.todos.filter(t => t.done)
+            },
+            findTodosByUser(user) {                   // 7
+                return self.todos.filter(t => t.assignee === user)
+            }
+        };
     })
     .actions(self => {
         return {
@@ -241,7 +241,7 @@ const TodoStore = types
                     title
                 })
             }
-	};
+        };
     })
 ```
 
@@ -418,7 +418,7 @@ someModel.actions(self => {
 
 #### Action listeners versus middleware
 
-The difference between action listeners and middleware is: Middleware can intercept the action that is about to be invoked, modify arguments, return types etc. Action listeners cannot intercept, and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receive the raw arguments. (`onAction` is actually just a built-in middleware)
+The difference between action listeners and middleware is: Middleware can intercept the action that is about to be invoked, modify arguments, return types etc. Action listeners cannot intercept, and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receives the raw arguments. (`onAction` is actually just a built-in middleware)
 
 For more details on creating middleware, see the [docs](docs/middleware.md)
 
@@ -444,10 +444,10 @@ const UserStore = types
     })
     .views(self => ({
         get amountOfChildren() {
-            return users.filter(user => user.age < 18).length
+            return self.users.filter(user => user.age < 18).length
         },
         amountOfPeopleOlderThan(age) {
-            return users.filter(user => user.age > age).length
+            return self.users.filter(user => user.age > age).length
         }
     }))
 
@@ -455,10 +455,10 @@ const userStore = UserStore.create(/* */)
 
 // Every time the userStore is updated in a relevant way, log messages will be printed
 autorun(() => {
-    console.log("There are now ", userStore.amountOfChildren, " children"
+    console.log("There are now ", userStore.amountOfChildren, " children")
 })
 autorun(() => {
-    console.log("There are now ", userStore.amountOfPeopleOlderThan(75), " pretty old people"
+    console.log("There are now ", userStore.amountOfPeopleOlderThan(75), " pretty old people")
 })
 ```
 
@@ -550,7 +550,7 @@ console.log(storeInstance.selectedTodo.title)
 
 -   Each model can define zero or one `identifier()` properties
 -   The identifier property of an object cannot be modified after initialization
--   Each identifiers / type combination should be unique within the entire tree
+-   Each identifier / type combination should be unique within the entire tree
 -   Identifiers are used to reconcile items inside arrays and maps - wherever possible - when applying snapshots
 -   The `map.put()` method can be used to simplify adding objects that have identifiers to [maps](API.md#typesmap)
 -   The primary goal of identifiers is not validation, but reconciliation and reference resolving. For this reason identifiers cannot be defined or updated after creation. If you want to check if some value just looks as an identifier, without providing the above semantics; use something like: `types.refinement(types.string, v => v.match(/someregex/))`
@@ -761,7 +761,7 @@ The object that is returned from the `volatile` initializer function can contain
 2. The volatile properties will be only observable be [observable _references_](https://mobx.js.org/refguide/modifiers.html). Values assigned to them will be unmodified and not automatically converted to deep observable structures.
 3. Like normal properties, they can only be modified through actions
 5. Volatile props will not show up in snapshots, and cannot be updated by applying snapshots
-5. Volatile props is preserved during the lifecycle of an instance. See also [reconciliation](#reconciliation)
+5. Volatile props are preserved during the lifecycle of an instance. See also [reconciliation](#reconciliation)
 4. Changes in volatile props won't show up in the patch or snapshot stream
 4. It is currently not supported to define getters / setters in the object returned by `volatile`
 
@@ -881,7 +881,7 @@ types
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `preProcessSnapshot` | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be a _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. This hook is not called for individual property updates. _**Note 1: Unlike the other hooks, this one is _not_ created as part of the `actions` initializer, but directly on the type!**_ _**Note 2: The `preProcessSnapshot` transformation must be pure; it is should not modify its original input argument!**_ |
 | `afterCreate`   | Immediately after an instance is created and initial values are applied. Children will fire this event before parents                                     |
-| `afterAttach`   | As soon as the _direct_ parent is assigned (this node is attached to an other node). If an element is created as part of a parent, `afterAttach` is also fired. Unlike `afterCreate`, `afterAttach` will fire breadt first. So, in `afterAttach` one can safely make assumptions about the parent, but in `afterCreate` not |
+| `afterAttach`   | As soon as the _direct_ parent is assigned (this node is attached to an other node). If an element is created as part of a parent, `afterAttach` is also fired. Unlike `afterCreate`, `afterAttach` will fire breadth first. So, in `afterAttach` one can safely make assumptions about the parent, but in `afterCreate` not |
 | `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot.
 | `beforeDetach`  | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used             |
 | `beforeDestroy` | Called before the node is destroyed, as a result of calling `destroy`, or by removing or replacing the node from the tree. Child destructors will fire before parents |
@@ -903,7 +903,7 @@ See the [full API docs](API.md) for more details.
 | [`applyAction(node, actionDescription)`](API.md#applyaction) | Replays an action on the targeted node |
 | [`applyPatch(node, jsonPatch)`](API.md#applypatch) | Applies a JSON patch, or array of patches, to a node in the tree |
 | [`applySnapshot(node, snapshot)`](API.md#applysnapshot) | Updates a node with the given snapshot |
-| [`createActionTrackingMiddleware`](API.md#createactiontrackingmiddleware) | Utility to make writing middleware that track async actions less cumbersome |
+| [`createActionTrackingMiddleware`](API.md#createactiontrackingmiddleware) | Utility to make writing middleware that tracks async actions less cumbersome |
 | [`clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone) | Creates a full clone of the given node. By default preserves the same environment |
 | [`decorate(middleware, function)`](API.md#decorate) | Attaches middleware to a specific action (or flow) |
 | [`destroy(node)`](API.md#destroy) | Kills `node`, making it unusable. Removes it from any parent in the process |
@@ -1003,7 +1003,7 @@ const Square = types
         }
     }))
 
-// create a new type, based of Square
+// create a new type, based on Square
 const Box = Square
     .named("Box")
     .views(self => {
@@ -1116,7 +1116,7 @@ const Todo = types.model({
 type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { title: string; setTitle: (v: string) => void }
 ```
 
-Due the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes alot of CPU time and freeze vscode (or others)
+Due to the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes a lot of CPU time and freeze vscode (or others)
 A partial solution for this is to turn the `.Type` into an interface.
 ```ts
 type ITodoType = typeof Todo.Type;
@@ -1228,7 +1228,7 @@ export const Todo = types.model({
 export type ITodo = typeof Todo.Type
 ```
 
-It aint pretty, but it works.
+It ain't pretty, but it works.
 
 ### How does MST compare to Redux
 
