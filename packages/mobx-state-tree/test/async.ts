@@ -66,6 +66,33 @@ function testCoffeeTodo(
     )
 }
 
+test.cb("flow happens in single ticks", t => {
+    const X = types
+        .model({
+            y: 1
+        })
+        .actions(self => ({
+            p: flow(function*() {
+                self.y++
+                self.y++
+                yield delay(1, true, false)
+                self.y++
+                self.y++
+            })
+        }))
+
+    const x = X.create()
+    const values: number[] = []
+    reaction(() => x.y, v => values.push(v))
+
+    debugger
+    x.p().then(() => {
+        t.is(x.y, 5)
+        t.deepEqual(values, [3, 5])
+        t.end()
+    })
+})
+
 test.cb("can handle async actions", t => {
     testCoffeeTodo(
         t,

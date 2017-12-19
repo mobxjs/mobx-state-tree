@@ -67,9 +67,6 @@ export function createActionInvoker<T extends Function>(
     name: string,
     fn: T
 ) {
-    const wrappedFn = mobxAction(name, fn)
-    ;(wrappedFn as any).$mst_middleware = (fn as any).$mst_middleware
-
     return function() {
         const id = getNextActionId()
         return runWithActionContext(
@@ -83,7 +80,7 @@ export function createActionInvoker<T extends Function>(
                 rootId: currentActionContext ? currentActionContext.rootId : id,
                 parentId: currentActionContext ? currentActionContext.id : 0
             },
-            wrappedFn
+            fn
         )
     }
 }
@@ -157,13 +154,13 @@ function collectMiddlewareHandlers(
 function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn: Function): any {
     const handlers = collectMiddlewareHandlers(node, baseCall, originalFn)
     // Short circuit
-    if (!handlers.length) return originalFn.apply(null, baseCall.args)
+    if (!handlers.length) return mobxAction(originalFn).apply(null, baseCall.args)
     let index = 0
 
     function runNextMiddleware(call: IMiddlewareEvent): any {
         const handler = handlers[index++]
         if (handler) return handler(call, runNextMiddleware)
-        else return originalFn.apply(null, baseCall.args)
+        else return mobxAction(originalFn).apply(null, baseCall.args)
     }
     return runNextMiddleware(baseCall)
 }
