@@ -1,22 +1,26 @@
-<p align="center">
-       <img src="docs/logo.png" height="100">
-    <h3 align="center">mobx-state-tree</h3>
-    <p align="center"><i>Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX</i><p>
-</p>
+<div style="margin-top: 20px">
+  [![npm version](https://badge.fury.io/js/mobx-state-tree.svg)](https://badge.fury.io/js/mobx-state-tree)
+  [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
+  [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
+  [![Join the chat at https://gitter.im/mobxjs/mobx-state-tree](https://badges.gitter.im/mobxjs/mobx-state-tree.svg)](https://gitter.im/mobxjs/mobx-state-tree?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+</div>
 
-[![npm version](https://badge.fury.io/js/mobx-state-tree.svg)](https://badge.fury.io/js/mobx-state-tree)
-[![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
-[![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
-[![Join the chat at https://gitter.im/mobxjs/mobx-state-tree](https://badges.gitter.im/mobxjs/mobx-state-tree.svg)](https://gitter.im/mobxjs/mobx-state-tree?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+<div style="display: flex;margin-bottom: 35px;margin-top: 40px;height: 100px;">
+  <img src="docs/mobx-state-tree-logo-gradient.svg" style="height: 100%">
+  <div style=" padding-left: 25px; width: 450px;">
+    <h3 style="margin: 0; margin-bottom: 10px;">
+      mobx-state-tree
+    </h3>
+    <i>
+      Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX
+    </i>
+  </div>
+</div>
 
 > Mobx and MST are amazing pieces of software, for me it is the missing brick when you build React based apps. Thanks for the great work!
 
 Nicolas Galle [full post](https://medium.com/@nicolasgall/i-started-to-use-react-last-year-and-i-loved-it-1ce8d53fec6a)
-
-
 Introduction blog post [The curious case of MobX state tree](https://medium.com/@mweststrate/the-curious-case-of-mobx-state-tree-7b4e22d461f)
-
 # Contents
 
 * [Installation](#installation)
