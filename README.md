@@ -3,8 +3,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx-state-tree](https://badges.gitter.im/mobxjs/mobx-state-tree.svg)](https://gitter.im/mobxjs/mobx-state-tree?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-</br>
-
 <p>
   <img src="docs/mobx-state-tree-logo-gradient.svg" align="left" height="140" width="100"
 style="margin-right: 20px"/>
