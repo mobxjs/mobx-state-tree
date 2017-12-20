@@ -6,16 +6,17 @@
 </br>
 
 <p>
-  <img src="docs/mobx-state-tree-logo-gradient.svg" align="left" class="logo" width="100"
+  <img src="docs/mobx-state-tree-logo-gradient.svg" align="left" height="140" width="100"
 style="margin-right: 20px"/>
-  <h2 style="margin: -10px">mobx-state-tree</h2>
-  <p style="width: 500px">
+  <h4 style="margin: 0;">mobx-state-tree</h4>
+  <p>
     <i>
-  Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX
+  Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world   for an optimal DX
     </i>
   </p>
 </p>
 
+</br>
 
 > Mobx and MST are amazing pieces of software, for me it is the missing brick when you build React based apps. Thanks for the great work!# Contents
 
