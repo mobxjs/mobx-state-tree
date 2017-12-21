@@ -1,22 +1,29 @@
-<p align="center">
-       <img src="docs/logo.png" height="100">
-    <h3 align="center">mobx-state-tree</h3>
-    <p align="center"><i>Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX</i><p>
-</p>
-
 [![npm version](https://badge.fury.io/js/mobx-state-tree.svg)](https://badge.fury.io/js/mobx-state-tree)
 [![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx-state-tree](https://badges.gitter.im/mobxjs/mobx-state-tree.svg)](https://gitter.im/mobxjs/mobx-state-tree?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+</br>
 
-> Mobx and MST are amazing pieces of software, for me it is the missing brick when you build React based apps. Thanks for the great work!
+<p>
+  <img src="docs/mobx-state-tree-logo-gradient.svg" align="left" height="145" width="100"
+style="margin-right: 20px"/>
+  <h4 style="margin: 0;">mobx-state-tree</h4>
+  <p>
+    <i>
+  Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world   for an optimal DX
+    </i>
+  </p>
+</p>
+
+</br>
+
+> Mobx and MST are amazing pieces of software, for me it is the missing brick when you build React based apps. Thanks for the great work!# Contents
 
 Nicolas Galle [full post](https://medium.com/@nicolasgall/i-started-to-use-react-last-year-and-i-loved-it-1ce8d53fec6a)
-
-
 Introduction blog post [The curious case of MobX state tree](https://medium.com/@mweststrate/the-curious-case-of-mobx-state-tree-7b4e22d461f)
 
+---
 # Contents
 
 * [Installation](#installation)
@@ -224,14 +231,14 @@ const TodoStore = types
         selectedTodo: types.reference(Todo)           // 5
     })
     .views(self => {
-    	return {
-	    get completedTodos() {                    // 6
-	        return self.todos.filter(t => t.done)
-	    },
-	    findTodosByUser(user) {                   // 7
-	        return self.todos.filter(t => t.assignee === user)
-	    }
-	};
+        return {
+            get completedTodos() {                    // 6
+                return self.todos.filter(t => t.done)
+            },
+            findTodosByUser(user) {                   // 7
+                return self.todos.filter(t => t.assignee === user)
+            }
+        };
     })
     .actions(self => {
         return {
@@ -241,7 +248,7 @@ const TodoStore = types
                     title
                 })
             }
-	};
+        };
     })
 ```
 
@@ -418,7 +425,7 @@ someModel.actions(self => {
 
 #### Action listeners versus middleware
 
-The difference between action listeners and middleware is: Middleware can intercept the action that is about to be invoked, modify arguments, return types etc. Action listeners cannot intercept, and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receive the raw arguments. (`onAction` is actually just a built-in middleware)
+The difference between action listeners and middleware is: Middleware can intercept the action that is about to be invoked, modify arguments, return types etc. Action listeners cannot intercept, and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receives the raw arguments. (`onAction` is actually just a built-in middleware)
 
 For more details on creating middleware, see the [docs](docs/middleware.md)
 
@@ -444,10 +451,10 @@ const UserStore = types
     })
     .views(self => ({
         get amountOfChildren() {
-            return users.filter(user => user.age < 18).length
+            return self.users.filter(user => user.age < 18).length
         },
         amountOfPeopleOlderThan(age) {
-            return users.filter(user => user.age > age).length
+            return self.users.filter(user => user.age > age).length
         }
     }))
 
@@ -550,7 +557,7 @@ console.log(storeInstance.selectedTodo.title)
 
 -   Each model can define zero or one `identifier()` properties
 -   The identifier property of an object cannot be modified after initialization
--   Each identifiers / type combination should be unique within the entire tree
+-   Each identifier / type combination should be unique within the entire tree
 -   Identifiers are used to reconcile items inside arrays and maps - wherever possible - when applying snapshots
 -   The `map.put()` method can be used to simplify adding objects that have identifiers to [maps](API.md#typesmap)
 -   The primary goal of identifiers is not validation, but reconciliation and reference resolving. For this reason identifiers cannot be defined or updated after creation. If you want to check if some value just looks as an identifier, without providing the above semantics; use something like: `types.refinement(types.string, v => v.match(/someregex/))`
@@ -761,7 +768,7 @@ The object that is returned from the `volatile` initializer function can contain
 2. The volatile properties will be only observable be [observable _references_](https://mobx.js.org/refguide/modifiers.html). Values assigned to them will be unmodified and not automatically converted to deep observable structures.
 3. Like normal properties, they can only be modified through actions
 5. Volatile props will not show up in snapshots, and cannot be updated by applying snapshots
-5. Volatile props is preserved during the lifecycle of an instance. See also [reconciliation](#reconciliation)
+5. Volatile props are preserved during the lifecycle of an instance. See also [reconciliation](#reconciliation)
 4. Changes in volatile props won't show up in the patch or snapshot stream
 4. It is currently not supported to define getters / setters in the object returned by `volatile`
 
@@ -903,7 +910,7 @@ See the [full API docs](API.md) for more details.
 | [`applyAction(node, actionDescription)`](API.md#applyaction) | Replays an action on the targeted node |
 | [`applyPatch(node, jsonPatch)`](API.md#applypatch) | Applies a JSON patch, or array of patches, to a node in the tree |
 | [`applySnapshot(node, snapshot)`](API.md#applysnapshot) | Updates a node with the given snapshot |
-| [`createActionTrackingMiddleware`](API.md#createactiontrackingmiddleware) | Utility to make writing middleware that track async actions less cumbersome |
+| [`createActionTrackingMiddleware`](API.md#createactiontrackingmiddleware) | Utility to make writing middleware that tracks async actions less cumbersome |
 | [`clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone) | Creates a full clone of the given node. By default preserves the same environment |
 | [`decorate(middleware, function)`](API.md#decorate) | Attaches middleware to a specific action (or flow) |
 | [`destroy(node)`](API.md#destroy) | Kills `node`, making it unusable. Removes it from any parent in the process |
@@ -1003,7 +1010,7 @@ const Square = types
         }
     }))
 
-// create a new type, based of Square
+// create a new type, based on Square
 const Box = Square
     .named("Box")
     .views(self => {
@@ -1116,7 +1123,7 @@ const Todo = types.model({
 type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { title: string; setTitle: (v: string) => void }
 ```
 
-Due the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes alot of CPU time and freeze vscode (or others)
+Due to the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes a lot of CPU time and freeze vscode (or others)
 A partial solution for this is to turn the `.Type` into an interface.
 ```ts
 type ITodoType = typeof Todo.Type;
@@ -1228,7 +1235,7 @@ export const Todo = types.model({
 export type ITodo = typeof Todo.Type
 ```
 
-It aint pretty, but it works.
+It ain't pretty, but it works.
 
 ### How does MST compare to Redux
 

@@ -1,5 +1,11 @@
-# next
+# 1.3.1
 
+* Fixed bug where `flows` didn't properly batch there next ticks properly in actions, significantly slowing processes down. Fixes [#563](https://github.com/mobxjs/mobx-state-tree/issues/563)
+
+# 1.3.0
+
+* Significantly improved the undo/redo manager. The undo manager now supports groups. See [#504](https://github.com/mobxjs/mobx-state-tree/pull/504) by @robinfehr! See the [updated docs](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-middlewares/README.md#undomanager) for more details.
+* Significantly improved performance, improvements of 20% could be expected, but changes of course per case. See [#553](https://github.com/mobxjs/mobx-state-tree/pull/553)
 * Implemented `actionLogger` middleware, which logs most events for async actions
 * Slightly changed the order in which life cycle hooks are fired. `afterAttach` will no fire first on the parent, then on the children. So, unlike `afterCreate`, in `afterAttach` one can assume in `afterAttach that the parent has completely initialized.
 

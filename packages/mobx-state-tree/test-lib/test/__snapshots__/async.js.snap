@@ -6,61 +6,6 @@ Array [
     "args": Array [
       "black",
     ],
-    "id": 1,
-    "name": "startFetch",
-    "parentId": 0,
-    "rootId": 1,
-    "type": "action",
-  },
-  Object {
-    "args": Array [
-      "black",
-    ],
-    "id": 2,
-    "name": "fetchData",
-    "parentId": 1,
-    "rootId": 1,
-    "type": "flow_spawn",
-  },
-  Object {
-    "args": Array [
-      undefined,
-    ],
-    "id": 2,
-    "name": "fetchData",
-    "parentId": 1,
-    "rootId": 1,
-    "type": "flow_resume",
-  },
-  Object {
-    "args": Array [
-      "drinking coffee",
-    ],
-    "id": 2,
-    "name": "fetchData",
-    "parentId": 1,
-    "rootId": 1,
-    "type": "flow_resume",
-  },
-  Object {
-    "args": Array [
-      "awake",
-    ],
-    "id": 2,
-    "name": "fetchData",
-    "parentId": 1,
-    "rootId": 1,
-    "type": "flow_return",
-  },
-]
-`;
-
-exports[`can handle erroring actions 1`] = `
-Array [
-  Object {
-    "args": Array [
-      "black",
-    ],
     "id": 3,
     "name": "startFetch",
     "parentId": 0,
@@ -89,168 +34,28 @@ Array [
   },
   Object {
     "args": Array [
-      "black",
+      "drinking coffee",
     ],
     "id": 4,
     "name": "fetchData",
     "parentId": 3,
     "rootId": 3,
-    "type": "flow_throw",
-  },
-]
-`;
-
-exports[`can handle nested async actions 1`] = `
-Array [
-  Object {
-    "args": Array [
-      "black",
-    ],
-    "id": 21,
-    "name": "startFetch",
-    "parentId": 0,
-    "rootId": 21,
-    "type": "action",
-  },
-  Object {
-    "args": Array [
-      "black",
-    ],
-    "id": 22,
-    "name": "fetchData",
-    "parentId": 21,
-    "rootId": 21,
-    "type": "flow_spawn",
-  },
-  Object {
-    "args": Array [
-      undefined,
-    ],
-    "id": 22,
-    "name": "fetchData",
-    "parentId": 21,
-    "rootId": 21,
     "type": "flow_resume",
   },
   Object {
     "args": Array [
-      "drinking black",
+      "awake",
     ],
-    "id": 23,
-    "name": "uppercase",
-    "parentId": 22,
-    "rootId": 21,
-    "type": "flow_spawn",
-  },
-  Object {
-    "args": Array [
-      undefined,
-    ],
-    "id": 23,
-    "name": "uppercase",
-    "parentId": 22,
-    "rootId": 21,
-    "type": "flow_resume",
-  },
-  Object {
-    "args": Array [
-      "DRINKING BLACK",
-    ],
-    "id": 23,
-    "name": "uppercase",
-    "parentId": 22,
-    "rootId": 21,
-    "type": "flow_resume",
-  },
-  Object {
-    "args": Array [
-      "DRINKING BLACK",
-    ],
-    "id": 23,
-    "name": "uppercase",
-    "parentId": 22,
-    "rootId": 21,
-    "type": "flow_return",
-  },
-  Object {
-    "args": Array [
-      "DRINKING BLACK",
-    ],
-    "id": 22,
+    "id": 4,
     "name": "fetchData",
-    "parentId": 21,
-    "rootId": 21,
-    "type": "flow_resume",
-  },
-  Object {
-    "args": Array [
-      "DRINKING BLACK",
-    ],
-    "id": 22,
-    "name": "fetchData",
-    "parentId": 21,
-    "rootId": 21,
+    "parentId": 3,
+    "rootId": 3,
     "type": "flow_return",
   },
 ]
 `;
 
-exports[`can handle throw from yielded promise works 1`] = `
-Array [
-  Object {
-    "args": Array [
-      "black",
-    ],
-    "id": 9,
-    "name": "startFetch",
-    "parentId": 0,
-    "rootId": 9,
-    "type": "action",
-  },
-  Object {
-    "args": Array [
-      "black",
-    ],
-    "id": 10,
-    "name": "fetchData",
-    "parentId": 9,
-    "rootId": 9,
-    "type": "flow_spawn",
-  },
-  Object {
-    "args": Array [
-      undefined,
-    ],
-    "id": 10,
-    "name": "fetchData",
-    "parentId": 9,
-    "rootId": 9,
-    "type": "flow_resume",
-  },
-  Object {
-    "args": Array [
-      "x",
-    ],
-    "id": 10,
-    "name": "fetchData",
-    "parentId": 9,
-    "rootId": 9,
-    "type": "flow_resume_error",
-  },
-  Object {
-    "args": Array [
-      "x",
-    ],
-    "id": 10,
-    "name": "fetchData",
-    "parentId": 9,
-    "rootId": 9,
-    "type": "flow_throw",
-  },
-]
-`;
-
-exports[`can handle try catch 1`] = `
+exports[`can handle erroring actions 1`] = `
 Array [
   Object {
     "args": Array [
@@ -284,28 +89,168 @@ Array [
   },
   Object {
     "args": Array [
-      "tea",
+      "black",
     ],
     "id": 6,
     "name": "fetchData",
     "parentId": 5,
     "rootId": 5,
-    "type": "flow_resume_error",
+    "type": "flow_throw",
+  },
+]
+`;
+
+exports[`can handle nested async actions 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 23,
+    "name": "startFetch",
+    "parentId": 0,
+    "rootId": 23,
+    "type": "action",
   },
   Object {
     "args": Array [
-      "biscuit",
+      "black",
     ],
-    "id": 6,
+    "id": 24,
     "name": "fetchData",
-    "parentId": 5,
-    "rootId": 5,
+    "parentId": 23,
+    "rootId": 23,
+    "type": "flow_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 24,
+    "name": "fetchData",
+    "parentId": 23,
+    "rootId": 23,
+    "type": "flow_resume",
+  },
+  Object {
+    "args": Array [
+      "drinking black",
+    ],
+    "id": 25,
+    "name": "uppercase",
+    "parentId": 24,
+    "rootId": 23,
+    "type": "flow_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 25,
+    "name": "uppercase",
+    "parentId": 24,
+    "rootId": 23,
+    "type": "flow_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 25,
+    "name": "uppercase",
+    "parentId": 24,
+    "rootId": 23,
+    "type": "flow_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 25,
+    "name": "uppercase",
+    "parentId": 24,
+    "rootId": 23,
+    "type": "flow_return",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 24,
+    "name": "fetchData",
+    "parentId": 23,
+    "rootId": 23,
+    "type": "flow_resume",
+  },
+  Object {
+    "args": Array [
+      "DRINKING BLACK",
+    ],
+    "id": 24,
+    "name": "fetchData",
+    "parentId": 23,
+    "rootId": 23,
     "type": "flow_return",
   },
 ]
 `;
 
-exports[`empty sequence works 1`] = `
+exports[`can handle throw from yielded promise works 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 11,
+    "name": "startFetch",
+    "parentId": 0,
+    "rootId": 11,
+    "type": "action",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 12,
+    "name": "fetchData",
+    "parentId": 11,
+    "rootId": 11,
+    "type": "flow_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 12,
+    "name": "fetchData",
+    "parentId": 11,
+    "rootId": 11,
+    "type": "flow_resume",
+  },
+  Object {
+    "args": Array [
+      "x",
+    ],
+    "id": 12,
+    "name": "fetchData",
+    "parentId": 11,
+    "rootId": 11,
+    "type": "flow_resume_error",
+  },
+  Object {
+    "args": Array [
+      "x",
+    ],
+    "id": 12,
+    "name": "fetchData",
+    "parentId": 11,
+    "rootId": 11,
+    "type": "flow_throw",
+  },
+]
+`;
+
+exports[`can handle try catch 1`] = `
 Array [
   Object {
     "args": Array [
@@ -339,12 +284,67 @@ Array [
   },
   Object {
     "args": Array [
-      undefined,
+      "tea",
     ],
     "id": 8,
     "name": "fetchData",
     "parentId": 7,
     "rootId": 7,
+    "type": "flow_resume_error",
+  },
+  Object {
+    "args": Array [
+      "biscuit",
+    ],
+    "id": 8,
+    "name": "fetchData",
+    "parentId": 7,
+    "rootId": 7,
+    "type": "flow_return",
+  },
+]
+`;
+
+exports[`empty sequence works 1`] = `
+Array [
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 9,
+    "name": "startFetch",
+    "parentId": 0,
+    "rootId": 9,
+    "type": "action",
+  },
+  Object {
+    "args": Array [
+      "black",
+    ],
+    "id": 10,
+    "name": "fetchData",
+    "parentId": 9,
+    "rootId": 9,
+    "type": "flow_spawn",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 10,
+    "name": "fetchData",
+    "parentId": 9,
+    "rootId": 9,
+    "type": "flow_resume",
+  },
+  Object {
+    "args": Array [
+      undefined,
+    ],
+    "id": 10,
+    "name": "fetchData",
+    "parentId": 9,
+    "rootId": 9,
     "type": "flow_return",
   },
 ]
