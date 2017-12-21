@@ -46,7 +46,7 @@ This approach works fine and has great type inference, but comes with a few down
 
 1. For complex flows, which update data in the middle of the flow, a lot of "utility" actions need to be created.
 2. Each step of the flow is exposed as action to the outside world. In the above example, one could (but shouldn't) directly invoke `store.fetchProjectsSuccess([])`
-2. Middleware cannot distinguish the flow initiating action from the handler actions. This means that actions like `fetchProjectsSuccess` will become part of the recorded action list, although you probably never want to replay it (as replaying `fetchProjects` itself will cause the handler actions to be fired in the end).
+3. Middleware cannot distinguish the flow initiating action from the handler actions. This means that actions like `fetchProjectsSuccess` will become part of the recorded action list, although you probably never want to replay it (as replaying `fetchProjects` itself will cause the handler actions to be fired in the end).
 
 ## Using generators
 
@@ -99,7 +99,7 @@ For example, the `onAction` middleware will only record starting asynchronous fl
 After all, when replaying the invocation will lead to the other steps being executed automatically.
 Besides that, each step in the generator is allowed to modify it's own instance, and there is no need to expose the individual flow steps as actions.
 
-See the [bookshop example sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25) for a more extensive example.
+See the [bookshop example sources](https://github.com/mobxjs/mobx-state-tree/blob/5a4bd43ac874cddbf91b40eeef20043198477084/packages/mst-example-bookshop/src/stores/BookStore.js#L25) for a more extensive example.
 
 Using generators requires Promises and generators to be available. Promises can easily be polyfilled although they tend to be available on every modern JS environment. Generators are well supported as well, and both TypeScript and Babel can compile generators to ES5.
 
