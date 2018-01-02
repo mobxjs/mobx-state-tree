@@ -162,13 +162,9 @@ test("it should not be possible to pass a complex object", t => {
 if (process.env.NODE_ENV === "development") {
     test("it should not be possible to set the wrong type", t => {
         const store = createTestStore()
-        t.throws(
-            () => {
-                store.orders[0].setCustomer(store.orders[0])
-            }, // wrong type!
-            "[mobx-state-tree] Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n" +
-                "value of type Order: <Order@/orders/0> is not assignable to type: `(reference(Customer) | null)`, expected an instance of `(reference(Customer) | null)` or a snapshot like `(reference(Customer) | null?)` instead."
-        )
+        t.throws(() => {
+            store.orders[0].setCustomer(store.orders[0])
+        }, "[mobx-state-tree] Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n\n" + "value of type Order: <Order@/orders/0> is not assignable to type: `(reference(Customer) | null)`, expected an instance of `(reference(Customer) | null)` or a snapshot like `(reference(Customer) | null?)` instead.") // wrong type!
     })
 }
 

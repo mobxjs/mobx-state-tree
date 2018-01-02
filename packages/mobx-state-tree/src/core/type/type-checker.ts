@@ -35,6 +35,14 @@ export function prettyPrintValue(value: any) {
         : isStateTreeNode(value) ? `<${value}>` : `\`${safeStringify(value)}\``
 }
 
+function shortenPrintValue(valueInString: string) {
+    return valueInString.length < 280
+        ? valueInString
+        : `${valueInString.substring(0, 272)}......${valueInString.substring(
+              valueInString.length - 8
+          )}`
+}
+
 function toErrorString(error: IValidationError): string {
     const { value } = error
     const type: IType<any, any> = error.context[error.context.length - 1].type as any
@@ -116,9 +124,11 @@ export function typecheckPublic(type: IType<any, any>, value: any): void {
     const errors = type.validate(value, [{ path: "", type }])
 
     if (errors.length > 0) {
+        console.error("Failed to create `${type.name}` from:", value)
         fail(
-            `Error while converting ${prettyPrintValue(value)} to \`${type.name}\`:\n` +
-                errors.map(toErrorString).join("\n")
+            `Error while converting ${shortenPrintValue(
+                prettyPrintValue(value)
+            )} to \`${type.name}\`:\n\n` + errors.map(toErrorString).join("\n")
         )
     }
 }

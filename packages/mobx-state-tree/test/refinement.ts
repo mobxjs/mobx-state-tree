@@ -24,10 +24,10 @@ if (process.env.NODE_ENV === "development") {
         })
         t.throws(() => {
             Factory.create({ number: "givenStringInstead" })
-        }, `[mobx-state-tree] Error while converting \`{\"number\":\"givenStringInstead\"}\` to \`AnonymousModel\`:\nat path \"/number\" value \`\"givenStringInstead\"\` is not assignable to type: \`positive number\` (Value is not a number).`)
+        }, `[mobx-state-tree] Error while converting \`{\"number\":\"givenStringInstead\"}\` to \`AnonymousModel\`:\n\nat path \"/number\" value \`\"givenStringInstead\"\` is not assignable to type: \`positive number\` (Value is not a number).`)
         t.throws(() => {
             Factory.create({ number: -4 })
-        }, `[mobx-state-tree] Error while converting \`{\"number\":-4}\` to \`AnonymousModel\`:\nat path \"/number\" value \`-4\` is not assignable to type: \`positive number\` (Value does not respect the refinement predicate).`)
+        }, `[mobx-state-tree] Error while converting \`{\"number\":-4}\` to \`AnonymousModel\`:\n\nat path \"/number\" value \`-4\` is not assignable to type: \`positive number\` (Value does not respect the refinement predicate).`)
     })
 
     test("it should throw custom error message with failing predicate is given", t => {
@@ -40,9 +40,9 @@ if (process.env.NODE_ENV === "development") {
         })
         t.throws(() => {
             Factory.create({ number: "givenStringInstead" })
-        }, `[mobx-state-tree] Error while converting \`{\"number\":\"givenStringInstead\"}\` to \`AnonymousModel\`:\nat path \"/number\" value \`\"givenStringInstead\"\` is not assignable to type: \`number\` (Value is not a number).`)
+        }, `[mobx-state-tree] Error while converting \`{\"number\":\"givenStringInstead\"}\` to \`AnonymousModel\`:\n\nat path \"/number\" value \`\"givenStringInstead\"\` is not assignable to type: \`number\` (Value is not a number).`)
         t.throws(() => {
             Factory.create({ number: -4 })
-        }, `[mobx-state-tree] Error while converting \`{\"number\":-4}\` to \`AnonymousModel\`:\nat path "/number" value \`-4\` is not assignable to type: \`number\` (A positive number was expected).`)
+        }, `[mobx-state-tree] Error while converting \`{\"number\":-4}\` to \`AnonymousModel\`:\n\nat path "/number" value \`-4\` is not assignable to type: \`number\` (A positive number was expected).`)
     })
 }
