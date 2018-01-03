@@ -1,6 +1,6 @@
 # 1.3.1
 
-* Fixed bug where `flows` didn't properly batch there next ticks properly in actions, significantly slowing processes down. Fixes [#563](https://github.com/mobxjs/mobx-state-tree/issues/563)
+* Fixed bug where `flows` didn't properly batch their next ticks properly in actions, significantly slowing processes down. Fixes [#563](https://github.com/mobxjs/mobx-state-tree/issues/563)
 
 # 1.3.0
 
