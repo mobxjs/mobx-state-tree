@@ -1130,6 +1130,28 @@ type ITodoType = typeof Todo.Type;
 interface ITodo extends ITodoType {};
 ```
 
+You can also get this benefit in your `.actions` claue by splitting your `state` part of the model for its own interface:
+```typescript
+const TodoState = types.model({
+        title: types.string
+    });
+
+type ITodoStateType = typeof TodoState.Type;
+interface ITodoState extends ITodoType {}
+
+const Todo = TodoState
+    .actions(self: ITodoState  => ({
+        setTitle(v: string) {
+            self.title = v
+        }
+    }))
+```
+
+\<assumption>  
+It's possible that the resaon for this slowdown is that MST types are based on infers, and each time your IDE/tsserver want to show type information for an expression, it needs to recalcued the entire model (And the entire subtree).
+Seems like giving it an real interface name turning on tsserver cache mechanizm, that recalculate it only on invalidation.  
+\</assumption>
+
 Sometimes you'll need to take into account where your typings are available and where they aren't. The code below will not compile: TypeScript will complain that `self.upperProp` is not a known property. Computed properties are only available after `.views` is evaluated.
 
 ```typescript
