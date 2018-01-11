@@ -1076,6 +1076,14 @@ Which has predictable and well-known performance characteristics, and has much l
 
 Likewise, if your application is mainly dealing with stateless information (such as a logging system) MST doesn't add much values.
 
+### Where is the `any` type?
+
+MST doesn't offer an any type because it can't reason about it. For example, given a snapshot and a field with `any`, how should MST know how to deserialize it? Or apply patches to it? Etc. etc. If you need any there are two options
+
+1. Use `types.frozen`. Frozen values need to be immutable and serializable (so MST can treat them verbatim)
+2. Use volatile state. Volatile state can store anything, but won't appear in snapshots, patches etc.
+3. If your type is regular, and you just are to lazy to type the model, you could also consider generating the type at runtime once (after all, MST types are just JS...). But you will loose static typing and any confusion it causes is up to you to handle :-).
+
 ### How does reconciliation work?
 
 * When applying snapshots, MST will always try to reuse existing object instances for snapshots with the same identifier (see `types.identifier()`).
@@ -1147,9 +1155,9 @@ const Todo = TodoState
     }))
 ```
 
-\<assumption>  
+\<assumption>
 It's possible that the resaon for this slowdown is that MST types are based on infers, and each time your IDE/tsserver want to show type information for an expression, it needs to recalcued the entire model (And the entire subtree).
-Seems like giving it an real interface name turning on tsserver cache mechanizm, that recalculate it only on invalidation.  
+Seems like giving it an real interface name turning on tsserver cache mechanizm, that recalculate it only on invalidation.
 \</assumption>
 
 Sometimes you'll need to take into account where your typings are available and where they aren't. The code below will not compile: TypeScript will complain that `self.upperProp` is not a known property. Computed properties are only available after `.views` is evaluated.
