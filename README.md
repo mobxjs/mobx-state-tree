@@ -1156,7 +1156,7 @@ const Todo = TodoState
 ```
 
 \<assumption>
-It's possible that the resaon for this slowdown is that MST types are based on infers, and each time your IDE/tsserver want to show type information for an expression, it needs to recalcued the entire model (And the entire subtree).
+It's possible that the reason for this slowdown is that MST types are based on infers, and each time your IDE/tsserver want to show type information for an expression, it needs to recalcued the entire model (And the entire subtree).
 Seems like giving it an real interface name turning on tsserver cache mechanizm, that recalculate it only on invalidation.
 \</assumption>
 
