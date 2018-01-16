@@ -128,7 +128,7 @@ export function typecheckPublic(type: IType<any, any>, value: any): void {
         fail(
             `Error while converting ${shortenPrintValue(
                 prettyPrintValue(value)
-            )} to \`${type.name}\`:\n\n` + errors.map(toErrorString).join("\n")
+            )} to \`${type.name}\`:\n\n    ` + errors.map(toErrorString).join("\n    ")
         )
     }
 }

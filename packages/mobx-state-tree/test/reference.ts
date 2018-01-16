@@ -80,7 +80,7 @@ if (process.env.NODE_ENV === "development") {
         t.throws(
             () => Todo.create(),
             "[mobx-state-tree] Error while converting `{}` to `AnonymousModel`:\n\n" +
-                'at path "/id" value `undefined` is not assignable to type: `identifier(string)` (Value is not a string), expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
+                '    at path "/id" value `undefined` is not assignable to type: `identifier(string)` (Value is not a string), expected an instance of `identifier(string)` or a snapshot like `identifier(string)` instead.'
         )
     })
 

@@ -234,7 +234,7 @@ test("#192 - put should not throw when identifier is a number", t => {
     if (process.env.NODE_ENV === "development") {
         t.throws(() => {
             todoStore.addTodo({ todo_id: "1", title: "Test" })
-        }, `[mobx-state-tree] Error while converting \`{\"todo_id\":\"1\",\"title\":\"Test\"}\` to \`Todo\`:\n\nat path \"/todo_id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\` (Value is not a number), expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`)
+        }, `[mobx-state-tree] Error while converting \`{\"todo_id\":\"1\",\"title\":\"Test\"}\` to \`Todo\`:\n\n    at path \"/todo_id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\` (Value is not a number), expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`)
     }
 })
 

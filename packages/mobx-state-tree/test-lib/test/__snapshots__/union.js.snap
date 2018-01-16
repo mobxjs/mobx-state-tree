@@ -3,14 +3,14 @@
 exports[`it should complain about multiple applicable types no dispatch method 1`] = `
 "[mobx-state-tree] Error while converting \`{\\"width\\":2,\\"height\\":2}\` to \`(Box | Square)\`:
 
-snapshot \`{\\"width\\":2,\\"height\\":2}\` is not assignable to type: \`(Box | Square)\` (Multiple types are applicable for the union (hint: provide a dispatch function)), expected an instance of \`(Box | Square)\` or a snapshot like \`({ width: number; height: number } | { width: number })\` instead."
+    snapshot \`{\\"width\\":2,\\"height\\":2}\` is not assignable to type: \`(Box | Square)\` (Multiple types are applicable for the union (hint: provide a dispatch function)), expected an instance of \`(Box | Square)\` or a snapshot like \`({ width: number; height: number } | { width: number })\` instead."
 `;
 
 exports[`it should complain about no applicable types 1`] = `
 "[mobx-state-tree] Error while converting \`{\\"height\\":2}\` to \`(Cube | Box)\`:
 
-snapshot \`{\\"height\\":2}\` is not assignable to type: \`(Cube | Box)\` (No type is applicable for the union), expected an instance of \`(Cube | Box)\` or a snapshot like \`({ width: number; height: number; depth: number } | { width: number; height: number })\` instead.
-at path \\"/width\\" value \`undefined\` is not assignable to type: \`number\` (Value is not a number).
-at path \\"/depth\\" value \`undefined\` is not assignable to type: \`number\` (Value is not a number).
-at path \\"/width\\" value \`undefined\` is not assignable to type: \`number\` (Value is not a number)."
+    snapshot \`{\\"height\\":2}\` is not assignable to type: \`(Cube | Box)\` (No type is applicable for the union), expected an instance of \`(Cube | Box)\` or a snapshot like \`({ width: number; height: number; depth: number } | { width: number; height: number })\` instead.
+    at path \\"/width\\" value \`undefined\` is not assignable to type: \`number\` (Value is not a number).
+    at path \\"/depth\\" value \`undefined\` is not assignable to type: \`number\` (Value is not a number).
+    at path \\"/width\\" value \`undefined\` is not assignable to type: \`number\` (Value is not a number)."
 `;

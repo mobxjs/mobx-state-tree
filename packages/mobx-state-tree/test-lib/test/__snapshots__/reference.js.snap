@@ -7,5 +7,5 @@ exports[`References are non-nullable by default 2`] = `"[mobx-state-tree] Failed
 exports[`References are non-nullable by default 3`] = `
 "[mobx-state-tree] Error while converting \`null\` to \`reference(AnonymousModel)\`:
 
-value \`null\` is not assignable to type: \`reference(AnonymousModel)\` (Value is not a valid identifier, which is a string or a number), expected an instance of \`reference(AnonymousModel)\` or a snapshot like \`reference(AnonymousModel)\` instead."
+    value \`null\` is not assignable to type: \`reference(AnonymousModel)\` (Value is not a valid identifier, which is a string or a number), expected an instance of \`reference(AnonymousModel)\` or a snapshot like \`reference(AnonymousModel)\` instead."
 `;
