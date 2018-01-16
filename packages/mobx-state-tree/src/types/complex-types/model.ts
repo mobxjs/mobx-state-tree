@@ -381,8 +381,14 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             ;(extras.getAtom(node.storedValue, name) as any).reportObserved()
             res[name] = this.getChildNode(node, name).snapshot
         })
-        if (typeof node.storedValue.postProcessSnapshot === "function")
-            return node.storedValue.postProcessSnapshot.call(null, res)
+        if (typeof node.storedValue.postProcessSnapshot === "function") {
+            const snapshot = node.storedValue.postProcessSnapshot.call(null, res)
+            if (!snapshot && process.env.NODE_ENV !== "production")
+                console.warn(
+                    "It's likely that there is custom middleware attached which doesn't return anything."
+                )
+            return snapshot
+        }
         return res
     }
 
