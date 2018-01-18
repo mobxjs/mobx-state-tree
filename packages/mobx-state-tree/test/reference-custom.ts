@@ -205,3 +205,46 @@ test.cb("it should support dynamic loading", t => {
         }
     )
 })
+
+test("it should allow for custom primitive types", t => {
+    class Decimal {
+        public number: number
+        public fraction: number
+
+        constructor(value: string) {
+            const parts = value.split(".")
+            this.number = parseInt(parts[0])
+            this.fraction = parseInt(parts[1])
+        }
+
+        toNumber() {
+            return this.number + parseInt("0." + this.fraction)
+        }
+
+        toString() {
+            return `${this.number}.${this.fraction}`
+        }
+    }
+
+    const DecimalPrimitive = types.reference<Decimal>(types.string as any, {
+        get(value: string) {
+            return new Decimal(value)
+        },
+        set(value: Decimal) {
+            return value.toString()
+        }
+    })
+
+    const Wallet = types.model({ balance: DecimalPrimitive })
+
+    const w1 = Wallet.create({
+        balance: new Decimal("2.5")
+    })
+
+    t.is(w1.balance.number, 2)
+    t.is(w1.balance.fraction, 5)
+
+    const w2 = Wallet.create({ balance: "3.5" })
+    t.is(w2.balance.number, 3)
+    t.is(w2.balance.fraction, 5)
+})
