@@ -35,37 +35,71 @@ const UndoManager = types
         }
     }))
     .actions(self => {
-        let skipping = false
-        let flagSkipping = false
         let targetStore: IStateTreeNode
-        let replaying = false
         let middlewareDisposer: () => void
+        let skipping = false
         let grouping = false
+        let recorder: any = null
         let groupRecorder: any = {
             patches: [] as ReadonlyArray<IJsonPatch>,
             inversePatches: [] as ReadonlyArray<IJsonPatch>
         }
+        let tmpHistoryRecorder: any = {
+            patches: [] as ReadonlyArray<IJsonPatch>,
+            inversePatches: [] as ReadonlyArray<IJsonPatch>
+        }
         let recordingActionId: any = null
-        let recordingActionLevel = 0
+        let potentialSkippingActionId: any = null
+        let skippingActionId: any = null
 
-        const startRecordAction = (call: IMiddlewareEvent): any => {
-            // level for the case that actions have the same name
-            skipping = flagSkipping
-            recordingActionLevel++
-            const actionId = call.name + recordingActionLevel
+        const uuidv4 = () => {
+            return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c: any) => {
+                var r = (Math.random() * 16) | 0,
+                    v = c == "x" ? r : (r & 0x3) | 0x8
+                return v.toString(16)
+            })
+        }
+        const tryStopSkipping = (actionId: any) => {
+            if (actionId !== skippingActionId) return
+
+            recorder && recorder.resume()
+            skippingActionId = null
+            potentialSkippingActionId = null
+        }
+        const startRecordAction = (call: IMiddlewareEvent, actionId: any): any => {
+            // outermost action
             recordingActionId = actionId
-            return {
-                recorder: recordPatches(call.tree),
-                actionId
+            recorder = recordPatches(call.tree)
+            return { recorder, actionId }
+        }
+        const addUndoStateTmp = () => {
+            if (!recorder || !recorder.patches.length) return
+            // tmp history group used to not have problems with computed
+            tmpHistoryRecorder = {
+                patches: tmpHistoryRecorder.patches.concat(recorder.patches),
+                inversePatches: tmpHistoryRecorder.inversePatches.concat(recorder.inversePatches)
             }
         }
-        const stopRecordingAction = (recorder: IPatchRecorder): void => {
-            recordingActionId = null
-            if (!skipping) {
-                if (grouping) return cachePatchForGroup(recorder)
-                ;(self as any).addUndoState(recorder)
+        const stopRecordingAction = (actionId: any): void => {
+            // global recorder used here to gather all patches inside an action
+            addUndoStateTmp()
+            if (recordingActionId === actionId) {
+                if (grouping) {
+                    cachePatchForGroup(tmpHistoryRecorder)
+                } else {
+                    ;(self as any).addUndoState(tmpHistoryRecorder)
+                }
+                recordingActionId = null
+                tmpHistoryRecorder = {
+                    patches: [] as ReadonlyArray<IJsonPatch>,
+                    inversePatches: [] as ReadonlyArray<IJsonPatch>
+                }
+                skipping = false
+                recorder = null
+                tryStopSkipping(actionId)
+            } else {
+                tryStopSkipping(actionId)
             }
-            skipping = flagSkipping
         }
         const cachePatchForGroup = (recorder: IPatchRecorder): void => {
             groupRecorder = {
@@ -74,12 +108,14 @@ const UndoManager = types
             }
         }
         const undoRedoMiddleware = createActionTrackingMiddleware({
-            // the flagSkipping === false check is mainly a performance optimisation
-            filter: call => flagSkipping === false && call.context !== self, // don't undo / redo undo redo :)
+            // don't record internal undo/ redo actions, wrapped with withoutUndo actions
+            filter: call => !skipping && call.context !== self,
             onStart: call => {
-                if (!recordingActionId) {
-                    return startRecordAction(call)
-                }
+                // id to make actionIds unique in case of sub actions with the same name
+                const actionId = `${call.name}-${uuidv4()}`
+                potentialSkippingActionId = actionId
+                if (!recordingActionId) return startRecordAction(call, actionId)
+                return { actionId }
             },
             onResume: (
                 call,
@@ -102,9 +138,7 @@ const UndoManager = types
                     actionId: undefined
                 }
             ) => {
-                if (recordingActionId === actionId) {
-                    stopRecordingAction(recorder)
-                }
+                stopRecordingAction(actionId)
             },
             onFail: (
                 call,
@@ -116,11 +150,9 @@ const UndoManager = types
         })
 
         return {
-            addUndoState(recorder: any) {
-                if (replaying) {
-                    // skip recording if this state was caused by undo / redo
-                    return
-                }
+            addUndoState(recorder: any = null) {
+                if (recorder.patches.length === 0) return
+
                 self.history.splice(self.undoIdx)
                 self.history.push({
                     patches: recorder.patches,
@@ -140,35 +172,37 @@ const UndoManager = types
                 middlewareDisposer()
             },
             undo() {
-                replaying = true
+                skipping = true
                 self.undoIdx--
                 // n.b: reverse patches back to forth
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
                 applyPatch(targetStore, self.history[self.undoIdx].inversePatches.slice().reverse())
-                replaying = false
+                skipping = false
             },
             redo() {
-                replaying = true
+                skipping = true
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
                 applyPatch(targetStore, self.history[self.undoIdx].patches)
                 self.undoIdx++
-                replaying = false
+                skipping = false
             },
             withoutUndo(fn: () => any) {
                 try {
+                    recorder && recorder.stop()
                     skipping = true
-                    flagSkipping = true
+                    if (!skippingActionId) skippingActionId = potentialSkippingActionId
                     return fn()
                 } finally {
-                    flagSkipping = false
+                    skipping = false
                 }
             },
             withoutUndoFlow(generatorFn: () => any) {
                 return flow(function*() {
+                    recorder && recorder.stop()
                     skipping = true
-                    flagSkipping = true
+                    if (!skippingActionId) skippingActionId = potentialSkippingActionId
                     const result = yield* generatorFn()
-                    flagSkipping = false
+                    skipping = false
                     return result
                 })
             },

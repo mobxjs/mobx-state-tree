@@ -16,14 +16,14 @@ const canTimeTravel = (t, store) => {
     t.is(store.x, 1)
 
     store.inc()
+    t.is(store.x, 2)
     t.is(undoManager.canUndo, true)
     t.is(undoManager.canRedo, false)
-    t.is(store.x, 2)
 
     store.inc()
+    t.is(store.x, 3)
     t.is(undoManager.canUndo, true)
     t.is(undoManager.canRedo, false)
-    t.is(store.x, 3)
 
     undoManager.undo()
     t.is(store.x, 2)
@@ -306,8 +306,172 @@ test("on tree - withoutUndoFlow declaratively", async t => {
     const value = await store.loadPosition()
     t.is(value.x, 4)
     t.is(store.y, 2)
-    t.is(_undoManager.canUndo, false)
+
+    t.is(_undoManager.canUndo, true)
     t.is(_undoManager.canRedo, false)
+})
+
+test("withoutUndo within withoutUndo declaratively", t => {
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            y: 1,
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            setUndoManagerSameTree(self)
+
+            return {
+                yinc: () =>
+                    undoManager.withoutUndo(() => {
+                        self.y += 1
+                    }),
+                xinc: () =>
+                    undoManager.withoutUndo(() => {
+                        ;(self as any).yinc()
+                        self.x += 1
+                    })
+            }
+        })
+
+    const store = HistoryOnTreeStoreModel.create()
+
+    t.is(undoManager.canUndo, false)
+    t.is(undoManager.canRedo, false)
+    t.is(store.x, 1)
+    t.is(store.y, 1)
+    store.xinc()
+    t.is(store.x, 2)
+    t.is(store.y, 2)
+    t.is(undoManager.canUndo, false)
+    t.is(undoManager.canRedo, false)
+})
+
+test("withoutUndo within undo declaratively", t => {
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            y: 1,
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            setUndoManagerSameTree(self)
+
+            return {
+                yinc: () =>
+                    undoManager.withoutUndo(() => {
+                        self.y += 1
+                    }),
+                xinc: () => {
+                    ;(self as any).yinc()
+                    self.x += 1
+                }
+            }
+        })
+
+    const store = HistoryOnTreeStoreModel.create()
+
+    t.is(undoManager.canUndo, false)
+    t.is(undoManager.canRedo, false)
+    t.is(store.x, 1)
+    t.is(store.y, 1)
+    store.xinc()
+    t.is(store.x, 2)
+    t.is(store.y, 2)
+    t.is(undoManager.canUndo, true)
+    t.is(undoManager.canRedo, false)
+    undoManager.undo()
+    t.is(store.x, 1)
+    t.is(store.y, 2)
+})
+
+test("undo within withoutUndo within undo declaratively", t => {
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            y: 1,
+            z: 1,
+            a: 1,
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            setUndoManagerSameTree(self)
+
+            return {
+                ainc: () => {
+                    self.a += 1
+                },
+                zinc: () => {
+                    self.z += 1
+                },
+                yinc: () =>
+                    undoManager.withoutUndo(() => {
+                        self.y += 1
+                        ;(self as any).zinc()
+                    }),
+                xinc: () => {
+                    ;(self as any).ainc()
+                    ;(self as any).yinc()
+                    self.x += 1
+                }
+            }
+        })
+
+    const store = HistoryOnTreeStoreModel.create()
+
+    t.is(undoManager.canUndo, false)
+    t.is(undoManager.canRedo, false)
+    t.is(store.x, 1)
+    t.is(store.y, 1)
+    t.is(store.z, 1)
+    t.is(store.a, 1)
+    store.xinc()
+    t.is(store.x, 2)
+    t.is(store.y, 2)
+    t.is(store.z, 2)
+    t.is(store.a, 2)
+    t.is(undoManager.canUndo, true)
+    t.is(undoManager.canRedo, false)
+    undoManager.undo()
+    t.is(store.x, 1)
+    t.is(store.a, 1)
+    t.is(store.y, 2)
+    t.is(store.z, 2)
+})
+
+test("undo within withoutUndo declaratively", t => {
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            y: 1,
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            setUndoManagerSameTree(self)
+
+            return {
+                yinc: () =>
+                    undoManager.withoutUndo(() => {
+                        self.y += 1
+                        ;(self as any).xinc()
+                    }),
+                xinc: () => {
+                    self.x += 1
+                }
+            }
+        })
+
+    const store = HistoryOnTreeStoreModel.create()
+
+    t.is(undoManager.canUndo, false)
+    t.is(undoManager.canRedo, false)
+    t.is(store.x, 1)
+    t.is(store.y, 1)
+    store.yinc()
+    t.is(store.x, 2)
+    t.is(store.y, 2)
+    t.is(undoManager.canUndo, false)
+    t.is(undoManager.canRedo, false)
 })
 
 test("on tree - group", t => {
