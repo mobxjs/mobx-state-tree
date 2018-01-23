@@ -1155,12 +1155,12 @@ const Todo = TodoState
     }))
 ```
 
-\<assumption>
 It's possible that the reason for this slowdown is that MST types are based on infers, and each time your IDE/tsserver want to show type information for an expression, it needs to recalcued the entire model (And the entire subtree).
 Seems like giving it an real interface name turning on tsserver cache mechanizm, that recalculate it only on invalidation.
-\</assumption>
 
 Sometimes you'll need to take into account where your typings are available and where they aren't. The code below will not compile: TypeScript will complain that `self.upperProp` is not a known property. Computed properties are only available after `.views` is evaluated.
+
+The type of `self` is what `self` was **before the action or views blocks starts**, and only after that part finishes, the actions will be added to the type of `self`.
 
 ```typescript
 const Example = types
@@ -1197,6 +1197,8 @@ const Example = types
 Another approach would be to use helper functions, as demonstrated in the following code. This definition allows for circular references, but is more verbose.
 
 ```typescript
+import { types, flow } from "mobx-state-tree"
+
 const Example = types
   .model('Example', { prop: types.string })
   .views(self => {
@@ -1215,6 +1217,24 @@ const Example = types
         return twiceUpperProp();
       },
     };
+  })
+  .actions(self => {
+    // Don't forget that async operations HAVE
+    // to use `flow( ... )`.
+    const fetchData = flow(function *() {
+      yield doSomething()
+    })
+
+    return {
+      fetchData,
+      afterCreate() {
+        // Notice that we call the function directly
+        // instead of using `self.fetchData()`. This is
+        // because Typescript doesn't know about `fetchData()`
+        // being part of `self` in this context.
+        fetchData()
+      }
+    }
   });
 ```
 
