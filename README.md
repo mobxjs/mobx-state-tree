@@ -1145,7 +1145,7 @@ const TodoState = types.model({
     });
 
 type ITodoStateType = typeof TodoState.Type;
-interface ITodoState extends ITodoType {}
+interface ITodoState extends ITodoStateType {}
 
 const Todo = TodoState
     .actions(self: ITodoState  => ({
