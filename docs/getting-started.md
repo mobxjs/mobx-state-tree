@@ -189,7 +189,7 @@ const RootStore = types.model({
 ```
 [View sample in playground](https://codesandbox.io/s/928l6pw7pr)
 
-Please notice the use of "self". Self is the object being constructed when an instance of your model is created. Thanks to the self object instance actions are "this-free", allowing you to be sure that they are correclty bound.
+Please notice the use of "self". Self is the object being constructed when an instance of your model is created. Thanks to the self object instance actions are "this-free", allowing you to be sure that they are correctly bound.
 
 Calling those actions is as simple as what you would do with plain JavaScript classes, you simply call them on a model instance!
 
