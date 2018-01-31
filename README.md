@@ -1078,11 +1078,11 @@ Likewise, if your application is mainly dealing with stateless information (such
 
 ### Where is the `any` type?
 
-MST doesn't offer an any type because it can't reason about it. For example, given a snapshot and a field with `any`, how should MST know how to deserialize it? Or apply patches to it? Etc. etc. If you need any there are two options
+MST doesn't offer an any type because it can't reason about it. For example, given a snapshot and a field with `any`, how should MST know how to deserialize it? Or apply patches to it? Etc. etc. If you need `any` there are following options
 
 1. Use `types.frozen`. Frozen values need to be immutable and serializable (so MST can treat them verbatim)
 2. Use volatile state. Volatile state can store anything, but won't appear in snapshots, patches etc.
-3. If your type is regular, and you just are to lazy to type the model, you could also consider generating the type at runtime once (after all, MST types are just JS...). But you will loose static typing and any confusion it causes is up to you to handle :-).
+3. If your type is regular, and you just are too lazy to type the model, you could also consider generating the type at runtime once (after all, MST types are just JS...). But you will loose static typing and any confusion it causes is up to you to handle :-).
 
 ### How does reconciliation work?
 
