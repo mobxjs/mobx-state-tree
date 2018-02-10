@@ -20,6 +20,7 @@ import {
     NodeLifeCycle,
     IdentifierCache,
     EMPTY_ARRAY,
+    EMPTY_OBJECT,
     escapeJsonPath,
     addHiddenFinalProp,
     toJSON,
@@ -27,7 +28,9 @@ import {
     freeze,
     IStateTreeNode,
     resolvePath,
-    resolveNodeByPathParts
+    resolveNodeByPathParts,
+    IMembers,
+    ModelType
 } from "../../internal"
 
 let nextNodeId = 1
@@ -48,6 +51,7 @@ export class ObjectNode implements INode {
     state = NodeLifeCycle.INITIALIZING
 
     middlewares = EMPTY_ARRAY as IMiddlewareHandler[]
+    members = EMPTY_OBJECT as IMembers
     private snapshotSubscribers: ((snapshot: any) => void)[]
     private patchSubscribers: ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)[]
     private disposers: (() => void)[]
@@ -75,6 +79,8 @@ export class ObjectNode implements INode {
 
         this.preboot()
 
+        if (type instanceof ModelType)
+            this.members.properties = (this.type as ModelType<any, any>).properties
         if (!parent) this.identifierCache = new IdentifierCache()
         if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "$treenode", this)
 
@@ -302,6 +308,12 @@ export class ObjectNode implements INode {
         this.middlewares = []
         this.snapshotSubscribers = []
         this.patchSubscribers = []
+        this.members = {
+            properties: {},
+            actions: {},
+            views: {},
+            volatile: {}
+        }
 
         // Optimization: this does not need to be done per instance
         // if some pieces from createActionInvoker are extracted

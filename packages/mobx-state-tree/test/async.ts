@@ -37,7 +37,6 @@ function testCoffeeTodo(
     const events: any[] = []
     const coffees: string[] = []
     const t1 = Todo.create({})
-    unprotect(t1)
     addMiddleware(t1, (c, next) => {
         events.push(c)
         return next(c)
@@ -60,7 +59,6 @@ function testCoffeeTodo(
         },
         r => {
             t.is(shouldError, true, "Ended up in ERROR handler")
-            console.error(r)
             handleResult(r)
         }
     )

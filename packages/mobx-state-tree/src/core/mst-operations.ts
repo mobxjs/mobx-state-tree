@@ -647,6 +647,42 @@ export function walk(target: IStateTreeNode, processor: (item: IStateTreeNode) =
     processor(node.storedValue)
 }
 
+export interface IModelReflectionData {
+    name: string
+    properties: { [K: string]: IType<any, any> }
+    actions: string[]
+    views: string[]
+    volatile: string[]
+}
+/**
+ * Returns a reflection of the node
+ *
+ * @export
+ * @param {IStateTreeNode} target
+ * @returns {IModelReflectionData}
+ */
+export function getMembers(target: IStateTreeNode): IModelReflectionData {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        const node: any = getStateTreeNode(target)
+        if (!(node.type instanceof ModelType))
+            fail(
+                "expected the node's type to be of the type: model" +
+                    target +
+                    " instead. It's likely you passed an array or a map."
+            )
+    }
+    const node: any = getStateTreeNode(target)
+    const reflected: IModelReflectionData = {
+        name: node.type.name,
+        properties: node.members.properties,
+        actions: Object.keys(node.members.actions),
+        volatile: Object.keys(node.members.volatile),
+        views: Object.keys(node.members.views)
+    }
+    return reflected
+}
+
 import {
     INode,
     getStateTreeNode,
@@ -662,5 +698,7 @@ import {
     IType,
     isType,
     resolveNodeByPath,
-    getRelativePathBetweenNodes
+    getRelativePathBetweenNodes,
+    ObjectNode,
+    ModelType
 } from "../internal"
