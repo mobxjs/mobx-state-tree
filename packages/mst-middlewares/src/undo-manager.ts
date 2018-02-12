@@ -134,7 +134,7 @@ const UndoManager = types
                     throw new Error(
                         "UndoManager should be created as part of a tree, or with `targetStore` in it's environment"
                     )
-                middlewareDisposer = addMiddleware(targetStore, undoRedoMiddleware)
+                middlewareDisposer = addMiddleware(targetStore, undoRedoMiddleware, false)
             },
             beforeDestroy() {
                 middlewareDisposer()

@@ -124,7 +124,9 @@ For more details, see the [middleware docs](docs/middleware.md)
 **Parameters**
 
 -   `target` **IStateTreeNode** 
--   `middleware`  
+-   `middleware`  **IMiddleware**
+-   `includeHooks` **([boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | any)** indicates whether the hooks should be piped to the middleware. 
+
 
 Returns **IDisposer** 
 
@@ -207,7 +209,7 @@ Binds middleware to a specific action
 
 **Parameters**
 
--   `middleware` **IMiddlewareHandler** 
+-   `handler` **IMiddlewareHandler** 
 -   `fn`  
 -   `Function`  } fn
 
