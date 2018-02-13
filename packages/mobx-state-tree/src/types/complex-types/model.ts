@@ -102,9 +102,9 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
                 // no other complex values
             } else if (typeof value === "object") {
                 fail(
-                    `In property '${key}': base model's should not contain complex values: '${value}'`
+                    `In property '${key}': base models should not contain complex values: '${value}'`
                 )
-                // WTF did you passed in mate?
+                // WTF did you pass in mate?
             } else {
                 fail(`Unexpected value for property '${key}'`)
             }
