@@ -1288,8 +1288,7 @@ export type ITodo = typeof Todo.Type
 It ain't pretty, but it works.
 
 ### How does MST compare to Redux
-
-So far this might look a lot like an immutable state tree as found for example in Redux apps, but there are a few differences:
+So far this might look a lot like an immutable state tree as found for example in Redux apps, but there're are only so many reasons to use redux as per [article linked at the very top of redux guide](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367) that MST covers too, meanwhile:
 
 -   Like Redux, and unlike MobX, MST prescribes a very specific state architecture.
 -   mobx-state-tree allows direct modification of any value in the tree; it is not necessary to construct a new tree in your actions.
