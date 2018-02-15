@@ -191,7 +191,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
 
     props<SP, TP>(
         properties: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
-    ): IModelType<S & SP, T & TP> {
+    ): IModelType<S & SP & Snapshot<SP>, T & TP> {
         return this.cloneAndEnhance({ properties } as any)
     }
 
