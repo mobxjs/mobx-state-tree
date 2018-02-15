@@ -64,7 +64,7 @@ test("it should accept a function to provide dynamic values", t => {
     if (process.env.NODE_ENV === "development") {
         t.throws(
             () => Factory.create(),
-            `[mobx-state-tree] Error while converting \`"hello world!"\` to \`number\`:\nvalue \`"hello world!"\` is not assignable to type: \`number\` (Value is not a number).`
+            `[mobx-state-tree] Error while converting \`"hello world!"\` to \`number\`:\n\n    value \`"hello world!"\` is not assignable to type: \`number\` (Value is not a number).`
         )
     }
 })
