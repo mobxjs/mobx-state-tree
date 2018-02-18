@@ -242,5 +242,5 @@ test("snapshot processors can be composed", t => {
         }))
     const x = X.create({ x: 25 })
     t.is(x.x, 2)
-    t.is(getSnapshot(x).x, 25)
+    t.is(getSnapshot<typeof X.SnapshotType>(x).x, 25)
 })

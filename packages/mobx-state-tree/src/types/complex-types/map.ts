@@ -100,11 +100,12 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         return map
     }
 
-    finalizeNewInstance = (node: ObjectNode, snapshot: any) => {
-        const instance = node.storedValue as ObservableMap<any>
-        extras.interceptReads(instance, node.unbox)
+    finalizeNewInstance = (node: INode, snapshot: any) => {
+        const objNode = node as ObjectNode
+        const instance = objNode.storedValue as ObservableMap<any>
+        extras.interceptReads(instance, objNode.unbox)
         intercept(instance, c => this.willChange(c))
-        node.applySnapshot(snapshot)
+        objNode.applySnapshot(snapshot)
         observe(instance, this.didChange)
     }
 

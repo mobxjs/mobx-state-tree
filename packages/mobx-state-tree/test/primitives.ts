@@ -46,5 +46,5 @@ test("Date can be rehydrated using unix timestamp", t => {
     t.is(store.date.getTime(), time.getTime())
     applySnapshot(store, { date: newTime })
     t.is(store.date.getTime(), newTime)
-    t.is(getSnapshot(store).date, newTime)
+    t.is(getSnapshot<typeof Factory.SnapshotType>(store).date, newTime)
 })

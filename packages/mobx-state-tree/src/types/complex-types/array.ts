@@ -61,11 +61,12 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return array
     }
 
-    finalizeNewInstance = (node: ObjectNode, snapshot: any) => {
-        const instance = node.storedValue as IObservableArray<any>
-        extras.getAdministration(instance).dehancer = node.unbox
+    finalizeNewInstance = (node: INode, snapshot: any) => {
+        const objNode = node as ObjectNode
+        const instance = objNode.storedValue as IObservableArray<any>
+        extras.getAdministration(instance).dehancer = objNode.unbox
         intercept(instance, change => this.willChange(change) as any)
-        node.applySnapshot(snapshot)
+        objNode.applySnapshot(snapshot)
         observe(instance, this.didChange)
     }
 

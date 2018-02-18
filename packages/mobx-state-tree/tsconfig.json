@@ -10,6 +10,8 @@
         "noImplicitAny": true,
         "moduleResolution": "node",
         "experimentalDecorators": true,
+        "strict": true,
+        "strictPropertyInitialization": false,
         "strictNullChecks": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
