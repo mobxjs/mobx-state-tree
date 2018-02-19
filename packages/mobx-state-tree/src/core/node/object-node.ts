@@ -220,22 +220,20 @@ export class ObjectNode implements INode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            const res = this.type.getChildNode(this, subpath)
+            return this.type.getChildNode(this, subpath)
         } finally {
             this._autoUnbox = true
         }
-        return res
     }
 
     getChildren(): INode[] {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            const res = this.type.getChildren(this)
+            return this.type.getChildren(this)
         } finally {
             this._autoUnbox = true
         }
-        return res
     }
 
     getChildType(key: string): IType<any, any> {
