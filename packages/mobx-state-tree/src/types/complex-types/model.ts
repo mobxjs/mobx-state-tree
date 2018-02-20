@@ -84,7 +84,7 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
             }
             // undefined and null are not valid
             const { value } = descriptor
-            if (value === null || undefined) {
+            if (value === null || value === undefined) {
                 fail(
                     "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
                 )
