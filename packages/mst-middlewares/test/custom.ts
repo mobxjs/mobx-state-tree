@@ -11,6 +11,13 @@ function customMiddleware1(call, next) {
 function customMiddleware2(call, next) {
     return next(call)
 }
+function customMiddleware3(call, next, abort) {
+    return abort("someValue")
+}
+function customMiddleware4(call, next, abort) {
+    error = Error("customMiddleware called even though the queue was aborted")
+    return next(call)
+}
 
 function noHooksMiddleware(call, next) {
     // thowing errors will lead to the aborting of further middlewares
@@ -35,10 +42,9 @@ const TestModel = types
         }
     })
 
-test("next() omitted within middleware", t => {
+test("next()/ abort() omitted within middleware", t => {
     const m = TestModel.create()
     addMiddleware(m, customMiddleware1)
-    addMiddleware(m, customMiddleware2)
     let thrownError: any = null
     try {
         m.inc(1)
@@ -46,6 +52,18 @@ test("next() omitted within middleware", t => {
         thrownError = e
     }
     t.is(!!thrownError, true)
+})
+
+test("abort() middleware queue", t => {
+    error = null
+    const m = TestModel.create()
+    addMiddleware(m, customMiddleware3) // contains abort()
+    addMiddleware(m, customMiddleware4) // would contain next() - should never be invoked
+
+    // the return value should be the one from the middleware 3
+    const valueFromMiddleware: any = m.inc(1)
+    t.is(valueFromMiddleware, "someValue")
+    t.is(!!error, false) // make sure the cutomMiddleware4 was never invoked
 })
 
 test("middleware should be invoked on hooks", t => {

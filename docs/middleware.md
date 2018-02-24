@@ -7,13 +7,13 @@ If a tree is protected (by default), this means that any mutation of the tree wi
 
 [SandBox example](https://codesandbox.io/s/mQrqy8j73)
 
-Middleware can be attached by using `addMiddleware(node, handler: (call, next(call) => void) => void)`
+Middleware can be attached by using `addMiddleware(node, handler: (call, next(call) => void, abort(value: any) => any) => void)`
 
 It is allowed to attach multiple middlewares. The order in which middleware is invoked is inside-out:
 local middleware is invoked before parent middleware. On the same object, earlier attached middleware is run before later attached middleware.
 
-A middleware handler receives two arguments: 1. the description of the the call, 2: a function to invoke the next middleware in the chain.
-If `next(call)` is not invoked by your middleware, the action will be aborted and not actually executed.
+A middleware handler receives three arguments: 1. the description of the the call, 2: a function to invoke the next middleware in the chain. 3: a function to abort the middleware queue and return a value.
+You must either call `next(call)` or `abort(value)` within a middleware. If none is invoked an error will be thrown.
 Before passing the call to the next middleware using `next`, feel free to (clone and) modify the call arguments. Other properties should not be modified
 
 A call description looks like:
@@ -44,9 +44,18 @@ A very simple middleware that just logs the invocation of actions will look like
 @example
 ```typescript
 const store = SomeStore.create()
-const disposer = addMiddleWare(store, (call, next) => {
+const disposer = addMiddleWare(store, (call, next, abort) => {
   console.log(`action ${call.name} was invoked`)
   return next(call) // runs the next middleware (or the implementation of the targeted action if there is no middleware to run left)
+})
+```
+
+@example
+```typescript
+const store = SomeStore.create()
+const disposer = addMiddleWare(store, (call, next, abort) => {
+  console.log(`action ${call.name} was invoked`)
+  return abort('value') // aborts running the middlewares and returns the 'value' instead. Note that the underlying action won't be invoked either.
 })
 ```
 

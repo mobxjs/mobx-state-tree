@@ -37,7 +37,8 @@ export type IMiddleware = {
 }
 export type IMiddlewareHandler = (
     actionCall: IMiddlewareEvent,
-    next: (actionCall: IMiddlewareEvent) => any
+    next: (actionCall: IMiddlewareEvent) => any,
+    abort: (value: any) => any
 ) => any
 
 let nextActionId = 1
@@ -166,20 +167,40 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
     // Short circuit
     if (!middlewares.length) return mobxAction(originalFn).apply(null, baseCall.args)
     let index = 0
+    let result: any = null
 
     function runNextMiddleware(call: IMiddlewareEvent): any {
         const middleware = middlewares[index++]
         const handler = middleware && middleware.handler
+        let nextInvoked = false
+        let abortInvoked = false
+        function next(call: IMiddlewareEvent) {
+            nextInvoked = true
+            // result should store the actual action return value/ abort value
+            result = runNextMiddleware(call)
+        }
+        function abort(value: any) {
+            abortInvoked = true
+            // result should store the actual action return value/ abort value
+            result = value
+        }
         const invokeHandler = () => {
-            const next = handler(call, runNextMiddleware)
-            if (!next && index < middlewares.length && process.env.NODE_ENV !== "production") {
+            handler(call, next, abort)
+            if (process.env.NODE_ENV !== "production" && !nextInvoked && !abortInvoked) {
                 const node = getStateTreeNode(call.tree)
                 fail(
-                    `The next() callback within a middleware for the action: "${call.name}" on the node: ${node
-                        .type.name} wasn't invoked.`
+                    `Neither the next() nor the abort() callback within a middleware for the action: "${call.name}" on the node: ${node
+                        .type.name} was invoked.`
                 )
             }
-            return next
+            if (process.env.NODE_ENV !== "production" && !!nextInvoked && !!abortInvoked) {
+                const node = getStateTreeNode(call.tree)
+                fail(
+                    `The next() and abort() callback within a middleware for the action: "${call.name}" on the node: ${node
+                        .type.name} was invoked.`
+                )
+            }
+            return result
         }
 
         if (handler && middleware.includeHooks) {
