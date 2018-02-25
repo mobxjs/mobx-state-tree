@@ -172,13 +172,6 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
         const handler = middleware && middleware.handler
         const invokeHandler = () => {
             const next = handler(call, runNextMiddleware)
-            if (!next && index < middlewares.length && process.env.NODE_ENV !== "production") {
-                const node = getStateTreeNode(call.tree)
-                fail(
-                    `The next() callback within a middleware for the action: "${call.name}" on the node: ${node
-                        .type.name} wasn't invoked.`
-                )
-            }
             return next
         }
 
