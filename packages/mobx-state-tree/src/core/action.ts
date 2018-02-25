@@ -186,19 +186,21 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
         }
         const invokeHandler = () => {
             handler(call, next, abort)
-            if (process.env.NODE_ENV !== "production" && !nextInvoked && !abortInvoked) {
-                const node = getStateTreeNode(call.tree)
-                fail(
-                    `Neither the next() nor the abort() callback within a middleware for the action: "${call.name}" on the node: ${node
-                        .type.name} was invoked.`
-                )
-            }
-            if (process.env.NODE_ENV !== "production" && !!nextInvoked && !!abortInvoked) {
-                const node = getStateTreeNode(call.tree)
-                fail(
-                    `The next() and abort() callback within a middleware for the action: "${call.name}" on the node: ${node
-                        .type.name} was invoked.`
-                )
+            if (process.env.NODE_ENV !== "production") {
+                if (!nextInvoked && !abortInvoked) {
+                    const node = getStateTreeNode(call.tree)
+                    fail(
+                        `Neither the next() nor the abort() callback within a middleware for the action: "${call.name}" on the node: ${node
+                            .type.name} was invoked.`
+                    )
+                }
+                if (!!nextInvoked && !!abortInvoked) {
+                    const node = getStateTreeNode(call.tree)
+                    fail(
+                        `The next() and abort() callback within a middleware for the action: "${call.name}" on the node: ${node
+                            .type.name} was invoked.`
+                    )
+                }
             }
             return result
         }
