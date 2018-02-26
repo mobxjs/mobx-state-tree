@@ -37,8 +37,8 @@ export type IMiddleware = {
 }
 export type IMiddlewareHandler = (
     actionCall: IMiddlewareEvent,
-    next: (actionCall: IMiddlewareEvent) => any,
-    abort: (value: any) => any
+    next: (actionCall: IMiddlewareEvent, callback?: (value: any) => any) => void,
+    abort: (value: any) => void
 ) => any
 
 let nextActionId = 1
@@ -174,14 +174,25 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
         const handler = middleware && middleware.handler
         let nextInvoked = false
         let abortInvoked = false
-        function next(call: IMiddlewareEvent) {
+
+        function next(call: IMiddlewareEvent): void
+        function next(call: IMiddlewareEvent, callback: (value: any) => any): void
+        function next(call: IMiddlewareEvent, callback?: (value: any) => any) {
             nextInvoked = true
-            // result should store the actual action return value/ abort value
-            result = runNextMiddleware(call)
+            // the result can contain
+            // - the non manipulated return value from an action
+            // - the non manipulated abort value
+            // - one of the above but manipulated through the callback function
+            if (callback) {
+                result = callback(runNextMiddleware(call) || result)
+            } else {
+                result = runNextMiddleware(call)
+            }
         }
         function abort(value: any) {
             abortInvoked = true
-            // result should store the actual action return value/ abort value
+            // overwrite the result
+            // can be manipulated through middlewares earlier in the queue using the callback fn
             result = value
         }
         const invokeHandler = () => {
