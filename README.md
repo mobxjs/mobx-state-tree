@@ -923,6 +923,7 @@ See the [full API docs](API.md) for more details.
 | [`getPathParts(node)`](API.md#getpathparts) | Returns the path of `node` in the tree, unescaped as separate parts |
 | [`getRelativePath(base, target)`](API.md#getrelativepath) | Returns the short path, which one could use to walk from node `base` to node `target`, assuming they are in the same tree. Up is represented as `../` |
 | [`getRoot(node)`](API.md#getroot) | Returns the root element of the tree containing `node` |
+| [`getIdentifier(node, property?)`](API.md#getidentifier) | Returns the identifier of the given element, or of the given property` |
 | [`getSnapshot(node)`](API.md#getsnapshot) | Returns the snapshot of the `node`. See [snapshots](#snapshots) |
 | [`getType(node)`](API.md#gettype) | Returns the type of `node` |
 | [`hasParent(node, depth=1)`](API.md#hasparent) | Returns `true` if `node` has a parent at `depth` |
