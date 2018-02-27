@@ -460,7 +460,10 @@ export function resolveIdentifier(
  * @param {string} property
  * @returns {(string | null)}
  */
-export function getIdentifier<T>(target: T, property?: keyof T): string | null {
+export function getIdentifier<T extends IStateTreeNode>(
+    target: T,
+    property?: keyof T
+): string | null {
     // check all arguments
 
     if (process.env.NODE_ENV !== "production") {
