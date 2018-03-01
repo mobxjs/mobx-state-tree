@@ -347,16 +347,13 @@ Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 Given an object in a model tree, returns the root object of that tree
 
-## getIdentifier(node, property?)
+## getIdentifier(node)
 
-Returns the identifier of the given node. If a property is given returns the identifier of that property. If the node or property
-does not have an identifier, returns null
+Returns the identifier of the given node.
 
 **Parameters**
 
 -   `node` **IStateTreeNode** 
--   `property?` **string** 
-
 
 
 Returns **string | null** 

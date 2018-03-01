@@ -452,18 +452,13 @@ export function resolveIdentifier(
 }
 
 /**
- * Returns the identifier of the target node. If a property is supplied returns the identifier
- * of the property even if it is a reference to a missing object.
+ * Returns the identifier of the target node.
  *
  * @export
  * @param {IStateTreeNode} target
- * @param {string} property
- * @returns {(string | null)}
+  * @returns {(string | null)}
  */
-export function getIdentifier<T extends IStateTreeNode>(
-    target: T,
-    property?: keyof T
-): string | null {
+export function getIdentifier(target: IStateTreeNode): string | null {
     // check all arguments
 
     if (process.env.NODE_ENV !== "production") {
@@ -471,25 +466,7 @@ export function getIdentifier<T extends IStateTreeNode>(
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
 
-    if (property === "$treenode") {
-        return null
-    }
-
-    if (!property) {
-        return getStateTreeNode(target).identifier
-    } else {
-        const propertyNode: INode = getStateTreeNode(target).getChildNode(property)
-        if (!isReferenceType(propertyNode.type)) {
-            return null
-        } else {
-            // if mode is 'object' then the value is a node
-            if (propertyNode.storedValue.mode === "identifier") {
-                return propertyNode.storedValue.value
-            } else {
-                return getStateTreeNode(propertyNode.storedValue.value).identifier
-            }
-        }
-    }
+    return getStateTreeNode(target).identifier
 }
 
 /**

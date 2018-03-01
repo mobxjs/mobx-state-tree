@@ -74,55 +74,15 @@ test("it should resolve to the root of an object", t => {
 // getIdentifier
 
 test("it should resolve to the identifier of the object", t => {
-    const Person = types.model("Person", {
+    const Document = types.model("Document", {
         id: types.identifier(types.string)
     })
-    const Document = types.model("Document", {
-        author: types.reference(Person),
-        id: types.identifier(types.string),
-        pageCount: types.number
-    })
     const doc = Document.create({
-        author: "person_1",
-        id: "document_1",
-        pageCount: 32
+        id: "document_1"
     })
-
-    // direct access throws
-    t.throws(() => {
-        const authorId = doc.author
-    })
-
-    // unfortunatly '$treenode' is accepted by the compile-time type checks
-    t.is(getIdentifier(doc, "$treenode"), null)
 
     // get identifier of object
     t.is(getIdentifier(doc), "document_1")
-
-    // get identifier of non-existent reference
-    t.is(getIdentifier(doc, "author"), "person_1")
-
-    // attempt to get identifier of scalar type
-    t.is(getIdentifier(doc, "pageCount"), null)
-
-    const Container = types.model("Container", {
-        person: Person,
-        doc: Document
-    })
-
-    const container = Container.create({
-        doc: Document.create({
-            author: "person_2",
-            id: "document_2",
-            pageCount: 12
-        }),
-        person: Person.create({
-            id: "person_2"
-        })
-    })
-
-    // get identifier of existing reference
-    t.is(getIdentifier(container.doc, "author"), "person_2")
 })
 
 // getPath
