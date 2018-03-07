@@ -422,3 +422,19 @@ test("it should extend types correctly", t => {
     x.log("z")
     t.pass()
 })
+
+test("self referring views", t => {
+    const Car = types.model({ x: 3 }).views(self => {
+        const views = {
+            get tripple() {
+                return self.x + views.double
+            },
+            get double() {
+                return self.x * 2
+            }
+        }
+        return views
+    })
+    t.is(Car.create().tripple, 9)
+    t.pass()
+})
