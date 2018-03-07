@@ -938,7 +938,10 @@ See the [full API docs](API.md) for more details.
 | [`protect(node)`](API.md#protect) | Protects an unprotected tree against modifications from outside actions |
 | [`recordActions(node)`](API.md#recordactions) | Creates a recorder that listens to all actions in `node`. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
 | [`recordPatches(node)`](API.md#recordpatches) | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree |
+| [`getMembers(node)`](API.md#getMembers) | Returns the model name, properties, actions, views, volatiles |
 | [`resolve(node, path)`](API.md#resolve) | Resolves a `path` (json path) relatively to the given `node` |
+| [`resolveIdentifier(type, target, identifier)`](API.md#resolveidentifier) | resolves an identifier of a given type in a model tree |
+| [`resolvePath(target, path)`](API.md#resolvepath) | resolves a JSON path, starting at the specified target |
 | [`splitJsonPath(path)`](API.md#splitjsonpath) | Splits and unescapes the given JSON `path` into path parts |
 | [`typecheck(type, value)`](API.md#typecheck) | Typechecks a value against a type. Throws on errors. Use this if you need typechecks even in a production build. |
 | [`tryResolve(node, path)`](API.md#tryresolve) | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
@@ -946,8 +949,6 @@ See the [full API docs](API.md) for more details.
 | [`walk(startNode, (node) => void)`](API.md#walk) | Performs a depth-first walk through a tree |
 | [`escapeJsonPath(path)`](API.md#escapejsonpath) | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
 | [`unescapeJsonPath(path)`](API.md#unescapejsonpath) | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901 |
-| [`resolveIdentifier(type, target, identifier)`](API.md#resolveidentifier) | resolves an identifier of a given type in a model tree |
-| [`resolvePath(target, path)`](API.md#resolvepath) | resolves a JSON path, starting at the specified target |
 
 A _disposer_ is a function that cancels the effect it was created for.
 

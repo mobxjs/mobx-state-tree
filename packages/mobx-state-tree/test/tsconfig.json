@@ -2,6 +2,7 @@
     "compilerOptions": {
         "rootDir": "../",
         "module": "commonjs",
+        "lib": ["es2017"],
         "target": "es2015",
         "noImplicitAny": false,
         "noImplicitThis": true,
