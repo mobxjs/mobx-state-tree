@@ -1111,6 +1111,8 @@ Yes, with MST it is pretty straight forward to setup hot reloading for your stor
 
 ### TypeScript & MST
 
+__Important: TypeScript 2.7 is currently *not* supported__ Use 2.6. TypeScript 2.8 will be supported in the future.
+
 TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is recommended to use TypeScript 2.3 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
 
 When using models, you write an interface, along with its property types, that will be used to perform type checks at runtime.
@@ -1133,6 +1135,7 @@ type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { 
 
 Due to the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes a lot of CPU time and freeze vscode (or others)
 A partial solution for this is to turn the `.Type` into an interface.
+
 ```ts
 type ITodoType = typeof Todo.Type;
 interface ITodo extends ITodoType {};
@@ -1155,12 +1158,9 @@ const Todo = TodoState
     }))
 ```
 
-\<assumption>
-It's possible that the reason for this slowdown is that MST types are based on infers, and each time your IDE/tsserver want to show type information for an expression, it needs to recalcued the entire model (And the entire subtree).
-Seems like giving it an real interface name turning on tsserver cache mechanizm, that recalculate it only on invalidation.
-\</assumption>
-
 Sometimes you'll need to take into account where your typings are available and where they aren't. The code below will not compile: TypeScript will complain that `self.upperProp` is not a known property. Computed properties are only available after `.views` is evaluated.
+
+The type of `self` is what `self` was **before the action or views blocks starts**, and only after that part finishes, the actions will be added to the type of `self`.
 
 ```typescript
 const Example = types
@@ -1182,7 +1182,25 @@ You can circumvent this situation by declaring the views in two steps:
 ```typescript
 const Example = types
   .model('Example', { prop: types.string })
-  .views(self => ({
+  .views(self => {
+      const views = {
+        get upperProp(): string {
+            return self.prop.toUpperCase();
+        },
+        get twiceUpperProp(): string {
+            return views.upperProp + views.upperProp;
+        }
+      }
+      return views
+  }))
+```
+
+Note that you can also declare multple `.views` block, in which case the `self` parameter gets extended after each block
+
+```typescript
+const Example = types
+  .model('Example', { prop: types.string })
+  .views(self => {
     get upperProp(): string {
       return self.prop.toUpperCase();
     },
@@ -1194,27 +1212,30 @@ const Example = types
   }));
 ```
 
-Another approach would be to use helper functions, as demonstrated in the following code. This definition allows for circular references, but is more verbose.
+Similarly, when writing actions or views one can use helper functions:
 
 ```typescript
+import { types, flow } from "mobx-state-tree"
+
 const Example = types
   .model('Example', { prop: types.string })
-  .views(self => {
-    function upperProp(): string {
-      return self.prop.toUpperCase();
-    }
-    function twiceUpperProp(): string {
-      return upperProp() + upperProp();
-    }
+  .actions(self => {
+    // Don't forget that async operations HAVE
+    // to use `flow( ... )`.
+    const fetchData = flow(function *fetchData() {
+      yield doSomething()
+    })
 
     return {
-      get upperProp(): string {
-        return upperProp();
-      },
-      get twiceUpperProp(): string {
-        return twiceUpperProp();
-      },
-    };
+      fetchData,
+      afterCreate() {
+        // Notice that we call the function directly
+        // instead of using `self.fetchData()`. This is
+        // because Typescript doesn't know yet about `fetchData()`
+        // being part of `self` in this context.
+        fetchData()
+      }
+    }
   });
 ```
 
