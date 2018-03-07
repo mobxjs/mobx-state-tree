@@ -81,7 +81,8 @@ export {
     IActionRecorder,
     ISerializedActionCall,
     recordActions,
-    createActionTrackingMiddleware
+    createActionTrackingMiddleware,
+    Snapshot
 } from "./internal"
 
 export * from "./core/mst-operations"
