@@ -1,4 +1,4 @@
-import { IObservableArray, ObservableMap } from "mobx"
+import { IObservableArray, ObservableMap, isObservable, isComputed } from "mobx"
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -673,13 +673,27 @@ export function getMembers(target: IStateTreeNode): IModelReflectionData {
             )
     }
     const node: any = getStateTreeNode(target)
+    const type = node.type as ModelType<any, any>
+    const props = Object.getOwnPropertyNames(target)
     const reflected: IModelReflectionData = {
-        name: node.type.name,
-        properties: node.members.properties,
-        actions: Object.keys(node.members.actions),
-        volatile: Object.keys(node.members.volatile),
-        views: Object.keys(node.members.views)
+        name: type.name,
+        properties: { ...type.properties },
+        actions: [],
+        volatile: [],
+        views: []
     }
+    props.forEach(key => {
+        if (key in reflected.properties) return
+        const descriptor = Object.getOwnPropertyDescriptor(target, key)!
+        if (descriptor.get) {
+            if (isComputed(target, key)) reflected.views.push(key)
+            else reflected.volatile.push(key)
+            return
+        }
+        if (descriptor.value._isMSTAction === true) reflected.actions.push(key)
+        else if (isObservable(target, key)) reflected.volatile.push(key)
+        else reflected.views.push(key)
+    })
     return reflected
 }
 
@@ -699,6 +713,5 @@ import {
     isType,
     resolveNodeByPath,
     getRelativePathBetweenNodes,
-    ObjectNode,
     ModelType
 } from "../internal"

@@ -17,7 +17,6 @@ import {
     EMPTY_ARRAY,
     EMPTY_OBJECT,
     addHiddenFinalProp,
-    addReadOnlyProp,
     createNode,
     getStateTreeNode,
     IStateTreeNode,
@@ -38,8 +37,7 @@ import {
     getContextForPath,
     getPrimitiveFactoryFromValue,
     optional,
-    ObjectNode,
-    extendKeepGetter
+    ObjectNode
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -59,7 +57,7 @@ function objectTypeToString(this: any) {
 export type ModelTypeConfig = {
     name?: string
     properties?: { [K: string]: IType<any, any> }
-    initializers?: ReadonlyArray<((instance: any, node: ObjectNode) => any)>
+    initializers?: ReadonlyArray<((instance: any) => any)>
     preProcessor?: (snapshot: any) => any
 }
 
@@ -122,7 +120,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     /*
      * The original object definition
      */
-    public readonly initializers: ((instance: any, node: ObjectNode) => any)[]
+    public readonly initializers: ((instance: any) => any)[]
     public readonly properties: { [K: string]: IType<any, any> }
     private preProcessor: (snapshot: any) => any | undefined
     private readonly propertiesNames: string[]
@@ -149,20 +147,17 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     }
 
     actions<A extends { [name: string]: Function }>(fn: (self: T) => A): IModelType<S, T & A> {
-        const actionInitializer = (self: T, node: ObjectNode) => {
-            this.instantiateActions(self, fn(self), node)
+        const actionInitializer = (self: T) => {
+            this.instantiateActions(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [actionInitializer] })
     }
 
-    instantiateActions(self: T, actions: { [name: string]: Function }, node: ObjectNode) {
+    instantiateActions(self: T, actions: { [name: string]: Function }) {
         // check if return is correct
         if (!isPlainObject(actions))
             fail(`actions initializer should return a plain object containing actions`)
-
-        node.members.actions = extendKeepGetter({}, node.members.actions, actions)
-
         // bind actions to the object created
         Object.keys(actions).forEach(name => {
             // warn if preprocessor was given
@@ -201,19 +196,18 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     }
 
     volatile<TP>(fn: (self: T) => TP): IModelType<S, T & TP> {
-        const stateInitializer = (self: T, node: ObjectNode) => {
-            this.instantiateVolatileState(self, fn(self), node)
+        const stateInitializer = (self: T) => {
+            this.instantiateVolatileState(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [stateInitializer] })
     }
 
-    instantiateVolatileState(self: T, state: Object, node: ObjectNode) {
+    instantiateVolatileState(self: T, state: Object) {
         // check views return
         if (!isPlainObject(state))
             fail(`state initializer should return a plain object containing views`)
         // TODO: typecheck & namecheck members of state?
-        node.members.volatile = extendKeepGetter({}, node.members.volatile, state)
         extendShallowObservable(self, state)
     }
 
@@ -224,35 +218,32 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     >(
         fn: (self: T & IStateTreeNode) => { actions?: A; views?: V; state?: VS }
     ): IModelType<S, T & A & V & VS> {
-        const initializer = (self: T, node: ObjectNode) => {
+        const initializer = (self: T) => {
             const { actions, views, state, ...rest } = fn(self)
             for (let key in rest)
                 fail(
                     `The \`extend\` function should return an object with a subset of the fields 'actions', 'views' and 'state'. Found invalid key '${key}'`
                 )
-            if (state) this.instantiateVolatileState(self, state, node)
-            if (views) this.instantiateViews(self, views, node)
-            if (actions) this.instantiateActions(self, actions, node)
+            if (state) this.instantiateVolatileState(self, state)
+            if (views) this.instantiateViews(self, views)
+            if (actions) this.instantiateActions(self, actions)
             return self
         }
         return this.cloneAndEnhance({ initializers: [initializer] })
     }
 
     views<V extends Object>(fn: (self: T) => V): IModelType<S, T & V> {
-        const viewInitializer = (self: T, node: ObjectNode) => {
-            this.instantiateViews(self, fn(self), node)
+        const viewInitializer = (self: T) => {
+            this.instantiateViews(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [viewInitializer] })
     }
 
-    instantiateViews(self: T, views: Object, node: ObjectNode) {
+    instantiateViews(self: T, views: Object) {
         // check views return
         if (!isPlainObject(views))
             fail(`views initializer should return a plain object containing views`)
-
-        node.members.views = extendKeepGetter({}, node.members.views, views)
-
         Object.keys(views).forEach(key => {
             // is this a computed property?
             const descriptor = Object.getOwnPropertyDescriptor(views, key)!
@@ -329,7 +320,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             extras.interceptReads(instance, name, node.unbox)
         })
 
-        this.initializers.reduce((self, fn) => fn(self, node), instance)
+        this.initializers.reduce((self, fn) => fn(self), instance)
         intercept(instance, change => this.willChange(change))
         observe(instance, this.didChange)
     }
