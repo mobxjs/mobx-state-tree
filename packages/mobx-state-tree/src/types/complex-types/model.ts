@@ -207,7 +207,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     instantiateVolatileState(self: T, state: Object) {
         // check views return
         if (!isPlainObject(state))
-            fail(`state initializer should return a plain object containing views`)
+            fail(`volatile state initializer should return a plain object containing state`)
         // TODO: typecheck & namecheck members of state?
         extendShallowObservable(self, state)
     }
