@@ -42,12 +42,12 @@ import {
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 
-const HOOK_NAMES = {
-    afterCreate: "afterCreate",
-    afterAttach: "afterAttach",
-    postProcessSnapshot: "postProcessSnapshot",
-    beforeDetach: "beforeDetach",
-    beforeDestroy: "beforeDestroy"
+export enum HookNames {
+    afterCreate = "afterCreate",
+    afterAttach = "afterAttach",
+    postProcessSnapshot = "postProcessSnapshot",
+    beforeDetach = "beforeDetach",
+    beforeDestroy = "beforeDestroy"
 }
 
 function objectTypeToString(this: any) {
@@ -72,7 +72,7 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
     return Object.keys(properties).reduce(
         (properties, key) => {
             // warn if user intended a HOOK
-            if (key in HOOK_NAMES)
+            if (key in HookNames)
                 return fail(
                     `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
                 )
@@ -169,9 +169,9 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             // apply hook composition
             let action = actions[name]
             let baseAction = (self as any)[name]
-            if (name in HOOK_NAMES && baseAction) {
+            if (name in HookNames && baseAction) {
                 let specializedAction = action
-                if (name === HOOK_NAMES.postProcessSnapshot)
+                if (name === HookNames.postProcessSnapshot)
                     action = (snapshot: any) => specializedAction(baseAction(snapshot))
                 else
                     action = function() {
@@ -383,8 +383,9 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             ;(extras.getAtom(node.storedValue, name) as any).reportObserved()
             res[name] = this.getChildNode(node, name).snapshot
         })
-        if (typeof node.storedValue.postProcessSnapshot === "function")
+        if (typeof node.storedValue.postProcessSnapshot === "function") {
             return node.storedValue.postProcessSnapshot.call(null, res)
+        }
         return res
     }
 

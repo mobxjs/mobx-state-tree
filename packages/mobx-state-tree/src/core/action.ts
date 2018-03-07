@@ -7,7 +7,8 @@ import {
     IDisposer,
     getRoot,
     EMPTY_ARRAY,
-    ObjectNode
+    ObjectNode,
+    HookNames
 } from "../internal"
 
 export type IMiddlewareEventType =
@@ -30,6 +31,10 @@ export type IMiddlewareEvent = {
     args: any[]
 }
 
+export type IMiddleware = {
+    handler: IMiddlewareHandler
+    includeHooks: boolean
+}
 export type IMiddlewareHandler = (
     actionCall: IMiddlewareEvent,
     next: (actionCall: IMiddlewareEvent) => any
@@ -98,7 +103,11 @@ export function createActionInvoker<T extends Function>(
  * @param {(action: IRawActionCall, next: (call: IRawActionCall) => any) => any} middleware
  * @returns {IDisposer}
  */
-export function addMiddleware(target: IStateTreeNode, middleware: IMiddlewareHandler): IDisposer {
+export function addMiddleware(
+    target: IStateTreeNode,
+    middleware: IMiddlewareHandler,
+    includeHooks: boolean = true
+): IDisposer {
     const node = getStateTreeNode(target)
     if (process.env.NODE_ENV !== "production") {
         if (!node.isProtectionEnabled)
@@ -106,7 +115,7 @@ export function addMiddleware(target: IStateTreeNode, middleware: IMiddlewareHan
                 "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
             )
     }
-    return node.addMiddleWare(middleware)
+    return node.addMiddleWare(middleware, includeHooks)
 }
 
 export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn: T): T
@@ -128,41 +137,54 @@ export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn:
  *
  * @export
  * @template T
- * @param {IMiddlewareHandler} middleware
+ * @param {IMiddlewareHandler} handler
  * @param Function} fn
  * @returns the original function
  */
-export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn: any) {
+export function decorate<T extends Function>(handler: IMiddlewareHandler, fn: any) {
+    const middleware: IMiddleware = { handler, includeHooks: true }
     if (fn.$mst_middleware) fn.$mst_middleware.push(middleware)
     else fn.$mst_middleware = [middleware]
     return fn
 }
 
-function collectMiddlewareHandlers(
+function collectMiddlewares(
     node: ObjectNode,
     baseCall: IMiddlewareEvent,
     fn: Function
-): IMiddlewareHandler[] {
-    let handlers: IMiddlewareHandler[] = (fn as any).$mst_middleware || EMPTY_ARRAY
+): IMiddleware[] {
+    let middlewares: IMiddleware[] = (fn as any).$mst_middleware || EMPTY_ARRAY
     let n: ObjectNode | null = node
     // Find all middlewares. Optimization: cache this?
     while (n) {
-        if (n.middlewares) handlers = handlers.concat(n.middlewares)
+        if (n.middlewares) middlewares = middlewares.concat(n.middlewares)
         n = n.parent
     }
-    return handlers
+    return middlewares
 }
 
 function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn: Function): any {
-    const handlers = collectMiddlewareHandlers(node, baseCall, originalFn)
+    const middlewares = collectMiddlewares(node, baseCall, originalFn)
     // Short circuit
-    if (!handlers.length) return mobxAction(originalFn).apply(null, baseCall.args)
+    if (!middlewares.length) return mobxAction(originalFn).apply(null, baseCall.args)
     let index = 0
 
     function runNextMiddleware(call: IMiddlewareEvent): any {
-        const handler = handlers[index++]
-        if (handler) return handler(call, runNextMiddleware)
-        else return mobxAction(originalFn).apply(null, baseCall.args)
+        const middleware = middlewares[index++]
+        const handler = middleware && middleware.handler
+        const invokeHandler = () => {
+            const next = handler(call, runNextMiddleware)
+            return next
+        }
+
+        if (handler && middleware.includeHooks) {
+            return invokeHandler()
+        } else if (handler && !middleware.includeHooks) {
+            if ((HookNames as any)[call.name]) return runNextMiddleware(call)
+            return invokeHandler()
+        } else {
+            return mobxAction(originalFn).apply(null, baseCall.args)
+        }
     }
     return runNextMiddleware(baseCall)
 }

@@ -33,6 +33,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [getSnapshot](#getsnapshot)
 -   [getType](#gettype)
 -   [hasParent](#hasparent)
+-   [hooks](#hooks)
 -   [Identifier](#identifier)
 -   [IdentifierCache](#identifiercache)
 -   [isAlive](#isalive)
@@ -125,7 +126,11 @@ For more details, see the [middleware docs](docs/middleware.md)
 **Parameters**
 
 -   `target` **IStateTreeNode** 
--   `middleware`  
+-   `middleware`  **IMiddleware**
+-   `includeHooks` **([boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | any)** indicates whether the [hooks](#hooks) should be piped to the middleware.
+
+See [hooks](#hooks) for more information.
+
 
 Returns **IDisposer** 
 
@@ -208,7 +213,7 @@ Binds middleware to a specific action
 
 **Parameters**
 
--   `middleware` **IMiddlewareHandler** 
+-   `handler` **IMiddlewareHandler** 
 -   `fn`  
 -   `Function`  } fn
 
@@ -385,6 +390,27 @@ Given a model instance, returns `true` if the object has a parent, that is, is p
 -   `depth` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** = 1, how far should we look upward?
 
 Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+
+## hooks
+
+The current action based LifeCycle hooks for [types.model](#types.model).
+
+```typescript
+enum HookNames {
+    afterCreate = "afterCreate",
+    afterAttach = "afterAttach",
+    postProcessSnapshot = "postProcessSnapshot",
+    beforeDetach = "beforeDetach",
+    beforeDestroy = "beforeDestroy"
+}
+```
+
+Note: 
+Unlike the other hooks, `preProcessSnapshot` is not created as part of the actions initializer, but directly on the type.
+`preProcessSnapshot` is currently not piped to middlewares. 
+
+For more details on middlewares, see the [middleware docs](docs/middleware.md) 
+
 
 ## Identifier
 

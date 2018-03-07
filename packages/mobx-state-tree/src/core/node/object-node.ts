@@ -15,6 +15,7 @@ import {
     registerEventHandler,
     addReadOnlyProp,
     walk,
+    IMiddleware,
     IMiddlewareHandler,
     createActionInvoker,
     NodeLifeCycle,
@@ -44,7 +45,7 @@ export class ObjectNode implements INode {
     protected _autoUnbox = true // unboxing is disabled when reading child nodes
     state = NodeLifeCycle.INITIALIZING
 
-    middlewares = EMPTY_ARRAY as IMiddlewareHandler[]
+    middlewares = EMPTY_ARRAY as IMiddleware[]
     private snapshotSubscribers: ((snapshot: any) => void)[]
     private patchSubscribers: ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)[]
     private disposers: (() => void)[]
@@ -405,8 +406,15 @@ export class ObjectNode implements INode {
         this.disposers.unshift(disposer)
     }
 
-    addMiddleWare(handler: IMiddlewareHandler) {
-        return registerEventHandler(this.middlewares, handler)
+    removeMiddleware(handler: IMiddlewareHandler) {
+        this.middlewares = this.middlewares.filter(middleware => middleware.handler !== handler)
+    }
+
+    addMiddleWare(handler: IMiddlewareHandler, includeHooks: boolean = true) {
+        this.middlewares.push({ handler, includeHooks })
+        return () => {
+            this.removeMiddleware(handler)
+        }
     }
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
