@@ -24,7 +24,7 @@ test("it should avoid processing patch if is exactly the current one in reconcil
     })
     const store = RootModel.create({ a: { a: 1, b: "hello" } })
     unprotect(store)
-    const snapshot = getSnapshot(store)
+    const snapshot = getSnapshot<typeof Model.SnapshotType>(store)
     store.a = snapshot.a
     t.is(getSnapshot(store.a), snapshot.a)
     t.deepEqual(getSnapshot(store), snapshot)

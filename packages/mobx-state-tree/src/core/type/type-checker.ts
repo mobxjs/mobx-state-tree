@@ -124,7 +124,7 @@ export function typecheckPublic(type: IType<any, any>, value: any): void {
     const errors = type.validate(value, [{ path: "", type }])
 
     if (errors.length > 0) {
-        console.error("Failed to create `${type.name}` from:", value)
+        console.error(`Failed to create "${type.name}" from:`, value)
         fail(
             `Error while converting ${shortenPrintValue(
                 prettyPrintValue(value)

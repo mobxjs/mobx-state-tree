@@ -121,7 +121,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
      * The original object definition
      */
     public readonly initializers: ((instance: any) => any)[]
-    public readonly properties: { [K: string]: IType<any, any> }
+    public readonly properties: { [K: string]: IType<any, any> } = {}
     private preProcessor: (snapshot: any) => any | undefined
     private readonly propertiesNames: string[]
 
@@ -190,7 +190,8 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     }
 
     props<SP, TP>(
-        properties: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
+        properties: { [K in keyof TP]: IType<any, TP[K]> | TP[K] } &
+            { [K in keyof SP]: IType<SP[K], any> | SP[K] }
     ): IModelType<S & SP, T & TP> {
         return this.cloneAndEnhance({ properties } as any)
     }
@@ -309,15 +310,16 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return instance as Object
     }
 
-    finalizeNewInstance = (node: ObjectNode, snapshot: any) => {
-        const instance = node.storedValue as IStateTreeNode
+    finalizeNewInstance = (node: INode, snapshot: any) => {
+        const objNode = node as ObjectNode
+        const instance = objNode.storedValue as IStateTreeNode
         this.forAllProps((name, type) => {
             extendShallowObservable(instance, {
                 [name]: observable.ref(
-                    type.instantiate(node, name, node._environment, snapshot[name])
+                    type.instantiate(objNode, name, objNode._environment, snapshot[name])
                 )
             })
-            extras.interceptReads(instance, name, node.unbox)
+            extras.interceptReads(instance, name, objNode.unbox)
         })
 
         this.initializers.reduce((self, fn) => fn(self), instance)
@@ -493,10 +495,10 @@ export function model<T = {}>(properties?: IModelProperties<T>): IModelType<Snap
  * @export
  * @alias types.model
  */
-export function model(...args: any[]) {
+export function model<T = {}>(...args: any[]): IModelType<Snapshot<T>, T> {
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
     const properties = args.shift() || {}
-    return new ModelType({ name, properties })
+    return new ModelType({ name, properties }) as IModelType<Snapshot<T>, T>
 }
 
 export function compose<T1, S1, T2, S2, T3, S3>(
