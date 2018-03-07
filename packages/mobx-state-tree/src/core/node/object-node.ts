@@ -23,10 +23,7 @@ import {
     escapeJsonPath,
     addHiddenFinalProp,
     toJSON,
-    joinJsonPath,
     freeze,
-    IStateTreeNode,
-    resolvePath,
     resolveNodeByPathParts
 } from "../../internal"
 

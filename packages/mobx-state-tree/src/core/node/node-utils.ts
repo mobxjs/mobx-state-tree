@@ -30,6 +30,13 @@ export type IStateTreeNode = {
     readonly $treenode?: any
 }
 
+export interface IMembers {
+    properties: { [name: string]: IType<any, any> }
+    actions: Object
+    views: Object
+    volatile: Object
+}
+
 /**
  * Returns true if the given value is a node in a state tree.
  * More precisely, that is, if the value is an instance of a

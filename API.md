@@ -47,6 +47,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [protect](#protect)
 -   [recordActions](#recordactions)
 -   [recordPatches](#recordpatches)
+-   [getMembers](#getMembers)
 -   [resolveIdentifier](#resolveidentifier)
 -   [resolvePath](#resolvepath)
 -   [StoredReference](#storedreference)
@@ -579,6 +580,28 @@ export interface IPatchRecorder {
 ```
 
 Returns **IPatchRecorder** 
+
+## getMembers
+
+Returns the model name, properties, actions, views, volatiles of a node.
+
+**Parameters**
+
+-   `target` **IStateTreeNode** 
+
+**Examples**
+
+```javascript
+export interface IModelReflectionData {
+    name: string
+    properties: { [K: string]: IType<any, any> }
+    actions: string[]
+    views: string[]
+    volatile: string[]
+}
+```
+
+Returns **IModelReflectionData** 
 
 ## resolveIdentifier
 

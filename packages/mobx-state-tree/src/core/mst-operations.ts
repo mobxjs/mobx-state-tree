@@ -1,4 +1,4 @@
-import { IObservableArray, ObservableMap } from "mobx"
+import { IObservableArray, ObservableMap, isObservable, isComputed } from "mobx"
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -647,6 +647,56 @@ export function walk(target: IStateTreeNode, processor: (item: IStateTreeNode) =
     processor(node.storedValue)
 }
 
+export interface IModelReflectionData {
+    name: string
+    properties: { [K: string]: IType<any, any> }
+    actions: string[]
+    views: string[]
+    volatile: string[]
+}
+/**
+ * Returns a reflection of the node
+ *
+ * @export
+ * @param {IStateTreeNode} target
+ * @returns {IModelReflectionData}
+ */
+export function getMembers(target: IStateTreeNode): IModelReflectionData {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        const node: any = getStateTreeNode(target)
+        if (!(node.type instanceof ModelType))
+            fail(
+                "expected the node's type to be of the type: model" +
+                    target +
+                    " instead. It's likely you passed an array or a map."
+            )
+    }
+    const node: any = getStateTreeNode(target)
+    const type = node.type as ModelType<any, any>
+    const props = Object.getOwnPropertyNames(target)
+    const reflected: IModelReflectionData = {
+        name: type.name,
+        properties: { ...type.properties },
+        actions: [],
+        volatile: [],
+        views: []
+    }
+    props.forEach(key => {
+        if (key in reflected.properties) return
+        const descriptor = Object.getOwnPropertyDescriptor(target, key)!
+        if (descriptor.get) {
+            if (isComputed(target, key)) reflected.views.push(key)
+            else reflected.volatile.push(key)
+            return
+        }
+        if (descriptor.value._isMSTAction === true) reflected.actions.push(key)
+        else if (isObservable(target, key)) reflected.volatile.push(key)
+        else reflected.views.push(key)
+    })
+    return reflected
+}
+
 import {
     INode,
     getStateTreeNode,
@@ -662,5 +712,6 @@ import {
     IType,
     isType,
     resolveNodeByPath,
-    getRelativePathBetweenNodes
+    getRelativePathBetweenNodes,
+    ModelType
 } from "../internal"

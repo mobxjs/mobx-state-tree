@@ -67,7 +67,7 @@ export function createActionInvoker<T extends Function>(
     name: string,
     fn: T
 ) {
-    return function() {
+    const res = function() {
         const id = getNextActionId()
         return runWithActionContext(
             {
@@ -83,6 +83,8 @@ export function createActionInvoker<T extends Function>(
             fn
         )
     }
+    ;(res as any)._isMSTAction = true
+    return res
 }
 
 /**
