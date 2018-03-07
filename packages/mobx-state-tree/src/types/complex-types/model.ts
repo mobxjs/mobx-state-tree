@@ -191,7 +191,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
 
     props<SP, TP>(
         properties: { [K in keyof TP]: IType<any, TP[K]> } & { [K in keyof SP]: IType<SP[K], any> }
-    ): IModelType<S & SP, T & TP> {
+    ): IModelType<S & SP & Snapshot<SP>, T & TP> {
         return this.cloneAndEnhance({ properties } as any)
     }
 
@@ -457,7 +457,7 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
         props: { [K in keyof TP]: IType<any, TP[K]> | TP[K] } &
             { [K in keyof SP]: IType<SP[K], any> | SP[K] }
     ): IModelType<S & Snapshot<SP>, T & TP>
-    //props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
+    props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
     views<V extends Object>(fn: (self: T & IStateTreeNode) => V): IModelType<S, T & V>
     actions<A extends { [name: string]: Function }>(
         fn: (self: T & IStateTreeNode) => A
@@ -480,11 +480,12 @@ export type Snapshot<T> = {
     [K in keyof T]?: Snapshot<T[K]> | any // Any because we cannot express conditional types yet, so this escape is needed for refs and such....
 }
 
+export function model<T = {}>(): IModelType<T | Snapshot<T>, T>
+export function model<T = {}>(properties: IModelProperties<T>): IModelType<Snapshot<T>, T>
 export function model<T = {}>(
     name: string,
-    properties?: IModelProperties<T>
-): IModelType<Snapshot<T>, T>
-export function model<T = {}>(properties?: IModelProperties<T>): IModelType<Snapshot<T>, T>
+    properties: IModelProperties<T>
+): IModelType<T | Snapshot<T>, T>
 /**
  * Creates a new model type by providing a name, properties, volatile state and actions.
  *
@@ -493,10 +494,11 @@ export function model<T = {}>(properties?: IModelProperties<T>): IModelType<Snap
  * @export
  * @alias types.model
  */
-export function model(...args: any[]) {
-    const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+export function model<T = {}>(...args: any[]): IModelType<Snapshot<any>, any> {
+    const name = typeof args[0] === "string" ? args.shift() as string : "AnonymousModel"
     const properties = args.shift() || {}
-    return new ModelType({ name, properties })
+    const config = { name: name as string, properties } as ModelTypeConfig
+    return new ModelType(config)
 }
 
 export function compose<T1, S1, T2, S2, T3, S3>(
