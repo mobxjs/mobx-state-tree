@@ -1111,9 +1111,15 @@ Yes, with MST it is pretty straight forward to setup hot reloading for your stor
 
 ### TypeScript & MST
 
-__Important: TypeScript 2.7 is currently *not* supported__ Use 2.6. TypeScript 2.8 will be supported in the future.
-
 TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is recommended to use TypeScript 2.3 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
+
+We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occassionally you will need to fallback to `any` or manually adding type annotations.
+
+Until conditionally mapped types are available (scheduled for TS 2.8), the types of snapshots cannot be inferred correctly. But you will get some type assistence when using `getSnaphot` like this:
+
+```javascript
+const snapshot = getSnapshot<typeof Car.SnapshotType>(car)
+```
 
 When using models, you write an interface, along with its property types, that will be used to perform type checks at runtime.
 What about compile time? You can use TypeScript interfaces to perform those checks, but that would require writing again all the properties and their actions!
