@@ -192,10 +192,9 @@ test("a node can exists only once in a tree", () => {
     unprotect(doc)
     const row = Row.create()
     doc.rows.push(row)
-    const error = expect(() => {
+    expect(() => {
         doc.foos.push(row)
-    }).toThrow()
-    expect(error.message).toBe(
+    }).toThrow(
         "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/foos/0', but it lives already at '/rows/0'"
     )
 })

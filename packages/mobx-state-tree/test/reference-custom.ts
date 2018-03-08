@@ -18,7 +18,7 @@ test("it should support custom references - basics", () => {
     const UserByNameReference = types.maybe(
         types.reference(User, {
             // given an identifier, find the user
-            get(identifier /* string */, parent /*Store*/) {
+            get(identifier /* string */, parent: typeof Store.Type /*Store*/) {
                 return parent.users.find(u => u.name === identifier) || null
             },
             // given a user, produce the identifier that should be stored
@@ -56,7 +56,7 @@ test("it should support custom references - adv", () => {
         name: types.string
     })
     const NameReference = types.reference(User, {
-        get(identifier, parent) {
+        get(identifier, parent: any) {
             if (identifier === null) return null
             return (
                 getRoot(parent)
@@ -82,21 +82,21 @@ test("it should support custom references - adv", () => {
     unprotect(s)
     expect(s.selection.name).toBe("Mattia")
     expect(s.selection === s.users.get("2")).toBe(true)
-    expect(getSnapshot(s).selection).toBe("Mattia")
+    expect(getSnapshot<typeof Store.SnapshotType>(s).selection).toBe("Mattia")
     const p = recordPatches(s)
     const r = []
     onSnapshot(s, r.push.bind(r))
-    const ids = []
+    const ids: any[] = []
     reaction(
         () => s.selection,
         selection => {
             ids.push(selection ? selection.id : null)
         }
     )
-    s.selection = s.users.get("1")
+    s.selection = s.users.get("1")!
     expect(s.selection.name).toBe("Michel")
     expect(s.selection === s.users.get("1")).toBe(true)
-    expect(getSnapshot(s).selection).toBe("Michel")
+    expect(getSnapshot<any>(s).selection).toBe("Michel")
     applySnapshot(s, Object.assign({}, getSnapshot(s), { selection: "Mattia" }))
     expect(s.selection).toBe(s.users.get("2"))
     applyPatch(s, { op: "replace", path: "/selection", value: "Michel" })
@@ -111,14 +111,14 @@ test("it should support custom references - adv", () => {
     expect(p.inversePatches).toMatchSnapshot()
 })
 test("it should support dynamic loading", done => {
-    const events = []
+    const events: any[] = []
     const User = types.model({
         name: types.string,
         age: 0
     })
     const UserByNameReference = types.maybe(
         types.reference(User, {
-            get(identifier /* string */, parent /*Store*/) {
+            get(identifier /* string */, parent: any /*Store*/) {
                 return parent.getOrLoadUser(identifier)
             },
             set(value /* User */) {
@@ -134,7 +134,7 @@ test("it should support dynamic loading", done => {
         .actions(self => ({
             loadUser: flow(function* loadUser(name) {
                 events.push("loading " + name)
-                self.users.push({ name })
+                self.users.push({ name } as any)
                 yield new Promise(resolve => {
                     setTimeout(resolve, 200)
                 })

@@ -120,7 +120,7 @@ test("it should not be possible to pass a complex object", () => {
     const recorder = recordActions(store)
     expect(store.customers[0].name).toBe("Mattia")
     store.orders[0].setCustomer(store.customers[0])
-    expect(store.orders[0].customer.name).toBe("Mattia")
+    expect(store.orders[0].customer!.name).toBe("Mattia")
     expect(store.orders[0].customer).toBe(store.customers[0])
     expect(getSnapshot(store)).toEqual({
         customers: [
@@ -174,7 +174,7 @@ test("it should not be possible to pass the element of another tree", () => {
 })
 test("it should not be possible to pass an unserializable object", () => {
     const store = createTestStore()
-    const circular = { a: null }
+    const circular = { a: null as any }
     circular.a = circular
     const recorder = recordActions(store)
     store.orders[0].noopSetCustomer(circular)
@@ -206,7 +206,7 @@ test("it should be possible to pass a complex plain object", () => {
     const t1 = Task.create()
     const t2 = Task.create()
     const recorder = recordActions(t1)
-    t1.toggle({ bla: ["nuff", ["said"]] }) // nonsense, but serializable!
+    ;(t1 as any).toggle({ bla: ["nuff", ["said"]] }) // nonsense, but serializable!
     expect(recorder.actions).toEqual([
         { name: "toggle", path: "", args: [{ bla: ["nuff", ["said"]] }] }
     ])
@@ -227,7 +227,7 @@ test("snapshot should be available and updated during an action", () => {
         .actions(self => {
             function inc() {
                 self.x += 1
-                const res = getSnapshot(self).x
+                const res = getSnapshot<typeof Model.Type>(self).x
                 self.x += 1
                 return res
             }
@@ -238,8 +238,9 @@ test("snapshot should be available and updated during an action", () => {
     const a = Model.create({ x: 2 })
     expect(a.inc()).toBe(3)
     expect(a.x).toBe(4)
-    expect(getSnapshot(a).x).toBe(4)
+    expect(getSnapshot<any>(a).x).toBe(4)
 })
+
 test("indirectly called private functions should be able to modify state", () => {
     const Model = types
         .model({
@@ -262,7 +263,7 @@ test("indirectly called private functions should be able to modify state", () =>
     expect(cnt.x).toBe(3)
     cnt.dec()
     expect(cnt.x).toBe(2)
-    expect(cnt.incrementBy).toBe(undefined)
+    expect((cnt as any).incrementBy).toBe(undefined)
 })
 test("volatile state survives reonciliation", () => {
     const Model = types.model({ x: 3 }).actions(self => {
@@ -293,14 +294,14 @@ test("volatile state survives reonciliation", () => {
 test("middleware events are correct", () => {
     const A = types.model({}).actions(self => ({
         a(x) {
-            return self.b(x * 2)
+            return (self as any).b(x * 2)
         },
         b(y) {
             return y + 1
         }
     }))
     const a = A.create()
-    const events = []
+    const events: any[] = []
     addMiddleware(a, function(call, next) {
         events.push(call)
         return next(call)

@@ -3,7 +3,7 @@ if (process.env.NODE_ENV === "development") {
     test("it should throw if late doesnt received a function as parameter", () => {
         expect(() => {
             types.model({
-                after: types.late(1)
+                after: types.late(1 as any)
             })
         }).toThrow()
     })

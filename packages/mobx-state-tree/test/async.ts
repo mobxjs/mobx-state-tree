@@ -15,17 +15,17 @@ function delay(time, value, shouldThrow = false) {
         }, time)
     })
 }
-function testCoffeeTodo(t, generator, shouldError, resultValue, producedCoffees) {
+function testCoffeeTodo(done, generator, shouldError, resultValue, producedCoffees) {
     useStrict(true)
     const Todo = types
         .model({
             title: "get coffee"
         })
         .actions(self => ({
-            startFetch: flow(generator(self))
+            startFetch: flow(generator(self)) as (string) => Promise<string>
         }))
-    const events = []
-    const coffees = []
+    const events: any[] = []
+    const coffees: any[] = []
     const t1 = Todo.create({})
     addMiddleware(t1, (c, next) => {
         events.push(c)
@@ -38,7 +38,7 @@ function testCoffeeTodo(t, generator, shouldError, resultValue, producedCoffees)
         const filtered = filterRelevantStuff(events)
         expect(filtered).toMatchSnapshot()
         useStrict(false)
-        t.end()
+        done()
     }
     t1.startFetch("black").then(
         r => {
@@ -66,18 +66,17 @@ test("flow happens in single ticks", done => {
             })
         }))
     const x = X.create()
-    const values = []
+    const values: any[] = []
     reaction(() => x.y, v => values.push(v))
-    debugger
     x.p().then(() => {
         expect(x.y).toBe(5)
         expect(values).toEqual([3, 5])
         done()
     })
 })
-test("can handle async actions", () => {
+test("can handle async actions", done => {
     testCoffeeTodo(
-        t,
+        done,
         self =>
             function* fetchData(kind) {
                 self.title = "getting coffee " + kind
@@ -89,9 +88,9 @@ test("can handle async actions", () => {
         ["getting coffee black", "drinking coffee"]
     )
 })
-test("can handle erroring actions", () => {
+test("can handle erroring actions", done => {
     testCoffeeTodo(
-        t,
+        done,
         self =>
             function* fetchData(kind) {
                 throw kind
@@ -101,7 +100,7 @@ test("can handle erroring actions", () => {
         []
     )
 })
-test("can handle try catch", () => {
+test("can handle try catch", t => {
     testCoffeeTodo(
         t,
         self =>
@@ -118,10 +117,10 @@ test("can handle try catch", () => {
         ["tea"]
     )
 })
-test("empty sequence works", () => {
+test("empty sequence works", t => {
     testCoffeeTodo(t, self => function* fetchData(kind) {}, false, undefined, [])
 })
-test("can handle throw from yielded promise works", () => {
+test("can handle throw from yielded promise works", t => {
     testCoffeeTodo(
         t,
         self =>
@@ -225,7 +224,7 @@ test("recordActions should only emit invocation", done => {
         }, 50)
     })
 })
-test("can handle nested async actions", () => {
+test("can handle nested async actions", t => {
     const uppercase = flow(function* uppercase(value) {
         const res = yield delay(20, value.toUpperCase())
         return res
@@ -243,7 +242,7 @@ test("can handle nested async actions", () => {
     )
 })
 test("can handle nested async actions when using decorate", done => {
-    const events = []
+    const events: any[] = []
     function middleware(call, next) {
         events.push([call.type, call.name])
         return next(call)

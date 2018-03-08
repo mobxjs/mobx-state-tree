@@ -18,7 +18,7 @@ export const start = () => {
     const started = process.hrtime()
     let last = [started[0], started[1]]
     return (lapTime = false) => {
-        const final = process.hrtime(lapTime ? last : started)
+        const final = process.hrtime(lapTime ? last : started as any)
         return Math.round((final[0] * 1e9 + final[1]) / 1e6)
     }
 }

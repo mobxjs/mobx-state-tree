@@ -6,8 +6,8 @@ const User = types.model("User", {
 const Model = types
     .model({
         isPerson: false,
-        users: types.maybe(types.map(User)),
-        dogs: types.maybe(types.array(User)),
+        users: types.optional(types.map(User), {}),
+        dogs: types.optional(types.array(User), []),
         user: types.maybe(types.late(() => User))
     })
     .volatile(self => ({
@@ -40,7 +40,7 @@ test("reflection - map", () => {
     const node = Model.create({
         users: { "1": { id: "1", name: "Test" } }
     })
-    const reflection = node.users ? getMembers(node.users.get("1") || {}) : {}
+    const reflection = getMembers(node.users.get("1")!)
     expect(reflection.name).toBe("User")
     expect(!!reflection.properties.id).toBe(true)
     expect(!!reflection.properties.name).toBe(true)
@@ -49,7 +49,7 @@ test("reflection - array", () => {
     const node = Model.create({
         dogs: [{ id: "1", name: "Test" }]
     })
-    const reflection = node.dogs ? getMembers(node.dogs[0]) : {}
+    const reflection = getMembers(node.dogs[0])
     expect(!!reflection.properties.id).toBe(true)
     expect(!!reflection.properties.name).toBe(true)
 })
@@ -144,7 +144,7 @@ test("reflection - conditionals respected", () => {
                 return 1
             }
         }))
-        .actions(self => {
+        .actions((self): { actionName1(): number } | { actionName2(): number } => {
             if (swap) {
                 return {
                     actionName1() {

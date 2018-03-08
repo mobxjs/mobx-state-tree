@@ -33,7 +33,7 @@ test("VS should not show up in patches", () => {
     expect(r.patches).toEqual([{ op: "replace", path: "/done", value: true }])
 })
 test("VS be observable", () => {
-    const promises = []
+    const promises: any = []
     const i = Todo.create()
     const d = reaction(() => i.state, p => promises.push(p))
     i.reload()

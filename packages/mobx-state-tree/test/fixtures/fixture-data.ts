@@ -5,7 +5,7 @@ import { HeroRoles } from "./fixture-models"
  * @param count The number of items to create.
  */
 export function createTreasure(count) {
-    const data = []
+    const data: { trapped: boolean; gold: number }[] = []
     let i = 0
     do {
         data.push({
@@ -30,7 +30,13 @@ const wtf = `Daenerys Stormborn of the House Targaryen, First of Her Name, the U
  * @param count The number of items to create.
  */
 export function createHeros(count) {
-    const data = []
+    const data: {
+        id: number
+        name: string
+        level: number
+        role: string
+        description: string
+    }[] = []
     let i = 0
     let even = true
     let n1
@@ -60,7 +66,7 @@ export function createHeros(count) {
  * @param heroCount The number of medium children to create.
  */
 export function createMonsters(count, treasureCount, heroCount) {
-    const data = []
+    const data: any[] = []
     let i = 0
     let even = true
     do {

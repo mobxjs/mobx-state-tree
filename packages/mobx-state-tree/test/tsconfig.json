@@ -2,7 +2,7 @@
     "compilerOptions": {
         "rootDir": "../",
         "module": "commonjs",
-        "lib": ["es6"],
+        "lib": ["es7"],
         "target": "es6",
         "noImplicitAny": false,
         "noImplicitThis": true,

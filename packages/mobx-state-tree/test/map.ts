@@ -40,7 +40,7 @@ test("it should emit snapshots", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let snapshots = []
+    let snapshots: any[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
     doc.set("hello", ItemFactory.create())
     expect(snapshots).toEqual([{ hello: { to: "world" } }])
@@ -77,7 +77,7 @@ test("it should emit add patches", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.set("hello", ItemFactory.create({ to: "universe" }))
     expect(patches).toEqual([{ op: "add", path: "/hello", value: { to: "universe" } }])
@@ -93,7 +93,7 @@ test("it should emit update patches", () => {
     const doc = Factory.create()
     unprotect(doc)
     doc.set("hello", ItemFactory.create())
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.set("hello", ItemFactory.create({ to: "universe" }))
     expect(patches).toEqual([{ op: "replace", path: "/hello", value: { to: "universe" } }])
@@ -110,7 +110,7 @@ test("it should emit remove patches", () => {
     const doc = Factory.create()
     unprotect(doc)
     doc.set("hello", ItemFactory.create())
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.delete("hello")
     expect(patches).toEqual([{ op: "remove", path: "/hello" }])
@@ -160,9 +160,9 @@ test("it should support identifiers", () => {
     const a = store.todos.get("17")
     applySnapshot(store.todos, { "16": { id: "16" }, "17": { id: "17" } })
     expect(a === store.todos.get("17")).toBe(true) // same instance still
-    expect(store.todos.get("17").id).toBe("17")
+    expect(store.todos.get("17")!.id).toBe("17")
     store.todos.put({ id: "19" })
-    expect(store.todos.get("19").id).toBe("19")
+    expect(store.todos.get("19")!.id).toBe("19")
     expect("" + store.todos.get("19")).toBe("AnonymousModel@/todos/19(id: 19)")
     if (process.env.NODE_ENV === "development") {
         expect(() => applySnapshot(store.todos, { "17": { id: "18" } })).toThrowError(
@@ -263,7 +263,7 @@ test("it should not throw when removing a non existing item from a map", () => {
 test("it should get map keys from reversePatch when deleted an item from a nested map", () => {
     const AppModel = types
         .model({
-            value: types.map(types.map(types.map(types.number)))
+            value: types.map(types.map(types.map(types.number)) as any) // TODO: fix typings?
         })
         .actions(self => ({
             remove(k) {

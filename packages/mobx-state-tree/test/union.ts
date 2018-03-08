@@ -27,11 +27,9 @@ const createTestFactories = () => {
 if (process.env.NODE_ENV === "development") {
     test("it should complain about multiple applicable types no dispatch method", () => {
         const { Box, Plane, Square } = createTestFactories()
-        expect(
-            expect(() => {
-                Plane.create({ width: 2, height: 2 })
-            }).toThrow().message
-        ).toMatchSnapshot()
+        expect(() => {
+            Plane.create({ width: 2, height: 2 })
+        }).toThrowErrorMatchingSnapshot()
     })
 }
 test("it should have parent whenever creating or applying from a complex data structure to a model which has Union typed children", () => {
@@ -45,11 +43,9 @@ test("it should have parent whenever creating or applying from a complex data st
 if (process.env.NODE_ENV === "development") {
     test("it should complain about no applicable types", () => {
         const { Heighed } = createTestFactories()
-        expect(
-            expect(() => {
-                Heighed.create({ height: 2 })
-            }).toThrow().message
-        ).toMatchSnapshot()
+        expect(() => {
+            Heighed.create({ height: 2 })
+        }).toThrowErrorMatchingSnapshot
     })
 }
 test("it should be smart enough to discriminate by keys", () => {
@@ -83,7 +79,11 @@ test("it should compute exact union types", () => {
 test("it should compute exact union types - 2", () => {
     const { Box, DispatchPlane, Square } = createTestFactories()
     expect(DispatchPlane.is(Box.create({ width: 3, height: 2 }))).toEqual(true)
-    expect(DispatchPlane.is(Square.create({ width: 3, height: 2 }))).toEqual(true)
+    expect(
+        DispatchPlane.is(
+            Square.create({ width: 3, height: 2 } as any /* incorrect type, superfluous attr!*/)
+        )
+    ).toEqual(true)
 })
 test("it should use dispatch to discriminate", () => {
     const { Box, DispatchPlane, Square } = createTestFactories()

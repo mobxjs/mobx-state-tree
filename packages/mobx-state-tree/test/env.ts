@@ -84,9 +84,9 @@ test("it is possible to set a value inside a map of a map when using the same en
     )
     unprotect(mapOfMap)
     // this should not throw
-    mapOfMap.map.get("whatever").map.set("1234", EmptyModel.create({}, env))
+    mapOfMap.map.get("whatever")!.map.set("1234", EmptyModel.create({}, env))
     expect(getEnv(mapOfMap) === env).toBe(true)
-    expect(getEnv(mapOfMap.map.get("whatever").map.get("1234")) === env).toBe(true)
+    expect(getEnv(mapOfMap.map.get("whatever")!.map.get("1234")!) === env).toBe(true)
 })
 test("clone preserves environnment", () => {
     const env = createEnvironment()

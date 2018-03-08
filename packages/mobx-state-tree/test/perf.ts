@@ -19,10 +19,10 @@ test("timer", done => {
     setTimeout(function() {
         const lap = go(true)
         setTimeout(function() {
-            const done = go()
+            const d = go()
             expect(lap).not.toBe(0)
-            expect(done).not.toBe(0)
-            expect(lap).not.toBe(done)
+            expect(d).not.toBe(0)
+            expect(lap).not.toBe(d)
             done()
         }, 2)
     }, 2)

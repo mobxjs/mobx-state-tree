@@ -1,5 +1,5 @@
 import { getSnapshot, unprotect, recordPatches, types } from "../src"
-function testPatches(t, type, snapshot, fn, expectedPatches) {
+function testPatches(type, snapshot, fn, expectedPatches) {
     const instance = type.create(snapshot)
     const baseSnapshot = getSnapshot(instance)
     const recorder = recordPatches(instance)
@@ -20,7 +20,6 @@ const Node = types.model("Node", {
 })
 test("it should apply simple patch", () => {
     testPatches(
-        t,
         Node,
         { id: 1 },
         n => {
@@ -37,7 +36,6 @@ test("it should apply simple patch", () => {
 })
 test("it should apply deep patches to arrays", () => {
     testPatches(
-        t,
         Node,
         { id: 1, children: [{ id: 2 }] },
         n => {
@@ -85,7 +83,6 @@ test("it should apply deep patches to arrays", () => {
 })
 test("it should apply deep patches to arrays with object instances", () => {
     testPatches(
-        t,
         Node,
         { id: 1, children: [{ id: 2 }] },
         n => {
@@ -122,7 +119,6 @@ test("it should apply deep patches to arrays with object instances", () => {
 })
 test("it should apply non flat patches", () => {
     testPatches(
-        t,
         Node,
         { id: 1 },
         n => {
@@ -157,7 +153,6 @@ test("it should apply non flat patches", () => {
 })
 test("it should apply non flat patches with object instances", () => {
     testPatches(
-        t,
         Node,
         { id: 1 },
         n => {
@@ -194,7 +189,6 @@ test("it should apply deep patches to arrays", () => {
         children: types.optional(types.map(types.late(() => NodeMap)), {})
     })
     testPatches(
-        t,
         NodeMap,
         { id: 1, children: { 2: { id: 2 } } },
         n => {
@@ -266,7 +260,6 @@ test("it should apply deep patches to objects", () => {
         child: types.maybe(types.late(() => NodeObject))
     })
     testPatches(
-        t,
         NodeObject,
         { id: 1, child: { id: 2 } },
         n => {
@@ -326,7 +319,6 @@ test("it should correctly escape/unescape json patches", () => {
         items: types.map(types.frozen)
     })
     testPatches(
-        t,
         AppStore,
         { items: {} },
         store => {

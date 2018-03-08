@@ -59,7 +59,7 @@ function createTestStore(listener) {
     }
 }
 test("it should trigger lifecycle hooks", () => {
-    const events = []
+    const events: any[] = []
     const { store, Todo } = createTestStore(e => events.push(e))
     const talk = detach(store.todos[2])
     events.push("-")
@@ -150,7 +150,7 @@ test("it should postprocess snapshots when generating snapshot", () => {
     expect(getSnapshot(f)).toEqual({ car: { id: "1" } })
 })
 test("base hooks can be composed", () => {
-    const events = []
+    const events: any[] = []
     function listener(message) {
         events.push(message)
     }

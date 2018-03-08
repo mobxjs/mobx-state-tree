@@ -41,7 +41,7 @@ const createTestFactories = () => {
         })
         .views(self => ({
             get area() {
-                return self.props.get("width") * self.props.get("height")
+                return self.props.get("width")! * self.props.get("height")!
             }
         }))
         .actions(self => {
@@ -71,7 +71,7 @@ test("it should create a factory", () => {
     const instance = Factory.create()
     const snapshot = getSnapshot(instance)
     expect(snapshot).toEqual({ to: "world" })
-    expect(Factory.create().toJSON()).toEqual({ to: "world" }) // toJSON is there as shortcut for getSnapshot(), primarily for debugging convenience
+    expect(Factory.create().toJSON!()).toEqual({ to: "world" }) // toJSON is there as shortcut for getSnapshot(), primarily for debugging convenience
     expect(Factory.create().toString()).toEqual("AnonymousModel@<root>")
 })
 test("it should restore the state from the snapshot", () => {
@@ -83,7 +83,7 @@ test("it should emit snapshots", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let snapshots = []
+    let snapshots: any[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
     doc.to = "universe"
     expect(snapshots).toEqual([{ to: "universe" }])
@@ -116,7 +116,7 @@ test("it should emit patches", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.to = "universe"
     expect(patches).toEqual([{ op: "replace", path: "/to", value: "universe" }])
@@ -140,7 +140,7 @@ test("it should stop listening to patches patches", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches = []
+    let patches: any[] = []
     let disposer = onPatch(doc, patch => patches.push(patch))
     doc.to = "universe"
     disposer()
@@ -157,7 +157,7 @@ test("it should call actions correctly", () => {
 test("it should emit action calls", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
-    let actions = []
+    let actions: any[] = []
     onAction(doc, action => actions.push(action))
     doc.setTo("universe")
     expect(actions).toEqual([{ name: "setTo", path: "", args: ["universe"] }])
@@ -406,7 +406,7 @@ test("view functions should be tracked", () => {
         }))
         .create()
     unprotect(model)
-    const values = []
+    const values: any[] = []
     const d = autorun(() => {
         values.push(model.doubler())
     })
@@ -506,6 +506,6 @@ test("it should be possible to share states between views and actions using enha
     d()
 })
 test("It should throw if any other key is returned from extend", () => {
-    const A = types.model({}).extend(() => ({ stuff() {} }))
+    const A = types.model({}).extend(() => ({ stuff() {} } as any)) // TODO: fix typing
     expect(() => A.create()).toThrowError(/stuff/)
 })

@@ -8,7 +8,8 @@ import {
     unprotect,
     detach,
     resolveIdentifier,
-    getRoot
+    getRoot,
+    IType
 } from "../src"
 test("it should support prefixed paths in maps", () => {
     const User = types.model({
@@ -27,12 +28,12 @@ test("it should support prefixed paths in maps", () => {
         }
     })
     unprotect(store)
-    expect(store.users.get("17").name).toBe("Michel")
-    expect(store.users.get("18").name).toBe("Veria")
+    expect(store.users.get("17")!.name).toBe("Michel")
+    expect(store.users.get("18")!.name).toBe("Veria")
     expect(store.user.name).toBe("Michel")
-    store.user = store.users.get("18")
+    store.user = store.users.get("18")!
     expect(store.user.name).toBe("Veria")
-    store.users.get("18").name = "Noa"
+    store.users.get("18")!.name = "Noa"
     expect(store.user.name).toBe("Noa")
     expect(getSnapshot(store)).toEqual({
         user: "18",
@@ -92,7 +93,7 @@ if (process.env.NODE_ENV === "development") {
     })
 }
 test("it should resolve refs during creation, when using path", () => {
-    const values = []
+    const values: any = []
     const Book = types.model({
         id: types.identifier(),
         price: types.number
@@ -115,7 +116,7 @@ test("it should resolve refs during creation, when using path", () => {
     })
     unprotect(s)
     reaction(() => s.entries.reduce((a, e) => a + e.price, 0), v => values.push(v))
-    s.entries.push({ book: s.books[0] })
+    s.entries.push({ book: s.books[0] } as any)
     expect(s.entries[0].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
     const entry = BookEntry.create({ book: s.books[0] }) // N.B. ref is initially not resolvable!
@@ -146,12 +147,12 @@ test("it should resolve refs over late types", () => {
         books: [{ id: "3", price: 2 }]
     })
     unprotect(s)
-    s.entries.push({ book: s.books[0] })
+    s.entries.push({ book: s.books[0] } as any)
     expect(s.entries[0].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
 })
 test("it should resolve refs during creation, when using generic reference", () => {
-    const values = []
+    const values: any[] = []
     const Book = types.model({
         id: types.identifier(),
         price: types.number
@@ -174,7 +175,7 @@ test("it should resolve refs during creation, when using generic reference", () 
     })
     unprotect(s)
     reaction(() => s.entries.reduce((a, e) => a + e.price, 0), v => values.push(v))
-    s.entries.push({ book: s.books[0] })
+    s.entries.push({ book: s.books[0] } as any)
     expect(s.entries[0].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
     const entry = BookEntry.create({ book: s.books[0] }) // can refer to book, even when not part of tree yet
@@ -228,7 +229,7 @@ test("self reference with a late type", () => {
     const Book = types.model("Book", {
         id: types.identifier(),
         genre: types.string,
-        reference: types.reference(types.late(() => Book))
+        reference: types.reference(types.late(() => Book) as IType<any, any>)
     })
     const Store = types
         .model("Store", {
@@ -251,7 +252,7 @@ test("self reference with a late type", () => {
         reference: s.books[0]
     })
     s.addBook(book2)
-    expect(s.books[1].reference.genre).toBe("thriller")
+    expect((s.books[1] as any).reference.genre).toBe("thriller") // TODO: `.reference` should be typed here...
 })
 test("when applying a snapshot, reference should resolve correctly if value added after", () => {
     const Box = types.model({
@@ -296,7 +297,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
     )
     unprotect(store)
     // first update the reference, than create a new matching item! Ref becomes ambigous now...
-    store.selected = 1
+    store.selected = 1 as any // valid assignment
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
     let err
     autorun(() => store.selected).onError(e => (err = e))
@@ -458,14 +459,14 @@ test("References are non-nullable by default", () => {
     unprotect(store)
     if (process.env.NODE_ENV === "development") {
         expect(store.maybeRef).toBe(null)
-        expect(expect(() => store.ref).toThrow().message).toMatchSnapshot()
-        store.maybeRef = 3
+        expect(() => store.ref).toThrowErrorMatchingSnapshot()
+        store.maybeRef = 3 as any // valid assignment
         expect(store.maybeRef).toBe(store.todo)
-        store.maybeRef = 4
-        expect(expect(() => store.maybeRef).toThrow().message).toMatchSnapshot()
+        store.maybeRef = 4 as any // valid assignment
+        expect(() => store.maybeRef).toThrowErrorMatchingSnapshot()
         store.maybeRef = null
         expect(store.maybeRef).toBe(null)
-        expect(expect(() => (store.ref = null)).toThrow().message).toMatchSnapshot()
+        expect(() => ((store as any).ref = null)).toThrowErrorMatchingSnapshot
     }
 })
 test("References are described properly", () => {

@@ -93,7 +93,7 @@ test("store emits correct patch paths", () => {
     const s = createStore()
     const recorder1 = recordPatches(s)
     const recorder2 = recordPatches(s.boxes)
-    const recorder3 = recordPatches(s.boxes.get("cc"))
+    const recorder3 = recordPatches(s.boxes.get("cc")!)
     s.arrows[0].from.x += 117
     expect(recorder1.patches).toEqual([{ op: "replace", path: "/boxes/cc/x", value: 217 }])
     expect(recorder2.patches).toEqual([{ op: "replace", path: "/cc/x", value: 217 }])
@@ -113,7 +113,7 @@ test("box operations works correctly", () => {
         arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
         selection: "b"
     })
-    s.boxes.get("a").setName("I'm groot")
+    s.boxes.get("a")!.setName("I'm groot")
     expect(getSnapshot(s)).toEqual({
         boxes: {
             cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
@@ -125,7 +125,7 @@ test("box operations works correctly", () => {
         selection: "b"
     })
     expect(JSON.stringify(s)).toEqual(JSON.stringify(getSnapshot(s)))
-    s.boxes.get("a").move(50, 50)
+    s.boxes.get("a")!.move(50, 50)
     expect(getSnapshot(s)).toEqual({
         boxes: {
             cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
@@ -136,6 +136,6 @@ test("box operations works correctly", () => {
         arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
         selection: "b"
     })
-    expect(s.boxes.get("b").width).toBe(15)
+    expect(s.boxes.get("b")!.width).toBe(15)
     expect(Box.create({ id: "hello" }).isSelected).toBe(false)
 })

@@ -84,7 +84,7 @@ test("it should do typescript type inference correctly", () => {
     })
     // sub fields have proper type
     b.sub.x = 4
-    const d: string = b.sub.y
+    const d: string | null = b.sub.y
     a.y = null
     const zz: string = a.z
     // Manual test not assignable:
@@ -101,7 +101,7 @@ test("#66 - it should accept superfluous fields", () => {
     expect(Item.is({ id: 3 })).toBe(false)
     expect(Item.is({ id: 3, name: "" })).toBe(true)
     expect(Item.is({ id: 3, name: "", description: "" })).toBe(true)
-    const a = Item.create({ id: 3, name: "", description: "bla" })
+    const a = Item.create({ id: 3, name: "", description: "bla" } as any) as any
     expect(a.description).toBe(undefined)
 })
 test("#66 - it should not require defaulted fields", () => {
@@ -113,8 +113,8 @@ test("#66 - it should not require defaulted fields", () => {
     expect(Item.is({ id: 3 })).toBe(true)
     expect(Item.is({ id: 3, name: "" })).toBe(true)
     expect(Item.is({ id: 3, name: "", description: "" })).toBe(true)
-    const a = Item.create({ id: 3, description: "bla" })
-    expect(a.description).toBe(undefined)
+    const a = Item.create({ id: 3, description: "bla" } as any)
+    expect((a as any).description).toBe(undefined)
     expect(a.name).toBe("boo")
 })
 test("#66 - it should be possible to omit defaulted fields", () => {
@@ -126,8 +126,8 @@ test("#66 - it should be possible to omit defaulted fields", () => {
     expect(Item.is({ id: 3 })).toBe(true)
     expect(Item.is({ id: 3, name: "" })).toBe(true)
     expect(Item.is({ id: 3, name: "", description: "" })).toBe(true)
-    const a = Item.create({ id: 3, description: "bla" })
-    expect(a.description).toBe(undefined)
+    const a = Item.create({ id: 3, description: "bla" } as any)
+    expect((a as any).description).toBe(undefined)
     expect(a.name).toBe("boo")
 })
 test("#66 - it should pick the correct type of defaulted fields", () => {
@@ -139,7 +139,7 @@ test("#66 - it should pick the correct type of defaulted fields", () => {
     unprotect(a)
     expect(a.name).toBe("boo")
     if (process.env.NODE_ENV === "development") {
-        expect(() => (a.name = 3)).toThrowError(
+        expect(() => ((a as any).name = 3)).toThrowError(
             `[mobx-state-tree] Error while converting \`3\` to \`string\`:\n\n    value \`3\` is not assignable to type: \`string\` (Value is not a string).`
         )
     }
@@ -237,13 +237,13 @@ test("types instances with compatible snapshots should not be interchangeable", 
         c.x = null
     }).not.toThrow()
     expect(() => {
-        c.x = {}
+        ;(c as any).x = {}
     }).not.toThrow()
     expect(() => {
         c.x = A.create()
     }).not.toThrow()
     expect(() => {
-        c.x = B.create()
+        ;(c as any).x = B.create()
     }).toThrow()
 })
 test("it handles complex types correctly", () => {
@@ -321,7 +321,7 @@ if (process.env.NODE_ENV === "development") {
                 todos: { "1": { title: true, setTitle: "hello" } },
                 amount: 1,
                 getAmount: "hello"
-            })
+            } as any)
         ).toThrowError(
             // MWE: TODO: Ideally (like in MST =< 0.9):
             // at path "/todos/1/setTitle" value \`"hello"\` is not assignable  (Action properties should not be provided in the snapshot).

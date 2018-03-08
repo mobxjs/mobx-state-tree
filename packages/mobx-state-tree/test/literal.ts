@@ -9,21 +9,17 @@ if (process.env.NODE_ENV === "development") {
     })
     test("it should fail if not optional and no default provided", () => {
         const Factory = types.literal("hello")
-        expect(
-            expect(() => {
-                Factory.create()
-            }).toThrow().message
-        ).toMatchSnapshot()
+        expect(() => {
+            Factory.create()
+        }).toThrowErrorMatchingSnapshot()
     })
     test("it should throw if a different type is given", () => {
         const Factory = types.model("TestFactory", {
             shouldBeOne: types.literal(1)
         })
-        expect(
-            expect(() => {
-                Factory.create({ shouldBeOne: 2 })
-            }).toThrow().message
-        ).toMatchSnapshot()
+        expect(() => {
+            Factory.create({ shouldBeOne: 2 })
+        }).toThrowErrorMatchingSnapshot()
     })
 }
 test("it should support null type", () => {

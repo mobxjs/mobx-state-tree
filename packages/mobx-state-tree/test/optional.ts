@@ -47,7 +47,7 @@ if (process.env.NODE_ENV === "development") {
     })
 }
 test("it should accept a function to provide dynamic values", () => {
-    let defaultValue = 1
+    let defaultValue: any = 1
     const Factory = types.model({
         a: types.optional(types.number, () => defaultValue)
     })
@@ -73,7 +73,7 @@ test("Values should reset to default if omitted in snapshot", () => {
     unprotect(store)
     store.todo.done = true
     expect(store.todo.done).toBe(true)
-    store.todo = { title: "stuff", id: "2" }
+    store.todo = { title: "stuff", id: "2" } as any
     expect(store.todo.title).toBe("stuff")
     expect(store.todo.done).toBe(false)
 })

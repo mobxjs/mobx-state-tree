@@ -10,7 +10,7 @@ function createDeprecationListener() {
     // create spy to track warning call
     const spyWarn = (console.warn = spy())
     // return callback to check if warn was called properly
-    return function isDeprecated(t) {
+    return function isDeprecated() {
         // replace original implementation
         console.warn = originalWarn
         // test for correct log message, if in development
@@ -26,7 +26,7 @@ test("`process` should mirror `flow`", () => {
     const flowResult = flow(generator)
     const processResult = mstProcess(generator)
     expect(processResult.name).toBe(flowResult.name)
-    isDeprecated(t)
+    isDeprecated()
 })
 test("`createProcessSpawner` should mirror `createFlowSpawner`", () => {
     const isDeprecated = createDeprecationListener()
@@ -35,5 +35,5 @@ test("`createProcessSpawner` should mirror `createFlowSpawner`", () => {
     const flowSpawnerResult = createFlowSpawner(alias, generator)
     const processSpawnerResult = createProcessSpawner(alias, generator)
     expect(processSpawnerResult.name).toBe(flowSpawnerResult.name)
-    isDeprecated(t)
+    isDeprecated()
 })

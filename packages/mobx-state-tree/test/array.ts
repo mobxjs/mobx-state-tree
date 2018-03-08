@@ -8,7 +8,8 @@ import {
     getPath,
     applySnapshot,
     getSnapshot,
-    types
+    types,
+    IJsonPatch
 } from "../src"
 import { observable } from "mobx"
 const createTestFactories = () => {
@@ -28,7 +29,7 @@ test("it should create a factory", () => {
 })
 test("it should succeed if not optional and no default provided", () => {
     const Factory = types.array(types.string)
-    expect(Factory.create().toJSON()).toEqual([])
+    expect(Factory.create().toJSON!()).toEqual([])
 })
 test("it should restore the state from the snapshot", () => {
     const { Factory } = createTestFactories()
@@ -41,7 +42,7 @@ test("it should emit snapshots", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let snapshots = []
+    let snapshots: (typeof Factory.SnapshotType)[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
     doc.push(ItemFactory.create())
     expect(snapshots).toEqual([[{ to: "world" }]])
@@ -64,7 +65,7 @@ test("it should emit add patches", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches = []
+    let patches: any[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.push(ItemFactory.create({ to: "universe" }))
     expect(patches).toEqual([{ op: "add", path: "/0", value: { to: "universe" } }])
@@ -80,7 +81,7 @@ test("it should emit update patches", () => {
     const doc = Factory.create()
     unprotect(doc)
     doc.push(ItemFactory.create())
-    let patches = []
+    let patches: IJsonPatch[] = []
     onPatch(doc, patch => patches.push(patch))
     doc[0] = ItemFactory.create({ to: "universe" })
     expect(patches).toEqual([{ op: "replace", path: "/0", value: { to: "universe" } }])
@@ -96,7 +97,7 @@ test("it should emit remove patches", () => {
     const doc = Factory.create()
     unprotect(doc)
     doc.push(ItemFactory.create())
-    let patches = []
+    let patches: IJsonPatch[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.splice(0)
     expect(patches).toEqual([{ op: "remove", path: "/0" }])
@@ -144,13 +145,13 @@ test("paths shoud remain correct when splicing", () => {
         })
     unprotect(store)
     expect(store.todos.map(getPath)).toEqual(["/todos/0"])
-    store.todos.push({})
+    store.todos.push({} as any)
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])
-    store.todos.unshift({})
+    store.todos.unshift({} as any)
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1", "/todos/2"])
     store.todos.splice(0, 2)
     expect(store.todos.map(getPath)).toEqual(["/todos/0"])
-    store.todos.splice(0, 1, {}, {}, {})
+    store.todos.splice(0, 1, {} as any, {} as any, {} as any)
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1", "/todos/2"])
     store.todos.remove(store.todos[1])
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])
