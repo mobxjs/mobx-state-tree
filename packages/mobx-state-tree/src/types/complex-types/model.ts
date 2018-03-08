@@ -123,7 +123,6 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     public readonly initializers: ((instance: any) => any)[]
     public readonly properties: { [K: string]: IType<any, any> } = {}
     private preProcessor: (snapshot: any) => any | undefined
-    private readonly propertiesNames: string[]
 
     constructor(opts: ModelTypeConfig) {
         super(opts.name || defaultObjectOptions.name)
@@ -133,8 +132,11 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         Object.assign(this, defaultObjectOptions, opts)
         // ensures that any default value gets converted to its related type
         this.properties = toPropertiesObject(this.properties)
-        this.propertiesNames = Object.keys(this.properties)
         Object.freeze(this.properties) // make sure nobody messes with it
+    }
+
+    get propertyNames(): string[] {
+        return Object.keys(this.properties)
     }
 
     cloneAndEnhance(opts: ModelTypeConfig): ModelType<any, any> {
@@ -421,7 +423,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         }
 
         return flattenTypeErrors(
-            this.propertiesNames.map(key =>
+            this.propertyNames.map(key =>
                 this.properties[key].validate(
                     snapshot[key],
                     getContextForPath(context, key, this.properties[key])
@@ -431,16 +433,14 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     }
 
     private forAllProps(fn: (name: string, type: IType<any, any>) => void) {
-        this.propertiesNames.forEach(key => fn(key, this.properties[key]))
+        this.propertyNames.forEach(key => fn(key, this.properties[key]))
     }
 
     describe() {
         // optimization: cache
         return (
             "{ " +
-            this.propertiesNames
-                .map(key => key + ": " + this.properties[key].describe())
-                .join("; ") +
+            this.propertyNames.map(key => key + ": " + this.properties[key].describe()).join("; ") +
             " }"
         )
     }
@@ -455,6 +455,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
 }
 
 export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
+    readonly properties: { readonly [K: string]: IType<any, any> } // for reflection purposes
     named(newName: string): IModelType<S, T>
     props<SP, TP>(
         props: { [K in keyof TP]: IType<any, TP[K]> | TP[K] } &

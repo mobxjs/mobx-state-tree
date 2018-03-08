@@ -159,7 +159,7 @@ test("reflection - conditionals respected", t => {
                 return 1
             }
         }))
-        .actions(self => {
+        .actions((self): { actionName1(): number } | { actionName2(): number } => {
             if (swap) {
                 return {
                     actionName1() {
