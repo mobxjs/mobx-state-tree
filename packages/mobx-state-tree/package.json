@@ -10,7 +10,7 @@
     "build": "npm run quick-build && cpr lib dist --delete-first --filter=\\\\.js && rollup -c",
     "quick-build": "tsc",
     "rollup": "rollup -c",
-    "test": "cross-env NODE_ENV=development jest && cross-env NODE_ENV=production jest && npm run test-cyclic",
+    "test": "cross-env NODE_ENV=development jest --ci && cross-env NODE_ENV=production jest --ci && npm run test-cyclic",
     "update-snapshots": "ava -u",
     "speedtest": "npm run build-tests && node --expose-gc test-lib/test/perf/report.js",
     "test-cyclic": "npm run build && node -e \"require('.')\"",
@@ -84,6 +84,8 @@
       "/node_modules/",
       "/src/",
       "/dist/",
+      "/test/fixtures",
+      "/test/perf",
       "/\\./"
     ],
     "watchPathIgnorePatterns": [
