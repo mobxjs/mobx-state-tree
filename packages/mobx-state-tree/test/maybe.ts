@@ -1,13 +1,10 @@
 import { types } from "../src"
-import { test } from "ava"
-
-test("It should warn when using types.maybe(types.frozen)", t => {
-    if (process.env.NODE_ENV === "development") {
-        t.throws(
-            () => types.maybe(types.frozen),
+test("It should warn when using types.maybe(types.frozen)", () => {
+    if (process.env.NODE_ENV !== "production") {
+        expect(() => types.maybe(types.frozen)).toThrowError(
             `[mobx-state-tree] Unable to declare \`types.maybe(types.frozen)\`. Frozen already accepts \`null\`. Consider using \`types.optional(types.frozen, null)\` instead.`
         )
     } else {
-        t.is(true, true)
+        expect(true).toBe(true)
     }
 })

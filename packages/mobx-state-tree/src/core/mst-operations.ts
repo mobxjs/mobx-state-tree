@@ -260,7 +260,7 @@ export function applySnapshot<S, T>(target: IStateTreeNode, snapshot: S) {
 
 export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S }
 export function getSnapshot<S>(target: IObservableArray<S>): S[]
-export function getSnapshot<S>(target: ISnapshottable<S>): S
+export function getSnapshot<S = any>(target: ISnapshottable<S>): S
 /**
  * Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
  * structural sharing where possible. Doesn't require MobX transactions to be completed.

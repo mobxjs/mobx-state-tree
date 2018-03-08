@@ -1,42 +1,25 @@
-import { getSnapshot, IJsonPatch, IType, unprotect, recordPatches, types } from "../src"
-import { test, TestContext, Context } from "ava"
-function testPatches<T extends IType<any, any>>(
-    t: TestContext & Context<any>,
-    type: T,
-    snapshot: any,
-    fn: (instance: typeof type.Type) => void,
-    expectedPatches: IJsonPatch[]
-) {
+import { getSnapshot, unprotect, recordPatches, types } from "../src"
+function testPatches(type, snapshot, fn, expectedPatches) {
     const instance = type.create(snapshot)
     const baseSnapshot = getSnapshot(instance)
     const recorder = recordPatches(instance)
     unprotect(instance)
     fn(instance)
     recorder.stop()
-    t.deepEqual(recorder.patches, expectedPatches, "mismatch in patches")
+    expect(recorder.patches).toEqual(expectedPatches)
     const clone = type.create(snapshot)
     recorder.replay(clone)
-    t.deepEqual(
-        getSnapshot(clone),
-        getSnapshot(instance),
-        "reapplying patches didn't result in same clone"
-    )
+    expect(getSnapshot(clone)).toEqual(getSnapshot(instance))
     recorder.undo()
-    t.deepEqual(
-        getSnapshot(instance),
-        baseSnapshot,
-        "reverting the patches didn't result in the same snapshot"
-    )
+    expect(getSnapshot(instance)).toEqual(baseSnapshot)
 }
 const Node = types.model("Node", {
     id: types.identifier(types.number),
     text: "Hi",
     children: types.optional(types.array(types.late(() => Node)), [])
 })
-
-test("it should apply simple patch", t => {
+test("it should apply simple patch", () => {
     testPatches(
-        t,
         Node,
         { id: 1 },
         n => {
@@ -51,10 +34,8 @@ test("it should apply simple patch", t => {
         ]
     )
 })
-
-test("it should apply deep patches to arrays", t => {
+test("it should apply deep patches to arrays", () => {
     testPatches(
-        t,
         Node,
         { id: 1, children: [{ id: 2 }] },
         n => {
@@ -100,10 +81,8 @@ test("it should apply deep patches to arrays", t => {
         ]
     )
 })
-
-test("it should apply deep patches to arrays with object instances", t => {
+test("it should apply deep patches to arrays with object instances", () => {
     testPatches(
-        t,
         Node,
         { id: 1, children: [{ id: 2 }] },
         n => {
@@ -138,10 +117,8 @@ test("it should apply deep patches to arrays with object instances", t => {
         ]
     )
 })
-
-test("it should apply non flat patches", t => {
+test("it should apply non flat patches", () => {
     testPatches(
-        t,
         Node,
         { id: 1 },
         n => {
@@ -174,10 +151,8 @@ test("it should apply non flat patches", t => {
         ]
     )
 })
-
-test("it should apply non flat patches with object instances", t => {
+test("it should apply non flat patches with object instances", () => {
     testPatches(
-        t,
         Node,
         { id: 1 },
         n => {
@@ -207,19 +182,17 @@ test("it should apply non flat patches with object instances", t => {
         ]
     )
 })
-
-test("it should apply deep patches to arrays", t => {
+test("it should apply deep patches to arrays", () => {
     const NodeMap = types.model("NodeMap", {
         id: types.identifier(types.number),
         text: "Hi",
         children: types.optional(types.map(types.late(() => NodeMap)), {})
     })
     testPatches(
-        t,
         NodeMap,
         { id: 1, children: { 2: { id: 2 } } },
-        (n: typeof NodeMap.Type) => {
-            n.children.get(2)!.text = "test" // update
+        n => {
+            n.children.get(2).text = "test" // update
             n.children.put({ id: 2, text: "world" }) // this reconciles; just an update
             n.children.set(
                 4,
@@ -280,18 +253,16 @@ test("it should apply deep patches to arrays", t => {
         ]
     )
 })
-
-test("it should apply deep patches to objects", t => {
+test("it should apply deep patches to objects", () => {
     const NodeObject = types.model("NodeObject", {
         id: types.identifier(types.number),
         text: "Hi",
         child: types.maybe(types.late(() => NodeObject))
     })
     testPatches(
-        t,
         NodeObject,
         { id: 1, child: { id: 2 } },
-        (n: typeof NodeObject.Type) => {
+        n => {
             n.child.text = "test" // update
             n.child = { id: 2, text: "world" } // this reconciles; just an update
             n.child = NodeObject.create({ id: 2, text: "coffee", child: { id: 23 } })
@@ -343,14 +314,11 @@ test("it should apply deep patches to objects", t => {
         ]
     )
 })
-
-test("it should correctly escape/unescape json patches", t => {
+test("it should correctly escape/unescape json patches", () => {
     const AppStore = types.model({
         items: types.map(types.frozen)
     })
-
     testPatches(
-        t,
         AppStore,
         { items: {} },
         store => {

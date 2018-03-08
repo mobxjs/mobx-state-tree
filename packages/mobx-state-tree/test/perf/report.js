@@ -1,5 +1,4 @@
-import { smallScenario, mediumScenario, largeScenario } from "./scenarios"
-
+const { smallScenario, mediumScenario, largeScenario } = require("./scenarios")
 // here's what we'll be testing
 const plan = [
     "-----------",
@@ -48,17 +47,14 @@ const plan = [
     () => largeScenario(250, 0, 100),
     () => largeScenario(50, 0, 100)
 ]
-
 // burn a few to get the juices flowing
 smallScenario(1000)
 mediumScenario(500)
 largeScenario(100, 10, 10)
-
 // remember when this broke the internet?
 function leftPad(value, length, char = " ") {
     return value.toString().length < length ? leftPad(char + value, length) : value
 }
-
 // let's start
 plan.forEach(fn => {
     // strings get printed, i guess.
@@ -66,22 +62,17 @@ plan.forEach(fn => {
         console.log(fn)
         return
     }
-
     // trigger awkward gc up front if we can
     if (global.gc) {
         global.gc()
     }
-
     // run the report
     const result = fn()
-
     // calculate some fields
     const seconds = leftPad((result.elapsed / 1.0).toLocaleString(), 8)
     const times = leftPad(`x ${result.count.toLocaleString()}`, 10)
     const avg = leftPad((result.elapsed / result.count).toFixed(1), 4)
-
     // print
     console.log(`${seconds}ms | ${times} | ${avg}ms avg`)
 })
-
 console.log("")

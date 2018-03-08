@@ -1,11 +1,6 @@
 {
 	"private": true,
 	"dependencies": {
-		"cross-env": "^5.1.1",
-		"husky": "^0.13.4",
-		"lerna": "^2.4.0",
-		"lint-staged": "^3.6.1",
-		"prettier": "^1.4.4"
 	},
 	"scripts": {
 		"clean": "lerna clean",
@@ -24,5 +19,13 @@
 			"prettier --write --print-width 100 --tab-width 4 --no-semi",
 			"git add"
 		]
+	},
+	"devDependencies": {
+		"cross-env": "^5.1.1",
+		"husky": "^0.13.4",
+		"lerna": "^2.4.0",
+		"lint-staged": "^3.6.1",
+		"prettier": "^1.4.4",
+		"jest": "^20.0.4"
 	}
 }

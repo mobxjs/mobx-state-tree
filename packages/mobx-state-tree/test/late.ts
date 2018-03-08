@@ -1,50 +1,38 @@
 import { types } from "../src"
-import { test } from "ava"
-
-if (process.env.NODE_ENV === "development") {
-    test("it should throw if late doesnt received a function as parameter", t => {
-        t.throws(() => {
+if (process.env.NODE_ENV !== "production") {
+    test("it should throw if late doesnt received a function as parameter", () => {
+        expect(() => {
             types.model({
                 after: types.late(1 as any)
             })
-        })
+        }).toThrow()
     })
 }
-
-test("it should accept a type and infer it correctly", t => {
+test("it should accept a type and infer it correctly", () => {
     const Before = types.model({
         after: types.late(() => After)
     })
     const After = types.model({
         name: types.maybe(types.string)
     })
-    t.notThrows(() => Before.create({ after: { name: "Hello, it's me." } }))
+    expect(() => Before.create({ after: { name: "Hello, it's me." } })).not.toThrow()
 })
-
-test("late should allow circular references", t => {
-    interface INode {
-        childs: INode[]
-    }
+test("late should allow circular references", () => {
     // TypeScript is'nt smart enough to infer self referencing types.
     const Node = types.model({
-        childs: types.optional(types.array(types.late<any, INode>(() => Node)), [])
+        childs: types.optional(types.array(types.late(() => Node)), [])
     })
-    t.notThrows(() => Node.create())
-    t.notThrows(() => Node.create({ childs: [{}, { childs: [] }] }))
+    expect(() => Node.create()).not.toThrow()
+    expect(() => Node.create({ childs: [{}, { childs: [] }] })).not.toThrow()
 })
-
-test("late should describe correctly circular references", t => {
-    interface INode {
-        childs: INode[]
-    }
+test("late should describe correctly circular references", () => {
     // TypeScript is'nt smart enough to infer self referencing types.
     const Node = types.model("Node", {
-        childs: types.array(types.late<any, INode>(() => Node))
+        childs: types.array(types.late(() => Node))
     })
-    t.deepEqual(Node.describe(), "{ childs: Node[] }")
+    expect(Node.describe()).toEqual("{ childs: Node[] }")
 })
-
-test("should typecheck", t => {
+test("should typecheck", () => {
     const NodeObject = types.model("NodeObject", {
         id: types.identifier(types.number),
         text: "Hi",
@@ -57,5 +45,4 @@ test("should typecheck", t => {
     } catch (e) {
         // ignore, this is about TS
     }
-    t.pass()
 })

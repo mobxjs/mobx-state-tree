@@ -2,14 +2,14 @@
     "compilerOptions": {
         "rootDir": "../",
         "module": "commonjs",
-        "lib": ["es2017"],
-        "target": "es2015",
+        "lib": ["es7"],
+        "target": "es6",
         "noImplicitAny": false,
         "noImplicitThis": true,
         "experimentalDecorators": true,
         "strictNullChecks": true,
         "sourceMap": false,
-        "outDir": "../test-lib"
+        "noEmit": true
     },
     "include": [
         "**/*.ts"

@@ -1,9 +1,7 @@
 import { spy } from "sinon"
-import { test, TestContext } from "ava"
 import { deprecated } from "../src/utils"
 import { flow, createFlowSpawner } from "../src/core/flow"
 import { process as mstProcess, createProcessSpawner } from "../src/core/process"
-
 function createDeprecationListener() {
     // clear previous deprecation dedupe keys
     deprecated.ids = {}
@@ -12,40 +10,30 @@ function createDeprecationListener() {
     // create spy to track warning call
     const spyWarn = (console.warn = spy())
     // return callback to check if warn was called properly
-    return function isDeprecated(t: TestContext) {
+    return function isDeprecated() {
         // replace original implementation
         console.warn = originalWarn
         // test for correct log message, if in development
-        if (process.env.NODE_ENV === "development") {
-            t.true(spyWarn.called)
-            t.regex(spyWarn.getCall(0).args[0], /Deprecation warning:/)
+        if (process.env.NODE_ENV !== "production") {
+            expect(spyWarn.called).toBe(true)
+            expect(spyWarn.getCall(0).args[0]).toMatch(/Deprecation warning:/)
         }
     }
 }
-
-test("`process` should mirror `flow`", t => {
+test("`process` should mirror `flow`", () => {
     const isDeprecated = createDeprecationListener()
-
     const generator = function*() {}
-
     const flowResult = flow(generator)
     const processResult = mstProcess(generator)
-
-    t.is(processResult.name, flowResult.name)
-
-    isDeprecated(t)
+    expect(processResult.name).toBe(flowResult.name)
+    isDeprecated()
 })
-
-test("`createProcessSpawner` should mirror `createFlowSpawner`", t => {
+test("`createProcessSpawner` should mirror `createFlowSpawner`", () => {
     const isDeprecated = createDeprecationListener()
-
     const alias = "generatorAlias"
     const generator = function*() {}
-
     const flowSpawnerResult = createFlowSpawner(alias, generator)
     const processSpawnerResult = createProcessSpawner(alias, generator)
-
-    t.is(processSpawnerResult.name, flowSpawnerResult.name)
-
-    isDeprecated(t)
+    expect(processSpawnerResult.name).toBe(flowSpawnerResult.name)
+    isDeprecated()
 })

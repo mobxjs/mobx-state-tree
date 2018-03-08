@@ -1,5 +1,4 @@
 import { types, getEnv, clone, detach, unprotect } from "../src"
-import { test } from "ava"
 const Todo = types
     .model({
         title: "test"
@@ -17,62 +16,54 @@ function createEnvironment() {
         useUppercase: true
     }
 }
-
-test("it should be possible to use environments", t => {
+test("it should be possible to use environments", () => {
     const env = createEnvironment()
     const todo = Todo.create({}, env)
-    t.is(todo.description, "TEST")
+    expect(todo.description).toBe("TEST")
     env.useUppercase = false
-    t.is(todo.description, "test")
+    expect(todo.description).toBe("test")
 })
-
-test("it should be possible to inherit environments", t => {
+test("it should be possible to inherit environments", () => {
     const env = createEnvironment()
     const store = Store.create({ todos: [{}] }, env)
-    t.is(store.todos[0].description, "TEST")
+    expect(store.todos[0].description).toBe("TEST")
     env.useUppercase = false
-    t.is(store.todos[0].description, "test")
+    expect(store.todos[0].description).toBe("test")
 })
-
-test("getEnv returns empty object without environment", t => {
+test("getEnv returns empty object without environment", () => {
     const todo = Todo.create()
-    t.deepEqual(getEnv(todo), {})
+    expect(getEnv(todo)).toEqual({})
 })
-
-test("detach should preserve environment", t => {
+test("detach should preserve environment", () => {
     const env = createEnvironment()
     const store = Store.create({ todos: [{}] }, env)
     unprotect(store)
     const todo = detach(store.todos[0])
-    t.is(todo.description, "TEST")
+    expect(todo.description).toBe("TEST")
     env.useUppercase = false
-    t.is(todo.description, "test")
+    expect(todo.description).toBe("test")
 })
-
-test("it is possible to assign instance with the same environment as the parent to a tree", t => {
+test("it is possible to assign instance with the same environment as the parent to a tree", () => {
     const env = createEnvironment()
     const store = Store.create({ todos: [] }, env)
     const todo = Todo.create({}, env)
     unprotect(store)
     store.todos.push(todo)
-    t.true(store.todos.length === 1)
-    t.true(getEnv(store.todos) === getEnv(store.todos[0]))
-    t.true(getEnv(todo) === getEnv(store.todos[0]))
+    expect(store.todos.length === 1).toBe(true)
+    expect(getEnv(store.todos) === getEnv(store.todos[0])).toBe(true)
+    expect(getEnv(todo) === getEnv(store.todos[0])).toBe(true)
 })
-
-test("it is not possible to assign instance with a different environment than the parent to a tree", t => {
+test("it is not possible to assign instance with a different environment than the parent to a tree", () => {
     const env1 = createEnvironment()
     const env2 = createEnvironment()
     const store = Store.create({ todos: [] }, env1)
     const todo = Todo.create({}, env2)
     unprotect(store)
-    t.throws(
-        () => store.todos.push(todo),
+    expect(() => store.todos.push(todo)).toThrowError(
         "[mobx-state-tree] A state tree cannot be made part of another state tree as long as their environments are different."
     )
 })
-
-test("it is possible to set a value inside a map of a map when using the same environment", t => {
+test("it is possible to set a value inside a map of a map when using the same environment", () => {
     const env = createEnvironment()
     const EmptyModel = types.model({})
     const MapOfEmptyModel = types.model({
@@ -94,28 +85,27 @@ test("it is possible to set a value inside a map of a map when using the same en
     unprotect(mapOfMap)
     // this should not throw
     mapOfMap.map.get("whatever")!.map.set("1234", EmptyModel.create({}, env))
-    t.true(getEnv(mapOfMap) === env)
-    t.true(getEnv(mapOfMap.map.get("whatever")!.map.get("1234")!) === env)
+    expect(getEnv(mapOfMap) === env).toBe(true)
+    expect(getEnv(mapOfMap.map.get("whatever")!.map.get("1234")!) === env).toBe(true)
 })
-
-test("clone preserves environnment", t => {
+test("clone preserves environnment", () => {
     const env = createEnvironment()
     const store = Store.create({ todos: [{}] }, env)
     {
         const todo = clone(store.todos[0])
-        t.true(getEnv(todo) === env)
+        expect(getEnv(todo) === env).toBe(true)
     }
     {
         const todo = clone(store.todos[0], true)
-        t.true(getEnv(todo) === env)
+        expect(getEnv(todo) === env).toBe(true)
     }
     {
         const todo = clone(store.todos[0], false)
-        t.deepEqual(getEnv(todo), {})
+        expect(getEnv(todo)).toEqual({})
     }
     {
         const env2 = createEnvironment()
         const todo = clone(store.todos[0], env2)
-        t.true(env2 === getEnv(todo))
+        expect(env2 === getEnv(todo)).toBe(true)
     }
 })

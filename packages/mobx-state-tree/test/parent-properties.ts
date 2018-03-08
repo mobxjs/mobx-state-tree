@@ -1,6 +1,4 @@
 import { types, getEnv, getParent } from "../src"
-import { test } from "ava"
-
 const ChildModel = types
     .model("Child", {
         parentPropertyIsNullAfterCreate: false,
@@ -23,7 +21,6 @@ const ChildModel = types
             self.parentPropertyIsNullAfterAttach = typeof self.parent.fetch === "undefined"
         }
     }))
-
 const ParentModel = types
     .model("Parent", {
         child: types.optional(ChildModel, {})
@@ -33,20 +30,16 @@ const ParentModel = types
             return getEnv(self).fetch
         }
     }))
-
-test("Parent property does not have value during child's afterCreate() event", t => {
+test("Parent property does not have value during child's afterCreate() event", () => {
     const mockFetcher = () => Promise.resolve(true)
     const parent = ParentModel.create({}, { fetch: mockFetcher })
-
     // Because the child is created before the parent creation is finished, this one will yield `true` (the .fetch view is still undefined)
-    t.is(parent.child.parentPropertyIsNullAfterCreate, true)
+    expect(parent.child.parentPropertyIsNullAfterCreate).toBe(true)
     // ... but, the env is available
-    t.is(parent.child.parentEnvIsNullAfterCreate, false)
+    expect(parent.child.parentEnvIsNullAfterCreate).toBe(false)
 })
-
-test("Parent property has value during child's afterAttach() event", t => {
+test("Parent property has value during child's afterAttach() event", () => {
     const mockFetcher = () => Promise.resolve(true)
     const parent = ParentModel.create({}, { fetch: mockFetcher })
-
-    t.is(parent.child.parentPropertyIsNullAfterAttach, false)
+    expect(parent.child.parentPropertyIsNullAfterAttach).toBe(false)
 })

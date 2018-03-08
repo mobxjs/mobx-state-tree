@@ -1,9 +1,9 @@
 /**
- * Start a timer which return a function, which when called show the 
+ * Start a timer which return a function, which when called show the
  * number of milliseconds since it started.
- * 
+ *
  * Passing true will give the current lap time.
- * 
+ *
  * Example:
  * ```ts
  * const time = start()
@@ -14,10 +14,10 @@
  * time(true) // 1.00
  * ```
  */
-export const start = () => {
+exports.start = () => {
     const started = process.hrtime()
-    let last: [number, number] = [started[0], started[1]]
-    return (lapTime: boolean = false): number => {
+    let last = [started[0], started[1]]
+    return (lapTime = false) => {
         const final = process.hrtime(lapTime ? last : started)
         return Math.round((final[0] * 1e9 + final[1]) / 1e6)
     }
