@@ -1,5 +1,4 @@
 import {
-    unprotect,
     types,
     addMiddleware,
     recordActions,
@@ -7,10 +6,8 @@ import {
     decorate
     // TODO: export IRawActionCall
 } from "../src"
-import { test, CallbackTestContext, Context } from "ava"
 import { reaction, useStrict } from "mobx"
-
-function delay<T>(time: number, value: T, shouldThrow = false): Promise<T> {
+function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             if (shouldThrow) reject(value)
@@ -18,14 +15,7 @@ function delay<T>(time: number, value: T, shouldThrow = false): Promise<T> {
         }, time)
     })
 }
-
-function testCoffeeTodo(
-    t: CallbackTestContext & Context<any>,
-    generator: (self: any) => (x: string) => IterableIterator<any>,
-    shouldError: boolean,
-    resultValue: any,
-    producedCoffees: string[]
-) {
+function testCoffeeTodo(t, generator, shouldError, resultValue, producedCoffees) {
     useStrict(true)
     const Todo = types
         .model({
@@ -34,37 +24,34 @@ function testCoffeeTodo(
         .actions(self => ({
             startFetch: flow(generator(self))
         }))
-    const events: any[] = []
-    const coffees: string[] = []
+    const events = []
+    const coffees = []
     const t1 = Todo.create({})
     addMiddleware(t1, (c, next) => {
         events.push(c)
         return next(c)
     })
     reaction(() => t1.title, coffee => coffees.push(coffee))
-
     function handleResult(res) {
-        t.is(res, resultValue)
-        t.deepEqual(coffees, producedCoffees)
+        expect(res).toBe(resultValue)
+        expect(coffees).toEqual(producedCoffees)
         const filtered = filterRelevantStuff(events)
-        t.snapshot(filtered, "Wrong events, expected\n" + JSON.stringify(filtered, null, 2))
+        expect(filtered).toMatchSnapshot()
         useStrict(false)
         t.end()
     }
-
     t1.startFetch("black").then(
         r => {
-            t.is(shouldError, false, "Ended up in OK handler")
+            expect(shouldError).toBe(false)
             handleResult(r)
         },
         r => {
-            t.is(shouldError, true, "Ended up in ERROR handler")
+            expect(shouldError).toBe(true)
             handleResult(r)
         }
     )
 }
-
-test.cb("flow happens in single ticks", t => {
+test("flow happens in single ticks", done => {
     const X = types
         .model({
             y: 1
@@ -78,24 +65,21 @@ test.cb("flow happens in single ticks", t => {
                 self.y++
             })
         }))
-
     const x = X.create()
-    const values: number[] = []
+    const values = []
     reaction(() => x.y, v => values.push(v))
-
     debugger
     x.p().then(() => {
-        t.is(x.y, 5)
-        t.deepEqual(values, [3, 5])
-        t.end()
+        expect(x.y).toBe(5)
+        expect(values).toEqual([3, 5])
+        done()
     })
 })
-
-test.cb("can handle async actions", t => {
+test("can handle async actions", () => {
     testCoffeeTodo(
         t,
         self =>
-            function* fetchData(this: any, kind: string) {
+            function* fetchData(kind) {
                 self.title = "getting coffee " + kind
                 self.title = yield delay(100, "drinking coffee")
                 return "awake"
@@ -105,12 +89,11 @@ test.cb("can handle async actions", t => {
         ["getting coffee black", "drinking coffee"]
     )
 })
-
-test.cb("can handle erroring actions", t => {
+test("can handle erroring actions", () => {
     testCoffeeTodo(
         t,
         self =>
-            function* fetchData(this: any, kind: string) {
+            function* fetchData(kind) {
                 throw kind
             },
         true,
@@ -118,12 +101,11 @@ test.cb("can handle erroring actions", t => {
         []
     )
 })
-
-test.cb("can handle try catch", t => {
+test("can handle try catch", () => {
     testCoffeeTodo(
         t,
         self =>
-            function* fetchData(this: any, kind: string) {
+            function* fetchData(kind) {
                 try {
                     yield delay(10, "tea", true)
                 } catch (e) {
@@ -136,16 +118,14 @@ test.cb("can handle try catch", t => {
         ["tea"]
     )
 })
-
-test.cb("empty sequence works", t => {
-    testCoffeeTodo(t, self => function* fetchData(this: any, kind: string) {}, false, undefined, [])
+test("empty sequence works", () => {
+    testCoffeeTodo(t, self => function* fetchData(kind) {}, false, undefined, [])
 })
-
-test.cb("can handle throw from yielded promise works", t => {
+test("can handle throw from yielded promise works", () => {
     testCoffeeTodo(
         t,
         self =>
-            function* fetchData(this: any, kind: string) {
+            function* fetchData(kind) {
                 yield delay(10, "x", true)
             },
         true,
@@ -153,55 +133,49 @@ test.cb("can handle throw from yielded promise works", t => {
         []
     )
 })
-
-test.cb("typings", t => {
+test("typings", done => {
     const M = types
         .model({
             title: types.string
         })
         .actions(self => {
-            function* a(x: string) {
+            function* a(x) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 23
             }
-
-            const b = flow(function* b(x: string) {
+            const b = flow(function* b(x) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 24
             })
-
             return { a: flow(a), b }
         })
     const m1 = M.create({ title: "test " })
     const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
     const resB = m1.b("z") // Arg typings are correct, TODO: Result is correctly promise, but incorrect generic arg
     Promise.all([resA, resB]).then(([x1, x2]) => {
-        t.is(x1, 23)
-        t.is(x2, 24)
-        t.end()
+        expect(x1).toBe(23)
+        expect(x2).toBe(24)
+        done()
     })
 })
-
-test.cb("typings", t => {
+test("typings", done => {
     const M = types
         .model({
             title: types.string
         })
         .actions(self => {
-            function* a(x: string) {
+            function* a(x) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 23
             }
-
-            const b = flow(function* b(x: string) {
+            const b = flow(function* b(x) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 24
             })
-
             return {
                 a: flow(a),
                 b
@@ -211,20 +185,19 @@ test.cb("typings", t => {
     const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
     const resB = m1.b("z") // Arg typings are correct, TODO: Result is correctly promise, but incorrect generic arg
     Promise.all([resA, resB]).then(([x1, x2]) => {
-        t.is(x1, 23)
-        t.is(x2, 24)
-        t.end()
+        expect(x1).toBe(23)
+        expect(x2).toBe(24)
+        done()
     })
 })
-
-test.cb("recordActions should only emit invocation", t => {
+test("recordActions should only emit invocation", done => {
     let calls = 0
     const M = types
         .model({
             title: types.string
         })
         .actions(self => {
-            function* a(x: string) {
+            function* a(x) {
                 yield delay(10, "x", false)
                 calls++
                 return 23
@@ -237,32 +210,30 @@ test.cb("recordActions should only emit invocation", t => {
     const recorder = recordActions(m1)
     m1.a("x").then(() => {
         recorder.stop()
-        t.deepEqual(recorder.actions, [
+        expect(recorder.actions).toEqual([
             {
                 args: ["x"],
                 name: "a",
                 path: ""
             }
         ])
-        t.is(calls, 1)
+        expect(calls).toBe(1)
         recorder.replay(m1)
         setTimeout(() => {
-            t.is(calls, 2)
-            t.end()
+            expect(calls).toBe(2)
+            done()
         }, 50)
     })
 })
-
-test.cb("can handle nested async actions", t => {
+test("can handle nested async actions", () => {
     const uppercase = flow(function* uppercase(value) {
         const res = yield delay(20, value.toUpperCase())
         return res
     })
-
     testCoffeeTodo(
         t,
         self =>
-            function* fetchData(this: any, kind: string) {
+            function* fetchData(kind) {
                 self.title = yield uppercase("drinking " + kind)
                 return self.title
             },
@@ -271,46 +242,39 @@ test.cb("can handle nested async actions", t => {
         ["DRINKING BLACK"]
     )
 })
-
-test.cb("can handle nested async actions when using decorate", t => {
-    const events: [string, string][] = []
-
+test("can handle nested async actions when using decorate", done => {
+    const events = []
     function middleware(call, next) {
         events.push([call.type, call.name])
         return next(call)
     }
-
     const uppercase = flow(function* uppercase(value) {
         const res = yield delay(20, value.toUpperCase())
         return res
     })
-
     const Todo = types.model({}).actions(self => {
         const act = flow(function* act(value) {
             return yield uppercase(value)
         })
-
         return {
             act: decorate(middleware, act)
         }
     })
-
     Todo.create()
         .act("x")
         .then(res => {
-            t.is(res, "X")
-            t.deepEqual(events, [
+            expect(res).toBe("X")
+            expect(events).toEqual([
                 ["action", "act"],
                 ["flow_spawn", "act"],
                 ["flow_resume", "act"],
                 ["flow_resume", "act"],
                 ["flow_return", "act"]
             ])
-            t.end()
+            done()
         })
 })
-
-function filterRelevantStuff(stuff: any): any {
+function filterRelevantStuff(stuff) {
     return stuff.map(x => {
         delete x.context
         delete x.tree

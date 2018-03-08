@@ -10,14 +10,7 @@ import {
     getSnapshot,
     types
 } from "../src"
-import { test } from "ava"
 import { observable } from "mobx"
-interface ITestSnapshot {
-    to: string
-}
-interface ITest {
-    to: string
-}
 const createTestFactories = () => {
     const ItemFactory = types.optional(
         types.model({
@@ -29,130 +22,115 @@ const createTestFactories = () => {
     return { Factory, ItemFactory }
 }
 // === FACTORY TESTS ===
-
-test("it should create a factory", t => {
+test("it should create a factory", () => {
     const { Factory } = createTestFactories()
-    t.deepEqual(getSnapshot(Factory.create()), [])
+    expect(getSnapshot(Factory.create())).toEqual([])
 })
-
-test("it should succeed if not optional and no default provided", t => {
+test("it should succeed if not optional and no default provided", () => {
     const Factory = types.array(types.string)
-    t.deepEqual((Factory.create() as any).toJSON(), [])
+    expect(Factory.create().toJSON()).toEqual([])
 })
-
-test("it should restore the state from the snapshot", t => {
+test("it should restore the state from the snapshot", () => {
     const { Factory } = createTestFactories()
     const instance = Factory.create([{ to: "universe" }])
-    t.deepEqual(getSnapshot(instance), [{ to: "universe" }])
-    t.is("" + instance, "AnonymousModel[]@<root>(1 items)")
+    expect(getSnapshot(instance)).toEqual([{ to: "universe" }])
+    expect("" + instance).toBe("AnonymousModel[]@<root>(1 items)")
 })
 // === SNAPSHOT TESTS ===
-
-test("it should emit snapshots", t => {
+test("it should emit snapshots", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let snapshots: any[] = []
+    let snapshots = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
     doc.push(ItemFactory.create())
-    t.deepEqual(snapshots, [[{ to: "world" }]])
+    expect(snapshots).toEqual([[{ to: "world" }]])
 })
-
-test("it should apply snapshots", t => {
+test("it should apply snapshots", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     applySnapshot(doc, [{ to: "universe" }])
-    t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
+    expect(getSnapshot(doc)).toEqual([{ to: "universe" }])
 })
-
-test("it should return a snapshot", t => {
+test("it should return a snapshot", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
     doc.push(ItemFactory.create())
-    t.deepEqual(getSnapshot(doc), [{ to: "world" }])
+    expect(getSnapshot(doc)).toEqual([{ to: "world" }])
 })
 // === PATCHES TESTS ===
-
-test("it should emit add patches", t => {
+test("it should emit add patches", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches: any[] = []
+    let patches = []
     onPatch(doc, patch => patches.push(patch))
     doc.push(ItemFactory.create({ to: "universe" }))
-    t.deepEqual(patches, [{ op: "add", path: "/0", value: { to: "universe" } }])
+    expect(patches).toEqual([{ op: "add", path: "/0", value: { to: "universe" } }])
 })
-
-test("it should apply an add patch", t => {
+test("it should apply an add patch", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     applyPatch(doc, { op: "add", path: "/0", value: { to: "universe" } })
-    t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
+    expect(getSnapshot(doc)).toEqual([{ to: "universe" }])
 })
-
-test("it should emit update patches", t => {
+test("it should emit update patches", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
     doc.push(ItemFactory.create())
-    let patches: any[] = []
+    let patches = []
     onPatch(doc, patch => patches.push(patch))
     doc[0] = ItemFactory.create({ to: "universe" })
-    t.deepEqual(patches, [{ op: "replace", path: "/0", value: { to: "universe" } }])
+    expect(patches).toEqual([{ op: "replace", path: "/0", value: { to: "universe" } }])
 })
-
-test("it should apply an update patch", t => {
+test("it should apply an update patch", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     applyPatch(doc, { op: "replace", path: "/0", value: { to: "universe" } })
-    t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
+    expect(getSnapshot(doc)).toEqual([{ to: "universe" }])
 })
-
-test("it should emit remove patches", t => {
+test("it should emit remove patches", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
     doc.push(ItemFactory.create())
-    let patches: any[] = []
+    let patches = []
     onPatch(doc, patch => patches.push(patch))
     doc.splice(0)
-    t.deepEqual(patches, [{ op: "remove", path: "/0" }])
+    expect(patches).toEqual([{ op: "remove", path: "/0" }])
 })
-
-test("it should apply a remove patch", t => {
+test("it should apply a remove patch", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
     doc.push(ItemFactory.create())
     doc.push(ItemFactory.create({ to: "universe" }))
     applyPatch(doc, { op: "remove", path: "/0" })
-    t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
+    expect(getSnapshot(doc)).toEqual([{ to: "universe" }])
 })
-
-test("it should apply patches", t => {
+test("it should apply patches", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     applyPatch(doc, [
         { op: "add", path: "/0", value: { to: "mars" } },
         { op: "replace", path: "/0", value: { to: "universe" } }
     ])
-    t.deepEqual(getSnapshot(doc), [{ to: "universe" }])
+    expect(getSnapshot(doc)).toEqual([{ to: "universe" }])
 })
 // === TYPE CHECKS ===
-
-test("it should check the type correctly", t => {
+test("it should check the type correctly", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
-    t.deepEqual(Factory.is(doc), true)
-    t.deepEqual(Factory.is([]), true)
-    t.deepEqual(Factory.is({}), false)
-    t.deepEqual(Factory.is([{ to: "mars" }]), true)
-    t.deepEqual(Factory.is([{ wrongKey: true }]), true)
-    t.deepEqual(Factory.is([{ to: true }]), false)
+    expect(Factory.is(doc)).toEqual(true)
+    expect(Factory.is([])).toEqual(true)
+    expect(Factory.is({})).toEqual(false)
+    expect(Factory.is([{ to: "mars" }])).toEqual(true)
+    expect(Factory.is([{ wrongKey: true }])).toEqual(true)
+    expect(Factory.is([{ to: true }])).toEqual(false)
 })
-
-test("paths shoud remain correct when splicing", t => {
+test("paths shoud remain correct when splicing", () => {
     const store = types
         .model({
             todos: types.array(
@@ -165,20 +143,19 @@ test("paths shoud remain correct when splicing", t => {
             todos: [{}]
         })
     unprotect(store)
-    t.deepEqual(store.todos.map(getPath), ["/todos/0"])
-    store.todos.push({} as any)
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1"])
-    store.todos.unshift({} as any)
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2"])
+    expect(store.todos.map(getPath)).toEqual(["/todos/0"])
+    store.todos.push({})
+    expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])
+    store.todos.unshift({})
+    expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1", "/todos/2"])
     store.todos.splice(0, 2)
-    t.deepEqual(store.todos.map(getPath), ["/todos/0"])
-    store.todos.splice(0, 1, {} as any, {} as any, {} as any)
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2"])
+    expect(store.todos.map(getPath)).toEqual(["/todos/0"])
+    store.todos.splice(0, 1, {}, {}, {})
+    expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1", "/todos/2"])
     store.todos.remove(store.todos[1])
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1"])
+    expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])
 })
-
-test("items should be reconciled correctly when splicing - 1", t => {
+test("items should be reconciled correctly when splicing - 1", () => {
     const Task = types.model("Task", {
         x: types.string
     })
@@ -194,26 +171,24 @@ test("items should be reconciled correctly when splicing - 1", t => {
             todos: [a]
         })
     unprotect(store)
-    t.deepEqual(store.todos.slice(), [a])
-    t.is(isAlive(a), true)
+    expect(store.todos.slice()).toEqual([a])
+    expect(isAlive(a)).toBe(true)
     store.todos.push(b)
-    t.deepEqual(store.todos.slice(), [a, b])
+    expect(store.todos.slice()).toEqual([a, b])
     store.todos.unshift(c)
-    t.deepEqual(store.todos.slice(), [c, a, b])
+    expect(store.todos.slice()).toEqual([c, a, b])
     store.todos.splice(0, 2)
-    t.deepEqual(store.todos.slice(), [b])
-    t.is(isAlive(a), false)
-    t.is(isAlive(b), true)
-    t.is(isAlive(c), false)
-    t.throws(
-        () => store.todos.splice(0, 1, a, c, d),
+    expect(store.todos.slice()).toEqual([b])
+    expect(isAlive(a)).toBe(false)
+    expect(isAlive(b)).toBe(true)
+    expect(isAlive(c)).toBe(false)
+    expect(() => store.todos.splice(0, 1, a, c, d)).toThrowError(
         "[mobx-state-tree] Task@<root>[dead] cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value"
     )
     store.todos.splice(0, 1, clone(a), clone(c), clone(d))
-    t.deepEqual(store.todos.map(_ => _.x), ["a", "c", "d"])
+    expect(store.todos.map(_ => _.x)).toEqual(["a", "c", "d"])
 })
-
-test("items should be reconciled correctly when splicing - 2", t => {
+test("items should be reconciled correctly when splicing - 2", () => {
     const Task = types.model("Task", {
         x: types.string
     })
@@ -231,16 +206,16 @@ test("items should be reconciled correctly when splicing - 2", t => {
     unprotect(store)
     store.todos.splice(2, 1, { x: "e" }, { x: "f" })
     // becomes, a, b, e, f, d
-    t.is(store.todos.length, 5)
-    t.true(store.todos[0] === a)
-    t.true(store.todos[1] === b)
-    t.true(store.todos[2] !== c)
-    t.is(store.todos[2].x, "e")
-    t.true(store.todos[3] !== d)
-    t.is(store.todos[3].x, "f")
-    t.true(store.todos[4] === d) // preserved and moved
-    t.is(store.todos[4].x, "d")
-    t.deepEqual(store.todos.map(getPath), [
+    expect(store.todos.length).toBe(5)
+    expect(store.todos[0] === a).toBe(true)
+    expect(store.todos[1] === b).toBe(true)
+    expect(store.todos[2] !== c).toBe(true)
+    expect(store.todos[2].x).toBe("e")
+    expect(store.todos[3] !== d).toBe(true)
+    expect(store.todos[3].x).toBe("f")
+    expect(store.todos[4] === d).toBe(true) // preserved and moved
+    expect(store.todos[4].x).toBe("d")
+    expect(store.todos.map(getPath)).toEqual([
         "/todos/0",
         "/todos/1",
         "/todos/2",
@@ -249,16 +224,15 @@ test("items should be reconciled correctly when splicing - 2", t => {
     ])
     store.todos.splice(1, 3, { x: "g" })
     // becomes a, g, d
-    t.is(store.todos.length, 3)
-    t.true(store.todos[0] === a)
-    t.is(store.todos[1].x, "g")
-    t.is(store.todos[2].x, "d")
-    t.true(store.todos[1] !== b)
-    t.true(store.todos[2] === d) // still original d
-    t.deepEqual(store.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2"])
+    expect(store.todos.length).toBe(3)
+    expect(store.todos[0] === a).toBe(true)
+    expect(store.todos[1].x).toBe("g")
+    expect(store.todos[2].x).toBe("d")
+    expect(store.todos[1] !== b).toBe(true)
+    expect(store.todos[2] === d).toBe(true) // still original d
+    expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1", "/todos/2"])
 })
-
-test("it should reconciliate keyed instances correctly", t => {
+test("it should reconciliate keyed instances correctly", () => {
     const Store = types.model({
         todos: types.optional(
             types.array(
@@ -278,9 +252,9 @@ test("it should reconciliate keyed instances correctly", t => {
             { id: "3", task: "biscuit", done: false }
         ]
     })
-    t.deepEqual(store.todos.map(todo => todo.task), ["coffee", "tea", "biscuit"])
-    t.deepEqual(store.todos.map(todo => todo.done), [false, false, false])
-    t.deepEqual(store.todos.map(todo => todo.id), ["1", "2", "3"])
+    expect(store.todos.map(todo => todo.task)).toEqual(["coffee", "tea", "biscuit"])
+    expect(store.todos.map(todo => todo.done)).toEqual([false, false, false])
+    expect(store.todos.map(todo => todo.id)).toEqual(["1", "2", "3"])
     const coffee = store.todos[0]
     const tea = store.todos[1]
     const biscuit = store.todos[2]
@@ -292,15 +266,14 @@ test("it should reconciliate keyed instances correctly", t => {
             { id: "5", task: "stuffz", done: false }
         ]
     })
-    t.deepEqual(store.todos.map(todo => todo.task), ["Tee", "coffee", "biscuit", "stuffz"])
-    t.deepEqual(store.todos.map(todo => todo.done), [true, true, false, false])
-    t.deepEqual(store.todos.map(todo => todo.id), ["2", "1", "4", "5"])
-    t.is(store.todos[0] === tea, true)
-    t.is(store.todos[1] === coffee, true)
-    t.is(store.todos[2] === biscuit, false)
+    expect(store.todos.map(todo => todo.task)).toEqual(["Tee", "coffee", "biscuit", "stuffz"])
+    expect(store.todos.map(todo => todo.done)).toEqual([true, true, false, false])
+    expect(store.todos.map(todo => todo.id)).toEqual(["2", "1", "4", "5"])
+    expect(store.todos[0] === tea).toBe(true)
+    expect(store.todos[1] === coffee).toBe(true)
+    expect(store.todos[2] === biscuit).toBe(false)
 })
-
-test("it correctly reconciliate when swapping", t => {
+test("it correctly reconciliate when swapping", () => {
     const Task = types.model("Task", {})
     const Store = types.model({
         todos: types.optional(types.array(Task), [])
@@ -311,12 +284,11 @@ test("it correctly reconciliate when swapping", t => {
     const b = Task.create()
     s.todos.push(a, b)
     s.todos.replace([b, a])
-    t.true(s.todos[0] === b)
-    t.true(s.todos[1] === a)
-    t.deepEqual(s.todos.map(getPath), ["/todos/0", "/todos/1"])
+    expect(s.todos[0] === b).toBe(true)
+    expect(s.todos[1] === a).toBe(true)
+    expect(s.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])
 })
-
-test("it correctly reconciliate when swapping using snapshots", t => {
+test("it correctly reconciliate when swapping using snapshots", () => {
     const Task = types.model("Task", {})
     const Store = types.model({
         todos: types.optional(types.array(Task), [])
@@ -327,16 +299,15 @@ test("it correctly reconciliate when swapping using snapshots", t => {
     const b = Task.create()
     s.todos.push(a, b)
     s.todos.replace([getSnapshot(b), getSnapshot(a)])
-    t.true(s.todos[0] === b)
-    t.true(s.todos[1] === a)
-    t.deepEqual(s.todos.map(getPath), ["/todos/0", "/todos/1"])
+    expect(s.todos[0] === b).toBe(true)
+    expect(s.todos[1] === a).toBe(true)
+    expect(s.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])
     s.todos.push({})
-    t.true(s.todos[0] === b)
-    t.true(s.todos[1] === a)
-    t.deepEqual(s.todos.map(getPath), ["/todos/0", "/todos/1", "/todos/2"])
+    expect(s.todos[0] === b).toBe(true)
+    expect(s.todos[1] === a).toBe(true)
+    expect(s.todos.map(getPath)).toEqual(["/todos/0", "/todos/1", "/todos/2"])
 })
-
-test("it should not be allowed to add the same item twice to the same store", t => {
+test("it should not be allowed to add the same item twice to the same store", () => {
     const Task = types.model("Task", {})
     const Store = types.model({
         todos: types.optional(types.array(Task), [])
@@ -345,19 +316,22 @@ test("it should not be allowed to add the same item twice to the same store", t 
     unprotect(s)
     const a = Task.create()
     s.todos.push(a)
-    t.throws(() => {
+    expect(() => {
         s.todos.push(a)
-    }, "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/1', but it lives already at '/todos/0'")
+    }).toThrowError(
+        "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/1', but it lives already at '/todos/0'"
+    )
     const b = Task.create()
-    t.throws(() => {
+    expect(() => {
         s.todos.push(b, b)
-    }, "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/2', but it lives already at '/todos/1'")
+    }).toThrowError(
+        "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/2', but it lives already at '/todos/1'"
+    )
 })
-
-test("it should support observable arrays", t => {
+test("it should support observable arrays", () => {
     const TestArray = types.array(types.number)
     const testArray = TestArray.create(observable([1, 2]))
-    t.true(testArray[0] === 1)
-    t.true(testArray.length === 2)
-    t.true(Array.isArray(testArray.slice()))
+    expect(testArray[0] === 1).toBe(true)
+    expect(testArray.length === 2).toBe(true)
+    expect(Array.isArray(testArray.slice())).toBe(true)
 })

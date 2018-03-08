@@ -1,16 +1,7 @@
 /**
  *  Based on examples/boxes/domain-state.js
  */
-import {
-    types,
-    getParent,
-    hasParent,
-    recordPatches,
-    IJsonPatch,
-    unprotect,
-    getSnapshot
-} from "../src"
-import { test } from "ava"
+import { types, getParent, hasParent, recordPatches, unprotect, getSnapshot } from "../src"
 export const Box = types
     .model("Box", {
         id: types.identifier(),
@@ -89,35 +80,30 @@ function createStore() {
         selection: "aa"
     })
 }
-
-test("store is deserialized correctly", t => {
+test("store is deserialized correctly", () => {
     const s = createStore()
-    t.is(s.boxes.size, 2)
-    t.is(s.arrows.length, 1)
-    t.true(s.selection === s.boxes.get("aa"))
-    t.is(s.arrows[0].from!.name, "Rotterdam")
-    t.is(s.arrows[0].to!.name, "Bratislava")
-    t.deepEqual(s.boxes.values().map(b => b.isSelected), [false, true])
+    expect(s.boxes.size).toBe(2)
+    expect(s.arrows.length).toBe(1)
+    expect(s.selection === s.boxes.get("aa")).toBe(true)
+    expect(s.arrows[0].from.name).toBe("Rotterdam")
+    expect(s.arrows[0].to.name).toBe("Bratislava")
+    expect(s.boxes.values().map(b => b.isSelected)).toEqual([false, true])
 })
-
-test("store emits correct patch paths", t => {
+test("store emits correct patch paths", () => {
     const s = createStore()
     const recorder1 = recordPatches(s)
     const recorder2 = recordPatches(s.boxes)
-    const recorder3 = recordPatches(s.boxes.get("cc")!)
-    s.arrows[0].from!.x += 117
-    t.deepEqual(recorder1.patches, [
-        { op: "replace", path: "/boxes/cc/x", value: 217 } as IJsonPatch
-    ])
-    t.deepEqual(recorder2.patches, [{ op: "replace", path: "/cc/x", value: 217 } as IJsonPatch])
-    t.deepEqual(recorder3.patches, [{ op: "replace", path: "/x", value: 217 } as IJsonPatch])
+    const recorder3 = recordPatches(s.boxes.get("cc"))
+    s.arrows[0].from.x += 117
+    expect(recorder1.patches).toEqual([{ op: "replace", path: "/boxes/cc/x", value: 217 }])
+    expect(recorder2.patches).toEqual([{ op: "replace", path: "/cc/x", value: 217 }])
+    expect(recorder3.patches).toEqual([{ op: "replace", path: "/x", value: 217 }])
 })
-
-test("box operations works correctly", t => {
+test("box operations works correctly", () => {
     const s = createStore()
     s.createBox("a", "A", 0, 0, null, null)
     s.createBox("b", "B", 100, 100, s.boxes.get("aa"), "aa2b")
-    t.deepEqual(getSnapshot(s), {
+    expect(getSnapshot(s)).toEqual({
         boxes: {
             cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
             aa: { id: "aa", name: "Bratislava", x: 650, y: 300 },
@@ -127,8 +113,8 @@ test("box operations works correctly", t => {
         arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
         selection: "b"
     })
-    s.boxes.get("a")!.setName("I'm groot")
-    t.deepEqual(getSnapshot(s), {
+    s.boxes.get("a").setName("I'm groot")
+    expect(getSnapshot(s)).toEqual({
         boxes: {
             cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
             aa: { id: "aa", name: "Bratislava", x: 650, y: 300 },
@@ -138,9 +124,9 @@ test("box operations works correctly", t => {
         arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
         selection: "b"
     })
-    t.deepEqual(JSON.stringify(s), JSON.stringify(getSnapshot(s)))
-    s.boxes.get("a")!.move(50, 50)
-    t.deepEqual(getSnapshot(s), {
+    expect(JSON.stringify(s)).toEqual(JSON.stringify(getSnapshot(s)))
+    s.boxes.get("a").move(50, 50)
+    expect(getSnapshot(s)).toEqual({
         boxes: {
             cc: { id: "cc", name: "Rotterdam", x: 100, y: 100 },
             aa: { id: "aa", name: "Bratislava", x: 650, y: 300 },
@@ -150,6 +136,6 @@ test("box operations works correctly", t => {
         arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
         selection: "b"
     })
-    t.is(s.boxes.get("b")!.width, 15)
-    t.is(Box.create({ id: "hello" }).isSelected, false)
+    expect(s.boxes.get("b").width).toBe(15)
+    expect(Box.create({ id: "hello" }).isSelected).toBe(false)
 })

@@ -1,5 +1,4 @@
 import * as mst from "../src"
-import { test } from "ava"
 import { readFileSync } from "fs"
 const METHODS = [
     "addDisposer",
@@ -32,7 +31,7 @@ const METHODS = [
     "onAction",
     "onPatch",
     "onSnapshot",
-    "process", // DEPRECATED
+    "process",
     "protect",
     "recordActions",
     "recordPatches",
@@ -68,27 +67,23 @@ const TYPES = [
     "union",
     "enumeration"
 ]
-
-test("correct api exposed", t => {
-    t.deepEqual(Object.keys(mst).sort(), METHODS.sort())
+test("correct api exposed", () => {
+    expect(Object.keys(mst).sort()).toEqual(METHODS.sort())
 })
-
-test("correct types exposed", t => {
-    t.deepEqual(Object.keys(mst.types).sort(), TYPES.sort())
+test("correct types exposed", () => {
+    expect(Object.keys(mst.types).sort()).toEqual(TYPES.sort())
 })
-
-test("all methods mentioned in readme.md", t => {
+test("all methods mentioned in readme.md", () => {
     const readme = readFileSync(__dirname + "/../../../../README.md", "utf8")
     const missing = TYPES.map(type => "types." + type)
         .concat(METHODS)
         .filter(identifier => readme.indexOf("`" + identifier) === -1)
-    t.deepEqual(missing, [])
+    expect(missing).toEqual([])
 })
-
-test("all methods mentioned in api.md", t => {
+test("all methods mentioned in api.md", () => {
     const apimd = readFileSync(__dirname + "/../../../../API.md", "utf8")
     const missing = TYPES.map(type => "types." + type)
         .concat(METHODS)
         .filter(identifier => apimd.indexOf("# " + identifier) === -1)
-    t.deepEqual(missing, [])
+    expect(missing).toEqual([])
 })

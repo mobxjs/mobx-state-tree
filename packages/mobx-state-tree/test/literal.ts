@@ -1,61 +1,53 @@
 import { types } from "../src"
-import { test } from "ava"
-
 if (process.env.NODE_ENV === "development") {
-    test("it should allow only primitives", t => {
-        const error = t.throws(() => {
+    test("it should allow only primitives", () => {
+        const error = expect(() => {
             types.model({
                 complexArg: types.literal({ a: 1 })
             })
-        }, "[mobx-state-tree] Literal types can be built only on top of primitives")
+        }).toThrowError("[mobx-state-tree] Literal types can be built only on top of primitives")
     })
-
-    test("it should fail if not optional and no default provided", t => {
+    test("it should fail if not optional and no default provided", () => {
         const Factory = types.literal("hello")
-        t.snapshot(
-            t.throws(() => {
+        expect(
+            expect(() => {
                 Factory.create()
-            }).message
-        )
+            }).toThrow().message
+        ).toMatchSnapshot()
     })
-
-    test("it should throw if a different type is given", t => {
+    test("it should throw if a different type is given", () => {
         const Factory = types.model("TestFactory", {
             shouldBeOne: types.literal(1)
         })
-        t.snapshot(
-            t.throws(() => {
+        expect(
+            expect(() => {
                 Factory.create({ shouldBeOne: 2 })
-            }).message
-        )
+            }).toThrow().message
+        ).toMatchSnapshot()
     })
 }
-
-test("it should support null type", t => {
+test("it should support null type", () => {
     const M = types.model({
         nullish: types.null
     })
-    t.is(
+    expect(
         M.is({
             nullish: null
-        }),
-        true
-    )
-    t.is(M.is({ nullish: undefined }), false)
-    t.is(M.is({ nullish: 17 }), false)
+        })
+    ).toBe(true)
+    expect(M.is({ nullish: undefined })).toBe(false)
+    expect(M.is({ nullish: 17 })).toBe(false)
 })
-
-test("it should support undefined type", t => {
+test("it should support undefined type", () => {
     const M = types.model({
         undefinedish: types.undefined
     })
-    t.is(
+    expect(
         M.is({
             undefinedish: undefined
-        }),
-        true
-    )
-    t.is(M.is({}), true) // MWE: disputable, should be false?
-    t.is(M.is({ undefinedish: null }), false)
-    t.is(M.is({ undefinedish: 17 }), false)
+        })
+    ).toBe(true)
+    expect(M.is({})).toBe(true) // MWE: disputable, should be false?
+    expect(M.is({ undefinedish: null })).toBe(false)
+    expect(M.is({ undefinedish: 17 })).toBe(false)
 })

@@ -1,7 +1,5 @@
-import { test } from "ava"
 import { Hero, Monster, Treasure } from "./fixtures/fixture-models"
 import { unprotect } from "../src"
-
 const SAMPLE_HERO = {
     id: 1,
     name: "jimmy",
@@ -9,19 +7,16 @@ const SAMPLE_HERO = {
     role: "cleric",
     description: "hi"
 }
-
-test("Hero computed fields", t => {
+test("Hero computed fields", () => {
     const hero = Hero.create(SAMPLE_HERO)
-    t.is(hero.descriptionLength, 2)
+    expect(hero.descriptionLength).toBe(2)
 })
-
-test("Tresure", t => {
+test("Tresure", () => {
     const treasure = Treasure.create({ gold: 1, trapped: true })
-    t.true(treasure.trapped)
-    t.is(treasure.gold, 1)
+    expect(treasure.trapped).toBe(true)
+    expect(treasure.gold).toBe(1)
 })
-
-test("Monster computed fields", t => {
+test("Monster computed fields", () => {
     const monster = Monster.create({
         id: "foo",
         level: 1,
@@ -36,16 +31,16 @@ test("Monster computed fields", t => {
         hasWings: true,
         hasGrowl: true
     })
-    t.true(monster.isAlive)
-    t.true(monster.isFlashingRed)
+    expect(monster.isAlive).toBe(true)
+    expect(monster.isFlashingRed).toBe(true)
     unprotect(monster)
-    t.is(monster.weight, 2)
+    expect(monster.weight).toBe(2)
     monster.level = 0
     monster.hasFangs = false
     monster.hasWings = false
     monster.eatenHeroes = null
-    t.is(monster.weight, 1)
+    expect(monster.weight).toBe(1)
     monster.hp = 0
-    t.false(monster.isFlashingRed)
-    t.false(monster.isAlive)
+    expect(monster.isFlashingRed).toBe(false)
+    expect(monster.isAlive).toBe(false)
 })

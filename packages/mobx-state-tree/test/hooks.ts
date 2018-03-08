@@ -1,5 +1,4 @@
 import { addDisposer, destroy, detach, types, unprotect, getSnapshot, applySnapshot } from "../src"
-import { test } from "ava"
 function createTestStore(listener) {
     const Todo = types
         .model("Todo", {
@@ -59,9 +58,8 @@ function createTestStore(listener) {
         Todo
     }
 }
-
-test("it should trigger lifecycle hooks", t => {
-    const events: string[] = []
+test("it should trigger lifecycle hooks", () => {
+    const events = []
     const { store, Todo } = createTestStore(e => events.push(e))
     const talk = detach(store.todos[2])
     events.push("-")
@@ -72,7 +70,7 @@ test("it should trigger lifecycle hooks", t => {
     events.push("---")
     destroy(store)
     destroy(talk)
-    t.deepEqual(events, [
+    expect(events).toEqual([
         "new todo: Get coffee",
         "new todo: Get biscuit",
         "new todo: Give talk",
@@ -106,11 +104,11 @@ const Car = types
     .model({
         id: types.number
     })
-    .preProcessSnapshot((snapshot: any) => ({ ...snapshot, id: parseInt(snapshot.id) * 2 }))
+    .preProcessSnapshot(snapshot => Object.assign({}, snapshot, { id: parseInt(snapshot.id) * 2 }))
     .actions(self => {
         // TODO: Move to a separate type
         function postProcessSnapshot(snapshot) {
-            return { ...snapshot, id: "" + snapshot.id / 2 }
+            return Object.assign({}, snapshot, { id: "" + snapshot.id / 2 })
         }
         return {
             postProcessSnapshot
@@ -119,51 +117,43 @@ const Car = types
 const Factory = types.model({
     car: Car
 })
-
-test("it should preprocess snapshots when creating", t => {
+test("it should preprocess snapshots when creating", () => {
     const car = Car.create({ id: "1" })
-    t.is(car.id, 2)
+    expect(car.id).toBe(2)
 })
-
-test("it should preprocess snapshots when updating", t => {
+test("it should preprocess snapshots when updating", () => {
     const car = Car.create({ id: "1" })
-    t.is(car.id, 2)
+    expect(car.id).toBe(2)
     applySnapshot(car, { id: "6" })
-    t.is(car.id, 12)
+    expect(car.id).toBe(12)
 })
-
-test("it should postprocess snapshots when generating snapshot", t => {
+test("it should postprocess snapshots when generating snapshot", () => {
     const car = Car.create({ id: "1" })
-    t.is(car.id, 2)
-    t.deepEqual(getSnapshot(car), { id: "1" })
+    expect(car.id).toBe(2)
+    expect(getSnapshot(car)).toEqual({ id: "1" })
 })
-
-test("it should preprocess snapshots when creating as property type", t => {
+test("it should preprocess snapshots when creating as property type", () => {
     const f = Factory.create({
         car: { id: "1" }
     })
-    t.is(f.car.id, 2)
+    expect(f.car.id).toBe(2)
 })
-
-test("it should preprocess snapshots when updating", t => {
+test("it should preprocess snapshots when updating", () => {
     const f = Factory.create({ car: { id: "1" } })
-    t.is(f.car.id, 2)
+    expect(f.car.id).toBe(2)
     applySnapshot(f, { car: { id: "6" } })
-    t.is(f.car.id, 12)
+    expect(f.car.id).toBe(12)
 })
-
-test("it should postprocess snapshots when generating snapshot", t => {
+test("it should postprocess snapshots when generating snapshot", () => {
     const f = Factory.create({ car: { id: "1" } })
-    t.is(f.car.id, 2)
-    t.deepEqual(getSnapshot(f), { car: { id: "1" } })
+    expect(f.car.id).toBe(2)
+    expect(getSnapshot(f)).toEqual({ car: { id: "1" } })
 })
-
-test("base hooks can be composed", t => {
-    const events: string[] = []
+test("base hooks can be composed", () => {
+    const events = []
     function listener(message) {
         events.push(message)
     }
-
     const Todo = types
         .model("Todo", { title: "" })
         .actions(self => {
@@ -196,16 +186,14 @@ test("base hooks can be composed", t => {
             }
             return { afterCreate, beforeDestroy, afterAttach, beforeDetach }
         })
-
     const Store = types.model("Store", { todos: types.array(Todo) })
-
     const store = Store.create({ todos: [] })
     const todo = Todo.create()
     unprotect(store)
     store.todos.push(todo)
     detach(todo)
     destroy(todo)
-    t.deepEqual(events, [
+    expect(events).toEqual([
         "aftercreate1",
         "aftercreate2",
         "afterattach1",
@@ -216,8 +204,7 @@ test("base hooks can be composed", t => {
         "beforedestroy2"
     ])
 })
-
-test("snapshot processors can be composed", t => {
+test("snapshot processors can be composed", () => {
     const X = types
         .model({
             x: 1
@@ -228,7 +215,7 @@ test("snapshot processors can be composed", t => {
                 return s
             }
         }))
-        .preProcessSnapshot((s: any) => ({
+        .preProcessSnapshot(s => ({
             x: s.x - 3
         }))
         .actions(self => ({
@@ -237,10 +224,10 @@ test("snapshot processors can be composed", t => {
                 return s
             }
         }))
-        .preProcessSnapshot((s: any) => ({
+        .preProcessSnapshot(s => ({
             x: s.x / 5
         }))
     const x = X.create({ x: 25 })
-    t.is(x.x, 2)
-    t.is(getSnapshot<typeof X.SnapshotType>(x).x, 25)
+    expect(x.x).toBe(2)
+    expect(getSnapshot(x).x).toBe(25)
 })

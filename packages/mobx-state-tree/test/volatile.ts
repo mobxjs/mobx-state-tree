@@ -1,7 +1,5 @@
 import { types, getSnapshot, recordPatches, unprotect } from "../src"
-import { test } from "ava"
 import { reaction, isObservable } from "mobx"
-
 const Todo = types
     .model({
         done: false
@@ -17,42 +15,33 @@ const Todo = types
             self.state = Promise.resolve(2)
         }
     }))
-
-test("Properties should be readable and writable", t => {
+test("Properties should be readable and writable", () => {
     const i = Todo.create()
-    t.true(i.state instanceof Promise)
+    expect(i.state instanceof Promise).toBe(true)
     i.reload()
-    t.true(i.state instanceof Promise)
+    expect(i.state instanceof Promise).toBe(true)
 })
-
-test("VS should not show up in snapshots", t => {
-    t.deepEqual(getSnapshot(Todo.create()), { done: false })
+test("VS should not show up in snapshots", () => {
+    expect(getSnapshot(Todo.create())).toEqual({ done: false })
 })
-
-test("VS should not show up in patches", t => {
+test("VS should not show up in patches", () => {
     const i = Todo.create()
     const r = recordPatches(i)
-
     i.reload()
     i.toggle()
     r.stop()
-    t.deepEqual(r.patches, [{ op: "replace", path: "/done", value: true }])
+    expect(r.patches).toEqual([{ op: "replace", path: "/done", value: true }])
 })
-
-test("VS be observable", t => {
-    const promises: Promise<any>[] = []
+test("VS be observable", () => {
+    const promises = []
     const i = Todo.create()
     const d = reaction(() => i.state, p => promises.push(p))
-
     i.reload()
     i.reload()
-
-    t.is(promises.length, 2)
-
+    expect(promises.length).toBe(2)
     d()
 })
-
-test("VS should not be deeply observable", t => {
+test("VS should not be deeply observable", () => {
     const i = types
         .model({})
         .volatile(self => ({
@@ -60,42 +49,33 @@ test("VS should not be deeply observable", t => {
         }))
         .create()
     unprotect(i)
-
-    t.true(isObservable(i, "x"))
-    t.false(isObservable(i.x))
-    t.false(isObservable(i.x, "a"))
-
+    expect(isObservable(i, "x")).toBe(true)
+    expect(isObservable(i.x)).toBe(false)
+    expect(isObservable(i.x, "a")).toBe(false)
     i.x = { a: 2 }
-    t.true(isObservable(i, "x"))
-    t.false(isObservable(i.x))
-    t.false(isObservable(i.x, "a"))
+    expect(isObservable(i, "x")).toBe(true)
+    expect(isObservable(i.x)).toBe(false)
+    expect(isObservable(i.x, "a")).toBe(false)
 })
-
-test("VS should not be strongly typed observable", t => {
+test("VS should not be strongly typed observable", () => {
     const i = Todo.create()
     // TEST: type error i.state = 7
-
     i.state.then(() => {}) // it's a promise
-
     // TEST: not available on snapshot: getSnapshot(i).state
-    t.true(true)
+    expect(true).toBe(true)
 })
-
-test("VS should not be modifiable without action", t => {
+test("VS should not be modifiable without action", () => {
     const i = Todo.create()
-    t.throws(() => {
+    expect(() => {
         i.state = Promise.resolve(4)
-    }, /the object is protected and can only be modified by using an action/)
+    }).toThrowError(/the object is protected and can only be modified by using an action/)
 })
-
-test("VS should not be modifiable when unprotected", t => {
+test("VS should not be modifiable when unprotected", () => {
     const i = Todo.create()
     unprotect(i)
-
     const p = Promise.resolve(7)
-    t.notThrows(() => {
+    expect(() => {
         i.state = p
-    })
-
-    t.true(i.state === p)
+    }).not.toThrow()
+    expect(i.state === p).toBe(true)
 })

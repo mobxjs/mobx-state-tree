@@ -1,5 +1,4 @@
 import { types, hasParent, tryResolve, getSnapshot } from "../src"
-import { test } from "ava"
 const createTestFactories = () => {
     const Box = types.model("Box", {
         width: types.number,
@@ -25,46 +24,41 @@ const createTestFactories = () => {
     })
     return { Box, Square, Cube, Plane, DispatchPlane, Heighed, Block }
 }
-
 if (process.env.NODE_ENV === "development") {
-    test("it should complain about multiple applicable types no dispatch method", t => {
+    test("it should complain about multiple applicable types no dispatch method", () => {
         const { Box, Plane, Square } = createTestFactories()
-        t.snapshot(
-            t.throws(() => {
+        expect(
+            expect(() => {
                 Plane.create({ width: 2, height: 2 })
-            }).message
-        )
+            }).toThrow().message
+        ).toMatchSnapshot()
     })
 }
-
-test("it should have parent whenever creating or applying from a complex data structure to a model which has Union typed children", t => {
+test("it should have parent whenever creating or applying from a complex data structure to a model which has Union typed children", () => {
     const { Block, Heighed } = createTestFactories()
     const block = Block.create({
         list: [{ width: 2, height: 2 }]
     })
     const child = tryResolve(block, "./list/0")
-    t.is(hasParent(child), true)
+    expect(hasParent(child)).toBe(true)
 })
-
 if (process.env.NODE_ENV === "development") {
-    test("it should complain about no applicable types", t => {
+    test("it should complain about no applicable types", () => {
         const { Heighed } = createTestFactories()
-        t.snapshot(
-            t.throws(() => {
+        expect(
+            expect(() => {
                 Heighed.create({ height: 2 })
-            }).message
-        )
+            }).toThrow().message
+        ).toMatchSnapshot()
     })
 }
-
-test("it should be smart enough to discriminate by keys", t => {
+test("it should be smart enough to discriminate by keys", () => {
     const { Box, Plane, Square } = createTestFactories()
     const doc = types.union(Square, Box).create({ width: 2 })
-    t.deepEqual(Box.is(doc), false)
-    t.deepEqual(Square.is(doc), true)
+    expect(Box.is(doc)).toEqual(false)
+    expect(Square.is(doc)).toEqual(true)
 })
-
-test("it should discriminate by value type", t => {
+test("it should discriminate by value type", () => {
     const Size = types.model("Size", {
         width: 0,
         height: 0
@@ -78,24 +72,21 @@ test("it should discriminate by value type", t => {
     })
     const PictureOrSquare = types.union(Picture, Square)
     const doc = PictureOrSquare.create({ size: { width: 0, height: 0 } })
-    t.deepEqual(Picture.is(doc), true)
-    t.deepEqual(Square.is(doc), false)
+    expect(Picture.is(doc)).toEqual(true)
+    expect(Square.is(doc)).toEqual(false)
 })
-
-test("it should compute exact union types", t => {
+test("it should compute exact union types", () => {
     const { Box, Plane, Square } = createTestFactories()
-    t.deepEqual(Plane.is(Box.create({ width: 3, height: 2 })), true)
-    t.deepEqual(Plane.is(Square.create({ width: 3 })), true)
+    expect(Plane.is(Box.create({ width: 3, height: 2 }))).toEqual(true)
+    expect(Plane.is(Square.create({ width: 3 }))).toEqual(true)
 })
-
-test("it should compute exact union types - 2", t => {
+test("it should compute exact union types - 2", () => {
     const { Box, DispatchPlane, Square } = createTestFactories()
-    t.deepEqual(DispatchPlane.is(Box.create({ width: 3, height: 2 })), true)
-    t.deepEqual(DispatchPlane.is(Square.create({ width: 3, height: 2 } as any)), true)
+    expect(DispatchPlane.is(Box.create({ width: 3, height: 2 }))).toEqual(true)
+    expect(DispatchPlane.is(Square.create({ width: 3, height: 2 }))).toEqual(true)
 })
-
-test("it should use dispatch to discriminate", t => {
+test("it should use dispatch to discriminate", () => {
     const { Box, DispatchPlane, Square } = createTestFactories()
     const a = DispatchPlane.create({ width: 3 })
-    t.deepEqual<any>(getSnapshot(a), { width: 3 })
+    expect(getSnapshot(a)).toEqual({ width: 3 })
 })

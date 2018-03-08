@@ -7,10 +7,6 @@ import {
     applySnapshot,
     addMiddleware
 } from "../src"
-import { test } from "ava"
-
-declare var Buffer
-
 /// Simple action replay and invocation
 const Task = types
     .model({
@@ -25,40 +21,37 @@ const Task = types
             toggle
         }
     })
-
-test("it should be possible to invoke a simple action", t => {
+test("it should be possible to invoke a simple action", () => {
     const t1 = Task.create()
-    t.is(t1.done, false)
-    t.is(t1.toggle(), true)
-    t.is(t1.done, true)
+    expect(t1.done).toBe(false)
+    expect(t1.toggle()).toBe(true)
+    expect(t1.done).toBe(true)
 })
-
-test("it should be possible to record & replay a simple action", t => {
+test("it should be possible to record & replay a simple action", () => {
     const t1 = Task.create()
     const t2 = Task.create()
-    t.is(t1.done, false)
-    t.is(t2.done, false)
+    expect(t1.done).toBe(false)
+    expect(t2.done).toBe(false)
     const recorder = recordActions(t1)
     t1.toggle()
     t1.toggle()
     t1.toggle()
-    t.deepEqual(recorder.actions, [
+    expect(recorder.actions).toEqual([
         { name: "toggle", path: "", args: [] },
         { name: "toggle", path: "", args: [] },
         { name: "toggle", path: "", args: [] }
     ])
     recorder.replay(t2)
-    t.is(t2.done, true)
+    expect(t2.done).toBe(true)
 })
-
-test("applying patches should be recordable and replayable", t => {
+test("applying patches should be recordable and replayable", () => {
     const t1 = Task.create()
     const t2 = Task.create()
     const recorder = recordActions(t1)
-    t.is(t1.done, false)
+    expect(t1.done).toBe(false)
     applyPatch(t1, { op: "replace", path: "done", value: true })
-    t.is(t1.done, true)
-    t.deepEqual(recorder.actions, [
+    expect(t1.done).toBe(true)
+    expect(recorder.actions).toEqual([
         {
             name: "@APPLY_PATCHES",
             path: "",
@@ -66,17 +59,16 @@ test("applying patches should be recordable and replayable", t => {
         }
     ])
     recorder.replay(t2)
-    t.is(t2.done, true)
+    expect(t2.done).toBe(true)
 })
-
-test("applying snapshots should be recordable and replayable", t => {
+test("applying snapshots should be recordable and replayable", () => {
     const t1 = Task.create()
     const t2 = Task.create()
     const recorder = recordActions(t1)
-    t.is(t1.done, false)
+    expect(t1.done).toBe(false)
     applySnapshot(t1, { done: true })
-    t.is(t1.done, true)
-    t.deepEqual(recorder.actions, [
+    expect(t1.done).toBe(true)
+    expect(recorder.actions).toEqual([
         {
             name: "@APPLY_SNAPSHOT",
             path: "",
@@ -84,15 +76,13 @@ test("applying snapshots should be recordable and replayable", t => {
         }
     ])
     recorder.replay(t2)
-    t.is(t2.done, true)
+    expect(t2.done).toBe(true)
 })
-
 // Complex actions
 const Customer = types.model("Customer", {
     id: types.identifier(types.number),
     name: types.string
 })
-
 const Order = types
     .model("Order", {
         customer: types.maybe(types.reference(Customer))
@@ -101,22 +91,18 @@ const Order = types
         function setCustomer(customer) {
             self.customer = customer
         }
-
         function noopSetCustomer(customer) {
             // noop
         }
-
         return {
             setCustomer,
             noopSetCustomer
         }
     })
-
 const OrderStore = types.model("OrderStore", {
     customers: types.array(Customer),
     orders: types.array(Order)
 })
-
 function createTestStore() {
     const store = OrderStore.create({
         customers: [{ id: 1, name: "Mattia" }],
@@ -129,15 +115,14 @@ function createTestStore() {
     onAction(store, () => {})
     return store
 }
-
-test("it should not be possible to pass a complex object", t => {
+test("it should not be possible to pass a complex object", () => {
     const store = createTestStore()
     const recorder = recordActions(store)
-    t.is(store.customers[0].name, "Mattia")
+    expect(store.customers[0].name).toBe("Mattia")
     store.orders[0].setCustomer(store.customers[0])
-    t.is(store.orders[0].customer!.name, "Mattia")
-    t.is(store.orders[0].customer, store.customers[0])
-    t.deepEqual(getSnapshot(store) as any, {
+    expect(store.orders[0].customer.name).toBe("Mattia")
+    expect(store.orders[0].customer).toBe(store.customers[0])
+    expect(getSnapshot(store)).toEqual({
         customers: [
             {
                 id: 1,
@@ -150,7 +135,7 @@ test("it should not be possible to pass a complex object", t => {
             }
         ]
     })
-    t.deepEqual(recorder.actions, [
+    expect(recorder.actions).toEqual([
         {
             name: "setCustomer",
             path: "/orders/0",
@@ -158,22 +143,23 @@ test("it should not be possible to pass a complex object", t => {
         }
     ])
 })
-
 if (process.env.NODE_ENV === "development") {
-    test("it should not be possible to set the wrong type", t => {
+    test("it should not be possible to set the wrong type", () => {
         const store = createTestStore()
-        t.throws(() => {
+        expect(() => {
             store.orders[0].setCustomer(store.orders[0])
-        }, "[mobx-state-tree] Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n\n    " + "value of type Order: <Order@/orders/0> is not assignable to type: `(reference(Customer) | null)`, expected an instance of `(reference(Customer) | null)` or a snapshot like `(reference(Customer) | null?)` instead.") // wrong type!
+        }).toThrowError(
+            "[mobx-state-tree] Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n\n    " +
+                "value of type Order: <Order@/orders/0> is not assignable to type: `(reference(Customer) | null)`, expected an instance of `(reference(Customer) | null)` or a snapshot like `(reference(Customer) | null?)` instead."
+        ) // wrong type!
     })
 }
-
-test("it should not be possible to pass the element of another tree", t => {
+test("it should not be possible to pass the element of another tree", () => {
     const store1 = createTestStore()
     const store2 = createTestStore()
     const recorder = recordActions(store2)
     store2.orders[0].setCustomer(store1.customers[0])
-    t.deepEqual(recorder.actions, [
+    expect(recorder.actions).toEqual([
         {
             name: "setCustomer",
             path: "/orders/0",
@@ -186,17 +172,14 @@ test("it should not be possible to pass the element of another tree", t => {
         }
     ])
 })
-
-test("it should not be possible to pass an unserializable object", t => {
+test("it should not be possible to pass an unserializable object", () => {
     const store = createTestStore()
-    const circular = { a: null as any }
+    const circular = { a: null }
     circular.a = circular
     const recorder = recordActions(store)
-
     store.orders[0].noopSetCustomer(circular)
     store.orders[0].noopSetCustomer(new Buffer("bla"))
-
-    t.deepEqual(recorder.actions, [
+    expect(recorder.actions).toEqual([
         {
             args: [
                 {
@@ -219,27 +202,24 @@ test("it should not be possible to pass an unserializable object", t => {
         }
     ])
 })
-
-test("it should be possible to pass a complex plain object", t => {
+test("it should be possible to pass a complex plain object", () => {
     const t1 = Task.create()
     const t2 = Task.create()
     const recorder = recordActions(t1)
-    ;(t1 as any).toggle({ bla: ["nuff", ["said"]] }) // nonsense, but serializable!
-    t.deepEqual(recorder.actions, [
+    t1.toggle({ bla: ["nuff", ["said"]] }) // nonsense, but serializable!
+    expect(recorder.actions).toEqual([
         { name: "toggle", path: "", args: [{ bla: ["nuff", ["said"]] }] }
     ])
     recorder.replay(t2)
-    t.is(t2.done, true)
+    expect(t2.done).toBe(true)
 })
-
-test("action should be bound", t => {
+test("action should be bound", () => {
     const task = Task.create()
     const f = task.toggle
-    t.is(f(), true)
-    t.is(task.done, true)
+    expect(f()).toBe(true)
+    expect(task.done).toBe(true)
 })
-
-test("snapshot should be available and updated during an action", t => {
+test("snapshot should be available and updated during an action", () => {
     const Model = types
         .model({
             x: types.number
@@ -247,7 +227,7 @@ test("snapshot should be available and updated during an action", t => {
         .actions(self => {
             function inc() {
                 self.x += 1
-                const res = getSnapshot(self as any).x
+                const res = getSnapshot(self).x
                 self.x += 1
                 return res
             }
@@ -256,12 +236,11 @@ test("snapshot should be available and updated during an action", t => {
             }
         })
     const a = Model.create({ x: 2 })
-    t.is(a.inc(), 3)
-    t.is(a.x, 4)
-    t.is(getSnapshot<typeof Model.SnapshotType>(a).x, 4)
+    expect(a.inc()).toBe(3)
+    expect(a.x).toBe(4)
+    expect(getSnapshot(a).x).toBe(4)
 })
-
-test("indirectly called private functions should be able to modify state", t => {
+test("indirectly called private functions should be able to modify state", () => {
     const Model = types
         .model({
             x: 3
@@ -270,7 +249,6 @@ test("indirectly called private functions should be able to modify state", t => 
             function incrementBy(delta) {
                 self.x += delta
             }
-
             return {
                 inc() {
                     incrementBy(1)
@@ -280,19 +258,17 @@ test("indirectly called private functions should be able to modify state", t => 
                 }
             }
         })
-
     const cnt = Model.create()
-    t.is(cnt.x, 3)
+    expect(cnt.x).toBe(3)
     cnt.dec()
-    t.is(cnt.x, 2)
-    t.is((cnt as any).incrementBy, undefined)
+    expect(cnt.x).toBe(2)
+    expect(cnt.incrementBy).toBe(undefined)
 })
-
-test("volatile state survives reonciliation", t => {
+test("volatile state survives reonciliation", () => {
     const Model = types.model({ x: 3 }).actions(self => {
         let incrementor = 1
         return {
-            setIncrementor(value: number) {
+            setIncrementor(value) {
                 incrementor = value
             },
             inc() {
@@ -300,42 +276,37 @@ test("volatile state survives reonciliation", t => {
             }
         }
     })
-
     const Store = types.model({
         cnt: types.optional(Model, {})
     })
-
     const store = Store.create()
     store.cnt.inc()
-    t.is(store.cnt.x, 4)
+    expect(store.cnt.x).toBe(4)
     store.cnt.setIncrementor(3)
     store.cnt.inc()
-    t.is(store.cnt.x, 7)
-
+    expect(store.cnt.x).toBe(7)
     applySnapshot(store, { cnt: { x: 2 } })
-    t.is(store.cnt.x, 2)
+    expect(store.cnt.x).toBe(2)
     store.cnt.inc()
-    t.is(store.cnt.x, 5) // incrementor was not lost
+    expect(store.cnt.x).toBe(5) // incrementor was not lost
 })
-
-test("middleware events are correct", t => {
+test("middleware events are correct", () => {
     const A = types.model({}).actions(self => ({
         a(x) {
-            return (self as any).b(x * 2)
+            return self.b(x * 2)
         },
         b(y) {
             return y + 1
         }
     }))
-
     const a = A.create()
-    const events: any[] = []
+    const events = []
     addMiddleware(a, function(call, next) {
         events.push(call)
         return next(call)
     })
     a.a(7)
-    t.deepEqual(events, [
+    expect(events).toEqual([
         {
             args: [7],
             context: {},

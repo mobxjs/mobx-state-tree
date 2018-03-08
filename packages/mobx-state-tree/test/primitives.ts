@@ -1,7 +1,5 @@
 import { types, applySnapshot, getSnapshot } from "../src"
-import { test } from "ava"
-
-test("Date instance can be reused", t => {
+test("Date instance can be reused", () => {
     const Model = types.model({
         a: types.model({
             b: types.string
@@ -31,20 +29,19 @@ test("Date instance can be reused", t => {
         index: [object]
     })
     instance.set(object)
-    t.notThrows(() => instance.push(object))
-    t.is(instance.one.c, object.c)
-    t.is(instance.index[0].c, object.c)
+    expect(() => instance.push(object)).not.toThrow()
+    expect(instance.one.c).toBe(object.c)
+    expect(instance.index[0].c).toBe(object.c)
 })
-
-test("Date can be rehydrated using unix timestamp", t => {
+test("Date can be rehydrated using unix timestamp", () => {
     const time = new Date()
     const newTime = 6813823163
     const Factory = types.model({
         date: types.optional(types.Date, () => time)
     })
     const store = Factory.create()
-    t.is(store.date.getTime(), time.getTime())
+    expect(store.date.getTime()).toBe(time.getTime())
     applySnapshot(store, { date: newTime })
-    t.is(store.date.getTime(), newTime)
-    t.is(getSnapshot<typeof Factory.SnapshotType>(store).date, newTime)
+    expect(store.date.getTime()).toBe(newTime)
+    expect(getSnapshot(store).date).toBe(newTime)
 })

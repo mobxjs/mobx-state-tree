@@ -1,14 +1,11 @@
 import { types } from "../../src"
-
 // tiny
 export const Treasure = types.model("Treasure", {
     trapped: types.boolean,
     gold: types.optional(types.number, 0)
 })
-
 // medium
 export const HeroRoles = ["warrior", "wizard", "cleric", "thief"]
-
 export const Hero = types
     .model("Hero", {
         id: types.identifier(types.number),
@@ -22,7 +19,6 @@ export const Hero = types
             return self.description.length
         }
     }))
-
 // large
 export const Monster = types
     .model("Monster", {
@@ -52,16 +48,13 @@ export const Monster = types
         get isAlive() {
             return self.hp > 0
         },
-
         get isFlashingRed() {
             return self.hp > 0 && self.hp < self.maxHp && self.hp === 1
         },
-
         get weight() {
             const victimWeight = self.eatenHeroes ? self.eatenHeroes.length : 0
             const fangWeight = self.hasFangs ? 10 : 5
             const wingWeight = self.hasWings ? 12 : 4
-
             return (victimWeight + fangWeight + wingWeight) * self.level > 5 ? 2 : 1
         }
     }))

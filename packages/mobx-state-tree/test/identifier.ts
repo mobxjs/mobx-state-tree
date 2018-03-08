@@ -1,8 +1,6 @@
-import { test } from "ava"
 import { types } from "../src"
-
 if (process.env.NODE_ENV === "development") {
-    test("#275 - Identifiers should check refinement", t => {
+    test("#275 - Identifiers should check refinement", () => {
         const Model = types
             .model("Model", {
                 id: types.refinement(
@@ -25,73 +23,70 @@ if (process.env.NODE_ENV === "development") {
                     self.models.push(model)
                 }
             }))
-
-        t.throws(() => {
+        expect(() => {
             ParentModel.create({ models: [{ id: "WrongId_1" }] })
-        })
-
-        t.throws(() => {
+        }).toThrow()
+        expect(() => {
             const parentStore = ParentModel.create({ models: [] })
             parentStore.addModel({ id: "WrongId_2" })
-        })
-
-        t.throws(() => {
+        }).toThrow()
+        expect(() => {
             const model = Model.create({ id: "Model_1" })
             model.setId("WrongId_3")
-        })
-
-        t.throws(() => {
+        }).toThrow()
+        expect(() => {
             Model.create({ id: "WrongId_4" })
-        })
+        }).toThrow()
     })
 }
-
-test("#158 - #88 - Identifiers should accept any string character", t => {
+test("#158 - #88 - Identifiers should accept any string character", () => {
     const Todo = types.model("Todo", {
         id: types.identifier(types.string),
         title: types.string
     })
-    t.notThrows(() => {
+    expect(() => {
         ;["coffee", "cof$fee", "cof|fee", "cof/fee"].forEach(id => {
             Todo.create({
                 id: id,
                 title: "Get coffee"
             })
         })
-    })
+    }).not.toThrow()
 })
-
-test("#187 - identifiers should not break late types", t => {
-    t.notThrows(() => {
+test("#187 - identifiers should not break late types", () => {
+    expect(() => {
         const MstNode = types.model("MstNode", {
             value: types.number,
             next: types.maybe(types.late(() => MstNode))
         })
-    })
+    }).not.toThrow()
 })
-
 if (process.env.NODE_ENV === "development") {
-    test("should throw if multiple identifiers provided", t => {
-        t.throws(() => {
+    test("should throw if multiple identifiers provided", () => {
+        expect(() => {
             const Model = types.model("Model", {
                 id: types.identifier(types.number),
                 pk: types.identifier(types.number)
             })
             Model.create({ id: 1, pk: 2 })
-        }, `[mobx-state-tree] Cannot define property 'pk' as object identifier, property 'id' is already defined as identifier property`)
+        }).toThrowError(
+            `[mobx-state-tree] Cannot define property 'pk' as object identifier, property 'id' is already defined as identifier property`
+        )
     })
-
-    test("should throw if identifier of wrong type", t => {
-        t.throws(() => {
+    test("should throw if identifier of wrong type", () => {
+        expect(() => {
             const Model = types.model("Model", { id: types.identifier(types.number) })
             Model.create({ id: "1" })
-        }, `[mobx-state-tree] Error while converting \`{\"id\":\"1\"}\` to \`Model\`:\n\n    at path \"/id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\` (Value is not a number), expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`)
+        }).toThrowError(
+            `[mobx-state-tree] Error while converting \`{\"id\":\"1\"}\` to \`Model\`:\n\n    at path \"/id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\` (Value is not a number), expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`
+        )
     })
-
-    test("identifier should be used only on model types - no parent provided", t => {
-        t.throws(() => {
+    test("identifier should be used only on model types - no parent provided", () => {
+        expect(() => {
             const Model = types.identifier(types.number)
             Model.create(1)
-        }, `[mobx-state-tree] Identifier types can only be instantiated as direct child of a model type`)
+        }).toThrowError(
+            `[mobx-state-tree] Identifier types can only be instantiated as direct child of a model type`
+        )
     })
 }

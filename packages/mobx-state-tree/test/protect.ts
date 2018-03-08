@@ -1,5 +1,4 @@
 import { protect, unprotect, applySnapshot, types, isProtected, getParent } from "../src"
-import { test } from "ava"
 const Todo = types
     .model("Todo", {
         title: ""
@@ -20,83 +19,90 @@ function createTestStore() {
         todos: [{ title: "Get coffee" }, { title: "Get biscuit" }]
     })
 }
-
-test("it should be possible to protect an object", t => {
+test("it should be possible to protect an object", () => {
     const store = createTestStore()
     unprotect(store)
     store.todos[1].title = "A"
     protect(store)
-    t.throws(() => {
+    expect(() => {
         store.todos[0].title = "B"
-    }, "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action.")
-    t.is(store.todos[1].title, "A")
-    t.is(store.todos[0].title, "Get coffee")
+    }).toThrowError(
+        "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action."
+    )
+    expect(store.todos[1].title).toBe("A")
+    expect(store.todos[0].title).toBe("Get coffee")
     store.todos[0].setTitle("B")
-    t.is(store.todos[0].title, "B")
+    expect(store.todos[0].title).toBe("B")
 })
-
-test("protect should protect against any update", t => {
+test("protect should protect against any update", () => {
     const store = createTestStore()
-    t.notThrows(
+    expect(
         // apply Snapshot / patch are currently allowed, even outside protected mode
         () => {
             applySnapshot(store, { todos: [{ title: "Get tea" }] })
-        },
+        }
+    ).not.toThrowError(
         "[mobx-state-tree] Cannot modify 'Todo@<root>', the object is protected and can only be modified by using an action."
     )
-    t.throws(() => {
-        store.todos.push({ title: "test" } as any)
-    }, "[mobx-state-tree] Cannot modify 'Todo[]@/todos', the object is protected and can only be modified by using an action.")
-    t.throws(() => {
+    expect(() => {
+        store.todos.push({ title: "test" })
+    }).toThrowError(
+        "[mobx-state-tree] Cannot modify 'Todo[]@/todos', the object is protected and can only be modified by using an action."
+    )
+    expect(() => {
         store.todos[0].title = "test"
-    }, "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action.")
+    }).toThrowError(
+        "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action."
+    )
 })
-
-test("protect should also protect children", t => {
+test("protect should also protect children", () => {
     const store = createTestStore()
-    t.throws(() => {
+    expect(() => {
         store.todos[0].title = "B"
-    }, "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action.")
+    }).toThrowError(
+        "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action."
+    )
     store.todos[0].setTitle("B")
-    t.is(store.todos[0].title, "B")
+    expect(store.todos[0].title).toBe("B")
 })
-
-test("unprotected mode should be lost when attaching children", t => {
+test("unprotected mode should be lost when attaching children", () => {
     const store = Store.create({ todos: [] })
     const t1 = Todo.create({ title: "hello" })
     unprotect(t1)
-    t.is(isProtected(t1), false)
-    t.is(isProtected(store), true)
+    expect(isProtected(t1)).toBe(false)
+    expect(isProtected(store)).toBe(true)
     t1.title = "world" // ok
     unprotect(store)
     store.todos.push(t1)
     protect(store)
-    t.is(isProtected(t1), true)
-    t.is(isProtected(store), true)
-    t.throws(() => {
+    expect(isProtected(t1)).toBe(true)
+    expect(isProtected(store)).toBe(true)
+    expect(() => {
         t1.title = "B"
-    }, "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action.")
+    }).toThrowError(
+        "[mobx-state-tree] Cannot modify 'Todo@/todos/0', the object is protected and can only be modified by using an action."
+    )
     store.todos[0].setTitle("C")
-    t.is(store.todos[0].title, "C")
+    expect(store.todos[0].title).toBe("C")
 })
-
-test("protected mode should be inherited when attaching children", t => {
+test("protected mode should be inherited when attaching children", () => {
     const store = Store.create({ todos: [] })
     unprotect(store)
     const t1 = Todo.create({ title: "hello" })
-    t.is(isProtected(t1), true)
-    t.is(isProtected(store), false)
-    t.throws(() => {
+    expect(isProtected(t1)).toBe(true)
+    expect(isProtected(store)).toBe(false)
+    expect(() => {
         t1.title = "B"
-    }, "[mobx-state-tree] Cannot modify 'Todo@<root>', the object is protected and can only be modified by using an action.")
+    }).toThrowError(
+        "[mobx-state-tree] Cannot modify 'Todo@<root>', the object is protected and can only be modified by using an action."
+    )
     store.todos.push(t1)
     t1.title = "world" // ok, now unprotected
-    t.is(isProtected(t1), false)
-    t.is(isProtected(store), false)
-    t.is(store.todos[0].title, "world")
+    expect(isProtected(t1)).toBe(false)
+    expect(isProtected(store)).toBe(false)
+    expect(store.todos[0].title).toBe("world")
 })
-
-test("action cannot modify parent", t => {
+test("action cannot modify parent", () => {
     const Child = types
         .model("Child", {
             x: 2
@@ -106,15 +112,12 @@ test("action cannot modify parent", t => {
                 getParent(self).x += 1
             }
         }))
-
     const Parent = types.model("Parent", {
         x: 3,
         child: Child
     })
-
     const p = Parent.create({ child: {} })
-    t.throws(
-        () => p.child.setParentX(),
+    expect(() => p.child.setParentX()).toThrowError(
         "[mobx-state-tree] Cannot modify 'Parent@<root>', the object is protected and can only be modified by using an action."
     )
 })

@@ -16,10 +16,8 @@ import {
     destroy,
     unprotect
 } from "../src"
-import { test } from "ava"
 // getParent
-
-test("it should resolve to the parent instance", t => {
+test("it should resolve to the parent instance", () => {
     const Row = types.model({
         article_id: 0
     })
@@ -30,11 +28,10 @@ test("it should resolve to the parent instance", t => {
     unprotect(doc)
     const row = Row.create()
     doc.rows.push(row)
-    t.deepEqual(getParent(row), doc.rows)
+    expect(getParent(row)).toEqual(doc.rows)
 })
 // hasParent
-
-test("it should check for parent instance", t => {
+test("it should check for parent instance", () => {
     const Row = types.model({
         article_id: 0
     })
@@ -45,19 +42,17 @@ test("it should check for parent instance", t => {
     unprotect(doc)
     const row = Row.create()
     doc.rows.push(row)
-    t.deepEqual(hasParent(row), true)
+    expect(hasParent(row)).toEqual(true)
 })
-
-test("it should check for parent instance (unbound)", t => {
+test("it should check for parent instance (unbound)", () => {
     const Row = types.model({
         article_id: 0
     })
     const row = Row.create()
-    t.deepEqual(hasParent(row), false)
+    expect(hasParent(row)).toEqual(false)
 })
 // getRoot
-
-test("it should resolve to the root of an object", t => {
+test("it should resolve to the root of an object", () => {
     const Row = types.model("Row", {
         article_id: 0
     })
@@ -68,26 +63,21 @@ test("it should resolve to the root of an object", t => {
     unprotect(doc)
     const row = Row.create()
     doc.rows.push(row)
-    t.is(getRoot(row), doc)
+    expect(getRoot(row)).toBe(doc)
 })
-
 // getIdentifier
-
-test("it should resolve to the identifier of the object", t => {
+test("it should resolve to the identifier of the object", () => {
     const Document = types.model("Document", {
         id: types.identifier(types.string)
     })
     const doc = Document.create({
         id: "document_1"
     })
-
     // get identifier of object
-    t.is(getIdentifier(doc), "document_1")
+    expect(getIdentifier(doc)).toBe("document_1")
 })
-
 // getPath
-
-test("it should resolve the path of an object", t => {
+test("it should resolve the path of an object", () => {
     const Row = types.model({
         article_id: 0
     })
@@ -98,11 +88,10 @@ test("it should resolve the path of an object", t => {
     unprotect(doc)
     const row = Row.create()
     doc.rows.push(row)
-    t.deepEqual(getPath(row), "/rows/0")
+    expect(getPath(row)).toEqual("/rows/0")
 })
 // getPathParts
-
-test("it should resolve the path of an object", t => {
+test("it should resolve the path of an object", () => {
     const Row = types.model({
         article_id: 0
     })
@@ -113,10 +102,9 @@ test("it should resolve the path of an object", t => {
     unprotect(doc)
     const row = Row.create()
     doc.rows.push(row)
-    t.deepEqual(getPathParts(row), ["rows", "0"])
+    expect(getPathParts(row)).toEqual(["rows", "0"])
 })
-
-test("it should resolve parents", t => {
+test("it should resolve parents", () => {
     const Row = types.model({
         article_id: 0
     })
@@ -127,19 +115,17 @@ test("it should resolve parents", t => {
     unprotect(doc)
     const row = Row.create()
     doc.rows.push(row)
-    t.is(hasParent(row), true) // array
-    t.is(hasParent(row, 2), true) // row
-    t.is(hasParent(row, 3), false)
-    t.is(getParent(row) === doc.rows, true) // array
-    t.is(getParent(row, 2) === doc, true) // row
-    t.throws(
-        () => getParent(row, 3),
+    expect(hasParent(row)).toBe(true) // array
+    expect(hasParent(row, 2)).toBe(true) // row
+    expect(hasParent(row, 3)).toBe(false)
+    expect(getParent(row) === doc.rows).toBe(true) // array
+    expect(getParent(row, 2) === doc).toBe(true) // row
+    expect(() => getParent(row, 3)).toThrowError(
         "[mobx-state-tree] Failed to find the parent of AnonymousModel@/rows/0 at depth 3"
     )
 })
 // clone
-
-test("it should clone a node", t => {
+test("it should clone a node", () => {
     const Row = types.model({
         article_id: 0
     })
@@ -151,10 +137,9 @@ test("it should clone a node", t => {
     const row = Row.create()
     doc.rows.push(row)
     const cloned = clone(doc)
-    t.deepEqual(doc, cloned)
+    expect(doc).toEqual(cloned)
 })
-
-test("it should be possible to clone a dead object", t => {
+test("it should be possible to clone a dead object", () => {
     const Task = types.model("Task", {
         x: types.string
     })
@@ -167,26 +152,24 @@ test("it should be possible to clone a dead object", t => {
             todos: [a]
         })
     unprotect(store)
-    t.deepEqual(store.todos.slice(), [a])
-    t.is(isAlive(a), true)
+    expect(store.todos.slice()).toEqual([a])
+    expect(isAlive(a)).toBe(true)
     store.todos.splice(0, 1)
-    t.is(isAlive(a), false)
+    expect(isAlive(a)).toBe(false)
     const a2 = clone(a)
     store.todos.splice(0, 0, a2)
-    t.is(store.todos[0].x, "a")
+    expect(store.todos[0].x).toBe("a")
 })
 // getModelFactory
-
-test("it should return the model factory", t => {
+test("it should return the model factory", () => {
     const Document = types.model({
         customer_id: 0
     })
     const doc = Document.create()
-    t.deepEqual(getType(doc), Document)
+    expect(getType(doc)).toEqual(Document)
 })
 // getChildModelFactory
-
-test("it should return the child model factory", t => {
+test("it should return the child model factory", () => {
     const Row = types.model({
         article_id: 0
     })
@@ -195,10 +178,9 @@ test("it should return the child model factory", t => {
         rows: ArrayOfRow
     })
     const doc = Document.create()
-    t.deepEqual(getChildType(doc, "rows"), ArrayOfRow)
+    expect(getChildType(doc, "rows")).toEqual(ArrayOfRow)
 })
-
-test("a node can exists only once in a tree", t => {
+test("a node can exists only once in a tree", () => {
     const Row = types.model({
         article_id: 0
     })
@@ -210,16 +192,14 @@ test("a node can exists only once in a tree", t => {
     unprotect(doc)
     const row = Row.create()
     doc.rows.push(row)
-    const error = t.throws(() => {
+    const error = expect(() => {
         doc.foos.push(row)
-    })
-    t.is(
-        error.message,
+    }).toThrow()
+    expect(error.message).toBe(
         "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/foos/0', but it lives already at '/rows/0'"
     )
 })
-
-test("make sure array filter works properly", t => {
+test("make sure array filter works properly", () => {
     const Row = types.model({
         done: false
     })
@@ -242,11 +222,10 @@ test("make sure array filter works properly", t => {
     doc.rows.push(a)
     doc.rows.push(b)
     doc.clearDone()
-    t.deepEqual<any>(getSnapshot(doc), { rows: [{ done: false }] })
+    expect(getSnapshot(doc)).toEqual({ rows: [{ done: false }] })
 })
 // === RECORD PATCHES ===
-
-test("it can record and replay patches", t => {
+test("it can record and replay patches", () => {
     const Row = types.model({
         article_id: 0
     })
@@ -261,11 +240,10 @@ test("it can record and replay patches", t => {
     source.customer_id = 1
     source.rows.push(Row.create({ article_id: 1 }))
     recorder.replay(target)
-    t.deepEqual(getSnapshot(source), getSnapshot(target))
+    expect(getSnapshot(source)).toEqual(getSnapshot(target))
 })
 // === RECORD ACTIONS ===
-
-test("it can record and replay actions", t => {
+test("it can record and replay actions", () => {
     const Row = types
         .model({
             article_id: 0
@@ -302,5 +280,5 @@ test("it can record and replay actions", t => {
     source.addRow()
     source.rows[0].setArticle(1)
     recorder.replay(target)
-    t.deepEqual(getSnapshot(source), getSnapshot(target))
+    expect(getSnapshot(source)).toEqual(getSnapshot(target))
 })
