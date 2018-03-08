@@ -1117,11 +1117,7 @@ TypeScript support is best-effort, as not all patterns can be expressed in TypeS
 
 We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occassionally you will need to fallback to `any` or manually adding type annotations.
 
-Until conditionally mapped types are available (scheduled for TS 2.8), the types of snapshots cannot be inferred correctly. But you will get some type assistence when using `getSnaphot` like this:
-
-```javascript
-const snapshot = getSnapshot<typeof Car.SnapshotType>(car)
-```
+#### Using a MST type at design time
 
 When using models, you write an interface, along with its property types, that will be used to perform type checks at runtime.
 What about compile time? You can use TypeScript interfaces to perform those checks, but that would require writing again all the properties and their actions!
@@ -1149,26 +1145,36 @@ type ITodoType = typeof Todo.Type;
 interface ITodo extends ITodoType {};
 ```
 
-You can also get this benefit in your `.actions` claue by splitting your `state` part of the model for its own interface:
-```typescript
-const TodoState = types.model({
-        title: types.string
-    });
+#### Snapshot types are limited
 
-type ITodoStateType = typeof TodoState.Type;
-interface ITodoState extends ITodoStateType {}
+Until conditionally mapped types are available (scheduled for TS 2.8), the types of snapshots cannot be inferred correctly. But you will get some type assistence when using `getSnaphot` with types, like this:
 
-const Todo = TodoState
-    .actions(self: ITodoState  => ({
-        setTitle(v: string) {
-            self.title = v
-        }
-    }))
+```javascript
+const snapshot = getSnapshot<typeof Car.SnapshotType>(car)
 ```
+
+Tip: recycle the interface
+
+```javascript
+type ICarSnapshot = typeof Car.SnapshotType
+const snapshot = getSnapshot<ICarSnapshot>(car)
+```
+
+For lazy folks:
+
+```javascript
+const snapshot = getSnapshot<any>(car)
+```
+
+_note: Even when typing snapshots, they will still not be as accurate as they could be until TS 2.8_
+
+#### Typing `self` in actions and views
+
+The type of `self` is what `self` was **before the action or views blocks starts**, and only after that part finishes, the actions will be added to the type of `self`.
 
 Sometimes you'll need to take into account where your typings are available and where they aren't. The code below will not compile: TypeScript will complain that `self.upperProp` is not a known property. Computed properties are only available after `.views` is evaluated.
 
-The type of `self` is what `self` was **before the action or views blocks starts**, and only after that part finishes, the actions will be added to the type of `self`.
+For example:
 
 ```typescript
 const Example = types
@@ -1180,7 +1186,7 @@ const Example = types
       return self.prop.toUpperCase();
     },
     get twiceUpperProp(): string {
-      return self.upperProp + self.upperProp;
+      return self.upperProp + self.upperProp; // Compile error: `self.upperProp` is not yet defined
     },
   }));
 ```
@@ -1190,7 +1196,7 @@ You can circumvent this situation by declaring the views in two steps:
 ```typescript
 const Example = types
   .model('Example', { prop: types.string })
-  .views(self => {
+  .views((self: typeof Example.Type) => { // override the inferred type of self
       const views = {
         get upperProp(): string {
             return self.prop.toUpperCase();
