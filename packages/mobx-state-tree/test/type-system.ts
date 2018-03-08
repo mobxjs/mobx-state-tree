@@ -138,7 +138,7 @@ test("#66 - it should pick the correct type of defaulted fields", () => {
     const a = Item.create({ id: 3 })
     unprotect(a)
     expect(a.name).toBe("boo")
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV !== "production") {
         expect(() => ((a as any).name = 3)).toThrowError(
             `[mobx-state-tree] Error while converting \`3\` to \`string\`:\n\n    value \`3\` is not assignable to type: \`string\` (Value is not a string).`
         )
@@ -284,7 +284,7 @@ test("it handles complex types correctly", () => {
         })
     expect(true).toBe(true) // supress no asserts warning
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should provide detailed reasons why the value is not appicable", () => {
         const Todo = types
             .model({

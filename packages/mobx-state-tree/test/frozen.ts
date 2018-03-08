@@ -8,7 +8,7 @@ test("it should accept any serializable value", () => {
     doc.value = { a: 1, b: 2 }
     expect(getSnapshot(doc)).toEqual({ value: { a: 1, b: 2 } })
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should throw if value is not serializable", () => {
         const Factory = types.model({
             value: types.frozen

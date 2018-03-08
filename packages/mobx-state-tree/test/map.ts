@@ -164,7 +164,7 @@ test("it should support identifiers", () => {
     store.todos.put({ id: "19" })
     expect(store.todos.get("19")!.id).toBe("19")
     expect("" + store.todos.get("19")).toBe("AnonymousModel@/todos/19(id: 19)")
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV !== "production") {
         expect(() => applySnapshot(store.todos, { "17": { id: "18" } })).toThrowError(
             "[mobx-state-tree] A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '18', but expected: '17'"
         )
@@ -205,7 +205,7 @@ test("#192 - put should not throw when identifier is a number", () => {
             title: "Test"
         })
     }).not.toThrow()
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV !== "production") {
         expect(() => {
             todoStore.addTodo({ todo_id: "1", title: "Test" })
         }).toThrowError(

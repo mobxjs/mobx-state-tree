@@ -24,7 +24,7 @@ const createTestFactories = () => {
     })
     return { Box, Square, Cube, Plane, DispatchPlane, Heighed, Block }
 }
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should complain about multiple applicable types no dispatch method", () => {
         const { Box, Plane, Square } = createTestFactories()
         expect(() => {
@@ -40,7 +40,7 @@ test("it should have parent whenever creating or applying from a complex data st
     const child = tryResolve(block, "./list/0")
     expect(hasParent(child)).toBe(true)
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should complain about no applicable types", () => {
         const { Heighed } = createTestFactories()
         expect(() => {

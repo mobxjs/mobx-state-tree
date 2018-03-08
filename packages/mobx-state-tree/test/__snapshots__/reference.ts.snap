@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`References are non-nullable by default 1`] = `"[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /ref)"`;
+
+exports[`References are non-nullable by default 2`] = `"[mobx-state-tree] Failed to resolve reference of type AnonymousModel: '4' (in: /maybeRef)"`;

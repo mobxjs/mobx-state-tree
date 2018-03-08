@@ -347,7 +347,7 @@ test("it should check the type correctly", () => {
     expect(Factory.is({ wrongKey: true })).toEqual(true)
     expect(Factory.is({ to: 3 })).toEqual(false)
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should require complex fields to be present", () => {
         expect(
             types
@@ -462,7 +462,7 @@ test("it should throw if a non-primitive value is provided and no default can be
         })
     }).toThrow()
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should not be possible to remove a node from a parent if it is required, see ", () => {
         const A = types.model("A", { x: 3 })
         const B = types.model("B", { a: A })

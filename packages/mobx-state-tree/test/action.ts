@@ -143,7 +143,7 @@ test("it should not be possible to pass a complex object", () => {
         }
     ])
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should not be possible to set the wrong type", () => {
         const store = createTestStore()
         expect(() => {
@@ -311,20 +311,20 @@ test("middleware events are correct", () => {
         {
             args: [7],
             context: {},
-            id: process.env.NODE_ENV === "development" ? 38 : 35,
+            id: process.env.NODE_ENV !== "production" ? 38 : 35,
             name: "a",
             parentId: 0,
-            rootId: process.env.NODE_ENV === "development" ? 38 : 35,
+            rootId: process.env.NODE_ENV !== "production" ? 38 : 35,
             tree: {},
             type: "action"
         },
         {
             args: [14],
             context: {},
-            id: process.env.NODE_ENV === "development" ? 39 : 36,
+            id: process.env.NODE_ENV !== "production" ? 39 : 36,
             name: "b",
-            parentId: process.env.NODE_ENV === "development" ? 38 : 35,
-            rootId: process.env.NODE_ENV === "development" ? 38 : 35,
+            parentId: process.env.NODE_ENV !== "production" ? 38 : 35,
+            rootId: process.env.NODE_ENV !== "production" ? 38 : 35,
             tree: {},
             type: "action"
         }

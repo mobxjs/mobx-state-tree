@@ -21,7 +21,7 @@ test("it should use the snapshot if provided", () => {
     const doc = Factory.create({ rows: [{ name: "snapshot", quantity: 0 }] })
     expect(getSnapshot(doc)).toEqual({ rows: [{ name: "snapshot", quantity: 0 }] })
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should throw if default value is invalid snapshot", () => {
         const Row = types.model({
             name: types.string,
@@ -34,7 +34,7 @@ if (process.env.NODE_ENV === "development") {
         }).toThrow()
     })
 }
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should throw bouncing errors from its sub-type", () => {
         const Row = types.model({
             name: types.string,
@@ -55,7 +55,7 @@ test("it should accept a function to provide dynamic values", () => {
     defaultValue = 2
     expect(getSnapshot(Factory.create())).toEqual({ a: 2 })
     defaultValue = "hello world!"
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV !== "production") {
         expect(() => Factory.create()).toThrowError(
             `[mobx-state-tree] Error while converting \`"hello world!"\` to \`number\`:\n\n    value \`"hello world!"\` is not assignable to type: \`number\` (Value is not a number).`
         )

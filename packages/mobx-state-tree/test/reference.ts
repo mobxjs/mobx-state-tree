@@ -66,7 +66,7 @@ test("it should support prefixed paths in arrays", () => {
         users: [{ id: "17", name: "Michel" }, { id: "18", name: "Noa" }]
     }) // TODO: better typings
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("identifiers are required", () => {
         const Todo = types.model({
             id: types.identifier()
@@ -457,7 +457,7 @@ test("References are non-nullable by default", () => {
         ref: 4
     })
     unprotect(store)
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV !== "production") {
         expect(store.maybeRef).toBe(null)
         expect(() => store.ref).toThrowErrorMatchingSnapshot()
         store.maybeRef = 3 as any // valid assignment

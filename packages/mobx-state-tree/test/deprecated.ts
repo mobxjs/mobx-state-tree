@@ -14,7 +14,7 @@ function createDeprecationListener() {
         // replace original implementation
         console.warn = originalWarn
         // test for correct log message, if in development
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV !== "production") {
             expect(spyWarn.called).toBe(true)
             expect(spyWarn.getCall(0).args[0]).toMatch(/Deprecation warning:/)
         }

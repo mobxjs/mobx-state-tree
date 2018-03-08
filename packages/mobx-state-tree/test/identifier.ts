@@ -1,5 +1,5 @@
 import { types } from "../src"
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("#275 - Identifiers should check refinement", () => {
         const Model = types
             .model("Model", {
@@ -61,7 +61,7 @@ test("#187 - identifiers should not break late types", () => {
         })
     }).not.toThrow()
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("should throw if multiple identifiers provided", () => {
         expect(() => {
             const Model = types.model("Model", {

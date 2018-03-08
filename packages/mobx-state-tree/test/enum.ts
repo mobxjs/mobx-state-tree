@@ -13,7 +13,7 @@ test("should support enums", () => {
     l.color = "Red"
     expect(TrafficLight.describe()).toBe('{ color: ("Orange" | "Green" | "Red") }')
     // Note, any cast needed, compiler should correctly error otherwise
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV !== "production") {
         expect(() => (l.color = "Blue" as any)).toThrowError(
             /Error while converting `"Blue"` to `Color`/
         )
@@ -30,7 +30,7 @@ test("should support anonymous enums", () => {
     l.color = "Red"
     expect(TrafficLight.describe()).toBe('{ color: ("Orange" | "Green" | "Red") }')
     // Note, any cast needed, compiler should correctly error otherwise
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV !== "production") {
         expect(() => (l.color = "Blue" as any)).toThrowError(
             /Error while converting `"Blue"` to `"Orange" | "Green" | "Red"`/
         )

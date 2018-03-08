@@ -10,7 +10,7 @@ test("it should allow if type and predicate is correct", () => {
     const doc = Factory.create({ number: 42 })
     expect(getSnapshot(doc)).toEqual({ number: 42 })
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should throw if a correct type with failing predicate is given", () => {
         const Factory = types.model({
             number: types.refinement(

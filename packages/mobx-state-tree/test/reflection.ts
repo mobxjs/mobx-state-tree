@@ -62,7 +62,7 @@ test("reflection - late", () => {
     expect(keys.includes("name")).toBe(true)
     expect(reflection.properties.name.describe()).toBe("string")
 })
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("reflection - throw on non model node", () => {
         const node = Model.create({
             users: { "1": { id: "1", name: "Test" } }

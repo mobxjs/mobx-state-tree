@@ -1,5 +1,5 @@
 import { types } from "../src"
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
     test("it should allow only primitives", () => {
         const error = expect(() => {
             types.model({
