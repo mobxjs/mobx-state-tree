@@ -29,7 +29,7 @@ if (process.env.NODE_ENV !== "production") {
         const { Box, Plane, Square } = createTestFactories()
         expect(() => {
             Plane.create({ width: 2, height: 2 })
-        }).toThrowErrorMatchingSnapshot()
+        }).toThrow(/Error while converting/)
     })
 }
 test("it should have parent whenever creating or applying from a complex data structure to a model which has Union typed children", () => {
@@ -45,7 +45,7 @@ if (process.env.NODE_ENV !== "production") {
         const { Heighed } = createTestFactories()
         expect(() => {
             Heighed.create({ height: 2 })
-        }).toThrowErrorMatchingSnapshot
+        }).toThrow(/Error while converting/)
     })
 }
 test("it should be smart enough to discriminate by keys", () => {

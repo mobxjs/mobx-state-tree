@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`it should complain about multiple applicable types no dispatch method 1`] = `
-"[mobx-state-tree] Error while converting \`{\\"width\\":2,\\"height\\":2}\` to \`(Box | Square)\`:
-
-    snapshot \`{\\"width\\":2,\\"height\\":2}\` is not assignable to type: \`(Box | Square)\` (Multiple types are applicable for the union (hint: provide a dispatch function)), expected an instance of \`(Box | Square)\` or a snapshot like \`({ width: number; height: number } | { width: number })\` instead."
-`;

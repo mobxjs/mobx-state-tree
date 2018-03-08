@@ -459,14 +459,14 @@ test("References are non-nullable by default", () => {
     unprotect(store)
     if (process.env.NODE_ENV !== "production") {
         expect(store.maybeRef).toBe(null)
-        expect(() => store.ref).toThrowErrorMatchingSnapshot()
+        expect(() => store.ref).toThrow(/Failed to resolve reference of type AnonymousModel/)
         store.maybeRef = 3 as any // valid assignment
         expect(store.maybeRef).toBe(store.todo)
         store.maybeRef = 4 as any // valid assignment
-        expect(() => store.maybeRef).toThrowErrorMatchingSnapshot()
+        expect(() => store.maybeRef).toThrow(/Failed to resolve reference of type/)
         store.maybeRef = null
         expect(store.maybeRef).toBe(null)
-        expect(() => ((store as any).ref = null)).toThrowErrorMatchingSnapshot
+        expect(() => ((store as any).ref = null)).toThrow(/Error while converting/)
     }
 })
 test("References are described properly", () => {

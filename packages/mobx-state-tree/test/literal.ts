@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== "production") {
         const Factory = types.literal("hello")
         expect(() => {
             Factory.create()
-        }).toThrowErrorMatchingSnapshot()
+        }).toThrow(/is not assignable to type/)
     })
     test("it should throw if a different type is given", () => {
         const Factory = types.model("TestFactory", {
@@ -19,7 +19,7 @@ if (process.env.NODE_ENV !== "production") {
         })
         expect(() => {
             Factory.create({ shouldBeOne: 2 })
-        }).toThrowErrorMatchingSnapshot()
+        }).toThrow(/is not assignable to type/)
     })
 }
 test("it should support null type", () => {
