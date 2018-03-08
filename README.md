@@ -1253,6 +1253,27 @@ const Example = types
   });
 ```
 
+#### Snapshots can be used to write values
+
+Everywhere where you can modify your state tree and assign a model instance, you can also
+just assign a snapshot, and MST will convert it to a model instance for you.
+However, that is simply not expressible in static type systems atm (as the type written to a value differs to the type read from it). So the only work around is to upcast to `any`:
+
+```javascript
+const Task = types.model({
+    done: false
+})
+const Store = types.model({
+    tasks: types.array(Task),
+    selection: types.maybe(Task)
+})
+
+const s = Store.create({ tasks: [] })
+// `{}` is a valid snapshot of Task, and hence a valid task, MST allows this, but TS doesn't, so need any cast
+s.tasks.push({} as any)
+s.selection = {} as any
+```
+
 #### Known Typescript Issue 5938
 
 Theres a known issue with typescript and interfaces as described by: https://github.com/Microsoft/TypeScript/issues/5938
