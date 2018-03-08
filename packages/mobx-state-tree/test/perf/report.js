@@ -1,4 +1,4 @@
-import { smallScenario, mediumScenario, largeScenario } from "./scenarios"
+const { smallScenario, mediumScenario, largeScenario } = require("./scenarios")
 // here's what we'll be testing
 const plan = [
     "-----------",

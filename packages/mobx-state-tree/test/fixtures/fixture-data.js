@@ -1,11 +1,11 @@
-import { HeroRoles } from "./fixture-models"
+const { HeroRoles } = require("./fixture-models")
 /**
  * Creates data containing very few fields.
  *
  * @param count The number of items to create.
  */
-export function createTreasure(count) {
-    const data: { trapped: boolean; gold: number }[] = []
+function createTreasure(count) {
+    const data = []
     let i = 0
     do {
         data.push({
@@ -16,8 +16,12 @@ export function createTreasure(count) {
     } while (i < count)
     return data
 }
+exports.createTreasure = createTreasure
+
 // why yes i DID graduate high school, why do you ask?
-export const rando = () => (Math.random() > 0.5 ? 1 : 0)
+const rando = () => (Math.random() > 0.5 ? 1 : 0)
+exports.rando = rando
+
 const titles = ["Sir", "Lady", "Baron von", "Baroness", "Captain", "Dread", "Fancy"].sort(rando)
 const givenNames = ["Abe", "Beth", "Chuck", "Dora", "Ernie", "Fran", "Gary", "Haily"].sort(rando)
 const epicNames = ["Amazing", "Brauny", "Chafed", "Dapper", "Egomaniac", "Foul"].sort(rando)
@@ -29,14 +33,8 @@ const wtf = `Daenerys Stormborn of the House Targaryen, First of Her Name, the U
  *
  * @param count The number of items to create.
  */
-export function createHeros(count) {
-    const data: {
-        id: number
-        name: string
-        level: number
-        role: string
-        description: string
-    }[] = []
+function createHeros(count) {
+    const data = []
     let i = 0
     let even = true
     let n1
@@ -58,6 +56,8 @@ export function createHeros(count) {
     } while (i < count)
     return data
 }
+exports.createHeros = createHeros
+
 /**
  * Creates data with a large amount of fields and data.
  *
@@ -65,8 +65,8 @@ export function createHeros(count) {
  * @param treasureCount The number of small children to create.
  * @param heroCount The number of medium children to create.
  */
-export function createMonsters(count, treasureCount, heroCount) {
-    const data: any[] = []
+function createMonsters(count, treasureCount, heroCount) {
+    const data = []
     let i = 0
     let even = true
     do {
@@ -99,3 +99,4 @@ export function createMonsters(count, treasureCount, heroCount) {
     } while (i < count)
     return data
 }
+exports.createMonsters = createMonsters

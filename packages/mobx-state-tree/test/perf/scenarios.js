@@ -1,12 +1,12 @@
-import { start } from "./timer"
-import { Treasure, Hero, Monster } from "../fixtures/fixture-models"
-import { createTreasure, createHeros, createMonsters } from "../fixtures/fixture-data"
+const { start } = require("./timer")
+const { Treasure, Hero, Monster } = require("../fixtures/fixture-models")
+const { createTreasure, createHeros, createMonsters } = require("../fixtures/fixture-data")
 /**
  * Covers models with a trivial amount of fields.
  *
  * @param count The number of records to create.
  */
-export function smallScenario(count) {
+exports.smallScenario = function smallScenario(count) {
     const data = createTreasure(count) // ready?
     const time = start()
     const converted = data.map(d => Treasure.create(d)) // go
@@ -19,7 +19,7 @@ export function smallScenario(count) {
  *
  * @param count The number of records to create.
  */
-export function mediumScenario(count) {
+exports.mediumScenario = function mediumScenario(count) {
     const data = createHeros(count) // ready?
     const time = start()
     const converted = data.map(d => Hero.create(d)) // go
@@ -34,7 +34,7 @@ export function mediumScenario(count) {
  * @param smallChildren The number of small children contained within.
  * @param mediumChildren The number of medium children contained within.
  */
-export function largeScenario(count, smallChildren, mediumChildren) {
+exports.largeScenario = function largeScenario(count, smallChildren, mediumChildren) {
     const data = createMonsters(count, smallChildren, mediumChildren) // ready?
     const time = start()
     const converted = data.map(d => Monster.create(d)) // go
