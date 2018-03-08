@@ -27,10 +27,8 @@ export class Frozen<T> extends Type<T, T> {
     }
 
     instantiate(parent: ObjectNode | null, subpath: string, environment: any, value: any): INode {
-        // deep freeze the object/array only in dev mode
-        const finalValue = process.env.NODE_ENV !== "production" ? deepFreeze(value) : value
         // create the node
-        return createNode(this, parent, subpath, environment, finalValue)
+        return createNode(this, parent, subpath, environment, deepFreeze(value))
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {

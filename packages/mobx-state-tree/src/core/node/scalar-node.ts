@@ -95,10 +95,7 @@ export class ScalarNode implements INode {
     public get snapshot() {
         const snapshot = this.type.getSnapshot(this)
         // avoid any external modification in dev mode
-        if (process.env.NODE_ENV !== "production") {
-            return freeze(snapshot)
-        }
-        return snapshot
+        return freeze(snapshot)
     }
 
     public get isAlive() {

@@ -187,10 +187,7 @@ export class ObjectNode implements INode {
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
         const snapshot = this.type.getSnapshot(this)
         // avoid any external modification in dev mode
-        if (process.env.NODE_ENV !== "production") {
-            return freeze(snapshot)
-        }
-        return snapshot
+        return freeze(snapshot)
     }
 
     isRunningAction(): boolean {

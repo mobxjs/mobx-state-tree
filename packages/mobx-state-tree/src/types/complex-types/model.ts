@@ -39,6 +39,7 @@ import {
     optional,
     ObjectNode
 } from "../../internal"
+import { freeze } from "../../utils"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 
@@ -132,7 +133,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         Object.assign(this, defaultObjectOptions, opts)
         // ensures that any default value gets converted to its related type
         this.properties = toPropertiesObject(this.properties)
-        Object.freeze(this.properties) // make sure nobody messes with it
+        freeze(this.properties) // make sure nobody messes with it
     }
 
     get propertyNames(): string[] {

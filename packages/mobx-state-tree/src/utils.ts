@@ -89,11 +89,19 @@ export function isPrimitive(value: any): boolean {
     return false
 }
 
+/**
+ * Freeze a value and return it (if not in production)
+ */
 export function freeze<T>(value: T): T {
+    if (process.env.NODE_ENV === "production") return value
     return isPrimitive(value) ? value : Object.freeze(value)
 }
 
+/**
+ * Recursively freeze a value (if not in production)
+ */
 export function deepFreeze<T>(value: T): T {
+    if (process.env.NODE_ENV === "production") return value
     freeze(value)
 
     if (isPlainObject(value)) {
