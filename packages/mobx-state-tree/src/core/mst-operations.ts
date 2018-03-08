@@ -452,6 +452,24 @@ export function resolveIdentifier(
 }
 
 /**
+ * Returns the identifier of the target node.
+ *
+ * @export
+ * @param {IStateTreeNode} target
+  * @returns {(string | null)}
+ */
+export function getIdentifier(target: IStateTreeNode): string | null {
+    // check all arguments
+
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
+
+    return getStateTreeNode(target).identifier
+}
+
+/**
  *
  *
  * @export

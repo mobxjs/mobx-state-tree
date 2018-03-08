@@ -21,6 +21,7 @@ const METHODS = [
     "getPathParts",
     "getRelativePath",
     "getRoot",
+    "getIdentifier",
     "getSnapshot",
     "getType",
     "hasParent",
