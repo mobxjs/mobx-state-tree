@@ -4,6 +4,7 @@ import {
     getParent,
     hasParent,
     getRoot,
+    getIdentifier,
     getPathParts,
     isAlive,
     clone,
@@ -69,6 +70,21 @@ test("it should resolve to the root of an object", t => {
     doc.rows.push(row)
     t.is(getRoot(row), doc)
 })
+
+// getIdentifier
+
+test("it should resolve to the identifier of the object", t => {
+    const Document = types.model("Document", {
+        id: types.identifier(types.string)
+    })
+    const doc = Document.create({
+        id: "document_1"
+    })
+
+    // get identifier of object
+    t.is(getIdentifier(doc), "document_1")
+})
+
 // getPath
 
 test("it should resolve the path of an object", t => {

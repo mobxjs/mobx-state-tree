@@ -353,11 +353,16 @@ Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 Given an object in a model tree, returns the root object of that tree
 
+## getIdentifier(node)
+
+Returns the identifier of the given node.
+
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `node` **IStateTreeNode** 
 
-Returns **any** 
+
+Returns **string | null** 
 
 ## getSnapshot
 
