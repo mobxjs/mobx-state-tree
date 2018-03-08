@@ -35,7 +35,7 @@ const TestModel = types
         }
     })
 
-test("next() omitted within middleware", t => {
+test.skip("next() omitted within middleware", t => {
     const m = TestModel.create()
     addMiddleware(m, customMiddleware1)
     addMiddleware(m, customMiddleware2)
