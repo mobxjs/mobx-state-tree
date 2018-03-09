@@ -30,13 +30,15 @@ import {
     undefinedType,
     nullType,
     late,
-    enumeration
+    enumeration,
+    custom
 } from "./internal"
 
 export const types = {
     enumeration,
     model,
     compose,
+    custom,
     reference,
     union,
     optional,

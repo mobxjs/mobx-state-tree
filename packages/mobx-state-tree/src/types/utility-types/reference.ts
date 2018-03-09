@@ -12,9 +12,9 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     fail,
-    ObjectNode
+    ObjectNode,
+    IStateTreeNode
 } from "../../internal"
-import { IStateTreeNode } from "../../index"
 
 class StoredReference {
     constructor(public readonly mode: "identifier" | "object", public readonly value: any) {

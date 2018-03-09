@@ -50,6 +50,7 @@ const TYPES = [
     "array",
     "boolean",
     "compose",
+    "custom",
     "frozen",
     "identifier",
     "late",
