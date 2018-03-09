@@ -459,11 +459,15 @@ test("References are non-nullable by default", () => {
     unprotect(store)
     if (process.env.NODE_ENV !== "production") {
         expect(store.maybeRef).toBe(null)
-        expect(() => store.ref).toThrow(/Failed to resolve reference of type AnonymousModel/)
+        expect(() => store.ref).toThrow(
+            "[mobx-state-tree] Failed to resolve reference '4' to type 'AnonymousModel' (from node: /ref)"
+        )
         store.maybeRef = 3 as any // valid assignment
         expect(store.maybeRef).toBe(store.todo)
         store.maybeRef = 4 as any // valid assignment
-        expect(() => store.maybeRef).toThrow(/Failed to resolve reference of type/)
+        expect(() => store.maybeRef).toThrow(
+            "[mobx-state-tree] Failed to resolve reference '4' to type 'AnonymousModel' (from node: /maybeRef)"
+        )
         store.maybeRef = null
         expect(store.maybeRef).toBe(null)
         expect(() => ((store as any).ref = null)).toThrow(/Error while converting/)

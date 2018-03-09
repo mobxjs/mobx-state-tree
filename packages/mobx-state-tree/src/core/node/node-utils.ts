@@ -1,4 +1,4 @@
-import { IType, fail, ObjectNode, splitJsonPath, joinJsonPath } from "../../internal"
+import { IType, fail, ObjectNode, splitJsonPath, joinJsonPath, ScalarNode } from "../../internal"
 
 export enum NodeLifeCycle {
     INITIALIZING, // setting up
@@ -118,32 +118,54 @@ export function resolveNodeByPathParts(
     pathParts: string[],
     failIfResolveFails: boolean = true
 ): INode | undefined {
+    debugger
     // counter part of getRelativePath
     // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
     // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
     // so we treat leading ../ apart...
     let current: INode | null = base
     for (let i = 0; i < pathParts.length; i++) {
-        if (pathParts[i] === "") current = current!.root
-        else if (pathParts[i] === "..") current = current!.parent
-        else if (pathParts[i] === "." || pathParts[i] === "")
+        const part = pathParts[i]
+        if (part === "") {
+            current = current!.root
+            continue
+        } else if (part === "..") {
+            current = current!.parent
+            if (current) continue // not everything has a parent
+        } else if (part === "." || part === "") {
             // '/bla' or 'a//b' splits to empty strings
             continue
-        else if (current) {
-            if (current instanceof ObjectNode) current = current.getChildNode(pathParts[i])
-            else return fail(`Illegal state`)
-            continue
+        } else if (current) {
+            if (current instanceof ScalarNode) {
+                // check if the value of a scalar resolves to a state tree node (e.g. references)
+                // then we can continue resolving...
+                try {
+                    const value = current.value
+                    if (isStateTreeNode(value)) {
+                        current = getStateTreeNode(value)
+                        // fall through
+                    }
+                } catch (e) {
+                    if (!failIfResolveFails) {
+                        return undefined
+                    }
+                    throw e
+                }
+            }
+            if (current instanceof ObjectNode) {
+                const subType = current.getChildType(part)
+                if (subType) {
+                    current = current.getChildNode(part)
+                    if (current) continue
+                }
+            }
         }
-
-        if (!current) {
-            if (failIfResolveFails)
-                return fail(
-                    `Could not resolve '${pathParts[i]}' in '${joinJsonPath(
-                        pathParts.slice(0, i - 1)
-                    )}', path of the patch does not resolve`
-                )
-            else return undefined
-        }
+        if (failIfResolveFails)
+            return fail(
+                `Could not resolve '${part}' in path '${joinJsonPath(pathParts.slice(0, i)) ||
+                    "/"}' while resolving '${joinJsonPath(pathParts)}'`
+            )
+        else return undefined
     }
     return current!
 }

@@ -71,8 +71,8 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
         if (!target)
             return fail(
-                `Failed to resolve reference of type ${this.targetType
-                    .name}: '${ref.value}' (in: ${node.path})`
+                `Failed to resolve reference '${ref.value}' to type '${this.targetType
+                    .name}' (from node: ${node.path})`
             )
         return target.value
     }
