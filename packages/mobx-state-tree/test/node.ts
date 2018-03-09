@@ -281,3 +281,41 @@ test("it can record and replay actions", () => {
     recorder.replay(target)
     expect(getSnapshot(source)).toEqual(getSnapshot(target))
 })
+
+test("Livelyness issue #683", () => {
+    const User = types.model({
+        id: types.identifier(types.number),
+        name: types.string
+    })
+
+    const Users = types
+        .model({
+            list: types.map(User)
+        })
+        .actions(self => ({
+            put(user) {
+                // if (self.has(user.id)) detach(self.get(user.id));
+                self.list.put(user)
+            },
+            get(id) {
+                return self.list.get(id)
+            },
+            has(id) {
+                return self.list.has(id)
+            }
+        }))
+
+    debugger
+    const users = Users.create({
+        list: {
+            1: { name: "Name", id: 1 }
+        }
+    })
+
+    const user = users.get(1)
+    expect(user.name).toBe("Name")
+
+    debugger
+    users.put({ id: 1, name: "Name" })
+    expect(user.name).toBe("Name")
+})
