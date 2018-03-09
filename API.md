@@ -11,6 +11,8 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [applyAction](#applyaction)
 -   [applyPatch](#applypatch)
 -   [applySnapshot](#applysnapshot)
+-   [BaseReferenceType](#basereferencetype)
+-   [BaseReferenceType](#basereferencetype-1)
 -   [clone](#clone)
 -   [ComplexType](#complextype)
 -   [ComplexType](#complextype-1)
@@ -25,6 +27,8 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [flow](#flow)
 -   [getChildType](#getchildtype)
 -   [getEnv](#getenv)
+-   [getIdentifier](#getidentifier)
+-   [getMembers](#getmembers)
 -   [getParent](#getparent)
 -   [getPath](#getpath)
 -   [getPathParts](#getpathparts)
@@ -33,14 +37,13 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [getSnapshot](#getsnapshot)
 -   [getType](#gettype)
 -   [hasParent](#hasparent)
--   [hooks](#hooks)
 -   [Identifier](#identifier)
 -   [IdentifierCache](#identifiercache)
 -   [isAlive](#isalive)
 -   [isProtected](#isprotected)
 -   [isRoot](#isroot)
 -   [isStateTreeNode](#isstatetreenode)
--   [Node](#node)
+-   [ObjectNode](#objectnode)
 -   [onAction](#onaction)
 -   [onPatch](#onpatch)
 -   [onSnapshot](#onsnapshot)
@@ -48,9 +51,9 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [protect](#protect)
 -   [recordActions](#recordactions)
 -   [recordPatches](#recordpatches)
--   [getMembers](#getMembers)
 -   [resolveIdentifier](#resolveidentifier)
 -   [resolvePath](#resolvepath)
+-   [ScalarNode](#scalarnode)
 -   [StoredReference](#storedreference)
 -   [tryResolve](#tryresolve)
 -   [Type](#type)
@@ -62,10 +65,12 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [Type](#type-6)
 -   [Type](#type-7)
 -   [Type](#type-8)
+-   [Type](#type-9)
 -   [typecheck](#typecheck)
 -   [types.array](#typesarray)
 -   [types.boolean](#typesboolean)
 -   [types.compose](#typescompose)
+-   [types.custom](#typescustom)
 -   [types.Date](#typesdate)
 -   [types.enumeration](#typesenumeration)
 -   [types.frozen](#typesfrozen)
@@ -126,11 +131,8 @@ For more details, see the [middleware docs](docs/middleware.md)
 **Parameters**
 
 -   `target` **IStateTreeNode** 
--   `middleware`  **IMiddleware**
--   `includeHooks` **([boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | any)** indicates whether the [hooks](#hooks) should be piped to the middleware.
-
-See [hooks](#hooks) for more information.
-
+-   `middleware`  
+-   `includeHooks`  
 
 Returns **IDisposer** 
 
@@ -166,6 +168,10 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 -   `snapshot` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+
+## BaseReferenceType
+
+## BaseReferenceType
 
 ## clone
 
@@ -303,6 +309,26 @@ Returns an empty environment if the tree wasn't initialized with an environment
 
 Returns **any** 
 
+## getIdentifier
+
+Returns the identifier of the target node.
+
+**Parameters**
+
+-   `target` **IStateTreeNode** 
+
+Returns **([string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) | null)** 
+
+## getMembers
+
+Returns a reflection of the node
+
+**Parameters**
+
+-   `target` **IStateTreeNode** 
+
+Returns **IModelReflectionData** 
+
 ## getParent
 
 Returns the immediate parent of this object, or null.
@@ -353,16 +379,11 @@ Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 Given an object in a model tree, returns the root object of that tree
 
-## getIdentifier(node)
-
-Returns the identifier of the given node.
-
 **Parameters**
 
--   `node` **IStateTreeNode** 
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
-
-Returns **string | null** 
+Returns **any** 
 
 ## getSnapshot
 
@@ -395,27 +416,6 @@ Given a model instance, returns `true` if the object has a parent, that is, is p
 -   `depth` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** = 1, how far should we look upward?
 
 Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
-
-## hooks
-
-The current action based LifeCycle hooks for [types.model](#types.model).
-
-```typescript
-enum HookNames {
-    afterCreate = "afterCreate",
-    afterAttach = "afterAttach",
-    postProcessSnapshot = "postProcessSnapshot",
-    beforeDetach = "beforeDetach",
-    beforeDestroy = "beforeDestroy"
-}
-```
-
-Note: 
-Unlike the other hooks, `preProcessSnapshot` is not created as part of the actions initializer, but directly on the type.
-`preProcessSnapshot` is currently not piped to middlewares. 
-
-For more details on middlewares, see the [middleware docs](docs/middleware.md) 
-
 
 ## Identifier
 
@@ -462,7 +462,7 @@ More precisely, that is, if the value is an instance of a
 
 -   `value` **any** 
 
-## Node
+## ObjectNode
 
 ## onAction
 
@@ -546,7 +546,7 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 -   **deprecated**: has been renamed to `flow()`.
     See <https://github.com/mobxjs/mobx-state-tree/issues/399> for more information.
-    Note that the middleware event type prefixes starting with `process` now start with `flow`.
+    Note that the middleware event types starting with `process` now start with `flow`.
 
 
 ## protect
@@ -612,28 +612,6 @@ export interface IPatchRecorder {
 
 Returns **IPatchRecorder** 
 
-## getMembers
-
-Returns the model name, properties, actions, views, volatiles of a node.
-
-**Parameters**
-
--   `target` **IStateTreeNode** 
-
-**Examples**
-
-```javascript
-export interface IModelReflectionData {
-    name: string
-    properties: { [K: string]: IType<any, any> }
-    actions: string[]
-    views: string[]
-    volatile: string[]
-}
-```
-
-Returns **IModelReflectionData** 
-
 ## resolveIdentifier
 
 Resolves a model instance given a root target, the type and the identifier you are searching for.
@@ -659,6 +637,8 @@ Returns undefined if no value can be found.
 
 Returns **any** 
 
+## ScalarNode
+
 ## StoredReference
 
 ## tryResolve
@@ -669,6 +649,8 @@ Returns **any**
 -   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 Returns **any** 
+
+## Type
 
 ## Type
 
@@ -748,6 +730,54 @@ Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
 Given 2 or more model types, the types are composed into a new Type.
 
+## types.custom
+
+Creates a custom type. Custom types can be used for arbitrary immutable values, that have a serializable representation. For example, to create your own Date representation, Decimal type etc.
+
+The signature of the options is:
+
+    export type CustomTypeOptions<S, T> = {
+        // Friendly name
+        name: string
+        // given a serialized value, how to turn it into the target type
+        fromSnapshot(snapshot: S): T
+        // return the serialization of the current value
+        toSnapshot(value: T): S
+        // if true, this is a converted value, if false, it's a snapshot
+        isTargetType(value: T | S): boolean
+        // a non empty string is assumed to be a validation error
+        isValidSnapshot?(snapshot: S): string
+    }
+
+**Parameters**
+
+-   `options`  
+
+**Examples**
+
+```javascript
+const DecimalPrimitive = types.custom<string, Decimal>({
+    name: "Decimal",
+    fromSnapshot(value: string) {
+        return new Decimal(value)
+    },
+    toSnapshot(value: Decimal) {
+        return value.toString()
+    },
+    isTargetType(value: string | Decimal): boolean {
+        return value instanceof Decimal
+    },
+    isValidSnapshot(value: string): string {
+        if (/^-?\d+\.\d+$/.test(value)) return "" // OK
+        return `'${value}' doesn't look like a valid decimal number`
+    }
+})
+
+const Wallet = types.model({
+    balance: DecimalPrimitive
+})
+```
+
 ## types.Date
 
 Creates a type that can only contain a javascript Date value.
@@ -785,10 +815,12 @@ Returns **ISimpleType&lt;[string](https://developer.mozilla.org/en-US/docs/Web/J
 ## types.frozen
 
 Frozen can be used to story any value that is serializable in itself (that is valid JSON).
-Frozen values need to be immutable or treated as if immutable.
+Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
 Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
 
 This is useful to store complex, but immutable values like vectors etc. It can form a powerful bridge to parts of your application that should be immutable, or that assume data to be immutable.
+
+Note: if you want to store free-form state that is mutable, or not serializeable, consider using volatile state instead.
 
 **Examples**
 
@@ -978,10 +1010,11 @@ See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tr
 **Parameters**
 
 -   `subType`  
+-   `options`  
 
 ## types.refinement
 
-`types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer than 5.
+`types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 
 **Parameters**
 

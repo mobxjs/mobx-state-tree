@@ -1,4 +1,4 @@
-/** all code is initially loaded through internal, to avoid circular dep issues */
+/* all code is initially loaded through internal, to avoid circular dep issues */
 import "./internal"
 
 // tslint:disable-next-line:no_unused-variable

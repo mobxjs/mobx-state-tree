@@ -15,7 +15,7 @@
     "watch": "jest --watch",
     "_prepublish": "npm run build && npm run build-docs",
     "coverage": "jest --coverage",
-    "build-docs": "npm run quick-build && documentation build lib/index.js --sort-order alpha -f md -o ../../API.md.tmp && concat -o ../../API.md ../../docs/API_header.md ../../API.md.tmp && rm ../../API.md.tmp",
+    "build-docs": "tsc && documentation build lib/index.js --sort-order alpha -f md -o ../../API.md.tmp && concat -o ../../API.md ../../docs/API_header.md ../../API.md.tmp && rm ../../API.md.tmp",
     "lint": "tslint -c tslint.json 'src/**/*.ts'"
   },
   "repository": {
