@@ -21,7 +21,9 @@ export type CustomTypeOptions<S, T> = {
     // if true, this is a converted value, if false, it's a snapshot
     isTargetType(value: T | S): boolean
     // a non empty string is assumed to be a validation error
-    isValidSnapshot?(snapshot: S): string
+    isValidSnapshot(snapshot: S): string
+    // TODO: isSnapshotEqual
+    // TODO: isValueEqual
 }
 
 /**
@@ -90,18 +92,16 @@ export class CustomType<S, T> extends Type<S, T> {
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (this.options.isValidSnapshot) {
-            const typeError: string = this.options.isValidSnapshot(value)
-            if (typeError) {
-                return typeCheckFailure(
-                    context,
-                    value,
-                    `Invalid value for type '${this.name}': ${typeError}`
-                )
-            } else return typeCheckSuccess()
-        } else {
-            return typeCheckSuccess()
+        if (this.options.isTargetType(value)) return typeCheckSuccess()
+        const typeError: string = this.options.isValidSnapshot(value)
+        if (typeError) {
+            return typeCheckFailure(
+                context,
+                value,
+                `Invalid value for type '${this.name}': ${typeError}`
+            )
         }
+        return typeCheckSuccess()
     }
 
     getValue(node: INode) {
