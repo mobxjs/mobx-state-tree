@@ -8,8 +8,8 @@
     "suppressTaskName": true,
     "tasks": [
         {
-            "taskName": "build-tests",
-            "args": ["run", "build-tests"],
+            "taskName": "build",
+            "args": ["tsc"],
             "isBuildCommand": true
         }
     ]
