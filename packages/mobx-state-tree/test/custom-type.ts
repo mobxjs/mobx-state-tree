@@ -53,9 +53,10 @@ class Decimal {
         expect(w2.balance.number).toBe(3)
         expect(w2.balance.fraction).toBe(5)
 
-        expect(() => Wallet.create({ balance: "two point one" })).toThrow(
-            "(Invalid value for type 'Decimal': 'two point one' doesn't look like a valid decimal number)"
-        )
+        if (process.env.NODE_ENV !== "production")
+            expect(() => Wallet.create({ balance: "two point one" })).toThrow(
+                "(Invalid value for type 'Decimal': 'two point one' doesn't look like a valid decimal number)"
+            )
     })
 
     // test reassignment / reconcilation / conversion works
@@ -126,9 +127,10 @@ class Decimal {
         expect(w2.balance.number).toBe(3)
         expect(w2.balance.fraction).toBe(5)
 
-        expect(() => Wallet.create({ balance: "two point one" })).toThrow(
-            "(Invalid value for type 'DecimalTuple': '\"two point one\"' doesn't look like a valid decimal number)"
-        )
+        if (process.env.NODE_ENV !== "production")
+            expect(() => Wallet.create({ balance: "two point one" })).toThrow(
+                "(Invalid value for type 'DecimalTuple': '\"two point one\"' doesn't look like a valid decimal number)"
+            )
     })
 
     // test reassignment / reconcilation / conversion works
