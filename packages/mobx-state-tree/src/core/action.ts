@@ -104,7 +104,7 @@ export function createActionInvoker<T extends Function>(
  */
 export function addMiddleware(
     target: IStateTreeNode,
-    middleware: IMiddlewareHandler,
+    handler: IMiddlewareHandler,
     includeHooks: boolean = true
 ): IDisposer {
     const node = getStateTreeNode(target)
@@ -114,7 +114,7 @@ export function addMiddleware(
                 "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
             )
     }
-    return node.addMiddleWare(middleware, includeHooks)
+    return node.addMiddleWare(handler, includeHooks)
 }
 
 export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn: T): T
@@ -201,15 +201,21 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
                 if (!nextInvoked && !abortInvoked) {
                     const node = getStateTreeNode(call.tree)
                     fail(
-                        `Neither the next() nor the abort() callback within a middleware for the action: "${call.name}" on the node: ${node
-                            .type.name} was invoked.`
+                        `Neither the next() nor the abort() callback within the middleware ${
+                            handler.name
+                        } for the action: "${call.name}" on the node: ${
+                            node.type.name
+                        } was invoked.`
                     )
                 }
-                if (!!nextInvoked && !!abortInvoked) {
+                if (nextInvoked && abortInvoked) {
                     const node = getStateTreeNode(call.tree)
                     fail(
-                        `The next() and abort() callback within a middleware for the action: "${call.name}" on the node: ${node
-                            .type.name} was invoked.`
+                        `The next() and abort() callback within the middleware ${
+                            handler.name
+                        } for the action: "${call.name}" on the node: ${
+                            node.type.name
+                        } were invoked.`
                     )
                 }
             }

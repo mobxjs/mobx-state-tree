@@ -5,7 +5,7 @@
 		"husky": "^0.13.4",
 		"prettier": "^1.4.4",
 		"lint-staged": "^3.6.1",
-		"cross-env":"^5.1.1"
+		"cross-env": "^5.1.1"
 	},
 	"scripts": {
 		"clean": "lerna clean",
