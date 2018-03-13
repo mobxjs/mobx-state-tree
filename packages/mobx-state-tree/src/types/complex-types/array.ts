@@ -7,8 +7,7 @@ import {
     IArraySplice,
     action,
     intercept,
-    observe,
-    extras
+    observe
 } from "mobx"
 import {
     createNode,
@@ -36,6 +35,7 @@ import {
     TypeFlags,
     ObjectNode
 } from "../../internal"
+import { getAdministration, shallowArray } from "../../mobx-compat"
 
 export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
     return `${getStateTreeNode(this)}(${this.length} items)`
@@ -56,7 +56,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     createNewInstance = () => {
-        const array = observable.shallowArray()
+        const array = shallowArray()
         addHiddenFinalProp(array, "toString", arrayToString)
         return array
     }
@@ -64,7 +64,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     finalizeNewInstance = (node: INode, snapshot: any) => {
         const objNode = node as ObjectNode
         const instance = objNode.storedValue as IObservableArray<any>
-        extras.getAdministration(instance).dehancer = objNode.unbox
+        getAdministration(instance).dehancer = objNode.unbox
         intercept(instance, change => this.willChange(change) as any)
         objNode.applySnapshot(snapshot)
         observe(instance, this.didChange)

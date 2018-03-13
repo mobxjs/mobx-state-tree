@@ -1,4 +1,4 @@
-import { reaction, observable, computed } from "mobx"
+import { reaction, observable, computed, onReactionError } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -103,9 +103,12 @@ export class ObjectNode implements INode {
                 this.emitSnapshot(snapshot)
             }
         )
-        snapshotDisposer.onError((e: any) => {
+        onReactionError((e: any) => {
             throw e
         })
+        // snapshotDisposer.onError((e: any) => {
+        //     throw e
+        // })
         this.addDisposer(snapshotDisposer)
     }
 

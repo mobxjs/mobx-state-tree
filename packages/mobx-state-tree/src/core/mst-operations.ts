@@ -1,4 +1,5 @@
-import { IObservableArray, ObservableMap, isObservable, isComputed } from "mobx"
+import { IObservableArray, ObservableMap } from "mobx"
+import { isComputed, isObservable } from "../mobx-compat"
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)

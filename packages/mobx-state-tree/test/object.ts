@@ -1,5 +1,6 @@
 import { unprotect } from "../src/core/mst-operations"
 import {
+    observable,
     destroy,
     detach,
     onSnapshot,
@@ -11,7 +12,10 @@ import {
     getSnapshot,
     types
 } from "../src"
-import { autorun, observable, reaction } from "mobx"
+import { autorun, reaction } from "mobx"
+// import {
+//     observable,
+// } from "../src/mobx-compat"
 const createTestFactories = () => {
     const Factory = types
         .model({
