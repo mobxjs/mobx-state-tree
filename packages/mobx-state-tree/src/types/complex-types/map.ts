@@ -294,7 +294,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
  */
 export function map<S, T>(
     subtype: IComplexType<S, T>
-): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>>;
+): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>>
 export function map<S, T>(
     subtype: IType<S, T>
 ): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
