@@ -305,7 +305,6 @@ test("Livelyness issue #683", () => {
             }
         }))
 
-    debugger
     const users = Users.create({
         list: {
             1: { name: "Name", id: 1 }
@@ -315,7 +314,6 @@ test("Livelyness issue #683", () => {
     const user = users.get(1)
     expect(user.name).toBe("Name")
 
-    debugger
     users.put({ id: 1, name: "Name" })
     expect(user.name).toBe("Name")
 })

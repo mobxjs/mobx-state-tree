@@ -118,7 +118,6 @@ if (process.env.NODE_ENV !== "production") {
     test("try resolve doesn't work #686", () => {
         expect(tryResolve(root, "/bar/fooRef")).toBe(undefined)
 
-        debugger
         expect(tryResolve(root, "/bar/fooRef/name")).toBe(undefined)
     })
 

@@ -24,6 +24,10 @@ Nicolas Galle [full post](https://medium.com/@nicolasgall/i-started-to-use-react
 Introduction blog post [The curious case of MobX state tree](https://medium.com/@mweststrate/the-curious-case-of-mobx-state-tree-7b4e22d461f)
 
 ---
+
+MobX state tree is a community driven project, but is looking for active maintainers! See [#700](https://github.com/mobxjs/mobx-state-tree/issues/700)
+
+---
 # Contents
 
 * [Installation](#installation)

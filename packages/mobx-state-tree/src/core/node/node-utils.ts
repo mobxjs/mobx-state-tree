@@ -118,7 +118,6 @@ export function resolveNodeByPathParts(
     pathParts: string[],
     failIfResolveFails: boolean = true
 ): INode | undefined {
-    debugger
     // counter part of getRelativePath
     // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
     // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...

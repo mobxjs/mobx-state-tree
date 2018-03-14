@@ -31,7 +31,7 @@ export type CustomTypeOptions<S, T> = {
  *
  * The signature of the options is:
  *
- * ```
+ * ```javascript
  * export type CustomTypeOptions<S, T> = {
  *     // Friendly name
  *     name: string
