@@ -8,5 +8,5 @@ export function actionLogger(call: IMiddlewareEvent, next: any) {
 
     if (!skip)
         console.log(`[MST] #${call.rootId} ${call.type} - ${getPath(call.context)}/${call.name}`)
-    return next(call)
+    next(call)
 }

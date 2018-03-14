@@ -197,7 +197,8 @@ export class ObjectNode implements INode {
     }
 
     get identifier(): string | null {
-        return this.identifierAttribute ? this.storedValue[this.identifierAttribute] : null
+        // MWE: read from the snapshot, as that is safe even when the object is dead :)
+        return this.identifierAttribute ? this.snapshot[this.identifierAttribute] : null
     }
 
     public get isAlive() {

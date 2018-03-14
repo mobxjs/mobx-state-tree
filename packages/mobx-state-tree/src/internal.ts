@@ -1,4 +1,4 @@
-/**
+/*
  * All imports / exports should be proxied through this file.
  * Why? It gives us full control over the module load order, preventing circular dependency isses
  */
@@ -32,3 +32,4 @@ export * from "./types/utility-types/late"
 export * from "./types/utility-types/frozen"
 export * from "./types/utility-types/reference"
 export * from "./types/utility-types/identifier"
+export * from "./types/utility-types/custom"

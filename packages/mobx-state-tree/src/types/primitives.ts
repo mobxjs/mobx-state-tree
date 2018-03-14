@@ -16,6 +16,7 @@ import {
     ObjectNode
 } from "../internal"
 
+// TODO: implement CoreType using types.custom ?
 export class CoreType<S, T> extends Type<S, T> {
     readonly shouldAttachNode = false
     readonly checker: (value: any) => boolean

@@ -1,4 +1,4 @@
-/** all code is initially loaded through internal, to avoid circular dep issues */
+/* all code is initially loaded through internal, to avoid circular dep issues */
 import "./internal"
 
 // tslint:disable-next-line:no_unused-variable
@@ -30,13 +30,15 @@ import {
     undefinedType,
     nullType,
     late,
-    enumeration
+    enumeration,
+    custom
 } from "./internal"
 
 export const types = {
     enumeration,
     model,
     compose,
+    custom,
     reference,
     union,
     optional,

@@ -12,9 +12,9 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     fail,
-    ObjectNode
+    ObjectNode,
+    IStateTreeNode
 } from "../../internal"
-import { IStateTreeNode } from "../../index"
 
 class StoredReference {
     constructor(public readonly mode: "identifier" | "object", public readonly value: any) {
@@ -29,6 +29,7 @@ class StoredReference {
 }
 
 export abstract class BaseReferenceType<T> extends Type<string | number, T> {
+    readonly shouldAttachNode = false
     readonly flags = TypeFlags.Reference
 
     constructor(protected readonly targetType: IType<any, T>) {
@@ -55,8 +56,6 @@ export abstract class BaseReferenceType<T> extends Type<string | number, T> {
 }
 
 export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
-    readonly shouldAttachNode = true
-
     constructor(targetType: IType<any, T>) {
         super(targetType)
     }
@@ -72,8 +71,8 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
         if (!target)
             return fail(
-                `Failed to resolve reference of type ${this.targetType
-                    .name}: '${ref.value}' (in: ${node.path})`
+                `Failed to resolve reference '${ref.value}' to type '${this.targetType
+                    .name}' (from node: ${node.path})`
             )
         return target.value
     }
@@ -121,8 +120,6 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
 }
 
 export class CustomReferenceType<T> extends BaseReferenceType<T> {
-    readonly shouldAttachNode = false
-
     constructor(targetType: IType<any, T>, private readonly options: ReferenceOptions<T>) {
         super(targetType)
     }
