@@ -117,16 +117,15 @@ const Todo = types.model({
 ```
 
 ## addMiddleware
-
-Middleware can be used to intercept any action is invoked on the subtree where it is attached.
-If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
-
+ 
+Middlewares can be used to intercept any action on a subtree.
+ 
 For more details, see the [middleware docs](docs/middleware.md)
-
+ 
 **Parameters**
-
+ 
 -   `target` **IStateTreeNode** 
--   `middleware`  **IMiddleware**
+-   `handler`  **IMiddlewareHandler**
 -   `includeHooks` **([boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | any)** indicates whether the [hooks](#hooks) should be piped to the middleware.
 
 See [hooks](#hooks) for more information.

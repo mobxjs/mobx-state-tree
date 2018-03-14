@@ -37,7 +37,8 @@ export type IMiddleware = {
 }
 export type IMiddlewareHandler = (
     actionCall: IMiddlewareEvent,
-    next: (actionCall: IMiddlewareEvent) => any
+    next: (actionCall: IMiddlewareEvent, callback?: (value: any) => any) => void,
+    abort: (value: any) => void
 ) => any
 
 let nextActionId = 1
@@ -105,7 +106,7 @@ export function createActionInvoker<T extends Function>(
  */
 export function addMiddleware(
     target: IStateTreeNode,
-    middleware: IMiddlewareHandler,
+    handler: IMiddlewareHandler,
     includeHooks: boolean = true
 ): IDisposer {
     const node = getStateTreeNode(target)
@@ -115,7 +116,7 @@ export function addMiddleware(
                 "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
             )
     }
-    return node.addMiddleWare(middleware, includeHooks)
+    return node.addMiddleWare(handler, includeHooks)
 }
 
 export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn: T): T
@@ -168,13 +169,53 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
     // Short circuit
     if (!middlewares.length) return mobxAction(originalFn).apply(null, baseCall.args)
     let index = 0
+    let result: any = null
 
     function runNextMiddleware(call: IMiddlewareEvent): any {
         const middleware = middlewares[index++]
         const handler = middleware && middleware.handler
+        let nextInvoked = false
+        let abortInvoked = false
+
+        function next(call: IMiddlewareEvent): void
+        function next(call: IMiddlewareEvent, callback: (value: any) => any): void
+        function next(call: IMiddlewareEvent, callback?: (value: any) => any) {
+            nextInvoked = true
+            // the result can contain
+            // - the non manipulated return value from an action
+            // - the non manipulated abort value
+            // - one of the above but manipulated through the callback function
+            if (callback) {
+                result = callback(runNextMiddleware(call) || result)
+            } else {
+                result = runNextMiddleware(call)
+            }
+        }
+        function abort(value: any) {
+            abortInvoked = true
+            // overwrite the result
+            // can be manipulated through middlewares earlier in the queue using the callback fn
+            result = value
+        }
         const invokeHandler = () => {
-            const next = handler(call, runNextMiddleware)
-            return next
+            handler(call, next, abort)
+            if (process.env.NODE_ENV !== "production") {
+                if (!nextInvoked && !abortInvoked) {
+                    const node = getStateTreeNode(call.tree)
+                    fail(
+                        `Neither the next() nor the abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node
+                            .type.name} was invoked.`
+                    )
+                }
+                if (nextInvoked && abortInvoked) {
+                    const node = getStateTreeNode(call.tree)
+                    fail(
+                        `The next() and abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node
+                            .type.name} were invoked.`
+                    )
+                }
+            }
+            return result
         }
 
         if (handler && middleware.includeHooks) {
