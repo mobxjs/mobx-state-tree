@@ -46,29 +46,46 @@ export function mapToString(this: ObservableMap<any>) {
     return `${getStateTreeNode(this as IStateTreeNode)}(${this.size} items)`
 }
 
+const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
+
 function put(this: ObservableMap<any>, value: any) {
     if (!!!value) fail(`Map.put cannot be used to set empty values`)
-    let node: ObjectNode
     if (isStateTreeNode(value)) {
-        node = getStateTreeNode(value)
-    } else if (isMutable(value)) {
-        const targetType = (getStateTreeNode(this as IStateTreeNode).type as MapType<any, any>)
-            .subType
-        node = getStateTreeNode(targetType.create(value))
-    } else {
+        const node = getStateTreeNode(value)
+        if (process.env.NODE_ENV !== "production") {
+            if (!node.identifierAttribute) return fail(needsIdentifierError)
+        }
+        this.set("" + node.identifier!, node.value)
+        return this
+    } else if (!isMutable(value)) {
         return fail(`Map.put can only be used to store complex values`)
+    } else {
+        const mapType = getStateTreeNode(this as IStateTreeNode).type as MapType<any, any>
+        if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
+        if (mapType.identifierMode === MapIdentifierMode.YES) {
+            this.set("" + value[mapType.identifierAttribute!], value)
+            return this
+        }
+        // we don't know the identifier attr yet, so we have to create the instance already to be able to determine
+        // luckily, needs to happen only once
+        const node = getStateTreeNode(mapType.subType.create(value)) // FIXME: this will unecessarly first create and after that attach.
+        if (!node.identifierAttribute) return fail(needsIdentifierError)
+        this.set("" + node.value[node.identifierAttribute!], node.value)
+        return this
     }
-    if (!node.identifierAttribute)
-        fail(
-            `Map.put can only be used to store complex values that have an identifier type attribute`
-        )
-    this.set(node.identifier!, node.value)
-    return this
+}
+
+export enum MapIdentifierMode {
+    UNKNOWN,
+    YES,
+    NO
 }
 
 export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
     shouldAttachNode = true
     subType: IType<any, any>
+    identifierMode: MapIdentifierMode = MapIdentifierMode.UNKNOWN
+    identifierAttribute: string | undefined = undefined
     readonly flags = TypeFlags.Map
 
     constructor(name: string, subType: IType<any, any>) {
@@ -134,7 +151,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                         node.getChildNode(change.name),
                         change.newValue
                     )
-                    this.verifyIdentifier(change.name, change.newValue as INode)
+                    this.processIdentifier(change.name, change.newValue as INode)
                 }
                 break
             case "add":
@@ -146,20 +163,38 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                         undefined,
                         change.newValue
                     )
-                    this.verifyIdentifier(change.name, change.newValue as INode)
+                    this.processIdentifier(change.name, change.newValue as INode)
                 }
                 break
         }
         return change
     }
 
-    private verifyIdentifier(expected: string, node: INode) {
+    private processIdentifier(expected: string, node: INode) {
         if (node instanceof ObjectNode) {
-            const identifier = node.identifier
-            if (identifier !== null && "" + identifier !== "" + expected)
+            // identifier cannot be determined up front, as they might need to go through unions etc
+            // but for maps, we do want them to be regular, and consistently used.
+            if (this.identifierMode === MapIdentifierMode.UNKNOWN) {
+                this.identifierMode =
+                    node.identifierAttribute !== undefined
+                        ? MapIdentifierMode.YES
+                        : MapIdentifierMode.NO
+                this.identifierAttribute = node.identifierAttribute
+            }
+            if (node.identifierAttribute !== this.identifierAttribute)
+                // both undefined if type is NO
                 fail(
-                    `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
+                    `The objects in a map should all have the same identifier attribute, expected '${this
+                        .identifierAttribute}', but child of type '${node.type
+                        .name}' declared attribute '${node.identifierAttribute}' as identifier`
                 )
+            if (this.identifierMode === MapIdentifierMode.YES) {
+                const identifier = "" + node.identifier! // 'cause snapshots always have their identifiers as strings. blegh..
+                if (identifier !== expected)
+                    fail(
+                        `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
+                    )
+            }
         }
     }
 

@@ -277,3 +277,20 @@ test("it should get map keys from reversePatch when deleted an item from a neste
     })
     store.remove("a")
 })
+
+test("map expects regular identifiers", () => {
+    const A = types.model("A", { a: types.identifier() })
+    const B = types.model("B", { b: types.identifier() })
+
+    const M = types.map(types.union(A, B))
+    const m = M.create()
+    unprotect(m)
+    m.put({ a: "3" }) // ok
+    m.put({ a: "4" }) // ok
+
+    expect(() => {
+        m.put({ b: "5" })
+    }).toThrow(
+        "[mobx-state-tree] The objects in a map should all have the same identifier attribute, expected 'a', but child of type 'B' declared attribute 'b' as identifier"
+    )
+})

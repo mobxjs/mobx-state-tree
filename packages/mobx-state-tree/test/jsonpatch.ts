@@ -182,7 +182,7 @@ test("it should apply non flat patches with object instances", () => {
         ]
     )
 })
-test("it should apply deep patches to arrays", () => {
+test("it should apply deep patches to maps", () => {
     const NodeMap = types.model("NodeMap", {
         id: types.identifier(types.number),
         text: "Hi",
@@ -209,12 +209,8 @@ test("it should apply deep patches to arrays", () => {
             },
             {
                 op: "replace",
-                path: "/children/2",
-                value: {
-                    children: {},
-                    id: 2,
-                    text: "world"
-                }
+                path: "/children/2/text",
+                value: "world"
             },
             {
                 op: "add",
