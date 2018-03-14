@@ -10,6 +10,7 @@ import {
     onSnapshot,
     flow
 } from "../src"
+
 test("it should support custom references - basics", () => {
     const User = types.model({
         id: types.identifier(),
@@ -50,6 +51,7 @@ test("it should support custom references - basics", () => {
     applySnapshot(s, Object.assign({}, getSnapshot(s), { selection: "Unknown" }))
     expect(s.selection).toBe(null)
 })
+
 test("it should support custom references - adv", () => {
     const User = types.model({
         id: types.identifier(),
@@ -110,6 +112,7 @@ test("it should support custom references - adv", () => {
     expect(p.patches).toMatchSnapshot()
     expect(p.inversePatches).toMatchSnapshot()
 })
+
 test("it should support dynamic loading", done => {
     const events: any[] = []
     const User = types.model({

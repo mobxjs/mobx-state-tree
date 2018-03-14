@@ -1,23 +1,71 @@
 # Middleware
+Middlewares can be used to intercept any action on a subtree.
 
-MST ships with a small set of [pre-built / example middlewares](../packages/mst-middlewares/README.md)
+It is allowed to attach multiple middlewares to a node.
+The order in which middlewares are invoked is inside-out:
+This means that the middlewares are invoked in the order you attach them.
+The value returned by the action invoked/ the aborted value gets passed through the middleware chain and can be manipulated.
 
-Middleware can be used to intercept any action is invoked on the subtree where it is attached.
-If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
 
+MST ships with a small set of [pre-built / example middlewares](../packages/mst-middlewares/README.md).
+
+
+Custom middleware example:
 [SandBox example](https://codesandbox.io/s/mQrqy8j73)
 
-Middleware can be attached by using `addMiddleware(node, handler: (call, next(call) => void) => void)`
+## Custom Middleware
+Middlewares can be attached by using:
 
-It is allowed to attach multiple middlewares. The order in which middleware is invoked is inside-out:
-local middleware is invoked before parent middleware. On the same object, earlier attached middleware is run before later attached middleware.
+`addMiddleware(target: IStateTreeNode, handler: IMiddlewareHandler, includeHooks: boolean = true) :
+void`
 
-A middleware handler receives two arguments: 1. the description of the the call, 2: a function to invoke the next middleware in the chain.
-If `next(call)` is not invoked by your middleware, the action will be aborted and not actually executed.
-Before passing the call to the next middleware using `next`, feel free to (clone and) modify the call arguments. Other properties should not be modified
+### target
 
-A call description looks like:
+the middleware will only be attached to actions of the `target` and further sub nodes of such.
 
+### handler
+An example of this is as follows:
+
+```js
+const store = SomeStore.create()
+const disposer = addMiddleWare(store, (call, next, abort) => {
+  console.log(`action ${call.name} was invoked`)
+  // runs the next middleware
+  // or the implementation of the targeted action
+  // if there is no middleware left to run
+
+  // the value returned from the next can be manipulated
+  next(call, value => value + 1);
+});
+```
+```js
+const store = SomeStore.create()
+const disposer = addMiddleWare(store, (call, next, abort) => {
+  console.log(`action ${call.name} was invoked`)
+  // aborts running the middlewares and returns the 'value' instead.
+  // note that the targeted action won't be reached either.
+  return abort('value')  
+})
+```
+
+A middleware handler receives three arguments:
+1. the description of the the call,
+-  a function to invoke the next middleware in the chain and manipulate the returned value from the next middleware in the chain.
+- a function to abort the middleware queue and return a value.
+
+
+
+*Note: You must call either `next(call)` or `abort(value)` within a middleware.*
+
+*Note: If you abort, the action invoked will never be reached.*
+
+*Note: The value from either `abort('value')` or the returned value from the `action` can be manipulated by previous middlewares.*
+
+*Note: It is important to invoke `next(call)` or `abort(value)` synchronously.*
+
+*Note: The value of the `abort(value)` must be a promise in case of aborting a `flow`.*
+
+#### call
 ```javascript
 export type IMiddleWareEvent = {
     type: IMiddlewareEventType
@@ -38,26 +86,6 @@ export type IMiddlewareEventType =
     | "flow_return"
     | "flow_throw"
 ```
-
-A very simple middleware that just logs the invocation of actions will look like:
-
-@example
-```typescript
-const store = SomeStore.create()
-const disposer = addMiddleWare(store, (call, next) => {
-  console.log(`action ${call.name} was invoked`)
-  return next(call) // runs the next middleware (or the implementation of the targeted action if there is no middleware to run left)
-})
-```
-
-_Note: for middleware, it is extremely important that `next(action)` is called for asynchronous actions (`call.type !== "action"`), otherwise the generator will remain in an unfinished state forever_
-
-# Built-in middlewares
-
-* [`onAction`](https://github.com/mobxjs/mobx-state-tree/blob/09708ba86d04f433cc23fbcb6d1dc4db170f798e/src/core/action.ts#L174)
-* More will follow soon
-
-## Call attributes
 
 * `name` is the name of the action
 * `context` is the object on which the action was defined & invoked
@@ -84,3 +112,31 @@ A minimal, empty process will fire the following events if started as action:
 2. `flow_spawn`: This is just the notification that a new generator was started
 3. `flow_resume`: This will be emitted when the first "code block" is entered. (So, with zero yields there is one `flow_resume`  still)
 4. `flow_return`: The process has completed
+
+#### next
+use next to call the next middleware.
+
+`next(call: IMiddlewareEvent, callback?: (value: any) => any): void`
+
+- `call` Before passing the call middleware, feel free to (clone and) modify the `call.args`.
+Other properties should not be modified
+
+- `callback` can be used to manipulate values returned by later middlewares or the implementation of the targeted action.
+
+#### abort
+
+use abort if you wan't kill the queue of middlewares and immediately return.
+the implementation of the targeted action won't be reached if you abort the queue.
+
+`abort(value: any) : void`
+
+- `value` is returned instead of the return value from the implementation of the targeted action.
+
+### includeHooks
+set this flag to `false` if you wan't to avoid having hooks passed to the middleware.
+
+## FAQ
+
+- I alter a property and the change does not appear in the middleware.
+
+ - *If you alter a value of an unprotected node, the change won't reach the middleware. Only actions can be intercepted.*
