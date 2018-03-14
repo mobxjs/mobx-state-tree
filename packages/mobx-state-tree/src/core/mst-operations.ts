@@ -1,4 +1,4 @@
-import { IObservableArray, ObservableMap, isObservable, isComputed } from "mobx"
+import { IObservableArray, ObservableMap, isComputedProp, isObservableProp } from "mobx"
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -54,9 +54,9 @@ export function onPatch(
     return getStateTreeNode(target).onPatch(callback)
 }
 
-export function onSnapshot<S>(
-    target: ObservableMap<S>,
-    callback: (snapshot: { [key: string]: S }) => void
+export function onSnapshot<K extends string | number, V>(
+    target: ObservableMap<K, V>,
+    callback: (snapshot: { [key: string]: V }) => void
 ): IDisposer
 export function onSnapshot<S>(
     target: IObservableArray<S>,
@@ -258,7 +258,9 @@ export function applySnapshot<S, T>(target: IStateTreeNode, snapshot: S) {
     return getStateTreeNode(target).applySnapshot(snapshot)
 }
 
-export function getSnapshot<S>(target: ObservableMap<S>): { [key: string]: S }
+export function getSnapshot<K extends string | number, V>(
+    target: ObservableMap<K, V>
+): { [key: string]: V }
 export function getSnapshot<S>(target: IObservableArray<S>): S[]
 export function getSnapshot<S = any>(target: ISnapshottable<S>): S
 /**
@@ -710,12 +712,12 @@ export function getMembers(target: IStateTreeNode): IModelReflectionData {
         if (key in reflected.properties) return
         const descriptor = Object.getOwnPropertyDescriptor(target, key)!
         if (descriptor.get) {
-            if (isComputed(target, key)) reflected.views.push(key)
+            if (isComputedProp(target, key)) reflected.views.push(key)
             else reflected.volatile.push(key)
             return
         }
         if (descriptor.value._isMSTAction === true) reflected.actions.push(key)
-        else if (isObservable(target, key)) reflected.volatile.push(key)
+        else if (isObservableProp(target, key)) reflected.volatile.push(key)
         else reflected.views.push(key)
     })
     return reflected
