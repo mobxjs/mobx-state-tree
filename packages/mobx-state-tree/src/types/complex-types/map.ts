@@ -75,7 +75,7 @@ function put(this: ObservableMap<any>, value: any) {
     }
 }
 
-enum MapIdentifierMode {
+export enum MapIdentifierMode {
     UNKNOWN,
     YES,
     NO
@@ -183,7 +183,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
             }
             if (node.identifierAttribute !== this.identifierAttribute)
                 // both undefined if type is NO
-                return fail(
+                fail(
                     `The objects in a map should all have the same identifier attribute, expected '${this
                         .identifierAttribute}', but child of type '${node.type
                         .name}' declared attribute '${node.identifierAttribute}' as identifier`
@@ -191,7 +191,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
             if (this.identifierMode === MapIdentifierMode.YES) {
                 const identifier = "" + node.identifier! // 'cause snapshots always have their identifiers as strings. blegh..
                 if (identifier !== expected)
-                    return fail(
+                    fail(
                         `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
                     )
             }
