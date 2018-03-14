@@ -39,7 +39,7 @@ interface IMapFactoryConfig {
     isMapFactory: true
 }
 
-export interface IExtendedObservableMap<T> extends ObservableMap<any, T> {
+export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
     put(value: T | any): this // downtype to any, again, because we cannot type the snapshot, see
 }
 
@@ -133,27 +133,28 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 
     getChildNode(node: ObjectNode, key: string): INode {
-        const childNode = node.storedValue.get(key)
+        const childNode = node.storedValue.get("" + key)
         if (!childNode) fail("Not a child " + key)
         return childNode
     }
 
     willChange(change: IMapWillChange<any, any>): IMapWillChange<any, any> | null {
         const node = getStateTreeNode(change.object as IStateTreeNode)
+        const key = "" + change.name
         node.assertWritable()
 
         switch (change.type) {
             case "update":
                 {
                     const { newValue } = change
-                    const oldValue = change.object.get(change.name)
+                    const oldValue = change.object.get(key)
                     if (newValue === oldValue) return null
                     typecheck(this.subType, newValue)
                     change.newValue = this.subType.reconcile(
-                        node.getChildNode(change.name),
+                        node.getChildNode(key),
                         change.newValue
                     )
-                    this.processIdentifier(change.name, change.newValue as INode)
+                    this.processIdentifier(key, change.newValue as INode)
                 }
                 break
             case "add":
@@ -161,11 +162,11 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                     typecheck(this.subType, change.newValue)
                     change.newValue = this.subType.instantiate(
                         node,
-                        change.name,
+                        key,
                         undefined,
                         change.newValue
                     )
-                    this.processIdentifier(change.name, change.newValue as INode)
+                    this.processIdentifier(key, change.newValue as INode)
                 }
                 break
         }
@@ -269,10 +270,10 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
             currentKeys[key] = false
         })
         // Don't use target.replace, as it will throw all existing items first
-        Object.keys(snapshot).forEach(key => {
-            target.set(key, snapshot[key])
-            currentKeys[key] = true
-        })
+        for (let key in snapshot) {
+            target.set("" + key, snapshot[key])
+            currentKeys["" + key] = true
+        }
         Object.keys(currentKeys).forEach(key => {
             if (currentKeys[key] === false) target.delete(key)
         })
