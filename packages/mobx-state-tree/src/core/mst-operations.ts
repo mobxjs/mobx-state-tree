@@ -487,7 +487,13 @@ export function tryResolve(target: IStateTreeNode, path: string): IStateTreeNode
     }
     const node = resolveNodeByPath(getStateTreeNode(target), path, false)
     if (node === undefined) return undefined
-    return node ? node.value : undefined
+    try {
+        return node.value
+    } catch (e) {
+        // For what ever reason not resolvable (e.g. totally not existing path, or value that cannot be fetched)
+        // see test / issue: 'try resolve doesn't work #686'
+        return undefined
+    }
 }
 
 /**

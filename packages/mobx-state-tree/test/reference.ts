@@ -459,11 +459,15 @@ test("References are non-nullable by default", () => {
     unprotect(store)
     if (process.env.NODE_ENV !== "production") {
         expect(store.maybeRef).toBe(null)
-        expect(() => store.ref).toThrow(/Failed to resolve reference of type AnonymousModel/)
+        expect(() => store.ref).toThrow(
+            "[mobx-state-tree] Failed to resolve reference '4' to type 'AnonymousModel' (from node: /ref)"
+        )
         store.maybeRef = 3 as any // valid assignment
         expect(store.maybeRef).toBe(store.todo)
         store.maybeRef = 4 as any // valid assignment
-        expect(() => store.maybeRef).toThrow(/Failed to resolve reference of type/)
+        expect(() => store.maybeRef).toThrow(
+            "[mobx-state-tree] Failed to resolve reference '4' to type 'AnonymousModel' (from node: /maybeRef)"
+        )
         store.maybeRef = null
         expect(store.maybeRef).toBe(null)
         expect(() => ((store as any).ref = null)).toThrow(/Error while converting/)
@@ -682,10 +686,16 @@ test("it should applySnapshot references in array", () => {
         hovers: ["item 1"]
     })
 })
-test("array of references should work fine", () => {
+
+test.skip("array of references should work fine", () => {
+    // This test breaks because `.move` doesn't dehence values in mobx...
+    // Since move functionality is about to be killed, we won't be fixing this
     const B = types.model("Block", { id: types.identifier(types.string) })
     const S = types
-        .model("Store", { blocks: types.array(B), blockRefs: types.array(types.reference(B)) })
+        .model("Store", {
+            blocks: types.array(B),
+            blockRefs: types.array(types.reference(B))
+        })
         .actions(self => {
             return {
                 order() {
@@ -694,5 +704,28 @@ test("array of references should work fine", () => {
             }
         })
     const a = S.create({ blocks: [{ id: "1" }, { id: "2" }], blockRefs: ["1", "2"] })
-    expect(() => a.order()).not.toThrow()
+    a.order()
+    expect(a.blocks[0].id).toBe("1")
+    expect(a.blockRefs[0].id).toBe("2")
+})
+
+test("array of references should work fine", () => {
+    const B = types.model("Block", { id: types.identifier(types.string) })
+    const S = types
+        .model("Store", {
+            blocks: types.array(B),
+            blockRefs: types.array(types.reference(B))
+        })
+        .actions(self => {
+            return {
+                order() {
+                    const res = self.blockRefs.slice()
+                    self.blockRefs.replace([res[1], res[0]])
+                }
+            }
+        })
+    const a = S.create({ blocks: [{ id: "1" }, { id: "2" }], blockRefs: ["1", "2"] })
+    a.order()
+    expect(a.blocks[0].id).toBe("1")
+    expect(a.blockRefs[0].id).toBe("2")
 })
