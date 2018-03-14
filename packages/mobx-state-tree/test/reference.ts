@@ -12,7 +12,6 @@ import {
     IType
 } from "../src"
 test("it should support prefixed paths in maps", () => {
-    debugger
     const User = types.model({
         id: types.identifier(),
         name: types.string
@@ -418,6 +417,7 @@ test("it should support relative lookups", () => {
         id: 1,
         children: [{ id: 2, children: [{ id: 4, children: [] }] }, { id: 3, children: [] }]
     })
+    debugger
     expect(resolveIdentifier(Node, root, 1)).toBe(root)
     expect(resolveIdentifier(Node, root, 4)).toBe(root.children[0].children[0])
     expect(resolveIdentifier(Node, root.children[0].children[0], 3)).toBe(root.children[1])
