@@ -12,7 +12,7 @@ import {MiddlewareName} from "mst-middlewares"
 
 The middlewares serve as example and are supported on a best effort bases. The goal of these middlewares is that if they are critical to your system, you can simply copy paste them and further tailor them towards your specific needs.
 
-For the exact description of all middleware events offered by MST, see the [api docs](../middleware.md)
+For the exact description of all middleware events offered by MST, see the [api docs](../docs/middleware.md)
 
 # Contributing
 
