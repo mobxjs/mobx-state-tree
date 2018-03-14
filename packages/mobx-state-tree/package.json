@@ -91,6 +91,6 @@
     ]
   },
   "dependencies": {
-    "mobx": "/home/michel/mobservable/mobservable"
+    "mobx": "^4.0.2"
   }
 }
