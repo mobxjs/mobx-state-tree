@@ -37,9 +37,10 @@ import {
     getContextForPath,
     getPrimitiveFactoryFromValue,
     optional,
-    ObjectNode
+    ObjectNode,
+    freeze,
+    addHiddenWritableProp
 } from "../../internal"
-import { freeze } from "../../utils"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 
@@ -182,8 +183,12 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
                         specializedAction.apply(null, arguments)
                     }
             }
-
-            addHiddenFinalProp(self, name, createActionInvoker(self, name, action))
+            // See #646, allow models to be mocked
+            ;(process.env.NODE_ENV === "production" ? addHiddenFinalProp : addHiddenWritableProp)(
+                self,
+                name,
+                createActionInvoker(self, name, action)
+            )
             return
         })
     }
@@ -272,7 +277,10 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
                 }
             } else if (typeof value === "function") {
                 // this is a view function, merge as is!
-                addHiddenFinalProp(self, key, value)
+                // See #646, allow models to be mocked
+                ;(process.env.NODE_ENV === "production"
+                    ? addHiddenFinalProp
+                    : addHiddenWritableProp)(self, key, value)
             } else {
                 fail(`A view member should either be a function or getter based property`)
             }

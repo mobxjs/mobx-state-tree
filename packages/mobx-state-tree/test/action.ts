@@ -330,3 +330,40 @@ test("middleware events are correct", () => {
         }
     ])
 })
+
+test("actions are mockable", () => {
+    const M = types
+        .model()
+        .actions(self => ({
+            method(): number {
+                return 3
+            }
+        }))
+        .views(self => ({
+            view(): number {
+                return 3
+            }
+        }))
+    const m = M.create()
+    if (process.env.NODE_ENV === "production") {
+        expect(() => {
+            m.method = function() {
+                return 3
+            }
+        }).toThrowError(TypeError)
+        expect(() => {
+            m.view = function() {
+                return 3
+            }
+        }).toThrowError(TypeError)
+    } else {
+        m.method = function() {
+            return 4
+        }
+        expect(m.method()).toBe(4)
+        m.view = function() {
+            return 4
+        }
+        expect(m.view()).toBe(4)
+    }
+})
