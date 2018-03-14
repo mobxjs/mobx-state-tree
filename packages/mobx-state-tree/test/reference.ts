@@ -183,15 +183,16 @@ test("it should resolve refs during creation, when using generic reference", () 
     s.entries.push(entry)
     expect(values).toEqual([4, 8])
 })
-test("identifiers should only support types.string and types.number", () => {
-    expect(() =>
-        types
-            .model({
-                id: types.identifier(types.model({ x: 1 }))
-            })
-            .create({ id: {} })
-    ).toThrow()
-})
+if (process.env.NODE_ENV !== "production")
+    test("identifiers should only support types.string and types.number", () => {
+        expect(() =>
+            types
+                .model({
+                    id: types.identifier(types.model({ x: 1 }))
+                })
+                .create({ id: {} })
+        ).toThrow()
+    })
 test("identifiers should support subtypes of types.string and types.number", () => {
     const M = types.model({
         id: types.identifier(types.refinement("Number greater then 5", types.number, n => n > 5))
@@ -417,7 +418,6 @@ test("it should support relative lookups", () => {
         id: 1,
         children: [{ id: 2, children: [{ id: 4, children: [] }] }, { id: 3, children: [] }]
     })
-    debugger
     expect(resolveIdentifier(Node, root, 1)).toBe(root)
     expect(resolveIdentifier(Node, root, 4)).toBe(root.children[0].children[0])
     expect(resolveIdentifier(Node, root.children[0].children[0], 3)).toBe(root.children[1])

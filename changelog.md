@@ -1,3 +1,10 @@
+# 2.0.0
+
+**Breaking changes**
+
+* MobX-state-tree now requires MobX 4.0 or higher
+* Identifiers are now internally always normalized to strings. This also means that adding an object with an number identifier to an observable map, it should still be requested back as string. In general, we recommend to always use string based identifiers to avoid confusion.
+
 # 1.4.0
 
 **Features**
