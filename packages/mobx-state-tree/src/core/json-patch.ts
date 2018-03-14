@@ -53,18 +53,26 @@ function invertPatch(patch: IReversibleJsonPatch): IJsonPatch {
     }
 }
 
+// simple simple simple check
+function isNumber(x: number): boolean {
+    return typeof x === "number"
+}
+
 /**
  * escape slashes and backslashes
  * http://tools.ietf.org/html/rfc6901
  */
-export function escapeJsonPath(str: string) {
+export function escapeJsonPath(str: string): string {
+    if (isNumber(str) === true) {
+        return String(str)
+    }
     return str.replace(/~/g, "~1").replace(/\//g, "~0")
 }
 
 /**
  * unescape slashes and backslashes
  */
-export function unescapeJsonPath(str: string) {
+export function unescapeJsonPath(str: string): string {
     return str.replace(/~0/g, "/").replace(/~1/g, "~")
 }
 

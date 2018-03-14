@@ -1,5 +1,6 @@
-import { observable, IObservableArray } from "mobx"
+import { IObservableArray, values } from "mobx"
 import { fail, IType, ObjectNode } from "../../internal"
+import { shallowArray, observable } from "../../mobx-compat"
 
 export class IdentifierCache {
     private cache = observable.map<IObservableArray<ObjectNode>>()
@@ -10,7 +11,7 @@ export class IdentifierCache {
         if (node.identifierAttribute) {
             const identifier = node.identifier!
             if (!this.cache.has(identifier)) {
-                this.cache.set(identifier, observable.shallowArray<ObjectNode>())
+                this.cache.set(identifier, shallowArray<ObjectNode>())
             }
             const set = this.cache.get(identifier)!
             if (set.indexOf(node) !== -1) fail(`Already registered`)
@@ -20,7 +21,7 @@ export class IdentifierCache {
     }
 
     mergeCache(node: ObjectNode) {
-        node.identifierCache!.cache.values().forEach(nodes =>
+        values(node.identifierCache!.cache).forEach(nodes =>
             nodes.forEach(child => {
                 this.addNodeToCache(child)
             })
@@ -37,7 +38,7 @@ export class IdentifierCache {
     splitCache(node: ObjectNode): IdentifierCache {
         const res = new IdentifierCache()
         const basePath = node.path
-        this.cache.values().forEach(nodes => {
+        values(this.cache).forEach(nodes => {
             for (let i = nodes.length - 1; i >= 0; i--) {
                 if (nodes[i].path.indexOf(basePath) === 0) {
                     res.addNodeToCache(nodes[i])

@@ -1,5 +1,6 @@
 import { types, getSnapshot, recordPatches, unprotect } from "../src"
-import { reaction, isObservable } from "mobx"
+import { reaction, isComputed, isObservable } from "../src/mobx-compat"
+
 const Todo = types
     .model({
         done: false

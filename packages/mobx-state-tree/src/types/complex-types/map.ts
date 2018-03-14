@@ -1,13 +1,4 @@
-import {
-    observable,
-    ObservableMap,
-    IMapChange,
-    IMapWillChange,
-    action,
-    intercept,
-    observe,
-    extras
-} from "mobx"
+import { ObservableMap, IMapChange, IMapWillChange, action, intercept, observe, values } from "mobx"
 import {
     getStateTreeNode,
     escapeJsonPath,
@@ -33,7 +24,7 @@ import {
     isType,
     ObjectNode
 } from "../../internal"
-
+import { observable, interceptReads } from "../../mobx-compat"
 interface IMapFactoryConfig {
     isMapFactory: true
 }
@@ -103,14 +94,15 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     finalizeNewInstance = (node: INode, snapshot: any) => {
         const objNode = node as ObjectNode
         const instance = objNode.storedValue as ObservableMap<any>
-        extras.interceptReads(instance, objNode.unbox)
+        interceptReads(instance, objNode.unbox)
         intercept(instance, c => this.willChange(c))
         objNode.applySnapshot(snapshot)
         observe(instance, this.didChange)
     }
 
     getChildren(node: ObjectNode): INode[] {
-        return (node.storedValue as ObservableMap<any>).values()
+        // return (node.storedValue as ObservableMap<any>).values()
+        return values(node.storedValue as ObservableMap<any>)
     }
 
     getChildNode(node: ObjectNode, key: string): INode {
@@ -226,9 +218,9 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     @action
     applySnapshot(node: ObjectNode, snapshot: any): void {
         typecheck(this, snapshot)
-        const target = node.storedValue as ObservableMap<any>
+        const target = node.storedValue as ObservableMap<any, any>
         const currentKeys: { [key: string]: boolean } = {}
-        target.keys().forEach(key => {
+        Array.from(target.keys()).forEach(key => {
             currentKeys[key] = false
         })
         // Don't use target.replace, as it will throw all existing items first

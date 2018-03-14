@@ -1,14 +1,12 @@
 import {
     action,
-    extendShallowObservable,
-    IObjectChange,
     IObjectWillChange,
     intercept,
     observe,
     computed,
     isComputed,
-    observable,
-    extras
+    getAtom,
+    IObjectDidChange as IObjectChange
 } from "mobx"
 import {
     fail,
@@ -40,6 +38,7 @@ import {
     ObjectNode
 } from "../../internal"
 import { freeze } from "../../utils"
+import { extendShallowObservable, interceptReads, observable } from "../../mobx-compat"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 
@@ -66,6 +65,11 @@ const defaultObjectOptions = {
     name: "AnonymousModel",
     properties: {},
     initializers: EMPTY_ARRAY
+}
+
+interface NewOld<T> {
+    oldValue: any
+    newValue: any
 }
 
 function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T]: IType<any, T> } {
@@ -308,7 +312,8 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     }
 
     createNewInstance = () => {
-        const instance = observable.shallowObject(EMPTY_OBJECT)
+        // const instance = observable.shallowObject(EMPTY_OBJECT)
+        const instance = observable.shallowObject({})
         addHiddenFinalProp(instance, "toString", objectTypeToString)
         return instance as Object
     }
@@ -317,12 +322,21 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         const objNode = node as ObjectNode
         const instance = objNode.storedValue as IStateTreeNode
         this.forAllProps((name, type) => {
-            extendShallowObservable(instance, {
-                [name]: observable.ref(
-                    type.instantiate(objNode, name, objNode._environment, snapshot[name])
-                )
-            })
-            extras.interceptReads(instance, name, objNode.unbox)
+            // extendShallowObservable(instance, {
+            //     [name]: observable.ref(
+            //         type.instantiate(objNode, name, objNode._environment, snapshot[name])
+            //     )
+            // })
+            extendShallowObservable(
+                instance,
+                {
+                    [name]: type.instantiate(objNode, name, objNode._environment, snapshot[name])
+                },
+                {
+                    [name]: observable.ref
+                }
+            )
+            interceptReads(instance, name, objNode.unbox)
         })
 
         this.initializers.reduce((self, fn) => fn(self), instance)

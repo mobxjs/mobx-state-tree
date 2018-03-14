@@ -6,7 +6,8 @@ import {
     decorate
     // TODO: export IRawActionCall
 } from "../src"
-import { reaction, useStrict } from "mobx"
+import { useStrict } from "../src/mobx-compat"
+import { reaction, configure } from "mobx"
 function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -15,6 +16,7 @@ function delay(time, value, shouldThrow = false) {
         }, time)
     })
 }
+
 function testCoffeeTodo(done, generator, shouldError, resultValue, producedCoffees) {
     useStrict(true)
     const Todo = types
