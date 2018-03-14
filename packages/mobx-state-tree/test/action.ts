@@ -350,12 +350,12 @@ test("actions are mockable", () => {
             m.method = function() {
                 return 3
             }
-        }).toThrow(/TypeError/)
+        }).toThrowError(TypeError)
         expect(() => {
             m.view = function() {
                 return 3
             }
-        }).toThrow(/TypeError/)
+        }).toThrowError(TypeError)
     } else {
         m.method = function() {
             return 4
