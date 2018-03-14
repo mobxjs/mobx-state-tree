@@ -2,24 +2,24 @@
 
 **Features**
 
-* It is now possible to create [custom primitive(like) types](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#typescustom)! Implements https://github.com/mobxjs/mobx-state-tree/issues/673 through https://github.com/mobxjs/mobx-state-tree/pull/689
-* [`getIdentifier`](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#getidentifier) is now exposed as function, to get the identifier of a model instance (if any). Fixes https://github.com/mobxjs/mobx-state-tree/issues/674 through https://github.com/mobxjs/mobx-state-tree/pull/678 by TimHollies
-* Writing [middleware](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/middleware.md) has slightly changed, to make it less error prone and more explicit whether a middleware chain should be aborted. For details, see https://github.com/mobxjs/mobx-state-tree/pull/675 by Robin Fehr
-* It is now possible to configure whether [attached middleware](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#addmiddleware) should be triggered for the built-in hooks / operations. https://github.com/mobxjs/mobx-state-tree/pull/653 by Robin Fehr
-* We exposed an [api](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#getmembers) to perform reflection on model instances. https://github.com/mobxjs/mobx-state-tree/pull/649 by Robin Fehr
+* It is now possible to create [custom primitive(like) types](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#typescustom)! Implements [#673](https://github.com/mobxjs/mobx-state-tree/issues/673) through [#689](https://github.com/mobxjs/mobx-state-tree/pull/689)
+* [`getIdentifier`](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#getidentifier) is now exposed as function, to get the identifier of a model instance (if any). Fixes [#674](https://github.com/mobxjs/mobx-state-tree/issues/674) through [#678](https://github.com/mobxjs/mobx-state-tree/pull/678) by TimHollies
+* Writing [middleware](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/middleware.md) has slightly changed, to make it less error prone and more explicit whether a middleware chain should be aborted. For details, see [#675](https://github.com/mobxjs/mobx-state-tree/pull/675) by Robin Fehr
+* It is now possible to configure whether [attached middleware](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#addmiddleware) should be triggered for the built-in hooks / operations. [#653](https://github.com/mobxjs/mobx-state-tree/pull/653) by Robin Fehr
+* We exposed an [api](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#getmembers) to perform reflection on model instances. [#649](https://github.com/mobxjs/mobx-state-tree/pull/649) by Robin Fehr
 
 **Fixes**
 
-* Fixed a bug where items in maps where not properly reconciled when the `put` operation was used. Fixed https://github.com/mobxjs/mobx-state-tree/issues/683 and https://github.com/mobxjs/mobx-state-tree/issues/672 through https://github.com/mobxjs/mobx-state-tree/pull/693
-* Fixed issue where trying to resolve a path would throw exceptions. Fixed https://github.com/mobxjs/mobx-state-tree/issues/686 through https://github.com/mobxjs/mobx-state-tree/pull/692
-* In non production builds actions and views on models can now be replaced, to simplify mocking. Fixes https://github.com/mobxjs/mobx-state-tree/issues/646 through https://github.com/mobxjs/mobx-state-tree/pull/690
-* Fixed bug where `tryResolve` could leave a node in a corrupt state. https://github.com/mobxjs/mobx-state-tree/pull/668 by dnakov
-* Fixed typings for TypeScript 2.7, through https://github.com/mobxjs/mobx-state-tree/pull/667 by Javier Gonzalez
+* Fixed a bug where items in maps where not properly reconciled when the `put` operation was used. Fixed [#683](https://github.com/mobxjs/mobx-state-tree/issues/683) and [#672](https://github.com/mobxjs/mobx-state-tree/issues/672) through [#693](https://github.com/mobxjs/mobx-state-tree/pull/693)
+* Fixed issue where trying to resolve a path would throw exceptions. Fixed [#686](https://github.com/mobxjs/mobx-state-tree/issues/686) through [#692](https://github.com/mobxjs/mobx-state-tree/pull/692)
+* In non production builds actions and views on models can now be replaced, to simplify mocking. Fixes [#646](https://github.com/mobxjs/mobx-state-tree/issues/646) through [#690](https://github.com/mobxjs/mobx-state-tree/pull/690)
+* Fixed bug where `tryResolve` could leave a node in a corrupt state. [#668](https://github.com/mobxjs/mobx-state-tree/pull/668) by dnakov
+* Fixed typings for TypeScript 2.7, through [#667](https://github.com/mobxjs/mobx-state-tree/pull/667) by Javier Gonzalez
 * Several improvements to error messages
 
 # 1.3.1
 
-* Fixed bug where `flows` didn't properly batch their next ticks properly in actions, significantly slowing processes down. Fixes [#563](https://github.com/mobxjs/mobx-state-tree/issues/563)
+* Fixed bug where `flows` didn't properly batch their next ticks properly in actions, significantly slowing processes down. Fixes [#563]([#563](https://github.com/mobxjs/mobx-state-tree/issues/563))
 
 # 1.3.0
 
