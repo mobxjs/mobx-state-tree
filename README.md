@@ -145,7 +145,7 @@ Simply subscribing to the patch stream of a tree is another way to sync diffs wi
 
 ![patches](docs/patches.png)
 
-Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](https://github.com/mobxjs/mobx-react).
+Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](https://github.com/mobxjs/mobx-react). See also this [egghead.io lesson: Render mobx-state-tree Models in React](https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react)
 But even cooler: because it supports snapshots, middleware and replayable actions out of the box, it is even possible to replace a Redux store and reducer with a MobX state tree.
 This makes it even possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/redux-todomvc/src/index.js#L6).
 
@@ -220,6 +220,8 @@ The type information will be used for both.
 
 
 ### Creating models
+
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-describe-your-application-domain-using-mobx-state-tree-mst-models">egghead.io lesson 1: Describe Your Application Domain Using mobx-state-tree(MST) Models</a></i>
 
 The most important type in MST is `types.model`, which can be used to describe the shape of an object.
 An example:
@@ -321,6 +323,12 @@ MST trees have very specific semantics. These semantics purposefully constrain w
 9. If a node in the tree is replaced by another node, the original node will die and become unusable. This makes sure you are not accidentally holding on to stale objects anywhere in your application.
 10. If you want to create a new node based on an existing node in a tree, you can either `detach` that node, or `clone` it.
 
+These egghead.io lessons nicely leverage the specific semantics of MST trees:
+
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-build-forms-with-react-to-edit-mobx-state-tree-models">egghead.io lesson 6: Build Forms with React to Edit mobx-state-tree Models</a></i>
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-remove-model-instances-from-the-tree">egghead.io lesson 7: Remove Model Instances from the Tree</a></i>
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-create-an-entry-form-to-add-models-to-the-state-tree">egghead.io lesson 8: Create an Entry Form to Add Models to the State Tree</a></i>
+
 ### Composing trees
 
 In MST every node in the tree is a tree in itself.
@@ -348,6 +356,8 @@ Because any node in a tree is an tree in itself, any built-in method in MST can 
 This makes it possible to get a patch stream of a certain subtree, or to apply middleware to a certain subtree only.
 
 ### Actions
+
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-attach-behavior-to-mobx-state-tree-models-using-actions">egghead.io lesson 2: Attach Behavior to mobx-state-tree Models Using Actions</a></i>
 
 By default, nodes can only be modified by one of their actions, or by actions higher up in the tree.
 Actions can be defined by returning an object from the action initializer function that was passed to `actions`.
@@ -398,6 +408,8 @@ Useful methods:
 
 #### Asynchronous actions
 
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-defining-asynchronous-processes-using-flow">egghead.io lesson 12: Defining Asynchronous Processes Using Flow</a></i>
+
 Asynchronous actions have first class support in MST and are described in more detail [here](docs/async-actions.md#asynchronous-actions-and-middleware).
 Asynchronous actions are written by using generators and always return a promise. For a real working example see the [bookshop sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A quick example to get the gist:
 
@@ -437,6 +449,8 @@ This may be desired if the default protection of `mobx-state-tree` doesn't fit y
 
 ### Views
 
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-derive-information-from-models-using-views">egghead.io lesson 4: Derive Information from Models Using Views</a></i>
+
 Any fact that can be derived from your state is called a "view" or "derivation".
 See the [Mobx concepts & principles](https://mobx.js.org/intro/concepts.html) for some background.
 
@@ -475,6 +489,10 @@ If you want to share volatile state between views and actions, use `.extend` ins
 
 ### Snapshots
 
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-test-mobx-state-tree-models-by-recording-snapshots-or-patches">egghead.io lesson 3: Test mobx-state-tree Models by Recording Snapshots or Patches</a></i>
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-store-store-in-local-storage">egghead.io lesson 9: Store Store in Local Storage</a></i>
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-automatically-send-changes-to-the-server-by-using-onsnapshot">egghead.io lesson 16: Automatically Send Changes to the Server by Using onSnapshot</a></i>
+
 Snapshots are the immutable serialization, in plain objects, of a tree at a specific point in time.
 Snapshots can be inspected through `getSnapshot(node)`.
 Snapshots don't contain any type information and are stripped from all actions etc, so they are perfectly suitable for transportation.
@@ -502,6 +520,8 @@ Useful methods:
 
 ## Patches
 
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-test-mobx-state-tree-models-by-recording-snapshots-or-patches">egghead.io lesson 3: Test mobx-state-tree Models by Recording Snapshots or Patches</a></i>
+
 Modifying a model does not only result in a new snapshot, but also in a stream of [JSON-patches](http://jsonpatch.com/) describing which modifications were made.
 Patches have the following signature:
 
@@ -525,6 +545,8 @@ Useful methods:
 -   `revertPatch(model, patch)` reverse applies a patch (or array of patches) to the provided model. This replays the inverse of a set of patches to a model, which can be used to bring it back to its original state
 
 ### References and identifiers
+
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-create-relationships-in-your-data-with-mobx-state-tree-using-references-and-identifiers">egghead.io lesson 13: Create Relationships in your Data with mobx-state-tree Using References and Identifiers</a></i>
 
 References and identifiers are a first-class concept in MST.
 This makes it possible to declare references, and keep the data normalized in the background, while you interact with it in a denormalized manner.
@@ -684,6 +706,9 @@ Finally, it is not only possible to be notified about snapshots, patches or acti
 
 ## Volatile state
 
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-use-volatile-state-and-lifecycle-methods-to-manage-private-state">egghead.io lesson 15: Use Volatile State and Lifecycle Methods to Manage Private State</a></i>
+
+
 MST models primarily aid in storing _persistable_ state. State that can be persisted, serialized, transferred, patched, replaced etc.
 However, sometimes you need to keep track of temporary, non-persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc. - state which is needed for local purposes as long as the object is alive.
 
@@ -820,6 +845,9 @@ store.todos[0].setTitle("Grab coffee")
 
 # Types overview
 
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-more-mobx-state-tree-types-map-literal-union-and-enumeration">egghead.io lesson 11: More mobx-state-tree Types: map, literal, union, and enumeration</a></i>
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-create-dynamic-types-and-use-type-composition-to-extract-common-functionality">egghead.io lesson 17: Create Dynamic Types and use Type Composition to Extract Common Functionality</a></i>
+
 These are the types available in MST. All types can be found in the `types` namespace, e.g. `types.string`. See [Api Docs](API.md) for examples.
 
 ## Complex types
@@ -857,6 +885,8 @@ Property types can only be used as a direct member of a `types.model` type and n
 * `types.reference(targetType)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
 
 ## LifeCycle hooks for `types.model`
+
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-loading-data-from-the-server">egghead.io lesson 14: Loading Data from the Server after model creation</a></i>
 
 All of the below hooks can be created by returning an action with the given name, like:
 
@@ -1103,6 +1133,8 @@ See [creating asynchronous flow](docs/async-actions.md).
 
 ### Using mobx and mobx-state-tree together
 
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react">egghead.io lesson 5: Render mobx-state-tree Models in React</a></i>
+
 Yep, perfectly fine. No problem. Go on. `observer`, `autorun` etc. will work as expected.
 
 ### Should all state of my app be stored in `mobx-state-tree`?
@@ -1111,6 +1143,9 @@ State trees are primarily designed to store your domain data, as this kind of st
 For local component state, for example, vanilla MobX observables might often be simpler to use.
 
 ### Can I use Hot Module Reloading?
+
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-restore-the-model-tree-state-using-hot-module-reloading-when-model-definitions-change">egghead.io lesson 10: Restore the Model Tree State using Hot Module Reloading when Model Definitions Change</a></i>
+
 
 Yes, with MST it is pretty straight forward to setup hot reloading for your store definitions, while preserving state. See the [todomvc example](https://github.com/mobxjs/mobx-state-tree/blob/745904101fdaeb51f16f40ebb80cd7fecf742572/packages/mst-example-todomvc/src/index.js#L60-L64)
 
