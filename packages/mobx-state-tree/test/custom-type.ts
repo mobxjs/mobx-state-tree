@@ -31,7 +31,7 @@ class Decimal {
         isTargetType(value: string | Decimal): boolean {
             return value instanceof Decimal
         },
-        isValidSnapshot(value: string): string {
+        getValidationMessage(value: string): string {
             if (/^-?\d+\.\d+$/.test(value)) return "" // OK
             return `'${value}' doesn't look like a valid decimal number`
         }
@@ -107,7 +107,7 @@ class Decimal {
         isTargetType(value: [number, number] | Decimal): boolean {
             return value instanceof Decimal
         },
-        isValidSnapshot(value: [number, number]): string {
+        getValidationMessage(value: [number, number]): string {
             if (Array.isArray(value) && value.length === 2) return "" // OK
             return `'${JSON.stringify(value)}' doesn't look like a valid decimal number`
         }

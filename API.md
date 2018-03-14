@@ -748,7 +748,7 @@ The signature of the options is:
         // if true, this is a converted value, if false, it's a snapshot
         isTargetType(value: T | S): boolean
         // a non empty string is assumed to be a validation error
-        isValidSnapshot?(snapshot: S): string
+        getValidationMessage?(snapshot: S): string
     }
 
 **Parameters**

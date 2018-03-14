@@ -21,7 +21,7 @@ export type CustomTypeOptions<S, T> = {
     // if true, this is a converted value, if false, it's a snapshot
     isTargetType(value: T | S): boolean
     // a non empty string is assumed to be a validation error
-    isValidSnapshot(snapshot: S): string
+    getValidationMessage(snapshot: S): string
     // TODO: isSnapshotEqual
     // TODO: isValueEqual
 }
@@ -93,7 +93,7 @@ export class CustomType<S, T> extends Type<S, T> {
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         if (this.options.isTargetType(value)) return typeCheckSuccess()
-        const typeError: string = this.options.isValidSnapshot(value)
+        const typeError: string = this.options.getValidationMessage(value)
         if (typeError) {
             return typeCheckFailure(
                 context,
