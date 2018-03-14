@@ -12,6 +12,7 @@ import {
     IType
 } from "../src"
 test("it should support prefixed paths in maps", () => {
+    debugger
     const User = types.model({
         id: types.identifier(),
         name: types.string
@@ -300,7 +301,11 @@ test("it should fail when reference snapshot is ambiguous", () => {
     store.selected = 1 as any // valid assignment
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
     let err
-    autorun(() => store.selected).onError(e => (err = e))
+    autorun(() => store.selected, {
+        onError(e) {
+            err = e
+        }
+    })
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
     store.arrows.push({ id: 1, name: "oops" })
     expect(err.message).toBe(

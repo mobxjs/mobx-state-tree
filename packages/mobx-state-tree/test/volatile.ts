@@ -1,5 +1,6 @@
 import { types, getSnapshot, recordPatches, unprotect } from "../src"
-import { reaction, isObservable } from "mobx"
+import { reaction, isObservableProp, isObservable } from "mobx"
+
 const Todo = types
     .model({
         done: false
@@ -49,13 +50,13 @@ test("VS should not be deeply observable", () => {
         }))
         .create()
     unprotect(i)
-    expect(isObservable(i, "x")).toBe(true)
+    expect(isObservableProp(i, "x")).toBe(true)
     expect(isObservable(i.x)).toBe(false)
-    expect(isObservable(i.x, "a")).toBe(false)
+    expect(isObservableProp(i.x, "a")).toBe(false)
     i.x = { a: 2 }
-    expect(isObservable(i, "x")).toBe(true)
+    expect(isObservableProp(i, "x")).toBe(true)
     expect(isObservable(i.x)).toBe(false)
-    expect(isObservable(i.x, "a")).toBe(false)
+    expect(isObservableProp(i.x, "a")).toBe(false)
 })
 test("VS should not be strongly typed observable", () => {
     const i = Todo.create()

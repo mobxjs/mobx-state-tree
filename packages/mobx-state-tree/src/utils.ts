@@ -5,6 +5,9 @@ declare const global: any
 export const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([])
 export const EMPTY_OBJECT: {} = Object.freeze({})
 
+export const mobxShallow = { deep: false }
+Object.freeze(mobxShallow)
+
 export type IDisposer = () => void
 
 export function fail(message = "Illegal state"): never {

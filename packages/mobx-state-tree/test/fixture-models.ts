@@ -8,6 +8,7 @@ const SAMPLE_HERO = {
     description: "hi"
 }
 test("Hero computed fields", () => {
+    debugger
     const hero = Hero.create(SAMPLE_HERO)
     expect(hero.descriptionLength).toBe(2)
 })

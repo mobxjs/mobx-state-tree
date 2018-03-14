@@ -101,11 +101,13 @@ export class ObjectNode implements INode {
             () => this.snapshot,
             snapshot => {
                 this.emitSnapshot(snapshot)
+            },
+            {
+                onError(e) {
+                    throw e
+                }
             }
         )
-        snapshotDisposer.onError((e: any) => {
-            throw e
-        })
         this.addDisposer(snapshotDisposer)
     }
 
@@ -222,7 +224,7 @@ export class ObjectNode implements INode {
         }
     }
 
-    getChildren(): INode[] {
+    getChildren(): ReadonlyArray<INode> {
         this.assertAlive()
         this._autoUnbox = false
         try {

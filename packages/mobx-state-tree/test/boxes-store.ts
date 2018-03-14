@@ -1,6 +1,7 @@
 /**
  *  Based on examples/boxes/domain-state.js
  */
+import { values } from "mobx"
 import { types, getParent, hasParent, recordPatches, unprotect, getSnapshot } from "../src"
 export const Box = types
     .model("Box", {
@@ -87,7 +88,7 @@ test("store is deserialized correctly", () => {
     expect(s.selection === s.boxes.get("aa")).toBe(true)
     expect(s.arrows[0].from.name).toBe("Rotterdam")
     expect(s.arrows[0].to.name).toBe("Bratislava")
-    expect(s.boxes.values().map(b => b.isSelected)).toEqual([false, true])
+    expect(values(s.boxes).map((b: any) => b.isSelected)).toEqual([false, true])
 })
 test("store emits correct patch paths", () => {
     const s = createStore()
