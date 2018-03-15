@@ -16,6 +16,7 @@
   "devDependencies": {
     "ava": "^0.22.0",
     "cross-env": "^5.1.1",
+    "lint-staged": "^4.3.0",
     "mobx": "^4.0.2",
     "mobx-state-tree": "^2.0.0",
     "rollup": "^0.50.0",
@@ -40,6 +41,5 @@
     ]
   },
   "dependencies": {
-    "lint-staged": "^4.3.0"
   }
 }
