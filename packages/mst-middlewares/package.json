@@ -23,7 +23,7 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^2.0.1",
     "sinon": "^4.0.1",
-    "typescript": "^2.4.2"
+    "typescript": "^2.7.2"
   },
   "peerDependencies": {
     "mobx-state-tree": "^2.0.0"

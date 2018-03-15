@@ -9,7 +9,6 @@ import {
     ISnapshottable,
     IModelType
 } from "mobx-state-tree"
-import { IObservableArray } from "mobx"
 
 const TimeTraveller = types
     .model("TimeTraveller", {
