@@ -329,6 +329,9 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
 export function map<S, T>(
+    subtype: IComplexType<S, T>
+): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>>
+export function map<S, T>(
     subtype: IType<S, T>
 ): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
     return new MapType<S, T>(`map<string, ${subtype.name}>`, subtype)
