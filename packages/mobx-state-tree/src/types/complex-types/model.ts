@@ -1,14 +1,14 @@
 import {
     action,
-    extendShallowObservable,
-    IObjectChange,
     IObjectWillChange,
     intercept,
     observe,
     computed,
     isComputed,
+    getAtom,
+    extendObservable,
     observable,
-    extras
+    _interceptReads
 } from "mobx"
 import {
     fail,
@@ -39,7 +39,8 @@ import {
     optional,
     ObjectNode,
     freeze,
-    addHiddenWritableProp
+    addHiddenWritableProp,
+    mobxShallow
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -217,7 +218,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         if (!isPlainObject(state))
             fail(`volatile state initializer should return a plain object containing state`)
         // TODO: typecheck & namecheck members of state?
-        extendShallowObservable(self, state)
+        extendObservable(self, state, EMPTY_OBJECT, mobxShallow)
     }
 
     extend<
@@ -263,7 +264,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
                     // TODO: use `isComputed(self, key)`, pending mobx #1120
                     ;(self as any).$mobx.values[key] = computed(descriptor.get!, {
                         name: key,
-                        setter: descriptor.set,
+                        set: descriptor.set,
                         context: self
                     })
                 } else {
@@ -273,7 +274,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
                         set: descriptor.set,
                         enumerable: true
                     })
-                    extendShallowObservable(self, tmp)
+                    extendObservable(self, tmp, EMPTY_OBJECT, mobxShallow)
                 }
             } else if (typeof value === "function") {
                 // this is a view function, merge as is!
@@ -316,7 +317,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     }
 
     createNewInstance = () => {
-        const instance = observable.shallowObject(EMPTY_OBJECT)
+        const instance = observable.object(EMPTY_OBJECT, EMPTY_OBJECT, mobxShallow)
         addHiddenFinalProp(instance, "toString", objectTypeToString)
         return instance as Object
     }
@@ -325,12 +326,15 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         const objNode = node as ObjectNode
         const instance = objNode.storedValue as IStateTreeNode
         this.forAllProps((name, type) => {
-            extendShallowObservable(instance, {
-                [name]: observable.ref(
-                    type.instantiate(objNode, name, objNode._environment, snapshot[name])
-                )
-            })
-            extras.interceptReads(instance, name, objNode.unbox)
+            extendObservable(
+                instance,
+                {
+                    [name]: type.instantiate(objNode, name, objNode._environment, snapshot[name])
+                },
+                EMPTY_OBJECT,
+                mobxShallow
+            )
+            _interceptReads(instance, name, objNode.unbox)
         })
 
         this.initializers.reduce((self, fn) => fn(self), instance)
@@ -338,7 +342,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         observe(instance, this.didChange)
     }
 
-    willChange(change: IObjectWillChange): IObjectWillChange | null {
+    willChange(change: any): IObjectWillChange | null {
         const node = getStateTreeNode(change.object)
         node.assertWritable()
         const type = this.properties[change.name]
@@ -350,7 +354,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return change
     }
 
-    didChange = (change: IObjectChange) => {
+    didChange = (change: any) => {
         if (!this.properties[change.name]) {
             // don't emit patches for volatile state
             return
@@ -391,7 +395,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         const res = {} as any
         this.forAllProps((name, type) => {
             // TODO: FIXME, make sure the observable ref is used!
-            ;(extras.getAtom(node.storedValue, name) as any).reportObserved()
+            ;(getAtom(node.storedValue, name) as any).reportObserved()
             res[name] = this.getChildNode(node, name).snapshot
         })
         if (typeof node.storedValue.postProcessSnapshot === "function") {
@@ -470,7 +474,7 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
         props: { [K in keyof TP]: IType<any, TP[K]> | TP[K] } &
             { [K in keyof SP]: IType<SP[K], any> | SP[K] }
     ): IModelType<S & Snapshot<SP>, T & TP>
-    //props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
+    // props<P>(props: IModelProperties<P>): IModelType<S & Snapshot<P>, T & P>
     views<V extends Object>(fn: (self: T & IStateTreeNode) => V): IModelType<S, T & V>
     actions<A extends { [name: string]: Function }>(
         fn: (self: T & IStateTreeNode) => A

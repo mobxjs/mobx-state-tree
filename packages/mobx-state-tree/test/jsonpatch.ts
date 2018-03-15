@@ -192,14 +192,14 @@ test("it should apply deep patches to maps", () => {
         NodeMap,
         { id: 1, children: { 2: { id: 2 } } },
         n => {
-            n.children.get(2).text = "test" // update
+            n.children.get("2").text = "test" // update
             n.children.put({ id: 2, text: "world" }) // this reconciles; just an update
             n.children.set(
-                4,
+                "4",
                 NodeMap.create({ id: 4, text: "coffee", children: { 23: { id: 23 } } })
             ) // new object
             n.children.put({ id: 3, text: "world", children: { 7: { id: 7 } } }) // addition
-            n.children.delete(2) // removal
+            n.children.delete("2") // removal
         },
         [
             {

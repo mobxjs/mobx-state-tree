@@ -58,7 +58,7 @@ export interface IType<S, T> {
     getSnapshot(node: INode): S
     applySnapshot(node: INode, snapshot: S): void
     applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void
-    getChildren(node: INode): INode[]
+    getChildren(node: INode): ReadonlyArray<INode>
     getChildNode(node: INode, key: string): INode
     getChildType(key: string): IType<any, any>
     removeChild(node: INode, subpath: string): void
@@ -101,7 +101,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
 
     abstract applySnapshot(node: INode, snapshot: any): void
     abstract getDefaultSnapshot(): any
-    abstract getChildren(node: INode): INode[]
+    abstract getChildren(node: INode): ReadonlyArray<INode>
     abstract getChildNode(node: INode, key: string): INode
     abstract getValue(node: INode): T
     abstract getSnapshot(node: INode): any

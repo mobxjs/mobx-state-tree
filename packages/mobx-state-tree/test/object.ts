@@ -11,7 +11,8 @@ import {
     getSnapshot,
     types
 } from "../src"
-import { autorun, observable, reaction } from "mobx"
+import { autorun, reaction, observable } from "mobx"
+
 const createTestFactories = () => {
     const Factory = types
         .model({
@@ -478,7 +479,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 test("it should be possible to share states between views and actions using enhance", () => {
     const A = types.model({}).extend(self => {
-        const localState = observable(3)
+        const localState = observable.box(3)
         return {
             views: {
                 get x() {

@@ -16,8 +16,8 @@
   "devDependencies": {
     "ava": "^0.22.0",
     "cross-env": "^5.1.1",
-    "mobx": "^3.3.1",
-    "mobx-state-tree": "^1.4.0",
+    "mobx": "^4.0.2",
+    "mobx-state-tree": "^2.0.0",
     "rollup": "^0.50.0",
     "rollup-plugin-commonjs": "^8.2.5",
     "rollup-plugin-node-resolve": "^3.0.0",
@@ -26,8 +26,7 @@
     "typescript": "^2.4.2"
   },
   "peerDependencies": {
-    "mobx": "^3.3.1",
-    "mobx-state-tree": "^1.4.0"
+    "mobx-state-tree": "^2.0.0"
   },
   "files": [
     "dist/"

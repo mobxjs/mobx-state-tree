@@ -183,15 +183,16 @@ test("it should resolve refs during creation, when using generic reference", () 
     s.entries.push(entry)
     expect(values).toEqual([4, 8])
 })
-test("identifiers should only support types.string and types.number", () => {
-    expect(() =>
-        types
-            .model({
-                id: types.identifier(types.model({ x: 1 }))
-            })
-            .create({ id: {} })
-    ).toThrow()
-})
+if (process.env.NODE_ENV !== "production")
+    test("identifiers should only support types.string and types.number", () => {
+        expect(() =>
+            types
+                .model({
+                    id: types.identifier(types.model({ x: 1 }))
+                })
+                .create({ id: {} })
+        ).toThrow()
+    })
 test("identifiers should support subtypes of types.string and types.number", () => {
     const M = types.model({
         id: types.identifier(types.refinement("Number greater then 5", types.number, n => n > 5))
@@ -300,7 +301,11 @@ test("it should fail when reference snapshot is ambiguous", () => {
     store.selected = 1 as any // valid assignment
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
     let err
-    autorun(() => store.selected).onError(e => (err = e))
+    autorun(() => store.selected, {
+        onError(e) {
+            err = e
+        }
+    })
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
     store.arrows.push({ id: 1, name: "oops" })
     expect(err.message).toBe(

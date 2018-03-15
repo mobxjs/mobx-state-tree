@@ -1,4 +1,4 @@
-import { reaction, when } from "mobx"
+import { reaction, when, values } from "mobx"
 import {
     types,
     recordPatches,
@@ -60,11 +60,8 @@ test("it should support custom references - adv", () => {
     const NameReference = types.reference(User, {
         get(identifier, parent: any) {
             if (identifier === null) return null
-            return (
-                getRoot(parent)
-                    .users.values()
-                    .filter(u => u.name === identifier)[0] || null
-            )
+            const users = values(getRoot(parent).users)
+            return users.filter(u => u.name === identifier)[0] || null
         },
         set(value) {
             return value ? value.name : ""
@@ -142,7 +139,7 @@ test("it should support dynamic loading", done => {
                     setTimeout(resolve, 200)
                 })
                 events.push("loaded " + name)
-                const user = (self.users.find(u => u.name === name).age = name.length * 3) // wonderful!
+                const user = (self.users.find(u => u.name === name)!.age = name.length * 3) // wonderful!
             })
         }))
         .views(self => ({
