@@ -310,10 +310,10 @@ test("Livelyness issue #683", () => {
             1: { name: "Name", id: 1 }
         }
     })
+    const user = users.get("1")
+    expect(user!.name).toBe("Name")
 
-    const user = users.get(1)
-    expect(user.name).toBe("Name")
-
-    users.put({ id: 1, name: "Name" })
-    expect(user.name).toBe("Name")
+    users.put({ id: 1, name: "NameX" })
+    expect(user!.name).toBe("NameX")
+    expect(users.get("1")!.name).toBe("NameX")
 })

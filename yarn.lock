@@ -7435,9 +7435,13 @@ mobx@3.1.15:
   version "3.1.15"
   resolved "https://registry.yarnpkg.com/mobx/-/mobx-3.1.15.tgz#b2c8831725de2f6f1b8d136e589b674b5b75c35d"
 
-mobx@^3.1.16, mobx@^3.2.2, mobx@^3.3.0, mobx@^3.3.1:
+mobx@^3.1.16, mobx@^3.3.0, mobx@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/mobx/-/mobx-3.3.1.tgz#c38fc1a287a0dda3f5d4b85efe1137fedd9dcdf0"
+
+mobx@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-4.0.2.tgz#912314f6ddb1f337dfa38754c9976eff57e31b97"
 
 modify-values@^1.0.0:
   version "1.0.0"
