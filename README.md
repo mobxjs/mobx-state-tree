@@ -169,7 +169,7 @@ function logTodo(todo) {
         () => console.log(todo.title),
         1000
     )
-)
+}
 
 logTodo(store.todos[0])
 store.removeTodo(0)
