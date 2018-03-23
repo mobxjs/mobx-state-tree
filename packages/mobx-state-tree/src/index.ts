@@ -68,6 +68,8 @@ export {
     typecheckPublic as typecheck,
     escapeJsonPath,
     unescapeJsonPath,
+    joinJsonPath,
+    splitJsonPath,
     IJsonPatch,
     decorate,
     addMiddleware,
