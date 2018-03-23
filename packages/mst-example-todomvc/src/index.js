@@ -27,7 +27,7 @@ const initialState = localStorage.getItem(localStorageKey)
           ]
       }
 
-let store = TodoStore.create(initialState)
+let store
 let snapshotListener
 
 function createTodoStore(snapshot) {
