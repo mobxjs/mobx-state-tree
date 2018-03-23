@@ -1,3 +1,4 @@
+import { values } from "mobx"
 import { types, getParent, flow } from "mobx-state-tree"
 
 export const Book = types.model("Book", {
@@ -18,7 +19,7 @@ export const BookStore = types
             return getParent(self)
         },
         get sortedAvailableBooks() {
-            return sortBooks(self.books.values())
+            return sortBooks(values(self.books))
         }
     }))
     .actions(self => {
@@ -27,7 +28,7 @@ export const BookStore = types
         }
 
         function updateBooks(json) {
-            self.books.values().forEach(book => (book.isAvailable = false))
+            values(self.books).forEach(book => (book.isAvailable = false))
             json.forEach(bookJson => {
                 self.books.put(bookJson)
                 self.books.get(bookJson.id).isAvailable = true

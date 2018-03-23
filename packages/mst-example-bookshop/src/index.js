@@ -28,9 +28,9 @@ const shop = ShopStore.create(
 )
 
 const history = {
-    snapshots: observable.shallowArray(),
-    actions: observable.shallowArray(),
-    patches: observable.shallowArray()
+    snapshots: observable.array([], { deep: false }),
+    actions: observable.array([], { deep: false }),
+    patches: observable.array([], { deep: false })
 }
 
 /**
