@@ -42,7 +42,7 @@ export type CustomTypeOptions<S, T> = {
  *     // if true, this is a converted value, if false, it's a snapshot
  *     isTargetType(value: T | S): boolean
  *     // a non empty string is assumed to be a validation error
- *     isValidSnapshot?(snapshot: S): string
+ *     getValidationMessage?(snapshot: S): string
  * }
  * ```
  *
@@ -61,7 +61,7 @@ export type CustomTypeOptions<S, T> = {
  *     isTargetType(value: string | Decimal): boolean {
  *         return value instanceof Decimal
  *     },
- *     isValidSnapshot(value: string): string {
+ *     getValidationMessage(value: string): string {
  *         if (/^-?\d+\.\d+$/.test(value)) return "" // OK
  *         return `'${value}' doesn't look like a valid decimal number`
  *     }
