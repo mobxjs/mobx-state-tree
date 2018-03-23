@@ -11,7 +11,7 @@ MST ships with a small set of [pre-built / example middlewares](../packages/mst-
 
 
 Custom middleware example:
-[SandBox example](https://codesandbox.io/s/mQrqy8j73)
+[SandBox example](https://codesandbox.io/s/88jrqlzm1l)
 
 ## Custom Middleware
 Middlewares can be attached by using:
