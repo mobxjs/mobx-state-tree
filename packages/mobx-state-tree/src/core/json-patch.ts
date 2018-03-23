@@ -76,12 +76,26 @@ export function unescapeJsonPath(str: string): string {
     return str.replace(/~0/g, "/").replace(/~1/g, "~")
 }
 
+/**
+ * Generates a json-path compliant json path from path parts
+ *
+ * @export
+ * @param {string[]} path
+ * @returns {string}
+ */
 export function joinJsonPath(path: string[]): string {
     // `/` refers to property with an empty name, while `` refers to root itself!
     if (path.length === 0) return ""
     return "/" + path.map(escapeJsonPath).join("/")
 }
 
+/**
+ * Splits and decodes a json path into several parts
+ *
+ * @export
+ * @param {string} path
+ * @returns {string[]}
+ */
 export function splitJsonPath(path: string): string[] {
     // `/` refers to property with an empty name, while `` refers to root itself!
     const parts = path.split("/").map(unescapeJsonPath)

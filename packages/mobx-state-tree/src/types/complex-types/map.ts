@@ -304,6 +304,9 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 }
 
+export function map<S, T>(
+    subtype: IComplexType<S, T>
+): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>>
 /**
  * Creates a key based collection type who's children are all of a uniform declared type.
  * If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
@@ -331,9 +334,6 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
  * @param {IType<S, T>} subtype
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
-export function map<S, T>(
-    subtype: IComplexType<S, T>
-): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>>
 export function map<S, T>(
     subtype: IType<S, T>
 ): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
