@@ -1,3 +1,9 @@
+# 2.0.2
+
+* Fixed bidirectional references from nodes to nodes, see [#728](https://github.com/mobxjs/mobx-state-tree/pull/728) by @robinfehr
+* `joinJsonPath` and `splitJsonPath` are now exposed as utilities, see [#724](https://github.com/mobxjs/mobx-state-tree/pull/724) by @jjrv
+* Several documentation and example fixes
+
 # 2.0.1
 
 * Fixed typings for maps of maps [#704](https://github.com/mobxjs/mobx-state-tree/pull/704) by @xaviergonz
