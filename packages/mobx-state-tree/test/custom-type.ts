@@ -38,7 +38,8 @@ class Decimal {
     })
 
     const Wallet = types.model({
-        balance: DecimalPrimitive
+        balance: DecimalPrimitive,
+        lastTransaction: types.maybe(DecimalPrimitive)
     })
 
     test("it should allow for custom primitive types", () => {
@@ -85,6 +86,12 @@ class Decimal {
 
         w1.balance = "4.5" as any
         expect(b1).toBeInstanceOf(Decimal)
+
+        w1.lastTransaction = b1
+        expect(w1.lastTransaction).toBe(b1)
+
+        w1.lastTransaction = null
+        expect(w1.lastTransaction).toBe(null)
 
         // patches & snapshots
         expect(snapshots).toMatchSnapshot()

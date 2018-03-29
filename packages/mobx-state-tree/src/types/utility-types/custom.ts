@@ -127,10 +127,9 @@ export class CustomType<S, T> extends Type<S, T> {
 
     reconcile(current: INode, value: any): INode {
         const isSnapshot = !this.options.isTargetType(value)
-        let unchanged = true
-        if (current.type === this) {
-            unchanged = isSnapshot ? value === current.snapshot : value === current.storedValue
-        }
+        const unchanged =
+            current.type === this &&
+            (isSnapshot ? value === current.snapshot : value === current.storedValue)
         if (unchanged) return current
         const valueToStore: T = isSnapshot ? this.options.fromSnapshot(value) : value
         const newNode = this.instantiate(

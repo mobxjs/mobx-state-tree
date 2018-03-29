@@ -70,12 +70,23 @@ exports[`reassignments will work 1`] = `
 Array [
   Object {
     "balance": "2.5",
+    "lastTransaction": null,
   },
   Object {
     "balance": "3.5",
+    "lastTransaction": null,
   },
   Object {
     "balance": "4.5",
+    "lastTransaction": null,
+  },
+  Object {
+    "balance": "4.5",
+    "lastTransaction": "2.5",
+  },
+  Object {
+    "balance": "4.5",
+    "lastTransaction": null,
   },
 ]
 `;
@@ -96,6 +107,16 @@ Array [
     "op": "replace",
     "path": "/balance",
     "value": "4.5",
+  },
+  Object {
+    "op": "replace",
+    "path": "/lastTransaction",
+    "value": "2.5",
+  },
+  Object {
+    "op": "replace",
+    "path": "/lastTransaction",
+    "value": null,
   },
 ]
 `;
