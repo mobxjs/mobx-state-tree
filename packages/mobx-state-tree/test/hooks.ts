@@ -1,4 +1,13 @@
-import { addDisposer, destroy, detach, types, unprotect, getSnapshot, applySnapshot } from "../src"
+import {
+    addDisposer,
+    destroy,
+    detach,
+    types,
+    unprotect,
+    getSnapshot,
+    applySnapshot,
+    onSnapshot
+} from "../src"
 function createTestStore(listener) {
     const Todo = types
         .model("Todo", {
@@ -132,12 +141,15 @@ test("it should postprocess snapshots when generating snapshot", () => {
     expect(car.id).toBe(2)
     expect(getSnapshot(car)).toEqual({ id: "1" })
 })
-test("it should be possible to overwrite the application of the postProcessor", () => {
+test("it should not apply postprocessor to snapshot on getSnapshot", () => {
     const car = Car.create({ id: "1" })
+    let error: any = false
+    onSnapshot(car, snapshot => {
+        error = true
+    })
     expect(getSnapshot(car)).toEqual({ id: "1" })
     expect(getSnapshot(car, false)).toEqual({ id: 2 })
-    // test again if snapshot gets recomputed
-    expect(getSnapshot(car)).toEqual({ id: "1" })
+    expect(error).toBeFalsy()
 })
 test("it should preprocess snapshots when creating as property type", () => {
     const f = Factory.create({

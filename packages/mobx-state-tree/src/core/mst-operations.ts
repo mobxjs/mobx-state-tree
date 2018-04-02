@@ -279,8 +279,10 @@ export function getSnapshot<S>(target: ISnapshottable<S>, applyPostProcess = tru
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
     const node = getStateTreeNode(target)
-    node._applyPostProcess = applyPostProcess
-    return node.snapshot
+    if (applyPostProcess) return node.snapshot
+
+    const snapshot = freeze(node.type.getSnapshot(node, false))
+    return snapshot
 }
 
 /**
@@ -742,5 +744,6 @@ import {
     isType,
     resolveNodeByPath,
     getRelativePathBetweenNodes,
-    ModelType
+    ModelType,
+    freeze
 } from "../internal"
