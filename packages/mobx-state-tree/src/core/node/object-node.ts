@@ -44,6 +44,7 @@ export class ObjectNode implements INode {
     _environment: any = undefined
     protected _autoUnbox = true // unboxing is disabled when reading child nodes
     state = NodeLifeCycle.INITIALIZING
+    @observable _applyPostProcess = true // needs to be an observable since the computed snapshots must recompute upon a change
 
     middlewares = EMPTY_ARRAY as IMiddleware[]
     private snapshotSubscribers: ((snapshot: any) => void)[]

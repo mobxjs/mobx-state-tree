@@ -499,7 +499,7 @@ If you want to share volatile state between views and actions, use `.extend` ins
 <i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-automatically-send-changes-to-the-server-by-using-onsnapshot">egghead.io lesson 16: Automatically Send Changes to the Server by Using onSnapshot</a></i>
 
 Snapshots are the immutable serialization, in plain objects, of a tree at a specific point in time.
-Snapshots can be inspected through `getSnapshot(node)`.
+Snapshots can be inspected through `getSnapshot(node, applyPostProcess)`.
 Snapshots don't contain any type information and are stripped from all actions etc, so they are perfectly suitable for transportation.
 Requesting a snapshot is cheap, as MST always maintains a snapshot of each node in the background, and uses structural sharing
 
@@ -519,7 +519,7 @@ Some interesting properties of snapshots:
 
 Useful methods:
 
--   `getSnapshot(model)`: returns a snapshot representing the current state of the model
+-   `getSnapshot(model, applyPostProcess)`: returns a snapshot representing the current state of the model
 -   `onSnapshot(model, callback)`: creates a listener that fires whenever a new snapshot is available (but only one per MobX transaction).
 -   `applySnapshot(model, snapshot)`: updates the state of the model and all its descendants to the state represented by the snapshot
 
@@ -962,7 +962,7 @@ See the [full API docs](API.md) for more details.
 | [`getRelativePath(base, target)`](API.md#getrelativepath) | Returns the short path, which one could use to walk from node `base` to node `target`, assuming they are in the same tree. Up is represented as `../` |
 | [`getRoot(node)`](API.md#getroot) | Returns the root element of the tree containing `node` |
 | [`getIdentifier(node)`](API.md#getidentifier) | Returns the identifier of the given element |
-| [`getSnapshot(node)`](API.md#getsnapshot) | Returns the snapshot of the `node`. See [snapshots](#snapshots) |
+| [`getSnapshot(node, applyPostProcess)`](API.md#getsnapshot) | Returns the snapshot of the `node`. See [snapshots](#snapshots) |
 | [`getType(node)`](API.md#gettype) | Returns the type of `node` |
 | [`hasParent(node, depth=1)`](API.md#hasparent) | Returns `true` if `node` has a parent at `depth` |
 | [`isAlive(node)`](API.md#isalive) | Returns `true` if `node` is alive |
@@ -1009,7 +1009,7 @@ The following service can generate MST models based on JSON: https://transform.n
 
 ### `toJSON()` for debugging
 
-For debugging you might want to use `getSnapshot(model)` to print the state of a model. But if you didn't import `getSnapshot` while debugging in some debugger; don't worry, `model.toJSON()` will produce the same snapshot. (For API consistency, this feature is not part of the typed API)
+For debugging you might want to use `getSnapshot(model, applyPostProcess)` to print the state of a model. But if you didn't import `getSnapshot` while debugging in some debugger; don't worry, `model.toJSON()` will produce the same snapshot. (For API consistency, this feature is not part of the typed API)
 
 ### Handle circular dependencies between files using `late`
 

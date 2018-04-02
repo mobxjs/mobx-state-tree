@@ -132,6 +132,13 @@ test("it should postprocess snapshots when generating snapshot", () => {
     expect(car.id).toBe(2)
     expect(getSnapshot(car)).toEqual({ id: "1" })
 })
+test("it should be possible to overwrite the application of the postProcessor", () => {
+    const car = Car.create({ id: "1" })
+    expect(getSnapshot(car)).toEqual({ id: "1" })
+    expect(getSnapshot(car, false)).toEqual({ id: 2 })
+    // test again if snapshot gets recomputed
+    expect(getSnapshot(car)).toEqual({ id: "1" })
+})
 test("it should preprocess snapshots when creating as property type", () => {
     const f = Factory.create({
         car: { id: "1" }

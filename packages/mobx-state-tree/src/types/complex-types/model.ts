@@ -398,7 +398,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             ;(getAtom(node.storedValue, name) as any).reportObserved()
             res[name] = this.getChildNode(node, name).snapshot
         })
-        if (typeof node.storedValue.postProcessSnapshot === "function") {
+        if (typeof node.storedValue.postProcessSnapshot === "function" && node._applyPostProcess) {
             return node.storedValue.postProcessSnapshot.call(null, res)
         }
         return res
