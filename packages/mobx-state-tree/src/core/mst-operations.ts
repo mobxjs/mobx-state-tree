@@ -281,8 +281,7 @@ export function getSnapshot<S>(target: ISnapshottable<S>, applyPostProcess = tru
     const node = getStateTreeNode(target)
     if (applyPostProcess) return node.snapshot
 
-    const snapshot = freeze(node.type.getSnapshot(node, false))
-    return snapshot
+    return freeze(node.type.getSnapshot(node, false))
 }
 
 /**
