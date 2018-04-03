@@ -1252,7 +1252,7 @@ const Example = types
   }))
 ```
 
-Note that you can also declare multple `.views` block, in which case the `self` parameter gets extended after each block
+Note that you can also declare multiple `.views` block, in which case the `self` parameter gets extended after each block
 
 ```typescript
 const Example = types
