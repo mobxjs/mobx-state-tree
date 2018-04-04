@@ -1,4 +1,5 @@
 import { addDisposer, destroy, detach, types, unprotect, getSnapshot, applySnapshot } from "../src"
+const disposers: any = []
 function createTestStore(listener) {
     const Todo = types
         .model("Todo", {
@@ -38,9 +39,11 @@ function createTestStore(listener) {
             function afterCreate() {
                 unprotect(self)
                 listener("new store: " + self.todos.length)
-                addDisposer(self, () => {
-                    listener("custom disposer for store")
-                })
+                disposers.push(
+                    addDisposer(self, () => {
+                        listener("custom disposer for store")
+                    })
+                )
             }
             function beforeDestroy() {
                 listener("destroy store: " + self.todos.length)
@@ -87,13 +90,13 @@ test("it should trigger lifecycle hooks", () => {
         "new todo: add sugar",
         "attach todo: add sugar",
         "---",
+        "custom disposer for store",
         "custom disposer 2 for Get coffee",
         "custom disposer 1 for Get coffee",
         "destroy todo: Get coffee",
         "custom disposer 2 for add sugar",
         "custom disposer 1 for add sugar",
         "destroy todo: add sugar",
-        "custom disposer for store",
         "destroy store: 2",
         "custom disposer 2 for Give talk",
         "custom disposer 1 for Give talk",

@@ -407,6 +407,11 @@ export class ObjectNode implements INode {
         this.disposers.unshift(disposer)
     }
 
+    removeDisposer(disposer: () => void) {
+        disposer()
+        this.disposers = this.disposers.filter(storedDisposer => storedDisposer !== disposer)
+    }
+
     removeMiddleware(handler: IMiddlewareHandler) {
         this.middlewares = this.middlewares.filter(middleware => middleware.handler !== handler)
     }

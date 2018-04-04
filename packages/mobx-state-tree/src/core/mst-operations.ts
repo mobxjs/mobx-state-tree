@@ -266,6 +266,7 @@ export function getSnapshot<S = any>(target: ISnapshottable<S>): S
 /**
  * Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
  * structural sharing where possible. Doesn't require MobX transactions to be completed.
+ * By default postProcessSnapshot hooks are applied to the snapshot.
  *
  * @export
  * @param {Object} target
@@ -604,24 +605,27 @@ export function isAlive(target: IStateTreeNode): boolean {
  *
  * @example
  * const Todo = types.model({
- *   title: types.string
- * }).actions(self => ({
- *   afterCreate() {
- *     const autoSaveDisposer = reaction(
- *       () => getSnapshot(self),
- *       snapshot => sendSnapshotToServerSomehow(snapshot)
- *     )
- *     // stop sending updates to server if this
- *     // instance is destroyed
- *     addDisposer(self, autoSaveDisposer)
+ *      title: types.string
+ *   }).actions(self => ({
+ *     afterCreate() {
+ *       // stop sending updates to server if this
+ *       // instance is destroyed
+ *
+ *       // addDisposer returns a disposer function execute the added disposer before the instance is destroyed. 
+ *       //this can be useful e.g. within view components which can be unmouneted.
+ *       const disposer = addDisposer(reaction(
+ *         () => getSnapshot(self),
+ *         snapshot => sendSnapshotToServerSomehow(snapshot)
+ *       ))
  *   }
- * }))
+ * })) 
  *
  * @export
  * @param {IStateTreeNode} target
  * @param {() => void} disposer
+ * @returns {() => void} disposer function
  */
-export function addDisposer(target: IStateTreeNode, disposer: () => void) {
+export function addDisposer(target: IStateTreeNode, disposer: () => void): () => void {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -629,7 +633,9 @@ export function addDisposer(target: IStateTreeNode, disposer: () => void) {
         if (typeof disposer !== "function")
             fail("expected second argument to be a function, got " + disposer + " instead")
     }
-    getStateTreeNode(target).addDisposer(disposer)
+    const node = getStateTreeNode(target)
+    node.addDisposer(disposer)
+    return () => node.removeDisposer(disposer)
 }
 
 /**
