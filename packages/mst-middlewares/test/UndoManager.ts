@@ -314,6 +314,7 @@ test("on tree - group", t => {
     const HistoryOnTreeStoreModel = types
         .model({
             x: 1,
+            numbers: types.optional(types.array(types.number), []),
             history: types.optional(UndoManager, {})
         })
         .actions(self => {
@@ -321,6 +322,9 @@ test("on tree - group", t => {
             return {
                 inc() {
                     self.x += 1
+                },
+                addNumber(number) {
+                    self.numbers.push(number)
                 }
             }
         })
@@ -339,9 +343,18 @@ test("on tree - group", t => {
     undoManager.stopGroup()
     t.is(store.x, 5)
     t.is(undoManager.canUndo, true)
-
     undoManager.undo()
     t.is(undoManager.canUndo, false)
     t.is(undoManager.canRedo, true)
-    t.is(store.x, 2)
+    t.is(store.x, 1)
+
+    undoManager.startGroup(() => {
+        store.addNumber(1)
+        store.addNumber(2)
+    })
+    undoManager.stopGroup()
+    undoManager.undo()
+    t.is(undoManager.canUndo, false)
+    t.is(undoManager.canRedo, true)
+    t.is(store.numbers.length, 0)
 })
