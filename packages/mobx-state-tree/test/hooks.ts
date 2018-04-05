@@ -71,6 +71,7 @@ test("it should trigger lifecycle hooks", () => {
     const sugar = Todo.create({ title: "add sugar" })
     store.todos.push(sugar)
     events.push("---")
+    disposers.forEach(disposer => disposer())
     destroy(store)
     destroy(talk)
     expect(events).toEqual([
