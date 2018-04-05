@@ -2,7 +2,8 @@ var path = require("path")
 var webpack = require("webpack")
 
 module.exports = {
-    devtool: "eval",
+    mode: "development",
+    devtool: "cheap-module-source-map",
     entry: [
         "webpack-dev-server/client?http://localhost:4000",
         "webpack/hot/only-dev-server",
@@ -13,12 +14,12 @@ module.exports = {
         filename: "bundle.js",
         publicPath: "/static/"
     },
-    plugins: [new webpack.HotModuleReplacementPlugin(), new webpack.NoErrorsPlugin()],
+    plugins: [new webpack.HotModuleReplacementPlugin(), new webpack.NoEmitOnErrorsPlugin()],
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.jsx?$/,
-                loaders: ["react-hot", "babel"],
+                loaders: ["babel-loader"],
                 include: path.join(__dirname, "src")
             }
         ]

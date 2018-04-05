@@ -1,4 +1,4 @@
-import { runInAction } from "mobx"
+import { runInAction, values } from "mobx"
 import { types, getSnapshot, applySnapshot, getParent, hasParent } from "mobx-state-tree"
 
 import { randomUuid } from "../utils"
@@ -96,15 +96,15 @@ window.store = store // for demo
 */
 export function generateStuff(amount) {
     runInAction(() => {
-        for (var i = 0; i < amount; i++) {
+        for (let i = 0; i < amount; i++) {
             store.addBox(
                 "#" + i,
                 Math.random() * window.innerWidth * 0.5,
                 Math.random() * window.innerHeight
             )
         }
-        const allBoxes = store.boxes.values()
-        for (var i = 0; i < amount; i++) {
+        const allBoxes = values(store.boxes)
+        for (let i = 0; i < amount; i++) {
             store.addArrow(
                 allBoxes[Math.floor(Math.random() * allBoxes.length)],
                 allBoxes[Math.floor(Math.random() * allBoxes.length)]
