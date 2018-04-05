@@ -224,7 +224,7 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
             if ((HookNames as any)[call.name]) return runNextMiddleware(call)
             return invokeHandler()
         } else {
-            return mobxAction(originalFn).apply(null, baseCall.args)
+            return mobxAction(originalFn).apply(null, call.args)
         }
     }
     return runNextMiddleware(baseCall)
