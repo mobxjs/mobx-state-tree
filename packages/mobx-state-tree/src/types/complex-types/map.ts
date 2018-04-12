@@ -40,7 +40,7 @@ interface IMapFactoryConfig {
 }
 
 export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
-    put(value: T | any): this // downtype to any, again, because we cannot type the snapshot, see
+    put(value: T | any): T | any // downtype to any, again, because we cannot type the snapshot, see
 }
 
 export function mapToString(this: ObservableMap<any, any>) {
@@ -56,23 +56,27 @@ function put(this: ObservableMap<any, any>, value: any) {
         if (process.env.NODE_ENV !== "production") {
             if (!node.identifierAttribute) return fail(needsIdentifierError)
         }
-        this.set("" + node.identifier!, node.value)
-        return this
+        let key = "" + node.identifier
+        this.set(key!, node.value)
+        return this.get(key)
     } else if (!isMutable(value)) {
         return fail(`Map.put can only be used to store complex values`)
     } else {
+        let key: string
         const mapType = getStateTreeNode(this as IStateTreeNode).type as MapType<any, any>
         if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
         if (mapType.identifierMode === MapIdentifierMode.YES) {
-            this.set("" + value[mapType.identifierAttribute!], value)
-            return this
+            key = "" + value[mapType.identifierAttribute!]
+            this.set(key, value)
+            return this.get(key)
         }
         // we don't know the identifier attr yet, so we have to create the instance already to be able to determine
         // luckily, needs to happen only once
         const node = getStateTreeNode(mapType.subType.create(value)) // FIXME: this will unecessarly first create and after that attach.
         if (!node.identifierAttribute) return fail(needsIdentifierError)
-        this.set("" + node.value[node.identifierAttribute!], node.value)
-        return this
+        key = "" + node.value[node.identifierAttribute]
+        this.set(key, node.value)
+        return this.get(key)
     }
 }
 
