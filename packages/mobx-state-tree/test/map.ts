@@ -262,21 +262,30 @@ test("#694 - map.put should return new node", () => {
         })
     const todoStore = TodoStore.create({ todos: {} })
 
-    let addedTodo = todoStore.addAndReturnTodo(
+    const addedTodo = todoStore.addAndReturnTodo(
         Todo.create({
             todo_id: "1",
             title: "Test 1"
         })
     )
+
     expect(isStateTreeNode(addedTodo)).toEqual(true)
     expect(getSnapshot(addedTodo)).toEqual({ todo_id: "1", title: "Test 1" })
 
-    addedTodo = todoStore.addAndReturnTodo({
+    const editedTodo = todoStore.addAndReturnTodo({
         todo_id: "1",
         title: "Test 1 Edited"
     })
-    expect(isStateTreeNode(addedTodo)).toEqual(true)
-    expect(getSnapshot(addedTodo)).toEqual({ todo_id: "1", title: "Test 1 Edited" })
+    expect(isStateTreeNode(editedTodo)).toEqual(true)
+    expect(getSnapshot(editedTodo)).toEqual({ todo_id: "1", title: "Test 1 Edited" })
+    expect(editedTodo).toEqual(addedTodo)
+
+    const addedTodo2 = todoStore.addAndReturnTodo({
+        todo_id: "2",
+        title: "Test 2"
+    })
+    expect(isStateTreeNode(addedTodo2)).toEqual(true)
+    expect(getSnapshot(addedTodo2)).toEqual({ todo_id: "2", title: "Test 2" })
 })
 test("it should not throw when removing a non existing item from a map", () => {
     expect(() => {
