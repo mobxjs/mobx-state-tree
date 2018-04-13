@@ -385,7 +385,7 @@ export function getParentOfType<S, T>(target: IStateTreeNode, type: IType<S, T>)
         if (parent.type === type) return parent.storedValue
         parent = parent.parent
     }
-    return fail(`Failed to find the parent of ${getStateTreeNode(target)} of type ${type}`)
+    return fail(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
 }
 
 export function getRoot(target: IStateTreeNode): any & IStateTreeNode
