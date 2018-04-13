@@ -57,8 +57,8 @@ function put(this: ObservableMap<any, any>, value: any) {
             if (!node.identifierAttribute) return fail(needsIdentifierError)
         }
         let key = "" + node.identifier
-        this.set(key!, node.value)
-        return this.get(key)
+        this.set(key, node.value)
+        return node.value
     } else if (!isMutable(value)) {
         return fail(`Map.put can only be used to store complex values`)
     } else {
@@ -76,7 +76,7 @@ function put(this: ObservableMap<any, any>, value: any) {
         if (!node.identifierAttribute) return fail(needsIdentifierError)
         key = "" + node.value[node.identifierAttribute]
         this.set(key, node.value)
-        return this.get(key)
+        return node.value
     }
 }
 
@@ -191,9 +191,11 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
             if (node.identifierAttribute !== this.identifierAttribute)
                 // both undefined if type is NO
                 fail(
-                    `The objects in a map should all have the same identifier attribute, expected '${this
-                        .identifierAttribute}', but child of type '${node.type
-                        .name}' declared attribute '${node.identifierAttribute}' as identifier`
+                    `The objects in a map should all have the same identifier attribute, expected '${
+                        this.identifierAttribute
+                    }', but child of type '${node.type.name}' declared attribute '${
+                        node.identifierAttribute
+                    }' as identifier`
                 )
             if (this.identifierMode === MapIdentifierMode.YES) {
                 const identifier = "" + node.identifier! // 'cause snapshots always have their identifiers as strings. blegh..
