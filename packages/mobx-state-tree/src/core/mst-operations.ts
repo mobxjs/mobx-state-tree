@@ -308,7 +308,7 @@ export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
 export function getParent(target: IStateTreeNode, depth?: number): any & IStateTreeNode
 export function getParent<T>(target: IStateTreeNode, depth?: number): T & IStateTreeNode
 /**
- * Returns the immediate parent of this object, or null.
+ * Returns the immediate parent of this object, or throws.
  *
  * Note that the immediate parent can be either an object, map or array, and
  * doesn't necessarily refer to the parent model
@@ -334,6 +334,58 @@ export function getParent<T>(target: IStateTreeNode, depth = 1): T & IStateTreeN
         parent = parent.parent
     }
     return fail(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
+}
+
+/**
+ * Given a model instance, returns `true` if the object has a parent of given type, that is, is part of another object, map or array
+ *
+ * @export
+ * @param {Object} target
+ * @param {IType<any, any>} type
+ * @returns {boolean}
+ */
+export function hasParentOfType(target: IStateTreeNode, type: IType<any, any>): boolean {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (!isType(type))
+            fail("expected second argument to be a mobx-state-tree type, got " + type + " instead")
+    }
+    let parent: INode | null = getStateTreeNode(target).parent
+    while (parent) {
+        if (parent.type === type) return true
+        parent = parent.parent
+    }
+    return false
+}
+
+export function getParentOfType(target: IStateTreeNode, type: IType<any, any>): any & IStateTreeNode
+export function getParentOfType<S, T>(target: IStateTreeNode, type: IType<S, T>): T & IStateTreeNode
+/**
+ * Returns the target's parent of a given type, or throws.
+ *
+ *
+ * @export
+ * @param {Object} target
+ * @param {IType<any, any>} type
+ * @returns {*}
+ */
+export function getParentOfType<S, T>(target: IStateTreeNode, type: IType<S, T>): T {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (!isType(type))
+            fail("expected second argument to be a mobx-state-tree type, got " + type + " instead")
+    }
+
+    let parent: INode | null = getStateTreeNode(target).parent
+    while (parent) {
+        if (parent.type === type) return parent.storedValue
+        parent = parent.parent
+    }
+    return fail(`Failed to find the parent of ${getStateTreeNode(target)} of type ${type}`)
 }
 
 export function getRoot(target: IStateTreeNode): any & IStateTreeNode
@@ -458,7 +510,7 @@ export function resolveIdentifier(
  *
  * @export
  * @param {IStateTreeNode} target
-  * @returns {(string | null)}
+ * @returns {(string | null)}
  */
 export function getIdentifier(target: IStateTreeNode): string | null {
     // check all arguments
@@ -547,7 +599,9 @@ export function clone<T extends IStateTreeNode>(
         node.snapshot,
         keepEnvironment === true
             ? node.root._environment
-            : keepEnvironment === false ? undefined : keepEnvironment
+            : keepEnvironment === false
+                ? undefined
+                : keepEnvironment
     ) as T // it's an object or something else
 }
 
