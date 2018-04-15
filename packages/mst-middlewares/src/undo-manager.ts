@@ -70,7 +70,7 @@ const UndoManager = types
         const cachePatchForGroup = (recorder: IPatchRecorder): void => {
             groupRecorder = {
                 patches: groupRecorder.patches.concat(recorder.patches),
-                inversePatches: groupRecorder.inversePatches.concat(recorder.patches)
+                inversePatches: groupRecorder.inversePatches.concat(recorder.inversePatches)
             }
         }
         const undoRedoMiddleware = createActionTrackingMiddleware({

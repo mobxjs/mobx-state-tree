@@ -972,7 +972,7 @@ See the [full API docs](API.md) for more details.
 | [`joinJsonPath(parts)`](API.md#joinjsonpath) | Joins and escapes the given path `parts` into a JSON path |
 | [`onAction(node, (actionDescription) => void)`](API.md#onaction) | A built-in middleware that calls the provided callback with an action description upon each invocation. Returns disposer |
 | [`onPatch(node, (patch) => void)`](API.md#onpatch) | Attach a JSONPatch listener, that is invoked for each change in the tree. Returns disposer |
-| [`onSnapshot(node, (snapshot, inverseSnapshot) => void)`](API.md#onsnapshot) | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer |
+| [`onSnapshot(node, (snapshot) => void)`](API.md#onsnapshot) | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer |
 | [`process(generator)`](API.md#process) | `DEPRECATED` – replaced with [flow](API.md#flow) |
 | [`protect(node)`](API.md#protect) | Protects an unprotected tree against modifications from outside actions |
 | [`recordActions(node)`](API.md#recordactions) | Creates a recorder that listens to all actions in `node`. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree  |
@@ -1252,7 +1252,7 @@ const Example = types
   }))
 ```
 
-Note that you can also declare multple `.views` block, in which case the `self` parameter gets extended after each block
+Note that you can also declare multiple `.views` block, in which case the `self` parameter gets extended after each block
 
 ```typescript
 const Example = types

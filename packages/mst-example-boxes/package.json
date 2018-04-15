@@ -1,7 +1,7 @@
 {
   "name": "mst-example-boxes",
   "private": true,
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Runnable source code of the #GoReactive #mobservable talk",
   "scripts": {
     "start": "node server.js",

@@ -1,3 +1,10 @@
+# 2.0.3
+
+* Fixed issue where middleware that changed arguments wasn't properly picked up. See [#732](https://github.com/mobxjs/mobx-state-tree/pull/732) by @robinfehr. Fixes [#731](https://github.com/mobxjs/mobx-state-tree/issues/731)
+* Fixed reassigning to a custom type from a different type in a union silently failing. See [#737](https://github.com/mobxjs/mobx-state-tree/pull/737) by @univerio. Fixes [#736](https://github.com/mobxjs/mobx-state-tree/issues/736)
+* Fixed typings issue with TypeScript 2.8. See [#740](https://github.com/mobxjs/mobx-state-tree/pull/740) by @bnaya.
+* Fixed undo manager apply grouped patches in the wrong order. See [#755](https://github.com/mobxjs/mobx-state-tree/pull/755) by @robinfehr. Fixes [#754](https://github.com/mobxjs/mobx-state-tree/issues/754)
+
 # 2.0.2
 
 * Fixed bidirectional references from nodes to nodes, see [#728](https://github.com/mobxjs/mobx-state-tree/pull/728) by @robinfehr

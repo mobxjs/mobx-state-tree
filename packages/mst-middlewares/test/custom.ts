@@ -30,6 +30,13 @@ function nextAlter(call, next, abort) {
 function nextAlter2(call, next, abort) {
     next(call, value => value + 2)
 }
+function alterArguments(call, next, abort) {
+    next({ ...call, args: [call.args[0].toUpperCase()] })
+}
+function alterArguments2(call, next, abort) {
+    // cut last char
+    next({ ...call, args: [call.args[0].slice(0, -1)] })
+}
 function nextAlterAsync(call, next, abort) {
     next(call, async value => (await value) + 2)
 }
@@ -91,6 +98,9 @@ const TestModel = types
                 self.z += x
                 return self.z
             },
+            addName(name) {
+                return name
+            },
             postProcessSnapshot(snapshot) {
                 return snapshot
             }
@@ -102,6 +112,14 @@ test("next() middleware queue ", t => {
     addMiddleware(m, nextNoAlter) // no alterations
     const valueFromMiddleware: any = m.inc(1)
     t.is(valueFromMiddleware, 2)
+})
+
+test("next() middleware queue and alter the call arguments", t => {
+    const m = TestModel.create()
+    addMiddleware(m, alterArguments)
+    addMiddleware(m, alterArguments2)
+    const valueFromMiddleware: any = m.addName("Freddy")
+    t.is(valueFromMiddleware, "FREDD")
 })
 
 test("next() middleware queue and alter the action value", t => {
