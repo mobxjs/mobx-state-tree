@@ -53,13 +53,71 @@ export enum HookNames {
     beforeDestroy = "beforeDestroy"
 }
 
+export type ModelProperties = {
+    readonly [key: string]: IType<any, any>
+}
+
+export type ModelPrimitive = string | number | boolean | Date
+
+export type ModelPropertiesDeclaration = {
+    readonly [key: string]: ModelPrimitive | IType<any, any>
+}
+
+export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
+    [K in keyof T]: T[K] extends string
+        ? IType<string | undefined, string>
+        : T[K] extends number
+            ? IType<number | undefined, number>
+            : T[K] extends boolean
+                ? IType<boolean | undefined, boolean>
+                : T[K] extends Date
+                    ? IType<number | undefined, Date>
+                    : T[K] extends IType<infer X, infer Y> ? IType<X, Y> : never // must extend IType<any, any> now, we exhausted all options from ModelPropertiesDeclaration
+}
+
+export type ModelSnapshotType<T extends ModelProperties> = {
+    [K in keyof T]: T[K] extends IType<infer X, any> ? X : never
+}
+
+export type ModelInstanceType<T extends ModelProperties, O> = {
+    [K in keyof T]: T[K] extends IType<infer X, any> ? X : never
+} &
+    O &
+    IStateTreeNode
+
+export type ModelActions = {
+    [key: string]: Function
+}
+
+export interface IModelType<PROPS extends ModelProperties, OTHERS>
+    extends IComplexType<ModelSnapshotType<PROPS>, ModelInstanceType<PROPS, OTHERS>> {
+    readonly properties: PROPS
+    named(newName: string): this
+    props<PROPS2 extends ModelPropertiesDeclaration>(
+        props: PROPS2
+    ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS>
+    views<V extends Object>(
+        fn: (self: ModelInstanceType<PROPS, OTHERS>) => V
+    ): IModelType<PROPS, OTHERS & V>
+    actions<A extends ModelActions>(
+        fn: (self: ModelInstanceType<PROPS, OTHERS>) => A
+    ): IModelType<PROPS, OTHERS & A>
+    volatile<TP extends object>(
+        fn: (self: ModelInstanceType<PROPS, OTHERS>) => TP
+    ): IModelType<PROPS, OTHERS & TP>
+    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
+        fn: (self: ModelInstanceType<PROPS, OTHERS>) => { actions?: A; views?: V; state?: VS }
+    ): IModelType<PROPS, OTHERS & A & V & VS>
+    preProcessSnapshot(fn: (snapshot: any) => ModelSnapshotType<PROPS>): this
+}
+
 function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
 }
 
 export type ModelTypeConfig = {
     name?: string
-    properties?: { [K: string]: IType<any, any> }
+    properties?: ModelProperties
     initializers?: ReadonlyArray<((instance: any) => any)>
     preProcessor?: (snapshot: any) => any
 }
@@ -457,64 +515,6 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     removeChild(node: ObjectNode, subpath: string) {
         node.storedValue[subpath] = null
     }
-}
-
-export type ModelProperties = {
-    readonly [key: string]: IType<any, any>
-}
-
-export type ModelPrimitive = string | number | boolean | Date
-
-export type ModelPropertiesDeclaration = {
-    readonly [key: string]: ModelPrimitive | IType<any, any>
-}
-
-export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
-    [K in keyof T]: T[K] extends string
-        ? IType<string | undefined, string>
-        : T[K] extends number
-            ? IType<number | undefined, number>
-            : T[K] extends boolean
-                ? IType<boolean | undefined, boolean>
-                : T[K] extends Date
-                    ? IType<number | undefined, Date>
-                    : T[K] extends IType<infer X, infer Y> ? IType<X, Y> : never // must extend IType<any, any> now, we exhausted all options from ModelPropertiesDeclaration
-}
-
-export type ModelSnapshotType<T extends ModelProperties> = {
-    [K in keyof T]: T[K] extends IType<infer X, any> ? X : never
-}
-
-export type ModelInstanceType<T extends ModelProperties, O> = {
-    [K in keyof T]: T[K] extends IType<infer X, any> ? X : never
-} &
-    O &
-    IStateTreeNode
-
-export type ModelActions = {
-    [key: string]: Function
-}
-
-export interface IModelType<PROPS extends ModelProperties, OTHERS>
-    extends IComplexType<ModelSnapshotType<PROPS>, ModelInstanceType<PROPS, OTHERS>> {
-    readonly properties: PROPS
-    named(newName: string): this
-    props<PROPS2 extends ModelPropertiesDeclaration>(
-        props: PROPS2
-    ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS>
-    views<V extends Object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => V
-    ): IModelType<PROPS, OTHERS & V>
-    actions<A extends ModelActions>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => A
-    ): IModelType<PROPS, OTHERS & A>
-    volatile<TP extends object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => TP
-    ): IModelType<PROPS, OTHERS & TP>
-    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => { actions?: A; views?: V; state?: VS }
-    ): IModelType<PROPS, OTHERS & A & V & VS>
-    preProcessSnapshot(fn: (snapshot: any) => ModelSnapshotType<PROPS>): this
 }
 
 export function model<T extends ModelPropertiesDeclaration = {}>(
