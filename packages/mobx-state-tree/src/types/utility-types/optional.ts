@@ -77,10 +77,22 @@ export class OptionalValue<S, T> extends Type<S, T> {
     }
 }
 
-export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: S): IType<S, T>
-export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: T): IType<S, T>
-export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => S): IType<S, T>
-export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => T): IType<S, T>
+export function optional<S, T>(
+    type: IType<S, T>,
+    defaultValueOrFunction: S
+): IType<S, T> & { flags: TypeFlags.Optional }
+export function optional<S, T>(
+    type: IType<S, T>,
+    defaultValueOrFunction: T
+): IType<S, T> & { flags: TypeFlags.Optional }
+export function optional<S, T>(
+    type: IType<S, T>,
+    defaultValueOrFunction: () => S
+): IType<S, T> & { flags: TypeFlags.Optional }
+export function optional<S, T>(
+    type: IType<S, T>,
+    defaultValueOrFunction: () => T
+): IType<S, T> & { flags: TypeFlags.Optional }
 /**
  * `types.optional` can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.

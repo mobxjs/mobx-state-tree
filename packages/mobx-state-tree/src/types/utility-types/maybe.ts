@@ -1,4 +1,4 @@
-import { union, nullType, optional, IType, isType, frozen, fail } from "../../internal"
+import { union, nullType, optional, IType, isType, frozen, fail, TypeFlags } from "../../internal"
 
 const optionalNullType = optional(nullType, null)
 
@@ -12,7 +12,9 @@ const optionalNullType = optional(nullType, null)
  * @param {IType<S, T>} type The type to make nullable
  * @returns {(IType<S | null | undefined, T | null>)}
  */
-export function maybe<S, T>(type: IType<S, T>): IType<S | null | undefined, T | null> {
+export function maybe<S, T>(
+    type: IType<S, T>
+): IType<S | null | undefined, T | null> & { flags: TypeFlags.Optional } {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
             fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
@@ -22,5 +24,5 @@ export function maybe<S, T>(type: IType<S, T>): IType<S | null | undefined, T | 
             )
         }
     }
-    return union(optionalNullType, type)
+    return union(optionalNullType, type) as any
 }

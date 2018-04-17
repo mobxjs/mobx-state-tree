@@ -54,10 +54,8 @@ export class Late<S, T> extends Type<S, T> {
     }
 }
 
-export type ILateType<S, T> = () => IType<S, T>
-
-export function late<S = any, T = any>(type: ILateType<S, T>): IType<S, T>
-export function late<S = any, T = any>(name: string, type: ILateType<S, T>): IType<S, T>
+export function late<S, T>(type: () => IType<S, T>): IType<S, T>
+export function late<S, T>(name: string, type: () => IType<S, T>): IType<S, T>
 /**
  * Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies.
  * Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
@@ -81,7 +79,7 @@ export function late<S = any, T = any>(name: string, type: ILateType<S, T>): ITy
  * @param {ILateType<S, T>} type A function that returns the type that will be defined.
  * @returns {IType<S, T>}
  */
-export function late<S, T>(nameOrType: any, maybeType?: ILateType<S, T>): IType<S, T> {
+export function late(nameOrType: any, maybeType?: () => IType<any, any>): IType<any, any> {
     const name = typeof nameOrType === "string" ? nameOrType : `late(${nameOrType.toString()})`
     const type = typeof nameOrType === "string" ? maybeType : nameOrType
     // checks that the type is actually a late type
@@ -92,7 +90,7 @@ export function late<S, T>(nameOrType: any, maybeType?: ILateType<S, T>): IType<
                     type
             )
     }
-    return new Late<S, T>(name, type)
+    return new Late<any, any>(name, type)
 }
 
 export function isLateType(type: any): type is Late<any, any> {

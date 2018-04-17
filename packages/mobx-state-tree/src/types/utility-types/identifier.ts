@@ -35,7 +35,9 @@ export class IdentifierType<T> extends Type<T, T> {
 
         if (parent.identifierAttribute)
             fail(
-                `Cannot define property '${subpath}' as object identifier, property '${parent.identifierAttribute}' is already defined as identifier property`
+                `Cannot define property '${subpath}' as object identifier, property '${
+                    parent.identifierAttribute
+                }' is already defined as identifier property`
             )
         parent.identifierAttribute = subpath
         return createNode(this, parent, subpath, environment, snapshot)
@@ -44,7 +46,9 @@ export class IdentifierType<T> extends Type<T, T> {
     reconcile(current: INode, newValue: any) {
         if (current.storedValue !== newValue)
             return fail(
-                `Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`
+                `Tried to change identifier from '${
+                    current.storedValue
+                }' to '${newValue}'. Changing identifiers is not allowed.`
             )
         return current
     }
@@ -69,8 +73,8 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 }
 
-export function identifier<T>(baseType: IType<T, T>): IType<T, T>
-export function identifier<T>(): T
+export function identifier<T extends string | number>(baseType: IType<T, T>): IType<T, T>
+export function identifier(): IType<string, string>
 /**
  * Identifiers are used to make references, lifecycle events and reconciling works.
  * Inside a state tree, for each type can exist only one instance for each given identifier.

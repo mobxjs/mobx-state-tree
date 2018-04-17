@@ -186,11 +186,9 @@ test("it should resolve refs during creation, when using generic reference", () 
 if (process.env.NODE_ENV !== "production")
     test("identifiers should only support types.string and types.number", () => {
         expect(() =>
-            types
-                .model({
-                    id: types.identifier(types.model({ x: 1 }))
-                })
-                .create({ id: {} })
+            types.model({
+                id: types.identifier(types.model({ x: 1 }) as any)
+            })
         ).toThrow()
     })
 test("identifiers should support subtypes of types.string and types.number", () => {
@@ -497,6 +495,7 @@ test("References in recursive structures", () => {
         name: types.string,
         files: types.array(types.string)
     })
+    // saddly, this becomes any, and further untypeable...
     const Tree = types
         .model("Tree", {
             children: types.array(types.late(() => Tree)),
@@ -512,10 +511,22 @@ test("References in recursive structures", () => {
                 addFolder
             }
         })
+
+    /* Sad work around to get recursive typings right */
+    type ITreeSnapshot = {
+        children: ITreeSnapshot[]
+        data: string | null
+    }
+    type ITreeType = {
+        children: ITreeType[]
+        data: null | typeof Folder.Type
+        addFolder(data: any)
+    }
+
     const Storage = types
         .model("Storage", {
             objects: types.map(Folder),
-            tree: Tree
+            tree: Tree as IType<ITreeSnapshot, ITreeType>
         })
         .actions(self => ({
             putFolderHelper(folder) {

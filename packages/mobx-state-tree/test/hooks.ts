@@ -104,7 +104,6 @@ const Car = types
     .model({
         id: types.number
     })
-    .preProcessSnapshot(snapshot => Object.assign({}, snapshot, { id: parseInt(snapshot.id) * 2 }))
     .actions(self => {
         // TODO: Move to a separate type
         function postProcessSnapshot(snapshot) {
@@ -114,6 +113,10 @@ const Car = types
             postProcessSnapshot
         }
     })
+    // must be last to fix type issues
+    .preProcessSnapshot((snapshot: { id: string }) =>
+        Object.assign({}, snapshot, { id: parseInt(snapshot.id) * 2 })
+    )
 const Factory = types.model({
     car: Car
 })
@@ -216,7 +219,7 @@ test("snapshot processors can be composed", () => {
             }
         }))
         .preProcessSnapshot(s => ({
-            x: s.x - 3
+            x: s.x! - 3
         }))
         .actions(self => ({
             postProcessSnapshot(s) {
@@ -225,7 +228,7 @@ test("snapshot processors can be composed", () => {
             }
         }))
         .preProcessSnapshot(s => ({
-            x: s.x / 5
+            x: s.x! / 5
         }))
     const x = X.create({ x: 25 })
     expect(x.x).toBe(2)

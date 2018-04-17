@@ -187,9 +187,11 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
             if (node.identifierAttribute !== this.identifierAttribute)
                 // both undefined if type is NO
                 fail(
-                    `The objects in a map should all have the same identifier attribute, expected '${this
-                        .identifierAttribute}', but child of type '${node.type
-                        .name}' declared attribute '${node.identifierAttribute}' as identifier`
+                    `The objects in a map should all have the same identifier attribute, expected '${
+                        this.identifierAttribute
+                    }', but child of type '${node.type.name}' declared attribute '${
+                        node.identifierAttribute
+                    }' as identifier`
                 )
             if (this.identifierMode === MapIdentifierMode.YES) {
                 const identifier = "" + node.identifier! // 'cause snapshots always have their identifiers as strings. blegh..
@@ -305,7 +307,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
 }
 
 export function map<S, T>(
-    subtype: IComplexType<S, T>
+    subtype: IType<S, T>
 ): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>>
 /**
  * Creates a key based collection type who's children are all of a uniform declared type.

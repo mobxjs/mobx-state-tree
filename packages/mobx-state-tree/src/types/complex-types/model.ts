@@ -54,33 +54,53 @@ export enum HookNames {
 }
 
 export type ModelProperties = {
-    readonly [key: string]: IType<any, any>
+    [key: string]: IType<any, any>
 }
 
 export type ModelPrimitive = string | number | boolean | Date
 
 export type ModelPropertiesDeclaration = {
-    readonly [key: string]: ModelPrimitive | IType<any, any>
+    [key: string]: ModelPrimitive | IType<any, any>
 }
 
+/**
+ * Unmaps syntax property declarations to a map of { propName: IType }
+ */
 export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
     [K in keyof T]: T[K] extends string
-        ? IType<string | undefined, string>
+        ? IType<string | undefined, string> & { flags: TypeFlags.Optional }
         : T[K] extends number
-            ? IType<number | undefined, number>
+            ? IType<number | undefined, number> & { flags: TypeFlags.Optional }
             : T[K] extends boolean
-                ? IType<boolean | undefined, boolean>
+                ? IType<boolean | undefined, boolean> & { flags: TypeFlags.Optional }
                 : T[K] extends Date
-                    ? IType<number | undefined, Date>
-                    : T[K] extends IType<infer X, infer Y> ? IType<X, Y> : never // must extend IType<any, any> now, we exhausted all options from ModelPropertiesDeclaration
+                    ? IType<number | undefined, Date> & { flags: TypeFlags.Optional }
+                    : T[K] extends IType<infer A, infer B> & { flags: TypeFlags.Optional }
+                        ? IType<A, B> & { flags: TypeFlags.Optional }
+                        : T[K] extends IType<infer A, infer B> ? IType<A, B> : never
 }
 
+export type OptionalPropertyTypes = ModelPrimitive | { flags: TypeFlags.Optional }
+
+export type RequiredPropNames<T> = {
+    [K in keyof T]: T[K] extends OptionalPropertyTypes ? never : undefined extends T[K] ? never : K
+}[keyof T]
+export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
+export type OptionalPropNames<T> = {
+    [K in keyof T]: T[K] extends OptionalPropertyTypes ? K : never
+}[keyof T]
+export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
+
+/**
+ * Maps property types to the snapshot, including omitted optional attributes
+ */
 export type ModelSnapshotType<T extends ModelProperties> = {
-    [K in keyof T]: T[K] extends IType<infer X, any> ? X : never
-}
+    [K in keyof RequiredProps<T>]: T[K] extends IType<infer X, any> ? X : never
+} &
+    { [K in keyof OptionalProps<T>]?: T[K] extends IType<infer X, any> ? X : never }
 
 export type ModelInstanceType<T extends ModelProperties, O> = {
-    [K in keyof T]: T[K] extends IType<infer X, any> ? X : never
+    [K in keyof T]: T[K] extends IType<any, infer X> ? X : never
 } &
     O &
     IStateTreeNode
@@ -108,7 +128,9 @@ export interface IModelType<PROPS extends ModelProperties, OTHERS>
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
         fn: (self: ModelInstanceType<PROPS, OTHERS>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS>
-    preProcessSnapshot(fn: (snapshot: any) => ModelSnapshotType<PROPS>): this
+    preProcessSnapshot<S0 = ModelSnapshotType<PROPS>>(
+        fn: (snapshot: S0) => ModelSnapshotType<PROPS>
+    ): this & IComplexType<S0, ModelInstanceType<PROPS, OTHERS>> // Snapshot can now be anything!
 }
 
 function objectTypeToString(this: any) {
