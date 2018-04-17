@@ -99,6 +99,6 @@ test("all methods mentioned in api.md", () => {
 
 test("no dependencies", () => {
     expect(JSON.parse(readFileSync(__dirname + "/../package.json", "utf8")).dependencies).toEqual(
-        {}
+        undefined
     )
 })
