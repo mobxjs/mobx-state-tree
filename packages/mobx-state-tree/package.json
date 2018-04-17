@@ -91,6 +91,5 @@
     ]
   },
   "dependencies": {
-    "mobx": "^4.0.2"
   }
 }
