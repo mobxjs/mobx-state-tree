@@ -1,3 +1,7 @@
+# 2.0.4
+
+* Removed accidental dependency on mobx
+
 # 2.0.3
 
 * Fixed issue where middleware that changed arguments wasn't properly picked up. See [#732](https://github.com/mobxjs/mobx-state-tree/pull/732) by @robinfehr. Fixes [#731](https://github.com/mobxjs/mobx-state-tree/issues/731)

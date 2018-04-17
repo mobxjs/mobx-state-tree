@@ -97,7 +97,7 @@ test("all methods mentioned in api.md", () => {
     expect(missing).toEqual([])
 })
 
-test("no deps", () => {
+test("no dependencies", () => {
     expect(JSON.parse(readFileSync(__dirname + "/../package.json", "utf8")).dependencies).toEqual(
         {}
     )
