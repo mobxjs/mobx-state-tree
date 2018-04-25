@@ -294,7 +294,7 @@ More details can be found on the mobx-react package documentation, but keep in m
 ```javascript
 const App = observer(props => <div>
     <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
-    {props.store.todos.values().map(todo =>
+    {Array.from(props.store.todos.values()).map(todo =>
         <div>
             <input type="checkbox" checked={todo.done} onChange={e => todo.toggle()} />
             <input type="text" value={todo.name} onChange={e => todo.setName(e.target.value)} />
@@ -303,7 +303,7 @@ const App = observer(props => <div>
 </div>
 )
 ```
-[View sample in playground](https://codesandbox.io/s/r54o5pp8z4)
+[View sample in playground](https://codesandbox.io/s/32jvl9417p)
 
 ## Improving render performance
 If you have the React DevTools installed, using the "Highlight Updates" check you will see that the entire application will re-render whenever a todo is toggled or name is changed. That's a shame, as this can cause performance issues if there are a lots of todos in our list!
