@@ -74,6 +74,12 @@ export function refinement<C, S, T>(
     predicate: (snapshot: C) => boolean,
     message?: string | ((v: any) => string)
 ): IType<T, T, T>
+export function refinement<C, S, T>(
+    type: IType<C, S, T>,
+    predicate: (snapshot: C) => boolean,
+    message?: string | ((v: any) => string)
+): IType<T, T, T>
+
 /**
  * `types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
  *

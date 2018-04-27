@@ -95,16 +95,14 @@ export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
 /**
  * Maps property types to the snapshot, including omitted optional attributes
  */
-export type ModelSnapshotType<T extends ModelProperties> = {
-    [K in keyof RequiredProps<T>]: T[K] extends IType<any, infer X, any> ? X : never
-} &
-    { [K in keyof OptionalProps<T>]?: T[K] extends IType<any, infer X, any> ? X : never }
-
 export type ModelCreationType<T extends ModelProperties> = {
     [K in keyof RequiredProps<T>]: T[K] extends IType<infer X, any, infer Y> ? X | Y : never
 } &
     { [K in keyof OptionalProps<T>]?: T[K] extends IType<infer X, any, infer Y> ? X | Y : never }
-
+export type ModelSnapshotType<T extends ModelProperties> = {
+    [K in keyof RequiredProps<T>]: T[K] extends IType<any, infer X, any> ? X : never
+} &
+    { [K in keyof OptionalProps<T>]?: T[K] extends IType<any, infer X, any> ? X : never }
 export type ModelInstanceType<T extends ModelProperties, O> = {
     [K in keyof T]: T[K] extends IType<any, any, infer X> ? X : never
 } &
@@ -115,12 +113,13 @@ export type ModelActions = {
     [key: string]: Function
 }
 
-export interface IModelType<PROPS extends ModelProperties, OTHERS>
-    extends IComplexType<
-            ModelCreationType<PROPS>,
-            ModelSnapshotType<PROPS>,
-            ModelInstanceType<PROPS, OTHERS>
-        > {
+export interface IModelType<
+    PROPS extends ModelProperties,
+    OTHERS,
+    C = ModelCreationType<PROPS>,
+    S = ModelSnapshotType<PROPS>,
+    T = ModelInstanceType<PROPS, OTHERS>
+> extends IComplexType<C, S, T> {
     readonly properties: PROPS
     named(newName: string): this
     props<PROPS2 extends ModelPropertiesDeclaration>(
@@ -138,9 +137,9 @@ export interface IModelType<PROPS extends ModelProperties, OTHERS>
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
         fn: (self: ModelInstanceType<PROPS, OTHERS>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS>
-    preProcessSnapshot<S0 = ModelCreationType<PROPS>, S1 = ModelSnapshotType<PROPS>>(
+    preProcessSnapshot<S0 = ModelCreationType<PROPS>>(
         fn: (snapshot: S0) => ModelCreationType<PROPS>
-    ): this & IComplexType<S0, S1, ModelInstanceType<PROPS, OTHERS>> // Snapshot can now be anything!
+    ): IModelType<PROPS, OTHERS, S0>
 }
 
 function objectTypeToString(this: any) {
@@ -242,7 +241,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         })
     }
 
-    actions(fn: (self: any) => any): IModelType<any, any> {
+    actions(fn: (self: any) => any): any {
         const actionInitializer = (self: T) => {
             this.instantiateActions(self, fn(self))
             return self
@@ -289,11 +288,11 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return this.cloneAndEnhance({ name }) as this
     }
 
-    props(properties: ModelPropertiesDeclaration): IModelType<any, any> {
+    props(properties: ModelPropertiesDeclaration): any {
         return this.cloneAndEnhance({ properties } as any)
     }
 
-    volatile(fn: (self: any) => any): IModelType<any, any> {
+    volatile(fn: (self: any) => any): any {
         const stateInitializer = (self: T) => {
             this.instantiateVolatileState(self, fn(self))
             return self
@@ -309,7 +308,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         extendObservable(self, state, EMPTY_OBJECT, mobxShallow)
     }
 
-    extend(fn: (self: any) => any): IModelType<any, any> {
+    extend(fn: (self: any) => any): any {
         const initializer = (self: T) => {
             const { actions, views, state, ...rest } = fn(self)
             for (let key in rest)
@@ -324,7 +323,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return this.cloneAndEnhance({ initializers: [initializer] })
     }
 
-    views(fn: (self: any) => any): IModelType<any, any> {
+    views(fn: (self: any) => any): any {
         const viewInitializer = (self: T) => {
             this.instantiateViews(self, fn(self))
             return self
@@ -603,7 +602,7 @@ export function compose<
  * @export
  * @alias types.compose
  */
-export function compose(...args: any[]): IModelType<any, any> {
+export function compose(...args: any[]): any {
     // TODO: just join the base type names if no name is provided
     const typeName: string = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
     // check all parameters

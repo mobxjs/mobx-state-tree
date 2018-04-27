@@ -72,7 +72,7 @@ export type CustomTypeOptions<S, T> = {
  *     balance: DecimalPrimitive
  * })
  */
-export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S, S, T> {
+export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S | T, S, T> {
     return new CustomType(options)
 }
 

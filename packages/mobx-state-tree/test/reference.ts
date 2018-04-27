@@ -9,7 +9,8 @@ import {
     detach,
     resolveIdentifier,
     getRoot,
-    IType
+    IType,
+    IAnyType
 } from "../src"
 test("it should support prefixed paths in maps", () => {
     const User = types.model({
@@ -526,7 +527,7 @@ test("References in recursive structures", () => {
     const Storage = types
         .model("Storage", {
             objects: types.map(Folder),
-            tree: Tree as IType<ITreeSnapshot, ITreeType>
+            tree: Tree as IType<ITreeSnapshot, ITreeSnapshot, ITreeType>
         })
         .actions(self => ({
             putFolderHelper(folder) {

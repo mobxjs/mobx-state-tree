@@ -29,7 +29,7 @@ if (process.env.NODE_ENV !== "production") {
         })
         const error = expect(() => {
             types.model({
-                rows: types.optional(types.array(Row), [{}])
+                rows: types.optional(types.array(Row), [{}] as any)
             })
         }).toThrow()
     })
@@ -42,7 +42,7 @@ if (process.env.NODE_ENV !== "production") {
         })
         const RowList = types.optional(types.array(Row), [])
         const error = expect(() => {
-            RowList.create([{ name: "a", quantity: 1 }, { name: "b", quantity: "x" }])
+            RowList.create([{ name: "a", quantity: 1 }, { name: "b", quantity: "x" }] as any)
         }).toThrow()
     })
 }
