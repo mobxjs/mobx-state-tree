@@ -11,7 +11,8 @@ import {
     IValidationResult,
     typeCheckFailure,
     string as stringType,
-    ObjectNode
+    ObjectNode,
+    IAnyType
 } from "../../internal"
 
 class Identifier {
@@ -21,11 +22,11 @@ class Identifier {
     }
 }
 
-export class IdentifierType<T> extends Type<T, T> {
+export class IdentifierType<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Identifier
 
-    constructor(public readonly identifierType: IType<T, T>) {
+    constructor(public readonly identifierType: IType<T, T, T>) {
         super(`identifier(${identifierType.name})`)
     }
 
@@ -73,8 +74,9 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 }
 
-export function identifier<T extends string | number>(baseType: IType<T, T>): IType<T, T>
-export function identifier(): IType<string, string>
+export function identifier<T extends string | number = string>(
+    baseType?: IType<T, T, T>
+): IType<T, T, T>
 /**
  * Identifiers are used to make references, lifecycle events and reconciling works.
  * Inside a state tree, for each type can exist only one instance for each given identifier.
@@ -94,7 +96,7 @@ export function identifier(): IType<string, string>
  * @param {IType<T, T>} baseType
  * @returns {IType<T, T>}
  */
-export function identifier(baseType: IType<any, any> = stringType): any {
+export function identifier(baseType: IAnyType = stringType): any {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(baseType))
             fail("expected a mobx-state-tree type as first argument, got " + baseType + " instead")

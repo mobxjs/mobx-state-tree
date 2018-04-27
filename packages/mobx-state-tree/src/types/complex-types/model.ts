@@ -40,7 +40,8 @@ import {
     ObjectNode,
     freeze,
     addHiddenWritableProp,
-    mobxShallow
+    mobxShallow,
+    IAnyType
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -54,13 +55,13 @@ export enum HookNames {
 }
 
 export type ModelProperties = {
-    [key: string]: IType<any, any>
+    [key: string]: IAnyType
 }
 
 export type ModelPrimitive = string | number | boolean | Date
 
 export type ModelPropertiesDeclaration = {
-    [key: string]: ModelPrimitive | IType<any, any>
+    [key: string]: ModelPrimitive | IAnyType
 }
 
 /**
@@ -68,16 +69,16 @@ export type ModelPropertiesDeclaration = {
  */
 export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
     [K in keyof T]: T[K] extends string
-        ? IType<string | undefined, string> & { flags: TypeFlags.Optional }
+        ? IType<string | undefined, string, string> & { flags: TypeFlags.Optional }
         : T[K] extends number
-            ? IType<number | undefined, number> & { flags: TypeFlags.Optional }
+            ? IType<number | undefined, number, number> & { flags: TypeFlags.Optional }
             : T[K] extends boolean
-                ? IType<boolean | undefined, boolean> & { flags: TypeFlags.Optional }
+                ? IType<boolean | undefined, boolean, boolean> & { flags: TypeFlags.Optional }
                 : T[K] extends Date
-                    ? IType<number | undefined, Date> & { flags: TypeFlags.Optional }
-                    : T[K] extends IType<infer A, infer B> & { flags: TypeFlags.Optional }
-                        ? IType<A, B> & { flags: TypeFlags.Optional }
-                        : T[K] extends IType<infer A, infer B> ? IType<A, B> : never
+                    ? IType<number | undefined, number, Date> & { flags: TypeFlags.Optional }
+                    : T[K] extends IType<infer C, infer S, infer T> & { flags: TypeFlags.Optional }
+                        ? IType<C, S, T> & { flags: TypeFlags.Optional }
+                        : T[K] extends IType<infer C, infer S, infer T> ? IType<C, S, T> : never
 }
 
 export type OptionalPropertyTypes = ModelPrimitive | { flags: TypeFlags.Optional }
@@ -95,12 +96,17 @@ export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
  * Maps property types to the snapshot, including omitted optional attributes
  */
 export type ModelSnapshotType<T extends ModelProperties> = {
-    [K in keyof RequiredProps<T>]: T[K] extends IType<infer X, any> ? X : never
+    [K in keyof RequiredProps<T>]: T[K] extends IType<any, infer X, any> ? X : never
 } &
-    { [K in keyof OptionalProps<T>]?: T[K] extends IType<infer X, any> ? X : never }
+    { [K in keyof OptionalProps<T>]?: T[K] extends IType<any, infer X, any> ? X : never }
+
+export type ModelCreationType<T extends ModelProperties> = {
+    [K in keyof RequiredProps<T>]: T[K] extends IType<infer X, any, infer Y> ? X | Y : never
+} &
+    { [K in keyof OptionalProps<T>]?: T[K] extends IType<infer X, any, infer Y> ? X | Y : never }
 
 export type ModelInstanceType<T extends ModelProperties, O> = {
-    [K in keyof T]: T[K] extends IType<any, infer X> ? X : never
+    [K in keyof T]: T[K] extends IType<any, any, infer X> ? X : never
 } &
     O &
     IStateTreeNode
@@ -110,7 +116,11 @@ export type ModelActions = {
 }
 
 export interface IModelType<PROPS extends ModelProperties, OTHERS>
-    extends IComplexType<ModelSnapshotType<PROPS>, ModelInstanceType<PROPS, OTHERS>> {
+    extends IComplexType<
+            ModelCreationType<PROPS>,
+            ModelSnapshotType<PROPS>,
+            ModelInstanceType<PROPS, OTHERS>
+        > {
     readonly properties: PROPS
     named(newName: string): this
     props<PROPS2 extends ModelPropertiesDeclaration>(
@@ -128,9 +138,9 @@ export interface IModelType<PROPS extends ModelProperties, OTHERS>
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
         fn: (self: ModelInstanceType<PROPS, OTHERS>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS>
-    preProcessSnapshot<S0 = ModelSnapshotType<PROPS>>(
-        fn: (snapshot: S0) => ModelSnapshotType<PROPS>
-    ): this & IComplexType<S0, ModelInstanceType<PROPS, OTHERS>> // Snapshot can now be anything!
+    preProcessSnapshot<S0 = ModelCreationType<PROPS>, S1 = ModelSnapshotType<PROPS>>(
+        fn: (snapshot: S0) => ModelCreationType<PROPS>
+    ): this & IComplexType<S0, S1, ModelInstanceType<PROPS, OTHERS>> // Snapshot can now be anything!
 }
 
 function objectTypeToString(this: any) {
@@ -196,7 +206,7 @@ function toPropertiesObject<T>(declaredProps: ModelPropertiesDeclaration): Model
     )
 }
 
-export class ModelType<S extends ModelProperties, T> extends ComplexType<any, any>
+export class ModelType<S extends ModelProperties, T> extends ComplexType<any, any, any>
     implements IModelType<S, T> {
     readonly flags = TypeFlags.Object
     shouldAttachNode = true
@@ -496,7 +506,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return snapshot
     }
 
-    getChildType(key: string): IType<any, any> {
+    getChildType(key: string): IAnyType {
         return this.properties[key]
     }
 
@@ -517,7 +527,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         )
     }
 
-    private forAllProps(fn: (name: string, type: IType<any, any>) => void) {
+    private forAllProps(fn: (name: string, type: IAnyType) => void) {
         this.propertyNames.forEach(key => fn(key, this.properties[key]))
     }
 

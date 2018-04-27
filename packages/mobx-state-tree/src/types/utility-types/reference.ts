@@ -13,7 +13,8 @@ import {
     typeCheckFailure,
     fail,
     ObjectNode,
-    IStateTreeNode
+    IStateTreeNode,
+    IAnyType
 } from "../../internal"
 
 class StoredReference {
@@ -28,11 +29,11 @@ class StoredReference {
     }
 }
 
-export abstract class BaseReferenceType<T> extends Type<string | number, T> {
+export abstract class BaseReferenceType<T> extends Type<string | number | T, string | number, T> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Reference
 
-    constructor(protected readonly targetType: IType<any, T>) {
+    constructor(protected readonly targetType: IType<any, any, T>) {
         super(`reference(${targetType.name})`)
     }
 
@@ -40,7 +41,7 @@ export abstract class BaseReferenceType<T> extends Type<string | number, T> {
         return this.name
     }
 
-    isAssignableFrom(type: IType<any, any>): boolean {
+    isAssignableFrom(type: IAnyType): boolean {
         return this.targetType.isAssignableFrom(type)
     }
 
@@ -56,7 +57,7 @@ export abstract class BaseReferenceType<T> extends Type<string | number, T> {
 }
 
 export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
-    constructor(targetType: IType<any, T>) {
+    constructor(targetType: IType<any, any, T>) {
         super(targetType)
     }
 
@@ -71,8 +72,9 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
         if (!target)
             return fail(
-                `Failed to resolve reference '${ref.value}' to type '${this.targetType
-                    .name}' (from node: ${node.path})`
+                `Failed to resolve reference '${ref.value}' to type '${
+                    this.targetType.name
+                }' (from node: ${node.path})`
             )
         return target.value
     }
@@ -120,7 +122,7 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
 }
 
 export class CustomReferenceType<T> extends BaseReferenceType<T> {
-    constructor(targetType: IType<any, T>, private readonly options: ReferenceOptions<T>) {
+    constructor(targetType: IType<any, any, T>, private readonly options: ReferenceOptions<T>) {
         super(targetType)
     }
 
@@ -169,9 +171,9 @@ export type ReferenceOptions<T> = {
 }
 
 export function reference<T>(
-    factory: IType<any, T>,
+    factory: IType<any, any, T>,
     options?: ReferenceOptions<T>
-): IType<string | number, T>
+): IType<string | number | T, string | number, T>
 /**
  * Creates a reference to another type, which should have defined an identifier.
  * See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
@@ -179,7 +181,7 @@ export function reference<T>(
  * @export
  * @alias types.reference
  */
-export function reference<T>(subType: IType<any, T>, options?: ReferenceOptions<T>): any {
+export function reference<T>(subType: IType<any, any, T>, options?: ReferenceOptions<T>): any {
     // check that a type is given
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subType))

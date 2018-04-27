@@ -1,4 +1,4 @@
-import { observable, computed } from "mobx"
+import { observable } from "mobx"
 
 import {
     INode,
@@ -7,14 +7,14 @@ import {
     addHiddenFinalProp,
     fail,
     freeze,
-    IType,
     NodeLifeCycle,
     noop,
-    ObjectNode
+    ObjectNode,
+    IAnyType
 } from "../../internal"
 
 export class ScalarNode implements INode {
-    readonly type: IType<any, any>
+    readonly type: IAnyType
     readonly storedValue: any
     @observable subpath: string = ""
 
@@ -25,7 +25,7 @@ export class ScalarNode implements INode {
     private state = NodeLifeCycle.INITIALIZING
 
     constructor(
-        type: IType<any, any>,
+        type: IAnyType,
         parent: ObjectNode | null,
         subpath: string,
         environment: any,

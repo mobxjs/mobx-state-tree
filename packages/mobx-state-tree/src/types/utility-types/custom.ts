@@ -8,7 +8,8 @@ import {
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    ObjectNode
+    ObjectNode,
+    IAnyType
 } from "../../internal"
 
 export type CustomTypeOptions<S, T> = {
@@ -71,11 +72,11 @@ export type CustomTypeOptions<S, T> = {
  *     balance: DecimalPrimitive
  * })
  */
-export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S, T> {
+export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S, S, T> {
     return new CustomType(options)
 }
 
-export class CustomType<S, T> extends Type<S, T> {
+export class CustomType<S, T> extends Type<S, S, T> {
     readonly flags = TypeFlags.Reference
     readonly shouldAttachNode = false
 
@@ -87,7 +88,7 @@ export class CustomType<S, T> extends Type<S, T> {
         return this.name
     }
 
-    isAssignableFrom(type: IType<any, any>): boolean {
+    isAssignableFrom(type: IAnyType): boolean {
         return type === this
     }
 

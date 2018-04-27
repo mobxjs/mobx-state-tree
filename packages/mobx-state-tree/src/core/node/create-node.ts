@@ -10,8 +10,8 @@ import {
 } from "../../internal"
 
 // TODO: split into object and scalar node?
-export function createNode<S, T>(
-    type: IType<S, T>,
+export function createNode<C, S, T>(
+    type: IType<C, S, T>,
     parent: ObjectNode | null,
     subpath: string,
     environment: any,
@@ -23,9 +23,9 @@ export function createNode<S, T>(
         const targetNode = initialValue.$treenode as ObjectNode
         if (!targetNode.isRoot)
             fail(
-                `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent
-                    ? parent.path
-                    : ""}/${subpath}', but it lives already at '${targetNode.path}'`
+                `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
+                    parent ? parent.path : ""
+                }/${subpath}', but it lives already at '${targetNode.path}'`
             )
         targetNode.setParent(parent, subpath)
         return targetNode

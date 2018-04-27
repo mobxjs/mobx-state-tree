@@ -228,7 +228,7 @@ test("self reference with a late type", () => {
     const Book = types.model("Book", {
         id: types.identifier(),
         genre: types.string,
-        reference: types.reference(types.late(() => Book) as IType<any, any>)
+        reference: types.reference(types.late(() => Book) as IAnyType)
     })
     const Store = types
         .model("Store", {

@@ -25,14 +25,15 @@ import {
     addHiddenFinalProp,
     toJSON,
     freeze,
-    resolveNodeByPathParts
+    resolveNodeByPathParts,
+    IAnyType
 } from "../../internal"
 
 let nextNodeId = 1
 
 export class ObjectNode implements INode {
     nodeId = ++nextNodeId
-    readonly type: IType<any, any>
+    readonly type: IAnyType
     readonly storedValue: any
     @observable subpath: string = ""
     @observable protected _parent: ObjectNode | null = null
@@ -55,7 +56,7 @@ export class ObjectNode implements INode {
     applySnapshot: (snapshot: any) => void
 
     constructor(
-        type: IType<any, any>,
+        type: IAnyType,
         parent: ObjectNode | null,
         subpath: string,
         environment: any,
@@ -141,12 +142,16 @@ export class ObjectNode implements INode {
         if (newParent) {
             if (this._parent && newParent !== this._parent) {
                 fail(
-                    `A node cannot exists twice in the state tree. Failed to add ${this} to path '${newParent.path}/${subpath}'.`
+                    `A node cannot exists twice in the state tree. Failed to add ${this} to path '${
+                        newParent.path
+                    }/${subpath}'.`
                 )
             }
             if (!this._parent && newParent.root === this) {
                 fail(
-                    `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`
+                    `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${
+                        newParent.path
+                    }/${subpath}'`
                 )
             }
             if (
@@ -235,7 +240,7 @@ export class ObjectNode implements INode {
         }
     }
 
-    getChildType(key: string): IType<any, any> {
+    getChildType(key: string): IAnyType {
         return this.type.getChildType(key)
     }
 
@@ -263,9 +268,9 @@ export class ObjectNode implements INode {
 
     toString(): string {
         const identifier = this.identifier ? `(id: ${this.identifier})` : ""
-        return `${this.type.name}@${this.path || "<root>"}${identifier}${this.isAlive
-            ? ""
-            : "[dead]"}`
+        return `${this.type.name}@${this.path || "<root>"}${identifier}${
+            this.isAlive ? "" : "[dead]"
+        }`
     }
 
     finalizeCreation() {
@@ -372,9 +377,9 @@ export class ObjectNode implements INode {
         Object.defineProperty(this.storedValue, "$mobx", {
             get() {
                 fail(
-                    `This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type '${self
-                        .type
-                        .name}') used to live at '${oldPath}'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead.`
+                    `This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type '${
+                        self.type.name
+                    }') used to live at '${oldPath}'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead.`
                 )
             }
         })
