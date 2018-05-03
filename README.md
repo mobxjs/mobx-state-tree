@@ -1366,6 +1366,14 @@ export type ITodo = typeof Todo.Type
 
 It ain't pretty, but it works.
 
+#### Optional/empty maps
+
+Optional parameters, including "empty" maps, should be either a valid snapshot or a MST instance. To fix type errors such as `Error while converting {} to map`, define your type as such:
+
+```typescript
+  map: types.optional(types.map(OtherType), {})
+```
+
 ### How does MST compare to Redux
 So far this might look a lot like an immutable state tree as found for example in Redux apps, but there're are only so many reasons to use redux as per [article linked at the very top of redux guide](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367) that MST covers too, meanwhile:
 
