@@ -39,7 +39,7 @@ interface IMapFactoryConfig {
     isMapFactory: true
 }
 
-export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
+export interface IExtendedObservableMap<T> extends ObservableMap<string | number, T> {
     put(value: T | any): this // downtype to any, again, because we cannot type the snapshot, see
 }
 
@@ -114,6 +114,8 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         // const identifierAttr = getIdentifierAttribute(this.subType)
         const map = observable.map({}, mobxShallow)
         addHiddenFinalProp(map, "put", put)
+        const _get = map.get
+        addHiddenFinalProp(map, "get", (key: string | number) => _get.call(map, "" + key))
         addHiddenFinalProp(map, "toString", mapToString)
         return map
     }

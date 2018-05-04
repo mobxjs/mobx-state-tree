@@ -294,3 +294,31 @@ test("map expects regular identifiers", () => {
         "[mobx-state-tree] The objects in a map should all have the same identifier attribute, expected 'a', but child of type 'B' declared attribute 'b' as identifier"
     )
 })
+
+test("get should return value when key is a number", () => {
+    const Todo = types.model("Todo", {
+        todo_id: types.identifier(types.number),
+        title: types.string
+    })
+    const TodoStore = types
+        .model("TodoStore", {
+            todos: types.optional(types.map(Todo), {})
+        })
+        .actions(self => {
+            function addTodo(todo) {
+                self.todos.put(todo)
+            }
+            return {
+                addTodo
+            }
+        })
+    const todoStore = TodoStore.create({})
+
+    const todo = {
+        todo_id: 1,
+        title: "Test"
+    }
+
+    todoStore.addTodo(todo)
+    expect(todoStore.todos.get(1)).toEqual(todo)
+})
