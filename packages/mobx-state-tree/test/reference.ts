@@ -187,10 +187,10 @@ test("it should resolve refs during creation, when using generic reference", () 
 if (process.env.NODE_ENV !== "production")
     test("identifiers should only support types.string and types.number", () => {
         expect(() =>
-            types.model({
-                id: types.identifier(types.model({ x: 1 }) as any)
-            })
-        ).toThrow()
+            types.model({ id: types.identifier(types.model({ x: 1 }) as any) }).create({
+                id: { x: 1 }
+            } as any)
+        ).toThrow("Value is not a valid identifier, which is a string or a number")
     })
 test("identifiers should support subtypes of types.string and types.number", () => {
     const M = types.model({
