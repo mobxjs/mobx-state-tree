@@ -14,4 +14,4 @@ script: yarn run bootstrap && yarn run build && yarn run test && yarn run covera
 after_success:
   - cat ./packages/mobx-state-tree/coverage/lcov.info|./packages/mobx-state-tree/node_modules/coveralls/bin/coveralls.js
 node_js:
-  - "6.10.1"
+  - "9.3.0"
