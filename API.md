@@ -391,10 +391,12 @@ Returns **any**
 
 Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
 structural sharing where possible. Doesn't require MobX transactions to be completed.
+By default postProcessSnapshot hooks are applied to the snapshot.
 
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `applyPostProcess` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
 
 Returns **any** 
 

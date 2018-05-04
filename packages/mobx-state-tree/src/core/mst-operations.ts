@@ -262,22 +262,26 @@ export function getSnapshot<K extends string | number, V>(
     target: ObservableMap<K, V>
 ): { [key: string]: V }
 export function getSnapshot<S>(target: IObservableArray<S>): S[]
-export function getSnapshot<S = any>(target: ISnapshottable<S>): S
+export function getSnapshot<S = any>(target: ISnapshottable<S>, applyPostProcess?: boolean): S
 /**
  * Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
  * structural sharing where possible. Doesn't require MobX transactions to be completed.
  *
  * @export
  * @param {Object} target
+ * @param {boolean} applyPostProcess = true, by default the postProcessSnapshot gets applied
  * @returns {*}
  */
-export function getSnapshot<S>(target: ISnapshottable<S>): S {
+export function getSnapshot<S>(target: ISnapshottable<S>, applyPostProcess = true): S {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
-    return getStateTreeNode(target).snapshot
+    const node = getStateTreeNode(target)
+    if (applyPostProcess) return node.snapshot
+
+    return freeze(node.type.getSnapshot(node, false))
 }
 
 /**
@@ -739,5 +743,6 @@ import {
     isType,
     resolveNodeByPath,
     getRelativePathBetweenNodes,
-    ModelType
+    ModelType,
+    freeze
 } from "../internal"

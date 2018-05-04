@@ -391,14 +391,14 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return node.storedValue
     }
 
-    getSnapshot(node: ObjectNode): any {
+    getSnapshot(node: ObjectNode, applyPostProcess = true): any {
         const res = {} as any
         this.forAllProps((name, type) => {
             // TODO: FIXME, make sure the observable ref is used!
             ;(getAtom(node.storedValue, name) as any).reportObserved()
             res[name] = this.getChildNode(node, name).snapshot
         })
-        if (typeof node.storedValue.postProcessSnapshot === "function") {
+        if (typeof node.storedValue.postProcessSnapshot === "function" && applyPostProcess) {
             return node.storedValue.postProcessSnapshot.call(null, res)
         }
         return res
