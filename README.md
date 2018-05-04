@@ -1156,9 +1156,11 @@ Yes, with MST it is pretty straight forward to setup hot reloading for your stor
 
 ### TypeScript & MST
 
-TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is recommended to use TypeScript 2.3 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
+TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is required to use TypeScript 2.8 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
 
 We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occassionally you will need to fallback to `any` or manually adding type annotations.
+
+Flow is not supported
 
 #### Using a MST type at design time
 
@@ -1187,29 +1189,6 @@ A partial solution for this is to turn the `.Type` into an interface.
 type ITodoType = typeof Todo.Type;
 interface ITodo extends ITodoType {};
 ```
-
-#### Snapshot types are limited
-
-Until conditionally mapped types are available (scheduled for TS 2.8), the types of snapshots cannot be inferred correctly. But you will get some type assistence when using `getSnaphot` with types, like this:
-
-```javascript
-const snapshot = getSnapshot<typeof Car.SnapshotType>(car)
-```
-
-Tip: recycle the interface
-
-```javascript
-type ICarSnapshot = typeof Car.SnapshotType
-const snapshot = getSnapshot<ICarSnapshot>(car)
-```
-
-For lazy folks:
-
-```javascript
-const snapshot = getSnapshot<any>(car)
-```
-
-_note: Even when typing snapshots, they will still not be as accurate as they could be until TS 2.8_
 
 #### Typing `self` in actions and views
 
