@@ -248,7 +248,7 @@ export class ArrayType<C, S, T> extends ComplexType<C[], S[], IObservableArray<T
  */
 export function array<C, S, T>(
     subtype: IType<C, S, T>
-): IComplexType<C[], S[], IObservableArray<T>> {
+): IComplexType<ReadonlyArray<C>, ReadonlyArray<S>, IObservableArray<T>> {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subtype))
             fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")

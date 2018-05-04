@@ -96,13 +96,19 @@ export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
  * Maps property types to the snapshot, including omitted optional attributes
  */
 export type ModelCreationType<T extends ModelProperties> = {
-    [K in keyof RequiredProps<T>]: T[K] extends IType<infer X, any, infer Y> ? X | Y : never
+    readonly [K in keyof RequiredProps<T>]: T[K] extends IType<infer X, any, infer Y>
+        ? X | Y
+        : never
 } &
-    { [K in keyof OptionalProps<T>]?: T[K] extends IType<infer X, any, infer Y> ? X | Y : never }
+    {
+        readonly [K in keyof OptionalProps<T>]?: T[K] extends IType<infer X, any, infer Y>
+            ? X | Y
+            : never
+    }
 export type ModelSnapshotType<T extends ModelProperties> = {
-    [K in keyof RequiredProps<T>]: T[K] extends IType<any, infer X, any> ? X : never
+    readonly [K in keyof RequiredProps<T>]: T[K] extends IType<any, infer X, any> ? X : never
 } &
-    { [K in keyof OptionalProps<T>]?: T[K] extends IType<any, infer X, any> ? X : never }
+    { readonly [K in keyof OptionalProps<T>]?: T[K] extends IType<any, infer X, any> ? X : never }
 export type ModelInstanceType<T extends ModelProperties, O> = {
     [K in keyof T]: T[K] extends IType<any, any, infer X> ? X : never
 } &

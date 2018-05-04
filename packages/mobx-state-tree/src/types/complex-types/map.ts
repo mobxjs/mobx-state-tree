@@ -45,7 +45,7 @@ export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
 }
 
 export interface IKeyValueMap<T> {
-    [key: string]: T
+    readonly [key: string]: T
 }
 
 export function mapToString(this: ObservableMap<any, any>) {
@@ -217,7 +217,7 @@ export class MapType<C, S, T> extends ComplexType<
     }
 
     getSnapshot(node: ObjectNode): IKeyValueMap<S> {
-        const res: IKeyValueMap<S> = {}
+        const res: any = {}
         node.getChildren().forEach(childNode => {
             res[childNode.subpath] = childNode.snapshot
         })
@@ -276,7 +276,7 @@ export class MapType<C, S, T> extends ComplexType<
     applySnapshot(node: ObjectNode, snapshot: any): void {
         typecheck(this, snapshot)
         const target = node.storedValue as ObservableMap<any, any>
-        const currentKeys: IKeyValueMap<boolean> = {}
+        const currentKeys: { [key: string]: boolean } = {}
         Array.from(target.keys()).forEach(key => {
             currentKeys[key] = false
         })
