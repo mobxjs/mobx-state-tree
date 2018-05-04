@@ -96,3 +96,9 @@ test("all methods mentioned in api.md", () => {
         .filter(identifier => apimd.indexOf("# " + identifier) === -1)
     expect(missing).toEqual([])
 })
+
+test("no dependencies", () => {
+    expect(JSON.parse(readFileSync(__dirname + "/../package.json", "utf8")).dependencies).toEqual(
+        {}
+    )
+})
