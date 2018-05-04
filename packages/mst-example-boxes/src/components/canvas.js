@@ -1,4 +1,5 @@
 import React, { Component } from "react"
+import { values } from "mobx"
 import { observer } from "mobx-react"
 import DevTools from "mobx-react-devtools"
 
@@ -16,9 +17,9 @@ class Canvas extends Component {
                     <svg>
                         {store.arrows.map(arrow => <ArrowView arrow={arrow} key={arrow.id} />)}
                     </svg>
-                    {store.boxes
-                        .values()
-                        .map(box => <BoxView box={box} store={store} key={box.id} />)}
+                    {values(store.boxes).map(box => (
+                        <BoxView box={box} store={store} key={box.id} />
+                    ))}
                 </div>
                 <Sidebar store={store} />
                 <FunStuff />
