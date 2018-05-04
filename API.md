@@ -30,6 +30,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [getIdentifier](#getidentifier)
 -   [getMembers](#getmembers)
 -   [getParent](#getparent)
+-   [getParentOfType](#getparentoftype)
 -   [getPath](#getpath)
 -   [getPathParts](#getpathparts)
 -   [getRelativePath](#getrelativepath)
@@ -37,6 +38,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [getSnapshot](#getsnapshot)
 -   [getType](#gettype)
 -   [hasParent](#hasparent)
+-   [hasParentOfType](#hasparentoftype)
 -   [Identifier](#identifier)
 -   [IdentifierCache](#identifiercache)
 -   [isAlive](#isalive)
@@ -333,7 +335,7 @@ Returns **IModelReflectionData**
 
 ## getParent
 
-Returns the immediate parent of this object, or null.
+Returns the immediate parent of this object, or throws.
 
 Note that the immediate parent can be either an object, map or array, and
 doesn't necessarily refer to the parent model
@@ -342,6 +344,17 @@ doesn't necessarily refer to the parent model
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 -   `depth` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** = 1, how far should we look upward?
+
+Returns **any** 
+
+## getParentOfType
+
+Returns the target's parent of a given type, or throws.
+
+**Parameters**
+
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `type` **IType&lt;any, any>** 
 
 Returns **any** 
 
@@ -391,12 +404,11 @@ Returns **any**
 
 Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
 structural sharing where possible. Doesn't require MobX transactions to be completed.
-By default postProcessSnapshot hooks are applied to the snapshot.
 
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `applyPostProcess` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+-   `applyPostProcess` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** = true, by default the postProcessSnapshot gets applied
 
 Returns **any** 
 
@@ -418,6 +430,17 @@ Given a model instance, returns `true` if the object has a parent, that is, is p
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 -   `depth` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** = 1, how far should we look upward?
+
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+
+## hasParentOfType
+
+Given a model instance, returns `true` if the object has a parent of given type, that is, is part of another object, map or array
+
+**Parameters**
+
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `type` **IType&lt;any, any>** 
 
 Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
 

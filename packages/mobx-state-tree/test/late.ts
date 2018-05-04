@@ -47,7 +47,7 @@ test("should typecheck", () => {
     }
 })
 
-test.only("typecheck should throw an Error when called at runtime, but not log the error", () => {
+test("typecheck should throw an Error when called at runtime, but not log the error", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
 
     const NodeObject = types.model("NodeObject", {

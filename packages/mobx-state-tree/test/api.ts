@@ -74,7 +74,6 @@ const TYPES = [
 ]
 
 test("correct api exposed", () => {
-    console.dir(mst["IActionRecorder"])
     expect(
         Object.keys(mst)
             .sort()
@@ -100,7 +99,6 @@ test("all methods mentioned in api.md", () => {
 })
 
 test("no dependencies", () => {
-    expect(JSON.parse(readFileSync(__dirname + "/../package.json", "utf8")).dependencies).toEqual(
-        {}
-    )
+    const deps = JSON.parse(readFileSync(__dirname + "/../package.json", "utf8")).dependencies
+    expect(deps === undefined || Object.keys(deps).length === 0).toBe(true)
 })

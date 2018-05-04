@@ -358,7 +358,7 @@ export function hasParentOfType(target: IStateTreeNode, type: IType<any, any>): 
     }
     let parent: INode | null = getStateTreeNode(target).parent
     while (parent) {
-        if (parent.type === type) return true
+        if (type.is(parent.storedValue)) return true
         parent = parent.parent
     }
     return false
@@ -386,7 +386,7 @@ export function getParentOfType<S, T>(target: IStateTreeNode, type: IType<S, T>)
 
     let parent: INode | null = getStateTreeNode(target).parent
     while (parent) {
-        if (parent.type === type) return parent.storedValue
+        if (type.is(parent.storedValue)) return parent.storedValue as T
         parent = parent.parent
     }
     return fail(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
@@ -603,9 +603,7 @@ export function clone<T extends IStateTreeNode>(
         node.snapshot,
         keepEnvironment === true
             ? node.root._environment
-            : keepEnvironment === false
-                ? undefined
-                : keepEnvironment
+            : keepEnvironment === false ? undefined : keepEnvironment
     ) as T // it's an object or something else
 }
 

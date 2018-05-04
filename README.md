@@ -957,6 +957,7 @@ See the [full API docs](API.md) for more details.
 | [`getChildType(node, property?)`](API.md#getchildtype) | Returns the declared type of the given `property` of `node`. For arrays and maps `property` can be omitted as they all have the same type |
 | [`getEnv(node)`](API.md#getenv) | Returns the environment of `node`, see [environments](#environments) |
 | [`getParent(node, depth=1)`](API.md#getparent) | Returns the intermediate parent of the `node`, or a higher one if `depth > 1` |
+| [`getParentOfType(node, type)`](API.md#getparentoftype) | Return the first parent that satisfies the provided type |
 | [`getPath(node)`](API.md#getpath) | Returns the path of `node` in the tree |
 | [`getPathParts(node)`](API.md#getpathparts) | Returns the path of `node` in the tree, unescaped as separate parts |
 | [`getRelativePath(base, target)`](API.md#getrelativepath) | Returns the short path, which one could use to walk from node `base` to node `target`, assuming they are in the same tree. Up is represented as `../` |
@@ -965,6 +966,7 @@ See the [full API docs](API.md) for more details.
 | [`getSnapshot(node, applyPostProcess)`](API.md#getsnapshot) | Returns the snapshot of the `node`. See [snapshots](#snapshots) |
 | [`getType(node)`](API.md#gettype) | Returns the type of `node` |
 | [`hasParent(node, depth=1)`](API.md#hasparent) | Returns `true` if `node` has a parent at `depth` |
+| [`hasParentOfType(node, type)`](API.md#hasparentoftype) | Returns `true` if the `node` has a parent that satisfies the provided type |
 | [`isAlive(node)`](API.md#isalive) | Returns `true` if `node` is alive |
 | [`isStateTreeNode(value)`](API.md#isstatetreenode) | Returns `true` if `value` is a node of a mobx-state-tree |
 | [`isProtected(value)`](API.md#isprotected) | Returns `true` if the given node is protected, see [actions](#actions) |
