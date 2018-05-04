@@ -1,4 +1,4 @@
-import { types } from "../src"
+import { types, typecheck } from "../src"
 if (process.env.NODE_ENV !== "production") {
     test("it should throw if late doesnt received a function as parameter", () => {
         expect(() => {
@@ -44,5 +44,25 @@ test("should typecheck", () => {
         x.floepie = 3 // TODO: better typings, should give compilation error!
     } catch (e) {
         // ignore, this is about TS
+    }
+})
+
+test.only("typecheck should throw an Error when called at runtime, but not log the error", () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+
+    const NodeObject = types.model("NodeObject", {
+        id: types.identifier(types.number),
+        text: types.string
+    })
+
+    expect(() => {
+        typecheck(NodeObject, { id: 1, text: 1 })
+    }).toThrow()
+
+    try {
+        typecheck(NodeObject, { id: 1, text: 1 })
+    } catch (error) {
+        expect(error).toBeDefined()
+        expect(consoleSpy).not.toHaveBeenCalled()
     }
 })
