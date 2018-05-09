@@ -1,7 +1,7 @@
 {
   "name": "mst-example-boxes",
   "private": true,
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Runnable source code of the #GoReactive #mobservable talk",
   "scripts": {
     "start": "node server.js",
@@ -40,7 +40,7 @@
     "mobx": "^4.0.2",
     "mobx-react": "^5.0.0",
     "mobx-react-devtools": "^5.0.1",
-    "mobx-state-tree": "^2.0.4",
+    "mobx-state-tree": "^2.0.5",
     "node-uuid": "^1.4.3",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
