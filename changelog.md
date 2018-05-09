@@ -1,3 +1,9 @@
+# 2.0.5
+
+* It is now possible to get the snapshot of a node without triggering the `postProcessSnapshot` hook. See [#745](https://github.com/mobxjs/mobx-state-tree/pull/745) for details. By @robinfehr
+* Introduced `getParentOfType` and `hasParentOfType`. See [#767](https://github.com/mobxjs/mobx-state-tree/pull/767) by @k-g-a
+* Fixed issue where running `typeCheck` accidentally logged typecheck errors to the console. Fixes [#781](https://github.com/mobxjs/mobx-state-tree/issues/781)
+
 # 2.0.4
 
 * Removed accidental dependency on mobx
