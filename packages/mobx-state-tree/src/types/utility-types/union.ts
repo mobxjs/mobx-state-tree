@@ -16,6 +16,7 @@ export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
 export class Union extends Type<any, any> {
     readonly dispatcher: ITypeDispatcher | null = null
+    readonly eager: Boolean = true
     readonly types: IType<any, any>[]
 
     get flags() {
@@ -62,7 +63,11 @@ export class Union extends Type<any, any> {
 
         // find the most accomodating type
         const applicableTypes = this.types.filter(type => type.is(value))
-        if (applicableTypes.length > 1)
+        if (applicableTypes.length > 1) {
+            debugger
+            console.log(this.types)
+        }
+        if (!this.eager && applicableTypes.length > 1)
             return fail(
                 `Ambiguos snapshot ${JSON.stringify(value)} for union ${this
                     .name}. Please provide a dispatch in the union declaration.`
@@ -79,7 +84,7 @@ export class Union extends Type<any, any> {
         const errors = this.types.map(type => type.validate(value, context))
         const applicableTypes = errors.filter(errorArray => errorArray.length === 0)
 
-        if (applicableTypes.length > 1) {
+        if (!this.eager && applicableTypes.length > 1) {
             return typeCheckFailure(
                 context,
                 value,
@@ -322,7 +327,7 @@ export function union(
     ...otherTypes: IType<any, any>[]
 ): IType<any, any> {
     const dispatcher = isType(dispatchOrType) ? null : dispatchOrType
-    const types = isType(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
+    const types = isType(dispatchOrType) ? [dispatchOrType, ...otherTypes] : otherTypes
     const name = "(" + types.map(type => type.name).join(" | ") + ")"
 
     // check all options
