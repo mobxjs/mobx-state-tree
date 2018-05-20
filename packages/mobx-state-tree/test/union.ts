@@ -24,6 +24,13 @@ const createTestFactories = () => {
     })
     return { Box, Square, Cube, Plane, DispatchPlane, Heighed, Block }
 }
+const createLiteralTestFactories = () => {
+    const Man = types.model("Man", { type: types.literal("M") })
+    const Woman = types.model("Woman", { type: types.literal("W") })
+    const All = types.model("All", { type: types.identifier(types.string) })
+    const ManWomanOrAll = types.union(Man, Woman, All)
+    return { Man, Woman, All, ManWomanOrAll }
+}
 if (process.env.NODE_ENV !== "production") {
     test("it should complain about multiple applicable types no dispatch method", () => {
         const { Box, Plane, Square } = createTestFactories()
@@ -89,4 +96,16 @@ test("it should use dispatch to discriminate", () => {
     const { Box, DispatchPlane, Square } = createTestFactories()
     const a = DispatchPlane.create({ width: 3 })
     expect(getSnapshot(a)).toEqual({ width: 3 })
+})
+test("it should eagerly match by ambiguos value", () => {
+    const { ManWomanOrAll, All, Man } = createLiteralTestFactories()
+    const person = ManWomanOrAll.create({ type: "Z" })
+    expect(All.is(person)).toEqual(true)
+    expect(Man.is(person)).toEqual(false)
+})
+test("it should eagerly match by value literal", () => {
+    const { ManWomanOrAll, All, Man } = createLiteralTestFactories()
+    const person = ManWomanOrAll.create({ type: "M" })
+    expect(All.is(person)).toEqual(false)
+    expect(Man.is(person)).toEqual(true)
 })
