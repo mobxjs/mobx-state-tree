@@ -320,7 +320,7 @@ const TodoView = observer(props =>
 const AppView = observer(props =>
         <div>
             <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
-            {props.store.todos.values().map(todo => <TodoView todo={todo} />)}
+            {values(props.store.todos).map(todo => <TodoView todo={todo} />)}
         </div>
 )
 ```
@@ -340,10 +340,10 @@ const RootStore = types.model({
     todos: types.optional(types.map(Todo), {}),
 }).views(self => ({
     get pendingCount() {
-        return self.todos.values().filter(todo => !todo.done).length
+        return values(self.todos).filter(todo => !todo.done).length
     },
     get completedCount() {
-        return self.todos.values().filter(todo => todo.done).length
+        return values(self.todos).filter(todo => todo.done).length
     }
 })).actions(self => {
     function addTodo(id, name) {
@@ -389,13 +389,13 @@ const RootStore = types.model({
     todos: types.optional(types.map(Todo), {})
 }).views(self => ({
     get pendingCount() {
-        return self.todos.values().filter(todo => !todo.done).length
+        return values(self.todos).filter(todo => !todo.done).length
     },
     get completedCount() {
-        return self.todos.values().filter(todo => todo.done).length
+        return values(self.todos).filter(todo => todo.done).length
     },
     getTodosWhereDoneIs(done) {
-        return self.todos.values().filter(todo => todo.done === done)
+        return values(self.todos).filter(todo => todo.done === done)
     }
 })).actions(self => {
     function addTodo(id, name) {
