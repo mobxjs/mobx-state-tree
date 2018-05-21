@@ -320,7 +320,7 @@ const TodoView = observer(props =>
 const AppView = observer(props =>
         <div>
             <button onClick={e => props.store.addTodo(randomId(), 'New Task')}>Add Task</button>
-            {props.store.todos.values().map(todo => <TodoView todo={todo} />)}
+            {values(props.store.todos).map(todo => <TodoView todo={todo} />)}
         </div>
 )
 ```
