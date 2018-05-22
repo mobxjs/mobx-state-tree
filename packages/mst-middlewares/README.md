@@ -223,7 +223,7 @@ export const Store = types.model({
 
     return {
         addTodo(todo) {
-            self.todos.put(todo)
+            self.todos.push(todo)
         }
         // to use the undoManager to wrap the afterCreate action
         // of the StoreModel it's necessary to set it within the store model like above
@@ -248,7 +248,7 @@ export const Store = types.model({
 
     return {
         addTodo(todo) {
-            self.todos.put(todo)
+            self.todos.push(todo)
         }
         // to use the undoManager to wrap the afterCreate action
         // of the StoreModel it's necessary to set it within the store model like above
