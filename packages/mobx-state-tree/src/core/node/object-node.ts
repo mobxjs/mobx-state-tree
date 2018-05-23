@@ -10,7 +10,6 @@ import {
     IType,
     IDisposer,
     extend,
-    noop,
     fail,
     registerEventHandler,
     addReadOnlyProp,
@@ -33,7 +32,7 @@ let nextNodeId = 1
 export class ObjectNode implements INode {
     nodeId = ++nextNodeId
     readonly type: IType<any, any>
-    readonly storedValue: any
+    storedValue: any
     @observable subpath: string = ""
     @observable protected _parent: ObjectNode | null = null
     _isRunningAction = false // only relevant for root
@@ -54,38 +53,59 @@ export class ObjectNode implements INode {
 
     applySnapshot: (snapshot: any) => void
 
+    readonly childNodes: { [key: string]: INode } | null = null
+    readonly initialSnapshot: any
+    observableInstanceCreated: boolean = false
+
+    private readonly _createNewInstance: (initialValue: any) => any
+    private readonly _finalizeNewInstance: (node: INode, initialValue: any) => void
+
     constructor(
         type: IType<any, any>,
         parent: ObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: any,
-        storedValue: any,
-        canAttachTreeNode: boolean,
-        finalizeNewInstance: (node: INode, initialValue: any) => void = noop
+        initialSnapshot: any,
+        patchSnapshotWithDefaults: (initialValue: any) => any,
+        createNewInstance: (initialValue: any) => any,
+        finalizeNewInstance: (node: INode, initialValue: any) => void
     ) {
-        this.type = type
-        this.storedValue = storedValue
         this._parent = parent
-        this.subpath = subpath
         this._environment = environment
-        this.unbox = this.unbox.bind(this)
+        this._createNewInstance = createNewInstance
+        this._finalizeNewInstance = finalizeNewInstance
 
+        this.type = type
+        this.subpath = subpath
+        this.unbox = this.unbox.bind(this)
+        this.initialSnapshot = patchSnapshotWithDefaults(initialSnapshot)
+
+        if (this._parent) {
+            this._parent.root.identifierCache!.addNodeToCache(this)
+        } else {
+            this.identifierCache = new IdentifierCache()
+            this.identifierCache!.addNodeToCache(this)
+        }
+
+        this.childNodes = type.initializeChildNodes(this, this.initialSnapshot)
+    }
+
+    private _createObservableInstance() {
+        this.storedValue = this._createNewInstance(this.initialSnapshot)
         this.preboot()
 
-        if (!parent) this.identifierCache = new IdentifierCache()
-        if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "$treenode", this)
+        addHiddenFinalProp(this.storedValue, "$treenode", this)
+        addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
 
+        this.observableInstanceCreated = true
         let sawException = true
         try {
-            if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
-
             this._isRunningAction = true
-            finalizeNewInstance(this, initialValue)
+            const snapshotClone = Array.isArray(this.initialSnapshot)
+                ? Array.from(this.initialSnapshot)
+                : Object.assign({}, this.initialSnapshot)
+            this._finalizeNewInstance(this, snapshotClone)
             this._isRunningAction = false
-
-            if (parent) parent.root.identifierCache!.addNodeToCache(this)
-            else this.identifierCache!.addNodeToCache(this)
 
             this.fireHook("afterCreate")
             this.state = NodeLifeCycle.CREATED
@@ -109,6 +129,8 @@ export class ObjectNode implements INode {
             }
         )
         this.addDisposer(snapshotDisposer)
+
+        this.finalizeCreation()
     }
 
     /*
@@ -179,6 +201,7 @@ export class ObjectNode implements INode {
 
     @computed
     public get value(): any {
+        if (!this.observableInstanceCreated) this._createObservableInstance()
         if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
@@ -187,7 +210,9 @@ export class ObjectNode implements INode {
     public get snapshot() {
         if (!this.isAlive) return undefined
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
-        const snapshot = this.type.getSnapshot(this)
+        const snapshot: any = this.observableInstanceCreated
+            ? this.type.getSnapshot(this)
+            : this.initialSnapshot
         // avoid any external modification in dev mode
         return freeze(snapshot)
     }
@@ -201,7 +226,7 @@ export class ObjectNode implements INode {
     get identifier(): string | null {
         // RF: do not read from the snapshot here, it can lead to cycle computations
         // using bidirectional references
-        return this.identifierAttribute ? this.storedValue[this.identifierAttribute] : null
+        return this.identifierAttribute ? this.initialSnapshot[this.identifierAttribute] : null
     }
 
     public get isAlive() {
@@ -219,7 +244,9 @@ export class ObjectNode implements INode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this.type.getChildNode(this, subpath)
+            return this.observableInstanceCreated
+                ? this.type.getChildNode(this, subpath)
+                : this.childNodes![subpath]
         } finally {
             this._autoUnbox = true
         }
@@ -229,10 +256,22 @@ export class ObjectNode implements INode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this.type.getChildren(this)
+            return this.observableInstanceCreated
+                ? this.type.getChildren(this)
+                : this._getChildNodesArray()
         } finally {
             this._autoUnbox = true
         }
+    }
+
+    private _getChildNodesArray(): ReadonlyArray<INode> {
+        if (Array.isArray(this.childNodes)) return this.childNodes
+
+        const res: INode[] = []
+        Object.keys(this.childNodes || []).forEach(name => {
+            res.push(this.childNodes![name])
+        })
+        return res
     }
 
     getChildType(key: string): IType<any, any> {
@@ -308,27 +347,28 @@ export class ObjectNode implements INode {
 
         // Optimization: this does not need to be done per instance
         // if some pieces from createActionInvoker are extracted
+        const self = this
         this.applyPatches = createActionInvoker(
             this.storedValue,
             "@APPLY_PATCHES",
             (patches: IJsonPatch[]) => {
                 patches.forEach(patch => {
                     const parts = splitJsonPath(patch.path)
-                    const node = resolveNodeByPathParts(this, parts.slice(0, -1))
-                    ;(node as ObjectNode).applyPatchLocally(parts[parts.length - 1], patch)
+                    const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as ObjectNode
+                    node.applyPatchLocally(parts[parts.length - 1], patch)
                 })
             }
-        ).bind(this.storedValue)
+        )
         this.applySnapshot = createActionInvoker(
             this.storedValue,
             "@APPLY_SNAPSHOT",
             (snapshot: any) => {
                 // if the snapshot is the same as the current one, avoid performing a reconcile
-                if (snapshot === this.snapshot) return
+                if (snapshot === self.snapshot) return
                 // else, apply it by calling the type logic
-                return this.type.applySnapshot(this, snapshot)
+                return this.type.applySnapshot(self, snapshot)
             }
-        ).bind(this.storedValue)
+        )
     }
 
     public die() {
@@ -420,6 +460,7 @@ export class ObjectNode implements INode {
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.assertWritable()
+        if (!this.observableInstanceCreated) this._createObservableInstance()
         this.type.applyPatchLocally(this, subpath, patch)
     }
 }

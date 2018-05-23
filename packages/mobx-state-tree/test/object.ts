@@ -1,4 +1,3 @@
-import { unprotect } from "../src/core/mst-operations"
 import {
     destroy,
     detach,
@@ -9,6 +8,7 @@ import {
     applyAction,
     applySnapshot,
     getSnapshot,
+    unprotect,
     types
 } from "../src"
 import { autorun, reaction, observable } from "mobx"

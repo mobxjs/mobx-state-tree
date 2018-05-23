@@ -83,6 +83,12 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         )
     }
 
+    initializeChildNodes(parent: INode, snapshot: S[] = []): any {
+        return snapshot.map((item, index) => {
+            return this.subType.instantiate(parent, `${index}`, parent._environment, item)
+        })
+    }
+
     getChildren(node: ObjectNode): INode[] {
         return node.storedValue.peek()
     }

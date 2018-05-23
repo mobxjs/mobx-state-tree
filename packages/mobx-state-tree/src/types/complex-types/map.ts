@@ -106,6 +106,20 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         )
     }
 
+    initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): any {
+        const type = this.subType
+        const result = {} as any
+        Object.keys(initialSnapshot).forEach(name => {
+            result[name] = type.instantiate(
+                objNode,
+                name,
+                objNode._environment,
+                initialSnapshot[name]
+            )
+        })
+        return result
+    }
+
     describe() {
         return "Map<string, " + this.subType.describe() + ">"
     }

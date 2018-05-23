@@ -30,7 +30,7 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 
     instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: T): INode {
-        if (!parent || !isStateTreeNode(parent.storedValue))
+        if (!parent /* || !isStateTreeNode(parent.storedValue)*/)
             return fail(`Identifier types can only be instantiated as direct child of a model type`)
 
         if (parent.identifierAttribute)

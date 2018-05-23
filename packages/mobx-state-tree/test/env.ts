@@ -65,11 +65,11 @@ test("it is not possible to assign instance with a different environment than th
 })
 test("it is possible to set a value inside a map of a map when using the same environment", () => {
     const env = createEnvironment()
-    const EmptyModel = types.model({})
-    const MapOfEmptyModel = types.model({
+    const EmptyModel = types.model("EmptyModel", {})
+    const MapOfEmptyModel = types.model("MapOfEmptyModel", {
         map: types.map(EmptyModel)
     })
-    const MapOfMapOfEmptyModel = types.model({
+    const MapOfMapOfEmptyModel = types.model("MapOfMapOfEmptyModel", {
         map: types.map(MapOfEmptyModel)
     })
     const mapOfMap = MapOfMapOfEmptyModel.create(

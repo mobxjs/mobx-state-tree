@@ -1,10 +1,8 @@
-import { observable, computed } from "mobx"
+import { observable } from "mobx"
 
 import {
     INode,
-    toJSON,
     escapeJsonPath,
-    addHiddenFinalProp,
     fail,
     freeze,
     IType,
@@ -21,7 +19,6 @@ export class ScalarNode implements INode {
     private readonly _parent: ObjectNode | null
 
     readonly _environment: any = undefined
-    private _autoUnbox = true // unboxing is disabled when reading child nodes
     private state = NodeLifeCycle.INITIALIZING
 
     constructor(
@@ -29,26 +26,20 @@ export class ScalarNode implements INode {
         parent: ObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: any,
-        storedValue: any,
-        canAttachTreeNode: boolean,
+        initialSnapshot: any,
+        createNewInstance: (initialValue: any) => any,
         finalizeNewInstance: (node: INode, initialValue: any) => void = noop
     ) {
         this.type = type
-        this.storedValue = storedValue
-        this._parent = parent
         this.subpath = subpath
-        this.storedValue = storedValue
+
+        this._parent = parent
         this._environment = environment
-        this.unbox = this.unbox.bind(this)
 
-        if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "$treenode", this)
-
+        this.storedValue = createNewInstance(initialSnapshot)
         let sawException = true
         try {
-            if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
-
-            finalizeNewInstance(this, initialValue)
+            finalizeNewInstance(this, initialSnapshot)
 
             this.state = NodeLifeCycle.CREATED
             sawException = false
@@ -103,8 +94,7 @@ export class ScalarNode implements INode {
     }
 
     unbox(childNode: INode): any {
-        if (childNode && this._autoUnbox === true) return childNode.value
-        return childNode
+        return childNode && childNode.value
     }
 
     toString(): string {

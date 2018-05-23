@@ -53,6 +53,7 @@ export interface IType<S, T> {
 
     // Internal api's
     instantiate(parent: INode | null, subpath: string, environment: any, initialValue?: any): INode
+    initializeChildNodes(node: INode, snapshot: any): { [key: string]: INode } | null
     reconcile(current: INode, newValue: any): INode
     getValue(node: INode): T
     getSnapshot(node: INode, applyPostProcess?: boolean): S
@@ -95,6 +96,8 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         environment: any,
         initialValue: any
     ): INode
+
+    abstract initializeChildNodes(node: INode, snapshot: any): { [key: string]: INode } | null
 
     abstract flags: TypeFlags
     abstract describe(): string
@@ -185,6 +188,10 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
         environment: any,
         initialValue: any
     ): INode
+
+    initializeChildNodes(node: INode, snapshot: any): null {
+        return null
+    }
 
     getValue(node: INode) {
         return node.storedValue
