@@ -30,7 +30,10 @@ const ParentModel = types
             return getEnv(self).fetch
         }
     }))
-test("Parent property does not have value during child's afterCreate() event", () => {
+
+// NOTE: parents are now always created before children;
+// moreover, we do not actually have actions hash during object-node creation
+test.skip("Parent property does not have value during child's afterCreate() event", () => {
     const mockFetcher = () => Promise.resolve(true)
     const parent = ParentModel.create({}, { fetch: mockFetcher })
     // Because the child is created before the parent creation is finished, this one will yield `true` (the .fetch view is still undefined)

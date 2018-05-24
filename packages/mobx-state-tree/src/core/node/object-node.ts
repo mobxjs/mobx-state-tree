@@ -55,8 +55,7 @@ export class ObjectNode implements INode {
 
     readonly childNodes: { [key: string]: INode } | null = null
     readonly initialSnapshot: any
-    observableInstanceCreated: boolean = false
-
+    @observable private _observableInstanceCreated: boolean = false
     private readonly _createNewInstance: (initialValue: any) => any
     private readonly _finalizeNewInstance: (node: INode, initialValue: any) => void
 
@@ -97,7 +96,6 @@ export class ObjectNode implements INode {
         addHiddenFinalProp(this.storedValue, "$treenode", this)
         addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
 
-        this.observableInstanceCreated = true
         let sawException = true
         try {
             this._isRunningAction = true
@@ -111,6 +109,7 @@ export class ObjectNode implements INode {
             this.state = NodeLifeCycle.CREATED
             sawException = false
         } finally {
+            this._observableInstanceCreated = true
             if (sawException) {
                 // short-cut to die the instance, to avoid the snapshot computed starting to throw...
                 this.state = NodeLifeCycle.DEAD
@@ -199,9 +198,13 @@ export class ObjectNode implements INode {
         if (typeof fn === "function") fn.apply(this.storedValue)
     }
 
-    @computed
     public get value(): any {
-        if (!this.observableInstanceCreated) this._createObservableInstance()
+        if (!this._observableInstanceCreated) this._createObservableInstance()
+        return this._value
+    }
+
+    @computed
+    private get _value(): any {
         if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
@@ -210,7 +213,7 @@ export class ObjectNode implements INode {
     public get snapshot() {
         if (!this.isAlive) return undefined
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
-        const snapshot: any = this.observableInstanceCreated
+        const snapshot: any = this._observableInstanceCreated
             ? this.type.getSnapshot(this)
             : this.initialSnapshot
         // avoid any external modification in dev mode
@@ -244,7 +247,7 @@ export class ObjectNode implements INode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this.observableInstanceCreated
+            return this._observableInstanceCreated
                 ? this.type.getChildNode(this, subpath)
                 : this.childNodes![subpath]
         } finally {
@@ -256,7 +259,7 @@ export class ObjectNode implements INode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this.observableInstanceCreated
+            return this._observableInstanceCreated
                 ? this.type.getChildren(this)
                 : this._getChildNodesArray()
         } finally {
@@ -460,7 +463,7 @@ export class ObjectNode implements INode {
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.assertWritable()
-        if (!this.observableInstanceCreated) this._createObservableInstance()
+        if (!this._observableInstanceCreated) this._createObservableInstance()
         this.type.applyPatchLocally(this, subpath, patch)
     }
 }

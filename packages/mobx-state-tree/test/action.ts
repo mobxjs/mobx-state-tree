@@ -118,11 +118,13 @@ function createTestStore() {
 test("it should not be possible to pass a complex object", () => {
     const store = createTestStore()
     const recorder = recordActions(store)
+
     expect(store.customers[0].name).toBe("Mattia")
     store.orders[0].setCustomer(store.customers[0])
     expect(store.orders[0].customer!.name).toBe("Mattia")
     expect(store.orders[0].customer).toBe(store.customers[0])
-    expect(getSnapshot(store)).toEqual({
+    const snapshot = getSnapshot(store)
+    expect(snapshot).toEqual({
         customers: [
             {
                 id: 1,
@@ -135,13 +137,11 @@ test("it should not be possible to pass a complex object", () => {
             }
         ]
     })
-    expect(recorder.actions).toEqual([
-        {
-            name: "setCustomer",
-            path: "/orders/0",
-            args: [{ $MST_UNSERIALIZABLE: true, type: "[MSTNode: Customer]" }]
-        }
-    ])
+    expect(recorder.actions[recorder.actions.length - 1]).toEqual({
+        name: "setCustomer",
+        path: "/orders/0",
+        args: [{ $MST_UNSERIALIZABLE: true, type: "[MSTNode: Customer]" }]
+    })
 })
 if (process.env.NODE_ENV !== "production") {
     test("it should not be possible to set the wrong type", () => {
