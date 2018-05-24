@@ -66,8 +66,13 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         const objNode = node as ObjectNode
         const instance = objNode.storedValue as IObservableArray<any>
         _getAdministration(instance).dehancer = objNode.unbox
+
         intercept(instance, change => this.willChange(change) as any)
-        objNode.applySnapshot(snapshot)
+
+        // NOTE: if we do it via objNode.applySnapshot()
+        // it will be recorded as action, which is not intended
+        this.applySnapshot(objNode, snapshot)
+
         observe(instance, this.didChange)
     }
 
@@ -127,7 +132,9 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
                 // update paths of remaining items
                 for (let i = index + removedCount; i < childNodes.length; i++) {
-                    childNodes[i].setParent(node, "" + (i + added.length - removedCount))
+                    if (childNodes[i] !== added[i]) {
+                        childNodes[i].setParent(node, "" + (i + added.length - removedCount))
+                    }
                 }
                 break
         }
@@ -291,13 +298,18 @@ function reconcileArrayChildren<T>(
             // there is no old node, create it
         } else if (!oldNode) {
             // check if already belongs to the same parent. if so, avoid pushing item in. only swapping can occur.
-            if (isStateTreeNode(newValue) && getStateTreeNode(newValue).parent === parent) {
+            const node = isStateTreeNode(newValue) && getStateTreeNode(newValue)
+            if (node && node.parent === parent) {
+                // skip fail if nothing changed; this happens when we apply initialSnapshot, which already has nodes during finalizeNewInstance()
+                // because those nodes already have their parent set right during createNode()
+                // if (node.subpath !== "" + i) {
                 // this node is owned by this parent, but not in the reconcilable set, so it must be double
                 fail(
                     `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${newPaths[
                         i
                     ]}', but it lives already at '${getStateTreeNode(newValue).path}'`
                 )
+                // }
             }
             oldNodes.splice(i, 0, valueAsNode(childType, parent, "" + newPaths[i], newValue))
             // both are the same, reconcile
@@ -356,8 +368,7 @@ function valueAsNode(
         return childNode
     }
     // nothing to do, create from scratch
-    const childNode = childType.instantiate(parent, subpath, parent._environment, newValue)
-    return childNode
+    return childType.instantiate(parent, subpath, parent._environment, newValue)
 }
 
 // given a value

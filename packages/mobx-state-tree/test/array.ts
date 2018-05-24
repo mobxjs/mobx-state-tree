@@ -165,7 +165,7 @@ test("items should be reconciled correctly when splicing - 1", () => {
         c = Task.create({ x: "c" }),
         d = Task.create({ x: "d" })
     const store = types
-        .model({
+        .model("Store", {
             todos: types.optional(types.array(Task), [])
         })
         .create({

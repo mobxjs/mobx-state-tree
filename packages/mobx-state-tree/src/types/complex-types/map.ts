@@ -137,7 +137,9 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         const instance = objNode.storedValue as ObservableMap<any, any>
         _interceptReads(instance, objNode.unbox)
         intercept(instance, c => this.willChange(c))
-        objNode.applySnapshot(snapshot)
+        // NOTE: if we do it via objNode.applySnapshot()
+        // it will be recorded as action, which is not intended
+        this.applySnapshot(objNode, snapshot)
         observe(instance, this.didChange)
     }
 

@@ -137,11 +137,13 @@ test("it should not be possible to pass a complex object", () => {
             }
         ]
     })
-    expect(recorder.actions[recorder.actions.length - 1]).toEqual({
-        name: "setCustomer",
-        path: "/orders/0",
-        args: [{ $MST_UNSERIALIZABLE: true, type: "[MSTNode: Customer]" }]
-    })
+    expect(recorder.actions).toEqual([
+        {
+            name: "setCustomer",
+            path: "/orders/0",
+            args: [{ $MST_UNSERIALIZABLE: true, type: "[MSTNode: Customer]" }]
+        }
+    ])
 })
 if (process.env.NODE_ENV !== "production") {
     test("it should not be possible to set the wrong type", () => {
