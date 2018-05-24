@@ -29,6 +29,10 @@ import {
 
 let nextNodeId = 1
 
+export interface IChildNodesMap {
+    [key: string]: INode
+}
+
 export class ObjectNode implements INode {
     nodeId = ++nextNodeId
     readonly type: IType<any, any>
@@ -53,9 +57,9 @@ export class ObjectNode implements INode {
 
     applySnapshot: (snapshot: any) => void
 
-    readonly childNodes: { [key: string]: INode } | null = null
+    readonly childNodes: IChildNodesMap | INode[] | null = null
     readonly initialSnapshot: any
-    @observable observableInstanceCreated: boolean = false
+    observableInstanceCreated: boolean = false
     private readonly _createNewInstance: (initialValue: any) => any
     private readonly _finalizeNewInstance: (node: INode, initialValue: any) => void
 
@@ -93,14 +97,13 @@ export class ObjectNode implements INode {
     }
 
     createObservableInstance() {
-        if (this.observableInstanceCreated) return
-
         this.storedValue = this._createNewInstance(this.initialSnapshot)
         this.preboot()
 
         addHiddenFinalProp(this.storedValue, "$treenode", this)
         addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
 
+        this.observableInstanceCreated = true
         let sawException = true
         try {
             this._isRunningAction = true
@@ -114,7 +117,6 @@ export class ObjectNode implements INode {
             this.state = NodeLifeCycle.CREATED
             sawException = false
         } finally {
-            this.observableInstanceCreated = true
             if (sawException) {
                 // short-cut to die the instance, to avoid the snapshot computed starting to throw...
                 this.state = NodeLifeCycle.DEAD
@@ -203,18 +205,18 @@ export class ObjectNode implements INode {
         if (typeof fn === "function") fn.apply(this.storedValue)
     }
 
+    @computed
     public get value(): any {
         if (!this.observableInstanceCreated) this.createObservableInstance()
-        return this._value
-    }
-
-    @computed
-    private get _value(): any {
         if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
 
-    @computed
+    // NOTE: "it should not be possible to pass a complex object" test fails with computed snapshot,
+    // because it's not re-evaluated after observableInstanceCreated changes to true.
+    // Unfortunately, we can not make observableInstanceCreated @observable,
+    // because it's changed during createObservableInstance() invoked from @computed value, which is forbidden
+    // @computed
     public get snapshot() {
         if (!this.isAlive) return undefined
         // advantage of using computed for a snapshot is that nicely respects transactions etc.
@@ -254,7 +256,7 @@ export class ObjectNode implements INode {
         try {
             return this.observableInstanceCreated
                 ? this.type.getChildNode(this, subpath)
-                : this.childNodes![subpath]
+                : (this.childNodes! as IChildNodesMap)[subpath]
         } finally {
             this._autoUnbox = true
         }
@@ -264,9 +266,9 @@ export class ObjectNode implements INode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this.type.getChildren(this)
-            /*?
-                : this._getChildNodesArray()*/
+            return this.observableInstanceCreated
+                ? this.type.getChildren(this)
+                : this._getChildNodesArray()
         } finally {
             this._autoUnbox = true
         }
@@ -277,7 +279,7 @@ export class ObjectNode implements INode {
 
         const res: INode[] = []
         Object.keys(this.childNodes || []).forEach(name => {
-            res.push(this.childNodes![name])
+            res.push((this.childNodes! as IChildNodesMap)[name])
         })
         return res
     }
@@ -304,7 +306,7 @@ export class ObjectNode implements INode {
     }
 
     unbox(childNode: INode): any {
-        if (childNode && this._autoUnbox === true) return childNode.value
+        if (childNode && this._autoUnbox) return childNode.value
         return childNode
     }
 
