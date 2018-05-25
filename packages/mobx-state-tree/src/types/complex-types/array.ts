@@ -35,7 +35,9 @@ import {
     isPlainObject,
     TypeFlags,
     ObjectNode,
-    mobxShallow
+    mobxShallow,
+    IChildNodesMap,
+    convertChildNodesToArray
 } from "../../internal"
 
 export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
@@ -56,21 +58,16 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return this.subType.describe() + "[]"
     }
 
-    createNewInstance = () => {
-        const array = observable.array([], mobxShallow)
+    createNewInstance = (childNodes: IChildNodesMap) => {
+        const array = observable.array(convertChildNodesToArray(childNodes), mobxShallow)
         addHiddenFinalProp(array, "toString", arrayToString)
         return array
     }
 
-    finalizeNewInstance = (node: INode, snapshot: any) => {
-        const objNode = node as ObjectNode
-        const instance = objNode.storedValue as IObservableArray<any>
-        const childNodes = objNode.childNodes as any[]
-        _getAdministration(instance).dehancer = objNode.unbox
-
-        // NOTE: if we do it via objNode.applySnapshot()
-        // it will be recorded as action, which is not intended
-        this._fillInstanceWithData(instance, childNodes)
+    finalizeNewInstance = (node: INode, childNodes: IChildNodesMap) => {
+        const objectNode = node as ObjectNode
+        const instance = objectNode.storedValue as IObservableArray<any>
+        _getAdministration(instance).dehancer = objectNode.unbox
         intercept(instance, change => this.willChange(change) as any)
         observe(instance, this.didChange)
     }
@@ -87,10 +84,15 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         )
     }
 
-    initializeChildNodes(parent: INode, snapshot: S[] = []): any {
-        return snapshot.map((item, index) => {
-            return this.subType.instantiate(parent, `${index}`, parent._environment, item)
+    initializeChildNodes(parent: INode, snapshot: S[] = []): IChildNodesMap {
+        const subType = this.subType
+        const environment = parent._environment
+        const result = {} as IChildNodesMap
+        snapshot.forEach((item, index) => {
+            const subpath = `${index}`
+            result[subpath] = subType.instantiate(parent, subpath, environment, item)
         })
+        return result
     }
 
     getChildren(node: ObjectNode): INode[] {
@@ -204,11 +206,6 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         typecheck(this, snapshot)
         const target = node.storedValue as IObservableArray<any>
         target.replace(snapshot)
-    }
-
-    @action
-    private _fillInstanceWithData(target: IObservableArray<any>, childNodes: INode[]) {
-        target.replace(childNodes)
     }
 
     getChildType(key: string): IType<any, any> {

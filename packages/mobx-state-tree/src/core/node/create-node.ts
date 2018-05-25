@@ -17,7 +17,7 @@ export function createNode<S, T>(
     environment: any,
     initialValue: any,
     createNewInstance: (initialValue: any) => T = identity,
-    finalizeNewInstance: (node: INode, initialValue: any) => void = noop,
+    finalizeNewInstance: (node: INode, childNodes?: any) => void = noop,
     patchSnapshotWithDefaults: (initialValue: any) => T = identity
 ) {
     if (isStateTreeNode(initialValue)) {

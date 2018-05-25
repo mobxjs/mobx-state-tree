@@ -42,7 +42,8 @@ import {
     addHiddenWritableProp,
     mobxShallow,
     OptionalValue,
-    Union
+    Union,
+    IChildNodesMap
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -342,8 +343,8 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return snapshot
     }
 
-    initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): { [key: string]: INode } {
-        const result = {} as any
+    initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
+        const result = {} as IChildNodesMap
         this.forAllProps((name, type) => {
             result[name] = type.instantiate(
                 objNode,
@@ -361,10 +362,10 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return instance as Object
     }
 
-    finalizeNewInstance = (node: INode) => {
+    finalizeNewInstance = (node: INode, childNodes: IChildNodesMap) => {
         const objNode = node as ObjectNode
         const instance = objNode.storedValue as IStateTreeNode
-        const childNodes = objNode.childNodes as any
+
         this.forAllProps(name => {
             extendObservable(
                 instance,
@@ -385,6 +386,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     willChange(change: any): IObjectWillChange | null {
         const node = getStateTreeNode(change.object)
         node.assertWritable()
+        // TODO: can get type from node._childNodes and make this pure => static
         const type = this.properties[change.name]
         // only properties are typed, state are stored as-is references
         if (type) {

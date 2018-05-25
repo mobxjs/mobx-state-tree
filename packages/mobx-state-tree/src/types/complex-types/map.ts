@@ -33,8 +33,10 @@ import {
     isPlainObject,
     isType,
     ObjectNode,
-    mobxShallow
+    mobxShallow,
+    IChildNodesMap
 } from "../../internal"
+
 interface IMapFactoryConfig {
     isMapFactory: true
 }
@@ -106,16 +108,12 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         )
     }
 
-    initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): any {
+    initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
         const type = this.subType
-        const result = {} as any
+        const environment = objNode._environment
+        const result = {} as IChildNodesMap
         Object.keys(initialSnapshot).forEach(name => {
-            result[name] = type.instantiate(
-                objNode,
-                name,
-                objNode._environment,
-                initialSnapshot[name]
-            )
+            result[name] = type.instantiate(objNode, name, environment, initialSnapshot[name])
         })
         return result
     }
@@ -124,24 +122,19 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         return "Map<string, " + this.subType.describe() + ">"
     }
 
-    createNewInstance = () => {
+    createNewInstance = (childNodes: IChildNodesMap) => {
         // const identifierAttr = getIdentifierAttribute(this.subType)
-        const map = observable.map({}, mobxShallow)
-        addHiddenFinalProp(map, "put", put)
-        addHiddenFinalProp(map, "toString", mapToString)
-        return map
+        const instance = observable.map(childNodes, mobxShallow)
+        addHiddenFinalProp(instance, "put", put)
+        addHiddenFinalProp(instance, "toString", mapToString)
+        return instance
     }
 
-    finalizeNewInstance = (node: INode, snapshot: any) => {
+    finalizeNewInstance = (node: INode) => {
         const objNode = node as ObjectNode
         const instance = objNode.storedValue as ObservableMap<any, any>
-        const childNodes = objNode.childNodes as any
         _interceptReads(instance, objNode.unbox)
-
-        // NOTE: if we do it via objNode.applySnapshot()
-        // it will be recorded as action, which is not intended
-        this._fillInstanceWithData(instance, childNodes)
-        intercept(instance, c => this.willChange(c))
+        intercept(instance, change => this.willChange(change))
         observe(instance, this.didChange)
     }
 
@@ -294,21 +287,6 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         }
         Object.keys(currentKeys).forEach(key => {
             if (currentKeys[key] === false) target.delete(key)
-        })
-    }
-    @action
-    private _fillInstanceWithData(target: ObservableMap<any, any>, childNodes: any) {
-        const currentKeys: { [key: string]: boolean } = {}
-        Array.from(target.keys()).forEach(key => {
-            currentKeys[key] = false
-        })
-        // Don't use target.replace, as it will throw all existing items first
-        for (let key in childNodes) {
-            target.set("" + key, childNodes[key])
-            currentKeys["" + key] = true
-        }
-        Object.keys(currentKeys).forEach(key => {
-            if (!currentKeys[key]) target.delete(key)
         })
     }
 

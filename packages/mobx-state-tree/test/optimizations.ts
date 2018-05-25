@@ -1,12 +1,10 @@
 import { getSnapshot, applySnapshot, unprotect, types } from "../src"
 test("it should avoid processing patch if is exactly the current one in applySnapshot", () => {
-    let called = false
     const Model = types.model({
         a: types.number,
         b: types.string
     })
     const store = Model.create({ a: 1, b: "hello" })
-    called = false
     const snapshot = getSnapshot(store)
     applySnapshot(store, snapshot)
     expect(getSnapshot(store)).toBe(snapshot) // no new snapshot emitted
