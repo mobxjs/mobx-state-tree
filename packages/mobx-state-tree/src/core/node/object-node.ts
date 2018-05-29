@@ -19,7 +19,6 @@ import {
     createActionInvoker,
     NodeLifeCycle,
     IdentifierCache,
-    EMPTY_ARRAY,
     escapeJsonPath,
     addHiddenFinalProp,
     toJSON,
@@ -50,7 +49,7 @@ export class ObjectNode implements INode {
     protected _autoUnbox = true // unboxing is disabled when reading child nodes
     state = NodeLifeCycle.INITIALIZING
 
-    middlewares = EMPTY_ARRAY as IMiddleware[]
+    middlewares: IMiddleware[] | null = null
     private snapshotSubscribers: ((snapshot: any) => void)[] | null = null
     private patchSubscribers:
         | ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)[]
@@ -355,11 +354,6 @@ export class ObjectNode implements INode {
     }
 
     preboot() {
-        this.disposers = []
-        this.middlewares = []
-        this.snapshotSubscribers = []
-        this.patchSubscribers = []
-
         // Optimization: this does not need to be done per instance
         // if some pieces from createActionInvoker are extracted
         const self = this
@@ -467,11 +461,14 @@ export class ObjectNode implements INode {
     }
 
     removeMiddleware(handler: IMiddlewareHandler) {
-        this.middlewares = this.middlewares.filter(middleware => middleware.handler !== handler)
+        if (this.middlewares)
+            this.middlewares = this.middlewares.filter(middleware => middleware.handler !== handler)
     }
 
     addMiddleWare(handler: IMiddlewareHandler, includeHooks: boolean = true) {
-        this.middlewares.push({ handler, includeHooks })
+        if (!this.middlewares) this.middlewares = [{ handler, includeHooks }]
+        else this.middlewares.push({ handler, includeHooks })
+
         return () => {
             this.removeMiddleware(handler)
         }
