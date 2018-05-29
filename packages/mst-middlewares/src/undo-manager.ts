@@ -5,7 +5,7 @@ import {
     recordPatches,
     addMiddleware,
     applyPatch,
-    getRoot,
+    getParent,
     createActionTrackingMiddleware,
     IStateTreeNode,
     IModelType,
@@ -55,7 +55,7 @@ const UndoManager = types
             const actionId = call.name + recordingActionLevel
             recordingActionId = actionId
             return {
-                recorder: recordPatches(call.tree),
+                recorder: recordPatches(call.context),
                 actionId
             }
         }
@@ -129,7 +129,7 @@ const UndoManager = types
                 self.undoIdx = self.history.length
             },
             afterCreate() {
-                targetStore = getEnv(self).targetStore ? getEnv(self).targetStore : getRoot(self)
+                targetStore = getEnv(self).targetStore ? getEnv(self).targetStore : getParent(self)
                 if (!targetStore || targetStore === self)
                     throw new Error(
                         "UndoManager should be created as part of a tree, or with `targetStore` in it's environment"
