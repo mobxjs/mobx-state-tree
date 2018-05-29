@@ -10,17 +10,28 @@ test("it should avoid processing patch if is exactly the current one in applySna
     expect(getSnapshot(store)).toBe(snapshot) // no new snapshot emitted
 })
 test("it should avoid processing patch if is exactly the current one in reconcile", () => {
-    const Model = types.model({
+    const Model = types.model("Model", {
         a: types.number,
         b: types.string
     })
-    const RootModel = types.model({
+    const RootModel = types.model("RootModel", {
         a: Model
     })
     const store = RootModel.create({ a: { a: 1, b: "hello" } })
     unprotect(store)
+    // NOTE: snapshots are not equal after property access anymore,
+    // so we test initial and actual ones separately
     const snapshot = getSnapshot(store)
-    store.a = snapshot.a
-    expect(getSnapshot(store.a)).toBe(snapshot.a)
     expect(getSnapshot(store)).toEqual(snapshot)
+
+    store.a = snapshot.a
+    // check whether reconciliation works on initial values
+    expect(getSnapshot(store)).toEqual(snapshot)
+
+    // access property to initialize observable instance
+    expect(store.a).toEqual(snapshot.a)
+
+    // check whether initializing instance does not cause snapshot invalidation
+    const actualSnapshot = getSnapshot(store)
+    expect(actualSnapshot.a).toBe(snapshot.a)
 })

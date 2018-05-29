@@ -123,17 +123,22 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                 )
                 result[name] = childNode
                 if (index === 0 && childNode instanceof ObjectNode) {
-                    if (childNode.identifierAttribute) {
-                        this.identifierMode = MapIdentifierMode.YES
-                        this.identifierAttribute = childNode.identifierAttribute
-                    } else {
-                        this.identifierMode = MapIdentifierMode.NO
-                    }
+                    this._setIdentifierMode(childNode)
                 }
             })
         }
 
         return result
+    }
+    private _setIdentifierMode(childNode: ObjectNode) {
+        if (childNode instanceof ObjectNode) {
+            if (childNode.identifierAttribute) {
+                this.identifierMode = MapIdentifierMode.YES
+                this.identifierAttribute = childNode.identifierAttribute
+            } else {
+                this.identifierMode = MapIdentifierMode.NO
+            }
+        }
     }
 
     describe() {
