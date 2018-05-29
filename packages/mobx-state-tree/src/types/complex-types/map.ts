@@ -112,9 +112,27 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         const type = this.subType
         const environment = objNode._environment
         const result = {} as IChildNodesMap
-        Object.keys(initialSnapshot).forEach(name => {
-            result[name] = type.instantiate(objNode, name, environment, initialSnapshot[name])
-        })
+        const keys = Object.keys(initialSnapshot)
+        if (keys.length > 0) {
+            keys.forEach((name, index) => {
+                const childNode = type.instantiate(
+                    objNode,
+                    name,
+                    environment,
+                    initialSnapshot[name]
+                )
+                result[name] = childNode
+                if (index === 0 && childNode instanceof ObjectNode) {
+                    if (childNode.identifierAttribute) {
+                        this.identifierMode = MapIdentifierMode.YES
+                        this.identifierAttribute = childNode.identifierAttribute
+                    } else {
+                        this.identifierMode = MapIdentifierMode.NO
+                    }
+                }
+            })
+        }
+
         return result
     }
 

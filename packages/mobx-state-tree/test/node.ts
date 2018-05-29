@@ -15,10 +15,10 @@ import {
     types,
     destroy,
     unprotect,
-    hasParentOfType
+    hasParentOfType,
+    getParentOfType
 } from "../src"
-import { getParentOfType } from "../src/core/mst-operations"
-import { getStateTreeNode } from "../src/internal"
+
 // getParent
 test("it should resolve to the parent instance", () => {
     const Row = types.model({
@@ -362,13 +362,13 @@ test("it can record and replay actions", () => {
 })
 
 test("Livelyness issue #683", () => {
-    const User = types.model({
+    const User = types.model("User", {
         id: types.identifier(types.number),
         name: types.string
     })
 
     const Users = types
-        .model({
+        .model("Users", {
             list: types.map(User)
         })
         .actions(self => ({

@@ -154,9 +154,7 @@ test("it should preprocess snapshots when updating", () => {
 test("it should postprocess snapshots when generating snapshot - 2", () => {
     const f = Factory.create({ car: { id: "1" } })
     expect(f.car.id).toBe(2)
-    const snapshot = getSnapshot(f)
-    console.log(snapshot)
-    expect(snapshot).toEqual({ car: { id: "1" } })
+    expect(getSnapshot(f)).toEqual({ car: { id: "1" } })
 })
 test("base hooks can be composed", () => {
     const events: any[] = []
