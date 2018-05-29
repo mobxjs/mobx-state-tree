@@ -324,7 +324,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         if (!currentPostprocessor) return this.cloneAndEnhance({ postProcessor })
         else
             return this.cloneAndEnhance({
-                postProcessor: snapshot => currentPostprocessor(postProcessor(snapshot))
+                postProcessor: snapshot => postProcessor(currentPostprocessor(snapshot))
             })
     }
 
@@ -470,11 +470,13 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             ? this.preProcessor.call(null, snapshot)
             : snapshot
 
-        Object.keys(this._optionalDefaultGetters).forEach(name => {
-            if (typeof processedSnapshot[name] === "undefined") {
-                processedSnapshot[name] = this._optionalDefaultGetters[name]()
-            }
-        })
+        if (processedSnapshot) {
+            Object.keys(this._optionalDefaultGetters).forEach(name => {
+                if (typeof processedSnapshot[name] === "undefined") {
+                    processedSnapshot[name] = this._optionalDefaultGetters[name]()
+                }
+            })
+        }
         return processedSnapshot
     }
 

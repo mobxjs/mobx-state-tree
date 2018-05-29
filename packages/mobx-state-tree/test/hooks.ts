@@ -216,20 +216,21 @@ test("snapshot processors can be composed", () => {
         .model({
             x: 1
         })
+        .preProcessSnapshot(s => ({
+            x: s.x - 3
+        }))
+        .preProcessSnapshot(s => ({
+            x: s.x / 5
+        }))
         .postProcessSnapshot(s => {
             s.x += 3
             return s
         })
-        .preProcessSnapshot(s => ({
-            x: s.x - 3
-        }))
         .postProcessSnapshot(s => {
             s.x *= 5
             return s
         })
-        .preProcessSnapshot(s => ({
-            x: s.x / 5
-        }))
+
     const x = X.create({ x: 25 })
     expect(x.x).toBe(2)
     expect(getSnapshot(x).x).toBe(25)
