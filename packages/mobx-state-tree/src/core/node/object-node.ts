@@ -1,4 +1,4 @@
-import { reaction, observable, computed } from "mobx"
+import { reaction, observable, computed, action, getAtom } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -25,7 +25,8 @@ import {
     toJSON,
     freeze,
     resolveNodeByPathParts,
-    convertChildNodesToArray
+    convertChildNodesToArray,
+    ModelType
 } from "../../internal"
 
 let nextNodeId = 1
@@ -55,7 +56,6 @@ export class ObjectNode implements INode {
     private disposers: (() => void)[]
 
     applyPatches: (patches: IJsonPatch[]) => void
-
     applySnapshot: (snapshot: any) => void
 
     readonly _childNodes: IChildNodesMap | null = null
@@ -70,7 +70,6 @@ export class ObjectNode implements INode {
         subpath: string,
         environment: any,
         initialSnapshot: any,
-        patchSnapshotWithDefaults: (initialValue: any) => any,
         createNewInstance: (initialValue: any) => any,
         finalizeNewInstance: (node: INode, initialValue: any) => void
     ) {
@@ -82,7 +81,7 @@ export class ObjectNode implements INode {
         this.type = type
         this.subpath = subpath
         this.unbox = this.unbox.bind(this)
-        this._initialSnapshot = patchSnapshotWithDefaults(initialSnapshot)
+        this._initialSnapshot = initialSnapshot
 
         if (!parent) {
             this.identifierCache = new IdentifierCache()
@@ -97,6 +96,7 @@ export class ObjectNode implements INode {
         }
     }
 
+    @action
     createObservableInstance() {
         this.storedValue = this._createNewInstance(this._childNodes)
         this.preboot()
@@ -121,6 +121,9 @@ export class ObjectNode implements INode {
             }
         }
 
+        const snapshotAtom = getAtom(this, "snapshot") as any
+        snapshotAtom.trackAndCompute()
+
         const snapshotDisposer = reaction(
             () => this.snapshot,
             snapshot => {
@@ -133,7 +136,6 @@ export class ObjectNode implements INode {
             }
         )
         this.addDisposer(snapshotDisposer)
-
         this.finalizeCreation()
     }
 
@@ -210,32 +212,24 @@ export class ObjectNode implements INode {
         return this.type.getValue(this)
     }
 
-    // NOTE: "it should not be possible to pass a complex object" test fails with computed snapshot,
-    // because it's not re-evaluated after observableInstanceCreated changes to true.
-    // Unfortunately, we can not make observableInstanceCreated @observable,
-    // because it's changed during createObservableInstance() invoked from @computed value, which is forbidden.
-    // So we split it into two @computed properties
-
-    public get snapshot() {
+    @computed
+    public get snapshot(): any {
         if (!this.isAlive) return undefined
-        return this.observableInstanceCreated
-            ? this._actualSnapshotComputed
-            : this._initialSnapshotComputed
-    }
-
-    @computed
-    private get _actualSnapshotComputed() {
-        // advantage of using computed for a snapshot is that nicely respects transactions etc.
-        const snapshot = this.type.getSnapshot(this)
-        // avoid any external modification in dev mode
+        const snapshot = this.observableInstanceCreated
+            ? this._getActualSnapshot()
+            : this._getInitialSnapshot()
         return freeze(snapshot)
     }
 
-    @computed
-    private get _initialSnapshotComputed() {
-        // advantage of using computed for a snapshot is that nicely respects transactions etc.
+    private _getActualSnapshot() {
+        return this.type.getSnapshot(this)
+    }
+
+    private _getInitialSnapshot() {
         const snapshot = this._initialSnapshot
-        return freeze(snapshot)
+        return this.type instanceof ModelType
+            ? this.type.applySnapshotPostProcessor(snapshot)
+            : snapshot
     }
 
     isRunningAction(): boolean {

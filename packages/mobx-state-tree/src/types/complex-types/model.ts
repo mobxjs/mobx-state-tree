@@ -47,11 +47,11 @@ import {
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
+const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
 
 export enum HookNames {
     afterCreate = "afterCreate",
     afterAttach = "afterAttach",
-    postProcessSnapshot = "postProcessSnapshot",
     beforeDetach = "beforeDetach",
     beforeDestroy = "beforeDestroy"
 }
@@ -65,6 +65,7 @@ export type ModelTypeConfig = {
     properties?: { [K: string]: IType<any, any> }
     initializers?: ReadonlyArray<((instance: any) => any)>
     preProcessor?: (snapshot: any) => any
+    postProcessor?: (snapshot: any) => any
 }
 
 const defaultObjectOptions = {
@@ -128,8 +129,9 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
      */
     public readonly initializers: ((instance: any) => any)[]
     public readonly properties: { [K: string]: IType<any, any> } = {}
-    private readonly _optionalValueGetters: any
+    private readonly _optionalDefaultGetters: any
     private preProcessor: (snapshot: any) => any | undefined
+    private postProcessor: (snapshot: any) => any | undefined
 
     constructor(opts: ModelTypeConfig) {
         super(opts.name || defaultObjectOptions.name)
@@ -141,16 +143,16 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         this.properties = toPropertiesObject(this.properties)
         freeze(this.properties) // make sure nobody messes with it
 
-        this._optionalValueGetters = {}
+        this._optionalDefaultGetters = {}
         this.forAllProps((propName, propType) => {
             if (propType instanceof OptionalValue) {
-                this._optionalValueGetters[propName] = propType.getDefaultValueSnapshot
+                this._optionalDefaultGetters[propName] = propType.getDefaultValueSnapshot
             } else if (propType instanceof Union) {
                 const optional = propType.types.find(
                     t => t instanceof OptionalValue
                 ) as OptionalValue<any, any>
                 if (optional) {
-                    this._optionalValueGetters[propName] = optional.getDefaultValueSnapshot
+                    this._optionalDefaultGetters[propName] = optional.getDefaultValueSnapshot
                 }
             }
         })
@@ -165,7 +167,8 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             name: opts.name || this.name,
             properties: Object.assign({}, this.properties, opts.properties),
             initializers: this.initializers.concat((opts.initializers as any) || []),
-            preProcessor: opts.preProcessor || this.preProcessor
+            preProcessor: opts.preProcessor || this.preProcessor,
+            postProcessor: opts.postProcessor || this.postProcessor
         })
     }
 
@@ -188,19 +191,21 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
                 fail(
                     `Cannot define action '${PRE_PROCESS_SNAPSHOT}', it should be defined using 'type.preProcessSnapshot(fn)' instead`
                 )
+            // warn if postprocessor was given
+            if (name === POST_PROCESS_SNAPSHOT)
+                fail(
+                    `Cannot define action '${POST_PROCESS_SNAPSHOT}', it should be defined using 'type.postProcessSnapshot(fn)' instead`
+                )
 
             // apply hook composition
             let action = actions[name]
             let baseAction = (self as any)[name]
             if (name in HookNames && baseAction) {
                 let specializedAction = action
-                if (name === HookNames.postProcessSnapshot)
-                    action = (snapshot: any) => specializedAction(baseAction(snapshot))
-                else
-                    action = function() {
-                        baseAction.apply(null, arguments)
-                        specializedAction.apply(null, arguments)
-                    }
+                action = function() {
+                    baseAction.apply(null, arguments)
+                    specializedAction.apply(null, arguments)
+                }
             }
             // See #646, allow models to be mocked
             ;(process.env.NODE_ENV === "production" ? addHiddenFinalProp : addHiddenWritableProp)(
@@ -314,6 +319,15 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             })
     }
 
+    postProcessSnapshot(postProcessor: (snapshot: any) => S): IModelType<S, T> {
+        const currentPostprocessor = this.postProcessor
+        if (!currentPostprocessor) return this.cloneAndEnhance({ postProcessor })
+        else
+            return this.cloneAndEnhance({
+                postProcessor: snapshot => currentPostprocessor(postProcessor(snapshot))
+            })
+    }
+
     instantiate(
         parent: ObjectNode | null,
         subpath: string,
@@ -327,20 +341,10 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             environment,
             this.applySnapshotPreProcessor(snapshot),
             this.createNewInstance,
-            this.finalizeNewInstance,
-            this.patchSnapshotWithDefaults
+            this.finalizeNewInstance
         )
         // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
         // that pre-reserves all these fields for fast object-member lookups
-    }
-
-    patchSnapshotWithDefaults = (snapshot: any) => {
-        Object.keys(this._optionalValueGetters).forEach(name => {
-            if (typeof snapshot[name] === "undefined") {
-                snapshot[name] = this._optionalValueGetters[name]()
-            }
-        })
-        return snapshot
     }
 
     initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
@@ -440,8 +444,8 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             ;(getAtom(node.storedValue, name) as any).reportObserved()
             res[name] = this.getChildNode(node, name).snapshot
         })
-        if (typeof node.storedValue.postProcessSnapshot === "function" && applyPostProcess) {
-            return node.storedValue.postProcessSnapshot.call(null, res)
+        if (applyPostProcess) {
+            return this.applySnapshotPostProcessor(res)
         }
         return res
     }
@@ -462,7 +466,20 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     }
 
     applySnapshotPreProcessor(snapshot: any) {
-        if (this.preProcessor) return this.preProcessor.call(null, snapshot)
+        const processedSnapshot = this.preProcessor
+            ? this.preProcessor.call(null, snapshot)
+            : snapshot
+
+        Object.keys(this._optionalDefaultGetters).forEach(name => {
+            if (typeof processedSnapshot[name] === "undefined") {
+                processedSnapshot[name] = this._optionalDefaultGetters[name]()
+            }
+        })
+        return processedSnapshot
+    }
+
+    applySnapshotPostProcessor(snapshot: any) {
+        if (this.postProcessor) return this.postProcessor.call(null, snapshot)
         return snapshot
     }
 
@@ -530,6 +547,7 @@ export interface IModelType<S, T> extends IComplexType<S, T & IStateTreeNode> {
         fn: (self: T & IStateTreeNode) => { actions?: A; views?: V; state?: VS }
     ): IModelType<S, T & A & V & VS>
     preProcessSnapshot(fn: (snapshot: any) => S): IModelType<S, T>
+    postProcessSnapshot(fn: (snapshot: any) => S): IModelType<S, T>
 }
 
 export type IModelProperties<T> = { [K in keyof T]: IType<any, T[K]> | T[K] }

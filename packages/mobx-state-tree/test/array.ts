@@ -310,7 +310,7 @@ test("it correctly reconciliate when swapping using snapshots", () => {
 })
 test("it should not be allowed to add the same item twice to the same store", () => {
     const Task = types.model("Task", {})
-    const Store = types.model({
+    const Store = types.model("TasksStore", {
         todos: types.optional(types.array(Task), [])
     })
     const s = Store.create()

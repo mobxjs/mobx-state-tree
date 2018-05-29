@@ -299,16 +299,12 @@ function reconcileArrayChildren<T>(
             // check if already belongs to the same parent. if so, avoid pushing item in. only swapping can occur.
             const node = isStateTreeNode(newValue) && getStateTreeNode(newValue)
             if (node && node.parent === parent) {
-                // skip fail if nothing changed; this happens when we apply initialSnapshot, which already has nodes during finalizeNewInstance()
-                // because those nodes already have their parent set right during createNode()
-                if (node.subpath !== "" + i) {
-                    // this node is owned by this parent, but not in the reconcilable set, so it must be double
-                    fail(
-                        `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${newPaths[
-                            i
-                        ]}', but it lives already at '${getStateTreeNode(newValue).path}'`
-                    )
-                }
+                // this node is owned by this parent, but not in the reconcilable set, so it must be double
+                fail(
+                    `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${newPaths[
+                        i
+                    ]}', but it lives already at '${getStateTreeNode(newValue).path}'`
+                )
             }
             oldNodes.splice(i, 0, valueAsNode(childType, parent, "" + newPaths[i], newValue))
             // both are the same, reconcile
