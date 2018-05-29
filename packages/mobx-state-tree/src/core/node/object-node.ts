@@ -51,9 +51,11 @@ export class ObjectNode implements INode {
     state = NodeLifeCycle.INITIALIZING
 
     middlewares = EMPTY_ARRAY as IMiddleware[]
-    private snapshotSubscribers: ((snapshot: any) => void)[]
-    private patchSubscribers: ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)[]
-    private disposers: (() => void)[]
+    private snapshotSubscribers: ((snapshot: any) => void)[] | null = null
+    private patchSubscribers:
+        | ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)[]
+        | null = null
+    private disposers: (() => void)[] | null = null
 
     applyPatches: (patches: IJsonPatch[]) => void
     applySnapshot: (snapshot: any) => void
@@ -401,7 +403,9 @@ export class ObjectNode implements INode {
     }
 
     public aboutToDie() {
-        this.disposers.splice(0).forEach(f => f())
+        if (this.disposers) {
+            this.disposers.splice(0).forEach(f => f())
+        }
         this.fireHook("beforeDestroy")
     }
 
@@ -412,9 +416,8 @@ export class ObjectNode implements INode {
         const oldPath = this.path
         addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
 
-        this.patchSubscribers.splice(0)
-        this.snapshotSubscribers.splice(0)
-        this.patchSubscribers.splice(0)
+        if (this.patchSubscribers) this.patchSubscribers.splice(0)
+        if (this.snapshotSubscribers) this.snapshotSubscribers.splice(0)
         this.state = NodeLifeCycle.DEAD
         this._parent = null
         this.subpath = ""
@@ -434,19 +437,21 @@ export class ObjectNode implements INode {
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
+        if (!this.snapshotSubscribers) this.snapshotSubscribers = []
         return registerEventHandler(this.snapshotSubscribers, onChange)
     }
 
     public emitSnapshot(snapshot: any) {
-        this.snapshotSubscribers.forEach((f: Function) => f(snapshot))
+        if (this.snapshotSubscribers) this.snapshotSubscribers.forEach((f: Function) => f(snapshot))
     }
 
     public onPatch(handler: (patch: IJsonPatch, reversePatch: IJsonPatch) => void): IDisposer {
+        if (!this.patchSubscribers) this.patchSubscribers = []
         return registerEventHandler(this.patchSubscribers, handler)
     }
 
     emitPatch(basePatch: IReversibleJsonPatch, source: INode) {
-        if (this.patchSubscribers.length) {
+        if (this.patchSubscribers && this.patchSubscribers.length) {
             const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, {
                 path: source.path.substr(this.path.length) + "/" + basePatch.path // calculate the relative path of the patch
             })
@@ -457,7 +462,8 @@ export class ObjectNode implements INode {
     }
 
     addDisposer(disposer: () => void) {
-        this.disposers.unshift(disposer)
+        if (!this.disposers) this.disposers = [disposer]
+        else this.disposers.unshift(disposer)
     }
 
     removeMiddleware(handler: IMiddlewareHandler) {
