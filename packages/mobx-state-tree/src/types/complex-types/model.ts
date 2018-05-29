@@ -129,7 +129,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
      */
     public readonly initializers: ((instance: any) => any)[]
     public readonly properties: { [K: string]: IType<any, any> } = {}
-    private readonly _optionalDefaultGetters: any
+    private readonly _optionalChildern: any
     private preProcessor: (snapshot: any) => any | undefined
     private postProcessor: (snapshot: any) => any | undefined
 
@@ -143,16 +143,16 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         this.properties = toPropertiesObject(this.properties)
         freeze(this.properties) // make sure nobody messes with it
 
-        this._optionalDefaultGetters = {}
+        this._optionalChildern = {}
         this.forAllProps((propName, propType) => {
             if (propType instanceof OptionalValue) {
-                this._optionalDefaultGetters[propName] = propType.getDefaultValueSnapshot
+                this._optionalChildern[propName] = propType
             } else if (propType instanceof Union) {
                 const optional = propType.types.find(
                     t => t instanceof OptionalValue
                 ) as OptionalValue<any, any>
                 if (optional) {
-                    this._optionalDefaultGetters[propName] = optional.getDefaultValueSnapshot
+                    this._optionalChildern[propName] = optional
                 }
             }
         })
@@ -471,9 +471,9 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             : snapshot
 
         if (processedSnapshot) {
-            Object.keys(this._optionalDefaultGetters).forEach(name => {
+            Object.keys(this._optionalChildern).forEach(name => {
                 if (typeof processedSnapshot[name] === "undefined") {
-                    processedSnapshot[name] = this._optionalDefaultGetters[name]()
+                    processedSnapshot[name] = this._optionalChildern[name].getDefaultValueSnapshot()
                 }
             })
         }

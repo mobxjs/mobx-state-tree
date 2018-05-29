@@ -84,11 +84,11 @@ test("reflection - can retrieve property names", () => {
     expect(keys.includes("isPerson")).toBe(true)
 })
 test("reflection - property contains type", () => {
-    const Model = types.model({
+    const TestModel = types.model({
         string: types.string,
         optional: false
     })
-    const node = Model.create({
+    const node = TestModel.create({
         string: "hello"
     })
     const reflection = getMembers(node)

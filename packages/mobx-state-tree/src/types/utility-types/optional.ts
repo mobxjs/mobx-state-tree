@@ -59,7 +59,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
         if (typeof this.defaultValue === "function") typecheck(this, defaultValue)
         return defaultValue
     }
-    public getDefaultValueSnapshot = () => {
+    public getDefaultValueSnapshot() {
         const defaultValue = this.getDefaultValue()
         return isStateTreeNode(defaultValue)
             ? getStateTreeNode(defaultValue).snapshot
