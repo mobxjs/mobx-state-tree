@@ -205,9 +205,13 @@ export class ObjectNode implements INode {
         if (typeof fn === "function") fn.apply(this.storedValue)
     }
 
-    @computed
-    public get value(): any {
+    public get value() {
         if (!this.observableInstanceCreated) this.createObservableInstance()
+        return this._value
+    }
+
+    @computed
+    private get _value(): any {
         if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
