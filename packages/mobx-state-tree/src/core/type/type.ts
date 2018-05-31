@@ -15,7 +15,8 @@ import {
     IStateTreeNode,
     IJsonPatch,
     getType,
-    ObjectNode
+    ObjectNode,
+    IChildNodesMap
 } from "../../internal"
 
 export enum TypeFlags {
@@ -53,7 +54,7 @@ export interface IType<S, T> {
 
     // Internal api's
     instantiate(parent: INode | null, subpath: string, environment: any, initialValue?: any): INode
-    initializeChildNodes(node: INode, snapshot: any): { [key: string]: INode } | null
+    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null
     reconcile(current: INode, newValue: any): INode
     getValue(node: INode): T
     getSnapshot(node: INode, applyPostProcess?: boolean): S
@@ -89,6 +90,9 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         typecheck(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).value
     }
+    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null {
+        return null
+    }
 
     abstract instantiate(
         parent: INode | null,
@@ -96,8 +100,6 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
         environment: any,
         initialValue: any
     ): INode
-
-    abstract initializeChildNodes(node: INode, snapshot: any): { [key: string]: INode } | null
 
     abstract flags: TypeFlags
     abstract describe(): string
@@ -190,10 +192,6 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
         environment: any,
         initialValue: any
     ): INode
-
-    initializeChildNodes(node: INode, snapshot: any): null {
-        return null
-    }
 
     getValue(node: INode) {
         return node.storedValue

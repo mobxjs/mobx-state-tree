@@ -2,7 +2,6 @@ import {
     fail,
     INode,
     createNode,
-    isStateTreeNode,
     Type,
     IType,
     TypeFlags,
@@ -11,7 +10,8 @@ import {
     IValidationResult,
     typeCheckFailure,
     string as stringType,
-    ObjectNode
+    ObjectNode,
+    ModelType
 } from "../../internal"
 
 class Identifier {
@@ -30,14 +30,9 @@ export class IdentifierType<T> extends Type<T, T> {
     }
 
     instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: T): INode {
-        if (!parent /* || !isStateTreeNode(parent.storedValue)*/)
-            return fail(`Identifier types can only be instantiated as direct child of a model type`)
+        if (!parent || !(parent.type instanceof ModelType))
+            fail(`Identifier types can only be instantiated as direct child of a model type`)
 
-        if (parent.identifierAttribute)
-            fail(
-                `Cannot define property '${subpath}' as object identifier, property '${parent.identifierAttribute}' is already defined as identifier property`
-            )
-        parent.identifierAttribute = subpath
         return createNode(this, parent, subpath, environment, snapshot)
     }
 

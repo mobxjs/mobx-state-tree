@@ -25,6 +25,7 @@ import {
     freeze,
     resolveNodeByPathParts,
     convertChildNodesToArray,
+    typecheck,
     ModelType
 } from "../../internal"
 
@@ -44,7 +45,7 @@ export class ObjectNode implements INode {
 
     identifierCache: IdentifierCache | undefined
     isProtectionEnabled = true
-    identifierAttribute: string | undefined = undefined // not to be modified directly, only through model initialization
+    readonly identifierAttribute: string | undefined
     _environment: any = undefined
     protected _autoUnbox = true // unboxing is disabled when reading child nodes
     state = NodeLifeCycle.INITIALIZING
@@ -81,7 +82,9 @@ export class ObjectNode implements INode {
 
         this.type = type
         this.subpath = subpath
+        this.identifierAttribute = type instanceof ModelType ? type.identifierAttribute : undefined
         this.unbox = this.unbox.bind(this)
+
         this._initialSnapshot = initialSnapshot
 
         if (!parent) {

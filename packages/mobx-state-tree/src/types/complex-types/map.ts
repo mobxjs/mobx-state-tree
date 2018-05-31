@@ -34,12 +34,12 @@ import {
     isType,
     ObjectNode,
     mobxShallow,
-    IChildNodesMap
+    IChildNodesMap,
+    ModelType,
+    OptionalValue,
+    Union,
+    Late
 } from "../../internal"
-
-interface IMapFactoryConfig {
-    isMapFactory: true
-}
 
 export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
     put(value: T | any): this // downtype to any, again, because we cannot type the snapshot, see
@@ -64,17 +64,31 @@ function put(this: ObservableMap<any, any>, value: any) {
         return fail(`Map.put can only be used to store complex values`)
     } else {
         const mapType = getStateTreeNode(this as IStateTreeNode).type as MapType<any, any>
-        if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
         if (mapType.identifierMode === MapIdentifierMode.YES) {
             this.set("" + value[mapType.identifierAttribute!], value)
             return this
         }
-        // we don't know the identifier attr yet, so we have to create the instance already to be able to determine
-        // luckily, needs to happen only once
-        const node = getStateTreeNode(mapType.subType.create(value)) // FIXME: this will unecessarly first create and after that attach.
-        if (!node.identifierAttribute) return fail(needsIdentifierError)
-        this.set("" + node.value[node.identifierAttribute!], node.value)
-        return this
+        return fail(needsIdentifierError)
+    }
+}
+
+function tryCollectModelTypes(
+    type: IType<any, any>,
+    modelTypes: Array<ModelType<any, any>>
+): boolean {
+    try {
+        if (type instanceof ModelType) {
+            modelTypes.push(type)
+        } else if (type instanceof OptionalValue) {
+            tryCollectModelTypes(type.type, modelTypes)
+        } else if (type instanceof Late) {
+            tryCollectModelTypes(type.subType, modelTypes)
+        } else if (type instanceof Union) {
+            type.types.forEach(uType => tryCollectModelTypes(uType, modelTypes))
+        }
+        return true
+    } catch (e) {
+        return false
     }
 }
 
@@ -94,9 +108,13 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     constructor(name: string, subType: IType<any, any>) {
         super(name)
         this.subType = subType
+        this._determineIdentifierMode()
     }
 
     instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: S): INode {
+        if (this.identifierMode === MapIdentifierMode.UNKNOWN) {
+            this._determineIdentifierMode()
+        }
         return createNode(
             this,
             parent,
@@ -108,37 +126,39 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         )
     }
 
-    initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
-        const type = this.subType
-        const environment = objNode._environment
-        const result = {} as IChildNodesMap
-        const keys = Object.keys(initialSnapshot)
-        if (keys.length > 0) {
-            keys.forEach((name, index) => {
-                const childNode = type.instantiate(
-                    objNode,
-                    name,
-                    environment,
-                    initialSnapshot[name]
-                )
-                result[name] = childNode
-                if (index === 0 && childNode instanceof ObjectNode) {
-                    this._setIdentifierMode(childNode)
+    private _determineIdentifierMode() {
+        const modelTypes = [] as Array<ModelType<any, any>>
+        if (tryCollectModelTypes(this.subType, modelTypes)) {
+            let identifierAttribute: string | undefined = undefined
+            modelTypes.forEach(type => {
+                if (type.identifierAttribute) {
+                    if (identifierAttribute && identifierAttribute !== type.identifierAttribute) {
+                        fail(
+                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
+                        )
+                    }
+                    identifierAttribute = type.identifierAttribute
                 }
             })
-        }
-
-        return result
-    }
-    private _setIdentifierMode(childNode: ObjectNode) {
-        if (childNode instanceof ObjectNode) {
-            if (childNode.identifierAttribute) {
+            if (identifierAttribute) {
                 this.identifierMode = MapIdentifierMode.YES
-                this.identifierAttribute = childNode.identifierAttribute
+                this.identifierAttribute = identifierAttribute
             } else {
                 this.identifierMode = MapIdentifierMode.NO
             }
         }
+    }
+
+    initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
+        const subType = this.subType
+        const environment = objNode._environment
+        const result = {} as IChildNodesMap
+        const keys = Object.keys(initialSnapshot)
+        keys.forEach(name => {
+            result[name] = subType.instantiate(objNode, name, environment, initialSnapshot[name])
+        })
+
+        return result
     }
 
     describe() {
@@ -146,7 +166,6 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 
     createNewInstance = (childNodes: IChildNodesMap) => {
-        // const identifierAttr = getIdentifierAttribute(this.subType)
         const instance = observable.map(childNodes, mobxShallow)
         addHiddenFinalProp(instance, "put", put)
         addHiddenFinalProp(instance, "toString", mapToString)
@@ -209,29 +228,11 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
 
     private processIdentifier(expected: string, node: INode) {
         if (node instanceof ObjectNode) {
-            // identifier cannot be determined up front, as they might need to go through unions etc
-            // but for maps, we do want them to be regular, and consistently used.
-            if (this.identifierMode === MapIdentifierMode.UNKNOWN) {
-                this.identifierMode =
-                    node.identifierAttribute !== undefined
-                        ? MapIdentifierMode.YES
-                        : MapIdentifierMode.NO
-                this.identifierAttribute = node.identifierAttribute
-            }
-            if (node.identifierAttribute !== this.identifierAttribute)
-                // both undefined if type is NO
+            const identifier = "" + node.identifier! // 'cause snapshots always have their identifiers as strings. blegh..
+            if (identifier !== expected)
                 fail(
-                    `The objects in a map should all have the same identifier attribute, expected '${this
-                        .identifierAttribute}', but child of type '${node.type
-                        .name}' declared attribute '${node.identifierAttribute}' as identifier`
+                    `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
                 )
-            if (this.identifierMode === MapIdentifierMode.YES) {
-                const identifier = "" + node.identifier! // 'cause snapshots always have their identifiers as strings. blegh..
-                if (identifier !== expected)
-                    fail(
-                        `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
-                    )
-            }
         }
     }
 

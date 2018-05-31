@@ -43,6 +43,7 @@ import {
     mobxShallow,
     OptionalValue,
     Union,
+    IdentifierType,
     IChildNodesMap
 } from "../../internal"
 
@@ -66,6 +67,10 @@ export type ModelTypeConfig = {
     initializers?: ReadonlyArray<((instance: any) => any)>
     preProcessor?: (snapshot: any) => any
     postProcessor?: (snapshot: any) => any
+}
+
+export type OptionalValuesMap = {
+    [key: string]: OptionalValue<any, any>
 }
 
 const defaultObjectOptions = {
@@ -129,9 +134,11 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
      */
     public readonly initializers: ((instance: any) => any)[]
     public readonly properties: { [K: string]: IType<any, any> } = {}
-    private readonly _optionalChildern: any
     private preProcessor: (snapshot: any) => any | undefined
     private postProcessor: (snapshot: any) => any | undefined
+
+    public identifierAttribute: string | undefined = undefined
+    private _optionalChildren: OptionalValuesMap
 
     constructor(opts: ModelTypeConfig) {
         super(opts.name || defaultObjectOptions.name)
@@ -142,20 +149,31 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         // ensures that any default value gets converted to its related type
         this.properties = toPropertiesObject(this.properties)
         freeze(this.properties) // make sure nobody messes with it
+        this._preBootModel()
+    }
 
-        this._optionalChildern = {}
+    private _preBootModel() {
+        this._optionalChildren = {} as OptionalValuesMap
         this.forAllProps((propName, propType) => {
-            if (propType instanceof OptionalValue) {
-                this._optionalChildern[propName] = propType
+            if (propType instanceof IdentifierType) {
+                if (this.identifierAttribute)
+                    fail(
+                        `Cannot define property '${propName}' as object identifier, property '${this
+                            .identifierAttribute}' is already defined as identifier property`
+                    )
+                this.identifierAttribute = propName
+            } else if (propType instanceof OptionalValue) {
+                this._optionalChildren[propName] = propType
             } else if (propType instanceof Union) {
                 const optional = propType.types.find(
                     t => t instanceof OptionalValue
                 ) as OptionalValue<any, any>
                 if (optional) {
-                    this._optionalChildern[propName] = optional
+                    this._optionalChildren[propName] = optional
                 }
             }
         })
+        freeze(this._optionalChildren)
     }
 
     get propertyNames(): string[] {
@@ -346,7 +364,6 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
         // that pre-reserves all these fields for fast object-member lookups
     }
-
     initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
         const result = {} as IChildNodesMap
         this.forAllProps((name, type) => {
@@ -359,7 +376,6 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         })
         return result
     }
-
     createNewInstance = () => {
         const instance = observable.object(EMPTY_OBJECT, EMPTY_OBJECT, mobxShallow)
         addHiddenFinalProp(instance, "toString", objectTypeToString)
@@ -471,9 +487,9 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             : snapshot
 
         if (processedSnapshot) {
-            Object.keys(this._optionalChildern).forEach(name => {
+            Object.keys(this._optionalChildren).forEach(name => {
                 if (typeof processedSnapshot[name] === "undefined") {
-                    processedSnapshot[name] = this._optionalChildern[name].getDefaultValueSnapshot()
+                    processedSnapshot[name] = this._optionalChildren[name].getDefaultValueSnapshot()
                 }
             })
         }
