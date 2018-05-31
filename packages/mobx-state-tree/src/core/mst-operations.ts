@@ -313,6 +313,10 @@ export function getParent<T>(target: IStateTreeNode, depth?: number): T & IState
  * Note that the immediate parent can be either an object, map or array, and
  * doesn't necessarily refer to the parent model
  *
+ * Please note that in child nodes access to the root is only possible
+ * once the `afterAttach` hook has fired
+ *
+ *
  * @export
  * @param {Object} target
  * @param {number} depth = 1, how far should we look upward?
@@ -340,6 +344,9 @@ export function getRoot(target: IStateTreeNode): any & IStateTreeNode
 export function getRoot<T>(target: IStateTreeNode): T & IStateTreeNode
 /**
  * Given an object in a model tree, returns the root object of that tree
+ *
+ * Please note that in child nodes access to the root is only possible
+ * once the `afterAttach` hook has fired
  *
  * @export
  * @param {Object} target
@@ -547,9 +554,7 @@ export function clone<T extends IStateTreeNode>(
         node.snapshot,
         keepEnvironment === true
             ? node.root._environment
-            : keepEnvironment === false
-                ? undefined
-                : keepEnvironment
+            : keepEnvironment === false ? undefined : keepEnvironment
     ) as T // it's an object or something else
 }
 
@@ -637,6 +642,9 @@ export function addDisposer(target: IStateTreeNode, disposer: () => void) {
 /**
  * Returns the environment of the current state tree. For more info on environments,
  * see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
+ *
+ * Please note that in child nodes access to the root is only possible
+ * once the `afterAttach` hook has fired
  *
  * Returns an empty environment if the tree wasn't initialized with an environment
  *
