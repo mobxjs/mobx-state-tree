@@ -22,5 +22,5 @@ export function maybe<S, T>(type: IType<S, T>): IType<S | null | undefined, T | 
             )
         }
     }
-    return union(optionalNullType, type)
+    return union(type, optionalNullType)
 }

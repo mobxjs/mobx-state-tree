@@ -294,7 +294,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
     expect(() => {
         store.selected // store.boxes[1] // throws because it can't know if you mean a box or an arrow!
     }).toThrowError(
-        "[mobx-state-tree] Cannot resolve a reference to type '(Arrow | Box)' with id: '2' unambigously, there are multiple candidates: /boxes/1, /arrows/0"
+        "[mobx-state-tree] Cannot resolve a reference to type '(Box | Arrow)' with id: '2' unambigously, there are multiple candidates: /boxes/1, /arrows/0"
     )
     unprotect(store)
     // first update the reference, than create a new matching item! Ref becomes ambigous now...
@@ -309,7 +309,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
     store.arrows.push({ id: 1, name: "oops" })
     expect(err.message).toBe(
-        "[mobx-state-tree] Cannot resolve a reference to type '(Arrow | Box)' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
+        "[mobx-state-tree] Cannot resolve a reference to type '(Box | Arrow)' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
     )
 })
 test("it should support array of references", () => {

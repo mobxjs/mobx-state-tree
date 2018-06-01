@@ -227,7 +227,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 
     private processIdentifier(expected: string, node: INode) {
-        if (node instanceof ObjectNode) {
+        if (node instanceof ObjectNode && this.identifierMode === MapIdentifierMode.YES) {
             const identifier = "" + node.identifier! // 'cause snapshots always have their identifiers as strings. blegh..
             if (identifier !== expected)
                 fail(
