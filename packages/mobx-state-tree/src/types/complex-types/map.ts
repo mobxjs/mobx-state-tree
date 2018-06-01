@@ -76,20 +76,23 @@ function tryCollectModelTypes(
     type: IType<any, any>,
     modelTypes: Array<ModelType<any, any>>
 ): boolean {
-    try {
-        if (type instanceof ModelType) {
-            modelTypes.push(type)
-        } else if (type instanceof OptionalValue) {
-            tryCollectModelTypes(type.type, modelTypes)
-        } else if (type instanceof Late) {
-            tryCollectModelTypes(type.subType, modelTypes)
-        } else if (type instanceof Union) {
-            type.types.forEach(uType => tryCollectModelTypes(uType, modelTypes))
+    if (type instanceof ModelType) {
+        modelTypes.push(type)
+    } else if (type instanceof OptionalValue) {
+        if (!tryCollectModelTypes(type.type, modelTypes)) return false
+    } else if (type instanceof Union) {
+        for (let i = 0; i < type.types.length; i++) {
+            const uType = type.types[i]
+            if (!tryCollectModelTypes(uType, modelTypes)) return false
         }
-        return true
-    } catch (e) {
-        return false
+    } else if (type instanceof Late) {
+        try {
+            tryCollectModelTypes(type.subType, modelTypes)
+        } catch (e) {
+            return false
+        }
     }
+    return true
 }
 
 export enum MapIdentifierMode {
