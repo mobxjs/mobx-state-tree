@@ -28,7 +28,7 @@ An example of this is as follows:
 
 ```js
 const store = SomeStore.create()
-const disposer = addMiddleWare(store, (call, next, abort) => {
+const disposer = addMiddleware(store, (call, next, abort) => {
   console.log(`action ${call.name} was invoked`)
   // runs the next middleware
   // or the implementation of the targeted action
@@ -40,7 +40,7 @@ const disposer = addMiddleWare(store, (call, next, abort) => {
 ```
 ```js
 const store = SomeStore.create()
-const disposer = addMiddleWare(store, (call, next, abort) => {
+const disposer = addMiddleware(store, (call, next, abort) => {
   console.log(`action ${call.name} was invoked`)
   // aborts running the middlewares and returns the 'value' instead.
   // note that the targeted action won't be reached either.

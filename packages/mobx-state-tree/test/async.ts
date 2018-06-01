@@ -3,7 +3,8 @@ import {
     addMiddleware,
     recordActions,
     flow,
-    decorate
+    decorate,
+    destroy
     // TODO: export IRawActionCall
 } from "../src"
 import { reaction, configure } from "mobx"
@@ -274,6 +275,35 @@ test("can handle nested async actions when using decorate", done => {
             done()
         })
 })
+
+test("flow gain back control when node become not alive during yield", async () => {
+    expect.assertions(2)
+    const rejectError = new Error("Reject Error")
+    const MyModel = types.model({}).actions(() => {
+        return {
+            doAction() {
+                return flow<void>(function*() {
+                    try {
+                        yield delay(20, "").then(() => Promise.reject(rejectError))
+                    } catch (e) {
+                        expect(e).toEqual(rejectError)
+                        throw e
+                    }
+                })()
+            }
+        }
+    })
+
+    const m = MyModel.create({})
+    const p = m.doAction()
+    destroy(m)
+    try {
+        await p
+    } catch (e) {
+        expect(e).toEqual(rejectError)
+    }
+})
+
 function filterRelevantStuff(stuff) {
     return stuff.map(x => {
         delete x.context
