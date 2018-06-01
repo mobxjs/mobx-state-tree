@@ -297,8 +297,7 @@ function reconcileArrayChildren<T>(
             // there is no old node, create it
         } else if (!oldNode) {
             // check if already belongs to the same parent. if so, avoid pushing item in. only swapping can occur.
-            const node = isStateTreeNode(newValue) && getStateTreeNode(newValue)
-            if (node && node.parent === parent) {
+            if (isStateTreeNode(newValue) && getStateTreeNode(newValue).parent === parent) {
                 // this node is owned by this parent, but not in the reconcilable set, so it must be double
                 fail(
                     `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${newPaths[

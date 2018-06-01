@@ -156,8 +156,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         const subType = this.subType
         const environment = objNode._environment
         const result = {} as IChildNodesMap
-        const keys = Object.keys(initialSnapshot)
-        keys.forEach(name => {
+        Object.keys(initialSnapshot).forEach(name => {
             result[name] = subType.instantiate(objNode, name, environment, initialSnapshot[name])
         })
 
@@ -230,7 +229,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 
     private processIdentifier(expected: string, node: INode) {
-        if (node instanceof ObjectNode && this.identifierMode === MapIdentifierMode.YES) {
+        if (this.identifierMode === MapIdentifierMode.YES && node instanceof ObjectNode) {
             const identifier = "" + node.identifier! // 'cause snapshots always have their identifiers as strings. blegh..
             if (identifier !== expected)
                 fail(

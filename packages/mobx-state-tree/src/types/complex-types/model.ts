@@ -482,22 +482,23 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     }
 
     applySnapshotPreProcessor(snapshot: any) {
-        const processedSnapshot = this.preProcessor
-            ? this.preProcessor.call(null, snapshot)
-            : snapshot
+        const processor = this.preProcessor
+        const processed = processor ? processor.call(null, snapshot) : snapshot
 
-        if (processedSnapshot) {
-            Object.keys(this._optionalChildren).forEach(name => {
-                if (typeof processedSnapshot[name] === "undefined") {
-                    processedSnapshot[name] = this._optionalChildren[name].getDefaultValueSnapshot()
+        if (processed) {
+            const optionalChildren = this._optionalChildren
+            Object.keys(optionalChildren).forEach(name => {
+                if (typeof processed[name] === "undefined") {
+                    processed[name] = optionalChildren[name].getDefaultValueSnapshot()
                 }
             })
         }
-        return processedSnapshot
+        return processed
     }
 
     applySnapshotPostProcessor(snapshot: any) {
-        if (this.postProcessor) return this.postProcessor.call(null, snapshot)
+        const postProcessor = this.postProcessor
+        if (postProcessor) return postProcessor.call(null, snapshot)
         return snapshot
     }
 

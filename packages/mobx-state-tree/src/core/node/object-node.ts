@@ -378,7 +378,7 @@ export class ObjectNode implements INode {
                 // if the snapshot is the same as the current one, avoid performing a reconcile
                 if (snapshot === self.snapshot) return
                 // else, apply it by calling the type logic
-                return this.type.applySnapshot(self, snapshot)
+                return self.type.applySnapshot(self, snapshot)
             }
         )
     }
@@ -417,10 +417,7 @@ export class ObjectNode implements INode {
         if (this.snapshotSubscribers) this.snapshotSubscribers.splice(0)
         this.state = NodeLifeCycle.DEAD
         this.subpath = ""
-        this.observableInstanceCreated = false
         this._parent = null
-        this._childNodes = null
-        this._initialSnapshot = null
 
         // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
         // we could express this in a much nicer way

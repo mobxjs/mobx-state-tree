@@ -10,11 +10,11 @@ test("it should avoid processing patch if is exactly the current one in applySna
     expect(getSnapshot(store)).toBe(snapshot) // no new snapshot emitted
 })
 test("it should avoid processing patch if is exactly the current one in reconcile", () => {
-    const Model = types.model("Model", {
+    const Model = types.model({
         a: types.number,
         b: types.string
     })
-    const RootModel = types.model("RootModel", {
+    const RootModel = types.model({
         a: Model
     })
     const store = RootModel.create({ a: { a: 1, b: "hello" } })

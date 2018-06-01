@@ -94,7 +94,7 @@ export class ScalarNode implements INode {
     }
 
     unbox(childNode: INode): any {
-        return childNode && childNode.value
+        return childNode ? childNode.value : childNode
     }
 
     toString(): string {

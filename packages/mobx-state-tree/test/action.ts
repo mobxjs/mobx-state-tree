@@ -118,13 +118,11 @@ function createTestStore() {
 test("it should not be possible to pass a complex object", () => {
     const store = createTestStore()
     const recorder = recordActions(store)
-
     expect(store.customers[0].name).toBe("Mattia")
     store.orders[0].setCustomer(store.customers[0])
     expect(store.orders[0].customer!.name).toBe("Mattia")
     expect(store.orders[0].customer).toBe(store.customers[0])
-    const snapshot = getSnapshot(store)
-    expect(snapshot).toEqual({
+    expect(getSnapshot(store)).toEqual({
         customers: [
             {
                 id: 1,

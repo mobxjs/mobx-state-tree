@@ -165,7 +165,7 @@ test("items should be reconciled correctly when splicing - 1", () => {
         c = Task.create({ x: "c" }),
         d = Task.create({ x: "d" })
     const store = types
-        .model("Store", {
+        .model({
             todos: types.optional(types.array(Task), [])
         })
         .create({
@@ -310,7 +310,7 @@ test("it correctly reconciliate when swapping using snapshots", () => {
 })
 test("it should not be allowed to add the same item twice to the same store", () => {
     const Task = types.model("Task", {})
-    const Store = types.model("TasksStore", {
+    const Store = types.model({
         todos: types.optional(types.array(Task), [])
     })
     const s = Store.create()

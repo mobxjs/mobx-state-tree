@@ -278,12 +278,29 @@ test("it should get map keys from reversePatch when deleted an item from a neste
     store.remove("a")
 })
 
-test("map expects regular identifiers", () => {
+test("map expects regular identifiers - 1", () => {
     const A = types.model("A", { a: types.identifier() })
     const B = types.model("B", { b: types.identifier() })
 
-    // NOTE: we can determine identifier attributes upfront, so no need to wait for runtime error
+    // NOTE: we can determine identifier attribute upfront, so no need to wait for error while craetion
     expect(() => types.map(types.union(A, B))).toThrow(
         `[mobx-state-tree] The objects in a map should all have the same identifier attribute, expected 'a', but child of type 'B' declared attribute 'b' as identifier`
     )
+})
+
+test("map can resolve late identifiers", () => {
+    const Late = types.model({
+        id: types.identifier(),
+        children: types.map(types.late(() => Late))
+    })
+    const snapshot = {
+        id: "1",
+        children: {
+            "2": {
+                id: "2",
+                children: {}
+            }
+        }
+    }
+    expect(() => Late.create(snapshot)).not.toThrow()
 })

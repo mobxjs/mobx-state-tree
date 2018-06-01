@@ -362,13 +362,13 @@ test("it can record and replay actions", () => {
 })
 
 test("Livelyness issue #683", () => {
-    const User = types.model("User", {
+    const User = types.model({
         id: types.identifier(types.number),
         name: types.string
     })
 
     const Users = types
-        .model("Users", {
+        .model({
             list: types.map(User)
         })
         .actions(self => ({
