@@ -23,7 +23,11 @@ export class Late<S, T> extends Type<S, T> {
 
     get subType(): IType<S, T> {
         if (this._subType === null) {
-            this._subType = this.definition()
+            // If called too early in es5 environment, this won't throw, but return undefined
+            // see "it should apply deep patches to maps" test for example
+            const definition = this.definition()
+            if (typeof definition !== "object") fail("Late type definition should return object")
+            this._subType = definition
         }
         return this._subType
     }
