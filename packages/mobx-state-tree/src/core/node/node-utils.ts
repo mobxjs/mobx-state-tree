@@ -177,7 +177,7 @@ export function resolveNodeByPathParts(
     return current!
 }
 
-export function convertChildNodesToArray(childNodes: IChildNodesMap): INode[] {
+export function convertChildNodesToArray(childNodes: IChildNodesMap | null): INode[] {
     if (!childNodes) return []
 
     const keys = Object.keys(childNodes)

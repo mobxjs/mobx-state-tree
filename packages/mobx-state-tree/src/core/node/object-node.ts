@@ -25,8 +25,9 @@ import {
     freeze,
     resolveNodeByPathParts,
     convertChildNodesToArray,
-    typecheck,
-    ModelType
+    ModelType,
+    identity,
+    noop
 } from "../../internal"
 
 let nextNodeId = 1
@@ -60,11 +61,11 @@ export class ObjectNode implements INode {
     applyPatches: (patches: IJsonPatch[]) => void
     applySnapshot: (snapshot: any) => void
 
-    readonly _childNodes: IChildNodesMap | null = null
-    private readonly _initialSnapshot: any
     observableInstanceCreated: boolean = false
-    private readonly _createNewInstance: (initialValue: any) => any
-    private readonly _finalizeNewInstance: (node: INode, initialValue: any) => void
+    private _childNodes: IChildNodesMap | null = null
+    private _initialSnapshot: any
+    private _createNewInstance: (initialValue: any) => any
+    private _finalizeNewInstance: (node: INode, initialValue: any) => void
 
     constructor(
         type: IType<any, any>,
@@ -124,7 +125,8 @@ export class ObjectNode implements INode {
                 this.state = NodeLifeCycle.DEAD
             }
         }
-
+        // NOTE: we need to touch snapshot, because non-observable
+        // "observableInstanceCreated" field was touched
         const snapshotAtom = getAtom(this, "snapshot") as any
         snapshotAtom.trackAndCompute()
 
@@ -219,7 +221,7 @@ export class ObjectNode implements INode {
         if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
-
+    // advantage of using computed for a snapshot is that nicely respects transactions etc.
     @computed
     public get snapshot(): any {
         if (!this.isAlive) return undefined
@@ -247,8 +249,8 @@ export class ObjectNode implements INode {
     }
 
     get identifier(): string | null {
-        // RF: do not read from the snapshot here, it can lead to cycle computations
-        // using bidirectional references
+        // identifier can not be changed during lifecycle of a node
+        // so we safely can read it from initial snapshot
         return this.identifierAttribute ? this._initialSnapshot[this.identifierAttribute] : null
     }
 
@@ -288,7 +290,7 @@ export class ObjectNode implements INode {
     }
 
     private _getChildNodesArray(): ReadonlyArray<INode> {
-        return convertChildNodesToArray(this._childNodes!)
+        return convertChildNodesToArray(this._childNodes)
     }
 
     getChildType(key: string): IType<any, any> {
@@ -357,8 +359,6 @@ export class ObjectNode implements INode {
     }
 
     preboot() {
-        // Optimization: this does not need to be done per instance
-        // if some pieces from createActionInvoker are extracted
         const self = this
         this.applyPatches = createActionInvoker(
             this.storedValue,
@@ -416,8 +416,11 @@ export class ObjectNode implements INode {
         if (this.patchSubscribers) this.patchSubscribers.splice(0)
         if (this.snapshotSubscribers) this.snapshotSubscribers.splice(0)
         this.state = NodeLifeCycle.DEAD
-        this._parent = null
         this.subpath = ""
+        this.observableInstanceCreated = false
+        this._parent = null
+        this._childNodes = null
+        this._initialSnapshot = null
 
         // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
         // we could express this in a much nicer way
