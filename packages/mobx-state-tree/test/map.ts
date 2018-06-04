@@ -278,7 +278,7 @@ test("it should get map keys from reversePatch when deleted an item from a neste
     store.remove("a")
 })
 
-test("map expects regular identifiers - 1", () => {
+test("map expects regular identifiers", () => {
     const A = types.model("A", { a: types.identifier() })
     const B = types.model("B", { b: types.identifier() })
 
