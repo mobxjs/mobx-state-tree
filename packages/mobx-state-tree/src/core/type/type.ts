@@ -148,8 +148,6 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
             (!current.identifierAttribute ||
                 current.identifier === newValue[current.identifierAttribute])
         ) {
-            // if current is obtained via getChildNode, it may be not initialized yet
-            if (!current.observableInstanceCreated) current.createObservableInstance()
             // the newValue has no node, so can be treated like a snapshot
             // we can reconcile
             current.applySnapshot(newValue)

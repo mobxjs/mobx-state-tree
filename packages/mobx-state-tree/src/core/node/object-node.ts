@@ -56,14 +56,20 @@ export class ObjectNode implements INode {
         | null = null
     private disposers: (() => void)[] | null = null
 
-    applyPatches: (patches: IJsonPatch[]) => void
-    applySnapshot: (snapshot: any) => void
+    applyPatches(patches: IJsonPatch[]): void {
+        if (!this._observableInstanceCreated) this._createObservableInstance()
+        this.applyPatches(patches)
+    }
+    applySnapshot(snapshot: any): void {
+        if (!this._observableInstanceCreated) this._createObservableInstance()
+        this.applySnapshot(snapshot)
+    }
 
-    observableInstanceCreated: boolean = false
-    private _childNodes: IChildNodesMap | null = null
-    private _initialSnapshot: any
-    private _createNewInstance: (initialValue: any) => any
-    private _finalizeNewInstance: (node: INode, initialValue: any) => void
+    private _observableInstanceCreated: boolean = false
+    private readonly _childNodes: IChildNodesMap | null = null
+    private readonly _initialSnapshot: any
+    private readonly _createNewInstance: (initialValue: any) => any
+    private readonly _finalizeNewInstance: (node: INode, initialValue: any) => void
 
     constructor(
         type: IType<any, any>,
@@ -100,14 +106,14 @@ export class ObjectNode implements INode {
     }
 
     @action
-    createObservableInstance() {
+    private _createObservableInstance() {
         this.storedValue = this._createNewInstance(this._childNodes)
         this.preboot()
 
         addHiddenFinalProp(this.storedValue, "$treenode", this)
         addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
 
-        this.observableInstanceCreated = true
+        this._observableInstanceCreated = true
         let sawException = true
         try {
             this._isRunningAction = true
@@ -210,7 +216,7 @@ export class ObjectNode implements INode {
     }
 
     public get value() {
-        if (!this.observableInstanceCreated) this.createObservableInstance()
+        if (!this._observableInstanceCreated) this._createObservableInstance()
         return this._value
     }
 
@@ -223,7 +229,7 @@ export class ObjectNode implements INode {
     @computed
     public get snapshot(): any {
         if (!this.isAlive) return undefined
-        const snapshot = this.observableInstanceCreated
+        const snapshot = this._observableInstanceCreated
             ? this._getActualSnapshot()
             : this._getInitialSnapshot()
         return freeze(snapshot)
@@ -267,7 +273,7 @@ export class ObjectNode implements INode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this.observableInstanceCreated
+            return this._observableInstanceCreated
                 ? this.type.getChildNode(this, subpath)
                 : this._childNodes![subpath]
         } finally {
@@ -279,7 +285,7 @@ export class ObjectNode implements INode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this.observableInstanceCreated
+            return this._observableInstanceCreated
                 ? this.type.getChildren(this)
                 : this._getChildNodesArray()
         } finally {
@@ -477,7 +483,7 @@ export class ObjectNode implements INode {
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.assertWritable()
-        if (!this.observableInstanceCreated) this.createObservableInstance()
+        if (!this._observableInstanceCreated) this._createObservableInstance()
         this.type.applyPatchLocally(this, subpath, patch)
     }
 }
