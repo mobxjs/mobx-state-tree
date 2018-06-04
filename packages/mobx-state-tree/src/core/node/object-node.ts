@@ -25,9 +25,7 @@ import {
     freeze,
     resolveNodeByPathParts,
     convertChildNodesToArray,
-    ModelType,
-    identity,
-    noop
+    ModelType
 } from "../../internal"
 
 let nextNodeId = 1
