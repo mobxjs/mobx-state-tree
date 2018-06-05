@@ -95,7 +95,7 @@ function toPropertiesObject<T>(properties: IModelProperties<T>): { [K in keyof T
                 fail("Getters are not supported as properties. Please use views instead")
             }
             // undefined and null are not valid
-            const { value } = descriptor
+            const value = descriptor.value
             if (value === null || value === undefined) {
                 fail(
                     "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
@@ -365,9 +365,10 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         // that pre-reserves all these fields for fast object-member lookups
     }
     initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
+        const type = objNode.type as ModelType<any, any>
         const result = {} as IChildNodesMap
-        this.forAllProps((name, type) => {
-            result[name] = type.instantiate(
+        type.forAllProps((name, childType) => {
+            result[name] = childType.instantiate(
                 objNode,
                 name,
                 objNode._environment,
@@ -376,17 +377,18 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         })
         return result
     }
-    createNewInstance = () => {
+    createNewInstance() {
         const instance = observable.object(EMPTY_OBJECT, EMPTY_OBJECT, mobxShallow)
         addHiddenFinalProp(instance, "toString", objectTypeToString)
         return instance as Object
     }
 
-    finalizeNewInstance = (node: INode, childNodes: IChildNodesMap) => {
+    finalizeNewInstance(node: INode, childNodes: IChildNodesMap) {
         const objNode = node as ObjectNode
+        const type = objNode.type as ModelType<any, any>
         const instance = objNode.storedValue as IStateTreeNode
 
-        this.forAllProps(name => {
+        type.forAllProps(name => {
             extendObservable(
                 instance,
                 {
@@ -398,16 +400,15 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             _interceptReads(instance, name, objNode.unbox)
         })
 
-        this.initializers.reduce((self, fn) => fn(self), instance)
-        intercept(instance, change => this.willChange(change))
-        observe(instance, this.didChange)
+        type.initializers.reduce((self, fn) => fn(self), instance)
+        intercept(instance, type.willChange)
+        observe(instance, type.didChange)
     }
 
     willChange(change: any): IObjectWillChange | null {
         const node = getStateTreeNode(change.object)
         node.assertWritable()
-        // TODO: can get type from node._childNodes and make this pure => static
-        const type = this.properties[change.name]
+        const type = (node.type as ModelType<any, any>).properties[change.name]
         // only properties are typed, state are stored as-is references
         if (type) {
             typecheck(type, change.newValue)
@@ -416,12 +417,13 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         return change
     }
 
-    didChange = (change: any) => {
-        if (!this.properties[change.name]) {
+    didChange(change: any) {
+        const node = getStateTreeNode(change.object)
+        const type = (node.type as ModelType<any, any>).properties[change.name]
+        if (!type) {
             // don't emit patches for volatile state
             return
         }
-        const node = getStateTreeNode(change.object)
         const oldValue = change.oldValue ? change.oldValue.snapshot : undefined
         node.emitPatch(
             {

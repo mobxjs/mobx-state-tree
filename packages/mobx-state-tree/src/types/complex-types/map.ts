@@ -153,7 +153,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 
     initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
-        const subType = this.subType
+        const subType = (objNode.type as MapType<any, any>).subType
         const environment = objNode._environment
         const result = {} as IChildNodesMap
         Object.keys(initialSnapshot).forEach(name => {
@@ -167,19 +167,20 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         return "Map<string, " + this.subType.describe() + ">"
     }
 
-    createNewInstance = (childNodes: IChildNodesMap) => {
+    createNewInstance(childNodes: IChildNodesMap) {
         const instance = observable.map(childNodes, mobxShallow)
         addHiddenFinalProp(instance, "put", put)
         addHiddenFinalProp(instance, "toString", mapToString)
         return instance
     }
 
-    finalizeNewInstance = (node: INode) => {
+    finalizeNewInstance(node: INode) {
         const objNode = node as ObjectNode
+        const type = objNode.type as MapType<any, any>
         const instance = objNode.storedValue as ObservableMap<any, any>
         _interceptReads(instance, objNode.unbox)
-        intercept(instance, change => this.willChange(change))
-        observe(instance, this.didChange)
+        intercept(instance, type.willChange)
+        observe(instance, type.didChange)
     }
 
     getChildren(node: ObjectNode): ReadonlyArray<INode> {
@@ -197,6 +198,8 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         const node = getStateTreeNode(change.object as IStateTreeNode)
         const key = "" + change.name
         node.assertWritable()
+        const mapType = node.type as MapType<any, any>
+        const subType = mapType.subType
 
         switch (change.type) {
             case "update":
@@ -204,24 +207,16 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                     const { newValue } = change
                     const oldValue = change.object.get(key)
                     if (newValue === oldValue) return null
-                    typecheck(this.subType, newValue)
-                    change.newValue = this.subType.reconcile(
-                        node.getChildNode(key),
-                        change.newValue
-                    )
-                    this.processIdentifier(key, change.newValue as INode)
+                    typecheck(subType, newValue)
+                    change.newValue = subType.reconcile(node.getChildNode(key), change.newValue)
+                    mapType.processIdentifier(key, change.newValue as INode)
                 }
                 break
             case "add":
                 {
-                    typecheck(this.subType, change.newValue)
-                    change.newValue = this.subType.instantiate(
-                        node,
-                        key,
-                        undefined,
-                        change.newValue
-                    )
-                    this.processIdentifier(key, change.newValue as INode)
+                    typecheck(subType, change.newValue)
+                    change.newValue = subType.instantiate(node, key, undefined, change.newValue)
+                    mapType.processIdentifier(key, change.newValue as INode)
                 }
                 break
         }
