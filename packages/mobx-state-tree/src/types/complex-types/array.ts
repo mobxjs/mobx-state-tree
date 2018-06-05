@@ -39,7 +39,6 @@ import {
     IChildNodesMap,
     convertChildNodesToArray
 } from "../../internal"
-import { MapType } from "./map"
 
 export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
     return `${getStateTreeNode(this)}(${this.length} items)`
