@@ -44,6 +44,7 @@ export class ObjectNode implements INode {
     nodeId = ++nextNodeId
     readonly type: IType<any, any>
     readonly identifierAttribute: string | undefined
+    readonly identifier: string | null
 
     @observable subpath: string = ""
     @observable parent: ObjectNode | null = null
@@ -63,11 +64,10 @@ export class ObjectNode implements INode {
         | null = null
     private _snapshotSubscribers: ((snapshot: any) => void)[] | null = null
     private _observableInstanceCreated: boolean = false
-    private readonly _childNodes: IChildNodesMap | null
-    private readonly _initialSnapshot: any
-    private readonly _createNewInstance: (initialValue: any) => any
-    private readonly _finalizeNewInstance: (node: INode, initialValue: any) => void
-    private readonly identifier: string | null
+    private _childNodes: IChildNodesMap | null
+    private _initialSnapshot: any
+    private _createNewInstance: ((initialValue: any) => any) | null
+    private _finalizeNewInstance: ((node: INode, initialValue: any) => void) | null
 
     applyPatches(patches: IJsonPatch[]): void {
         if (!this._observableInstanceCreated) this._createObservableInstance()
@@ -118,7 +118,7 @@ export class ObjectNode implements INode {
 
     @action
     private _createObservableInstance() {
-        this.storedValue = this._createNewInstance(this._childNodes)
+        this.storedValue = this._createNewInstance!(this._childNodes)
         this.preboot()
 
         addHiddenFinalProp(this.storedValue, "$treenode", this)
@@ -128,7 +128,7 @@ export class ObjectNode implements INode {
         let sawException = true
         try {
             this._isRunningAction = true
-            this._finalizeNewInstance(this, this._childNodes)
+            this._finalizeNewInstance!(this, this._childNodes)
             this._isRunningAction = false
 
             this.fireHook("afterCreate")
@@ -152,6 +152,11 @@ export class ObjectNode implements INode {
         )
         this.addDisposer(snapshotDisposer)
         this.finalizeCreation()
+
+        this._childNodes = null
+        this._initialSnapshot = null
+        this._createNewInstance = null
+        this._finalizeNewInstance = null
     }
 
     /*
