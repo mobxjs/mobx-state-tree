@@ -2,7 +2,7 @@ const { start } = require("./timer")
 const { Treasure, Hero, Monster } = require("../fixtures/fixture-models")
 const { createTreasure, createHeros, createMonsters } = require("../fixtures/fixture-data")
 /**
- * Covers models with a trivial amount of fields.
+ * Covers models with a trivial number of fields.
  *
  * @param count The number of records to create.
  */
@@ -15,7 +15,7 @@ exports.smallScenario = function smallScenario(count) {
     return { count, elapsed, sanity }
 }
 /**
- * Covers models with a moderate amount of fields + 1 computed field.
+ * Covers models with a moderate number of fields + 1 computed field.
  *
  * @param count The number of records to create.
  */
@@ -28,7 +28,7 @@ exports.mediumScenario = function mediumScenario(count) {
     return { count, elapsed, sanity }
 }
 /**
- * Covers models with a large amount of fields.
+ * Covers models with a large number of fields.
  *
  * @param count The number of records to create.
  * @param smallChildren The number of small children contained within.
