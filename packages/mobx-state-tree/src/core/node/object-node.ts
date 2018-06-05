@@ -63,10 +63,11 @@ export class ObjectNode implements INode {
         | null = null
     private _snapshotSubscribers: ((snapshot: any) => void)[] | null = null
     private _observableInstanceCreated: boolean = false
-    readonly _childNodes: IChildNodesMap | null = null
+    private readonly _childNodes: IChildNodesMap | null
     private readonly _initialSnapshot: any
     private readonly _createNewInstance: (initialValue: any) => any
     private readonly _finalizeNewInstance: (node: INode, initialValue: any) => void
+    private readonly identifier: string | null
 
     applyPatches(patches: IJsonPatch[]): void {
         if (!this._observableInstanceCreated) this._createObservableInstance()
@@ -95,6 +96,12 @@ export class ObjectNode implements INode {
         this.parent = parent
         this.subpath = subpath
         this.identifierAttribute = type instanceof ModelType ? type.identifierAttribute : undefined
+        // identifier can not be changed during lifecycle of a node
+        // so we safely can read it from initial snapshot
+        this.identifier =
+            this.identifierAttribute && this._initialSnapshot
+                ? this._initialSnapshot[this.identifierAttribute]
+                : null
 
         if (!parent) {
             this.identifierCache = new IdentifierCache()
@@ -244,14 +251,6 @@ export class ObjectNode implements INode {
         if (this._isRunningAction) return true
         if (this.isRoot) return false
         return this.parent!.isRunningAction()
-    }
-
-    get identifier(): string | null {
-        // identifier can not be changed during lifecycle of a node
-        // so we safely can read it from initial snapshot
-        return this.identifierAttribute && this._initialSnapshot
-            ? this._initialSnapshot[this.identifierAttribute]
-            : null
     }
 
     public get isAlive() {

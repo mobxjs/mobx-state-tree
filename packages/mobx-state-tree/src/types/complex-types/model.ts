@@ -132,14 +132,14 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     /*
      * The original object definition
      */
+    public identifierAttribute: string | undefined = undefined
     public readonly initializers: ((instance: any) => any)[]
-    public readonly properties: { [K: string]: IType<any, any> } = {}
+    public readonly properties: { [K: string]: IType<any, any> }
+
     private preProcessor: (snapshot: any) => any | undefined
     private postProcessor: (snapshot: any) => any | undefined
-
-    public identifierAttribute: string | undefined = undefined
-    private optionalChildren: OptionalValuesMap
-    private propertyNames: string[]
+    private optionalChildren: OptionalValuesMap | null = null
+    private readonly propertyNames: string[]
 
     constructor(opts: ModelTypeConfig) {
         super(opts.name || defaultObjectOptions.name)
@@ -155,7 +155,9 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
     }
 
     private _preBootModel() {
-        this.optionalChildren = {} as OptionalValuesMap
+        let optionalFound = false
+        const optionalChildren = {} as OptionalValuesMap
+
         this.forAllProps((propName, propType) => {
             if (propType instanceof IdentifierType) {
                 if (this.identifierAttribute)
@@ -165,17 +167,23 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
                     )
                 this.identifierAttribute = propName
             } else if (propType instanceof OptionalValue) {
-                this.optionalChildren[propName] = propType
+                optionalChildren[propName] = propType
+                optionalFound = true
             } else if (propType instanceof Union) {
                 const optional = propType.types.find(
                     t => t instanceof OptionalValue
                 ) as OptionalValue<any, any>
                 if (optional) {
-                    this.optionalChildren[propName] = optional
+                    optionalChildren[propName] = optional
+                    optionalFound = true
                 }
             }
         })
-        freeze(this.optionalChildren)
+
+        if (optionalFound) {
+            this.optionalChildren = optionalChildren
+            freeze(this.optionalChildren)
+        }
     }
 
     cloneAndEnhance(opts: ModelTypeConfig): ModelType<any, any> {
@@ -485,7 +493,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         const processor = this.preProcessor
         const processed = processor ? processor.call(null, snapshot) : snapshot
 
-        if (processed) {
+        if (processed && this.optionalChildren) {
             const optionalChildren = this.optionalChildren
             Object.keys(optionalChildren).forEach(name => {
                 if (typeof processed[name] === "undefined") {
