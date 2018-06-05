@@ -168,7 +168,6 @@ export class ObjectNode implements INode {
         return this.parent.path + "/" + escapeJsonPath(this.subpath)
     }
 
-    @computed
     public get root(): ObjectNode {
         let p,
             r: ObjectNode = this
