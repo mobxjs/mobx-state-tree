@@ -358,3 +358,72 @@ test("on tree - group", t => {
     t.is(undoManager.canRedo, true)
     t.is(store.numbers.length, 0)
 })
+
+test("on tree - debounce group", async t => {
+    function delay(time) {
+        return new Promise(resolve => {
+            setTimeout(resolve, time)
+        })
+    }
+
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            numbers: types.optional(types.array(types.number), []),
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            setUndoManagerSameTree(self)
+            return {
+                inc() {
+                    self.x += 1
+                },
+                addNumber(number) {
+                    self.numbers.push(number)
+                }
+            }
+        })
+    const store = HistoryOnTreeStoreModel.create()
+
+    const debounced = undoManager.debounceGroup(() => {
+        store.inc()
+    }, 20)
+
+    t.is(undoManager.canUndo, false)
+    t.is(undoManager.canRedo, false)
+    t.is(store.x, 1)
+
+    await delay(0)
+    debounced()
+
+    await delay(10)
+    t.is(store.x, 2)
+    t.is(undoManager.canUndo, false)
+    debounced()
+
+    await delay(30)
+    t.is(undoManager.canUndo, true)
+    t.is(undoManager.history.length, 1)
+    undoManager.undo()
+    t.is(store.x, 1)
+    t.is(undoManager.canUndo, false)
+    t.is(undoManager.canRedo, true)
+    debounced()
+
+    await delay(30)
+    debounced()
+
+    await delay(30)
+    debounced()
+
+    await delay(30)
+    t.is(store.x, 4)
+    t.is(undoManager.canUndo, true)
+    t.is(undoManager.history.length, 3)
+    debounced()
+
+    await delay(10)
+    debounced.cancel()
+    t.is(store.x, 5)
+    t.is(undoManager.history.length, 4)
+})

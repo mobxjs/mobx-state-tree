@@ -15,6 +15,10 @@ import {
     IJsonPatch
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
+interface Debounce {
+    (): any
+    cancel?(): any
+}
 
 const Entry = types.model("UndoManagerEntry", {
     patches: types.frozen,
@@ -181,6 +185,20 @@ const UndoManager = types
                 grouping = false
                 ;(self as any).addUndoState(groupRecorder)
                 groupRecorder = { patches: [], inversePatches: [] }
+            },
+            debounceGroup(fn: () => any, wait: number) {
+                let timeout = 0
+                const debounced: Debounce = function() {
+                    if (timeout) clearTimeout(timeout)
+                    ;(self as any).startGroup(fn)
+                    timeout = setTimeout((self as any).stopGroup, wait)
+                }
+                debounced.cancel = function() {
+                    clearTimeout(timeout)
+                    ;(self as any).stopGroup()
+                    timeout = 0
+                }
+                return debounced
             }
         }
     })
