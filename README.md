@@ -1108,15 +1108,13 @@ export const LoggingSquare = types
 
 ### When not to use MST?
 
-MST makes state management very tangible by offering access to snapshots, patches and by providing interceptable actions.
-Also it fixes the `this` problem.
-All these features have the downside that they incur a little runtime overhead.
+MST provides access to snapshots, patches and interceptable actions.  Also, it fixes the `this` problem.
+All these features have a downside as they incur a little runtime overhead.
 Although in many places the MST core can still be optimized significantly, there will always be a constant overhead.
-If you have a performance critical application that handles huge amounts of mutable data, you will probably be better
-off by using 'raw' mobx.
-Which has predictable and well-known performance characteristics, and has much less overhead.
+If you have a performance critical application that handles a huge amount of mutable data, you will probably be better
+off by using 'raw' MobX, which has a predictable and well-known performance and much less overhead.
 
-Likewise, if your application is mainly dealing with stateless information (such as a logging system) MST doesn't add much values.
+Likewise, if your application mainly processes stateless information (such as a logging system), MST won't add much value.
 
 ### Where is the `any` type?
 
