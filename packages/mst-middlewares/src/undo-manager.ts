@@ -15,12 +15,12 @@ import {
     IJsonPatch
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
-interface Debounce {
-    (): any
+interface Debounce<T> {
+    (val?: T): any
     cancel?(): any
 }
-interface Throttle {
-    (): any
+interface Throttle<T> {
+    (val?: T): any
     cancel?(): any
 }
 
@@ -190,16 +190,16 @@ const UndoManager = types
                 ;(self as any).addUndoState(groupRecorder)
                 groupRecorder = { patches: [], inversePatches: [] }
             },
-            debounceGroup(fn: () => any, wait: number) {
+            debounceGroup<T>(fn: (val: T) => any, wait: number) {
                 let timeout: any = 0 // TODO: should the timeout be handled by both number and NodeJS.Timer?
                 function later() {
                     clearTimeout(timeout)
                     ;(self as any).stopGroup()
                     timeout = 0
                 }
-                const debounced: Debounce = function() {
+                const debounced: Debounce<T> = function(val?: T) {
                     if (timeout) clearTimeout(timeout)
-                    ;(self as any).startGroup(fn)
+                    ;(self as any).startGroup(fn.bind(null, val))
                     timeout = setTimeout(later, wait)
                 }
                 debounced.cancel = function() {
@@ -207,15 +207,15 @@ const UndoManager = types
                 }
                 return debounced
             },
-            throttleGroup(fn: () => any, wait: number) {
+            throttleGroup<T>(fn: (val: T) => any, wait: number) {
                 let timeout: any = 0 // TODO: should the timeout be handled by both number and NodeJS.Timer?
                 function later() {
                     clearTimeout(timeout)
                     ;(self as any).stopGroup()
                     timeout = 0
                 }
-                const throttled: Throttle = function() {
-                    ;(self as any).startGroup(fn)
+                const throttled: Throttle<T> = function(val?: T) {
+                    ;(self as any).startGroup(fn.bind(null, val))
                     timeout = timeout || setTimeout(later, wait)
                 }
                 throttled.cancel = function() {
