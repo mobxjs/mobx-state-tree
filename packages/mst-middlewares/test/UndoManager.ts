@@ -380,8 +380,8 @@ test("on tree - debounce group", async t => {
         .actions(self => {
             _setUndoManagerSameTree(self)
             return {
-                inc() {
-                    self.x += 1
+                inc(n: number) {
+                    self.x += n || 1
                 },
                 addNumber(number) {
                     self.numbers.push(number)
@@ -390,18 +390,18 @@ test("on tree - debounce group", async t => {
         })
     const store = HistoryOnTreeStoreModel.create()
 
-    const debounced = _undoManager.debounceGroup(() => {
-        store.inc()
+    const debounced = _undoManager.debounceGroup(val => {
+        store.inc(val)
     }, 20)
 
     t.is(_undoManager.canUndo, false)
     t.is(_undoManager.canRedo, false)
     t.is(store.x, 1)
 
-    debounced()
+    debounced(2)
 
     await delay(10)
-    t.is(store.x, 2)
+    t.is(store.x, 3)
     t.is(_undoManager.canUndo, false)
     debounced()
 
@@ -453,8 +453,8 @@ test("on tree - throttle group", async t => {
         .actions(self => {
             _setUndoManagerSameTree(self)
             return {
-                inc() {
-                    self.x += 1
+                inc(n: number) {
+                    self.x += n || 1
                 },
                 addNumber(number) {
                     self.numbers.push(number)
@@ -463,28 +463,28 @@ test("on tree - throttle group", async t => {
         })
     const store = HistoryOnTreeStoreModel.create()
 
-    const throttled = _undoManager.throttleGroup(() => {
-        store.inc()
+    const throttled = _undoManager.throttleGroup(val => {
+        store.inc(val)
     }, 30)
 
     t.is(_undoManager.canUndo, false)
     t.is(_undoManager.canRedo, false)
     t.is(store.x, 1)
 
-    throttled()
+    throttled(2)
 
     await delay(10)
-    t.is(store.x, 2)
-    t.is(_undoManager.canUndo, false)
-    throttled()
-
-    await delay(5)
     t.is(store.x, 3)
     t.is(_undoManager.canUndo, false)
     throttled()
 
-    await delay(20)
+    await delay(5)
     t.is(store.x, 4)
+    t.is(_undoManager.canUndo, false)
+    throttled()
+
+    await delay(20)
+    t.is(store.x, 5)
     t.is(_undoManager.canUndo, true)
     t.is(_undoManager.history.length, 1)
     _undoManager.undo()
