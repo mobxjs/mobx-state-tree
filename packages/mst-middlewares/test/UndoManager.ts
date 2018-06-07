@@ -360,6 +360,11 @@ test("on tree - group", t => {
 })
 
 test("on tree - debounce group", async t => {
+    let _undoManager: any = {}
+    const _setUndoManagerSameTree = targetStore => {
+        _undoManager = targetStore.history
+    }
+
     function delay(time) {
         return new Promise(resolve => {
             setTimeout(resolve, time)
@@ -373,7 +378,7 @@ test("on tree - debounce group", async t => {
             history: types.optional(UndoManager, {})
         })
         .actions(self => {
-            setUndoManagerSameTree(self)
+            _setUndoManagerSameTree(self)
             return {
                 inc() {
                     self.x += 1
@@ -385,29 +390,28 @@ test("on tree - debounce group", async t => {
         })
     const store = HistoryOnTreeStoreModel.create()
 
-    const debounced = undoManager.debounceGroup(() => {
+    const debounced = _undoManager.debounceGroup(() => {
         store.inc()
     }, 20)
 
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, false)
+    t.is(_undoManager.canUndo, false)
+    t.is(_undoManager.canRedo, false)
     t.is(store.x, 1)
 
-    await delay(0)
     debounced()
 
     await delay(10)
     t.is(store.x, 2)
-    t.is(undoManager.canUndo, false)
+    t.is(_undoManager.canUndo, false)
     debounced()
 
     await delay(30)
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.history.length, 1)
-    undoManager.undo()
+    t.is(_undoManager.canUndo, true)
+    t.is(_undoManager.history.length, 1)
+    _undoManager.undo()
     t.is(store.x, 1)
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, true)
+    t.is(_undoManager.canUndo, false)
+    t.is(_undoManager.canRedo, true)
     debounced()
 
     await delay(30)
@@ -418,12 +422,91 @@ test("on tree - debounce group", async t => {
 
     await delay(30)
     t.is(store.x, 4)
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.history.length, 3)
+    t.is(_undoManager.canUndo, true)
+    t.is(_undoManager.history.length, 3)
     debounced()
 
     await delay(10)
     debounced.cancel()
     t.is(store.x, 5)
-    t.is(undoManager.history.length, 4)
+    t.is(_undoManager.history.length, 4)
+})
+
+test("on tree - throttle group", async t => {
+    let _undoManager: any = {}
+    const _setUndoManagerSameTree = targetStore => {
+        _undoManager = targetStore.history
+    }
+
+    function delay(time) {
+        return new Promise(resolve => {
+            setTimeout(resolve, time)
+        })
+    }
+
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            numbers: types.optional(types.array(types.number), []),
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            _setUndoManagerSameTree(self)
+            return {
+                inc() {
+                    self.x += 1
+                },
+                addNumber(number) {
+                    self.numbers.push(number)
+                }
+            }
+        })
+    const store = HistoryOnTreeStoreModel.create()
+
+    const throttled = _undoManager.throttleGroup(() => {
+        store.inc()
+    }, 30)
+
+    t.is(_undoManager.canUndo, false)
+    t.is(_undoManager.canRedo, false)
+    t.is(store.x, 1)
+
+    throttled()
+
+    await delay(10)
+    t.is(store.x, 2)
+    t.is(_undoManager.canUndo, false)
+    throttled()
+
+    await delay(5)
+    t.is(store.x, 3)
+    t.is(_undoManager.canUndo, false)
+    throttled()
+
+    await delay(20)
+    t.is(store.x, 4)
+    t.is(_undoManager.canUndo, true)
+    t.is(_undoManager.history.length, 1)
+    _undoManager.undo()
+    t.is(store.x, 1)
+    t.is(_undoManager.canUndo, false)
+    t.is(_undoManager.canRedo, true)
+    throttled()
+
+    await delay(40)
+    throttled()
+
+    await delay(40)
+    throttled()
+
+    await delay(40)
+    t.is(store.x, 4)
+    t.is(_undoManager.canUndo, true)
+    t.is(_undoManager.history.length, 3)
+    throttled()
+
+    await delay(10)
+    throttled.cancel()
+    t.is(store.x, 5)
+    t.is(_undoManager.history.length, 4)
 })
