@@ -19,6 +19,10 @@ interface Debounce {
     (): any
     cancel?(): any
 }
+interface Throttle {
+    (): any
+    cancel?(): any
+}
 
 const Entry = types.model("UndoManagerEntry", {
     patches: types.frozen,
@@ -187,18 +191,37 @@ const UndoManager = types
                 groupRecorder = { patches: [], inversePatches: [] }
             },
             debounceGroup(fn: () => any, wait: number) {
-                let timeout = 0
-                const debounced: Debounce = function() {
-                    if (timeout) clearTimeout(timeout)
-                    ;(self as any).startGroup(fn)
-                    timeout = setTimeout((self as any).stopGroup, wait)
-                }
-                debounced.cancel = function() {
+                let timeout: any = 0 // TODO: should the timeout be handled by both number and NodeJS.Timer?
+                function later() {
                     clearTimeout(timeout)
                     ;(self as any).stopGroup()
                     timeout = 0
                 }
+                const debounced: Debounce = function() {
+                    if (timeout) clearTimeout(timeout)
+                    ;(self as any).startGroup(fn)
+                    timeout = setTimeout(later, wait)
+                }
+                debounced.cancel = function() {
+                    timeout && later()
+                }
                 return debounced
+            },
+            throttleGroup(fn: () => any, wait: number) {
+                let timeout: any = 0 // TODO: should the timeout be handled by both number and NodeJS.Timer?
+                function later() {
+                    clearTimeout(timeout)
+                    ;(self as any).stopGroup()
+                    timeout = 0
+                }
+                const throttled: Throttle = function() {
+                    ;(self as any).startGroup(fn)
+                    timeout = timeout || setTimeout(later, wait)
+                }
+                throttled.cancel = function() {
+                    timeout && later()
+                }
+                return throttled
             }
         }
     })
