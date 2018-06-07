@@ -303,7 +303,7 @@ const App = observer(props => <div>
 </div>
 )
 ```
-[View sample in playground](https://codesandbox.io/s/6vj27j6mqr)
+[View sample in playground](https://codesandbox.io/s/4rzvkx6z77)
 
 ## Improving render performance
 If you have the React DevTools installed, using the "Highlight Updates" check you will see that the entire application will re-render whenever a todo is toggled or name is changed. That's a shame, as this can cause performance issues if there are a lots of todos in our list!

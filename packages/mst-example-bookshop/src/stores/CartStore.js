@@ -16,11 +16,11 @@ const CartEntry = types
         }
     }))
     .actions(self => ({
-        increaseQuantity(amount) {
-            self.quantity += amount
+        increaseQuantity(number) {
+            self.quantity += number
         },
-        setQuantity(amount) {
-            self.quantity = amount
+        setQuantity(number) {
+            self.quantity = number
         }
     }))
 
