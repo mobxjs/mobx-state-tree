@@ -15,11 +15,11 @@ import {
     IJsonPatch
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
-interface Debounce<T> {
+export interface Debounce<T> {
     (val?: T): any
     cancel?(): any
 }
-interface Throttle<T> {
+export interface Throttle<T> {
     (val?: T): any
     cancel?(): any
 }
