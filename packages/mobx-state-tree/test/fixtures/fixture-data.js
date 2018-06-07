@@ -59,7 +59,7 @@ function createHeros(count) {
 exports.createHeros = createHeros
 
 /**
- * Creates data with a large amount of fields and data.
+ * Creates data with a large number of fields and data.
  *
  * @param count The number of items to create.
  * @param treasureCount The number of small children to create.
