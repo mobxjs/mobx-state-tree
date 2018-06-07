@@ -15,6 +15,14 @@ import {
     IJsonPatch
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
+export interface Debounce<T> {
+    (val?: T): any
+    cancel?(): any
+}
+export interface Throttle<T> {
+    (val?: T): any
+    cancel?(): any
+}
 
 const Entry = types.model("UndoManagerEntry", {
     patches: types.frozen,
@@ -176,11 +184,44 @@ const UndoManager = types
                 grouping = true
                 return fn()
             },
-            stopGroup(fn: () => any) {
+            stopGroup(fn?: () => any) {
                 if (fn) fn()
                 grouping = false
                 ;(self as any).addUndoState(groupRecorder)
                 groupRecorder = { patches: [], inversePatches: [] }
+            },
+            debounceGroup<T>(fn: (val: T) => any, wait: number) {
+                let timeout: any = 0 // TODO: should the timeout be handled by both number and NodeJS.Timer?
+                function later() {
+                    clearTimeout(timeout)
+                    ;(self as any).stopGroup()
+                    timeout = 0
+                }
+                const debounced: Debounce<T> = function(val?: T) {
+                    if (timeout) clearTimeout(timeout)
+                    ;(self as any).startGroup(fn.bind(null, val))
+                    timeout = setTimeout(later, wait)
+                }
+                debounced.cancel = function() {
+                    timeout && later()
+                }
+                return debounced
+            },
+            throttleGroup<T>(fn: (val: T) => any, wait: number) {
+                let timeout: any = 0 // TODO: should the timeout be handled by both number and NodeJS.Timer?
+                function later() {
+                    clearTimeout(timeout)
+                    ;(self as any).stopGroup()
+                    timeout = 0
+                }
+                const throttled: Throttle<T> = function(val?: T) {
+                    ;(self as any).startGroup(fn.bind(null, val))
+                    timeout = timeout || setTimeout(later, wait)
+                }
+                throttled.cancel = function() {
+                    timeout && later()
+                }
+                return throttled
             }
         }
     })

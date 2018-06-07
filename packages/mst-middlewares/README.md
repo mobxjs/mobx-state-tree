@@ -204,6 +204,8 @@ API:
 * `withoutUndoFlow(fn*)` patches the fn* are not recorded.
 * `startGroup(() => fn)` can be used to start a group, all patches within a group are saved as one history entry.
 * `stopGroup()` can be used to stop the recording of patches for the grouped history entry.
+* `debounceGroup((val?: T) => fn:(val?: T) => any, wait)` can be used to stop the recording of patches by a debounce function.
+* `throttleGroup((val?: T) => fn:(val?: T) => any, wait)` can be used to stop the recording of patches by a throttle function.
 
 Setup and API usage examples:
 
@@ -378,6 +380,30 @@ handleDrag = (mousePosition, { dx, dy }) => {
   );
 }
 ...
+```
+
+DebounceGroup, ThrottleGroup - within an interactive component:
+```js
+import {undoManager} from '../Store';
+
+const debounceTitle = undoManager.debounceGroup(val => {
+  // the group of patches will only be stopped after 5s from the last change.
+  this.saveTitle(val);
+}, 1e3 * 5);
+
+const throttleArticle = undoManager.throttledGroup(val => {
+  // the group of patches will be stopped in every 5s.
+  this.saveArticle(val);
+}, 1e3 * 5);
+...
+
+onTitleChange = val => {
+  debounceTitle(val);
+}
+
+onArticleChange = val => {
+  throttleArticle(val);
+}
 ```
 
 ---

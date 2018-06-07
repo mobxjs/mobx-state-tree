@@ -358,3 +358,155 @@ test("on tree - group", t => {
     t.is(undoManager.canRedo, true)
     t.is(store.numbers.length, 0)
 })
+
+test("on tree - debounce group", async t => {
+    let _undoManager: any = {}
+    const _setUndoManagerSameTree = targetStore => {
+        _undoManager = targetStore.history
+    }
+
+    function delay(time) {
+        return new Promise(resolve => {
+            setTimeout(resolve, time)
+        })
+    }
+
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            numbers: types.optional(types.array(types.number), []),
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            _setUndoManagerSameTree(self)
+            return {
+                inc(n: number) {
+                    self.x += n || 1
+                },
+                addNumber(number) {
+                    self.numbers.push(number)
+                }
+            }
+        })
+    const store = HistoryOnTreeStoreModel.create()
+
+    const debounced = _undoManager.debounceGroup(val => {
+        store.inc(val)
+    }, 20)
+
+    t.is(_undoManager.canUndo, false)
+    t.is(_undoManager.canRedo, false)
+    t.is(store.x, 1)
+
+    debounced(2)
+
+    await delay(10)
+    t.is(store.x, 3)
+    t.is(_undoManager.canUndo, false)
+    debounced()
+
+    await delay(30)
+    t.is(_undoManager.canUndo, true)
+    t.is(_undoManager.history.length, 1)
+    _undoManager.undo()
+    t.is(store.x, 1)
+    t.is(_undoManager.canUndo, false)
+    t.is(_undoManager.canRedo, true)
+    debounced()
+
+    await delay(30)
+    debounced()
+
+    await delay(30)
+    debounced()
+
+    await delay(30)
+    t.is(store.x, 4)
+    t.is(_undoManager.canUndo, true)
+    t.is(_undoManager.history.length, 3)
+    debounced()
+
+    await delay(10)
+    debounced.cancel()
+    t.is(store.x, 5)
+    t.is(_undoManager.history.length, 4)
+})
+
+test("on tree - throttle group", async t => {
+    let _undoManager: any = {}
+    const _setUndoManagerSameTree = targetStore => {
+        _undoManager = targetStore.history
+    }
+
+    function delay(time) {
+        return new Promise(resolve => {
+            setTimeout(resolve, time)
+        })
+    }
+
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            numbers: types.optional(types.array(types.number), []),
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            _setUndoManagerSameTree(self)
+            return {
+                inc(n: number) {
+                    self.x += n || 1
+                },
+                addNumber(number) {
+                    self.numbers.push(number)
+                }
+            }
+        })
+    const store = HistoryOnTreeStoreModel.create()
+
+    const throttled = _undoManager.throttleGroup(val => {
+        store.inc(val)
+    }, 30)
+
+    t.is(_undoManager.canUndo, false)
+    t.is(_undoManager.canRedo, false)
+    t.is(store.x, 1)
+
+    throttled(2)
+
+    await delay(10)
+    t.is(store.x, 3)
+    t.is(_undoManager.canUndo, false)
+    throttled()
+
+    await delay(5)
+    t.is(store.x, 4)
+    t.is(_undoManager.canUndo, false)
+    throttled()
+
+    await delay(20)
+    t.is(store.x, 5)
+    t.is(_undoManager.canUndo, true)
+    t.is(_undoManager.history.length, 1)
+    _undoManager.undo()
+    t.is(store.x, 1)
+    t.is(_undoManager.canUndo, false)
+    t.is(_undoManager.canRedo, true)
+    throttled()
+
+    await delay(40)
+    throttled()
+
+    await delay(40)
+    throttled()
+
+    await delay(40)
+    t.is(store.x, 4)
+    t.is(_undoManager.canUndo, true)
+    t.is(_undoManager.history.length, 3)
+    throttled()
+
+    await delay(10)
+    throttled.cancel()
+    t.is(store.x, 5)
+    t.is(_undoManager.history.length, 4)
+})
