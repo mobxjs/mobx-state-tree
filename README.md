@@ -1114,7 +1114,7 @@ Although in many places the MST core can still be optimized significantly, there
 If you have a performance critical application that handles a huge amount of mutable data, you will probably be better
 off by using 'raw' MobX, which has a predictable and well-known performance and much less overhead.
 
-Likewise, if your application processes stateless information (such as a logging system), MST won't add much value.
+Likewise, if your application mainly processes stateless information (such as a logging system), MST won't add much value.
 
 ### Where is the `any` type?
 
