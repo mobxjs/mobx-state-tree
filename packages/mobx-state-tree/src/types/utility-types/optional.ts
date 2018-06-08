@@ -52,7 +52,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
     reconcile(current: INode, newValue: any): INode {
         return this.type.reconcile(
             current,
-            this.type.is(newValue) ? newValue : this.getDefaultValue()
+            this.type.is(newValue) && newValue !== undefined ? newValue : this.getDefaultValue()
         )
     }
 
