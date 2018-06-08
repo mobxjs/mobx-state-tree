@@ -31,7 +31,7 @@ export type ISerializedActionCall = {
 export interface IActionRecorder {
     actions: ReadonlyArray<ISerializedActionCall>
     stop(): any
-    replay(target: IStateTreeNode): any
+    replay(target: IStateTreeNode): Promise<any[]>
 }
 
 function serializeArgument(node: INode, actionName: string, index: number, arg: any): any {
@@ -144,7 +144,7 @@ function baseApplyAction(target: IStateTreeNode, action: ISerializedActionCall):
  *      // stop recording actions
  *      stop(): any
  *      // apply all the recorded actions on the given object
- *      replay(target: IStateTreeNode): any
+ *      replay(target: IStateTreeNode): Promise<any[]>
  * }
  *
  * @export
