@@ -1,4 +1,4 @@
-import { getSnapshot, types, unprotect } from "../src"
+import { getSnapshot, types, unprotect, applySnapshot } from "../src"
 test("it should provide a default value, if no snapshot is provided", () => {
     const Row = types.model({
         name: "",
@@ -66,7 +66,8 @@ test("Values should reset to default if omitted in snapshot", () => {
         todo: types.model({
             id: types.identifier(),
             done: false,
-            title: "test"
+            title: "test",
+            thing: types.optional(types.frozen, {})
         })
     })
     const store = Store.create({ todo: { id: "2" } })
@@ -77,6 +78,21 @@ test("Values should reset to default if omitted in snapshot", () => {
     expect(store.todo.title).toBe("stuff")
     expect(store.todo.done).toBe(false)
 })
+
+test("optional frozen should fallback to default value if snapshot is undefined", () => {
+    const Store = types.model({
+        thing: types.optional(types.frozen, {})
+    })
+    const store = Store.create({
+        thing: null
+    })
+
+    expect(store.thing).toBeNull()
+    applySnapshot(store, {})
+    expect(store.thing).toBeDefined()
+    expect(store.thing).toEqual({})
+})
+
 test("a model is a valid default value, snapshot will be used", () => {
     const Row = types.model({
         name: "",

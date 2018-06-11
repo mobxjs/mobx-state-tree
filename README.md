@@ -320,7 +320,7 @@ MST trees have very specific semantics. These semantics purposefully constrain w
 1. Every _node_ tree in a MST tree is a tree in itself. Any operation that can be invoked on the complete tree can also be applied to a sub tree.
 1. A node can only exist exactly _once_ in a tree. This ensures it has a unique, identifiable position.
 2. It is however possible to refer to another object in the _same_ tree by using _references_
-3. There is no limit to the amount of MST trees that live in an application. However, each node can only live in exactly one tree.
+3. There is no limit to the number of MST trees that live in an application. However, each node can only live in exactly one tree.
 4. All _leaves_ in the tree must be serializable; it is not possible to store, for example, functions in a MST.
 6. The only free-form type in MST is frozen; with the requirement that frozen values are immutable and serializable so that the MST semantics can still be upheld.
 7. At any point in the tree it is possible to assign a snapshot to the tree instead of a concrete instance of the expected type. In that case an instance of the correct type, based on the snapshot, will be automatically created for you.
@@ -471,10 +471,10 @@ const UserStore = types
         users: types.array(User)
     })
     .views(self => ({
-        get amountOfChildren() {
+        get numberOfChildren() {
             return self.users.filter(user => user.age < 18).length
         },
-        amountOfPeopleOlderThan(age) {
+        numberOfPeopleOlderThan(age) {
             return self.users.filter(user => user.age > age).length
         }
     }))
@@ -483,10 +483,10 @@ const userStore = UserStore.create(/* */)
 
 // Every time the userStore is updated in a relevant way, log messages will be printed
 autorun(() => {
-    console.log("There are now ", userStore.amountOfChildren, " children")
+    console.log("There are now ", userStore.numberOfChildren, " children")
 })
 autorun(() => {
-    console.log("There are now ", userStore.amountOfPeopleOlderThan(75), " pretty old people")
+    console.log("There are now ", userStore.numberOfPeopleOlderThan(75), " pretty old people")
 })
 ```
 
@@ -1108,15 +1108,13 @@ export const LoggingSquare = types
 
 ### When not to use MST?
 
-MST makes state management very tangible by offering access to snapshots, patches and by providing interceptable actions.
-Also it fixes the `this` problem.
-All these features have the downside that they incur a little runtime overhead.
+MST provides access to snapshots, patches and interceptable actions.  Also, it fixes the `this` problem.
+All these features have a downside as they incur a little runtime overhead.
 Although in many places the MST core can still be optimized significantly, there will always be a constant overhead.
-If you have a performance critical application that handles huge amounts of mutable data, you will probably be better
-off by using 'raw' mobx.
-Which has predictable and well-known performance characteristics, and has much less overhead.
+If you have a performance critical application that handles a huge amount of mutable data, you will probably be better
+off by using 'raw' MobX, which has a predictable and well-known performance and much less overhead.
 
-Likewise, if your application is mainly dealing with stateless information (such as a logging system) MST doesn't add much values.
+Likewise, if your application mainly processes stateless information (such as a logging system), MST won't add much value.
 
 ### Where is the `any` type?
 
