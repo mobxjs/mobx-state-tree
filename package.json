@@ -1,6 +1,7 @@
 {
 	"private": true,
-	"dependencies": {},
+	"dependencies": {
+	},
 	"scripts": {
 		"clean": "lerna clean",
 		"build": "lerna run build",
