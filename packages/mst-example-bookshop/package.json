@@ -1,6 +1,6 @@
 {
   "name": "mst-example-bookshop",
-  "version": "2.0.5",
+  "version": "2.1.0",
   "private": true,
   "devDependencies": {
     "react-scripts": "1.0.14"
@@ -9,7 +9,7 @@
     "mobx": "^4.0.2",
     "mobx-react": "^5.0.0",
     "mobx-react-devtools": "^5.0.1",
-    "mobx-state-tree": "^2.0.5",
+    "mobx-state-tree": "^2.1.0",
     "mobx-utils": "^2.0.1",
     "path-match": "^1.2.4",
     "react": "^15.5.0",
