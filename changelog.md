@@ -1,3 +1,11 @@
+# 2.1.0
+
+* Fixed issue where default values of `types.frozen` where not applied correctly after apply snapshot. [#842](https://github.com/mobxjs/mobx-state-tree/pull/842) by [SirbyAlive](https://github.com/SirbyAlive). Fixes [#643](https://github.com/mobxjs/mobx-state-tree/issues/634)
+* Fixed issue where empty patch sets resulted in in unnecessary history items. [#838](https://github.com/mobxjs/mobx-state-tree/pull/838) by [chemitaxis](https://github.com/chemitaxis). Fixes [#837](https://github.com/mobxjs/mobx-state-tree/issues/837)
+* `flow`s of destroyed nodes can no 'safely' resume. [#798](https://github.com/mobxjs/mobx-state-tree/pull/798/files) by [Bnaya](https://github.com/Bnaya). Fixes [#792](https://github.com/mobxjs/mobx-state-tree/issues/792)
+* Made sure the type `Snapshot` is exposed. [#821](https://github.com/mobxjs/mobx-state-tree/pull/821) by [dsabanin](https://github.com/dsabanin)
+* Fix: the function parameter was incorrectly typed as non-optional. [#851](undoManager.stopGroup) by [abruzzihraig](https://github.com/abruzzihraig)
+
 # 2.0.5
 
 * It is now possible to get the snapshot of a node without triggering the `postProcessSnapshot` hook. See [#745](https://github.com/mobxjs/mobx-state-tree/pull/745) for details. By @robinfehr
