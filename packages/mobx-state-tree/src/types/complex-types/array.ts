@@ -58,7 +58,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
     createNewInstance = () => {
         const array = observable.array([], mobxShallow)
-        addHiddenFinalProp(array, "toString", arrayToString)
+        addHiddenFinalProp(_getAdministration(array).values, "toString", arrayToString)
         return array
     }
 
@@ -84,7 +84,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getChildren(node: ObjectNode): INode[] {
-        return node.storedValue.peek()
+        return node.storedValue.slice()
     }
 
     getChildNode(node: ObjectNode, key: string): INode {
