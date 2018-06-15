@@ -117,8 +117,9 @@ const UndoManager = types
 
         return {
             addUndoState(recorder: any) {
-                if (replaying) {
-                    // skip recording if this state was caused by undo / redo
+                if (replaying || (recorder.patches && recorder.patches.length === 0)) {
+                    // skip recording if this state was caused by undo / redo 
+                    // or if patches is empty
                     return
                 }
                 self.history.splice(self.undoIdx)
@@ -176,7 +177,7 @@ const UndoManager = types
                 grouping = true
                 return fn()
             },
-            stopGroup(fn: () => any) {
+            stopGroup(fn?: () => any) {
                 if (fn) fn()
                 grouping = false
                 ;(self as any).addUndoState(groupRecorder)
