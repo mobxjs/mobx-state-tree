@@ -28,7 +28,7 @@ class BoxView extends Component {
     }
 
     handleDrag = (e, dragInfo) => {
-        this.props.box.move(dragInfo.position.deltaX, dragInfo.position.deltaY)
+        this.props.box.move(dragInfo.deltaX, dragInfo.deltaY)
     }
 }
 

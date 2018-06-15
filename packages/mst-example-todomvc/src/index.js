@@ -1,8 +1,7 @@
 import React from "react"
 import { render } from "react-dom"
-import { getSnapshot, destroy } from "mobx-state-tree"
+import { getSnapshot, destroy, onSnapshot } from "mobx-state-tree"
 import { connectReduxDevtools } from "mst-middlewares"
-import { onSnapshot } from "mobx-state-tree"
 import "todomvc-app-css/index.css"
 
 import App from "./components/App"

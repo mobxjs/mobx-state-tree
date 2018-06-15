@@ -8,7 +8,8 @@ import {
     getAtom,
     extendObservable,
     observable,
-    _interceptReads
+    _interceptReads,
+    _getAdministration
 } from "mobx"
 import {
     fail,
@@ -260,13 +261,16 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             const { value } = descriptor
             if ("get" in descriptor) {
                 // TODO: mobx currently does not allow redefining computes yet, pending #1121
-                if (isComputed((self as any).$mobx.values[key])) {
+                if (isComputed(_getAdministration(self).values.get(key))) {
                     // TODO: use `isComputed(self, key)`, pending mobx #1120
-                    ;(self as any).$mobx.values[key] = computed(descriptor.get!, {
-                        name: key,
-                        set: descriptor.set,
-                        context: self
-                    })
+                    _getAdministration(self).values.set(
+                        key,
+                        computed(descriptor.get!, {
+                            name: key,
+                            set: descriptor.set,
+                            context: self
+                        })
+                    )
                 } else {
                     const tmp = {}
                     Object.defineProperty(tmp, key, {
@@ -382,7 +386,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
 
     getChildNode(node: ObjectNode, key: string): INode {
         if (!(key in this.properties)) return fail("Not a value property: " + key)
-        const childNode = node.storedValue.$mobx.values[key].value // TODO: blegh!
+        const childNode = _getAdministration(node.storedValue).values.get(key).value // TODO: blegh!
         if (!childNode) return fail("Node not available for property " + key)
         return childNode
     }
