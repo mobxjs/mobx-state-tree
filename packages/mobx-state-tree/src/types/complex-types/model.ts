@@ -8,7 +8,9 @@ import {
     getAtom,
     extendObservable,
     observable,
-    _interceptReads
+    _interceptReads,
+    _getAdministration,
+    isComputedProp
 } from "mobx"
 import {
     fail,
@@ -259,14 +261,17 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
             const descriptor = Object.getOwnPropertyDescriptor(views, key)!
             const { value } = descriptor
             if ("get" in descriptor) {
-                // TODO: mobx currently does not allow redefining computes yet, pending #1121
-                if (isComputed((self as any).$mobx.values[key])) {
-                    // TODO: use `isComputed(self, key)`, pending mobx #1120
-                    ;(self as any).$mobx.values[key] = computed(descriptor.get!, {
-                        name: key,
-                        set: descriptor.set,
-                        context: self
-                    })
+                if (isComputedProp(self, key)) {
+                    const computedValue = _getAdministration(self, key)
+                    // TODO: mobx currently does not allow redefining computes yet, pending #1121
+                    // FIXME: this binds to the internals of mobx!
+                    computedValue.derivation = descriptor.get
+                    computedValue.scope = self
+                    if (descriptor.set)
+                        computedValue.setter = action(
+                            computedValue.name + "-setter",
+                            descriptor.set
+                        )
                 } else {
                     const tmp = {}
                     Object.defineProperty(tmp, key, {
@@ -382,7 +387,7 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
 
     getChildNode(node: ObjectNode, key: string): INode {
         if (!(key in this.properties)) return fail("Not a value property: " + key)
-        const childNode = node.storedValue.$mobx.values[key].value // TODO: blegh!
+        const childNode = _getAdministration(node.storedValue, key).value // TODO: blegh!
         if (!childNode) return fail("Node not available for property " + key)
         return childNode
     }

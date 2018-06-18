@@ -212,7 +212,8 @@ export class ObjectNode implements INode {
     public assertAlive() {
         if (!this.isAlive)
             fail(
-                `${this} cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`
+                `You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${this
+                    .type.name}').`
             )
     }
 
@@ -258,6 +259,7 @@ export class ObjectNode implements INode {
     }
 
     unbox(childNode: INode): any {
+        if (childNode && childNode.parent) childNode.parent.assertAlive()
         if (childNode && childNode.parent && childNode.parent._autoUnbox) return childNode.value
         return childNode
     }
@@ -361,19 +363,6 @@ export class ObjectNode implements INode {
         this._parent = null
         this.subpath = ""
         this._invalidateComputed("path")
-
-        // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
-        // we could express this in a much nicer way
-        // TODO: should be possible to obtain id's still...
-        Object.defineProperty(this.storedValue, "$mobx", {
-            get() {
-                fail(
-                    `This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type '${self
-                        .type
-                        .name}') used to live at '${oldPath}'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead.`
-                )
-            }
-        })
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {

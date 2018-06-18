@@ -1,3 +1,8 @@
+# 2.2.0
+
+* Added support for MobX 5. Initiative by [@jeffberry](https://github.com/jeffberry) through [#868](https://github.com/mobxjs/mobx-state-tree/pull/868/files). Please not that there are JavaScript engine restrictions for MobX 5 (no Internet Explorer, or React Native Android). If you need to target those versions please keep using MobX 4 as peer dependency (MST is compatible with both)
+
+
 # 2.1.0
 
 * Fixed issue where default values of `types.frozen` where not applied correctly after apply snapshot. [#842](https://github.com/mobxjs/mobx-state-tree/pull/842) by [SirbyAlive](https://github.com/SirbyAlive). Fixes [#643](https://github.com/mobxjs/mobx-state-tree/issues/634)

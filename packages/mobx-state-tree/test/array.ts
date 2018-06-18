@@ -35,7 +35,7 @@ test("it should restore the state from the snapshot", () => {
     const { Factory } = createTestFactories()
     const instance = Factory.create([{ to: "universe" }])
     expect(getSnapshot(instance)).toEqual([{ to: "universe" }])
-    expect("" + instance).toBe("AnonymousModel[]@<root>(1 items)")
+    expect("" + instance).toBe("AnonymousModel@/0") // just the normal to string
 })
 // === SNAPSHOT TESTS ===
 test("it should emit snapshots", () => {
@@ -184,7 +184,7 @@ test("items should be reconciled correctly when splicing - 1", () => {
     expect(isAlive(b)).toBe(true)
     expect(isAlive(c)).toBe(false)
     expect(() => store.todos.splice(0, 1, a, c, d)).toThrowError(
-        "[mobx-state-tree] Task@<root>[dead] cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value"
+        "[mobx-state-tree] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Task')."
     )
     store.todos.splice(0, 1, clone(a), clone(c), clone(d))
     expect(store.todos.map(_ => _.x)).toEqual(["a", "c", "d"])

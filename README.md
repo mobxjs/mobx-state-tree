@@ -59,14 +59,17 @@ MobX state tree is a community driven project, but is looking for active maintai
 
 # Installation
 
-* NPM: `npm install mobx@4 mobx-state-tree --save` (use `mobx@3` for MST 1.x)
-* Yarn: `yarn add mobx@4 mobx-state-tree`
+* NPM: `npm install mobx mobx-state-tree --save` (use `mobx@3` for MST 1.x)
+* Yarn: `yarn add mobx mobx-state-tree`
 * CDN: https://unpkg.com/mobx-state-tree@1.1.0/dist/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
 * Playground: [https://mattiamanzati.github.io/mobx-state-tree-playground/](https://mattiamanzati.github.io/mobx-state-tree-playground/) (with React UI, snapshots, patches and actions display)
 * CodeSandbox [TodoList demo](https://codesandbox.io/s/nZ26kGMD) fork for testing and bug reporting
 
 Typescript typings are included in the packages. Use `module: "commonjs"` or `moduleResolution: "node"` to make sure they are picked up automatically in any consuming project.
 
+Supported browsers:
+ * MobX-state-tree runs on any ES5 environment
+ * However, for MobX version 4 or 5 can be used. MobX 4 will run on any environment, MobX 5 only on modern browsers. See for more details the [MobX readme](https://github.com/mobxjs/mobx#browser-support)
 
 
 # Getting started
