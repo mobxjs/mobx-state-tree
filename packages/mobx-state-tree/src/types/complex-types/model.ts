@@ -3,8 +3,6 @@ import {
     IObjectWillChange,
     intercept,
     observe,
-    computed,
-    isComputed,
     getAtom,
     extendObservable,
     observable,
@@ -42,7 +40,8 @@ import {
     ObjectNode,
     freeze,
     addHiddenWritableProp,
-    mobxShallow
+    mobxShallow,
+    isStateTreeNode
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -308,12 +307,15 @@ export class ModelType<S, T> extends ComplexType<S, T> implements IModelType<S, 
         environment: any,
         snapshot: any
     ): INode {
+        const initialValue = isStateTreeNode(snapshot)
+            ? snapshot
+            : this.applySnapshotPreProcessor(snapshot)
         return createNode(
             this,
             parent,
             subpath,
             environment,
-            this.applySnapshotPreProcessor(snapshot),
+            initialValue,
             this.createNewInstance,
             this.finalizeNewInstance
         )
