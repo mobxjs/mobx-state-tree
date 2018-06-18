@@ -1,5 +1,4 @@
-import { observable, computed } from "mobx"
-
+import { computed, getAtom } from "mobx"
 import {
     INode,
     toJSON,
@@ -16,12 +15,11 @@ import {
 export class ScalarNode implements INode {
     readonly type: IType<any, any>
     readonly storedValue: any
-    @observable subpath: string = ""
+    subpath: string = ""
 
     private readonly _parent: ObjectNode | null
 
     readonly _environment: any = undefined
-    private _autoUnbox = true // unboxing is disabled when reading child nodes
     private state = NodeLifeCycle.INITIALIZING
 
     constructor(
@@ -40,7 +38,6 @@ export class ScalarNode implements INode {
         this.subpath = subpath
         this.storedValue = storedValue
         this._environment = environment
-        this.unbox = this.unbox.bind(this)
 
         if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "$treenode", this)
 
@@ -63,6 +60,7 @@ export class ScalarNode implements INode {
     /*
      * Returnes (escaped) path representation as string
      */
+    @computed
     public get path(): string {
         if (!this.parent) return ""
         return this.parent.path + "/" + escapeJsonPath(this.subpath)
@@ -86,6 +84,7 @@ export class ScalarNode implements INode {
         if (this.parent !== newParent) fail(`Cannot change parent of immutable node`)
         if (this.subpath === subpath) return
         this.subpath = subpath || ""
+        this._invalidateComputed("path")
     }
 
     public get value(): any {
@@ -102,16 +101,16 @@ export class ScalarNode implements INode {
         return this.state !== NodeLifeCycle.DEAD
     }
 
-    unbox(childNode: INode): any {
-        if (childNode && this._autoUnbox === true) return childNode.value
-        return childNode
-    }
-
     toString(): string {
         return `${this.type.name}@${this.path || "<root>"}${this.isAlive ? "" : "[dead]"}`
     }
 
     die() {
         this.state = NodeLifeCycle.DEAD
+    }
+
+    private _invalidateComputed(prop: string) {
+        const atom = getAtom(this, prop) as any
+        atom.trackAndCompute()
     }
 }
