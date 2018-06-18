@@ -58,7 +58,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
 
     createNewInstance = () => {
         const array = observable.array([], mobxShallow)
-        addHiddenFinalProp(_getAdministration(array).values, "toString", arrayToString)
+        addHiddenFinalProp(array, "toString", arrayToString)
         return array
     }
 
