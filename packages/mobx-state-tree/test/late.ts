@@ -66,3 +66,15 @@ test("typecheck should throw an Error when called at runtime, but not log the er
         expect(consoleSpy).not.toHaveBeenCalled()
     }
 })
+
+test("#825, late type checking ", () => {
+    const Product = types.model({
+        details: types.late(() => types.optional(Details, {}))
+    })
+    const Details = types.model({
+        name: types.maybe(types.string)
+    })
+
+    const p2 = Product.create({})
+    const p = Product.create({ details: { name: "bla" } })
+})
