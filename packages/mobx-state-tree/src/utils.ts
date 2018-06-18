@@ -1,11 +1,12 @@
-import { isObservableArray } from "mobx"
+import { isObservableArray, $mobx } from "mobx"
 
 declare const global: any
 
 export const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([])
 export const EMPTY_OBJECT: {} = Object.freeze({})
 
-export const mobxShallow = { deep: false, proxy: false }
+export const mobxShallow =
+    typeof $mobx === "string" ? { deep: false } : { deep: false, proxy: false }
 Object.freeze(mobxShallow)
 
 export type IDisposer = () => void

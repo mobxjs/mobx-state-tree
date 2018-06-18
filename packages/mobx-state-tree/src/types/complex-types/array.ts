@@ -28,7 +28,6 @@ import {
     IComplexType,
     IType,
     isType,
-    addHiddenFinalProp,
     fail,
     isMutable,
     isArray,
