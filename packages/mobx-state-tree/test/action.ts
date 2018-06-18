@@ -303,7 +303,7 @@ test("middleware events are correct", () => {
     const a = A.create()
     const events: any[] = []
     addMiddleware(a, function(call, next) {
-        events.push(call)
+        events.push({ ...call, context: {}, tree: {} }) // TODO: streep of some fields, since jest doesn't compare properly, restore in next jest version
         return next(call)
     })
     a.a(7)

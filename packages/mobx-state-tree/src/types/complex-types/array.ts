@@ -38,10 +38,6 @@ import {
     mobxShallow
 } from "../../internal"
 
-export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
-    return `${getStateTreeNode(this)}(${this.length} items)`
-}
-
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     shouldAttachNode = true
     subType: IType<any, any>
@@ -57,9 +53,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     createNewInstance = () => {
-        const array = observable.array([], mobxShallow)
-        addHiddenFinalProp(array, "toString", arrayToString)
-        return array
+        return observable.array([], mobxShallow)
     }
 
     finalizeNewInstance = (node: INode, snapshot: any) => {

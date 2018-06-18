@@ -35,7 +35,7 @@ test("it should restore the state from the snapshot", () => {
     const { Factory } = createTestFactories()
     const instance = Factory.create([{ to: "universe" }])
     expect(getSnapshot(instance)).toEqual([{ to: "universe" }])
-    expect("" + instance).toBe("AnonymousModel[]@<root>(1 items)")
+    expect("" + instance).toBe("AnonymousModel@/0") // just the normal to string
 })
 // === SNAPSHOT TESTS ===
 test("it should emit snapshots", () => {
