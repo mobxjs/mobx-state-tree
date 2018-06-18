@@ -187,9 +187,10 @@ test("it should have computed properties", () => {
     doc.height = 2
     expect(doc.area).toEqual(6)
 })
+
 test("it should throw if a replaced object is read or written to", () => {
     const Todo = types
-        .model({
+        .model("Todo", {
             title: "test"
         })
         .actions(self => {
@@ -198,7 +199,7 @@ test("it should throw if a replaced object is read or written to", () => {
                 fn
             }
         })
-    const Store = types.model({
+    const Store = types.model("Store", {
         todo: Todo
     })
     const s = Store.create({
@@ -208,13 +209,13 @@ test("it should throw if a replaced object is read or written to", () => {
     const todo = s.todo
     s.todo = Todo.create({ title: "4" })
     expect(s.todo.title).toBe("4")
+
+    // try reading old todo
     const err =
-        "[mobx-state-tree] This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type 'AnonymousModel') used to live at '/todo'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead."
+        "[mobx-state-tree] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo')."
     expect(() => {
         todo.fn()
-    }).toThrowError(
-        "[mobx-state-tree] AnonymousModel@<root>[dead] cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value"
-    )
+    }).toThrowError(err)
     expect(() => {
         todo.title
     }).toThrowError(err)
@@ -222,6 +223,7 @@ test("it should throw if a replaced object is read or written to", () => {
         todo.title = "5"
     }).toThrowError(err)
 })
+
 // === COMPOSE FACTORY ===
 test("it should compose factories", () => {
     const { BoxFactory, ColorFactory } = createTestFactories()
