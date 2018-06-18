@@ -4,7 +4,7 @@
 * Fixed issue where empty patch sets resulted in in unnecessary history items. [#838](https://github.com/mobxjs/mobx-state-tree/pull/838) by [chemitaxis](https://github.com/chemitaxis). Fixes [#837](https://github.com/mobxjs/mobx-state-tree/issues/837)
 * `flow`s of destroyed nodes can no 'safely' resume. [#798](https://github.com/mobxjs/mobx-state-tree/pull/798/files) by [Bnaya](https://github.com/Bnaya). Fixes [#792](https://github.com/mobxjs/mobx-state-tree/issues/792)
 * Made sure the type `Snapshot` is exposed. [#821](https://github.com/mobxjs/mobx-state-tree/pull/821) by [dsabanin](https://github.com/dsabanin)
-* Fix: the function parameter was incorrectly typed as non-optional. [#851](undoManager.stopGroup) by [abruzzihraig](https://github.com/abruzzihraig)
+* Fix: the function parameter was incorrectly typed as non-optional. [#851](https://github.com/mobxjs/mobx-state-tree/pull/851) by [abruzzihraig](https://github.com/abruzzihraig)
 
 # 2.0.5
 
