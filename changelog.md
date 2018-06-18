@@ -1,7 +1,8 @@
 # 2.2.0
 
 * Added support for MobX 5. Initiative by [@jeffberry](https://github.com/jeffberry) through [#868](https://github.com/mobxjs/mobx-state-tree/pull/868/files). Please not that there are JavaScript engine restrictions for MobX 5 (no Internet Explorer, or React Native Android). If you need to target those versions please keep using MobX 4 as peer dependency (MST is compatible with both)
-
+* Reduced memory footprint with ~10-20%, by [k-g-a](https://github.com/k-g-a) through [#872](https://github.com/mobxjs/mobx-state-tree/pull/872)
+* Fixed issue where undo manager was not working correctly for non-root stores, by [marcofugaro](https://github.com/marcofugaro) trough [#875](https://github.com/mobxjs/mobx-state-tree/pull/875)
 
 # 2.1.0
 
