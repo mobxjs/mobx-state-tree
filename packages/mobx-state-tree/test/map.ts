@@ -294,3 +294,47 @@ test("map expects regular identifiers", () => {
         "[mobx-state-tree] The objects in a map should all have the same identifier attribute, expected 'a', but child of type 'B' declared attribute 'b' as identifier"
     )
 })
+
+test("issue #876 - map.put works fine for models with preProcessSnapshot", () => {
+    const Note = types.model("Item", {
+        text: types.string
+    })
+    const Item = types
+        .model("Item", {
+            id: types.identifier(),
+            title: types.string,
+            notes: types.array(Note)
+        })
+        .preProcessSnapshot(snapshot => {
+            const result = Object.assign({}, snapshot)
+            if (typeof result.title !== "string") result.title = ""
+            return result
+        })
+
+    const Store = types
+        .model("Store", {
+            items: types.optional(types.map(Item), {})
+        })
+        .actions(self => ({
+            afterCreate() {
+                self.items.put({
+                    id: "1",
+                    notes: [{ text: "first note" }, { text: "second note" }]
+                })
+            }
+        }))
+
+    let store
+    expect(() => {
+        store = Store.create({})
+    }).not.toThrow()
+    expect(getSnapshot(store)).toEqual({
+        items: {
+            "1": {
+                id: "1",
+                notes: [{ text: "first note" }, { text: "second note" }],
+                title: ""
+            }
+        }
+    })
+})
