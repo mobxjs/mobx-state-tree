@@ -85,9 +85,6 @@
       "/test/fixtures",
       "/test/perf",
       "/\\./"
-    ],
-    "watchPathIgnorePatterns": [
-      "<rootDir>/node_modules/"
     ]
   }
 }
