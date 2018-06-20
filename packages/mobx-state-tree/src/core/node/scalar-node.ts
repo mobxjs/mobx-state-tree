@@ -1,4 +1,4 @@
-import { computed, getAtom } from "mobx"
+import { computed } from "mobx"
 import {
     INode,
     escapeJsonPath,
@@ -7,7 +7,8 @@ import {
     IType,
     NodeLifeCycle,
     noop,
-    ObjectNode
+    ObjectNode,
+    invalidateComputed
 } from "../../internal"
 
 export class ScalarNode implements INode {
@@ -77,7 +78,7 @@ export class ScalarNode implements INode {
         if (this.parent !== newParent) fail(`Cannot change parent of immutable node`)
         if (this.subpath === subpath) return
         this.subpath = subpath || ""
-        this._invalidateComputed("path")
+        invalidateComputed(this, "path")
     }
 
     public get value(): any {
@@ -100,10 +101,5 @@ export class ScalarNode implements INode {
 
     die() {
         this.state = NodeLifeCycle.DEAD
-    }
-
-    private _invalidateComputed(prop: string) {
-        const atom = getAtom(this, prop) as any
-        atom.trackAndCompute()
     }
 }

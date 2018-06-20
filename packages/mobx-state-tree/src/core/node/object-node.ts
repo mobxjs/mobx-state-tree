@@ -1,4 +1,4 @@
-import { reaction, computed, action, getAtom } from "mobx"
+import { reaction, computed, action } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -25,7 +25,8 @@ import {
     freeze,
     resolveNodeByPathParts,
     convertChildNodesToArray,
-    ModelType
+    ModelType,
+    invalidateComputed
 } from "../../internal"
 
 let nextNodeId = 1
@@ -130,9 +131,7 @@ export class ObjectNode implements INode {
         }
         // NOTE: we need to touch snapshot, because non-observable
         // "observableInstanceCreated" field was touched
-
-        const snapshotAtom = getAtom(this, "snapshot") as any
-        snapshotAtom.trackAndCompute()
+        invalidateComputed(this, "snapshot")
 
         const snapshotDisposer = reaction(
             () => this.snapshot,
@@ -206,7 +205,7 @@ export class ObjectNode implements INode {
                 this._parent = newParent
                 this.fireHook("afterAttach")
             }
-            this._invalidateComputed("path")
+            invalidateComputed(this, "path")
         }
     }
 
@@ -362,7 +361,7 @@ export class ObjectNode implements INode {
             this._parent = null
             this.subpath = ""
             this.state = NodeLifeCycle.FINALIZED
-            this._invalidateComputed("path")
+            invalidateComputed(this, "path")
         }
     }
 
@@ -424,7 +423,7 @@ export class ObjectNode implements INode {
         this.state = NodeLifeCycle.DEAD
         this.subpath = ""
         this._parent = null
-        this._invalidateComputed("path")
+        invalidateComputed(this, "path")
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
@@ -475,10 +474,5 @@ export class ObjectNode implements INode {
         this.assertWritable()
         if (!this._observableInstanceCreated) this._createObservableInstance()
         this.type.applyPatchLocally(this, subpath, patch)
-    }
-
-    private _invalidateComputed(prop: string) {
-        const atom = getAtom(this, prop) as any
-        atom.trackAndCompute()
     }
 }

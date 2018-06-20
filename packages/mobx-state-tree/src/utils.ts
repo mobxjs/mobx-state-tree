@@ -1,4 +1,4 @@
-import { isObservableArray, $mobx } from "mobx"
+import { isObservableArray, $mobx, getAtom } from "mobx"
 
 declare const global: any
 
@@ -174,6 +174,11 @@ export function argsToArray(args: IArguments): any[] {
     const res = new Array(args.length)
     for (let i = 0; i < args.length; i++) res[i] = args[i]
     return res
+}
+
+export function invalidateComputed(target: any, propName: string) {
+    const atom = getAtom(target, propName) as any
+    atom.trackAndCompute()
 }
 
 export type DeprecatedFunction = Function & { ids?: { [id: string]: true } }
