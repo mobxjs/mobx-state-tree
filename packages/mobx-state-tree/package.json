@@ -1,6 +1,6 @@
 {
   "name": "mobx-state-tree",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Opinionated, transactional, MobX powered state container",
   "main": "dist/mobx-state-tree.js",
   "umd:main": "dist/mobx-state-tree.umd.js",
@@ -9,9 +9,10 @@
   "scripts": {
     "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
     "rollup": "rollup -c",
-    "test": "cross-env NODE_ENV=development jest --ci && cross-env NODE_ENV=production jest --ci && npm run test-cyclic && npm run speedtest",
+    "test": "cross-env NODE_ENV=development jest --ci && cross-env NODE_ENV=production jest --ci && npm run test-cyclic && npm run speedtest && npm run test-mobx4",
     "speedtest": "node --expose-gc test/perf/report.js",
     "test-cyclic": "npm run build && node -e \"require('.')\"",
+    "test-mobx4": "yarn add -D mobx@4.3.1 && yarn build && jest --ci && git checkout package.json ../../yarn.lock && yarn install",
     "watch": "jest --watch",
     "_prepublish": "npm run build && npm run build-docs",
     "coverage": "jest --coverage",
@@ -39,8 +40,7 @@
     "cpr": "^2.1.0",
     "cross-env": "^5.1.1",
     "documentation": "^5.2.2",
-    "jest": "^22.4.2",
-    "mobx": "^4.0.2",
+    "mobx": "5.0.3",
     "rollup": "^0.43.0",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-filesize": "^1.3.2",
@@ -54,7 +54,7 @@
     "typescript": "^2.7.0"
   },
   "peerDependencies": {
-    "mobx": "^4.0.2"
+    "mobx": "^4.3.1 || ^5.0.3"
   },
   "keywords": [
     "mobx",

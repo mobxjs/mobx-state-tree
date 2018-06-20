@@ -28,7 +28,6 @@ import {
     IComplexType,
     IType,
     isType,
-    addHiddenFinalProp,
     fail,
     isMutable,
     isArray,
@@ -39,10 +38,6 @@ import {
     IChildNodesMap,
     convertChildNodesToArray
 } from "../../internal"
-
-export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
-    return `${getStateTreeNode(this)}(${this.length} items)`
-}
 
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     shouldAttachNode = true
@@ -59,9 +54,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     createNewInstance = (childNodes: IChildNodesMap) => {
-        const array = observable.array(convertChildNodesToArray(childNodes), mobxShallow)
-        addHiddenFinalProp(array, "toString", arrayToString)
-        return array
+        return observable.array(convertChildNodesToArray(childNodes), mobxShallow)
     }
 
     finalizeNewInstance = (node: INode, childNodes: IChildNodesMap) => {
@@ -96,7 +89,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getChildren(node: ObjectNode): INode[] {
-        return node.storedValue.peek()
+        return node.storedValue.slice()
     }
 
     getChildNode(node: ObjectNode, key: string): INode {

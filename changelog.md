@@ -1,10 +1,16 @@
+# 2.2.0
+
+* Added support for MobX 5. Initiative by [@jeffberry](https://github.com/jeffberry) through [#868](https://github.com/mobxjs/mobx-state-tree/pull/868/files). Please not that there are JavaScript engine restrictions for MobX 5 (no Internet Explorer, or React Native Android). If you need to target those versions please keep using MobX 4 as peer dependency (MST is compatible with both)
+* Reduced memory footprint with ~10-20%, by [k-g-a](https://github.com/k-g-a) through [#872](https://github.com/mobxjs/mobx-state-tree/pull/872)
+* Fixed issue where undo manager was not working correctly for non-root stores, by [marcofugaro](https://github.com/marcofugaro) trough [#875](https://github.com/mobxjs/mobx-state-tree/pull/875)
+
 # 2.1.0
 
 * Fixed issue where default values of `types.frozen` where not applied correctly after apply snapshot. [#842](https://github.com/mobxjs/mobx-state-tree/pull/842) by [SirbyAlive](https://github.com/SirbyAlive). Fixes [#643](https://github.com/mobxjs/mobx-state-tree/issues/634)
 * Fixed issue where empty patch sets resulted in in unnecessary history items. [#838](https://github.com/mobxjs/mobx-state-tree/pull/838) by [chemitaxis](https://github.com/chemitaxis). Fixes [#837](https://github.com/mobxjs/mobx-state-tree/issues/837)
 * `flow`s of destroyed nodes can no 'safely' resume. [#798](https://github.com/mobxjs/mobx-state-tree/pull/798/files) by [Bnaya](https://github.com/Bnaya). Fixes [#792](https://github.com/mobxjs/mobx-state-tree/issues/792)
 * Made sure the type `Snapshot` is exposed. [#821](https://github.com/mobxjs/mobx-state-tree/pull/821) by [dsabanin](https://github.com/dsabanin)
-* Fix: the function parameter was incorrectly typed as non-optional. [#851](undoManager.stopGroup) by [abruzzihraig](https://github.com/abruzzihraig)
+* Fix: the function parameter was incorrectly typed as non-optional. [#851](https://github.com/mobxjs/mobx-state-tree/pull/851) by [abruzzihraig](https://github.com/abruzzihraig)
 
 # 2.0.5
 

@@ -1,4 +1,4 @@
-import { reaction, observable, computed, action, getAtom } from "mobx"
+import { reaction, computed, action, getAtom } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -38,8 +38,8 @@ export class ObjectNode implements INode {
     nodeId = ++nextNodeId
     readonly type: IType<any, any>
     storedValue: any
-    @observable subpath: string = ""
-    @observable protected _parent: ObjectNode | null = null
+    subpath: string = ""
+    protected _parent: ObjectNode | null = null
     _isRunningAction = false // only relevant for root
 
     identifierCache: IdentifierCache | undefined
@@ -88,7 +88,6 @@ export class ObjectNode implements INode {
         this.type = type
         this.subpath = subpath
         this.identifierAttribute = type instanceof ModelType ? type.identifierAttribute : undefined
-        this.unbox = this.unbox.bind(this)
 
         this._initialSnapshot = initialSnapshot
 
@@ -131,6 +130,7 @@ export class ObjectNode implements INode {
         }
         // NOTE: we need to touch snapshot, because non-observable
         // "observableInstanceCreated" field was touched
+
         const snapshotAtom = getAtom(this, "snapshot") as any
         snapshotAtom.trackAndCompute()
 
@@ -206,6 +206,7 @@ export class ObjectNode implements INode {
                 this._parent = newParent
                 this.fireHook("afterAttach")
             }
+            this._invalidateComputed("path")
         }
     }
 
@@ -265,7 +266,8 @@ export class ObjectNode implements INode {
     public assertAlive() {
         if (!this.isAlive)
             fail(
-                `${this} cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`
+                `You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${this
+                    .type.name}').`
             )
     }
 
@@ -319,7 +321,8 @@ export class ObjectNode implements INode {
     }
 
     unbox(childNode: INode): any {
-        if (childNode && this._autoUnbox) return childNode.value
+        if (childNode && childNode.parent) childNode.parent.assertAlive()
+        if (childNode && childNode.parent && childNode.parent._autoUnbox) return childNode.value
         return childNode
     }
 
@@ -359,6 +362,7 @@ export class ObjectNode implements INode {
             this._parent = null
             this.subpath = ""
             this.state = NodeLifeCycle.FINALIZED
+            this._invalidateComputed("path")
         }
     }
 
@@ -404,9 +408,7 @@ export class ObjectNode implements INode {
     }
 
     public aboutToDie() {
-        if (this.disposers) {
-            this.disposers.splice(0).forEach(f => f())
-        }
+        if (this.disposers) this.disposers.splice(0).forEach(f => f())
         this.fireHook("beforeDestroy")
     }
 
@@ -422,19 +424,7 @@ export class ObjectNode implements INode {
         this.state = NodeLifeCycle.DEAD
         this.subpath = ""
         this._parent = null
-
-        // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
-        // we could express this in a much nicer way
-        // TODO: should be possible to obtain id's still...
-        Object.defineProperty(this.storedValue, "$mobx", {
-            get() {
-                fail(
-                    `This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type '${self
-                        .type
-                        .name}') used to live at '${oldPath}'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead.`
-                )
-            }
-        })
+        this._invalidateComputed("path")
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
@@ -485,5 +475,10 @@ export class ObjectNode implements INode {
         this.assertWritable()
         if (!this._observableInstanceCreated) this._createObservableInstance()
         this.type.applyPatchLocally(this, subpath, patch)
+    }
+
+    private _invalidateComputed(prop: string) {
+        const atom = getAtom(this, prop) as any
+        atom.trackAndCompute()
     }
 }

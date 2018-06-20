@@ -1,6 +1,6 @@
 {
   "name": "mst-example-redux-todomvc",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "devDependencies": {
     "enzyme": "^2.4.1",
@@ -9,9 +9,9 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "mobx": "3.1.15",
-    "mobx-state-tree": "^2.1.0",
-    "mst-middlewares": "^2.1.0",
+    "mobx": "4.3.1",
+    "mobx-state-tree": "^2.2.0",
+    "mst-middlewares": "^2.2.0",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
     "react-redux": "^4.4.5",

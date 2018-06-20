@@ -118,7 +118,7 @@ const UndoManager = types
         return {
             addUndoState(recorder: any) {
                 if (replaying || (recorder.patches && recorder.patches.length === 0)) {
-                    // skip recording if this state was caused by undo / redo 
+                    // skip recording if this state was caused by undo / redo
                     // or if patches is empty
                     return
                 }
@@ -145,13 +145,16 @@ const UndoManager = types
                 self.undoIdx--
                 // n.b: reverse patches back to forth
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
-                applyPatch(targetStore, self.history[self.undoIdx].inversePatches.slice().reverse())
+                applyPatch(
+                    getRoot(targetStore),
+                    self.history[self.undoIdx].inversePatches.slice().reverse()
+                )
                 replaying = false
             },
             redo() {
                 replaying = true
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
-                applyPatch(targetStore, self.history[self.undoIdx].patches)
+                applyPatch(getRoot(targetStore), self.history[self.undoIdx].patches)
                 self.undoIdx++
                 replaying = false
             },
