@@ -40,6 +40,7 @@
     "cpr": "^2.1.0",
     "cross-env": "^5.1.1",
     "documentation": "^5.2.2",
+		"jest": "^20.0.4",
     "mobx": "5.0.3",
     "rollup": "^0.43.0",
     "rollup-plugin-commonjs": "^8.0.2",
