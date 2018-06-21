@@ -15,6 +15,7 @@
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.22.0",
+    "cpr": "^3.0.1",
     "cross-env": "^5.1.1",
     "lint-staged": "^4.3.0",
     "mobx": "^5.0.2",
