@@ -532,10 +532,23 @@ export function compose<T1, S1, A1, T2, S2, A2, T3, S3, A3>(
     t2: IModelType<T2, S2>,
     t3?: IModelType<T3, S3>
 ): IModelType<T1 & T2 & T3, S1 & S2 & S3> // ...and so forth...
+export function compose(
+    t1: IModelType<any, any>,
+    t2: IModelType<any, any>,
+    ...types: Array<IModelType<any, any>>
+): IModelType<any, any>;
+export function compose(
+    name: string,
+    t1: IModelType<any, any>,
+    t2: IModelType<any, any>,
+    ...types: Array<IModelType<any, any>>
+): IModelType<any, any>;
 /**
  * Composes a new model from one or more existing model types.
  * This method can be invoked in two forms:
  * Given 2 or more model types, the types are composed into a new Type.
+ * Given first parameter as a string and 2 or more model types, 
+ * the types are composed into a new Type with the given name
  *
  * @export
  * @alias types.compose
