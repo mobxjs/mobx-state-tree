@@ -1,4 +1,7 @@
 language: node_js
+sudo: required
+cache:
+  yarn: true
 script:
   - yarn install
   - cd packages/mobx-state-tree && yarn install && yarn build && yarn test && yarn run-coverage && yarn link
