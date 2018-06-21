@@ -35,27 +35,25 @@ export interface IChildNodesMap {
     [key: string]: INode
 }
 
+const snapshotReactionOptions = {
+    onError(e: any) {
+        throw e
+    }
+}
+
 export class ObjectNode implements INode {
     nodeId = ++nextNodeId
     readonly type: IType<any, any>
-    storedValue: any
-    subpath: string = ""
-    protected _parent: ObjectNode | null = null
-    _isRunningAction = false // only relevant for root
+    readonly identifierAttribute: string | undefined
+    readonly identifier: string | null
 
+    subpath: string = ""
+    parent: ObjectNode | null = null
+    state = NodeLifeCycle.INITIALIZING
+    storedValue: any
     identifierCache: IdentifierCache | undefined
     isProtectionEnabled = true
-    readonly identifierAttribute: string | undefined
-    _environment: any = undefined
-    protected _autoUnbox = true // unboxing is disabled when reading child nodes
-    state = NodeLifeCycle.INITIALIZING
-
     middlewares: IMiddleware[] | null = null
-    private snapshotSubscribers: ((snapshot: any) => void)[] | null = null
-    private patchSubscribers:
-        | ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)[]
-        | null = null
-    private disposers: (() => void)[] | null = null
 
     applyPatches(patches: IJsonPatch[]): void {
         if (!this._observableInstanceCreated) this._createObservableInstance()
@@ -66,11 +64,21 @@ export class ObjectNode implements INode {
         this.applySnapshot(snapshot)
     }
 
+    _autoUnbox = true // unboxing is disabled when reading child nodes
+    _environment: any = undefined
+    _isRunningAction = false // only relevant for root
+
+    private _disposers: (() => void)[] | null = null
+    private _patchSubscribers:
+        | ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)[]
+        | null = null
+    private _snapshotSubscribers: ((snapshot: any) => void)[] | null = null
+
     private _observableInstanceCreated: boolean = false
-    private readonly _childNodes: IChildNodesMap | null = null
-    private readonly _initialSnapshot: any
-    private readonly _createNewInstance: (initialValue: any) => any
-    private readonly _finalizeNewInstance: (node: INode, initialValue: any) => void
+    private _childNodes: IChildNodesMap | null
+    private _initialSnapshot: any
+    private _createNewInstance: ((initialValue: any) => any) | null
+    private _finalizeNewInstance: ((node: INode, initialValue: any) => void) | null
 
     constructor(
         type: IType<any, any>,
@@ -81,16 +89,21 @@ export class ObjectNode implements INode {
         createNewInstance: (initialValue: any) => any,
         finalizeNewInstance: (node: INode, initialValue: any) => void
     ) {
-        this._parent = parent
         this._environment = environment
+        this._initialSnapshot = initialSnapshot
         this._createNewInstance = createNewInstance
         this._finalizeNewInstance = finalizeNewInstance
 
         this.type = type
+        this.parent = parent
         this.subpath = subpath
         this.identifierAttribute = type instanceof ModelType ? type.identifierAttribute : undefined
-
-        this._initialSnapshot = initialSnapshot
+        // identifier can not be changed during lifecycle of a node
+        // so we safely can read it from initial snapshot
+        this.identifier =
+            this.identifierAttribute && this._initialSnapshot
+                ? this._initialSnapshot[this.identifierAttribute]
+                : null
 
         if (!parent) {
             this.identifierCache = new IdentifierCache()
@@ -107,7 +120,7 @@ export class ObjectNode implements INode {
 
     @action
     private _createObservableInstance() {
-        this.storedValue = this._createNewInstance(this._childNodes)
+        this.storedValue = this._createNewInstance!(this._childNodes)
         this.preboot()
 
         addHiddenFinalProp(this.storedValue, "$treenode", this)
@@ -117,7 +130,7 @@ export class ObjectNode implements INode {
         let sawException = true
         try {
             this._isRunningAction = true
-            this._finalizeNewInstance(this, this._childNodes)
+            this._finalizeNewInstance!(this, this._childNodes)
             this._isRunningAction = false
 
             this.fireHook("afterCreate")
@@ -135,17 +148,16 @@ export class ObjectNode implements INode {
 
         const snapshotDisposer = reaction(
             () => this.snapshot,
-            snapshot => {
-                this.emitSnapshot(snapshot)
-            },
-            {
-                onError(e) {
-                    throw e
-                }
-            }
+            snapshot => this.emitSnapshot(snapshot),
+            snapshotReactionOptions
         )
         this.addDisposer(snapshotDisposer)
         this.finalizeCreation()
+
+        this._childNodes = null
+        this._initialSnapshot = null
+        this._createNewInstance = null
+        this._finalizeNewInstance = null
     }
 
     /*
@@ -157,37 +169,30 @@ export class ObjectNode implements INode {
         return this.parent.path + "/" + escapeJsonPath(this.subpath)
     }
 
+    public get root(): ObjectNode {
+        const parent = this.parent
+        return parent ? parent.root : this
+    }
+
     public get isRoot(): boolean {
         return this.parent === null
-    }
-
-    public get parent(): ObjectNode | null {
-        return this._parent
-    }
-
-    // Optimization: make computed
-    public get root(): ObjectNode {
-        let p,
-            r: ObjectNode = this
-        while ((p = r.parent)) r = p
-        return r
     }
 
     setParent(newParent: ObjectNode | null, subpath: string | null = null) {
         if (this.parent === newParent && this.subpath === subpath) return
         if (newParent) {
-            if (this._parent && newParent !== this._parent) {
+            if (this.parent && newParent !== this.parent) {
                 fail(
                     `A node cannot exists twice in the state tree. Failed to add ${this} to path '${newParent.path}/${subpath}'.`
                 )
             }
-            if (!this._parent && newParent.root === this) {
+            if (!this.parent && newParent.root === this) {
                 fail(
                     `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`
                 )
             }
             if (
-                !this._parent &&
+                !this.parent &&
                 !!this.root._environment &&
                 this.root._environment !== newParent.root._environment
             ) {
@@ -200,9 +205,9 @@ export class ObjectNode implements INode {
             this.die()
         } else {
             this.subpath = subpath || ""
-            if (newParent && newParent !== this._parent) {
+            if (newParent && newParent !== this.parent) {
                 newParent.root.identifierCache!.mergeCache(this)
-                this._parent = newParent
+                this.parent = newParent
                 this.fireHook("afterAttach")
             }
             invalidateComputed(this, "path")
@@ -252,12 +257,6 @@ export class ObjectNode implements INode {
         return this.parent!.isRunningAction()
     }
 
-    get identifier(): string | null {
-        // identifier can not be changed during lifecycle of a node
-        // so we safely can read it from initial snapshot
-        return this.identifierAttribute ? this._initialSnapshot[this.identifierAttribute] : null
-    }
-
     public get isAlive() {
         return this.state !== NodeLifeCycle.DEAD
     }
@@ -288,14 +287,10 @@ export class ObjectNode implements INode {
         try {
             return this._observableInstanceCreated
                 ? this.type.getChildren(this)
-                : this._getChildNodesArray()
+                : convertChildNodesToArray(this._childNodes)
         } finally {
             this._autoUnbox = true
         }
-    }
-
-    private _getChildNodesArray(): ReadonlyArray<INode> {
-        return convertChildNodesToArray(this._childNodes)
     }
 
     getChildType(key: string): IType<any, any> {
@@ -358,10 +353,10 @@ export class ObjectNode implements INode {
             this.state = NodeLifeCycle.DETACHING
             this.identifierCache = this.root.identifierCache!.splitCache(this)
             this.parent!.removeChild(this.subpath)
-            this._parent = null
+            this.parent = null
             this.subpath = ""
-            this.state = NodeLifeCycle.FINALIZED
             invalidateComputed(this, "path")
+            this.state = NodeLifeCycle.FINALIZED
         }
     }
 
@@ -407,53 +402,56 @@ export class ObjectNode implements INode {
     }
 
     public aboutToDie() {
-        if (this.disposers) this.disposers.splice(0).forEach(f => f())
+        if (this._disposers) {
+            this._disposers.forEach(f => f())
+            this._disposers = null
+        }
         this.fireHook("beforeDestroy")
     }
 
     public finalizeDeath() {
         // invariant: not called directly but from "die"
         this.root.identifierCache!.notifyDied(this)
-        const self = this
-        const oldPath = this.path
         addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
 
-        if (this.patchSubscribers) this.patchSubscribers.splice(0)
-        if (this.snapshotSubscribers) this.snapshotSubscribers.splice(0)
+        if (this._patchSubscribers) this._patchSubscribers = null
+        if (this._snapshotSubscribers) this._snapshotSubscribers = null
         this.state = NodeLifeCycle.DEAD
         this.subpath = ""
-        this._parent = null
+        this.parent = null
         invalidateComputed(this, "path")
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
-        if (!this.snapshotSubscribers) this.snapshotSubscribers = []
-        return registerEventHandler(this.snapshotSubscribers, onChange)
+        if (!this._snapshotSubscribers) this._snapshotSubscribers = []
+        return registerEventHandler(this._snapshotSubscribers, onChange)
     }
 
     public emitSnapshot(snapshot: any) {
-        if (this.snapshotSubscribers) this.snapshotSubscribers.forEach((f: Function) => f(snapshot))
+        if (this._snapshotSubscribers)
+            this._snapshotSubscribers.forEach((f: Function) => f(snapshot))
     }
 
     public onPatch(handler: (patch: IJsonPatch, reversePatch: IJsonPatch) => void): IDisposer {
-        if (!this.patchSubscribers) this.patchSubscribers = []
-        return registerEventHandler(this.patchSubscribers, handler)
+        if (!this._patchSubscribers) this._patchSubscribers = []
+        return registerEventHandler(this._patchSubscribers, handler)
     }
 
     emitPatch(basePatch: IReversibleJsonPatch, source: INode) {
-        if (this.patchSubscribers && this.patchSubscribers.length) {
+        const patchSubscribers = this._patchSubscribers
+        if (patchSubscribers && patchSubscribers.length) {
             const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, {
                 path: source.path.substr(this.path.length) + "/" + basePatch.path // calculate the relative path of the patch
             })
             const [patch, reversePatch] = splitPatch(localizedPatch)
-            this.patchSubscribers.forEach(f => f(patch, reversePatch))
+            patchSubscribers.forEach(f => f(patch, reversePatch))
         }
         if (this.parent) this.parent.emitPatch(basePatch, source)
     }
 
     addDisposer(disposer: () => void) {
-        if (!this.disposers) this.disposers = [disposer]
-        else this.disposers.unshift(disposer)
+        if (!this._disposers) this._disposers = [disposer]
+        else this._disposers.unshift(disposer)
     }
 
     removeMiddleware(handler: IMiddlewareHandler) {

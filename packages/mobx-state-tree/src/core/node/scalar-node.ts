@@ -14,12 +14,12 @@ import {
 export class ScalarNode implements INode {
     readonly type: IType<any, any>
     readonly storedValue: any
+    readonly parent: ObjectNode | null
+
     subpath: string = ""
 
-    private readonly _parent: ObjectNode | null
-
-    readonly _environment: any = undefined
     private state = NodeLifeCycle.INITIALIZING
+    _environment: any = undefined
 
     constructor(
         type: IType<any, any>,
@@ -31,10 +31,8 @@ export class ScalarNode implements INode {
         finalizeNewInstance: (node: INode, initialValue: any) => void = noop
     ) {
         this.type = type
+        this.parent = parent
         this.subpath = subpath
-
-        this._parent = parent
-        this._environment = environment
 
         this.storedValue = createNewInstance(initialSnapshot)
         let sawException = true
@@ -64,14 +62,10 @@ export class ScalarNode implements INode {
         return this.parent === null
     }
 
-    public get parent(): ObjectNode | null {
-        return this._parent
-    }
-
     public get root(): ObjectNode {
         // future optimization: store root ref in the node and maintain it
-        if (!this._parent) return fail(`This scalar node is not part of a tree`)
-        return this._parent.root
+        if (!this.parent) return fail(`This scalar node is not part of a tree`)
+        return this.parent.root
     }
 
     setParent(newParent: INode | null, subpath: string | null = null) {
