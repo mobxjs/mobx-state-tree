@@ -1,6 +1,4 @@
 language: node_js
-cache:
-  yarn: true
 script:
   - yarn install
   - cd packages/mobx-state-tree && yarn install && yarn build && yarn test && yarn run-coverage && yarn link
