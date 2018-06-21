@@ -9,12 +9,12 @@
   "scripts": {
     "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
     "rollup": "rollup -c",
-    "test": "cross-env NODE_ENV=development jest --ci && cross-env NODE_ENV=production jest --ci && npm run test-cyclic && npm run speedtest && npm run test-mobx4",
-    "speedtest": "node --expose-gc test/perf/report.js",
-    "test-cyclic": "npm run build && node -e \"require('.')\"",
+    "test": "cross-env NODE_ENV=development jest --ci && cross-env NODE_ENV=production jest --ci && yarn run test-cyclic && yarn run test-mobx4",
+    "speedtest": "yarn build && node --expose-gc test/perf/report.js",
+    "test-cyclic": "yarn run build && node -e \"require('.')\"",
     "test-mobx4": "yarn add -D mobx@4.3.1 && yarn build && jest --ci && git checkout package.json ../../yarn.lock && yarn install",
     "watch": "jest --watch",
-    "_prepublish": "npm run build && npm run build-docs",
+    "_prepublish": "yarn run build && yarn run build-docs",
     "coverage": "jest --coverage",
     "build-docs": "tsc && documentation build lib/index.js --sort-order alpha -f md -o ../../API.md.tmp && concat -o ../../API.md ../../docs/API_header.md ../../API.md.tmp && rm ../../API.md.tmp",
     "lint": "tslint -c tslint.json 'src/**/*.ts'"
@@ -40,6 +40,7 @@
     "cpr": "^2.1.0",
     "cross-env": "^5.1.1",
     "documentation": "^5.2.2",
+    "jest": "^23.1.0",
     "mobx": "5.0.3",
     "rollup": "^0.43.0",
     "rollup-plugin-commonjs": "^8.0.2",
@@ -85,9 +86,6 @@
       "/test/fixtures",
       "/test/perf",
       "/\\./"
-    ],
-    "watchPathIgnorePatterns": [
-      "<rootDir>/node_modules/"
     ]
   }
 }

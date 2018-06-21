@@ -1,4 +1,4 @@
-const { types } = require("../../src")
+const { types } = require("../../")
 // tiny
 exports.Treasure = types.model("Treasure", {
     trapped: types.boolean,
