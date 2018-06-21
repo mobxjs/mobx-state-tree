@@ -1,7 +1,18 @@
 language: node_js
 cache:
   yarn: true
-script: yarn run bootstrap && yarn run build && yarn run test && yarn run coverage
+script:
+  - cd packages/mobx-state-tree
+  - yarn install
+  - yarn build
+  - yarn test
+  - yarn run-converage
+  - yarn link
+  - cd ../mst-middlewares
+  - yarn install
+  - yarn link mobx-state-tree
+  - yarn build
+  - yarn test
 after_success:
   - cat ./packages/mobx-state-tree/coverage/lcov.info|./packages/mobx-state-tree/node_modules/coveralls/bin/coveralls.js
 node_js:
