@@ -262,22 +262,26 @@ export function getSnapshot<K extends string | number, V>(
     target: ObservableMap<K, V>
 ): { [key: string]: V }
 export function getSnapshot<S>(target: IObservableArray<S>): S[]
-export function getSnapshot<S = any>(target: ISnapshottable<S>): S
+export function getSnapshot<S = any>(target: ISnapshottable<S>, applyPostProcess?: boolean): S
 /**
  * Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
  * structural sharing where possible. Doesn't require MobX transactions to be completed.
  *
  * @export
  * @param {Object} target
+ * @param {boolean} applyPostProcess = true, by default the postProcessSnapshot gets applied
  * @returns {*}
  */
-export function getSnapshot<S>(target: ISnapshottable<S>): S {
+export function getSnapshot<S>(target: ISnapshottable<S>, applyPostProcess = true): S {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
-    return getStateTreeNode(target).snapshot
+    const node = getStateTreeNode(target)
+    if (applyPostProcess) return node.snapshot
+
+    return freeze(node.type.getSnapshot(node, false))
 }
 
 /**
@@ -308,7 +312,7 @@ export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
 export function getParent(target: IStateTreeNode, depth?: number): any & IStateTreeNode
 export function getParent<T>(target: IStateTreeNode, depth?: number): T & IStateTreeNode
 /**
- * Returns the immediate parent of this object, or null.
+ * Returns the immediate parent of this object, or throws.
  *
  * Note that the immediate parent can be either an object, map or array, and
  * doesn't necessarily refer to the parent model
@@ -334,6 +338,58 @@ export function getParent<T>(target: IStateTreeNode, depth = 1): T & IStateTreeN
         parent = parent.parent
     }
     return fail(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
+}
+
+/**
+ * Given a model instance, returns `true` if the object has a parent of given type, that is, is part of another object, map or array
+ *
+ * @export
+ * @param {Object} target
+ * @param {IType<any, any>} type
+ * @returns {boolean}
+ */
+export function hasParentOfType(target: IStateTreeNode, type: IType<any, any>): boolean {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (!isType(type))
+            fail("expected second argument to be a mobx-state-tree type, got " + type + " instead")
+    }
+    let parent: INode | null = getStateTreeNode(target).parent
+    while (parent) {
+        if (type.is(parent.storedValue)) return true
+        parent = parent.parent
+    }
+    return false
+}
+
+export function getParentOfType(target: IStateTreeNode, type: IType<any, any>): any & IStateTreeNode
+export function getParentOfType<S, T>(target: IStateTreeNode, type: IType<S, T>): T & IStateTreeNode
+/**
+ * Returns the target's parent of a given type, or throws.
+ *
+ *
+ * @export
+ * @param {Object} target
+ * @param {IType<any, any>} type
+ * @returns {*}
+ */
+export function getParentOfType<S, T>(target: IStateTreeNode, type: IType<S, T>): T {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+        if (!isType(type))
+            fail("expected second argument to be a mobx-state-tree type, got " + type + " instead")
+    }
+
+    let parent: INode | null = getStateTreeNode(target).parent
+    while (parent) {
+        if (type.is(parent.storedValue)) return parent.storedValue as T
+        parent = parent.parent
+    }
+    return fail(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
 }
 
 export function getRoot(target: IStateTreeNode): any & IStateTreeNode
@@ -458,7 +514,7 @@ export function resolveIdentifier(
  *
  * @export
  * @param {IStateTreeNode} target
-  * @returns {(string | null)}
+ * @returns {(string | null)}
  */
 export function getIdentifier(target: IStateTreeNode): string | null {
     // check all arguments
@@ -739,5 +795,6 @@ import {
     isType,
     resolveNodeByPath,
     getRelativePathBetweenNodes,
-    ModelType
+    ModelType,
+    freeze
 } from "../internal"

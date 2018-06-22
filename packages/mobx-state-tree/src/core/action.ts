@@ -52,7 +52,11 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const node = getStateTreeNode(context.context)
     const baseIsRunningAction = node._isRunningAction
     const prevContext = currentActionContext
-    node.assertAlive()
+
+    if (context.type === "action") {
+        node.assertAlive()
+    }
+
     node._isRunningAction = true
     currentActionContext = context
     try {

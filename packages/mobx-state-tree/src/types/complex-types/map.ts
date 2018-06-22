@@ -43,10 +43,6 @@ export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
     put(value: T | any): T | any // downtype to any, again, because we cannot type the snapshot, see
 }
 
-export function mapToString(this: ObservableMap<any, any>) {
-    return `${getStateTreeNode(this as IStateTreeNode)}(${this.size} items)`
-}
-
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
 
 function put(this: ObservableMap<any, any>, value: any) {
@@ -118,7 +114,6 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         // const identifierAttr = getIdentifierAttribute(this.subType)
         const map = observable.map({}, mobxShallow)
         addHiddenFinalProp(map, "put", put)
-        addHiddenFinalProp(map, "toString", mapToString)
         return map
     }
 

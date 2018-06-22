@@ -59,14 +59,17 @@ MobX state tree is a community driven project, but is looking for active maintai
 
 # Installation
 
-* NPM: `npm install mobx@4 mobx-state-tree --save` (use `mobx@3` for MST 1.x)
-* Yarn: `yarn add mobx@4 mobx-state-tree`
+* NPM: `npm install mobx mobx-state-tree --save` (use `mobx@3` for MST 1.x)
+* Yarn: `yarn add mobx mobx-state-tree`
 * CDN: https://unpkg.com/mobx-state-tree@1.1.0/dist/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
 * Playground: [https://mattiamanzati.github.io/mobx-state-tree-playground/](https://mattiamanzati.github.io/mobx-state-tree-playground/) (with React UI, snapshots, patches and actions display)
 * CodeSandbox [TodoList demo](https://codesandbox.io/s/nZ26kGMD) fork for testing and bug reporting
 
 Typescript typings are included in the packages. Use `module: "commonjs"` or `moduleResolution: "node"` to make sure they are picked up automatically in any consuming project.
 
+Supported browsers:
+ * MobX-state-tree runs on any ES5 environment
+ * However, for MobX version 4 or 5 can be used. MobX 4 will run on any environment, MobX 5 only on modern browsers. See for more details the [MobX readme](https://github.com/mobxjs/mobx#browser-support)
 
 
 # Getting started
@@ -193,6 +196,7 @@ mobx-state-tree "immutable trees" and "graph model" features talk, ["Next Genera
 
 * [Bookshop](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-bookshop) Example webshop application with references, identifiers, routing, testing etc.
 * [Boxes](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-boxes) Example app where one can draw, drag, and drop boxes. With time-travelling and multi-client synchronization over websockets.
+* [TodoMVC](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-todomvc) Classic example app using React and MST.
 * [Redux TodoMVC](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-redux-todomvc) Redux TodoMVC application, except that the reducers are replaced with a MST. Tip: open the Redux devtools; they will work!
 
 # Concepts
@@ -320,7 +324,7 @@ MST trees have very specific semantics. These semantics purposefully constrain w
 1. Every _node_ tree in a MST tree is a tree in itself. Any operation that can be invoked on the complete tree can also be applied to a sub tree.
 1. A node can only exist exactly _once_ in a tree. This ensures it has a unique, identifiable position.
 2. It is however possible to refer to another object in the _same_ tree by using _references_
-3. There is no limit to the amount of MST trees that live in an application. However, each node can only live in exactly one tree.
+3. There is no limit to the number of MST trees that live in an application. However, each node can only live in exactly one tree.
 4. All _leaves_ in the tree must be serializable; it is not possible to store, for example, functions in a MST.
 6. The only free-form type in MST is frozen; with the requirement that frozen values are immutable and serializable so that the MST semantics can still be upheld.
 7. At any point in the tree it is possible to assign a snapshot to the tree instead of a concrete instance of the expected type. In that case an instance of the correct type, based on the snapshot, will be automatically created for you.
@@ -471,10 +475,10 @@ const UserStore = types
         users: types.array(User)
     })
     .views(self => ({
-        get amountOfChildren() {
+        get numberOfChildren() {
             return self.users.filter(user => user.age < 18).length
         },
-        amountOfPeopleOlderThan(age) {
+        numberOfPeopleOlderThan(age) {
             return self.users.filter(user => user.age > age).length
         }
     }))
@@ -483,10 +487,10 @@ const userStore = UserStore.create(/* */)
 
 // Every time the userStore is updated in a relevant way, log messages will be printed
 autorun(() => {
-    console.log("There are now ", userStore.amountOfChildren, " children")
+    console.log("There are now ", userStore.numberOfChildren, " children")
 })
 autorun(() => {
-    console.log("There are now ", userStore.amountOfPeopleOlderThan(75), " pretty old people")
+    console.log("There are now ", userStore.numberOfPeopleOlderThan(75), " pretty old people")
 })
 ```
 
@@ -499,7 +503,7 @@ If you want to share volatile state between views and actions, use `.extend` ins
 <i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-automatically-send-changes-to-the-server-by-using-onsnapshot">egghead.io lesson 16: Automatically Send Changes to the Server by Using onSnapshot</a></i>
 
 Snapshots are the immutable serialization, in plain objects, of a tree at a specific point in time.
-Snapshots can be inspected through `getSnapshot(node)`.
+Snapshots can be inspected through `getSnapshot(node, applyPostProcess)`.
 Snapshots don't contain any type information and are stripped from all actions etc, so they are perfectly suitable for transportation.
 Requesting a snapshot is cheap, as MST always maintains a snapshot of each node in the background, and uses structural sharing
 
@@ -519,7 +523,7 @@ Some interesting properties of snapshots:
 
 Useful methods:
 
--   `getSnapshot(model)`: returns a snapshot representing the current state of the model
+-   `getSnapshot(model, applyPostProcess)`: returns a snapshot representing the current state of the model
 -   `onSnapshot(model, callback)`: creates a listener that fires whenever a new snapshot is available (but only one per MobX transaction).
 -   `applySnapshot(model, snapshot)`: updates the state of the model and all its descendants to the state represented by the snapshot
 
@@ -957,14 +961,16 @@ See the [full API docs](API.md) for more details.
 | [`getChildType(node, property?)`](API.md#getchildtype) | Returns the declared type of the given `property` of `node`. For arrays and maps `property` can be omitted as they all have the same type |
 | [`getEnv(node)`](API.md#getenv) | Returns the environment of `node`, see [environments](#environments) |
 | [`getParent(node, depth=1)`](API.md#getparent) | Returns the intermediate parent of the `node`, or a higher one if `depth > 1` |
+| [`getParentOfType(node, type)`](API.md#getparentoftype) | Return the first parent that satisfies the provided type |
 | [`getPath(node)`](API.md#getpath) | Returns the path of `node` in the tree |
 | [`getPathParts(node)`](API.md#getpathparts) | Returns the path of `node` in the tree, unescaped as separate parts |
 | [`getRelativePath(base, target)`](API.md#getrelativepath) | Returns the short path, which one could use to walk from node `base` to node `target`, assuming they are in the same tree. Up is represented as `../` |
 | [`getRoot(node)`](API.md#getroot) | Returns the root element of the tree containing `node` |
 | [`getIdentifier(node)`](API.md#getidentifier) | Returns the identifier of the given element |
-| [`getSnapshot(node)`](API.md#getsnapshot) | Returns the snapshot of the `node`. See [snapshots](#snapshots) |
+| [`getSnapshot(node, applyPostProcess)`](API.md#getsnapshot) | Returns the snapshot of the `node`. See [snapshots](#snapshots) |
 | [`getType(node)`](API.md#gettype) | Returns the type of `node` |
 | [`hasParent(node, depth=1)`](API.md#hasparent) | Returns `true` if `node` has a parent at `depth` |
+| [`hasParentOfType(node, type)`](API.md#hasparentoftype) | Returns `true` if the `node` has a parent that satisfies the provided type |
 | [`isAlive(node)`](API.md#isalive) | Returns `true` if `node` is alive |
 | [`isStateTreeNode(value)`](API.md#isstatetreenode) | Returns `true` if `value` is a node of a mobx-state-tree |
 | [`isProtected(value)`](API.md#isprotected) | Returns `true` if the given node is protected, see [actions](#actions) |
@@ -1009,7 +1015,7 @@ The following service can generate MST models based on JSON: https://transform.n
 
 ### `toJSON()` for debugging
 
-For debugging you might want to use `getSnapshot(model)` to print the state of a model. But if you didn't import `getSnapshot` while debugging in some debugger; don't worry, `model.toJSON()` will produce the same snapshot. (For API consistency, this feature is not part of the typed API)
+For debugging you might want to use `getSnapshot(model, applyPostProcess)` to print the state of a model. But if you didn't import `getSnapshot` while debugging in some debugger; don't worry, `model.toJSON()` will produce the same snapshot. (For API consistency, this feature is not part of the typed API)
 
 ### Handle circular dependencies between files using `late`
 
@@ -1106,15 +1112,13 @@ export const LoggingSquare = types
 
 ### When not to use MST?
 
-MST makes state management very tangible by offering access to snapshots, patches and by providing interceptable actions.
-Also it fixes the `this` problem.
-All these features have the downside that they incur a little runtime overhead.
+MST provides access to snapshots, patches and interceptable actions.  Also, it fixes the `this` problem.
+All these features have a downside as they incur a little runtime overhead.
 Although in many places the MST core can still be optimized significantly, there will always be a constant overhead.
-If you have a performance critical application that handles huge amounts of mutable data, you will probably be better
-off by using 'raw' mobx.
-Which has predictable and well-known performance characteristics, and has much less overhead.
+If you have a performance critical application that handles a huge amount of mutable data, you will probably be better
+off by using 'raw' MobX, which has a predictable and well-known performance and much less overhead.
 
-Likewise, if your application is mainly dealing with stateless information (such as a logging system) MST doesn't add much values.
+Likewise, if your application mainly processes stateless information (such as a logging system), MST won't add much value.
 
 ### Where is the `any` type?
 
@@ -1365,6 +1369,14 @@ export type ITodo = typeof Todo.Type
 ```
 
 It ain't pretty, but it works.
+
+#### Optional/empty maps
+
+Optional parameters, including "empty" maps, should be either a valid snapshot or a MST instance. To fix type errors such as `Error while converting {} to map`, define your type as such:
+
+```typescript
+  map: types.optional(types.map(OtherType), {})
+```
 
 ### How does MST compare to Redux
 So far this might look a lot like an immutable state tree as found for example in Redux apps, but there're are only so many reasons to use redux as per [article linked at the very top of redux guide](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367) that MST covers too, meanwhile:

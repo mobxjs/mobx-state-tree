@@ -1,6 +1,6 @@
 {
   "name": "mst-middlewares",
-  "version": "2.0.3",
+  "version": "2.2.0",
   "description": "The MST package ships with some prebuilt middlewares, which serves mainly as examples on how to write your own middleware. The source of each middleware can be found in this github directory, you are encouraged to read them!",
   "main": "dist/mst-middlewares.js",
   "umd:main": "dist/mst-middlewares.umd.js",
@@ -8,17 +8,18 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "build-tests": "tsc -p test/",
-    "test": "npm run build-tests && cross-env NODE_ENV=development ava && cross-env NODE_ENV=production ava",
+    "test": "yarn run build-tests && cross-env NODE_ENV=development ava && cross-env NODE_ENV=production ava",
     "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && rollup -c"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.22.0",
+    "cpr": "^3.0.1",
     "cross-env": "^5.1.1",
     "lint-staged": "^4.3.0",
-    "mobx": "^4.0.2",
-    "mobx-state-tree": "^2.0.3",
+    "mobx": "^5.0.2",
+    "mobx-state-tree": "^2.2.0",
     "rollup": "^0.50.0",
     "rollup-plugin-commonjs": "^8.2.5",
     "rollup-plugin-node-resolve": "^3.0.0",
@@ -27,7 +28,7 @@
     "typescript": "^2.7.2"
   },
   "peerDependencies": {
-    "mobx-state-tree": "^2.0.3"
+    "mobx-state-tree": "^2.2.0"
   },
   "files": [
     "dist/"

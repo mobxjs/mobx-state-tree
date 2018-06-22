@@ -16,6 +16,7 @@ const METHODS = [
     "getChildType",
     "getEnv",
     "getParent",
+    "getParentOfType",
     "getPath",
     "getPathParts",
     "getRelativePath",
@@ -24,6 +25,7 @@ const METHODS = [
     "getSnapshot",
     "getType",
     "hasParent",
+    "hasParentOfType",
     "isAlive",
     "isProtected",
     "isRoot",
@@ -72,7 +74,6 @@ const TYPES = [
 ]
 
 test("correct api exposed", () => {
-    console.dir(mst["IActionRecorder"])
     expect(
         Object.keys(mst)
             .sort()
@@ -95,4 +96,9 @@ test("all methods mentioned in api.md", () => {
         .concat(METHODS)
         .filter(identifier => apimd.indexOf("# " + identifier) === -1)
     expect(missing).toEqual([])
+})
+
+test("no dependencies", () => {
+    const deps = JSON.parse(readFileSync(__dirname + "/../package.json", "utf8")).dependencies
+    expect(deps === undefined || Object.keys(deps).length === 0).toBe(true)
 })

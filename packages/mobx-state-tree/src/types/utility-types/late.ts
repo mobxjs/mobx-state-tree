@@ -24,6 +24,9 @@ export class Late<S, T> extends Type<S, T> {
     get subType(): IType<S, T> {
         if (this._subType === null) {
             this._subType = this.definition()
+            if (!this.subType) {
+                fail("Failed to determine subtype, make sure types.late returns a type definition.")
+            }
         }
         return this._subType
     }

@@ -1,4 +1,4 @@
-import { reaction, observable, computed } from "mobx"
+import { reaction, computed, getAtom } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -20,7 +20,6 @@ import {
     createActionInvoker,
     NodeLifeCycle,
     IdentifierCache,
-    EMPTY_ARRAY,
     escapeJsonPath,
     addHiddenFinalProp,
     toJSON,
@@ -34,8 +33,8 @@ export class ObjectNode implements INode {
     nodeId = ++nextNodeId
     readonly type: IType<any, any>
     readonly storedValue: any
-    @observable subpath: string = ""
-    @observable protected _parent: ObjectNode | null = null
+    subpath: string = ""
+    protected _parent: ObjectNode | null = null
     _isRunningAction = false // only relevant for root
 
     identifierCache: IdentifierCache | undefined
@@ -45,10 +44,12 @@ export class ObjectNode implements INode {
     protected _autoUnbox = true // unboxing is disabled when reading child nodes
     state = NodeLifeCycle.INITIALIZING
 
-    middlewares = EMPTY_ARRAY as IMiddleware[]
-    private snapshotSubscribers: ((snapshot: any) => void)[]
-    private patchSubscribers: ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)[]
-    private disposers: (() => void)[]
+    middlewares: IMiddleware[] | null = null
+    private snapshotSubscribers: ((snapshot: any) => void)[] | null = null
+    private patchSubscribers:
+        | ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)[]
+        | null = null
+    private disposers: (() => void)[] | null = null
 
     applyPatches: (patches: IJsonPatch[]) => void
 
@@ -69,7 +70,6 @@ export class ObjectNode implements INode {
         this._parent = parent
         this.subpath = subpath
         this._environment = environment
-        this.unbox = this.unbox.bind(this)
 
         this.preboot()
 
@@ -168,6 +168,7 @@ export class ObjectNode implements INode {
                 this._parent = newParent
                 this.fireHook("afterAttach")
             }
+            this._invalidateComputed("path")
         }
     }
 
@@ -211,7 +212,8 @@ export class ObjectNode implements INode {
     public assertAlive() {
         if (!this.isAlive)
             fail(
-                `${this} cannot be used anymore as it has died; it has been removed from a state tree. If you want to remove an element from a tree and let it live on, use 'detach' or 'clone' the value`
+                `You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${this
+                    .type.name}').`
             )
     }
 
@@ -257,7 +259,8 @@ export class ObjectNode implements INode {
     }
 
     unbox(childNode: INode): any {
-        if (childNode && this._autoUnbox === true) return childNode.value
+        if (childNode && childNode.parent) childNode.parent.assertAlive()
+        if (childNode && childNode.parent && childNode.parent._autoUnbox) return childNode.value
         return childNode
     }
 
@@ -297,38 +300,33 @@ export class ObjectNode implements INode {
             this._parent = null
             this.subpath = ""
             this.state = NodeLifeCycle.FINALIZED
+            this._invalidateComputed("path")
         }
     }
 
     preboot() {
-        this.disposers = []
-        this.middlewares = []
-        this.snapshotSubscribers = []
-        this.patchSubscribers = []
-
-        // Optimization: this does not need to be done per instance
-        // if some pieces from createActionInvoker are extracted
+        const self = this
         this.applyPatches = createActionInvoker(
             this.storedValue,
             "@APPLY_PATCHES",
             (patches: IJsonPatch[]) => {
                 patches.forEach(patch => {
                     const parts = splitJsonPath(patch.path)
-                    const node = resolveNodeByPathParts(this, parts.slice(0, -1))
-                    ;(node as ObjectNode).applyPatchLocally(parts[parts.length - 1], patch)
+                    const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as ObjectNode
+                    node.applyPatchLocally(parts[parts.length - 1], patch)
                 })
             }
-        ).bind(this.storedValue)
+        )
         this.applySnapshot = createActionInvoker(
             this.storedValue,
             "@APPLY_SNAPSHOT",
             (snapshot: any) => {
                 // if the snapshot is the same as the current one, avoid performing a reconcile
-                if (snapshot === this.snapshot) return
+                if (snapshot === self.snapshot) return
                 // else, apply it by calling the type logic
-                return this.type.applySnapshot(this, snapshot)
+                return self.type.applySnapshot(self, snapshot)
             }
-        ).bind(this.storedValue)
+        )
     }
 
     public die() {
@@ -348,7 +346,7 @@ export class ObjectNode implements INode {
     }
 
     public aboutToDie() {
-        this.disposers.splice(0).forEach(f => f())
+        if (this.disposers) this.disposers.splice(0).forEach(f => f())
         this.fireHook("beforeDestroy")
     }
 
@@ -359,41 +357,30 @@ export class ObjectNode implements INode {
         const oldPath = this.path
         addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
 
-        this.patchSubscribers.splice(0)
-        this.snapshotSubscribers.splice(0)
-        this.patchSubscribers.splice(0)
+        if (this.patchSubscribers) this.patchSubscribers.splice(0)
+        if (this.snapshotSubscribers) this.snapshotSubscribers.splice(0)
         this.state = NodeLifeCycle.DEAD
         this._parent = null
         this.subpath = ""
-
-        // This is quite a hack, once interceptable objects / arrays / maps are extracted from mobx,
-        // we could express this in a much nicer way
-        // TODO: should be possible to obtain id's still...
-        Object.defineProperty(this.storedValue, "$mobx", {
-            get() {
-                fail(
-                    `This object has died and is no longer part of a state tree. It cannot be used anymore. The object (of type '${self
-                        .type
-                        .name}') used to live at '${oldPath}'. It is possible to access the last snapshot of this object using 'getSnapshot', or to create a fresh copy using 'clone'. If you want to remove an object from the tree without killing it, use 'detach' instead.`
-                )
-            }
-        })
+        this._invalidateComputed("path")
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
+        if (!this.snapshotSubscribers) this.snapshotSubscribers = []
         return registerEventHandler(this.snapshotSubscribers, onChange)
     }
 
     public emitSnapshot(snapshot: any) {
-        this.snapshotSubscribers.forEach((f: Function) => f(snapshot))
+        if (this.snapshotSubscribers) this.snapshotSubscribers.forEach((f: Function) => f(snapshot))
     }
 
     public onPatch(handler: (patch: IJsonPatch, reversePatch: IJsonPatch) => void): IDisposer {
+        if (!this.patchSubscribers) this.patchSubscribers = []
         return registerEventHandler(this.patchSubscribers, handler)
     }
 
     emitPatch(basePatch: IReversibleJsonPatch, source: INode) {
-        if (this.patchSubscribers.length) {
+        if (this.patchSubscribers && this.patchSubscribers.length) {
             const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, {
                 path: source.path.substr(this.path.length) + "/" + basePatch.path // calculate the relative path of the patch
             })
@@ -404,14 +391,17 @@ export class ObjectNode implements INode {
     }
 
     addDisposer(disposer: () => void) {
+        if (!this.disposers) this.disposers = []
         this.disposers.unshift(disposer)
     }
 
     removeMiddleware(handler: IMiddlewareHandler) {
-        this.middlewares = this.middlewares.filter(middleware => middleware.handler !== handler)
+        if (this.middlewares)
+            this.middlewares = this.middlewares.filter(middleware => middleware.handler !== handler)
     }
 
     addMiddleWare(handler: IMiddlewareHandler, includeHooks: boolean = true) {
+        if (!this.middlewares) this.middlewares = []
         this.middlewares.push({ handler, includeHooks })
         return () => {
             this.removeMiddleware(handler)
@@ -421,5 +411,10 @@ export class ObjectNode implements INode {
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.assertWritable()
         this.type.applyPatchLocally(this, subpath, patch)
+    }
+
+    private _invalidateComputed(prop: string) {
+        const atom = getAtom(this, prop) as any
+        atom.trackAndCompute()
     }
 }

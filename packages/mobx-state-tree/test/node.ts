@@ -14,8 +14,11 @@ import {
     recordPatches,
     types,
     destroy,
-    unprotect
+    unprotect,
+    hasParentOfType
 } from "../src"
+import { getParentOfType } from "../src/core/mst-operations"
+import { getStateTreeNode } from "../src/internal"
 // getParent
 test("it should resolve to the parent instance", () => {
     const Row = types.model({
@@ -50,6 +53,82 @@ test("it should check for parent instance (unbound)", () => {
     })
     const row = Row.create()
     expect(hasParent(row)).toEqual(false)
+})
+// getParentOfType
+test("it should resolve to the given parent instance", () => {
+    const Cell = types.model({
+        cell_id: 0
+    })
+    const Row = types.model({
+        row_id: 0,
+        cells: types.optional(types.array(Cell), [])
+    })
+    const Document = types.model({
+        rows: types.optional(types.array(Row), [])
+    })
+    const doc = Document.create()
+    unprotect(doc)
+    const row = Row.create()
+    doc.rows.push(row)
+    const cell = Cell.create()
+    doc.rows[0].cells.push(cell)
+    expect(getParentOfType(cell, Document)).toEqual(doc)
+})
+test("it should throw if there is not parent of type", () => {
+    const Cell = types.model({
+        cell_id: 0
+    })
+    const Row = types.model({
+        row_id: 0,
+        cells: types.optional(types.array(Cell), [])
+    })
+    const Document = types.model({
+        rows: types.optional(types.array(Row), [])
+    })
+    const row = Row.create()
+    unprotect(row)
+    const cell = Cell.create()
+    row.cells.push(cell)
+    expect(() => getParentOfType(cell, Document)).toThrowError(
+        "[mobx-state-tree] Failed to find the parent of AnonymousModel@/cells/0 of a given type"
+    )
+})
+// hasParentOfType
+test("it should check for parent instance of given type", () => {
+    const Cell = types.model({
+        cell_id: 0
+    })
+    const Row = types.model({
+        row_id: 0,
+        cells: types.optional(types.array(Cell), [])
+    })
+    const Document = types.model({
+        rows: types.optional(types.array(Row), [])
+    })
+    const doc = Document.create()
+    unprotect(doc)
+    const row = Row.create()
+    doc.rows.push(row)
+    const cell = Cell.create()
+    doc.rows[0].cells.push(cell)
+    expect(hasParentOfType(cell, Document)).toEqual(true)
+})
+test("it should check for parent instance of given type (unbound)", () => {
+    const Cell = types.model({
+        cell_id: 0
+    })
+    const Row = types.model({
+        row_id: 0,
+        cells: types.optional(types.array(Cell), [])
+    })
+    const Document = types.model({
+        rows: types.optional(types.array(Row), [])
+    })
+    const row = Row.create()
+    unprotect(row)
+    const cell = Cell.create()
+    row.cells.push(cell)
+    expect(hasParentOfType(cell, Document)).toEqual(false)
 })
 // getRoot
 test("it should resolve to the root of an object", () => {
@@ -137,7 +216,8 @@ test("it should clone a node", () => {
     const row = Row.create()
     doc.rows.push(row)
     const cloned = clone(doc)
-    expect(doc).toEqual(cloned)
+    // expect(doc).toEqual(cloned) // TODO: restore once jest version *after* 2.3.1.0 has been released
+    expect(getSnapshot(doc)).toEqual(getSnapshot(cloned))
 })
 test("it should be possible to clone a dead object", () => {
     const Task = types.model("Task", {

@@ -28,7 +28,6 @@ import {
     IComplexType,
     IType,
     isType,
-    addHiddenFinalProp,
     fail,
     isMutable,
     isArray,
@@ -37,10 +36,6 @@ import {
     ObjectNode,
     mobxShallow
 } from "../../internal"
-
-export function arrayToString(this: IObservableArray<any> & IStateTreeNode) {
-    return `${getStateTreeNode(this)}(${this.length} items)`
-}
 
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     shouldAttachNode = true
@@ -57,9 +52,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     createNewInstance = () => {
-        const array = observable.array([], mobxShallow)
-        addHiddenFinalProp(array, "toString", arrayToString)
-        return array
+        return observable.array([], mobxShallow)
     }
 
     finalizeNewInstance = (node: INode, snapshot: any) => {
@@ -84,7 +77,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getChildren(node: ObjectNode): INode[] {
-        return node.storedValue.peek()
+        return node.storedValue.slice()
     }
 
     getChildNode(node: ObjectNode, key: string): INode {
