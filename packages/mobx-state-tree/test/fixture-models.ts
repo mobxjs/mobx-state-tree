@@ -1,4 +1,4 @@
-import { Hero, Monster, Treasure } from "./fixtures/fixture-models"
+import { Hero, Monster, Treasure } from "./fixtures/fixture-models.js"
 import { unprotect } from "../src"
 const SAMPLE_HERO = {
     id: 1,

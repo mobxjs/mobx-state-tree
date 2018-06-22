@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "mobx": "3.1.15",
+    "mobx": "4.3.1",
     "mobx-state-tree": "^2.2.0",
     "mst-middlewares": "^2.2.0",
     "react": "^15.3.0",

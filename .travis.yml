@@ -1,17 +1,21 @@
 language: node_js
 sudo: required
-before_install: # if "install" is overridden
-  # Repo for Yarn
-  - sudo apt-key adv --fetch-keys http://dl.yarnpkg.com/debian/pubkey.gpg
-  - echo "deb http://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-  - sudo apt-get update -qq
-  - sudo apt-get install -y -qq yarn=1.3.2-1
-  - which yarn
-  - yarn --version
 cache:
   yarn: true
-script: yarn run bootstrap && yarn run build && yarn run test && yarn run coverage
+script:
+  - yarn install
+  - cd packages/mobx-state-tree
+  - yarn install
+  - yarn build
+  - yarn test
+  - yarn run coverage
+  - yarn link
+  - cd ../mst-middlewares
+  - yarn install
+  - yarn link mobx-state-tree
+  - yarn build
+  - yarn test
 after_success:
   - cat ./packages/mobx-state-tree/coverage/lcov.info|./packages/mobx-state-tree/node_modules/coveralls/bin/coveralls.js
 node_js:
-  - "9.3.0"
+  - 9.3.0

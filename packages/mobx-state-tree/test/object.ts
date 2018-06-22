@@ -512,3 +512,13 @@ test("It should throw if any other key is returned from extend", () => {
     const A = types.model({}).extend(() => ({ stuff() {} } as any)) // TODO: fix typing
     expect(() => A.create()).toThrowError(/stuff/)
 })
+
+test("782, TS + compose", () => {
+    const User = types.model("User", {
+        id: types.identifier(types.string),
+        name: types.maybe(types.string),
+        avatar: types.maybe(types.string)
+    })
+
+    const user = User.create({ id: "someId" })
+})
