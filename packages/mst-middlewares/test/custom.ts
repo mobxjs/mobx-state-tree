@@ -1,6 +1,5 @@
 import { test } from "ava"
-import atomic from "../src/atomic"
-import { decorate, types, addMiddleware, onSnapshot, flow } from "mobx-state-tree"
+import { decorate, types, addMiddleware, onSnapshot, flow, destroy } from "mobx-state-tree"
 
 let error: any = null
 
@@ -44,7 +43,7 @@ function nextAlterAsync(call, next, abort) {
 function noHooksMiddleware(call, next, abort) {
     // throwing errors will lead to the aborting of further middlewares
     // => don't throw here but set a global var instead
-    if (call.name === "postProcessSnapshot") error = Error("hook in middleware")
+    if (call.name === "beforeDestroy") error = Error("hook in middleware")
     next(call)
 }
 function shouldNeverBeInvoked(call, next, abort) {
@@ -61,6 +60,9 @@ function delay(time) {
 const TestModel = types
     .model("Test1", {
         z: 1
+    })
+    .postProcessSnapshot(snapshot => {
+        return snapshot
     })
     .actions(self => {
         return {
@@ -101,9 +103,7 @@ const TestModel = types
             addName(name) {
                 return name
             },
-            postProcessSnapshot(snapshot) {
-                return snapshot
-            }
+            beforeDestroy() {}
         }
     })
 
@@ -187,6 +187,7 @@ test("middleware should be invoked on hooks", t => {
     const m = TestModel.create()
     addMiddleware(m, noHooksMiddleware)
     m.inc(1)
+    destroy(m)
     t.is(!!error, true)
 })
 
@@ -195,6 +196,7 @@ test("middleware should not be invoked on hooks", t => {
     const m = TestModel.create()
     addMiddleware(m, noHooksMiddleware, false)
     m.inc(1)
+    destroy(m)
     t.is(!error, true)
 })
 

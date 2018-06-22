@@ -33,7 +33,7 @@ test("it should restore the state from the snapshot", () => {
     const { Factory } = createTestFactories()
     const instance = Factory.create({ hello: { to: "world" } })
     expect(getSnapshot(instance)).toEqual({ hello: { to: "world" } })
-    expect("" + instance).toBe("ObservableMap@17[{ hello: AnonymousModel@/hello }]") // default toString
+    expect("" + instance).toBe("ObservableMap@18[{ hello: AnonymousModel@/hello }]") // default toString
 })
 // === SNAPSHOT TESTS ===
 test("it should emit snapshots", () => {
@@ -282,15 +282,25 @@ test("map expects regular identifiers", () => {
     const A = types.model("A", { a: types.identifier() })
     const B = types.model("B", { b: types.identifier() })
 
-    const M = types.map(types.union(A, B))
-    const m = M.create()
-    unprotect(m)
-    m.put({ a: "3" }) // ok
-    m.put({ a: "4" }) // ok
-
-    expect(() => {
-        m.put({ b: "5" })
-    }).toThrow(
-        "[mobx-state-tree] The objects in a map should all have the same identifier attribute, expected 'a', but child of type 'B' declared attribute 'b' as identifier"
+    // NOTE: we can determine identifier attribute upfront, so no need to wait for error while craetion
+    expect(() => types.map(types.union(A, B))).toThrow(
+        `[mobx-state-tree] The objects in a map should all have the same identifier attribute, expected 'a', but child of type 'B' declared attribute 'b' as identifier`
     )
+})
+
+test("map can resolve late identifiers", () => {
+    const Late = types.model({
+        id: types.identifier(),
+        children: types.map(types.late(() => Late))
+    })
+    const snapshot = {
+        id: "1",
+        children: {
+            "2": {
+                id: "2",
+                children: {}
+            }
+        }
+    }
+    expect(() => Late.create(snapshot)).not.toThrow()
 })

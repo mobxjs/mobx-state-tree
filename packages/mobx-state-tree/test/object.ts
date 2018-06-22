@@ -1,4 +1,3 @@
-import { unprotect } from "../src/core/mst-operations"
 import {
     destroy,
     detach,
@@ -9,6 +8,7 @@ import {
     applyAction,
     applySnapshot,
     getSnapshot,
+    unprotect,
     types
 } from "../src"
 import { autorun, reaction, observable } from "mobx"
@@ -457,7 +457,7 @@ test("it should consider primitives as proposed defaults", () => {
 })
 test("it should throw if a non-primitive value is provided and no default can be created", () => {
     expect(() => {
-        const Todo = types.model({
+        types.model({
             complex: {
                 a: 1,
                 b: 2

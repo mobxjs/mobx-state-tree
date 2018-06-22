@@ -38,7 +38,7 @@ test("it logs", t => {
 
     store.todos[0].setTitle("hello world")
 
-    t.deepEqual((console.log as any).args, [["[MST] #2 action - /todos/0/setTitle"]])
+    t.deepEqual((console.log as any).args, [["[MST] #1 action - /todos/0/setTitle"]])
 })
 
 test("it logs flows", async t => {
@@ -72,10 +72,10 @@ test("it logs flows", async t => {
 
     await store.todos[0].setTitle("hello world")
     t.deepEqual((console.log as any).args.map(([x]) => x), [
-        "[MST] #5 action - /todos/0/setTitle",
-        "[MST] #5 flow_spawn - /todos/0/setTitle",
-        "[MST] #5 flow_spawn - /todos/0/helper2",
-        "[MST] #5 flow_return - /todos/0/helper2",
-        "[MST] #5 flow_return - /todos/0/setTitle"
+        "[MST] #3 action - /todos/0/setTitle",
+        "[MST] #3 flow_spawn - /todos/0/setTitle",
+        "[MST] #3 flow_spawn - /todos/0/helper2",
+        "[MST] #3 flow_return - /todos/0/helper2",
+        "[MST] #3 flow_return - /todos/0/setTitle"
     ])
 })
