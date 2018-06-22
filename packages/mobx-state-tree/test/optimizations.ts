@@ -29,7 +29,7 @@ test("it should avoid processing patch if is exactly the current one in reconcil
     expect(getSnapshot(store)).toEqual(snapshot)
 
     // access property to initialize observable instance
-    expect(store.a).toEqual(snapshot.a)
+    expect(getSnapshot(store.a)).toEqual(snapshot.a)
 
     // check whether initializing instance does not cause snapshot invalidation
     const actualSnapshot = getSnapshot(store)
