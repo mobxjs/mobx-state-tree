@@ -358,3 +358,48 @@ test("on tree - group", t => {
     t.is(undoManager.canRedo, true)
     t.is(store.numbers.length, 0)
 })
+
+test("timestamp", t => {
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            numbers: types.optional(types.array(types.number), []),
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            setUndoManagerSameTree(self)
+            return {
+                inc() {
+                    self.x += 1
+                },
+                addNumber(number) {
+                    self.numbers.push(number)
+                }
+            }
+        })
+    const store = HistoryOnTreeStoreModel.create()
+
+    t.is(undoManager.canUndo, false)
+    t.is(undoManager.canRedo, false)
+    t.is(store.x, 1)
+
+    store.inc()
+
+    t.is(undoManager.canUndo, true)
+    const timestamp1 = undoManager.history[undoManager.history.length - 1].timestamp
+    t.true(timestamp1 > 0 && typeof timestamp1 === "number")
+
+    store.inc()
+    const timestamp2 = undoManager.history[undoManager.history.length - 1].timestamp
+    t.true(timestamp2 >= timestamp1 && typeof timestamp2 === "number")
+
+    undoManager.startGroup(() => {
+        store.inc()
+        store.inc()
+        store.inc()
+        store.inc()
+    })
+    undoManager.stopGroup()
+    const timestamp3 = undoManager.history[undoManager.history.length - 1].timestamp
+    t.true(timestamp3 >= timestamp2 && typeof timestamp3 === "number")
+})

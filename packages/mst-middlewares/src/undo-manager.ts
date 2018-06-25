@@ -18,7 +18,8 @@ import { IObservableArray } from "mobx"
 
 const Entry = types.model("UndoManagerEntry", {
     patches: types.frozen,
-    inversePatches: types.frozen
+    inversePatches: types.frozen,
+    timestamp: types.frozen
 })
 
 const UndoManager = types
@@ -43,7 +44,8 @@ const UndoManager = types
         let grouping = false
         let groupRecorder: any = {
             patches: [] as ReadonlyArray<IJsonPatch>,
-            inversePatches: [] as ReadonlyArray<IJsonPatch>
+            inversePatches: [] as ReadonlyArray<IJsonPatch>,
+            timestamp: 0 as Readonly<number>
         }
         let recordingActionId: any = null
         let recordingActionLevel = 0
@@ -70,7 +72,8 @@ const UndoManager = types
         const cachePatchForGroup = (recorder: IPatchRecorder): void => {
             groupRecorder = {
                 patches: groupRecorder.patches.concat(recorder.patches),
-                inversePatches: groupRecorder.inversePatches.concat(recorder.inversePatches)
+                inversePatches: groupRecorder.inversePatches.concat(recorder.inversePatches),
+                timestamp: groupRecorder.timestamp || recorder.timestamp
             }
         }
         const undoRedoMiddleware = createActionTrackingMiddleware({
@@ -103,6 +106,7 @@ const UndoManager = types
                 }
             ) => {
                 if (recordingActionId === actionId) {
+                    recorder.timestamp = Date.now()
                     stopRecordingAction(recorder)
                 }
             },
@@ -125,7 +129,8 @@ const UndoManager = types
                 self.history.splice(self.undoIdx)
                 self.history.push({
                     patches: recorder.patches,
-                    inversePatches: recorder.inversePatches
+                    inversePatches: recorder.inversePatches,
+                    timestamp: recorder.timestamp || 0
                 })
                 self.undoIdx = self.history.length
             },
@@ -145,7 +150,10 @@ const UndoManager = types
                 self.undoIdx--
                 // n.b: reverse patches back to forth
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
-                applyPatch(getRoot(targetStore), self.history[self.undoIdx].inversePatches.slice().reverse())
+                applyPatch(
+                    getRoot(targetStore),
+                    self.history[self.undoIdx].inversePatches.slice().reverse()
+                )
                 replaying = false
             },
             redo() {
@@ -181,7 +189,7 @@ const UndoManager = types
                 if (fn) fn()
                 grouping = false
                 ;(self as any).addUndoState(groupRecorder)
-                groupRecorder = { patches: [], inversePatches: [] }
+                groupRecorder = { patches: [], inversePatches: [], timestamp: 0 }
             }
         }
     })
