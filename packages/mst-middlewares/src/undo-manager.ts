@@ -16,6 +16,10 @@ import {
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
+interface IPatchRecord extends IPatchRecorder {
+    timestamp: Readonly<number>
+}
+
 const Entry = types.model("UndoManagerEntry", {
     patches: types.frozen,
     inversePatches: types.frozen,
@@ -61,7 +65,7 @@ const UndoManager = types
                 actionId
             }
         }
-        const stopRecordingAction = (recorder: IPatchRecorder): void => {
+        const stopRecordingAction = (recorder: IPatchRecord): void => {
             recordingActionId = null
             if (!skipping) {
                 if (grouping) return cachePatchForGroup(recorder)
@@ -69,7 +73,7 @@ const UndoManager = types
             }
             skipping = flagSkipping
         }
-        const cachePatchForGroup = (recorder: IPatchRecorder): void => {
+        const cachePatchForGroup = (recorder: IPatchRecord): void => {
             groupRecorder = {
                 patches: groupRecorder.patches.concat(recorder.patches),
                 inversePatches: groupRecorder.inversePatches.concat(recorder.inversePatches),
