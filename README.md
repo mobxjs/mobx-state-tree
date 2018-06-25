@@ -52,7 +52,7 @@ MobX state tree is a community driven project, but is looking for active maintai
   * [Lifecycle hooks](#lifecycle-hooks-for-typesmodel)
 * [Api overview](#api-overview)
 * [Tips](#tips)
-* [FAQ](#FAQ)
+* [FAQ](#faq)
 * [Full Api Docs](API.md)
 * [Built-in / example middlewares](packages/mst-middlewares/README.md)
 * [Changelog](changelog.md)
