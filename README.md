@@ -1243,7 +1243,7 @@ You can circumvent this situation by declaring the views in two steps:
 ```typescript
 const Example = types
   .model('Example', { prop: types.string })
-  .views((self: typeof Example.Type) => { // override the inferred type of self
+  .views(self => {
       const views = {
         get upperProp(): string {
             return self.prop.toUpperCase();
@@ -1253,6 +1253,24 @@ const Example = types
         }
       }
       return views
+  }))
+```
+
+_**NOTE: the above approach will incur runtime performance penalty as accessing such computed values (e.g. inside `render()` method of an observed component) always leads to full recompute (see [this issue](https://github.com/mobxjs/mobx-state-tree/issues/818#issue-323164363) for details). For a heavily-used computed properties it's recommended to use one of below approaches.**_
+
+
+Alternatively, you can manually override the inferred type of `self`:
+
+```typescript
+const Example = types
+  .model('Example', { prop: types.string })
+  .views((self: typeof Example.Type) => ({ // use typeof instead of predefined type to avoid circular references
+    get upperProp(): string {
+      return self.prop.toUpperCase();
+    },
+    get twiceUpperProp(): string {
+      return self.upperProp + self.upperProp;
+    }
   }))
 ```
 
