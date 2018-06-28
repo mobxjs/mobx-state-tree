@@ -1,3 +1,19 @@
+# 3.0.0
+
+## Improvements
+
+// TODO: add actual numbers
+* Significantly improved the performance of constructing MST trees. Significantly reduced the memory footprint of MST. Big shoutout to the relentless effort by [k-g-a](https://github.com/k-g-a) to optimize all the things! See [#845](https://github.com/mobxjs/mobx-state-tree/issues/845) for details.
+* Improved the overloads of `model.compose`, see [#892](https://github.com/mobxjs/mobx-state-tree/pull/892) by [t49tran](https://github.com/t49tran)
+
+## Breaking changes
+
+* MobX-state-tree now requires at least TypeScript 2.8 when using MST with typescript
+* `map.put` will now return the inserted node, rather than the map itself. This makes it easier to find objects for which the identifier is not known upfront. See [#766](https://github.com/mobxjs/mobx-state-tree/issues/766) by [k-g-a](https://github.com/k-g-a)
+* `postProcessSnapshot` can no longer be declared as action, but, like `preProcessSnapshot`, needs to be defined on the type rather than on the instance.
+* The order of firing hooks when instantiating has slighlty changed, as the `afterCreate` hook will now only be fired upon instantation of the tree node, which now happens lazily (on first read / action). The internal order within a single node has remained the same.
+
+
 # 2.2.0
 
 * Added support for MobX 5. Initiative by [@jeffberry](https://github.com/jeffberry) through [#868](https://github.com/mobxjs/mobx-state-tree/pull/868/files). Please not that there are JavaScript engine restrictions for MobX 5 (no Internet Explorer, or React Native Android). If you need to target those versions please keep using MobX 4 as peer dependency (MST is compatible with both)
