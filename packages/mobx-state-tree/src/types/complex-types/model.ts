@@ -8,7 +8,9 @@ import {
     observable,
     _interceptReads,
     _getAdministration,
-    isComputedProp
+    isComputedProp,
+    computed,
+    set
 } from "mobx"
 import {
     fail,
@@ -363,8 +365,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         // check views return
         if (!isPlainObject(state))
             fail(`volatile state initializer should return a plain object containing state`)
-        // TODO: typecheck & namecheck members of state?
-        extendObservable(self, state, EMPTY_OBJECT, mobxShallow)
+        set(self, state)
     }
 
     extend(fn: (self: any) => any): any {
@@ -411,13 +412,8 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                             descriptor.set
                         )
                 } else {
-                    const tmp = {}
-                    Object.defineProperty(tmp, key, {
-                        get: descriptor.get,
-                        set: descriptor.set,
-                        enumerable: true
-                    })
-                    extendObservable(self, tmp, EMPTY_OBJECT, mobxShallow)
+                    // use internal api as shortcut
+                    ;(computed as any)(self, key, descriptor, true)
                 }
             } else if (typeof value === "function") {
                 // this is a view function, merge as is!
