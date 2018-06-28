@@ -110,10 +110,12 @@ export type ModelCreationType<T extends ModelProperties> = {
             ? X | Y
             : never
     }
+
 export type ModelSnapshotType<T extends ModelProperties> = {
     readonly [K in keyof RequiredProps<T>]: T[K] extends IType<any, infer X, any> ? X : never
 } &
-    { readonly [K in keyof OptionalProps<T>]?: T[K] extends IType<any, infer X, any> ? X : never }
+    { readonly [K in keyof OptionalProps<T>]: T[K] extends IType<any, infer X, any> ? X : never }
+
 export type ModelInstanceType<T extends ModelProperties, O> = {
     [K in keyof T]: T[K] extends IType<any, any, infer X> ? X : never
 } &
@@ -151,8 +153,8 @@ export interface IModelType<
     preProcessSnapshot<S0 = ModelCreationType<PROPS>>(
         fn: (snapshot: S0) => ModelCreationType<PROPS>
     ): IModelType<PROPS, OTHERS, S0>
-    postProcessSnapshot<S0 = ModelSnapshotType<PROPS>, S1 = ModelCreationType<PROPS>>(
-        fn: (snapshot: S0) => S1
+    postProcessSnapshot<S1 = ModelCreationType<PROPS>>(
+        fn: (snapshot: ModelSnapshotType<PROPS>) => S1
     ): IModelType<PROPS, OTHERS, S1>
 }
 
@@ -169,7 +171,7 @@ export type ModelTypeConfig = {
 }
 
 export type OptionalValuesMap = {
-    [key: string]: OptionalValue<any, any>
+    [key: string]: OptionalValue<any, any, any>
 }
 
 const defaultObjectOptions = {
@@ -234,7 +236,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
      */
     public identifierAttribute: string | undefined = undefined
     public readonly initializers: ((instance: any) => any)[]
-    public readonly properties: { [K: string]: IAnyType }
+    public readonly properties: any
 
     private preProcessor: (snapshot: any) => any | undefined
     private postProcessor: (snapshot: any) => any | undefined
@@ -273,7 +275,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
             } else if (propType instanceof Union) {
                 const optional = propType.types.find(
                     t => t instanceof OptionalValue
-                ) as OptionalValue<any, any>
+                ) as OptionalValue<any, any, any>
                 if (optional) {
                     optionalChildren[propName] = optional
                     optionalFound = true
@@ -429,7 +431,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         })
     }
 
-    preProcessSnapshot(preProcessor: (snapshot: any) => any): this {
+    preProcessSnapshot(preProcessor: (snapshot: any) => any): any {
         const currentPreprocessor = this.preProcessor
         if (!currentPreprocessor) return this.cloneAndEnhance({ preProcessor }) as this
         else
@@ -438,7 +440,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
             }) as this
     }
 
-    postProcessSnapshot(postProcessor: (snapshot: any) => S): IModelType<S, T> {
+    postProcessSnapshot(postProcessor: (snapshot: any) => any): any {
         const currentPostprocessor = this.postProcessor
         if (!currentPostprocessor) return this.cloneAndEnhance({ postProcessor })
         else

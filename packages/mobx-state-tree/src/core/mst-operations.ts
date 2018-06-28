@@ -5,7 +5,7 @@ import { IObservableArray, ObservableMap, isComputedProp, isObservableProp } fro
  *
  * @export
  * @param {IStateTreeNode} object
- * @returns {IType<S, T>}
+ * @returns {IAnyType}
  */
 export function getType<C, S, T>(object: IStateTreeNode): IType<C, S, T> {
     return getStateTreeNode(object).type
@@ -349,10 +349,10 @@ export function getParent<T>(target: IStateTreeNode, depth = 1): T & IStateTreeN
  *
  * @export
  * @param {Object} target
- * @param {IType<any, any>} type
+ * @param {IAnyType} type
  * @returns {boolean}
  */
-export function hasParentOfType(target: IStateTreeNode, type: IType<any, any>): boolean {
+export function hasParentOfType(target: IStateTreeNode, type: IAnyType): boolean {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -368,18 +368,18 @@ export function hasParentOfType(target: IStateTreeNode, type: IType<any, any>): 
     return false
 }
 
-export function getParentOfType(target: IStateTreeNode, type: IType<any, any>): any & IStateTreeNode
-export function getParentOfType<S, T>(target: IStateTreeNode, type: IType<S, T>): T & IStateTreeNode
+export function getParentOfType(target: IStateTreeNode, type: IAnyType): any & IStateTreeNode
+export function getParentOfType<S, T>(target: IStateTreeNode, type: IAnyType): T & IStateTreeNode
 /**
  * Returns the target's parent of a given type, or throws.
  *
  *
  * @export
  * @param {Object} target
- * @param {IType<any, any>} type
+ * @param {IAnyType} type
  * @returns {*}
  */
-export function getParentOfType<S, T>(target: IStateTreeNode, type: IType<S, T>): T {
+export function getParentOfType<S, T>(target: IStateTreeNode, type: IAnyType): T {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))

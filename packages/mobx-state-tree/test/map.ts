@@ -300,7 +300,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
         })
         .preProcessSnapshot(snapshot => {
             const result = Object.assign({}, snapshot)
-            if (typeof result.title !== "string") result.title = ""
+            if (typeof result.title !== "string") (result as any).title = ""
             return result
         })
 

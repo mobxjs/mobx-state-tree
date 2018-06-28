@@ -154,7 +154,7 @@ export class MapType<C, S, T> extends ComplexType<
     }
 
     initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
-        const subType = (objNode.type as MapType<any, any>).subType
+        const subType = (objNode.type as MapType<any, any, any>).subType
         const environment = objNode._environment
         const result = {} as IChildNodesMap
         Object.keys(initialSnapshot).forEach(name => {
@@ -176,7 +176,7 @@ export class MapType<C, S, T> extends ComplexType<
 
     finalizeNewInstance(node: INode) {
         const objNode = node as ObjectNode
-        const type = objNode.type as MapType<any, any>
+        const type = objNode.type as MapType<any, any, any>
         const instance = objNode.storedValue as ObservableMap<any, any>
         _interceptReads(instance, objNode.unbox)
         intercept(instance, type.willChange)
@@ -198,7 +198,7 @@ export class MapType<C, S, T> extends ComplexType<
         const node = getStateTreeNode(change.object as IStateTreeNode)
         const key = "" + change.name
         node.assertWritable()
-        const mapType = node.type as MapType<any, any>
+        const mapType = node.type as MapType<any, any, any>
         const subType = mapType.subType
 
         switch (change.type) {

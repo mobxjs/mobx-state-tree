@@ -67,7 +67,6 @@ export {
     ISimpleType,
     IComplexType,
     ISnapshottable,
-    Snapshot,
     typecheckPublic as typecheck,
     escapeJsonPath,
     unescapeJsonPath,

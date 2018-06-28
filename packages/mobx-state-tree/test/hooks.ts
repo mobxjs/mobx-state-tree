@@ -104,12 +104,17 @@ test("it should trigger lifecycle hooks", () => {
         "destroy todo: Give talk"
     ])
 })
+type CarSnapshot = { id: string }
 const Car = types
     .model("Car", {
         id: types.number
     })
-    .preProcessSnapshot(snapshot => Object.assign({}, snapshot, { id: parseInt(snapshot.id) * 2 }))
-    .postProcessSnapshot(snapshot => Object.assign({}, snapshot, { id: "" + snapshot.id / 2 }))
+    .preProcessSnapshot<CarSnapshot>(snapshot =>
+        Object.assign({}, snapshot, { id: parseInt(snapshot.id) * 2 })
+    )
+    .postProcessSnapshot<CarSnapshot>(snapshot =>
+        Object.assign({}, snapshot, { id: "" + snapshot.id / 2 })
+    )
 
 const Factory = types.model("Factory", {
     car: Car
@@ -223,12 +228,10 @@ test("snapshot processors can be composed", () => {
             x: s.x! / 5
         }))
         .postProcessSnapshot(s => {
-            s.x += 3
-            return s
+            return { x: s.x + 3 }
         })
         .postProcessSnapshot(s => {
-            s.x *= 5
-            return s
+            return { x: s.x * 5 }
         })
 
     const x = X.create({ x: 25 })
