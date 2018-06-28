@@ -1,4 +1,4 @@
-import { reaction, computed, action, observable } from "mobx"
+import { reaction, computed, action, IAtom, createAtom } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -47,7 +47,8 @@ export class ObjectNode implements INode {
     readonly identifierAttribute: string | undefined
     readonly identifier: string | null
 
-    @observable subpath: string = ""
+    subpathAtom = createAtom(`path`)
+    subpath: string = ""
     parent: ObjectNode | null = null
     state = NodeLifeCycle.INITIALIZING
     storedValue: any
@@ -165,7 +166,8 @@ export class ObjectNode implements INode {
      */
     @computed
     public get path(): string {
-        if (!this.parent) return this.subpath
+        this.subpathAtom.reportObserved()
+        if (!this.parent) return ""
         return this.parent.path + "/" + escapeJsonPath(this.subpath)
     }
 
@@ -180,40 +182,43 @@ export class ObjectNode implements INode {
 
     setParent(newParent: ObjectNode | null, subpath: string | null = null) {
         if (this.parent === newParent && this.subpath === subpath) return
-        if (newParent) {
-            if (process.env.NODE_ENV !== "production") {
-                if (this.parent && newParent !== this.parent) {
-                    fail(
-                        `A node cannot exists twice in the state tree. Failed to add ${this} to path '${
-                            newParent.path
-                        }/${subpath}'.`
-                    )
-                }
-                if (!this.parent && newParent.root === this) {
-                    fail(
-                        `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${
-                            newParent.path
-                        }/${subpath}'`
-                    )
-                }
-                if (
-                    !this.parent &&
-                    !!this.root._environment &&
-                    this.root._environment !== newParent.root._environment
-                ) {
-                    fail(
-                        `A state tree cannot be made part of another state tree as long as their environments are different.`
-                    )
-                }
+        if (newParent && process.env.NODE_ENV !== "production") {
+            if (this.parent && newParent !== this.parent) {
+                fail(
+                    `A node cannot exists twice in the state tree. Failed to add ${this} to path '${
+                        newParent.path
+                    }/${subpath}'.`
+                )
+            }
+            if (!this.parent && newParent.root === this) {
+                fail(
+                    `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${
+                        newParent.path
+                    }/${subpath}'`
+                )
+            }
+            if (
+                !this.parent &&
+                !!this.root._environment &&
+                this.root._environment !== newParent.root._environment
+            ) {
+                fail(
+                    `A state tree cannot be made part of another state tree as long as their environments are different.`
+                )
             }
         }
         if (this.parent && !newParent) {
             this.die()
         } else {
-            this.subpath = subpath === null ? "" : subpath
+            const newPath = subpath === null ? "" : subpath
+            if (this.subpath !== newPath) {
+                this.subpath = newPath
+                this.subpathAtom.reportChanged()
+            }
             if (newParent && newParent !== this.parent) {
                 newParent.root.identifierCache!.mergeCache(this)
                 this.parent = newParent
+                this.subpathAtom.reportChanged()
                 this.fireHook("afterAttach")
             }
         }
@@ -350,6 +355,7 @@ export class ObjectNode implements INode {
         }
     }
 
+    @action
     detach() {
         if (!this.isAlive) fail(`Error while detaching, node is not alive.`)
         if (this.isRoot) return
@@ -361,6 +367,7 @@ export class ObjectNode implements INode {
             this.parent!.removeChild(this.subpath)
             this.parent = null
             this.subpath = ""
+            this.subpathAtom.reportChanged()
             this.state = NodeLifeCycle.FINALIZED
         }
     }
@@ -390,6 +397,7 @@ export class ObjectNode implements INode {
         )
     }
 
+    @action
     public die() {
         if (this.state === NodeLifeCycle.DETACHING) return
 
@@ -424,7 +432,7 @@ export class ObjectNode implements INode {
         this.state = NodeLifeCycle.DEAD
         this.subpath = ""
         this.parent = null
-        // invalidateComputed(this, "path")
+        this.subpathAtom.reportChanged()
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
