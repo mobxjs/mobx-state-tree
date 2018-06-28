@@ -97,342 +97,45 @@ export class Union extends Type<any, any, any> {
     }
 }
 
-// Generator for the union types:
-// const alfa = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-// let str = ""
-// function withChars(amount: number, fn: (char: string) => string): string[] {
-//     return alfa
-//         .substr(0, amount)
-//         .split("")
-//         .map(fn)
-// }
-// function getNames(char: string) {
-//     return `C${char}, S${char}, T${char}`
-// }
-// for (let i = 2; i < 10; i++) {
-//     str += `
-// export function union<${withChars(i, getNames).join(", ")}>(
-//     dispatch: ITypeDispatcher,
-//     ${withChars(i, char => `${char}: IType<${getNames(char)}>`).join(",\n")}
-// ): IType<${withChars(i, char => "C" + char).join(" | ")}, ${withChars(i, char => "S" + char).join(
-//         " | "
-//     )}, ${withChars(i, char => "T" + char).join(" | ")}>
-// export function union<${withChars(i, getNames).join(", ")}>(
-//     ${withChars(i, char => `${char}: IType<${getNames(char)}>`).join(",\n")}
-// ): IType<${withChars(i, char => "C" + char).join(" | ")}, ${withChars(i, char => "S" + char).join(
-//         " | "
-//     )}, ${withChars(i, char => "T" + char).join(" | ")}>
-// `
-// }
-// console.log(str)
-export function union<CA, SA, TA, CB, SB, TB>(
-    dispatch: ITypeDispatcher,
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>
-): IType<CA | CB, SA | SB, TA | TB>
-export function union<CA, SA, TA, CB, SB, TB>(
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>
-): IType<CA | CB, SA | SB, TA | TB>
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(
-    dispatch: ITypeDispatcher,
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>
-): IType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>
-): IType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(
-    dispatch: ITypeDispatcher,
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>
-): IType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>
-): IType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(
-    dispatch: ITypeDispatcher,
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>,
-    E: IType<CE, SE, TE>
-): IType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>,
-    E: IType<CE, SE, TE>
-): IType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(
-    dispatch: ITypeDispatcher,
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>,
-    E: IType<CE, SE, TE>,
-    F: IType<CF, SF, TF>
-): IType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>,
-    E: IType<CE, SE, TE>,
-    F: IType<CF, SF, TF>
-): IType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
-export function union<
-    CA,
-    SA,
-    TA,
-    CB,
-    SB,
-    TB,
-    CC,
-    SC,
-    TC,
-    CD,
-    SD,
-    TD,
-    CE,
-    SE,
-    TE,
-    CF,
-    SF,
-    TF,
-    CG,
-    SG,
-    TG
->(
-    dispatch: ITypeDispatcher,
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>,
-    E: IType<CE, SE, TE>,
-    F: IType<CF, SF, TF>,
-    G: IType<CG, SG, TG>
-): IType<
-    CA | CB | CC | CD | CE | CF | CG,
-    SA | SB | SC | SD | SE | SF | SG,
-    TA | TB | TC | TD | TE | TF | TG
->
-export function union<
-    CA,
-    SA,
-    TA,
-    CB,
-    SB,
-    TB,
-    CC,
-    SC,
-    TC,
-    CD,
-    SD,
-    TD,
-    CE,
-    SE,
-    TE,
-    CF,
-    SF,
-    TF,
-    CG,
-    SG,
-    TG
->(
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>,
-    E: IType<CE, SE, TE>,
-    F: IType<CF, SF, TF>,
-    G: IType<CG, SG, TG>
-): IType<
-    CA | CB | CC | CD | CE | CF | CG,
-    SA | SB | SC | SD | SE | SF | SG,
-    TA | TB | TC | TD | TE | TF | TG
->
-export function union<
-    CA,
-    SA,
-    TA,
-    CB,
-    SB,
-    TB,
-    CC,
-    SC,
-    TC,
-    CD,
-    SD,
-    TD,
-    CE,
-    SE,
-    TE,
-    CF,
-    SF,
-    TF,
-    CG,
-    SG,
-    TG,
-    CH,
-    SH,
-    TH
->(
-    dispatch: ITypeDispatcher,
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>,
-    E: IType<CE, SE, TE>,
-    F: IType<CF, SF, TF>,
-    G: IType<CG, SG, TG>,
-    H: IType<CH, SH, TH>
-): IType<
-    CA | CB | CC | CD | CE | CF | CG | CH,
-    SA | SB | SC | SD | SE | SF | SG | SH,
-    TA | TB | TC | TD | TE | TF | TG | TH
->
-export function union<
-    CA,
-    SA,
-    TA,
-    CB,
-    SB,
-    TB,
-    CC,
-    SC,
-    TC,
-    CD,
-    SD,
-    TD,
-    CE,
-    SE,
-    TE,
-    CF,
-    SF,
-    TF,
-    CG,
-    SG,
-    TG,
-    CH,
-    SH,
-    TH
->(
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>,
-    E: IType<CE, SE, TE>,
-    F: IType<CF, SF, TF>,
-    G: IType<CG, SG, TG>,
-    H: IType<CH, SH, TH>
-): IType<
-    CA | CB | CC | CD | CE | CF | CG | CH,
-    SA | SB | SC | SD | SE | SF | SG | SH,
-    TA | TB | TC | TD | TE | TF | TG | TH
->
-export function union<
-    CA,
-    SA,
-    TA,
-    CB,
-    SB,
-    TB,
-    CC,
-    SC,
-    TC,
-    CD,
-    SD,
-    TD,
-    CE,
-    SE,
-    TE,
-    CF,
-    SF,
-    TF,
-    CG,
-    SG,
-    TG,
-    CH,
-    SH,
-    TH,
-    CI,
-    SI,
-    TI
->(
-    dispatch: ITypeDispatcher,
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>,
-    E: IType<CE, SE, TE>,
-    F: IType<CF, SF, TF>,
-    G: IType<CG, SG, TG>,
-    H: IType<CH, SH, TH>,
-    I: IType<CI, SI, TI>
-): IType<
-    CA | CB | CC | CD | CE | CF | CG | CH | CI,
-    SA | SB | SC | SD | SE | SF | SG | SH | SI,
-    TA | TB | TC | TD | TE | TF | TG | TH | TI
->
-export function union<
-    CA,
-    SA,
-    TA,
-    CB,
-    SB,
-    TB,
-    CC,
-    SC,
-    TC,
-    CD,
-    SD,
-    TD,
-    CE,
-    SE,
-    TE,
-    CF,
-    SF,
-    TF,
-    CG,
-    SG,
-    TG,
-    CH,
-    SH,
-    TH,
-    CI,
-    SI,
-    TI
->(
-    A: IType<CA, SA, TA>,
-    B: IType<CB, SB, TB>,
-    C: IType<CC, SC, TC>,
-    D: IType<CD, SD, TD>,
-    E: IType<CE, SE, TE>,
-    F: IType<CF, SF, TF>,
-    G: IType<CG, SG, TG>,
-    H: IType<CH, SH, TH>,
-    I: IType<CI, SI, TI>
-): IType<
-    CA | CB | CC | CD | CE | CF | CG | CH | CI,
-    SA | SB | SC | SD | SE | SF | SG | SH | SI,
-    TA | TB | TC | TD | TE | TF | TG | TH | TI
->
+// generated with /home/michel/mobservable/mobx-state-tree/packages/mobx-state-tree/scripts/generate-union-types.js
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB>(dispatch: ITypeDispatcher, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>): IType<CA | CB, SA | SB, TA | TB>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>): IType<CA | CB, SA | SB, TA | TB>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(dispatch: ITypeDispatcher, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>): IType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>): IType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(dispatch: ITypeDispatcher, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>): IType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>): IType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(dispatch: ITypeDispatcher, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>): IType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>): IType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(dispatch: ITypeDispatcher, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>): IType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>): IType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(dispatch: ITypeDispatcher, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>): IType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>): IType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(dispatch: ITypeDispatcher, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>): IType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>): IType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(dispatch: ITypeDispatcher, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>, I: IType<CI, SI, TI>): IType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>, I: IType<CI, SI, TI>): IType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
+// manual written
 export function union(...types: IAnyType[]): IAnyType
 export function union(
     dispatchOrType: ITypeDispatcher | IAnyType,
     ...otherTypes: IAnyType[]
 ): IAnyType
-
 /**
  * types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
  *
