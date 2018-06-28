@@ -37,7 +37,8 @@ import {
     mobxShallow,
     IChildNodesMap,
     convertChildNodesToArray,
-    IAnyType
+    IAnyType,
+    EMPTY_ARRAY
 } from "../../internal"
 
 export class ArrayType<C, S, T> extends ComplexType<C[], S[], IObservableArray<T>> {
@@ -221,7 +222,7 @@ export class ArrayType<C, S, T> extends ComplexType<C[], S[], IObservableArray<T
     }
 
     getDefaultSnapshot() {
-        return []
+        return EMPTY_ARRAY
     }
 
     removeChild(node: ObjectNode, subpath: string) {

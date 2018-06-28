@@ -64,7 +64,7 @@ test("it should accept a function to provide dynamic values", () => {
 test("Values should reset to default if omitted in snapshot", () => {
     const Store = types.model({
         todo: types.model({
-            id: types.identifier(),
+            id: types.identifier,
             done: false,
             title: "test",
             thing: types.optional(types.frozen, {})

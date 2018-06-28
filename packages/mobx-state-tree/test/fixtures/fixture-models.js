@@ -8,7 +8,7 @@ exports.Treasure = types.model("Treasure", {
 exports.HeroRoles = ["warrior", "wizard", "cleric", "thief"]
 exports.Hero = types
     .model("Hero", {
-        id: types.identifier(types.number),
+        id: types.identifierNumber,
         name: types.string,
         description: types.string,
         level: types.optional(types.number, 1),
@@ -22,7 +22,7 @@ exports.Hero = types
 // large
 exports.Monster = types
     .model("Monster", {
-        id: types.identifier(types.string),
+        id: types.identifier,
         freestyle: types.frozen,
         level: types.number,
         maxHp: types.number,

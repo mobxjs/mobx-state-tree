@@ -6,7 +6,8 @@ import {
     joinJsonPath,
     ScalarNode,
     IChildNodesMap,
-    IAnyType
+    IAnyType,
+    EMPTY_ARRAY
 } from "../../internal"
 
 export enum NodeLifeCycle {
@@ -179,10 +180,10 @@ export function resolveNodeByPathParts(
 }
 
 export function convertChildNodesToArray(childNodes: IChildNodesMap | null): INode[] {
-    if (!childNodes) return []
+    if (!childNodes) return EMPTY_ARRAY as INode[]
 
     const keys = Object.keys(childNodes)
-    if (!keys.length) return []
+    if (!keys.length) return EMPTY_ARRAY as INode[]
 
     const result = new Array(keys.length) as INode[]
     keys.forEach((key, index) => {

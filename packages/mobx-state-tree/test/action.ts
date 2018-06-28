@@ -80,7 +80,7 @@ test("applying snapshots should be recordable and replayable", () => {
 })
 // Complex actions
 const Customer = types.model("Customer", {
-    id: types.identifier(types.number),
+    id: types.identifierNumber,
     name: types.string
 })
 const Order = types

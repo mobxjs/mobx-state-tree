@@ -149,7 +149,7 @@ test("it should support identifiers", () => {
         todos: types.optional(
             types.map(
                 types.model({
-                    id: types.identifier()
+                    id: types.identifier
                 })
             ),
             {}
@@ -183,10 +183,7 @@ test("#184 - types.map().get(key) should not throw if key doesnt exists", () => 
     }).not.toThrow()
 })
 test("#192 - put should not throw when identifier is a number", () => {
-    const Todo = types.model("Todo", {
-        todo_id: types.identifier(types.number),
-        title: types.string
-    })
+    const Todo = types.model("Todo", { todo_id: types.identifierNumber, title: types.string })
     const TodoStore = types
         .model("TodoStore", {
             todos: types.optional(types.map(Todo), {})
@@ -215,10 +212,7 @@ test("#192 - put should not throw when identifier is a number", () => {
     }
 })
 test("#192 - map should not mess up keys when putting twice", () => {
-    const Todo = types.model("Todo", {
-        todo_id: types.identifier(types.number),
-        title: types.string
-    })
+    const Todo = types.model("Todo", { todo_id: types.identifierNumber, title: types.string })
     const TodoStore = types
         .model("TodoStore", {
             todos: types.optional(types.map(Todo), {})
@@ -245,7 +239,7 @@ test("#192 - map should not mess up keys when putting twice", () => {
 })
 test("#694 - map.put should return new node", () => {
     const Todo = types.model("Todo", {
-        todo_id: types.identifier(types.string),
+        todo_id: types.identifier,
         title: types.string
     })
     const TodoStore = types
@@ -324,8 +318,8 @@ test("it should get map keys from reversePatch when deleted an item from a neste
 })
 
 test("map expects regular identifiers", () => {
-    const A = types.model("A", { a: types.identifier() })
-    const B = types.model("B", { b: types.identifier() })
+    const A = types.model("A", { a: types.identifier })
+    const B = types.model("B", { b: types.identifier })
 
     // NOTE: we can determine identifier attribute upfront, so no need to wait for error while craetion
     expect(() => types.map(types.union(A, B))).toThrow(
@@ -339,7 +333,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
     })
     const Item = types
         .model("Item", {
-            id: types.identifier(),
+            id: types.identifier,
             title: types.string,
             notes: types.array(Note)
         })
@@ -379,7 +373,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
 
 test("map can resolve late identifiers", () => {
     const Late = types.model({
-        id: types.identifier(),
+        id: types.identifier,
         children: types.map(types.late(() => Late))
     })
     const snapshot = {

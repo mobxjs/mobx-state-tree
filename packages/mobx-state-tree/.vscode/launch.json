@@ -5,7 +5,7 @@
             "type": "node",
             "request": "launch",
             "name": "debug unit test",
-            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+            "program": "${workspaceRoot}/node_modules/.bin/jest",
             "args": ["-i", "${file}"],
         }
     ]

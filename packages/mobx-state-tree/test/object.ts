@@ -227,12 +227,18 @@ test("it should throw if a replaced object is read or written to", () => {
 // === COMPOSE FACTORY ===
 test("it should compose factories", () => {
     const { BoxFactory, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(BoxFactory, ColorFactory)
+    const ComposedFactory = types.compose(
+        BoxFactory,
+        ColorFactory
+    )
     expect(getSnapshot(ComposedFactory.create())).toEqual({ width: 0, height: 0, color: "#FFFFFF" })
 })
 test("it should compose factories with computed properties", () => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2)
+    const ComposedFactory = types.compose(
+        ColorFactory,
+        ComputedFactory2
+    )
     const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
     expect(getSnapshot(store)).toEqual({ props: { width: 100, height: 200 }, color: "#FFFFFF" })
     expect(store.area).toBe(20000)
@@ -241,7 +247,10 @@ test("it should compose factories with computed properties", () => {
 })
 test("it should compose multiple types with computed properties", () => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2)
+    const ComposedFactory = types.compose(
+        ColorFactory,
+        ComputedFactory2
+    )
     const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
     expect(getSnapshot(store)).toEqual({ props: { width: 100, height: 200 }, color: "#FFFFFF" })
     expect(store.area).toBe(20000)
@@ -515,7 +524,7 @@ test("It should throw if any other key is returned from extend", () => {
 
 test("782, TS + compose", () => {
     const User = types.model("User", {
-        id: types.identifier(types.string),
+        id: types.identifier,
         name: types.maybe(types.string),
         avatar: types.maybe(types.string)
     })

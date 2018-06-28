@@ -32,7 +32,8 @@ import {
     nullType,
     late,
     enumeration,
-    custom
+    custom,
+    identifierNumber
 } from "./internal"
 
 export const types = {
@@ -54,6 +55,7 @@ export const types = {
     array,
     frozen,
     identifier,
+    identifierNumber,
     late,
     undefined: undefinedType,
     null: nullType

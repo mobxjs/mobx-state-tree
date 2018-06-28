@@ -140,7 +140,9 @@ export class MapType<C, S, T> extends ComplexType<
                 if (type.identifierAttribute) {
                     if (identifierAttribute && identifierAttribute !== type.identifierAttribute) {
                         fail(
-                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
+                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${
+                                type.name
+                            }' declared attribute '${type.identifierAttribute}' as identifier`
                         )
                     }
                     identifierAttribute = type.identifierAttribute
@@ -349,7 +351,7 @@ export function map<C, S, T>(
  *
  * @example
  * const Todo = types.model({
- *   id: types.identifier(types.number),
+ *   id: types.identifier,
  *   task: types.string
  * })
  *

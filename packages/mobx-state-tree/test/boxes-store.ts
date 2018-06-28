@@ -5,7 +5,7 @@ import { values } from "mobx"
 import { types, getParent, hasParent, recordPatches, unprotect, getSnapshot } from "../src"
 export const Box = types
     .model("Box", {
-        id: types.identifier(),
+        id: types.identifier,
         name: "",
         x: 0,
         y: 0
@@ -33,7 +33,7 @@ export const Box = types
         }
     })
 export const Arrow = types.model("Arrow", {
-    id: types.identifier(),
+    id: types.identifier,
     from: types.reference(Box),
     to: types.reference(Box)
 })

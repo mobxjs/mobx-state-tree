@@ -563,7 +563,7 @@ This makes it possible to declare references, and keep the data normalized in th
 Example:
 ```javascript
 const Todo = types.model({
-    id: types.identifier(),
+    id: types.identifier,
     title: types.string
 })
 
@@ -599,13 +599,13 @@ _Tip: If you know the format of the identifiers in your application, leverage `t
 
 ```javascript
 const Car = types.model("Car", {
-    id: types.identifier(types.refinement(types.string, identifier => identifier.indexOf("Car_") === 0))
+    id: types.refinement(types.identifier, identifier => identifier.indexOf("Car_") === 0)
 })
 ```
 
 #### References
 
-References are defined by mentioning the type they should resolve to. The targeted type should have exactly one attribute of the type `identifier()`.
+References are defined by mentioning the type they should resolve to. The targeted type should have exactly one attribute of the type `identifier`.
 References are looked up through the entire tree, but per type. So identifiers need to be unique in the entire tree.
 
 #### Customizable references
@@ -618,7 +618,7 @@ Example:
 
 ```javascript
 const User = types.model({
-    id: types.identifier(),
+    id: types.identifier,
     name: types.string
 })
 
@@ -890,7 +890,7 @@ These are the types available in MST. All types can be found in the `types` name
 ## Property types
 
 Property types can only be used as a direct member of a `types.model` type and not further composed (for now).
-* `types.identifier(subType?)` Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](#identifiers) for more details. `subType` should be either `types.string` or `types.number`, defaulting to the first if not specified.
+* `types.identifier` Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](#identifiers) for more details. `subType` should be either `types.string` or `types.number`, defaulting to the first if not specified.
 * `types.reference(targetType)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
 
 ## LifeCycle hooks for `types.model`
@@ -1130,7 +1130,7 @@ MST doesn't offer an any type because it can't reason about it. For example, giv
 
 ### How does reconciliation work?
 
-* When applying snapshots, MST will always try to reuse existing object instances for snapshots with the same identifier (see `types.identifier()`).
+* When applying snapshots, MST will always try to reuse existing object instances for snapshots with the same identifier (see `types.identifier`).
 * If no identifier is specified, but the type of the snapshot is correct, MST will reconcile objects as well if they are stored in a specific model property or under the same map key.
 * In arrays, items without an identifier are never reconciled.
 
