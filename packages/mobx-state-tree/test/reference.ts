@@ -309,7 +309,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
         }
     })
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
-    store.arrows.push({ id: 1, name: "oops" })
+    store.arrows.push({ id: 1, name: "oops" } as any)
     expect(err.message).toBe(
         "[mobx-state-tree] Cannot resolve a reference to type '(Box | Arrow)' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
     )
@@ -726,4 +726,47 @@ test("array of references should work fine", () => {
     a.order()
     expect(a.blocks[0].id).toBe("1")
     expect(a.blockRefs[0].id).toBe("2")
+})
+
+test("should serialize references correctly", () => {
+    const M = types.model({
+        id: types.identifierNumber
+    })
+    const S = types.model({
+        mies: types.map(M),
+        ref: types.maybe(types.reference(M))
+    })
+
+    const s = S.create({
+        mies: {
+            7: {
+                id: 7
+            }
+        }
+    })
+    unprotect(s)
+
+    expect(Array.from(s.mies.keys())).toEqual(["7"])
+    expect(s.mies.get("7")!.id).toBe("7")
+    expect(s.mies.get(7 as any)).toBe(undefined) // maps only use numbers as keys
+
+    s.mies.put({
+        id: 8
+    })
+    expect(Array.from(s.mies.keys())).toEqual(["7", "8"])
+
+    s.ref = 8 as any
+    expect(s.ref!.id).toBe("8") // resolved from number
+    expect(getSnapshot(s).ref).toBe(8) // ref serialized as number
+
+    s.ref = "7" as any // resolved from string
+    expect(s.ref!.id).toBe("7") // resolved from number
+    expect(getSnapshot(s).ref).toBe("7") // ref serialized as string (number would be ok as well)
+
+    s.ref = s.mies.get("8")!
+    expect(s.ref.id).toBe("8") // resolved from instance
+    expect(getSnapshot(s).ref).toBe(8) // ref serialized as number
+
+    s.ref = "9" as any // unresolvable
+    expect(getSnapshot(s).ref).toBe("9") // snapshot preserved as it was unresolvable
 })
