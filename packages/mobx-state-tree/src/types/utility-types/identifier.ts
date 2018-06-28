@@ -72,7 +72,7 @@ export class IdentifierNumberType extends IdentifierType {
         environment: any,
         snapshot: any
     ): INode {
-        return super.instantiate(parent, subpath, environment, "" + snapshot)
+        return super.instantiate(parent, subpath, environment, snapshot)
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
@@ -87,11 +87,11 @@ export class IdentifierNumberType extends IdentifierType {
     }
 
     reconcile(current: INode, newValue: any) {
-        return super.reconcile(current, "" + newValue)
+        return super.reconcile(current, newValue)
     }
 
     getSnapshot(node: INode) {
-        return parseInt(node.storedValue, 10)
+        return node.storedValue
     }
 
     describe() {
@@ -133,7 +133,7 @@ export const identifier: IType<string, string, string> = new IdentifierType()
  * @template T
  * @returns {IType<T, T>}
  */
-export const identifierNumber: IType<number, number, string> = new IdentifierNumberType() as any
+export const identifierNumber: IType<number, number, number> = new IdentifierNumberType() as any
 
 export function isIdentifierType(type: any): type is IdentifierType | IdentifierNumberType {
     return isType(type) && (type.flags & TypeFlags.Identifier) > 0

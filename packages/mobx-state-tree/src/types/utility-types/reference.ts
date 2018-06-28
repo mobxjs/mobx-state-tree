@@ -85,7 +85,7 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
             case "identifier":
                 return ref.value
             case "object":
-                return getStateTreeNode(ref.value).identifier
+                return ref.value[getStateTreeNode(ref.value).identifierAttribute!]
         }
     }
 

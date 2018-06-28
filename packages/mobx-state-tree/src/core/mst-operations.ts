@@ -518,6 +518,7 @@ export function resolveIdentifier(
 
 /**
  * Returns the identifier of the target node.
+ * This is the *string normalized* identifier, which might not match the type of the identifier attribute
  *
  * @export
  * @param {IStateTreeNode} target

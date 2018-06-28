@@ -56,7 +56,7 @@ function put(this: ObservableMap<any, any>, value: any) {
         if (process.env.NODE_ENV !== "production") {
             if (!node.identifierAttribute) return fail(needsIdentifierError)
         }
-        let key = "" + node.identifier
+        let key = node.identifier
         this.set(key, node.value)
         return node.value
     } else if (!isMutable(value)) {
@@ -229,7 +229,7 @@ export class MapType<C, S, T> extends ComplexType<
 
     private processIdentifier(expected: string, node: INode) {
         if (this.identifierMode === MapIdentifierMode.YES && node instanceof ObjectNode) {
-            const identifier = "" + node.identifier! // always normalize to string
+            const identifier = node.identifier!
             if (identifier !== expected)
                 fail(
                     `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`

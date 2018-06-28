@@ -9,7 +9,7 @@ export class IdentifierCache {
 
     addNodeToCache(node: ObjectNode) {
         if (node.identifierAttribute) {
-            const identifier = "" + node.identifier!
+            const identifier = node.identifier!
             if (!this.cache.has(identifier)) {
                 this.cache.set(identifier, observable.array<ObjectNode>([], mobxShallow))
             }
@@ -30,7 +30,7 @@ export class IdentifierCache {
 
     notifyDied(node: ObjectNode) {
         if (node.identifierAttribute) {
-            const set = this.cache.get("" + node.identifier!)
+            const set = this.cache.get(node.identifier!)
             if (set) set.remove(node)
         }
     }

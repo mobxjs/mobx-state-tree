@@ -149,7 +149,7 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T> {
             isMutable(newValue) &&
             !isStateTreeNode(newValue) &&
             (!current.identifierAttribute ||
-                current.identifier === newValue[current.identifierAttribute])
+                current.identifier === "" + newValue[current.identifierAttribute])
         ) {
             // the newValue has no node, so can be treated like a snapshot
             // we can reconcile

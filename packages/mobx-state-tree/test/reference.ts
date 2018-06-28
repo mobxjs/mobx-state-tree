@@ -222,7 +222,7 @@ test("122 - identifiers should support numbers as well", () => {
         F.create({
             id: 3
         }).id
-    ).toBe("3")
+    ).toBe(3)
 
     expect(F.is({ id: 4 })).toBe(true)
     expect(F.is({ id: "4" })).toBe(false)
@@ -747,7 +747,7 @@ test("should serialize references correctly", () => {
     unprotect(s)
 
     expect(Array.from(s.mies.keys())).toEqual(["7"])
-    expect(s.mies.get("7")!.id).toBe("7")
+    expect(s.mies.get("7")!.id).toBe(7)
     expect(s.mies.get(7 as any)).toBe(undefined) // maps only use numbers as keys
 
     s.mies.put({
@@ -756,15 +756,15 @@ test("should serialize references correctly", () => {
     expect(Array.from(s.mies.keys())).toEqual(["7", "8"])
 
     s.ref = 8 as any
-    expect(s.ref!.id).toBe("8") // resolved from number
+    expect(s.ref!.id).toBe(8) // resolved from number
     expect(getSnapshot(s).ref).toBe(8) // ref serialized as number
 
     s.ref = "7" as any // resolved from string
-    expect(s.ref!.id).toBe("7") // resolved from number
+    expect(s.ref!.id).toBe(7) // resolved from string
     expect(getSnapshot(s).ref).toBe("7") // ref serialized as string (number would be ok as well)
 
     s.ref = s.mies.get("8")!
-    expect(s.ref.id).toBe("8") // resolved from instance
+    expect(s.ref.id).toBe(8) // resolved from instance
     expect(getSnapshot(s).ref).toBe(8) // ref serialized as number
 
     s.ref = "9" as any // unresolvable
