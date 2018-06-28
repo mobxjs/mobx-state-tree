@@ -44,7 +44,7 @@ import {
 } from "../../internal"
 
 export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
-    put(value: T | any): this // downtype to any, again, because we cannot type the snapshot, see
+    put(value: T | any): T | any // downtype to any, again, because we cannot type the snapshot, see
 }
 
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
@@ -56,15 +56,19 @@ function put(this: ObservableMap<any, any>, value: any) {
         if (process.env.NODE_ENV !== "production") {
             if (!node.identifierAttribute) return fail(needsIdentifierError)
         }
-        this.set("" + node.identifier!, node.value)
-        return this
+        let key = "" + node.identifier
+        this.set(key, node.value)
+        return node.value
     } else if (!isMutable(value)) {
         return fail(`Map.put can only be used to store complex values`)
     } else {
+        let key: string
         const mapType = getStateTreeNode(this as IStateTreeNode).type as MapType<any, any, any>
+        if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
         if (mapType.identifierMode === MapIdentifierMode.YES) {
-            this.set("" + value[mapType.identifierAttribute!], value)
-            return this
+            key = "" + value[mapType.identifierAttribute!]
+            this.set(key, value)
+            return this.get(key)
         }
         return fail(needsIdentifierError)
     }
@@ -136,9 +140,7 @@ export class MapType<C, S, T> extends ComplexType<
                 if (type.identifierAttribute) {
                     if (identifierAttribute && identifierAttribute !== type.identifierAttribute) {
                         fail(
-                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${
-                                type.name
-                            }' declared attribute '${type.identifierAttribute}' as identifier`
+                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
                         )
                     }
                     identifierAttribute = type.identifierAttribute
