@@ -750,7 +750,7 @@ test("should serialize references correctly", () => {
 
     expect(Array.from(s.mies.keys())).toEqual(["7"])
     expect(s.mies.get("7")!.id).toBe(7)
-    expect(s.mies.get(7 as any)).toBe(undefined) // maps only use numbers as keys
+    expect(s.mies.get(7 as any)).toBe(s.mies.get("7")) // maps automatically normalizes the key
 
     s.mies.put({
         id: 8

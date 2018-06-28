@@ -49,6 +49,11 @@ export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
 
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
 
+function get(this: ObservableMap, key: any): any {
+    // maybe this is over-enthousiastic? normalize numeric keys to strings
+    return ObservableMap.prototype.get.call(this, "" + key)
+}
+
 function put(this: ObservableMap<any, any>, value: any) {
     if (!!!value) fail(`Map.put cannot be used to set empty values`)
     if (isStateTreeNode(value)) {
@@ -175,6 +180,7 @@ export class MapType<C, S, T> extends ComplexType<
     createNewInstance(childNodes: IChildNodesMap) {
         const instance = observable.map(childNodes, mobxShallow)
         addHiddenFinalProp(instance, "put", put)
+        addHiddenFinalProp(instance, "get", get)
         return instance
     }
 
