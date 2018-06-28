@@ -387,3 +387,31 @@ test("map can resolve late identifiers", () => {
     }
     expect(() => Late.create(snapshot)).not.toThrow()
 })
+
+test("get should return value when key is a number", () => {
+    const Todo = types.model("Todo", {
+        todo_id: types.identifierNumber,
+        title: types.string
+    })
+    const TodoStore = types
+        .model("TodoStore", {
+            todos: types.optional(types.map(Todo), {})
+        })
+        .actions(self => {
+            function addTodo(todo) {
+                self.todos.put(todo)
+            }
+            return {
+                addTodo
+            }
+        })
+    const todoStore = TodoStore.create({})
+
+    const todo = {
+        todo_id: 1,
+        title: "Test"
+    }
+
+    todoStore.addTodo(todo)
+    expect(todoStore.todos.get(1 as any)!.title).toEqual("Test")
+})
