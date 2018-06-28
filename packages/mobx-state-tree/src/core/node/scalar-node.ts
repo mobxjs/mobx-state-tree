@@ -50,7 +50,7 @@ export class ScalarNode implements INode {
      * Returnes (escaped) path representation as string
      */
     public get path(): string {
-        if (!this.parent) return this.subpath
+        if (!this.parent) return ""
         return this.parent.path + "/" + escapeJsonPath(this.subpath)
     }
 
