@@ -15,7 +15,7 @@ export class Late<C, S, T> extends Type<C, S, T> {
     private _subType: IAnyType | null = null
 
     get flags() {
-        return this.subType.flags | TypeFlags.Late
+        return (this._subType ? this._subType.flags : 0) | TypeFlags.Late
     }
 
     get shouldAttachNode() {

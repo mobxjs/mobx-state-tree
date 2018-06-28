@@ -188,14 +188,16 @@ test("identifiers should support subtypes of types.string and types.number", () 
     })
     expect(M.is({})).toBe(false)
     expect(M.is({ id: "test" })).toBe(false)
-    expect(M.is({ id: "6" })).toBe(true)
+    expect(M.is({ id: "6" })).toBe(false)
     expect(M.is({ id: "4" })).toBe(false)
+    expect(M.is({ id: 6 })).toBe(true)
+    expect(M.is({ id: 4 })).toBe(false)
 
     const S = types.model({
         mies: types.map(M),
         ref: types.reference(M)
     })
-    const s = S.create({ mies: { "7": { id: "7" } }, ref: "7" })
+    const s = S.create({ mies: { "7": { id: 7 } }, ref: "7" })
     expect(s.mies.get("7")).toBeTruthy()
     expect(s.ref).toBe(s.mies.get("7"))
 })
@@ -220,9 +222,11 @@ test("122 - identifiers should support numbers as well", () => {
         F.create({
             id: 3
         }).id
-    ).toBe(3)
+    ).toBe("3")
+
     expect(F.is({ id: 4 })).toBe(true)
     expect(F.is({ id: "4" })).toBe(false)
+    expect(F.is({ id: "bla" })).toBe(false)
 })
 test("self reference with a late type", () => {
     const Book = types.model("Book", {
@@ -486,7 +490,7 @@ test("References are described properly", () => {
         maybeRef: types.maybe(types.reference(Todo))
     })
     expect(Store.describe()).toBe(
-        "{ todo: ({ id: identifier(number) } | null?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | null?) }"
+        "{ todo: ({ id: identifierNumber } | null?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | null?) }"
     )
 })
 test("References in recursive structures", () => {
@@ -534,13 +538,13 @@ test("References in recursive structures", () => {
             }
         }))
     const store = Storage.create({ objects: {}, tree: { children: [], data: null } })
-    const folder = { id: "1", name: "Folder 1", files: ["a.jpg", "b.jpg"] }
+    const folder = { id: 1, name: "Folder 1", files: ["a.jpg", "b.jpg"] }
     store.tree.addFolder(folder)
     expect(getSnapshot(store)).toEqual({
         objects: {
             "1": {
                 files: ["a.jpg", "b.jpg"],
-                id: "1",
+                id: 1,
                 name: "Folder 1"
             }
         },
@@ -548,25 +552,25 @@ test("References in recursive structures", () => {
             children: [
                 {
                     children: [],
-                    data: "1"
+                    data: 1
                 }
             ],
             data: null
         }
     })
     expect(store.objects.get("1")).toBe(store.tree.children[0].data)
-    const folder2 = { id: "2", name: "Folder 2", files: ["c.jpg", "d.jpg"] }
+    const folder2 = { id: 2, name: "Folder 2", files: ["c.jpg", "d.jpg"] }
     store.tree.children[0].addFolder(folder2)
     expect(getSnapshot(store)).toEqual({
         objects: {
             "1": {
                 files: ["a.jpg", "b.jpg"],
-                id: "1",
+                id: 1,
                 name: "Folder 1"
             },
             "2": {
                 files: ["c.jpg", "d.jpg"],
-                id: "2",
+                id: 2,
                 name: "Folder 2"
             }
         },
@@ -576,10 +580,10 @@ test("References in recursive structures", () => {
                     children: [
                         {
                             children: [],
-                            data: "2"
+                            data: 2
                         }
                     ],
-                    data: "1"
+                    data: 1
                 }
             ],
             data: null
@@ -701,28 +705,6 @@ test("it should applySnapshot references in array", () => {
         },
         hovers: ["item 1"]
     })
-})
-
-test.skip("array of references should work fine", () => {
-    // This test breaks because `.move` doesn't dehence values in mobx...
-    // Since move functionality is about to be killed, we won't be fixing this
-    const B = types.model("Block", { id: types.identifier })
-    const S = types
-        .model("Store", {
-            blocks: types.array(B),
-            blockRefs: types.array(types.reference(B))
-        })
-        .actions(self => {
-            return {
-                order() {
-                    self.blockRefs.move(0, 1)
-                }
-            }
-        })
-    const a = S.create({ blocks: [{ id: "1" }, { id: "2" }], blockRefs: ["1", "2"] })
-    a.order()
-    expect(a.blocks[0].id).toBe("1")
-    expect(a.blockRefs[0].id).toBe("2")
 })
 
 test("array of references should work fine", () => {

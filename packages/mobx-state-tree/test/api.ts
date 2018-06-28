@@ -57,6 +57,7 @@ const TYPES = [
     "custom",
     "frozen",
     "identifier",
+    "identifierNumber",
     "late",
     "literal",
     "map",

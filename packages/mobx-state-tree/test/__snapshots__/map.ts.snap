@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`#192 - put should not throw when identifier is a number 1`] = `
+"[mobx-state-tree] Error while converting \`{\\"todo_id\\":\\"1\\",\\"title\\":\\"Test\\"}\` to \`Todo\`:
+
+    at path \\"/todo_id\\" value \`\\"1\\"\` is not assignable to type: \`identifierNumber\` (Value is not a valid identifierNumber, expected a number), expected an instance of \`identifierNumber\` or a snapshot like \`identifierNumber\` instead."
+`;

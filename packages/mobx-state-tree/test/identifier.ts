@@ -83,7 +83,7 @@ if (process.env.NODE_ENV !== "production") {
     test("identifier should be used only on model types - no parent provided", () => {
         expect(() => {
             const Model = types.identifierNumber
-            Model.create("1")
+            Model.create(1)
         }).toThrowError(
             `[mobx-state-tree] Identifier types can only be instantiated as direct child of a model type`
         )

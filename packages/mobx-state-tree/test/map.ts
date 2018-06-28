@@ -206,9 +206,7 @@ test("#192 - put should not throw when identifier is a number", () => {
     if (process.env.NODE_ENV !== "production") {
         expect(() => {
             todoStore.addTodo({ todo_id: "1", title: "Test" })
-        }).toThrowError(
-            `[mobx-state-tree] Error while converting \`{\"todo_id\":\"1\",\"title\":\"Test\"}\` to \`Todo\`:\n\n    at path \"/todo_id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\` (Value is not a number), expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`
-        )
+        }).toThrowErrorMatchingSnapshot()
     }
 })
 test("#192 - map should not mess up keys when putting twice", () => {
