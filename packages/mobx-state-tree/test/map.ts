@@ -5,7 +5,8 @@ import {
     applySnapshot,
     getSnapshot,
     types,
-    unprotect
+    unprotect,
+    isStateTreeNode
 } from "../src"
 const createTestFactories = () => {
     const ItemFactory = types.model({
@@ -241,6 +242,50 @@ test("#192 - map should not mess up keys when putting twice", () => {
         title: "Test Edited"
     })
     expect(getSnapshot(todoStore.todos)).toEqual({ "1": { todo_id: 1, title: "Test Edited" } })
+})
+test("#694 - map.put should return new node", () => {
+    const Todo = types.model("Todo", {
+        todo_id: types.identifier(types.string),
+        title: types.string
+    })
+    const TodoStore = types
+        .model("TodoStore", {
+            todos: types.map(Todo)
+        })
+        .actions(self => {
+            function addAndReturnTodo(todo) {
+                return self.todos.put(todo)
+            }
+            return {
+                addAndReturnTodo
+            }
+        })
+    const todoStore = TodoStore.create({ todos: {} })
+
+    const addedTodo = todoStore.addAndReturnTodo(
+        Todo.create({
+            todo_id: "1",
+            title: "Test 1"
+        })
+    )
+
+    expect(isStateTreeNode(addedTodo)).toEqual(true)
+    expect(getSnapshot(addedTodo)).toEqual({ todo_id: "1", title: "Test 1" })
+
+    const editedTodo = todoStore.addAndReturnTodo({
+        todo_id: "1",
+        title: "Test 1 Edited"
+    })
+    expect(isStateTreeNode(editedTodo)).toEqual(true)
+    expect(getSnapshot(editedTodo)).toEqual({ todo_id: "1", title: "Test 1 Edited" })
+    expect(editedTodo).toEqual(addedTodo)
+
+    const addedTodo2 = todoStore.addAndReturnTodo({
+        todo_id: "2",
+        title: "Test 2"
+    })
+    expect(isStateTreeNode(addedTodo2)).toEqual(true)
+    expect(getSnapshot(addedTodo2)).toEqual({ todo_id: "2", title: "Test 2" })
 })
 test("it should not throw when removing a non existing item from a map", () => {
     expect(() => {
