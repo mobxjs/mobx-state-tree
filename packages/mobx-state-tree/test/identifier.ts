@@ -78,7 +78,9 @@ if (process.env.NODE_ENV !== "production") {
         expect(() => {
             const Model = types.model("Model", { id: types.identifier })
             Model.create({ id: 1 } as any)
-        }).toThrowErrorMatchingSnapshot()
+        }).toThrowError(
+            'at path "/id" value `1` is not assignable to type: `identifier` (Value is not a valid identifier, expected a string).'
+        )
     })
     test("identifier should be used only on model types - no parent provided", () => {
         expect(() => {

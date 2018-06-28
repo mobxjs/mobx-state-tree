@@ -206,7 +206,9 @@ test("#192 - put should not throw when identifier is a number", () => {
     if (process.env.NODE_ENV !== "production") {
         expect(() => {
             todoStore.addTodo({ todo_id: "1", title: "Test" })
-        }).toThrowErrorMatchingSnapshot()
+        }).toThrowError(
+            'at path "/todo_id" value `"1"` is not assignable to type: `identifierNumber` (Value is not a valid identifierNumber, expected a number)'
+        )
     }
 })
 test("#192 - map should not mess up keys when putting twice", () => {

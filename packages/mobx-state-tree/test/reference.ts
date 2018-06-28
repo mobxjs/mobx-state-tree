@@ -74,7 +74,9 @@ if (process.env.NODE_ENV !== "production") {
         })
         expect(Todo.is({})).toBe(false)
         expect(Todo.is({ id: "x" })).toBe(true)
-        expect(() => Todo.create()).toThrowErrorMatchingSnapshot()
+        expect(() => Todo.create()).toThrowError(
+            " `undefined` is not assignable to type: `identifier` (Value is not a valid identifier, expected a string)"
+        )
     })
     test("identifiers cannot be modified", () => {
         const Todo = types.model({
