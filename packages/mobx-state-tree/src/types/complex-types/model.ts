@@ -490,15 +490,9 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         const type = objNode.type as ModelType<any, any>
         const instance = objNode.storedValue as IStateTreeNode
 
+        extendObservable(instance, EMPTY_OBJECT, EMPTY_OBJECT, mobxShallow)
+        set(instance, childNodes)
         type.forAllProps(name => {
-            extendObservable(
-                instance,
-                {
-                    [name]: childNodes[name]
-                },
-                EMPTY_OBJECT,
-                mobxShallow
-            )
             _interceptReads(instance, name, objNode.unbox)
         })
 
