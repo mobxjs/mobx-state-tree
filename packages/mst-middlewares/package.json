@@ -25,7 +25,7 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^2.0.1",
     "sinon": "^4.0.1",
-    "typescript": "^2.9.3"
+    "typescript": "^2.9.2"
   },
   "peerDependencies": {
     "mobx-state-tree": "^2.2.0"
