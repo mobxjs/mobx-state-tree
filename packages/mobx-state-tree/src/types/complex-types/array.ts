@@ -34,7 +34,9 @@ import {
     isPlainObject,
     TypeFlags,
     ObjectNode,
-    mobxShallow
+    mobxShallow,
+    IChildNodesMap,
+    convertChildNodesToArray
 } from "../../internal"
 
 export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
@@ -51,17 +53,17 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return this.subType.describe() + "[]"
     }
 
-    createNewInstance = () => {
-        return observable.array([], mobxShallow)
+    createNewInstance(childNodes: IChildNodesMap) {
+        return observable.array(convertChildNodesToArray(childNodes), mobxShallow)
     }
 
-    finalizeNewInstance = (node: INode, snapshot: any) => {
-        const objNode = node as ObjectNode
-        const instance = objNode.storedValue as IObservableArray<any>
-        _getAdministration(instance).dehancer = objNode.unbox
-        intercept(instance, change => this.willChange(change) as any)
-        objNode.applySnapshot(snapshot)
-        observe(instance, this.didChange)
+    finalizeNewInstance(node: INode) {
+        const objectNode = node as ObjectNode
+        const type = objectNode.type as ArrayType<any, any>
+        const instance = objectNode.storedValue as IObservableArray<any>
+        _getAdministration(instance).dehancer = objectNode.unbox
+        intercept(instance, type.willChange as any)
+        observe(instance, type.didChange)
     }
 
     instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: S): INode {
@@ -74,6 +76,17 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
             this.createNewInstance,
             this.finalizeNewInstance
         )
+    }
+
+    initializeChildNodes(objNode: ObjectNode, snapshot: S[] = []): IChildNodesMap {
+        const subType = (objNode.type as ArrayType<any, any>).subType
+        const environment = objNode._environment
+        const result = {} as IChildNodesMap
+        snapshot.forEach((item, index) => {
+            const subpath = `${index}`
+            result[subpath] = subType.instantiate(objNode, subpath, environment, item)
+        })
+        return result
     }
 
     getChildren(node: ObjectNode): INode[] {
@@ -89,6 +102,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
         const node = getStateTreeNode(change.object as IStateTreeNode)
         node.assertWritable()
+        const subType = (node.type as ArrayType<any, any>).subType
         const childNodes = node.getChildren()
 
         switch (change.type) {
@@ -96,7 +110,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                 if (change.newValue === change.object[change.index]) return null
                 change.newValue = reconcileArrayChildren(
                     node,
-                    this.subType,
+                    subType,
                     [childNodes[change.index]],
                     [change.newValue],
                     [change.index]
@@ -106,7 +120,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                 const { index, removedCount, added } = change
                 change.added = reconcileArrayChildren(
                     node,
-                    this.subType,
+                    subType,
                     childNodes.slice(index, index + removedCount),
                     added,
                     added.map((_, i) => index + i)
@@ -343,8 +357,7 @@ function valueAsNode(
         return childNode
     }
     // nothing to do, create from scratch
-    const childNode = childType.instantiate(parent, subpath, parent._environment, newValue)
-    return childNode
+    return childType.instantiate(parent, subpath, parent._environment, newValue)
 }
 
 // given a value

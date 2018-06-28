@@ -145,7 +145,10 @@ const UndoManager = types
                 self.undoIdx--
                 // n.b: reverse patches back to forth
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
-                applyPatch(getRoot(targetStore), self.history[self.undoIdx].inversePatches.slice().reverse())
+                applyPatch(
+                    getRoot(targetStore),
+                    self.history[self.undoIdx].inversePatches.slice().reverse()
+                )
                 replaying = false
             },
             redo() {

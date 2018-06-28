@@ -321,8 +321,11 @@ export function union(
     dispatchOrType: ITypeDispatcher | IType<any, any>,
     ...otherTypes: IType<any, any>[]
 ): IType<any, any> {
+    const types = otherTypes
     const dispatcher = isType(dispatchOrType) ? null : dispatchOrType
-    const types = isType(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
+    if (!dispatcher) {
+        types.unshift(dispatchOrType as IType<any, any>)
+    }
     const name = "(" + types.map(type => type.name).join(" | ") + ")"
 
     // check all options

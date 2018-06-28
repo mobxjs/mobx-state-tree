@@ -311,20 +311,20 @@ test("middleware events are correct", () => {
         {
             args: [7],
             context: {},
-            id: process.env.NODE_ENV !== "production" ? 38 : 35,
+            id: process.env.NODE_ENV !== "production" ? 28 : 27,
             name: "a",
             parentId: 0,
-            rootId: process.env.NODE_ENV !== "production" ? 38 : 35,
+            rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
             tree: {},
             type: "action"
         },
         {
             args: [14],
             context: {},
-            id: process.env.NODE_ENV !== "production" ? 39 : 36,
+            id: process.env.NODE_ENV !== "production" ? 29 : 28,
             name: "b",
-            parentId: process.env.NODE_ENV !== "production" ? 38 : 35,
-            rootId: process.env.NODE_ENV !== "production" ? 38 : 35,
+            parentId: process.env.NODE_ENV !== "production" ? 28 : 27,
+            rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
             tree: {},
             type: "action"
         }

@@ -40,10 +40,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
 
     instantiate(parent: INode, subpath: string, environment: any, value: S): INode {
         if (typeof value === "undefined") {
-            const defaultValue = this.getDefaultValue()
-            const defaultSnapshot = isStateTreeNode(defaultValue)
-                ? getStateTreeNode(defaultValue).snapshot
-                : defaultValue
+            const defaultSnapshot = this.getDefaultValueSnapshot()
             return this.type.instantiate(parent, subpath, environment, defaultSnapshot)
         }
         return this.type.instantiate(parent, subpath, environment, value)
@@ -61,6 +58,12 @@ export class OptionalValue<S, T> extends Type<S, T> {
             typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
         if (typeof this.defaultValue === "function") typecheck(this, defaultValue)
         return defaultValue
+    }
+    public getDefaultValueSnapshot() {
+        const defaultValue = this.getDefaultValue()
+        return isStateTreeNode(defaultValue)
+            ? getStateTreeNode(defaultValue).snapshot
+            : defaultValue
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
