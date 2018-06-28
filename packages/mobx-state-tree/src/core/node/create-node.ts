@@ -17,7 +17,7 @@ export function createNode<S, T>(
     environment: any,
     initialValue: any,
     createNewInstance: (initialValue: any) => T = identity,
-    finalizeNewInstance: (node: INode, initialValue: any) => void = noop
+    finalizeNewInstance: (node: INode, childNodes?: any) => void = noop
 ) {
     if (isStateTreeNode(initialValue)) {
         const targetNode = initialValue.$treenode as ObjectNode
@@ -31,21 +31,16 @@ export function createNode<S, T>(
         return targetNode
     }
 
-    const storedValue = createNewInstance(initialValue)
-
     if (type.shouldAttachNode) {
-        const node = new ObjectNode(
+        return new ObjectNode(
             type,
             parent,
             subpath,
             environment,
             initialValue,
-            storedValue,
-            type.shouldAttachNode,
+            createNewInstance,
             finalizeNewInstance
         )
-        node.finalizeCreation()
-        return node
     }
     return new ScalarNode(
         type,
@@ -53,8 +48,7 @@ export function createNode<S, T>(
         subpath,
         environment,
         initialValue,
-        storedValue,
-        type.shouldAttachNode,
+        createNewInstance,
         finalizeNewInstance
     )
 }

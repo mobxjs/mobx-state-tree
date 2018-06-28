@@ -93,13 +93,8 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         environment: any,
         snapshot: any
     ): INode {
-        return createNode(
-            this,
-            parent,
-            subpath,
-            environment,
-            new StoredReference(isStateTreeNode(snapshot) ? "object" : "identifier", snapshot)
-        )
+        const mode = isStateTreeNode(snapshot) ? "object" : "identifier"
+        return createNode(this, parent, subpath, environment, new StoredReference(mode, snapshot))
     }
 
     reconcile(current: INode, newValue: any): INode {

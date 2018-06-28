@@ -15,10 +15,10 @@ import {
     types,
     destroy,
     unprotect,
-    hasParentOfType
+    hasParentOfType,
+    getParentOfType
 } from "../src"
-import { getParentOfType } from "../src/core/mst-operations"
-import { getStateTreeNode } from "../src/internal"
+
 // getParent
 test("it should resolve to the parent instance", () => {
     const Row = types.model({

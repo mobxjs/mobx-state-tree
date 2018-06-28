@@ -183,6 +183,9 @@ test("it should apply non flat patches with object instances", () => {
     )
 })
 test("it should apply deep patches to maps", () => {
+    // If user does not transpile const/let to var, trying to call Late' subType
+    // property getter during map's tryCollectModelTypes() will throw ReferenceError.
+    // But if it's transpiled to var, then subType will become 'undefined'.
     const NodeMap = types.model("NodeMap", {
         id: types.identifier(types.number),
         text: "Hi",
