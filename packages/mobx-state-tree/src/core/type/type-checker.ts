@@ -5,12 +5,13 @@ import {
     isPrimitive,
     getStateTreeNode,
     isStateTreeNode,
-    isPrimitiveType
+    isPrimitiveType,
+    IAnyType
 } from "../../internal"
 
 export interface IContextEntry {
     path: string
-    type?: IType<any, any>
+    type?: IAnyType
 }
 
 export type IContext = IContextEntry[]
@@ -32,7 +33,9 @@ function safeStringify(value: any) {
 export function prettyPrintValue(value: any) {
     return typeof value === "function"
         ? `<function${value.name ? " " + value.name : ""}>`
-        : isStateTreeNode(value) ? `<${value}>` : `\`${safeStringify(value)}\``
+        : isStateTreeNode(value)
+            ? `<${value}>`
+            : `\`${safeStringify(value)}\``
 }
 
 function shortenPrintValue(valueInString: string) {
@@ -45,7 +48,7 @@ function shortenPrintValue(valueInString: string) {
 
 function toErrorString(error: IValidationError): string {
     const { value } = error
-    const type: IType<any, any> = error.context[error.context.length - 1].type as any
+    const type: IAnyType = error.context[error.context.length - 1].type as any
     const fullPath = error.context
         .map(({ path }) => path)
         .filter(path => path.length > 0)
@@ -55,35 +58,35 @@ function toErrorString(error: IValidationError): string {
 
     const currentTypename = isStateTreeNode(value)
         ? `value of type ${getStateTreeNode(value).type.name}:`
-        : isPrimitive(value) ? "value" : "snapshot"
+        : isPrimitive(value)
+            ? "value"
+            : "snapshot"
     const isSnapshotCompatible =
         type && isStateTreeNode(value) && type.is(getStateTreeNode(value).snapshot)
 
     return (
-        `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${type
-            ? `to type: \`${type.name}\``
-            : ``}` +
+        `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${
+            type ? `to type: \`${type.name}\`` : ``
+        }` +
         (error.message ? ` (${error.message})` : "") +
         (type
             ? isPrimitiveType(type)
-              ? `.`
-              : `, expected an instance of \`${type.name}\` or a snapshot like \`${type.describe()}\` instead.` +
-                (isSnapshotCompatible
-                    ? " (Note that a snapshot of the provided value is compatible with the targeted type)"
-                    : "")
+                ? `.`
+                : `, expected an instance of \`${
+                      type.name
+                  }\` or a snapshot like \`${type.describe()}\` instead.` +
+                  (isSnapshotCompatible
+                      ? " (Note that a snapshot of the provided value is compatible with the targeted type)"
+                      : "")
             : `.`)
     )
 }
 
-export function getDefaultContext(type: IType<any, any>): IContext {
+export function getDefaultContext(type: IAnyType): IContext {
     return [{ type, path: "" }]
 }
 
-export function getContextForPath(
-    context: IContext,
-    path: string,
-    type?: IType<any, any>
-): IContext {
+export function getContextForPath(context: IContext, path: string, type?: IAnyType): IContext {
     return context.concat([{ path, type }])
 }
 
@@ -104,7 +107,7 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
 }
 
 // TODO; doublecheck: typecheck should only needed to be invoked from: type.create and array / map / value.property will change
-export function typecheck(type: IType<any, any>, value: any): void {
+export function typecheck(type: IAnyType, value: any): void {
     // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
     if (process.env.NODE_ENV === "production") return
     typecheckPublic(type, value)
@@ -117,17 +120,17 @@ export function typecheck(type: IType<any, any>, value: any): void {
  *
  * @alias typecheck
  * @export
- * @param {IType<any, any>} type
+ * @param {IAnyType} type
  * @param {*} value
  */
-export function typecheckPublic(type: IType<any, any>, value: any): void {
+export function typecheckPublic(type: IAnyType, value: any): void {
     const errors = type.validate(value, [{ path: "", type }])
 
     if (errors.length > 0) {
         fail(
-            `Error while converting ${shortenPrintValue(
-                prettyPrintValue(value)
-            )} to \`${type.name}\`:\n\n    ` + errors.map(toErrorString).join("\n    ")
+            `Error while converting ${shortenPrintValue(prettyPrintValue(value))} to \`${
+                type.name
+            }\`:\n\n    ` + errors.map(toErrorString).join("\n    ")
         )
     }
 }

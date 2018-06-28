@@ -7,7 +7,7 @@ import { IObservableArray, ObservableMap, isComputedProp, isObservableProp } fro
  * @param {IStateTreeNode} object
  * @returns {IType<S, T>}
  */
-export function getType<S, T>(object: IStateTreeNode): IType<S, T> {
+export function getType<C, S, T>(object: IStateTreeNode): IType<C, S, T> {
     return getStateTreeNode(object).type
 }
 
@@ -23,9 +23,9 @@ export function getType<S, T>(object: IStateTreeNode): IType<S, T> {
  * @export
  * @param {IStateTreeNode} object
  * @param {string} child
- * @returns {IType<any, any>}
+ * @returns {IAnyType}
  */
-export function getChildType(object: IStateTreeNode, child: string): IType<any, any> {
+export function getChildType(object: IStateTreeNode, child: string): IAnyType {
     return getStateTreeNode(object).getChildType(child)
 }
 
@@ -317,6 +317,10 @@ export function getParent<T>(target: IStateTreeNode, depth?: number): T & IState
  * Note that the immediate parent can be either an object, map or array, and
  * doesn't necessarily refer to the parent model
  *
+ * Please note that in child nodes access to the root is only possible
+ * once the `afterAttach` hook has fired
+ *
+ *
  * @export
  * @param {Object} target
  * @param {number} depth = 1, how far should we look upward?
@@ -396,6 +400,9 @@ export function getRoot(target: IStateTreeNode): any & IStateTreeNode
 export function getRoot<T>(target: IStateTreeNode): T & IStateTreeNode
 /**
  * Given an object in a model tree, returns the root object of that tree
+ *
+ * Please note that in child nodes access to the root is only possible
+ * once the `afterAttach` hook has fired
  *
  * @export
  * @param {Object} target
@@ -484,13 +491,13 @@ export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNod
  * Returns undefined if no value can be found.
  *
  * @export
- * @param {IType<any, any>} type
+ * @param {IAnyType} type
  * @param {IStateTreeNode} target
  * @param {(string | number)} identifier
  * @returns {*}
  */
 export function resolveIdentifier(
-    type: IType<any, any>,
+    type: IAnyType,
     target: IStateTreeNode,
     identifier: string | number
 ): any {
@@ -603,7 +610,9 @@ export function clone<T extends IStateTreeNode>(
         node.snapshot,
         keepEnvironment === true
             ? node.root._environment
-            : keepEnvironment === false ? undefined : keepEnvironment
+            : keepEnvironment === false
+                ? undefined
+                : keepEnvironment
     ) as T // it's an object or something else
 }
 
@@ -692,6 +701,9 @@ export function addDisposer(target: IStateTreeNode, disposer: () => void) {
  * Returns the environment of the current state tree. For more info on environments,
  * see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
  *
+ * Please note that in child nodes access to the root is only possible
+ * once the `afterAttach` hook has fired
+ *
  * Returns an empty environment if the tree wasn't initialized with an environment
  *
  * @export
@@ -731,7 +743,7 @@ export function walk(target: IStateTreeNode, processor: (item: IStateTreeNode) =
 
 export interface IModelReflectionData {
     name: string
-    properties: { [K: string]: IType<any, any> }
+    properties: { [K: string]: IAnyType }
     actions: string[]
     views: string[]
     volatile: string[]
@@ -796,5 +808,6 @@ import {
     resolveNodeByPath,
     getRelativePathBetweenNodes,
     ModelType,
-    freeze
+    freeze,
+    IAnyType
 } from "../internal"

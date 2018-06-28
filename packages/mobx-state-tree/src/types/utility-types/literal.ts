@@ -14,7 +14,7 @@ import {
     ObjectNode
 } from "../../internal"
 
-export class Literal<T> extends Type<T, T> {
+export class Literal<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     readonly value: any
     readonly flags = TypeFlags.Literal

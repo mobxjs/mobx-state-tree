@@ -79,7 +79,7 @@ test("it should do typescript type inference correctly", () => {
     unprotect(b)
     // sub fields can be reassigned
     b.sub = A.create({
-        // MANUAL TEST not ok: z: 4
+        // MANUAL TEST not ok: z: 4,
         x: 3
     })
     // sub fields have proper type
@@ -148,7 +148,7 @@ test("cannot create factories with null values", () => {
     expect(() =>
         types.model({
             x: null
-        })
+        } as any)
     ).toThrow()
 })
 test("can create factories with maybe primitives", () => {

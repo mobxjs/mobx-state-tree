@@ -4,15 +4,15 @@ import {
     escapeJsonPath,
     fail,
     freeze,
-    IType,
     NodeLifeCycle,
     noop,
     ObjectNode,
-    invalidateComputed
+    invalidateComputed,
+    IAnyType
 } from "../../internal"
 
 export class ScalarNode implements INode {
-    readonly type: IType<any, any>
+    readonly type: IAnyType
     readonly storedValue: any
     readonly parent: ObjectNode | null
 
@@ -22,7 +22,7 @@ export class ScalarNode implements INode {
     _environment: any = undefined
 
     constructor(
-        type: IType<any, any>,
+        type: IAnyType,
         parent: ObjectNode | null,
         subpath: string,
         environment: any,

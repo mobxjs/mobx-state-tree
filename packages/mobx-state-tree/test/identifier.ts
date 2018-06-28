@@ -77,7 +77,7 @@ if (process.env.NODE_ENV !== "production") {
     test("should throw if identifier of wrong type", () => {
         expect(() => {
             const Model = types.model("Model", { id: types.identifier(types.number) })
-            Model.create({ id: "1" })
+            Model.create({ id: "1" } as any)
         }).toThrowError(
             `[mobx-state-tree] Error while converting \`{\"id\":\"1\"}\` to \`Model\`:\n\n    at path \"/id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\` (Value is not a number), expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`
         )

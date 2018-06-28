@@ -10,11 +10,12 @@ import {
     typeCheckFailure,
     isType,
     fail,
-    TypeFlags
+    TypeFlags,
+    IAnyType
 } from "../../internal"
 
-export class Refinement<S, T> extends Type<S, T> {
-    readonly type: IType<any, any>
+export class Refinement<C, S, T> extends Type<C, S, T> {
+    readonly type: IAnyType
     readonly predicate: (v: any) => boolean
     readonly message: (v: any) => string
 
@@ -28,7 +29,7 @@ export class Refinement<S, T> extends Type<S, T> {
 
     constructor(
         name: string,
-        type: IType<any, any>,
+        type: IAnyType,
         predicate: (v: any) => boolean,
         message: (v: any) => string
     ) {
@@ -49,7 +50,7 @@ export class Refinement<S, T> extends Type<S, T> {
         return inst
     }
 
-    isAssignableFrom(type: IType<any, any>) {
+    isAssignableFrom(type: IAnyType) {
         return this.type.isAssignableFrom(type)
     }
 
@@ -67,28 +68,18 @@ export class Refinement<S, T> extends Type<S, T> {
     }
 }
 
-export function refinement<T>(
+export function refinement<C, S, T>(
     name: string,
-    type: IType<T, T>,
-    predicate: (snapshot: T) => boolean,
+    type: IType<C, S, T>,
+    predicate: (snapshot: C) => boolean,
     message?: string | ((v: any) => string)
-): IType<T, T>
-export function refinement<S, T extends S, U extends S>(
-    name: string,
-    type: IType<S, T>,
-    predicate: (snapshot: S) => snapshot is U,
+): IType<T, T, T>
+export function refinement<C, S, T>(
+    type: IType<C, S, T>,
+    predicate: (snapshot: C) => boolean,
     message?: string | ((v: any) => string)
-): IType<S, U>
-export function refinement<S, T extends S, U extends S>(
-    type: IType<S, T>,
-    predicate: (snapshot: S) => snapshot is U,
-    message?: string | ((v: any) => string)
-): IType<S, U>
-export function refinement<T>(
-    type: IType<T, T>,
-    predicate: (snapshot: T) => boolean,
-    message?: string | ((v: any) => string)
-): IType<T, T>
+): IType<T, T, T>
+
 /**
  * `types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
  *
@@ -100,7 +91,7 @@ export function refinement<T>(
  * @param {(snapshot: T) => boolean} predicate
  * @returns {IType<T, T>}
  */
-export function refinement(...args: any[]): IType<any, any> {
+export function refinement(...args: any[]): IAnyType {
     const name = typeof args[0] === "string" ? args.shift() : isType(args[0]) ? args[0].name : null
     const type = args[0]
     const predicate = args[1]
@@ -125,6 +116,6 @@ export function refinement(...args: any[]): IType<any, any> {
     return new Refinement(name, type, predicate, message)
 }
 
-export function isRefinementType(type: any): type is Refinement<any, any> {
+export function isRefinementType(type: any): type is Refinement<any, any, any> {
     return (type.flags & TypeFlags.Refinement) > 0
 }

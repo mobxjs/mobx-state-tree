@@ -14,7 +14,7 @@ import {
     ObjectNode
 } from "../../internal"
 
-export class Frozen<T> extends Type<T, T> {
+export class Frozen<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     flags = TypeFlags.Frozen
 

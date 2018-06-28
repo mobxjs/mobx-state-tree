@@ -9,7 +9,8 @@ import {
     detach,
     resolveIdentifier,
     getRoot,
-    IType
+    IType,
+    IAnyType
 } from "../src"
 test("it should support prefixed paths in maps", () => {
     const User = types.model({
@@ -186,12 +187,10 @@ test("it should resolve refs during creation, when using generic reference", () 
 if (process.env.NODE_ENV !== "production")
     test("identifiers should only support types.string and types.number", () => {
         expect(() =>
-            types
-                .model({
-                    id: types.identifier(types.model({ x: 1 }))
-                })
-                .create({ id: {} })
-        ).toThrow()
+            types.model({ id: types.identifier(types.model({ x: 1 }) as any) }).create({
+                id: { x: 1 }
+            } as any)
+        ).toThrow("Value is not a valid identifier, which is a string or a number")
     })
 test("identifiers should support subtypes of types.string and types.number", () => {
     const M = types.model({
@@ -230,7 +229,7 @@ test("self reference with a late type", () => {
     const Book = types.model("Book", {
         id: types.identifier(),
         genre: types.string,
-        reference: types.reference(types.late(() => Book) as IType<any, any>)
+        reference: types.reference(types.late(() => Book) as IAnyType)
     })
     const Store = types
         .model("Store", {
@@ -497,6 +496,7 @@ test("References in recursive structures", () => {
         name: types.string,
         files: types.array(types.string)
     })
+    // saddly, this becomes any, and further untypeable...
     const Tree = types
         .model("Tree", {
             children: types.array(types.late(() => Tree)),
@@ -512,10 +512,22 @@ test("References in recursive structures", () => {
                 addFolder
             }
         })
+
+    /* Sad work around to get recursive typings right */
+    type ITreeSnapshot = {
+        children: ITreeSnapshot[]
+        data: string | null
+    }
+    type ITreeType = {
+        children: ITreeType[]
+        data: null | typeof Folder.Type
+        addFolder(data: any)
+    }
+
     const Storage = types
         .model("Storage", {
             objects: types.map(Folder),
-            tree: Tree
+            tree: Tree as IType<ITreeSnapshot, ITreeSnapshot, ITreeType>
         })
         .actions(self => ({
             putFolderHelper(folder) {

@@ -461,7 +461,7 @@ test("it should throw if a non-primitive value is provided and no default can be
             complex: {
                 a: 1,
                 b: 2
-            }
+            } as any
         })
     }).toThrow()
 })

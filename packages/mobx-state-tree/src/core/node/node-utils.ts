@@ -5,7 +5,8 @@ import {
     splitJsonPath,
     joinJsonPath,
     ScalarNode,
-    IChildNodesMap
+    IChildNodesMap,
+    IAnyType
 } from "../../internal"
 
 export enum NodeLifeCycle {
@@ -17,7 +18,7 @@ export enum NodeLifeCycle {
 }
 
 export interface INode {
-    readonly type: IType<any, any>
+    readonly type: IAnyType
     readonly storedValue: any
     readonly path: string
     readonly isRoot: boolean
@@ -39,7 +40,7 @@ export type IStateTreeNode = {
 }
 
 export interface IMembers {
-    properties: { [name: string]: IType<any, any> }
+    properties: { [name: string]: IAnyType }
     actions: Object
     views: Object
     volatile: Object

@@ -217,10 +217,10 @@ test("snapshot processors can be composed", () => {
             x: 1
         })
         .preProcessSnapshot(s => ({
-            x: s.x - 3
+            x: s.x! - 3
         }))
         .preProcessSnapshot(s => ({
-            x: s.x / 5
+            x: s.x! / 5
         }))
         .postProcessSnapshot(s => {
             s.x += 3

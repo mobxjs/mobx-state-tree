@@ -26,7 +26,8 @@ import {
     resolveNodeByPathParts,
     convertChildNodesToArray,
     ModelType,
-    invalidateComputed
+    invalidateComputed,
+    IAnyType
 } from "../../internal"
 
 let nextNodeId = 1
@@ -43,7 +44,7 @@ const snapshotReactionOptions = {
 
 export class ObjectNode implements INode {
     nodeId = ++nextNodeId
-    readonly type: IType<any, any>
+    readonly type: IAnyType
     readonly identifierAttribute: string | undefined
     readonly identifier: string | null
 
@@ -81,7 +82,7 @@ export class ObjectNode implements INode {
     private _finalizeNewInstance: ((node: INode, initialValue: any) => void) | null
 
     constructor(
-        type: IType<any, any>,
+        type: IAnyType,
         parent: ObjectNode | null,
         subpath: string,
         environment: any,
@@ -183,12 +184,16 @@ export class ObjectNode implements INode {
         if (newParent) {
             if (this.parent && newParent !== this.parent) {
                 fail(
-                    `A node cannot exists twice in the state tree. Failed to add ${this} to path '${newParent.path}/${subpath}'.`
+                    `A node cannot exists twice in the state tree. Failed to add ${this} to path '${
+                        newParent.path
+                    }/${subpath}'.`
                 )
             }
             if (!this.parent && newParent.root === this) {
                 fail(
-                    `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`
+                    `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${
+                        newParent.path
+                    }/${subpath}'`
                 )
             }
             if (
@@ -264,8 +269,9 @@ export class ObjectNode implements INode {
     public assertAlive() {
         if (!this.isAlive)
             fail(
-                `You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${this
-                    .type.name}').`
+                `You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${
+                    this.type.name
+                }').`
             )
     }
 
@@ -293,7 +299,7 @@ export class ObjectNode implements INode {
         }
     }
 
-    getChildType(key: string): IType<any, any> {
+    getChildType(key: string): IAnyType {
         return this.type.getChildType(key)
     }
 
@@ -322,9 +328,9 @@ export class ObjectNode implements INode {
 
     toString(): string {
         const identifier = this.identifier ? `(id: ${this.identifier})` : ""
-        return `${this.type.name}@${this.path || "<root>"}${identifier}${this.isAlive
-            ? ""
-            : "[dead]"}`
+        return `${this.type.name}@${this.path || "<root>"}${identifier}${
+            this.isAlive ? "" : "[dead]"
+        }`
     }
 
     finalizeCreation() {

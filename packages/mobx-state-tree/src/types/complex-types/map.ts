@@ -7,7 +7,8 @@ import {
     values,
     observable,
     _interceptReads,
-    IMapDidChange
+    IMapDidChange,
+    IKeyValueMap
 } from "mobx"
 import {
     getStateTreeNode,
@@ -38,7 +39,8 @@ import {
     ModelType,
     OptionalValue,
     Union,
-    Late
+    Late,
+    IAnyType
 } from "../../internal"
 
 export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
@@ -59,7 +61,7 @@ function put(this: ObservableMap<any, any>, value: any) {
     } else if (!isMutable(value)) {
         return fail(`Map.put can only be used to store complex values`)
     } else {
-        const mapType = getStateTreeNode(this as IStateTreeNode).type as MapType<any, any>
+        const mapType = getStateTreeNode(this as IStateTreeNode).type as MapType<any, any, any>
         if (mapType.identifierMode === MapIdentifierMode.YES) {
             this.set("" + value[mapType.identifierAttribute!], value)
             return this
@@ -68,10 +70,7 @@ function put(this: ObservableMap<any, any>, value: any) {
     }
 }
 
-function tryCollectModelTypes(
-    type: IType<any, any>,
-    modelTypes: Array<ModelType<any, any>>
-): boolean {
+function tryCollectModelTypes(type: IAnyType, modelTypes: Array<ModelType<any, any>>): boolean {
     if (type instanceof ModelType) {
         modelTypes.push(type)
     } else if (type instanceof OptionalValue) {
@@ -97,14 +96,18 @@ export enum MapIdentifierMode {
     NO
 }
 
-export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
+export class MapType<C, S, T> extends ComplexType<
+    IKeyValueMap<C>,
+    IKeyValueMap<S>,
+    IExtendedObservableMap<T>
+> {
     shouldAttachNode = true
-    subType: IType<any, any>
+    subType: IAnyType
     identifierMode: MapIdentifierMode = MapIdentifierMode.UNKNOWN
     identifierAttribute: string | undefined = undefined
     readonly flags = TypeFlags.Map
 
-    constructor(name: string, subType: IType<any, any>) {
+    constructor(name: string, subType: IAnyType) {
         super(name)
         this.subType = subType
         this._determineIdentifierMode()
@@ -133,7 +136,9 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
                 if (type.identifierAttribute) {
                     if (identifierAttribute && identifierAttribute !== type.identifierAttribute) {
                         fail(
-                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
+                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${
+                                type.name
+                            }' declared attribute '${type.identifierAttribute}' as identifier`
                         )
                     }
                     identifierAttribute = type.identifierAttribute
@@ -232,8 +237,8 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         return node.storedValue
     }
 
-    getSnapshot(node: ObjectNode): { [key: string]: any } {
-        const res: { [key: string]: any } = {}
+    getSnapshot(node: ObjectNode): IKeyValueMap<S> {
+        const res: any = {}
         node.getChildren().forEach(childNode => {
             res[childNode.subpath] = childNode.snapshot
         })
@@ -306,7 +311,7 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
         })
     }
 
-    getChildType(key: string): IType<any, any> {
+    getChildType(key: string): IAnyType {
         return this.subType
     }
 
@@ -331,9 +336,9 @@ export class MapType<S, T> extends ComplexType<{ [key: string]: S }, IExtendedOb
     }
 }
 
-export function map<S, T>(
-    subtype: IComplexType<S, T>
-): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>>
+export function map<C, S, T>(
+    subtype: IType<C, S, T>
+): IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IExtendedObservableMap<T>>
 /**
  * Creates a key based collection type who's children are all of a uniform declared type.
  * If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
@@ -361,14 +366,14 @@ export function map<S, T>(
  * @param {IType<S, T>} subtype
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
-export function map<S, T>(
-    subtype: IType<S, T>
-): IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
-    return new MapType<S, T>(`map<string, ${subtype.name}>`, subtype)
+export function map<C, S, T>(
+    subtype: IType<C, S, T>
+): IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IExtendedObservableMap<T>> {
+    return new MapType<C, S, T>(`map<string, ${subtype.name}>`, subtype)
 }
 
-export function isMapType<S, T>(
+export function isMapType<C, S, T>(
     type: any
-): type is IComplexType<{ [key: string]: S }, IExtendedObservableMap<T>> {
+): type is IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IExtendedObservableMap<T>> {
     return isType(type) && (type.flags & TypeFlags.Map) > 0
 }

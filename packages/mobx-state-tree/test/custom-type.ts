@@ -135,7 +135,7 @@ class Decimal {
         expect(w2.balance.fraction).toBe(5)
 
         if (process.env.NODE_ENV !== "production")
-            expect(() => Wallet.create({ balance: "two point one" })).toThrow(
+            expect(() => Wallet.create({ balance: "two point one" } as any)).toThrow(
                 "(Invalid value for type 'DecimalTuple': '\"two point one\"' doesn't look like a valid decimal number)"
             )
     })

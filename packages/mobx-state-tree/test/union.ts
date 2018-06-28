@@ -44,7 +44,7 @@ if (process.env.NODE_ENV !== "production") {
     test("it should complain about no applicable types", () => {
         const { Heighed } = createTestFactories()
         expect(() => {
-            Heighed.create({ height: 2 })
+            Heighed.create({ height: 2 } as any)
         }).toThrow(/Error while converting/)
     })
 }
