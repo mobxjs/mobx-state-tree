@@ -1,4 +1,4 @@
-import { reaction, computed, action } from "mobx"
+import { reaction, computed, action, observable } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -7,7 +7,6 @@ import {
     IReversibleJsonPatch,
     splitJsonPath,
     splitPatch,
-    IType,
     IDisposer,
     extend,
     fail,
@@ -48,7 +47,7 @@ export class ObjectNode implements INode {
     readonly identifierAttribute: string | undefined
     readonly identifier: string | null
 
-    subpath: string = ""
+    @observable subpath: string = ""
     parent: ObjectNode | null = null
     state = NodeLifeCycle.INITIALIZING
     storedValue: any
@@ -166,7 +165,7 @@ export class ObjectNode implements INode {
      */
     @computed
     public get path(): string {
-        if (!this.parent) return ""
+        if (!this.parent) return this.subpath
         return this.parent.path + "/" + escapeJsonPath(this.subpath)
     }
 
@@ -182,40 +181,41 @@ export class ObjectNode implements INode {
     setParent(newParent: ObjectNode | null, subpath: string | null = null) {
         if (this.parent === newParent && this.subpath === subpath) return
         if (newParent) {
-            if (this.parent && newParent !== this.parent) {
-                fail(
-                    `A node cannot exists twice in the state tree. Failed to add ${this} to path '${
-                        newParent.path
-                    }/${subpath}'.`
-                )
-            }
-            if (!this.parent && newParent.root === this) {
-                fail(
-                    `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${
-                        newParent.path
-                    }/${subpath}'`
-                )
-            }
-            if (
-                !this.parent &&
-                !!this.root._environment &&
-                this.root._environment !== newParent.root._environment
-            ) {
-                fail(
-                    `A state tree cannot be made part of another state tree as long as their environments are different.`
-                )
+            if (process.env.NODE_ENV !== "production") {
+                if (this.parent && newParent !== this.parent) {
+                    fail(
+                        `A node cannot exists twice in the state tree. Failed to add ${this} to path '${
+                            newParent.path
+                        }/${subpath}'.`
+                    )
+                }
+                if (!this.parent && newParent.root === this) {
+                    fail(
+                        `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${
+                            newParent.path
+                        }/${subpath}'`
+                    )
+                }
+                if (
+                    !this.parent &&
+                    !!this.root._environment &&
+                    this.root._environment !== newParent.root._environment
+                ) {
+                    fail(
+                        `A state tree cannot be made part of another state tree as long as their environments are different.`
+                    )
+                }
             }
         }
         if (this.parent && !newParent) {
             this.die()
         } else {
-            this.subpath = subpath || ""
+            this.subpath = subpath === null ? "" : subpath
             if (newParent && newParent !== this.parent) {
                 newParent.root.identifierCache!.mergeCache(this)
                 this.parent = newParent
                 this.fireHook("afterAttach")
             }
-            invalidateComputed(this, "path")
         }
     }
 
@@ -361,7 +361,6 @@ export class ObjectNode implements INode {
             this.parent!.removeChild(this.subpath)
             this.parent = null
             this.subpath = ""
-            invalidateComputed(this, "path")
             this.state = NodeLifeCycle.FINALIZED
         }
     }
@@ -425,7 +424,7 @@ export class ObjectNode implements INode {
         this.state = NodeLifeCycle.DEAD
         this.subpath = ""
         this.parent = null
-        invalidateComputed(this, "path")
+        // invalidateComputed(this, "path")
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {

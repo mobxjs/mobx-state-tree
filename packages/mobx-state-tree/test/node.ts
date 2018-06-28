@@ -16,8 +16,10 @@ import {
     destroy,
     unprotect,
     hasParentOfType,
-    getParentOfType
+    getParentOfType,
+    detach
 } from "../src"
+import { observable, autorun, getAtom } from "mobx"
 
 // getParent
 test("it should resolve to the parent instance", () => {
@@ -396,4 +398,49 @@ test("Livelyness issue #683", () => {
     users.put({ id: 1, name: "NameX" })
     expect(user!.name).toBe("NameX")
     expect(users.get("1")!.name).toBe("NameX")
+})
+
+test("triggers on changing paths - 1", () => {
+    const Todo = types.model({
+        title: types.string
+    })
+    const App = types
+        .model({
+            todos: types.array(Todo)
+        })
+        .actions(self => ({
+            do(fn: () => void) {
+                fn()
+            }
+        }))
+
+    const t1 = Todo.create({ title: "t1 " })
+    const t2 = Todo.create({ title: "t2 " })
+
+    const app = App.create({
+        todos: [t1]
+    })
+
+    const events: string[] = []
+    const d1 = autorun(() => {
+        events.push("t1@" + getPath(t1))
+    })
+    const d2 = autorun(() => {
+        events.push("t2@" + getPath(t2))
+    })
+
+    expect(events.splice(0)).toEqual(["t1@/todos/0", "t2@"])
+    app.do(() => {
+        app.todos.unshift(t2)
+    })
+    expect(events.splice(0)).toEqual(["t2@/todos/0", "t1@/todos/1"])
+    app.do(() => {
+        detach(t2)
+    })
+    expect(events.splice(0)).toEqual(["t1@/todos/0", "t2@"])
+
+    app.do(() => {
+        app.todos.splice(0)
+    })
+    expect(events.splice(0)).toEqual(["t1@"])
 })
