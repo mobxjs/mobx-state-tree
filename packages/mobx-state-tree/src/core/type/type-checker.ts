@@ -70,7 +70,7 @@ function toErrorString(error: IValidationError): string {
         }` +
         (error.message ? ` (${error.message})` : "") +
         (type
-            ? isPrimitiveType(type) // TODO: or is primitive (value)
+            ? isPrimitiveType(type) || isPrimitive(value)
                 ? `.`
                 : `, expected an instance of \`${
                       type.name

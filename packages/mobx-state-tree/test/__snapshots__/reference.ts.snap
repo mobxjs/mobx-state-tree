@@ -3,5 +3,5 @@
 exports[`identifiers are required 1`] = `
 "[mobx-state-tree] Error while converting \`{}\` to \`AnonymousModel\`:
 
-    at path \\"/id\\" value \`undefined\` is not assignable to type: \`identifier\` (Value is not a valid identifier, expected a string), expected an instance of \`identifier\` or a snapshot like \`identifier\` instead."
+    at path \\"/id\\" value \`undefined\` is not assignable to type: \`identifier\` (Value is not a valid identifier, expected a string)."
 `;

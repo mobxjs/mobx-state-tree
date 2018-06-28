@@ -3,5 +3,5 @@
 exports[`should throw if identifier of wrong type 1`] = `
 "[mobx-state-tree] Error while converting \`{\\"id\\":1}\` to \`Model\`:
 
-    at path \\"/id\\" value \`1\` is not assignable to type: \`identifier\` (Value is not a valid identifier, expected a string), expected an instance of \`identifier\` or a snapshot like \`identifier\` instead."
+    at path \\"/id\\" value \`1\` is not assignable to type: \`identifier\` (Value is not a valid identifier, expected a string)."
 `;
