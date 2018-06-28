@@ -54,14 +54,16 @@ test("it is possible to assign instance with the same environment as the parent 
     expect(getEnv(todo) === getEnv(store.todos[0])).toBe(true)
 })
 test("it is not possible to assign instance with a different environment than the parent to a tree", () => {
-    const env1 = createEnvironment()
-    const env2 = createEnvironment()
-    const store = Store.create({ todos: [] }, env1)
-    const todo = Todo.create({}, env2)
-    unprotect(store)
-    expect(() => store.todos.push(todo)).toThrowError(
-        "[mobx-state-tree] A state tree cannot be made part of another state tree as long as their environments are different."
-    )
+    if (process.env.NODE_ENV !== "production") {
+        const env1 = createEnvironment()
+        const env2 = createEnvironment()
+        const store = Store.create({ todos: [] }, env1)
+        const todo = Todo.create({}, env2)
+        unprotect(store)
+        expect(() => store.todos.push(todo)).toThrowError(
+            "[mobx-state-tree] A state tree cannot be made part of another state tree as long as their environments are different."
+        )
+    }
 })
 test("it is possible to set a value inside a map of a map when using the same environment", () => {
     const env = createEnvironment()
