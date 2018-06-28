@@ -66,6 +66,30 @@ const createTestFactories = () => {
     })
     return { Factory, ComputedFactory, ComputedFactory2, BoxFactory, ColorFactory }
 }
+
+const createFactoryWithChildren = () => {
+    const File = types
+        .model("File", {
+            name: types.string
+        })
+        .actions(self => ({
+            rename(value: string) {
+                self.name = value
+            }
+        }))
+
+    const Folder = types
+        .model("Folder", {
+            name: types.string,
+            files: types.array(File)
+        })
+        .actions(self => ({
+            rename(value: string) {
+                self.name = value
+            }
+        }))
+    return Folder
+}
 // === FACTORY TESTS ===
 test("it should create a factory", () => {
     const { Factory } = createTestFactories()
@@ -89,6 +113,44 @@ test("it should emit snapshots", () => {
     doc.to = "universe"
     expect(snapshots).toEqual([{ to: "universe" }])
 })
+
+test("it should emit snapshots for children", () => {
+    const Factory = createFactoryWithChildren()
+    const folder = Factory.create({
+        name: "Photos to sort",
+        files: [
+            {
+                name: "Photo1"
+            },
+            {
+                name: "Photo2"
+            }
+        ]
+    })
+    let snapshots: any[] = []
+    onSnapshot(folder, snapshot => snapshots.push(snapshot))
+    folder.rename("Vacation photos")
+    expect(snapshots[0]).toEqual({
+        name: "Vacation photos",
+        files: [{ name: "Photo1" }, { name: "Photo2" }]
+    })
+
+    onSnapshot(folder.files[0], snapshot => snapshots.push(snapshot))
+    folder.files[0].rename("01-arrival")
+    expect(snapshots[1]).toEqual({
+        name: "Vacation photos",
+        files: [{ name: "01-arrival" }, { name: "Photo2" }]
+    })
+    expect(snapshots[2]).toEqual({ name: "01-arrival" })
+
+    folder.files[1].rename("02-hotel")
+    expect(snapshots[3]).toEqual({
+        name: "Vacation photos",
+        files: [{ name: "01-arrival" }, { name: "02-hotel" }]
+    })
+    expect(snapshots[4]).not.toBeDefined()
+})
+
 test("it should apply snapshots", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -227,12 +289,18 @@ test("it should throw if a replaced object is read or written to", () => {
 // === COMPOSE FACTORY ===
 test("it should compose factories", () => {
     const { BoxFactory, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(BoxFactory, ColorFactory)
+    const ComposedFactory = types.compose(
+        BoxFactory,
+        ColorFactory
+    )
     expect(getSnapshot(ComposedFactory.create())).toEqual({ width: 0, height: 0, color: "#FFFFFF" })
 })
 test("it should compose factories with computed properties", () => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2)
+    const ComposedFactory = types.compose(
+        ColorFactory,
+        ComputedFactory2
+    )
     const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
     expect(getSnapshot(store)).toEqual({ props: { width: 100, height: 200 }, color: "#FFFFFF" })
     expect(store.area).toBe(20000)
@@ -241,7 +309,10 @@ test("it should compose factories with computed properties", () => {
 })
 test("it should compose multiple types with computed properties", () => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2)
+    const ComposedFactory = types.compose(
+        ColorFactory,
+        ComputedFactory2
+    )
     const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
     expect(getSnapshot(store)).toEqual({ props: { width: 100, height: 200 }, color: "#FFFFFF" })
     expect(store.area).toBe(20000)
