@@ -16,9 +16,16 @@ import {
     IStateTreeNode,
     IAnyType
 } from "../../internal"
+import { computed } from "mobx"
 
 class StoredReference {
-    constructor(public readonly mode: "identifier" | "object", public readonly value: any) {
+    node!: INode
+
+    constructor(
+        public readonly mode: "identifier" | "object",
+        public readonly value: any,
+        private readonly targetType: IAnyType
+    ) {
         if (mode === "object") {
             if (!isStateTreeNode(value))
                 return fail(`Can only store references to tree nodes, got: '${value}'`)
@@ -26,6 +33,20 @@ class StoredReference {
             if (!targetNode.identifierAttribute)
                 return fail(`Can only store references with a defined identifier attribute.`)
         }
+    }
+
+    @computed
+    get resolvedValue() {
+        // reference was initialized with the identifier of the target
+        const { node, targetType } = this
+        const target = node.root.identifierCache!.resolve(targetType, this.value)
+        if (!target)
+            return fail(
+                `Failed to resolve reference '${this.value}' to type '${
+                    this.targetType.name
+                }' (from node: ${node.path})`
+            )
+        return target.value
     }
 }
 
@@ -67,16 +88,7 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
 
         // id already resolved, return
         if (ref.mode === "object") return ref.value
-
-        // reference was initialized with the identifier of the target
-        const target = node.root.identifierCache!.resolve(this.targetType, ref.value)
-        if (!target)
-            return fail(
-                `Failed to resolve reference '${ref.value}' to type '${
-                    this.targetType.name
-                }' (from node: ${node.path})`
-            )
-        return target.value
+        return ref.resolvedValue
     }
 
     getSnapshot(node: INode): any {
@@ -96,7 +108,16 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         snapshot: any
     ): INode {
         const mode = isStateTreeNode(snapshot) ? "object" : "identifier"
-        return createNode(this, parent, subpath, environment, new StoredReference(mode, snapshot))
+        let r
+        const node = createNode(
+            this,
+            parent,
+            subpath,
+            environment,
+            (r = new StoredReference(mode, snapshot, this.targetType))
+        )
+        r.node = node
+        return node
     }
 
     reconcile(current: INode, newValue: any): INode {
