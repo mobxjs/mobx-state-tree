@@ -116,7 +116,7 @@ export enum MapIdentifierMode {
     NO
 }
 
-export class MSTMap<C, S, T> extends ObservableMap {
+class MSTMap<C, S, T> extends ObservableMap {
     constructor(initialData: any) {
         super(initialData, observable.ref.enhancer)
     }
@@ -237,7 +237,7 @@ export class MapType<C, S, T> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap) {
-        return new MSTMap(childNodes)
+        return (new MSTMap(childNodes) as any) as IMSTMap<any, any, any>
     }
 
     finalizeNewInstance(node: INode) {

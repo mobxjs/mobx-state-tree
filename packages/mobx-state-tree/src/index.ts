@@ -11,7 +11,7 @@ import {
     IType,
     IAnyType,
     map,
-    IExtendedObservableMap,
+    IMSTMap,
     array,
     identifier,
     model,
@@ -64,7 +64,7 @@ export const types = {
 export {
     IAnyType,
     IModelType,
-    IExtendedObservableMap,
+    IMSTMap,
     IType,
     ISimpleType,
     IComplexType,
