@@ -49,6 +49,7 @@ export class ObjectNode implements INode {
 
     subpathAtom = createAtom(`path`)
     subpath: string = ""
+    escapedSubpath: string
     parent: ObjectNode | null = null
     state = NodeLifeCycle.INITIALIZING
     storedValue: any
@@ -98,6 +99,7 @@ export class ObjectNode implements INode {
         this.type = type
         this.parent = parent
         this.subpath = subpath
+        this.escapedSubpath = escapeJsonPath(this.subpath)
         this.identifierAttribute = type instanceof ModelType ? type.identifierAttribute : undefined
         // identifier can not be changed during lifecycle of a node
         // so we safely can read it from initial snapshot
@@ -164,11 +166,10 @@ export class ObjectNode implements INode {
     /*
      * Returnes (escaped) path representation as string
      */
-    @computed
     public get path(): string {
         this.subpathAtom.reportObserved()
         if (!this.parent) return ""
-        return this.parent.path + "/" + escapeJsonPath(this.subpath)
+        return this.parent.path + "/" + this.escapedSubpath
     }
 
     public get root(): ObjectNode {
@@ -213,6 +214,7 @@ export class ObjectNode implements INode {
             const newPath = subpath === null ? "" : subpath
             if (this.subpath !== newPath) {
                 this.subpath = newPath
+                this.escapedSubpath = escapeJsonPath(this.subpath)
                 this.subpathAtom.reportChanged()
             }
             if (newParent && newParent !== this.parent) {
@@ -366,7 +368,7 @@ export class ObjectNode implements INode {
             this.identifierCache = this.root.identifierCache!.splitCache(this)
             this.parent!.removeChild(this.subpath)
             this.parent = null
-            this.subpath = ""
+            this.subpath = this.escapedSubpath = ""
             this.subpathAtom.reportChanged()
             this.state = NodeLifeCycle.FINALIZED
         }
@@ -430,7 +432,7 @@ export class ObjectNode implements INode {
         if (this._patchSubscribers) this._patchSubscribers = null
         if (this._snapshotSubscribers) this._snapshotSubscribers = null
         this.state = NodeLifeCycle.DEAD
-        this.subpath = ""
+        this.subpath = this.escapedSubpath = ""
         this.parent = null
         this.subpathAtom.reportChanged()
     }
