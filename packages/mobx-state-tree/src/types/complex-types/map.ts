@@ -8,7 +8,9 @@ import {
     observable,
     _interceptReads,
     IMapDidChange,
-    IKeyValueMap
+    IKeyValueMap,
+    Lambda,
+    IInterceptor
 } from "mobx"
 import {
     getStateTreeNode,
@@ -28,13 +30,11 @@ import {
     flattenTypeErrors,
     getContextForPath,
     typecheck,
-    addHiddenFinalProp,
     fail,
     isMutable,
     isPlainObject,
     isType,
     ObjectNode,
-    mobxShallow,
     IChildNodesMap,
     ModelType,
     OptionalValue,
@@ -43,8 +43,49 @@ import {
     IAnyType
 } from "../../internal"
 
-export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
-    put(value: T | any): T | any // downtype to any, again, because we cannot type the snapshot, see
+export interface IMSTMap<C, S, T> {
+    // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
+
+    clear(): void
+    delete(key: string): boolean
+    forEach(callbackfn: (value: T, key: string, map: IMSTMap<C, S, T>) => void, thisArg?: any): void
+    get(key: string): T | undefined
+    has(key: string): boolean
+    set(key: string, value: C | S | T): this
+    readonly size: number
+    put(value: C | S | T): T
+    keys(): IterableIterator<string>
+    values(): IterableIterator<T>
+    entries(): IterableIterator<[string, T]>
+    [Symbol.iterator](): IterableIterator<[string, T]>
+    /** Merge another object into this map, returns self. */
+    merge(other: IMSTMap<any, any, T> | IKeyValueMap<C | S | T> | any): this
+    clear(): void
+    replace(values: IMSTMap<any, any, T> | IKeyValueMap<T>): this
+    /**
+     * Returns a plain object that represents this map.
+     * Note that all the keys being stringified.
+     * If there are duplicating keys after converting them to strings, behaviour is undetermined.
+     */
+    toPOJO(): IKeyValueMap<T>
+    /**
+     * Returns a shallow non observable object clone of this map.
+     * Note that the values migth still be observable. For a deep clone use mobx.toJS.
+     */
+    toJS(): Map<string, T>
+    toJSON(): IKeyValueMap<T>
+    toString(): string
+    [Symbol.toStringTag]: "Map"
+    /**
+     * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
+     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
+     * for callback details
+     */
+    observe(
+        listener: (changes: IMapDidChange<string, T>) => void,
+        fireImmediately?: boolean
+    ): Lambda
+    intercept(handler: IInterceptor<IMapWillChange<string, T>>): Lambda
 }
 
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
@@ -75,7 +116,7 @@ export enum MapIdentifierMode {
     NO
 }
 
-export class MSTMap<C, S, T, X extends IType<C, S, T>> extends ObservableMap<any> {
+export class MSTMap<C, S, T> extends ObservableMap {
     constructor(initialData: any) {
         super(initialData, observable.ref.enhancer)
     }
@@ -126,7 +167,7 @@ export class MSTMap<C, S, T, X extends IType<C, S, T>> extends ObservableMap<any
 export class MapType<C, S, T> extends ComplexType<
     IKeyValueMap<C>,
     IKeyValueMap<S>,
-    IExtendedObservableMap<T>
+    IMSTMap<C, S, T>
 > {
     shouldAttachNode = true
     subType: IAnyType
@@ -363,7 +404,7 @@ export class MapType<C, S, T> extends ComplexType<
 
 export function map<C, S, T>(
     subtype: IType<C, S, T>
-): IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IExtendedObservableMap<T>>
+): IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IMSTMap<C, S, T>>
 /**
  * Creates a key based collection type who's children are all of a uniform declared type.
  * If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
@@ -393,12 +434,12 @@ export function map<C, S, T>(
  */
 export function map<C, S, T>(
     subtype: IType<C, S, T>
-): IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IExtendedObservableMap<T>> {
+): IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IMSTMap<C, S, T>> {
     return new MapType<C, S, T>(`map<string, ${subtype.name}>`, subtype)
 }
 
 export function isMapType<C, S, T>(
     type: any
-): type is IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IExtendedObservableMap<T>> {
+): type is IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IMSTMap<C, S, T>> {
     return isType(type) && (type.flags & TypeFlags.Map) > 0
 }

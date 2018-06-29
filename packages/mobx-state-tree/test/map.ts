@@ -353,6 +353,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
             afterCreate() {
                 self.items.put({
                     id: "1",
+                    title: "",
                     notes: [{ text: "first note" }, { text: "second note" }]
                 })
             }
