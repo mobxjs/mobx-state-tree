@@ -34,7 +34,9 @@ test("it should restore the state from the snapshot", () => {
     const { Factory } = createTestFactories()
     const instance = Factory.create({ hello: { to: "world" } })
     expect(getSnapshot(instance)).toEqual({ hello: { to: "world" } })
-    expect("" + instance).toBe("ObservableMap@18[{ hello: AnonymousModel@/hello }]") // default toString
+    expect(("" + instance).replace(/@\d+/, "@xx")).toBe(
+        "ObservableMap@xx[{ hello: AnonymousModel@/hello }]"
+    ) // default toString
 })
 // === SNAPSHOT TESTS ===
 test("it should emit snapshots", () => {

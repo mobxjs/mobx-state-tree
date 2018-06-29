@@ -1,4 +1,3 @@
-import { computed } from "mobx"
 import {
     INode,
     escapeJsonPath,
@@ -7,7 +6,6 @@ import {
     NodeLifeCycle,
     noop,
     ObjectNode,
-    invalidateComputed,
     IAnyType
 } from "../../internal"
 
@@ -15,8 +13,7 @@ export class ScalarNode implements INode {
     readonly type: IAnyType
     readonly storedValue: any
     readonly parent: ObjectNode | null
-
-    subpath: string = ""
+    readonly subpath: string = ""
 
     private state = NodeLifeCycle.INITIALIZING
     _environment: any = undefined
@@ -52,7 +49,6 @@ export class ScalarNode implements INode {
     /*
      * Returnes (escaped) path representation as string
      */
-    @computed
     public get path(): string {
         if (!this.parent) return ""
         return this.parent.path + "/" + escapeJsonPath(this.subpath)
@@ -69,10 +65,7 @@ export class ScalarNode implements INode {
     }
 
     setParent(newParent: INode | null, subpath: string | null = null) {
-        if (this.parent !== newParent) fail(`Cannot change parent of immutable node`)
-        if (this.subpath === subpath) return
-        this.subpath = subpath || ""
-        invalidateComputed(this, "path")
+        fail("setParent is not supposed to be called on scalar nodes")
     }
 
     public get value(): any {

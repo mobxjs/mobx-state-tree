@@ -10,7 +10,7 @@
     "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
     "rollup": "rollup -c",
     "test": "cross-env NODE_ENV=development jest --ci && cross-env NODE_ENV=production jest --ci && yarn run test-cyclic && yarn run test-mobx4",
-    "speedtest": "yarn build && node --expose-gc test/perf/report.js",
+    "speedtest": "yarn build && /usr/bin/time node --expose-gc test/perf/report.js",
     "test-cyclic": "yarn run build && node -e \"require('.')\"",
     "test-mobx4": "yarn add -D mobx@4.3.1 && yarn build && jest --ci && git checkout package.json ../../yarn.lock && yarn install",
     "watch": "jest --watch",

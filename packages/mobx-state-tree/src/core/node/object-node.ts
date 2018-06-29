@@ -1,4 +1,4 @@
-import { reaction, computed, action } from "mobx"
+import { reaction, computed, action, IAtom, createAtom } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -7,7 +7,6 @@ import {
     IReversibleJsonPatch,
     splitJsonPath,
     splitPatch,
-    IType,
     IDisposer,
     extend,
     fail,
@@ -48,7 +47,9 @@ export class ObjectNode implements INode {
     readonly identifierAttribute: string | undefined
     readonly identifier: string | null // Identifier is always normalized to string, even if the identifier property isn't
 
+    subpathAtom = createAtom(`path`)
     subpath: string = ""
+    escapedSubpath: string
     parent: ObjectNode | null = null
     state = NodeLifeCycle.INITIALIZING
     storedValue: any
@@ -98,6 +99,7 @@ export class ObjectNode implements INode {
         this.type = type
         this.parent = parent
         this.subpath = subpath
+        this.escapedSubpath = escapeJsonPath(this.subpath)
         this.identifierAttribute = type instanceof ModelType ? type.identifierAttribute : undefined
         // identifier can not be changed during lifecycle of a node
         // so we safely can read it from initial snapshot
@@ -164,10 +166,10 @@ export class ObjectNode implements INode {
     /*
      * Returnes (escaped) path representation as string
      */
-    @computed
     public get path(): string {
+        this.subpathAtom.reportObserved()
         if (!this.parent) return ""
-        return this.parent.path + "/" + escapeJsonPath(this.subpath)
+        return this.parent.path + "/" + this.escapedSubpath
     }
 
     public get root(): ObjectNode {
@@ -181,7 +183,7 @@ export class ObjectNode implements INode {
 
     setParent(newParent: ObjectNode | null, subpath: string | null = null) {
         if (this.parent === newParent && this.subpath === subpath) return
-        if (newParent) {
+        if (newParent && process.env.NODE_ENV !== "production") {
             if (this.parent && newParent !== this.parent) {
                 fail(
                     `A node cannot exists twice in the state tree. Failed to add ${this} to path '${
@@ -209,13 +211,18 @@ export class ObjectNode implements INode {
         if (this.parent && !newParent) {
             this.die()
         } else {
-            this.subpath = subpath || ""
+            const newPath = subpath === null ? "" : subpath
+            if (this.subpath !== newPath) {
+                this.subpath = newPath
+                this.escapedSubpath = escapeJsonPath(this.subpath)
+                this.subpathAtom.reportChanged()
+            }
             if (newParent && newParent !== this.parent) {
                 newParent.root.identifierCache!.mergeCache(this)
                 this.parent = newParent
+                this.subpathAtom.reportChanged()
                 this.fireHook("afterAttach")
             }
-            invalidateComputed(this, "path")
         }
     }
 
@@ -230,11 +237,11 @@ export class ObjectNode implements INode {
         return this._value
     }
 
-    @computed
     private get _value(): any {
         if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
+
     // advantage of using computed for a snapshot is that nicely respects transactions etc.
     @computed
     public get snapshot(): any {
@@ -350,6 +357,7 @@ export class ObjectNode implements INode {
         }
     }
 
+    @action
     detach() {
         if (!this.isAlive) fail(`Error while detaching, node is not alive.`)
         if (this.isRoot) return
@@ -360,8 +368,8 @@ export class ObjectNode implements INode {
             this.identifierCache = this.root.identifierCache!.splitCache(this)
             this.parent!.removeChild(this.subpath)
             this.parent = null
-            this.subpath = ""
-            invalidateComputed(this, "path")
+            this.subpath = this.escapedSubpath = ""
+            this.subpathAtom.reportChanged()
             this.state = NodeLifeCycle.FINALIZED
         }
     }
@@ -391,6 +399,7 @@ export class ObjectNode implements INode {
         )
     }
 
+    @action
     public die() {
         if (this.state === NodeLifeCycle.DETACHING) return
 
@@ -423,9 +432,9 @@ export class ObjectNode implements INode {
         if (this._patchSubscribers) this._patchSubscribers = null
         if (this._snapshotSubscribers) this._snapshotSubscribers = null
         this.state = NodeLifeCycle.DEAD
-        this.subpath = ""
+        this.subpath = this.escapedSubpath = ""
         this.parent = null
-        invalidateComputed(this, "path")
+        this.subpathAtom.reportChanged()
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
