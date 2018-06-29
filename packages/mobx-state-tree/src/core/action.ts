@@ -48,6 +48,7 @@ export function getNextActionId() {
     return nextActionId++
 }
 
+// TODO: optimize away entire action context if there is no middleware in tree?
 export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const node = getStateTreeNode(context.context)
     const baseIsRunningAction = node._isRunningAction
@@ -207,15 +208,21 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
                 if (!nextInvoked && !abortInvoked) {
                     const node = getStateTreeNode(call.tree)
                     fail(
-                        `Neither the next() nor the abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node
-                            .type.name} was invoked.`
+                        `Neither the next() nor the abort() callback within the middleware ${
+                            handler.name
+                        } for the action: "${call.name}" on the node: ${
+                            node.type.name
+                        } was invoked.`
                     )
                 }
                 if (nextInvoked && abortInvoked) {
                     const node = getStateTreeNode(call.tree)
                     fail(
-                        `The next() and abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node
-                            .type.name} were invoked.`
+                        `The next() and abort() callback within the middleware ${
+                            handler.name
+                        } for the action: "${call.name}" on the node: ${
+                            node.type.name
+                        } were invoked.`
                     )
                 }
             }

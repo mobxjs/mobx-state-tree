@@ -46,7 +46,7 @@ export class ObjectNode implements INode {
     nodeId = ++nextNodeId
     readonly type: IAnyType
     readonly identifierAttribute: string | undefined
-    readonly identifier: string | null
+    readonly identifier: string | null // Identifier is always normalized to string, even if the identifier property isn't
 
     subpath: string = ""
     parent: ObjectNode | null = null
@@ -103,7 +103,7 @@ export class ObjectNode implements INode {
         // so we safely can read it from initial snapshot
         this.identifier =
             this.identifierAttribute && this._initialSnapshot
-                ? this._initialSnapshot[this.identifierAttribute]
+                ? "" + this._initialSnapshot[this.identifierAttribute] // normalize internal identifier to string
                 : null
 
         if (!parent) {

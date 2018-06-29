@@ -34,7 +34,7 @@ test("late should describe correctly circular references", () => {
 })
 test("should typecheck", () => {
     const NodeObject = types.model("NodeObject", {
-        id: types.identifier(types.number),
+        id: types.identifierNumber,
         text: "Hi",
         child: types.maybe(types.late(() => NodeObject))
     })
@@ -51,7 +51,7 @@ test("typecheck should throw an Error when called at runtime, but not log the er
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
 
     const NodeObject = types.model("NodeObject", {
-        id: types.identifier(types.number),
+        id: types.identifierNumber,
         text: types.string
     })
 

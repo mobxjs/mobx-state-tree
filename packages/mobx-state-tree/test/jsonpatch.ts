@@ -14,7 +14,7 @@ function testPatches(type, snapshot, fn, expectedPatches) {
     expect(getSnapshot(instance)).toEqual(baseSnapshot)
 }
 const Node = types.model("Node", {
-    id: types.identifier(types.number),
+    id: types.identifierNumber,
     text: "Hi",
     children: types.optional(types.array(types.late(() => Node)), [])
 })
@@ -187,7 +187,7 @@ test("it should apply deep patches to maps", () => {
     // property getter during map's tryCollectModelTypes() will throw ReferenceError.
     // But if it's transpiled to var, then subType will become 'undefined'.
     const NodeMap = types.model("NodeMap", {
-        id: types.identifier(types.number),
+        id: types.identifierNumber,
         text: "Hi",
         children: types.optional(types.map(types.late(() => NodeMap)), {})
     })
@@ -254,7 +254,7 @@ test("it should apply deep patches to maps", () => {
 })
 test("it should apply deep patches to objects", () => {
     const NodeObject = types.model("NodeObject", {
-        id: types.identifier(types.number),
+        id: types.identifierNumber,
         text: "Hi",
         child: types.maybe(types.late(() => NodeObject))
     })

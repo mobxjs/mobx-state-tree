@@ -261,7 +261,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         const optionalChildren = {} as OptionalValuesMap
 
         this.forAllProps((propName, propType) => {
-            if (propType instanceof IdentifierType) {
+            if (propType.flags & TypeFlags.Identifier) {
                 if (this.identifierAttribute)
                     fail(
                         `Cannot define property '${propName}' as object identifier, property '${
@@ -270,9 +270,11 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                     )
                 this.identifierAttribute = propName
             } else if (propType instanceof OptionalValue) {
+                // TODO: use type flags instead
                 optionalChildren[propName] = propType
                 optionalFound = true
             } else if (propType instanceof Union) {
+                // TODO: use type flags instead
                 const optional = propType.types.find(
                     t => t instanceof OptionalValue
                 ) as OptionalValue<any, any, any>

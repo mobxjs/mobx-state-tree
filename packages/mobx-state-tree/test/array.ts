@@ -238,7 +238,7 @@ test("it should reconciliate keyed instances correctly", () => {
         todos: types.optional(
             types.array(
                 types.model("Task", {
-                    id: types.identifier(),
+                    id: types.identifier,
                     task: "",
                     done: false
                 })

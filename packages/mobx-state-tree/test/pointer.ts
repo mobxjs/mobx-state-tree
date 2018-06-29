@@ -5,7 +5,7 @@ function Pointer(Model) {
     })
 }
 const Todo = types.model("Todo", {
-    id: types.identifier(),
+    id: types.identifier,
     name: types.string
 })
 test("it should allow array of pointer objects", () => {

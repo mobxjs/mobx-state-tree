@@ -5,7 +5,7 @@ import { randomUuid } from "../utils"
 
 export const Box = types
     .model("Box", {
-        id: types.identifier(),
+        id: types.identifier,
         name: "hal",
         x: 0,
         y: 0
@@ -30,7 +30,7 @@ export const Box = types
     }))
 
 export const Arrow = types.model("Arrow", {
-    id: types.identifier(),
+    id: types.identifier,
     from: types.reference(Box),
     to: types.reference(Box)
 })

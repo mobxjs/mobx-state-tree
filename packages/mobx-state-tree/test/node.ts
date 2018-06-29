@@ -147,7 +147,7 @@ test("it should resolve to the root of an object", () => {
 // getIdentifier
 test("it should resolve to the identifier of the object", () => {
     const Document = types.model("Document", {
-        id: types.identifier(types.string)
+        id: types.identifier
     })
     const doc = Document.create({
         id: "document_1"
@@ -363,10 +363,7 @@ test("it can record and replay actions", () => {
 })
 
 test("Livelyness issue #683", () => {
-    const User = types.model({
-        id: types.identifier(types.number),
-        name: types.string
-    })
+    const User = types.model({ id: types.identifierNumber, name: types.string })
 
     const Users = types
         .model({

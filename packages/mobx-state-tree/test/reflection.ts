@@ -1,6 +1,6 @@
 import { types, getMembers, IStateTreeNode } from "../src"
 const User = types.model("User", {
-    id: types.identifier(types.string),
+    id: types.identifier,
     name: types.string
 })
 const Model = types
@@ -138,21 +138,23 @@ test("reflection - conditionals respected", () => {
                 return 1
             }
         }))
-        .actions((self): { actionName1(): number } | { actionName2(): number } => {
-            if (swap) {
-                return {
-                    actionName1() {
-                        return 1
+        .actions(
+            (self): { actionName1(): number } | { actionName2(): number } => {
+                if (swap) {
+                    return {
+                        actionName1() {
+                            return 1
+                        }
                     }
-                }
-            } else {
-                return {
-                    actionName2() {
-                        return 1
+                } else {
+                    return {
+                        actionName2() {
+                            return 1
+                        }
                     }
                 }
             }
-        })
+        )
         .views(self => {
             if (swap) {
                 return {
