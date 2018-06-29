@@ -69,6 +69,7 @@ export class ObjectNode implements INode {
     _autoUnbox = true // unboxing is disabled when reading child nodes
     _environment: any = undefined
     _isRunningAction = false // only relevant for root
+    _hasSnapshotReaction = false
 
     private _disposers: (() => void)[] | null = null
     private _patchSubscribers:
@@ -149,12 +150,8 @@ export class ObjectNode implements INode {
         // "observableInstanceCreated" field was touched
         invalidateComputed(this, "snapshot")
 
-        const snapshotDisposer = reaction(
-            () => this.snapshot,
-            snapshot => this.emitSnapshot(snapshot),
-            snapshotReactionOptions
-        )
-        this.addDisposer(snapshotDisposer)
+        if (this.isRoot) this._addSnapshotReaction()
+
         this.finalizeCreation()
 
         this._childNodes = null
@@ -438,6 +435,7 @@ export class ObjectNode implements INode {
     }
 
     public onSnapshot(onChange: (snapshot: any) => void): IDisposer {
+        this._addSnapshotReaction()
         if (!this._snapshotSubscribers) this._snapshotSubscribers = []
         return registerEventHandler(this._snapshotSubscribers, onChange)
     }
@@ -487,5 +485,17 @@ export class ObjectNode implements INode {
         this.assertWritable()
         if (!this._observableInstanceCreated) this._createObservableInstance()
         this.type.applyPatchLocally(this, subpath, patch)
+    }
+
+    private _addSnapshotReaction() {
+        if (!this._hasSnapshotReaction) {
+            const snapshotDisposer = reaction(
+                () => this.snapshot,
+                snapshot => this.emitSnapshot(snapshot),
+                snapshotReactionOptions
+            )
+            this.addDisposer(snapshotDisposer)
+            this._hasSnapshotReaction = true
+        }
     }
 }

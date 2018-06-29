@@ -44,11 +44,12 @@ import {
     addHiddenWritableProp,
     mobxShallow,
     isStateTreeNode,
-    OptionalValue,
-    Union,
     IdentifierType,
     IChildNodesMap,
-    IAnyType
+    IAnyType,
+    Union,
+    Late,
+    OptionalValue
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -172,10 +173,6 @@ export type ModelTypeConfig = {
     postProcessor?: (snapshot: any) => any
 }
 
-export type OptionalValuesMap = {
-    [key: string]: OptionalValue<any, any, any>
-}
-
 const defaultObjectOptions = {
     name: "AnonymousModel",
     properties: {},
@@ -236,13 +233,12 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     /*
      * The original object definition
      */
-    public identifierAttribute: string | undefined = undefined
+    public readonly identifierAttribute: string | undefined
     public readonly initializers: ((instance: any) => any)[]
     public readonly properties: any
 
     private preProcessor: (snapshot: any) => any | undefined
     private postProcessor: (snapshot: any) => any | undefined
-    private optionalChildren: OptionalValuesMap | null = null
     private readonly propertyNames: string[]
 
     constructor(opts: ModelTypeConfig) {
@@ -255,42 +251,21 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         this.properties = toPropertiesObject(this.properties) as S
         freeze(this.properties) // make sure nobody messes with it
         this.propertyNames = Object.keys(this.properties)
-        this._preBootModel()
+        this.identifierAttribute = this._getIdentifierAttribute()
     }
 
-    private _preBootModel() {
-        let optionalFound = false
-        const optionalChildren = {} as OptionalValuesMap
-
+    private _getIdentifierAttribute(): string | undefined {
+        let identifierAttribute: string | undefined = undefined
         this.forAllProps((propName, propType) => {
             if (propType.flags & TypeFlags.Identifier) {
-                if (this.identifierAttribute)
+                if (identifierAttribute)
                     fail(
-                        `Cannot define property '${propName}' as object identifier, property '${
-                            this.identifierAttribute
-                        }' is already defined as identifier property`
+                        `Cannot define property '${propName}' as object identifier, property '${identifierAttribute}' is already defined as identifier property`
                     )
-                this.identifierAttribute = propName
-            } else if (propType instanceof OptionalValue) {
-                // TODO: use type flags instead
-                optionalChildren[propName] = propType
-                optionalFound = true
-            } else if (propType instanceof Union) {
-                // TODO: use type flags instead
-                const optional = propType.types.find(
-                    t => t instanceof OptionalValue
-                ) as OptionalValue<any, any, any>
-                if (optional) {
-                    optionalChildren[propName] = optional
-                    optionalFound = true
-                }
+                identifierAttribute = propName
             }
         })
-
-        if (optionalFound) {
-            this.optionalChildren = optionalChildren
-            freeze(this.optionalChildren)
-        }
+        return identifierAttribute
     }
 
     cloneAndEnhance(opts: ModelTypeConfig): ModelType<any, any> {
@@ -584,11 +559,13 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         const processor = this.preProcessor
         const processed = processor ? processor.call(null, snapshot) : snapshot
 
-        if (processed && this.optionalChildren) {
-            const optionalChildren = this.optionalChildren
-            Object.keys(optionalChildren).forEach(name => {
+        if (processed) {
+            this.forAllProps((name, type) => {
                 if (typeof processed[name] === "undefined") {
-                    processed[name] = optionalChildren[name].getDefaultValueSnapshot()
+                    const optional = tryGetOptional(type)
+                    if (optional) {
+                        processed[name] = optional.getDefaultValueSnapshot()
+                    }
                 }
             })
         }
@@ -714,4 +691,16 @@ export function compose(...args: any[]): any {
 
 export function isObjectType(type: any): type is ModelType<any, any> {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
+}
+
+function tryGetOptional(type: any): OptionalValue<any, any, any> | undefined {
+    let optional
+    if (type instanceof OptionalValue) {
+        optional = type
+    } else if (type instanceof Union) {
+        optional = type.types.find(t => t instanceof OptionalValue) as OptionalValue<any, any, any>
+    } else if (type instanceof Late && type.subType instanceof OptionalValue) {
+        optional = type.subType
+    }
+    return optional
 }
