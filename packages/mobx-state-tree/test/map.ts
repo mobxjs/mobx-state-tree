@@ -458,3 +458,64 @@ test("numeric keys should work", () => {
     expect(s.mies.delete(8 as any)).toBeTruthy()
     expect(s.mies.size).toBe(1)
 })
+
+describe("#826, adding stuff twice", () => {
+    const Store = types
+        .model({
+            map: types.optional(types.map(types.boolean), {})
+        })
+        .actions(self => ({
+            toogleMap: id => {
+                self.map.set(id, !self.map.get(id))
+            }
+        }))
+
+    // This one pass fine 👍
+    test("Toogling once shouldn't throw", () => {
+        const store = Store.create({})
+        expect(() => {
+            store.toogleMap(1)
+        }).not.toThrow()
+    })
+
+    // This one throws with 'Not a child 1' error 👎
+    test("Toogling twice shouldn't throw", () => {
+        const store = Store.create({})
+        expect(() => {
+            store.toogleMap(1)
+            store.toogleMap(1)
+        }).not.toThrow()
+    })
+})
+
+test("#751 restore from snapshot should work", () => {
+    const Submodel = types.model("Submodel", {
+        id: types.identifierNumber
+    })
+
+    const Model = types.model("Model", {
+        map: types.map(Submodel)
+    })
+
+    const server = Model.create({ map: {} })
+
+    // We add an item with a number id
+    unprotect(server)
+    server.map.set(1 as any, { id: 1 })
+
+    // We can access it using a number
+    expect(server.map.get(1 as any)!.id).toBe(1)
+
+    // But if we get a snapshot...
+    const snapshot = getSnapshot(server)
+    // And apply it back...
+    const browser = Model.create(snapshot)
+
+    // We can access it using a string
+    expect(server.map.get("1")!.id).toBe(1)
+
+    // And as number
+    expect(server.map.get(1 as any)!.id).toBe(1)
+
+    expect(server.map.size).toBe(1)
+})
