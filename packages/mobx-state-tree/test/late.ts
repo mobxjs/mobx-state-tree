@@ -75,6 +75,6 @@ test("#825, late type checking ", () => {
         name: types.maybe(types.string)
     })
 
-    const p2 = Product.create({})
+    const p2 = Product.create({} as any)
     const p = Product.create({ details: { name: "bla" } })
 })
