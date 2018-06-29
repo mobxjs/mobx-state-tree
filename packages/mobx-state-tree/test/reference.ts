@@ -771,4 +771,11 @@ test("should serialize references correctly", () => {
 
     s.ref = "9" as any // unresolvable
     expect(getSnapshot(s).ref).toBe("9") // snapshot preserved as it was unresolvable
+
+    s.mies.set(9 as any, {
+        id: 9
+    })
+    expect(Array.from(s.mies.keys())).toEqual(["7", "8", "9"])
+    expect(s.mies.get("9")!.id).toBe(9)
+    expect(getSnapshot(s).ref).toBe("9") // ref serialized as string (number would be ok as well)
 })

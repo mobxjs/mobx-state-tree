@@ -415,3 +415,46 @@ test("get should return value when key is a number", () => {
     todoStore.addTodo(todo)
     expect(todoStore.todos.get(1 as any)!.title).toEqual("Test")
 })
+
+test("numeric keys should work", () => {
+    const M = types.model({
+        id: types.identifier,
+        title: "test"
+    })
+    const S = types.model({
+        mies: types.map(M),
+        ref: types.maybe(types.reference(M))
+    })
+
+    const s = S.create({
+        mies: {}
+    })
+    unprotect(s)
+
+    s.mies.set(7 as any, { id: "7" } as any)
+    const i7 = s.mies.get(7 as any)!
+    expect(i7.title).toBe("test")
+    expect(s.mies.has("7")).toBeTruthy()
+    expect(s.mies.has(7 as any)).toBeTruthy()
+    expect(s.mies.get("7")).toBeTruthy()
+    expect(s.mies.get(7 as any)).toBeTruthy()
+
+    s.mies.set("8", { id: "8" } as any)
+    expect(s.mies.has("8")).toBeTruthy()
+    expect(s.mies.has(8 as any)).toBeTruthy()
+    expect(s.mies.get("8")).toBeTruthy()
+    expect(s.mies.get(8 as any)).toBeTruthy()
+
+    expect(Array.from(s.mies.keys())).toEqual(["7", "8"])
+
+    s.mies.put({ id: "7", title: "coffee" })
+    expect(s.mies.size).toBe(2)
+    expect(s.mies.has("7")).toBeTruthy()
+    expect(s.mies.has(7 as any)).toBeTruthy()
+    expect(s.mies.get("7")).toBeTruthy()
+    expect(s.mies.get(7 as any)).toBeTruthy()
+    expect(i7.title).toBe("coffee")
+
+    expect(s.mies.delete(8 as any)).toBeTruthy()
+    expect(s.mies.size).toBe(1)
+})

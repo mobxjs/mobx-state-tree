@@ -49,36 +49,6 @@ export interface IExtendedObservableMap<T> extends ObservableMap<string, T> {
 
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
 
-function get(this: ObservableMap, key: any): any {
-    // maybe this is over-enthousiastic? normalize numeric keys to strings
-    return ObservableMap.prototype.get.call(this, "" + key)
-}
-
-function put(this: ObservableMap<any, any>, value: any) {
-    if (!!!value) fail(`Map.put cannot be used to set empty values`)
-    if (isStateTreeNode(value)) {
-        const node = getStateTreeNode(value)
-        if (process.env.NODE_ENV !== "production") {
-            if (!node.identifierAttribute) return fail(needsIdentifierError)
-        }
-        let key = node.identifier
-        this.set(key, node.value)
-        return node.value
-    } else if (!isMutable(value)) {
-        return fail(`Map.put can only be used to store complex values`)
-    } else {
-        let key: string
-        const mapType = getStateTreeNode(this as IStateTreeNode).type as MapType<any, any, any>
-        if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
-        if (mapType.identifierMode === MapIdentifierMode.YES) {
-            key = "" + value[mapType.identifierAttribute!]
-            this.set(key, value)
-            return this.get(key)
-        }
-        return fail(needsIdentifierError)
-    }
-}
-
 function tryCollectModelTypes(type: IAnyType, modelTypes: Array<ModelType<any, any>>): boolean {
     if (type instanceof ModelType) {
         modelTypes.push(type)
@@ -103,6 +73,54 @@ export enum MapIdentifierMode {
     UNKNOWN,
     YES,
     NO
+}
+
+export class MSTMap<C, S, T, X extends IType<C, S, T>> extends ObservableMap<any> {
+    constructor(initialData: any) {
+        super(initialData, observable.ref.enhancer)
+    }
+
+    get(key: string): T {
+        // maybe this is over-enthousiastic? normalize numeric keys to strings
+        return super.get("" + key)
+    }
+
+    has(key: string): boolean {
+        return super.has("" + key)
+    }
+
+    delete(key: string): boolean {
+        return super.delete("" + key)
+    }
+
+    set(key: string, value: C | S | T): this {
+        return super.set("" + key, value)
+    }
+
+    put(value: C | S | T): T {
+        if (!!!value) fail(`Map.put cannot be used to set empty values`)
+        if (isStateTreeNode(value)) {
+            const node = getStateTreeNode(value)
+            if (process.env.NODE_ENV !== "production") {
+                if (!node.identifierAttribute) return fail(needsIdentifierError)
+            }
+            let key = node.identifier!
+            this.set(key, node.value)
+            return node.value
+        } else if (!isMutable(value)) {
+            return fail(`Map.put can only be used to store complex values`)
+        } else {
+            let key: string
+            const mapType = getStateTreeNode(this as IStateTreeNode).type as MapType<any, any, any>
+            if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
+            if (mapType.identifierMode === MapIdentifierMode.YES) {
+                key = "" + (value as any)[mapType.identifierAttribute!]
+                this.set(key, value)
+                return this.get(key) as any
+            }
+            return fail(needsIdentifierError)
+        }
+    }
 }
 
 export class MapType<C, S, T> extends ComplexType<
@@ -178,10 +196,7 @@ export class MapType<C, S, T> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap) {
-        const instance = observable.map(childNodes, mobxShallow)
-        addHiddenFinalProp(instance, "put", put)
-        addHiddenFinalProp(instance, "get", get)
-        return instance
+        return new MSTMap(childNodes)
     }
 
     finalizeNewInstance(node: INode) {
@@ -206,7 +221,7 @@ export class MapType<C, S, T> extends ComplexType<
 
     willChange(change: IMapWillChange<any, any>): IMapWillChange<any, any> | null {
         const node = getStateTreeNode(change.object as IStateTreeNode)
-        const key = "" + change.name
+        const key = change.name
         node.assertWritable()
         const mapType = node.type as MapType<any, any, any>
         const subType = mapType.subType
@@ -313,7 +328,7 @@ export class MapType<C, S, T> extends ComplexType<
         })
         // Don't use target.replace, as it will throw all existing items first
         for (let key in snapshot) {
-            target.set("" + key, snapshot[key])
+            target.set(key, snapshot[key])
             currentKeys["" + key] = true
         }
         Object.keys(currentKeys).forEach(key => {
