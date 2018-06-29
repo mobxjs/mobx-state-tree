@@ -237,11 +237,11 @@ export class ObjectNode implements INode {
         return this._value
     }
 
-    @computed
     private get _value(): any {
         if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
+
     // advantage of using computed for a snapshot is that nicely respects transactions etc.
     @computed
     public get snapshot(): any {
