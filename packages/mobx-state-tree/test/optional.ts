@@ -67,7 +67,7 @@ test("Values should reset to default if omitted in snapshot", () => {
             id: types.identifier,
             done: false,
             title: "test",
-            thing: types.optional(types.frozen, {})
+            thing: types.frozen({})
         })
     })
     const store = Store.create({ todo: { id: "2" } })
@@ -80,9 +80,7 @@ test("Values should reset to default if omitted in snapshot", () => {
 })
 
 test("optional frozen should fallback to default value if snapshot is undefined", () => {
-    const Store = types.model({
-        thing: types.optional(types.frozen, {})
-    })
+    const Store = types.model({ thing: types.frozen({}) })
     const store = Store.create({
         thing: null
     })

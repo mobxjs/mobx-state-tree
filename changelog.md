@@ -14,7 +14,7 @@
 * `postProcessSnapshot` can no longer be declared as action, but, like `preProcessSnapshot`, needs to be defined on the type rather than on the instance.
 * `types.identifier` can no longer be parameterized with either `types.string` or `types.number`. Identifiers are now always normalized to strings. This reflects what was already happening internally and solves a lot of edge cases. To use numbers as identifiers, `types.identifierNumber` can be used, which serializes it's snapshot to a number, but will internally work like a string based identifier
 * The order of firing hooks when instantiating has slighlty changed, as the `afterCreate` hook will now only be fired upon instantation of the tree node, which now happens lazily (on first read / action). The internal order within a single node has remained the same.
-
+* types.frozen is now a function
 
 # 2.2.0
 

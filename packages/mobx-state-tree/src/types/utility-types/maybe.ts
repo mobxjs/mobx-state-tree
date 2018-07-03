@@ -15,14 +15,7 @@ const optionalNullType = optional(nullType, null)
 export function maybe<C, S, T>(
     type: IType<C, S, T>
 ): IType<S | null | undefined, S | null, T | null> & { flags: TypeFlags.Optional } {
-    if (process.env.NODE_ENV !== "production") {
-        if (!isType(type))
-            fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
-        if (type === frozen) {
-            fail(
-                "Unable to declare `types.maybe(types.frozen)`. Frozen already accepts `null`. Consider using `types.optional(types.frozen, null)` instead."
-            )
-        }
-    }
+    if (process.env.NODE_ENV !== "production" && !isType(type))
+        fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
     return union(type, optionalNullType) as any
 }

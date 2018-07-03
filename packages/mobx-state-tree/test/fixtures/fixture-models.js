@@ -23,7 +23,7 @@ exports.Hero = types
 exports.Monster = types
     .model("Monster", {
         id: types.identifier,
-        freestyle: types.frozen,
+        freestyle: types.frozen(),
         level: types.number,
         maxHp: types.number,
         hp: types.number,

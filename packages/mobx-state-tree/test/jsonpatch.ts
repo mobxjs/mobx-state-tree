@@ -315,7 +315,7 @@ test("it should apply deep patches to objects", () => {
 })
 test("it should correctly escape/unescape json patches", () => {
     const AppStore = types.model({
-        items: types.map(types.frozen)
+        items: types.map(types.frozen())
     })
     testPatches(
         AppStore,
