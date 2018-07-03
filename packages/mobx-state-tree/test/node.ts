@@ -218,7 +218,7 @@ test("it should clone a node", () => {
     const row = Row.create()
     doc.rows.push(row)
     const cloned = clone(doc)
-    // expect(doc).toEqual(cloned) // TODO: restore once jest version *after* 2.3.1.0 has been released
+    expect(doc).toEqual(cloned)
     expect(getSnapshot(doc)).toEqual(getSnapshot(cloned))
 })
 test("it should be possible to clone a dead object", () => {

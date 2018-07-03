@@ -447,6 +447,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
         // that pre-reserves all these fields for fast object-member lookups
     }
+
     initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
         const type = objNode.type as ModelType<any, any>
         const result = {} as IChildNodesMap
@@ -460,6 +461,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         })
         return result
     }
+
     createNewInstance() {
         const instance = observable.object(EMPTY_OBJECT, EMPTY_OBJECT, mobxShallow)
         addHiddenFinalProp(instance, "toString", objectTypeToString)

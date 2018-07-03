@@ -460,6 +460,7 @@ test("it should check the type correctly", () => {
     expect(Factory.is({ wrongKey: true })).toEqual(true)
     expect(Factory.is({ to: 3 })).toEqual(false)
 })
+
 if (process.env.NODE_ENV !== "production") {
     test("it should require complex fields to be present", () => {
         expect(
