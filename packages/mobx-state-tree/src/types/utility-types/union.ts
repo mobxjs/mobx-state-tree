@@ -14,9 +14,12 @@ import {
 
 export type ITypeDispatcher = (snapshot: any) => IType<any, any>
 
+export type UnionOptions<T> = {
+    eager: Boolean
+}
 export class Union extends Type<any, any> {
     readonly dispatcher: ITypeDispatcher | null = null
-    readonly eager: Boolean = true
+    readonly options: UnionOptions<T>
     readonly types: IType<any, any>[]
 
     get flags() {
@@ -33,10 +36,16 @@ export class Union extends Type<any, any> {
         return this.types.some(type => type.shouldAttachNode)
     }
 
-    constructor(name: string, types: IType<any, any>[], dispatcher: ITypeDispatcher | null) {
+    constructor(
+        name: string,
+        types: IType<any, any>[],
+        dispatcher: ITypeDispatcher | null,
+        options?: UnionOptions<T> | null
+    ) {
         super(name)
         this.dispatcher = dispatcher
         this.types = types
+        this.options = options
     }
 
     isAssignableFrom(type: IType<any, any>) {
@@ -67,7 +76,7 @@ export class Union extends Type<any, any> {
             debugger
             console.log(this.types)
         }
-        if (!this.eager && applicableTypes.length > 1)
+        if (!this.options.eager && applicableTypes.length > 1)
             return fail(
                 `Ambiguos snapshot ${JSON.stringify(value)} for union ${this
                     .name}. Please provide a dispatch in the union declaration.`
@@ -84,7 +93,7 @@ export class Union extends Type<any, any> {
         const errors = this.types.map(type => type.validate(value, context))
         const applicableTypes = errors.filter(errorArray => errorArray.length === 0)
 
-        if (!this.eager && applicableTypes.length > 1) {
+        if (!this.options.eager && applicableTypes.length > 1) {
             return typeCheckFailure(
                 context,
                 value,
@@ -329,6 +338,7 @@ export function union(
     const dispatcher = isType(dispatchOrType) ? null : dispatchOrType
     const types = isType(dispatchOrType) ? [dispatchOrType, ...otherTypes] : otherTypes
     const name = "(" + types.map(type => type.name).join(" | ") + ")"
+    const options = { eager: true }
 
     // check all options
     if (process.env.NODE_ENV !== "production") {
@@ -341,7 +351,7 @@ export function union(
                 )
         })
     }
-    return new Union(name, types, dispatcher)
+    return new Union(name, types, dispatcher, options)
 }
 
 export function isUnionType(type: any): type is Union {

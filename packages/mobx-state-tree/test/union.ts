@@ -33,9 +33,12 @@ const createLiteralTestFactories = () => {
 }
 if (process.env.NODE_ENV !== "production") {
     test("it should complain about multiple applicable types no dispatch method", () => {
-        const { Box, Plane, Square } = createTestFactories()
+        const { Box, Square } = createTestFactories()
+        const PlaneNotEager = types.union(Square, Box, {
+            eager: false
+        })
         expect(() => {
-            Plane.create({ width: 2, height: 2 })
+            PlaneNotEager.create({ width: 2, height: 2 })
         }).toThrow(/Error while converting/)
     })
 }
