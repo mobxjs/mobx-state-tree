@@ -1,4 +1,4 @@
-import { reaction, computed, action, IAtom, createAtom } from "mobx"
+import { reaction, computed, action, createAtom, IAtom } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -30,6 +30,23 @@ import {
 } from "../../internal"
 
 let nextNodeId = 1
+
+export type LivelynessMode = "warn" | "error" | "ignore"
+let livelynessChecking = "warn"
+
+/**
+ *  Defines what MST should do when running into reads / writes to objects that have died.
+ * By default it will print a warning.
+ * Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place
+ *
+ * Possible values: `"warn"`, `"error"` and `"ignore"`
+ *
+ * @export
+ * @param {LivelynessMode} mode
+ */
+export function setLivelynessChecking(mode: LivelynessMode) {
+    livelynessChecking = mode
+}
 
 export interface IChildNodesMap {
     [key: string]: INode
@@ -271,12 +288,20 @@ export class ObjectNode implements INode {
     }
 
     public assertAlive() {
-        if (!this.isAlive)
-            fail(
-                `You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${
-                    this.type.name
-                }').`
-            )
+        if (!this.isAlive) {
+            const baseMsg = `[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${
+                this.type.name
+            }'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
+            switch (livelynessChecking) {
+                case "error":
+                    throw new Error(baseMsg)
+                case "warn":
+                    console.warn(
+                        baseMsg +
+                            ' Use setLivelynessCheck("error") to simplify debugging this error.'
+                    )
+            }
+        }
     }
 
     getChildNode(subpath: string): INode {

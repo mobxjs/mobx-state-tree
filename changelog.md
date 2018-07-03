@@ -2,6 +2,7 @@
 
 ## Improvements
 
+* Introduced `setLivelynessChecking("warn" | "ignore" | "error")`
 // TODO: add actual numbers
 * Significantly improved the performance of constructing MST trees. Significantly reduced the memory footprint of MST. Big shoutout to the relentless effort by [k-g-a](https://github.com/k-g-a) to optimize all the things! See [#845](https://github.com/mobxjs/mobx-state-tree/issues/845) for details.
 * Improved the overloads of `model.compose`, see [#892](https://github.com/mobxjs/mobx-state-tree/pull/892) by [t49tran](https://github.com/t49tran)

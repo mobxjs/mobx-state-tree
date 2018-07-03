@@ -89,7 +89,9 @@ export {
     IActionRecorder,
     ISerializedActionCall,
     recordActions,
-    createActionTrackingMiddleware
+    createActionTrackingMiddleware,
+    setLivelynessChecking,
+    LivelynessMode
 } from "./internal"
 
 export * from "./core/mst-operations"

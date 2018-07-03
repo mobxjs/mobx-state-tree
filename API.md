@@ -47,6 +47,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [isStateTreeNode](#isstatetreenode)
 -   [joinJsonPath](#joinjsonpath)
 -   [ObjectNode](#objectnode)
+-   [ObservableMap](#observablemap)
 -   [onAction](#onaction)
 -   [onPatch](#onpatch)
 -   [onSnapshot](#onsnapshot)
@@ -57,6 +58,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [resolveIdentifier](#resolveidentifier)
 -   [resolvePath](#resolvepath)
 -   [ScalarNode](#scalarnode)
+-   [setLivelynessChecking](#setlivelynesschecking)
 -   [splitJsonPath](#splitjsonpath)
 -   [StoredReference](#storedreference)
 -   [tryResolve](#tryresolve)
@@ -320,6 +322,7 @@ Returns **any**
 ## getIdentifier
 
 Returns the identifier of the target node.
+This is the _string normalized_ identifier, which might not match the type of the identifier attribute
 
 **Parameters**
 
@@ -511,6 +514,8 @@ Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ## ObjectNode
 
+## ObservableMap
+
 ## onAction
 
 Registers a function that will be invoked for each action that is called on the provided model instance, or to any of its children.
@@ -685,6 +690,18 @@ Returns undefined if no value can be found.
 Returns **any** 
 
 ## ScalarNode
+
+## setLivelynessChecking
+
+Defines what MST should do when running into reads / writes to objects that have died.
+By default it will print a warning.
+Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place
+
+Possible values: `"warn"`, `"error"` and `"ignore"`
+
+**Parameters**
+
+-   `mode` **LivelynessMode** 
 
 ## splitJsonPath
 

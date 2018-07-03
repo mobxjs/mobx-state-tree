@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`it should warn if a replaced object is read or written to 1`] = `
+Array [
+  Array [
+    "[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo'). Either detach nodes first, or don't use objects after removing / replacing them in the tree. Use setLivelynessCheck(\\"error\\") to simplify debugging this error.",
+  ],
+  Array [
+    "[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo'). Either detach nodes first, or don't use objects after removing / replacing them in the tree. Use setLivelynessCheck(\\"error\\") to simplify debugging this error.",
+  ],
+  Array [
+    "[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo'). Either detach nodes first, or don't use objects after removing / replacing them in the tree. Use setLivelynessCheck(\\"error\\") to simplify debugging this error.",
+  ],
+  Array [
+    "[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo'). Either detach nodes first, or don't use objects after removing / replacing them in the tree. Use setLivelynessCheck(\\"error\\") to simplify debugging this error.",
+  ],
+]
+`;

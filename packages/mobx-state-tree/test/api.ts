@@ -40,6 +40,7 @@ const METHODS = [
     "recordPatches",
     "resolveIdentifier",
     "resolvePath",
+    "setLivelynessChecking",
     "splitJsonPath",
     "tryResolve",
     "typecheck",

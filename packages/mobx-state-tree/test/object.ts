@@ -9,7 +9,8 @@ import {
     applySnapshot,
     getSnapshot,
     unprotect,
-    types
+    types,
+    setLivelynessChecking
 } from "../src"
 import { autorun, reaction, observable } from "mobx"
 
@@ -272,18 +273,56 @@ test("it should throw if a replaced object is read or written to", () => {
     s.todo = Todo.create({ title: "4" })
     expect(s.todo.title).toBe("4")
 
+    setLivelynessChecking("error")
     // try reading old todo
     const err =
-        "[mobx-state-tree] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo')."
+        "You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo'). Either detach nodes first, or don't use objects after removing / replacing them in the tree"
     expect(() => {
         todo.fn()
-    }).toThrowError(err)
+    }).toThrow(err)
     expect(() => {
         todo.title
-    }).toThrowError(err)
+    }).toThrow(err)
     expect(() => {
         todo.title = "5"
-    }).toThrowError(err)
+    }).toThrow(err)
+})
+
+test("it should warn if a replaced object is read or written to", () => {
+    const Todo = types
+        .model("Todo", {
+            title: "test"
+        })
+        .actions(self => {
+            function fn() {}
+            return {
+                fn
+            }
+        })
+    const Store = types.model("Store", {
+        todo: Todo
+    })
+    const s = Store.create({
+        todo: { title: "3" }
+    })
+    unprotect(s)
+    const todo = s.todo
+    s.todo = Todo.create({ title: "4" })
+    expect(s.todo.title).toBe("4")
+
+    // try reading old todo
+    setLivelynessChecking("warn")
+    const bwarn = console.warn
+    try {
+        const mock = (console.warn = jest.fn())
+        todo.fn()
+        todo.title
+        unprotect(todo)
+        todo.title = "5"
+        expect(mock.mock.calls).toMatchSnapshot()
+    } finally {
+        console.warn = bwarn
+    }
 })
 
 // === COMPOSE FACTORY ===
