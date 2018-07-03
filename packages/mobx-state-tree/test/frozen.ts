@@ -58,3 +58,33 @@ test("it should type strongly", () => {
         }).toThrow("Cannot assign to read only property 'x'")
     }
 })
+
+test("it should be capable of using another MST type", () => {
+    const Point = types.model("Point", { x: types.number, y: types.number })
+    type PS = typeof Point.CreationType
+    const Mouse = types.model({
+        loc: types.frozen(Point)
+    })
+
+    expect(Mouse.is({})).toBeFalsy()
+    expect(Mouse.is({ loc: {} })).toBeFalsy()
+    expect(Mouse.is({ loc: { x: 3, y: 2 } })).toBeTruthy()
+
+    expect(() => {
+        Mouse.create()
+    }).toThrow(
+        'at path "/loc" value `undefined` is not assignable to type: `frozen(Point)` (Value is not a plain object)'
+    )
+    expect(() => {
+        Mouse.create({ loc: { x: 4 } } as any)
+    }).toThrow(
+        'at path "/loc/y" value `undefined` is not assignable to type: `number` (Value is not a number)'
+    )
+
+    const m = Mouse.create({
+        loc: { x: 3, y: 2 }
+    })
+
+    const x: number = m.loc.x
+    expect(x).toBe(3)
+})
