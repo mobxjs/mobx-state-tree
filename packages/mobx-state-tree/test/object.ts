@@ -593,3 +593,20 @@ test("782, TS + compose", () => {
 
     const user = User.create({ id: "someId" })
 })
+
+if (process.env.NODE_ENV === "development")
+    test("beautiful errors", () => {
+        expect(() => {
+            types.model("User", { x: (types.identifier as any)() })
+        }).toThrow("types.identifier is not a function")
+        expect(() => {
+            types.model("User", { x: { bla: true } as any })
+        }).toThrow(
+            "Invalid type definition for property 'x', it looks like you passed an object. Try passing another model type or a types.frozen"
+        )
+        expect(() => {
+            types.model("User", { x: function() {} as any })
+        }).toThrow(
+            "Invalid type definition for property 'x', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?"
+        )
+    })

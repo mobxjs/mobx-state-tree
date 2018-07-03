@@ -209,16 +209,20 @@ function toPropertiesObject<T>(declaredProps: ModelPropertiesDeclaration): Model
             } else if (isType(value)) {
                 return props
                 // its a function, maybe the user wanted a view?
-            } else if (typeof value === "function") {
-                fail("Functions are not supported as properties, use views instead")
-                // no other complex values
-            } else if (typeof value === "object") {
+            } else if (process.env.NODE_ENV !== "production" && typeof value === "function") {
                 fail(
-                    `In property '${key}': base models should not contain complex values: '${value}'`
+                    `Invalid type definition for property '${key}', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?`
+                )
+                // no other complex values
+            } else if (process.env.NODE_ENV !== "production" && typeof value === "object") {
+                fail(
+                    `Invalid type definition for property '${key}', it looks like you passed an object. Try passing another model type or a types.frozen.`
                 )
                 // WTF did you pass in mate?
             } else {
-                fail(`Unexpected value for property '${key}'`)
+                fail(
+                    `Invalid type definition for property '${key}', cannot infer a type from a value like '${value}' (${typeof value})`
+                )
             }
         },
         declaredProps as any
