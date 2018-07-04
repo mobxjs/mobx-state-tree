@@ -159,10 +159,10 @@ test("it should apply snapshots", () => {
     expect(getSnapshot(doc)).toEqual({ to: "universe" })
 })
 test("it should apply and accept null value for types.maybe(complexType)", () => {
-    const Item = types.model({
+    const Item = types.model("Item", {
         value: types.string
     })
-    const Model = types.model({
+    const Model = types.model("Model", {
         item: types.maybe(Item)
     })
     const myModel = Model.create()
@@ -462,7 +462,7 @@ test("it should check the type correctly", () => {
 })
 
 if (process.env.NODE_ENV !== "production") {
-    test("it should require complex fields to be present", () => {
+    test("complex map / array values are optional by default", () => {
         expect(
             types
                 .model({
@@ -475,7 +475,7 @@ if (process.env.NODE_ENV !== "production") {
                 .model({
                     todo: types.model({})
                 })
-                .create()
+                .create({} as any)
         ).toThrow()
         expect(
             types
@@ -483,28 +483,32 @@ if (process.env.NODE_ENV !== "production") {
                     todo: types.array(types.string)
                 })
                 .is({})
-        ).toBe(false) // TBD: or true?
-        expect(() =>
-            types
-                .model({
-                    todo: types.array(types.string)
-                })
-                .create()
-        ).toThrow()
+        ).toBe(true) // TBD: or true?
+        expect(
+            getSnapshot(
+                types
+                    .model({
+                        todo: types.array(types.string)
+                    })
+                    .create({})
+            )
+        ).toEqual({ todo: [] })
         expect(
             types
                 .model({
                     todo: types.map(types.string)
                 })
                 .is({})
-        ).toBe(false)
-        expect(() =>
-            types
-                .model({
-                    todo: types.map(types.string)
-                })
-                .create()
-        ).toThrow()
+        ).toBe(true)
+        expect(
+            getSnapshot(
+                types
+                    .model({
+                        todo: types.map(types.string)
+                    })
+                    .create({})
+            )
+        ).toEqual({ todo: {} })
     })
 }
 // === VIEW FUNCTIONS ===

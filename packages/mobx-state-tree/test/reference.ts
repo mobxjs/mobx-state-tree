@@ -141,7 +141,7 @@ test("it should resolve refs over late types", () => {
         }))
     const Store = types.model({
         books: types.array(Book),
-        entries: types.optional(types.array(BookEntry), [])
+        entries: types.array(BookEntry)
     })
     const s = Store.create({
         books: [{ id: "3", price: 2 }]

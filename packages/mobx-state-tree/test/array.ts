@@ -167,7 +167,7 @@ test("items should be reconciled correctly when splicing - 1", () => {
         d = Task.create({ x: "d" })
     const store = types
         .model({
-            todos: types.optional(types.array(Task), [])
+            todos: types.array(Task)
         })
         .create({
             todos: [a]
@@ -295,7 +295,7 @@ test("it correctly reconciliate when swapping", () => {
 test("it correctly reconciliate when swapping using snapshots", () => {
     const Task = types.model("Task", {})
     const Store = types.model({
-        todos: types.optional(types.array(Task), [])
+        todos: types.array(Task)
     })
     const s = Store.create()
     unprotect(s)

@@ -287,7 +287,7 @@ test("it should not throw when removing a non existing item from a map", () => {
     expect(() => {
         const AppModel = types
             .model({
-                myMap: types.optional(types.map(types.number), {})
+                myMap: types.map(types.number)
             })
             .actions(self => {
                 function something() {

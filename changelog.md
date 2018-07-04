@@ -2,6 +2,7 @@
 
 ## Improvements
 
+* It is no longer necessary to wrap `types.map` or `types.array` in `types.optional` when used in a model type, they are now optional by default when used as property type.
 * Introduced `setLivelynessChecking("warn" | "ignore" | "error")`
 // TODO: add actual numbers
 * Significantly improved the performance of constructing MST trees. Significantly reduced the memory footprint of MST. Big shoutout to the relentless effort by [k-g-a](https://github.com/k-g-a) to optimize all the things! See [#845](https://github.com/mobxjs/mobx-state-tree/issues/845) for details.

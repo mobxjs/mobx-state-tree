@@ -10,7 +10,8 @@ import {
     _getAdministration,
     isComputedProp,
     computed,
-    set
+    set,
+    IObservableArray
 } from "mobx"
 import {
     fail,
@@ -49,7 +50,12 @@ import {
     IAnyType,
     Union,
     Late,
-    OptionalValue
+    OptionalValue,
+    isMapType,
+    isArrayType,
+    IMSTMap,
+    MapType,
+    ArrayType
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -84,9 +90,17 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
                 ? IType<boolean | undefined, boolean, boolean> & { flags: TypeFlags.Optional }
                 : T[K] extends Date
                     ? IType<number | undefined, number, Date> & { flags: TypeFlags.Optional }
-                    : T[K] extends IType<infer C, infer S, infer T> & { flags: TypeFlags.Optional }
-                        ? IType<C, S, T> & { flags: TypeFlags.Optional }
-                        : T[K] extends IType<infer C, infer S, infer T> ? IType<C, S, T> : never
+                    : T[K] extends (IComplexType<
+                          any,
+                          any,
+                          IMSTMap<any, any, any> | IObservableArray<any>
+                      >)
+                        ? T[K] & { flags: TypeFlags.Optional }
+                        : T[K] extends IType<any, any, any> & {
+                              flags: TypeFlags.Optional
+                          }
+                            ? T[K] & { flags: TypeFlags.Optional }
+                            : T[K] extends IType<any, any, any> ? T[K] : never
 }
 
 export type OptionalPropertyTypes = ModelPrimitive | { flags: TypeFlags.Optional }
@@ -205,6 +219,13 @@ function toPropertiesObject<T>(declaredProps: ModelPropertiesDeclaration): Model
                 return Object.assign({}, props, {
                     [key]: optional(getPrimitiveFactoryFromValue(value), value)
                 })
+                // map defaults to empty object automatically for models
+            } else if (value instanceof MapType) {
+                return Object.assign({}, props, {
+                    [key]: optional(value, {})
+                })
+            } else if (value instanceof ArrayType) {
+                return Object.assign({}, props, { [key]: optional(value, []) })
                 // its already a type
             } else if (isType(value)) {
                 return props
@@ -695,7 +716,7 @@ export function compose(...args: any[]): any {
         .named(typeName)
 }
 
-export function isObjectType(type: any): type is ModelType<any, any> {
+export function isModelType(type: any): type is ModelType<any, any> {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 

@@ -30,7 +30,7 @@ test("late should describe correctly circular references", () => {
     const Node = types.model("Node", {
         childs: types.array(types.late(() => Node))
     })
-    expect(Node.describe()).toEqual("{ childs: Node[] }")
+    expect(Node.describe()).toEqual("{ childs: Node[]? }")
 })
 test("should typecheck", () => {
     const NodeObject = types.model("NodeObject", {

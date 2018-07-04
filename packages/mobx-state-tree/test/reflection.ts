@@ -7,7 +7,7 @@ const Model = types
     .model({
         isPerson: false,
         users: types.optional(types.map(User), {}),
-        dogs: types.optional(types.array(User), []),
+        dogs: types.array(User),
         user: types.maybe(types.late(() => User))
     })
     .volatile(self => ({
