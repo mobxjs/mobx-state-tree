@@ -422,6 +422,8 @@ Useful methods:
 Asynchronous actions have first class support in MST and are described in more detail [here](docs/async-actions.md#asynchronous-actions-and-middleware).
 Asynchronous actions are written by using generators and always return a promise. For a real working example see the [bookshop sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A quick example to get the gist:
 
+_Warning: don't import `flow` from `"mobx"`, but from `"mobx-state-tree"` instead!_
+
 ```javascript
 import { types, flow } from "mobx-state-tree"
 

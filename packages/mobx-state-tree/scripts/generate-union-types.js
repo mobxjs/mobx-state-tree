@@ -14,7 +14,7 @@ function getNames(char) {
 for (let i = 2; i < 10; i++) {
     str += `// prettier-ignore\nexport function union<${withChars(i, getNames).join(
         ", "
-    )}>(dispatch: ITypeDispatcher, ${withChars(i, char => `${char}: IType<${getNames(char)}>`).join(
+    )}>(options: UnionOptions, ${withChars(i, char => `${char}: IType<${getNames(char)}>`).join(
         ","
     )}): IType<${withChars(i, char => "C" + char).join(" | ")}, ${withChars(
         i,
