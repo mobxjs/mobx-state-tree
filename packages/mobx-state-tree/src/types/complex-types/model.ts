@@ -90,17 +90,21 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
                 ? IType<boolean | undefined, boolean, boolean> & { flags: TypeFlags.Optional }
                 : T[K] extends Date
                     ? IType<number | undefined, number, Date> & { flags: TypeFlags.Optional }
-                    : T[K] extends (IComplexType<
-                          any,
-                          any,
-                          IMSTMap<any, any, any> | IObservableArray<any>
-                      >)
-                        ? T[K] & { flags: TypeFlags.Optional }
-                        : T[K] extends IType<any, any, any> & {
-                              flags: TypeFlags.Optional
-                          }
-                            ? T[K] & { flags: TypeFlags.Optional }
-                            : T[K] extends IType<any, any, any> ? T[K] : never
+                    : T[K] extends (IComplexType<infer C, infer S, IObservableArray<infer A>>)
+                        ? IComplexType<C, S, IObservableArray<A>> & { flags: TypeFlags.Optional }
+                        : T[K] extends (IComplexType<
+                              infer C,
+                              infer S,
+                              IMSTMap<infer X, infer Y, infer Z>
+                          >)
+                            ? IComplexType<C, S, IMSTMap<X, Y, Z>> & { flags: TypeFlags.Optional }
+                            : T[K] extends IType<infer C, infer S, infer A> & {
+                                  flags: TypeFlags.Optional
+                              }
+                                ? IType<C, S, A> & { flags: TypeFlags.Optional }
+                                : T[K] extends IType<infer C, infer S, infer A>
+                                    ? IType<C, S, A>
+                                    : never
 }
 
 export type OptionalPropertyTypes = ModelPrimitive | { flags: TypeFlags.Optional }

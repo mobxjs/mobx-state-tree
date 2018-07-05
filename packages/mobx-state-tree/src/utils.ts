@@ -29,7 +29,7 @@ export function isArray(val: any): boolean {
     return !!(Array.isArray(val) || isObservableArray(val)) as boolean
 }
 
-export function asArray<T>(val: undefined | null | T | T[]): T[] {
+export function asArray<T>(val: undefined | null | T | T[] | ReadonlyArray<T>): T[] {
     if (!val) return (EMPTY_ARRAY as any) as T[]
     if (isArray(val)) return val as T[]
     return [val] as T[]

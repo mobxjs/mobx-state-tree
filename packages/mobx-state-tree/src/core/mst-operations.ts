@@ -98,7 +98,7 @@ export function onSnapshot<S>(
  * @param {IJsonPatch} patch
  * @returns
  */
-export function applyPatch(target: IStateTreeNode, patch: IJsonPatch | IJsonPatch[]) {
+export function applyPatch(target: IStateTreeNode, patch: IJsonPatch | ReadonlyArray<IJsonPatch>) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))

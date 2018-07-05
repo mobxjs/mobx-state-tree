@@ -17,8 +17,8 @@ import {
 import { IObservableArray } from "mobx"
 
 const Entry = types.model("UndoManagerEntry", {
-    patches: types.frozen,
-    inversePatches: types.frozen
+    patches: types.frozen<ReadonlyArray<IJsonPatch>>(),
+    inversePatches: types.frozen<ReadonlyArray<IJsonPatch>>()
 })
 
 const UndoManager = types
@@ -147,14 +147,14 @@ const UndoManager = types
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
                 applyPatch(
                     getRoot(targetStore),
-                    self.history[self.undoIdx].inversePatches.slice().reverse()
+                    self.history[self.undoIdx].inversePatches!.slice().reverse()
                 )
                 replaying = false
             },
             redo() {
                 replaying = true
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
-                applyPatch(getRoot(targetStore), self.history[self.undoIdx].patches)
+                applyPatch(getRoot(targetStore), self.history[self.undoIdx].patches as any) // TODO: fix compile error here?
                 self.undoIdx++
                 replaying = false
             },
