@@ -86,6 +86,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [types.literal](#typesliteral)
 -   [types.map](#typesmap)
 -   [types.maybe](#typesmaybe)
+-   [types.maybeNull](#typesmaybenull)
 -   [types.model](#typesmodel)
 -   [types.null](#typesnull)
 -   [types.number](#typesnumber)
@@ -900,12 +901,22 @@ This is useful to store complex, but immutable values like vectors etc. It can f
 
 Note: if you want to store free-form state that is mutable, or not serializeable, consider using volatile state instead.
 
+Frozen properties can be defined in three different ways
+1\. `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type
+2\. `types.frozen({ someDefaultValue: true})` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
+3\. `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
+
+**Parameters**
+
+-   `arg`  
+-   `defaultValueOrType` **([Type](#type) | value)** 
+
 **Examples**
 
 ```javascript
 const GameCharacter = types.model({
   name: string,
-  location: types.frozen
+  location: types.frozen({ x: 0, y: 0})
 })
 
 const hero = GameCharacter.create({
@@ -916,6 +927,15 @@ const hero = GameCharacter.create({
 hero.location = { x: 10, y: 2 } // OK
 hero.location.x = 7 // Not ok!
 ```
+
+```javascript
+type Point = { x: number, y: number }
+   const Mouse = types.model({
+        loc: types.frozen<Point>()
+   })
+```
+
+Returns **[Type](#type)** 
 
 ## types.identifier
 
@@ -1034,13 +1054,25 @@ Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/J
 
 ## types.maybe
 
-Maybe will make a type nullable, and also null by default.
+Maybe will make a type nullable, and also optional.
+The value `undefined` will be used to represent nullability.
 
 **Parameters**
 
 -   `type` **IType&lt;S, T>** The type to make nullable
 
-Returns **(IType&lt;(S | null | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)), (T | null)>)** 
+Returns **(IType&lt;(S | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)), (T | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined))>)** 
+
+## types.maybeNull
+
+Maybe will make a type nullable, and also optional.
+The value `null` will be used to represent no value.
+
+**Parameters**
+
+-   `type` **IType&lt;S, T>** The type to make nullable
+
+Returns **(IType&lt;(S | null), (T | null)>)** 
 
 ## types.model
 
@@ -1136,7 +1168,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Parameters**
 
--   `dispatchOrType` **(ITypeDispatcher | IAnyType)** 
+-   `optionsOrType` **(ITypeDispatcher | IAnyType)** 
 -   `otherTypes` **...[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IAnyType>** 
 
 Returns **IAnyType** 

@@ -85,7 +85,7 @@ const Customer = types.model("Customer", {
 })
 const Order = types
     .model("Order", {
-        customer: types.maybe(types.reference(Customer))
+        customer: types.maybeNull(types.reference(Customer))
     })
     .actions(self => {
         function setCustomer(customer) {

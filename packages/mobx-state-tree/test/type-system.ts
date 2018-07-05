@@ -44,7 +44,7 @@ test("it should do typescript type inference correctly", () => {
     const A = types
         .model({
             x: types.number,
-            y: types.maybe(types.string)
+            y: types.maybeNull(types.string)
         })
         .views(self => ({
             get z(): string {
@@ -153,7 +153,7 @@ test("cannot create factories with null values", () => {
 })
 test("can create factories with maybe primitives", () => {
     const F = types.model({
-        x: types.maybe(types.string)
+        x: types.maybeNull(types.string)
     })
     expect(F.is(undefined)).toBe(false)
     expect(F.is({})).toBe(true)
@@ -234,7 +234,7 @@ test("types instances with compatible snapshots should not be interchangeable", 
     const c = C.create()
     unprotect(c)
     expect(() => {
-        c.x = null
+        c.x = undefined
     }).not.toThrow()
     expect(() => {
         ;(c as any).x = {}

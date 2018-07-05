@@ -39,7 +39,7 @@ class Decimal {
 
     const Wallet = types.model({
         balance: DecimalPrimitive,
-        lastTransaction: types.maybe(DecimalPrimitive)
+        lastTransaction: types.maybeNull(DecimalPrimitive)
     })
 
     test("it should allow for custom primitive types", () => {

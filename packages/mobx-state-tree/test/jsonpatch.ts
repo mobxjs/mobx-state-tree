@@ -266,7 +266,7 @@ test("it should apply deep patches to objects", () => {
             n.child = { id: 2, text: "world" } // this reconciles; just an update
             n.child = NodeObject.create({ id: 2, text: "coffee", child: { id: 23 } })
             n.child = { id: 3, text: "world", child: { id: 7 } } // addition
-            n.child = null // removal
+            n.child = undefined // removal
         },
         [
             {
@@ -284,7 +284,7 @@ test("it should apply deep patches to objects", () => {
                 path: "/child",
                 value: {
                     child: {
-                        child: null,
+                        child: undefined,
                         id: 23,
                         text: "Hi"
                     },
@@ -297,7 +297,7 @@ test("it should apply deep patches to objects", () => {
                 path: "/child",
                 value: {
                     child: {
-                        child: null,
+                        child: undefined,
                         id: 7,
                         text: "Hi"
                     },
@@ -308,7 +308,7 @@ test("it should apply deep patches to objects", () => {
             {
                 op: "replace",
                 path: "/child",
-                value: null
+                value: undefined
             }
         ]
     )

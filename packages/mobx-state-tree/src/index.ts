@@ -33,7 +33,8 @@ import {
     late,
     enumeration,
     custom,
-    identifierNumber
+    identifierNumber,
+    maybeNull
 } from "./internal"
 
 export const types = {
@@ -46,6 +47,7 @@ export const types = {
     optional,
     literal,
     maybe,
+    maybeNull,
     refinement,
     string,
     boolean,

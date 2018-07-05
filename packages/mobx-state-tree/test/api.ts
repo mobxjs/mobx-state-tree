@@ -63,6 +63,7 @@ const TYPES = [
     "literal",
     "map",
     "maybe",
+    "maybeNull",
     "model",
     "null",
     "number",

@@ -592,7 +592,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
 
         if (processed) {
             this.forAllProps((name, type) => {
-                if (typeof processed[name] === "undefined") {
+                if (!(name in processed)) {
                     const optional = tryGetOptional(type)
                     if (optional) {
                         processed[name] = optional.getDefaultValueSnapshot()

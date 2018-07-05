@@ -17,6 +17,7 @@
 * The order of firing hooks when instantiating has slighlty changed, as the `afterCreate` hook will now only be fired upon instantation of the tree node, which now happens lazily (on first read / action). The internal order within a single node has remained the same.
 * types.frozen is now a function
 * Union is now eager #907 / #804, `dispatcher` param => option,
+* types.maybe now used undefined by default, use `types.maybeNull` for the old behavior
 
 # 2.2.0
 

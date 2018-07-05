@@ -453,21 +453,20 @@ test("References are non-nullable by default", () => {
     expect(Store.is({ ref: null })).toBe(false)
     expect(Store.is({ ref: undefined })).toBe(false)
     expect(Store.is({ ref: 3, maybeRef: 3 })).toBe(true)
-    expect(Store.is({ ref: 3, maybeRef: null })).toBe(true)
     expect(Store.is({ ref: 3, maybeRef: undefined })).toBe(true)
     let store = Store.create({
         todo: { id: 3 },
         ref: 3
     })
     expect(store.ref).toBe(store.todo)
-    expect(store.maybeRef).toBe(null)
+    expect(store.maybeRef).toBe(undefined)
     store = Store.create({
         todo: { id: 3 },
         ref: 4
     })
     unprotect(store)
     if (process.env.NODE_ENV !== "production") {
-        expect(store.maybeRef).toBe(null)
+        expect(store.maybeRef).toBe(undefined)
         expect(() => store.ref).toThrow(
             "[mobx-state-tree] Failed to resolve reference '4' to type 'AnonymousModel' (from node: /ref)"
         )
@@ -477,9 +476,9 @@ test("References are non-nullable by default", () => {
         expect(() => store.maybeRef).toThrow(
             "[mobx-state-tree] Failed to resolve reference '4' to type 'AnonymousModel' (from node: /maybeRef)"
         )
-        store.maybeRef = null
-        expect(store.maybeRef).toBe(null)
-        expect(() => ((store as any).ref = null)).toThrow(/Error while converting/)
+        store.maybeRef = undefined
+        expect(store.maybeRef).toBe(undefined)
+        expect(() => ((store as any).ref = undefined)).toThrow(/Error while converting/)
     }
 })
 test("References are described properly", () => {
@@ -492,7 +491,7 @@ test("References are described properly", () => {
         maybeRef: types.maybe(types.reference(Todo))
     })
     expect(Store.describe()).toBe(
-        "{ todo: ({ id: identifierNumber } | null?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | null?) }"
+        "{ todo: ({ id: identifierNumber } | undefined?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | undefined?) }"
     )
 })
 test("References in recursive structures", () => {
@@ -505,7 +504,7 @@ test("References in recursive structures", () => {
     const Tree = types
         .model("Tree", {
             children: types.array(types.late(() => Tree)),
-            data: types.maybe(types.reference(Folder))
+            data: types.maybeNull(types.reference(Folder))
         })
         .actions(self => {
             function addFolder(data) {

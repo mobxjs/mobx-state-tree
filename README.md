@@ -624,7 +624,7 @@ const User = types.model({
     name: types.string
 })
 
-const UserByNameReference = types.maybe(
+const UserByNameReference = types.maybeNull(
     types.reference(User, {
         // given an identifier, find the user
         get(identifier /* string */, parent: any /*Store*/) {
@@ -882,7 +882,8 @@ These are the types available in MST. All types can be found in the `types` name
 * `types.literal(value)` can be used to create a literal type, where the only possible value is specifically that value. This is very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
 * `types.enumeration(name?, options: string[])` creates an enumeration. This method is a shorthand for a union of string literals.
 * `types.refinement(name?, baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
-* `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(null)), null)`.
+* `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(undefined)), undefined)`.
+* `types.maybeNull(type)` like `maybe`, but uses `null` to represent the absence of a value.
 * `types.null` the type of `null`
 * `types.undefined` the type of `undefined`
 * `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.

@@ -167,6 +167,18 @@ test("it should apply and accept null value for types.maybe(complexType)", () =>
     })
     const myModel = Model.create()
     applySnapshot(myModel, { item: { value: "something" } })
+    applySnapshot(myModel, { item: undefined })
+    expect(getSnapshot(myModel)).toEqual({ item: undefined })
+})
+test("it should apply and accept null value for types.maybeNull(complexType)", () => {
+    const Item = types.model("Item", {
+        value: types.string
+    })
+    const Model = types.model("Model", {
+        item: types.maybeNull(Item)
+    })
+    const myModel = Model.create()
+    applySnapshot(myModel, { item: { value: "something" } })
     applySnapshot(myModel, { item: null })
     expect(getSnapshot(myModel)).toEqual({ item: null })
 })

@@ -53,6 +53,9 @@ export type CreationTypeOf<T extends IType<any, any, any>> = T extends IType<inf
     ? C
     : never
 
+export function frozen<T extends IType<any, any, any>>(subType: T): ISimpleType<CreationTypeOf<T>>
+export function frozen<T>(defaultValue: T): IType<T | undefined, T, Readonly<T>>
+export function frozen<T = any>(): IType<T | undefined, T | undefined, Readonly<T> | undefined>
 /**
  * Frozen can be used to story any value that is serializable in itself (that is valid JSON).
  * Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
@@ -88,10 +91,9 @@ export type CreationTypeOf<T extends IType<any, any, any>> = T extends IType<inf
  *    })
  *
  * @alias types.frozen
+ * @param {Type|value} defaultValueOrType
+ * @returns {Type}
  */
-export function frozen<T extends IType<any, any, any>>(subType: T): ISimpleType<CreationTypeOf<T>>
-export function frozen<T>(defaultValue: T): IType<T | undefined, T, Readonly<T>>
-export function frozen<T = any>(): IType<T | undefined, T | undefined, Readonly<T> | undefined>
 export function frozen<T>(arg?: any): any {
     if (arguments.length === 0) return untypedFrozenInstance
     else if (isType(arg)) return new Frozen(arg)
