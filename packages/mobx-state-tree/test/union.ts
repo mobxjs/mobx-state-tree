@@ -15,7 +15,7 @@ const createTestFactories = () => {
     const Plane = types.union(Square, Box)
     const Heighed = types.union(Box, Cube)
     const DispatchPlane = types.union(
-        snapshot => (snapshot && "height" in snapshot ? Box : Square),
+        { dispatcher: snapshot => (snapshot && "height" in snapshot ? Box : Square) },
         Box,
         Square
     )
@@ -118,4 +118,45 @@ test("it should eagerly match by value literal", () => {
     const person = ManWomanOrAll.create({ type: "M" })
     expect(All.is(person)).toEqual(false)
     expect(Man.is(person)).toEqual(true)
+})
+
+test("dispatch", () => {
+    const Odd = types
+        .model({
+            value: types.number
+        })
+        .actions(self => ({
+            isOdd() {
+                return true
+            },
+            isEven() {
+                return false
+            }
+        }))
+    const Even = types.model({ value: types.number }).actions(self => ({
+        isOdd() {
+            return false
+        },
+        isEven() {
+            return true
+        }
+    }))
+    const Num = types.union(
+        { dispatcher: snapshot => (snapshot.value % 2 === 0 ? Even : Odd) },
+        Even,
+        Odd
+    )
+    expect(Num.create({ value: 3 }).isOdd()).toBe(true)
+    expect(Num.create({ value: 3 }).isEven()).toBe(false)
+    expect(Num.create({ value: 4 }).isOdd()).toBe(false)
+    expect(Num.create({ value: 4 }).isEven()).toBe(true)
+    if (process.env.NODE_ENV !== "production") {
+        expect(() => {
+            const Num = types.union(
+                (snapshot => (snapshot.value % 2 === 0 ? Even : Odd)) as any, // { dispatcher: snapshot => (snapshot.value % 2 === 0 ? Even : Odd) },
+                Even,
+                Odd
+            )
+        }).toThrow("First argument to types.union should either be a type")
+    }
 })

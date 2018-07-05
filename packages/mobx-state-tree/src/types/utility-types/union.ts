@@ -10,6 +10,7 @@ import {
     Type,
     INode,
     fail,
+    isPlainObject,
     IAnyType
 } from "../../internal"
 
@@ -153,6 +154,10 @@ export function union(optionsOrType: UnionOptions | IAnyType, ...otherTypes: IAn
 
     // check all options
     if (process.env.NODE_ENV !== "production") {
+        if (!isType(optionsOrType) && !isPlainObject(optionsOrType))
+            fail(
+                "First argument to types.union should either be a type, or an objects object of the form: { eager?: boolean, dispatcher?: Function }"
+            )
         types.forEach(type => {
             if (!isType(type))
                 fail(
