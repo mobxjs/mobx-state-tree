@@ -74,7 +74,7 @@ Supported browsers:
 
 # Getting started
 
-See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial.
+See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial or follow the free [egghead.io course](https://egghead.io/courses/manage-application-state-with-mobx-state-tree).
 
 # Talks & blogs
 
