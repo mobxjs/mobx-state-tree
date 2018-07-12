@@ -1,4 +1,4 @@
-import { types, getEnv, getParent } from "../src"
+import { types, getEnv, getParent, getPath } from "../src"
 const ChildModel = types
     .model("Child", {
         parentPropertyIsNullAfterCreate: false,
@@ -45,4 +45,79 @@ test("Parent property has value during child's afterAttach() event", () => {
     const mockFetcher = () => Promise.resolve(true)
     const parent = ParentModel.create({}, { fetch: mockFetcher })
     expect(parent.child.parentPropertyIsNullAfterAttach).toBe(false)
+})
+
+test("#917", () => {
+    const SubTodo = types
+        .model("SubTodo", {
+            id: types.optional(types.number, () => Math.random()),
+            title: types.string,
+            finished: false
+        })
+        .views(self => ({
+            get path() {
+                return getPath(self)
+            }
+        }))
+        .actions(self => ({
+            toggle() {
+                self.finished = !self.finished
+            }
+        }))
+
+    const Todo = types
+        .model("Todo", {
+            id: types.optional(types.number, () => Math.random()),
+            title: types.string,
+            finished: false,
+            subTodos: types.array(SubTodo)
+        })
+        .views(self => ({
+            get path() {
+                return getPath(self)
+            }
+        }))
+        .actions(self => ({
+            toggle() {
+                self.finished = !self.finished
+            }
+        }))
+
+    const TodoStore = types
+        .model("TodoStore", {
+            todos: types.array(Todo)
+        })
+        .views(self => ({
+            get unfinishedTodoCount() {
+                return self.todos.filter(todo => !todo.finished).length
+            }
+        }))
+        .actions(self => ({
+            addTodo(title) {
+                self.todos.push({
+                    title,
+                    subTodos: [
+                        {
+                            title
+                        }
+                    ]
+                })
+            }
+        }))
+
+    const store2 = TodoStore.create({
+        todos: [
+            Todo.create({
+                title: "get Coffee",
+                subTodos: [
+                    SubTodo.create({
+                        title: "test"
+                    })
+                ]
+            })
+        ]
+    })
+
+    expect(store2.todos[0].path).toBe("/todos/0")
+    expect(store2.todos[0].subTodos[0].path).toBe("/todos/0/subTodos/0")
 })
