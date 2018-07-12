@@ -37,7 +37,6 @@ export function getChildType(object: IStateTreeNode, child: string): IAnyType {
  * @export
  * @param {Object} target the model instance from which to receive patches
  * @param {(patch: IJsonPatch, reversePatch) => void} callback the callback that is invoked for each patch. The reversePatch is a patch that would actually undo the emitted patch
- * @param {includeOldValue} boolean if oldValue is included in the patches, they can be inverted. However patches will become much bigger and might not be suitable for efficient transport
  * @returns {IDisposer} function to remove the listener
  */
 export function onPatch(

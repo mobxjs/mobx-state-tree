@@ -1393,10 +1393,15 @@ So far this might look a lot like an immutable state tree as found for example i
 ## Contributing
 
 1. Clone this repository
-2. Run `yarn run bootstrap` and `yarn run build` once.
+2. Yarn is the package manager of choice. Make sure to run Node 8 or higher.
+2. Run `yarn install && yarn run bootstrap`.
+3. Run `yarn build` at least once in `packages/mobx-state-tree`
+3. For MST changes: go to `packages/mobx-state-tree` and run `yarn watch` (the test runner is Jest)
+3. Editor settings are optimized for VS Code, so just run `code .` in the root folder. Debugger settings are included in the project.
+3. After updating jsdocs, best run `yarn build-docs`
+3. When creating PRs, make sure to check the travis build, it will run some tests which are by default not run locally
 3. Extensive pull requests are best discussed in an issue first
 3. Have fun!
-
 
 ## Thanks!
 
