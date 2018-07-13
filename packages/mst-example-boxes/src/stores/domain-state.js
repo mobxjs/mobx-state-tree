@@ -39,7 +39,7 @@ export const Store = types
     .model("Store", {
         boxes: types.map(Box),
         arrows: types.array(Arrow),
-        selection: types.maybe(types.reference(Box))
+        selection: types.maybeNull(types.reference(Box))
     })
     .actions(self => ({
         addBox(name, x, y) {
