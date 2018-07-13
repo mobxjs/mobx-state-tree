@@ -5,7 +5,8 @@ import {
     onAction,
     applyPatch,
     applySnapshot,
-    addMiddleware
+    addMiddleware,
+    getRoot
 } from "../src"
 /// Simple action replay and invocation
 const Task = types
@@ -366,4 +367,47 @@ test("actions are mockable", () => {
         }
         expect(m.view()).toBe(4)
     }
+})
+
+test("after attach action should work correctly", () => {
+    const Todo = types
+        .model({
+            title: "test"
+        })
+        .actions(self => ({
+            remove() {
+                getRoot(self).remove(self)
+            }
+        }))
+    const S = types
+        .model({
+            todos: types.array(Todo)
+        })
+        .actions(self => ({
+            remove(todo) {
+                self.todos.remove(todo)
+            }
+        }))
+
+    const s = S.create({
+        todos: [{ title: "todo" }]
+    })
+    const events: any[] = []
+    onAction(
+        s,
+        call => {
+            events.push(call)
+        },
+        true
+    )
+
+    s.todos[0].remove()
+
+    expect(events).toEqual([
+        {
+            args: [],
+            name: "remove",
+            path: "/todos/0"
+        }
+    ])
 })
