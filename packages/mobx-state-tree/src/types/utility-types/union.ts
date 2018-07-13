@@ -11,7 +11,8 @@ import {
     INode,
     fail,
     isPlainObject,
-    IAnyType
+    IAnyType,
+    IValidationError
 } from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
@@ -53,29 +54,25 @@ export class Union extends Type<any, any, any> {
     }
 
     instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
-        return this.determineType(value).instantiate(parent, subpath, environment, value)
+        const type = this.determineType(value)
+        if (!type) return fail("No matching type for union " + this.describe()) // can happen in prod builds
+        return type.instantiate(parent, subpath, environment, value)
     }
 
     reconcile(current: INode, newValue: any): INode {
-        return this.determineType(newValue).reconcile(current, newValue)
+        const type = this.determineType(newValue)
+        if (!type) return fail("No matching type for union " + this.describe()) // can happen in prod builds
+        return type.reconcile(current, newValue)
     }
 
-    determineType(value: any): IAnyType {
+    determineType(value: any): IAnyType | undefined {
         // try the dispatcher, if defined
         if (this.dispatcher) {
             return this.dispatcher(value)
         }
 
         // find the most accomodating type
-        const applicableTypes = this.types.filter(type => type.is(value))
-        if (!this.eager && applicableTypes.length > 1)
-            return fail(
-                `Ambiguos snapshot ${JSON.stringify(value)} for union ${
-                    this.name
-                }. Please provide a dispatch in the union declaration.`
-            )
-
-        return applicableTypes[0]
+        return this.types.find(type => type.is(value))
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
@@ -83,22 +80,23 @@ export class Union extends Type<any, any, any> {
             return this.dispatcher(value).validate(value, context)
         }
 
-        const errors = this.types.map(type => type.validate(value, context))
-        const applicableTypes = errors.filter(errorArray => errorArray.length === 0)
-
-        if (!this.eager && applicableTypes.length > 1) {
-            return typeCheckFailure(
-                context,
-                value,
-                "Multiple types are applicable for the union (hint: provide a dispatch function)"
-            )
-        } else if (applicableTypes.length === 0) {
-            return typeCheckFailure(context, value, "No type is applicable for the union").concat(
-                flattenTypeErrors(errors)
-            )
+        const allErrors: IValidationError[][] = []
+        let applicableTypes = 0
+        for (let i = 0; i < this.types.length; i++) {
+            const type = this.types[i]
+            const errors = type.validate(value, context)
+            if (errors.length === 0) {
+                if (this.eager) return typeCheckSuccess()
+                else applicableTypes++
+            } else {
+                allErrors.push(errors)
+            }
         }
 
-        return typeCheckSuccess()
+        if (applicableTypes === 1) return typeCheckSuccess()
+        return typeCheckFailure(context, value, "No type is applicable for the union").concat(
+            flattenTypeErrors(allErrors)
+        )
     }
 }
 
