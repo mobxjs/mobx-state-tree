@@ -5,7 +5,8 @@ import {
     onAction,
     applyPatch,
     applySnapshot,
-    addMiddleware
+    addMiddleware,
+    getRoot
 } from "../src"
 /// Simple action replay and invocation
 const Task = types
@@ -80,12 +81,12 @@ test("applying snapshots should be recordable and replayable", () => {
 })
 // Complex actions
 const Customer = types.model("Customer", {
-    id: types.identifier(types.number),
+    id: types.identifierNumber,
     name: types.string
 })
 const Order = types
     .model("Order", {
-        customer: types.maybe(types.reference(Customer))
+        customer: types.maybeNull(types.reference(Customer))
     })
     .actions(self => {
         function setCustomer(customer) {
@@ -311,20 +312,20 @@ test("middleware events are correct", () => {
         {
             args: [7],
             context: {},
-            id: process.env.NODE_ENV !== "production" ? 38 : 35,
+            id: process.env.NODE_ENV !== "production" ? 28 : 27,
             name: "a",
             parentId: 0,
-            rootId: process.env.NODE_ENV !== "production" ? 38 : 35,
+            rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
             tree: {},
             type: "action"
         },
         {
             args: [14],
             context: {},
-            id: process.env.NODE_ENV !== "production" ? 39 : 36,
+            id: process.env.NODE_ENV !== "production" ? 29 : 28,
             name: "b",
-            parentId: process.env.NODE_ENV !== "production" ? 38 : 35,
-            rootId: process.env.NODE_ENV !== "production" ? 38 : 35,
+            parentId: process.env.NODE_ENV !== "production" ? 28 : 27,
+            rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
             tree: {},
             type: "action"
         }
@@ -366,4 +367,47 @@ test("actions are mockable", () => {
         }
         expect(m.view()).toBe(4)
     }
+})
+
+test("after attach action should work correctly", () => {
+    const Todo = types
+        .model({
+            title: "test"
+        })
+        .actions(self => ({
+            remove() {
+                getRoot(self).remove(self)
+            }
+        }))
+    const S = types
+        .model({
+            todos: types.array(Todo)
+        })
+        .actions(self => ({
+            remove(todo) {
+                self.todos.remove(todo)
+            }
+        }))
+
+    const s = S.create({
+        todos: [{ title: "todo" }]
+    })
+    const events: any[] = []
+    onAction(
+        s,
+        call => {
+            events.push(call)
+        },
+        true
+    )
+
+    s.todos[0].remove()
+
+    expect(events).toEqual([
+        {
+            args: [],
+            name: "remove",
+            path: "/todos/0"
+        }
+    ])
 })

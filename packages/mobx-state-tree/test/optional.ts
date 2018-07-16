@@ -29,7 +29,7 @@ if (process.env.NODE_ENV !== "production") {
         })
         const error = expect(() => {
             types.model({
-                rows: types.optional(types.array(Row), [{}])
+                rows: types.optional(types.array(Row), [{}] as any)
             })
         }).toThrow()
     })
@@ -42,7 +42,7 @@ if (process.env.NODE_ENV !== "production") {
         })
         const RowList = types.optional(types.array(Row), [])
         const error = expect(() => {
-            RowList.create([{ name: "a", quantity: 1 }, { name: "b", quantity: "x" }])
+            RowList.create([{ name: "a", quantity: 1 }, { name: "b", quantity: "x" }] as any)
         }).toThrow()
     })
 }
@@ -64,10 +64,10 @@ test("it should accept a function to provide dynamic values", () => {
 test("Values should reset to default if omitted in snapshot", () => {
     const Store = types.model({
         todo: types.model({
-            id: types.identifier(),
+            id: types.identifier,
             done: false,
             title: "test",
-            thing: types.optional(types.frozen, {})
+            thing: types.frozen({})
         })
     })
     const store = Store.create({ todo: { id: "2" } })
@@ -80,9 +80,7 @@ test("Values should reset to default if omitted in snapshot", () => {
 })
 
 test("optional frozen should fallback to default value if snapshot is undefined", () => {
-    const Store = types.model({
-        thing: types.optional(types.frozen, {})
-    })
+    const Store = types.model({ thing: types.frozen({}) })
     const store = Store.create({
         thing: null
     })

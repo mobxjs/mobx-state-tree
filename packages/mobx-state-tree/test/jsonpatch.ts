@@ -14,7 +14,7 @@ function testPatches(type, snapshot, fn, expectedPatches) {
     expect(getSnapshot(instance)).toEqual(baseSnapshot)
 }
 const Node = types.model("Node", {
-    id: types.identifier(types.number),
+    id: types.identifierNumber,
     text: "Hi",
     children: types.optional(types.array(types.late(() => Node)), [])
 })
@@ -183,8 +183,11 @@ test("it should apply non flat patches with object instances", () => {
     )
 })
 test("it should apply deep patches to maps", () => {
+    // If user does not transpile const/let to var, trying to call Late' subType
+    // property getter during map's tryCollectModelTypes() will throw ReferenceError.
+    // But if it's transpiled to var, then subType will become 'undefined'.
     const NodeMap = types.model("NodeMap", {
-        id: types.identifier(types.number),
+        id: types.identifierNumber,
         text: "Hi",
         children: types.optional(types.map(types.late(() => NodeMap)), {})
     })
@@ -251,7 +254,7 @@ test("it should apply deep patches to maps", () => {
 })
 test("it should apply deep patches to objects", () => {
     const NodeObject = types.model("NodeObject", {
-        id: types.identifier(types.number),
+        id: types.identifierNumber,
         text: "Hi",
         child: types.maybe(types.late(() => NodeObject))
     })
@@ -263,7 +266,7 @@ test("it should apply deep patches to objects", () => {
             n.child = { id: 2, text: "world" } // this reconciles; just an update
             n.child = NodeObject.create({ id: 2, text: "coffee", child: { id: 23 } })
             n.child = { id: 3, text: "world", child: { id: 7 } } // addition
-            n.child = null // removal
+            n.child = undefined // removal
         },
         [
             {
@@ -281,7 +284,7 @@ test("it should apply deep patches to objects", () => {
                 path: "/child",
                 value: {
                     child: {
-                        child: null,
+                        child: undefined,
                         id: 23,
                         text: "Hi"
                     },
@@ -294,7 +297,7 @@ test("it should apply deep patches to objects", () => {
                 path: "/child",
                 value: {
                     child: {
-                        child: null,
+                        child: undefined,
                         id: 7,
                         text: "Hi"
                     },
@@ -305,14 +308,14 @@ test("it should apply deep patches to objects", () => {
             {
                 op: "replace",
                 path: "/child",
-                value: null
+                value: undefined
             }
         ]
     )
 })
 test("it should correctly escape/unescape json patches", () => {
     const AppStore = types.model({
-        items: types.map(types.frozen)
+        items: types.map(types.frozen())
     })
     testPatches(
         AppStore,

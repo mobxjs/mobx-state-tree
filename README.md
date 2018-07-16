@@ -74,7 +74,7 @@ Supported browsers:
 
 # Getting started
 
-See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial.
+See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial or follow the free [egghead.io course](https://egghead.io/courses/manage-application-state-with-mobx-state-tree).
 
 # Talks & blogs
 
@@ -193,6 +193,11 @@ An introduction to the philosophy can be watched [here](https://youtu.be/ta8QKmN
 mobx-state-tree "immutable trees" and "graph model" features talk, ["Next Generation State Management"](https://www.youtube.com/watch?v=rwqwwn_46kA) at React Europe 2017. [Slides](http://tree.surge.sh/#1).
 
 # Examples
+
+To run the examples:
+1. clone this repository
+2. navigate to the example folder (e.g. `packages/mst-example-bookshop`)
+3. run `yarn install` and `yarn start`
 
 * [Bookshop](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-bookshop) Example webshop application with references, identifiers, routing, testing etc.
 * [Boxes](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-boxes) Example app where one can draw, drag, and drop boxes. With time-travelling and multi-client synchronization over websockets.
@@ -422,6 +427,8 @@ Useful methods:
 Asynchronous actions have first class support in MST and are described in more detail [here](docs/async-actions.md#asynchronous-actions-and-middleware).
 Asynchronous actions are written by using generators and always return a promise. For a real working example see the [bookshop sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A quick example to get the gist:
 
+_Warning: don't import `flow` from `"mobx"`, but from `"mobx-state-tree"` instead!_
+
 ```javascript
 import { types, flow } from "mobx-state-tree"
 
@@ -563,7 +570,7 @@ This makes it possible to declare references, and keep the data normalized in th
 Example:
 ```javascript
 const Todo = types.model({
-    id: types.identifier(),
+    id: types.identifier,
     title: types.string
 })
 
@@ -599,13 +606,13 @@ _Tip: If you know the format of the identifiers in your application, leverage `t
 
 ```javascript
 const Car = types.model("Car", {
-    id: types.identifier(types.refinement(types.string, identifier => identifier.indexOf("Car_") === 0))
+    id: types.refinement(types.identifier, identifier => identifier.indexOf("Car_") === 0)
 })
 ```
 
 #### References
 
-References are defined by mentioning the type they should resolve to. The targeted type should have exactly one attribute of the type `identifier()`.
+References are defined by mentioning the type they should resolve to. The targeted type should have exactly one attribute of the type `identifier`.
 References are looked up through the entire tree, but per type. So identifiers need to be unique in the entire tree.
 
 #### Customizable references
@@ -618,11 +625,11 @@ Example:
 
 ```javascript
 const User = types.model({
-    id: types.identifier(),
+    id: types.identifier,
     name: types.string
 })
 
-const UserByNameReference = types.maybe(
+const UserByNameReference = types.maybeNull(
     types.reference(User, {
         // given an identifier, find the user
         get(identifier /* string */, parent: any /*Store*/) {
@@ -880,7 +887,8 @@ These are the types available in MST. All types can be found in the `types` name
 * `types.literal(value)` can be used to create a literal type, where the only possible value is specifically that value. This is very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
 * `types.enumeration(name?, options: string[])` creates an enumeration. This method is a shorthand for a union of string literals.
 * `types.refinement(name?, baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
-* `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(null)), null)`.
+* `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(undefined)), undefined)`.
+* `types.maybeNull(type)` like `maybe`, but uses `null` to represent the absence of a value.
 * `types.null` the type of `null`
 * `types.undefined` the type of `undefined`
 * `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
@@ -890,7 +898,8 @@ These are the types available in MST. All types can be found in the `types` name
 ## Property types
 
 Property types can only be used as a direct member of a `types.model` type and not further composed (for now).
-* `types.identifier(subType?)` Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](#identifiers) for more details. `subType` should be either `types.string` or `types.number`, defaulting to the first if not specified.
+* `types.identifier` Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](#identifiers) for more details. `subType` should be either `types.string` or `types.number`, defaulting to the first if not specified.
+* `types.identifierNumber` Similar to `types.identifier`. However, during serialization, the identifier value will be parsed from / serialized to a number
 * `types.reference(targetType)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
 
 ## LifeCycle hooks for `types.model`
@@ -931,7 +940,7 @@ types
 | `preProcessSnapshot` | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be a _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. This hook is not called for individual property updates. _**Note 1: Unlike the other hooks, this one is _not_ created as part of the `actions` initializer, but directly on the type!**_ _**Note 2: The `preProcessSnapshot` transformation must be pure; it should not modify its original input argument!**_ |
 | `afterCreate`   | Immediately after an instance is created and initial values are applied. Children will fire this event before parents. You can't make assumptions about the parent safely, use `afterAttach` if you need to.                                     |
 | `afterAttach`   | As soon as the _direct_ parent is assigned (this node is attached to another node). If an element is created as part of a parent, `afterAttach` is also fired. Unlike `afterCreate`, `afterAttach` will fire breadth first. So, in `afterAttach` one can safely make assumptions about the parent, but in `afterCreate` not |
-| `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot.
+| `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot. _**Note: Unlike the other hooks, this one is _not_ created as part of the `actions` initializer, but directly on the type!**_
 | `beforeDetach`  | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used             |
 | `beforeDestroy` | Called before the node is destroyed, as a result of calling `destroy`, or by removing or replacing the node from the tree. Child destructors will fire before parents |
 
@@ -987,6 +996,7 @@ See the [full API docs](API.md) for more details.
 | [`resolve(node, path)`](API.md#resolve) | Resolves a `path` (json path) relatively to the given `node` |
 | [`resolveIdentifier(type, target, identifier)`](API.md#resolveidentifier) | resolves an identifier of a given type in a model tree |
 | [`resolvePath(target, path)`](API.md#resolvepath) | resolves a JSON path, starting at the specified target |
+| [`setLivelynessChecking("warn" | "ignore" | "error")`](API.md#setlivelynesschecking) | Defines what MST should do when running into reads / writes to objects that have died. By default it will print a warning. Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place |
 | [`splitJsonPath(path)`](API.md#splitjsonpath) | Splits and unescapes the given JSON `path` into path parts |
 | [`typecheck(type, value)`](API.md#typecheck) | Typechecks a value against a type. Throws on errors. Use this if you need typechecks even in a production build. |
 | [`tryResolve(node, path)`](API.md#tryresolve) | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
@@ -1130,7 +1140,7 @@ MST doesn't offer an any type because it can't reason about it. For example, giv
 
 ### How does reconciliation work?
 
-* When applying snapshots, MST will always try to reuse existing object instances for snapshots with the same identifier (see `types.identifier()`).
+* When applying snapshots, MST will always try to reuse existing object instances for snapshots with the same identifier (see `types.identifier`).
 * If no identifier is specified, but the type of the snapshot is correct, MST will reconcile objects as well if they are stored in a specific model property or under the same map key.
 * In arrays, items without an identifier are never reconciled.
 
@@ -1160,9 +1170,11 @@ Yes, with MST it is pretty straight forward to setup hot reloading for your stor
 
 ### TypeScript & MST
 
-TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is recommended to use TypeScript 2.3 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
+TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is required to use TypeScript 2.8 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
 
 We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occassionally you will need to fallback to `any` or manually adding type annotations.
+
+Flow is not supported
 
 #### Using a MST type at design time
 
@@ -1191,29 +1203,6 @@ A partial solution for this is to turn the `.Type` into an interface.
 type ITodoType = typeof Todo.Type;
 interface ITodo extends ITodoType {};
 ```
-
-#### Snapshot types are limited
-
-Until conditionally mapped types are available (scheduled for TS 2.8), the types of snapshots cannot be inferred correctly. But you will get some type assistence when using `getSnaphot` with types, like this:
-
-```javascript
-const snapshot = getSnapshot<typeof Car.SnapshotType>(car)
-```
-
-Tip: recycle the interface
-
-```javascript
-type ICarSnapshot = typeof Car.SnapshotType
-const snapshot = getSnapshot<ICarSnapshot>(car)
-```
-
-For lazy folks:
-
-```javascript
-const snapshot = getSnapshot<any>(car)
-```
-
-_note: Even when typing snapshots, they will still not be as accurate as they could be until TS 2.8_
 
 #### Typing `self` in actions and views
 
@@ -1409,10 +1398,15 @@ So far this might look a lot like an immutable state tree as found for example i
 ## Contributing
 
 1. Clone this repository
-2. Run `yarn run bootstrap` and `yarn run build` once.
+2. Yarn is the package manager of choice. Make sure to run Node 8 or higher.
+2. Run `yarn install && yarn run bootstrap`.
+3. Run `yarn build` at least once in `packages/mobx-state-tree`
+3. For MST changes: go to `packages/mobx-state-tree` and run `yarn watch` (the test runner is Jest)
+3. Editor settings are optimized for VS Code, so just run `code .` in the root folder. Debugger settings are included in the project.
+3. After updating jsdocs, best run `yarn build-docs`
+3. When creating PRs, make sure to check the travis build, it will run some tests which are by default not run locally
 3. Extensive pull requests are best discussed in an issue first
 3. Have fun!
-
 
 ## Thanks!
 

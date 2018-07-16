@@ -1,4 +1,14 @@
-import { IType, fail, ObjectNode, splitJsonPath, joinJsonPath, ScalarNode } from "../../internal"
+import {
+    IType,
+    fail,
+    ObjectNode,
+    splitJsonPath,
+    joinJsonPath,
+    ScalarNode,
+    IChildNodesMap,
+    IAnyType,
+    EMPTY_ARRAY
+} from "../../internal"
 
 export enum NodeLifeCycle {
     INITIALIZING, // setting up
@@ -9,7 +19,7 @@ export enum NodeLifeCycle {
 }
 
 export interface INode {
-    readonly type: IType<any, any>
+    readonly type: IAnyType
     readonly storedValue: any
     readonly path: string
     readonly isRoot: boolean
@@ -31,7 +41,7 @@ export type IStateTreeNode = {
 }
 
 export interface IMembers {
-    properties: { [name: string]: IType<any, any> }
+    properties: { [name: string]: IAnyType }
     actions: Object
     views: Object
     volatile: Object
@@ -167,4 +177,17 @@ export function resolveNodeByPathParts(
         else return undefined
     }
     return current!
+}
+
+export function convertChildNodesToArray(childNodes: IChildNodesMap | null): INode[] {
+    if (!childNodes) return EMPTY_ARRAY as INode[]
+
+    const keys = Object.keys(childNodes)
+    if (!keys.length) return EMPTY_ARRAY as INode[]
+
+    const result = new Array(keys.length) as INode[]
+    keys.forEach((key, index) => {
+        result[index] = childNodes![key]
+    })
+    return result
 }

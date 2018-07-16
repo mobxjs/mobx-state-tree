@@ -39,14 +39,15 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [getType](#gettype)
 -   [hasParent](#hasparent)
 -   [hasParentOfType](#hasparentoftype)
--   [Identifier](#identifier)
 -   [IdentifierCache](#identifiercache)
+-   [IdentifierType](#identifiertype)
 -   [isAlive](#isalive)
 -   [isProtected](#isprotected)
 -   [isRoot](#isroot)
 -   [isStateTreeNode](#isstatetreenode)
 -   [joinJsonPath](#joinjsonpath)
 -   [ObjectNode](#objectnode)
+-   [ObservableMap](#observablemap)
 -   [onAction](#onaction)
 -   [onPatch](#onpatch)
 -   [onSnapshot](#onsnapshot)
@@ -57,6 +58,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [resolveIdentifier](#resolveidentifier)
 -   [resolvePath](#resolvepath)
 -   [ScalarNode](#scalarnode)
+-   [setLivelynessChecking](#setlivelynesschecking)
 -   [splitJsonPath](#splitjsonpath)
 -   [StoredReference](#storedreference)
 -   [tryResolve](#tryresolve)
@@ -79,10 +81,12 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [types.enumeration](#typesenumeration)
 -   [types.frozen](#typesfrozen)
 -   [types.identifier](#typesidentifier)
+-   [types.identifierNumber](#typesidentifiernumber)
 -   [types.late](#typeslate)
 -   [types.literal](#typesliteral)
 -   [types.map](#typesmap)
 -   [types.maybe](#typesmaybe)
+-   [types.maybeNull](#typesmaybenull)
 -   [types.model](#typesmodel)
 -   [types.null](#typesnull)
 -   [types.number](#typesnumber)
@@ -298,12 +302,15 @@ const box = Box.create()
 console.log(getChildType(box, "x").name) // 'number'
 ```
 
-Returns **IType&lt;any, any>** 
+Returns **IAnyType** 
 
 ## getEnv
 
 Returns the environment of the current state tree. For more info on environments,
 see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
+
+Please note that in child nodes access to the root is only possible
+once the `afterAttach` hook has fired
 
 Returns an empty environment if the tree wasn't initialized with an environment
 
@@ -316,6 +323,7 @@ Returns **any**
 ## getIdentifier
 
 Returns the identifier of the target node.
+This is the _string normalized_ identifier, which might not match the type of the identifier attribute
 
 **Parameters**
 
@@ -340,6 +348,9 @@ Returns the immediate parent of this object, or throws.
 Note that the immediate parent can be either an object, map or array, and
 doesn't necessarily refer to the parent model
 
+Please note that in child nodes access to the root is only possible
+once the `afterAttach` hook has fired
+
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
@@ -354,7 +365,7 @@ Returns the target's parent of a given type, or throws.
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `type` **IType&lt;any, any>** 
+-   `type` **IAnyType** 
 
 Returns **any** 
 
@@ -394,6 +405,9 @@ Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 Given an object in a model tree, returns the root object of that tree
 
+Please note that in child nodes access to the root is only possible
+once the `afterAttach` hook has fired
+
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
@@ -420,7 +434,7 @@ Returns the _actual_ type of the given tree node. (Or throws)
 
 -   `object` **IStateTreeNode** 
 
-Returns **IType&lt;S, T>** 
+Returns **IAnyType** 
 
 ## hasParent
 
@@ -440,13 +454,13 @@ Given a model instance, returns `true` if the object has a parent of given type,
 **Parameters**
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `type` **IType&lt;any, any>** 
+-   `type` **IAnyType** 
 
 Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
 
-## Identifier
-
 ## IdentifierCache
+
+## IdentifierType
 
 ## isAlive
 
@@ -500,6 +514,8 @@ Generates a json-path compliant json path from path parts
 Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 ## ObjectNode
+
+## ObservableMap
 
 ## onAction
 
@@ -656,7 +672,7 @@ Returns undefined if no value can be found.
 
 **Parameters**
 
--   `type` **IType&lt;any, any>** 
+-   `type` **IAnyType** 
 -   `target` **IStateTreeNode** 
 -   `identifier` **([string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number))** 
 
@@ -675,6 +691,18 @@ Returns undefined if no value can be found.
 Returns **any** 
 
 ## ScalarNode
+
+## setLivelynessChecking
+
+Defines what MST should do when running into reads / writes to objects that have died.
+By default it will print a warning.
+Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place
+
+Possible values: `"warn"`, `"error"` and `"ignore"`
+
+**Parameters**
+
+-   `mode` **LivelynessMode** 
 
 ## splitJsonPath
 
@@ -725,7 +753,7 @@ Use this if you need typechecks even in a production build (by default all autom
 
 **Parameters**
 
--   `type` **IType&lt;any, any>** 
+-   `type` **IAnyType** 
 -   `value` **any** 
 
 ## types.array
@@ -776,6 +804,8 @@ const Thing = types.model({
 Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
 Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 ## types.custom
 
@@ -871,12 +901,22 @@ This is useful to store complex, but immutable values like vectors etc. It can f
 
 Note: if you want to store free-form state that is mutable, or not serializeable, consider using volatile state instead.
 
+Frozen properties can be defined in three different ways
+1\. `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type
+2\. `types.frozen({ someDefaultValue: true})` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
+3\. `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
+
+**Parameters**
+
+-   `arg`  
+-   `defaultValueOrType` **([Type](#type) | value)** 
+
 **Examples**
 
 ```javascript
 const GameCharacter = types.model({
   name: string,
-  location: types.frozen
+  location: types.frozen({ x: 0, y: 0})
 })
 
 const hero = GameCharacter.create({
@@ -888,6 +928,15 @@ hero.location = { x: 10, y: 2 } // OK
 hero.location.x = 7 // Not ok!
 ```
 
+```javascript
+type Point = { x: number, y: number }
+   const Mouse = types.model({
+        loc: types.frozen<Point>()
+   })
+```
+
+Returns **[Type](#type)** 
+
 ## types.identifier
 
 Identifiers are used to make references, lifecycle events and reconciling works.
@@ -896,15 +945,26 @@ For example there couldn't be 2 instances of user with id 1. If you need more, c
 Identifier can be used only as type property of a model.
 This type accepts as parameter the value type of the identifier field that can be either string or number.
 
-**Parameters**
+**Examples**
 
--   `baseType` **IType&lt;T, T>** 
+```javascript
+const Todo = types.model("Todo", {
+     id: types.identifier,
+     title: types.string
+ })
+```
+
+Returns **IType&lt;T, T>** 
+
+## types.identifierNumber
+
+Similar to `types.identifier`, but `identifierNumber` will serialize from / to a number when applying snapshots
 
 **Examples**
 
 ```javascript
 const Todo = types.model("Todo", {
-     id: types.identifier(types.string),
+     id: types.identifierNumber,
      title: types.string
  })
 ```
@@ -975,7 +1035,7 @@ This type will always produce [observable maps](https://mobx.js.org/refguide/map
 
 ```javascript
 const Todo = types.model({
-  id: types.identifier(types.number),
+  id: types.identifier,
   task: types.string
 })
 
@@ -994,13 +1054,25 @@ Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/J
 
 ## types.maybe
 
-Maybe will make a type nullable, and also null by default.
+Maybe will make a type nullable, and also optional.
+The value `undefined` will be used to represent nullability.
 
 **Parameters**
 
 -   `type` **IType&lt;S, T>** The type to make nullable
 
-Returns **(IType&lt;(S | null | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)), (T | null)>)** 
+Returns **(IType&lt;(S | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)), (T | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined))>)** 
+
+## types.maybeNull
+
+Maybe will make a type nullable, and also optional.
+The value `null` will be used to represent no value.
+
+**Parameters**
+
+-   `type` **IType&lt;S, T>** The type to make nullable
+
+Returns **(IType&lt;(S | null), (T | null)>)** 
 
 ## types.model
 
@@ -1096,10 +1168,10 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Parameters**
 
--   `dispatchOrType` **(ITypeDispatcher | IType&lt;any, any>)** 
--   `otherTypes` **...[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IType&lt;any, any>>** 
+-   `optionsOrType` **(ITypeDispatcher | IAnyType)** 
+-   `otherTypes` **...[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IAnyType>** 
 
-Returns **IType&lt;any, any>** 
+Returns **IAnyType** 
 
 ## unescapeJsonPath
 

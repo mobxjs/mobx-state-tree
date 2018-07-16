@@ -8,7 +8,7 @@ exports.Treasure = types.model("Treasure", {
 exports.HeroRoles = ["warrior", "wizard", "cleric", "thief"]
 exports.Hero = types
     .model("Hero", {
-        id: types.identifier(types.number),
+        id: types.identifierNumber,
         name: types.string,
         description: types.string,
         level: types.optional(types.number, 1),
@@ -22,15 +22,15 @@ exports.Hero = types
 // large
 exports.Monster = types
     .model("Monster", {
-        id: types.identifier(types.string),
-        freestyle: types.frozen,
+        id: types.identifier,
+        freestyle: types.frozen(),
         level: types.number,
         maxHp: types.number,
         hp: types.number,
-        warning: types.maybe(types.string),
-        createdAt: types.maybe(types.Date),
+        warning: types.maybeNull(types.string),
+        createdAt: types.maybeNull(types.Date),
         treasures: types.optional(types.array(exports.Treasure), []),
-        eatenHeroes: types.maybe(types.array(exports.Hero)),
+        eatenHeroes: types.maybeNull(types.array(exports.Hero)),
         hasFangs: types.optional(types.boolean, false),
         hasClaws: types.optional(types.boolean, false),
         hasWings: types.optional(types.boolean, false),

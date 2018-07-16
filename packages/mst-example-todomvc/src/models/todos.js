@@ -12,7 +12,7 @@ const Todo = types
     .model({
         text: types.string,
         completed: false,
-        id: types.identifier(types.number)
+        id: types.identifierNumber
     })
     .actions(self => ({
         remove() {

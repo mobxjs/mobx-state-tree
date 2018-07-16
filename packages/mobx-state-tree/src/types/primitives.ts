@@ -17,7 +17,7 @@ import {
 } from "../internal"
 
 // TODO: implement CoreType using types.custom ?
-export class CoreType<S, T> extends Type<S, T> {
+export class CoreType<S, T> extends Type<S, S, T> {
     readonly shouldAttachNode = false
     readonly checker: (value: any) => boolean
     readonly flags: TypeFlags
@@ -146,7 +146,7 @@ export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, und
  * LogLine.create({ timestamp: new Date() })
  */
 // tslint:disable-next-line:variable-name
-export const DatePrimitive: IType<number, Date> = new CoreType<number, Date>(
+export const DatePrimitive: IType<number, number, Date> = new CoreType<number, Date>(
     "Date",
     TypeFlags.Date,
     (v: any) => typeof v === "number" || v instanceof Date,

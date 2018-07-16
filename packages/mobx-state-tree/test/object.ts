@@ -1,4 +1,3 @@
-import { unprotect } from "../src/core/mst-operations"
 import {
     destroy,
     detach,
@@ -9,7 +8,9 @@ import {
     applyAction,
     applySnapshot,
     getSnapshot,
-    types
+    unprotect,
+    types,
+    setLivelynessChecking
 } from "../src"
 import { autorun, reaction, observable } from "mobx"
 
@@ -66,6 +67,30 @@ const createTestFactories = () => {
     })
     return { Factory, ComputedFactory, ComputedFactory2, BoxFactory, ColorFactory }
 }
+
+const createFactoryWithChildren = () => {
+    const File = types
+        .model("File", {
+            name: types.string
+        })
+        .actions(self => ({
+            rename(value: string) {
+                self.name = value
+            }
+        }))
+
+    const Folder = types
+        .model("Folder", {
+            name: types.string,
+            files: types.array(File)
+        })
+        .actions(self => ({
+            rename(value: string) {
+                self.name = value
+            }
+        }))
+    return Folder
+}
 // === FACTORY TESTS ===
 test("it should create a factory", () => {
     const { Factory } = createTestFactories()
@@ -89,6 +114,44 @@ test("it should emit snapshots", () => {
     doc.to = "universe"
     expect(snapshots).toEqual([{ to: "universe" }])
 })
+
+test("it should emit snapshots for children", () => {
+    const Factory = createFactoryWithChildren()
+    const folder = Factory.create({
+        name: "Photos to sort",
+        files: [
+            {
+                name: "Photo1"
+            },
+            {
+                name: "Photo2"
+            }
+        ]
+    })
+    let snapshots: any[] = []
+    onSnapshot(folder, snapshot => snapshots.push(snapshot))
+    folder.rename("Vacation photos")
+    expect(snapshots[0]).toEqual({
+        name: "Vacation photos",
+        files: [{ name: "Photo1" }, { name: "Photo2" }]
+    })
+
+    onSnapshot(folder.files[0], snapshot => snapshots.push(snapshot))
+    folder.files[0].rename("01-arrival")
+    expect(snapshots[1]).toEqual({
+        name: "Vacation photos",
+        files: [{ name: "01-arrival" }, { name: "Photo2" }]
+    })
+    expect(snapshots[2]).toEqual({ name: "01-arrival" })
+
+    folder.files[1].rename("02-hotel")
+    expect(snapshots[3]).toEqual({
+        name: "Vacation photos",
+        files: [{ name: "01-arrival" }, { name: "02-hotel" }]
+    })
+    expect(snapshots[4]).not.toBeDefined()
+})
+
 test("it should apply snapshots", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
@@ -96,11 +159,23 @@ test("it should apply snapshots", () => {
     expect(getSnapshot(doc)).toEqual({ to: "universe" })
 })
 test("it should apply and accept null value for types.maybe(complexType)", () => {
-    const Item = types.model({
+    const Item = types.model("Item", {
         value: types.string
     })
-    const Model = types.model({
+    const Model = types.model("Model", {
         item: types.maybe(Item)
+    })
+    const myModel = Model.create()
+    applySnapshot(myModel, { item: { value: "something" } })
+    applySnapshot(myModel, { item: undefined })
+    expect(getSnapshot(myModel)).toEqual({ item: undefined })
+})
+test("it should apply and accept null value for types.maybeNull(complexType)", () => {
+    const Item = types.model("Item", {
+        value: types.string
+    })
+    const Model = types.model("Model", {
+        item: types.maybeNull(Item)
     })
     const myModel = Model.create()
     applySnapshot(myModel, { item: { value: "something" } })
@@ -210,29 +285,73 @@ test("it should throw if a replaced object is read or written to", () => {
     s.todo = Todo.create({ title: "4" })
     expect(s.todo.title).toBe("4")
 
+    setLivelynessChecking("error")
     // try reading old todo
     const err =
-        "[mobx-state-tree] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo')."
+        "You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo'). Either detach nodes first, or don't use objects after removing / replacing them in the tree"
     expect(() => {
         todo.fn()
-    }).toThrowError(err)
+    }).toThrow(err)
     expect(() => {
         todo.title
-    }).toThrowError(err)
+    }).toThrow(err)
     expect(() => {
         todo.title = "5"
-    }).toThrowError(err)
+    }).toThrow(err)
+})
+
+test("it should warn if a replaced object is read or written to", () => {
+    const Todo = types
+        .model("Todo", {
+            title: "test"
+        })
+        .actions(self => {
+            function fn() {}
+            return {
+                fn
+            }
+        })
+    const Store = types.model("Store", {
+        todo: Todo
+    })
+    const s = Store.create({
+        todo: { title: "3" }
+    })
+    unprotect(s)
+    const todo = s.todo
+    s.todo = Todo.create({ title: "4" })
+    expect(s.todo.title).toBe("4")
+
+    // try reading old todo
+    setLivelynessChecking("warn")
+    const bwarn = console.warn
+    try {
+        const mock = (console.warn = jest.fn())
+        todo.fn()
+        todo.title
+        unprotect(todo)
+        todo.title = "5"
+        expect(mock.mock.calls).toMatchSnapshot()
+    } finally {
+        console.warn = bwarn
+    }
 })
 
 // === COMPOSE FACTORY ===
 test("it should compose factories", () => {
     const { BoxFactory, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(BoxFactory, ColorFactory)
+    const ComposedFactory = types.compose(
+        BoxFactory,
+        ColorFactory
+    )
     expect(getSnapshot(ComposedFactory.create())).toEqual({ width: 0, height: 0, color: "#FFFFFF" })
 })
 test("it should compose factories with computed properties", () => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2)
+    const ComposedFactory = types.compose(
+        ColorFactory,
+        ComputedFactory2
+    )
     const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
     expect(getSnapshot(store)).toEqual({ props: { width: 100, height: 200 }, color: "#FFFFFF" })
     expect(store.area).toBe(20000)
@@ -241,7 +360,10 @@ test("it should compose factories with computed properties", () => {
 })
 test("it should compose multiple types with computed properties", () => {
     const { ComputedFactory2, ColorFactory } = createTestFactories()
-    const ComposedFactory = types.compose(ColorFactory, ComputedFactory2)
+    const ComposedFactory = types.compose(
+        ColorFactory,
+        ComputedFactory2
+    )
     const store = ComposedFactory.create({ props: { width: 100, height: 200 } })
     expect(getSnapshot(store)).toEqual({ props: { width: 100, height: 200 }, color: "#FFFFFF" })
     expect(store.area).toBe(20000)
@@ -350,8 +472,9 @@ test("it should check the type correctly", () => {
     expect(Factory.is({ wrongKey: true })).toEqual(true)
     expect(Factory.is({ to: 3 })).toEqual(false)
 })
+
 if (process.env.NODE_ENV !== "production") {
-    test("it should require complex fields to be present", () => {
+    test("complex map / array values are optional by default", () => {
         expect(
             types
                 .model({
@@ -364,7 +487,7 @@ if (process.env.NODE_ENV !== "production") {
                 .model({
                     todo: types.model({})
                 })
-                .create()
+                .create({} as any)
         ).toThrow()
         expect(
             types
@@ -372,28 +495,32 @@ if (process.env.NODE_ENV !== "production") {
                     todo: types.array(types.string)
                 })
                 .is({})
-        ).toBe(false) // TBD: or true?
-        expect(() =>
-            types
-                .model({
-                    todo: types.array(types.string)
-                })
-                .create()
-        ).toThrow()
+        ).toBe(true) // TBD: or true?
+        expect(
+            getSnapshot(
+                types
+                    .model({
+                        todo: types.array(types.string)
+                    })
+                    .create({})
+            )
+        ).toEqual({ todo: [] })
         expect(
             types
                 .model({
                     todo: types.map(types.string)
                 })
                 .is({})
-        ).toBe(false)
-        expect(() =>
-            types
-                .model({
-                    todo: types.map(types.string)
-                })
-                .create()
-        ).toThrow()
+        ).toBe(true)
+        expect(
+            getSnapshot(
+                types
+                    .model({
+                        todo: types.map(types.string)
+                    })
+                    .create({})
+            )
+        ).toEqual({ todo: {} })
     })
 }
 // === VIEW FUNCTIONS ===
@@ -457,11 +584,11 @@ test("it should consider primitives as proposed defaults", () => {
 })
 test("it should throw if a non-primitive value is provided and no default can be created", () => {
     expect(() => {
-        const Todo = types.model({
+        types.model({
             complex: {
                 a: 1,
                 b: 2
-            }
+            } as any
         })
     }).toThrow()
 })
@@ -515,10 +642,27 @@ test("It should throw if any other key is returned from extend", () => {
 
 test("782, TS + compose", () => {
     const User = types.model("User", {
-        id: types.identifier(types.string),
+        id: types.identifier,
         name: types.maybe(types.string),
         avatar: types.maybe(types.string)
     })
 
     const user = User.create({ id: "someId" })
 })
+
+if (process.env.NODE_ENV === "development")
+    test("beautiful errors", () => {
+        expect(() => {
+            types.model("User", { x: (types.identifier as any)() })
+        }).toThrow("types.identifier is not a function")
+        expect(() => {
+            types.model("User", { x: { bla: true } as any })
+        }).toThrow(
+            "Invalid type definition for property 'x', it looks like you passed an object. Try passing another model type or a types.frozen"
+        )
+        expect(() => {
+            types.model("User", { x: function() {} as any })
+        }).toThrow(
+            "Invalid type definition for property 'x', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?"
+        )
+    })

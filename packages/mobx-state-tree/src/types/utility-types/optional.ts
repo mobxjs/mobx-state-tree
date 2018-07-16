@@ -10,15 +10,16 @@ import {
     IValidationResult,
     typecheck,
     typeCheckSuccess,
-    fail
+    fail,
+    IAnyType
 } from "../../internal"
 
 export type IFunctionReturn<T> = () => T
-export type IOptionalValue<S, T> = S | T | IFunctionReturn<S> | IFunctionReturn<T>
+export type IOptionalValue<C, S, T> = C | S | T | IFunctionReturn<C | S | T>
 
-export class OptionalValue<S, T> extends Type<S, T> {
-    readonly type: IType<S, T>
-    readonly defaultValue: IOptionalValue<S, T>
+export class OptionalValue<C, S, T> extends Type<C, S, T> {
+    readonly type: IType<C, S, T>
+    readonly defaultValue: IOptionalValue<C, S, T>
 
     get flags() {
         return this.type.flags | TypeFlags.Optional
@@ -28,7 +29,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.shouldAttachNode
     }
 
-    constructor(type: IType<S, T>, defaultValue: IOptionalValue<S, T>) {
+    constructor(type: IType<C, S, T>, defaultValue: IOptionalValue<C, S, T>) {
         super(type.name)
         this.type = type
         this.defaultValue = defaultValue
@@ -40,10 +41,7 @@ export class OptionalValue<S, T> extends Type<S, T> {
 
     instantiate(parent: INode, subpath: string, environment: any, value: S): INode {
         if (typeof value === "undefined") {
-            const defaultValue = this.getDefaultValue()
-            const defaultSnapshot = isStateTreeNode(defaultValue)
-                ? getStateTreeNode(defaultValue).snapshot
-                : defaultValue
+            const defaultSnapshot = this.getDefaultValueSnapshot()
             return this.type.instantiate(parent, subpath, environment, defaultSnapshot)
         }
         return this.type.instantiate(parent, subpath, environment, value)
@@ -63,6 +61,13 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return defaultValue
     }
 
+    public getDefaultValueSnapshot() {
+        const defaultValue = this.getDefaultValue()
+        return isStateTreeNode(defaultValue)
+            ? getStateTreeNode(defaultValue).snapshot
+            : defaultValue
+    }
+
     isValidSnapshot(value: any, context: IContext): IValidationResult {
         // defaulted values can be skipped
         if (value === undefined) {
@@ -72,15 +77,19 @@ export class OptionalValue<S, T> extends Type<S, T> {
         return this.type.validate(value, context)
     }
 
-    isAssignableFrom(type: IType<any, any>) {
+    isAssignableFrom(type: IAnyType) {
         return this.type.isAssignableFrom(type)
     }
 }
 
-export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: S): IType<S, T>
-export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: T): IType<S, T>
-export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => S): IType<S, T>
-export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => T): IType<S, T>
+export function optional<C, S, T>(
+    type: IType<C, S, T>,
+    defaultValueOrFunction: C | S | T
+): IType<C | undefined, S, T> & { flags: TypeFlags.Optional }
+export function optional<C, S, T>(
+    type: IType<C, S, T>,
+    defaultValueOrFunction: () => C | S | T
+): IType<C, S, T> & { flags: TypeFlags.Optional }
 /**
  * `types.optional` can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
@@ -100,7 +109,7 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: () => 
  * @export
  * @alias types.optional
  */
-export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): IType<S, T> {
+export function optional(type: IAnyType, defaultValueOrFunction: any): IAnyType {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
             fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
@@ -116,6 +125,6 @@ export function optional<S, T>(type: IType<S, T>, defaultValueOrFunction: any): 
     return new OptionalValue(type, defaultValueOrFunction)
 }
 
-export function isOptionalType(type: any): type is OptionalValue<any, any> {
+export function isOptionalType(type: any): type is OptionalValue<any, any, any> {
     return isType(type) && (type.flags & TypeFlags.Optional) > 0
 }

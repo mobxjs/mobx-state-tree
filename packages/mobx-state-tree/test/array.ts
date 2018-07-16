@@ -9,7 +9,8 @@ import {
     applySnapshot,
     getSnapshot,
     types,
-    IJsonPatch
+    IJsonPatch,
+    setLivelynessChecking
 } from "../src"
 import { observable } from "mobx"
 const createTestFactories = () => {
@@ -166,7 +167,7 @@ test("items should be reconciled correctly when splicing - 1", () => {
         d = Task.create({ x: "d" })
     const store = types
         .model({
-            todos: types.optional(types.array(Task), [])
+            todos: types.array(Task)
         })
         .create({
             todos: [a]
@@ -183,8 +184,10 @@ test("items should be reconciled correctly when splicing - 1", () => {
     expect(isAlive(a)).toBe(false)
     expect(isAlive(b)).toBe(true)
     expect(isAlive(c)).toBe(false)
+
+    setLivelynessChecking("error")
     expect(() => store.todos.splice(0, 1, a, c, d)).toThrowError(
-        "[mobx-state-tree] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Task')."
+        "[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Task'). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
     )
     store.todos.splice(0, 1, clone(a), clone(c), clone(d))
     expect(store.todos.map(_ => _.x)).toEqual(["a", "c", "d"])
@@ -238,7 +241,7 @@ test("it should reconciliate keyed instances correctly", () => {
         todos: types.optional(
             types.array(
                 types.model("Task", {
-                    id: types.identifier(),
+                    id: types.identifier,
                     task: "",
                     done: false
                 })
@@ -292,7 +295,7 @@ test("it correctly reconciliate when swapping", () => {
 test("it correctly reconciliate when swapping using snapshots", () => {
     const Task = types.model("Task", {})
     const Store = types.model({
-        todos: types.optional(types.array(Task), [])
+        todos: types.array(Task)
     })
     const s = Store.create()
     unprotect(s)

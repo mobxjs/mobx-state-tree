@@ -13,7 +13,7 @@ import { IObservableArray } from "mobx"
 
 const TimeTraveller = types
     .model("TimeTraveller", {
-        history: types.optional(types.array(types.frozen), []),
+        history: types.array(types.frozen()),
         undoIdx: -1,
         targetPath: ""
     })

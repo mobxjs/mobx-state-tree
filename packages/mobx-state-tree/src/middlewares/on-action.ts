@@ -208,30 +208,26 @@ export function onAction(
             )
     }
 
-    function fireListener(rawCall: IMiddlewareEvent) {
+    return addMiddleware(target, function handler(rawCall, next) {
         if (rawCall.type === "action" && rawCall.id === rawCall.rootId) {
             const sourceNode = getStateTreeNode(rawCall.context)
-            listener({
+            const info = {
                 name: rawCall.name,
                 path: getRelativePathBetweenNodes(getStateTreeNode(target), sourceNode),
                 args: rawCall.args.map((arg: any, index: number) =>
                     serializeArgument(sourceNode, rawCall.name, index, arg)
                 )
-            })
+            }
+            if (attachAfter) {
+                const res = next(rawCall)
+                listener(info)
+                return res
+            } else {
+                listener(info)
+                return next(rawCall)
+            }
+        } else {
+            return next(rawCall)
         }
-    }
-
-    return addMiddleware(
-        target,
-        attachAfter
-            ? function onActionMiddleware(rawCall, next) {
-                  const res = next(rawCall)
-                  fireListener(rawCall)
-                  return res
-              }
-            : function onActionMiddleware(rawCall, next) {
-                  fireListener(rawCall)
-                  return next(rawCall)
-              }
-    )
+    })
 }

@@ -20,7 +20,7 @@ if (process.env.NODE_ENV !== "production") {
             )
         })
         expect(() => {
-            Factory.create({ number: "givenStringInstead" })
+            Factory.create({ number: "givenStringInstead" } as any)
         }).toThrowError(
             `[mobx-state-tree] Error while converting \`{\"number\":\"givenStringInstead\"}\` to \`AnonymousModel\`:\n\n    at path \"/number\" value \`\"givenStringInstead\"\` is not assignable to type: \`positive number\` (Value is not a number).`
         )
@@ -39,7 +39,7 @@ if (process.env.NODE_ENV !== "production") {
             )
         })
         expect(() => {
-            Factory.create({ number: "givenStringInstead" })
+            Factory.create({ number: "givenStringInstead" } as any)
         }).toThrowError(
             `[mobx-state-tree] Error while converting \`{\"number\":\"givenStringInstead\"}\` to \`AnonymousModel\`:\n\n    at path \"/number\" value \`\"givenStringInstead\"\` is not assignable to type: \`number\` (Value is not a number).`
         )

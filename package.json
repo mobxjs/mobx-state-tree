@@ -25,6 +25,6 @@
 		"husky": "^0.13.4",
 		"lerna": "^2.4.0",
 		"lint-staged": "^3.6.1",
-		"prettier": "^1.4.4"
+		"prettier": "^1.13.6"
 	}
 }

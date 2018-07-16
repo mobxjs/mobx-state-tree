@@ -15,67 +15,72 @@ import {
     IStateTreeNode,
     IJsonPatch,
     getType,
-    ObjectNode
+    ObjectNode,
+    IChildNodesMap
 } from "../../internal"
 
 export enum TypeFlags {
-    String = 1 << 0,
-    Number = 1 << 1,
-    Boolean = 1 << 2,
-    Date = 1 << 3,
-    Literal = 1 << 4,
-    Array = 1 << 5,
-    Map = 1 << 6,
-    Object = 1 << 7,
-    Frozen = 1 << 8,
-    Optional = 1 << 9,
-    Reference = 1 << 10,
-    Identifier = 1 << 11,
-    Late = 1 << 12,
-    Refinement = 1 << 13,
-    Union = 1 << 14,
-    Null = 1 << 15,
-    Undefined = 1 << 16
+    String = 1,
+    Number = 2,
+    Boolean = 4,
+    Date = 8,
+    Literal = 16,
+    Array = 32,
+    Map = 64,
+    Object = 128,
+    Frozen = 256,
+    Optional = 512,
+    Reference = 1024,
+    Identifier = 2048,
+    Late = 4096,
+    Refinement = 8192,
+    Union = 16384,
+    Null = 32768,
+    Undefined = 65536
 }
 
-export interface ISnapshottable<S> {}
+export interface ISnapshottable<S> {} // TODO: kill this?
 
-export interface IType<S, T> {
+export interface IType<C, S, T> {
     name: string
     flags: TypeFlags
-    is(thing: any): thing is S | T
+    is(thing: any): thing is C | S | T
     validate(thing: any, context: IContext): IValidationResult
-    create(snapshot?: S, environment?: any): T
+    create(snapshot?: C, environment?: any): T
     isType: boolean
     describe(): string
     Type: T
     SnapshotType: S
+    CreationType: C
 
     // Internal api's
     instantiate(parent: INode | null, subpath: string, environment: any, initialValue?: any): INode
+    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null
     reconcile(current: INode, newValue: any): INode
     getValue(node: INode): T
     getSnapshot(node: INode, applyPostProcess?: boolean): S
-    applySnapshot(node: INode, snapshot: S): void
+    applySnapshot(node: INode, snapshot: C): void
     applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void
     getChildren(node: INode): ReadonlyArray<INode>
     getChildNode(node: INode, key: string): INode
-    getChildType(key: string): IType<any, any>
+    getChildType(key: string): IAnyType
     removeChild(node: INode, subpath: string): void
-    isAssignableFrom(type: IType<any, any>): boolean
+    isAssignableFrom(type: IAnyType): boolean
     shouldAttachNode: boolean
 }
 
-export interface ISimpleType<T> extends IType<T, T> {}
+export type IAnyType = IType<any, any, any>
 
-export interface IComplexType<S, T> extends IType<S, T & IStateTreeNode> {
-    create(snapshot?: S, environment?: any): T & { toJSON?(): S } & ISnapshottable<S>
+export interface ISimpleType<T> extends IType<T, T, T> {}
+
+export interface IComplexType<C, S, T> extends IType<C, S, T & IStateTreeNode> {
+    create(snapshot?: C, environment?: any): T & { toJSON?(): S } & ISnapshottable<S>
 }
 
 /*
  * A complex type produces a MST node (Node in the state tree)
  */
-export abstract class ComplexType<S, T> implements IType<S, T> {
+export abstract class ComplexType<C, S, T> implements IType<C, S, T> {
     readonly isType = true
     readonly name: string
 
@@ -84,9 +89,12 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     }
 
     @action
-    create(snapshot: S = this.getDefaultSnapshot(), environment?: any) {
+    create(snapshot: C = this.getDefaultSnapshot(), environment?: any) {
         typecheck(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).value
+    }
+    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null {
+        return null
     }
 
     abstract instantiate(
@@ -106,13 +114,13 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
     abstract getValue(node: INode): T
     abstract getSnapshot(node: INode, applyPostProcess?: boolean): any
     abstract applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void
-    abstract getChildType(key: string): IType<any, any>
+    abstract getChildType(key: string): IAnyType
     abstract removeChild(node: INode, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
     abstract shouldAttachNode: boolean
 
-    isAssignableFrom(type: IType<any, any>): boolean {
-        return type === this
+    isAssignableFrom(type: IAnyType): boolean {
+        return type === (this as any)
     }
 
     validate(value: any, context: IContext): IValidationResult {
@@ -141,7 +149,7 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
             isMutable(newValue) &&
             !isStateTreeNode(newValue) &&
             (!current.identifierAttribute ||
-                current.identifier === newValue[current.identifierAttribute])
+                current.identifier === "" + newValue[current.identifierAttribute])
         ) {
             // the newValue has no node, so can be treated like a snapshot
             // we can reconcile
@@ -172,9 +180,14 @@ export abstract class ComplexType<S, T> implements IType<S, T> {
             "Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`"
         )
     }
+    get CreationType(): C {
+        return fail(
+            "Factory.CreationType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.CreationType`"
+        )
+    }
 }
 
-export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T> {
+export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements IType<C, S, T> {
     constructor(name: string) {
         super(name)
     }
@@ -198,7 +211,7 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
         return undefined
     }
 
-    applySnapshot(node: INode, snapshot: S): void {
+    applySnapshot(node: INode, snapshot: C): void {
         fail("Immutable types do not support applying snapshots")
     }
 
@@ -214,7 +227,7 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
         return fail(`No child '${key}' available in type: ${this.name}`)
     }
 
-    getChildType(key: string): IType<any, any> {
+    getChildType(key: string): IAnyType {
         return fail(`No child '${key}' available in type: ${this.name}`)
     }
 
@@ -236,6 +249,6 @@ export abstract class Type<S, T> extends ComplexType<S, T> implements IType<S, T
     }
 }
 
-export function isType(value: any): value is IType<any, any> {
+export function isType(value: any): value is IAnyType {
     return typeof value === "object" && value && value.isType === true
 }

@@ -5,7 +5,7 @@
   "description": "Runnable source code of the #GoReactive #mobservable talk",
   "scripts": {
     "start": "node server.js",
-    "_test": "jest"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -40,7 +40,7 @@
     "mobx": "^4.0.2",
     "mobx-react": "^5.0.0",
     "mobx-react-devtools": "^5.0.1",
-    "mobx-state-tree": "^2.2.0",
+    "mobx-state-tree": "3.0.0-beta.2",
     "node-uuid": "^1.4.3",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",

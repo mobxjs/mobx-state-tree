@@ -4524,9 +4524,9 @@ mobx-react@^5.2.3:
     hoist-non-react-statics "^2.5.0"
     react-lifecycles-compat "^3.0.2"
 
-mobx-state-tree@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/mobx-state-tree/-/mobx-state-tree-2.2.0.tgz#10bb84e090ed7700333ac52d05b304579fc78dc4"
+mobx-state-tree@3.0.0-beta.2:
+  version "3.0.0-beta.2"
+  resolved "https://registry.yarnpkg.com/mobx-state-tree/-/mobx-state-tree-3.0.0-beta.2.tgz#a53b02a3314091d74c10c65165255214e3f64c47"
 
 mobx@^5.0.3:
   version "5.0.3"
@@ -4536,9 +4536,9 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
-mst-middlewares@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/mst-middlewares/-/mst-middlewares-2.2.0.tgz#aeeff9a7111b0373c90fe838e59f0807da79386b"
+mst-middlewares@3.0.0-beta.2:
+  version "3.0.0-beta.2"
+  resolved "https://registry.yarnpkg.com/mst-middlewares/-/mst-middlewares-3.0.0-beta.2.tgz#872ef085bc8d34255c129966a63c26d00c9e3506"
 
 multicast-dns-service-types@^1.1.0:
   version "1.1.0"

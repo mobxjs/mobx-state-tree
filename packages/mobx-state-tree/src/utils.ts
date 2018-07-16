@@ -1,4 +1,4 @@
-import { isObservableArray, $mobx } from "mobx"
+import { isObservableArray, $mobx, getAtom } from "mobx"
 
 declare const global: any
 
@@ -29,7 +29,7 @@ export function isArray(val: any): boolean {
     return !!(Array.isArray(val) || isObservableArray(val)) as boolean
 }
 
-export function asArray<T>(val: undefined | null | T | T[]): T[] {
+export function asArray<T>(val: undefined | null | T | T[] | ReadonlyArray<T>): T[] {
     if (!val) return (EMPTY_ARRAY as any) as T[]
     if (isArray(val)) return val as T[]
     return [val] as T[]
@@ -174,6 +174,11 @@ export function argsToArray(args: IArguments): any[] {
     const res = new Array(args.length)
     for (let i = 0; i < args.length; i++) res[i] = args[i]
     return res
+}
+
+export function invalidateComputed(target: any, propName: string) {
+    const atom = getAtom(target, propName) as any
+    atom.trackAndCompute()
 }
 
 export type DeprecatedFunction = Function & { ids?: { [id: string]: true } }

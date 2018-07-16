@@ -67,6 +67,9 @@ function createTestStore(listener) {
         Todo
     }
 }
+
+// NOTE: as we defer creation (and thus, hooks) till first real access,
+// some of original hooks do not fire at all
 test("it should trigger lifecycle hooks", () => {
     const events: any[] = []
     const { store, Todo } = createTestStore(e => events.push(e))
@@ -80,25 +83,17 @@ test("it should trigger lifecycle hooks", () => {
     destroy(store)
     destroy(talk)
     expect(events).toEqual([
-        "new todo: Get coffee",
-        "new todo: Get biscuit",
-        "new todo: Give talk",
         "new store: 3",
-        "attach todo: Get coffee",
-        "attach todo: Get biscuit",
+        "new todo: Give talk",
         "attach todo: Give talk",
         "detach todo: Give talk",
         "-",
-        "custom disposer 2 for Get biscuit",
-        "custom disposer 1 for Get biscuit",
-        "destroy todo: Get biscuit",
+        "new todo: Get biscuit",
+        "attach todo: Get biscuit",
         "--",
         "new todo: add sugar",
         "attach todo: add sugar",
         "---",
-        "custom disposer 2 for Get coffee",
-        "custom disposer 1 for Get coffee",
-        "destroy todo: Get coffee",
         "custom disposer 2 for add sugar",
         "custom disposer 1 for add sugar",
         "destroy todo: add sugar",
@@ -109,21 +104,19 @@ test("it should trigger lifecycle hooks", () => {
         "destroy todo: Give talk"
     ])
 })
+type CarSnapshot = { id: string }
 const Car = types
-    .model({
+    .model("Car", {
         id: types.number
     })
-    .preProcessSnapshot(snapshot => Object.assign({}, snapshot, { id: parseInt(snapshot.id) * 2 }))
-    .actions(self => {
-        // TODO: Move to a separate type
-        function postProcessSnapshot(snapshot) {
-            return Object.assign({}, snapshot, { id: "" + snapshot.id / 2 })
-        }
-        return {
-            postProcessSnapshot
-        }
-    })
-const Factory = types.model({
+    .preProcessSnapshot<CarSnapshot>(snapshot =>
+        Object.assign({}, snapshot, { id: parseInt(snapshot.id) * 2 })
+    )
+    .postProcessSnapshot<CarSnapshot>(snapshot =>
+        Object.assign({}, snapshot, { id: "" + snapshot.id / 2 })
+    )
+
+const Factory = types.model("Factory", {
     car: Car
 })
 test("it should preprocess snapshots when creating", () => {
@@ -136,7 +129,7 @@ test("it should preprocess snapshots when updating", () => {
     applySnapshot(car, { id: "6" })
     expect(car.id).toBe(12)
 })
-test("it should postprocess snapshots when generating snapshot", () => {
+test("it should postprocess snapshots when generating snapshot - 1", () => {
     const car = Car.create({ id: "1" })
     expect(car.id).toBe(2)
     expect(getSnapshot(car)).toEqual({ id: "1" })
@@ -163,7 +156,7 @@ test("it should preprocess snapshots when updating", () => {
     applySnapshot(f, { car: { id: "6" } })
     expect(f.car.id).toBe(12)
 })
-test("it should postprocess snapshots when generating snapshot", () => {
+test("it should postprocess snapshots when generating snapshot - 2", () => {
     const f = Factory.create({ car: { id: "1" } })
     expect(f.car.id).toBe(2)
     expect(getSnapshot(f)).toEqual({ car: { id: "1" } })
@@ -228,24 +221,19 @@ test("snapshot processors can be composed", () => {
         .model({
             x: 1
         })
-        .actions(self => ({
-            postProcessSnapshot(s) {
-                s.x += 3
-                return s
-            }
+        .preProcessSnapshot(s => ({
+            x: s.x! - 3
         }))
         .preProcessSnapshot(s => ({
-            x: s.x - 3
+            x: s.x! / 5
         }))
-        .actions(self => ({
-            postProcessSnapshot(s) {
-                s.x *= 5
-                return s
-            }
-        }))
-        .preProcessSnapshot(s => ({
-            x: s.x / 5
-        }))
+        .postProcessSnapshot(s => {
+            return { x: s.x + 3 }
+        })
+        .postProcessSnapshot(s => {
+            return { x: s.x * 5 }
+        })
+
     const x = X.create({ x: 25 })
     expect(x.x).toBe(2)
     expect(getSnapshot(x).x).toBe(25)

@@ -34,15 +34,19 @@ import {
     isPlainObject,
     TypeFlags,
     ObjectNode,
-    mobxShallow
+    mobxShallow,
+    IChildNodesMap,
+    convertChildNodesToArray,
+    IAnyType,
+    EMPTY_ARRAY
 } from "../../internal"
 
-export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
+export class ArrayType<C, S, T> extends ComplexType<C[], S[], IObservableArray<T>> {
     shouldAttachNode = true
-    subType: IType<any, any>
+    subType: IAnyType
     readonly flags = TypeFlags.Array
 
-    constructor(name: string, subType: IType<any, any>) {
+    constructor(name: string, subType: IAnyType) {
         super(name)
         this.subType = subType
     }
@@ -51,17 +55,17 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         return this.subType.describe() + "[]"
     }
 
-    createNewInstance = () => {
-        return observable.array([], mobxShallow)
+    createNewInstance(childNodes: IChildNodesMap) {
+        return observable.array(convertChildNodesToArray(childNodes), mobxShallow)
     }
 
-    finalizeNewInstance = (node: INode, snapshot: any) => {
-        const objNode = node as ObjectNode
-        const instance = objNode.storedValue as IObservableArray<any>
-        _getAdministration(instance).dehancer = objNode.unbox
-        intercept(instance, change => this.willChange(change) as any)
-        objNode.applySnapshot(snapshot)
-        observe(instance, this.didChange)
+    finalizeNewInstance(node: INode) {
+        const objectNode = node as ObjectNode
+        const type = objectNode.type as ArrayType<any, any, any>
+        const instance = objectNode.storedValue as IObservableArray<any>
+        _getAdministration(instance).dehancer = objectNode.unbox
+        intercept(instance, type.willChange as any)
+        observe(instance, type.didChange)
     }
 
     instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: S): INode {
@@ -74,6 +78,17 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
             this.createNewInstance,
             this.finalizeNewInstance
         )
+    }
+
+    initializeChildNodes(objNode: ObjectNode, snapshot: S[] = []): IChildNodesMap {
+        const subType = (objNode.type as ArrayType<any, any, any>).subType
+        const environment = objNode._environment
+        const result = {} as IChildNodesMap
+        snapshot.forEach((item, index) => {
+            const subpath = `${index}`
+            result[subpath] = subType.instantiate(objNode, subpath, environment, item)
+        })
+        return result
     }
 
     getChildren(node: ObjectNode): INode[] {
@@ -89,6 +104,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
         const node = getStateTreeNode(change.object as IStateTreeNode)
         node.assertWritable()
+        const subType = (node.type as ArrayType<any, any, any>).subType
         const childNodes = node.getChildren()
 
         switch (change.type) {
@@ -96,7 +112,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                 if (change.newValue === change.object[change.index]) return null
                 change.newValue = reconcileArrayChildren(
                     node,
-                    this.subType,
+                    subType,
                     [childNodes[change.index]],
                     [change.newValue],
                     [change.index]
@@ -106,7 +122,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
                 const { index, removedCount, added } = change
                 change.added = reconcileArrayChildren(
                     node,
-                    this.subType,
+                    subType,
                     childNodes.slice(index, index + removedCount),
                     added,
                     added.map((_, i) => index + i)
@@ -189,7 +205,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
         target.replace(snapshot)
     }
 
-    getChildType(key: string): IType<any, any> {
+    getChildType(key: string): IAnyType {
         return this.subType
     }
 
@@ -206,7 +222,7 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
     }
 
     getDefaultSnapshot() {
-        return []
+        return EMPTY_ARRAY
     }
 
     removeChild(node: ObjectNode, subpath: string) {
@@ -238,17 +254,19 @@ export class ArrayType<S, T> extends ComplexType<S[], IObservableArray<T>> {
  * @param {IType<S, T>} subtype
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
-export function array<S, T>(subtype: IType<S, T>): IComplexType<S[], IObservableArray<T>> {
+export function array<C, S, T>(
+    subtype: IType<C, S, T>
+): IComplexType<ReadonlyArray<C>, ReadonlyArray<S>, IObservableArray<T>> {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subtype))
             fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")
     }
-    return new ArrayType<S, T>(subtype.name + "[]", subtype)
+    return new ArrayType<C, S, T>(subtype.name + "[]", subtype)
 }
 
 function reconcileArrayChildren<T>(
     parent: ObjectNode,
-    childType: IType<any, T>,
+    childType: IType<any, any, T>,
     oldNodes: INode[],
     newValues: T[],
     newPaths: (string | number)[]
@@ -281,9 +299,9 @@ function reconcileArrayChildren<T>(
             if (isStateTreeNode(newValue) && getStateTreeNode(newValue).parent === parent) {
                 // this node is owned by this parent, but not in the reconcilable set, so it must be double
                 fail(
-                    `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${parent.path}/${newPaths[
-                        i
-                    ]}', but it lives already at '${getStateTreeNode(newValue).path}'`
+                    `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
+                        parent.path
+                    }/${newPaths[i]}', but it lives already at '${getStateTreeNode(newValue).path}'`
                 )
             }
             oldNodes.splice(i, 0, valueAsNode(childType, parent, "" + newPaths[i], newValue))
@@ -315,7 +333,7 @@ function reconcileArrayChildren<T>(
 
 // convert a value to a node at given parent and subpath. attempts to reuse old node if possible and given
 function valueAsNode(
-    childType: IType<any, any>,
+    childType: IAnyType,
     parent: ObjectNode,
     subpath: string,
     newValue: any,
@@ -343,8 +361,7 @@ function valueAsNode(
         return childNode
     }
     // nothing to do, create from scratch
-    const childNode = childType.instantiate(parent, subpath, parent._environment, newValue)
-    return childNode
+    return childType.instantiate(parent, subpath, parent._environment, newValue)
 }
 
 // given a value
@@ -361,12 +378,14 @@ function areSame(oldNode: INode, newValue: any) {
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&
-        newValue[oldNode.identifierAttribute] === oldNode.identifier
+        oldNode.identifier === "" + newValue[oldNode.identifierAttribute]
     )
         return true
     return false
 }
 
-export function isArrayType<S, T>(type: any): type is IComplexType<S[], IObservableArray<T>> {
+export function isArrayType<C, S, T>(
+    type: any
+): type is IComplexType<C[], S[], IObservableArray<T>> {
     return isType(type) && (type.flags & TypeFlags.Array) > 0
 }

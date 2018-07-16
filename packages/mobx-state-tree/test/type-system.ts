@@ -1,4 +1,4 @@
-import { types, getSnapshot, unprotect } from "../src"
+import { types, getSnapshot, unprotect, IType } from "../src"
 const createTestFactories = () => {
     const Box = types.model({
         width: 0,
@@ -44,7 +44,7 @@ test("it should do typescript type inference correctly", () => {
     const A = types
         .model({
             x: types.number,
-            y: types.maybe(types.string)
+            y: types.maybeNull(types.string)
         })
         .views(self => ({
             get z(): string {
@@ -79,7 +79,7 @@ test("it should do typescript type inference correctly", () => {
     unprotect(b)
     // sub fields can be reassigned
     b.sub = A.create({
-        // MANUAL TEST not ok: z: 4
+        // MANUAL TEST not ok: z: 4,
         x: 3
     })
     // sub fields have proper type
@@ -148,12 +148,12 @@ test("cannot create factories with null values", () => {
     expect(() =>
         types.model({
             x: null
-        })
+        } as any)
     ).toThrow()
 })
 test("can create factories with maybe primitives", () => {
     const F = types.model({
-        x: types.maybe(types.string)
+        x: types.maybeNull(types.string)
     })
     expect(F.is(undefined)).toBe(false)
     expect(F.is({})).toBe(true)
@@ -234,7 +234,7 @@ test("types instances with compatible snapshots should not be interchangeable", 
     const c = C.create()
     unprotect(c)
     expect(() => {
-        c.x = null
+        c.x = undefined
     }).not.toThrow()
     expect(() => {
         ;(c as any).x = {}
@@ -359,7 +359,10 @@ test("it should type compose correctly", () => {
                 log
             }
         })
-    const LoggableCar = types.compose(Car, Logger)
+    const LoggableCar = types.compose(
+        Car,
+        Logger
+    )
     const x = LoggableCar.create({ wheels: 3, logNode: "test" /* compile error: x: 7  */ })
     //x.test() // compile error
     x.drive()
@@ -390,7 +393,11 @@ test("it should extend types correctly", () => {
                 }
             }
         })
-    const LoggableCar = types.compose("LoggableCar", Car, Logger)
+    const LoggableCar = types.compose(
+        "LoggableCar",
+        Car,
+        Logger
+    )
     const x = LoggableCar.create({ wheels: 3, logNode: "test" /* compile error: x: 7  */ })
     // x.test() // compile error
     x.drive()
@@ -409,4 +416,29 @@ test("self referring views", () => {
         return views
     })
     expect(Car.create().tripple).toBe(9)
+})
+
+test("Alternative typeof syntax #885", () => {
+    const Car = types
+        .model({
+            wheels: 3
+        })
+        .actions(self => {
+            function drive() {}
+            return {
+                drive
+            }
+        })
+
+    type TypeOf<T extends IType<any, any, any>> = T extends IType<any, any, infer T2> ? T2 : never
+    type SnapshotTypeOf<T extends IType<any, any, any>> = T extends IType<any, infer S, any>
+        ? S
+        : never
+    type CreationTypeOf<T extends IType<any, any, any>> = T extends IType<infer C, any, any>
+        ? C
+        : never
+
+    type CarT = TypeOf<typeof Car>
+    type Car2 = typeof Car.Type
+    type CarSnapshot = SnapshotTypeOf<typeof Car>
 })

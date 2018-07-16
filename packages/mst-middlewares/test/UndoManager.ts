@@ -1,6 +1,6 @@
 import { test } from "ava"
 import { UndoManager } from "../src"
-import { types, flow, clone } from "mobx-state-tree"
+import { types, flow, clone, getSnapshot } from "mobx-state-tree"
 
 let undoManager: any = {}
 const setUndoManagerSameTree = targetStore => {
@@ -154,38 +154,38 @@ test("can time travel with Mutable object", t => {
             setUndoManagerDifferentTree(self)
             return {
                 setProp(k, v) {
-                    self.mutable.set(k, v)
+                    ;(self.mutable as any).set(k, v)
                 }
             }
         })
     const store = MutableStoreModel.create({ mutable: {} })
     const mutable = store.mutable
 
-    t.deepEqual(mutable.toJSON(), {})
+    t.deepEqual(getSnapshot(mutable), {})
     t.is(undoManager.canUndo, false)
     t.is(undoManager.canRedo, false)
     t.is(undoManager.history.length, 0)
 
     store.setProp("foo", 1)
-    t.deepEqual(mutable.toJSON(), { foo: 1 })
+    t.deepEqual(getSnapshot(mutable), { foo: 1 })
     t.is(undoManager.canUndo, true)
     t.is(undoManager.canRedo, false)
     t.is(undoManager.history.length, 1)
 
     store.setProp("foo", {})
-    t.deepEqual(mutable.toJSON(), { foo: {} })
+    t.deepEqual(getSnapshot(mutable), { foo: {} })
     t.is(undoManager.canUndo, true)
     t.is(undoManager.canRedo, false)
     t.is(undoManager.history.length, 2)
 
     undoManager.undo()
-    t.deepEqual(mutable.toJSON(), { foo: 1 })
+    t.deepEqual(getSnapshot(mutable), { foo: 1 })
     t.is(undoManager.canUndo, true)
     t.is(undoManager.canRedo, true)
     t.is(undoManager.history.length, 2)
 
     undoManager.undo()
-    t.deepEqual(mutable.toJSON(), {})
+    t.deepEqual(getSnapshot(mutable), {})
     t.is(undoManager.canUndo, false)
     t.is(undoManager.canRedo, true)
     t.is(undoManager.history.length, 2)

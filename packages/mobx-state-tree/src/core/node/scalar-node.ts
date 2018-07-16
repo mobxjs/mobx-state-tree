@@ -1,51 +1,40 @@
-import { computed, getAtom } from "mobx"
 import {
     INode,
-    toJSON,
     escapeJsonPath,
-    addHiddenFinalProp,
     fail,
     freeze,
-    IType,
     NodeLifeCycle,
     noop,
-    ObjectNode
+    ObjectNode,
+    IAnyType
 } from "../../internal"
 
 export class ScalarNode implements INode {
-    readonly type: IType<any, any>
+    readonly type: IAnyType
     readonly storedValue: any
-    subpath: string = ""
+    readonly parent: ObjectNode | null
+    readonly subpath: string = ""
 
-    private readonly _parent: ObjectNode | null
-
-    readonly _environment: any = undefined
     private state = NodeLifeCycle.INITIALIZING
+    _environment: any = undefined
 
     constructor(
-        type: IType<any, any>,
+        type: IAnyType,
         parent: ObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: any,
-        storedValue: any,
-        canAttachTreeNode: boolean,
+        initialSnapshot: any,
+        createNewInstance: (initialValue: any) => any,
         finalizeNewInstance: (node: INode, initialValue: any) => void = noop
     ) {
         this.type = type
-        this.storedValue = storedValue
-        this._parent = parent
+        this.parent = parent
         this.subpath = subpath
-        this.storedValue = storedValue
-        this._environment = environment
 
-        if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "$treenode", this)
-
+        this.storedValue = createNewInstance(initialSnapshot)
         let sawException = true
         try {
-            if (canAttachTreeNode) addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
-
-            finalizeNewInstance(this, initialValue)
+            finalizeNewInstance(this, initialSnapshot)
 
             this.state = NodeLifeCycle.CREATED
             sawException = false
@@ -60,7 +49,6 @@ export class ScalarNode implements INode {
     /*
      * Returnes (escaped) path representation as string
      */
-    @computed
     public get path(): string {
         if (!this.parent) return ""
         return this.parent.path + "/" + escapeJsonPath(this.subpath)
@@ -70,21 +58,14 @@ export class ScalarNode implements INode {
         return this.parent === null
     }
 
-    public get parent(): ObjectNode | null {
-        return this._parent
-    }
-
     public get root(): ObjectNode {
         // future optimization: store root ref in the node and maintain it
-        if (!this._parent) return fail(`This scalar node is not part of a tree`)
-        return this._parent.root
+        if (!this.parent) return fail(`This scalar node is not part of a tree`)
+        return this.parent.root
     }
 
     setParent(newParent: INode | null, subpath: string | null = null) {
-        if (this.parent !== newParent) fail(`Cannot change parent of immutable node`)
-        if (this.subpath === subpath) return
-        this.subpath = subpath || ""
-        this._invalidateComputed("path")
+        fail("setParent is not supposed to be called on scalar nodes")
     }
 
     public get value(): any {
@@ -107,10 +88,5 @@ export class ScalarNode implements INode {
 
     die() {
         this.state = NodeLifeCycle.DEAD
-    }
-
-    private _invalidateComputed(prop: string) {
-        const atom = getAtom(this, prop) as any
-        atom.trackAndCompute()
     }
 }

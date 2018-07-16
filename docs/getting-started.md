@@ -452,7 +452,7 @@ To define an identifier, you will need to define a property using the `types.ide
 
 ```javascript
 const User = types.model({
-    id: types.identifier(types.string),
+    id: types.identifier,
     name: types.optional(types.string, "")
 })
 ```

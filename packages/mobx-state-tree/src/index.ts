@@ -9,8 +9,9 @@ import {
     ISimpleType,
     IComplexType,
     IType,
+    IAnyType,
     map,
-    IExtendedObservableMap,
+    IMSTMap,
     array,
     identifier,
     model,
@@ -31,7 +32,9 @@ import {
     nullType,
     late,
     enumeration,
-    custom
+    custom,
+    identifierNumber,
+    maybeNull
 } from "./internal"
 
 export const types = {
@@ -44,6 +47,7 @@ export const types = {
     optional,
     literal,
     maybe,
+    maybeNull,
     refinement,
     string,
     boolean,
@@ -53,19 +57,20 @@ export const types = {
     array,
     frozen,
     identifier,
+    identifierNumber,
     late,
     undefined: undefinedType,
     null: nullType
 }
 
 export {
+    IAnyType,
     IModelType,
-    IExtendedObservableMap,
+    IMSTMap,
     IType,
     ISimpleType,
     IComplexType,
     ISnapshottable,
-    Snapshot,
     typecheckPublic as typecheck,
     escapeJsonPath,
     unescapeJsonPath,
@@ -86,7 +91,9 @@ export {
     IActionRecorder,
     ISerializedActionCall,
     recordActions,
-    createActionTrackingMiddleware
+    createActionTrackingMiddleware,
+    setLivelynessChecking,
+    LivelynessMode
 } from "./internal"
 
 export * from "./core/mst-operations"

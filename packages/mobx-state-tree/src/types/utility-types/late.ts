@@ -6,32 +6,35 @@ import {
     IContext,
     IValidationResult,
     TypeFlags,
-    isType
+    isType,
+    IAnyType
 } from "../../internal"
 
-export class Late<S, T> extends Type<S, T> {
-    readonly definition: () => IType<S, T>
-    private _subType: IType<S, T> | null = null
+export class Late<C, S, T> extends Type<C, S, T> {
+    readonly definition: () => IAnyType
+    private _subType: IAnyType | null = null
 
     get flags() {
-        return this.subType.flags | TypeFlags.Late
+        return (this._subType ? this._subType.flags : 0) | TypeFlags.Late
     }
 
     get shouldAttachNode() {
         return this.subType.shouldAttachNode
     }
 
-    get subType(): IType<S, T> {
+    get subType(): IAnyType {
         if (this._subType === null) {
-            this._subType = this.definition()
-            if (!this.subType) {
+            // If called too early in es5 environment, this won't throw, but return undefined
+            // see "it should apply deep patches to maps" test for example
+            const definition = this.definition()
+            if (typeof definition !== "object")
                 fail("Failed to determine subtype, make sure types.late returns a type definition.")
-            }
+            this._subType = definition
         }
         return this._subType
     }
 
-    constructor(name: string, definition: () => IType<S, T>) {
+    constructor(name: string, definition: () => IAnyType) {
         super(name)
         this.definition = definition
     }
@@ -52,15 +55,13 @@ export class Late<S, T> extends Type<S, T> {
         return this.subType.validate(value, context)
     }
 
-    isAssignableFrom(type: IType<any, any>) {
+    isAssignableFrom(type: IAnyType) {
         return this.subType.isAssignableFrom(type)
     }
 }
 
-export type ILateType<S, T> = () => IType<S, T>
-
-export function late<S = any, T = any>(type: ILateType<S, T>): IType<S, T>
-export function late<S = any, T = any>(name: string, type: ILateType<S, T>): IType<S, T>
+export function late<C, S, T>(type: () => IType<C, S, T>): IType<C, S, T>
+export function late<C, S, T>(name: string, type: () => IType<C, S, T>): IType<C, S, T>
 /**
  * Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies.
  * Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
@@ -84,7 +85,7 @@ export function late<S = any, T = any>(name: string, type: ILateType<S, T>): ITy
  * @param {ILateType<S, T>} type A function that returns the type that will be defined.
  * @returns {IType<S, T>}
  */
-export function late<S, T>(nameOrType: any, maybeType?: ILateType<S, T>): IType<S, T> {
+export function late(nameOrType: any, maybeType?: () => IAnyType): IAnyType {
     const name = typeof nameOrType === "string" ? nameOrType : `late(${nameOrType.toString()})`
     const type = typeof nameOrType === "string" ? maybeType : nameOrType
     // checks that the type is actually a late type
@@ -95,9 +96,9 @@ export function late<S, T>(nameOrType: any, maybeType?: ILateType<S, T>): IType<
                     type
             )
     }
-    return new Late<S, T>(name, type)
+    return new Late(name, type)
 }
 
-export function isLateType(type: any): type is Late<any, any> {
+export function isLateType(type: any): type is Late<any, any, any> {
     return isType(type) && (type.flags & TypeFlags.Late) > 0
 }

@@ -2,7 +2,6 @@ import {
     fail,
     INode,
     createNode,
-    isStateTreeNode,
     Type,
     IType,
     TypeFlags,
@@ -10,67 +9,96 @@ import {
     IContext,
     IValidationResult,
     typeCheckFailure,
-    string as stringType,
-    ObjectNode
+    ObjectNode,
+    ModelType,
+    typeCheckSuccess
 } from "../../internal"
 
-class Identifier {
-    constructor(public identifier: string | number) {}
-    toString() {
-        return `identifier(${this.identifier})`
-    }
-}
-
-export class IdentifierType<T> extends Type<T, T> {
+export class IdentifierType extends Type<string, string, string> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Identifier
 
-    constructor(public readonly identifierType: IType<T, T>) {
-        super(`identifier(${identifierType.name})`)
+    constructor() {
+        super(`identifier`)
     }
 
-    instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: T): INode {
-        if (!parent || !isStateTreeNode(parent.storedValue))
-            return fail(`Identifier types can only be instantiated as direct child of a model type`)
+    instantiate(
+        parent: ObjectNode | null,
+        subpath: string,
+        environment: any,
+        snapshot: string
+    ): INode {
+        if (!parent || !(parent.type instanceof ModelType))
+            fail(`Identifier types can only be instantiated as direct child of a model type`)
 
-        if (parent.identifierAttribute)
-            fail(
-                `Cannot define property '${subpath}' as object identifier, property '${parent.identifierAttribute}' is already defined as identifier property`
-            )
-        parent.identifierAttribute = subpath
         return createNode(this, parent, subpath, environment, snapshot)
     }
 
-    reconcile(current: INode, newValue: any) {
+    reconcile(current: INode, newValue: string) {
         if (current.storedValue !== newValue)
             return fail(
-                `Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`
+                `Tried to change identifier from '${
+                    current.storedValue
+                }' to '${newValue}'. Changing identifiers is not allowed.`
             )
         return current
     }
 
     describe() {
-        return `identifier(${this.identifierType.describe()})`
+        return `identifier`
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (
-            value === undefined ||
-            value === null ||
-            typeof value === "string" ||
-            typeof value === "number"
-        )
-            return this.identifierType.validate(value, context)
-        return typeCheckFailure(
-            context,
-            value,
-            "Value is not a valid identifier, which is a string or a number"
-        )
+        if (typeof value !== "string") {
+            return typeCheckFailure(
+                context,
+                value,
+                "Value is not a valid identifier, expected a string"
+            )
+        }
+        return typeCheckSuccess()
     }
 }
 
-export function identifier<T>(baseType: IType<T, T>): IType<T, T>
-export function identifier<T>(): T
+export class IdentifierNumberType extends IdentifierType {
+    constructor() {
+        super()
+        ;(this as any).name = "identifierNumber"
+    }
+
+    instantiate(
+        parent: ObjectNode | null,
+        subpath: string,
+        environment: any,
+        snapshot: any
+    ): INode {
+        return super.instantiate(parent, subpath, environment, snapshot)
+    }
+
+    isValidSnapshot(value: any, context: IContext): IValidationResult {
+        if (typeof value === "number") {
+            return typeCheckSuccess()
+        }
+        return typeCheckFailure(
+            context,
+            value,
+            "Value is not a valid identifierNumber, expected a number"
+        )
+    }
+
+    reconcile(current: INode, newValue: any) {
+        return super.reconcile(current, newValue)
+    }
+
+    getSnapshot(node: INode) {
+        return node.storedValue
+    }
+
+    describe() {
+        return `identifierNumber`
+    }
+}
+
 /**
  * Identifiers are used to make references, lifecycle events and reconciling works.
  * Inside a state tree, for each type can exist only one instance for each given identifier.
@@ -80,24 +108,33 @@ export function identifier<T>(): T
  *
  * @example
  *  const Todo = types.model("Todo", {
- *      id: types.identifier(types.string),
+ *      id: types.identifier,
  *      title: types.string
  *  })
  *
  * @export
  * @alias types.identifier
  * @template T
- * @param {IType<T, T>} baseType
  * @returns {IType<T, T>}
  */
-export function identifier(baseType: IType<any, any> = stringType): any {
-    if (process.env.NODE_ENV !== "production") {
-        if (!isType(baseType))
-            fail("expected a mobx-state-tree type as first argument, got " + baseType + " instead")
-    }
-    return new IdentifierType(baseType)
-}
+export const identifier: IType<string, string, string> = new IdentifierType()
 
-export function isIdentifierType(type: any): type is IdentifierType<any> {
+/**
+ * Similar to `types.identifier`, but `identifierNumber` will serialize from / to a number when applying snapshots
+ *
+ * @example
+ *  const Todo = types.model("Todo", {
+ *      id: types.identifierNumber,
+ *      title: types.string
+ *  })
+ *
+ * @export
+ * @alias types.identifierNumber
+ * @template T
+ * @returns {IType<T, T>}
+ */
+export const identifierNumber: IType<number, number, number> = new IdentifierNumberType() as any
+
+export function isIdentifierType(type: any): type is IdentifierType | IdentifierNumberType {
     return isType(type) && (type.flags & TypeFlags.Identifier) > 0
 }

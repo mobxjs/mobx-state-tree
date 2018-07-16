@@ -1,13 +1,13 @@
-import { types, getMembers } from "../src"
+import { types, getMembers, IStateTreeNode } from "../src"
 const User = types.model("User", {
-    id: types.identifier(types.string),
+    id: types.identifier,
     name: types.string
 })
 const Model = types
     .model({
         isPerson: false,
         users: types.optional(types.map(User), {}),
-        dogs: types.optional(types.array(User), []),
+        dogs: types.array(User),
         user: types.maybe(types.late(() => User))
     })
     .volatile(self => ({
@@ -40,7 +40,7 @@ test("reflection - map", () => {
     const node = Model.create({
         users: { "1": { id: "1", name: "Test" } }
     })
-    const reflection = getMembers(node.users.get("1")!)
+    const reflection = getMembers(node.users.get("1")! as IStateTreeNode)
     expect(reflection.name).toBe("User")
     expect(!!reflection.properties.id).toBe(true)
     expect(!!reflection.properties.name).toBe(true)
@@ -67,13 +67,7 @@ if (process.env.NODE_ENV !== "production") {
         const node = Model.create({
             users: { "1": { id: "1", name: "Test" } }
         })
-        let error = null
-        try {
-            const reflection = node.users ? getMembers(node.users) : {}
-        } catch (e) {
-            error = e
-        }
-        expect(!!error).toBe(true)
+        expect(() => (node.users ? getMembers(node.users) : {})).toThrowError()
     })
 }
 test("reflection - can retrieve property names", () => {
@@ -84,11 +78,11 @@ test("reflection - can retrieve property names", () => {
     expect(keys.includes("isPerson")).toBe(true)
 })
 test("reflection - property contains type", () => {
-    const Model = types.model({
+    const TestModel = types.model({
         string: types.string,
         optional: false
     })
-    const node = Model.create({
+    const node = TestModel.create({
         string: "hello"
     })
     const reflection = getMembers(node)
@@ -144,21 +138,23 @@ test("reflection - conditionals respected", () => {
                 return 1
             }
         }))
-        .actions((self): { actionName1(): number } | { actionName2(): number } => {
-            if (swap) {
-                return {
-                    actionName1() {
-                        return 1
+        .actions(
+            (self): { actionName1(): number } | { actionName2(): number } => {
+                if (swap) {
+                    return {
+                        actionName1() {
+                            return 1
+                        }
                     }
-                }
-            } else {
-                return {
-                    actionName2() {
-                        return 1
+                } else {
+                    return {
+                        actionName2() {
+                            return 1
+                        }
                     }
                 }
             }
-        })
+        )
         .views(self => {
             if (swap) {
                 return {

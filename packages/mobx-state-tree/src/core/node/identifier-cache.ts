@@ -1,5 +1,5 @@
 import { IObservableArray, values, observable } from "mobx"
-import { fail, IType, ObjectNode, mobxShallow } from "../../internal"
+import { fail, IType, ObjectNode, mobxShallow, IAnyType } from "../../internal"
 
 export class IdentifierCache {
     // n.b. in cache all identifiers are normalized to strings
@@ -9,7 +9,7 @@ export class IdentifierCache {
 
     addNodeToCache(node: ObjectNode) {
         if (node.identifierAttribute) {
-            const identifier = "" + node.identifier!
+            const identifier = node.identifier!
             if (!this.cache.has(identifier)) {
                 this.cache.set(identifier, observable.array<ObjectNode>([], mobxShallow))
             }
@@ -30,7 +30,7 @@ export class IdentifierCache {
 
     notifyDied(node: ObjectNode) {
         if (node.identifierAttribute) {
-            const set = this.cache.get("" + node.identifier!)
+            const set = this.cache.get(node.identifier!)
             if (set) set.remove(node)
         }
     }
@@ -49,7 +49,7 @@ export class IdentifierCache {
         return res
     }
 
-    resolve(type: IType<any, any>, identifier: string): ObjectNode | null {
+    resolve(type: IAnyType, identifier: string): ObjectNode | null {
         const set = this.cache.get("" + identifier)
         if (!set) return null
         const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))
@@ -60,7 +60,9 @@ export class IdentifierCache {
                 return matches[0]
             default:
                 return fail(
-                    `Cannot resolve a reference to type '${type.name}' with id: '${identifier}' unambigously, there are multiple candidates: ${matches
+                    `Cannot resolve a reference to type '${
+                        type.name
+                    }' with id: '${identifier}' unambigously, there are multiple candidates: ${matches
                         .map(n => n.path)
                         .join(", ")}`
                 )

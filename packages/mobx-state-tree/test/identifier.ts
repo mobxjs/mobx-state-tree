@@ -42,7 +42,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 test("#158 - #88 - Identifiers should accept any string character", () => {
     const Todo = types.model("Todo", {
-        id: types.identifier(types.string),
+        id: types.identifier,
         title: types.string
     })
     expect(() => {
@@ -66,8 +66,8 @@ if (process.env.NODE_ENV !== "production") {
     test("should throw if multiple identifiers provided", () => {
         expect(() => {
             const Model = types.model("Model", {
-                id: types.identifier(types.number),
-                pk: types.identifier(types.number)
+                id: types.identifierNumber,
+                pk: types.identifierNumber
             })
             Model.create({ id: 1, pk: 2 })
         }).toThrowError(
@@ -76,15 +76,15 @@ if (process.env.NODE_ENV !== "production") {
     })
     test("should throw if identifier of wrong type", () => {
         expect(() => {
-            const Model = types.model("Model", { id: types.identifier(types.number) })
-            Model.create({ id: "1" })
+            const Model = types.model("Model", { id: types.identifier })
+            Model.create({ id: 1 } as any)
         }).toThrowError(
-            `[mobx-state-tree] Error while converting \`{\"id\":\"1\"}\` to \`Model\`:\n\n    at path \"/id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\` (Value is not a number), expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`
+            'at path "/id" value `1` is not assignable to type: `identifier` (Value is not a valid identifier, expected a string).'
         )
     })
     test("identifier should be used only on model types - no parent provided", () => {
         expect(() => {
-            const Model = types.identifier(types.number)
+            const Model = types.identifierNumber
             Model.create(1)
         }).toThrowError(
             `[mobx-state-tree] Identifier types can only be instantiated as direct child of a model type`
@@ -94,7 +94,7 @@ if (process.env.NODE_ENV !== "production") {
 
 {
     const Foo = types.model("Foo", {
-        id: types.identifier(),
+        id: types.identifier,
         name: types.string
     })
 
@@ -146,7 +146,7 @@ if (process.env.NODE_ENV !== "production") {
 test("it can resolve through refrences", () => {
     const Folder = types.model("Folder", {
         type: types.literal("folder"),
-        name: types.identifier(),
+        name: types.identifier,
         children: types.array(types.late(() => types.union(Folder, SymLink)))
     })
     const SymLink = types.model({

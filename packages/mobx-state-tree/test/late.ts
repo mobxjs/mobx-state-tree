@@ -30,11 +30,11 @@ test("late should describe correctly circular references", () => {
     const Node = types.model("Node", {
         childs: types.array(types.late(() => Node))
     })
-    expect(Node.describe()).toEqual("{ childs: Node[] }")
+    expect(Node.describe()).toEqual("{ childs: Node[]? }")
 })
 test("should typecheck", () => {
     const NodeObject = types.model("NodeObject", {
-        id: types.identifier(types.number),
+        id: types.identifierNumber,
         text: "Hi",
         child: types.maybe(types.late(() => NodeObject))
     })
@@ -51,7 +51,7 @@ test("typecheck should throw an Error when called at runtime, but not log the er
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
 
     const NodeObject = types.model("NodeObject", {
-        id: types.identifier(types.number),
+        id: types.identifierNumber,
         text: types.string
     })
 
@@ -75,6 +75,6 @@ test("#825, late type checking ", () => {
         name: types.maybe(types.string)
     })
 
-    const p2 = Product.create({})
+    const p2 = Product.create({} as any)
     const p = Product.create({ details: { name: "bla" } })
 })

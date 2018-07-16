@@ -13,10 +13,10 @@ import {
 
 test("it should support custom references - basics", () => {
     const User = types.model({
-        id: types.identifier(),
+        id: types.identifier,
         name: types.string
     })
-    const UserByNameReference = types.maybe(
+    const UserByNameReference = types.maybeNull(
         types.reference(User, {
             // given an identifier, find the user
             get(identifier /* string */, parent: typeof Store.Type /*Store*/) {
@@ -54,7 +54,7 @@ test("it should support custom references - basics", () => {
 
 test("it should support custom references - adv", () => {
     const User = types.model({
-        id: types.identifier(),
+        id: types.identifier,
         name: types.string
     })
     const NameReference = types.reference(User, {

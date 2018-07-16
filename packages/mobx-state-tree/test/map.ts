@@ -5,7 +5,8 @@ import {
     applySnapshot,
     getSnapshot,
     types,
-    unprotect
+    unprotect,
+    isStateTreeNode
 } from "../src"
 const createTestFactories = () => {
     const ItemFactory = types.model({
@@ -33,7 +34,9 @@ test("it should restore the state from the snapshot", () => {
     const { Factory } = createTestFactories()
     const instance = Factory.create({ hello: { to: "world" } })
     expect(getSnapshot(instance)).toEqual({ hello: { to: "world" } })
-    expect("" + instance).toBe("ObservableMap@17[{ hello: AnonymousModel@/hello }]") // default toString
+    expect(("" + instance).replace(/@\d+/, "@xx")).toBe(
+        "ObservableMap@xx[{ hello: AnonymousModel@/hello }]"
+    ) // default toString
 })
 // === SNAPSHOT TESTS ===
 test("it should emit snapshots", () => {
@@ -148,7 +151,7 @@ test("it should support identifiers", () => {
         todos: types.optional(
             types.map(
                 types.model({
-                    id: types.identifier()
+                    id: types.identifier
                 })
             ),
             {}
@@ -182,10 +185,7 @@ test("#184 - types.map().get(key) should not throw if key doesnt exists", () => 
     }).not.toThrow()
 })
 test("#192 - put should not throw when identifier is a number", () => {
-    const Todo = types.model("Todo", {
-        todo_id: types.identifier(types.number),
-        title: types.string
-    })
+    const Todo = types.model("Todo", { todo_id: types.identifierNumber, title: types.string })
     const TodoStore = types
         .model("TodoStore", {
             todos: types.optional(types.map(Todo), {})
@@ -209,15 +209,12 @@ test("#192 - put should not throw when identifier is a number", () => {
         expect(() => {
             todoStore.addTodo({ todo_id: "1", title: "Test" })
         }).toThrowError(
-            `[mobx-state-tree] Error while converting \`{\"todo_id\":\"1\",\"title\":\"Test\"}\` to \`Todo\`:\n\n    at path \"/todo_id\" value \`\"1\"\` is not assignable to type: \`identifier(number)\` (Value is not a number), expected an instance of \`identifier(number)\` or a snapshot like \`identifier(number)\` instead.`
+            'at path "/todo_id" value `"1"` is not assignable to type: `identifierNumber` (Value is not a valid identifierNumber, expected a number)'
         )
     }
 })
 test("#192 - map should not mess up keys when putting twice", () => {
-    const Todo = types.model("Todo", {
-        todo_id: types.identifier(types.number),
-        title: types.string
-    })
+    const Todo = types.model("Todo", { todo_id: types.identifierNumber, title: types.string })
     const TodoStore = types
         .model("TodoStore", {
             todos: types.optional(types.map(Todo), {})
@@ -242,11 +239,55 @@ test("#192 - map should not mess up keys when putting twice", () => {
     })
     expect(getSnapshot(todoStore.todos)).toEqual({ "1": { todo_id: 1, title: "Test Edited" } })
 })
+test("#694 - map.put should return new node", () => {
+    const Todo = types.model("Todo", {
+        todo_id: types.identifier,
+        title: types.string
+    })
+    const TodoStore = types
+        .model("TodoStore", {
+            todos: types.map(Todo)
+        })
+        .actions(self => {
+            function addAndReturnTodo(todo) {
+                return self.todos.put(todo)
+            }
+            return {
+                addAndReturnTodo
+            }
+        })
+    const todoStore = TodoStore.create({ todos: {} })
+
+    const addedTodo = todoStore.addAndReturnTodo(
+        Todo.create({
+            todo_id: "1",
+            title: "Test 1"
+        })
+    )
+
+    expect(isStateTreeNode(addedTodo)).toEqual(true)
+    expect(getSnapshot(addedTodo)).toEqual({ todo_id: "1", title: "Test 1" })
+
+    const editedTodo = todoStore.addAndReturnTodo({
+        todo_id: "1",
+        title: "Test 1 Edited"
+    })
+    expect(isStateTreeNode(editedTodo)).toEqual(true)
+    expect(getSnapshot(editedTodo)).toEqual({ todo_id: "1", title: "Test 1 Edited" })
+    expect(editedTodo).toEqual(addedTodo)
+
+    const addedTodo2 = todoStore.addAndReturnTodo({
+        todo_id: "2",
+        title: "Test 2"
+    })
+    expect(isStateTreeNode(addedTodo2)).toEqual(true)
+    expect(getSnapshot(addedTodo2)).toEqual({ todo_id: "2", title: "Test 2" })
+})
 test("it should not throw when removing a non existing item from a map", () => {
     expect(() => {
         const AppModel = types
             .model({
-                myMap: types.optional(types.map(types.number), {})
+                myMap: types.map(types.number)
             })
             .actions(self => {
                 function something() {
@@ -279,19 +320,12 @@ test("it should get map keys from reversePatch when deleted an item from a neste
 })
 
 test("map expects regular identifiers", () => {
-    const A = types.model("A", { a: types.identifier() })
-    const B = types.model("B", { b: types.identifier() })
+    const A = types.model("A", { a: types.identifier })
+    const B = types.model("B", { b: types.identifier })
 
-    const M = types.map(types.union(A, B))
-    const m = M.create()
-    unprotect(m)
-    m.put({ a: "3" }) // ok
-    m.put({ a: "4" }) // ok
-
-    expect(() => {
-        m.put({ b: "5" })
-    }).toThrow(
-        "[mobx-state-tree] The objects in a map should all have the same identifier attribute, expected 'a', but child of type 'B' declared attribute 'b' as identifier"
+    // NOTE: we can determine identifier attribute upfront, so no need to wait for error while craetion
+    expect(() => types.map(types.union(A, B))).toThrow(
+        `[mobx-state-tree] The objects in a map should all have the same identifier attribute, expected 'a', but child of type 'B' declared attribute 'b' as identifier`
     )
 })
 
@@ -301,13 +335,13 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
     })
     const Item = types
         .model("Item", {
-            id: types.identifier(),
+            id: types.identifier,
             title: types.string,
             notes: types.array(Note)
         })
         .preProcessSnapshot(snapshot => {
             const result = Object.assign({}, snapshot)
-            if (typeof result.title !== "string") result.title = ""
+            if (typeof result.title !== "string") (result as any).title = ""
             return result
         })
 
@@ -319,6 +353,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
             afterCreate() {
                 self.items.put({
                     id: "1",
+                    title: "",
                     notes: [{ text: "first note" }, { text: "second note" }]
                 })
             }
@@ -337,4 +372,153 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
             }
         }
     })
+})
+
+test("map can resolve late identifiers", () => {
+    const Late = types.model({
+        id: types.identifier,
+        children: types.map(types.late(() => Late))
+    })
+    const snapshot = {
+        id: "1",
+        children: {
+            "2": {
+                id: "2",
+                children: {}
+            }
+        }
+    }
+    expect(() => Late.create(snapshot)).not.toThrow()
+})
+
+test("get should return value when key is a number", () => {
+    const Todo = types.model("Todo", {
+        todo_id: types.identifierNumber,
+        title: types.string
+    })
+    const TodoStore = types
+        .model("TodoStore", {
+            todos: types.optional(types.map(Todo), {})
+        })
+        .actions(self => {
+            function addTodo(todo) {
+                self.todos.put(todo)
+            }
+            return {
+                addTodo
+            }
+        })
+    const todoStore = TodoStore.create({})
+
+    const todo = {
+        todo_id: 1,
+        title: "Test"
+    }
+
+    todoStore.addTodo(todo)
+    expect(todoStore.todos.get(1 as any)!.title).toEqual("Test")
+})
+
+test("numeric keys should work", () => {
+    const M = types.model({
+        id: types.identifier,
+        title: "test"
+    })
+    const S = types.model({
+        mies: types.map(M),
+        ref: types.maybe(types.reference(M))
+    })
+
+    const s = S.create({
+        mies: {}
+    })
+    unprotect(s)
+
+    s.mies.set(7 as any, { id: "7" } as any)
+    const i7 = s.mies.get(7 as any)!
+    expect(i7.title).toBe("test")
+    expect(s.mies.has("7")).toBeTruthy()
+    expect(s.mies.has(7 as any)).toBeTruthy()
+    expect(s.mies.get("7")).toBeTruthy()
+    expect(s.mies.get(7 as any)).toBeTruthy()
+
+    s.mies.set("8", { id: "8" } as any)
+    expect(s.mies.has("8")).toBeTruthy()
+    expect(s.mies.has(8 as any)).toBeTruthy()
+    expect(s.mies.get("8")).toBeTruthy()
+    expect(s.mies.get(8 as any)).toBeTruthy()
+
+    expect(Array.from(s.mies.keys())).toEqual(["7", "8"])
+
+    s.mies.put({ id: "7", title: "coffee" })
+    expect(s.mies.size).toBe(2)
+    expect(s.mies.has("7")).toBeTruthy()
+    expect(s.mies.has(7 as any)).toBeTruthy()
+    expect(s.mies.get("7")).toBeTruthy()
+    expect(s.mies.get(7 as any)).toBeTruthy()
+    expect(i7.title).toBe("coffee")
+
+    expect(s.mies.delete(8 as any)).toBeTruthy()
+    expect(s.mies.size).toBe(1)
+})
+
+describe("#826, adding stuff twice", () => {
+    const Store = types
+        .model({
+            map: types.optional(types.map(types.boolean), {})
+        })
+        .actions(self => ({
+            toogleMap: id => {
+                self.map.set(id, !self.map.get(id))
+            }
+        }))
+
+    // This one pass fine 👍
+    test("Toogling once shouldn't throw", () => {
+        const store = Store.create({})
+        expect(() => {
+            store.toogleMap(1)
+        }).not.toThrow()
+    })
+
+    // This one throws with 'Not a child 1' error 👎
+    test("Toogling twice shouldn't throw", () => {
+        const store = Store.create({})
+        expect(() => {
+            store.toogleMap(1)
+            store.toogleMap(1)
+        }).not.toThrow()
+    })
+})
+
+test("#751 restore from snapshot should work", () => {
+    const Submodel = types.model("Submodel", {
+        id: types.identifierNumber
+    })
+
+    const Model = types.model("Model", {
+        map: types.map(Submodel)
+    })
+
+    const server = Model.create({ map: {} })
+
+    // We add an item with a number id
+    unprotect(server)
+    server.map.set(1 as any, { id: 1 })
+
+    // We can access it using a number
+    expect(server.map.get(1 as any)!.id).toBe(1)
+
+    // But if we get a snapshot...
+    const snapshot = getSnapshot(server)
+    // And apply it back...
+    const browser = Model.create(snapshot)
+
+    // We can access it using a string
+    expect(server.map.get("1")!.id).toBe(1)
+
+    // And as number
+    expect(server.map.get(1 as any)!.id).toBe(1)
+
+    expect(server.map.size).toBe(1)
 })

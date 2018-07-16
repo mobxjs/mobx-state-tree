@@ -9,14 +9,20 @@ import {
     IType,
     Type,
     INode,
-    fail
+    fail,
+    isPlainObject,
+    IAnyType,
+    IValidationError
 } from "../../internal"
 
-export type ITypeDispatcher = (snapshot: any) => IType<any, any>
+export type ITypeDispatcher = (snapshot: any) => IAnyType
 
-export class Union extends Type<any, any> {
-    readonly dispatcher: ITypeDispatcher | null = null
-    readonly types: IType<any, any>[]
+export type UnionOptions = { eager?: boolean; dispatcher?: ITypeDispatcher }
+
+export class Union extends Type<any, any, any> {
+    readonly dispatcher?: ITypeDispatcher
+    readonly eager: boolean = true
+    readonly types: IAnyType[]
 
     get flags() {
         let result: TypeFlags = TypeFlags.Union
@@ -32,13 +38,14 @@ export class Union extends Type<any, any> {
         return this.types.some(type => type.shouldAttachNode)
     }
 
-    constructor(name: string, types: IType<any, any>[], dispatcher: ITypeDispatcher | null) {
+    constructor(name: string, types: IAnyType[], options?: UnionOptions) {
         super(name)
-        this.dispatcher = dispatcher
+        this.dispatcher = options && options.dispatcher
+        if (options && !options.eager) this.eager = false
         this.types = types
     }
 
-    isAssignableFrom(type: IType<any, any>) {
+    isAssignableFrom(type: IAnyType) {
         return this.types.some(subType => subType.isAssignableFrom(type))
     }
 
@@ -47,286 +54,108 @@ export class Union extends Type<any, any> {
     }
 
     instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
-        return this.determineType(value).instantiate(parent, subpath, environment, value)
+        const type = this.determineType(value)
+        if (!type) return fail("No matching type for union " + this.describe()) // can happen in prod builds
+        return type.instantiate(parent, subpath, environment, value)
     }
 
     reconcile(current: INode, newValue: any): INode {
-        return this.determineType(newValue).reconcile(current, newValue)
+        const type = this.determineType(newValue)
+        if (!type) return fail("No matching type for union " + this.describe()) // can happen in prod builds
+        return type.reconcile(current, newValue)
     }
 
-    determineType(value: any): IType<any, any> {
+    determineType(value: any): IAnyType | undefined {
         // try the dispatcher, if defined
-        if (this.dispatcher !== null) {
+        if (this.dispatcher) {
             return this.dispatcher(value)
         }
 
         // find the most accomodating type
-        const applicableTypes = this.types.filter(type => type.is(value))
-        if (applicableTypes.length > 1)
-            return fail(
-                `Ambiguos snapshot ${JSON.stringify(value)} for union ${this
-                    .name}. Please provide a dispatch in the union declaration.`
-            )
-
-        return applicableTypes[0]
+        return this.types.find(type => type.is(value))
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (this.dispatcher !== null) {
+        if (this.dispatcher) {
             return this.dispatcher(value).validate(value, context)
         }
 
-        const errors = this.types.map(type => type.validate(value, context))
-        const applicableTypes = errors.filter(errorArray => errorArray.length === 0)
-
-        if (applicableTypes.length > 1) {
-            return typeCheckFailure(
-                context,
-                value,
-                "Multiple types are applicable for the union (hint: provide a dispatch function)"
-            )
-        } else if (applicableTypes.length === 0) {
-            return typeCheckFailure(context, value, "No type is applicable for the union").concat(
-                flattenTypeErrors(errors)
-            )
+        const allErrors: IValidationError[][] = []
+        let applicableTypes = 0
+        for (let i = 0; i < this.types.length; i++) {
+            const type = this.types[i]
+            const errors = type.validate(value, context)
+            if (errors.length === 0) {
+                if (this.eager) return typeCheckSuccess()
+                else applicableTypes++
+            } else {
+                allErrors.push(errors)
+            }
         }
 
-        return typeCheckSuccess()
+        if (applicableTypes === 1) return typeCheckSuccess()
+        return typeCheckFailure(context, value, "No type is applicable for the union").concat(
+            flattenTypeErrors(allErrors)
+        )
     }
 }
 
-export function union<SA, SB, TA, TB>(
-    dispatch: ITypeDispatcher,
-    A: IType<SA, TA>,
-    B: IType<SB, TB>
-): IType<SA | SB, TA | TB>
-export function union<SA, SB, TA, TB>(A: IType<SA, TA>, B: IType<SB, TB>): IType<SA | SB, TA | TB>
-
-export function union<SA, SB, SC, TA, TB, TC>(
-    dispatch: ITypeDispatcher,
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>
-): IType<SA | SB | SC, TA | TB | TC>
-export function union<SA, SB, SC, TA, TB, TC>(
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>
-): IType<SA | SB | SC, TA | TB | TC>
-
-export function union<SA, SB, SC, SD, TA, TB, TC, TD>(
-    dispatch: ITypeDispatcher,
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>
-): IType<SA | SB | SC | SD, TA | TB | TC | TD>
-export function union<SA, SB, SC, SD, TA, TB, TC, TD>(
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>
-): IType<SA | SB | SC | SD, TA | TB | TC | TD>
-
-export function union<SA, SB, SC, SD, SE, TA, TB, TC, TD, TE>(
-    dispatch: ITypeDispatcher,
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>
-): IType<SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
-export function union<SA, SB, SC, SD, SE, TA, TB, TC, TD, TE>(
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>
-): IType<SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
-
-export function union<SA, SB, SC, SD, SE, SF, TA, TB, TC, TD, TE, TF>(
-    dispatch: ITypeDispatcher,
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>,
-    F: IType<SF, TF>
-): IType<SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
-export function union<SA, SB, SC, SD, SE, SF, TA, TB, TC, TD, TE, TF>(
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>,
-    F: IType<SF, TF>
-): IType<SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
-
-export function union<SA, SB, SC, SD, SE, SF, SG, TA, TB, TC, TD, TE, TF, TG>(
-    dispatch: ITypeDispatcher,
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>,
-    F: IType<SF, TF>,
-    G: IType<SG, TG>
-): IType<SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
-export function union<SA, SB, SC, SD, SE, SF, SG, TA, TB, TC, TD, TE, TF, TG>(
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>,
-    F: IType<SF, TF>,
-    G: IType<SG, TG>
-): IType<SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
-
-export function union<SA, SB, SC, SD, SE, SF, SG, SH, TA, TB, TC, TD, TE, TF, TG, TH>(
-    dispatch: ITypeDispatcher,
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>,
-    F: IType<SF, TF>,
-    G: IType<SG, TG>,
-    H: IType<SH, TH>
-): IType<SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
-export function union<SA, SB, SC, SD, SE, SF, SG, SH, TA, TB, TC, TD, TE, TF, TG, TH>(
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>,
-    F: IType<SF, TF>,
-    G: IType<SG, TG>,
-    H: IType<SH, TH>
-): IType<SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
-
-export function union<SA, SB, SC, SD, SE, SF, SG, SH, SI, TA, TB, TC, TD, TE, TF, TG, TH, TI>(
-    dispatch: ITypeDispatcher,
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>,
-    F: IType<SF, TF>,
-    G: IType<SG, TG>,
-    H: IType<SH, TH>,
-    I: IType<SI, TI>
-): IType<SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
-export function union<SA, SB, SC, SD, SE, SF, SG, SH, SI, TA, TB, TC, TD, TE, TF, TG, TH, TI>(
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>,
-    F: IType<SF, TF>,
-    G: IType<SG, TG>,
-    H: IType<SH, TH>,
-    I: IType<SI, TI>
-): IType<SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
-
-export function union<
-    SA,
-    SB,
-    SC,
-    SD,
-    SE,
-    SF,
-    SG,
-    SH,
-    SI,
-    SJ,
-    TA,
-    TB,
-    TC,
-    TD,
-    TE,
-    TF,
-    TG,
-    TH,
-    TI,
-    TJ
->(
-    dispatch: ITypeDispatcher,
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>,
-    F: IType<SF, TF>,
-    G: IType<SG, TG>,
-    H: IType<SH, TH>,
-    I: IType<SI, TI>,
-    J: IType<SJ, TJ>
-): IType<
-    SA | SB | SC | SD | SE | SF | SG | SH | SI | SJ,
-    TA | TB | TC | TD | TE | TF | TG | TH | TI | TJ
->
-export function union<
-    SA,
-    SB,
-    SC,
-    SD,
-    SE,
-    SF,
-    SG,
-    SH,
-    SI,
-    SJ,
-    TA,
-    TB,
-    TC,
-    TD,
-    TE,
-    TF,
-    TG,
-    TH,
-    TI,
-    TJ
->(
-    A: IType<SA, TA>,
-    B: IType<SB, TB>,
-    C: IType<SC, TC>,
-    D: IType<SD, TD>,
-    E: IType<SE, TE>,
-    F: IType<SF, TF>,
-    G: IType<SG, TG>,
-    H: IType<SH, TH>,
-    I: IType<SI, TI>,
-    J: IType<SJ, TJ>
-): IType<
-    SA | SB | SC | SD | SE | SF | SG | SH | SI | SJ,
-    TA | TB | TC | TD | TE | TF | TG | TH | TI | TJ
->
-
-export function union(...types: IType<any, any>[]): IType<any, any>
-export function union(
-    dispatchOrType: ITypeDispatcher | IType<any, any>,
-    ...otherTypes: IType<any, any>[]
-): IType<any, any>
-
+// generated with /home/michel/mobservable/mobx-state-tree/packages/mobx-state-tree/scripts/generate-union-types.js
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>): IType<CA | CB, SA | SB, TA | TB>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>): IType<CA | CB, SA | SB, TA | TB>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>): IType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>): IType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>): IType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>): IType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>): IType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>): IType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>): IType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>): IType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>): IType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>): IType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>): IType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>): IType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>, I: IType<CI, SI, TI>): IType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>, I: IType<CI, SI, TI>): IType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
+// manual written
+export function union(...types: IAnyType[]): IAnyType
+export function union(dispatchOrType: UnionOptions | IAnyType, ...otherTypes: IAnyType[]): IAnyType
 /**
  * types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
  *
  * @export
  * @alias types.union
- * @param {(ITypeDispatcher | IType<any, any>)} dispatchOrType
- * @param {...IType<any, any>[]} otherTypes
- * @returns {IType<any, any>}
+ * @param {(ITypeDispatcher | IAnyType)} optionsOrType
+ * @param {...IAnyType[]} otherTypes
+ * @returns {IAnyType}
  */
-export function union(
-    dispatchOrType: ITypeDispatcher | IType<any, any>,
-    ...otherTypes: IType<any, any>[]
-): IType<any, any> {
-    const dispatcher = isType(dispatchOrType) ? null : dispatchOrType
-    const types = isType(dispatchOrType) ? otherTypes.concat(dispatchOrType) : otherTypes
+export function union(optionsOrType: UnionOptions | IAnyType, ...otherTypes: IAnyType[]): IAnyType {
+    const options = isType(optionsOrType) ? undefined : optionsOrType
+    const types = isType(optionsOrType) ? [optionsOrType, ...otherTypes] : otherTypes
     const name = "(" + types.map(type => type.name).join(" | ") + ")"
 
     // check all options
     if (process.env.NODE_ENV !== "production") {
+        if (!isType(optionsOrType) && !isPlainObject(optionsOrType))
+            fail(
+                "First argument to types.union should either be a type, or an objects object of the form: { eager?: boolean, dispatcher?: Function }"
+            )
         types.forEach(type => {
             if (!isType(type))
                 fail(
@@ -336,7 +165,7 @@ export function union(
                 )
         })
     }
-    return new Union(name, types, dispatcher)
+    return new Union(name, types, options)
 }
 
 export function isUnionType(type: any): type is Union {

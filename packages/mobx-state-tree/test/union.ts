@@ -15,7 +15,7 @@ const createTestFactories = () => {
     const Plane = types.union(Square, Box)
     const Heighed = types.union(Box, Cube)
     const DispatchPlane = types.union(
-        snapshot => (snapshot && "height" in snapshot ? Box : Square),
+        { dispatcher: snapshot => (snapshot && "height" in snapshot ? Box : Square) },
         Box,
         Square
     )
@@ -24,11 +24,19 @@ const createTestFactories = () => {
     })
     return { Box, Square, Cube, Plane, DispatchPlane, Heighed, Block }
 }
+const createLiteralTestFactories = () => {
+    const Man = types.model("Man", { type: types.literal("M") })
+    const Woman = types.model("Woman", { type: types.literal("W") })
+    const All = types.model("All", { type: types.string })
+    const ManWomanOrAll = types.union(Man, Woman, All)
+    return { Man, Woman, All, ManWomanOrAll }
+}
 if (process.env.NODE_ENV !== "production") {
     test("it should complain about multiple applicable types no dispatch method", () => {
-        const { Box, Plane, Square } = createTestFactories()
+        const { Box, Square } = createTestFactories()
+        const PlaneNotEager = types.union({ eager: false }, Square, Box)
         expect(() => {
-            Plane.create({ width: 2, height: 2 })
+            PlaneNotEager.create({ width: 2, height: 2 })
         }).toThrow(/Error while converting/)
     })
 }
@@ -44,7 +52,7 @@ if (process.env.NODE_ENV !== "production") {
     test("it should complain about no applicable types", () => {
         const { Heighed } = createTestFactories()
         expect(() => {
-            Heighed.create({ height: 2 })
+            Heighed.create({ height: 2 } as any)
         }).toThrow(/Error while converting/)
     })
 }
@@ -89,4 +97,66 @@ test("it should use dispatch to discriminate", () => {
     const { Box, DispatchPlane, Square } = createTestFactories()
     const a = DispatchPlane.create({ width: 3 })
     expect(getSnapshot(a)).toEqual({ width: 3 })
+})
+
+test("it should eagerly match by ambiguos value", () => {
+    const { ManWomanOrAll, All, Man } = createLiteralTestFactories()
+    const person = ManWomanOrAll.create({ type: "Z" })
+    expect(All.is(person)).toEqual(true)
+    expect(Man.is(person)).toEqual(false)
+})
+
+test("it should eagerly match by ambiguos value - 2", () => {
+    const { All, Man } = createLiteralTestFactories()
+    const person = types.union(All, Man).create({ type: "M" })
+    expect(All.is(person)).toEqual(true)
+    expect(Man.is(person)).toEqual(false) // not matched, All grabbed everything!
+})
+
+test("it should eagerly match by value literal", () => {
+    const { ManWomanOrAll, All, Man } = createLiteralTestFactories()
+    const person = ManWomanOrAll.create({ type: "M" })
+    expect(All.is(person)).toEqual(false)
+    expect(Man.is(person)).toEqual(true)
+})
+
+test("dispatch", () => {
+    const Odd = types
+        .model({
+            value: types.number
+        })
+        .actions(self => ({
+            isOdd() {
+                return true
+            },
+            isEven() {
+                return false
+            }
+        }))
+    const Even = types.model({ value: types.number }).actions(self => ({
+        isOdd() {
+            return false
+        },
+        isEven() {
+            return true
+        }
+    }))
+    const Num = types.union(
+        { dispatcher: snapshot => (snapshot.value % 2 === 0 ? Even : Odd) },
+        Even,
+        Odd
+    )
+    expect(Num.create({ value: 3 }).isOdd()).toBe(true)
+    expect(Num.create({ value: 3 }).isEven()).toBe(false)
+    expect(Num.create({ value: 4 }).isOdd()).toBe(false)
+    expect(Num.create({ value: 4 }).isEven()).toBe(true)
+    if (process.env.NODE_ENV !== "production") {
+        expect(() => {
+            const Num = types.union(
+                (snapshot => (snapshot.value % 2 === 0 ? Even : Odd)) as any, // { dispatcher: snapshot => (snapshot.value % 2 === 0 ? Even : Odd) },
+                Even,
+                Odd
+            )
+        }).toThrow("First argument to types.union should either be a type")
+    }
 })
