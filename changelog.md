@@ -16,13 +16,14 @@ Running `yarn speedtest` on Node 9.3:
 
 Beyond that, MST 3 uses TypeScript 2.8, which results in more accurate TypeScript support.
 
-The type system has been slightly simplified, and many issues around map keys have been resolved. See below for the full details.
+The type system has been simplified and improved in several areas. Several open issues around maps and (numberic) keys have been resolved. The `frozen` type can now be fully typed.  See below for the full details.
 
-Also, the 'object has died' exception can be supressed now. One should still addres it, but at least it won't be a show-stopper from now on.
+Also, the 'object has died' exception can be supressed now. One should still address it, but at least it won't be a show-stopper from now on.
 
 ## Changes in the type system
 
 * **[BREAKING]** `types.identifier` can no longer be parameterized with either `types.string` or `types.number`. So instead of `types.identifier()` use `types.identifier`. Identifiers are now always normalized to strings. This reflects what was already happening internally and solves a lot of edge cases. To use numbers as identifiers, `types.identifierNumber` (instead of `types.identifier(types.number)`) can be used, which serializes it's snapshot to a number, but will internally work like a string based identifier
+* **[BREAKING]** `types.maybe` now serializes to / from `undefined` by default, as it is more and more the common best practice to don't use `null` at all and MST follows this practice. Use `types.maybeNull` for the old behavior (see [#830](https://github.com/mobxjs/mobx-state-tree/issues/830))
 * **[BREAKING]** `types.frozen` is now a function, and can now be invoked in a few different ways:
   1. `types.frozen()` - behaves the same as `types.frozen` in MST 2.
   1. `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type. Note that the type will not actually be instantiated, so it can only be used to check the _shape_ of the data. Adding views or actions to `SubType` would be pointless.
@@ -35,20 +36,23 @@ Also, the 'object has died' exception can be supressed now. One should still add
 
 ## Other improvements
 
+* **[BREAKING]** MobX-state-tree now requires at least TypeScript 2.8 when using MST with typescript. The type system has been revamped, and should now be a lot more accurate, especially concerning snapshot types.
+* **[BREAKING]** `map.put` will now return the inserted node, rather than the map itself. This makes it easier to find objects for which the identifier is not known upfront. See [#766](https://github.com/mobxjs/mobx-state-tree/issues/766) by [k-g-a](https://github.com/k-g-a)
+* **[BREAKING]** The order of firing hooks when instantiating has slighlty changed, as the `afterCreate` hook will now only be fired upon instantation of the tree node, which now happens lazily (on first read / action). The internal order in which hooks are fired within a single node has remained the same. See [#845](https://github.com/mobxjs/mobx-state-tree/issues/845) for details
 * Significantly improved the performance of constructing MST trees. Significantly reduced the memory footprint of MST. Big shoutout to the relentless effort by [k-g-a](https://github.com/k-g-a) to optimize all the things! See [#845](https://github.com/mobxjs/mobx-state-tree/issues/845) for details.
-* Introduced `setLivelynessChecking("warn" | "ignore" | "error")`, this can be used to customize how MST should act when one tries to read or write to a node that has already ben removed from the tree. The default behavior is `warn`.
+* Introduced `setLivelynessChecking("warn" | "ignore" | "error")`, this can be used to customize how MST should act when one tries to read or write to a node that has already been removed from the tree. The default behavior is `warn`.
 * Improved the overloads of `model.compose`, see [#892](https://github.com/mobxjs/mobx-state-tree/pull/892) by [t49tran](https://github.com/t49tran)
 * Fixed issue where computed properties based on `getPath` could return stale results, fixes [#917](https://github.com/mobxjs/mobx-state-tree/issues/917)
 * Fixed issue where onAction middleware threw on dead nodes when attachAfter option was used
+* Fixed several issues with maps and numberic identifiers, such as [#884](https://github.com/mobxjs/mobx-state-tree/issues/884) and [#826](https://github.com/mobxjs/mobx-state-tree/issues/826)
 
-## Breaking changes
+## TL,DR Migration guide
 
-* **[BREAKING]** MobX-state-tree now requires at least TypeScript 2.8 when using MST with typescript
-* **[BREAKING]** `map.put` will now return the inserted node, rather than the map itself. This makes it easier to find objects for which the identifier is not known upfront. See [#766](https://github.com/mobxjs/mobx-state-tree/issues/766) by [k-g-a](https://github.com/k-g-a)
-* **[BREAKING]** The order of firing hooks when instantiating has slighlty changed, as the `afterCreate` hook will now only be fired upon instantation of the tree node, which now happens lazily (on first read / action). The internal order within a single node has remained the same.
-* types.maybe now used undefined by default, use `types.maybeNull` for the old behavior (see [#830](https://github.com/mobxjs/mobx-state-tree/issues/830))
-
-Map issues: 884, 826
+* `types.identifier(types.number)` => `types.identifierNumber`
+* `types.identifier()` and `types.identifier(types.string) => `types.identifier`
+* `types.frozen` => `types.frozen()`
+* `types.maybe(x)` => `types.maybeNull(x)`
+* `postProcessSnapshot` should now be declared on the type instead of as action
 
 # 2.2.0
 
