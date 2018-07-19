@@ -1,3 +1,4 @@
+import { isInteger } from "./../src/utils"
 import { types, applySnapshot, getSnapshot } from "../src"
 test("Date instance can be reused", () => {
     const Model = types.model({
@@ -44,4 +45,25 @@ test("Date can be rehydrated using unix timestamp", () => {
     applySnapshot(store, { date: newTime })
     expect(store.date.getTime()).toBe(newTime)
     expect(getSnapshot(store).date).toBe(newTime)
+})
+
+test("isInteger polyfill", () => {
+    expect(isInteger(5)).toBe(true)
+    expect(isInteger(-5)).toBe(true)
+    expect(isInteger(5.2)).toBe(false)
+})
+
+test("Passing non integer to types.integer", () => {
+    const Size = types.model({
+        width: types.integer,
+        height: 20
+    })
+
+    expect(() => {
+        const size = Size.create({ width: 10 })
+    }).not.toThrow()
+
+    expect(() => {
+        const size = Size.create({ width: 10.5 })
+    }).toThrow()
 })

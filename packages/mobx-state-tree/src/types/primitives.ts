@@ -1,3 +1,4 @@
+import { isInteger } from "./../utils"
 import {
     Type,
     isPrimitive,
@@ -80,7 +81,7 @@ export const string: ISimpleType<string> = new CoreType<string, string>(
  * @example
  * const Vector = types.model({
  *   x: types.number,
- *   y: 0
+ *   y: 1.5
  * })
  */
 // tslint:disable-next-line:variable-name
@@ -88,6 +89,25 @@ export const number: ISimpleType<number> = new CoreType<number, number>(
     "number",
     TypeFlags.Number,
     (v: any) => typeof v === "number"
+)
+
+/**
+ * Creates a type that can only contain an integer value.
+ * This type is used for integer values by default
+ *
+ * @export
+ * @alias types.integer
+ * @example
+ * const Size = types.model({
+ *   width: types.integer,
+ *   height: 10
+ * })
+ */
+// tslint:disable-next-line:variable-name
+export const integer: ISimpleType<number> = new CoreType<number, number>(
+    "integer",
+    TypeFlags.Integer,
+    (v: any) => isInteger(v)
 )
 
 /**
@@ -161,7 +181,7 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
         case "string":
             return string
         case "number":
-            return number
+            return isInteger(value) ? integer : number
         case "boolean":
             return boolean
         case "object":
@@ -173,7 +193,9 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
 export function isPrimitiveType(type: any): type is CoreType<any, any> {
     return (
         isType(type) &&
-        (type.flags & (TypeFlags.String | TypeFlags.Number | TypeFlags.Boolean | TypeFlags.Date)) >
+        (type.flags &
+            (TypeFlags.String | TypeFlags.Number | TypeFlags.Integer,
+            TypeFlags.Boolean | TypeFlags.Date)) >
             0
     )
 }

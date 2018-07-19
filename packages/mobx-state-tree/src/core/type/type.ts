@@ -36,7 +36,8 @@ export enum TypeFlags {
     Refinement = 8192,
     Union = 16384,
     Null = 32768,
-    Undefined = 65536
+    Undefined = 65536,
+    Integer = 131072
 }
 
 export interface ISnapshottable<S> {} // TODO: kill this?
