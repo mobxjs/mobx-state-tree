@@ -67,6 +67,7 @@ const TYPES = [
     "model",
     "null",
     "number",
+    "integer",
     "optional",
     "reference",
     "refinement",
