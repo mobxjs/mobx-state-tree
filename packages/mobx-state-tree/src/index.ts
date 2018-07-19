@@ -93,7 +93,8 @@ export {
     recordActions,
     createActionTrackingMiddleware,
     setLivelynessChecking,
-    LivelynessMode
+    LivelynessMode,
+    TypeFlags
 } from "./internal"
 
 export * from "./core/mst-operations"
