@@ -19,8 +19,8 @@ test("it should support custom references - basics", () => {
     const UserByNameReference = types.maybeNull(
         types.reference(User, {
             // given an identifier, find the user
-            get(identifier /* string */, parent: typeof Store.Type /*Store*/) {
-                return parent.users.find(u => u.name === identifier) || null
+            get(identifier /* string */, parent: any /*Store*/) {
+                return parent.users.find((u: typeof User.Type) => u.name === identifier) || null
             },
             // given a user, produce the identifier that should be stored
             set(value /* User */) {
@@ -37,7 +37,7 @@ test("it should support custom references - basics", () => {
         selection: "Mattia"
     })
     unprotect(s)
-    expect(s.selection.name).toBe("Mattia")
+    expect(s.selection!.name).toBe("Mattia")
     expect(s.selection === s.users[1]).toBe(true)
     expect(getSnapshot(s).selection).toBe("Mattia")
     s.selection = s.users[0]
@@ -60,8 +60,8 @@ test("it should support custom references - adv", () => {
     const NameReference = types.reference(User, {
         get(identifier, parent: any) {
             if (identifier === null) return null
-            const users = values(getRoot(parent).users)
-            return users.filter(u => u.name === identifier)[0] || null
+            const users = values((getRoot(parent) as any).users)
+            return users.filter((u: typeof User.Type) => u.name === identifier)[0] || null
         },
         set(value) {
             return value ? value.name : ""
@@ -83,7 +83,7 @@ test("it should support custom references - adv", () => {
     expect(s.selection === s.users.get("2")).toBe(true)
     expect(getSnapshot<typeof Store.SnapshotType>(s).selection).toBe("Mattia")
     const p = recordPatches(s)
-    const r = []
+    const r: any[] = []
     onSnapshot(s, r.push.bind(r))
     const ids: any[] = []
     reaction(
@@ -132,7 +132,7 @@ test("it should support dynamic loading", done => {
             selection: UserByNameReference
         })
         .actions(self => ({
-            loadUser: flow(function* loadUser(name) {
+            loadUser: flow(function* loadUser(name: string) {
                 events.push("loading " + name)
                 self.users.push({ name } as any)
                 yield new Promise(resolve => {
@@ -144,7 +144,7 @@ test("it should support dynamic loading", done => {
         }))
         .views(self => ({
             // Important: a view so that the reference will automatically react to the reference being changed!
-            getOrLoadUser(name) {
+            getOrLoadUser(name: string) {
                 const user = self.users.find(u => u.name === name) || null
                 if (!user) {
                     /*

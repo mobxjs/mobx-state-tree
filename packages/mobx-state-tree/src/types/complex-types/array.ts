@@ -256,12 +256,15 @@ export class ArrayType<C, S, T> extends ComplexType<C[], S[], IObservableArray<T
  */
 export function array<C, S, T>(
     subtype: IType<C, S, T>
-): IComplexType<ReadonlyArray<C>, ReadonlyArray<S>, IObservableArray<T>> {
+): IComplexType<ReadonlyArray<C> | undefined, ReadonlyArray<S>, IObservableArray<T>> & {
+    flags: TypeFlags.Optional
+} {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subtype))
             fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")
     }
-    return new ArrayType<C, S, T>(subtype.name + "[]", subtype)
+    const ret = new ArrayType<C, S, T>(subtype.name + "[]", subtype)
+    return ret as typeof ret & { flags: TypeFlags.Optional }
 }
 
 function reconcileArrayChildren<T>(

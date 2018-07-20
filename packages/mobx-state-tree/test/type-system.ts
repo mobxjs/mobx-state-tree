@@ -354,7 +354,7 @@ test("it should type compose correctly", () => {
             logNode: "test"
         })
         .actions(self => {
-            function log(msg) {}
+            function log(msg: string) {}
             return {
                 log
             }

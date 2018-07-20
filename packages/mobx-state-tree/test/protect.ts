@@ -4,7 +4,7 @@ const Todo = types
         title: ""
     })
     .actions(self => {
-        function setTitle(newTitle) {
+        function setTitle(newTitle: string) {
             self.title = newTitle
         }
         return {

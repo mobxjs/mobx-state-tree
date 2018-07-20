@@ -8,7 +8,7 @@ import {
     // TODO: export IRawActionCall
 } from "../src"
 import { reaction, configure } from "mobx"
-function delay(time, value, shouldThrow = false) {
+function delay(time: number, value: any, shouldThrow = false) {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             if (shouldThrow) reject(value)
@@ -17,14 +17,20 @@ function delay(time, value, shouldThrow = false) {
     })
 }
 
-function testCoffeeTodo(done, generator, shouldError, resultValue, producedCoffees) {
+function testCoffeeTodo(
+    done: () => void,
+    generator: any,
+    shouldError: boolean,
+    resultValue: any,
+    producedCoffees: any[]
+) {
     configure({ enforceActions: true })
     const Todo = types
         .model({
             title: "get coffee"
         })
         .actions(self => ({
-            startFetch: flow(generator(self)) as (string) => Promise<string>
+            startFetch: flow(generator(self)) as (string: string) => Promise<string>
         }))
     const events: any[] = []
     const coffees: any[] = []
@@ -34,7 +40,7 @@ function testCoffeeTodo(done, generator, shouldError, resultValue, producedCoffe
         return next(c)
     })
     reaction(() => t1.title, coffee => coffees.push(coffee))
-    function handleResult(res) {
+    function handleResult(res: any) {
         expect(res).toBe(resultValue)
         expect(coffees).toEqual(producedCoffees)
         const filtered = filterRelevantStuff(events)
@@ -79,8 +85,8 @@ test("flow happens in single ticks", done => {
 test("can handle async actions", done => {
     testCoffeeTodo(
         done,
-        self =>
-            function* fetchData(kind) {
+        (self: any) =>
+            function* fetchData(kind: string) {
                 self.title = "getting coffee " + kind
                 self.title = yield delay(100, "drinking coffee")
                 return "awake"
@@ -93,8 +99,8 @@ test("can handle async actions", done => {
 test("can handle erroring actions", done => {
     testCoffeeTodo(
         done,
-        self =>
-            function* fetchData(kind) {
+        (self: any) =>
+            function* fetchData(kind: string): IterableIterator<any> {
                 throw kind
             },
         true,
@@ -105,8 +111,8 @@ test("can handle erroring actions", done => {
 test("can handle try catch", t => {
     testCoffeeTodo(
         t,
-        self =>
-            function* fetchData(kind) {
+        (self: any) =>
+            function* fetchData(kind: string): IterableIterator<any> {
                 try {
                     yield delay(10, "tea", true)
                 } catch (e) {
@@ -120,13 +126,19 @@ test("can handle try catch", t => {
     )
 })
 test("empty sequence works", t => {
-    testCoffeeTodo(t, self => function* fetchData(kind) {}, false, undefined, [])
+    testCoffeeTodo(
+        t,
+        (self: any) => function* fetchData(kind: string): IterableIterator<any> {},
+        false,
+        undefined,
+        []
+    )
 })
 test("can handle throw from yielded promise works", t => {
     testCoffeeTodo(
         t,
-        self =>
-            function* fetchData(kind) {
+        (self: any) =>
+            function* fetchData(kind: string): IterableIterator<any> {
                 yield delay(10, "x", true)
             },
         true,
@@ -140,12 +152,12 @@ test("typings", done => {
             title: types.string
         })
         .actions(self => {
-            function* a(x) {
+            function* a(x: string) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 23
             }
-            const b = flow(function* b(x) {
+            const b = flow(function* b(x: string) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 24
@@ -167,12 +179,12 @@ test("typings", done => {
             title: types.string
         })
         .actions(self => {
-            function* a(x) {
+            function* a(x: string) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 23
             }
-            const b = flow(function* b(x) {
+            const b = flow(function* b(x: string) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 24
@@ -198,7 +210,7 @@ test("recordActions should only emit invocation", done => {
             title: types.string
         })
         .actions(self => {
-            function* a(x) {
+            function* a(x: string) {
                 yield delay(10, "x", false)
                 calls++
                 return 23
@@ -227,14 +239,14 @@ test("recordActions should only emit invocation", done => {
     })
 })
 test("can handle nested async actions", t => {
-    const uppercase = flow(function* uppercase(value) {
+    const uppercase = flow(function* uppercase(value: string) {
         const res = yield delay(20, value.toUpperCase())
         return res
     })
     testCoffeeTodo(
         t,
-        self =>
-            function* fetchData(kind) {
+        (self: any) =>
+            function* fetchData(kind: string) {
                 self.title = yield uppercase("drinking " + kind)
                 return self.title
             },
@@ -245,16 +257,16 @@ test("can handle nested async actions", t => {
 })
 test("can handle nested async actions when using decorate", done => {
     const events: any[] = []
-    function middleware(call, next) {
+    function middleware(call: any, next: any) {
         events.push([call.type, call.name])
         return next(call)
     }
-    const uppercase = flow(function* uppercase(value) {
+    const uppercase = flow(function* uppercase(value: string) {
         const res = yield delay(20, value.toUpperCase())
         return res
     })
     const Todo = types.model({}).actions(self => {
-        const act = flow(function* act(value) {
+        const act = flow(function* act(value: string) {
             return yield uppercase(value)
         })
         return {
@@ -304,8 +316,8 @@ test("flow gain back control when node become not alive during yield", async () 
     }
 })
 
-function filterRelevantStuff(stuff) {
-    return stuff.map(x => {
+function filterRelevantStuff(stuff: any) {
+    return stuff.map((x: any) => {
         delete x.context
         delete x.tree
         return x

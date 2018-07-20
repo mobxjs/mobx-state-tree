@@ -2,7 +2,6 @@ import {
     fail,
     INode,
     Type,
-    IType,
     IContext,
     IValidationResult,
     TypeFlags,
@@ -60,8 +59,8 @@ export class Late<C, S, T> extends Type<C, S, T> {
     }
 }
 
-export function late<C, S, T>(type: () => IType<C, S, T>): IType<C, S, T>
-export function late<C, S, T>(name: string, type: () => IType<C, S, T>): IType<C, S, T>
+export function late<T extends IAnyType>(type: () => T): T
+export function late<T extends IAnyType>(name: string, type: () => T): T
 /**
  * Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies.
  * Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.

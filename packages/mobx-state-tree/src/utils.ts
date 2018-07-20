@@ -195,3 +195,23 @@ deprecated = function(id: string, message: string): void {
 }
 deprecated.ids = {}
 export { deprecated }
+
+export type Primitive = undefined | null | boolean | string | number | Function
+
+export interface DeepImmutableArray<T> extends ReadonlyArray<DeepImmutable<T>> {}
+
+export interface DeepImmutableMap<K, V> extends ReadonlyMap<DeepImmutable<K>, DeepImmutable<V>> {}
+
+export type DeepImmutableObject<T> = { readonly [K in keyof T]: DeepImmutable<T[K]> }
+
+export type DeepImmutable<T> = T extends Primitive
+    ? T
+    : T extends Array<infer U>
+        ? DeepImmutableArray<U>
+        : T extends ReadonlyArray<infer U>
+            ? DeepImmutableArray<U>
+            : T extends Map<infer K, infer V>
+                ? DeepImmutableMap<K, V>
+                : T extends ReadonlyMap<infer K, infer V>
+                    ? DeepImmutableMap<K, V>
+                    : DeepImmutableObject<T>

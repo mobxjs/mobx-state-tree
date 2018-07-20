@@ -10,7 +10,8 @@ import {
     resolveIdentifier,
     getRoot,
     IType,
-    IAnyType
+    IAnyType,
+    IComplexType
 } from "../src"
 test("it should support prefixed paths in maps", () => {
     const User = types.model({
@@ -231,17 +232,17 @@ test("122 - identifiers should support numbers as well", () => {
     expect(F.is({ id: "bla" })).toBe(false)
 })
 test("self reference with a late type", () => {
-    const Book = types.model("Book", {
+    const Book: any = types.model("Book", {
         id: types.identifier,
         genre: types.string,
-        reference: types.reference(types.late(() => Book) as IAnyType)
+        reference: types.reference(types.late(() => Book))
     })
     const Store = types
         .model("Store", {
             books: types.array(Book)
         })
         .actions(self => {
-            function addBook(book) {
+            function addBook(book: typeof Book.Type | typeof Book.CreationType) {
                 self.books.push(book)
             }
             return {
@@ -304,7 +305,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
     // first update the reference, than create a new matching item! Ref becomes ambigous now...
     store.selected = 1 as any // valid assignment
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
-    let err
+    let err!: Error
     autorun(() => store.selected, {
         onError(e) {
             err = e
@@ -397,7 +398,7 @@ test("it should restore map of references from snapshot", () => {
     expect(store.selected.get("to") === store.boxes[1]).toEqual(true)
 })
 test("it should support relative lookups", () => {
-    const Node = types.model({
+    const Node: any = types.model({
         id: types.identifierNumber,
         children: types.optional(types.array(types.late(() => Node)), [])
     })
@@ -501,15 +502,15 @@ test("References in recursive structures", () => {
         files: types.array(types.string)
     })
     // saddly, this becomes any, and further untypeable...
-    const Tree = types
+    const Tree: any = types
         .model("Tree", {
             children: types.array(types.late(() => Tree)),
             data: types.maybeNull(types.reference(Folder))
         })
         .actions(self => {
-            function addFolder(data) {
+            function addFolder(data: typeof Folder.Type | typeof Folder.CreationType) {
                 const folder = Folder.create(data)
-                getRoot(self).putFolderHelper(folder)
+                getRoot<typeof Storage.Type>(self).putFolderHelper(folder)
                 self.children.push(Tree.create({ data: folder, children: [] }))
             }
             return {
@@ -525,16 +526,16 @@ test("References in recursive structures", () => {
     type ITreeType = {
         children: ITreeType[]
         data: null | typeof Folder.Type
-        addFolder(data: any)
+        addFolder(data: typeof Folder.Type | typeof Folder.CreationType): void
     }
 
     const Storage = types
         .model("Storage", {
             objects: types.map(Folder),
-            tree: Tree as IType<ITreeSnapshot, ITreeSnapshot, ITreeType>
+            tree: Tree as IComplexType<ITreeSnapshot, ITreeSnapshot, ITreeType>
         })
         .actions(self => ({
-            putFolderHelper(folder) {
+            putFolderHelper(folder: typeof Folder.Type | typeof Folder.CreationType) {
                 self.objects.put(folder)
             }
         }))
@@ -605,13 +606,13 @@ test("it should applyPatch references in array", () => {
             hovers: types.array(types.reference(Item))
         })
         .actions(self => {
-            function addObject(item) {
+            function addObject(item: typeof Item.Type) {
                 self.objects.put(item)
             }
-            function addHover(item) {
+            function addHover(item: typeof Item.Type) {
                 self.hovers.push(item)
             }
-            function removeHover(item) {
+            function removeHover(item: typeof Item.Type) {
                 self.hovers.remove(item)
             }
             return {
@@ -622,7 +623,7 @@ test("it should applyPatch references in array", () => {
         })
     const folder = Folder.create({ id: "folder 1", objects: {}, hovers: [] })
     folder.addObject({ id: "item 1", name: "item name 1" })
-    const item = folder.objects.get("item 1")
+    const item = folder.objects.get("item 1")!
     const snapshot = getSnapshot(folder)
     const newStore = Folder.create(snapshot)
     onPatch(folder, data => {

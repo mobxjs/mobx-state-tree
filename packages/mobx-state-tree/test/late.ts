@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== "production") {
     test("it should throw if late doesnt received a function as parameter", () => {
         expect(() => {
             types.model({
-                after: types.late(1 as any)
+                after: types.late(1 as any) as any
             })
         }).toThrow()
     })
@@ -19,7 +19,7 @@ test("it should accept a type and infer it correctly", () => {
 })
 test("late should allow circular references", () => {
     // TypeScript is'nt smart enough to infer self referencing types.
-    const Node = types.model({
+    const Node: any = types.model({
         childs: types.optional(types.array(types.late(() => Node)), [])
     })
     expect(() => Node.create()).not.toThrow()
@@ -27,13 +27,13 @@ test("late should allow circular references", () => {
 })
 test("late should describe correctly circular references", () => {
     // TypeScript is'nt smart enough to infer self referencing types.
-    const Node = types.model("Node", {
+    const Node: any = types.model("Node", {
         childs: types.array(types.late(() => Node))
     })
     expect(Node.describe()).toEqual("{ childs: Node[]? }")
 })
 test("should typecheck", () => {
-    const NodeObject = types.model("NodeObject", {
+    const NodeObject: any = types.model("NodeObject", {
         id: types.identifierNumber,
         text: "Hi",
         child: types.maybe(types.late(() => NodeObject))

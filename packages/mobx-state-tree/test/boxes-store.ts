@@ -20,11 +20,11 @@ export const Box = types
         }
     }))
     .actions(self => {
-        function move(dx, dy) {
+        function move(dx: number, dy: number) {
             self.x += dx
             self.y += dy
         }
-        function setName(newName) {
+        function setName(newName: string) {
             self.name = newName
         }
         return {
@@ -47,21 +47,28 @@ export const Store = types
         function afterCreate() {
             unprotect(self)
         }
-        function addBox(id, name, x, y) {
+        function addBox(id: string, name: string, x: number, y: number) {
             const box = Box.create({ name, x, y, id })
             self.boxes.put(box)
             return box
         }
-        function addArrow(id, from, to) {
+        function addArrow(id: string, from: string, to: string) {
             self.arrows.push(Arrow.create({ id, from, to }))
         }
-        function setSelection(selection) {
+        function setSelection(selection: typeof Box.Type) {
             self.selection = selection
         }
-        function createBox(id, name, x, y, source, arrowId) {
+        function createBox(
+            id: string,
+            name: string,
+            x: number,
+            y: number,
+            source: typeof Box.Type | null | undefined,
+            arrowId: string | null
+        ) {
             const box = addBox(id, name, x, y)
             setSelection(box)
-            if (source) addArrow(arrowId, source.id, box.id)
+            if (source) addArrow(arrowId!, source.id, box.id)
         }
         return {
             afterCreate,

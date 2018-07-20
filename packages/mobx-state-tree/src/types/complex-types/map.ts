@@ -403,8 +403,10 @@ export class MapType<C, S, T> extends ComplexType<
 }
 
 export function map<C, S, T>(
-    subtype: IType<C, S, T>
-): IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IMSTMap<C, S, T>>
+    subtype: IComplexType<C, S, T>
+): IComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<C, S, T>> & {
+    flags: TypeFlags.Optional
+}
 /**
  * Creates a key based collection type who's children are all of a uniform declared type.
  * If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
@@ -434,8 +436,11 @@ export function map<C, S, T>(
  */
 export function map<C, S, T>(
     subtype: IType<C, S, T>
-): IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IMSTMap<C, S, T>> {
-    return new MapType<C, S, T>(`map<string, ${subtype.name}>`, subtype)
+): IComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<C, S, T>> & {
+    flags: TypeFlags.Optional
+} {
+    const ret = new MapType<C, S, T>(`map<string, ${subtype.name}>`, subtype)
+    return ret as typeof ret & { flags: TypeFlags.Optional }
 }
 
 export function isMapType<C, S, T>(

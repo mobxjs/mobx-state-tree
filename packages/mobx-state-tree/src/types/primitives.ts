@@ -13,7 +13,8 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    ObjectNode
+    ObjectNode,
+    IComplexType
 } from "../internal"
 
 // TODO: implement CoreType using types.custom ?
@@ -146,7 +147,7 @@ export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, und
  * LogLine.create({ timestamp: new Date() })
  */
 // tslint:disable-next-line:variable-name
-export const DatePrimitive: IType<number, number, Date> = new CoreType<number, Date>(
+export const DatePrimitive: IComplexType<number | Date, number, Date> = new CoreType<number, Date>(
     "Date",
     TypeFlags.Date,
     (v: any) => typeof v === "number" || v instanceof Date,

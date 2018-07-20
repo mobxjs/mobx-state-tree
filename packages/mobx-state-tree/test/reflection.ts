@@ -57,7 +57,8 @@ test("reflection - late", () => {
     const node = Model.create({
         user: { id: "5", name: "Test" }
     })
-    const reflection = getMembers(node.user || {})
+    const empty: IStateTreeNode = {}
+    const reflection = getMembers((node.user as IStateTreeNode) || empty)
     const keys = Object.keys(reflection.properties || {})
     expect(keys.includes("name")).toBe(true)
     expect(reflection.properties.name.describe()).toBe("string")
@@ -114,7 +115,7 @@ test("reflection - members chained", () => {
             }
         }))
         .views(self => ({
-            anotherView(prop) {
+            anotherView(prop: string) {
                 return 1
             }
         }))

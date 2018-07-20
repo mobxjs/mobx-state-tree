@@ -7,7 +7,7 @@ import {
     TypeFlags,
     undefinedType,
     nullType,
-    IAnyType
+    IComplexType
 } from "../../internal"
 
 const optionalUndefinedType = optional(undefinedType, undefined)
@@ -19,17 +19,17 @@ const optionalNullType = optional(nullType, null)
  *
  * @export
  * @alias types.maybe
+ * @template C
  * @template S
  * @template T
- * @param {IType<S, T>} type The type to make nullable
- * @returns {(IType<S | undefined, T | undefined>)}
+ * @param {IComplexType<C, S, M> | IType<C, S, M>} type The type to make nullable
+ * @returns {(IType<C | undefined, S | undefined, T | undefined>)}
  */
-export function maybe<C, S, T>(
-    type: IType<C, S, T>
-): IType<S | undefined, S | undefined, T | undefined> & { flags: TypeFlags.Optional } {
+export function maybe<C, S, T>(type: IComplexType<C, S, T> | IType<C, S, T>) {
     if (process.env.NODE_ENV !== "production" && !isType(type))
         fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
-    return union(type, optionalUndefinedType) as any
+    const ret = union(type, optionalUndefinedType)
+    return ret as typeof ret & { flags: TypeFlags.Optional }
 }
 
 /**
@@ -38,15 +38,15 @@ export function maybe<C, S, T>(
  *
  * @export
  * @alias types.maybeNull
+ * @template C
  * @template S
  * @template T
- * @param {IType<S, T>} type The type to make nullable
- * @returns {(IType<S | null, T | null>)}
+ * @param {IComplexType<C, S, M> | IType<C, S, M>} type The type to make nullable
+ * @returns {(IType<C | null | undefined, S | null, T | null>)}
  */
-export function maybeNull<C, S, T>(
-    type: IType<C, S, T>
-): IType<S | null | undefined, S | null, T | null> & { flags: TypeFlags.Optional } {
+export function maybeNull<C, S, M>(type: IComplexType<C, S, M> | IType<C, S, M>) {
     if (process.env.NODE_ENV !== "production" && !isType(type))
         fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
-    return union(type, optionalNullType) as any
+    const ret = union(type, optionalNullType)
+    return ret as typeof ret & { flags: TypeFlags.Optional }
 }

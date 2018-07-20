@@ -367,18 +367,16 @@ export function hasParentOfType(target: IStateTreeNode, type: IAnyType): boolean
     return false
 }
 
-export function getParentOfType(target: IStateTreeNode, type: IAnyType): any & IStateTreeNode
-export function getParentOfType<S, T>(target: IStateTreeNode, type: IAnyType): T & IStateTreeNode
 /**
  * Returns the target's parent of a given type, or throws.
  *
  *
  * @export
- * @param {Object} target
- * @param {IAnyType} type
- * @returns {*}
+ * @param {IStateTreeNode} target
+ * @param {IType<any, any, T>} type
+ * @returns {T}
  */
-export function getParentOfType<S, T>(target: IStateTreeNode, type: IAnyType): T {
+export function getParentOfType<T>(target: IStateTreeNode, type: IType<any, any, T>): T {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -395,8 +393,8 @@ export function getParentOfType<S, T>(target: IStateTreeNode, type: IAnyType): T
     return fail(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
 }
 
-export function getRoot(target: IStateTreeNode): any & IStateTreeNode
 export function getRoot<T>(target: IStateTreeNode): T & IStateTreeNode
+export function getRoot(target: IStateTreeNode): any & IStateTreeNode
 /**
  * Given an object in a model tree, returns the root object of that tree
  *

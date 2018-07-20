@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== "production") {
                 )
             })
             .actions(self => ({
-                setId(id) {
+                setId(id: string) {
                     self.id = id
                 }
             }))
@@ -20,8 +20,8 @@ if (process.env.NODE_ENV !== "production") {
                 models: types.array(Model)
             })
             .actions(self => ({
-                addModel(model) {
-                    self.models.push(model)
+                addModel(model: typeof Model.Type | typeof Model.CreationType) {
+                    self.models.push(model as typeof Model.Type)
                 }
             }))
         expect(() => {
@@ -56,7 +56,7 @@ test("#158 - #88 - Identifiers should accept any string character", () => {
 })
 test("#187 - identifiers should not break late types", () => {
     expect(() => {
-        const MstNode = types.model("MstNode", {
+        const MstNode: any = types.model("MstNode", {
             value: types.number,
             next: types.maybe(types.late(() => MstNode))
         })
@@ -144,7 +144,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 test("it can resolve through refrences", () => {
-    const Folder = types.model("Folder", {
+    const Folder: any = types.model("Folder", {
         type: types.literal("folder"),
         name: types.identifier,
         children: types.array(types.late(() => types.union(Folder, SymLink)))

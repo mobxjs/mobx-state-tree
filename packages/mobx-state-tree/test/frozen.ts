@@ -62,7 +62,6 @@ test("it should type strongly", () => {
 if (process.env.NODE_ENV !== "production") {
     test("it should be capable of using another MST type", () => {
         const Point = types.model("Point", { x: types.number, y: types.number })
-        type PS = typeof Point.CreationType
         const Mouse = types.model({
             loc: types.frozen(Point)
         })
@@ -86,7 +85,7 @@ if (process.env.NODE_ENV !== "production") {
             loc: { x: 3, y: 2 }
         })
 
-        const x: number = m.loc.x
+        const x = m.loc.x
         expect(x).toBe(3)
     })
 }

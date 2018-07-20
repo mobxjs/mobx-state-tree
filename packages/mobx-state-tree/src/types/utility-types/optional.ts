@@ -11,7 +11,8 @@ import {
     typecheck,
     typeCheckSuccess,
     fail,
-    IAnyType
+    IAnyType,
+    IComplexType
 } from "../../internal"
 
 export type IFunctionReturn<T> = () => T
@@ -82,6 +83,15 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
     }
 }
 
+// we override IComplexType first to make sure the type is not downgraded to IType
+export function optional<C, S, T>(
+    type: IComplexType<C, S, T>,
+    defaultValueOrFunction: C | S | T
+): IComplexType<C | undefined, S, T> & { flags: TypeFlags.Optional }
+export function optional<C, S, T>(
+    type: IComplexType<C, S, T>,
+    defaultValueOrFunction: () => C | S | T
+): IComplexType<C | undefined, S, T> & { flags: TypeFlags.Optional }
 export function optional<C, S, T>(
     type: IType<C, S, T>,
     defaultValueOrFunction: C | S | T
@@ -89,7 +99,7 @@ export function optional<C, S, T>(
 export function optional<C, S, T>(
     type: IType<C, S, T>,
     defaultValueOrFunction: () => C | S | T
-): IType<C, S, T> & { flags: TypeFlags.Optional }
+): IType<C | undefined, S, T> & { flags: TypeFlags.Optional }
 /**
  * `types.optional` can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.

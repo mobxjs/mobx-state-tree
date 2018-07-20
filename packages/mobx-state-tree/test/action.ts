@@ -89,10 +89,10 @@ const Order = types
         customer: types.maybeNull(types.reference(Customer))
     })
     .actions(self => {
-        function setCustomer(customer) {
+        function setCustomer(customer: typeof Customer.Type) {
             self.customer = customer
         }
-        function noopSetCustomer(customer) {
+        function noopSetCustomer(_: typeof Customer.Type) {
             // noop
         }
         return {
@@ -148,7 +148,7 @@ if (process.env.NODE_ENV !== "production") {
     test("it should not be possible to set the wrong type", () => {
         const store = createTestStore()
         expect(() => {
-            store.orders[0].setCustomer(store.orders[0])
+            store.orders[0].setCustomer(store.orders[0] as any)
         }).toThrowError(
             "[mobx-state-tree] Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n\n    " +
                 "value of type Order: <Order@/orders/0> is not assignable to type: `(reference(Customer) | null)`, expected an instance of `(reference(Customer) | null)` or a snapshot like `(reference(Customer) | null?)` instead."
@@ -178,8 +178,8 @@ test("it should not be possible to pass an unserializable object", () => {
     const circular = { a: null as any }
     circular.a = circular
     const recorder = recordActions(store)
-    store.orders[0].noopSetCustomer(circular)
-    store.orders[0].noopSetCustomer(new Buffer("bla"))
+    store.orders[0].noopSetCustomer(circular as any)
+    store.orders[0].noopSetCustomer(new Buffer("bla") as any)
     expect(recorder.actions).toEqual([
         {
             args: [
@@ -248,7 +248,7 @@ test("indirectly called private functions should be able to modify state", () =>
             x: 3
         })
         .actions(self => {
-            function incrementBy(delta) {
+            function incrementBy(delta: number) {
                 self.x += delta
             }
             return {
@@ -270,7 +270,7 @@ test("volatile state survives reonciliation", () => {
     const Model = types.model({ x: 3 }).actions(self => {
         let incrementor = 1
         return {
-            setIncrementor(value) {
+            setIncrementor(value: number) {
                 incrementor = value
             },
             inc() {
@@ -294,10 +294,10 @@ test("volatile state survives reonciliation", () => {
 })
 test("middleware events are correct", () => {
     const A = types.model({}).actions(self => ({
-        a(x) {
+        a(x: number) {
             return (self as any).b(x * 2)
         },
-        b(y) {
+        b(y: number) {
             return y + 1
         }
     }))
@@ -376,7 +376,7 @@ test("after attach action should work correctly", () => {
         })
         .actions(self => ({
             remove() {
-                getRoot(self).remove(self)
+                getRoot<typeof S.Type>(self).remove(self as typeof Todo.Type)
             }
         }))
     const S = types
@@ -384,7 +384,7 @@ test("after attach action should work correctly", () => {
             todos: types.array(Todo)
         })
         .actions(self => ({
-            remove(todo) {
+            remove(todo: typeof Todo.Type) {
                 self.todos.remove(todo)
             }
         }))
