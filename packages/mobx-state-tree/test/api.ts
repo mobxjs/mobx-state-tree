@@ -80,7 +80,7 @@ test("correct api exposed", () => {
     expect(
         Object.keys(mst)
             .sort()
-            .filter(key => mst[key] !== undefined) // filter out interfaces
+            .filter(key => mst[key] !== undefined && key !== "TypeFlags") // filter out interfaces and special TypeFlags enum
     ).toEqual(METHODS.sort())
 })
 test("correct types exposed", () => {

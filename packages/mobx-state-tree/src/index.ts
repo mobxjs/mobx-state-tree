@@ -34,7 +34,8 @@ import {
     enumeration,
     custom,
     identifierNumber,
-    maybeNull
+    maybeNull,
+    TypeFlags
 } from "./internal"
 
 export const types = {
@@ -93,7 +94,8 @@ export {
     recordActions,
     createActionTrackingMiddleware,
     setLivelynessChecking,
-    LivelynessMode
+    LivelynessMode,
+    TypeFlags
 } from "./internal"
 
 export * from "./core/mst-operations"
