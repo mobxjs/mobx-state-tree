@@ -718,8 +718,8 @@ export function getEnv<T = any>(target: IStateTreeNode): T {
     }
     const node = getStateTreeNode(target)
     const env = node.root._environment
-    if (!!!env) return EMPTY_OBJECT as T
-    return env
+
+    return env || fail(`Failed to find the environment of ${getStateTreeNode(target)}`)
 }
 
 /**

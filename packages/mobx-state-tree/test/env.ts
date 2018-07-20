@@ -30,9 +30,11 @@ test("it should be possible to inherit environments", () => {
     env.useUppercase = false
     expect(store.todos[0].description).toBe("test")
 })
-test("getEnv returns empty object without environment", () => {
+test("getEnv should throw error without environment", () => {
     const todo = Todo.create()
-    expect(getEnv(todo)).toEqual({})
+    expect(() => getEnv(todo)).toThrowError(
+        "Failed to find the environment of AnonymousModel@<root>"
+    )
 })
 test("detach should preserve environment", () => {
     const env = createEnvironment()
@@ -103,7 +105,9 @@ test("clone preserves environnment", () => {
     }
     {
         const todo = clone(store.todos[0], false)
-        expect(getEnv(todo)).toEqual({})
+        expect(() => {
+            getEnv(todo)
+        }).toThrowError("Failed to find the environment of AnonymousModel@<root>")
     }
     {
         const env2 = createEnvironment()
