@@ -741,8 +741,9 @@ export function isModelType(type: any): type is ModelType<any, any> {
 
 function tryGetOptional(type: any): OptionalValue<any, any, any> | undefined {
     if (!type) return undefined
-    if (type.flags & TypeFlags.Union) return type.types.find(tryGetOptional)
-    if (type.flags & TypeFlags.Late) return tryGetOptional(type.subType)
+    // we need to check for type.types since an optional union doesn't have direct subtypes
+    if (type.flags & TypeFlags.Union && type.types) return type.types.find(tryGetOptional)
+    if (type.flags & TypeFlags.Late && type.subType) return tryGetOptional(type.subType)
     if (type.flags & TypeFlags.Optional) return type
     return undefined
 }
