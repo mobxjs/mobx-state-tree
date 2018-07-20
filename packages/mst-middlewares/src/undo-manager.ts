@@ -12,7 +12,8 @@ import {
     ISnapshottable,
     IMiddlewareEvent,
     IPatchRecorder,
-    IJsonPatch
+    IJsonPatch,
+    TypeFlags
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 

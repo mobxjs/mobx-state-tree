@@ -7,7 +7,8 @@ import {
     resolvePath,
     getPath,
     ISnapshottable,
-    IModelType
+    IModelType,
+    TypeFlags
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
