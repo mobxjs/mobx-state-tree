@@ -89,7 +89,7 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
             : T[K] extends boolean
                 ? IType<boolean | undefined, boolean, boolean> & { flags: TypeFlags.Optional }
                 : T[K] extends Date
-                    ? IType<number | Date | undefined, number, Date> & { flags: TypeFlags.Optional }
+                    ? IComplexType<number | Date | undefined, number, Date> & { flags: TypeFlags.Optional }
                     : T[K] extends IComplexType<infer C, infer S, infer T> & {
                           flags: TypeFlags.Optional
                       }
