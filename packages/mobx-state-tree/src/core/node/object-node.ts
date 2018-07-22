@@ -1,4 +1,4 @@
-import { reaction, computed, action, createAtom } from "mobx"
+import { reaction, computed, action, createAtom, IAtom } from "mobx"
 import {
     INode,
     isStateTreeNode,

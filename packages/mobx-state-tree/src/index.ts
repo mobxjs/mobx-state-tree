@@ -75,6 +75,7 @@ export {
     IAnyType,
     IModelType,
     IMSTMap,
+    IMSTArray,
     IType,
     ISimpleType,
     IComplexType,
@@ -101,7 +102,15 @@ export {
     createActionTrackingMiddleware,
     setLivelynessChecking,
     LivelynessMode,
-    TypeFlags
+    TypeFlags,
+    ModelSnapshotType,
+    ModelCreationType,
+    ModelInstanceType,
+    ModelPropertiesDeclarationToProperties,
+    DeepImmutable,
+    DeepImmutableArray,
+    DeepImmutableObject,
+    DeepImmutableMap
 } from "./internal"
 
 export * from "./core/mst-operations"

@@ -12,7 +12,13 @@ import {
     IMiddlewareEvent,
     IPatchRecorder,
     IJsonPatch,
-    TypeFlags
+    TypeFlags,
+    DeepImmutableArray,
+    IComplexType,
+    IMSTArray,
+    ModelSnapshotType,
+    IType,
+    ModelPropertiesDeclarationToProperties
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
