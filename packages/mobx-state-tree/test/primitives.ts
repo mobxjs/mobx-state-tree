@@ -53,17 +53,19 @@ test("isInteger polyfill", () => {
     expect(isInteger(5.2)).toBe(false)
 })
 
-test("Passing non integer to types.integer", () => {
-    const Size = types.model({
-        width: types.integer,
-        height: 20
+if (process.env.NODE_ENV !== "production") {
+    test("Passing non integer to types.integer", () => {
+        const Size = types.model({
+            width: types.integer,
+            height: 20
+        })
+
+        expect(() => {
+            const size = Size.create({ width: 10 })
+        }).not.toThrow()
+
+        expect(() => {
+            const size = Size.create({ width: 10.5 })
+        }).toThrow()
     })
-
-    expect(() => {
-        const size = Size.create({ width: 10 })
-    }).not.toThrow()
-
-    expect(() => {
-        const size = Size.create({ width: 10.5 })
-    }).toThrow()
-})
+}

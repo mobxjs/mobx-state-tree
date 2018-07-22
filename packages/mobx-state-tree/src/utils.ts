@@ -29,7 +29,7 @@ export function noop() {}
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
 export const isInteger =
     Number.isInteger ||
-    function(value) {
+    function(value: any) {
         return typeof value === "number" && isFinite(value) && Math.floor(value) === value
     }
 
