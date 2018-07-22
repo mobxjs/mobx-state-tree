@@ -367,10 +367,10 @@ export function hasParentOfType(target: IStateTreeNode<any>, type: IAnyType): bo
  * @param {IType<any, any, T>} type
  * @returns {T}
  */
-export function getParentOfType<IT extends IType<any, S, T>, S, T>(
+export function getParentOfType<IT extends IAnyType>(
     target: IStateTreeNode<any>,
     type: IT
-): ExtractIStateTreeNode<IT, S, T> {
+): ExtractIStateTreeNode<IT, ExtractS<IT>, ExtractT<IT>> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -487,11 +487,11 @@ export function resolvePath(target: IStateTreeNode<any>, path: string): any {
  * @param {(string | number)} identifier
  * @returns {*}
  */
-export function resolveIdentifier<IT extends IType<any, S, T>, S, T>(
+export function resolveIdentifier<IT extends IAnyType>(
     type: IT,
     target: IStateTreeNode<any>,
     identifier: string | number
-): ExtractIStateTreeNode<IT, S, T> | undefined {
+): ExtractIStateTreeNode<IT, ExtractS<IT>, ExtractT<IT>> | undefined {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
