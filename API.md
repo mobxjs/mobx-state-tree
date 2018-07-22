@@ -62,16 +62,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [splitJsonPath](#splitjsonpath)
 -   [StoredReference](#storedreference)
 -   [tryResolve](#tryresolve)
--   [Type](#type)
--   [Type](#type-1)
--   [Type](#type-2)
--   [Type](#type-3)
--   [Type](#type-4)
--   [Type](#type-5)
--   [Type](#type-6)
--   [Type](#type-7)
--   [Type](#type-8)
--   [Type](#type-9)
 -   [typecheck](#typecheck)
 -   [types.array](#typesarray)
 -   [types.boolean](#typesboolean)
@@ -724,26 +714,6 @@ Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refere
 -   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 Returns **any** 
-
-## Type
-
-## Type
-
-## Type
-
-## Type
-
-## Type
-
-## Type
-
-## Type
-
-## Type
-
-## Type
-
-## Type
 
 ## typecheck
 
