@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== "production") {
     test("it should throw if late doesnt received a function as parameter", () => {
         expect(() => {
             types.model({
-                after: types.late(1 as any) as any
+                after: types.late(1 as any)
             })
         }).toThrow()
     })
@@ -75,6 +75,6 @@ test("#825, late type checking ", () => {
         name: types.maybe(types.string)
     })
 
-    const p2 = Product.create({} as any)
+    const p2 = Product.create({})
     const p = Product.create({ details: { name: "bla" } })
 })

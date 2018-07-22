@@ -226,9 +226,9 @@ test("snapshot should be available and updated during an action", () => {
             x: types.number
         })
         .actions(self => {
-            function inc() {
+            function inc(): any {
                 self.x += 1
-                const res = getSnapshot<typeof Model.Type>(self).x
+                const res = getSnapshot(self).x
                 self.x += 1
                 return res
             }
@@ -376,7 +376,7 @@ test("after attach action should work correctly", () => {
         })
         .actions(self => ({
             remove() {
-                getRoot<typeof S.Type>(self).remove(self as typeof Todo.Type)
+                getRoot<typeof S>(self).remove(self as typeof Todo.Type)
             }
         }))
     const S = types

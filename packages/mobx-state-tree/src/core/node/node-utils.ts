@@ -1,5 +1,4 @@
 import {
-    IType,
     fail,
     ObjectNode,
     splitJsonPath,
@@ -36,8 +35,9 @@ export interface INode {
     die(): void
 }
 
-export type IStateTreeNode = {
+export type IStateTreeNode<S> = {
     readonly $treenode?: any
+    readonly $snapshottable?: S // fake, will never be present, just for typing
 }
 
 export interface IMembers {
@@ -56,11 +56,11 @@ export interface IMembers {
  * @param {*} value
  * @returns {value is IStateTreeNode}
  */
-export function isStateTreeNode(value: any): value is IStateTreeNode {
+export function isStateTreeNode<S = any>(value: any): value is IStateTreeNode<S> {
     return !!(value && value.$treenode)
 }
 
-export function getStateTreeNode(value: IStateTreeNode): ObjectNode {
+export function getStateTreeNode(value: IStateTreeNode<any>): ObjectNode {
     if (isStateTreeNode(value)) return value.$treenode!
     else return fail(`Value ${value} is no MST Node`)
 }
@@ -75,7 +75,7 @@ export function canAttachNode(value: any) {
     )
 }
 
-export function toJSON(this: IStateTreeNode) {
+export function toJSON<S>(this: IStateTreeNode<S>): S {
     return getStateTreeNode(this).snapshot
 }
 

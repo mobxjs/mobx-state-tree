@@ -1,4 +1,5 @@
-import { IObservableArray, ObservableMap, isComputedProp, isObservableProp } from "mobx"
+import { isComputedProp, isObservableProp } from "mobx"
+import { IType, ExtractS, ExtractT } from "../internal"
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -7,7 +8,7 @@ import { IObservableArray, ObservableMap, isComputedProp, isObservableProp } fro
  * @param {IStateTreeNode} object
  * @returns {IAnyType}
  */
-export function getType<C, S, T>(object: IStateTreeNode): IType<C, S, T> {
+export function getType(object: IStateTreeNode<any>) {
     return getStateTreeNode(object).type
 }
 
@@ -25,7 +26,7 @@ export function getType<C, S, T>(object: IStateTreeNode): IType<C, S, T> {
  * @param {string} child
  * @returns {IAnyType}
  */
-export function getChildType(object: IStateTreeNode, child: string): IAnyType {
+export function getChildType(object: IStateTreeNode<any>, child: string) {
     return getStateTreeNode(object).getChildType(child)
 }
 
@@ -40,7 +41,7 @@ export function getChildType(object: IStateTreeNode, child: string): IAnyType {
  * @returns {IDisposer} function to remove the listener
  */
 export function onPatch(
-    target: IStateTreeNode,
+    target: IStateTreeNode<any>,
     callback: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
 ): IDisposer {
     // check all arguments
@@ -53,15 +54,6 @@ export function onPatch(
     return getStateTreeNode(target).onPatch(callback)
 }
 
-export function onSnapshot<K extends string | number, V>(
-    target: ObservableMap<K, V>,
-    callback: (snapshot: { [key: string]: V }) => void
-): IDisposer
-export function onSnapshot<S>(
-    target: IObservableArray<S>,
-    callback: (snapshot: S[]) => void
-): IDisposer
-export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S) => void): IDisposer
 /**
  * Registers a function that is invoked whenever a new snapshot for the given model instance is available.
  * The listener will only be fire at the and of the current MobX (trans)action.
@@ -73,7 +65,7 @@ export function onSnapshot<S>(target: ISnapshottable<S>, callback: (snapshot: S)
  * @returns {IDisposer}
  */
 export function onSnapshot<S>(
-    target: ISnapshottable<S>,
+    target: IStateTreeNode<S>,
     callback: (snapshot: S) => void
 ): IDisposer {
     // check all arguments
@@ -97,7 +89,10 @@ export function onSnapshot<S>(
  * @param {IJsonPatch} patch
  * @returns
  */
-export function applyPatch(target: IStateTreeNode, patch: IJsonPatch | ReadonlyArray<IJsonPatch>) {
+export function applyPatch(
+    target: IStateTreeNode<any>,
+    patch: IJsonPatch | ReadonlyArray<IJsonPatch>
+) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -112,8 +107,8 @@ export interface IPatchRecorder {
     patches: ReadonlyArray<IJsonPatch>
     inversePatches: ReadonlyArray<IJsonPatch>
     stop(): any
-    replay(target?: IStateTreeNode): any
-    undo(target?: IStateTreeNode): void
+    replay(target?: IStateTreeNode<any>): any
+    undo(target?: IStateTreeNode<any>): void
 }
 
 /**
@@ -141,7 +136,7 @@ export interface IPatchRecorder {
  * @param {IStateTreeNode} subject
  * @returns {IPatchRecorder}
  */
-export function recordPatches(subject: IStateTreeNode): IPatchRecorder {
+export function recordPatches(subject: IStateTreeNode<any>): IPatchRecorder {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(subject))
@@ -171,10 +166,10 @@ export function recordPatches(subject: IStateTreeNode): IPatchRecorder {
             disposer = null
         },
         resume,
-        replay(target?: IStateTreeNode) {
+        replay(target?: IStateTreeNode<any>) {
             applyPatch(target || subject, recorder.patches)
         },
-        undo(target?: IStateTreeNode) {
+        undo(target?: IStateTreeNode<any>) {
             applyPatch(target || subject, recorder.inversePatches.slice().reverse())
         }
     }
@@ -189,7 +184,7 @@ export function recordPatches(subject: IStateTreeNode): IPatchRecorder {
  * @param {IStateTreeNode} target
  *
  */
-export function protect(target: IStateTreeNode) {
+export function protect(target: IStateTreeNode<any>) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -222,7 +217,7 @@ export function protect(target: IStateTreeNode) {
  * unprotect(todo)
  * todo.done = false // OK
  */
-export function unprotect(target: IStateTreeNode) {
+export function unprotect(target: IStateTreeNode<any>) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -236,7 +231,7 @@ export function unprotect(target: IStateTreeNode) {
 /**
  * Returns true if the object is in protected mode, @see protect
  */
-export function isProtected(target: IStateTreeNode): boolean {
+export function isProtected(target: IStateTreeNode<any>): boolean {
     return getStateTreeNode(target).isProtected
 }
 
@@ -248,7 +243,7 @@ export function isProtected(target: IStateTreeNode): boolean {
  * @param {Object} snapshot
  * @returns
  */
-export function applySnapshot<S, T>(target: IStateTreeNode, snapshot: S) {
+export function applySnapshot<S>(target: IStateTreeNode<S>, snapshot: S) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -257,11 +252,6 @@ export function applySnapshot<S, T>(target: IStateTreeNode, snapshot: S) {
     return getStateTreeNode(target).applySnapshot(snapshot)
 }
 
-export function getSnapshot<K extends string | number, V>(
-    target: ObservableMap<K, V>
-): { [key: string]: V }
-export function getSnapshot<S>(target: IObservableArray<S>): S[]
-export function getSnapshot<S = any>(target: ISnapshottable<S>, applyPostProcess?: boolean): S
 /**
  * Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
  * structural sharing where possible. Doesn't require MobX transactions to be completed.
@@ -271,7 +261,7 @@ export function getSnapshot<S = any>(target: ISnapshottable<S>, applyPostProcess
  * @param {boolean} applyPostProcess = true, by default the postProcessSnapshot gets applied
  * @returns {*}
  */
-export function getSnapshot<S>(target: ISnapshottable<S>, applyPostProcess = true): S {
+export function getSnapshot<S>(target: IStateTreeNode<S>, applyPostProcess = true): S {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -291,7 +281,7 @@ export function getSnapshot<S>(target: ISnapshottable<S>, applyPostProcess = tru
  * @param {number} depth = 1, how far should we look upward?
  * @returns {boolean}
  */
-export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
+export function hasParent(target: IStateTreeNode<any>, depth: number = 1): boolean {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -308,8 +298,6 @@ export function hasParent(target: IStateTreeNode, depth: number = 1): boolean {
     return false
 }
 
-export function getParent(target: IStateTreeNode, depth?: number): any & IStateTreeNode
-export function getParent<T>(target: IStateTreeNode, depth?: number): T & IStateTreeNode
 /**
  * Returns the immediate parent of this object, or throws.
  *
@@ -325,7 +313,10 @@ export function getParent<T>(target: IStateTreeNode, depth?: number): T & IState
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent<T>(target: IStateTreeNode, depth = 1): T & IStateTreeNode {
+export function getParent<IT extends IAnyType>(
+    target: IStateTreeNode<any>,
+    depth = 1
+): ExtractIStateTreeNode<IT, ExtractS<IT>, ExtractT<IT>> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -351,7 +342,7 @@ export function getParent<T>(target: IStateTreeNode, depth = 1): T & IStateTreeN
  * @param {IAnyType} type
  * @returns {boolean}
  */
-export function hasParentOfType(target: IStateTreeNode, type: IAnyType): boolean {
+export function hasParentOfType(target: IStateTreeNode<any>, type: IAnyType): boolean {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -376,7 +367,10 @@ export function hasParentOfType(target: IStateTreeNode, type: IAnyType): boolean
  * @param {IType<any, any, T>} type
  * @returns {T}
  */
-export function getParentOfType<T>(target: IStateTreeNode, type: IType<any, any, T>): T {
+export function getParentOfType<IT extends IType<any, S, T>, S, T>(
+    target: IStateTreeNode<any>,
+    type: IT
+): ExtractIStateTreeNode<IT, S, T> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -387,14 +381,12 @@ export function getParentOfType<T>(target: IStateTreeNode, type: IType<any, any,
 
     let parent: INode | null = getStateTreeNode(target).parent
     while (parent) {
-        if (type.is(parent.storedValue)) return parent.storedValue as T
+        if (type.is(parent.storedValue)) return parent.storedValue
         parent = parent.parent
     }
     return fail(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
 }
 
-export function getRoot<T>(target: IStateTreeNode): T & IStateTreeNode
-export function getRoot(target: IStateTreeNode): any & IStateTreeNode
 /**
  * Given an object in a model tree, returns the root object of that tree
  *
@@ -405,7 +397,9 @@ export function getRoot(target: IStateTreeNode): any & IStateTreeNode
  * @param {Object} target
  * @returns {*}
  */
-export function getRoot(target: IStateTreeNode): IStateTreeNode {
+export function getRoot<IT extends IAnyType>(
+    target: IStateTreeNode<any>
+): ExtractIStateTreeNode<IT, ExtractS<IT>, ExtractT<IT>> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -421,7 +415,7 @@ export function getRoot(target: IStateTreeNode): IStateTreeNode {
  * @param {Object} target
  * @returns {string}
  */
-export function getPath(target: IStateTreeNode): string {
+export function getPath(target: IStateTreeNode<any>): string {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -437,7 +431,7 @@ export function getPath(target: IStateTreeNode): string {
  * @param {Object} target
  * @returns {string[]}
  */
-export function getPathParts(target: IStateTreeNode): string[] {
+export function getPathParts(target: IStateTreeNode<any>): string[] {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -453,7 +447,7 @@ export function getPathParts(target: IStateTreeNode): string[] {
  * @param {Object} target
  * @returns {boolean}
  */
-export function isRoot(target: IStateTreeNode): boolean {
+export function isRoot(target: IStateTreeNode<any>): boolean {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -471,7 +465,7 @@ export function isRoot(target: IStateTreeNode): boolean {
  * @param {string} path - escaped json path
  * @returns {*}
  */
-export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNode | any {
+export function resolvePath(target: IStateTreeNode<any>, path: string): any {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -493,11 +487,11 @@ export function resolvePath(target: IStateTreeNode, path: string): IStateTreeNod
  * @param {(string | number)} identifier
  * @returns {*}
  */
-export function resolveIdentifier(
-    type: IAnyType,
-    target: IStateTreeNode,
+export function resolveIdentifier<IT extends IType<any, S, T>, S, T>(
+    type: IT,
+    target: IStateTreeNode<any>,
     identifier: string | number
-): any {
+): ExtractIStateTreeNode<IT, S, T> | undefined {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
@@ -521,7 +515,7 @@ export function resolveIdentifier(
  * @param {IStateTreeNode} target
  * @returns {(string | null)}
  */
-export function getIdentifier(target: IStateTreeNode): string | null {
+export function getIdentifier(target: IStateTreeNode<any>): string | null {
     // check all arguments
 
     if (process.env.NODE_ENV !== "production") {
@@ -540,7 +534,7 @@ export function getIdentifier(target: IStateTreeNode): string | null {
  * @param {string} path
  * @returns {*}
  */
-export function tryResolve(target: IStateTreeNode, path: string): IStateTreeNode | any {
+export function tryResolve(target: IStateTreeNode<any>, path: string): any {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -568,7 +562,7 @@ export function tryResolve(target: IStateTreeNode, path: string): IStateTreeNode
  * @param {IStateTreeNode} target
  * @returns {string}
  */
-export function getRelativePath(base: IStateTreeNode, target: IStateTreeNode): string {
+export function getRelativePath(base: IStateTreeNode<any>, target: IStateTreeNode<any>): string {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -594,7 +588,7 @@ export function getRelativePath(base: IStateTreeNode, target: IStateTreeNode): s
  * @param {boolean | any} keepEnvironment indicates whether the clone should inherit the same environment (`true`, the default), or not have an environment (`false`). If an object is passed in as second argument, that will act as the environment for the cloned tree.
  * @returns {T}
  */
-export function clone<T extends IStateTreeNode>(
+export function clone<T extends IStateTreeNode<any>>(
     source: T,
     keepEnvironment: boolean | any = true
 ): T {
@@ -617,7 +611,7 @@ export function clone<T extends IStateTreeNode>(
 /**
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
-export function detach<T extends IStateTreeNode>(target: T): T {
+export function detach<T extends IStateTreeNode<any>>(target: T): T {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -630,7 +624,7 @@ export function detach<T extends IStateTreeNode>(target: T): T {
 /**
  * Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
  */
-export function destroy(target: IStateTreeNode) {
+export function destroy(target: IStateTreeNode<any>) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -651,7 +645,7 @@ export function destroy(target: IStateTreeNode) {
  * @param {IStateTreeNode} target
  * @returns {boolean}
  */
-export function isAlive(target: IStateTreeNode): boolean {
+export function isAlive(target: IStateTreeNode<any>): boolean {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -684,7 +678,7 @@ export function isAlive(target: IStateTreeNode): boolean {
  * @param {IStateTreeNode} target
  * @param {() => void} disposer
  */
-export function addDisposer(target: IStateTreeNode, disposer: () => void) {
+export function addDisposer(target: IStateTreeNode<any>, disposer: () => void) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -708,7 +702,7 @@ export function addDisposer(target: IStateTreeNode, disposer: () => void) {
  * @param {IStateTreeNode} target
  * @returns {*}
  */
-export function getEnv<T = any>(target: IStateTreeNode): T {
+export function getEnv<T = any>(target: IStateTreeNode<any>): T {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -723,7 +717,7 @@ export function getEnv<T = any>(target: IStateTreeNode): T {
 /**
  * Performs a depth first walk through a tree
  */
-export function walk(target: IStateTreeNode, processor: (item: IStateTreeNode) => void) {
+export function walk(target: IStateTreeNode<any>, processor: (item: IStateTreeNode<any>) => void) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -753,7 +747,7 @@ export interface IModelReflectionData {
  * @param {IStateTreeNode} target
  * @returns {IModelReflectionData}
  */
-export function getMembers(target: IStateTreeNode): IModelReflectionData {
+export function getMembers(target: IStateTreeNode<any>): IModelReflectionData {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         const node: any = getStateTreeNode(target)
@@ -800,12 +794,13 @@ import {
     EMPTY_OBJECT,
     fail,
     IDisposer,
-    ISnapshottable,
-    IType,
     isType,
     resolveNodeByPath,
     getRelativePathBetweenNodes,
     ModelType,
     freeze,
-    IAnyType
+    IAnyType,
+    IMSTMap,
+    ExtractIStateTreeNode,
+    IMSTArray
 } from "../internal"

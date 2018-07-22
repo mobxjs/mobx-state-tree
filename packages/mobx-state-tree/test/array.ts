@@ -133,26 +133,25 @@ test("it should check the type correctly", () => {
     expect(Factory.is([{ to: true }])).toEqual(false)
 })
 test("paths shoud remain correct when splicing", () => {
+    const Task = types.model("Task", {
+        done: false
+    })
     const store = types
         .model({
-            todos: types.array(
-                types.model("Task", {
-                    done: false
-                })
-            )
+            todos: types.array(Task)
         })
         .create({
             todos: [{}]
         })
     unprotect(store)
     expect(store.todos.map(getPath)).toEqual(["/todos/0"])
-    store.todos.push({} as any)
+    store.todos.push({} as typeof Task.Type)
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])
-    store.todos.unshift({} as any)
+    store.todos.unshift({} as typeof Task.Type)
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1", "/todos/2"])
     store.todos.splice(0, 2)
     expect(store.todos.map(getPath)).toEqual(["/todos/0"])
-    store.todos.splice(0, 1, {} as any, {} as any, {} as any)
+    store.todos.splice(0, 1, {} as typeof Task.Type, {} as typeof Task.Type, {} as typeof Task.Type)
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1", "/todos/2"])
     store.todos.remove(store.todos[1])
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])

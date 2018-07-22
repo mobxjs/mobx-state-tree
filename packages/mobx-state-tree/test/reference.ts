@@ -510,7 +510,7 @@ test("References in recursive structures", () => {
         .actions(self => {
             function addFolder(data: typeof Folder.Type | typeof Folder.CreationType) {
                 const folder = Folder.create(data)
-                getRoot<typeof Storage.Type>(self).putFolderHelper(folder)
+                getRoot<typeof Storage>(self).putFolderHelper(folder)
                 self.children.push(Tree.create({ data: folder, children: [] }))
             }
             return {

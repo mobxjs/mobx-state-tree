@@ -1,5 +1,5 @@
 import { IObservableArray, values, observable } from "mobx"
-import { fail, IType, ObjectNode, mobxShallow, IAnyType } from "../../internal"
+import { fail, ObjectNode, mobxShallow, IAnyType } from "../../internal"
 
 export class IdentifierCache {
     // n.b. in cache all identifiers are normalized to strings

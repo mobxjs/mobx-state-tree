@@ -1,5 +1,4 @@
 import {
-    IType,
     fail,
     EMPTY_ARRAY,
     isPrimitive,

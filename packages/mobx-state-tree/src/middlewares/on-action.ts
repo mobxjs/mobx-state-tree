@@ -6,7 +6,6 @@ import {
     IStateTreeNode,
     isStateTreeNode,
     addMiddleware,
-    IMiddlewareEvent,
     tryResolve,
     applyPatch,
     getType,
@@ -31,7 +30,7 @@ export type ISerializedActionCall = {
 export interface IActionRecorder {
     actions: ReadonlyArray<ISerializedActionCall>
     stop(): any
-    replay(target: IStateTreeNode): any
+    replay(target: IStateTreeNode<any>): any
 }
 
 function serializeArgument(node: INode, actionName: string, index: number, arg: any): any {
@@ -79,7 +78,7 @@ function serializeTheUnserializable(baseType: string) {
  * @param {IActionCallOptions} [options]
  */
 export function applyAction(
-    target: IStateTreeNode,
+    target: IStateTreeNode<any>,
     actions: ISerializedActionCall | ISerializedActionCall[]
 ): void {
     // check all arguments
@@ -94,7 +93,7 @@ export function applyAction(
     })
 }
 
-function baseApplyAction(target: IStateTreeNode, action: ISerializedActionCall): any {
+function baseApplyAction(target: IStateTreeNode<any>, action: ISerializedActionCall): any {
     const resolvedTarget = tryResolve(target, action.path || "")
     if (!resolvedTarget) return fail(`Invalid action path: ${action.path || ""}`)
     const node = getStateTreeNode(resolvedTarget)
@@ -133,7 +132,7 @@ function baseApplyAction(target: IStateTreeNode, action: ISerializedActionCall):
  * @param {IStateTreeNode} subject
  * @returns {IPatchRecorder}
  */
-export function recordActions(subject: IStateTreeNode): IActionRecorder {
+export function recordActions(subject: IStateTreeNode<any>): IActionRecorder {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(subject))
@@ -144,7 +143,7 @@ export function recordActions(subject: IStateTreeNode): IActionRecorder {
     let recorder = {
         actions: [] as ISerializedActionCall[],
         stop: () => disposer(),
-        replay: (target: IStateTreeNode) => {
+        replay: (target: IStateTreeNode<any>) => {
             applyAction(target, recorder.actions)
         }
     }
@@ -190,7 +189,7 @@ export function recordActions(subject: IStateTreeNode): IActionRecorder {
  * @returns {IDisposer}
  */
 export function onAction(
-    target: IStateTreeNode,
+    target: IStateTreeNode<any>,
     listener: (call: ISerializedActionCall) => void,
     attachAfter = false
 ): IDisposer {

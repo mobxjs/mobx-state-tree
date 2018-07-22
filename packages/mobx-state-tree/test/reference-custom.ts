@@ -41,7 +41,7 @@ test("it should support custom references - basics", () => {
     expect(s.selection === s.users[1]).toBe(true)
     expect(getSnapshot(s).selection).toBe("Mattia")
     s.selection = s.users[0]
-    expect(s.selection.name).toBe("Michel")
+    expect(s.selection!.name).toBe("Michel")
     expect(s.selection === s.users[0]).toBe(true)
     expect(getSnapshot(s).selection).toBe("Michel")
     s.selection = null
@@ -58,9 +58,9 @@ test("it should support custom references - adv", () => {
         name: types.string
     })
     const NameReference = types.reference(User, {
-        get(identifier, parent: any) {
+        get(identifier, parent) {
             if (identifier === null) return null
-            const users = values((getRoot(parent) as any).users)
+            const users = values(getRoot(parent!).users)
             return users.filter((u: typeof User.Type) => u.name === identifier)[0] || null
         },
         set(value) {
@@ -134,7 +134,7 @@ test("it should support dynamic loading", done => {
         .actions(self => ({
             loadUser: flow(function* loadUser(name: string) {
                 events.push("loading " + name)
-                self.users.push({ name } as any)
+                self.users.push({ name } as typeof User.Type)
                 yield new Promise(resolve => {
                     setTimeout(resolve, 200)
                 })

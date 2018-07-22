@@ -81,7 +81,7 @@ test("correct api exposed", () => {
     expect(
         Object.keys(mst)
             .sort()
-            .filter(key => mst[key] !== undefined) // filter out interfaces
+            .filter(key => (mst as any)[key] !== undefined) // filter out interfaces
     ).toEqual([...METHODS, ...INTERNAL_TYPES].sort())
 })
 test("correct types exposed", () => {

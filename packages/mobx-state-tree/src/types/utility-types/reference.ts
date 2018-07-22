@@ -14,7 +14,9 @@ import {
     fail,
     ObjectNode,
     IStateTreeNode,
-    IAnyType
+    IAnyType,
+    ExtractT,
+    IComplexType
 } from "../../internal"
 import { computed } from "mobx"
 
@@ -181,15 +183,16 @@ export class CustomReferenceType<T> extends BaseReferenceType<T> {
     }
 }
 
-export type ReferenceOptions<T> = {
-    get(identifier: string | number, parent: IStateTreeNode | null): T
-    set(value: T, parent: IStateTreeNode | null): string | number
+export interface ReferenceOptions<T> {
+    get(identifier: string | number, parent: IStateTreeNode<any> | null): T
+    set(value: T, parent: IStateTreeNode<any> | null): string | number
 }
 
-export function reference<T>(
-    factory: IType<any, any, T>,
-    options?: ReferenceOptions<T>
-): IType<string | number | T, string | number, T>
+export interface IReferenceType<IR extends IComplexType<any, any, any>>
+    extends IType<string | number | ExtractT<IR>, string | number, ExtractT<IR>> {
+    flags: TypeFlags.Reference
+}
+
 /**
  * Creates a reference to another type, which should have defined an identifier.
  * See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
@@ -197,7 +200,10 @@ export function reference<T>(
  * @export
  * @alias types.reference
  */
-export function reference<T>(subType: IType<any, any, T>, options?: ReferenceOptions<T>): any {
+export function reference<IT extends IComplexType<any, any, any>>(
+    subType: IT,
+    options?: ReferenceOptions<ExtractT<IT>>
+): IReferenceType<IT> {
     // check that a type is given
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subType))
@@ -205,10 +211,11 @@ export function reference<T>(subType: IType<any, any, T>, options?: ReferenceOpt
         if (arguments.length === 2 && typeof arguments[1] === "string")
             fail("References with base path are no longer supported. Please remove the base path.")
     }
-    if (options) return new CustomReferenceType(subType, options)
+    // as any because getValue might actually return undefined if the node is not alive
+    if (options) return new CustomReferenceType(subType, options) as any
     else return new IdentifierReferenceType(subType)
 }
 
-export function isReferenceType(type: any): type is BaseReferenceType<any> {
+export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type is IT {
     return (type.flags & TypeFlags.Reference) > 0
 }

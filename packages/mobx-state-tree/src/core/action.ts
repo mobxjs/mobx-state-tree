@@ -26,8 +26,8 @@ export type IMiddlewareEvent = {
     id: number
     parentId: number
     rootId: number
-    context: IStateTreeNode
-    tree: IStateTreeNode
+    context: IStateTreeNode<any>
+    tree: IStateTreeNode<any>
     args: any[]
 }
 
@@ -74,7 +74,7 @@ export function getActionContext(): IMiddlewareEvent {
 }
 
 export function createActionInvoker<T extends Function>(
-    target: IStateTreeNode,
+    target: IStateTreeNode<any>,
     name: string,
     fn: T
 ) {
@@ -110,7 +110,7 @@ export function createActionInvoker<T extends Function>(
  * @returns {IDisposer}
  */
 export function addMiddleware(
-    target: IStateTreeNode,
+    target: IStateTreeNode<any>,
     handler: IMiddlewareHandler,
     includeHooks: boolean = true
 ): IDisposer {

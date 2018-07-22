@@ -77,7 +77,7 @@ if (process.env.NODE_ENV !== "production") {
     test("should throw if identifier of wrong type", () => {
         expect(() => {
             const Model = types.model("Model", { id: types.identifier })
-            Model.create({ id: 1 } as any)
+            Model.create({ id: (1 as any) as string })
         }).toThrowError(
             'at path "/id" value `1` is not assignable to type: `identifier` (Value is not a valid identifier, expected a string).'
         )

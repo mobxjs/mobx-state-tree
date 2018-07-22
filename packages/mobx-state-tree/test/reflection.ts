@@ -40,7 +40,7 @@ test("reflection - map", () => {
     const node = Model.create({
         users: { "1": { id: "1", name: "Test" } }
     })
-    const reflection = getMembers(node.users.get("1")! as IStateTreeNode)
+    const reflection = getMembers(node.users.get("1")!)
     expect(reflection.name).toBe("User")
     expect(!!reflection.properties.id).toBe(true)
     expect(!!reflection.properties.name).toBe(true)
@@ -57,8 +57,8 @@ test("reflection - late", () => {
     const node = Model.create({
         user: { id: "5", name: "Test" }
     })
-    const empty: IStateTreeNode = {}
-    const reflection = getMembers((node.user as IStateTreeNode) || empty)
+    const empty: IStateTreeNode<any> = {}
+    const reflection = getMembers(node.user || empty)
     const keys = Object.keys(reflection.properties || {})
     expect(keys.includes("name")).toBe(true)
     expect(reflection.properties.name.describe()).toBe("string")

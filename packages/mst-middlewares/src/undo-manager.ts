@@ -9,7 +9,6 @@ import {
     createActionTrackingMiddleware,
     IStateTreeNode,
     IModelType,
-    ISnapshottable,
     IMiddlewareEvent,
     IPatchRecorder,
     IJsonPatch,
@@ -38,7 +37,7 @@ const UndoManager = types
     .actions(self => {
         let skipping = false
         let flagSkipping = false
-        let targetStore: IStateTreeNode
+        let targetStore: IStateTreeNode<any>
         let replaying = false
         let middlewareDisposer: () => void
         let grouping = false

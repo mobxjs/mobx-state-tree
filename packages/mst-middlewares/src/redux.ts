@@ -10,7 +10,7 @@ import * as mst from "mobx-state-tree"
  * @param {...MiddleWare[]} middlewares
  * @returns {IReduxStore}
  */
-export const asReduxStore = function(model: mst.IStateTreeNode, ...middlewares: any[]) {
+export const asReduxStore = function(model: mst.IStateTreeNode<any>, ...middlewares: any[]) {
     if (!mst.isStateTreeNode(model)) throw new Error("Expected model object")
     let store = {
         getState: () => mst.getSnapshot(model),

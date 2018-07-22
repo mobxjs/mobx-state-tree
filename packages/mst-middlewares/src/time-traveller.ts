@@ -6,7 +6,6 @@ import {
     getEnv,
     resolvePath,
     getPath,
-    ISnapshottable,
     IModelType,
     TypeFlags
 } from "mobx-state-tree"

@@ -10,8 +10,7 @@ import {
     _getAdministration,
     isComputedProp,
     computed,
-    set,
-    IObservableArray
+    set
 } from "mobx"
 import {
     fail,
@@ -45,17 +44,12 @@ import {
     addHiddenWritableProp,
     mobxShallow,
     isStateTreeNode,
-    IdentifierType,
     IChildNodesMap,
     IAnyType,
-    Union,
-    Late,
     OptionalValue,
-    isMapType,
-    isArrayType,
-    IMSTMap,
     MapType,
-    ArrayType
+    ArrayType,
+    ExtractIStateTreeNode
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -89,20 +83,10 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
             : T[K] extends boolean
                 ? IType<boolean | undefined, boolean, boolean> & { flags: TypeFlags.Optional }
                 : T[K] extends Date
-                    ? IComplexType<number | Date | undefined, number, Date> & { flags: TypeFlags.Optional }
-                    : T[K] extends IComplexType<infer C, infer S, infer T> & {
+                    ? IType<number | Date | undefined, number, Date> & {
                           flags: TypeFlags.Optional
                       }
-                        ? IComplexType<C, S, T> & { flags: TypeFlags.Optional }
-                        : T[K] extends IComplexType<infer C, infer S, infer T>
-                            ? IComplexType<C, S, T>
-                            : T[K] extends IType<infer C, infer S, infer T> & {
-                                  flags: TypeFlags.Optional
-                              }
-                                ? IType<C, S, T> & { flags: TypeFlags.Optional }
-                                : T[K] extends IType<infer C, infer S, infer T>
-                                    ? IType<C, S, T>
-                                    : never
+                    : T[K] extends IAnyType ? T[K] : never
 }
 
 export type OptionalPropertyTypes = { flags: TypeFlags.Optional }
@@ -121,23 +105,21 @@ export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
  * Maps property types to the snapshot, including omitted optional attributes
  */
 export type ModelCreationType<T extends ModelPropertiesDeclarationToProperties<any>> = {
-    readonly [K in keyof RequiredProps<T>]: T[K] extends IType<infer X, any, any> ? X : never
+    [K in keyof RequiredProps<T>]: T[K] extends IType<infer C, any, any> ? C : never
 } &
-    { readonly [K in keyof OptionalProps<T>]?: T[K] extends IType<infer X, any, any> ? X : never }
+    { [K in keyof OptionalProps<T>]?: T[K] extends IType<infer C, any, any> ? C : never }
 
 export type ModelSnapshotType<T extends ModelPropertiesDeclarationToProperties<any>> = {
-    readonly [K in keyof T]: T[K] extends IType<any, infer X, any> ? X : never
+    [K in keyof T]: T[K] extends IType<any, infer S, any> ? S : never
 }
 
-export type ModelTypeOf<T> = T extends IComplexType<any, any, infer X>
-    ? X & IStateTreeNode
-    : T extends IType<any, any, infer X> ? X : never
-
-export type ModelInstanceType<T extends ModelPropertiesDeclarationToProperties<any>, O> = {
-    [K in keyof T]: ModelTypeOf<T[K]>
+export type ModelInstanceType<T extends ModelPropertiesDeclarationToProperties<any>, O, S> = {
+    [K in keyof T]: T[K] extends IType<any, infer S, infer M>
+        ? ExtractIStateTreeNode<T[K], S, M>
+        : never
 } &
     O &
-    IStateTreeNode
+    IStateTreeNode<S>
 
 export type ModelActions = {
     [key: string]: Function
@@ -148,7 +130,7 @@ export interface IModelType<
     OTHERS,
     C = ModelCreationType<PROPS>,
     S = ModelSnapshotType<PROPS>,
-    T = ModelInstanceType<PROPS, OTHERS>
+    T = ModelInstanceType<PROPS, OTHERS, S>
 > extends IComplexType<C, S, T> {
     readonly properties: PROPS
     named(newName: string): this
@@ -156,16 +138,16 @@ export interface IModelType<
         props: PROPS2
     ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS>
     views<V extends Object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => V
+        fn: (self: ModelInstanceType<PROPS, OTHERS, S>) => V
     ): IModelType<PROPS, OTHERS & V>
     actions<A extends ModelActions>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => A
+        fn: (self: ModelInstanceType<PROPS, OTHERS, S>) => A
     ): IModelType<PROPS, OTHERS & A>
     volatile<TP extends object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => TP
+        fn: (self: ModelInstanceType<PROPS, OTHERS, S>) => TP
     ): IModelType<PROPS, OTHERS & TP>
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => { actions?: A; views?: V; state?: VS }
+        fn: (self: ModelInstanceType<PROPS, OTHERS, S>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS>
     preProcessSnapshot<S0 = ModelCreationType<PROPS>>(
         fn: (snapshot: S0) => ModelCreationType<PROPS>
@@ -492,7 +474,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     finalizeNewInstance(node: INode, childNodes: IChildNodesMap) {
         const objNode = node as ObjectNode
         const type = objNode.type as ModelType<any, any>
-        const instance = objNode.storedValue as IStateTreeNode
+        const instance = objNode.storedValue as IStateTreeNode<any>
 
         extendObservable(instance, childNodes, EMPTY_OBJECT, mobxShallow)
         type.forAllProps(name => {
@@ -735,7 +717,7 @@ export function compose(...args: any[]): any {
         .named(typeName)
 }
 
-export function isModelType(type: any): type is ModelType<any, any> {
+export function isModelType<IT extends IModelType<any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 

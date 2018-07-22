@@ -341,7 +341,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
         })
         .preProcessSnapshot(snapshot => {
             const result = Object.assign({}, snapshot)
-            if (typeof result.title !== "string") (result as any).title = ""
+            if (typeof result.title !== "string") result.title = ""
             return result
         })
 
@@ -434,7 +434,7 @@ test("numeric keys should work", () => {
     })
     unprotect(s)
 
-    s.mies.set(7 as any, { id: "7" } as any)
+    s.mies.set(7 as any, { id: "7" })
     const i7 = s.mies.get(7 as any)!
     expect(i7.title).toBe("test")
     expect(s.mies.has("7")).toBeTruthy()
@@ -442,7 +442,7 @@ test("numeric keys should work", () => {
     expect(s.mies.get("7")).toBeTruthy()
     expect(s.mies.get(7 as any)).toBeTruthy()
 
-    s.mies.set("8", { id: "8" } as any)
+    s.mies.set("8", { id: "8" })
     expect(s.mies.has("8")).toBeTruthy()
     expect(s.mies.has(8 as any)).toBeTruthy()
     expect(s.mies.get("8")).toBeTruthy()

@@ -91,6 +91,12 @@ test("it should do typescript type inference correctly", () => {
     // a.z = "test"
     b.sub.method()
     expect(true).toBe(true) // supress no asserts warning
+    // snapshots are of the proper type
+    const snapshot = getSnapshot(a)
+    const sx: number = snapshot.x
+    const sy: string | null = snapshot.y
+    expect(sx).toBe(7)
+    expect(sy).toBe(null)
 })
 test("#66 - it should accept superfluous fields", () => {
     const Item = types.model({

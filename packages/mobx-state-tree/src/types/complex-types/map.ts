@@ -43,6 +43,12 @@ import {
     IAnyType
 } from "../../internal"
 
+export type IMapType<C, S, T> = IComplexType<
+    IKeyValueMap<C> | undefined,
+    IKeyValueMap<S>,
+    IMSTMap<C, S, T>
+> & { flags: TypeFlags.Optional }
+
 export interface IMSTMap<C, S, T> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
 
@@ -152,7 +158,11 @@ class MSTMap<C, S, T> extends ObservableMap {
             return fail(`Map.put can only be used to store complex values`)
         } else {
             let key: string
-            const mapType = getStateTreeNode(this as IStateTreeNode).type as MapType<any, any, any>
+            const mapType = getStateTreeNode(this as IStateTreeNode<any>).type as MapType<
+                any,
+                any,
+                any
+            >
             if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
             if (mapType.identifierMode === MapIdentifierMode.YES) {
                 key = "" + (value as any)[mapType.identifierAttribute!]
@@ -165,7 +175,7 @@ class MSTMap<C, S, T> extends ObservableMap {
 }
 
 export class MapType<C, S, T> extends ComplexType<
-    IKeyValueMap<C>,
+    IKeyValueMap<C> | undefined,
     IKeyValueMap<S>,
     IMSTMap<C, S, T>
 > {
@@ -261,7 +271,7 @@ export class MapType<C, S, T> extends ComplexType<
     }
 
     willChange(change: IMapWillChange<any, any>): IMapWillChange<any, any> | null {
-        const node = getStateTreeNode(change.object as IStateTreeNode)
+        const node = getStateTreeNode(change.object as IStateTreeNode<any>)
         const key = change.name
         node.assertWritable()
         const mapType = node.type as MapType<any, any, any>
@@ -312,7 +322,7 @@ export class MapType<C, S, T> extends ComplexType<
     }
 
     didChange(change: IMapDidChange<any, any>): void {
-        const node = getStateTreeNode(change.object as IStateTreeNode)
+        const node = getStateTreeNode(change.object as IStateTreeNode<any>)
         switch (change.type) {
             case "update":
                 return void node.emitPatch(
@@ -402,11 +412,6 @@ export class MapType<C, S, T> extends ComplexType<
     }
 }
 
-export function map<C, S, T>(
-    subtype: IComplexType<C, S, T>
-): IComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<C, S, T>> & {
-    flags: TypeFlags.Optional
-}
 /**
  * Creates a key based collection type who's children are all of a uniform declared type.
  * If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
@@ -434,17 +439,11 @@ export function map<C, S, T>(
  * @param {IType<S, T>} subtype
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
-export function map<C, S, T>(
-    subtype: IType<C, S, T>
-): IComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<C, S, T>> & {
-    flags: TypeFlags.Optional
-} {
+export function map<C, S, T>(subtype: IType<C, S, T>): IMapType<C, S, T> {
     const ret = new MapType<C, S, T>(`map<string, ${subtype.name}>`, subtype)
     return ret as typeof ret & { flags: TypeFlags.Optional }
 }
 
-export function isMapType<C, S, T>(
-    type: any
-): type is IComplexType<IKeyValueMap<C>, IKeyValueMap<S>, IMSTMap<C, S, T>> {
+export function isMapType<IT extends IMapType<any, any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Map) > 0
 }

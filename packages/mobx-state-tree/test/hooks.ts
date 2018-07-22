@@ -126,7 +126,7 @@ test("it should preprocess snapshots when creating", () => {
 test("it should preprocess snapshots when updating", () => {
     const car = Car.create({ id: "1" })
     expect(car.id).toBe(2)
-    applySnapshot(car, { id: "6" })
+    applySnapshot(car, { id: ("6" as any) as number })
     expect(car.id).toBe(12)
 })
 test("it should postprocess snapshots when generating snapshot - 1", () => {
@@ -153,7 +153,7 @@ test("it should preprocess snapshots when creating as property type", () => {
 test("it should preprocess snapshots when updating", () => {
     const f = Factory.create({ car: { id: "1" } })
     expect(f.car.id).toBe(2)
-    applySnapshot(f, { car: { id: "6" } })
+    applySnapshot(f, { car: { id: ("6" as any) as number } })
     expect(f.car.id).toBe(12)
 })
 test("it should postprocess snapshots when generating snapshot - 2", () => {
