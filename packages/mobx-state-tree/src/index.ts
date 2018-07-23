@@ -107,11 +107,7 @@ export {
     ModelSnapshotType,
     ModelCreationType,
     ModelInstanceType,
-    ModelPropertiesDeclarationToProperties,
-    DeepImmutable,
-    DeepImmutableArray,
-    DeepImmutableObject,
-    DeepImmutableMap
+    ModelPropertiesDeclarationToProperties
 } from "./internal"
 
 export * from "./core/mst-operations"

@@ -10,8 +10,7 @@ import {
     getSnapshot,
     types,
     IJsonPatch,
-    setLivelynessChecking,
-    DeepImmutable
+    setLivelynessChecking
 } from "../src"
 import { observable } from "mobx"
 const createTestFactories = () => {
@@ -44,7 +43,7 @@ test("it should emit snapshots", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let snapshots: DeepImmutable<typeof Factory.SnapshotType>[] = []
+    let snapshots: (typeof Factory.SnapshotType)[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
     doc.push(ItemFactory.create())
     expect(snapshots).toEqual([[{ to: "world" }]])

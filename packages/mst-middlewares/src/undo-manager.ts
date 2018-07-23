@@ -13,7 +13,6 @@ import {
     IPatchRecorder,
     IJsonPatch,
     TypeFlags,
-    DeepImmutableArray,
     IComplexType,
     IMSTArray,
     ModelSnapshotType,

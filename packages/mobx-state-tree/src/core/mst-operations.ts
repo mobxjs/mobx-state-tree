@@ -1,5 +1,5 @@
 import { isComputedProp, isObservableProp } from "mobx"
-import { ExtractS, ExtractT, DeepImmutable, IAnyStateTreeNode, ExtractC } from "../internal"
+import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC } from "../internal"
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -66,7 +66,7 @@ export function onPatch(
  */
 export function onSnapshot<S>(
     target: IStateTreeNode<any, S>,
-    callback: (snapshot: DeepImmutable<S>) => void
+    callback: (snapshot: S) => void
 ): IDisposer {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
@@ -243,7 +243,7 @@ export function isProtected(target: IAnyStateTreeNode): boolean {
  * @param {Object} snapshot
  * @returns
  */
-export function applySnapshot<C>(target: IStateTreeNode<C, any>, snapshot: C | DeepImmutable<C>) {
+export function applySnapshot<C>(target: IStateTreeNode<C, any>, snapshot: C) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -261,10 +261,7 @@ export function applySnapshot<C>(target: IStateTreeNode<C, any>, snapshot: C | D
  * @param {boolean} applyPostProcess = true, by default the postProcessSnapshot gets applied
  * @returns {*}
  */
-export function getSnapshot<S>(
-    target: IStateTreeNode<any, S>,
-    applyPostProcess = true
-): DeepImmutable<S> {
+export function getSnapshot<S>(target: IStateTreeNode<any, S>, applyPostProcess = true): S {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))

@@ -13,8 +13,7 @@ import {
     ObjectNode,
     optional,
     IType,
-    IAnyType,
-    DeepImmutable
+    IAnyType
 } from "../../internal"
 
 export class Frozen<T> extends Type<T, T, T> {
@@ -49,11 +48,11 @@ export class Frozen<T> extends Type<T, T, T> {
 
 const untypedFrozenInstance = new Frozen()
 
-export function frozen<C>(subType: IType<C, any, any>): IType<C, C, DeepImmutable<C>>
+export function frozen<C>(subType: IType<C, any, any>): IType<C, C, C>
 export function frozen<T>(
     defaultValue: T
-): IType<T | undefined | null, T, DeepImmutable<T>> & { flags: TypeFlags.Optional }
-export function frozen<T = any>(): IType<T, T, DeepImmutable<T>> // do not assume undefined by default, let the user specify it if needed
+): IType<T | undefined | null, T, T> & { flags: TypeFlags.Optional }
+export function frozen<T = any>(): IType<T, T, T> // do not assume undefined by default, let the user specify it if needed
 /**
  * Frozen can be used to story any value that is serializable in itself (that is valid JSON).
  * Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
@@ -98,8 +97,6 @@ export function frozen<T>(arg?: any): any {
     else return optional(untypedFrozenInstance, arg)
 }
 
-export function isFrozenType<IT extends IType<T | any, T, DeepImmutable<T>>, T = any>(
-    type: IT
-): type is IT {
+export function isFrozenType<IT extends IType<T | any, T, T>, T = any>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Frozen) > 0
 }
