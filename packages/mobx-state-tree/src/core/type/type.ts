@@ -109,7 +109,7 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T> {
     }
 
     @action
-    create(snapshot: C = this.getDefaultSnapshot(), environment?: any) {
+    create(snapshot: C | DeepImmutable<C> = this.getDefaultSnapshot(), environment?: any) {
         typecheck(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).value
     }
