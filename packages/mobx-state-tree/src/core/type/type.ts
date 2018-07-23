@@ -18,7 +18,8 @@ import {
     ObjectNode,
     IChildNodesMap,
     ModelPrimitive,
-    IReferenceType
+    IReferenceType,
+    DeepImmutable
 } from "../../internal"
 
 export enum TypeFlags {
@@ -79,19 +80,22 @@ export type Primitives = ModelPrimitive | null | undefined
 export type TAndInterface<T, I> = (Exclude<T, Primitives> & I) | Extract<T, Primitives>
 
 export interface IComplexType<C, S, T> extends IType<C, S, T> {
-    create(snapshot?: C, environment?: any): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<S>>
+    create(
+        snapshot?: C | DeepImmutable<C>,
+        environment?: any
+    ): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>
 }
 
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
 export type ExtractT<T extends IAnyType> = T extends IType<any, any, infer X> ? X : never
-export type ExtractIStateTreeNode<IT extends IAnyType, S, T> =
+export type ExtractIStateTreeNode<IT extends IAnyType, C, S, T> =
     // if it is a reference it is state tree node, but of the type of the refrenced type
     // if the instance is a primitive then keep it as is (it is not a state tree node)
     // else it is a state tree node, but respect primitives
     IT extends IReferenceType<infer RT>
-        ? TAndInterface<ExtractT<RT>, IStateTreeNode<ExtractS<RT>>>
-        : T extends ModelPrimitive ? T : TAndInterface<T, IStateTreeNode<S>>
+        ? TAndInterface<ExtractT<RT>, IStateTreeNode<ExtractC<RT>, ExtractS<RT>>>
+        : T extends ModelPrimitive ? T : TAndInterface<T, IStateTreeNode<C, S>>
 
 /*
  * A complex type produces a MST node (Node in the state tree)

@@ -3,7 +3,6 @@ import { runInAction } from "mobx"
 import {
     INode,
     getStateTreeNode,
-    IStateTreeNode,
     isStateTreeNode,
     addMiddleware,
     tryResolve,
@@ -18,7 +17,8 @@ import {
     IDisposer,
     isArray,
     asArray,
-    getRelativePathBetweenNodes
+    getRelativePathBetweenNodes,
+    IAnyStateTreeNode
 } from "../internal"
 
 export type ISerializedActionCall = {
@@ -30,7 +30,7 @@ export type ISerializedActionCall = {
 export interface IActionRecorder {
     actions: ReadonlyArray<ISerializedActionCall>
     stop(): any
-    replay(target: IStateTreeNode<any>): any
+    replay(target: IAnyStateTreeNode): any
 }
 
 function serializeArgument(node: INode, actionName: string, index: number, arg: any): any {
@@ -78,7 +78,7 @@ function serializeTheUnserializable(baseType: string) {
  * @param {IActionCallOptions} [options]
  */
 export function applyAction(
-    target: IStateTreeNode<any>,
+    target: IAnyStateTreeNode,
     actions: ISerializedActionCall | ISerializedActionCall[]
 ): void {
     // check all arguments
@@ -93,7 +93,7 @@ export function applyAction(
     })
 }
 
-function baseApplyAction(target: IStateTreeNode<any>, action: ISerializedActionCall): any {
+function baseApplyAction(target: IAnyStateTreeNode, action: ISerializedActionCall): any {
     const resolvedTarget = tryResolve(target, action.path || "")
     if (!resolvedTarget) return fail(`Invalid action path: ${action.path || ""}`)
     const node = getStateTreeNode(resolvedTarget)
@@ -132,7 +132,7 @@ function baseApplyAction(target: IStateTreeNode<any>, action: ISerializedActionC
  * @param {IStateTreeNode} subject
  * @returns {IPatchRecorder}
  */
-export function recordActions(subject: IStateTreeNode<any>): IActionRecorder {
+export function recordActions(subject: IAnyStateTreeNode): IActionRecorder {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(subject))
@@ -143,7 +143,7 @@ export function recordActions(subject: IStateTreeNode<any>): IActionRecorder {
     let recorder = {
         actions: [] as ISerializedActionCall[],
         stop: () => disposer(),
-        replay: (target: IStateTreeNode<any>) => {
+        replay: (target: IAnyStateTreeNode) => {
             applyAction(target, recorder.actions)
         }
     }
@@ -189,7 +189,7 @@ export function recordActions(subject: IStateTreeNode<any>): IActionRecorder {
  * @returns {IDisposer}
  */
 export function onAction(
-    target: IStateTreeNode<any>,
+    target: IAnyStateTreeNode,
     listener: (call: ISerializedActionCall) => void,
     attachAfter = false
 ): IDisposer {

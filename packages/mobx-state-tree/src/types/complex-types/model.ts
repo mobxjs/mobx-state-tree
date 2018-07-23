@@ -49,7 +49,8 @@ import {
     OptionalValue,
     MapType,
     ArrayType,
-    ExtractIStateTreeNode
+    ExtractIStateTreeNode,
+    IAnyStateTreeNode
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -113,13 +114,13 @@ export type ModelSnapshotType<T extends ModelPropertiesDeclarationToProperties<a
     [K in keyof T]: T[K] extends IType<any, infer S, any> ? S : never
 }
 
-export type ModelInstanceType<T extends ModelPropertiesDeclarationToProperties<any>, O, S> = {
-    [K in keyof T]: T[K] extends IType<any, infer S, infer M>
-        ? ExtractIStateTreeNode<T[K], S, M>
+export type ModelInstanceType<T extends ModelPropertiesDeclarationToProperties<any>, O, C, S> = {
+    [K in keyof T]: T[K] extends IType<infer C, infer S, infer M>
+        ? ExtractIStateTreeNode<T[K], C, S, M>
         : never
 } &
     O &
-    IStateTreeNode<S>
+    IStateTreeNode<C, S>
 
 export type ModelActions = {
     [key: string]: Function
@@ -130,7 +131,7 @@ export interface IModelType<
     OTHERS,
     C = ModelCreationType<PROPS>,
     S = ModelSnapshotType<PROPS>,
-    T = ModelInstanceType<PROPS, OTHERS, S>
+    T = ModelInstanceType<PROPS, OTHERS, C, S>
 > extends IComplexType<C, S, T> {
     readonly properties: PROPS
     named(newName: string): this
@@ -138,16 +139,16 @@ export interface IModelType<
         props: PROPS2
     ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS>
     views<V extends Object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, S>) => V
+        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => V
     ): IModelType<PROPS, OTHERS & V>
     actions<A extends ModelActions>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, S>) => A
+        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => A
     ): IModelType<PROPS, OTHERS & A>
     volatile<TP extends object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, S>) => TP
+        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => TP
     ): IModelType<PROPS, OTHERS & TP>
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, S>) => { actions?: A; views?: V; state?: VS }
+        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS>
     preProcessSnapshot<S0 = ModelCreationType<PROPS>>(
         fn: (snapshot: S0) => ModelCreationType<PROPS>
@@ -474,7 +475,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     finalizeNewInstance(node: INode, childNodes: IChildNodesMap) {
         const objNode = node as ObjectNode
         const type = objNode.type as ModelType<any, any>
-        const instance = objNode.storedValue as IStateTreeNode<any>
+        const instance = objNode.storedValue as IAnyStateTreeNode
 
         extendObservable(instance, childNodes, EMPTY_OBJECT, mobxShallow)
         type.forAllProps(name => {

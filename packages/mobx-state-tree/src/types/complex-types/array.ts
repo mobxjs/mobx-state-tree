@@ -42,19 +42,11 @@ import {
 } from "../../internal"
 
 export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
-export type IArrayType<C, S, T> = IComplexType<
-    ReadonlyArray<C> | undefined,
-    ReadonlyArray<S>,
-    IMSTArray<C, S, T>
-> & {
+export type IArrayType<C, S, T> = IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> & {
     flags: TypeFlags.Optional
 }
 
-export class ArrayType<C, S, T> extends ComplexType<
-    ReadonlyArray<C> | undefined,
-    ReadonlyArray<S>,
-    IMSTArray<C, S, T>
-> {
+export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> {
     shouldAttachNode = true
     subType: IAnyType
     readonly flags = TypeFlags.Array
@@ -115,7 +107,7 @@ export class ArrayType<C, S, T> extends ComplexType<
     }
 
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
-        const node = getStateTreeNode(change.object as IStateTreeNode<S>)
+        const node = getStateTreeNode(change.object as IStateTreeNode<C, S>)
         node.assertWritable()
         const subType = (node.type as ArrayType<any, any, any>).subType
         const childNodes = node.getChildren()
@@ -159,7 +151,7 @@ export class ArrayType<C, S, T> extends ComplexType<
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
-        const node = getStateTreeNode(change.object as IStateTreeNode<S>)
+        const node = getStateTreeNode(change.object as IStateTreeNode<C, S>)
         switch (change.type) {
             case "update":
                 return void node.emitPatch(

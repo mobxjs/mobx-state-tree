@@ -43,7 +43,7 @@ const UndoManager = types
     .actions(self => {
         let skipping = false
         let flagSkipping = false
-        let targetStore: IStateTreeNode<any>
+        let targetStore: IStateTreeNode
         let replaying = false
         let middlewareDisposer: () => void
         let grouping = false

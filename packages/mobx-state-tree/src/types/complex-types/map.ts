@@ -19,7 +19,6 @@ import {
     INode,
     createNode,
     isStateTreeNode,
-    IStateTreeNode,
     IType,
     IComplexType,
     ComplexType,
@@ -40,7 +39,8 @@ import {
     OptionalValue,
     Union,
     Late,
-    IAnyType
+    IAnyType,
+    IAnyStateTreeNode
 } from "../../internal"
 
 export type IMapType<C, S, T> = IComplexType<
@@ -158,7 +158,7 @@ class MSTMap<C, S, T> extends ObservableMap {
             return fail(`Map.put can only be used to store complex values`)
         } else {
             let key: string
-            const mapType = getStateTreeNode(this as IStateTreeNode<any>).type as MapType<
+            const mapType = getStateTreeNode(this as IAnyStateTreeNode).type as MapType<
                 any,
                 any,
                 any
@@ -271,7 +271,7 @@ export class MapType<C, S, T> extends ComplexType<
     }
 
     willChange(change: IMapWillChange<any, any>): IMapWillChange<any, any> | null {
-        const node = getStateTreeNode(change.object as IStateTreeNode<any>)
+        const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         const key = change.name
         node.assertWritable()
         const mapType = node.type as MapType<any, any, any>
@@ -322,7 +322,7 @@ export class MapType<C, S, T> extends ComplexType<
     }
 
     didChange(change: IMapDidChange<any, any>): void {
-        const node = getStateTreeNode(change.object as IStateTreeNode<any>)
+        const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         switch (change.type) {
             case "update":
                 return void node.emitPatch(

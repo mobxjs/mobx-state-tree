@@ -1,4 +1,4 @@
-import { types, getMembers, IStateTreeNode } from "../src"
+import { types, getMembers, IAnyStateTreeNode } from "../src"
 const User = types.model("User", {
     id: types.identifier,
     name: types.string
@@ -57,7 +57,7 @@ test("reflection - late", () => {
     const node = Model.create({
         user: { id: "5", name: "Test" }
     })
-    const empty: IStateTreeNode<any> = {}
+    const empty: IAnyStateTreeNode = {}
     const reflection = getMembers(node.user || empty)
     const keys = Object.keys(reflection.properties || {})
     expect(keys.includes("name")).toBe(true)

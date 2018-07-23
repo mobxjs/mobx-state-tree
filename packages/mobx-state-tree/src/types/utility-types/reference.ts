@@ -13,10 +13,10 @@ import {
     typeCheckFailure,
     fail,
     ObjectNode,
-    IStateTreeNode,
     IAnyType,
     ExtractT,
-    IComplexType
+    IComplexType,
+    IAnyStateTreeNode
 } from "../../internal"
 import { computed } from "mobx"
 
@@ -184,8 +184,8 @@ export class CustomReferenceType<T> extends BaseReferenceType<T> {
 }
 
 export interface ReferenceOptions<T> {
-    get(identifier: string | number, parent: IStateTreeNode<any> | null): T
-    set(value: T, parent: IStateTreeNode<any> | null): string | number
+    get(identifier: string | number, parent: IAnyStateTreeNode | null): T
+    set(value: T, parent: IAnyStateTreeNode | null): string | number
 }
 
 export interface IReferenceType<IR extends IComplexType<any, any, any>>

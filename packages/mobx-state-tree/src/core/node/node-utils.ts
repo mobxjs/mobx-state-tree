@@ -35,10 +35,14 @@ export interface INode {
     die(): void
 }
 
-export type IStateTreeNode<S> = {
+export interface IStateTreeNode<C = any, S = any> {
     readonly $treenode?: any
-    readonly $snapshottable?: S // fake, will never be present, just for typing
+    // fake, will never be present, just for typing
+    readonly $creationType?: C
+    readonly $snapshotType?: S
 }
+
+export interface IAnyStateTreeNode extends IStateTreeNode<any, any> {}
 
 export interface IMembers {
     properties: { [name: string]: IAnyType }
@@ -56,11 +60,11 @@ export interface IMembers {
  * @param {*} value
  * @returns {value is IStateTreeNode}
  */
-export function isStateTreeNode<S = any>(value: any): value is IStateTreeNode<S> {
+export function isStateTreeNode<C = any, S = any>(value: any): value is IStateTreeNode<C, S> {
     return !!(value && value.$treenode)
 }
 
-export function getStateTreeNode(value: IStateTreeNode<any>): ObjectNode {
+export function getStateTreeNode(value: IAnyStateTreeNode): ObjectNode {
     if (isStateTreeNode(value)) return value.$treenode!
     else return fail(`Value ${value} is no MST Node`)
 }
@@ -75,7 +79,7 @@ export function canAttachNode(value: any) {
     )
 }
 
-export function toJSON<S>(this: IStateTreeNode<S>): S {
+export function toJSON<S>(this: IStateTreeNode<any, S>): S {
     return getStateTreeNode(this).snapshot
 }
 

@@ -93,6 +93,7 @@ export {
     process,
     isStateTreeNode,
     IStateTreeNode,
+    IAnyStateTreeNode,
     flow,
     applyAction,
     onAction,
