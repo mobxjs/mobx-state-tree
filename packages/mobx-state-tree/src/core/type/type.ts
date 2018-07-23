@@ -47,7 +47,7 @@ export interface IType<C, S, T> {
     flags: TypeFlags
     is(thing: any): thing is C | S | T
     validate(thing: any, context: IContext): IValidationResult
-    create(snapshot?: C, environment?: any): T
+    create(snapshot?: C | DeepImmutable<C>, environment?: any): T
     isType: boolean
     describe(): string
     Type: T
@@ -59,8 +59,8 @@ export interface IType<C, S, T> {
     initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null
     reconcile(current: INode, newValue: any): INode
     getValue(node: INode): T
-    getSnapshot(node: INode, applyPostProcess?: boolean): S
-    applySnapshot(node: INode, snapshot: C): void
+    getSnapshot(node: INode, applyPostProcess?: boolean): DeepImmutable<S>
+    applySnapshot(node: INode, snapshot: C | DeepImmutable<C>): void
     applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void
     getChildren(node: INode): ReadonlyArray<INode>
     getChildNode(node: INode, key: string): INode
@@ -231,7 +231,7 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
         return undefined
     }
 
-    applySnapshot(node: INode, snapshot: C): void {
+    applySnapshot(node: INode, snapshot: C | DeepImmutable<C>): void {
         fail("Immutable types do not support applying snapshots")
     }
 

@@ -40,7 +40,8 @@ import {
     Union,
     Late,
     IAnyType,
-    IAnyStateTreeNode
+    IAnyStateTreeNode,
+    DeepImmutable
 } from "../../internal"
 
 export type IMapType<C, S, T> = IComplexType<
@@ -313,7 +314,7 @@ export class MapType<C, S, T> extends ComplexType<
         return node.storedValue
     }
 
-    getSnapshot(node: ObjectNode): IKeyValueMap<S> {
+    getSnapshot(node: ObjectNode): DeepImmutable<IKeyValueMap<S>> {
         const res: any = {}
         node.getChildren().forEach(childNode => {
             res[childNode.subpath] = childNode.snapshot
