@@ -13,7 +13,8 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    ObjectNode
+    ObjectNode,
+    IAnyType
 } from "../internal"
 
 // TODO: implement CoreType using types.custom ?
@@ -146,7 +147,7 @@ export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, und
  * LogLine.create({ timestamp: new Date() })
  */
 // tslint:disable-next-line:variable-name
-export const DatePrimitive: IType<number, number, Date> = new CoreType<number, Date>(
+export const DatePrimitive: IType<number | Date, number, Date> = new CoreType<number, Date>(
     "Date",
     TypeFlags.Date,
     (v: any) => typeof v === "number" || v instanceof Date,
@@ -170,7 +171,7 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     return fail("Cannot determine primitive type from value " + value)
 }
 
-export function isPrimitiveType(type: any): type is CoreType<any, any> {
+export function isPrimitiveType<S = any, T = any>(type: IAnyType): type is CoreType<S, T> {
     return (
         isType(type) &&
         (type.flags & (TypeFlags.String | TypeFlags.Number | TypeFlags.Boolean | TypeFlags.Date)) >

@@ -2,7 +2,6 @@ import {
     isStateTreeNode,
     getStateTreeNode,
     INode,
-    IType,
     Type,
     IContext,
     IValidationResult,
@@ -11,7 +10,8 @@ import {
     isType,
     fail,
     TypeFlags,
-    IAnyType
+    IAnyType,
+    ExtractC
 } from "../../internal"
 
 export class Refinement<C, S, T> extends Type<C, S, T> {
@@ -68,17 +68,17 @@ export class Refinement<C, S, T> extends Type<C, S, T> {
     }
 }
 
-export function refinement<C, S, T>(
+export function refinement<IT extends IAnyType>(
     name: string,
-    type: IType<C, S, T>,
-    predicate: (snapshot: C) => boolean,
+    type: IT,
+    predicate: (snapshot: ExtractC<IT>) => boolean,
     message?: string | ((v: any) => string)
-): IType<C, S, T>
-export function refinement<C, S, T>(
-    type: IType<C, S, T>,
-    predicate: (snapshot: C) => boolean,
+): IT
+export function refinement<IT extends IAnyType>(
+    type: IT,
+    predicate: (snapshot: ExtractC<IT>) => boolean,
     message?: string | ((v: any) => string)
-): IType<C, S, T>
+): IT
 
 /**
  * `types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
@@ -116,6 +116,6 @@ export function refinement(...args: any[]): IAnyType {
     return new Refinement(name, type, predicate, message)
 }
 
-export function isRefinementType(type: any): type is Refinement<any, any, any> {
+export function isRefinementType<IT extends IAnyType>(type: IT): type is IT {
     return (type.flags & TypeFlags.Refinement) > 0
 }

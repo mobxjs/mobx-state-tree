@@ -12,10 +12,10 @@ test("Date instance can be reused", () => {
             index: types.array(Model)
         })
         .actions(self => {
-            function set(one) {
+            function set(one: typeof Model.Type) {
                 self.one = one
             }
-            function push(model) {
+            function push(model: typeof Model.Type) {
                 self.index.push(model)
             }
             return {

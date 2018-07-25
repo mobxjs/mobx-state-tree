@@ -1,14 +1,14 @@
 import { action as mobxAction } from "mobx"
 import {
     getStateTreeNode,
-    IStateTreeNode,
     fail,
     argsToArray,
     IDisposer,
     getRoot,
     EMPTY_ARRAY,
     ObjectNode,
-    HookNames
+    HookNames,
+    IAnyStateTreeNode
 } from "../internal"
 
 export type IMiddlewareEventType =
@@ -26,8 +26,8 @@ export type IMiddlewareEvent = {
     id: number
     parentId: number
     rootId: number
-    context: IStateTreeNode
-    tree: IStateTreeNode
+    context: IAnyStateTreeNode
+    tree: IAnyStateTreeNode
     args: any[]
 }
 
@@ -74,7 +74,7 @@ export function getActionContext(): IMiddlewareEvent {
 }
 
 export function createActionInvoker<T extends Function>(
-    target: IStateTreeNode,
+    target: IAnyStateTreeNode,
     name: string,
     fn: T
 ) {
@@ -110,7 +110,7 @@ export function createActionInvoker<T extends Function>(
  * @returns {IDisposer}
  */
 export function addMiddleware(
-    target: IStateTreeNode,
+    target: IAnyStateTreeNode,
     handler: IMiddlewareHandler,
     includeHooks: boolean = true
 ): IDisposer {

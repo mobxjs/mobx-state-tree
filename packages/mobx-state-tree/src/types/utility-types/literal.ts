@@ -69,6 +69,6 @@ export function literal<S>(value: S): ISimpleType<S> {
     return new Literal<S>(value)
 }
 
-export function isLiteralType(type: any): type is Literal<any> {
+export function isLiteralType<IT extends ISimpleType<any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Literal) > 0
 }

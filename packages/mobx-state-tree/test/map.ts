@@ -191,7 +191,7 @@ test("#192 - put should not throw when identifier is a number", () => {
             todos: types.optional(types.map(Todo), {})
         })
         .actions(self => {
-            function addTodo(todo) {
+            function addTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
                 self.todos.put(todo)
             }
             return {
@@ -207,7 +207,7 @@ test("#192 - put should not throw when identifier is a number", () => {
     }).not.toThrow()
     if (process.env.NODE_ENV !== "production") {
         expect(() => {
-            todoStore.addTodo({ todo_id: "1", title: "Test" })
+            todoStore.addTodo({ todo_id: "1", title: "Test" } as any)
         }).toThrowError(
             'at path "/todo_id" value `"1"` is not assignable to type: `identifierNumber` (Value is not a valid identifierNumber, expected a number)'
         )
@@ -220,7 +220,7 @@ test("#192 - map should not mess up keys when putting twice", () => {
             todos: types.optional(types.map(Todo), {})
         })
         .actions(self => {
-            function addTodo(todo) {
+            function addTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
                 self.todos.put(todo)
             }
             return {
@@ -249,7 +249,7 @@ test("#694 - map.put should return new node", () => {
             todos: types.map(Todo)
         })
         .actions(self => {
-            function addAndReturnTodo(todo) {
+            function addAndReturnTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
                 return self.todos.put(todo)
             }
             return {
@@ -304,10 +304,10 @@ test("it should not throw when removing a non existing item from a map", () => {
 test("it should get map keys from reversePatch when deleted an item from a nested map", () => {
     const AppModel = types
         .model({
-            value: types.map(types.map(types.map(types.number)) as any) // TODO: fix typings?
+            value: types.map(types.map(types.map(types.number)))
         })
         .actions(self => ({
-            remove(k) {
+            remove(k: string) {
                 self.value.delete(k)
             }
         }))
@@ -341,7 +341,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
         })
         .preProcessSnapshot(snapshot => {
             const result = Object.assign({}, snapshot)
-            if (typeof result.title !== "string") (result as any).title = ""
+            if (typeof result.title !== "string") result.title = ""
             return result
         })
 
@@ -359,7 +359,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
             }
         }))
 
-    let store
+    let store!: typeof Store.Type
     expect(() => {
         store = Store.create({})
     }).not.toThrow()
@@ -375,7 +375,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
 })
 
 test("map can resolve late identifiers", () => {
-    const Late = types.model({
+    const Late: any = types.model({
         id: types.identifier,
         children: types.map(types.late(() => Late))
     })
@@ -401,7 +401,7 @@ test("get should return value when key is a number", () => {
             todos: types.optional(types.map(Todo), {})
         })
         .actions(self => {
-            function addTodo(todo) {
+            function addTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
                 self.todos.put(todo)
             }
             return {
@@ -434,7 +434,7 @@ test("numeric keys should work", () => {
     })
     unprotect(s)
 
-    s.mies.set(7 as any, { id: "7" } as any)
+    s.mies.set(7 as any, { id: "7" })
     const i7 = s.mies.get(7 as any)!
     expect(i7.title).toBe("test")
     expect(s.mies.has("7")).toBeTruthy()
@@ -442,7 +442,7 @@ test("numeric keys should work", () => {
     expect(s.mies.get("7")).toBeTruthy()
     expect(s.mies.get(7 as any)).toBeTruthy()
 
-    s.mies.set("8", { id: "8" } as any)
+    s.mies.set("8", { id: "8" })
     expect(s.mies.has("8")).toBeTruthy()
     expect(s.mies.has(8 as any)).toBeTruthy()
     expect(s.mies.get("8")).toBeTruthy()
@@ -468,7 +468,7 @@ describe("#826, adding stuff twice", () => {
             map: types.optional(types.map(types.boolean), {})
         })
         .actions(self => ({
-            toogleMap: id => {
+            toogleMap: (id: string) => {
                 self.map.set(id, !self.map.get(id))
             }
         }))
@@ -477,7 +477,7 @@ describe("#826, adding stuff twice", () => {
     test("Toogling once shouldn't throw", () => {
         const store = Store.create({})
         expect(() => {
-            store.toogleMap(1)
+            store.toogleMap("1")
         }).not.toThrow()
     })
 
@@ -485,8 +485,8 @@ describe("#826, adding stuff twice", () => {
     test("Toogling twice shouldn't throw", () => {
         const store = Store.create({})
         expect(() => {
-            store.toogleMap(1)
-            store.toogleMap(1)
+            store.toogleMap("1")
+            store.toogleMap("1")
         }).not.toThrow()
     })
 })

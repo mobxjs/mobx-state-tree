@@ -8,7 +8,7 @@ import {
     applySnapshot,
     onSnapshot
 } from "../src"
-function createTestStore(listener) {
+function createTestStore(listener: (s: string) => void) {
     const Todo = types
         .model("Todo", {
             title: ""
@@ -163,7 +163,7 @@ test("it should postprocess snapshots when generating snapshot - 2", () => {
 })
 test("base hooks can be composed", () => {
     const events: any[] = []
-    function listener(message) {
+    function listener(message: string) {
         events.push(message)
     }
     const Todo = types

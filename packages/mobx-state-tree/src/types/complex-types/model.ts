@@ -10,8 +10,7 @@ import {
     _getAdministration,
     isComputedProp,
     computed,
-    set,
-    IObservableArray
+    set
 } from "mobx"
 import {
     fail,
@@ -45,17 +44,13 @@ import {
     addHiddenWritableProp,
     mobxShallow,
     isStateTreeNode,
-    IdentifierType,
     IChildNodesMap,
     IAnyType,
-    Union,
-    Late,
     OptionalValue,
-    isMapType,
-    isArrayType,
-    IMSTMap,
     MapType,
-    ArrayType
+    ArrayType,
+    ExtractIStateTreeNode,
+    IAnyStateTreeNode
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -89,59 +84,43 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
             : T[K] extends boolean
                 ? IType<boolean | undefined, boolean, boolean> & { flags: TypeFlags.Optional }
                 : T[K] extends Date
-                    ? IType<number | undefined, number, Date> & { flags: TypeFlags.Optional }
-                    : T[K] extends (IComplexType<infer C, infer S, IObservableArray<infer A>>)
-                        ? IComplexType<C, S, IObservableArray<A>> & { flags: TypeFlags.Optional }
-                        : T[K] extends (IComplexType<
-                              infer C,
-                              infer S,
-                              IMSTMap<infer X, infer Y, infer Z>
-                          >)
-                            ? IComplexType<C, S, IMSTMap<X, Y, Z>> & { flags: TypeFlags.Optional }
-                            : T[K] extends IType<infer C, infer S, infer A> & {
-                                  flags: TypeFlags.Optional
-                              }
-                                ? IType<C, S, A> & { flags: TypeFlags.Optional }
-                                : T[K] extends IType<infer C, infer S, infer A>
-                                    ? IType<C, S, A>
-                                    : never
+                    ? IType<number | Date | undefined, number, Date> & {
+                          flags: TypeFlags.Optional
+                      }
+                    : T[K] extends IAnyType ? T[K] : never
 }
 
-export type OptionalPropertyTypes = ModelPrimitive | { flags: TypeFlags.Optional }
+export type OptionalPropertyTypes = { flags: TypeFlags.Optional }
 
 export type RequiredPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalPropertyTypes ? never : undefined extends T[K] ? never : K
+    [K in keyof T]: T[K] extends OptionalPropertyTypes ? never : K
 }[keyof T]
-export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
 export type OptionalPropNames<T> = {
     [K in keyof T]: T[K] extends OptionalPropertyTypes ? K : never
 }[keyof T]
+
+export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
 export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
 
 /**
  * Maps property types to the snapshot, including omitted optional attributes
  */
-export type ModelCreationType<T extends ModelProperties> = {
-    readonly [K in keyof RequiredProps<T>]: T[K] extends IType<infer X, any, infer Y>
-        ? X | Y
+export type ModelCreationType<T extends ModelPropertiesDeclarationToProperties<any>> = {
+    [K in keyof RequiredProps<T>]: T[K] extends IType<infer C, any, any> ? C : never
+} &
+    { [K in keyof OptionalProps<T>]?: T[K] extends IType<infer C, any, any> ? C : never }
+
+export type ModelSnapshotType<T extends ModelPropertiesDeclarationToProperties<any>> = {
+    [K in keyof T]: T[K] extends IType<any, infer S, any> ? S : never
+}
+
+export type ModelInstanceType<T extends ModelPropertiesDeclarationToProperties<any>, O, C, S> = {
+    [K in keyof T]: T[K] extends IType<infer C, infer S, infer M>
+        ? ExtractIStateTreeNode<T[K], C, S, M>
         : never
 } &
-    {
-        readonly [K in keyof OptionalProps<T>]?: T[K] extends IType<infer X, any, infer Y>
-            ? X | Y
-            : never
-    }
-
-export type ModelSnapshotType<T extends ModelProperties> = {
-    readonly [K in keyof RequiredProps<T>]: T[K] extends IType<any, infer X, any> ? X : never
-} &
-    { readonly [K in keyof OptionalProps<T>]: T[K] extends IType<any, infer X, any> ? X : never }
-
-export type ModelInstanceType<T extends ModelProperties, O> = {
-    [K in keyof T]: T[K] extends IType<any, any, infer X> ? X : never
-} &
     O &
-    IStateTreeNode
+    IStateTreeNode<C, S>
 
 export type ModelActions = {
     [key: string]: Function
@@ -152,7 +131,7 @@ export interface IModelType<
     OTHERS,
     C = ModelCreationType<PROPS>,
     S = ModelSnapshotType<PROPS>,
-    T = ModelInstanceType<PROPS, OTHERS>
+    T = ModelInstanceType<PROPS, OTHERS, C, S>
 > extends IComplexType<C, S, T> {
     readonly properties: PROPS
     named(newName: string): this
@@ -160,16 +139,16 @@ export interface IModelType<
         props: PROPS2
     ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS>
     views<V extends Object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => V
+        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => V
     ): IModelType<PROPS, OTHERS & V>
     actions<A extends ModelActions>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => A
+        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => A
     ): IModelType<PROPS, OTHERS & A>
     volatile<TP extends object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => TP
+        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => TP
     ): IModelType<PROPS, OTHERS & TP>
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS>) => { actions?: A; views?: V; state?: VS }
+        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS>
     preProcessSnapshot<S0 = ModelCreationType<PROPS>>(
         fn: (snapshot: S0) => ModelCreationType<PROPS>
@@ -263,11 +242,11 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
      * The original object definition
      */
     public readonly identifierAttribute: string | undefined
-    public readonly initializers: ((instance: any) => any)[]
+    public readonly initializers!: ((instance: any) => any)[]
     public readonly properties: any
 
-    private preProcessor: (snapshot: any) => any | undefined
-    private postProcessor: (snapshot: any) => any | undefined
+    private preProcessor!: (snapshot: any) => any | undefined
+    private postProcessor!: (snapshot: any) => any | undefined
     private readonly propertyNames: string[]
 
     constructor(opts: ModelTypeConfig) {
@@ -496,7 +475,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     finalizeNewInstance(node: INode, childNodes: IChildNodesMap) {
         const objNode = node as ObjectNode
         const type = objNode.type as ModelType<any, any>
-        const instance = objNode.storedValue as IStateTreeNode
+        const instance = objNode.storedValue as IAnyStateTreeNode
 
         extendObservable(instance, childNodes, EMPTY_OBJECT, mobxShallow)
         type.forAllProps(name => {
@@ -675,7 +654,26 @@ export function model(...args: any[]): any {
 
 // generated with /home/michel/mobservable/mobx-state-tree/packages/mobx-state-tree/scripts/generate-compose-type.js
 // prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2>(t1: IModelType<T1, S1>, t2: IModelType<T2, S2>): IModelType<T1 & T2, S1 & S2>
+export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>): IModelType<T1 & T2, S1 & S2>
+// prettier-ignore
+export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>): IModelType<T1 & T2 & T3, S1 & S2 & S3>
+// prettier-ignore
+export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>): IModelType<T1 & T2 & T3 & T4, S1 & S2 & S3 & S4>
+// prettier-ignore
+export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>): IModelType<T1 & T2 & T3 & T4 & T5, S1 & S2 & S3 & S4 & S5>
+// prettier-ignore
+export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>): IModelType<T1 & T2 & T3 & T4 & T5 & T6, S1 & S2 & S3 & S4 & S5 & S6>
+// prettier-ignore
+export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6, T7 extends ModelProperties, S7>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>, t7: IModelType<T7, S7>): IModelType<T1 & T2 & T3 & T4 & T5 & T6 & T7, S1 & S2 & S3 & S4 & S5 & S6 & S7>
+// prettier-ignore
+export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6, T7 extends ModelProperties, S7, T8 extends ModelProperties, S8>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>, t7: IModelType<T7, S7>, t8: IModelType<T8, S8>): IModelType<T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8, S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8>
+// prettier-ignore
+export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6, T7 extends ModelProperties, S7, T8 extends ModelProperties, S8, T9 extends ModelProperties, S9>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>, t7: IModelType<T7, S7>, t8: IModelType<T8, S8>, t9: IModelType<T9, S9>): IModelType<T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8 & T9, S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 & S9>
+
+export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2>(
+    t1: IModelType<T1, S1>,
+    t2: IModelType<T2, S2>
+): IModelType<T1 & T2, S1 & S2>
 // prettier-ignore
 export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3>(t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>): IModelType<T1 & T2 & T3, S1 & S2 & S3>
 // prettier-ignore
@@ -720,14 +718,15 @@ export function compose(...args: any[]): any {
         .named(typeName)
 }
 
-export function isModelType(type: any): type is ModelType<any, any> {
+export function isModelType<IT extends IModelType<any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 
 function tryGetOptional(type: any): OptionalValue<any, any, any> | undefined {
     if (!type) return undefined
-    if (type.flags & TypeFlags.Union) return type.types.find(tryGetOptional)
-    if (type.flags & TypeFlags.Late) return tryGetOptional(type.subType)
+    // we need to check for type.types since an optional union doesn't have direct subtypes
+    if (type.flags & TypeFlags.Union && type.types) return type.types.find(tryGetOptional)
+    if (type.flags & TypeFlags.Late && type.subType) return tryGetOptional(type.subType)
     if (type.flags & TypeFlags.Optional) return type
     return undefined
 }

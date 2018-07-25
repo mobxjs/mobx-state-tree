@@ -36,3 +36,15 @@ test("should support anonymous enums", () => {
         )
     }
 })
+test("should support optional enums", () => {
+    const TrafficLight = types.optional(types.enumeration(["Red", "Orange", "Green"]), "Orange")
+    const l = TrafficLight.create()
+    expect(l).toBe("Orange")
+})
+test("should support optional enums inside a model", () => {
+    const TrafficLight = types.model({
+        color: types.optional(types.enumeration(["Red", "Orange", "Green"]), "Orange")
+    })
+    const l = TrafficLight.create({})
+    expect(l.color).toBe("Orange")
+})

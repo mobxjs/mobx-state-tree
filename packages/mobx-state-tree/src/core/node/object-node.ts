@@ -298,7 +298,7 @@ export class ObjectNode implements INode {
                 case "warn":
                     console.warn(
                         baseMsg +
-                            ' Use setLivelynessCheck("error") to simplify debugging this error.'
+                            ' Use setLivelynessChecking("error") to simplify debugging this error.'
                     )
             }
         }

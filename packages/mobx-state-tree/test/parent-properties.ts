@@ -93,7 +93,7 @@ test("#917", () => {
             }
         }))
         .actions(self => ({
-            addTodo(title) {
+            addTodo(title: string) {
                 self.todos.push({
                     title,
                     subTodos: [
@@ -101,7 +101,7 @@ test("#917", () => {
                             title
                         }
                     ]
-                })
+                } as typeof Todo.Type) // TODO: if IObservableArray supported separate write/read types then this typecast could be avoided
             }
         }))
 
