@@ -997,7 +997,7 @@ See the [full API docs](API.md) for more details.
 | [`resolve(node, path)`](API.md#resolve) | Resolves a `path` (json path) relatively to the given `node` |
 | [`resolveIdentifier(type, target, identifier)`](API.md#resolveidentifier) | resolves an identifier of a given type in a model tree |
 | [`resolvePath(target, path)`](API.md#resolvepath) | resolves a JSON path, starting at the specified target |
-| [`setLivelynessChecking("warn" | "ignore" | "error")`](API.md#setlivelynesschecking) | Defines what MST should do when running into reads / writes to objects that have died. By default it will print a warning. Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place |
+| [`setLivelynessChecking("warn" \| "ignore" \| "error")`](API.md#setlivelynesschecking) | Defines what MST should do when running into reads / writes to objects that have died. By default it will print a warning. Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place |
 | [`splitJsonPath(path)`](API.md#splitjsonpath) | Splits and unescapes the given JSON `path` into path parts |
 | [`typecheck(type, value)`](API.md#typecheck) | Typechecks a value against a type. Throws on errors. Use this if you need typechecks even in a production build. |
 | [`tryResolve(node, path)`](API.md#tryresolve) | Like `resolve`, but just returns `null` if resolving fails at any point in the path |
