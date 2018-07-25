@@ -42,7 +42,8 @@ import {
 } from "../../internal"
 
 export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
-export type IArrayType<C, S, T> = IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> & {
+export interface IArrayType<C, S, T>
+    extends IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> {
     flags: TypeFlags.Optional
 }
 

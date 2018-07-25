@@ -12,7 +12,7 @@ import {
     IAnyType
 } from "../../internal"
 
-export type CustomTypeOptions<S, T> = {
+export interface CustomTypeOptions<S, T> {
     // Friendly name
     name: string
     // given a serialized value, how to turn it into the target type
@@ -33,7 +33,7 @@ export type CustomTypeOptions<S, T> = {
  * The signature of the options is:
  *
  * ```javascript
- * export type CustomTypeOptions<S, T> = {
+ * export interface CustomTypeOptions<S, T> {
  *     // Friendly name
  *     name: string
  *     // given a serialized value, how to turn it into the target type

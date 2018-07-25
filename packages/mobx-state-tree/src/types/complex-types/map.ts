@@ -43,11 +43,10 @@ import {
     IAnyStateTreeNode
 } from "../../internal"
 
-export type IMapType<C, S, T> = IComplexType<
-    IKeyValueMap<C> | undefined,
-    IKeyValueMap<S>,
-    IMSTMap<C, S, T>
-> & { flags: TypeFlags.Optional }
+export interface IMapType<C, S, T>
+    extends IComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<C, S, T>> {
+    flags: TypeFlags.Optional
+}
 
 export interface IMSTMap<C, S, T> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
