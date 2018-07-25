@@ -1,12 +1,13 @@
-const { types } = require("../../src")
+import { types } from "../../src"
+
 // tiny
-exports.Treasure = types.model("Treasure", {
+export const Treasure = types.model("Treasure", {
     trapped: types.boolean,
     gold: types.optional(types.number, 0)
 })
 // medium
-exports.HeroRoles = ["warrior", "wizard", "cleric", "thief"]
-exports.Hero = types
+export const HeroRoles = ["warrior", "wizard", "cleric", "thief"]
+export const Hero = types
     .model("Hero", {
         id: types.identifierNumber,
         name: types.string,
@@ -20,7 +21,7 @@ exports.Hero = types
         }
     }))
 // large
-exports.Monster = types
+export const Monster = types
     .model("Monster", {
         id: types.identifier,
         freestyle: types.frozen(),

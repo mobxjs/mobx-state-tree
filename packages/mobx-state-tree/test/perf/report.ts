@@ -1,4 +1,5 @@
-const { smallScenario, mediumScenario, largeScenario } = require("./scenarios")
+import { smallScenario, mediumScenario, largeScenario } from "./scenarios"
+
 // here's what we'll be testing
 const plan = [
     "-----------",
@@ -52,7 +53,7 @@ smallScenario(1000)
 mediumScenario(500)
 largeScenario(100, 10, 10)
 // remember when this broke the internet?
-function leftPad(value, length, char = " ") {
+function leftPad(value: string, length: number, char = " "): string {
     return value.toString().length < length ? leftPad(char + value, length) : value
 }
 // let's start

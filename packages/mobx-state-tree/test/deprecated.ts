@@ -2,6 +2,7 @@ import { spy } from "sinon"
 import { deprecated } from "../src/utils"
 import { flow, createFlowSpawner } from "../src/core/flow"
 import { process as mstProcess, createProcessSpawner } from "../src/core/process"
+
 function createDeprecationListener() {
     // clear previous deprecation dedupe keys
     deprecated.ids = {}
