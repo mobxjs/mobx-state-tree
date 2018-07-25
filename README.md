@@ -876,6 +876,7 @@ These are the types available in MST. All types can be found in the `types` name
 
 * `types.string`
 * `types.number`
+* `types.integer`
 * `types.boolean`
 * `types.Date`
 * `types.custom` creates a custom primitive type. This is useful to define your own types that map a serialized form one-to-one to an immutable object like a Decimal or Date.
