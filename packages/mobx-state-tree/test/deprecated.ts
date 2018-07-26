@@ -22,7 +22,7 @@ function createDeprecationListener() {
 }
 test("`process` should mirror `flow`", () => {
     const isDeprecated = createDeprecationListener()
-    const generator = function*() {}
+    const generator = function*(): IterableIterator<any> {}
     const flowResult = flow(generator)
     const processResult = mstProcess(generator)
     expect(processResult.name).toBe(flowResult.name)
@@ -31,7 +31,7 @@ test("`process` should mirror `flow`", () => {
 test("`createProcessSpawner` should mirror `createFlowSpawner`", () => {
     const isDeprecated = createDeprecationListener()
     const alias = "generatorAlias"
-    const generator = function*() {}
+    const generator = function*(): IterableIterator<any> {}
     const flowSpawnerResult = createFlowSpawner(alias, generator)
     const processSpawnerResult = createProcessSpawner(alias, generator)
     expect(processSpawnerResult.name).toBe(flowSpawnerResult.name)

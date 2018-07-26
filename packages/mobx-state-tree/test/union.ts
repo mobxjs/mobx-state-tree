@@ -153,7 +153,7 @@ test("dispatch", () => {
     if (process.env.NODE_ENV !== "production") {
         expect(() => {
             const Num = types.union(
-                (snapshot => (snapshot.value % 2 === 0 ? Even : Odd)) as any, // { dispatcher: snapshot => (snapshot.value % 2 === 0 ? Even : Odd) },
+                ((snapshot: any) => (snapshot.value % 2 === 0 ? Even : Odd)) as any, // { dispatcher: snapshot => (snapshot.value % 2 === 0 ? Even : Odd) },
                 Even,
                 Odd
             )

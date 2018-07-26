@@ -4,7 +4,7 @@ const Todo = types
         title: ""
     })
     .actions(self => {
-        function setTitle(newTitle) {
+        function setTitle(newTitle: string) {
             self.title = newTitle
         }
         return {
@@ -45,7 +45,7 @@ test("protect should protect against any update", () => {
         "[mobx-state-tree] Cannot modify 'Todo@<root>', the object is protected and can only be modified by using an action."
     )
     expect(() => {
-        store.todos.push({ title: "test" } as any)
+        store.todos.push({ title: "test" } as typeof Todo.Type)
     }).toThrowError(
         "[mobx-state-tree] Cannot modify 'Todo[]@/todos', the object is protected and can only be modified by using an action."
     )

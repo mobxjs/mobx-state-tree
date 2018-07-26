@@ -9,10 +9,15 @@ import {
     createActionTrackingMiddleware,
     IStateTreeNode,
     IModelType,
-    ISnapshottable,
     IMiddlewareEvent,
     IPatchRecorder,
-    IJsonPatch
+    IJsonPatch,
+    TypeFlags,
+    IComplexType,
+    IMSTArray,
+    ModelSnapshotType,
+    IType,
+    ModelPropertiesDeclarationToProperties
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 

@@ -58,79 +58,67 @@ test("it should check for parent instance (unbound)", () => {
 })
 // getParentOfType
 test("it should resolve to the given parent instance", () => {
-    const Cell = types.model({
-        cell_id: 0
-    })
+    const Cell = types.model({})
     const Row = types.model({
-        row_id: 0,
         cells: types.optional(types.array(Cell), [])
     })
     const Document = types.model({
         rows: types.optional(types.array(Row), [])
     })
-    const doc = Document.create()
-    unprotect(doc)
-    const row = Row.create()
-    doc.rows.push(row)
-    const cell = Cell.create()
-    doc.rows[0].cells.push(cell)
-    expect(getParentOfType(cell, Document)).toEqual(doc)
+    const doc = Document.create({
+        rows: [
+            {
+                cells: [{}]
+            }
+        ]
+    })
+    expect(getParentOfType(doc.rows[0].cells[0], Document)).toEqual(doc)
 })
 test("it should throw if there is not parent of type", () => {
-    const Cell = types.model({
-        cell_id: 0
-    })
+    const Cell = types.model({})
     const Row = types.model({
-        row_id: 0,
         cells: types.optional(types.array(Cell), [])
     })
     const Document = types.model({
         rows: types.optional(types.array(Row), [])
     })
-    const row = Row.create()
-    unprotect(row)
-    const cell = Cell.create()
-    row.cells.push(cell)
-    expect(() => getParentOfType(cell, Document)).toThrowError(
+    const row = Row.create({
+        cells: [{}]
+    })
+    expect(() => getParentOfType(row.cells[0], Document)).toThrowError(
         "[mobx-state-tree] Failed to find the parent of AnonymousModel@/cells/0 of a given type"
     )
 })
 // hasParentOfType
 test("it should check for parent instance of given type", () => {
-    const Cell = types.model({
-        cell_id: 0
-    })
+    const Cell = types.model({})
     const Row = types.model({
-        row_id: 0,
         cells: types.optional(types.array(Cell), [])
     })
     const Document = types.model({
         rows: types.optional(types.array(Row), [])
     })
-    const doc = Document.create()
-    unprotect(doc)
-    const row = Row.create()
-    doc.rows.push(row)
-    const cell = Cell.create()
-    doc.rows[0].cells.push(cell)
-    expect(hasParentOfType(cell, Document)).toEqual(true)
+    const doc = Document.create({
+        rows: [
+            {
+                cells: [{}]
+            }
+        ]
+    })
+    expect(hasParentOfType(doc.rows[0].cells[0], Document)).toEqual(true)
 })
 test("it should check for parent instance of given type (unbound)", () => {
-    const Cell = types.model({
-        cell_id: 0
-    })
+    const Cell = types.model({})
     const Row = types.model({
-        row_id: 0,
         cells: types.optional(types.array(Cell), [])
     })
     const Document = types.model({
         rows: types.optional(types.array(Row), [])
     })
-    const row = Row.create()
-    unprotect(row)
-    const cell = Cell.create()
-    row.cells.push(cell)
-    expect(hasParentOfType(cell, Document)).toEqual(false)
+    const row = Row.create({
+        cells: [{}]
+    })
+    expect(hasParentOfType(row.cells[0], Document)).toEqual(false)
 })
 // getRoot
 test("it should resolve to the root of an object", () => {
@@ -330,7 +318,7 @@ test("it can record and replay actions", () => {
             article_id: 0
         })
         .actions(self => {
-            function setArticle(article_id) {
+            function setArticle(article_id: number) {
                 self.article_id = article_id
             }
             return {
@@ -343,7 +331,7 @@ test("it can record and replay actions", () => {
             rows: types.optional(types.array(Row), [])
         })
         .actions(self => {
-            function setCustomer(customer_id) {
+            function setCustomer(customer_id: number) {
                 self.customer_id = customer_id
             }
             function addRow() {
@@ -372,14 +360,14 @@ test("Livelyness issue #683", () => {
             list: types.map(User)
         })
         .actions(self => ({
-            put(user) {
+            put(user: typeof User.CreationType | typeof User.Type) {
                 // if (self.has(user.id)) detach(self.get(user.id));
                 self.list.put(user)
             },
-            get(id) {
+            get(id: string) {
                 return self.list.get(id)
             },
-            has(id) {
+            has(id: string) {
                 return self.list.has(id)
             }
         }))

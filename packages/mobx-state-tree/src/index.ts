@@ -7,17 +7,24 @@ import { IObservableArray, ObservableMap, IAction } from "mobx"
 // tslint:disable-next-line:no_unused-variable
 import {
     ISimpleType,
-    IComplexType,
     IType,
     IAnyType,
+    ExtractC,
+    ExtractS,
+    ExtractT,
+    TAndInterface,
+    ExtractIStateTreeNode,
+    IComplexType,
     map,
     IMSTMap,
     array,
+    IMSTArray,
     identifier,
     model,
     compose,
     IModelType,
     reference,
+    IReferenceType,
     union,
     optional,
     literal,
@@ -27,6 +34,7 @@ import {
     boolean,
     DatePrimitive,
     number,
+    integer,
     string,
     undefinedType,
     nullType,
@@ -34,7 +42,8 @@ import {
     enumeration,
     custom,
     identifierNumber,
-    maybeNull
+    maybeNull,
+    TypeFlags
 } from "./internal"
 
 export const types = {
@@ -52,6 +61,7 @@ export const types = {
     string,
     boolean,
     number,
+    integer,
     Date: DatePrimitive,
     map,
     array,
@@ -67,10 +77,10 @@ export {
     IAnyType,
     IModelType,
     IMSTMap,
+    IMSTArray,
     IType,
     ISimpleType,
     IComplexType,
-    ISnapshottable,
     typecheckPublic as typecheck,
     escapeJsonPath,
     unescapeJsonPath,
@@ -85,6 +95,7 @@ export {
     process,
     isStateTreeNode,
     IStateTreeNode,
+    IAnyStateTreeNode,
     flow,
     applyAction,
     onAction,
@@ -93,7 +104,12 @@ export {
     recordActions,
     createActionTrackingMiddleware,
     setLivelynessChecking,
-    LivelynessMode
+    LivelynessMode,
+    TypeFlags,
+    ModelSnapshotType,
+    ModelCreationType,
+    ModelInstanceType,
+    ModelPropertiesDeclarationToProperties
 } from "./internal"
 
 export * from "./core/mst-operations"

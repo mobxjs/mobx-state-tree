@@ -25,6 +25,14 @@ export function nothing(): null {
 
 export function noop() {}
 
+// pollyfill (for IE) suggested in MDN:
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
+export const isInteger =
+    Number.isInteger ||
+    function(value: any) {
+        return typeof value === "number" && isFinite(value) && Math.floor(value) === value
+    }
+
 export function isArray(val: any): boolean {
     return !!(Array.isArray(val) || isObservableArray(val)) as boolean
 }

@@ -41,7 +41,12 @@ import {
     EMPTY_ARRAY
 } from "../../internal"
 
-export class ArrayType<C, S, T> extends ComplexType<C[], S[], IObservableArray<T>> {
+export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
+export type IArrayType<C, S, T> = IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> & {
+    flags: TypeFlags.Optional
+}
+
+export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> {
     shouldAttachNode = true
     subType: IAnyType
     readonly flags = TypeFlags.Array
@@ -102,7 +107,7 @@ export class ArrayType<C, S, T> extends ComplexType<C[], S[], IObservableArray<T
     }
 
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
-        const node = getStateTreeNode(change.object as IStateTreeNode)
+        const node = getStateTreeNode(change.object as IStateTreeNode<C, S>)
         node.assertWritable()
         const subType = (node.type as ArrayType<any, any, any>).subType
         const childNodes = node.getChildren()
@@ -146,7 +151,7 @@ export class ArrayType<C, S, T> extends ComplexType<C[], S[], IObservableArray<T
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
-        const node = getStateTreeNode(change.object as IStateTreeNode)
+        const node = getStateTreeNode(change.object as IStateTreeNode<C, S>)
         switch (change.type) {
             case "update":
                 return void node.emitPatch(
@@ -254,14 +259,13 @@ export class ArrayType<C, S, T> extends ComplexType<C[], S[], IObservableArray<T
  * @param {IType<S, T>} subtype
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
-export function array<C, S, T>(
-    subtype: IType<C, S, T>
-): IComplexType<ReadonlyArray<C>, ReadonlyArray<S>, IObservableArray<T>> {
+export function array<C, S, T>(subtype: IType<C, S, T>): IArrayType<C, S, T> {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subtype))
             fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")
     }
-    return new ArrayType<C, S, T>(subtype.name + "[]", subtype)
+    const ret = new ArrayType<C, S, T>(subtype.name + "[]", subtype)
+    return ret as typeof ret & { flags: TypeFlags.Optional }
 }
 
 function reconcileArrayChildren<T>(
@@ -384,8 +388,6 @@ function areSame(oldNode: INode, newValue: any) {
     return false
 }
 
-export function isArrayType<C, S, T>(
-    type: any
-): type is IComplexType<C[], S[], IObservableArray<T>> {
+export function isArrayType<IT extends IArrayType<any, any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Array) > 0
 }

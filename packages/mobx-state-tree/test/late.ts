@@ -19,7 +19,7 @@ test("it should accept a type and infer it correctly", () => {
 })
 test("late should allow circular references", () => {
     // TypeScript is'nt smart enough to infer self referencing types.
-    const Node = types.model({
+    const Node: any = types.model({
         childs: types.optional(types.array(types.late(() => Node)), [])
     })
     expect(() => Node.create()).not.toThrow()
@@ -27,13 +27,13 @@ test("late should allow circular references", () => {
 })
 test("late should describe correctly circular references", () => {
     // TypeScript is'nt smart enough to infer self referencing types.
-    const Node = types.model("Node", {
+    const Node: any = types.model("Node", {
         childs: types.array(types.late(() => Node))
     })
     expect(Node.describe()).toEqual("{ childs: Node[]? }")
 })
 test("should typecheck", () => {
-    const NodeObject = types.model("NodeObject", {
+    const NodeObject: any = types.model("NodeObject", {
         id: types.identifierNumber,
         text: "Hi",
         child: types.maybe(types.late(() => NodeObject))
@@ -75,6 +75,6 @@ test("#825, late type checking ", () => {
         name: types.maybe(types.string)
     })
 
-    const p2 = Product.create({} as any)
+    const p2 = Product.create({})
     const p = Product.create({ details: { name: "bla" } })
 })

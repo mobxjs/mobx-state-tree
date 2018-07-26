@@ -1,5 +1,5 @@
-import { types, unprotect } from "../src"
-function Pointer(Model) {
+import { types, unprotect, IAnyType } from "../src"
+function Pointer(Model: IAnyType) {
     return types.model("PointerOf" + Model.name, {
         value: types.maybe(types.reference(Model))
     })

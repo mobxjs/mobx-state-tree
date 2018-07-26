@@ -4,14 +4,16 @@
         "module": "commonjs",
         "lib": ["es7"],
         "target": "es6",
-        "noImplicitAny": false,
-        "noImplicitThis": true,
         "experimentalDecorators": true,
+        "strict": true,
         "strictNullChecks": true,
+        "strictFunctionTypes": false,
+        "noImplicitAny": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
         "sourceMap": false,
         "noEmit": true
     },
-    "include": [
-        "**/*.ts"
-    ]
+    "include": ["**/*.ts"]
 }

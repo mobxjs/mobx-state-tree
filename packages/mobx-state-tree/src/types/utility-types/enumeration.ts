@@ -127,7 +127,7 @@ export function enumeration(name: string, options: string[]): ISimpleType<string
  * @param {string[]} options possible values this enumeration can have
  * @returns {ISimpleType<string>}
  */
-export function enumeration(name: string | string[], options?: any): ISimpleType<any> {
+export function enumeration(name: string | string[], options?: any): ISimpleType<string> {
     const realOptions: string[] = typeof name === "string" ? options! : name
     // check all options
     if (process.env.NODE_ENV !== "production") {

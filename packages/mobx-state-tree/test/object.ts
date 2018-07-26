@@ -20,7 +20,7 @@ const createTestFactories = () => {
             to: "world"
         })
         .actions(self => {
-            function setTo(to) {
+            function setTo(to: string) {
                 self.to = to
             }
             return {
@@ -47,10 +47,10 @@ const createTestFactories = () => {
             }
         }))
         .actions(self => {
-            function setWidth(value) {
+            function setWidth(value: number) {
                 self.props.set("width", value)
             }
-            function setHeight(value) {
+            function setHeight(value: number) {
                 self.props.set("height", value)
             }
             return {
@@ -616,7 +616,7 @@ test("it should be possible to share states between views and actions using enha
                 }
             },
             actions: {
-                setX(value) {
+                setX(value: number) {
                     localState.set(value)
                 }
             }
