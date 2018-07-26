@@ -26,7 +26,15 @@ export class Late<C, S, T> extends Type<C, S, T> {
     getSubType(mustSucceed: false): IAnyType | null
     getSubType(mustSucceed: boolean): IAnyType | null {
         if (this._subType === null) {
-            const t = this.definition()
+            let t = undefined
+            try {
+                t = this.definition()
+            } catch (e) {
+                if (e instanceof ReferenceError)
+                    // can happen in strict ES5 code when a definition is self refering
+                    t = undefined
+                else throw e
+            }
             if (mustSucceed && t === undefined)
                 fail(
                     "Late type seems to be used too early, the definition (still) returns undefined"
