@@ -135,7 +135,11 @@ const UndoManager = types
                 self.undoIdx = self.history.length
             },
             afterCreate() {
-                targetStore = getEnv(self).targetStore ? getEnv(self).targetStore : getRoot(self)
+                try {
+                    targetStore = getEnv(self).targetStore
+                } catch {
+                    targetStore = getRoot(self)
+                }
                 if (!targetStore || targetStore === self)
                     throw new Error(
                         "UndoManager should be created as part of a tree, or with `targetStore` in it's environment"
