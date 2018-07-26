@@ -1,5 +1,5 @@
-import { smallScenario, mediumScenario, largeScenario } from "./perf/scenarios"
-import { start } from "./perf/timer"
+import { smallScenario, mediumScenario, largeScenario } from "./scenarios"
+import { start } from "./timer"
 
 // TODO: Not sure how this should work. This feels super fragile.
 const TOO_SLOW_MS = 10000

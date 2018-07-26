@@ -9,10 +9,10 @@
   "scripts": {
     "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
     "rollup": "rollup -c",
-    "test": "cross-env NODE_ENV=development jest --ci && cross-env NODE_ENV=production jest --ci && yarn run test-cyclic && yarn run test-mobx4",
-    "speedtest": "yarn build && /usr/bin/time node --expose-gc test/perf/report.js",
-    "test-cyclic": "yarn run build && node -e \"require('.')\"",
-    "test-mobx4": "yarn add -D mobx@4.3.1 && yarn build && jest --ci && git checkout package.json ../../yarn.lock && yarn install",
+    "test": "cross-env NODE_ENV=development jest --ci && cross-env NODE_ENV=production jest --ci && yarn run test:cyclic && yarn run test:mobx4",
+    "test:perf": "yarn build && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register test/perf/report.ts",
+    "test:cyclic": "yarn run build && node -e \"require('.')\"",
+    "test:mobx4": "yarn add -D mobx@4.3.1 && yarn build && jest --ci && git checkout package.json ../../yarn.lock && yarn install",
     "watch": "jest --watch",
     "_prepublish": "yarn run build && yarn run build-docs",
     "coverage": "jest --coverage",
@@ -51,6 +51,7 @@
     "rollup-plugin-uglify": "^2.0.1",
     "sinon": "^3.2.1",
     "ts-jest": "^22.4.1",
+    "ts-node": "^7.0.0",
     "tslib": "^1.7.1",
     "tslint": "^3.15.1",
     "typescript": "^2.7.0"

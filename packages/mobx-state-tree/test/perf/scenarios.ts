@@ -1,6 +1,6 @@
 import { start } from "./timer"
-import { Treasure, Hero, Monster } from "../fixtures/fixture-models"
-import { createTreasure, createHeros, createMonsters } from "../fixtures/fixture-data"
+import { Treasure, Hero, Monster } from "./fixtures/fixture-models"
+import { createTreasure, createHeros, createMonsters } from "./fixtures/fixture-data"
 
 /**
  * Covers models with a trivial number of fields.
