@@ -10,7 +10,7 @@
     "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
     "rollup": "rollup -c",
     "test": "cross-env NODE_ENV=development jest --ci && cross-env NODE_ENV=production jest --ci && yarn run test:cyclic && yarn run test:mobx4",
-    "test:perf": "yarn build && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register test/perf/report.ts",
+    "test:perf": "yarn build && yarn jest --testRegex 'test/perf/fixture*' && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register test/perf/report.ts",
     "test:cyclic": "yarn run build && node -e \"require('.')\"",
     "test:mobx4": "yarn add -D mobx@4.3.1 && yarn build && jest --ci && git checkout package.json ../../yarn.lock && yarn install",
     "watch": "jest --watch",
@@ -73,7 +73,7 @@
       "^.+\\.tsx?$": "ts-jest",
       "^.+\\.jsx?$": "babel-jest"
     },
-    "testRegex": "test/.*\\.(t|j)sx?$",
+    "testRegex": "test/(?!perf).*\\.(t|j)sx?$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -85,8 +85,7 @@
       "/node_modules/",
       "/src/",
       "/dist/",
-      "/test/fixtures",
-      "/test/perf",
+      "/test/perf/fixtures",
       "/\\./"
     ]
   }

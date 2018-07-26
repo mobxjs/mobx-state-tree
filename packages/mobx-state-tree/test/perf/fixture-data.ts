@@ -1,4 +1,3 @@
-// N.B. this test is currently not run, but should be as prelude to test:perf
 import { rando, createHeros, createMonsters, createTreasure } from "./fixtures/fixture-data"
 import { Hero, Monster, Treasure } from "./fixtures/fixture-models"
 
