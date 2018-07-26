@@ -542,3 +542,15 @@ test("932 - 2", () => {
     })
     const y2: string = x2.myField // string only
 })
+
+test("#923", () => {
+    const Foo = types.model("Foo", {
+        name: types.optional(types.string, "")
+    })
+
+    const Bar = types.model("Bar", {
+        foos: types.optional(types.array(Foo), [])
+    })
+
+    types.optional(types.map(Bar), {}) // Should have no compile error!
+})
