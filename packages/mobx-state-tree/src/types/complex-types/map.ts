@@ -106,11 +106,9 @@ function tryCollectModelTypes(type: IAnyType, modelTypes: Array<ModelType<any, a
             if (!tryCollectModelTypes(uType, modelTypes)) return false
         }
     } else if (type instanceof Late) {
-        try {
-            tryCollectModelTypes(type.subType, modelTypes)
-        } catch (e) {
-            return false
-        }
+        const t = type.getSubType(false)
+        if (!t) return false
+        tryCollectModelTypes(t, modelTypes)
     }
     return true
 }

@@ -78,3 +78,52 @@ test("#825, late type checking ", () => {
     const p2 = Product.create({})
     const p = Product.create({ details: { name: "bla" } })
 })
+
+test("#916 - 0", () => {
+    const Todo: any = types.model("Todo", {
+        title: types.string,
+        newTodo: types.optional(types.late(() => Todo), {}) // N.B. this definition is never instantiateable!
+    })
+})
+
+test("#916 - 1", () => {
+    const Todo: any = types.model("Todo", {
+        title: types.string,
+        newTodo: types.maybe(types.late(() => Todo))
+    })
+    const t = Todo.create({
+        title: "Get Coffee"
+    })
+})
+
+test("#916 - 2", () => {
+    const Todo: any = types.model("Todo", {
+        title: types.string,
+        newTodo: types.maybe(types.late(() => Todo))
+    })
+    expect(
+        Todo.is({
+            title: "A",
+            newTodo: { title: " test" }
+        })
+    ).toBe(true)
+    expect(
+        Todo.is({
+            title: "A",
+            newTodo: { title: 7 }
+        })
+    ).toBe(false)
+})
+
+test("#916 - 3", () => {
+    const Todo: any = types.model("Todo", {
+        title: types.string,
+        newTodo: types.maybe(types.late(() => Todo))
+    })
+    const t = Todo.create({
+        title: "Get Coffee",
+        newTodo: { title: "test" }
+    })
+
+    expect(t.newTodo.title).toBe("test")
+})

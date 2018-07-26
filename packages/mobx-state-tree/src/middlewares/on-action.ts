@@ -75,7 +75,6 @@ function serializeTheUnserializable(baseType: string) {
  * @export
  * @param {Object} target
  * @param {IActionCall[]} actions
- * @param {IActionCallOptions} [options]
  */
 export function applyAction(
     target: IAnyStateTreeNode,
