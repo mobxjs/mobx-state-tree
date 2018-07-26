@@ -155,7 +155,6 @@ Takes an action description as produced by the `onAction` middleware.
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 -   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IActionCall>** 
--   `options` **IActionCallOptions?** 
 
 ## applyPatch
 
