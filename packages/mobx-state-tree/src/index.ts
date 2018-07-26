@@ -77,7 +77,9 @@ export {
     IAnyType,
     IModelType,
     IMSTMap,
+    IMapType,
     IMSTArray,
+    IArrayType,
     IType,
     ISimpleType,
     IComplexType,
@@ -87,6 +89,7 @@ export {
     joinJsonPath,
     splitJsonPath,
     IJsonPatch,
+    IReversibleJsonPatch,
     decorate,
     addMiddleware,
     IMiddlewareEvent,
@@ -109,7 +112,14 @@ export {
     ModelSnapshotType,
     ModelCreationType,
     ModelInstanceType,
-    ModelPropertiesDeclarationToProperties
+    ModelPropertiesDeclarationToProperties,
+    ModelProperties,
+    ModelPropertiesDeclaration,
+    OptionalPropertyTypes,
+    ModelActions,
+    ModelTypeConfig,
+    CustomTypeOptions,
+    UnionOptions
 } from "./internal"
 
 export * from "./core/mst-operations"

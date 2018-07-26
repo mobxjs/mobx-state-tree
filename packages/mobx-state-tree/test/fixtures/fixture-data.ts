@@ -1,26 +1,25 @@
-const { HeroRoles } = require("./fixture-models")
+import { HeroRoles } from "./fixture-models"
+
 /**
  * Creates data containing very few fields.
  *
  * @param count The number of items to create.
  */
-function createTreasure(count) {
+export function createTreasure(count: number) {
     const data = []
     let i = 0
     do {
         data.push({
             trapped: i % 2 === 0,
-            gold: (count % 10 + 1) * 10
+            gold: ((count % 10) + 1) * 10
         })
         i++
     } while (i < count)
     return data
 }
-exports.createTreasure = createTreasure
 
 // why yes i DID graduate high school, why do you ask?
-const rando = () => (Math.random() > 0.5 ? 1 : 0)
-exports.rando = rando
+export const rando = () => (Math.random() > 0.5 ? 1 : 0)
 
 const titles = ["Sir", "Lady", "Baron von", "Baroness", "Captain", "Dread", "Fancy"].sort(rando)
 const givenNames = ["Abe", "Beth", "Chuck", "Dora", "Ernie", "Fran", "Gary", "Haily"].sort(rando)
@@ -33,7 +32,7 @@ const wtf = `Daenerys Stormborn of the House Targaryen, First of Her Name, the U
  *
  * @param count The number of items to create.
  */
-function createHeros(count) {
+export function createHeros(count: number) {
     const data = []
     let i = 0
     let even = true
@@ -47,7 +46,7 @@ function createHeros(count) {
         data.push({
             id: i,
             name: `${n1} ${n2} the ${n3}`,
-            level: count % 100 + 1,
+            level: (count % 100) + 1,
             role: HeroRoles[i % HeroRoles.length],
             description: `${wtf} ${wtf} ${wtf}`
         })
@@ -56,7 +55,6 @@ function createHeros(count) {
     } while (i < count)
     return data
 }
-exports.createHeros = createHeros
 
 /**
  * Creates data with a large number of fields and data.
@@ -65,7 +63,7 @@ exports.createHeros = createHeros
  * @param treasureCount The number of small children to create.
  * @param heroCount The number of medium children to create.
  */
-function createMonsters(count, treasureCount, heroCount) {
+export function createMonsters(count: number, treasureCount: number, heroCount: number) {
     const data = []
     let i = 0
     let even = true
@@ -75,7 +73,7 @@ function createMonsters(count, treasureCount, heroCount) {
         data.push({
             id: `omg-${i}-run!`,
             freestyle: `${wtf} ${wtf} ${wtf}${wtf} ${wtf} ${wtf}`,
-            level: count % 100 + 1,
+            level: (count % 100) + 1,
             hp: i % 2 === 0 ? 1 : 5 * i,
             maxHp: 5 * i,
             warning: "!!!!!!",
@@ -99,4 +97,3 @@ function createMonsters(count, treasureCount, heroCount) {
     } while (i < count)
     return data
 }
-exports.createMonsters = createMonsters

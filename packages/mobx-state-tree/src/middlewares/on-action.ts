@@ -21,7 +21,7 @@ import {
     IAnyStateTreeNode
 } from "../internal"
 
-export type ISerializedActionCall = {
+export interface ISerializedActionCall {
     name: string
     path?: string
     args?: any[]
