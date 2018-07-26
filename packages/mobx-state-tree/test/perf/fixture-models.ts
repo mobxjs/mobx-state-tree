@@ -1,5 +1,7 @@
+// N.B. this test is currently not run, but should be as prelude to test:perf
 import { Hero, Monster, Treasure } from "./fixtures/fixture-models"
-import { unprotect } from "../src"
+const mst = require("../../dist/mobx-state-tree.umd")
+const { unprotect } = mst
 
 const SAMPLE_HERO = {
     id: 1,
