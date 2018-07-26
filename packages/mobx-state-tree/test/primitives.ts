@@ -53,6 +53,17 @@ test("isInteger polyfill", () => {
     expect(isInteger(5.2)).toBe(false)
 })
 
+test("Default inference for integers is 'number'", () => {
+    const A = types.model({
+        x: 3
+    })
+    expect(
+        A.is({
+            x: 2.5
+        })
+    ).toBe(true)
+})
+
 if (process.env.NODE_ENV !== "production") {
     test("Passing non integer to types.integer", () => {
         const Size = types.model({
