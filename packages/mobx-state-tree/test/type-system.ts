@@ -448,3 +448,97 @@ test("Alternative typeof syntax #885", () => {
     type Car2 = typeof Car.Type
     type CarSnapshot = SnapshotTypeOf<typeof Car>
 })
+
+test("#922", () => {
+    expect(() => {
+        const Stateable = types.model("Statable", {
+            state: types.optional(
+                types.enumeration("state", ["initalized", "pending", "done", "error"]),
+                "initalized"
+            )
+        })
+
+        const Client = types.model("Client", {
+            id: types.identifierNumber,
+            name: types.string
+        })
+
+        const UserClientList = types.compose(
+            "UserClientList",
+            Stateable,
+            types.model({
+                items: types.array(Client),
+                month: types.optional(types.Date, () => {
+                    return new Date()
+                })
+            })
+        )
+
+        const NonExtendedUserClientList = types.model("NonExtendedUserClientList", {
+            items: types.array(Client),
+            month: types.optional(types.Date, () => {
+                return new Date()
+            }),
+            state: types.optional(
+                types.enumeration("state", ["initalized", "pending", "done", "error"]),
+                "initalized"
+            )
+        })
+
+        const User = types.model("User", {
+            name: types.string,
+            clients: types.optional(UserClientList, () => UserClientList.create({}))
+        })
+
+        const NonExtendedUser = types.model("User", {
+            name: types.string,
+            clients: types.optional(NonExtendedUserClientList, () =>
+                NonExtendedUserClientList.create({})
+            )
+        })
+
+        const you = NonExtendedUser.create({
+            name: "you"
+        })
+
+        const me = User.create({
+            name: "me"
+        })
+    }).not.toThrow()
+})
+
+test("#922 - 2", () => {
+    expect(() => {
+        types.optional(types.enumeration("state", ["init", "pending", "done", "error"]), "init")
+    }).not.toThrow()
+})
+
+test("#932", () => {
+    interface MyInterface {
+        test: string
+    }
+
+    const MyModel = types.model("MyModel", {
+        myField: types.array(types.frozen<MyInterface>())
+    })
+
+    const x = MyModel.create({ myField: [{ test: "stuff" }] })
+    const a: string = x.myField[0].test
+})
+
+test("932 - 2", () => {
+    type MyType = string
+    const ModelA = types.model("ModelA", {
+        myField: types.maybe(types.frozen<MyType>())
+    })
+    const x = ModelA.create({})
+    const y = x.myField // y is string | undefined
+
+    const ModelA2 = types.model("ModelA", {
+        myField: types.frozen<MyType>()
+    })
+    const x2 = ModelA2.create({
+        myField: "test" // mandatory
+    })
+    const y2: string = x2.myField // string only
+})
