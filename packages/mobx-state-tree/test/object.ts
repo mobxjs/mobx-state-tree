@@ -128,28 +128,30 @@ test("it should emit snapshots for children", () => {
             }
         ]
     })
-    let snapshots: any[] = []
-    onSnapshot(folder, snapshot => snapshots.push(snapshot))
+    let snapshotsP: any[] = []
+    let snapshotsC: any[] = []
+    onSnapshot(folder, snapshot => snapshotsP.push(snapshot))
     folder.rename("Vacation photos")
-    expect(snapshots[0]).toEqual({
+    expect(snapshotsP[0]).toEqual({
         name: "Vacation photos",
         files: [{ name: "Photo1" }, { name: "Photo2" }]
     })
 
-    onSnapshot(folder.files[0], snapshot => snapshots.push(snapshot))
+    onSnapshot(folder.files[0], snapshot => snapshotsC.push(snapshot))
     folder.files[0].rename("01-arrival")
-    expect(snapshots[1]).toEqual({
+    expect(snapshotsP[1]).toEqual({
         name: "Vacation photos",
         files: [{ name: "01-arrival" }, { name: "Photo2" }]
     })
-    expect(snapshots[2]).toEqual({ name: "01-arrival" })
+    expect(snapshotsC[0]).toEqual({ name: "01-arrival" })
 
     folder.files[1].rename("02-hotel")
-    expect(snapshots[3]).toEqual({
+    expect(snapshotsP[2]).toEqual({
         name: "Vacation photos",
         files: [{ name: "01-arrival" }, { name: "02-hotel" }]
     })
-    expect(snapshots[4]).not.toBeDefined()
+    expect(snapshotsP.length).toBe(3)
+    expect(snapshotsC.length).toBe(1)
 })
 
 test("it should apply snapshots", () => {
