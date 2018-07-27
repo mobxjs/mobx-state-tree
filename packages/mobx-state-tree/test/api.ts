@@ -24,6 +24,7 @@ const METHODS = [
     "getIdentifier",
     "getSnapshot",
     "getType",
+    "hasEnv",
     "hasParent",
     "hasParentOfType",
     "isAlive",
