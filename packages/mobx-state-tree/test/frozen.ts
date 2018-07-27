@@ -2,7 +2,7 @@ import { getSnapshot, types, unprotect } from "../src"
 
 test("it should accept any serializable value", () => {
     const Factory = types.model({
-        value: types.frozen()
+        value: types.frozen<{ a: number; b: number } | undefined>()
     })
     const doc = Factory.create()
     unprotect(doc)
@@ -13,7 +13,7 @@ test("it should accept any serializable value", () => {
 if (process.env.NODE_ENV !== "production") {
     test("it should throw if value is not serializable", () => {
         const Factory = types.model({
-            value: types.frozen()
+            value: types.frozen<Function | undefined>()
         })
         const doc = Factory.create()
         unprotect(doc)
@@ -71,7 +71,7 @@ if (process.env.NODE_ENV !== "production") {
         expect(Mouse.is({ loc: { x: 3, y: 2 } })).toBeTruthy()
 
         expect(() => {
-            Mouse.create()
+            ;(Mouse.create as any)()
         }).toThrow(
             'at path "/loc" value `undefined` is not assignable to type: `frozen(Point)` (Value is not a plain object)'
         )

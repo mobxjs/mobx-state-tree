@@ -118,7 +118,7 @@ export type ModelSnapshotType<T extends ModelPropertiesDeclarationToProperties<a
 
 export type ModelInstanceType<T extends ModelPropertiesDeclarationToProperties<any>, O, C, S> = {
     [K in keyof T]: T[K] extends IType<infer C, infer S, infer M>
-        ? ExtractIStateTreeNode<T[K], C, S, M>
+        ? ExtractIStateTreeNode<C, S, M>
         : never
 } &
     O &

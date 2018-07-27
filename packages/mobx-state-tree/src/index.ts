@@ -119,7 +119,11 @@ export {
     ModelActions,
     ModelTypeConfig,
     CustomTypeOptions,
-    UnionOptions
+    UnionOptions,
+    DefinablePropsNames,
+    IsTypeAny,
+    IsEmptyCreationType,
+    CreateFunction
 } from "./internal"
 
 export * from "./core/mst-operations"
