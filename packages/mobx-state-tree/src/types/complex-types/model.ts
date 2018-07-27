@@ -63,13 +63,13 @@ export enum HookNames {
     beforeDestroy = "beforeDestroy"
 }
 
-export type ModelProperties = {
+export interface ModelProperties {
     [key: string]: IAnyType
 }
 
 export type ModelPrimitive = string | number | boolean | Date
 
-export type ModelPropertiesDeclaration = {
+export interface ModelPropertiesDeclaration {
     [key: string]: ModelPrimitive | IAnyType
 }
 
@@ -90,7 +90,9 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
                     : T[K] extends IAnyType ? T[K] : never
 }
 
-export type OptionalPropertyTypes = { flags: TypeFlags.Optional }
+export interface OptionalPropertyTypes {
+    flags: TypeFlags.Optional
+}
 
 export type RequiredPropNames<T> = {
     [K in keyof T]: T[K] extends OptionalPropertyTypes ? never : K
@@ -122,7 +124,7 @@ export type ModelInstanceType<T extends ModelPropertiesDeclarationToProperties<a
     O &
     IStateTreeNode<C, S>
 
-export type ModelActions = {
+export interface ModelActions {
     [key: string]: Function
 }
 
@@ -162,7 +164,7 @@ function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
 }
 
-export type ModelTypeConfig = {
+export interface ModelTypeConfig {
     name?: string
     properties?: ModelProperties
     initializers?: ReadonlyArray<((instance: any) => any)>
@@ -726,7 +728,8 @@ function tryGetOptional(type: any): OptionalValue<any, any, any> | undefined {
     if (!type) return undefined
     // we need to check for type.types since an optional union doesn't have direct subtypes
     if (type.flags & TypeFlags.Union && type.types) return type.types.find(tryGetOptional)
-    if (type.flags & TypeFlags.Late && type.subType) return tryGetOptional(type.subType)
+    if (type.flags & TypeFlags.Late && type.getSubType && type.getSubType(false))
+        return tryGetOptional(type.subType)
     if (type.flags & TypeFlags.Optional) return type
     return undefined
 }

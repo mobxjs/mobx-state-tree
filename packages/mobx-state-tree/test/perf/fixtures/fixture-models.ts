@@ -1,12 +1,14 @@
-const { types } = require("../../src")
+const mst = require("../../../dist/mobx-state-tree.umd")
+const { types } = mst
+
 // tiny
-exports.Treasure = types.model("Treasure", {
+export const Treasure = types.model("Treasure", {
     trapped: types.boolean,
     gold: types.optional(types.number, 0)
 })
 // medium
-exports.HeroRoles = ["warrior", "wizard", "cleric", "thief"]
-exports.Hero = types
+export const HeroRoles = ["warrior", "wizard", "cleric", "thief"]
+export const Hero = types
     .model("Hero", {
         id: types.identifierNumber,
         name: types.string,
@@ -14,13 +16,13 @@ exports.Hero = types
         level: types.optional(types.number, 1),
         role: types.union(...exports.HeroRoles.map(types.literal))
     })
-    .views(self => ({
+    .views((self: any) => ({
         get descriptionLength() {
             return self.description.length
         }
     }))
 // large
-exports.Monster = types
+export const Monster = types
     .model("Monster", {
         id: types.identifier,
         freestyle: types.frozen(),
@@ -44,7 +46,7 @@ exports.Monster = types
         fearsThieves: types.optional(types.boolean, false),
         fearsProgrammers: types.optional(types.boolean, true)
     })
-    .views(self => ({
+    .views((self: any) => ({
         get isAlive() {
             return self.hp > 0
         },

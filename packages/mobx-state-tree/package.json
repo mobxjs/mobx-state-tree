@@ -1,6 +1,6 @@
 {
   "name": "mobx-state-tree",
-  "version": "3.0.0",
+  "version": "3.0.2",
   "description": "Opinionated, transactional, MobX powered state container",
   "main": "dist/mobx-state-tree.js",
   "umd:main": "dist/mobx-state-tree.umd.js",
@@ -9,13 +9,14 @@
   "scripts": {
     "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
     "rollup": "rollup -c",
-    "test": "cross-env NODE_ENV=development jest --ci && cross-env NODE_ENV=production jest --ci && yarn run test-cyclic && yarn run test-mobx4",
-    "speedtest": "yarn build && /usr/bin/time node --expose-gc test/perf/report.js",
-    "test-cyclic": "yarn run build && node -e \"require('.')\"",
-    "test-mobx4": "yarn add -D mobx@4.3.1 && yarn build && jest --ci && git checkout package.json ../../yarn.lock && yarn install",
-    "watch": "jest --watch",
+    "jest": "jest --projects='test'",
+    "jest:perf": "jest --projects='test/perf'",
+    "test": "cross-env NODE_ENV=development yarn jest --ci && cross-env NODE_ENV=production yarn jest --ci && yarn run test:cyclic && yarn run test:mobx4",
+    "test:perf": "yarn build && yarn jest:perf && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register test/perf/report.ts",
+    "test:cyclic": "yarn run build && node -e \"require('.')\"",
+    "test:mobx4": "yarn add -D mobx@4.3.1 && yarn build && yarn jest --ci && git checkout package.json ../../yarn.lock && yarn install",
     "_prepublish": "yarn run build && yarn run build-docs",
-    "coverage": "jest --coverage",
+    "coverage": "yarn jest --coverage",
     "build-docs": "tsc && documentation build lib/index.js --sort-order alpha -f md -o ../../API.md.tmp && concat -o ../../API.md ../../docs/API_header.md ../../API.md.tmp && rm ../../API.md.tmp",
     "lint": "tslint -c tslint.json 'src/**/*.ts'"
   },
@@ -34,6 +35,7 @@
   "devDependencies": {
     "@types/jest": "^22.2.0",
     "@types/node": "^8.0.19",
+    "@types/sinon": "^5.0.1",
     "concat": "^1.0.3",
     "concurrently": "^3.1.0",
     "coveralls": "^2.11.4",
@@ -50,6 +52,7 @@
     "rollup-plugin-uglify": "^2.0.1",
     "sinon": "^3.2.1",
     "ts-jest": "^22.4.1",
+    "ts-node": "^7.0.0",
     "tslib": "^1.7.1",
     "tslint": "^3.15.1",
     "typescript": "^2.7.0"
@@ -65,27 +68,5 @@
     "frp",
     "functional-reactive-programming",
     "state management"
-  ],
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest",
-      "^.+\\.jsx?$": "babel-jest"
-    },
-    "testRegex": "test/.*\\.(t|j)sx?$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/src/",
-      "/dist/",
-      "/test/fixtures",
-      "/test/perf",
-      "/\\./"
-    ]
-  }
+  ]
 }

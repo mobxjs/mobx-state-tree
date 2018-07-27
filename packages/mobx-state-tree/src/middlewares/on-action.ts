@@ -21,7 +21,7 @@ import {
     IAnyStateTreeNode
 } from "../internal"
 
-export type ISerializedActionCall = {
+export interface ISerializedActionCall {
     name: string
     path?: string
     args?: any[]
@@ -75,7 +75,6 @@ function serializeTheUnserializable(baseType: string) {
  * @export
  * @param {Object} target
  * @param {IActionCall[]} actions
- * @param {IActionCallOptions} [options]
  */
 export function applyAction(
     target: IAnyStateTreeNode,

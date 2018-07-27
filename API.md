@@ -156,7 +156,6 @@ Takes an action description as produced by the `onAction` middleware.
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 -   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IActionCall>** 
--   `options` **IActionCallOptions?** 
 
 ## applyPatch
 
@@ -825,7 +824,7 @@ Creates a custom type. Custom types can be used for arbitrary immutable values, 
 The signature of the options is:
 
 ```javascript
-export type CustomTypeOptions<S, T> = {
+export interface CustomTypeOptions<S, T> {
     // Friendly name
     name: string
     // given a serialized value, how to turn it into the target type

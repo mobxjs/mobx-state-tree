@@ -182,7 +182,7 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
         case "string":
             return string
         case "number":
-            return isInteger(value) ? integer : number
+            return number // In the future, isInteger(value) ? integer : number would be interesting, but would be too breaking for now
         case "boolean":
             return boolean
         case "object":

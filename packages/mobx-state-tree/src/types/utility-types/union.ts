@@ -19,7 +19,10 @@ import {
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
 
-export type UnionOptions = { eager?: boolean; dispatcher?: ITypeDispatcher }
+export interface UnionOptions {
+    eager?: boolean
+    dispatcher?: ITypeDispatcher
+}
 
 export class Union extends Type<any, any, any> {
     readonly dispatcher?: ITypeDispatcher

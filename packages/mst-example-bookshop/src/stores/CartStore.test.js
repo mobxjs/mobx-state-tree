@@ -1,5 +1,4 @@
 import * as fs from "fs"
-import { when } from "mobx"
 import { ShopStore } from "./ShopStore"
 
 const testEnvironment = {

@@ -1,3 +1,11 @@
+# 3.0.2
+
+* Introduced `types.integer`! By [@jayarjo](https://github.com/jayarjo) through [#935](https://github.com/mobxjs/mobx-state-tree/pull/935)
+* Improved typescript typings, several fixes to the type system. Awesome contribution by [@xaviergonz](https://github.com/xaviergonz) through [#937](https://github.com/mobxjs/mobx-state-tree/pull/937) and [#945](https://github.com/mobxjs/mobx-state-tree/pull/945). Fixes [#922](https://github.com/mobxjs/mobx-state-tree/issues/922), [#930](https://github.com/mobxjs/mobx-state-tree/issues/930), [#932](https://github.com/mobxjs/mobx-state-tree/issues/932), [#923](https://github.com/mobxjs/mobx-state-tree/issues/923)
+* Improved handling of `types.late`
+
+# 3.0.1 (retracted)
+
 # 3.0.0
 
 Welcome to MobX-state-tree! This version introduces some breaking changes, but nonetheless is an recommended upgrade as all changes should be pretty straight forward and there is no reason anymore to maintain the 2.x range (3.0 is still compatible with MobX 4)

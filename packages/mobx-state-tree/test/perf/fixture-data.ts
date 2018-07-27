@@ -1,5 +1,6 @@
 import { rando, createHeros, createMonsters, createTreasure } from "./fixtures/fixture-data"
 import { Hero, Monster, Treasure } from "./fixtures/fixture-models"
+
 test("createHeros", () => {
     const data = createHeros(10)
     expect(data.length).toBe(10)

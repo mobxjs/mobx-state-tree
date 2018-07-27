@@ -3,13 +3,13 @@ import { fail } from "../internal"
 // https://tools.ietf.org/html/rfc6902
 // http://jsonpatch.com/
 
-export type IJsonPatch = {
+export interface IJsonPatch {
     op: "replace" | "add" | "remove"
     path: string
     value?: any
 }
 
-export type IReversibleJsonPatch = IJsonPatch & {
+export interface IReversibleJsonPatch extends IJsonPatch {
     oldValue: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
 }
 
