@@ -2,6 +2,7 @@ import {
     types,
     flow,
     getEnv,
+    hasEnv,
     recordPatches,
     addMiddleware,
     applyPatch,
@@ -135,11 +136,7 @@ const UndoManager = types
                 self.undoIdx = self.history.length
             },
             afterCreate() {
-                try {
-                    targetStore = getEnv(self).targetStore
-                } catch {
-                    targetStore = getRoot(self)
-                }
+                targetStore = hasEnv(self) ? getEnv(self).targetStore : getRoot(self)
                 if (!targetStore || targetStore === self)
                     throw new Error(
                         "UndoManager should be created as part of a tree, or with `targetStore` in it's environment"
