@@ -711,7 +711,7 @@ export function getEnv<T = any>(target: IAnyStateTreeNode): T {
     const node = getStateTreeNode(target)
     const env = node.root._environment
 
-    return env || fail(`Failed to find the environment of ${getStateTreeNode(target)}`)
+    return env || fail(`Failed to find the environment of ${node} ${node.path}`)
 }
 
 /**
