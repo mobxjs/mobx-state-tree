@@ -6,25 +6,24 @@ import { IObservableArray, ObservableMap, IAction } from "mobx"
 
 // tslint:disable-next-line:no_unused-variable
 import {
-    ISimpleType,
+    IModelType,
+    IAnyModelType,
+    IMSTMap,
+    IMapType,
+    IMSTArray,
+    IArrayType,
     IType,
     IAnyType,
-    ExtractC,
-    ExtractS,
-    ExtractT,
-    TAndInterface,
-    ExtractIStateTreeNode,
+    ISimpleType,
     IComplexType,
+    IAnyComplexType,
+    IReferenceType,
     map,
-    IMSTMap,
     array,
-    IMSTArray,
     identifier,
     model,
     compose,
-    IModelType,
     reference,
-    IReferenceType,
     union,
     optional,
     literal,
@@ -74,15 +73,18 @@ export const types = {
 }
 
 export {
-    IAnyType,
     IModelType,
+    IAnyModelType,
     IMSTMap,
     IMapType,
     IMSTArray,
     IArrayType,
     IType,
+    IAnyType,
     ISimpleType,
     IComplexType,
+    IAnyComplexType,
+    IReferenceType,
     typecheckPublic as typecheck,
     escapeJsonPath,
     unescapeJsonPath,
@@ -119,11 +121,7 @@ export {
     ModelActions,
     ModelTypeConfig,
     CustomTypeOptions,
-    UnionOptions,
-    DefinablePropsNames,
-    IsTypeAnyOrUnknown,
-    IsEmptyCreationType,
-    CreateParams
+    UnionOptions
 } from "./internal"
 
 export * from "./core/mst-operations"

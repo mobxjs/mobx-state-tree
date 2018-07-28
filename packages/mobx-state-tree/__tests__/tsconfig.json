@@ -2,7 +2,7 @@
     "compilerOptions": {
         "rootDir": "../",
         "module": "commonjs",
-        "lib": ["es7"],
+        "lib": ["es2017", "dom"],
         "target": "es6",
         "experimentalDecorators": true,
         "strict": true,

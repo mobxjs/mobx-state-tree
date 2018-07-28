@@ -313,7 +313,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
         }
     })
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
-    store.arrows.push({ id: 1, name: "oops" } as any)
+    store.arrows.push({ id: 1, name: "oops" })
     expect(err.message).toBe(
         "[mobx-state-tree] Cannot resolve a reference to type '(Box | Arrow)' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
     )

@@ -50,7 +50,10 @@ import {
     MapType,
     ArrayType,
     ExtractIStateTreeNode,
-    IAnyStateTreeNode
+    IAnyStateTreeNode,
+    ExtractT,
+    ExtractS,
+    ExtractC
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -159,6 +162,11 @@ export interface IModelType<
         fn: (snapshot: ModelSnapshotType<PROPS>) => S1
     ): IModelType<PROPS, OTHERS, S1>
 }
+
+export interface IAnyModelType extends IModelType<any, any, any, any, any> {}
+
+export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any> ? P : never
+export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O> ? O : never
 
 function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
@@ -654,42 +662,76 @@ export function model(...args: any[]): any {
     return new ModelType({ name, properties })
 }
 
-// generated with /home/michel/mobservable/mobx-state-tree/packages/mobx-state-tree/scripts/generate-compose-type.js
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>): IModelType<T1 & T2, S1 & S2>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>): IModelType<T1 & T2 & T3, S1 & S2 & S3>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>): IModelType<T1 & T2 & T3 & T4, S1 & S2 & S3 & S4>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>): IModelType<T1 & T2 & T3 & T4 & T5, S1 & S2 & S3 & S4 & S5>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>): IModelType<T1 & T2 & T3 & T4 & T5 & T6, S1 & S2 & S3 & S4 & S5 & S6>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6, T7 extends ModelProperties, S7>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>, t7: IModelType<T7, S7>): IModelType<T1 & T2 & T3 & T4 & T5 & T6 & T7, S1 & S2 & S3 & S4 & S5 & S6 & S7>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6, T7 extends ModelProperties, S7, T8 extends ModelProperties, S8>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>, t7: IModelType<T7, S7>, t8: IModelType<T8, S8>): IModelType<T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8, S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6, T7 extends ModelProperties, S7, T8 extends ModelProperties, S8, T9 extends ModelProperties, S9>(name: string, t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>, t7: IModelType<T7, S7>, t8: IModelType<T8, S8>, t9: IModelType<T9, S9>): IModelType<T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8 & T9, S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 & S9>
+export type ComposeProps<T extends IAnyModelType[]> = ExtractProps<T[0]> &
+    ExtractProps<T[1]> &
+    ExtractProps<T[2]> &
+    ExtractProps<T[3]> &
+    ExtractProps<T[4]> &
+    ExtractProps<T[5]> &
+    ExtractProps<T[6]> &
+    ExtractProps<T[7]> &
+    ExtractProps<T[8]> &
+    ExtractProps<T[9]>
+export type ComposeOthers<T extends IAnyModelType[]> = ExtractOthers<T[0]> &
+    ExtractOthers<T[1]> &
+    ExtractOthers<T[2]> &
+    ExtractOthers<T[3]> &
+    ExtractOthers<T[4]> &
+    ExtractOthers<T[5]> &
+    ExtractOthers<T[6]> &
+    ExtractOthers<T[7]> &
+    ExtractOthers<T[8]> &
+    ExtractOthers<T[9]>
+export type ComposeC<T extends IAnyModelType[]> = ExtractC<T[0]> &
+    ExtractC<T[1]> &
+    ExtractC<T[2]> &
+    ExtractC<T[3]> &
+    ExtractC<T[4]> &
+    ExtractC<T[5]> &
+    ExtractC<T[6]> &
+    ExtractC<T[7]> &
+    ExtractC<T[8]> &
+    ExtractC<T[9]>
+export type ComposeS<T extends IAnyModelType[]> = ExtractS<T[0]> &
+    ExtractS<T[1]> &
+    ExtractS<T[2]> &
+    ExtractS<T[3]> &
+    ExtractS<T[4]> &
+    ExtractS<T[5]> &
+    ExtractS<T[6]> &
+    ExtractS<T[7]> &
+    ExtractS<T[8]> &
+    ExtractS<T[9]>
+export type ComposeT<T extends IAnyModelType[]> = ExtractT<T[0]> &
+    ExtractT<T[1]> &
+    ExtractT<T[2]> &
+    ExtractT<T[3]> &
+    ExtractT<T[4]> &
+    ExtractT<T[5]> &
+    ExtractT<T[6]> &
+    ExtractT<T[7]> &
+    ExtractT<T[8]> &
+    ExtractT<T[9]>
 
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2>(
-    t1: IModelType<T1, S1>,
-    t2: IModelType<T2, S2>
-): IModelType<T1 & T2, S1 & S2>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3>(t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>): IModelType<T1 & T2 & T3, S1 & S2 & S3>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4>(t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>): IModelType<T1 & T2 & T3 & T4, S1 & S2 & S3 & S4>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5>(t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>): IModelType<T1 & T2 & T3 & T4 & T5, S1 & S2 & S3 & S4 & S5>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6>(t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>): IModelType<T1 & T2 & T3 & T4 & T5 & T6, S1 & S2 & S3 & S4 & S5 & S6>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6, T7 extends ModelProperties, S7>(t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>, t7: IModelType<T7, S7>): IModelType<T1 & T2 & T3 & T4 & T5 & T6 & T7, S1 & S2 & S3 & S4 & S5 & S6 & S7>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6, T7 extends ModelProperties, S7, T8 extends ModelProperties, S8>(t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>, t7: IModelType<T7, S7>, t8: IModelType<T8, S8>): IModelType<T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8, S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8>
-// prettier-ignore
-export function compose<T1 extends ModelProperties, S1, T2 extends ModelProperties, S2, T3 extends ModelProperties, S3, T4 extends ModelProperties, S4, T5 extends ModelProperties, S5, T6 extends ModelProperties, S6, T7 extends ModelProperties, S7, T8 extends ModelProperties, S8, T9 extends ModelProperties, S9>(t1: IModelType<T1, S1>, t2: IModelType<T2, S2>, t3: IModelType<T3, S3>, t4: IModelType<T4, S4>, t5: IModelType<T5, S5>, t6: IModelType<T6, S6>, t7: IModelType<T7, S7>, t8: IModelType<T8, S8>, t9: IModelType<T9, S9>): IModelType<T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8 & T9, S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 & S9>
+export function compose<Types extends IAnyModelType[]>(
+    name: string,
+    ...types: Types
+): IModelType<
+    ComposeProps<Types>,
+    ComposeOthers<Types>,
+    ComposeC<Types>,
+    ComposeS<Types>,
+    ComposeT<Types>
+>
+export function compose<Types extends IAnyModelType[]>(
+    ...types: Types
+): IModelType<
+    ComposeProps<Types>,
+    ComposeOthers<Types>,
+    ComposeC<Types>,
+    ComposeS<Types>,
+    ComposeT<Types>
+>
 /**
  * Composes a new model from one or more existing model types.
  * This method can be invoked in two forms:

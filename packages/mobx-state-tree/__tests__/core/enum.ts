@@ -1,16 +1,20 @@
 import { types, unprotect } from "../../src"
+
+enum ColorEnum {
+    Red = "Red",
+    Orange = "Orange",
+    Green = "Green"
+}
+const colorEnumValues = Object.values(ColorEnum) as ColorEnum[]
+
 test("should support enums", () => {
-    const TrafficLight = types.model({
-        color: types.enumeration("Color", ["Red", "Orange", "Green"])
-    })
-    expect(TrafficLight.is({ color: "Green" })).toBe(true)
+    const TrafficLight = types.model({ color: types.enumeration("Color", colorEnumValues) })
+    expect(TrafficLight.is({ color: ColorEnum.Green })).toBe(true)
     expect(TrafficLight.is({ color: "Blue" })).toBe(false)
     expect(TrafficLight.is({ color: undefined })).toBe(false)
-    const l = TrafficLight.create({
-        color: "Orange"
-    })
+    const l = TrafficLight.create({ color: ColorEnum.Orange })
     unprotect(l)
-    l.color = "Red"
+    l.color = ColorEnum.Red
     expect(TrafficLight.describe()).toBe('{ color: ("Red" | "Orange" | "Green") }')
     // Note, any cast needed, compiler should correctly error otherwise
     if (process.env.NODE_ENV !== "production") {
@@ -20,14 +24,10 @@ test("should support enums", () => {
     }
 })
 test("should support anonymous enums", () => {
-    const TrafficLight = types.model({
-        color: types.enumeration(["Red", "Orange", "Green"])
-    })
-    const l = TrafficLight.create({
-        color: "Orange"
-    })
+    const TrafficLight = types.model({ color: types.enumeration(colorEnumValues) })
+    const l = TrafficLight.create({ color: ColorEnum.Orange })
     unprotect(l)
-    l.color = "Red"
+    l.color = ColorEnum.Red
     expect(TrafficLight.describe()).toBe('{ color: ("Red" | "Orange" | "Green") }')
     // Note, any cast needed, compiler should correctly error otherwise
     if (process.env.NODE_ENV !== "production") {
@@ -37,14 +37,14 @@ test("should support anonymous enums", () => {
     }
 })
 test("should support optional enums", () => {
-    const TrafficLight = types.optional(types.enumeration(["Red", "Orange", "Green"]), "Orange")
+    const TrafficLight = types.optional(types.enumeration(colorEnumValues), ColorEnum.Orange)
     const l = TrafficLight.create()
-    expect(l).toBe("Orange")
+    expect(l).toBe(ColorEnum.Orange)
 })
 test("should support optional enums inside a model", () => {
     const TrafficLight = types.model({
-        color: types.optional(types.enumeration(["Red", "Orange", "Green"]), "Orange")
+        color: types.optional(types.enumeration(colorEnumValues), ColorEnum.Orange)
     })
     const l = TrafficLight.create({})
-    expect(l.color).toBe("Orange")
+    expect(l.color).toBe(ColorEnum.Orange)
 })

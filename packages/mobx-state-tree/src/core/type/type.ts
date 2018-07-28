@@ -104,6 +104,8 @@ export interface IComplexType<C, S, T> extends IType<C, S, T> {
     create(...args: CreateParams<C>): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>
 }
 
+export interface IAnyComplexType extends IComplexType<any, any, any> {}
+
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
 export type ExtractT<T extends IAnyType> = T extends IType<any, any, infer X> ? X : never
