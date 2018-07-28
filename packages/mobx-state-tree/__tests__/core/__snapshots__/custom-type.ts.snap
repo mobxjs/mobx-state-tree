@@ -1,0 +1,122 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`complex reassignments will work 1`] = `
+Array [
+  Object {
+    "balance": Array [
+      2,
+      5,
+    ],
+  },
+  Object {
+    "balance": Array [
+      2,
+      5,
+    ],
+  },
+  Object {
+    "balance": Array [
+      3,
+      5,
+    ],
+  },
+  Object {
+    "balance": Array [
+      4,
+      5,
+    ],
+  },
+]
+`;
+
+exports[`complex reassignments will work 2`] = `
+Array [
+  Object {
+    "op": "replace",
+    "path": "/balance",
+    "value": Array [
+      2,
+      5,
+    ],
+  },
+  Object {
+    "op": "replace",
+    "path": "/balance",
+    "value": Array [
+      2,
+      5,
+    ],
+  },
+  Object {
+    "op": "replace",
+    "path": "/balance",
+    "value": Array [
+      3,
+      5,
+    ],
+  },
+  Object {
+    "op": "replace",
+    "path": "/balance",
+    "value": Array [
+      4,
+      5,
+    ],
+  },
+]
+`;
+
+exports[`reassignments will work 1`] = `
+Array [
+  Object {
+    "balance": "2.5",
+    "lastTransaction": null,
+  },
+  Object {
+    "balance": "3.5",
+    "lastTransaction": null,
+  },
+  Object {
+    "balance": "4.5",
+    "lastTransaction": null,
+  },
+  Object {
+    "balance": "4.5",
+    "lastTransaction": "2.5",
+  },
+  Object {
+    "balance": "4.5",
+    "lastTransaction": null,
+  },
+]
+`;
+
+exports[`reassignments will work 2`] = `
+Array [
+  Object {
+    "op": "replace",
+    "path": "/balance",
+    "value": "2.5",
+  },
+  Object {
+    "op": "replace",
+    "path": "/balance",
+    "value": "3.5",
+  },
+  Object {
+    "op": "replace",
+    "path": "/balance",
+    "value": "4.5",
+  },
+  Object {
+    "op": "replace",
+    "path": "/lastTransaction",
+    "value": "2.5",
+  },
+  Object {
+    "op": "replace",
+    "path": "/lastTransaction",
+    "value": null,
+  },
+]
+`;
