@@ -182,18 +182,18 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
         let nextInvoked = false
         let abortInvoked = false
 
-        function next(call: IMiddlewareEvent): void
-        function next(call: IMiddlewareEvent, callback: (value: any) => any): void
-        function next(call: IMiddlewareEvent, callback?: (value: any) => any) {
+        function next(call2: IMiddlewareEvent): void
+        function next(call2: IMiddlewareEvent, callback: (value: any) => any): void
+        function next(call2: IMiddlewareEvent, callback?: (value: any) => any) {
             nextInvoked = true
             // the result can contain
             // - the non manipulated return value from an action
             // - the non manipulated abort value
             // - one of the above but manipulated through the callback function
             if (callback) {
-                result = callback(runNextMiddleware(call) || result)
+                result = callback(runNextMiddleware(call2) || result)
             } else {
-                result = runNextMiddleware(call)
+                result = runNextMiddleware(call2)
             }
         }
         function abort(value: any) {
@@ -206,22 +206,22 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
             handler(call, next, abort)
             if (process.env.NODE_ENV !== "production") {
                 if (!nextInvoked && !abortInvoked) {
-                    const node = getStateTreeNode(call.tree)
+                    const node2 = getStateTreeNode(call.tree)
                     fail(
                         `Neither the next() nor the abort() callback within the middleware ${
                             handler.name
                         } for the action: "${call.name}" on the node: ${
-                            node.type.name
+                            node2.type.name
                         } was invoked.`
                     )
                 }
                 if (nextInvoked && abortInvoked) {
-                    const node = getStateTreeNode(call.tree)
+                    const node2 = getStateTreeNode(call.tree)
                     fail(
                         `The next() and abort() callback within the middleware ${
                             handler.name
                         } for the action: "${call.name}" on the node: ${
-                            node.type.name
+                            node2.type.name
                         } were invoked.`
                     )
                 }

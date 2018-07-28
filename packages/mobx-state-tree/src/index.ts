@@ -121,9 +121,9 @@ export {
     CustomTypeOptions,
     UnionOptions,
     DefinablePropsNames,
-    IsTypeAny,
+    IsTypeAnyOrUnknown,
     IsEmptyCreationType,
-    CreateFunction
+    CreateParams
 } from "./internal"
 
 export * from "./core/mst-operations"

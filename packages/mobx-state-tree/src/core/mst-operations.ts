@@ -750,8 +750,8 @@ export interface IModelReflectionData {
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
-        const node: any = getStateTreeNode(target)
-        if (!(node.type instanceof ModelType))
+        const node2: any = getStateTreeNode(target)
+        if (!(node2.type instanceof ModelType))
             fail(
                 "expected the node's type to be of the type: model" +
                     target +

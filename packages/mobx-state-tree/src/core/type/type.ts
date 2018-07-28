@@ -46,34 +46,29 @@ export type DefinablePropsNames<T> = {
     [K in keyof T]: Extract<T[K], undefined> extends never ? K : never
 }[keyof T]
 
-// checks if a type is any
-// TODO: what to do with the new uknown type?
-export type IsTypeAny<T> = Exclude<
-    T,
-    {} | object | number | string | boolean | symbol | null | undefined
-> extends never
-    ? false
-    : true
+// checks if a type is any or unknown
+export type IsTypeAnyOrUnknown<T> = unknown extends T ? true : false
 
 // checks if a type supports an empty create() function
-// basically !any, X | undefined, objects with all properties being optional
-export type IsEmptyCreationType<O> = IsTypeAny<O> extends true
+// basically !any, !unknown, X | undefined, objects with all properties being optional
+export type IsEmptyCreationType<O> = IsTypeAnyOrUnknown<O> extends true
     ? false
     : Extract<O, undefined> extends never
         ? (DefinablePropsNames<O> extends never | undefined ? true : false)
         : true
 
 // chooses a create function based on the creation type
-export type CreateFunction<C, R> = IsEmptyCreationType<C> extends false
-    ? (snapshot: C, env?: any) => R
-    : (snapshot?: C, env?: any) => R
+// prettier-ignore
+export type CreateParams<C> = IsEmptyCreationType<C> extends false
+    ? [C, any?]
+    : [C?, any?]
 
 export interface IType<C, S, T> {
     name: string
     flags: TypeFlags
     is(thing: any): thing is C | S | T
     validate(thing: any, context: IContext): IValidationResult
-    create: CreateFunction<C, T>
+    create(...args: CreateParams<C>): T
     isType: boolean
     describe(): string
     Type: T
@@ -106,7 +101,7 @@ export type Primitives = ModelPrimitive | null | undefined
 export type TAndInterface<T, I> = (Exclude<T, Primitives> & I) | Extract<T, Primitives>
 
 export interface IComplexType<C, S, T> extends IType<C, S, T> {
-    create: CreateFunction<C, TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>>
+    create(...args: CreateParams<C>): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>
 }
 
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
@@ -129,10 +124,10 @@ export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
     }
 
     @action
-    create = ((snapshot: C = this.getDefaultSnapshot(), environment?: any) => {
+    create(snapshot: C = this.getDefaultSnapshot(), environment?: any) {
         typecheck(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).value
-    }) as any
+    }
 
     initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null {
         return null

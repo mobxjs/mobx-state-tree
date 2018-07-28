@@ -1,5 +1,5 @@
 import resolve from "rollup-plugin-node-resolve"
-import uglify from "rollup-plugin-uglify"
+import { uglify } from "rollup-plugin-uglify"
 
 const externals = ["mobx", "mobx-state-tree"]
 const globals = {

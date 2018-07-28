@@ -117,8 +117,8 @@ export type ModelSnapshotType<T extends ModelPropertiesDeclarationToProperties<a
 }
 
 export type ModelInstanceType<T extends ModelPropertiesDeclarationToProperties<any>, O, C, S> = {
-    [K in keyof T]: T[K] extends IType<infer C, infer S, infer M>
-        ? ExtractIStateTreeNode<C, S, M>
+    [K in keyof T]: T[K] extends IType<infer TC, infer TS, infer TM>
+        ? ExtractIStateTreeNode<TC, TS, TM>
         : never
 } &
     O &
@@ -314,11 +314,11 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                 )
 
             // apply hook composition
-            let action = actions[name]
+            let action2 = actions[name]
             let baseAction = (self as any)[name]
             if (name in HookNames && baseAction) {
-                let specializedAction = action
-                action = function() {
+                let specializedAction = action2
+                action2 = function() {
                     baseAction.apply(null, arguments)
                     specializedAction.apply(null, arguments)
                 }
@@ -327,7 +327,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
             ;(process.env.NODE_ENV === "production" ? addHiddenFinalProp : addHiddenWritableProp)(
                 self,
                 name,
-                createActionInvoker(self, name, action)
+                createActionInvoker(self, name, action2)
             )
         })
     }
@@ -574,9 +574,9 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         if (processed) {
             this.forAllProps((name, type) => {
                 if (!(name in processed)) {
-                    const optional = tryGetOptional(type)
-                    if (optional) {
-                        processed[name] = optional.getDefaultValueSnapshot()
+                    const optional2 = tryGetOptional(type)
+                    if (optional2) {
+                        processed[name] = optional2.getDefaultValueSnapshot()
                     }
                 }
             })
