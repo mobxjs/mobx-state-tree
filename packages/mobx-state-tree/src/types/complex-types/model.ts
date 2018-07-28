@@ -10,7 +10,10 @@ import {
     _getAdministration,
     isComputedProp,
     computed,
-    set
+    set,
+    isObservableProp,
+    isObservableArray,
+    isObservableMap
 } from "mobx"
 import {
     fail,
@@ -50,7 +53,9 @@ import {
     MapType,
     ArrayType,
     ExtractIStateTreeNode,
-    IAnyStateTreeNode
+    IAnyStateTreeNode,
+    isNode,
+    addDisposer
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -410,6 +415,59 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                     : addHiddenWritableProp)(self, key, value)
             } else {
                 fail(`A view member should either be a function or getter based property`)
+            }
+        })
+    }
+
+    reactions(fn: (self: any) => any): any {
+        const reactionInitializer = (self: T) => {
+            this.instantiateReactions(self, fn(self))
+            return self
+        }
+        return this.cloneAndEnhance({ initializers: [reactionInitializer] })
+    }
+
+    instantiateReactions(self: T, reactions: Object) {
+        if (!isPlainObject(reactions))
+            fail(`reactions initializer should return a plain object containing reactions`)
+
+        const prepareListener = (callback: Function) => {
+            return (change: any) => {
+                if (callback.length < 2) {
+                    callback.call(self, change)
+                } else {
+                    let newValue, oldValue
+                    const snapshotOrValue = (obj: any) => (isNode(obj) ? obj.snapshot : obj)
+                    switch (change.type) {
+                        case "add":
+                        case "delete":
+                        case "update":
+                            newValue = snapshotOrValue(change.newValue)
+                            oldValue = snapshotOrValue(change.oldValue)
+                            break
+
+                        case "splice":
+                        default:
+                            newValue = oldValue = change.object
+                            break
+                    }
+                    callback.call(self, newValue, oldValue, change.type)
+                }
+            }
+        }
+
+        Object.keys(reactions).forEach(key => {
+            if (isObservableProp(self, key)) {
+                const target = (self as any)[key]
+                const listener = prepareListener((reactions as any)[key])
+                addDisposer(
+                    self,
+                    isObservableArray(target) || isObservableMap(target)
+                        ? observe(target, listener)
+                        : observe(self as any, key, listener)
+                )
+            } else {
+                fail(`${key} is neither observable nor computed value`)
             }
         })
     }
