@@ -2,6 +2,7 @@ language: node_js
 sudo: required
 cache:
   yarn: true
+language: node_js
 script:
   - yarn install
   - cd packages/mobx-state-tree
@@ -18,4 +19,4 @@ script:
 after_success:
   - cat ./packages/mobx-state-tree/coverage/lcov.info|./packages/mobx-state-tree/node_modules/coveralls/bin/coveralls.js
 node_js:
-  - 9.3.0
+  - "node"
