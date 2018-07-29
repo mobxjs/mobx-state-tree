@@ -296,6 +296,7 @@ test("it should throw if a replaced object is read or written to", () => {
         todo.fn()
     }).toThrow(err)
     expect(() => {
+        // tslint:disable-next-line:no-unused-expression
         todo.title
     }).toThrow(err)
     expect(() => {
@@ -331,6 +332,7 @@ test("it should warn if a replaced object is read or written to", () => {
     try {
         const mock = (console.warn = jest.fn())
         todo.fn()
+        // tslint:disable-next-line:no-unused-expression
         todo.title
         unprotect(todo)
         todo.title = "5"

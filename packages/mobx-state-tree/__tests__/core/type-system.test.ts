@@ -371,7 +371,7 @@ test("it should type compose correctly", () => {
         Logger
     )
     const x = LoggableCar.create({ wheels: 3, logNode: "test" /* compile error: x: 7  */ })
-    //x.test() // compile error
+    // x.test() // compile error
     x.drive()
     x.log("z")
 })

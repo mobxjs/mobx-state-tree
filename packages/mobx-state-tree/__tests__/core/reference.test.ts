@@ -9,8 +9,6 @@ import {
     detach,
     resolveIdentifier,
     getRoot,
-    IType,
-    IAnyType,
     IComplexType
 } from "../../src"
 
@@ -298,6 +296,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
         arrows: [{ id: 2, name: "arrow" }]
     })
     expect(() => {
+        // tslint:disable-next-line:no-unused-expression
         store.selected // store.boxes[1] // throws because it can't know if you mean a box or an arrow!
     }).toThrowError(
         "[mobx-state-tree] Cannot resolve a reference to type '(Box | Arrow)' with id: '2' unambigously, there are multiple candidates: /boxes/1, /arrows/0"
@@ -510,9 +509,9 @@ test("References in recursive structures", () => {
         })
         .actions(self => {
             function addFolder(data: typeof Folder.Type | typeof Folder.CreationType) {
-                const folder = Folder.create(data)
-                getRoot<typeof Storage>(self).putFolderHelper(folder)
-                self.children.push(Tree.create({ data: folder, children: [] }))
+                const folder3 = Folder.create(data)
+                getRoot<typeof Storage>(self).putFolderHelper(folder3)
+                self.children.push(Tree.create({ data: folder3, children: [] }))
             }
             return {
                 addFolder
@@ -536,8 +535,8 @@ test("References in recursive structures", () => {
             tree: Tree as IComplexType<ITreeSnapshot, ITreeSnapshot, ITreeType>
         })
         .actions(self => ({
-            putFolderHelper(folder: typeof Folder.Type | typeof Folder.CreationType) {
-                self.objects.put(folder)
+            putFolderHelper(aFolder: typeof Folder.Type | typeof Folder.CreationType) {
+                self.objects.put(aFolder)
             }
         }))
     const store = Storage.create({ objects: {}, tree: { children: [], data: null } })
@@ -607,14 +606,14 @@ test("it should applyPatch references in array", () => {
             hovers: types.array(types.reference(Item))
         })
         .actions(self => {
-            function addObject(item: typeof Item.Type) {
-                self.objects.put(item)
+            function addObject(anItem: typeof Item.Type) {
+                self.objects.put(anItem)
             }
-            function addHover(item: typeof Item.Type) {
-                self.hovers.push(item)
+            function addHover(anItem: typeof Item.Type) {
+                self.hovers.push(anItem)
             }
-            function removeHover(item: typeof Item.Type) {
-                self.hovers.remove(item)
+            function removeHover(anItem: typeof Item.Type) {
+                self.hovers.remove(anItem)
             }
             return {
                 addObject,

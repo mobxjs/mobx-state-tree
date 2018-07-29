@@ -402,8 +402,8 @@ test("get should return value when key is a number", () => {
             todos: types.optional(types.map(Todo), {})
         })
         .actions(self => {
-            function addTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
-                self.todos.put(todo)
+            function addTodo(aTodo: typeof Todo.Type | typeof Todo.CreationType) {
+                self.todos.put(aTodo)
             }
             return {
                 addTodo

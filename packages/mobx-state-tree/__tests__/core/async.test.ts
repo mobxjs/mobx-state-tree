@@ -31,7 +31,7 @@ function testCoffeeTodo(
             title: "get coffee"
         })
         .actions(self => ({
-            startFetch: flow(generator(self)) as (string: string) => Promise<string>
+            startFetch: flow(generator(self)) as (str: string) => Promise<string>
         }))
     const events: any[] = []
     const coffees: any[] = []
@@ -158,6 +158,7 @@ test("typings", done => {
                 self.title = "7"
                 return 23
             }
+            // tslint:disable-next-line:no-shadowed-variable
             const b = flow(function* b(x: string) {
                 yield delay(10, "x", false)
                 self.title = "7"
@@ -185,15 +186,13 @@ test("typings", done => {
                 self.title = "7"
                 return 23
             }
+            // tslint:disable-next-line:no-shadowed-variable
             const b = flow(function* b(x: string) {
                 yield delay(10, "x", false)
                 self.title = "7"
                 return 24
             })
-            return {
-                a: flow(a),
-                b
-            }
+            return { a: flow(a), b }
         })
     const m1 = M.create({ title: "test " })
     const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
@@ -240,6 +239,7 @@ test("recordActions should only emit invocation", done => {
     })
 })
 test("can handle nested async actions", t => {
+    // tslint:disable-next-line:no-shadowed-variable
     const uppercase = flow(function* uppercase(value: string) {
         const res = yield delay(20, value.toUpperCase())
         return res
@@ -262,17 +262,17 @@ test("can handle nested async actions when using decorate", done => {
         events.push([call.type, call.name])
         return next(call)
     }
+    // tslint:disable-next-line:no-shadowed-variable
     const uppercase = flow(function* uppercase(value: string) {
         const res = yield delay(20, value.toUpperCase())
         return res
     })
     const Todo = types.model({}).actions(self => {
+        // tslint:disable-next-line:no-shadowed-variable
         const act = flow(function* act(value: string) {
             return yield uppercase(value)
         })
-        return {
-            act: decorate(middleware, act)
-        }
+        return { act: decorate(middleware, act) }
     })
     Todo.create()
         .act("x")

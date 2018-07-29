@@ -361,9 +361,9 @@ test("Livelyness issue #683", () => {
             list: types.map(User)
         })
         .actions(self => ({
-            put(user: typeof User.CreationType | typeof User.Type) {
+            put(aUser: typeof User.CreationType | typeof User.Type) {
                 // if (self.has(user.id)) detach(self.get(user.id));
-                self.list.put(user)
+                self.list.put(aUser)
             },
             get(id: string) {
                 return self.list.get(id)

@@ -7,7 +7,7 @@ import { createTreasure, createHeros, createMonsters } from "./fixtures/fixture-
  *
  * @param count The number of records to create.
  */
-export const smallScenario = function smallScenario(count: number) {
+export function smallScenario(count: number) {
     const data = createTreasure(count) // ready?
     const time = start()
     const converted = data.map(d => Treasure.create(d)) // go
@@ -20,7 +20,7 @@ export const smallScenario = function smallScenario(count: number) {
  *
  * @param count The number of records to create.
  */
-export const mediumScenario = function mediumScenario(count: number) {
+export function mediumScenario(count: number) {
     const data = createHeros(count) // ready?
     const time = start()
     const converted = data.map(d => Hero.create(d)) // go
@@ -35,11 +35,7 @@ export const mediumScenario = function mediumScenario(count: number) {
  * @param smallChildren The number of small children contained within.
  * @param mediumChildren The number of medium children contained within.
  */
-export const largeScenario = function largeScenario(
-    count: number,
-    smallChildren: number,
-    mediumChildren: number
-) {
+export function largeScenario(count: number, smallChildren: number, mediumChildren: number) {
     const data = createMonsters(count, smallChildren, mediumChildren) // ready?
     const time = start()
     const converted = data.map(d => Monster.create(d)) // go

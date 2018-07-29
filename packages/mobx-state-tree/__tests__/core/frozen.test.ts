@@ -48,7 +48,7 @@ test("it should type strongly", () => {
     expect(Mouse.is({})).toBeTruthy() // any value is acceptable to frozen, even undefined...
 
     const m = Mouse.create({
-        //loc: 3 // type error!
+        // loc: 3 // type error!
         loc: { x: 2, y: 3 }
     })
 
