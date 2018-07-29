@@ -9,8 +9,8 @@
     "scripts": {
         "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
         "rollup": "rollup -c",
-        "jest": "jest -c __tests__/core/jest.config.js",
-        "jest:perf": "jest -c __tests__/perf/jest.config.js",
+        "jest": "jest --testPathPattern=/__tests__/core/",
+        "jest:perf": "jest --testPathPattern=/__tests__/perf/",
         "test": "cross-env NODE_ENV=development yarn jest --ci && cross-env NODE_ENV=production yarn jest --ci && yarn run test:cyclic && yarn run test:mobx4",
         "test:perf": "yarn build && yarn jest:perf && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register __tests__/perf/report.ts",
         "test:cyclic": "yarn run build && node -e \"require('.')\"",
