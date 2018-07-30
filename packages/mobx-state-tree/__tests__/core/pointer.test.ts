@@ -1,8 +1,8 @@
-import { types, unprotect, IModelType } from "../../src"
+import { types, unprotect, IAnyModelType } from "../../src"
 
-function Pointer<IT extends IModelType<any, any>>(Model: IT) {
+function Pointer<IT extends IAnyModelType>(Model: IT) {
     return types.model("PointerOf" + Model.name, {
-        value: types.maybe(types.reference(Model))
+        value: types.maybe(types.reference(Model as any))
     })
 }
 const Todo = types.model("Todo", {
