@@ -15,9 +15,9 @@ export const Box = types
         get width() {
             return self.name.length * 15
         },
-        get isSelected() {
+        get isSelected(): boolean {
             if (!hasParent(self)) return false
-            return getParent(getParent(self)).selection === self
+            return getParent<typeof Store>(getParent(self)).selection === self
         }
     }))
     .actions(self => {

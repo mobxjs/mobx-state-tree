@@ -60,7 +60,7 @@ test("it should support custom references - adv", () => {
     const NameReference = types.reference(User, {
         get(identifier, parent) {
             if (identifier === null) return null
-            const users = values(getRoot(parent!).users)
+            const users = values(getRoot<any>(parent!).users)
             return users.filter((u: typeof User.Type) => u.name === identifier)[0] || null
         },
         set(value) {

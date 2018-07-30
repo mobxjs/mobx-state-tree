@@ -9,7 +9,7 @@ const ChildModel = types
     .views(self => {
         return {
             get parent() {
-                return getParent(self)
+                return getParent<typeof ParentModel>(self)
             }
         }
     })

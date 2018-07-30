@@ -1,5 +1,11 @@
 import { isComputedProp, isObservableProp } from "mobx"
-import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC } from "../internal"
+import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC, IType } from "../internal"
+
+export type TypeOrStateTreeNodeToStateTreeNode<
+    T extends IAnyType | IAnyStateTreeNode
+> = T extends IAnyStateTreeNode
+    ? T
+    : T extends IType<infer TC, infer TS, infer TT> ? ExtractIStateTreeNode<TC, TS, TT> : never
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -313,10 +319,10 @@ export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent<IT extends IAnyType>(
+export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
     target: IAnyStateTreeNode,
     depth = 1
-): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): TypeOrStateTreeNodeToStateTreeNode<IT> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -397,9 +403,9 @@ export function getParentOfType<IT extends IAnyType>(
  * @param {Object} target
  * @returns {*}
  */
-export function getRoot<IT extends IAnyType>(
+export function getRoot<IT extends IAnyType | IAnyStateTreeNode>(
     target: IAnyStateTreeNode
-): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): TypeOrStateTreeNodeToStateTreeNode<IT> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -804,3 +810,4 @@ import {
     ExtractIStateTreeNode,
     IMSTArray
 } from "../internal"
+import { ModelPrimitive } from "../types/complex-types/model"
