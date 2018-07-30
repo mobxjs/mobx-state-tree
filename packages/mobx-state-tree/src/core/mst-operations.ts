@@ -1,11 +1,11 @@
 import { isComputedProp, isObservableProp } from "mobx"
-import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC } from "../internal"
+import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC, IType } from "../internal"
 
 export type TypeOrStateTreeNodeToStateTreeNode<
     T extends IAnyType | IAnyStateTreeNode
 > = T extends IAnyStateTreeNode
     ? T
-    : T extends IAnyType ? ExtractIStateTreeNode<T, ExtractC<T>, ExtractS<T>, ExtractT<T>> : never
+    : T extends IType<infer TC, infer TS, infer TT> ? ExtractIStateTreeNode<T, TC, TS, TT> : never
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
