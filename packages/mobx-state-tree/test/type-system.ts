@@ -1,4 +1,4 @@
-import { types, getSnapshot, unprotect, IType } from "../src"
+import { types, getSnapshot, unprotect, IType, getRoot, getParent } from "../src"
 const createTestFactories = () => {
     const Box = types.model({
         width: 0,
@@ -553,4 +553,48 @@ test("#923", () => {
     })
 
     types.optional(types.map(Bar), {}) // Should have no compile error!
+})
+
+test("#951", () => {
+    const C = types.model({ a: 123 })
+
+    // model as root
+    const ModelWithC = types.model({ c: C })
+    const modelInstance = ModelWithC.create({ c: C.create() })
+
+    // getRoot
+    const modelRoot1 = getRoot<typeof ModelWithC>(modelInstance.c)
+    const modelCR1: typeof C.Type = modelRoot1.c
+    const modelRoot2 = getRoot<typeof ModelWithC.Type>(modelInstance.c)
+    const modelCR2: typeof C.Type = modelRoot2.c
+
+    // getParent
+    const modelParent1 = getParent<typeof ModelWithC>(modelInstance.c)
+    const modelCP1: typeof ModelWithC.Type = modelParent1
+    const modelParent2 = getParent<typeof ModelWithC.Type>(modelInstance.c)
+    const modelCP2: typeof ModelWithC.Type = modelParent2
+
+    // array as root
+    const ArrayOfC = types.array(C)
+    const arrayInstance = ArrayOfC.create([C.create()])
+
+    // getRoot
+    const arrayRoot1 = getRoot<typeof ArrayOfC>(arrayInstance[0])
+    const arrayCR1: typeof C.Type = arrayRoot1[0]
+
+    // getParent
+    const arrayParent1 = getParent<typeof ArrayOfC>(arrayInstance[0])
+    const arrayCP1: typeof ArrayOfC.Type = arrayParent1
+
+    // map as root
+    const MapOfC = types.map(C)
+    const mapInstance = MapOfC.create({ a: C.create() })
+
+    // getRoot
+    const mapRoot1 = getRoot<typeof MapOfC>(mapInstance.get("a")!)
+    const mapC1: typeof C.Type = mapRoot1.get("a")!
+
+    // getParent
+    const mapParent1 = getRoot<typeof MapOfC>(mapInstance.get("a")!)
+    const mapCP1: typeof MapOfC.Type = mapParent1
 })

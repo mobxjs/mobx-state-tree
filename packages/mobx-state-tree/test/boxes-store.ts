@@ -16,7 +16,7 @@ export const Box = types
         },
         get isSelected() {
             if (!hasParent(self)) return false
-            return getParent(getParent(self)).selection === self
+            return getParent<typeof Store>(getParent(self)).selection === self
         }
     }))
     .actions(self => {
