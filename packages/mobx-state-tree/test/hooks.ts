@@ -178,8 +178,8 @@ test("it should postprocess snapshots when generating snapshot - 2", () => {
 })
 
 test("it should postprocess non-initialized children", () => {
-    const f = MotorcycleFactory.create({ motorcycles: [{ id: "a" }] })
-    expect(getSnapshot(f)).toEqual({ motorcycles: [{ id: "A" }] })
+    const f = MotorcycleFactory.create({ motorcycles: [{ id: "a" }, { id: "b" }] })
+    expect(getSnapshot(f)).toEqual({ motorcycles: [{ id: "A" }, { id: "B" }] })
 })
 
 test("base hooks can be composed", () => {
