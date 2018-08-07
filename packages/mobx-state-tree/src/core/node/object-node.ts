@@ -1,4 +1,4 @@
-import { reaction, computed, action, createAtom, IAtom } from "mobx"
+import { reaction, computed, action, createAtom } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -26,7 +26,8 @@ import {
     convertChildNodesToArray,
     ModelType,
     invalidateComputed,
-    IAnyType
+    IAnyType,
+    ArrayType
 } from "../../internal"
 
 let nextNodeId = 1
@@ -271,7 +272,24 @@ export class ObjectNode implements INode {
     }
 
     private _getInitialSnapshot() {
-        const snapshot = this._initialSnapshot
+        let snapshot: any = this._initialSnapshot
+        const childNodes = this._childNodes
+
+        if (!childNodes) return snapshot
+
+        const keys = Object.keys(childNodes)
+        if (this.type instanceof ArrayType) {
+            snapshot = new Array(keys.length)
+            keys.forEach((k, i) => {
+                snapshot[i] = childNodes[k].snapshot
+            })
+        } else {
+            snapshot = {}
+            keys.forEach(k => {
+                snapshot[k] = childNodes[k].snapshot
+            })
+        }
+
         return this.type instanceof ModelType
             ? this.type.applySnapshotPostProcessor(snapshot)
             : snapshot

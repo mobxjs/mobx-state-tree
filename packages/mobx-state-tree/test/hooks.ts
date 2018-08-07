@@ -119,6 +119,21 @@ const Car = types
 const Factory = types.model("Factory", {
     car: Car
 })
+
+const Motorcycle = types
+    .model("Motorcycle", {
+        id: types.string
+    })
+    .preProcessSnapshot<CarSnapshot>(snapshot =>
+        Object.assign({}, snapshot, { id: snapshot.id.toLowerCase() })
+    )
+    .postProcessSnapshot<CarSnapshot>(snapshot =>
+        Object.assign({}, snapshot, { id: snapshot.id.toUpperCase() })
+    )
+const MotorcycleFactory = types.model("MotorcycleFactory", {
+    motorcycles: types.array(Motorcycle)
+})
+
 test("it should preprocess snapshots when creating", () => {
     const car = Car.create({ id: "1" })
     expect(car.id).toBe(2)
@@ -161,6 +176,12 @@ test("it should postprocess snapshots when generating snapshot - 2", () => {
     expect(f.car.id).toBe(2)
     expect(getSnapshot(f)).toEqual({ car: { id: "1" } })
 })
+
+test("it should postprocess non-initialized children", () => {
+    const f = MotorcycleFactory.create({ motorcycles: [{ id: "a" }] })
+    expect(getSnapshot(f)).toEqual({ motorcycles: [{ id: "A" }] })
+})
+
 test("base hooks can be composed", () => {
     const events: any[] = []
     function listener(message: string) {
