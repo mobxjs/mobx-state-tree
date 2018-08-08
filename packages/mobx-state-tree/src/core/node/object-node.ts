@@ -1,4 +1,4 @@
-import { reaction, computed, action, createAtom, IAtom } from "mobx"
+import { reaction, computed, action, createAtom } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -24,9 +24,9 @@ import {
     freeze,
     resolveNodeByPathParts,
     convertChildNodesToArray,
-    ModelType,
     invalidateComputed,
-    IAnyType
+    IAnyType,
+    isModelTypeInstance
 } from "../../internal"
 
 let nextNodeId = 1
@@ -110,7 +110,9 @@ export class ObjectNode implements INode {
         finalizeNewInstance: (node: INode, initialValue: any) => void
     ) {
         this._environment = environment
-        this._initialSnapshot = initialSnapshot
+        this._initialSnapshot = isModelTypeInstance(type)
+            ? type.applyOptionalValuesToSnapshot(initialSnapshot)
+            : initialSnapshot
         this._createNewInstance = createNewInstance
         this._finalizeNewInstance = finalizeNewInstance
 
@@ -118,7 +120,7 @@ export class ObjectNode implements INode {
         this.parent = parent
         this.subpath = subpath
         this.escapedSubpath = escapeJsonPath(this.subpath)
-        this.identifierAttribute = type instanceof ModelType ? type.identifierAttribute : undefined
+        this.identifierAttribute = isModelTypeInstance(type) ? type.identifierAttribute : undefined
         // identifier can not be changed during lifecycle of a node
         // so we safely can read it from initial snapshot
         this.identifier =
@@ -272,7 +274,7 @@ export class ObjectNode implements INode {
 
     private _getInitialSnapshot() {
         const snapshot = this._initialSnapshot
-        return this.type instanceof ModelType
+        return isModelTypeInstance(this.type)
             ? this.type.applySnapshotPostProcessor(snapshot)
             : snapshot
     }
