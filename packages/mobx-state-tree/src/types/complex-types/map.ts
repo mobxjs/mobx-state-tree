@@ -1,46 +1,46 @@
 import {
-    ObservableMap,
-    IMapWillChange,
-    action,
-    intercept,
-    observe,
-    values,
-    observable,
     _interceptReads,
-    IMapDidChange,
+    action,
+    IInterceptor,
     IKeyValueMap,
+    IMapDidChange,
+    IMapWillChange,
+    intercept,
     Lambda,
-    IInterceptor
+    observable,
+    ObservableMap,
+    observe,
+    values
 } from "mobx"
 import {
-    getStateTreeNode,
-    escapeJsonPath,
-    IJsonPatch,
-    INode,
-    createNode,
-    isStateTreeNode,
-    IType,
-    IComplexType,
     ComplexType,
-    TypeFlags,
-    IContext,
-    IValidationResult,
-    typeCheckFailure,
+    createNode,
+    escapeJsonPath,
+    fail,
     flattenTypeErrors,
     getContextForPath,
-    typecheck,
-    fail,
+    getStateTreeNode,
+    IAnyStateTreeNode,
+    IAnyType,
+    IChildNodesMap,
+    IComplexType,
+    IContext,
+    IJsonPatch,
+    INode,
     isMutable,
     isPlainObject,
+    isStateTreeNode,
     isType,
-    ObjectNode,
-    IChildNodesMap,
-    ModelType,
-    OptionalValue,
-    Union,
+    IType,
+    IValidationResult,
     Late,
-    IAnyType,
-    IAnyStateTreeNode
+    ModelType,
+    ObjectNode,
+    OptionalValue,
+    typecheck,
+    typeCheckFailure,
+    TypeFlags,
+    Union
 } from "../../internal"
 
 export interface IMapType<C, S, T>
@@ -192,15 +192,7 @@ export class MapType<C, S, T> extends ComplexType<
         if (this.identifierMode === MapIdentifierMode.UNKNOWN) {
             this._determineIdentifierMode()
         }
-        return createNode(
-            this,
-            parent,
-            subpath,
-            environment,
-            snapshot,
-            this.createNewInstance,
-            this.finalizeNewInstance
-        )
+        return createNode(this, parent, subpath, environment, snapshot)
     }
 
     private _determineIdentifierMode() {
@@ -239,21 +231,18 @@ export class MapType<C, S, T> extends ComplexType<
         return result
     }
 
+    initializeInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
+        const instance = new MSTMap(childNodes)
+
+        _interceptReads(instance, (node as ObjectNode).unbox)
+        intercept(instance, this.willChange)
+        observe(instance, this.didChange)
+
+        return instance
+    }
+
     describe() {
         return "Map<string, " + this.subType.describe() + ">"
-    }
-
-    createNewInstance(childNodes: IChildNodesMap) {
-        return (new MSTMap(childNodes) as any) as IMSTMap<any, any, any>
-    }
-
-    finalizeNewInstance(node: INode) {
-        const objNode = node as ObjectNode
-        const type = objNode.type as MapType<any, any, any>
-        const instance = objNode.storedValue as ObservableMap<any, any>
-        _interceptReads(instance, objNode.unbox)
-        intercept(instance, type.willChange)
-        observe(instance, type.didChange)
     }
 
     getChildren(node: ObjectNode): ReadonlyArray<INode> {

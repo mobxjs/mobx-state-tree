@@ -56,7 +56,8 @@ export interface IType<C, S, T> {
 
     // Internal api's
     instantiate(parent: INode | null, subpath: string, environment: any, initialValue?: any): INode
-    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null
+    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap
+    initializeInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any
     reconcile(current: INode, newValue: any): INode
     getValue(node: INode): T
     getSnapshot(node: INode, applyPostProcess?: boolean): S
@@ -113,8 +114,12 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T> {
         typecheck(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).value
     }
-    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null {
-        return null
+    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap {
+        return {}
+    }
+
+    initializeInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
+        return snapshot
     }
 
     abstract instantiate(

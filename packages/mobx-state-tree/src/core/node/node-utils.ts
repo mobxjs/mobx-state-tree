@@ -69,6 +69,10 @@ export function getStateTreeNode(value: IAnyStateTreeNode): ObjectNode {
     else return fail(`Value ${value} is no MST Node`)
 }
 
+export function getStateTreeNodeSafe(value: IAnyStateTreeNode): ObjectNode {
+    return (value && value.$treenode) || null
+}
+
 export function canAttachNode(value: any) {
     return (
         value &&

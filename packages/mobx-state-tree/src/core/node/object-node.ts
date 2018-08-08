@@ -1,4 +1,4 @@
-import { reaction, computed, action, createAtom, IAtom } from "mobx"
+import { reaction, computed, action, createAtom } from "mobx"
 import {
     INode,
     isStateTreeNode,
@@ -95,24 +95,18 @@ export class ObjectNode implements INode {
     private _snapshotSubscribers: ((snapshot: any) => void)[] | null = null
 
     private _observableInstanceCreated: boolean = false
-    private _childNodes: IChildNodesMap | null
+    private _childNodes: IChildNodesMap
     private _initialSnapshot: any
-    private _createNewInstance: ((initialValue: any) => any) | null
-    private _finalizeNewInstance: ((node: INode, initialValue: any) => void) | null
 
     constructor(
         type: IAnyType,
         parent: ObjectNode | null,
         subpath: string,
         environment: any,
-        initialSnapshot: any,
-        createNewInstance: (initialValue: any) => any,
-        finalizeNewInstance: (node: INode, initialValue: any) => void
+        initialSnapshot: any
     ) {
         this._environment = environment
         this._initialSnapshot = initialSnapshot
-        this._createNewInstance = createNewInstance
-        this._finalizeNewInstance = finalizeNewInstance
 
         this.type = type
         this.parent = parent
@@ -141,18 +135,18 @@ export class ObjectNode implements INode {
 
     @action
     private _createObservableInstance() {
-        this.storedValue = this._createNewInstance!(this._childNodes)
-        this.preboot()
-
-        addHiddenFinalProp(this.storedValue, "$treenode", this)
-        addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
-
         this._observableInstanceCreated = true
         let sawException = true
         try {
             this._isRunningAction = true
-            this._finalizeNewInstance!(this, this._childNodes)
+            this.storedValue = this.type.initializeInstance(
+                this,
+                this._childNodes,
+                this._initialSnapshot
+            )
             this._isRunningAction = false
+
+            this.preboot()
 
             this.fireHook("afterCreate")
             this.state = NodeLifeCycle.CREATED
@@ -171,10 +165,8 @@ export class ObjectNode implements INode {
 
         this.finalizeCreation()
 
-        this._childNodes = null
+        this._childNodes = {}
         this._initialSnapshot = null
-        this._createNewInstance = null
-        this._finalizeNewInstance = null
     }
 
     /*
@@ -246,12 +238,8 @@ export class ObjectNode implements INode {
         if (typeof fn === "function") fn.apply(this.storedValue)
     }
 
-    public get value() {
+    public get value(): any {
         if (!this._observableInstanceCreated) this._createObservableInstance()
-        return this._value
-    }
-
-    private get _value(): any {
         if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
@@ -397,6 +385,9 @@ export class ObjectNode implements INode {
     }
 
     preboot() {
+        addHiddenFinalProp(this.storedValue, "$treenode", this)
+        addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
+
         const self = this
         this.applyPatches = createActionInvoker(
             this.storedValue,

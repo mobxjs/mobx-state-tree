@@ -1,56 +1,55 @@
 import {
-    action,
-    IObjectWillChange,
-    intercept,
-    observe,
-    getAtom,
-    extendObservable,
-    observable,
-    _interceptReads,
     _getAdministration,
-    isComputedProp,
+    _interceptReads,
+    action,
     computed,
+    extendObservable,
+    getAtom,
+    intercept,
+    IObjectWillChange,
+    isComputedProp,
+    observable,
+    observe,
     set
 } from "mobx"
 import {
-    fail,
-    isPlainObject,
-    isPrimitive,
+    addHiddenFinalProp,
+    addHiddenWritableProp,
+    ArrayType,
+    ComplexType,
+    createActionInvoker,
+    createNode,
     EMPTY_ARRAY,
     EMPTY_OBJECT,
-    addHiddenFinalProp,
-    createNode,
-    getStateTreeNode,
-    IStateTreeNode,
-    IJsonPatch,
-    INode,
-    createActionInvoker,
     escapeJsonPath,
-    ComplexType,
-    IComplexType,
-    IType,
-    TypeFlags,
-    isType,
+    ExtractIStateTreeNode,
+    fail,
     flattenTypeErrors,
-    IContext,
-    IValidationResult,
-    typecheck,
-    typeCheckFailure,
+    freeze,
     getContextForPath,
     getPrimitiveFactoryFromValue,
-    optional,
-    ObjectNode,
-    freeze,
-    addHiddenWritableProp,
-    mobxShallow,
-    isStateTreeNode,
-    IChildNodesMap,
+    getStateTreeNode,
     IAnyType,
-    OptionalValue,
+    IChildNodesMap,
+    IComplexType,
+    IContext,
+    IJsonPatch,
+    INode,
+    isPlainObject,
+    isPrimitive,
+    isStateTreeNode,
+    IStateTreeNode,
+    isType,
+    IType,
+    IValidationResult,
     MapType,
-    ArrayType,
-    ExtractIStateTreeNode,
-    IAnyStateTreeNode
+    mobxShallow,
+    ObjectNode,
+    optional,
+    OptionalValue,
+    typecheck,
+    typeCheckFailure,
+    TypeFlags
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -441,15 +440,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         const initialValue = isStateTreeNode(snapshot)
             ? snapshot
             : this.applySnapshotPreProcessor(snapshot)
-        return createNode(
-            this,
-            parent,
-            subpath,
-            environment,
-            initialValue,
-            this.createNewInstance,
-            this.finalizeNewInstance
-        )
+        return createNode(this, parent, subpath, environment, initialValue)
         // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
         // that pre-reserves all these fields for fast object-member lookups
     }
@@ -468,25 +459,20 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return result
     }
 
-    createNewInstance() {
+    initializeInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
         const instance = observable.object(EMPTY_OBJECT, EMPTY_OBJECT, mobxShallow)
         addHiddenFinalProp(instance, "toString", objectTypeToString)
-        return instance as Object
-    }
-
-    finalizeNewInstance(node: INode, childNodes: IChildNodesMap) {
-        const objNode = node as ObjectNode
-        const type = objNode.type as ModelType<any, any>
-        const instance = objNode.storedValue as IAnyStateTreeNode
 
         extendObservable(instance, childNodes, EMPTY_OBJECT, mobxShallow)
-        type.forAllProps(name => {
-            _interceptReads(instance, name, objNode.unbox)
+        this.forAllProps(name => {
+            _interceptReads(instance, name, (node as ObjectNode).unbox)
         })
 
-        type.initializers.reduce((self, fn) => fn(self), instance)
-        intercept(instance, type.willChange)
-        observe(instance, type.didChange)
+        this.initializers.reduce((self, fn) => fn(self), instance)
+        intercept(instance, this.willChange)
+        observe(instance, this.didChange)
+
+        return instance
     }
 
     willChange(change: any): IObjectWillChange | null {

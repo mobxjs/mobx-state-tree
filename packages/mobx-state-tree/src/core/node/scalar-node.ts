@@ -4,7 +4,6 @@ import {
     fail,
     freeze,
     NodeLifeCycle,
-    noop,
     ObjectNode,
     IAnyType
 } from "../../internal"
@@ -23,19 +22,15 @@ export class ScalarNode implements INode {
         parent: ObjectNode | null,
         subpath: string,
         environment: any,
-        initialSnapshot: any,
-        createNewInstance: (initialValue: any) => any,
-        finalizeNewInstance: (node: INode, initialValue: any) => void = noop
+        initialSnapshot: any
     ) {
         this.type = type
         this.parent = parent
         this.subpath = subpath
 
-        this.storedValue = createNewInstance(initialSnapshot)
         let sawException = true
         try {
-            finalizeNewInstance(this, initialSnapshot)
-
+            this.storedValue = type.initializeInstance(this, {}, initialSnapshot)
             this.state = NodeLifeCycle.CREATED
             sawException = false
         } finally {
