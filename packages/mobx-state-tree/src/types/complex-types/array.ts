@@ -113,27 +113,36 @@ export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTAr
         node.assertWritable()
         const subType = (node.type as ArrayType<any, any, any>).subType
         const childNodes = node.getChildren()
+        let nodes = null
 
         switch (change.type) {
             case "update":
                 if (change.newValue === change.object[change.index]) return null
-                change.newValue = reconcileArrayChildren(
+                nodes = reconcileArrayChildren(
                     node,
                     subType,
                     [childNodes[change.index]],
                     [change.newValue],
                     [change.index]
-                )[0]
+                )
+                if (!nodes) {
+                    return null
+                }
+                change.newValue = nodes[0]
                 break
             case "splice":
                 const { index, removedCount, added } = change
-                change.added = reconcileArrayChildren(
+                nodes = reconcileArrayChildren(
                     node,
                     subType,
                     childNodes.slice(index, index + removedCount),
                     added,
                     added.map((_, i) => index + i)
                 )
+                if (!nodes) {
+                    return null
+                }
+                change.added = nodes
 
                 // update paths of remaining items
                 for (let i = index + removedCount; i < childNodes.length; i++) {
@@ -284,11 +293,12 @@ function reconcileArrayChildren<T>(
     oldNodes: INode[],
     newValues: T[],
     newPaths: (string | number)[]
-): INode[] {
+): INode[] | null {
     let oldNode: INode,
         newValue: any,
         hasNewNode = false,
-        oldMatch: INode | undefined = undefined
+        oldMatch: INode | undefined = undefined,
+        nothingChanged = true
 
     for (let i = 0; ; i++) {
         hasNewNode = i <= newValues.length - 1
@@ -307,6 +317,7 @@ function reconcileArrayChildren<T>(
             oldNode.die()
             oldNodes.splice(i, 1)
             i--
+            nothingChanged = false
             // there is no old node, create it
         } else if (!oldNode) {
             // check if already belongs to the same parent. if so, avoid pushing item in. only swapping can occur.
@@ -319,6 +330,7 @@ function reconcileArrayChildren<T>(
                 )
             }
             oldNodes.splice(i, 0, valueAsNode(childType, parent, "" + newPaths[i], newValue))
+            nothingChanged = false
             // both are the same, reconcile
         } else if (areSame(oldNode, newValue)) {
             oldNodes[i] = valueAsNode(childType, parent, "" + newPaths[i], newValue, oldNode)
@@ -339,10 +351,11 @@ function reconcileArrayChildren<T>(
                 0,
                 valueAsNode(childType, parent, "" + newPaths[i], newValue, oldMatch)
             )
+            nothingChanged = false
         }
     }
 
-    return oldNodes
+    return nothingChanged ? null : oldNodes
 }
 
 // convert a value to a node at given parent and subpath. attempts to reuse old node if possible and given
@@ -385,7 +398,7 @@ function areSame(oldNode: INode, newValue: any) {
         return getStateTreeNode(newValue) === oldNode
     }
     // the provided value is the snapshot of the old node
-    if (isMutable(newValue) && oldNode.snapshot === newValue) return true
+    if (oldNode.snapshot === newValue) return true
     // new value is a snapshot with the correct identifier
     if (
         oldNode instanceof ObjectNode &&
