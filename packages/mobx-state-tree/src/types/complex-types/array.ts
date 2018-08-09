@@ -152,6 +152,14 @@ export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTAr
         return node.getChildren().map(childNode => childNode.snapshot)
     }
 
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
+        const processed = [] as any[]
+        Object.keys(childNodes).forEach(key => {
+            processed.push(childNodes[key].getSnapshot())
+        })
+        return processed
+    }
+
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
         const node = getStateTreeNode(change.object as IStateTreeNode<C, S>)
         switch (change.type) {
@@ -392,8 +400,4 @@ function areSame(oldNode: INode, newValue: any) {
 
 export function isArrayType<IT extends IArrayType<any, any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Array) > 0
-}
-
-export function isArrayTypeInstance(type: IAnyType): type is ArrayType<any, any, any> {
-    return type instanceof ArrayType
 }

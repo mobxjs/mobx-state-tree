@@ -112,7 +112,7 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T> {
     @action
     create(snapshot: C = this.getDefaultSnapshot(), environment?: any) {
         typecheck(this, snapshot)
-        return this.instantiate(null, "", environment, cloneSnapshotIfNeeded(snapshot)).value
+        return this.instantiate(null, "", environment, snapshot).value
     }
     initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null {
         return null
@@ -139,6 +139,10 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T> {
     abstract removeChild(node: INode, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
     abstract shouldAttachNode: boolean
+
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
+        return snapshot
+    }
 
     isAssignableFrom(type: IAnyType): boolean {
         return type === (this as any)
@@ -272,13 +276,4 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
 
 export function isType(value: any): value is IAnyType {
     return typeof value === "object" && value && value.isType === true
-}
-
-function cloneSnapshotIfNeeded(snapshot: any): any {
-    if (snapshot) {
-        if (isStateTreeNode(snapshot)) return snapshot
-        else if (isArray(snapshot)) return (snapshot as Array<any>).slice()
-        else if (isMutable(snapshot)) return Object.assign({}, snapshot)
-    }
-    return snapshot
 }

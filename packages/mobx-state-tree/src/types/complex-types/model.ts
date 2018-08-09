@@ -552,6 +552,14 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return res
     }
 
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
+        const processed = {} as any
+        Object.keys(childNodes).forEach(key => {
+            processed[key] = childNodes[key].getSnapshot()
+        })
+        return this.applySnapshotPostProcessor(this.applyOptionalValuesToSnapshot(processed))
+    }
+
     applyPatchLocally(node: ObjectNode, subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add"))
             fail(`object does not support operation ${patch.op}`)
@@ -574,6 +582,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
 
     applyOptionalValuesToSnapshot(snapshot: any) {
         if (snapshot) {
+            snapshot = Object.assign({}, snapshot)
             this.forAllProps((name, type) => {
                 if (!(name in snapshot)) {
                     const optional = tryGetOptional(type)
@@ -724,10 +733,6 @@ export function compose(...args: any[]): any {
 
 export function isModelType<IT extends IModelType<any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
-}
-
-export function isModelTypeInstance(type: IAnyType): type is ModelType<any, any> {
-    return type instanceof ModelType
 }
 
 function tryGetOptional(type: any): OptionalValue<any, any, any> | undefined {
