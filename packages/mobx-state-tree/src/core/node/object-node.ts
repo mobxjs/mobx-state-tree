@@ -24,10 +24,10 @@ import {
     freeze,
     resolveNodeByPathParts,
     convertChildNodesToArray,
-    ModelType,
     invalidateComputed,
     IAnyType,
-    ArrayType
+    isModelTypeInstance,
+    isArrayTypeInstance
 } from "../../internal"
 
 let nextNodeId = 1
@@ -119,7 +119,7 @@ export class ObjectNode implements INode {
         this.parent = parent
         this.subpath = subpath
         this.escapedSubpath = escapeJsonPath(this.subpath)
-        this.identifierAttribute = type instanceof ModelType ? type.identifierAttribute : undefined
+        this.identifierAttribute = isModelTypeInstance(type) ? type.identifierAttribute : undefined
         // identifier can not be changed during lifecycle of a node
         // so we safely can read it from initial snapshot
         this.identifier =
@@ -277,8 +277,10 @@ export class ObjectNode implements INode {
 
         if (!childNodes) return snapshot
 
+        const type = this.type
         const keys = Object.keys(childNodes)
-        if (this.type instanceof ArrayType) {
+
+        if (isArrayTypeInstance(type)) {
             snapshot = new Array(keys.length)
             keys.forEach((k, i) => {
                 snapshot[i] = childNodes[k].snapshot
@@ -290,8 +292,8 @@ export class ObjectNode implements INode {
             })
         }
 
-        return this.type instanceof ModelType
-            ? this.type.applySnapshotPostProcessor(snapshot)
+        return isModelTypeInstance(type)
+            ? type.applySnapshotPostProcessor(type.applyOptionalValuesToSnapshot(snapshot))
             : snapshot
     }
 

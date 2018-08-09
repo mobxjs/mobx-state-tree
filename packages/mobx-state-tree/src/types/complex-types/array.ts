@@ -40,6 +40,7 @@ import {
     IAnyType,
     EMPTY_ARRAY
 } from "../../internal"
+import { ModelType } from "./model"
 
 export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
 export interface IArrayType<C, S, T>
@@ -391,4 +392,8 @@ function areSame(oldNode: INode, newValue: any) {
 
 export function isArrayType<IT extends IArrayType<any, any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Array) > 0
+}
+
+export function isArrayTypeInstance(type: IAnyType): type is ArrayType<any, any, any> {
+    return type instanceof ArrayType
 }
