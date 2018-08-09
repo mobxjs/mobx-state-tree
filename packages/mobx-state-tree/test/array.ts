@@ -338,3 +338,24 @@ test("it should support observable arrays", () => {
     expect(testArray.length === 2).toBe(true)
     expect(Array.isArray(testArray.slice())).toBe(true)
 })
+
+test("it should correctly handle re-adding of the same objects", () => {
+    const Store = types
+        .model("Task", {
+            objects: types.array(types.maybe(types.frozen()))
+        })
+        .actions(self => ({
+            setObjects(objects: {}[]) {
+                self.objects.replace(objects)
+            }
+        }))
+    const store = Store.create({
+        objects: []
+    })
+    expect(store.objects.slice()).toEqual([])
+    const someObject = {}
+    store.setObjects([someObject])
+    expect(store.objects.slice()).toEqual([someObject])
+    store.setObjects([someObject])
+    expect(store.objects.slice()).toEqual([someObject])
+})
