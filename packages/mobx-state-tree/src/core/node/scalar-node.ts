@@ -30,7 +30,7 @@ export class ScalarNode implements INode {
 
         let sawException = true
         try {
-            this.storedValue = type.initializeInstance(this, {}, initialSnapshot)
+            this.storedValue = type.createNewInstance(this, {}, initialSnapshot)
             this.state = NodeLifeCycle.CREATED
             sawException = false
         } finally {

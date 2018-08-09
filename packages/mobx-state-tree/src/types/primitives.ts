@@ -1,4 +1,3 @@
-import { isInteger } from "./../utils"
 import {
     Type,
     isPrimitive,
@@ -16,7 +15,8 @@ import {
     isType,
     ObjectNode,
     IAnyType,
-    IChildNodesMap
+    IChildNodesMap,
+    isInteger
 } from "../internal"
 
 // TODO: implement CoreType using types.custom ?
@@ -46,7 +46,7 @@ export class CoreType<S, T> extends Type<S, S, T> {
         return createNode(this, parent, subpath, environment, snapshot)
     }
 
-    initializeInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
+    createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
         return this.initializer(snapshot)
     }
 

@@ -3,10 +3,10 @@ import {
     _interceptReads,
     action,
     computed,
-    extendObservable,
     getAtom,
     intercept,
     IObjectWillChange,
+    IObservableObject,
     isComputedProp,
     observable,
     observe,
@@ -459,20 +459,19 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return result
     }
 
-    initializeInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
-        const instance = observable.object(EMPTY_OBJECT, EMPTY_OBJECT, mobxShallow)
+    createNewInstance(node: ObjectNode, childNodes: IChildNodesMap, snapshot: any): any {
+        return observable.object(childNodes, EMPTY_OBJECT, mobxShallow)
+    }
+    finalizeNewInstance(node: ObjectNode, instance: IObservableObject): void {
         addHiddenFinalProp(instance, "toString", objectTypeToString)
 
-        extendObservable(instance, childNodes, EMPTY_OBJECT, mobxShallow)
         this.forAllProps(name => {
-            _interceptReads(instance, name, (node as ObjectNode).unbox)
+            _interceptReads(instance, name, node.unbox)
         })
 
         this.initializers.reduce((self, fn) => fn(self), instance)
         intercept(instance, this.willChange)
         observe(instance, this.didChange)
-
-        return instance
     }
 
     willChange(change: any): IObjectWillChange | null {

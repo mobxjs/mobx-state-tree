@@ -72,14 +72,17 @@ export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTAr
         return result
     }
 
-    initializeInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
-        const instance = observable.array(convertChildNodesToArray(childNodes), mobxShallow)
-
-        _getAdministration(instance).dehancer = (node as ObjectNode).unbox
+    createNewInstance(
+        node: ObjectNode,
+        childNodes: IChildNodesMap,
+        snapshot: any
+    ): IObservableArray<any> {
+        return observable.array(convertChildNodesToArray(childNodes), mobxShallow)
+    }
+    finalizeNewInstance(node: ObjectNode, instance: IObservableArray<any>): void {
+        _getAdministration(instance).dehancer = node.unbox
         intercept(instance, this.willChange as any)
         observe(instance, this.didChange)
-
-        return instance
     }
 
     describe() {

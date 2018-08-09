@@ -231,14 +231,18 @@ export class MapType<C, S, T> extends ComplexType<
         return result
     }
 
-    initializeInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
-        const instance = new MSTMap(childNodes)
+    createNewInstance(
+        node: INode,
+        childNodes: IChildNodesMap,
+        snapshot: any
+    ): IMSTMap<any, any, any> {
+        return (new MSTMap(childNodes) as any) as IMSTMap<any, any, any>
+    }
 
-        _interceptReads(instance, (node as ObjectNode).unbox)
+    finalizeNewInstance(node: ObjectNode, instance: any) {
+        _interceptReads(instance, node.unbox)
         intercept(instance, this.willChange)
         observe(instance, this.didChange)
-
-        return instance
     }
 
     describe() {
