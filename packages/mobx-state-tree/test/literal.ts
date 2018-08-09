@@ -10,7 +10,7 @@ if (process.env.NODE_ENV !== "production") {
     test("it should fail if not optional and no default provided", () => {
         const Factory = types.literal("hello")
         expect(() => {
-            Factory.create()
+            ;(Factory.create as any)()
         }).toThrow(/is not assignable to type/)
     })
     test("it should throw if a different type is given", () => {

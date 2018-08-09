@@ -316,7 +316,7 @@ export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean
 export function getParent<IT extends IAnyType>(
     target: IAnyStateTreeNode,
     depth = 1
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -370,7 +370,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
 export function getParentOfType<IT extends IAnyType>(
     target: IAnyStateTreeNode,
     type: IT
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -399,7 +399,7 @@ export function getParentOfType<IT extends IAnyType>(
  */
 export function getRoot<IT extends IAnyType>(
     target: IAnyStateTreeNode
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -491,7 +491,7 @@ export function resolveIdentifier<IT extends IAnyType>(
     type: IT,
     target: IAnyStateTreeNode,
     identifier: string | number
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | undefined {
+): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | undefined {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))

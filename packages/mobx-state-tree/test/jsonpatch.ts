@@ -5,14 +5,14 @@ function testPatches<C, S, T>(
     fn: any,
     expectedPatches: IJsonPatch[]
 ) {
-    const instance = type.create(snapshot)
+    const instance = (type.create as any)(snapshot) // create cannot be inferred without knowing the type
     const baseSnapshot = getSnapshot(instance)
     const recorder = recordPatches(instance)
     unprotect(instance)
     fn(instance)
     recorder.stop()
     expect(recorder.patches).toEqual(expectedPatches)
-    const clone = type.create(snapshot)
+    const clone = (type.create as any)(snapshot) // create cannot be inferred without knowing the type
     recorder.replay(clone)
     expect(getSnapshot(clone)).toEqual(getSnapshot(instance))
     recorder.undo()
