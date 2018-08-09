@@ -277,7 +277,7 @@ export function isType(value: any): value is IAnyType {
 function cloneSnapshotIfNeeded(snapshot: any): any {
     if (snapshot) {
         if (isStateTreeNode(snapshot)) return snapshot
-        else if (isArray(snapshot)) return Array.from(snapshot)
+        else if (isArray(snapshot)) return (snapshot as Array<any>).slice()
         else if (isMutable(snapshot)) return Object.assign({}, snapshot)
     }
     return snapshot
