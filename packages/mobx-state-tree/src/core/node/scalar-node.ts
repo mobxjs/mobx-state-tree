@@ -65,6 +65,7 @@ export class ScalarNode implements INode {
     }
 
     setParent(newParent: INode | null, subpath: string | null = null) {
+        if (this.parent === newParent && this.subpath === subpath) return
         fail("setParent is not supposed to be called on scalar nodes")
     }
 
