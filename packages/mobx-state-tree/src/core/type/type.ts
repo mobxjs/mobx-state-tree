@@ -18,7 +18,8 @@ import {
     ObjectNode,
     IChildNodesMap,
     ModelPrimitive,
-    IReferenceType
+    IReferenceType,
+    isArray
 } from "../../internal"
 
 export enum TypeFlags {
@@ -138,6 +139,10 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T> {
     abstract removeChild(node: INode, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
     abstract shouldAttachNode: boolean
+
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
+        return snapshot
+    }
 
     isAssignableFrom(type: IAnyType): boolean {
         return type === (this as any)

@@ -1,56 +1,56 @@
 import {
-    action,
-    IObjectWillChange,
-    intercept,
-    observe,
-    getAtom,
-    extendObservable,
-    observable,
-    _interceptReads,
     _getAdministration,
-    isComputedProp,
+    _interceptReads,
+    action,
     computed,
+    extendObservable,
+    getAtom,
+    intercept,
+    IObjectWillChange,
+    isComputedProp,
+    observable,
+    observe,
     set
 } from "mobx"
 import {
-    fail,
-    isPlainObject,
-    isPrimitive,
+    addHiddenFinalProp,
+    addHiddenWritableProp,
+    ArrayType,
+    ComplexType,
+    createActionInvoker,
+    createNode,
     EMPTY_ARRAY,
     EMPTY_OBJECT,
-    addHiddenFinalProp,
-    createNode,
-    getStateTreeNode,
-    IStateTreeNode,
-    IJsonPatch,
-    INode,
-    createActionInvoker,
     escapeJsonPath,
-    ComplexType,
-    IComplexType,
-    IType,
-    TypeFlags,
-    isType,
+    ExtractIStateTreeNode,
+    fail,
     flattenTypeErrors,
-    IContext,
-    IValidationResult,
-    typecheck,
-    typeCheckFailure,
+    freeze,
     getContextForPath,
     getPrimitiveFactoryFromValue,
-    optional,
-    ObjectNode,
-    freeze,
-    addHiddenWritableProp,
-    mobxShallow,
-    isStateTreeNode,
-    IChildNodesMap,
+    getStateTreeNode,
+    IAnyStateTreeNode,
     IAnyType,
-    OptionalValue,
+    IChildNodesMap,
+    IComplexType,
+    IContext,
+    IJsonPatch,
+    INode,
+    isPlainObject,
+    isPrimitive,
+    isStateTreeNode,
+    IStateTreeNode,
+    isType,
+    IType,
+    IValidationResult,
     MapType,
-    ArrayType,
-    ExtractIStateTreeNode,
-    IAnyStateTreeNode
+    mobxShallow,
+    ObjectNode,
+    optional,
+    OptionalValue,
+    typecheck,
+    typeCheckFailure,
+    TypeFlags
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -552,6 +552,14 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return res
     }
 
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
+        const processed = {} as any
+        Object.keys(childNodes).forEach(key => {
+            processed[key] = childNodes[key].getSnapshot()
+        })
+        return this.applySnapshotPostProcessor(this.applyOptionalValuesToSnapshot(processed))
+    }
+
     applyPatchLocally(node: ObjectNode, subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add"))
             fail(`object does not support operation ${patch.op}`)
@@ -569,19 +577,22 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
 
     applySnapshotPreProcessor(snapshot: any) {
         const processor = this.preProcessor
-        const processed = processor ? processor.call(null, snapshot) : snapshot
+        return processor ? processor.call(null, snapshot) : snapshot
+    }
 
-        if (processed) {
+    applyOptionalValuesToSnapshot(snapshot: any) {
+        if (snapshot) {
+            snapshot = Object.assign({}, snapshot)
             this.forAllProps((name, type) => {
-                if (!(name in processed)) {
+                if (!(name in snapshot)) {
                     const optional = tryGetOptional(type)
                     if (optional) {
-                        processed[name] = optional.getDefaultValueSnapshot()
+                        snapshot[name] = optional.getDefaultValueSnapshot()
                     }
                 }
             })
         }
-        return processed
+        return snapshot
     }
 
     applySnapshotPostProcessor(snapshot: any) {

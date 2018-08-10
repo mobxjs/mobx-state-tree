@@ -16,6 +16,7 @@ export class ScalarNode implements INode {
     readonly subpath: string = ""
 
     private state = NodeLifeCycle.INITIALIZING
+    private readonly _initialSnapshot: any
     _environment: any = undefined
 
     constructor(
@@ -27,11 +28,13 @@ export class ScalarNode implements INode {
         createNewInstance: (initialValue: any) => any,
         finalizeNewInstance: (node: INode, initialValue: any) => void = noop
     ) {
+        this._initialSnapshot = initialSnapshot
+
         this.type = type
         this.parent = parent
         this.subpath = subpath
-
         this.storedValue = createNewInstance(initialSnapshot)
+
         let sawException = true
         try {
             finalizeNewInstance(this, initialSnapshot)
@@ -73,10 +76,14 @@ export class ScalarNode implements INode {
         return this.type.getValue(this)
     }
 
-    public get snapshot() {
-        const snapshot = this.type.getSnapshot(this)
+    public get snapshot(): any {
+        const snapshot = this.getSnapshot()
         // avoid any external modification in dev mode
         return freeze(snapshot)
+    }
+
+    public getSnapshot(): any {
+        return this.type.getSnapshot(this)
     }
 
     public get isAlive() {
