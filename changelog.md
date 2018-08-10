@@ -1,3 +1,7 @@
+# 3.0.3
+
+* Fixed re-adding the same objects to an array. Fixes [#928](https://github.com/mobxjs/mobx-state-tree/issues/928) through [#949](https://github.com/mobxjs/mobx-state-tree/pull/949) by [@Krivega](https://github.com/Krivega)
+
 # 3.0.2
 
 * Introduced `types.integer`! By [@jayarjo](https://github.com/jayarjo) through [#935](https://github.com/mobxjs/mobx-state-tree/pull/935)
