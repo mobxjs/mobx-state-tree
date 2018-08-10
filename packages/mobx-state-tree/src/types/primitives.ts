@@ -195,8 +195,11 @@ export function isPrimitiveType<S = any, T = any>(type: IAnyType): type is CoreT
     return (
         isType(type) &&
         (type.flags &
-            (TypeFlags.String | TypeFlags.Number | TypeFlags.Integer,
-            TypeFlags.Boolean | TypeFlags.Date)) >
+            (TypeFlags.String |
+                TypeFlags.Number |
+                TypeFlags.Integer |
+                TypeFlags.Boolean |
+                TypeFlags.Date)) >
             0
     )
 }

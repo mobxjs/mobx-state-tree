@@ -109,7 +109,7 @@ test("action cannot modify parent", () => {
         })
         .actions(self => ({
             setParentX() {
-                getParent(self).x += 1
+                getParent<typeof self>(self).x += 1
             }
         }))
     const Parent = types.model("Parent", {
