@@ -1,3 +1,7 @@
+# 3.1.1
+
+* Fixed typings of `getParent` and `getRoot`. Fixes [#951](https://github.com/mobxjs/mobx-state-tree/issues/951) through [#953](https://github.com/mobxjs/mobx-state-tree/pull/953) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.1.0
 
 * Fixed issue where snapshot post-processors where not always applied. Fixes [#926](https://github.com/mobxjs/mobx-state-tree/issues/926), [#961](https://github.com/mobxjs/mobx-state-tree/issues/961), through [#959](https://github.com/mobxjs/mobx-state-tree/pull/959) by [@k-g-a](https://github.com/k-g-a)
