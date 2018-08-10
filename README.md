@@ -935,6 +935,7 @@ types
     }))
 ```
 
+Note; pre and post processing are just meant to convert your data into types that are more acceptable to MST. Typically it should be the case that `postProcess(preProcess(snapshot)) === snapshot. If that isn't the case, consider whether you shouldn't be using a dedicated a view instead to normalize your snapshot to some other format you need.
 
 | Hook            | Meaning                                                                                                                                                   |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
