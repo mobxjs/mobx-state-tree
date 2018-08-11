@@ -1343,7 +1343,7 @@ const Store = types.model({
 })
 
 const s = Store.create({ tasks: [] })
-// `{}` is a valid snapshot of Task, and hence a valid task, MST allows this, but TS doesn't, so need to use 'cast'
+// `{}` is a valid snapshot of Task, and hence a valid task, MST allows this, but TS doesn't, so we need to use 'cast'
 s.tasks.push(cast({}))
 s.selection = cast({})
 ```
@@ -1360,14 +1360,10 @@ const Task = types.model({
 const Store = types.model({
     tasks: types.array(Task)
 }).actions(self => ({
-    addTask(
-        task: SnapshotOrInstance<typeof Task>
-    ) {
+    addTask(task: SnapshotOrInstance<typeof Task>) {
         self.tasks.push(cast(task))
     },
-    replaceTasks(
-        tasks: SnapshotOrInstance<typeof self.tasks>
-    ) {
+    replaceTasks(tasks: SnapshotOrInstance<typeof self.tasks>) {
         self.tasks = cast(tasks)
     }
 }))
