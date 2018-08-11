@@ -962,6 +962,7 @@ See the [full API docs](API.md) for more details.
 | [`addMiddleware(node, middleware: (actionDescription, next) => any, includeHooks)`](API.md#addmiddleware) | Attaches middleware to a node. See [middleware](docs/middleware.md). Returns disposer. |
 | [`applyAction(node, actionDescription)`](API.md#applyaction) | Replays an action on the targeted node |
 | [`applyPatch(node, jsonPatch)`](API.md#applypatch) | Applies a JSON patch, or array of patches, to a node in the tree |
+| [`cast(nodeOrSnapshot)`](API.md#cast) | Cast a node instance or snapshot to a node so it can be used in assignment operations |
 | [`applySnapshot(node, snapshot)`](API.md#applysnapshot) | Updates a node with the given snapshot |
 | [`createActionTrackingMiddleware`](API.md#createactiontrackingmiddleware) | Utility to make writing middleware that tracks async actions less cumbersome |
 | [`clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone) | Creates a full clone of the given node. By default preserves the same environment |
