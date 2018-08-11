@@ -43,7 +43,9 @@ import {
     custom,
     identifierNumber,
     maybeNull,
-    TypeFlags
+    TypeFlags,
+    SnapshotOrInstance,
+    cast
 } from "./internal"
 
 export const types = {
@@ -119,7 +121,9 @@ export {
     ModelActions,
     ModelTypeConfig,
     CustomTypeOptions,
-    UnionOptions
+    UnionOptions,
+    SnapshotOrInstance,
+    cast
 } from "./internal"
 
 export * from "./core/mst-operations"

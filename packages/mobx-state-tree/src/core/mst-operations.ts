@@ -789,6 +789,69 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     return reflected
 }
 
+/**
+ * A type which is equivalent to the union of the CreationType with the InstanceType of a given typeof Type or typeof Instance.
+ * For primitives it defaults to the primitive itself.
+ *
+ * For example:
+ * - SnapshotOrInstance<typeof ModelA> = typeof ModelA.CreationType | typeof ModelA.Type
+ * - SnapshotOrInstance<typeof self.a (where self.a is a ModelA)> = typeof ModelA.CreationType | typeof ModelA.Type
+ *
+ * Usually you might want to use this when your model has a setter action that sets a property.
+ *
+ * @example
+ * const ModelA = types.model({
+ *   n: types.number
+ * })
+ *
+ * const ModelB = types.model({
+ *   innerModel: ModelA
+ * }).actions(self => ({
+ *   // this will accept as property both the snapshot and the instance, whichever is preferred
+ *   setInnerModel(m: SnapshotOrInstance<typeof self.innerModel>) {
+ *     self.innerModel = cast(m)
+ *   }
+ * }))
+ */
+export type SnapshotOrInstance<T> = T extends IStateTreeNode<infer STNC, any>
+    ? STNC | T
+    : T extends IType<infer TC, any, infer TT> ? TC | TT : T
+
+export type CastedType<T> = T extends IStateTreeNode<infer STNC> ? STNC | T : T
+
+/**
+ * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
+ * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,
+ * but just fool typescript into thinking so.
+ * Casting only works on assignation operations, it won't work (compile) stand-alone.
+ * Technically it is not required for instances, but it is provided for consistency reasons.
+ *
+ * @example
+ * const ModelA = types.model({
+ *   n: types.number
+ * }).actions(self => ({
+ *   setN(aNumber: number) {
+ *     self.n = aNumber
+ *   }
+ * }))
+ *
+ * const ModelB = types.model({
+ *   innerModel: ModelA
+ * }).actions(self => ({
+ *   someAction() {
+ *     // this will allow the compiler to assign an snapshot to the property
+ *     self.innerModel = cast({ a: 5 })
+ *   }
+ * }))
+ *
+ * @export
+ * @param {CastedType<T>} snapshotOrInstance
+ * @returns {T}
+ */
+export function cast<T = never>(snapshotOrInstance: CastedType<T>): T {
+    return (snapshotOrInstance as any) as T
+}
+
 import {
     INode,
     getStateTreeNode,

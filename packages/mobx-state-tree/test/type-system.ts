@@ -1,4 +1,13 @@
-import { types, getSnapshot, unprotect, IType, getRoot, getParent } from "../src"
+import {
+    types,
+    getSnapshot,
+    unprotect,
+    IType,
+    getRoot,
+    getParent,
+    SnapshotOrInstance,
+    cast
+} from "../src"
 const createTestFactories = () => {
     const Box = types.model({
         width: 0,
@@ -597,4 +606,134 @@ test("#951", () => {
     // getParent
     const mapParent1 = getRoot<typeof MapOfC>(mapInstance.get("a")!)
     const mapCP1: typeof MapOfC.Type = mapParent1
+})
+
+test("cast and SnapshotOrInstance", () => {
+    const NumberArray = types.array(types.number)
+    const NumberMap = types.map(types.number)
+    const A = types
+        .model({ n: 123, n2: types.number, arr: NumberArray, map: NumberMap })
+        .actions(self => ({
+            // for primitives (although not needed)
+            setN(nn: SnapshotOrInstance<typeof self.n>) {
+                self.n = cast(nn)
+            },
+            setN2(nn: SnapshotOrInstance<typeof types.number>) {
+                self.n = cast(nn)
+            },
+            setN3(nn: SnapshotOrInstance<number>) {
+                self.n = cast(nn)
+            },
+            setN4(nn: number) {
+                self.n = cast(nn)
+            },
+            setN5() {
+                self.n = cast(5)
+            },
+
+            // for arrays
+            setArr(nn: SnapshotOrInstance<typeof self.arr>) {
+                self.arr = cast(nn)
+            },
+            setArr2(nn: SnapshotOrInstance<typeof NumberArray>) {
+                self.arr = cast(nn!) // TODO: non-undefined operator ! is not required once the PR for TS3 is merged
+            },
+            setArr3(nn: number[]) {
+                self.arr = cast(nn)
+            },
+            setArr4() {
+                // it works even without specifying the target type, magic!
+                self.arr = cast([2, 3, 4])
+                self.arr = cast(NumberArray.create([2, 3, 4]))
+            },
+
+            // for maps
+            setMap(nn: SnapshotOrInstance<typeof self.map>) {
+                self.map = cast(nn)
+            },
+            setMap2(nn: SnapshotOrInstance<typeof NumberMap>) {
+                self.map = cast(nn!) // TODO: non-undefined operator ! is not required once the PR for TS3 is merged
+            },
+            setMap3(nn: { [k: string]: number }) {
+                self.map = cast(nn)
+            },
+            setMap4() {
+                // it works even without specifying the target type, magic!
+                self.map = cast({ a: 2, b: 3 })
+                self.map = cast(NumberMap.create({ a: 2, b: 3 }))
+            }
+        }))
+
+    const C = types.model({ a: A }).actions(self => ({
+        // for submodels, using typeof self.var
+        setA(na: SnapshotOrInstance<typeof self.a>) {
+            self.a = cast(na)
+        },
+        // for submodels, using the type directly
+        setA2(na: SnapshotOrInstance<typeof A>) {
+            self.a = cast(na)
+        },
+        // works too
+        setA3(na: typeof A.CreationType) {
+            self.a = cast(na)
+        },
+        // works too
+        setA4(na: typeof A.Type) {
+            self.a = cast(na)
+        },
+        setA5() {
+            // it works even without specifying the target type, magic!
+            self.a = cast({ n2: 5 })
+            self.a = cast(A.create({ n2: 5 }))
+        }
+    }))
+
+    const c = C.create({ a: { n2: 5 } })
+    // all below works
+    c.setA({ n2: 5 })
+    c.setA(A.create({ n2: 5 }))
+    c.setA2({ n2: 5 })
+    c.setA2(A.create({ n2: 5 }))
+    c.setA3({ n2: 5 })
+    // c.setA3(A.create({ n2: 5 })) // this one doesn't work, but that's expected, it wants the creation type
+    // c.setA4({n2: 5}) // this one doesn't work, but that's expected, it wants the instance type
+    c.setA4(A.create({ n2: 5 }))
+    c.setA5()
+
+    c.a.setN(1)
+    c.a.setN2(1)
+    c.a.setN3(1)
+    c.a.setN4(1)
+    c.a.setN5()
+
+    c.a.setArr([])
+    c.a.setArr(NumberArray.create([]))
+    c.a.setArr2([])
+    c.a.setArr2(NumberArray.create([]))
+    c.a.setArr3([])
+    c.a.setArr3(NumberArray.create([]))
+    c.a.setArr4()
+
+    c.a.setMap({ a: 2, b: 3 })
+    c.a.setMap(NumberMap.create({ a: 2, b: 3 }))
+    c.a.setMap2({ a: 2, b: 3 })
+    c.a.setMap2(NumberMap.create({ a: 2, b: 3 }))
+    c.a.setMap3({ a: 2, b: 3 })
+    // c.a.setMap3(NumberMap.create({ a: 2, b: 3 })) // doesn't work as expected, wants a plain object
+    c.a.setMap4()
+
+    const arr = types.array(A).create()
+    arr[0] = cast({ n2: 5 })
+
+    const map = types.map(A).create()
+    map.set("a", cast({ n2: 5 })) // not really needed in this case, but whatever :)
+
+    // and the best part, it actually doesn't work outside assignments :DDDD
+    // all this fails to compile
+    // cast([])
+    // cast({a:5})
+    // cast(NumberArray.create([]))
+    // cast(A.create({n2: 5}))
+    // cast({a: 2, b: 5})
+    // cast(NumberMap({a: 2, b: 3}))
 })
