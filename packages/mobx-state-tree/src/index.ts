@@ -128,8 +128,7 @@ export {
     Instance,
     InSnapshot,
     OutSnapshot,
-    SnapshotOrInstance,
-    cast
+    SnapshotOrInstance
 } from "./internal"
 
 export * from "./core/mst-operations"

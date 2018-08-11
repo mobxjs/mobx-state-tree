@@ -726,9 +726,11 @@ test("cast and SnapshotOrInstance", () => {
     c.a.setMap4()
 
     const arr = types.array(A).create()
+    unprotect(arr)
     arr[0] = cast({ n2: 5 })
 
     const map = types.map(A).create()
+    unprotect(map)
     map.set("a", cast({ n2: 5 })) // not really needed in this case, but whatever :)
 
     // and the best part, it actually doesn't work outside assignments :DDDD
