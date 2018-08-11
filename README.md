@@ -1183,11 +1183,17 @@ Flow is not supported
 When using models, you write an interface, along with its property types, that will be used to perform type checks at runtime.
 What about compile time? You can use TypeScript interfaces to perform those checks, but that would require writing again all the properties and their actions!
 
-Good news! You don't need to write it twice! Using the `typeof` operator of TypeScript over the `.Type` property of a MST Type will result in a valid TypeScript Type!
+Good news! You don't need to write it twice!
+
+There are three kinds of types available, plus one helper type:
+- `Instance<typeof TYPE>` or `Instance<typeof VARIABLE>` is the node instance type. (Legacy form is `typeof MODEL.Type`).
+- `InSnapshot<typeof TYPE>` or `InSnapshot<typeof VARIABLE>` is the input (creation) snapshot type. (Legacy form is `typeof MODEL.CreationType`).
+- `OutSnapshot<typeof TYPE>` or `OutSnapshot<typeof VARIABLE>` is the output (creation) snapshot type. (Legacy form is `typeof MODEL.SnapshotType`).  
+- `SnapshotOrInstance<typeof TYPE>` or `SnapshotOrInstance<typeof VARIABLE>` is `InSnapshot<T> | Instance<T>`. This type is useful when you want to declare an input parameter that is able consume both types.
 
 ```typescript
 const Todo = types.model({
-        title: types.string
+        title: "hello"
     })
     .actions(self => ({
         setTitle(v: string) {
@@ -1195,15 +1201,25 @@ const Todo = types.model({
         }
     }))
 
-type ITodo = typeof Todo.Type // => ITodo is now a valid TypeScript type with { title: string; setTitle: (v: string) => void }
+type ITodo = Instance<typeof Todo> // => ITodo is now a valid TypeScript type with { title: string; setTitle: (v: string) => void }
+
+type ITodoInSnapshot = InSnapshot<typeof Todo> // => ITodoSnapshot is now a valid TypeScript type with { title?: string }
+
+type ITodoOutSnapshot = OutSnapshot<typeof Todo> // => ITodoSnapshot is now a valid TypeScript type with { title: string }
 ```
 
 Due to the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes a lot of CPU time and freeze vscode (or others)
-A partial solution for this is to turn the `.Type` into an interface.
+A partial solution for this is to turn the types into interfaces.
 
 ```ts
-type ITodoType = typeof Todo.Type;
+type ITodoType = Instance<typeof Todo>;
 interface ITodo extends ITodoType {};
+
+type ITodoInSnapshotType = InSnapshot<typeof Todo>;
+interface ITodoInSnapshot extends ITodoInSnapshotType {};
+
+type ITodoOutSnapshotType = OutSnapshot<typeof Todo>;
+interface ITodoOutSnapshot extends ITodoOutSnapshotType {};
 ```
 
 #### Typing `self` in actions and views
@@ -1313,9 +1329,11 @@ const Example = types
 
 Everywhere where you can modify your state tree and assign a model instance, you can also
 just assign a snapshot, and MST will convert it to a model instance for you.
-However, that is simply not expressible in static type systems atm (as the type written to a value differs to the type read from it). So the only work around is to upcast to `any`:
+However, that is simply not expressible in static type systems atm (as the type written to a value differs to the type read from it).
+As a workaround MST offers a `cast` function, which will try to fool the typesystem into thinking that an snapshot type (and instance as well)
+is of the related instance type.
 
-```javascript
+```typescript
 const Task = types.model({
     done: false
 })
@@ -1325,9 +1343,46 @@ const Store = types.model({
 })
 
 const s = Store.create({ tasks: [] })
-// `{}` is a valid snapshot of Task, and hence a valid task, MST allows this, but TS doesn't, so need any cast
-s.tasks.push({} as any)
-s.selection = {} as any
+// `{}` is a valid snapshot of Task, and hence a valid task, MST allows this, but TS doesn't, so need to use 'cast'
+s.tasks.push(cast({}))
+s.selection = cast({})
+```
+
+Additionally, for function parameters, MST offers a `SnapshotOrInstance<T>` type, where T can either be a `typeof TYPE` or a
+`typeof VARIABLE`. In both cases it will resolve to the union of the input (creation) snapshot and instance type of that TYPE or VARIABLE.
+
+Using both at the same time we can express property assignation of complex properties in this form:
+
+```typescript
+const Task = types.model({
+    done: false
+})
+const Store = types.model({
+    tasks: types.array(Task)
+}).actions(self => ({
+    addTask(
+        // equivalent to typeof Task.Type | typeof Task.CreationType
+        task: SnapshotOrInstance<typeof Task>
+    ) {
+        self.tasks.push(cast(task))
+    },
+    replaceTasks(
+        // equivalent to typeof typeof (types.array(Task)).Type | typeof (types.array(Task)).CreationType
+        tasks: SnapshotOrInstance<typeof self.tasks>
+    ) {
+        self.tasks = cast(tasks)
+    }
+}))
+
+const s = Store.create({ tasks: [] })
+
+s.addTask({}) 
+// or
+s.addTask(Task.create({}))
+
+s.replaceTasks([{ done: true }])
+// or
+s.replaceTasks(types.array(Task).create([{ done: true }]))
 ```
 
 #### Known Typescript Issue 5938

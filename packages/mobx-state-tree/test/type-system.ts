@@ -116,8 +116,8 @@ test("#66 - it should accept superfluous fields", () => {
     expect(Item.is({ id: 3 })).toBe(false)
     expect(Item.is({ id: 3, name: "" })).toBe(true)
     expect(Item.is({ id: 3, name: "", description: "" })).toBe(true)
-    const a = Item.create({ id: 3, name: "", description: "bla" } as any) as any
-    expect(a.description).toBe(undefined)
+    const a = Item.create({ id: 3, name: "", description: "bla" } as any)
+    expect((a as any).description).toBe(undefined)
 })
 test("#66 - it should not require defaulted fields", () => {
     const Item = types.model({
@@ -192,7 +192,7 @@ test("it is possible to refer to a type", () => {
             }
         })
     function x(): typeof Todo.Type {
-        return Todo.create({ title: "test" }) // as any to make sure the type is not inferred accidentally
+        return Todo.create({ title: "test" })
     }
     const z = x()
     unprotect(z)
@@ -573,15 +573,15 @@ test("#951", () => {
 
     // getRoot
     const modelRoot1 = getRoot<typeof ModelWithC>(modelInstance.c)
-    const modelCR1: typeof C.Type = modelRoot1.c
-    const modelRoot2 = getRoot<typeof ModelWithC.Type>(modelInstance.c)
-    const modelCR2: typeof C.Type = modelRoot2.c
+    const modelCR1: Instance<typeof C> = modelRoot1.c
+    const modelRoot2 = getRoot<Instance<typeof ModelWithC>>(modelInstance.c)
+    const modelCR2: Instance<typeof C> = modelRoot2.c
 
     // getParent
     const modelParent1 = getParent<typeof ModelWithC>(modelInstance.c)
-    const modelCP1: typeof ModelWithC.Type = modelParent1
-    const modelParent2 = getParent<typeof ModelWithC.Type>(modelInstance.c)
-    const modelCP2: typeof ModelWithC.Type = modelParent2
+    const modelCP1: Instance<typeof ModelWithC> = modelParent1
+    const modelParent2 = getParent<Instance<typeof ModelWithC>>(modelInstance.c)
+    const modelCP2: Instance<typeof ModelWithC> = modelParent2
 
     // array as root
     const ArrayOfC = types.array(C)
@@ -589,11 +589,11 @@ test("#951", () => {
 
     // getRoot
     const arrayRoot1 = getRoot<typeof ArrayOfC>(arrayInstance[0])
-    const arrayCR1: typeof C.Type = arrayRoot1[0]
+    const arrayCR1: Instance<typeof C> = arrayRoot1[0]
 
     // getParent
     const arrayParent1 = getParent<typeof ArrayOfC>(arrayInstance[0])
-    const arrayCP1: typeof ArrayOfC.Type = arrayParent1
+    const arrayCP1: Instance<typeof ArrayOfC> = arrayParent1
 
     // map as root
     const MapOfC = types.map(C)
@@ -601,11 +601,11 @@ test("#951", () => {
 
     // getRoot
     const mapRoot1 = getRoot<typeof MapOfC>(mapInstance.get("a")!)
-    const mapC1: typeof C.Type = mapRoot1.get("a")!
+    const mapC1: Instance<typeof C> = mapRoot1.get("a")!
 
     // getParent
     const mapParent1 = getRoot<typeof MapOfC>(mapInstance.get("a")!)
-    const mapCP1: typeof MapOfC.Type = mapParent1
+    const mapCP1: Instance<typeof MapOfC> = mapParent1
 })
 
 test("cast and SnapshotOrInstance", () => {
@@ -674,11 +674,11 @@ test("cast and SnapshotOrInstance", () => {
             self.a = cast(na)
         },
         // works too
-        setA3(na: typeof A.CreationType) {
+        setA3(na: InSnapshot<typeof A>) {
             self.a = cast(na)
         },
         // works too
-        setA4(na: typeof A.Type) {
+        setA4(na: Instance<typeof self.a>) {
             self.a = cast(na)
         },
         setA5() {
@@ -695,8 +695,8 @@ test("cast and SnapshotOrInstance", () => {
     c.setA2({ n2: 5 })
     c.setA2(A.create({ n2: 5 }))
     c.setA3({ n2: 5 })
-    // c.setA3(A.create({ n2: 5 })) // this one doesn't work, but that's expected, it wants the creation type
-    // c.setA4({n2: 5}) // this one doesn't work, but that's expected, it wants the instance type
+    // c.setA3(A.create({ n2: 5 })) // this one doesn't work (as expected, it wants the creation type)
+    // c.setA4({n2: 5}) // this one doesn't work (as expected, it wants the instance type)
     c.setA4(A.create({ n2: 5 }))
     c.setA5()
 
@@ -719,7 +719,7 @@ test("cast and SnapshotOrInstance", () => {
     c.a.setMap2({ a: 2, b: 3 })
     c.a.setMap2(NumberMap.create({ a: 2, b: 3 }))
     c.a.setMap3({ a: 2, b: 3 })
-    // c.a.setMap3(NumberMap.create({ a: 2, b: 3 })) // doesn't work as expected, wants a plain object
+    // c.a.setMap3(NumberMap.create({ a: 2, b: 3 })) // doesn't work (as expected, wants a plain object)
     c.a.setMap4()
 
     const arr = types.array(A).create()

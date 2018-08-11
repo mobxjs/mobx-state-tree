@@ -44,6 +44,9 @@ import {
     identifierNumber,
     maybeNull,
     TypeFlags,
+    Instance,
+    InSnapshot,
+    OutSnapshot,
     SnapshotOrInstance,
     cast
 } from "./internal"
@@ -122,6 +125,9 @@ export {
     ModelTypeConfig,
     CustomTypeOptions,
     UnionOptions,
+    Instance,
+    InSnapshot,
+    OutSnapshot,
     SnapshotOrInstance,
     cast
 } from "./internal"

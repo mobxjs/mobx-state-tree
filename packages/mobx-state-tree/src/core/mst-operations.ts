@@ -789,34 +789,6 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     return reflected
 }
 
-/**
- * A type which is equivalent to the union of the CreationType with the InstanceType of a given typeof Type or typeof Instance.
- * For primitives it defaults to the primitive itself.
- *
- * For example:
- * - SnapshotOrInstance<typeof ModelA> = typeof ModelA.CreationType | typeof ModelA.Type
- * - SnapshotOrInstance<typeof self.a (where self.a is a ModelA)> = typeof ModelA.CreationType | typeof ModelA.Type
- *
- * Usually you might want to use this when your model has a setter action that sets a property.
- *
- * @example
- * const ModelA = types.model({
- *   n: types.number
- * })
- *
- * const ModelB = types.model({
- *   innerModel: ModelA
- * }).actions(self => ({
- *   // this will accept as property both the snapshot and the instance, whichever is preferred
- *   setInnerModel(m: SnapshotOrInstance<typeof self.innerModel>) {
- *     self.innerModel = cast(m)
- *   }
- * }))
- */
-export type SnapshotOrInstance<T> = T extends IStateTreeNode<infer STNC, any>
-    ? STNC | T
-    : T extends IType<infer TC, any, infer TT> ? TC | TT : T
-
 export type CastedType<T> = T extends IStateTreeNode<infer STNC> ? STNC | T : T
 
 /**
@@ -849,7 +821,7 @@ export type CastedType<T> = T extends IStateTreeNode<infer STNC> ? STNC | T : T
  * @returns {T}
  */
 export function cast<T = never>(snapshotOrInstance: CastedType<T>): T {
-    return (snapshotOrInstance as any) as T
+    return snapshotOrInstance as T
 }
 
 import {

@@ -1,4 +1,4 @@
-import { types, tryResolve, resolvePath } from "../src"
+import { types, tryResolve, resolvePath, cast, SnapshotOrInstance } from "../src"
 
 if (process.env.NODE_ENV !== "production") {
     test("#275 - Identifiers should check refinement", () => {
@@ -20,8 +20,8 @@ if (process.env.NODE_ENV !== "production") {
                 models: types.array(Model)
             })
             .actions(self => ({
-                addModel(model: typeof Model.Type | typeof Model.CreationType) {
-                    self.models.push(model as typeof Model.Type)
+                addModel(model: SnapshotOrInstance<typeof Model>) {
+                    self.models.push(cast(model))
                 }
             }))
         expect(() => {

@@ -1,3 +1,8 @@
+# x.x.x
+
+* Made the internal CreationType/SnapshotType/Type official via the new InSnapshot/OutSnapshot/Instance/SnapshotOrInstance<typeof X>
+* A new 'cast' method that makes automatic casts from instances/input snapshots for assignments
+
 # 3.1.1
 
 * Fixed typings of `getParent` and `getRoot`. Fixes [#951](https://github.com/mobxjs/mobx-state-tree/issues/951) through [#953](https://github.com/mobxjs/mobx-state-tree/pull/953) by [@xaviergonz](https://github.com/xaviergonz)

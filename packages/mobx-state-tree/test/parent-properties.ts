@@ -1,4 +1,4 @@
-import { types, getEnv, getParent, getPath } from "../src"
+import { types, getEnv, getParent, getPath, cast } from "../src"
 const ChildModel = types
     .model("Child", {
         parentPropertyIsNullAfterCreate: false,
@@ -94,14 +94,16 @@ test("#917", () => {
         }))
         .actions(self => ({
             addTodo(title: string) {
-                self.todos.push({
-                    title,
-                    subTodos: [
-                        {
-                            title
-                        }
-                    ]
-                } as typeof Todo.Type) // TODO: if IObservableArray supported separate write/read types then this typecast could be avoided
+                self.todos.push(
+                    cast({
+                        title,
+                        subTodos: [
+                            {
+                                title
+                            }
+                        ]
+                    })
+                )
             }
         }))
 

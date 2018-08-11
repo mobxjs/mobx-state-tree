@@ -1,4 +1,4 @@
-import { getSnapshot, types } from "../src"
+import { getSnapshot, types, cast } from "../src"
 test("it should allow if type and predicate is correct", () => {
     const Factory = types.model({
         number: types.refinement(
