@@ -1,6 +1,18 @@
-# 3.1.0
+# 3.2.0
 
 -   **[BREAKING]** MobX-state-tree now requires at least TypeScript 3.0 when using MST with typescript. The type system has been revamped (once more), and should now be even more accurate.
+
+# 3.1.1
+
+* Fixed typings of `getParent` and `getRoot`. Fixes [#951](https://github.com/mobxjs/mobx-state-tree/issues/951) through [#953](https://github.com/mobxjs/mobx-state-tree/pull/953) by [@xaviergonz](https://github.com/xaviergonz)
+
+# 3.1.0
+
+* Fixed issue where snapshot post-processors where not always applied. Fixes [#926](https://github.com/mobxjs/mobx-state-tree/issues/926), [#961](https://github.com/mobxjs/mobx-state-tree/issues/961), through [#959](https://github.com/mobxjs/mobx-state-tree/pull/959) by [@k-g-a](https://github.com/k-g-a)
+
+# 3.0.3
+
+* Fixed re-adding the same objects to an array. Fixes [#928](https://github.com/mobxjs/mobx-state-tree/issues/928) through [#949](https://github.com/mobxjs/mobx-state-tree/pull/949) by [@Krivega](https://github.com/Krivega)
 
 # 3.0.2
 

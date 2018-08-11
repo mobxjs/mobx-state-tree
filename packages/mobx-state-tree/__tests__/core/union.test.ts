@@ -1,4 +1,5 @@
-import { types, hasParent, tryResolve, getSnapshot } from "../../src"
+import { types, hasParent, tryResolve, getSnapshot, applySnapshot } from "../../src"
+
 const createTestFactories = () => {
     const Box = types.model("Box", {
         width: types.number,
@@ -159,4 +160,13 @@ test("dispatch", () => {
             )
         }).toThrow("First argument to types.union should either be a type")
     }
+})
+
+test("961 - apply snapshot to union should not throw when union keeps models with different properties and snapshot is got by getSnapshot", () => {
+    const Foo = types.model({ foo: 1 })
+    const Bar = types.model({ bar: 1 })
+    const U = types.union(Foo, Bar)
+
+    const u = U.create({ foo: 1 })
+    applySnapshot(u, getSnapshot(Bar.create()))
 })

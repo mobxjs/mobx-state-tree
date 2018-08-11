@@ -157,6 +157,10 @@ export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
     abstract shouldAttachNode: boolean
 
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
+        return snapshot
+    }
+
     isAssignableFrom(type: IAnyType): boolean {
         return type === (this as any)
     }

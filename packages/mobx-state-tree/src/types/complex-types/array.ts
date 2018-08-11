@@ -40,6 +40,7 @@ import {
     IAnyType,
     EMPTY_ARRAY
 } from "../../internal"
+import { ModelType } from "./model"
 
 export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
 export interface IArrayType<C, S, T>
@@ -149,6 +150,14 @@ export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTAr
 
     getSnapshot(node: ObjectNode): any {
         return node.getChildren().map(childNode => childNode.snapshot)
+    }
+
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
+        const processed = [] as any[]
+        Object.keys(childNodes).forEach(key => {
+            processed.push(childNodes[key].getSnapshot())
+        })
+        return processed
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
