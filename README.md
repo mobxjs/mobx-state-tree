@@ -1361,13 +1361,11 @@ const Store = types.model({
     tasks: types.array(Task)
 }).actions(self => ({
     addTask(
-        // equivalent to typeof Task.Type | typeof Task.CreationType
         task: SnapshotOrInstance<typeof Task>
     ) {
         self.tasks.push(cast(task))
     },
     replaceTasks(
-        // equivalent to typeof typeof (types.array(Task)).Type | typeof (types.array(Task)).CreationType
         tasks: SnapshotOrInstance<typeof self.tasks>
     ) {
         self.tasks = cast(tasks)

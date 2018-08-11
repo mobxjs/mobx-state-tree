@@ -6,7 +6,9 @@ import {
     getRoot,
     getParent,
     SnapshotOrInstance,
-    cast
+    cast,
+    InSnapshot,
+    Instance
 } from "../src"
 const createTestFactories = () => {
     const Box = types.model({
@@ -689,6 +691,7 @@ test("cast and SnapshotOrInstance", () => {
     }))
 
     const c = C.create({ a: { n2: 5 } })
+    unprotect(c)
     // all below works
     c.setA({ n2: 5 })
     c.setA(A.create({ n2: 5 }))
