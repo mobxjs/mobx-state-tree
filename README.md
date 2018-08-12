@@ -1202,11 +1202,11 @@ const Todo = types.model({
         }
     }))
 
-type ITodo = Instance<typeof Todo> // => ITodo is now a valid TypeScript type with { title: string; setTitle: (v: string) => void }
+type ITodo = Instance<typeof Todo> // => { title: string; setTitle: (v: string) => void }
 
-type ITodoInSnapshot = InSnapshot<typeof Todo> // => ITodoSnapshot is now a valid TypeScript type with { title?: string }
+type ITodoInSnapshot = InSnapshot<typeof Todo> // => { title?: string }
 
-type ITodoOutSnapshot = OutSnapshot<typeof Todo> // => ITodoSnapshot is now a valid TypeScript type with { title: string }
+type ITodoOutSnapshot = OutSnapshot<typeof Todo> // => { title: string }
 ```
 
 Due to the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes a lot of CPU time and freeze vscode (or others)
