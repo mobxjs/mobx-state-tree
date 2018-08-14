@@ -10,7 +10,8 @@ import {
     getSnapshot,
     types,
     IJsonPatch,
-    setLivelynessChecking
+    setLivelynessChecking,
+    cast
 } from "../../src"
 import { observable } from "mobx"
 
@@ -146,13 +147,13 @@ test("paths shoud remain correct when splicing", () => {
         })
     unprotect(store)
     expect(store.todos.map(getPath)).toEqual(["/todos/0"])
-    store.todos.push({} as typeof Task.Type)
+    store.todos.push(cast({}))
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])
-    store.todos.unshift({} as typeof Task.Type)
+    store.todos.unshift(cast({}))
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1", "/todos/2"])
     store.todos.splice(0, 2)
     expect(store.todos.map(getPath)).toEqual(["/todos/0"])
-    store.todos.splice(0, 1, {} as typeof Task.Type, {} as typeof Task.Type, {} as typeof Task.Type)
+    store.todos.splice(0, 1, cast({}), cast({}), cast({}))
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1", "/todos/2"])
     store.todos.remove(store.todos[1])
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])

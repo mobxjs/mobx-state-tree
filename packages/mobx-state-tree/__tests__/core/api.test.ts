@@ -49,7 +49,8 @@ const METHODS = [
     "unescapeJsonPath",
     "unprotect",
     "walk",
-    "getMembers"
+    "getMembers",
+    "cast"
 ]
 const TYPES = [
     "Date",

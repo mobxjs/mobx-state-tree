@@ -1,4 +1,4 @@
-import { getSnapshot, types, unprotect, applySnapshot } from "../../src"
+import { getSnapshot, types, unprotect, applySnapshot, cast } from "../../src"
 
 test("it should provide a default value, if no snapshot is provided", () => {
     const Row = types.model({
@@ -75,7 +75,7 @@ test("Values should reset to default if omitted in snapshot", () => {
     unprotect(store)
     store.todo.done = true
     expect(store.todo.done).toBe(true)
-    store.todo = { title: "stuff", id: "2" } as any
+    store.todo = cast({ title: "stuff", id: "2" })
     expect(store.todo.title).toBe("stuff")
     expect(store.todo.done).toBe(false)
 })

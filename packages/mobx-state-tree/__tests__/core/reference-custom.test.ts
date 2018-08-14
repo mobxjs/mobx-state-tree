@@ -8,7 +8,8 @@ import {
     unprotect,
     getRoot,
     onSnapshot,
-    flow
+    flow,
+    cast
 } from "../../src"
 
 test("it should support custom references - basics", () => {
@@ -134,7 +135,7 @@ test("it should support dynamic loading", done => {
         .actions(self => ({
             loadUser: flow(function* loadUser(name: string) {
                 events.push("loading " + name)
-                self.users.push({ name } as typeof User.Type)
+                self.users.push(cast({ name }))
                 yield new Promise(resolve => {
                     setTimeout(resolve, 200)
                 })

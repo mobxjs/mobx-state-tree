@@ -1,4 +1,12 @@
-import { types, recordPatches, onSnapshot, unprotect, applySnapshot, applyPatch } from "../../src"
+import {
+    types,
+    recordPatches,
+    onSnapshot,
+    unprotect,
+    applySnapshot,
+    applyPatch,
+    cast
+} from "../../src"
 
 class Decimal {
     public number: number
@@ -74,7 +82,7 @@ class Decimal {
         const b1 = w1.balance
         expect(b1).toBeInstanceOf(Decimal)
 
-        w1.balance = "2.5" as any
+        w1.balance = cast("2.5")
         expect(b1).toBeInstanceOf(Decimal)
         expect(w1.balance).toBe(b1) // reconciled
 
@@ -84,7 +92,7 @@ class Decimal {
         w1.balance = new Decimal("3.5")
         expect(b1).toBeInstanceOf(Decimal)
 
-        w1.balance = "4.5" as any
+        w1.balance = cast("4.5")
         expect(b1).toBeInstanceOf(Decimal)
 
         w1.lastTransaction = b1
@@ -154,7 +162,7 @@ class Decimal {
         const b1 = w1.balance
         expect(b1).toBeInstanceOf(Decimal)
 
-        w1.balance = [2, 5] as any
+        w1.balance = cast([2, 5])
         expect(b1).toBeInstanceOf(Decimal)
         expect(w1.balance).not.toBe(b1) // not reconciled, balance is not deep equaled (TODO: future feature?)
 
@@ -164,7 +172,7 @@ class Decimal {
         w1.balance = new Decimal("3.5")
         expect(b1).toBeInstanceOf(Decimal)
 
-        w1.balance = [4, 5] as any
+        w1.balance = cast([4, 5])
         expect(b1).toBeInstanceOf(Decimal)
 
         // patches & snapshots

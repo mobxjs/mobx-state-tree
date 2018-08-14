@@ -6,8 +6,10 @@ import {
     applyPatch,
     applySnapshot,
     addMiddleware,
-    getRoot
+    getRoot,
+    cast
 } from "../../src"
+
 /// Simple action replay and invocation
 const Task = types
     .model({
@@ -376,7 +378,7 @@ test("after attach action should work correctly", () => {
         })
         .actions(self => ({
             remove() {
-                getRoot<typeof S>(self).remove(self as typeof Todo.Type)
+                getRoot<typeof S>(self).remove(cast(self))
             }
         }))
     const S = types

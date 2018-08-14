@@ -13,6 +13,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 -   [applySnapshot](#applysnapshot)
 -   [BaseReferenceType](#basereferencetype)
 -   [BaseReferenceType](#basereferencetype-1)
+-   [cast](#cast)
 -   [clone](#clone)
 -   [ComplexType](#complextype)
 -   [ComplexType](#complextype-1)
@@ -180,6 +181,41 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 ## BaseReferenceType
 
 ## BaseReferenceType
+
+## cast
+
+Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
+Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,
+but just fool typescript into thinking so.
+Casting only works on assignation operations, it won't work (compile) stand-alone.
+Technically it is not required for instances, but it is provided for consistency reasons.
+
+**Parameters**
+
+-   `snapshotOrInstance` **CastedType&lt;T>** 
+
+**Examples**
+
+```javascript
+const ModelA = types.model({
+  n: types.number
+}).actions(self => ({
+  setN(aNumber: number) {
+    self.n = aNumber
+  }
+}))
+
+const ModelB = types.model({
+  innerModel: ModelA
+}).actions(self => ({
+  someAction() {
+    // this will allow the compiler to assign an snapshot to the property
+    self.innerModel = cast({ a: 5 })
+  }
+}))
+```
+
+Returns **T** 
 
 ## clone
 

@@ -1,4 +1,4 @@
-import { protect, unprotect, applySnapshot, types, isProtected, getParent } from "../../src"
+import { protect, unprotect, applySnapshot, types, isProtected, getParent, cast } from "../../src"
 
 const Todo = types
     .model("Todo", {
@@ -46,7 +46,7 @@ test("protect should protect against any update", () => {
         "[mobx-state-tree] Cannot modify 'Todo@<root>', the object is protected and can only be modified by using an action."
     )
     expect(() => {
-        store.todos.push({ title: "test" } as typeof Todo.Type)
+        store.todos.push(cast({ title: "test" }))
     }).toThrowError(
         "[mobx-state-tree] Cannot modify 'Todo[]@/todos', the object is protected and can only be modified by using an action."
     )
