@@ -98,6 +98,42 @@ export type ExtractIStateTreeNode<IT extends IAnyType, C, S, T> =
         ? TAndInterface<ExtractT<RT>, IStateTreeNode<ExtractC<RT>, ExtractS<RT>>>
         : T extends ModelPrimitive ? T : TAndInterface<T, IStateTreeNode<C, S>>
 
+export type Instance<T> = T extends IStateTreeNode
+    ? T
+    : T extends IType<any, any, infer TT> ? TT : T
+export type SnapshotIn<T> = T extends IStateTreeNode<infer STNC, any>
+    ? STNC
+    : T extends IType<infer TC, any, any> ? TC : T
+export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
+    ? STNS
+    : T extends IType<any, infer TS, any> ? TS : T
+
+/**
+ * A type which is equivalent to the union of SnapshotIn and Instance types of a given typeof TYPE or typeof VARIABLE.
+ * For primitives it defaults to the primitive itself.
+ *
+ * For example:
+ * - SnapshotOrInstance<typeof ModelA> = SnapshotIn<typeof ModelA> | Instance<typeof ModelA>
+ * - SnapshotOrInstance<typeof self.a (where self.a is a ModelA)> = SnapshotIn<typeof ModelA> | Instance<typeof ModelA>
+ *
+ * Usually you might want to use this when your model has a setter action that sets a property.
+ *
+ * @example
+ * const ModelA = types.model({
+ *   n: types.number
+ * })
+ *
+ * const ModelB = types.model({
+ *   innerModel: ModelA
+ * }).actions(self => ({
+ *   // this will accept as property both the snapshot and the instance, whichever is preferred
+ *   setInnerModel(m: SnapshotOrInstance<typeof self.innerModel>) {
+ *     self.innerModel = cast(m)
+ *   }
+ * }))
+ */
+export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
+
 /*
  * A complex type produces a MST node (Node in the state tree)
  */

@@ -11,7 +11,8 @@ import {
     getRoot,
     IType,
     IAnyType,
-    IComplexType
+    IComplexType,
+    cast
 } from "../src"
 test("it should support prefixed paths in maps", () => {
     const User = types.model({
@@ -117,7 +118,7 @@ test("it should resolve refs during creation, when using path", () => {
     })
     unprotect(s)
     reaction(() => s.entries.reduce((a, e) => a + e.price, 0), v => values.push(v))
-    s.entries.push({ book: s.books[0] } as any)
+    s.entries.push(cast({ book: s.books[0] }))
     expect(s.entries[0].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
     const entry = BookEntry.create({ book: s.books[0] }) // N.B. ref is initially not resolvable!
@@ -148,7 +149,7 @@ test("it should resolve refs over late types", () => {
         books: [{ id: "3", price: 2 }]
     })
     unprotect(s)
-    s.entries.push({ book: s.books[0] } as any)
+    s.entries.push(cast({ book: s.books[0] }))
     expect(s.entries[0].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
 })
@@ -176,7 +177,7 @@ test("it should resolve refs during creation, when using generic reference", () 
     })
     unprotect(s)
     reaction(() => s.entries.reduce((a, e) => a + e.price, 0), v => values.push(v))
-    s.entries.push({ book: s.books[0] } as any)
+    s.entries.push(cast({ book: s.books[0] }))
     expect(s.entries[0].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
     const entry = BookEntry.create({ book: s.books[0] }) // can refer to book, even when not part of tree yet
@@ -312,7 +313,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
         }
     })
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
-    store.arrows.push({ id: 1, name: "oops" } as any)
+    store.arrows.push(cast({ id: 1, name: "oops" }))
     expect(err.message).toBe(
         "[mobx-state-tree] Cannot resolve a reference to type '(Box | Arrow)' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
     )
