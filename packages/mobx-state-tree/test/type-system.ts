@@ -7,7 +7,7 @@ import {
     getParent,
     SnapshotOrInstance,
     cast,
-    InSnapshot,
+    SnapshotIn,
     Instance
 } from "../src"
 const createTestFactories = () => {
@@ -675,11 +675,9 @@ test("cast and SnapshotOrInstance", () => {
         setA2(na: SnapshotOrInstance<typeof A>) {
             self.a = cast(na)
         },
-        // works too
-        setA3(na: InSnapshot<typeof A>) {
+        setA3(na: SnapshotIn<typeof A>) {
             self.a = cast(na)
         },
-        // works too
         setA4(na: Instance<typeof self.a>) {
             self.a = cast(na)
         },

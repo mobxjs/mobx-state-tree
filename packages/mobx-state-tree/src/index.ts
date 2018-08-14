@@ -45,8 +45,8 @@ import {
     maybeNull,
     TypeFlags,
     Instance,
-    InSnapshot,
-    OutSnapshot,
+    SnapshotIn,
+    SnapshotOut,
     SnapshotOrInstance,
     cast
 } from "./internal"
@@ -126,8 +126,8 @@ export {
     CustomTypeOptions,
     UnionOptions,
     Instance,
-    InSnapshot,
-    OutSnapshot,
+    SnapshotIn,
+    SnapshotOut,
     SnapshotOrInstance
 } from "./internal"
 

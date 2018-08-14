@@ -789,7 +789,7 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     return reflected
 }
 
-export type CastedType<T> = T extends IStateTreeNode<infer STNC> ? STNC | T : T
+export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
 
 /**
  * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
