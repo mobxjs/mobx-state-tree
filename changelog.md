@@ -1,4 +1,4 @@
-# x.x.x
+# 3.2.0
 
 -   Made the internal CreationType/SnapshotType/Type official via the new [`SnapshotIn`, `SnapshotOut`, `Instance` and `SnapshotOrInstance<typeof X>`](README.md#typeScript-and-mst)
 -   A new [`cast` method](README.md#snapshots-can-be-used-to-write-values) that makes automatic casts from instances/input snapshots for assignments
