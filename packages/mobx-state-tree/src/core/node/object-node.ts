@@ -1,4 +1,5 @@
-import { action, computed, createAtom, reaction } from "mobx"
+// noinspection ES6UnusedImports
+import { action, computed, createAtom, reaction, IAtom } from "mobx"
 import {
     addHiddenFinalProp,
     addReadOnlyProp,
