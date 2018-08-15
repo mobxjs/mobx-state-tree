@@ -1,3 +1,7 @@
+# 3.2.1
+
+-   Fix for wrong generated TS import [#968](https://github.com/mobxjs/mobx-state-tree/issues/968) through [#969](https://github.com/mobxjs/mobx-state-tree/pull/969) by [@k-g-a](https://github.com/k-g-a)
+
 # 3.2.0
 
 -   Made the internal CreationType/SnapshotType/Type official via the new [`SnapshotIn`, `SnapshotOut`, `Instance` and `SnapshotOrInstance<typeof X>`](README.md#typeScript-and-mst)
