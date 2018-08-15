@@ -18,8 +18,7 @@ import {
     ObjectNode,
     IChildNodesMap,
     ModelPrimitive,
-    IReferenceType,
-    isArray
+    IReferenceType
 } from "../../internal"
 
 export enum TypeFlags {

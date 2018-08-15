@@ -40,7 +40,6 @@ import {
     typeCheckFailure,
     TypeFlags
 } from "../../internal"
-import { ModelType } from "./model"
 
 export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
 export interface IArrayType<C, S, T>
