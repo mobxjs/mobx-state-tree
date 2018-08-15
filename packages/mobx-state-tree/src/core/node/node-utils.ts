@@ -30,6 +30,7 @@ export interface INode {
     isAlive: boolean
     readonly value: any
     readonly snapshot: any
+    getSnapshot(): any
 
     setParent(newParent: ObjectNode | null, subpath?: string | null): void
     die(): void

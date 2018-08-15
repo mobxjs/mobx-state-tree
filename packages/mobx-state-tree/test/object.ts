@@ -652,6 +652,15 @@ test("782, TS + compose", () => {
     const user = User.create({ id: "someId" })
 })
 
+test("961 - model creating should not change snapshot", () => {
+    const M = types.model({ foo: 1 })
+    const o = {}
+
+    const m = M.create(o)
+    expect(o).toEqual({})
+    expect(getSnapshot(m)).toEqual({ foo: 1 })
+})
+
 if (process.env.NODE_ENV === "development")
     test("beautiful errors", () => {
         expect(() => {

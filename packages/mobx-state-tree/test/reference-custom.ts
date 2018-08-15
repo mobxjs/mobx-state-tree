@@ -8,7 +8,8 @@ import {
     unprotect,
     getRoot,
     onSnapshot,
-    flow
+    flow,
+    cast
 } from "../src"
 
 test("it should support custom references - basics", () => {
@@ -60,7 +61,7 @@ test("it should support custom references - adv", () => {
     const NameReference = types.reference(User, {
         get(identifier, parent) {
             if (identifier === null) return null
-            const users = values(getRoot(parent!).users)
+            const users = values(getRoot<any>(parent!).users)
             return users.filter((u: typeof User.Type) => u.name === identifier)[0] || null
         },
         set(value) {
@@ -134,7 +135,7 @@ test("it should support dynamic loading", done => {
         .actions(self => ({
             loadUser: flow(function* loadUser(name: string) {
                 events.push("loading " + name)
-                self.users.push({ name } as typeof User.Type)
+                self.users.push(cast({ name }))
                 yield new Promise(resolve => {
                     setTimeout(resolve, 200)
                 })

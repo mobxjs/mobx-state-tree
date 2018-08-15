@@ -3,8 +3,8 @@ import {
     _interceptReads,
     action,
     computed,
-    getAtom,
     intercept,
+    getAtom,
     IObjectWillChange,
     IObservableObject,
     isComputedProp,
@@ -537,6 +537,14 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return res
     }
 
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
+        const processed = {} as any
+        Object.keys(childNodes).forEach(key => {
+            processed[key] = childNodes[key].getSnapshot()
+        })
+        return this.applySnapshotPostProcessor(this.applyOptionalValuesToSnapshot(processed))
+    }
+
     applyPatchLocally(node: ObjectNode, subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add"))
             fail(`object does not support operation ${patch.op}`)
@@ -554,19 +562,22 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
 
     applySnapshotPreProcessor(snapshot: any) {
         const processor = this.preProcessor
-        const processed = processor ? processor.call(null, snapshot) : snapshot
+        return processor ? processor.call(null, snapshot) : snapshot
+    }
 
-        if (processed) {
+    applyOptionalValuesToSnapshot(snapshot: any) {
+        if (snapshot) {
+            snapshot = Object.assign({}, snapshot)
             this.forAllProps((name, type) => {
-                if (!(name in processed)) {
+                if (!(name in snapshot)) {
                     const optional = tryGetOptional(type)
                     if (optional) {
-                        processed[name] = optional.getDefaultValueSnapshot()
+                        snapshot[name] = optional.getDefaultValueSnapshot()
                     }
                 }
             })
         }
-        return processed
+        return snapshot
     }
 
     applySnapshotPostProcessor(snapshot: any) {

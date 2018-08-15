@@ -1,5 +1,11 @@
 import { isComputedProp, isObservableProp } from "mobx"
-import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC } from "../internal"
+import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC, IType } from "../internal"
+
+export type TypeOrStateTreeNodeToStateTreeNode<
+    T extends IAnyType | IAnyStateTreeNode
+> = T extends IAnyStateTreeNode
+    ? T
+    : T extends IType<infer TC, infer TS, infer TT> ? ExtractIStateTreeNode<T, TC, TS, TT> : never
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -313,10 +319,10 @@ export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent<IT extends IAnyType>(
+export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
     target: IAnyStateTreeNode,
     depth = 1
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): TypeOrStateTreeNodeToStateTreeNode<IT> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -397,9 +403,9 @@ export function getParentOfType<IT extends IAnyType>(
  * @param {Object} target
  * @returns {*}
  */
-export function getRoot<IT extends IAnyType>(
+export function getRoot<IT extends IAnyType | IAnyStateTreeNode>(
     target: IAnyStateTreeNode
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): TypeOrStateTreeNodeToStateTreeNode<IT> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -783,6 +789,41 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     return reflected
 }
 
+export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
+
+/**
+ * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
+ * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,
+ * but just fool typescript into thinking so.
+ * Casting only works on assignation operations, it won't work (compile) stand-alone.
+ * Technically it is not required for instances, but it is provided for consistency reasons.
+ *
+ * @example
+ * const ModelA = types.model({
+ *   n: types.number
+ * }).actions(self => ({
+ *   setN(aNumber: number) {
+ *     self.n = aNumber
+ *   }
+ * }))
+ *
+ * const ModelB = types.model({
+ *   innerModel: ModelA
+ * }).actions(self => ({
+ *   someAction() {
+ *     // this will allow the compiler to assign an snapshot to the property
+ *     self.innerModel = cast({ a: 5 })
+ *   }
+ * }))
+ *
+ * @export
+ * @param {CastedType<T>} snapshotOrInstance
+ * @returns {T}
+ */
+export function cast<T = never>(snapshotOrInstance: CastedType<T>): T {
+    return snapshotOrInstance as T
+}
+
 import {
     INode,
     getStateTreeNode,
@@ -804,3 +845,4 @@ import {
     ExtractIStateTreeNode,
     IMSTArray
 } from "../internal"
+import { ModelPrimitive } from "../types/complex-types/model"

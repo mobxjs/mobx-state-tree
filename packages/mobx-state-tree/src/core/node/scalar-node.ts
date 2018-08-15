@@ -15,6 +15,7 @@ export class ScalarNode implements INode {
     readonly subpath: string = ""
 
     private state = NodeLifeCycle.INITIALIZING
+    private readonly _initialSnapshot: any
     _environment: any = undefined
 
     constructor(
@@ -24,6 +25,8 @@ export class ScalarNode implements INode {
         environment: any,
         initialSnapshot: any
     ) {
+        this._initialSnapshot = initialSnapshot
+
         this.type = type
         this.parent = parent
         this.subpath = subpath
@@ -60,6 +63,7 @@ export class ScalarNode implements INode {
     }
 
     setParent(newParent: INode | null, subpath: string | null = null) {
+        if (this.parent === newParent && this.subpath === subpath) return
         fail("setParent is not supposed to be called on scalar nodes")
     }
 
@@ -67,10 +71,14 @@ export class ScalarNode implements INode {
         return this.type.getValue(this)
     }
 
-    public get snapshot() {
-        const snapshot = this.type.getSnapshot(this)
+    public get snapshot(): any {
+        const snapshot = this.getSnapshot()
         // avoid any external modification in dev mode
         return freeze(snapshot)
+    }
+
+    public getSnapshot(): any {
+        return this.type.getSnapshot(this)
     }
 
     public get isAlive() {

@@ -106,7 +106,7 @@ export function isPrimitive(value: any): boolean {
  */
 export function freeze<T>(value: T): T {
     if (process.env.NODE_ENV === "production") return value
-    return isPrimitive(value) ? value : Object.freeze(value)
+    return isPrimitive(value) || isObservableArray(value) ? value : Object.freeze(value)
 }
 
 /*

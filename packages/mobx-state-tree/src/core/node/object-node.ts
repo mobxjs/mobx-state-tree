@@ -2,6 +2,7 @@ import { action, computed, createAtom, reaction } from "mobx"
 import {
     addHiddenFinalProp,
     addReadOnlyProp,
+    ComplexType,
     convertChildNodesToArray,
     createActionInvoker,
     EMPTY_OBJECT,
@@ -20,7 +21,6 @@ import {
     invalidateComputed,
     IReversibleJsonPatch,
     isStateTreeNode,
-    ModelType,
     NodeLifeCycle,
     registerEventHandler,
     resolveNodeByPathParts,
@@ -98,6 +98,7 @@ export class ObjectNode implements INode {
     private _observableInstanceCreated: boolean = false
     private _childNodes: IChildNodesMap
     private _initialSnapshot: any
+    private _cachedInitialSnapshot: any = null
 
     constructor(
         type: IAnyType,
@@ -107,13 +108,13 @@ export class ObjectNode implements INode {
         initialSnapshot: any
     ) {
         this._environment = environment
-        this._initialSnapshot = initialSnapshot
+        this._initialSnapshot = freeze(initialSnapshot)
 
         this.type = type
         this.parent = parent
         this.subpath = subpath
         this.escapedSubpath = escapeJsonPath(this.subpath)
-        this.identifierAttribute = type instanceof ModelType ? type.identifierAttribute : undefined
+        this.identifierAttribute = (type as any).identifierAttribute
         // identifier can not be changed during lifecycle of a node
         // so we safely can read it from initial snapshot
         this.identifier =
@@ -165,7 +166,6 @@ export class ObjectNode implements INode {
         this.finalizeCreation()
 
         this._childNodes = EMPTY_OBJECT
-        this._initialSnapshot = null
     }
 
     /*
@@ -247,21 +247,32 @@ export class ObjectNode implements INode {
     @computed
     public get snapshot(): any {
         if (!this.isAlive) return undefined
-        const snapshot = this._observableInstanceCreated
-            ? this._getActualSnapshot()
-            : this._getInitialSnapshot()
-        return freeze(snapshot)
+        return freeze(this.getSnapshot())
     }
 
-    private _getActualSnapshot() {
+    // NOTE: we use this method to get snapshot without creating @computed overhead
+    public getSnapshot(): any {
+        if (!this.isAlive) return undefined
+        return this._observableInstanceCreated
+            ? this._getActualSnapshot()
+            : this._getInitialSnapshot()
+    }
+
+    private _getActualSnapshot(): any {
         return this.type.getSnapshot(this)
     }
 
-    private _getInitialSnapshot() {
+    private _getInitialSnapshot(): any {
+        if (!this.isAlive) return undefined
+        if (!this._initialSnapshot) return this._initialSnapshot
+        if (this._cachedInitialSnapshot) return this._cachedInitialSnapshot
+
+        const type = this.type as ComplexType<any, any, any>
+        const childNodes = this._childNodes!
         const snapshot = this._initialSnapshot
-        return this.type instanceof ModelType
-            ? this.type.applySnapshotPostProcessor(snapshot)
-            : snapshot
+
+        this._cachedInitialSnapshot = type.processInitialSnapshot(childNodes, snapshot)
+        return this._cachedInitialSnapshot
     }
 
     isRunningAction(): boolean {

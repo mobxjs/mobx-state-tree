@@ -311,6 +311,14 @@ export class MapType<C, S, T> extends ComplexType<
         return res
     }
 
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
+        const processed = {} as any
+        Object.keys(childNodes).forEach(key => {
+            processed[key] = childNodes[key].getSnapshot()
+        })
+        return processed
+    }
+
     didChange(change: IMapDidChange<any, any>): void {
         const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         switch (change.type) {

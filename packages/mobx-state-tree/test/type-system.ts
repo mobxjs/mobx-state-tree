@@ -1,4 +1,15 @@
-import { types, getSnapshot, unprotect, IType } from "../src"
+import {
+    types,
+    getSnapshot,
+    unprotect,
+    IType,
+    getRoot,
+    getParent,
+    SnapshotOrInstance,
+    cast,
+    SnapshotIn,
+    Instance
+} from "../src"
 const createTestFactories = () => {
     const Box = types.model({
         width: 0,
@@ -107,8 +118,8 @@ test("#66 - it should accept superfluous fields", () => {
     expect(Item.is({ id: 3 })).toBe(false)
     expect(Item.is({ id: 3, name: "" })).toBe(true)
     expect(Item.is({ id: 3, name: "", description: "" })).toBe(true)
-    const a = Item.create({ id: 3, name: "", description: "bla" } as any) as any
-    expect(a.description).toBe(undefined)
+    const a = Item.create({ id: 3, name: "", description: "bla" } as any)
+    expect((a as any).description).toBe(undefined)
 })
 test("#66 - it should not require defaulted fields", () => {
     const Item = types.model({
@@ -183,7 +194,7 @@ test("it is possible to refer to a type", () => {
             }
         })
     function x(): typeof Todo.Type {
-        return Todo.create({ title: "test" }) // as any to make sure the type is not inferred accidentally
+        return Todo.create({ title: "test" })
     }
     const z = x()
     unprotect(z)
@@ -553,4 +564,179 @@ test("#923", () => {
     })
 
     types.optional(types.map(Bar), {}) // Should have no compile error!
+})
+
+test("#951", () => {
+    const C = types.model({ a: 123 })
+
+    // model as root
+    const ModelWithC = types.model({ c: C })
+    const modelInstance = ModelWithC.create({ c: C.create() })
+
+    // getRoot
+    const modelRoot1 = getRoot<typeof ModelWithC>(modelInstance.c)
+    const modelCR1: Instance<typeof C> = modelRoot1.c
+    const modelRoot2 = getRoot<Instance<typeof ModelWithC>>(modelInstance.c)
+    const modelCR2: Instance<typeof C> = modelRoot2.c
+
+    // getParent
+    const modelParent1 = getParent<typeof ModelWithC>(modelInstance.c)
+    const modelCP1: Instance<typeof ModelWithC> = modelParent1
+    const modelParent2 = getParent<Instance<typeof ModelWithC>>(modelInstance.c)
+    const modelCP2: Instance<typeof ModelWithC> = modelParent2
+
+    // array as root
+    const ArrayOfC = types.array(C)
+    const arrayInstance = ArrayOfC.create([C.create()])
+
+    // getRoot
+    const arrayRoot1 = getRoot<typeof ArrayOfC>(arrayInstance[0])
+    const arrayCR1: Instance<typeof C> = arrayRoot1[0]
+
+    // getParent
+    const arrayParent1 = getParent<typeof ArrayOfC>(arrayInstance[0])
+    const arrayCP1: Instance<typeof ArrayOfC> = arrayParent1
+
+    // map as root
+    const MapOfC = types.map(C)
+    const mapInstance = MapOfC.create({ a: C.create() })
+
+    // getRoot
+    const mapRoot1 = getRoot<typeof MapOfC>(mapInstance.get("a")!)
+    const mapC1: Instance<typeof C> = mapRoot1.get("a")!
+
+    // getParent
+    const mapParent1 = getRoot<typeof MapOfC>(mapInstance.get("a")!)
+    const mapCP1: Instance<typeof MapOfC> = mapParent1
+})
+
+test("cast and SnapshotOrInstance", () => {
+    const NumberArray = types.array(types.number)
+    const NumberMap = types.map(types.number)
+    const A = types
+        .model({ n: 123, n2: types.number, arr: NumberArray, map: NumberMap })
+        .actions(self => ({
+            // for primitives (although not needed)
+            setN(nn: SnapshotOrInstance<typeof self.n>) {
+                self.n = cast(nn)
+            },
+            setN2(nn: SnapshotOrInstance<typeof types.number>) {
+                self.n = cast(nn)
+            },
+            setN3(nn: SnapshotOrInstance<number>) {
+                self.n = cast(nn)
+            },
+            setN4(nn: number) {
+                self.n = cast(nn)
+            },
+            setN5() {
+                self.n = cast(5)
+            },
+
+            // for arrays
+            setArr(nn: SnapshotOrInstance<typeof self.arr>) {
+                self.arr = cast(nn)
+            },
+            setArr2(nn: SnapshotOrInstance<typeof NumberArray>) {
+                self.arr = cast(nn!) // TODO: non-undefined operator ! is not required once the PR for TS3 is merged
+            },
+            setArr3(nn: number[]) {
+                self.arr = cast(nn)
+            },
+            setArr4() {
+                // it works even without specifying the target type, magic!
+                self.arr = cast([2, 3, 4])
+                self.arr = cast(NumberArray.create([2, 3, 4]))
+            },
+
+            // for maps
+            setMap(nn: SnapshotOrInstance<typeof self.map>) {
+                self.map = cast(nn)
+            },
+            setMap2(nn: SnapshotOrInstance<typeof NumberMap>) {
+                self.map = cast(nn!) // TODO: non-undefined operator ! is not required once the PR for TS3 is merged
+            },
+            setMap3(nn: { [k: string]: number }) {
+                self.map = cast(nn)
+            },
+            setMap4() {
+                // it works even without specifying the target type, magic!
+                self.map = cast({ a: 2, b: 3 })
+                self.map = cast(NumberMap.create({ a: 2, b: 3 }))
+            }
+        }))
+
+    const C = types.model({ a: A }).actions(self => ({
+        // for submodels, using typeof self.var
+        setA(na: SnapshotOrInstance<typeof self.a>) {
+            self.a = cast(na)
+        },
+        // for submodels, using the type directly
+        setA2(na: SnapshotOrInstance<typeof A>) {
+            self.a = cast(na)
+        },
+        setA3(na: SnapshotIn<typeof A>) {
+            self.a = cast(na)
+        },
+        setA4(na: Instance<typeof self.a>) {
+            self.a = cast(na)
+        },
+        setA5() {
+            // it works even without specifying the target type, magic!
+            self.a = cast({ n2: 5 })
+            self.a = cast(A.create({ n2: 5 }))
+        }
+    }))
+
+    const c = C.create({ a: { n2: 5 } })
+    unprotect(c)
+    // all below works
+    c.setA({ n2: 5 })
+    c.setA(A.create({ n2: 5 }))
+    c.setA2({ n2: 5 })
+    c.setA2(A.create({ n2: 5 }))
+    c.setA3({ n2: 5 })
+    // c.setA3(A.create({ n2: 5 })) // this one doesn't work (as expected, it wants the creation type)
+    // c.setA4({n2: 5}) // this one doesn't work (as expected, it wants the instance type)
+    c.setA4(A.create({ n2: 5 }))
+    c.setA5()
+
+    c.a.setN(1)
+    c.a.setN2(1)
+    c.a.setN3(1)
+    c.a.setN4(1)
+    c.a.setN5()
+
+    c.a.setArr([])
+    c.a.setArr(NumberArray.create([]))
+    c.a.setArr2([])
+    c.a.setArr2(NumberArray.create([]))
+    c.a.setArr3([])
+    c.a.setArr3(NumberArray.create([]))
+    c.a.setArr4()
+
+    c.a.setMap({ a: 2, b: 3 })
+    c.a.setMap(NumberMap.create({ a: 2, b: 3 }))
+    c.a.setMap2({ a: 2, b: 3 })
+    c.a.setMap2(NumberMap.create({ a: 2, b: 3 }))
+    c.a.setMap3({ a: 2, b: 3 })
+    // c.a.setMap3(NumberMap.create({ a: 2, b: 3 })) // doesn't work (as expected, wants a plain object)
+    c.a.setMap4()
+
+    const arr = types.array(A).create()
+    unprotect(arr)
+    arr[0] = cast({ n2: 5 })
+
+    const map = types.map(A).create()
+    unprotect(map)
+    map.set("a", cast({ n2: 5 })) // not really needed in this case, but whatever :)
+
+    // and the best part, it actually doesn't work outside assignments :DDDD
+    // all this fails to compile
+    // cast([])
+    // cast({a:5})
+    // cast(NumberArray.create([]))
+    // cast(A.create({n2: 5}))
+    // cast({a: 2, b: 5})
+    // cast(NumberMap({a: 2, b: 3}))
 })
