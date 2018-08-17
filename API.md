@@ -185,10 +185,10 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 ## cast
 
 Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
-Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,
-but just fool typescript into thinking so.
+Alternatively also casts a node snapshot or instance to an snapshot type so it can be assigned to a type snapshot.
+Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance
+(or vice-versa), but just fool typescript into thinking so.
 Casting only works on assignation operations, it won't work (compile) stand-alone.
-Technically it is not required for instances, but it is provided for consistency reasons.
 
 **Parameters**
 
