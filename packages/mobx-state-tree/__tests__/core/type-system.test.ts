@@ -567,6 +567,60 @@ test("#923", () => {
     types.optional(types.map(Bar), {}) // Should have no compile error!
 })
 
+test("#920", () => {
+    const X = types.model({
+        test: types.string
+    })
+
+    const T = types.model({
+        // test: X,
+        test: types.refinement(X, s => s.test.length > 5)
+    })
+
+    // T.create() // manual test: expects compilation error
+    // T.create({}) // manual test: expects compilation error
+
+    const T2 = types.model({
+        test: types.maybe(X)
+    })
+
+    T2.create() // ok
+    T2.create({}) // ok
+
+    const A = types.model({
+        test: "bla"
+    })
+
+    A.create() // ok
+    A.create({}) // ok
+
+    const B = types.array(types.string)
+    B.create() // ok
+
+    const C = types.map(types.string)
+    C.create() // ok
+
+    const D = types.number
+    // D.create() // manual test: expects compilation error
+    D.create(5) // ok
+
+    const E = types.optional(types.number, 5)
+    E.create() // ok
+    E.create(6) // ok
+
+    const F = types.frozen<number>()
+    // F.create() // manual test: compilation error
+    F.create(6) // ok
+
+    const FF = types.frozen<number | undefined>()
+    FF.create() // ok
+    FF.create(undefined) // ok
+
+    const G = types.frozen(5)
+    G.create() // ok
+    G.create(6) // ok
+})
+
 test("snapshot type of reference must be string | number", () => {
     const M = types.model({ id: types.identifier, a: "bar" })
     const R = types.reference(M)

@@ -1,5 +1,9 @@
 # x.x.x
 
+-   **[BREAKING]** MobX-state-tree now requires at least TypeScript 3.0 when using MST with typescript. The type system has been revamped (once more), and should now be even more accurate.
+
+# x.x.x
+
 -   Better Typescript support for enumeration, compose and union
 -   Updated dependencies to latest versions
 
