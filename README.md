@@ -1191,7 +1191,7 @@ Yes, with MST it is pretty straight forward to setup hot reloading for your stor
 
 ### TypeScript and MST
 
-TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is required to use TypeScript 2.8 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
+TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is required to use TypeScript 3.0 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
 Actually, the more strict options that are enabled, the better the type system will behave.
 
 We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occassionally you will need to fallback to `any` or manually adding type annotations.
