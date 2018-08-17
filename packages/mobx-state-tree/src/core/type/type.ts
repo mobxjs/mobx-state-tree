@@ -42,34 +42,12 @@ export enum TypeFlags {
     Integer = 131072
 }
 
-// name of the properties of an object that can't be set to undefined
-export type DefinablePropsNames<T> = {
-    [K in keyof T]: Extract<T[K], undefined> extends never ? K : never
-}[keyof T]
-
-// checks if a type is any or unknown
-export type IsTypeAnyOrUnknown<T> = unknown extends T ? true : false
-
-// checks if a type supports an empty create() function
-// basically !any, !unknown, X | undefined, objects with all properties being optional
-export type IsEmptyCreationType<O> = IsTypeAnyOrUnknown<O> extends true
-    ? false
-    : Extract<O, undefined> extends never
-        ? (DefinablePropsNames<O> extends never | undefined ? true : false)
-        : true
-
-// chooses a create function based on the creation type
-// prettier-ignore
-export type CreateParams<C> = IsEmptyCreationType<C> extends false
-    ? [C, any?]
-    : [C?, any?]
-
 export interface IType<C, S, T> {
     name: string
     flags: TypeFlags
     is(thing: any): thing is C | S | T
     validate(thing: any, context: IContext): IValidationResult
-    create(...args: CreateParams<C>): T
+    create(snapshot?: C, environment?: any): T
     isType: boolean
     describe(): string
     Type: T
@@ -104,7 +82,10 @@ export type Primitives = ModelPrimitive | null | undefined
 export type TAndInterface<T, I> = (Exclude<T, Primitives> & I) | Extract<T, Primitives>
 
 export interface IComplexType<C, S, T> extends IType<C, S, T> {
-    create(...args: CreateParams<C>): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>
+    create(
+        snapshot?: C,
+        environment?: any
+    ): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>
 }
 
 export type IAnyComplexType = IComplexType<any, any, any>
