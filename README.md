@@ -1401,6 +1401,16 @@ s.replaceTasks([{ done: true }])
 s.replaceTasks(types.array(Task).create([{ done: true }]))
 ```
 
+Additionally, the `cast` function can be also used in the inverse case, this is, when you want to use an instance inside an snapshot.
+In this case MST will internally convert the instance to an snapshot before using it, but we need once more to fool Typescript into
+thinking that this instance is actually an snapshot.
+
+```typescript
+const task = Task.create({ done: true })
+// we cast the task instance to a snapshot so it can be used as part of another snapshot without typing errors
+const s = Store.create({ tasks: [ cast(task) ] })
+```
+
 #### Known Typescript Issue 5938
 
 Theres a known issue with typescript and interfaces as described by: https://github.com/Microsoft/TypeScript/issues/5938

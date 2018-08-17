@@ -1,6 +1,6 @@
 {
     "name": "mst-middlewares",
-    "version": "3.1.1",
+    "version": "3.2.1",
     "description": "The MST package ships with some prebuilt middlewares, which serves mainly as examples on how to write your own middleware. The source of each middleware can be found in this github directory, you are encouraged to read them!",
     "main": "dist/mst-middlewares.js",
     "umd:main": "dist/mst-middlewares.umd.js",
@@ -15,11 +15,11 @@
     "license": "MIT",
     "devDependencies": {
         "ava": "^0.25.0",
-        "cpr": "^3.0.0",
+        "cpr": "^3.0.1",
         "cross-env": "^5.1.1",
         "lint-staged": "^7.0.0",
         "mobx": "^5.0.2",
-        "mobx-state-tree": "^3.1.1",
+        "mobx-state-tree": "^3.2.1",
         "rollup": "^0.64.0",
         "rollup-plugin-commonjs": "^9.0.0",
         "rollup-plugin-node-resolve": "^3.0.0",

@@ -17,7 +17,8 @@ import {
     getType,
     ObjectNode,
     IChildNodesMap,
-    ModelPrimitive
+    ModelPrimitive,
+    IReferenceType
 } from "../../internal"
 
 export enum TypeFlags {
@@ -77,7 +78,9 @@ export interface IType<C, S, T> {
 
     // Internal api's
     instantiate(parent: INode | null, subpath: string, environment: any, initialValue?: any): INode
-    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null
+    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap
+    createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any
+    finalizeNewInstance(node: INode, instance: any): void
     reconcile(current: INode, newValue: any): INode
     getValue(node: INode): T
     getSnapshot(node: INode, applyPostProcess?: boolean): S
@@ -167,9 +170,15 @@ export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
         return this.instantiate(null, "", environment, snapshot).value
     }
 
-    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap | null {
-        return null
+    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap {
+        return {}
     }
+
+    createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
+        return snapshot
+    }
+
+    finalizeNewInstance(node: INode, instance: any) {}
 
     abstract instantiate(
         parent: INode | null,

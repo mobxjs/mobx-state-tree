@@ -1,4 +1,8 @@
-# x.x.x
+# 3.2.1
+
+-   Fix for wrong generated TS import [#968](https://github.com/mobxjs/mobx-state-tree/issues/968) through [#969](https://github.com/mobxjs/mobx-state-tree/pull/969) by [@k-g-a](https://github.com/k-g-a)
+
+# 3.2.0
 
 -   **[BREAKING]** MobX-state-tree now requires at least TypeScript 3.0 when using MST with typescript. The type system has been revamped (once more), and should now be even more accurate.
 

@@ -1,46 +1,45 @@
 import {
-    observable,
-    IObservableArray,
-    IArrayWillChange,
-    IArrayWillSplice,
+    _getAdministration,
+    action,
     IArrayChange,
     IArraySplice,
-    action,
+    IArrayWillChange,
+    IArrayWillSplice,
     intercept,
-    observe,
-    _getAdministration
+    IObservableArray,
+    observable,
+    observe
 } from "mobx"
 import {
+    ComplexType,
+    convertChildNodesToArray,
     createNode,
-    getStateTreeNode,
-    IJsonPatch,
-    INode,
-    isStateTreeNode,
-    IStateTreeNode,
-    isNode,
-    typecheck,
+    EMPTY_ARRAY,
+    fail,
     flattenTypeErrors,
     getContextForPath,
-    IContext,
-    IValidationResult,
-    typeCheckFailure,
-    ComplexType,
-    IComplexType,
-    IType,
-    isType,
-    fail,
-    isMutable,
-    isArray,
-    isPlainObject,
-    TypeFlags,
-    ObjectNode,
-    mobxShallow,
-    IChildNodesMap,
-    convertChildNodesToArray,
+    getStateTreeNode,
     IAnyType,
-    EMPTY_ARRAY
+    IChildNodesMap,
+    IComplexType,
+    IContext,
+    IJsonPatch,
+    INode,
+    isArray,
+    isMutable,
+    isNode,
+    isPlainObject,
+    isStateTreeNode,
+    IStateTreeNode,
+    isType,
+    IType,
+    IValidationResult,
+    mobxShallow,
+    ObjectNode,
+    typecheck,
+    typeCheckFailure,
+    TypeFlags
 } from "../../internal"
-import { ModelType } from "./model"
 
 export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
 export interface IArrayType<C, S, T>
@@ -58,33 +57,8 @@ export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTAr
         this.subType = subType
     }
 
-    describe() {
-        return this.subType.describe() + "[]"
-    }
-
-    createNewInstance(childNodes: IChildNodesMap) {
-        return observable.array(convertChildNodesToArray(childNodes), mobxShallow)
-    }
-
-    finalizeNewInstance(node: INode) {
-        const objectNode = node as ObjectNode
-        const type = objectNode.type as ArrayType<any, any, any>
-        const instance = objectNode.storedValue as IObservableArray<any>
-        _getAdministration(instance).dehancer = objectNode.unbox
-        intercept(instance, type.willChange as any)
-        observe(instance, type.didChange)
-    }
-
     instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: S): INode {
-        return createNode(
-            this,
-            parent,
-            subpath,
-            environment,
-            snapshot,
-            this.createNewInstance,
-            this.finalizeNewInstance
-        )
+        return createNode(this, parent, subpath, environment, snapshot)
     }
 
     initializeChildNodes(objNode: ObjectNode, snapshot: S[] = []): IChildNodesMap {
@@ -96,6 +70,23 @@ export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTAr
             result[subpath] = subType.instantiate(objNode, subpath, environment, item)
         })
         return result
+    }
+
+    createNewInstance(
+        node: ObjectNode,
+        childNodes: IChildNodesMap,
+        snapshot: any
+    ): IObservableArray<any> {
+        return observable.array(convertChildNodesToArray(childNodes), mobxShallow)
+    }
+    finalizeNewInstance(node: ObjectNode, instance: IObservableArray<any>): void {
+        _getAdministration(instance).dehancer = node.unbox
+        intercept(instance, this.willChange as any)
+        observe(instance, this.didChange)
+    }
+
+    describe() {
+        return this.subType.describe() + "[]"
     }
 
     getChildren(node: ObjectNode): INode[] {

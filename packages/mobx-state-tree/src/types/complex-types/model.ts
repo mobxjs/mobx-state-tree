@@ -3,10 +3,10 @@ import {
     _interceptReads,
     action,
     computed,
-    extendObservable,
-    getAtom,
     intercept,
+    getAtom,
     IObjectWillChange,
+    IObservableObject,
     isComputedProp,
     observable,
     observe,
@@ -29,7 +29,6 @@ import {
     getContextForPath,
     getPrimitiveFactoryFromValue,
     getStateTreeNode,
-    IAnyStateTreeNode,
     IAnyType,
     IChildNodesMap,
     IComplexType,
@@ -449,15 +448,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         const initialValue = isStateTreeNode(snapshot)
             ? snapshot
             : this.applySnapshotPreProcessor(snapshot)
-        return createNode(
-            this,
-            parent,
-            subpath,
-            environment,
-            initialValue,
-            this.createNewInstance,
-            this.finalizeNewInstance
-        )
+        return createNode(this, parent, subpath, environment, initialValue)
         // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
         // that pre-reserves all these fields for fast object-member lookups
     }
@@ -476,25 +467,19 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return result
     }
 
-    createNewInstance() {
-        const instance = observable.object(EMPTY_OBJECT, EMPTY_OBJECT, mobxShallow)
-        addHiddenFinalProp(instance, "toString", objectTypeToString)
-        return instance as Object
+    createNewInstance(node: ObjectNode, childNodes: IChildNodesMap, snapshot: any): any {
+        return observable.object(childNodes, EMPTY_OBJECT, mobxShallow)
     }
+    finalizeNewInstance(node: ObjectNode, instance: IObservableObject): void {
+        addHiddenFinalProp(instance, "toString", objectTypeToString)
 
-    finalizeNewInstance(node: INode, childNodes: IChildNodesMap) {
-        const objNode = node as ObjectNode
-        const type = objNode.type as ModelType<any, any>
-        const instance = objNode.storedValue as IAnyStateTreeNode
-
-        extendObservable(instance, childNodes, EMPTY_OBJECT, mobxShallow)
-        type.forAllProps(name => {
-            _interceptReads(instance, name, objNode.unbox)
+        this.forAllProps(name => {
+            _interceptReads(instance, name, node.unbox)
         })
 
-        type.initializers.reduce((self, fn) => fn(self), instance)
-        intercept(instance, type.willChange)
-        observe(instance, type.didChange)
+        this.initializers.reduce((self, fn) => fn(self), instance)
+        intercept(instance, this.willChange)
+        observe(instance, this.didChange)
     }
 
     willChange(change: any): IObjectWillChange | null {
