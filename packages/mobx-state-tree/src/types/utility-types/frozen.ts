@@ -54,7 +54,7 @@ export function frozen<T>(
 ): IType<T | undefined | null, T, T> & { flags: TypeFlags.Optional }
 export function frozen<T = any>(): IType<T, T, T> // do not assume undefined by default, let the user specify it if needed
 /**
- * Frozen can be used to story any value that is serializable in itself (that is valid JSON).
+ * Frozen can be used to store any value that is serializable in itself (that is valid JSON).
  * Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
  * Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
  *
