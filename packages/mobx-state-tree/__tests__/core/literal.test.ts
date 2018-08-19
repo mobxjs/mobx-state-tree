@@ -4,7 +4,7 @@ if (process.env.NODE_ENV !== "production") {
     test("it should allow only primitives", () => {
         const error = expect(() => {
             types.model({
-                complexArg: types.literal({ a: 1 })
+                complexArg: types.literal({ a: 1 } as any)
             })
         }).toThrowError("[mobx-state-tree] Literal types can be built only on top of primitives")
     })
@@ -19,7 +19,7 @@ if (process.env.NODE_ENV !== "production") {
             shouldBeOne: types.literal(1)
         })
         expect(() => {
-            Factory.create({ shouldBeOne: 2 })
+            Factory.create({ shouldBeOne: 2 as any })
         }).toThrow(/is not assignable to type/)
     })
 }

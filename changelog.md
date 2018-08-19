@@ -4,7 +4,7 @@
 
 # x.x.x
 
--   Better Typescript support for enumeration, compose and union
+-   Better Typescript support for enumeration, compose, union, literal and references
 -   Updated dependencies to latest versions
 
 # 3.2.1

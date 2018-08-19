@@ -13,6 +13,7 @@ import {
     isType,
     ObjectNode
 } from "../../internal"
+import { Primitives } from "../../core/type/type"
 
 export class Literal<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
@@ -61,7 +62,7 @@ export class Literal<T> extends Type<T, T, T> {
  * @param {S} value The value to use in the strict equal check
  * @returns {ISimpleType<S>}
  */
-export function literal<S>(value: S): ISimpleType<S> {
+export function literal<S extends Primitives>(value: S): ISimpleType<S> {
     // check that the given value is a primitive
     if (process.env.NODE_ENV !== "production") {
         if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
