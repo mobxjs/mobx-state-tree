@@ -1234,14 +1234,9 @@ Due to the way typeof operator works, when working with big and deep models tree
 A partial solution for this is to turn the types into interfaces.
 
 ```ts
-type ITodoType = Instance<typeof Todo>
-interface ITodo extends ITodoType {}
-
-type ITodoSnapshotInType = SnapshotIn<typeof Todo>
-interface ITodoSnapshotIn extends ITodoSnapshotInType {}
-
-type ITodoSnapshotOutType = SnapshotOut<typeof Todo>
-interface ITodoSnapshotOut extends ITodoSnapshotOutType {}
+interface ITodo extends Instance<typeof Todo> {}
+interface ITodoSnapshotIn extends SnapshotIn<typeof Todo> {}
+interface ITodoSnapshotOut extends SnapshotOut<typeof Todo> {}
 ```
 
 #### Typing `self` in actions and views
