@@ -1,11 +1,16 @@
-# x.x.x
+# 4.x.x
 
--   **[BREAKING]** MobX-state-tree now requires at least TypeScript 3.0 when using MST with typescript. The type system has been revamped (once more), and should now be even more accurate.
+-   **[BREAKING]** MobX-state-tree now requires at least TypeScript 3.0 when using MST with typescript.
+-   The `create` method is now able to infer in TS if it can be called parameterless or not for a certan type.
 
-# x.x.x
+# 3.2.2
 
 -   Better Typescript support for enumeration, compose, union, literal and references
 -   Updated dependencies to latest versions
+-   Fixes for the reconciliation algorithm of arrays [#928](https://github.com/mobxjs/mobx-state-tree/issues/928) through [#960](https://github.com/mobxjs/mobx-state-tree/pull/960) by [@liuqiang1357](https://github.com/liuqiang1357)
+-   Better Typescript support for enumeration, compose, union, literal and references by [@xaviergonz](https://github.com/xaviergonz)
+-   Updated dependencies to latest versions by [@xaviergonz](https://github.com/xaviergonz)
+-   [Internal] Cleanup 'createNode' and related codepaths through [#962](https://github.com/mobxjs/mobx-state-tree/pull/962) by [@k-g-a](https://github.com/k-g-a)
 
 # 3.2.1
 
@@ -13,8 +18,8 @@
 
 # 3.2.0
 
--   Made the internal CreationType/SnapshotType/Type official via the new [`SnapshotIn`, `SnapshotOut`, `Instance` and `SnapshotOrInstance<typeof X>`](README.md#typeScript-and-mst)
--   A new [`cast` method](README.md#snapshots-can-be-used-to-write-values) that makes automatic casts from instances/input snapshots for assignments
+-   Made the internal CreationType/SnapshotType/Type official via the new [`SnapshotIn`, `SnapshotOut`, `Instance` and `SnapshotOrInstance<typeof X>`](README.md#typeScript-and-mst) by [@xaviergonz](https://github.com/xaviergonz)
+-   A new [`cast` method](README.md#snapshots-can-be-used-to-write-values) that makes automatic casts from instances/input snapshots for assignments by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.1.1
 
