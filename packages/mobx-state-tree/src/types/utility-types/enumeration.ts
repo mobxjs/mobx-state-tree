@@ -1,56 +1,6 @@
 import { ISimpleType, union, literal, fail } from "../../internal"
 
-export type UnionStringArray<T extends string[]> =
-    | T[0]
-    | T[1]
-    | T[2]
-    | T[3]
-    | T[4]
-    | T[5]
-    | T[6]
-    | T[7]
-    | T[8]
-    | T[9]
-    | T[10]
-    | T[11]
-    | T[12]
-    | T[13]
-    | T[14]
-    | T[15]
-    | T[16]
-    | T[17]
-    | T[18]
-    | T[19]
-    | T[20]
-    | T[21]
-    | T[22]
-    | T[23]
-    | T[24]
-    | T[25]
-    | T[26]
-    | T[27]
-    | T[28]
-    | T[29]
-    | T[30]
-    | T[31]
-    | T[32]
-    | T[33]
-    | T[34]
-    | T[35]
-    | T[36]
-    | T[37]
-    | T[38]
-    | T[39]
-    | T[40]
-    | T[41]
-    | T[42]
-    | T[43]
-    | T[44]
-    | T[45]
-    | T[46]
-    | T[47]
-    | T[48]
-    | T[49]
+export type ExtractStringFromStringArray<T extends string[]> = T extends Array<infer S> ? S : never
 
 // strongly typed enumeration forms for plain string arrays (if there is a nicer way to do this in TS, PR welcome!
 
@@ -162,12 +112,19 @@ export type UnionStringArray<T extends string[]> =
 /* prettier-ignore */ export function enumeration<E0 extends string, E1 extends string, E2 extends string, E3 extends string, E4 extends string, E5 extends string, E6 extends string, E7 extends string, E8 extends string, E9 extends string, E10 extends string, E11 extends string, E12 extends string, E13 extends string, E14 extends string, E15 extends string, E16 extends string, E17 extends string, E18 extends string, E19 extends string, E20 extends string, E21 extends string, E22 extends string, E23 extends string, E24 extends string, E25 extends string, E26 extends string, E27 extends string, E28 extends string, E29 extends string, E30 extends string, E31 extends string, E32 extends string, E33 extends string, E34 extends string, E35 extends string, E36 extends string, E37 extends string, E38 extends string, E39 extends string, E40 extends string, E41 extends string, E42 extends string, E43 extends string, E44 extends string, E45 extends string, E46 extends string, E47 extends string, E48 extends string, E49 extends string, E50 extends string>(name: string, options: [E0, E1, E2, E3, E4, E5, E6, E7, E8, E9, E10, E11, E12, E13, E14, E15, E16, E17, E18, E19, E20, E21, E22, E23, E24, E25, E26, E27, E28, E29, E30, E31, E32, E33, E34, E35, E36, E37, E38, E39, E40, E41, E42, E43, E44, E45, E46, E47, E48, E49, E50]): ISimpleType<E0 | E1 | E2 | E3 | E4 | E5 | E6 | E7 | E8 | E9 | E10 | E11 | E12 | E13 | E14 | E15 | E16 | E17 | E18 | E19 | E20 | E21 | E22 | E23 | E24 | E25 | E26 | E27 | E28 | E29 | E30 | E31 | E32 | E33 | E34 | E35 | E36 | E37 | E38 | E39 | E40 | E41 | E42 | E43 | E44 | E45 | E46 | E47 | E48 | E49 | E50>
 /* prettier-ignore */ export function enumeration<E0 extends string, E1 extends string, E2 extends string, E3 extends string, E4 extends string, E5 extends string, E6 extends string, E7 extends string, E8 extends string, E9 extends string, E10 extends string, E11 extends string, E12 extends string, E13 extends string, E14 extends string, E15 extends string, E16 extends string, E17 extends string, E18 extends string, E19 extends string, E20 extends string, E21 extends string, E22 extends string, E23 extends string, E24 extends string, E25 extends string, E26 extends string, E27 extends string, E28 extends string, E29 extends string, E30 extends string, E31 extends string, E32 extends string, E33 extends string, E34 extends string, E35 extends string, E36 extends string, E37 extends string, E38 extends string, E39 extends string, E40 extends string, E41 extends string, E42 extends string, E43 extends string, E44 extends string, E45 extends string, E46 extends string, E47 extends string, E48 extends string, E49 extends string, E50 extends string>(options: [E0, E1, E2, E3, E4, E5, E6, E7, E8, E9, E10, E11, E12, E13, E14, E15, E16, E17, E18, E19, E20, E21, E22, E23, E24, E25, E26, E27, E28, E29, E30, E31, E32, E33, E34, E35, E36, E37, E38, E39, E40, E41, E42, E43, E44, E45, E46, E47, E48, E49, E50]): ISimpleType<E0 | E1 | E2 | E3 | E4 | E5 | E6 | E7 | E8 | E9 | E10 | E11 | E12 | E13 | E14 | E15 | E16 | E17 | E18 | E19 | E20 | E21 | E22 | E23 | E24 | E25 | E26 | E27 | E28 | E29 | E30 | E31 | E32 | E33 | E34 | E35 | E36 | E37 | E38 | E39 | E40 | E41 | E42 | E43 | E44 | E45 | E46 | E47 | E48 | E49 | E50>
 
-// using UnionStringArray we get correct typing for native TS string enums
-export function enumeration<T extends string[]>(options: T): ISimpleType<UnionStringArray<T>>
+// with these overloads we get correct typing for native TS string enums when we use Object.values(Enum) as Enum[] as options
+export function enumeration<T extends string[]>(
+    options: T
+): ISimpleType<ExtractStringFromStringArray<T>>
 export function enumeration<T extends string[]>(
     name: string,
     options: T
-): ISimpleType<UnionStringArray<T>>
+): ISimpleType<ExtractStringFromStringArray<T>>
+
+// these overloads make types.enumeration<Enum>(Object.values(Enum)) possible
+export function enumeration<E extends string>(options: E[]): ISimpleType<E>
+export function enumeration<E extends string>(name: string, options: E[]): ISimpleType<E>
+
 /**
  * Can be used to create an string based enumeration.
  * (note: this methods is just sugar for a union of string literals)
