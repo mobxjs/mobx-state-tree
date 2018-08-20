@@ -635,7 +635,7 @@ References are looked up through the entire tree, but per type. So identifiers n
 
 The default implementation uses the `identifier` cache to resolve references (See [`resolveIdentifier`](API.md#resolveIdentifier)).
 However, it is also possible to override the resolve logic, and provide your own custom resolve logic.
-This also makes it possible to, for example, trigger a data fetch when trying to resolve the reference ([example](https://github.com/mobxjs/mobx-state-tree/blob/cdb3298a5621c3229b3856bb469327da6deb31ea/packages/mobx-state-tree/test/reference-custom.ts#L150)).
+This also makes it possible to, for example, trigger a data fetch when trying to resolve the reference ([example](https://github.com/mobxjs/mobx-state-tree/blob/cdb3298a5621c3229b3856bb469327da6deb31ea/packages/mobx-state-tree/__tests__/core/reference-custom.ts#L150)).
 
 Example:
 
@@ -906,7 +906,7 @@ These are the types available in MST. All types can be found in the `types` name
 -   `types.union(dispatcher?, types...)` create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 -   `types.optional(type, defaultValue)` marks an value as being optional (in e.g. a model). If a value is not provided the `defaultValue` will be used instead. If `defaultValue` is a function, it will be evaluated. This can be used to generate, for example, IDs or timestamps upon creation.
 -   `types.literal(value)` can be used to create a literal type, where the only possible value is specifically that value. This is very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
--   `types.enumeration(name?, options: string[])` creates an enumeration. This method is a shorthand for a union of string literals.
+-   `types.enumeration(name?, options: string[])` creates an enumeration. This method is a shorthand for a union of string literals. If you are using typescript and want to create a type based on an string enum (e.g. `enum Color { ... }`) then use `types.enumeration<Color>("Color", Object.values(Color))`, where the `"Color"` name argument is optional.
 -   `types.refinement(name?, baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 -   `types.maybe(type)` makes a type optional and nullable, shorthand for `types.optional(types.union(type, types.literal(undefined)), undefined)`.
 -   `types.maybeNull(type)` like `maybe`, but uses `null` to represent the absence of a value.
@@ -1192,6 +1192,7 @@ Yes, with MST it is pretty straight forward to setup hot reloading for your stor
 ### TypeScript and MST
 
 TypeScript support is best-effort, as not all patterns can be expressed in TypeScript. But except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy Typescript features it is required to use TypeScript 2.8 or higher, with `noImplicitThis` and `strictNullChecks` enabled.
+Actually, the more strict options that are enabled, the better the type system will behave.
 
 We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occassionally you will need to fallback to `any` or manually adding type annotations.
 
@@ -1233,14 +1234,9 @@ Due to the way typeof operator works, when working with big and deep models tree
 A partial solution for this is to turn the types into interfaces.
 
 ```ts
-type ITodoType = Instance<typeof Todo>
-interface ITodo extends ITodoType {}
-
-type ITodoSnapshotInType = SnapshotIn<typeof Todo>
-interface ITodoSnapshotIn extends ITodoSnapshotInType {}
-
-type ITodoSnapshotOutType = SnapshotOut<typeof Todo>
-interface ITodoSnapshotOut extends ITodoSnapshotOutType {}
+interface ITodo extends Instance<typeof Todo> {}
+interface ITodoSnapshotIn extends SnapshotIn<typeof Todo> {}
+interface ITodoSnapshotOut extends SnapshotOut<typeof Todo> {}
 ```
 
 #### Typing `self` in actions and views
@@ -1407,7 +1403,7 @@ thinking that this instance is actually an snapshot.
 ```typescript
 const task = Task.create({ done: true })
 // we cast the task instance to a snapshot so it can be used as part of another snapshot without typing errors
-const s = Store.create({ tasks: [ cast(task) ] })
+const s = Store.create({ tasks: [cast(task)] })
 ```
 
 #### Known Typescript Issue 5938

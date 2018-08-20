@@ -1,33 +1,21 @@
+const { getDeclaration } = require("./generate-shared")
+
 let str = `// generated with ${__filename}\n`
 
-const alfa = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const minArgs = 2
+const maxArgs = 10
+const preParam = "options: UnionOptions, "
+for (let i = minArgs; i < maxArgs; i++) {
+    str += getDeclaration("union", "IModelType", ["P", "O", "C", "S", "T"], i, null, "|")
+    str += getDeclaration("union", "IModelType", ["P", "O", "C", "S", "T"], i, preParam, "|")
+}
+for (let i = minArgs; i < maxArgs; i++) {
+    str += getDeclaration("union", "IComplexType", ["C", "S", "T"], i, null, "|")
+    str += getDeclaration("union", "IComplexType", ["C", "S", "T"], i, preParam, "|")
+}
+for (let i = minArgs; i < maxArgs; i++) {
+    str += getDeclaration("union", "IType", ["C", "S", "T"], i, null, "|")
+    str += getDeclaration("union", "IType", ["C", "S", "T"], i, preParam, "|")
+}
 
-function withChars(amount, fn) {
-    return alfa
-        .substr(0, amount)
-        .split("")
-        .map(fn)
-}
-function getNames(char) {
-    return `C${char}, S${char}, T${char}`
-}
-for (let i = 2; i < 10; i++) {
-    str += `// prettier-ignore\nexport function union<${withChars(i, getNames).join(
-        ", "
-    )}>(options: UnionOptions, ${withChars(i, char => `${char}: IType<${getNames(char)}>`).join(
-        ","
-    )}): IType<${withChars(i, char => "C" + char).join(" | ")}, ${withChars(
-        i,
-        char => "S" + char
-    ).join(" | ")}, ${withChars(i, char => "T" + char).join(
-        " | "
-    )}>\n// prettier-ignore\nexport function union<${withChars(i, getNames).join(
-        ", "
-    )}>(    ${withChars(i, char => `${char}: IType<${getNames(char)}>`).join(
-        ","
-    )}): IType<${withChars(i, char => "C" + char).join(" | ")}, ${withChars(
-        i,
-        char => "S" + char
-    ).join(" | ")}, ${withChars(i, char => "T" + char).join(" | ")}>\n`
-}
 console.log(str)

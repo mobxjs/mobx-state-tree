@@ -14,17 +14,17 @@
     "author": "",
     "license": "MIT",
     "devDependencies": {
-        "ava": "^0.22.0",
+        "ava": "^0.25.0",
         "cpr": "^3.0.1",
         "cross-env": "^5.1.1",
-        "lint-staged": "^4.3.0",
+        "lint-staged": "^7.0.0",
         "mobx": "^5.0.2",
         "mobx-state-tree": "^3.2.1",
-        "rollup": "^0.50.0",
-        "rollup-plugin-commonjs": "^8.2.5",
+        "rollup": "^0.64.0",
+        "rollup-plugin-commonjs": "^9.0.0",
         "rollup-plugin-node-resolve": "^3.0.0",
-        "rollup-plugin-uglify": "^2.0.1",
-        "sinon": "^4.0.1",
+        "rollup-plugin-uglify": "^4.0.0",
+        "sinon": "^6.0.0",
         "typescript": "^2.9.2"
     },
     "peerDependencies": {

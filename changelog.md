@@ -1,3 +1,8 @@
+# x.x.x
+
+-   Better Typescript support for enumeration, compose, union, literal and references
+-   Updated dependencies to latest versions
+
 # 3.2.1
 
 -   Fix for wrong generated TS import [#968](https://github.com/mobxjs/mobx-state-tree/issues/968) through [#969](https://github.com/mobxjs/mobx-state-tree/pull/969) by [@k-g-a](https://github.com/k-g-a)

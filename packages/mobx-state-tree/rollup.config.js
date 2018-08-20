@@ -1,6 +1,6 @@
 import filesize from "rollup-plugin-filesize"
 import resolve from "rollup-plugin-node-resolve"
-import uglify from "rollup-plugin-uglify"
+import { uglify } from "rollup-plugin-uglify"
 import replace from "rollup-plugin-replace"
 
 function getEnvVariables(production) {

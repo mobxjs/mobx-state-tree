@@ -5,7 +5,7 @@ export type TypeOrStateTreeNodeToStateTreeNode<
     T extends IAnyType | IAnyStateTreeNode
 > = T extends IAnyStateTreeNode
     ? T
-    : T extends IType<infer TC, infer TS, infer TT> ? ExtractIStateTreeNode<T, TC, TS, TT> : never
+    : T extends IType<infer TC, infer TS, infer TT> ? ExtractIStateTreeNode<TC, TS, TT> : never
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -376,7 +376,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
 export function getParentOfType<IT extends IAnyType>(
     target: IAnyStateTreeNode,
     type: IT
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -497,7 +497,7 @@ export function resolveIdentifier<IT extends IAnyType>(
     type: IT,
     target: IAnyStateTreeNode,
     identifier: string | number
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | undefined {
+): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | undefined {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
@@ -756,8 +756,8 @@ export interface IModelReflectionData {
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
-        const node: any = getStateTreeNode(target)
-        if (!(node.type instanceof ModelType))
+        const node2: any = getStateTreeNode(target)
+        if (!(node2.type instanceof ModelType))
             fail(
                 "expected the node's type to be of the type: model" +
                     target +

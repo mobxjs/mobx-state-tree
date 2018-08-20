@@ -18,4 +18,4 @@ script:
 after_success:
   - cat ./packages/mobx-state-tree/coverage/lcov.info|./packages/mobx-state-tree/node_modules/coveralls/bin/coveralls.js
 node_js:
-  - 9.3.0
+  - "node"

@@ -14,8 +14,16 @@ import {
     IAnyType,
     IValidationError,
     IComplexType,
-    IModelType
+    IModelType,
+    ExtractC,
+    ExtractT,
+    ExtractS,
+    IAnyModelType,
+    ExtractProps,
+    ExtractOthers,
+    IAnyComplexType
 } from "../../internal"
+import { ModelProperties } from "../complex-types/model"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
 
@@ -105,109 +113,110 @@ export class Union extends Type<any, any, any> {
     }
 }
 
-// generated with /home/michel/mobservable/mobx-state-tree/packages/mobx-state-tree/scripts/generate-union-types.js
-export function union<CA, SA, TA, CB, SB, TB>(
-    options: UnionOptions,
-    A: IModelType<any, any, CA, SA, TA>,
-    B: IModelType<any, any, CB, SB, TB>
-): IComplexType<CA | CB, SA | SB, TA | TB>
+// generated with mobx-state-tree\packages\mobx-state-tree\scripts\generate-union-types.js
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB>(A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>): IComplexType<CA | CB, SA | SB, TA | TB>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>): IModelType<PA | PB, OA | OB, CA | CB, SA | SB, TA | TB>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(options: UnionOptions, A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>): IComplexType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB>(options: UnionOptions, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>): IModelType<PA | PB, OA | OB, CA | CB, SA | SB, TA | TB>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>): IComplexType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>): IModelType<PA | PB | PC, OA | OB | OC, CA | CB | CC, SA | SB | SC, TA | TB | TC>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(options: UnionOptions, A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IComplexType<CD, SD, TD>): IModelType<any, any, CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC>(options: UnionOptions, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>): IModelType<PA | PB | PC, OA | OB | OC, CA | CB | CC, SA | SB | SC, TA | TB | TC>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>): IComplexType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>): IModelType<PA | PB | PC | PD, OA | OB | OC |
+    OD, CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(options: UnionOptions, A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>, E: IModelType<any, any, CE, SE, TE>): IComplexType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD>(options: UnionOptions, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>): IModelType<PA | PB | PC | PD, OA | OB | OC | OD, CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>, E: IModelType<any, any, CE, SE, TE>): IComplexType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>): IModelType<PA | PB | PC | PD | PE, OA | OB | OC | OD | OE, CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(options: UnionOptions, A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>, E: IModelType<any, any, CE, SE, TE>, F: IModelType<any, any, CF, SF, TF>): IComplexType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE>(options: UnionOptions, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>): IModelType<PA | PB | PC | PD | PE, OA | OB | OC | OD | OE, CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>, E: IModelType<any, any, CE, SE, TE>, F: IModelType<any, any, CF, SF, TF>): IComplexType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>): IModelType<PA | PB | PC | PD | PE | PF, OA | OB | OC | OD | OE | OF, CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(options: UnionOptions, A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>, E: IModelType<any, any, CE, SE, TE>, F: IModelType<any, any, CF, SF, TF>, G: IModelType<any, any, CG, SG, TG>): IComplexType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF>(options: UnionOptions, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>): IModelType<PA | PB | PC | PD | PE | PF, OA | OB | OC | OD | OE | OF, CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>, E: IModelType<any, any, CE, SE, TE>, F: IModelType<any, any, CF, SF, TF>, G: IModelType<any, any, CG, SG, TG>): IComplexType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>): IModelType<PA | PB | PC | PD | PE | PF | PG, OA | OB | OC | OD | OE | OF | OG, CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(options: UnionOptions, A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>, E: IModelType<any, any, CE, SE, TE>, F: IModelType<any, any, CF, SF, TF>, G: IModelType<any, any, CG, SG, TG>, H: IModelType<any, any, CH, SH, TH>): IComplexType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG>(options: UnionOptions, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>): IModelType<PA | PB | PC | PD | PE | PF | PG, OA | OB | OC | OD | OE | OF | OG, CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>, E: IModelType<any, any, CE, SE, TE>, F: IModelType<any, any, CF, SF, TF>, G: IModelType<any, any, CG, SG, TG>, H: IModelType<any, any, CH, SH, TH>): IComplexType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG, PH extends ModelProperties, OH, CH, SH, TH>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>, H: IModelType<PH, OH, CH, SH, TH>): IModelType<PA | PB | PC | PD | PE | PF | PG | PH, OA | OB | OC | OD | OE | OF | OG | OH, CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(options: UnionOptions, A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>, E: IModelType<any, any, CE, SE, TE>, F: IModelType<any, any, CF, SF, TF>, G: IModelType<any, any, CG, SG, TG>, H: IModelType<any, any, CH, SH, TH>, I: IModelType<any, any, CI, SI, TI>): IComplexType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG, PH extends ModelProperties, OH, CH, SH, TH>(options: UnionOptions, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>, H: IModelType<PH, OH, CH, SH, TH>): IModelType<PA | PB | PC | PD | PE | PF | PG | PH, OA | OB | OC | OD | OE | OF | OG | OH, CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(A: IModelType<any, any, CA, SA, TA>, B: IModelType<any, any, CB, SB, TB>, C: IModelType<any, any, CC, SC, TC>, D: IModelType<any, any, CD, SD, TD>, E: IModelType<any, any, CE, SE, TE>, F: IModelType<any, any, CF, SF, TF>, G: IModelType<any, any, CG, SG, TG>, H: IModelType<any, any, CH, SH, TH>, I: IModelType<any, any, CI, SI, TI>): IComplexType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
-
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG, PH extends ModelProperties, OH, CH, SH, TH, PI extends ModelProperties, OI, CI, SI, TI>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>, H: IModelType<PH, OH, CH, SH, TH>, I: IModelType<PI, OI, CI, SI, TI>): IModelType<PA | PB | PC | PD | PE
+    | PF | PG | PH | PI, OA | OB | OC | OD | OE | OF | OG | OH | OI, CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>): IComplexType<CA | CB, SA | SB, TA | TB>
+export function union<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG, PH extends ModelProperties, OH, CH, SH, TH, PI extends ModelProperties, OI, CI, SI, TI>(options: UnionOptions, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>, H: IModelType<PH, OH, CH, SH, TH>, I: IModelType<PI, OI, CI, SI, TI>): IModelType<PA | PB | PC | PD | PE | PF | PG | PH | PI, OA | OB | OC | OD | OE | OF | OG | OH | OI, CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB>(A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>): IComplexType<CA | CB, SA | SB, TA | TB>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>): IComplexType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
+export function union<CA, SA, TA, CB, SB, TB>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>): IComplexType<CA | CB, SA | SB, TA | TB>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>): IComplexType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>): IComplexType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>): IComplexType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>): IComplexType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>): IComplexType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>): IComplexType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>): IComplexType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>): IComplexType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>): IComplexType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>): IComplexType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>, G: IComplexType<CG, SG, TG>): IComplexType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>): IComplexType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>, G: IComplexType<CG, SG, TG>): IComplexType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
 // prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>, G: IComplexType<CG, SG, TG>): IComplexType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>, G: IComplexType<CG, SG, TG>, H: IComplexType<CH, SH, TH>): IComplexType<CA | CB | CC | CD |
+    CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
+// prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>, G: IComplexType<CG, SG, TG>, H: IComplexType<CH, SH, TH>): IComplexType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>, G: IComplexType<CG, SG, TG>, H: IComplexType<CH, SH, TH>): IComplexType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>, G: IComplexType<CG, SG, TG>, H: IComplexType<CH, SH, TH>, I: IComplexType<CI, SI, TI>): IComplexType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(options: UnionOptions, A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>, G: IComplexType<CG, SG, TG>, H: IComplexType<CH, SH, TH>, I: IComplexType<CI, SI, TI>): IComplexType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(A: IComplexType<CA, SA, TA>, B: IComplexType<CB, SB, TB>, C: IComplexType<CC, SC, TC>, D: IComplexType<CD, SD, TD>, E: IComplexType<CE, SE, TE>, F: IComplexType<CF, SF, TF>, G: IComplexType<CG, SG, TG>, H: IComplexType<CH, SH, TH>, I: IComplexType<CI, SI, TI>): IComplexType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
-
-// prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB>(options: UnionOptions,A: IType<CA, SA, TA>,B: IType<CB, SB, TB>): IType<CA | CB, SA | SB, TA | TB>
-// prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>): IType<CA | CB, SA | SB, TA | TB>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>): IType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
+export function union<CA, SA, TA, CB, SB, TB>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>): IType<CA | CB, SA | SB, TA | TB>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>): IType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>): IType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>): IType<CA | CB | CC, SA | SB | SC, TA | TB | TC>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>): IType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>): IType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>): IType<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>): IType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>): IType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>): IType<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>): IType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>): IType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>): IType<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>): IType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
 // prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>): IType<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>
+// prettier-ignore
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>): IType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA |
+    TB | TC | TD | TE | TF | TG | TH>
+// prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>): IType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
 // prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>): IType<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>
+export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>, I: IType<CI, SI, TI>): IType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA |
+    SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
 // prettier-ignore
 export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(options: UnionOptions, A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>, I: IType<CI, SI, TI>): IType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
-// prettier-ignore
-export function union<CA, SA, TA, CB, SB, TB, CC, SC, TC, CD, SD, TD, CE, SE, TE, CF, SF, TF, CG, SG, TG, CH, SH, TH, CI, SI, TI>(A: IType<CA, SA, TA>, B: IType<CB, SB, TB>, C: IType<CC, SC, TC>, D: IType<CD, SD, TD>, E: IType<CE, SE, TE>, F: IType<CF, SF, TF>, G: IType<CG, SG, TG>, H: IType<CH, SH, TH>, I: IType<CI, SI, TI>): IType<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>
-// manual written
+
+// manually written
 export function union(...types: IAnyType[]): IAnyType
 export function union(dispatchOrType: UnionOptions | IAnyType, ...otherTypes: IAnyType[]): IAnyType
 /**

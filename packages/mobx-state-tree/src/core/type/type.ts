@@ -72,7 +72,7 @@ export interface IType<C, S, T> {
     shouldAttachNode: boolean
 }
 
-export interface IAnyType extends IType<any, any, any> {}
+export type IAnyType = IType<any, any, any>
 
 export interface ISimpleType<T> extends IType<T, T, T> {}
 
@@ -88,16 +88,15 @@ export interface IComplexType<C, S, T> extends IType<C, S, T> {
     ): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>
 }
 
+export type IAnyComplexType = IComplexType<any, any, any>
+
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
 export type ExtractT<T extends IAnyType> = T extends IType<any, any, infer X> ? X : never
-export type ExtractIStateTreeNode<IT extends IAnyType, C, S, T> =
-    // if it is a reference it is state tree node, but of the type of the refrenced type
+export type ExtractIStateTreeNode<C, S, T> =
     // if the instance is a primitive then keep it as is (it is not a state tree node)
     // else it is a state tree node, but respect primitives
-    IT extends IReferenceType<infer RT>
-        ? TAndInterface<ExtractT<RT>, IStateTreeNode<ExtractC<RT>, ExtractS<RT>>>
-        : T extends ModelPrimitive ? T : TAndInterface<T, IStateTreeNode<C, S>>
+    T extends ModelPrimitive ? T : TAndInterface<T, IStateTreeNode<C, S>>
 
 export type Instance<T> = T extends IStateTreeNode
     ? T
@@ -138,7 +137,7 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
 /*
  * A complex type produces a MST node (Node in the state tree)
  */
-export abstract class ComplexType<C, S, T> implements IType<C, S, T> {
+export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
     readonly isType = true
     readonly name: string
 
@@ -151,6 +150,7 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T> {
         typecheck(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).value
     }
+
     initializeChildNodes(node: INode, snapshot: any): IChildNodesMap {
         return {}
     }
