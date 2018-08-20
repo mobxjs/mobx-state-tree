@@ -13,7 +13,7 @@ import {
     setLivelynessChecking,
     cast
 } from "../../src"
-import { observable } from "mobx"
+import { observable, autorun } from "mobx"
 
 const createTestFactories = () => {
     const ItemFactory = types.optional(
@@ -360,4 +360,60 @@ test("it should correctly handle re-adding of the same objects", () => {
     expect(store.objects.slice()).toEqual([someObject])
     store.setObjects([someObject])
     expect(store.objects.slice()).toEqual([someObject])
+})
+test("it should work correctly for splicing primitive array", () => {
+    const store = types.array(types.number).create([1, 2, 3])
+    unprotect(store)
+    store.splice(0, 1)
+    expect(store.slice()).toEqual([2, 3])
+    store.unshift(1)
+    expect(store.slice()).toEqual([1, 2, 3])
+    store.replace([4, 5])
+    expect(store.slice()).toEqual([4, 5])
+    store.clear()
+    expect(store.slice()).toEqual([])
+})
+test("it should keep unchanged for structrual equalled snapshot", () => {
+    const Store = types.model({
+        todos: types.array(
+            types.model("Task", {
+                id: types.identifier,
+                task: "",
+                done: false
+            })
+        ),
+        numbers: types.array(types.number)
+    })
+    const store = Store.create({
+        todos: [
+            { id: "1", task: "coffee", done: false },
+            { id: "2", task: "tea", done: false },
+            { id: "3", task: "biscuit", done: false }
+        ],
+        numbers: [1, 2, 3]
+    })
+
+    const values: any = []
+    autorun(() => {
+        values.push(store.todos.map(todo => todo.done))
+    })
+    applySnapshot(store.todos, [
+        { id: "1", task: "coffee", done: false },
+        { id: "2", task: "tea", done: false },
+        { id: "3", task: "biscuit", done: true }
+    ])
+    applySnapshot(store.todos, [
+        { id: "1", task: "coffee", done: false },
+        { id: "2", task: "tea", done: false },
+        { id: "3", task: "biscuit", done: true }
+    ])
+    expect(values).toEqual([[false, false, false], [false, false, true]])
+
+    const values1: any = []
+    autorun(() => {
+        values1.push(store.numbers.slice())
+    })
+    applySnapshot(store.numbers, [1, 2, 4])
+    applySnapshot(store.numbers, [1, 2, 4])
+    expect(values1).toEqual([[1, 2, 3], [1, 2, 4]])
 })

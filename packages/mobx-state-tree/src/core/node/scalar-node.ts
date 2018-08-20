@@ -11,8 +11,8 @@ import {
 export class ScalarNode implements INode {
     readonly type: IAnyType
     readonly storedValue: any
-    readonly parent: ObjectNode | null
-    readonly subpath: string = ""
+    parent: ObjectNode | null = null
+    subpath: string = ""
 
     private state = NodeLifeCycle.INITIALIZING
     private readonly _initialSnapshot: any
@@ -62,9 +62,19 @@ export class ScalarNode implements INode {
         return this.parent.root
     }
 
-    setParent(newParent: INode | null, subpath: string | null = null) {
+    setParent(newParent: ObjectNode | null, subpath: string | null = null) {
         if (this.parent === newParent && this.subpath === subpath) return
-        fail("setParent is not supposed to be called on scalar nodes")
+        if (this.parent && !newParent) {
+            this.die()
+        } else {
+            const newPath = subpath === null ? "" : subpath
+            if (this.subpath !== newPath) {
+                this.subpath = newPath
+            }
+            if (newParent && newParent !== this.parent) {
+                this.parent = newParent
+            }
+        }
     }
 
     public get value(): any {
