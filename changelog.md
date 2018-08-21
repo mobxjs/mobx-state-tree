@@ -9,8 +9,6 @@
 
 # 3.2.2
 
--   Better Typescript support for enumeration, compose, union, literal and references
--   Updated dependencies to latest versions
 -   Fixes for the reconciliation algorithm of arrays [#928](https://github.com/mobxjs/mobx-state-tree/issues/928) through [#960](https://github.com/mobxjs/mobx-state-tree/pull/960) by [@liuqiang1357](https://github.com/liuqiang1357)
 -   Better Typescript support for enumeration, compose, union, literal and references by [@xaviergonz](https://github.com/xaviergonz)
 -   Updated dependencies to latest versions by [@xaviergonz](https://github.com/xaviergonz)
