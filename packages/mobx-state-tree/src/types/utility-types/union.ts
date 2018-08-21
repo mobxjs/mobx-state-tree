@@ -112,62 +112,11 @@ export class Union extends Type<any, any, any> {
     }
 }
 
-export type UnionProps<T extends IAnyModelType[]> =
-    | ExtractProps<T[0]>
-    | ExtractProps<T[1]>
-    | ExtractProps<T[2]>
-    | ExtractProps<T[3]>
-    | ExtractProps<T[4]>
-    | ExtractProps<T[5]>
-    | ExtractProps<T[6]>
-    | ExtractProps<T[7]>
-    | ExtractProps<T[8]>
-    | ExtractProps<T[9]>
-export type UnionOthers<T extends IAnyModelType[]> =
-    | ExtractOthers<T[0]>
-    | ExtractOthers<T[1]>
-    | ExtractOthers<T[2]>
-    | ExtractOthers<T[3]>
-    | ExtractOthers<T[4]>
-    | ExtractOthers<T[5]>
-    | ExtractOthers<T[6]>
-    | ExtractOthers<T[7]>
-    | ExtractOthers<T[8]>
-    | ExtractOthers<T[9]>
-
-export type UnionC<T extends IAnyType[]> =
-    | ExtractC<T[0]>
-    | ExtractC<T[1]>
-    | ExtractC<T[2]>
-    | ExtractC<T[3]>
-    | ExtractC<T[4]>
-    | ExtractC<T[5]>
-    | ExtractC<T[6]>
-    | ExtractC<T[7]>
-    | ExtractC<T[8]>
-    | ExtractC<T[9]>
-export type UnionS<T extends IAnyType[]> =
-    | ExtractS<T[0]>
-    | ExtractS<T[1]>
-    | ExtractS<T[2]>
-    | ExtractS<T[3]>
-    | ExtractS<T[4]>
-    | ExtractS<T[5]>
-    | ExtractS<T[6]>
-    | ExtractS<T[7]>
-    | ExtractS<T[8]>
-    | ExtractS<T[9]>
-export type UnionT<T extends IAnyType[]> =
-    | ExtractT<T[0]>
-    | ExtractT<T[1]>
-    | ExtractT<T[2]>
-    | ExtractT<T[3]>
-    | ExtractT<T[4]>
-    | ExtractT<T[5]>
-    | ExtractT<T[6]>
-    | ExtractT<T[7]>
-    | ExtractT<T[8]>
-    | ExtractT<T[9]>
+export type UnionProps<T extends IAnyModelType[]> = ExtractProps<T[number]>
+export type UnionOthers<T extends IAnyModelType[]> = ExtractOthers<T[number]>
+export type UnionC<T extends IAnyType[]> = ExtractC<T[number]>
+export type UnionS<T extends IAnyType[]> = ExtractS<T[number]>
+export type UnionT<T extends IAnyType[]> = ExtractT<T[number]>
 
 export function union<Types extends IAnyModelType[]>(
     options: UnionOptions,

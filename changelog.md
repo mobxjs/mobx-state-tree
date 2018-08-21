@@ -1,7 +1,11 @@
 # 4.x.x
 
 -   **[BREAKING]** MobX-state-tree now requires at least TypeScript 3.0 when using MST with typescript.
--   The `create` method is now able to infer in TS if it can be called parameterless or not for a certan type.
+-   The `create` method is now able to infer in TS if it can be called parameterless or not for a certan type by [@xaviergonz](https://github.com/xaviergonz).
+
+# x.x.x
+
+-   Further improvements for Typescript support for enumeration by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.2.2
 
