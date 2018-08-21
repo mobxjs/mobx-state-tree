@@ -1,3 +1,7 @@
+# x.x.x
+
+-   Further improvements for Typescript support for enumeration by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.2.2
 
 -   Fixes for the reconciliation algorithm of arrays [#928](https://github.com/mobxjs/mobx-state-tree/issues/928) through [#960](https://github.com/mobxjs/mobx-state-tree/pull/960) by [@liuqiang1357](https://github.com/liuqiang1357)
