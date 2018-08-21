@@ -629,7 +629,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     getDefaultSnapshot(): any {
-        return {}
+        return EMPTY_OBJECT
     }
 
     removeChild(node: ObjectNode, subpath: string) {

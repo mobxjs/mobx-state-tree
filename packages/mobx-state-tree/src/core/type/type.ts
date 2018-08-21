@@ -18,7 +18,8 @@ import {
     ObjectNode,
     IChildNodesMap,
     ModelPrimitive,
-    IReferenceType
+    IReferenceType,
+    EMPTY_OBJECT
 } from "../../internal"
 
 export enum TypeFlags {
@@ -152,7 +153,7 @@ export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
     }
 
     initializeChildNodes(node: INode, snapshot: any): IChildNodesMap {
-        return {}
+        return EMPTY_OBJECT
     }
 
     createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {

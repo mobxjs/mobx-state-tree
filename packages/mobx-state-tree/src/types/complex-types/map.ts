@@ -40,7 +40,8 @@ import {
     typecheck,
     typeCheckFailure,
     TypeFlags,
-    Union
+    Union,
+    EMPTY_OBJECT
 } from "../../internal"
 
 export interface IMapType<C, S, T>
@@ -402,7 +403,7 @@ export class MapType<C, S, T> extends ComplexType<
     }
 
     getDefaultSnapshot() {
-        return {}
+        return EMPTY_OBJECT
     }
 
     removeChild(node: ObjectNode, subpath: string) {
