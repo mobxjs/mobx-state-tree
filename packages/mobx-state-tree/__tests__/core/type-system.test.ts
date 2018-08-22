@@ -824,23 +824,3 @@ test("extendClass - basic functionality", () => {
     mi.setLocalState(7)
     expect(mi.localState).toBe(7)
 })
-
-test("extendClass - arrow function properties must throw an error", () => {
-    expect(() => {
-        const EM = types.model({ x: 5 }).extendClass(_ => {
-            class E {
-                @modelState
-                localState = 3
-
-                @modelAction
-                boundSetLocalState = (x: number) => {
-                    this.localState = x
-                }
-            }
-            return E
-        })
-        EM.create()
-    }).toThrowError(
-        '[mobx-state-tree] extendClass: class property "boundSetLocalState" must NOT be an arrow function'
-    )
-})

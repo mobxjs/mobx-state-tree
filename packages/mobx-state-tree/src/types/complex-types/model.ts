@@ -390,35 +390,44 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
             }
 
             const instanceMembers = instance as object
-            const instanceProto = Object.getPrototypeOf(instanceMembers)
+            const protoChain: any[] = []
+
+            let proto = instance
+            while (proto) {
+                protoChain.push(proto)
+                proto = Object.getPrototypeOf(proto)
+            }
+
+            function getPropertyDescriptor(k: string): PropertyDescriptor | undefined {
+                for (const p of protoChain) {
+                    const desc = Object.getOwnPropertyDescriptor(p, k)
+                    if (desc) {
+                        return desc
+                    }
+                }
+                return undefined
+            }
 
             const actions: object = {}
             const views: object = {}
             const state: object = {}
 
-            function fixPropertyDescriptor(
-                key: string,
-                instancePdesc: PropertyDescriptor | undefined,
-                protoPdesc: PropertyDescriptor | undefined
-            ) {
-                if (!instancePdesc && !protoPdesc) {
-                    fail("extendClass: no property descriptor could be found for class property")
+            function fixPropertyDescriptor(key: string, desc: PropertyDescriptor | undefined) {
+                if (!desc) {
+                    fail(
+                        `extendClass: no property descriptor could be found for class property "${key}"`
+                    )
                 }
-                const desc = instancePdesc || protoPdesc!
+                desc = desc!
+                // rebind functions to self
                 if (desc.value && typeof desc.value === "function") {
-                    if (desc === instancePdesc) {
-                        fail(`extendClass: class property "${key}" must NOT be an arrow function`)
-                    }
                     desc.value = desc.value.bind(self)
                 }
                 return desc
             }
 
             function addProperty(obj: object, k: string) {
-                const instancePdesc = Object.getOwnPropertyDescriptor(instance, k)
-                const protoPdesc = Object.getOwnPropertyDescriptor(instanceProto, k)
-
-                const pdesc = fixPropertyDescriptor(k, instancePdesc, protoPdesc)
+                const pdesc = fixPropertyDescriptor(k, getPropertyDescriptor(k))
 
                 Object.defineProperty(obj, k, pdesc)
             }
