@@ -433,6 +433,11 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                 } else if (instance.$state && instance.$state.includes(k)) {
                     addProperty(state, k)
                 } else {
+                    if (k in self) {
+                        fail(
+                            `volatile property \`${k}\` is already present and cannot be redefined`
+                        )
+                    }
                     addProperty(self, k)
                 }
             }
