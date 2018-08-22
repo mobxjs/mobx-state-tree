@@ -10,6 +10,7 @@ import {
     SnapshotIn,
     Instance
 } from "../../src"
+import { isObservable, isObservableProp } from "mobx"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -773,6 +774,9 @@ test("extendDecorate - basic functionality", () => {
             },
             innerBoundTo() {
                 return () => this
+            },
+            isThisObservable() {
+                return isObservableProp(this, "x2") && isObservableProp(this, "localState")
             }
         }),
         {
@@ -783,7 +787,8 @@ test("extendDecorate - basic functionality", () => {
             setXBy: "action",
             setLocalState: "action",
             boundTo: "view",
-            innerBoundTo: "view"
+            innerBoundTo: "view",
+            isThisObservable: "view"
         }
     )
 
@@ -805,6 +810,8 @@ test("extendDecorate - basic functionality", () => {
     expect(mi.localState).toBe(6)
     mi.setLocalState(7)
     expect(mi.localState).toBe(7)
+
+    expect(mi.isThisObservable()).toBe(true)
 })
 
 test("extendDecorate - throw if decorator is missing or wrong", () => {
