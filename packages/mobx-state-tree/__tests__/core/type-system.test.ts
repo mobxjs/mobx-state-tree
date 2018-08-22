@@ -10,7 +10,7 @@ import {
     SnapshotIn,
     Instance
 } from "../../src"
-import { isObservable, isObservableProp } from "mobx"
+import { isObservable, isObservableProp, isComputed, isComputedProp } from "mobx"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -776,7 +776,11 @@ test("extendDecorate - basic functionality", () => {
                 return () => this
             },
             isThisObservable() {
-                return isObservableProp(this, "x2") && isObservableProp(this, "localState")
+                return (
+                    isObservableProp(this, "x2") &&
+                    isObservableProp(this, "localState") &&
+                    isComputedProp(this, "x2")
+                )
             }
         }),
         {
