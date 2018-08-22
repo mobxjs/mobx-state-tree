@@ -616,8 +616,9 @@ if (process.env.NODE_ENV !== "production") {
         const b = B.create({ a: { x: 7 } })
         unprotect(b)
         expect(() => {
-            detach(b.a!)
-            destroy(b.a!)
+            const a = b.a!
+            detach(a)
+            destroy(a)
         }).not.toThrow()
     })
     test("it should be possible to remove a node from a parent if it is defined as type maybeNull ", () => {
@@ -626,8 +627,9 @@ if (process.env.NODE_ENV !== "production") {
         const b = B.create({ a: { x: 7 } })
         unprotect(b)
         expect(() => {
-            detach(b.a!)
-            destroy(b.a!)
+            const a = b.a!
+            detach(a)
+            destroy(a)
         }).not.toThrow()
     })
 }
