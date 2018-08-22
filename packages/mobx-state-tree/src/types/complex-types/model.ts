@@ -435,11 +435,11 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
             for (const k in instanceMembers) {
                 if (k === "$actions" || k === "$views" || k === "$state") {
                     continue
-                } else if (instance.$actions && instance.$actions.includes(k)) {
+                } else if (instance.$actions && instance.$actions.indexOf(k) >= 0) {
                     addProperty(actions, k)
-                } else if (instance.$views && instance.$views.includes(k)) {
+                } else if (instance.$views && instance.$views.indexOf(k) >= 0) {
                     addProperty(views, k)
-                } else if (instance.$state && instance.$state.includes(k)) {
+                } else if (instance.$state && instance.$state.indexOf(k) >= 0) {
                     addProperty(state, k)
                 } else {
                     if (k in self) {
