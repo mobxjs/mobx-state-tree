@@ -617,10 +617,8 @@ if (process.env.NODE_ENV !== "production") {
         unprotect(b)
         expect(() => {
             detach(b.a!)
-        }).not.toThrowError(/Error while converting `undefined` to `A`/)
-        expect(() => {
             destroy(b.a!)
-        }).not.toThrowError(/Error while converting `undefined` to `A`/)
+        }).not.toThrow()
     })
     test("it should be possible to remove a node from a parent if it is defined as type maybeNull ", () => {
         const A = types.model("A", { x: 3 })
@@ -629,10 +627,8 @@ if (process.env.NODE_ENV !== "production") {
         unprotect(b)
         expect(() => {
             detach(b.a!)
-        }).not.toThrowError(/Error while converting `undefined` to `A`/)
-        expect(() => {
             destroy(b.a!)
-        }).not.toThrowError(/Error while converting `undefined` to `A`/)
+        }).not.toThrow()
     })
 }
 test("it should be possible to share states between views and actions using enhance", () => {
