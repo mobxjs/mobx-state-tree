@@ -1,3 +1,7 @@
+# x.x.x
+
+-   Added extendClass [TODO](TODO) through [TODO](TODO) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.2.3
 
 -   Fixed incorrect typing generation for mst-middlewares [#979](https://github.com/mobxjs/mobx-state-tree/issues/979)

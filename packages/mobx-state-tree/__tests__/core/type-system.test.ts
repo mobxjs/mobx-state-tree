@@ -10,6 +10,18 @@ import {
     SnapshotIn,
     Instance
 } from "../../src"
+import {
+    model,
+    IAnyType,
+    ModelPropertiesDeclaration,
+    ModelPropertiesDeclarationToProperties,
+    ModelInstanceType,
+    IAnyModelType,
+    ModelActions,
+    modelAction,
+    modelState,
+    modelView
+} from "../../src/internal"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -747,4 +759,89 @@ test("cast and SnapshotOrInstance", () => {
     // cast(A.create({n2: 5}))
     // cast({a: 2, b: 5})
     // cast(NumberMap({a: 2, b: 3}))
+})
+
+test("extendClass - basic functionality", () => {
+    const M = types.model({ x: 5 }).extendClass(self => {
+        class E {
+            @modelState
+            localState = 3
+
+            @modelView
+            get x2() {
+                return self.x * 2
+            }
+
+            @modelView
+            xBy(by: number) {
+                return self.x * by
+            }
+
+            @modelAction
+            setX(x: number) {
+                self.x = x
+            }
+
+            @modelAction
+            setXBy(x: number) {
+                this.setX(this.xBy(x))
+            }
+
+            @modelAction
+            setLocalState(x: number) {
+                this.localState = x
+            }
+        }
+        return E
+    })
+
+    const mi = M.create()
+    expect(mi.x).toBe(5)
+
+    mi.setX(6)
+    expect(mi.x).toBe(6)
+    mi.setXBy(2)
+    expect(mi.x).toBe(12)
+    expect(mi.x2).toBe(24)
+    expect(mi.xBy(2)).toBe(24)
+
+    expect(mi.localState).toBe(3)
+    mi.setLocalState(6)
+    expect(mi.localState).toBe(6)
+    mi.setLocalState(7)
+    expect(mi.localState).toBe(7)
+})
+
+test("extendClass - arrow function properties must throw an error", () => {
+    expect(() => {
+        const EM = types.model({ x: 5 }).extendClass(_ => {
+            class E {
+                @modelState
+                localState = 3
+
+                @modelAction
+                boundSetLocalState = (x: number) => {
+                    this.localState = x
+                }
+            }
+            return E
+        })
+        EM.create()
+    }).toThrowError(
+        '[mobx-state-tree] extendClass: class property "boundSetLocalState" must NOT be an arrow function'
+    )
+})
+
+test("extendClass - undecorated properties must throw an error", () => {
+    expect(() => {
+        const EM = types.model({ x: 5 }).extendClass(_ => {
+            class E {
+                private undecorated = undefined
+            }
+            return E
+        })
+        EM.create()
+    }).toThrowError(
+        '[mobx-state-tree] extendClass: class property "undecorated" must be decorated with @modelView, @modelAction or @modelState (if private state is needed it can be moved outside the class definition)'
+    )
 })

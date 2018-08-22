@@ -154,6 +154,9 @@ export interface IModelType<
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
         fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS>
+    extendClass<NEWOTHERS extends object>(
+        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => new () => NEWOTHERS
+    ): IModelType<PROPS, OTHERS & NEWOTHERS>
     preProcessSnapshot<S0 = ModelCreationType<PROPS>>(
         fn: (snapshot: S0) => ModelCreationType<PROPS>
     ): IModelType<PROPS, OTHERS, S0>
@@ -375,6 +378,75 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
             return self
         }
         return this.cloneAndEnhance({ initializers: [initializer] })
+    }
+
+    extendClass(fn: (self: any) => new () => object): any {
+        function toExtend(self: any): any {
+            const clazz = fn(self)
+            const instance = new clazz() as {
+                $actions?: string[]
+                $views?: string[]
+                $state?: string[]
+            }
+
+            const instanceMembers = instance as object
+            const instanceProto = Object.getPrototypeOf(instanceMembers)
+
+            const actions: object = {}
+            const views: object = {}
+            const state: object = {}
+
+            function fixPropertyDescriptor(
+                key: string,
+                instancePdesc: PropertyDescriptor | undefined,
+                protoPdesc: PropertyDescriptor | undefined
+            ) {
+                if (!instancePdesc && !protoPdesc) {
+                    fail("extendClass: no property descriptor could be found for class property")
+                }
+                const desc = instancePdesc || protoPdesc!
+                if (desc.value && typeof desc.value === "function") {
+                    if (desc === instancePdesc) {
+                        fail(`extendClass: class property "${key}" must NOT be an arrow function`)
+                    }
+                    desc.value = desc.value.bind(self)
+                }
+                return desc
+            }
+
+            function addProperty(obj: object, k: string) {
+                const instancePdesc = Object.getOwnPropertyDescriptor(instance, k)
+                const protoPdesc = Object.getOwnPropertyDescriptor(instanceProto, k)
+
+                const pdesc = fixPropertyDescriptor(k, instancePdesc, protoPdesc)
+
+                Object.defineProperty(obj, k, pdesc)
+            }
+
+            for (const k in instanceMembers) {
+                if (k === "$actions" || k === "$views" || k === "$state") {
+                    continue
+                } else if (instance.$actions && instance.$actions.includes(k)) {
+                    addProperty(actions, k)
+                } else if (instance.$views && instance.$views.includes(k)) {
+                    addProperty(views, k)
+                } else if (instance.$state && instance.$state.includes(k)) {
+                    addProperty(state, k)
+                } else {
+                    fail(
+                        `extendClass: class property "${k}" must be decorated with @modelView, @modelAction or @modelState (if private state is needed it can be moved outside the class definition)`
+                    )
+                }
+            }
+
+            return {
+                actions,
+                views,
+                state
+            }
+        }
+
+        return this.extend(toExtend)
     }
 
     views(fn: (self: any) => any): any {
@@ -739,4 +811,31 @@ function tryGetOptional(type: any): OptionalValue<any, any, any> | undefined {
         return tryGetOptional(type.subType)
     if (type.flags & TypeFlags.Optional) return type
     return undefined
+}
+
+export function modelAction(target: object, key: string | symbol) {
+    if (typeof key !== "string") {
+        throw new Error("key must be a string")
+    }
+    const tany = target as any
+    const actions = (tany.$actions = tany.$actions || [])
+    actions.push(key)
+}
+
+export function modelView(target: object, key: string | symbol) {
+    if (typeof key !== "string") {
+        throw new Error("key must be a string")
+    }
+    const tany = target as any
+    const views = (tany.$views = tany.$views || [])
+    views.push(key)
+}
+
+export function modelState(target: object, key: string | symbol) {
+    if (typeof key !== "string") {
+        throw new Error("key must be a string")
+    }
+    const tany = target as any
+    const state = (tany.$state = tany.$state || [])
+    state.push(key)
 }
