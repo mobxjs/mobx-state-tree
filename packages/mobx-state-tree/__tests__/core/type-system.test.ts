@@ -806,3 +806,36 @@ test("extendDecorate - basic functionality", () => {
     mi.setLocalState(7)
     expect(mi.localState).toBe(7)
 })
+
+test("extendDecorate - throw if decorator is missing or wrong", () => {
+    expect(() => {
+        const M = types.model({ x: 5 }).extendDecorate(
+            self => ({
+                localState: 3,
+                get x2() {
+                    return self.x * 2
+                }
+            }),
+            {
+                localState: "state"
+            } as any
+        )
+        M.create()
+    }).toThrowError()
+
+    expect(() => {
+        const M = types.model({ x: 5 }).extendDecorate(
+            self => ({
+                localState: 3,
+                get x2() {
+                    return self.x * 2
+                }
+            }),
+            {
+                localState: "state",
+                x2: "WRONG"
+            } as any
+        )
+        M.create()
+    }).toThrowError()
+})
