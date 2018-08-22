@@ -433,9 +433,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                 } else if (instance.$state && instance.$state.includes(k)) {
                     addProperty(state, k)
                 } else {
-                    fail(
-                        `extendClass: class property "${k}" must be decorated with @modelView, @modelAction or @modelState (if private state is needed it can be moved outside the class definition)`
-                    )
+                    addProperty(self, k)
                 }
             }
 

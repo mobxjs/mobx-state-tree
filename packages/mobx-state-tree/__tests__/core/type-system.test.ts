@@ -755,12 +755,14 @@ test("cast and SnapshotOrInstance", () => {
 test("extendClass - basic functionality", () => {
     const M = types.model({ x: 5 }).extendClass(self => {
         class E {
+            private number2 = 2
+
             @modelState
             localState = 3
 
             @modelView
             get x2() {
-                return self.x * 2
+                return self.x * this.number2
             }
 
             @modelView
@@ -783,9 +785,19 @@ test("extendClass - basic functionality", () => {
                 this.localState = x
             }
 
+            @modelAction
+            incNumber2() {
+                this.number2++
+            }
+
             @modelView
             boundTo() {
                 return this
+            }
+
+            @modelView
+            innerBoundTo() {
+                return () => this
             }
         }
         return E
@@ -795,12 +807,15 @@ test("extendClass - basic functionality", () => {
     expect(mi.x).toBe(5)
 
     expect(mi.boundTo()).toBe(mi)
+    expect(mi.innerBoundTo()()).toBe(mi)
 
     mi.setX(6)
     expect(mi.x).toBe(6)
     mi.setXBy(2)
     expect(mi.x).toBe(12)
-    expect(mi.x2).toBe(24)
+    expect(mi.x2).toBe(12 * 2)
+    mi.incNumber2()
+    expect(mi.x2).toBe(12 * 3)
     expect(mi.xBy(2)).toBe(24)
 
     expect(mi.localState).toBe(3)
@@ -827,19 +842,5 @@ test("extendClass - arrow function properties must throw an error", () => {
         EM.create()
     }).toThrowError(
         '[mobx-state-tree] extendClass: class property "boundSetLocalState" must NOT be an arrow function'
-    )
-})
-
-test("extendClass - undecorated properties must throw an error", () => {
-    expect(() => {
-        const EM = types.model({ x: 5 }).extendClass(_ => {
-            class E {
-                private undecorated = undefined
-            }
-            return E
-        })
-        EM.create()
-    }).toThrowError(
-        '[mobx-state-tree] extendClass: class property "undecorated" must be decorated with @modelView, @modelAction or @modelState (if private state is needed it can be moved outside the class definition)'
     )
 })
