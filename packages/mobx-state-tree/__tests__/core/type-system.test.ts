@@ -10,7 +10,6 @@ import {
     SnapshotIn,
     Instance
 } from "../../src"
-import { isObservable, isObservableProp, isComputed, isComputedProp } from "mobx"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -748,105 +747,4 @@ test("cast and SnapshotOrInstance", () => {
     // cast(A.create({n2: 5}))
     // cast({a: 2, b: 5})
     // cast(NumberMap({a: 2, b: 3}))
-})
-
-test("extendDecorate - basic functionality", () => {
-    const M = types.model({ x: 5 }).extendDecorate(
-        self => ({
-            localState: 3,
-            get x2() {
-                return self.x * 2
-            },
-            xBy(by: number) {
-                return self.x * by
-            },
-            setX(x: number) {
-                self.x = x
-            },
-            setXBy(x: number) {
-                this.setX(this.xBy(x))
-            },
-            setLocalState(x: number) {
-                this.localState = x
-            },
-            boundTo() {
-                return this
-            },
-            innerBoundTo() {
-                return () => this
-            },
-            isThisObservable() {
-                return (
-                    isObservableProp(this, "x2") &&
-                    isObservableProp(this, "localState") &&
-                    isComputedProp(this, "x2")
-                )
-            }
-        }),
-        {
-            localState: "state",
-            x2: "view",
-            xBy: "action",
-            setX: "action",
-            setXBy: "action",
-            setLocalState: "action",
-            boundTo: "view",
-            innerBoundTo: "view",
-            isThisObservable: "view"
-        }
-    )
-
-    const mi = M.create()
-    expect(mi.x).toBe(5)
-
-    expect(mi.boundTo()).toBe(mi)
-    expect(mi.innerBoundTo()()).toBe(mi)
-
-    mi.setX(6)
-    expect(mi.x).toBe(6)
-    mi.setXBy(2)
-    expect(mi.x).toBe(12)
-    expect(mi.x2).toBe(12 * 2)
-    expect(mi.xBy(2)).toBe(24)
-
-    expect(mi.localState).toBe(3)
-    mi.setLocalState(6)
-    expect(mi.localState).toBe(6)
-    mi.setLocalState(7)
-    expect(mi.localState).toBe(7)
-
-    expect(mi.isThisObservable()).toBe(true)
-})
-
-test("extendDecorate - throw if decorator is missing or wrong", () => {
-    expect(() => {
-        const M = types.model({ x: 5 }).extendDecorate(
-            self => ({
-                localState: 3,
-                get x2() {
-                    return self.x * 2
-                }
-            }),
-            {
-                localState: "state"
-            } as any
-        )
-        M.create()
-    }).toThrowError()
-
-    expect(() => {
-        const M = types.model({ x: 5 }).extendDecorate(
-            self => ({
-                localState: 3,
-                get x2() {
-                    return self.x * 2
-                }
-            }),
-            {
-                localState: "state",
-                x2: "WRONG"
-            } as any
-        )
-        M.create()
-    }).toThrowError()
 })

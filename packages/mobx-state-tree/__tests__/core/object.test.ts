@@ -13,7 +13,7 @@ import {
     setLivelynessChecking
 } from "../../src"
 
-import { autorun, reaction, observable } from "mobx"
+import { autorun, reaction, observable, isObservableProp, isComputedProp } from "mobx"
 
 const createTestFactories = () => {
     const Factory = types
@@ -161,7 +161,7 @@ test("it should apply snapshots", () => {
     applySnapshot(doc, { to: "universe" })
     expect(getSnapshot(doc)).toEqual({ to: "universe" })
 })
-test("it should apply and accept null value for types.maybe(complexType)", () => {
+test("it should apply and accept undefined value for types.maybe(complexType)", () => {
     const Item = types.model("Item", {
         value: types.string
     })
@@ -611,7 +611,7 @@ if (process.env.NODE_ENV !== "production") {
         }).toThrowError(/Error while converting `null` to `A`/)
     })
 }
-test("it should be possible to share states between views and actions using enhance", () => {
+test("it should be possible to share states between views and actions using extend", () => {
     const A = types.model({}).extend(self => {
         const localState = observable.box(3)
         return {
@@ -653,6 +653,107 @@ test("782, TS + compose", () => {
     })
 
     const user = User.create({ id: "someId" })
+})
+
+test("extendDecorate - basic functionality", () => {
+    const M = types.model({ x: 5 }).extendDecorate(
+        self => ({
+            localState: 3,
+            get x2() {
+                return self.x * 2
+            },
+            xBy(by: number) {
+                return self.x * by
+            },
+            setX(x: number) {
+                self.x = x
+            },
+            setXBy(x: number) {
+                this.setX(this.xBy(x))
+            },
+            setLocalState(x: number) {
+                this.localState = x
+            },
+            boundTo() {
+                return this
+            },
+            innerBoundTo() {
+                return () => this
+            },
+            isThisObservable() {
+                return (
+                    isObservableProp(this, "x2") &&
+                    isObservableProp(this, "localState") &&
+                    isComputedProp(this, "x2")
+                )
+            }
+        }),
+        {
+            localState: "state",
+            x2: "view",
+            xBy: "action",
+            setX: "action",
+            setXBy: "action",
+            setLocalState: "action",
+            boundTo: "view",
+            innerBoundTo: "view",
+            isThisObservable: "view"
+        }
+    )
+
+    const mi = M.create()
+    expect(mi.x).toBe(5)
+
+    expect(mi.boundTo()).toBe(mi)
+    expect(mi.innerBoundTo()()).toBe(mi)
+
+    mi.setX(6)
+    expect(mi.x).toBe(6)
+    mi.setXBy(2)
+    expect(mi.x).toBe(12)
+    expect(mi.x2).toBe(12 * 2)
+    expect(mi.xBy(2)).toBe(24)
+
+    expect(mi.localState).toBe(3)
+    mi.setLocalState(6)
+    expect(mi.localState).toBe(6)
+    mi.setLocalState(7)
+    expect(mi.localState).toBe(7)
+
+    expect(mi.isThisObservable()).toBe(true)
+})
+
+test("extendDecorate - throw if decorator is missing or wrong", () => {
+    expect(() => {
+        const M = types.model({ x: 5 }).extendDecorate(
+            self => ({
+                localState: 3,
+                get x2() {
+                    return self.x * 2
+                }
+            }),
+            {
+                localState: "state"
+            } as any
+        )
+        M.create()
+    }).toThrowError()
+
+    expect(() => {
+        const M = types.model({ x: 5 }).extendDecorate(
+            self => ({
+                localState: 3,
+                get x2() {
+                    return self.x * 2
+                }
+            }),
+            {
+                localState: "state",
+                x2: "WRONG"
+            } as any
+        )
+        M.create()
+    }).toThrowError()
 })
 
 test("961 - model creating should not change snapshot", () => {
