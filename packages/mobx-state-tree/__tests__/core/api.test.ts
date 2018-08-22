@@ -78,7 +78,7 @@ const TYPES = [
     "union",
     "enumeration"
 ]
-const INTERNAL_TYPES = ["TypeFlags"]
+const INTERNAL_TYPES = ["TypeFlags", "modelAction", "modelView", "modelState"]
 
 test("correct api exposed", () => {
     expect(

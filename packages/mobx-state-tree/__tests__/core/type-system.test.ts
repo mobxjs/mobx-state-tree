@@ -8,20 +8,11 @@ import {
     SnapshotOrInstance,
     cast,
     SnapshotIn,
-    Instance
-} from "../../src"
-import {
-    model,
-    IAnyType,
-    ModelPropertiesDeclaration,
-    ModelPropertiesDeclarationToProperties,
-    ModelInstanceType,
-    IAnyModelType,
-    ModelActions,
+    Instance,
+    modelView,
     modelAction,
-    modelState,
-    modelView
-} from "../../src/internal"
+    modelState
+} from "../../src"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -791,12 +782,19 @@ test("extendClass - basic functionality", () => {
             setLocalState(x: number) {
                 this.localState = x
             }
+
+            @modelView
+            boundTo() {
+                return this
+            }
         }
         return E
     })
 
     const mi = M.create()
     expect(mi.x).toBe(5)
+
+    expect(mi.boundTo()).toBe(mi)
 
     mi.setX(6)
     expect(mi.x).toBe(6)

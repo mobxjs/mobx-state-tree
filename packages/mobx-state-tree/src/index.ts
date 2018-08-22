@@ -130,7 +130,10 @@ export {
     Instance,
     SnapshotIn,
     SnapshotOut,
-    SnapshotOrInstance
+    SnapshotOrInstance,
+    modelAction,
+    modelView,
+    modelState
 } from "./internal"
 
 export * from "./core/mst-operations"
