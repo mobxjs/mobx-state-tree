@@ -605,10 +605,10 @@ if (process.env.NODE_ENV !== "production") {
         unprotect(b)
         expect(() => {
             detach(b.a)
-        }).toThrowError(/Error while converting `null` to `A`/)
+        }).toThrowError(/Error while converting `undefined` to `A`/)
         expect(() => {
             destroy(b.a)
-        }).toThrowError(/Error while converting `null` to `A`/)
+        }).toThrowError(/Error while converting `undefined` to `A`/)
     })
 }
 test("it should be possible to share states between views and actions using enhance", () => {
