@@ -610,6 +610,30 @@ if (process.env.NODE_ENV !== "production") {
             destroy(b.a)
         }).toThrowError(/Error while converting `undefined` to `A`/)
     })
+    test("it should be possible to remove a node from a parent if it is defined as type maybe ", () => {
+        const A = types.model("A", { x: 3 })
+        const B = types.model("B", { a: types.maybe(A) })
+        const b = B.create({ a: { x: 7 } })
+        unprotect(b)
+        expect(() => {
+            detach(b.a!)
+        }).not.toThrowError(/Error while converting `undefined` to `A`/)
+        expect(() => {
+            destroy(b.a!)
+        }).not.toThrowError(/Error while converting `undefined` to `A`/)
+    })
+    test("it should be possible to remove a node from a parent if it is defined as type maybeNull ", () => {
+        const A = types.model("A", { x: 3 })
+        const B = types.model("B", { a: types.maybeNull(A) })
+        const b = B.create({ a: { x: 7 } })
+        unprotect(b)
+        expect(() => {
+            detach(b.a!)
+        }).not.toThrowError(/Error while converting `undefined` to `A`/)
+        expect(() => {
+            destroy(b.a!)
+        }).not.toThrowError(/Error while converting `undefined` to `A`/)
+    })
 }
 test("it should be possible to share states between views and actions using enhance", () => {
     const A = types.model({}).extend(self => {
