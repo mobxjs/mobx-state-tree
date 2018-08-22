@@ -1,6 +1,6 @@
 # x.x.x
 
--   Added extendClass [#982](https://github.com/mobxjs/mobx-state-tree/issues/982) through [#983](https://github.com/mobxjs/mobx-state-tree/pull/983) by [@xaviergonz](https://github.com/xaviergonz)
+-   Added extendDecorate [#982](https://github.com/mobxjs/mobx-state-tree/issues/982) through [#984](https://github.com/mobxjs/mobx-state-tree/pull/984) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.2.3
 

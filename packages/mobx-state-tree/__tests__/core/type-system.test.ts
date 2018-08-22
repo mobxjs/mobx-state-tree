@@ -8,10 +8,7 @@ import {
     SnapshotOrInstance,
     cast,
     SnapshotIn,
-    Instance,
-    modelView,
-    modelAction,
-    modelState
+    Instance
 } from "../../src"
 
 const createTestFactories = () => {
@@ -752,56 +749,43 @@ test("cast and SnapshotOrInstance", () => {
     // cast(NumberMap({a: 2, b: 3}))
 })
 
-test("extendClass - basic functionality", () => {
-    const M = types.model({ x: 5 }).extendClass(self => {
-        class E {
-            private number2 = 2
-
-            @modelState
-            localState = 3
-
-            @modelView
+test("extendDecorate - basic functionality", () => {
+    const M = types.model({ x: 5 }).extendDecorate(
+        self => ({
+            localState: 3,
             get x2() {
-                return self.x * this.number2
-            }
-
-            @modelView
+                return self.x * 2
+            },
             xBy(by: number) {
                 return self.x * by
-            }
-
-            @modelAction
+            },
             setX(x: number) {
                 self.x = x
-            }
-
-            @modelAction
+            },
             setXBy(x: number) {
                 this.setX(this.xBy(x))
-            }
-
-            @modelAction
+            },
             setLocalState(x: number) {
                 this.localState = x
-            }
-
-            @modelAction
-            incNumber2() {
-                this.number2++
-            }
-
-            @modelView
+            },
             boundTo() {
                 return this
-            }
-
-            @modelView
+            },
             innerBoundTo() {
                 return () => this
             }
+        }),
+        {
+            localState: "state",
+            x2: "view",
+            xBy: "action",
+            setX: "action",
+            setXBy: "action",
+            setLocalState: "action",
+            boundTo: "view",
+            innerBoundTo: "view"
         }
-        return E
-    })
+    )
 
     const mi = M.create()
     expect(mi.x).toBe(5)
@@ -814,8 +798,6 @@ test("extendClass - basic functionality", () => {
     mi.setXBy(2)
     expect(mi.x).toBe(12)
     expect(mi.x2).toBe(12 * 2)
-    mi.incNumber2()
-    expect(mi.x2).toBe(12 * 3)
     expect(mi.xBy(2)).toBe(24)
 
     expect(mi.localState).toBe(3)

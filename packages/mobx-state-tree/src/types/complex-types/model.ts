@@ -154,8 +154,9 @@ export interface IModelType<
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
         fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS>
-    extendClass<NEWOTHERS extends object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => new () => NEWOTHERS
+    extendDecorate<NEWOTHERS extends object>(
+        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => NEWOTHERS,
+        decorators: { [k in keyof NEWOTHERS]: "action" | "view" | "state" }
     ): IModelType<PROPS, OTHERS & NEWOTHERS>
     preProcessSnapshot<S0 = ModelCreationType<PROPS>>(
         fn: (snapshot: S0) => ModelCreationType<PROPS>
@@ -380,32 +381,15 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return this.cloneAndEnhance({ initializers: [initializer] })
     }
 
-    extendClass(fn: (self: any) => new () => object): any {
+    extendDecorate<NEWOTHERS extends object>(
+        fn: (self: any) => NEWOTHERS,
+        decorators: { [k in keyof NEWOTHERS]: "action" | "view" | "state" }
+    ): any {
         function toExtend(self: any): any {
-            const clazz = fn(self)
-            const instance = new clazz() as {
-                $actions?: string[]
-                $views?: string[]
-                $state?: string[]
-            }
-
-            const instanceMembers = instance as object
-            const protoChain: any[] = []
-
-            let proto = instance
-            while (proto) {
-                protoChain.push(proto)
-                proto = Object.getPrototypeOf(proto)
-            }
+            const instance = fn(self)
 
             function getPropertyDescriptor(k: string): PropertyDescriptor | undefined {
-                for (const p of protoChain) {
-                    const desc = Object.getOwnPropertyDescriptor(p, k)
-                    if (desc) {
-                        return desc
-                    }
-                }
-                return undefined
+                return Object.getOwnPropertyDescriptor(instance, k)
             }
 
             const actions: object = {}
@@ -415,7 +399,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
             function fixPropertyDescriptor(key: string, desc: PropertyDescriptor | undefined) {
                 if (!desc) {
                     fail(
-                        `extendClass: no property descriptor could be found for class property "${key}"`
+                        `extendDecorate: no property descriptor could be found for property "${key}"`
                     )
                 }
                 desc = desc!
@@ -432,30 +416,24 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                 Object.defineProperty(obj, k, pdesc)
             }
 
-            for (const k in instanceMembers) {
-                if (k === "$actions" || k === "$views" || k === "$state") {
-                    continue
-                } else if (instance.$actions && instance.$actions.indexOf(k) >= 0) {
-                    addProperty(actions, k)
-                } else if (instance.$views && instance.$views.indexOf(k) >= 0) {
-                    addProperty(views, k)
-                } else if (instance.$state && instance.$state.indexOf(k) >= 0) {
-                    addProperty(state, k)
-                } else {
-                    if (k in self) {
-                        fail(
-                            `volatile property \`${k}\` is already present and cannot be redefined`
-                        )
-                    }
-                    addProperty(self, k)
+            for (const k in instance) {
+                const kind = decorators[k]
+                switch (kind) {
+                    case "action":
+                        addProperty(actions, k)
+                        break
+                    case "view":
+                        addProperty(views, k)
+                        break
+                    case "state":
+                        addProperty(state, k)
+                        break
+                    default:
+                        fail(`property \`${k}\` should be decorated`)
                 }
             }
 
-            return {
-                actions,
-                views,
-                state
-            }
+            return { actions, views, state }
         }
 
         return this.extend(toExtend)
@@ -507,7 +485,10 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
 
     preProcessSnapshot(preProcessor: (snapshot: any) => any): any {
         const currentPreprocessor = this.preProcessor
-        if (!currentPreprocessor) return this.cloneAndEnhance({ preProcessor }) as this
+        if (!currentPreprocessor)
+            return this.cloneAndEnhance({
+                preProcessor
+            }) as this
         else
             return this.cloneAndEnhance({
                 preProcessor: snapshot => currentPreprocessor(preProcessor(snapshot))
@@ -823,31 +804,4 @@ function tryGetOptional(type: any): OptionalValue<any, any, any> | undefined {
         return tryGetOptional(type.subType)
     if (type.flags & TypeFlags.Optional) return type
     return undefined
-}
-
-export function modelAction(target: object, key: string | symbol) {
-    if (typeof key !== "string") {
-        throw new Error("key must be a string")
-    }
-    const tany = target as any
-    const actions = (tany.$actions = tany.$actions || [])
-    actions.push(key)
-}
-
-export function modelView(target: object, key: string | symbol) {
-    if (typeof key !== "string") {
-        throw new Error("key must be a string")
-    }
-    const tany = target as any
-    const views = (tany.$views = tany.$views || [])
-    views.push(key)
-}
-
-export function modelState(target: object, key: string | symbol) {
-    if (typeof key !== "string") {
-        throw new Error("key must be a string")
-    }
-    const tany = target as any
-    const state = (tany.$state = tany.$state || [])
-    state.push(key)
 }
