@@ -66,7 +66,6 @@ export interface IMSTMap<C, S, T> {
     [Symbol.iterator](): IterableIterator<[string, T]>
     /** Merge another object into this map, returns self. */
     merge(other: IMSTMap<any, any, T> | IKeyValueMap<C | S | T> | any): this
-    clear(): void
     replace(values: IMSTMap<any, any, T> | IKeyValueMap<T>): this
     /**
      * Returns a plain object that represents this map.
