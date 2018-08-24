@@ -162,7 +162,7 @@ export interface IModelType<
     ): IModelType<PROPS, OTHERS, S1>
 }
 
-export type IAnyModelType = IModelType<any, any, any, any, any>
+export interface IAnyModelType extends IModelType<any, any, any, any, any> {}
 
 export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any> ? P : never
 export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O> ? O : never

@@ -73,7 +73,7 @@ export interface IType<C, S, T> {
     shouldAttachNode: boolean
 }
 
-export type IAnyType = IType<any, any, any>
+export interface IAnyType extends IType<any, any, any> {}
 
 export interface ISimpleType<T> extends IType<T, T, T> {}
 
@@ -89,7 +89,7 @@ export interface IComplexType<C, S, T> extends IType<C, S, T> {
     ): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>
 }
 
-export type IAnyComplexType = IComplexType<any, any, any>
+export interface IAnyComplexType extends IComplexType<any, any, any> {}
 
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
