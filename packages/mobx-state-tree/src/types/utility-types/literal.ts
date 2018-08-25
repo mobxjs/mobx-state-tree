@@ -15,7 +15,10 @@ import {
     Primitives
 } from "../../internal"
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class Literal<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     readonly value: any

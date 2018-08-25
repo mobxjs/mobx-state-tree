@@ -25,7 +25,10 @@ export interface UnionOptions {
     dispatcher?: ITypeDispatcher
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class Union extends Type<any, any, any> {
     readonly dispatcher?: ITypeDispatcher
     readonly eager: boolean = true

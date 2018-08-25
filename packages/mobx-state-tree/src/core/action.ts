@@ -44,13 +44,19 @@ export type IMiddlewareHandler = (
 let nextActionId = 1
 let currentActionContext: IMiddlewareEvent | null = null
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function getNextActionId() {
     return nextActionId++
 }
 
 // TODO: optimize away entire action context if there is no middleware in tree?
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const node = getStateTreeNode(context.context)
     const baseIsRunningAction = node._isRunningAction
@@ -70,13 +76,19 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     }
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function getActionContext(): IMiddlewareEvent {
     if (!currentActionContext) return fail("Not running an action!")
     return currentActionContext
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function createActionInvoker<T extends Function>(
     target: IAnyStateTreeNode,
     name: string,

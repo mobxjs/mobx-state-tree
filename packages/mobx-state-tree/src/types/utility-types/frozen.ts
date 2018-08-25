@@ -17,7 +17,10 @@ import {
     OptionalProperty
 } from "../../internal"
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class Frozen<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     flags = TypeFlags.Frozen

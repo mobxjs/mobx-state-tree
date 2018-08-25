@@ -8,7 +8,10 @@ import {
     IAnyType
 } from "../../internal"
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class ScalarNode implements INode {
     readonly type: IAnyType
     readonly storedValue: any

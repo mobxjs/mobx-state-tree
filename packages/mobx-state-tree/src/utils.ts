@@ -1,68 +1,116 @@
 import { isObservableArray, $mobx, getAtom } from "mobx"
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 declare const global: any
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([])
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export const EMPTY_OBJECT: {} = Object.freeze({})
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export const mobxShallow =
     typeof $mobx === "string" ? { deep: false } : { deep: false, proxy: false }
 Object.freeze(mobxShallow)
 
 export type IDisposer = () => void
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function fail(message = "Illegal state"): never {
     throw new Error("[mobx-state-tree] " + message)
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function identity<T>(_: T): T {
     return _
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function nothing(): null {
     return null
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function noop() {}
 
 // pollyfill (for IE) suggested in MDN:
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export const isInteger =
     Number.isInteger ||
     function(value: any) {
         return typeof value === "number" && isFinite(value) && Math.floor(value) === value
     }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function isArray(val: any): boolean {
     return !!(Array.isArray(val) || isObservableArray(val)) as boolean
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function asArray<T>(val: undefined | null | T | T[] | ReadonlyArray<T>): T[] {
     if (!val) return (EMPTY_ARRAY as any) as T[]
     if (isArray(val)) return val as T[]
     return [val] as T[]
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function extend<A, B>(a: A, b: B): A & B
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function extend<A, B, C>(a: A, b: B, c: C): A & B & C
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function extend<A, B, C, D>(a: A, b: B, c: C, d: D): A & B & C & D
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function extend(a: any, ...b: any[]): any
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function extend(a: any, ...b: any[]) {
     for (let i = 0; i < b.length; i++) {
         const current = b[i]
@@ -71,15 +119,30 @@ export function extend(a: any, ...b: any[]) {
     return a
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function extendKeepGetter<A, B>(a: A, b: B): A & B
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function extendKeepGetter<A, B, C>(a: A, b: B, c: C): A & B & C
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function extendKeepGetter<A, B, C, D>(a: A, b: B, c: C, d: D): A & B & C & D
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function extendKeepGetter(a: any, ...b: any[]): any
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function extendKeepGetter(a: any, ...b: any[]) {
     for (let i = 0; i < b.length; i++) {
         const current = b[i]
@@ -95,14 +158,20 @@ export function extendKeepGetter(a: any, ...b: any[]) {
     return a
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function isPlainObject(value: any) {
     if (value === null || typeof value !== "object") return false
     const proto = Object.getPrototypeOf(value)
     return proto === Object.prototype || proto === null
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function isMutable(value: any) {
     return (
         value !== null &&
@@ -112,7 +181,10 @@ export function isMutable(value: any) {
     )
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function isPrimitive(value: any): boolean {
     if (value === null || value === undefined) return true
     if (
@@ -127,6 +199,7 @@ export function isPrimitive(value: any): boolean {
 
 /**
  * @internal
+ * @private
  * Freeze a value and return it (if not in production)
  */
 export function freeze<T>(value: T): T {
@@ -136,6 +209,7 @@ export function freeze<T>(value: T): T {
 
 /**
  * @internal
+ * @private
  * Recursively freeze a value (if not in production)
  */
 export function deepFreeze<T>(value: T): T {
@@ -156,12 +230,18 @@ export function deepFreeze<T>(value: T): T {
     return value
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function isSerializable(value: any) {
     return typeof value !== "function"
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function addHiddenFinalProp(object: any, propName: string, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: false,
@@ -171,7 +251,10 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
     })
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function addHiddenWritableProp(object: any, propName: string, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: false,
@@ -181,7 +264,10 @@ export function addHiddenWritableProp(object: any, propName: string, value: any)
     })
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function addReadOnlyProp(object: any, propName: string, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: true,
@@ -191,13 +277,19 @@ export function addReadOnlyProp(object: any, propName: string, value: any) {
     })
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function remove<T>(collection: T[], item: T) {
     const idx = collection.indexOf(item)
     if (idx !== -1) collection.splice(idx, 1)
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function registerEventHandler(handlers: Function[], handler: Function): IDisposer {
     handlers.push(handler)
     return () => {
@@ -206,27 +298,42 @@ export function registerEventHandler(handlers: Function[], handler: Function): I
 }
 
 const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function hasOwnProperty(object: Object, propName: string) {
     return prototypeHasOwnProperty.call(object, propName)
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function argsToArray(args: IArguments): any[] {
     const res = new Array(args.length)
     for (let i = 0; i < args.length; i++) res[i] = args[i]
     return res
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function invalidateComputed(target: any, propName: string) {
     const atom = getAtom(target, propName) as any
     atom.trackAndCompute()
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export type DeprecatedFunction = Function & { ids?: { [id: string]: true } }
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export const deprecated: DeprecatedFunction = function(id: string, message: string): void {
     // skip if running production
     if (process.env.NODE_ENV === "production") return

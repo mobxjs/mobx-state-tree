@@ -47,7 +47,7 @@ import {
     optional,
     OptionalValue,
     MapType,
-    typecheck,
+    typecheckInternal,
     typeCheckFailure,
     TypeFlags
 } from "../../internal"
@@ -55,7 +55,10 @@ import {
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export enum HookNames {
     afterCreate = "afterCreate",
     afterAttach = "afterAttach",
@@ -167,7 +170,10 @@ function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export interface ModelTypeConfig {
     name?: string
     properties?: ModelProperties
@@ -239,7 +245,10 @@ function toPropertiesObject<T>(declaredProps: ModelPropertiesDeclaration): Model
     )
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class ModelType<S extends ModelProperties, T> extends ComplexType<any, any, any>
     implements IModelType<S, T> {
     readonly flags = TypeFlags.Object
@@ -486,7 +495,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         const type = (node.type as ModelType<any, any>).properties[change.name]
         // only properties are typed, state are stored as-is references
         if (type) {
-            typecheck(type, change.newValue)
+            typecheckInternal(type, change.newValue)
             change.newValue = type.reconcile(node.getChildNode(change.name), change.newValue)
         }
         return change
@@ -560,7 +569,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     @action
     applySnapshot(node: ObjectNode, snapshot: any): void {
         const s = this.applySnapshotPreProcessor(snapshot)
-        typecheck(this, s)
+        typecheckInternal(this, s)
         this.forAllProps((name, type) => {
             node.storedValue[name] = s[name]
         })

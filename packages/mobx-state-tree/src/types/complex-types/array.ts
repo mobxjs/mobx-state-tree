@@ -36,7 +36,7 @@ import {
     IValidationResult,
     mobxShallow,
     ObjectNode,
-    typecheck,
+    typecheckInternal,
     typeCheckFailure,
     TypeFlags,
     OptionalProperty
@@ -47,7 +47,10 @@ export interface IArrayType<C, S, T>
     extends IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>>,
         OptionalProperty {}
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> {
     shouldAttachNode = true
     subType: IAnyType
@@ -216,7 +219,7 @@ export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTAr
 
     @action
     applySnapshot(node: ObjectNode, snapshot: any[]): void {
-        typecheck(this, snapshot)
+        typecheckInternal(this, snapshot)
         const target = node.storedValue as IObservableArray<any>
         target.replace(snapshot)
     }
@@ -359,7 +362,7 @@ function valueAsNode(
     oldNode?: INode
 ) {
     // ensure the value is valid-ish
-    typecheck(childType, newValue)
+    typecheckInternal(childType, newValue)
 
     // the new value has a MST node
     if (isStateTreeNode(newValue)) {

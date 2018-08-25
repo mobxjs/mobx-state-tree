@@ -9,7 +9,10 @@ import {
     EMPTY_ARRAY
 } from "../../internal"
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export enum NodeLifeCycle {
     INITIALIZING, // setting up
     CREATED, // afterCreate has run
@@ -18,7 +21,10 @@ export enum NodeLifeCycle {
     DEAD // no coming back from this one
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export interface INode {
     readonly type: IAnyType
     readonly storedValue: any
@@ -60,18 +66,27 @@ export function isStateTreeNode<C = any, S = any>(value: any): value is IStateTr
     return !!(value && value.$treenode)
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function getStateTreeNode(value: IAnyStateTreeNode): ObjectNode {
     if (isStateTreeNode(value)) return value.$treenode!
     else return fail(`Value ${value} is no MST Node`)
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function getStateTreeNodeSafe(value: IAnyStateTreeNode): ObjectNode {
     return (value && value.$treenode) || null
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function canAttachNode(value: any) {
     return (
         value &&
@@ -88,7 +103,10 @@ export function toJSON<S>(this: IStateTreeNode<any, S>): S {
 
 const doubleDot = (_: any) => ".."
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode): string {
     // PRE condition target is (a child of) base!
     if (base.root !== target.root)
@@ -111,15 +129,24 @@ export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode
     )
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPath(base: ObjectNode, pathParts: string): INode
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPath(
     base: ObjectNode,
     pathParts: string,
     failIfResolveFails: boolean
 ): INode | undefined
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPath(
     base: ObjectNode,
     path: string,
@@ -128,15 +155,24 @@ export function resolveNodeByPath(
     return resolveNodeByPathParts(base, splitJsonPath(path), failIfResolveFails)
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPathParts(base: ObjectNode, pathParts: string[]): INode
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPathParts(
     base: ObjectNode,
     pathParts: string[],
     failIfResolveFails: boolean
 ): INode | undefined
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPathParts(
     base: ObjectNode,
     pathParts: string[],
@@ -193,7 +229,10 @@ export function resolveNodeByPathParts(
     return current!
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function convertChildNodesToArray(childNodes: IChildNodesMap | null): INode[] {
     if (!childNodes) return EMPTY_ARRAY as INode[]
 

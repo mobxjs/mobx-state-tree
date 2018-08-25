@@ -1,7 +1,10 @@
 import { IObservableArray, values, observable } from "mobx"
 import { fail, ObjectNode, mobxShallow, IAnyType } from "../../internal"
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class IdentifierCache {
     // n.b. in cache all identifiers are normalized to strings
     private cache = observable.map<string, IObservableArray<ObjectNode>>()

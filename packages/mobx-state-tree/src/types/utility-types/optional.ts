@@ -8,7 +8,7 @@ import {
     isType,
     IContext,
     IValidationResult,
-    typecheck,
+    typecheckInternal,
     typeCheckSuccess,
     fail,
     IAnyType,
@@ -16,12 +16,21 @@ import {
     OptionalProperty
 } from "../../internal"
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export type IFunctionReturn<T> = () => T
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export type IOptionalValue<C, S, T> = C | S | T | IFunctionReturn<C | S | T>
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class OptionalValue<C, S, T> extends Type<C, S, T> {
     readonly type: IType<C, S, T>
     readonly defaultValue: IOptionalValue<C, S, T>
@@ -62,7 +71,7 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
     private getDefaultValue() {
         const defaultValue =
             typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
-        if (typeof this.defaultValue === "function") typecheck(this, defaultValue)
+        if (typeof this.defaultValue === "function") typecheckInternal(this, defaultValue)
         return defaultValue
     }
 
@@ -134,7 +143,7 @@ export function optional(type: IAnyType, defaultValueOrFunction: any): IAnyType 
         const defaultSnapshot = isStateTreeNode(defaultValue)
             ? getStateTreeNode(defaultValue).snapshot
             : defaultValue
-        typecheck(type, defaultSnapshot)
+        typecheckInternal(type, defaultSnapshot)
     }
     const ret = new OptionalValue(type, defaultValueOrFunction)
     return ret as typeof ret & OptionalProperty

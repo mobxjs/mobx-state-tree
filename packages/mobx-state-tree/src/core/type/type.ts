@@ -8,7 +8,7 @@ import {
     getStateTreeNode,
     IContext,
     IValidationResult,
-    typecheck,
+    typecheckInternal,
     typeCheckFailure,
     typeCheckSuccess,
     INode,
@@ -55,39 +55,91 @@ export interface IType<C, S, T> {
     CreationType: C
 
     // Internal api's
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     flags: TypeFlags
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
+
     isType: boolean
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     instantiate(parent: INode | null, subpath: string, environment: any, initialValue?: any): INode
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     initializeChildNodes(node: INode, snapshot: any): IChildNodesMap
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     finalizeNewInstance(node: INode, instance: any): void
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     reconcile(current: INode, newValue: any): INode
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     getValue(node: INode): T
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     getSnapshot(node: INode, applyPostProcess?: boolean): S
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     applySnapshot(node: INode, snapshot: C): void
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     getChildren(node: INode): ReadonlyArray<INode>
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     getChildNode(node: INode, key: string): INode
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     getChildType(key: string): IAnyType
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     removeChild(node: INode, subpath: string): void
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     isAssignableFrom(type: IAnyType): boolean
-    /** @internal */
+    /**
+     * @internal
+     * @private
+     */
     shouldAttachNode: boolean
 }
 
@@ -154,8 +206,10 @@ export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
 export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
 
 /**
- * @internal
  * A complex type produces a MST node (Node in the state tree)
+ *
+ * @internal
+ * @private
  */
 export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
     readonly isType = true
@@ -167,7 +221,7 @@ export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
 
     @action
     create(snapshot: C = this.getDefaultSnapshot(), environment?: any) {
-        typecheck(this, snapshot)
+        typecheckInternal(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).value
     }
 
@@ -275,7 +329,10 @@ export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
     }
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements IType<C, S, T> {
     constructor(name: string) {
         super(name)

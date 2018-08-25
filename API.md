@@ -6,101 +6,185 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 
 ### Table of Contents
 
--   [addDisposer](#adddisposer)
--   [addMiddleware](#addmiddleware)
--   [applyAction](#applyaction)
--   [applyPatch](#applypatch)
--   [applySnapshot](#applysnapshot)
--   [BaseReferenceType](#basereferencetype)
--   [BaseReferenceType](#basereferencetype-1)
--   [cast](#cast)
--   [clone](#clone)
--   [ComplexType](#complextype)
--   [ComplexType](#complextype-1)
--   [ComplexType](#complextype-2)
--   [ComplexType](#complextype-3)
--   [ComplexType](#complextype-4)
--   [createActionTrackingMiddleware](#createactiontrackingmiddleware)
--   [decorate](#decorate)
--   [destroy](#destroy)
--   [detach](#detach)
--   [escapeJsonPath](#escapejsonpath)
--   [flow](#flow)
--   [getChildType](#getchildtype)
--   [getEnv](#getenv)
--   [getIdentifier](#getidentifier)
--   [getMembers](#getmembers)
--   [getParent](#getparent)
--   [getParentOfType](#getparentoftype)
--   [getPath](#getpath)
--   [getPathParts](#getpathparts)
--   [getRelativePath](#getrelativepath)
--   [getRoot](#getroot)
--   [getSnapshot](#getsnapshot)
--   [getType](#gettype)
--   [hasParent](#hasparent)
--   [hasParentOfType](#hasparentoftype)
--   [IdentifierCache](#identifiercache)
--   [IdentifierType](#identifiertype)
--   [isAlive](#isalive)
--   [isProtected](#isprotected)
--   [isRoot](#isroot)
--   [isStateTreeNode](#isstatetreenode)
--   [joinJsonPath](#joinjsonpath)
--   [ObjectNode](#objectnode)
--   [ObservableMap](#observablemap)
--   [onAction](#onaction)
--   [onPatch](#onpatch)
--   [onSnapshot](#onsnapshot)
--   [process](#process)
--   [protect](#protect)
--   [recordActions](#recordactions)
--   [recordPatches](#recordpatches)
--   [resolveIdentifier](#resolveidentifier)
--   [resolvePath](#resolvepath)
--   [ScalarNode](#scalarnode)
--   [setLivelynessChecking](#setlivelynesschecking)
--   [splitJsonPath](#splitjsonpath)
--   [StoredReference](#storedreference)
--   [tryResolve](#tryresolve)
--   [Type](#type)
--   [Type](#type-1)
--   [Type](#type-2)
--   [Type](#type-3)
--   [Type](#type-4)
--   [Type](#type-5)
--   [Type](#type-6)
--   [Type](#type-7)
--   [Type](#type-8)
--   [Type](#type-9)
--   [typecheck](#typecheck)
--   [types.array](#typesarray)
--   [types.boolean](#typesboolean)
--   [types.compose](#typescompose)
--   [types.custom](#typescustom)
--   [types.Date](#typesdate)
--   [types.enumeration](#typesenumeration)
--   [types.frozen](#typesfrozen)
--   [types.identifier](#typesidentifier)
--   [types.identifierNumber](#typesidentifiernumber)
--   [types.integer](#typesinteger)
--   [types.late](#typeslate)
--   [types.literal](#typesliteral)
--   [types.map](#typesmap)
--   [types.maybe](#typesmaybe)
--   [types.maybeNull](#typesmaybenull)
--   [types.model](#typesmodel)
--   [types.null](#typesnull)
--   [types.number](#typesnumber)
--   [types.optional](#typesoptional)
--   [types.reference](#typesreference)
--   [types.refinement](#typesrefinement)
--   [types.string](#typesstring)
--   [types.undefined](#typesundefined)
--   [types.union](#typesunion)
--   [unescapeJsonPath](#unescapejsonpath)
--   [unprotect](#unprotect)
--   [walk](#walk)
+-   [addDisposer][1]
+    -   [Parameters][2]
+    -   [Examples][3]
+-   [addMiddleware][4]
+    -   [Parameters][5]
+-   [applyAction][6]
+    -   [Parameters][7]
+-   [applyPatch][8]
+    -   [Parameters][9]
+-   [applySnapshot][10]
+    -   [Parameters][11]
+-   [BaseReferenceType][12]
+-   [BaseReferenceType][13]
+-   [cast][14]
+    -   [Parameters][15]
+    -   [Examples][16]
+-   [clone][17]
+    -   [Parameters][18]
+-   [ComplexType][19]
+-   [ComplexType][20]
+-   [ComplexType][21]
+-   [ComplexType][22]
+-   [ComplexType][23]
+-   [createActionTrackingMiddleware][24]
+    -   [Parameters][25]
+-   [decorate][26]
+    -   [Parameters][27]
+    -   [Examples][28]
+-   [destroy][29]
+    -   [Parameters][30]
+-   [detach][31]
+    -   [Parameters][32]
+-   [escapeJsonPath][33]
+    -   [Parameters][34]
+-   [flow][35]
+    -   [Parameters][36]
+-   [getChildType][37]
+    -   [Parameters][38]
+    -   [Examples][39]
+-   [getEnv][40]
+    -   [Parameters][41]
+-   [getIdentifier][42]
+    -   [Parameters][43]
+-   [getMembers][44]
+    -   [Parameters][45]
+-   [getParent][46]
+    -   [Parameters][47]
+-   [getParentOfType][48]
+    -   [Parameters][49]
+-   [getPath][50]
+    -   [Parameters][51]
+-   [getPathParts][52]
+    -   [Parameters][53]
+-   [getRelativePath][54]
+    -   [Parameters][55]
+-   [getRoot][56]
+    -   [Parameters][57]
+-   [getSnapshot][58]
+    -   [Parameters][59]
+-   [getType][60]
+    -   [Parameters][61]
+-   [hasParent][62]
+    -   [Parameters][63]
+-   [hasParentOfType][64]
+    -   [Parameters][65]
+-   [IdentifierCache][66]
+-   [IdentifierType][67]
+-   [isAlive][68]
+    -   [Parameters][69]
+-   [isProtected][70]
+    -   [Parameters][71]
+-   [isRoot][72]
+    -   [Parameters][73]
+-   [isStateTreeNode][74]
+    -   [Parameters][75]
+-   [joinJsonPath][76]
+    -   [Parameters][77]
+-   [ObjectNode][78]
+-   [ObservableMap][79]
+-   [onAction][80]
+    -   [Parameters][81]
+    -   [Examples][82]
+-   [onPatch][83]
+    -   [Parameters][84]
+-   [onSnapshot][85]
+    -   [Parameters][86]
+-   [process][87]
+    -   [Parameters][88]
+-   [protect][89]
+    -   [Parameters][90]
+-   [recordActions][91]
+    -   [Parameters][92]
+    -   [Examples][93]
+-   [recordPatches][94]
+    -   [Parameters][95]
+    -   [Examples][96]
+-   [resolveIdentifier][97]
+    -   [Parameters][98]
+-   [resolvePath][99]
+    -   [Parameters][100]
+-   [ScalarNode][101]
+-   [setLivelynessChecking][102]
+    -   [Parameters][103]
+-   [splitJsonPath][104]
+    -   [Parameters][105]
+-   [StoredReference][106]
+-   [tryResolve][107]
+    -   [Parameters][108]
+-   [Type][109]
+-   [Type][110]
+-   [Type][111]
+-   [Type][112]
+-   [Type][113]
+-   [Type][114]
+-   [Type][115]
+-   [Type][116]
+-   [Type][117]
+-   [Type][118]
+-   [typecheck][119]
+    -   [Parameters][120]
+-   [types.array][121]
+    -   [Parameters][122]
+    -   [Examples][123]
+-   [types.boolean][124]
+    -   [Examples][125]
+-   [types.compose][126]
+-   [types.custom][127]
+    -   [Parameters][128]
+    -   [Examples][129]
+-   [types.Date][130]
+    -   [Examples][131]
+-   [types.enumeration][132]
+    -   [Parameters][133]
+    -   [Examples][134]
+-   [types.frozen][135]
+    -   [Parameters][136]
+    -   [Examples][137]
+-   [types.identifier][138]
+    -   [Examples][139]
+-   [types.identifierNumber][140]
+    -   [Examples][141]
+-   [types.integer][142]
+    -   [Examples][143]
+-   [types.late][144]
+    -   [Parameters][145]
+    -   [Examples][146]
+-   [types.literal][147]
+    -   [Parameters][148]
+    -   [Examples][149]
+-   [types.map][150]
+    -   [Parameters][151]
+    -   [Examples][152]
+-   [types.maybe][153]
+    -   [Parameters][154]
+-   [types.maybeNull][155]
+    -   [Parameters][156]
+-   [types.model][157]
+-   [types.null][158]
+-   [types.number][159]
+    -   [Examples][160]
+-   [types.optional][161]
+    -   [Parameters][162]
+    -   [Examples][163]
+-   [types.reference][164]
+    -   [Parameters][165]
+-   [types.refinement][166]
+    -   [Parameters][167]
+-   [types.string][168]
+    -   [Examples][169]
+-   [types.undefined][170]
+-   [types.union][171]
+    -   [Parameters][172]
+-   [unescapeJsonPath][173]
+    -   [Parameters][174]
+-   [unprotect][175]
+    -   [Parameters][176]
+    -   [Examples][177]
+-   [walk][178]
+    -   [Parameters][179]
 
 ## addDisposer
 
@@ -108,12 +192,12 @@ Use this utility to register a function that should be called whenever the
 targeted state tree node is destroyed. This is a useful alternative to managing
 cleanup methods yourself using the `beforeDestroy` hook.
 
-**Parameters**
+### Parameters
 
 -   `target` **IStateTreeNode** 
 -   `disposer`  
 
-**Examples**
+### Examples
 
 ```javascript
 const Todo = types.model({
@@ -136,9 +220,9 @@ const Todo = types.model({
 Middleware can be used to intercept any action is invoked on the subtree where it is attached.
 If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
 
-For more details, see the [middleware docs](docs/middleware.md)
+For more details, see the [middleware docs][180]
 
-**Parameters**
+### Parameters
 
 -   `target` **IStateTreeNode** 
 -   `handler`  
@@ -152,31 +236,31 @@ Applies an action or a series of actions in a single MobX transaction.
 Does not return any value
 Takes an action description as produced by the `onAction` middleware.
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IActionCall>** 
+-   `target` **[Object][181]** 
+-   `actions` **[Array][182]&lt;IActionCall>** 
 
 ## applyPatch
 
 Applies a JSON-patch to the given model instance or bails out if the patch couldn't be applied
-See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details.
+See [patches][183] for more details.
 
 Can apply a single past, or an array of patches.
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object][181]** 
 -   `patch` **IJsonPatch** 
 
 ## applySnapshot
 
 Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `snapshot` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object][181]** 
+-   `snapshot` **[Object][181]** 
 
 ## BaseReferenceType
 
@@ -190,11 +274,11 @@ Note that this is just a cast for the type system, this is, it won't actually co
 (or vice-versa), but just fool typescript into thinking so.
 Casting only works on assignation operations, it won't work (compile) stand-alone.
 
-**Parameters**
+### Parameters
 
 -   `snapshotOrInstance` **CastedType&lt;T>** 
 
-**Examples**
+### Examples
 
 ```javascript
 const ModelA = types.model({
@@ -224,10 +308,10 @@ Short hand for `snapshot(x) = getType(x).create(getSnapshot(x))`
 
 _Tip: clone will create a literal copy, including the same identifiers. To modify identifiers etc during cloning, don't use clone but take a snapshot of the tree, modify it, and create new instance_
 
-**Parameters**
+### Parameters
 
 -   `source` **T** 
--   `keepEnvironment` **([boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | any)** indicates whether the clone should inherit the same environment (`true`, the default), or not have an environment (`false`). If an object is passed in as second argument, that will act as the environment for the cloned tree.
+-   `keepEnvironment` **([boolean][184] | any)** indicates whether the clone should inherit the same environment (`true`, the default), or not have an environment (`false`). If an object is passed in as second argument, that will act as the environment for the cloned tree.
 
 Returns **T** 
 
@@ -251,7 +335,7 @@ The create middleware tracks the process of an action (assuming it passes the `f
 
 See the `atomic` middleware for an example
 
-**Parameters**
+### Parameters
 
 -   `hooks`  
 
@@ -261,13 +345,13 @@ Returns **IMiddlewareHandler**
 
 Binds middleware to a specific action
 
-**Parameters**
+### Parameters
 
 -   `handler` **IMiddlewareHandler** 
 -   `fn`  
 -   `Function`  } fn
 
-**Examples**
+### Examples
 
 ```javascript
 type.actions(self => {
@@ -289,7 +373,7 @@ Returns **any** the original function
 
 Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
 
-**Parameters**
+### Parameters
 
 -   `target`  
 
@@ -297,39 +381,39 @@ Removes a model element from the state tree, and mark it as end-of-life; the ele
 
 Removes a model element from the state tree, and let it live on as a new state tree
 
-**Parameters**
+### Parameters
 
 -   `target`  
 
 ## escapeJsonPath
 
 escape slashes and backslashes
-<http://tools.ietf.org/html/rfc6901>
+[http://tools.ietf.org/html/rfc6901][185]
 
-**Parameters**
+### Parameters
 
 -   `str`  
 
 ## flow
 
-See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
+See [asynchronous actions][186].
 
-**Parameters**
+### Parameters
 
 -   `asyncAction`  
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
+Returns **[Promise][187]** 
 
 ## getChildType
 
 Returns the _declared_ type of the given sub property of an object, array or map.
 
-**Parameters**
+### Parameters
 
 -   `object` **IStateTreeNode** 
--   `child` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `child` **[string][188]** 
 
-**Examples**
+### Examples
 
 ```javascript
 const Box = types.model({ x: 0, y: 0 })
@@ -343,14 +427,14 @@ Returns **IAnyType**
 ## getEnv
 
 Returns the environment of the current state tree. For more info on environments,
-see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
+see [Dependency injection][189]
 
 Please note that in child nodes access to the root is only possible
 once the `afterAttach` hook has fired
 
 Returns an empty environment if the tree wasn't initialized with an environment
 
-**Parameters**
+### Parameters
 
 -   `target` **IStateTreeNode** 
 
@@ -361,17 +445,17 @@ Returns **any**
 Returns the identifier of the target node.
 This is the _string normalized_ identifier, which might not match the type of the identifier attribute
 
-**Parameters**
+### Parameters
 
 -   `target` **IStateTreeNode** 
 
-Returns **([string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) | null)** 
+Returns **([string][188] | null)** 
 
 ## getMembers
 
 Returns a reflection of the node
 
-**Parameters**
+### Parameters
 
 -   `target` **IStateTreeNode** 
 
@@ -387,10 +471,10 @@ doesn't necessarily refer to the parent model
 Please note that in child nodes access to the root is only possible
 once the `afterAttach` hook has fired
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `depth` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** = 1, how far should we look upward?
+-   `target` **[Object][181]** 
+-   `depth` **[number][190]** = 1, how far should we look upward?
 
 Returns **any** 
 
@@ -398,7 +482,7 @@ Returns **any**
 
 Returns the target's parent of a given type, or throws.
 
-**Parameters**
+### Parameters
 
 -   `target` **IStateTreeNode** 
 -   `type` **IType&lt;any, any, T>** 
@@ -409,33 +493,33 @@ Returns **T**
 
 Returns the path of the given object in the model tree
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object][181]** 
 
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+Returns **[string][188]** 
 
 ## getPathParts
 
 Returns the path of the given object as unescaped string array
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object][181]** 
 
-Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** 
+Returns **[Array][182]&lt;[string][188]>** 
 
 ## getRelativePath
 
 Given two state tree nodes that are part of the same tree,
 returns the shortest jsonpath needed to navigate from the one to the other
 
-**Parameters**
+### Parameters
 
 -   `base` **IStateTreeNode** 
 -   `target` **IStateTreeNode** 
 
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+Returns **[string][188]** 
 
 ## getRoot
 
@@ -444,9 +528,9 @@ Given an object in a model tree, returns the root object of that tree
 Please note that in child nodes access to the root is only possible
 once the `afterAttach` hook has fired
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object][181]** 
 
 Returns **any** 
 
@@ -455,10 +539,10 @@ Returns **any**
 Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
 structural sharing where possible. Doesn't require MobX transactions to be completed.
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `applyPostProcess` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** = true, by default the postProcessSnapshot gets applied
+-   `target` **[Object][181]** 
+-   `applyPostProcess` **[boolean][184]** = true, by default the postProcessSnapshot gets applied
 
 Returns **any** 
 
@@ -466,7 +550,7 @@ Returns **any**
 
 Returns the _actual_ type of the given tree node. (Or throws)
 
-**Parameters**
+### Parameters
 
 -   `object` **IStateTreeNode** 
 
@@ -476,23 +560,23 @@ Returns **IAnyType**
 
 Given a model instance, returns `true` if the object has a parent, that is, is part of another object, map or array
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `depth` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** = 1, how far should we look upward?
+-   `target` **[Object][181]** 
+-   `depth` **[number][190]** = 1, how far should we look upward?
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean][184]** 
 
 ## hasParentOfType
 
 Given a model instance, returns `true` if the object has a parent of given type, that is, is part of another object, map or array
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object][181]** 
 -   `type` **IAnyType** 
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean][184]** 
 
 ## IdentifierCache
 
@@ -505,17 +589,17 @@ This means that the node is still a part of a tree, and that `destroy`
 has not been called. If a node is not alive anymore, the only thing one can do with it
 is requesting it's last path and snapshot
 
-**Parameters**
+### Parameters
 
 -   `target` **IStateTreeNode** 
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean][184]** 
 
 ## isProtected
 
 Returns true if the object is in protected mode, @see protect
 
-**Parameters**
+### Parameters
 
 -   `target`  
 
@@ -523,11 +607,11 @@ Returns true if the object is in protected mode, @see protect
 
 Returns true if the given object is the root of a model tree
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object][181]** 
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean][184]** 
 
 ## isStateTreeNode
 
@@ -535,7 +619,7 @@ Returns true if the given value is a node in a state tree.
 More precisely, that is, if the value is an instance of a
 `types.model`, `types.array` or `types.map`.
 
-**Parameters**
+### Parameters
 
 -   `value` **any** 
 
@@ -543,11 +627,11 @@ More precisely, that is, if the value is an instance of a
 
 Generates a json-path compliant json path from path parts
 
-**Parameters**
+### Parameters
 
--   `path` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** 
+-   `path` **[Array][182]&lt;[string][188]>** 
 
-Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+Returns **[string][188]** 
 
 ## ObjectNode
 
@@ -556,20 +640,20 @@ Returns **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 ## onAction
 
 Registers a function that will be invoked for each action that is called on the provided model instance, or to any of its children.
-See [actions](https://github.com/mobxjs/mobx-state-tree#actions) for more details. onAction events are emitted only for the outermost called action in the stack.
+See [actions][191] for more details. onAction events are emitted only for the outermost called action in the stack.
 Action can also be intercepted by middleware using addMiddleware to change the function call before it will be run.
 
 Not all action arguments might be serializable. For unserializable arguments, a struct like `{ $MST_UNSERIALIZABLE: true, type: "someType" }` will be generated.
 MST Nodes are considered non-serializable as well (they could be serialized as there snapshot, but it is uncertain whether an replaying party will be able to handle such a non-instantiated snapshot).
 Rather, when using `onAction` middleware, one should consider in passing arguments which are 1: an id, 2: a (relative) path, or 3: a snapshot. Instead of a real MST node.
 
-**Parameters**
+### Parameters
 
 -   `target` **IStateTreeNode** 
 -   `listener`  
 -   `attachAfter`  {boolean} (default false) fires the listener _after_ the action has executed instead of before.
 
-**Examples**
+### Examples
 
 ```javascript
 const Todo = types.model({
@@ -599,12 +683,12 @@ Returns **IDisposer**
 ## onPatch
 
 Registers a function that will be invoked for each mutation that is applied to the provided model instance, or to any of its children.
-See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details. onPatch events are emitted immediately and will not await the end of a transaction.
+See [patches][183] for more details. onPatch events are emitted immediately and will not await the end of a transaction.
 Patches can be used to deep observe a model tree.
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the model instance from which to receive patches
+-   `target` **[Object][181]** the model instance from which to receive patches
 -   `callback`  
 
 Returns **IDisposer** function to remove the listener
@@ -613,27 +697,27 @@ Returns **IDisposer** function to remove the listener
 
 Registers a function that is invoked whenever a new snapshot for the given model instance is available.
 The listener will only be fire at the and of the current MobX (trans)action.
-See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
+See [snapshots][192] for more details.
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `target` **[Object][181]** 
 -   `callback`  
 
 Returns **IDisposer** 
 
 ## process
 
-**Parameters**
+### Parameters
 
 -   `asyncAction`  
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
+Returns **[Promise][187]** 
 
 **Meta**
 
 -   **deprecated**: has been renamed to `flow()`.
-    See <https://github.com/mobxjs/mobx-state-tree/issues/399> for more information.
+    See [https://github.com/mobxjs/mobx-state-tree/issues/399][193] for more information.
     Note that the middleware event types starting with `process` now start with `flow`.
 
 
@@ -641,7 +725,7 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 The inverse of `unprotect`
 
-**Parameters**
+### Parameters
 
 -   `target` **IStateTreeNode** 
 
@@ -650,11 +734,11 @@ The inverse of `unprotect`
 Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted.
 Returns an recorder object with the following signature:
 
-**Parameters**
+### Parameters
 
 -   `subject` **IStateTreeNode** 
 
-**Examples**
+### Examples
 
 ```javascript
 export interface IActionRecorder {
@@ -674,11 +758,11 @@ Returns **IPatchRecorder**
 Small abstraction around `onPatch` and `applyPatch`, attaches a patch listener to a tree and records all the patches.
 Returns an recorder object with the following signature:
 
-**Parameters**
+### Parameters
 
 -   `subject` **IStateTreeNode** 
 
-**Examples**
+### Examples
 
 ```javascript
 export interface IPatchRecorder {
@@ -705,11 +789,11 @@ Returns **IPatchRecorder**
 Resolves a model instance given a root target, the type and the identifier you are searching for.
 Returns undefined if no value can be found.
 
-**Parameters**
+### Parameters
 
 -   `type` **IAnyType** 
 -   `target` **IStateTreeNode** 
--   `identifier` **([string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number))** 
+-   `identifier` **([string][188] \| [number][190])** 
 
 Returns **any** 
 
@@ -718,10 +802,10 @@ Returns **any**
 Resolves a path relatively to a given object.
 Returns undefined if no value can be found.
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** escaped json path
+-   `target` **[Object][181]** 
+-   `path` **[string][188]** escaped json path
 
 Returns **any** 
 
@@ -735,7 +819,7 @@ Use te `"error"` option to easy debugging to see where the error was thrown and 
 
 Possible values: `"warn"`, `"error"` and `"ignore"`
 
-**Parameters**
+### Parameters
 
 -   `mode` **LivelynessMode** 
 
@@ -743,20 +827,20 @@ Possible values: `"warn"`, `"error"` and `"ignore"`
 
 Splits and decodes a json path into several parts
 
-**Parameters**
+### Parameters
 
--   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `path` **[string][188]** 
 
-Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** 
+Returns **[Array][182]&lt;[string][188]>** 
 
 ## StoredReference
 
 ## tryResolve
 
-**Parameters**
+### Parameters
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
--   `path` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `target` **[Object][181]** 
+-   `path` **[string][188]** 
 
 Returns **any** 
 
@@ -786,7 +870,7 @@ Run's the typechecker on the given type.
 Throws if the given value is not according the provided type specification.
 Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
 
-**Parameters**
+### Parameters
 
 -   `type` **IAnyType** 
 -   `value` **any** 
@@ -795,13 +879,13 @@ Use this if you need typechecks even in a production build (by default all autom
 
 Creates an index based collection type who's children are all of a uniform declared type.
 
-This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
+This type will always produce [observable arrays][194]
 
-**Parameters**
+### Parameters
 
 -   `subtype` **IType&lt;S, T>** 
 
-**Examples**
+### Examples
 
 ```javascript
 const Todo = types.model({
@@ -818,14 +902,14 @@ s.todos.push({ task: "Grab coffee" })
 console.log(s.todos[0]) // prints: "Grab coffee"
 ```
 
-Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;S>, IObservableArray&lt;T>>** 
+Returns **IComplexType&lt;[Array][182]&lt;S>, IObservableArray&lt;T>>** 
 
 ## types.boolean
 
 Creates a type that can only contain a boolean value.
 This type is used for boolean values by default
 
-**Examples**
+### Examples
 
 ```javascript
 const Thing = types.model({
@@ -863,11 +947,11 @@ export interface CustomTypeOptions<S, T> {
 }
 ```
 
-**Parameters**
+### Parameters
 
--   `options`  
+-   `options` **CustomTypeOptions&lt;S, T>** 
 
-**Examples**
+### Examples
 
 ```javascript
 const DecimalPrimitive = types.custom<string, Decimal>({
@@ -892,11 +976,13 @@ const Wallet = types.model({
 })
 ```
 
+Returns **(IType&lt;(S | T), S, T>)** 
+
 ## types.Date
 
 Creates a type that can only contain a javascript Date value.
 
-**Examples**
+### Examples
 
 ```javascript
 const LogLine = types.model({
@@ -911,12 +997,12 @@ LogLine.create({ timestamp: new Date() })
 Can be used to create an string based enumeration.
 (note: this methods is just sugar for a union of string literals)
 
-**Parameters**
+### Parameters
 
--   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** descriptive name of the enumeration (optional)
--   `options` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** possible values this enumeration can have
+-   `name` **[string][188]** descriptive name of the enumeration (optional)
+-   `options` **[Array][182]&lt;[string][188]>** possible values this enumeration can have
 
-**Examples**
+### Examples
 
 ```javascript
 const TrafficLight = types.model({
@@ -924,11 +1010,11 @@ const TrafficLight = types.model({
 })
 ```
 
-Returns **ISimpleType&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** 
+Returns **ISimpleType&lt;[string][188]>** 
 
 ## types.frozen
 
-Frozen can be used to story any value that is serializable in itself (that is valid JSON).
+Frozen can be used to store any value that is serializable in itself (that is valid JSON).
 Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
 Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
 
@@ -941,12 +1027,12 @@ Frozen properties can be defined in three different ways
 2\. `types.frozen({ someDefaultValue: true})` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
 3\. `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
 
-**Parameters**
+### Parameters
 
 -   `arg`  
--   `defaultValueOrType` **([Type](#type) | value)** 
+-   `defaultValueOrType` **([Type][195] | value)** 
 
-**Examples**
+### Examples
 
 ```javascript
 const GameCharacter = types.model({
@@ -970,7 +1056,7 @@ type Point = { x: number, y: number }
    })
 ```
 
-Returns **[Type](#type)** 
+Returns **[Type][195]** 
 
 ## types.identifier
 
@@ -980,7 +1066,7 @@ For example there couldn't be 2 instances of user with id 1. If you need more, c
 Identifier can be used only as type property of a model.
 This type accepts as parameter the value type of the identifier field that can be either string or number.
 
-**Examples**
+### Examples
 
 ```javascript
 const Todo = types.model("Todo", {
@@ -995,7 +1081,7 @@ Returns **IType&lt;T, T>**
 
 Similar to `types.identifier`, but `identifierNumber` will serialize from / to a number when applying snapshots
 
-**Examples**
+### Examples
 
 ```javascript
 const Todo = types.model("Todo", {
@@ -1011,7 +1097,7 @@ Returns **IType&lt;T, T>**
 Creates a type that can only contain an integer value.
 This type is used for integer values by default
 
-**Examples**
+### Examples
 
 ```javascript
 const Size = types.model({
@@ -1026,14 +1112,14 @@ Defines a type that gets implemented later. This is useful when you have to deal
 Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
 You need to declare an interface to explicit the return type of the late parameter function.
 
-**Parameters**
+### Parameters
 
 -   `nameOrType`  
 -   `maybeType`  
--   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** The name to use for the type that will be returned.
+-   `name` **[string][188]?** The name to use for the type that will be returned.
 -   `type` **ILateType&lt;S, T>** A function that returns the type that will be defined.
 
-**Examples**
+### Examples
 
 ```javascript
 interface INode {
@@ -1054,11 +1140,11 @@ The literal type will return a type that will match only the exact given type.
 The given value must be a primitive, in order to be serialized to a snapshot correctly.
 You can use literal to match exact strings for example the exact male or female string.
 
-**Parameters**
+### Parameters
 
 -   `value` **S** The value to use in the strict equal check
 
-**Examples**
+### Examples
 
 ```javascript
 const Person = types.model({
@@ -1074,13 +1160,13 @@ Returns **ISimpleType&lt;S>**
 Creates a key based collection type who's children are all of a uniform declared type.
 If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
 
-This type will always produce [observable maps](https://mobx.js.org/refguide/map.html)
+This type will always produce [observable maps][196]
 
-**Parameters**
+### Parameters
 
 -   `subtype` **IType&lt;S, T>** 
 
-**Examples**
+### Examples
 
 ```javascript
 const Todo = types.model({
@@ -1099,35 +1185,35 @@ s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the iden
 console.log(s.todos.get(17).task) // prints: "Grab coffee"
 ```
 
-Returns **IComplexType&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;S>, IObservableArray&lt;T>>** 
+Returns **IComplexType&lt;[Array][182]&lt;S>, IObservableArray&lt;T>>** 
 
 ## types.maybe
 
 Maybe will make a type nullable, and also optional.
 The value `undefined` will be used to represent nullability.
 
-**Parameters**
+### Parameters
 
 -   `type` **IType&lt;C, S, M>** The type to make nullable
 
-Returns **(IType&lt;(C | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)), (S | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)), (T | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined))>)** 
+Returns **(IType&lt;(C | [undefined][197]), (S | [undefined][197]), (T | [undefined][197])>)** 
 
 ## types.maybeNull
 
 Maybe will make a type nullable, and also optional.
 The value `null` will be used to represent no value.
 
-**Parameters**
+### Parameters
 
 -   `type` **IType&lt;C, S, M>** The type to make nullable
 
-Returns **(IType&lt;(C | null | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)), (S | null), (T | null)>)** 
+Returns **(IType&lt;(C | null | [undefined][197]), (S | null), (T | null)>)** 
 
 ## types.model
 
 Creates a new model type by providing a name, properties, volatile state and actions.
 
-See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
+See the [model type][198] description or the [getting started][199] tutorial.
 
 ## types.null
 
@@ -1138,7 +1224,7 @@ The type of the value `null`
 Creates a type that can only contain a numeric value.
 This type is used for numeric values by default
 
-**Examples**
+### Examples
 
 ```javascript
 const Vector = types.model({
@@ -1154,12 +1240,12 @@ If the given value is not provided in the snapshot, it will default to the provi
 If `defaultValue` is a function, the function will be invoked for every new instance.
 Applying a snapshot in which the optional value is _not_ present, causes the value to be reset
 
-**Parameters**
+### Parameters
 
 -   `type`  
 -   `defaultValueOrFunction`  
 
-**Examples**
+### Examples
 
 ```javascript
 const Todo = types.model({
@@ -1175,9 +1261,9 @@ const todo = Todo.create({ title: "Get coffee "})
 ## types.reference
 
 Creates a reference to another type, which should have defined an identifier.
-See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
+See also the [reference and identifiers][200] section.
 
-**Parameters**
+### Parameters
 
 -   `subType`  
 -   `options`  
@@ -1186,9 +1272,9 @@ See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tr
 
 `types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 
-**Parameters**
+### Parameters
 
--   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `name` **[string][188]** 
 -   `type` **IType&lt;T, T>** 
 
 Returns **IType&lt;T, T>** 
@@ -1198,7 +1284,7 @@ Returns **IType&lt;T, T>**
 Creates a type that can only contain a string value.
 This type is used for string values by default
 
-**Examples**
+### Examples
 
 ```javascript
 const Person = types.model({
@@ -1215,10 +1301,10 @@ The type of the value `undefined`
 
 types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
 
-**Parameters**
+### Parameters
 
 -   `optionsOrType` **(ITypeDispatcher | IAnyType)** 
--   `otherTypes` **...[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;IAnyType>** 
+-   `otherTypes` **...[Array][182]&lt;IAnyType>** 
 
 Returns **IAnyType** 
 
@@ -1226,7 +1312,7 @@ Returns **IAnyType**
 
 unescape slashes and backslashes
 
-**Parameters**
+### Parameters
 
 -   `str`  
 
@@ -1238,11 +1324,11 @@ For example because you are building a PoC or don't have any middleware attached
 
 In that case you can disable this protection by calling `unprotect` on the root of your tree.
 
-**Parameters**
+### Parameters
 
 -   `target`  
 
-**Examples**
+### Examples
 
 ```javascript
 const Todo = types.model({
@@ -1264,7 +1350,407 @@ todo.done = false // OK
 
 Performs a depth first walk through a tree
 
-**Parameters**
+### Parameters
 
 -   `target`  
 -   `processor`  
+
+[1]: #adddisposer
+
+[2]: #parameters
+
+[3]: #examples
+
+[4]: #addmiddleware
+
+[5]: #parameters-1
+
+[6]: #applyaction
+
+[7]: #parameters-2
+
+[8]: #applypatch
+
+[9]: #parameters-3
+
+[10]: #applysnapshot
+
+[11]: #parameters-4
+
+[12]: #basereferencetype
+
+[13]: #basereferencetype-1
+
+[14]: #cast
+
+[15]: #parameters-5
+
+[16]: #examples-1
+
+[17]: #clone
+
+[18]: #parameters-6
+
+[19]: #complextype
+
+[20]: #complextype-1
+
+[21]: #complextype-2
+
+[22]: #complextype-3
+
+[23]: #complextype-4
+
+[24]: #createactiontrackingmiddleware
+
+[25]: #parameters-7
+
+[26]: #decorate
+
+[27]: #parameters-8
+
+[28]: #examples-2
+
+[29]: #destroy
+
+[30]: #parameters-9
+
+[31]: #detach
+
+[32]: #parameters-10
+
+[33]: #escapejsonpath
+
+[34]: #parameters-11
+
+[35]: #flow
+
+[36]: #parameters-12
+
+[37]: #getchildtype
+
+[38]: #parameters-13
+
+[39]: #examples-3
+
+[40]: #getenv
+
+[41]: #parameters-14
+
+[42]: #getidentifier
+
+[43]: #parameters-15
+
+[44]: #getmembers
+
+[45]: #parameters-16
+
+[46]: #getparent
+
+[47]: #parameters-17
+
+[48]: #getparentoftype
+
+[49]: #parameters-18
+
+[50]: #getpath
+
+[51]: #parameters-19
+
+[52]: #getpathparts
+
+[53]: #parameters-20
+
+[54]: #getrelativepath
+
+[55]: #parameters-21
+
+[56]: #getroot
+
+[57]: #parameters-22
+
+[58]: #getsnapshot
+
+[59]: #parameters-23
+
+[60]: #gettype
+
+[61]: #parameters-24
+
+[62]: #hasparent
+
+[63]: #parameters-25
+
+[64]: #hasparentoftype
+
+[65]: #parameters-26
+
+[66]: #identifiercache
+
+[67]: #identifiertype
+
+[68]: #isalive
+
+[69]: #parameters-27
+
+[70]: #isprotected
+
+[71]: #parameters-28
+
+[72]: #isroot
+
+[73]: #parameters-29
+
+[74]: #isstatetreenode
+
+[75]: #parameters-30
+
+[76]: #joinjsonpath
+
+[77]: #parameters-31
+
+[78]: #objectnode
+
+[79]: #observablemap
+
+[80]: #onaction
+
+[81]: #parameters-32
+
+[82]: #examples-4
+
+[83]: #onpatch
+
+[84]: #parameters-33
+
+[85]: #onsnapshot
+
+[86]: #parameters-34
+
+[87]: #process
+
+[88]: #parameters-35
+
+[89]: #protect
+
+[90]: #parameters-36
+
+[91]: #recordactions
+
+[92]: #parameters-37
+
+[93]: #examples-5
+
+[94]: #recordpatches
+
+[95]: #parameters-38
+
+[96]: #examples-6
+
+[97]: #resolveidentifier
+
+[98]: #parameters-39
+
+[99]: #resolvepath
+
+[100]: #parameters-40
+
+[101]: #scalarnode
+
+[102]: #setlivelynesschecking
+
+[103]: #parameters-41
+
+[104]: #splitjsonpath
+
+[105]: #parameters-42
+
+[106]: #storedreference
+
+[107]: #tryresolve
+
+[108]: #parameters-43
+
+[109]: #type
+
+[110]: #type-1
+
+[111]: #type-2
+
+[112]: #type-3
+
+[113]: #type-4
+
+[114]: #type-5
+
+[115]: #type-6
+
+[116]: #type-7
+
+[117]: #type-8
+
+[118]: #type-9
+
+[119]: #typecheck
+
+[120]: #parameters-44
+
+[121]: #typesarray
+
+[122]: #parameters-45
+
+[123]: #examples-7
+
+[124]: #typesboolean
+
+[125]: #examples-8
+
+[126]: #typescompose
+
+[127]: #typescustom
+
+[128]: #parameters-46
+
+[129]: #examples-9
+
+[130]: #typesdate
+
+[131]: #examples-10
+
+[132]: #typesenumeration
+
+[133]: #parameters-47
+
+[134]: #examples-11
+
+[135]: #typesfrozen
+
+[136]: #parameters-48
+
+[137]: #examples-12
+
+[138]: #typesidentifier
+
+[139]: #examples-13
+
+[140]: #typesidentifiernumber
+
+[141]: #examples-14
+
+[142]: #typesinteger
+
+[143]: #examples-15
+
+[144]: #typeslate
+
+[145]: #parameters-49
+
+[146]: #examples-16
+
+[147]: #typesliteral
+
+[148]: #parameters-50
+
+[149]: #examples-17
+
+[150]: #typesmap
+
+[151]: #parameters-51
+
+[152]: #examples-18
+
+[153]: #typesmaybe
+
+[154]: #parameters-52
+
+[155]: #typesmaybenull
+
+[156]: #parameters-53
+
+[157]: #typesmodel
+
+[158]: #typesnull
+
+[159]: #typesnumber
+
+[160]: #examples-19
+
+[161]: #typesoptional
+
+[162]: #parameters-54
+
+[163]: #examples-20
+
+[164]: #typesreference
+
+[165]: #parameters-55
+
+[166]: #typesrefinement
+
+[167]: #parameters-56
+
+[168]: #typesstring
+
+[169]: #examples-21
+
+[170]: #typesundefined
+
+[171]: #typesunion
+
+[172]: #parameters-57
+
+[173]: #unescapejsonpath
+
+[174]: #parameters-58
+
+[175]: #unprotect
+
+[176]: #parameters-59
+
+[177]: #examples-22
+
+[178]: #walk
+
+[179]: #parameters-60
+
+[180]: docs/middleware.md
+
+[181]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[182]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[183]: https://github.com/mobxjs/mobx-state-tree#patches
+
+[184]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[185]: http://tools.ietf.org/html/rfc6901
+
+[186]: https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md
+
+[187]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
+[188]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[189]: https://github.com/mobxjs/mobx-state-tree#dependency-injection
+
+[190]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[191]: https://github.com/mobxjs/mobx-state-tree#actions
+
+[192]: https://github.com/mobxjs/mobx-state-tree#snapshots
+
+[193]: https://github.com/mobxjs/mobx-state-tree/issues/399
+
+[194]: https://mobx.js.org/refguide/array.html
+
+[195]: #type
+
+[196]: https://mobx.js.org/refguide/map.html
+
+[197]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
+
+[198]: https://github.com/mobxjs/mobx-state-tree#creating-models
+
+[199]: https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1
+
+[200]: https://github.com/mobxjs/mobx-state-tree#references-and-identifiers

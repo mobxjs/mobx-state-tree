@@ -50,7 +50,10 @@ export function setLivelynessChecking(mode: LivelynessMode) {
     livelynessChecking = mode
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export interface IChildNodesMap {
     [key: string]: INode
 }
@@ -61,7 +64,10 @@ const snapshotReactionOptions = {
     }
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class ObjectNode implements INode {
     nodeId = ++nextNodeId
     readonly type: IAnyType

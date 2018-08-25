@@ -69,7 +69,10 @@ export function process(asyncAction: any): any {
     return flow(asyncAction)
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function createProcessSpawner(name: string, generator: Function) {
     deprecated(
         "process",

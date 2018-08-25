@@ -37,7 +37,7 @@ import {
     ModelType,
     ObjectNode,
     OptionalValue,
-    typecheck,
+    typecheckInternal,
     typeCheckFailure,
     TypeFlags,
     Union,
@@ -113,7 +113,10 @@ function tryCollectModelTypes(type: IAnyType, modelTypes: Array<ModelType<any, a
     return true
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export enum MapIdentifierMode {
     UNKNOWN,
     YES,
@@ -172,7 +175,10 @@ class MSTMap<C, S, T> extends ObservableMap {
     }
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class MapType<C, S, T> extends ComplexType<
     IKeyValueMap<C> | undefined,
     IKeyValueMap<S>,
@@ -275,14 +281,14 @@ export class MapType<C, S, T> extends ComplexType<
                     const { newValue } = change
                     const oldValue = change.object.get(key)
                     if (newValue === oldValue) return null
-                    typecheck(subType, newValue)
+                    typecheckInternal(subType, newValue)
                     change.newValue = subType.reconcile(node.getChildNode(key), change.newValue)
                     mapType.processIdentifier(key, change.newValue as INode)
                 }
                 break
             case "add":
                 {
-                    typecheck(subType, change.newValue)
+                    typecheckInternal(subType, change.newValue)
                     change.newValue = subType.instantiate(node, key, undefined, change.newValue)
                     mapType.processIdentifier(key, change.newValue as INode)
                 }
@@ -371,7 +377,7 @@ export class MapType<C, S, T> extends ComplexType<
 
     @action
     applySnapshot(node: ObjectNode, snapshot: any): void {
-        typecheck(this, snapshot)
+        typecheckInternal(this, snapshot)
         const target = node.storedValue as ObservableMap<any, any>
         const currentKeys: { [key: string]: boolean } = {}
         Array.from(target.keys()).forEach(key => {

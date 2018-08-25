@@ -30,7 +30,10 @@ function safeStringify(value: any) {
     }
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function prettyPrintValue(value: any) {
     return typeof value === "function"
         ? `<function${value.name ? " " + value.name : ""}>`
@@ -87,22 +90,34 @@ function toErrorString(error: IValidationError): string {
     )
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function getDefaultContext(type: IAnyType): IContext {
     return [{ type, path: "" }]
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function getContextForPath(context: IContext, path: string, type?: IAnyType): IContext {
     return context.concat([{ path, type }])
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function typeCheckSuccess(): IValidationResult {
     return EMPTY_ARRAY as any
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function typeCheckFailure(
     context: IContext,
     value: any,
@@ -111,17 +126,23 @@ export function typeCheckFailure(
     return [{ context, value, message }]
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function flattenTypeErrors(errors: IValidationResult[]): IValidationResult {
     return errors.reduce((a, i) => a.concat(i), [])
 }
 
 // TODO; doublecheck: typecheck should only needed to be invoked from: type.create and array / map / value.property will change
-/** @internal */
-export function typecheck(type: IAnyType, value: any): void {
+/**
+ * @internal
+ * @private
+ */
+export function typecheckInternal(type: IAnyType, value: any): void {
     // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
     if (process.env.NODE_ENV === "production") return
-    typecheckPublic(type, value)
+    typecheck(type, value)
 }
 
 /**
@@ -129,12 +150,11 @@ export function typecheck(type: IAnyType, value: any): void {
  * Throws if the given value is not according the provided type specification.
  * Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
  *
- * @alias typecheck
  * @export
  * @param {IAnyType} type
  * @param {*} value
  */
-export function typecheckPublic(type: IAnyType, value: any): void {
+export function typecheck(type: IAnyType, value: any): void {
     const errors = type.validate(value, [{ path: "", type }])
 
     if (errors.length > 0) {

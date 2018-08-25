@@ -43,7 +43,10 @@ export function flow(asyncAction: any): any {
     return createFlowSpawner(asyncAction.name, asyncAction)
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export function createFlowSpawner(name: string, generator: Function) {
     const spawner = function flowSpawner(this: any) {
         // Implementation based on https://github.com/tj/co/blob/master/index.js

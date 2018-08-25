@@ -53,7 +53,10 @@ class StoredReference {
     }
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export abstract class BaseReferenceType<T> extends Type<string | number | T, string | number, T> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Reference
@@ -81,7 +84,10 @@ export abstract class BaseReferenceType<T> extends Type<string | number | T, str
     }
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
     constructor(targetType: IType<any, any, T>) {
         super(targetType)
@@ -142,7 +148,10 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
     }
 }
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class CustomReferenceType<T> extends BaseReferenceType<T> {
     constructor(targetType: IType<any, any, T>, private readonly options: ReferenceOptions<T>) {
         super(targetType)

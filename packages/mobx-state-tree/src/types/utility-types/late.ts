@@ -10,7 +10,10 @@ import {
     typeCheckSuccess
 } from "../../internal"
 
-/** @internal */
+/**
+ * @internal
+ * @private
+ */
 export class Late<C, S, T> extends Type<C, S, T> {
     readonly definition: () => IAnyType
     private _subType: IAnyType | null = null
