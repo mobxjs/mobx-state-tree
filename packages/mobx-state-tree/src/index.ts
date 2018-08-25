@@ -115,22 +115,21 @@ export {
     createActionTrackingMiddleware,
     setLivelynessChecking,
     LivelynessMode,
-    TypeFlags,
     ModelSnapshotType,
     ModelCreationType,
     ModelInstanceType,
     ModelPropertiesDeclarationToProperties,
     ModelProperties,
     ModelPropertiesDeclaration,
-    OptionalPropertyTypes,
+    OptionalProperty,
     ModelActions,
-    ModelTypeConfig,
     CustomTypeOptions,
     UnionOptions,
     Instance,
     SnapshotIn,
     SnapshotOut,
-    SnapshotOrInstance
+    SnapshotOrInstance,
+    TypeFlags
 } from "./internal"
 
 export * from "./core/mst-operations"

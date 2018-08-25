@@ -7,6 +7,7 @@ import {
     isPrimitiveType,
     IAnyType
 } from "../../internal"
+import { CoreType } from "../../types/primitives"
 
 export interface IContextEntry {
     path: string
@@ -29,6 +30,7 @@ function safeStringify(value: any) {
     }
 }
 
+/** @internal */
 export function prettyPrintValue(value: any) {
     return typeof value === "function"
         ? `<function${value.name ? " " + value.name : ""}>`
@@ -72,8 +74,12 @@ function toErrorString(error: IValidationError): string {
             ? isPrimitiveType(type) || isPrimitive(value)
                 ? `.`
                 : `, expected an instance of \`${
-                      type.name
-                  }\` or a snapshot like \`${type.describe()}\` instead.` +
+                      (type as CoreType<any, any, any>).name
+                  }\` or a snapshot like \`${(type as CoreType<
+                      any,
+                      any,
+                      any
+                  >).describe()}\` instead.` +
                   (isSnapshotCompatible
                       ? " (Note that a snapshot of the provided value is compatible with the targeted type)"
                       : "")
@@ -81,18 +87,22 @@ function toErrorString(error: IValidationError): string {
     )
 }
 
+/** @internal */
 export function getDefaultContext(type: IAnyType): IContext {
     return [{ type, path: "" }]
 }
 
+/** @internal */
 export function getContextForPath(context: IContext, path: string, type?: IAnyType): IContext {
     return context.concat([{ path, type }])
 }
 
+/** @internal */
 export function typeCheckSuccess(): IValidationResult {
     return EMPTY_ARRAY as any
 }
 
+/** @internal */
 export function typeCheckFailure(
     context: IContext,
     value: any,
@@ -101,11 +111,13 @@ export function typeCheckFailure(
     return [{ context, value, message }]
 }
 
+/** @internal */
 export function flattenTypeErrors(errors: IValidationResult[]): IValidationResult {
     return errors.reduce((a, i) => a.concat(i), [])
 }
 
 // TODO; doublecheck: typecheck should only needed to be invoked from: type.create and array / map / value.property will change
+/** @internal */
 export function typecheck(type: IAnyType, value: any): void {
     // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
     if (process.env.NODE_ENV === "production") return

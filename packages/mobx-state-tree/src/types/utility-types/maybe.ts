@@ -12,20 +12,17 @@ import {
     ExtractC,
     ExtractS,
     ExtractT,
-    IAnyComplexType
+    IAnyComplexType,
+    OptionalProperty
 } from "../../internal"
 
 const optionalUndefinedType = optional(undefinedType, undefined)
 const optionalNullType = optional(nullType, null)
 
 export type IMaybeTypeBase<IT extends IAnyType, C, O> = IT extends IAnyComplexType
-    ? IComplexType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractT<IT> | O> & {
-          flags: TypeFlags.Optional
-      }
+    ? IComplexType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractT<IT> | O> & OptionalProperty
     : IT extends IAnyType
-        ? IType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractT<IT> | O> & {
-              flags: TypeFlags.Optional
-          }
+        ? IType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractT<IT> | O> & OptionalProperty
         : never
 
 export type IMaybeType<IT extends IAnyType> = IMaybeTypeBase<IT, undefined, undefined>

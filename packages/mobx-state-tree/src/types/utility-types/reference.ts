@@ -53,6 +53,7 @@ class StoredReference {
     }
 }
 
+/** @internal */
 export abstract class BaseReferenceType<T> extends Type<string | number | T, string | number, T> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Reference
@@ -80,6 +81,7 @@ export abstract class BaseReferenceType<T> extends Type<string | number | T, str
     }
 }
 
+/** @internal */
 export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
     constructor(targetType: IType<any, any, T>) {
         super(targetType)
@@ -140,6 +142,7 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
     }
 }
 
+/** @internal */
 export class CustomReferenceType<T> extends BaseReferenceType<T> {
     constructor(targetType: IType<any, any, T>, private readonly options: ReferenceOptions<T>) {
         super(targetType)
@@ -190,9 +193,7 @@ export interface ReferenceOptions<T> {
 }
 
 export interface IReferenceType<IR extends IAnyModelType>
-    extends IComplexType<string | number | ExtractT<IR>, string | number, ExtractT<IR>> {
-    flags: TypeFlags.Reference
-}
+    extends IComplexType<string | number | ExtractT<IR>, string | number, ExtractT<IR>> {}
 
 /**
  * Creates a reference to another type, which should have defined an identifier.

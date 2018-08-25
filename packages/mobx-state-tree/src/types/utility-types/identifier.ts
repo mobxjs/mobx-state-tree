@@ -14,6 +14,7 @@ import {
     ISimpleType
 } from "../../internal"
 
+/** @internal */
 export class IdentifierType extends Type<string, string, string> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Identifier
@@ -60,6 +61,7 @@ export class IdentifierType extends Type<string, string, string> {
     }
 }
 
+/** @internal */
 export class IdentifierNumberType extends IdentifierType {
     constructor() {
         super()

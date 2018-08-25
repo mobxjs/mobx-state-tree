@@ -12,12 +12,16 @@ import {
     typeCheckSuccess,
     fail,
     IAnyType,
-    IComplexType
+    IComplexType,
+    OptionalProperty
 } from "../../internal"
 
+/** @internal */
 export type IFunctionReturn<T> = () => T
+/** @internal */
 export type IOptionalValue<C, S, T> = C | S | T | IFunctionReturn<C | S | T>
 
+/** @internal */
 export class OptionalValue<C, S, T> extends Type<C, S, T> {
     readonly type: IType<C, S, T>
     readonly defaultValue: IOptionalValue<C, S, T>
@@ -86,20 +90,20 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
 export function optional<C, S, T>(
     type: IComplexType<C, S, T>,
     defaultValueOrFunction: C | S | T
-): IComplexType<C | undefined, S, T> & { flags: TypeFlags.Optional }
+): IComplexType<C | undefined, S, T> & OptionalProperty
 export function optional<C, S, T>(
     type: IComplexType<C, S, T>,
     defaultValueOrFunction: () => C | S | T
-): IComplexType<C | undefined, S, T> & { flags: TypeFlags.Optional }
+): IComplexType<C | undefined, S, T> & OptionalProperty
 
 export function optional<C, S, T>(
     type: IType<C, S, T>,
     defaultValueOrFunction: C | S | T
-): IType<C | undefined, S, T> & { flags: TypeFlags.Optional }
+): IType<C | undefined, S, T> & OptionalProperty
 export function optional<C, S, T>(
     type: IType<C, S, T>,
     defaultValueOrFunction: () => C | S | T
-): IType<C | undefined, S, T> & { flags: TypeFlags.Optional }
+): IType<C | undefined, S, T> & OptionalProperty
 /**
  * `types.optional` can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
@@ -119,10 +123,7 @@ export function optional<C, S, T>(
  * @export
  * @alias types.optional
  */
-export function optional(
-    type: IAnyType,
-    defaultValueOrFunction: any
-): IAnyType & { flags: TypeFlags.Optional } {
+export function optional(type: IAnyType, defaultValueOrFunction: any): IAnyType & OptionalProperty {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
             fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
@@ -135,11 +136,12 @@ export function optional(
             : defaultValue
         typecheck(type, defaultSnapshot)
     }
-    return new OptionalValue(type, defaultValueOrFunction)
+    const ret = new OptionalValue(type, defaultValueOrFunction)
+    return ret as typeof ret & OptionalProperty
 }
 
-export function isOptionalType<
-    IT extends IType<any | undefined, any, any> & { flags: TypeFlags.Optional }
->(type: IT): type is IT {
+export function isOptionalType<IT extends IType<any | undefined, any, any> & OptionalProperty>(
+    type: IT
+): type is IT {
     return isType(type) && (type.flags & TypeFlags.Optional) > 0
 }

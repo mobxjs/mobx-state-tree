@@ -14,6 +14,7 @@ import {
     ExtractC
 } from "../../internal"
 
+/** @internal */
 export class Refinement<C, S, T> extends Type<C, S, T> {
     readonly type: IAnyType
     readonly predicate: (v: any) => boolean

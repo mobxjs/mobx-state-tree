@@ -11,10 +11,11 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    ObjectNode
+    ObjectNode,
+    Primitives
 } from "../../internal"
-import { Primitives } from "../../core/type/type"
 
+/** @internal */
 export class Literal<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     readonly value: any

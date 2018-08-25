@@ -20,6 +20,7 @@ import {
 } from "../internal"
 
 // TODO: implement CoreType using types.custom ?
+/** @internal */
 export class CoreType<C, S, T> extends Type<C, S, T> {
     readonly shouldAttachNode = false
     readonly checker: (value: any) => boolean
@@ -186,6 +187,7 @@ export const DatePrimitive: IType<number | Date, number, Date> = new CoreType<
     return node.storedValue.getTime()
 }
 
+/** @internal */
 export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     switch (typeof value) {
         case "string":
@@ -200,9 +202,7 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     return fail("Cannot determine primitive type from value " + value)
 }
 
-export function isPrimitiveType<C = any, S = any, T = any>(
-    type: IAnyType
-): type is CoreType<C, S, T> {
+export function isPrimitiveType<C = any, S = any, T = any>(type: IAnyType): type is IType<C, S, T> {
     return (
         isType(type) &&
         (type.flags &

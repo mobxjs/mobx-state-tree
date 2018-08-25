@@ -41,13 +41,13 @@ import {
     typeCheckFailure,
     TypeFlags,
     Union,
-    EMPTY_OBJECT
+    EMPTY_OBJECT,
+    OptionalProperty
 } from "../../internal"
 
 export interface IMapType<C, S, T>
-    extends IComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<C, S, T>> {
-    flags: TypeFlags.Optional
-}
+    extends IComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<C, S, T>>,
+        OptionalProperty {}
 
 export interface IMSTMap<C, S, T> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
@@ -113,6 +113,7 @@ function tryCollectModelTypes(type: IAnyType, modelTypes: Array<ModelType<any, a
     return true
 }
 
+/** @internal */
 export enum MapIdentifierMode {
     UNKNOWN,
     YES,
@@ -171,6 +172,7 @@ class MSTMap<C, S, T> extends ObservableMap {
     }
 }
 
+/** @internal */
 export class MapType<C, S, T> extends ComplexType<
     IKeyValueMap<C> | undefined,
     IKeyValueMap<S>,
@@ -439,7 +441,7 @@ export class MapType<C, S, T> extends ComplexType<
  */
 export function map<C, S, T>(subtype: IType<C, S, T>): IMapType<C, S, T> {
     const ret = new MapType<C, S, T>(`map<string, ${subtype.name}>`, subtype)
-    return ret as typeof ret & { flags: TypeFlags.Optional }
+    return ret as typeof ret & { optional: true }
 }
 
 export function isMapType<IT extends IMapType<any, any, any>>(type: IT): type is IT {

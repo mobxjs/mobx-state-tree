@@ -38,15 +38,16 @@ import {
     ObjectNode,
     typecheck,
     typeCheckFailure,
-    TypeFlags
+    TypeFlags,
+    OptionalProperty
 } from "../../internal"
 
 export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
 export interface IArrayType<C, S, T>
-    extends IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> {
-    flags: TypeFlags.Optional
-}
+    extends IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>>,
+        OptionalProperty {}
 
+/** @internal */
 export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> {
     shouldAttachNode = true
     subType: IAnyType
@@ -275,7 +276,7 @@ export function array<C, S, T>(subtype: IType<C, S, T>): IArrayType<C, S, T> {
             fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")
     }
     const ret = new ArrayType<C, S, T>(subtype.name + "[]", subtype)
-    return ret as typeof ret & { flags: TypeFlags.Optional }
+    return ret as typeof ret & OptionalProperty
 }
 
 function reconcileArrayChildren<T>(

@@ -13,9 +13,11 @@ import {
     ObjectNode,
     optional,
     IType,
-    IAnyType
+    IAnyType,
+    OptionalProperty
 } from "../../internal"
 
+/** @internal */
 export class Frozen<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     flags = TypeFlags.Frozen
@@ -49,9 +51,7 @@ export class Frozen<T> extends Type<T, T, T> {
 const untypedFrozenInstance = new Frozen()
 
 export function frozen<C>(subType: IType<C, any, any>): IType<C, C, C>
-export function frozen<T>(
-    defaultValue: T
-): IType<T | undefined | null, T, T> & { flags: TypeFlags.Optional }
+export function frozen<T>(defaultValue: T): IType<T | undefined | null, T, T> & OptionalProperty
 export function frozen<T>(): IType<T, T, T> // do not assume undefined by default, let the user specify it if needed
 /**
  * Frozen can be used to store any value that is serializable in itself (that is valid JSON).

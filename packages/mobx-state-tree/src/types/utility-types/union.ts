@@ -15,15 +15,8 @@ import {
     IValidationError,
     IComplexType,
     IModelType,
-    ExtractC,
-    ExtractT,
-    ExtractS,
-    IAnyModelType,
-    ExtractProps,
-    ExtractOthers,
-    IAnyComplexType
+    ModelProperties
 } from "../../internal"
-import { ModelProperties } from "../complex-types/model"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
 
@@ -32,6 +25,7 @@ export interface UnionOptions {
     dispatcher?: ITypeDispatcher
 }
 
+/** @internal */
 export class Union extends Type<any, any, any> {
     readonly dispatcher?: ITypeDispatcher
     readonly eager: boolean = true

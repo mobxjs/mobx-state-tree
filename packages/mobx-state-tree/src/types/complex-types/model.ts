@@ -47,9 +47,6 @@ import {
     optional,
     OptionalValue,
     MapType,
-    ExtractT,
-    ExtractS,
-    ExtractC,
     typecheck,
     typeCheckFailure,
     TypeFlags
@@ -58,6 +55,7 @@ import {
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
 
+/** @internal */
 export enum HookNames {
     afterCreate = "afterCreate",
     afterAttach = "afterAttach",
@@ -80,27 +78,25 @@ export interface ModelPropertiesDeclaration {
  */
 export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
     [K in keyof T]: T[K] extends string
-        ? IType<string | undefined, string, string> & { flags: TypeFlags.Optional }
+        ? IType<string | undefined, string, string> & OptionalProperty
         : T[K] extends number
-            ? IType<number | undefined, number, number> & { flags: TypeFlags.Optional }
+            ? IType<number | undefined, number, number> & OptionalProperty
             : T[K] extends boolean
-                ? IType<boolean | undefined, boolean, boolean> & { flags: TypeFlags.Optional }
+                ? IType<boolean | undefined, boolean, boolean> & OptionalProperty
                 : T[K] extends Date
-                    ? IType<number | Date | undefined, number, Date> & {
-                          flags: TypeFlags.Optional
-                      }
+                    ? IType<number | Date | undefined, number, Date> & OptionalProperty
                     : T[K] extends IAnyType ? T[K] : never
 }
 
-export interface OptionalPropertyTypes {
-    flags: TypeFlags.Optional
+export interface OptionalProperty {
+    optional: true
 }
 
 export type RequiredPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalPropertyTypes ? never : K
+    [K in keyof T]: T[K] extends OptionalProperty ? never : K
 }[keyof T]
 export type OptionalPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalPropertyTypes ? K : never
+    [K in keyof T]: T[K] extends OptionalProperty ? K : never
 }[keyof T]
 
 export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
@@ -171,6 +167,7 @@ function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
 }
 
+/** @internal */
 export interface ModelTypeConfig {
     name?: string
     properties?: ModelProperties
@@ -242,6 +239,7 @@ function toPropertiesObject<T>(declaredProps: ModelPropertiesDeclaration): Model
     )
 }
 
+/** @internal */
 export class ModelType<S extends ModelProperties, T> extends ComplexType<any, any, any>
     implements IModelType<S, T> {
     readonly flags = TypeFlags.Object
