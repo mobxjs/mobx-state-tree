@@ -31,10 +31,15 @@ export type IMiddlewareEvent = {
     args: any[]
 }
 
+/**
+ * @internal
+ * @private
+ */
 export type IMiddleware = {
     handler: IMiddlewareHandler
     includeHooks: boolean
 }
+
 export type IMiddlewareHandler = (
     actionCall: IMiddlewareEvent,
     next: (actionCall: IMiddlewareEvent, callback?: (value: any) => any) => void,

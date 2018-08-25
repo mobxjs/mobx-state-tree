@@ -149,6 +149,14 @@ export function optional(type: IAnyType, defaultValueOrFunction: any): IAnyType 
     return ret as typeof ret & OptionalProperty
 }
 
+/**
+ * Returns if a value represents an optional type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isOptionalType<IT extends IType<any | undefined, any, any> & OptionalProperty>(
     type: IT
 ): type is IT {

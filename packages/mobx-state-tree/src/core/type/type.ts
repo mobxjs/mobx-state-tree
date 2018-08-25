@@ -50,10 +50,7 @@ export enum TypeFlags {
 export interface IType<C, S, T> {
     name: string
 
-    is(thing: any): thing is C | S | T
-    validate(thing: any, context: IContext): IValidationResult
     create(snapshot?: C, environment?: any): T
-    describe(): string
     Type: T
     SnapshotType: S
     CreationType: C
@@ -63,12 +60,26 @@ export interface IType<C, S, T> {
      * @internal
      * @private
      */
+    is(thing: any): thing is C | S | T
+    /**
+     * @internal
+     * @private
+     */
+    validate(thing: any, context: IContext): IValidationResult
+    /**
+     * @internal
+     * @private
+     */
+    describe(): string
+    /**
+     * @internal
+     * @private
+     */
     flags: TypeFlags
     /**
      * @internal
      * @private
      */
-
     isType: boolean
     /**
      * @internal
@@ -399,6 +410,13 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
     }
 }
 
+/**
+ * Returns if a given value represents a type.
+ *
+ * @export
+ * @param {*} value
+ * @returns {value is IAnyType}
+ */
 export function isType(value: any): value is IAnyType {
     return typeof value === "object" && value && value.isType === true
 }

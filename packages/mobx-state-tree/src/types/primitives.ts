@@ -208,7 +208,21 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     return fail("Cannot determine primitive type from value " + value)
 }
 
-export function isPrimitiveType<C = any, S = any, T = any>(type: IAnyType): type is IType<C, S, T> {
+/**
+ * Returns if a given value represents a primitive type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
+export function isPrimitiveType<
+    IT extends
+        | ISimpleType<string>
+        | ISimpleType<number>
+        | ISimpleType<boolean>
+        | typeof DatePrimitive
+>(type: IT): type is IT {
     return (
         isType(type) &&
         (type.flags &

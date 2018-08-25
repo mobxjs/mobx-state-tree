@@ -126,6 +126,14 @@ export function late(nameOrType: any, maybeType?: () => IAnyType): IAnyType {
     return new Late(name, type)
 }
 
+/**
+ * Returns if a given value represents a late type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isLateType<IT extends IAnyType>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Late) > 0
 }

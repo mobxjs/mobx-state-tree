@@ -248,6 +248,14 @@ export function union(optionsOrType: UnionOptions | IAnyType, ...otherTypes: IAn
     return new Union(name, types, options)
 }
 
+/**
+ * Returns if a given value represents a union type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isUnionType<IT extends IAnyType>(type: IT): type is IT {
     return (type.flags & TypeFlags.Union) > 0
 }

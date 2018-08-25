@@ -97,6 +97,10 @@ export function canAttachNode(value: any) {
     )
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function toJSON<S>(this: IStateTreeNode<any, S>): S {
     return getStateTreeNode(this).snapshot
 }

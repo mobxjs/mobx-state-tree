@@ -100,6 +100,15 @@ export function frozen<T>(arg?: any): any {
     else return optional(untypedFrozenInstance, arg)
 }
 
+/**
+ * Returns if a given value represents a frozen type.
+ *
+ * @export
+ * @template IT
+ * @template T
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isFrozenType<IT extends IType<T | any, T, T>, T = any>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Frozen) > 0
 }

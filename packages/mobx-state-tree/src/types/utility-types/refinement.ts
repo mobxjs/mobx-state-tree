@@ -120,6 +120,14 @@ export function refinement(...args: any[]): IAnyType {
     return new Refinement(name, type, predicate, message)
 }
 
+/**
+ * Returns if a given value is a refinement type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isRefinementType<IT extends IAnyType>(type: IT): type is IT {
     return (type.flags & TypeFlags.Refinement) > 0
 }

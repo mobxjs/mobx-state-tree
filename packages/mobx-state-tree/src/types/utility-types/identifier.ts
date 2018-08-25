@@ -143,6 +143,14 @@ export const identifier: ISimpleType<string> = new IdentifierType()
  */
 export const identifierNumber: ISimpleType<number> = new IdentifierNumberType() as any
 
+/**
+ * Returns if a given value represents an identifier type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isIdentifierType<IT extends typeof identifier | typeof identifierNumber>(
     type: IT
 ): type is IT {

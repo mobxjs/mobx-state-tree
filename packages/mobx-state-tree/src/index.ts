@@ -149,7 +149,21 @@ import {
     IModelReflectionData,
     getMembers,
     CastedType,
-    cast
+    cast,
+    isType,
+    isArrayType,
+    isFrozenType,
+    isIdentifierType,
+    isLateType,
+    isLiteralType,
+    isMapType,
+    isModelType,
+    isOptionalType,
+    isPrimitiveType,
+    isReferenceType,
+    isRefinementType,
+    isUnionType,
+    ExtractIStateTreeNode
 } from "./internal"
 
 export {
@@ -241,5 +255,19 @@ export {
     IModelReflectionData,
     getMembers,
     CastedType,
-    cast
+    cast,
+    isType,
+    isArrayType,
+    isFrozenType,
+    isIdentifierType,
+    isLateType,
+    isLiteralType,
+    isMapType,
+    isModelType,
+    isOptionalType,
+    isPrimitiveType,
+    isReferenceType,
+    isRefinementType,
+    isUnionType,
+    ExtractIStateTreeNode
 }

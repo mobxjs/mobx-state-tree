@@ -227,6 +227,14 @@ export function reference<IT extends IAnyModelType>(
     else return new IdentifierReferenceType(subType)
 }
 
+/**
+ * Returns if a given value represents a reference type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type is IT {
     return (type.flags & TypeFlags.Reference) > 0
 }

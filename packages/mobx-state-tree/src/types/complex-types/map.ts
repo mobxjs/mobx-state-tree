@@ -450,6 +450,14 @@ export function map<C, S, T>(subtype: IType<C, S, T>): IMapType<C, S, T> {
     return ret as typeof ret & { optional: true }
 }
 
+/**
+ * Returns if a given value represents a map type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isMapType<IT extends IMapType<any, any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Map) > 0
 }

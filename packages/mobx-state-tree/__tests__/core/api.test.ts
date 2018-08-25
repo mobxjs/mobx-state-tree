@@ -54,9 +54,22 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     walk,
     getMembers,
     cast,
+    isType,
+    isArrayType,
+    isFrozenType,
+    isIdentifierType,
+    isLateType,
+    isLiteralType,
+    isMapType,
+    isModelType,
+    isOptionalType,
+    isPrimitiveType,
+    isReferenceType,
+    isRefinementType,
+    isUnionType,
 
     types
-    `)
+`)
 
 const METHODS = METHODS_AND_INTERNAL_TYPES.filter(s => s[0].toLowerCase() === s[0])
 

@@ -734,6 +734,14 @@ export function compose(...args: any[]): any {
         .named(typeName)
 }
 
+/**
+ * Returns if a given value represents a model type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isModelType<IT extends IModelType<any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
