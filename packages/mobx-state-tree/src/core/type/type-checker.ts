@@ -5,9 +5,9 @@ import {
     getStateTreeNode,
     isStateTreeNode,
     isPrimitiveType,
-    IAnyType
+    IAnyType,
+    CoreType
 } from "../../internal"
-import { CoreType } from "../../types/primitives"
 
 export interface IContextEntry {
     path: string
