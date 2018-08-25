@@ -21,7 +21,6 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     recordActions,
     createActionTrackingMiddleware,
     setLivelynessChecking,
-    TypeFlags,
     getType,
     getChildType,
     onPatch,

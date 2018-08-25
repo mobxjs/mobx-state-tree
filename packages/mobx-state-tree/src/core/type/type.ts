@@ -22,6 +22,10 @@ import {
     EMPTY_OBJECT
 } from "../../internal"
 
+/**
+ * @internal
+ * @private
+ */
 export enum TypeFlags {
     String = 1,
     Number = 2,
