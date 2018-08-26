@@ -15,13 +15,7 @@ import {
     IValidationError,
     IComplexType,
     IModelType,
-    ExtractC,
-    ExtractT,
-    ExtractS,
-    IAnyModelType,
-    ExtractProps,
-    ExtractOthers,
-    IAnyComplexType
+    ModelProperties
 } from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
@@ -31,6 +25,10 @@ export interface UnionOptions {
     dispatcher?: ITypeDispatcher
 }
 
+/**
+ * @internal
+ * @private
+ */
 export class Union extends Type<any, any, any> {
     readonly dispatcher?: ITypeDispatcher
     readonly eager: boolean = true
@@ -175,6 +173,14 @@ export function union(optionsOrType: UnionOptions | IAnyType, ...otherTypes: IAn
     return new Union(name, types, options)
 }
 
+/**
+ * Returns if a given value represents a union type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isUnionType<IT extends IAnyType>(type: IT): type is IT {
     return (type.flags & TypeFlags.Union) > 0
 }

@@ -13,11 +13,19 @@ export interface IReversibleJsonPatch extends IJsonPatch {
     oldValue: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function splitPatch(patch: IReversibleJsonPatch): [IJsonPatch, IJsonPatch] {
     if (!("oldValue" in patch)) fail(`Patches without \`oldValue\` field cannot be inversed`)
     return [stripPatch(patch), invertPatch(patch)]
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function stripPatch(patch: IReversibleJsonPatch): IJsonPatch {
     // strips `oldvalue` information from the patch, so that it becomes a patch conform the json-patch spec
     // this removes the ability to undo the patch

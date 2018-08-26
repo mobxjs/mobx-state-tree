@@ -36,17 +36,21 @@ import {
     IValidationResult,
     mobxShallow,
     ObjectNode,
-    typecheck,
+    typecheckInternal,
     typeCheckFailure,
-    TypeFlags
+    TypeFlags,
+    OptionalProperty
 } from "../../internal"
 
 export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
 export interface IArrayType<C, S, T>
-    extends IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> {
-    flags: TypeFlags.Optional
-}
+    extends IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>>,
+        OptionalProperty {}
 
+/**
+ * @internal
+ * @private
+ */
 export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> {
     shouldAttachNode = true
     subType: IAnyType
@@ -215,7 +219,7 @@ export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTAr
 
     @action
     applySnapshot(node: ObjectNode, snapshot: any[]): void {
-        typecheck(this, snapshot)
+        typecheckInternal(this, snapshot)
         const target = node.storedValue as IObservableArray<any>
         target.replace(snapshot)
     }
@@ -275,7 +279,7 @@ export function array<C, S, T>(subtype: IType<C, S, T>): IArrayType<C, S, T> {
             fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")
     }
     const ret = new ArrayType<C, S, T>(subtype.name + "[]", subtype)
-    return ret as typeof ret & { flags: TypeFlags.Optional }
+    return ret as typeof ret & OptionalProperty
 }
 
 function reconcileArrayChildren<T>(
@@ -358,7 +362,7 @@ function valueAsNode(
     oldNode?: INode
 ) {
     // ensure the value is valid-ish
-    typecheck(childType, newValue)
+    typecheckInternal(childType, newValue)
 
     // the new value has a MST node
     if (isStateTreeNode(newValue)) {
@@ -402,6 +406,14 @@ function areSame(oldNode: INode, newValue: any) {
     return false
 }
 
+/**
+ * Returns if a given value represents an array type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isArrayType<IT extends IArrayType<any, any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Array) > 0
 }

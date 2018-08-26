@@ -37,17 +37,17 @@ import {
     ModelType,
     ObjectNode,
     OptionalValue,
-    typecheck,
+    typecheckInternal,
     typeCheckFailure,
     TypeFlags,
     Union,
-    EMPTY_OBJECT
+    EMPTY_OBJECT,
+    OptionalProperty
 } from "../../internal"
 
 export interface IMapType<C, S, T>
-    extends IComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<C, S, T>> {
-    flags: TypeFlags.Optional
-}
+    extends IComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<C, S, T>>,
+        OptionalProperty {}
 
 export interface IMSTMap<C, S, T> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
@@ -66,7 +66,6 @@ export interface IMSTMap<C, S, T> {
     [Symbol.iterator](): IterableIterator<[string, T]>
     /** Merge another object into this map, returns self. */
     merge(other: IMSTMap<any, any, T> | IKeyValueMap<C | S | T> | any): this
-    clear(): void
     replace(values: IMSTMap<any, any, T> | IKeyValueMap<T>): this
     /**
      * Returns a plain object that represents this map.
@@ -114,6 +113,10 @@ function tryCollectModelTypes(type: IAnyType, modelTypes: Array<ModelType<any, a
     return true
 }
 
+/**
+ * @internal
+ * @private
+ */
 export enum MapIdentifierMode {
     UNKNOWN,
     YES,
@@ -172,6 +175,10 @@ class MSTMap<C, S, T> extends ObservableMap {
     }
 }
 
+/**
+ * @internal
+ * @private
+ */
 export class MapType<C, S, T> extends ComplexType<
     IKeyValueMap<C> | undefined,
     IKeyValueMap<S>,
@@ -274,14 +281,14 @@ export class MapType<C, S, T> extends ComplexType<
                     const { newValue } = change
                     const oldValue = change.object.get(key)
                     if (newValue === oldValue) return null
-                    typecheck(subType, newValue)
+                    typecheckInternal(subType, newValue)
                     change.newValue = subType.reconcile(node.getChildNode(key), change.newValue)
                     mapType.processIdentifier(key, change.newValue as INode)
                 }
                 break
             case "add":
                 {
-                    typecheck(subType, change.newValue)
+                    typecheckInternal(subType, change.newValue)
                     change.newValue = subType.instantiate(node, key, undefined, change.newValue)
                     mapType.processIdentifier(key, change.newValue as INode)
                 }
@@ -370,7 +377,7 @@ export class MapType<C, S, T> extends ComplexType<
 
     @action
     applySnapshot(node: ObjectNode, snapshot: any): void {
-        typecheck(this, snapshot)
+        typecheckInternal(this, snapshot)
         const target = node.storedValue as ObservableMap<any, any>
         const currentKeys: { [key: string]: boolean } = {}
         Array.from(target.keys()).forEach(key => {
@@ -440,9 +447,17 @@ export class MapType<C, S, T> extends ComplexType<
  */
 export function map<C, S, T>(subtype: IType<C, S, T>): IMapType<C, S, T> {
     const ret = new MapType<C, S, T>(`map<string, ${subtype.name}>`, subtype)
-    return ret as typeof ret & { flags: TypeFlags.Optional }
+    return ret as typeof ret & { optional: true }
 }
 
+/**
+ * Returns if a given value represents a map type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isMapType<IT extends IMapType<any, any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Map) > 0
 }

@@ -20,7 +20,7 @@
         "lint-staged": "^7.0.0",
         "mobx": "^5.0.2",
         "mobx-state-tree": "^3.2.3",
-        "rollup": "^0.64.0",
+        "rollup": "^0.65.0",
         "rollup-plugin-commonjs": "^9.0.0",
         "rollup-plugin-node-resolve": "^3.0.0",
         "rollup-plugin-uglify": "^4.0.0",

@@ -12,7 +12,6 @@ import {
     IMiddlewareEvent,
     IPatchRecorder,
     IJsonPatch,
-    TypeFlags,
     IComplexType,
     IMSTArray,
     ModelSnapshotType,

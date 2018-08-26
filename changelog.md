@@ -6,6 +6,7 @@
 # x.x.x
 
 -   Further improvements for Typescript support for enumeration by [@xaviergonz](https://github.com/xaviergonz)
+-   Smaller generated .d.ts files through [#990](https://github.com/mobxjs/mobx-state-tree/pull/990) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.2.3
 
@@ -65,9 +66,9 @@ Running `yarn speedtest` on Node 9.3:
 
 Beyond that, MST 3 uses TypeScript 2.8, which results in more accurate TypeScript support.
 
-The type system has been simplified and improved in several areas. Several open issues around maps and (numberic) keys have been resolved. The `frozen` type can now be fully typed. See below for the full details.
+The type system has been simplified and improved in several areas. Several open issues around maps and (numeric) keys have been resolved. The `frozen` type can now be fully typed. See below for the full details.
 
-Also, the 'object has died' exception can be supressed now. One should still address it, but at least it won't be a show-stopper from now on.
+Also, the 'object has died' exception can be suppressed now. One should still address it, but at least it won't be a show-stopper from now on.
 
 ## Changes in the type system
 
@@ -86,13 +87,13 @@ Also, the 'object has died' exception can be supressed now. One should still add
 
 -   **[BREAKING]** MobX-state-tree now requires at least TypeScript 2.8 when using MST with typescript. The type system has been revamped, and should now be a lot more accurate, especially concerning snapshot types.
 -   **[BREAKING]** `map.put` will now return the inserted node, rather than the map itself. This makes it easier to find objects for which the identifier is not known upfront. See [#766](https://github.com/mobxjs/mobx-state-tree/issues/766) by [k-g-a](https://github.com/k-g-a)
--   **[BREAKING]** The order of firing hooks when instantiating has slighlty changed, as the `afterCreate` hook will now only be fired upon instantation of the tree node, which now happens lazily (on first read / action). The internal order in which hooks are fired within a single node has remained the same. See [#845](https://github.com/mobxjs/mobx-state-tree/issues/845) for details
+-   **[BREAKING]** The order of firing hooks when instantiating has slighlty changed, as the `afterCreate` hook will now only be fired upon instantiation of the tree node, which now happens lazily (on first read / action). The internal order in which hooks are fired within a single node has remained the same. See [#845](https://github.com/mobxjs/mobx-state-tree/issues/845) for details
 -   Significantly improved the performance of constructing MST trees. Significantly reduced the memory footprint of MST. Big shoutout to the relentless effort by [k-g-a](https://github.com/k-g-a) to optimize all the things! See [#845](https://github.com/mobxjs/mobx-state-tree/issues/845) for details.
 -   Introduced `setLivelynessChecking("warn" | "ignore" | "error")`, this can be used to customize how MST should act when one tries to read or write to a node that has already been removed from the tree. The default behavior is `warn`.
 -   Improved the overloads of `model.compose`, see [#892](https://github.com/mobxjs/mobx-state-tree/pull/892) by [t49tran](https://github.com/t49tran)
 -   Fixed issue where computed properties based on `getPath` could return stale results, fixes [#917](https://github.com/mobxjs/mobx-state-tree/issues/917)
 -   Fixed issue where onAction middleware threw on dead nodes when attachAfter option was used
--   Fixed several issues with maps and numberic identifiers, such as [#884](https://github.com/mobxjs/mobx-state-tree/issues/884) and [#826](https://github.com/mobxjs/mobx-state-tree/issues/826)
+-   Fixed several issues with maps and numeric identifiers, such as [#884](https://github.com/mobxjs/mobx-state-tree/issues/884) and [#826](https://github.com/mobxjs/mobx-state-tree/issues/826)
 
 ## TL,DR Migration guide
 
@@ -104,7 +105,7 @@ Also, the 'object has died' exception can be supressed now. One should still add
 
 # 2.2.0
 
--   Added support for MobX 5. Initiative by [@jeffberry](https://github.com/jeffberry) through [#868](https://github.com/mobxjs/mobx-state-tree/pull/868/files). Please not that there are JavaScript engine restrictions for MobX 5 (no Internet Explorer, or React Native Android). If you need to target those versions please keep using MobX 4 as peer dependency (MST is compatible with both)
+-   Added support for MobX 5. Initiative by [@jeffberry](https://github.com/jeffberry) through [#868](https://github.com/mobxjs/mobx-state-tree/pull/868/files). Please note that there are JavaScript engine restrictions for MobX 5 (no Internet Explorer, or React Native Android). If you need to target those versions please keep using MobX 4 as peer dependency (MST is compatible with both)
 -   Reduced memory footprint with ~10-20%, by [k-g-a](https://github.com/k-g-a) through [#872](https://github.com/mobxjs/mobx-state-tree/pull/872)
 -   Fixed issue where undo manager was not working correctly for non-root stores, by [marcofugaro](https://github.com/marcofugaro) trough [#875](https://github.com/mobxjs/mobx-state-tree/pull/875)
 
@@ -288,7 +289,7 @@ No changes
 
 **How to run the codemod?**
 
-The codemod is provided as npm package command line tool. It has been written using the TypeScript parser, so it will succefully support either TS or regular JavaScript source files.
+The codemod is provided as npm package command line tool. It has been written using the TypeScript parser, so it will successfully support either TS or regular JavaScript source files.
 
 To run the codemod, you need to first install it globally by `npm install -g mst-codemod-to-0.10`.
 After that, the `mst-codemod-to-0.10` command will be available in your command line.
@@ -410,8 +411,8 @@ at path "/quantity" snapshot undefined is not assignable to type: number.
 -   **BREAKING** Array and map types can no longer be left out of snapshots by default. Use `optional` to make them optional in the snapshot
 -   **BREAKING** Literals no longer have a default value by default (use optional + literal instead)
 -   **BREAKING** Disabled inlining type.model definitions as introduced in 0.5.1; to many subtle issues
--   Improved identifier support, they are no properly propageted through utility types like `maybe`, `union` etc
--   Fixed issue where fields where not referted back to default when a partial snapshot was provided
+-   Improved identifier support, they are no properly propagated through utility types like `maybe`, `union` etc
+-   Fixed issue where fields where not referred back to default when a partial snapshot was provided
 -   Fixed #122: `types.identifier` now also accepts a subtype to override the default string type; e.g. `types.identifier(types.number)`
 
 # 0.5.1
@@ -440,7 +441,7 @@ Where the type of `point` property is inferred to `point: types.withDefault(type
 
 # 0.4.0
 
-**BREAKING** `types.model` no requires 2 parameters to define a model. The first parameter defines the properties, derived values and view functions. The second argment is used to define the actions. For example:
+**BREAKING** `types.model` no requires 2 parameters to define a model. The first parameter defines the properties, derived values and view functions. The second argument is used to define the actions. For example:
 
 ```javascript
 const Todo = types.model("Todo", {
@@ -494,7 +495,7 @@ It is still possible to define functions on the first object. However, those fun
 
 # 0.2.2
 
--   Introduced the concept of livelyness; if nodes are removed from the the tree because they are replaced by some other value, they will be marked as "died". This should help to early signal when people hold on to references that are not part of the tree anymore. To explicitly remove an node from a tree, with the intent to spawn a new state tree from it, use `detach`.
+-   Introduced the concept of liveliness; if nodes are removed from the the tree because they are replaced by some other value, they will be marked as "died". This should help to early signal when people hold on to references that are not part of the tree anymore. To explicitly remove an node from a tree, with the intent to spawn a new state tree from it, use `detach`.
 -   Introduced the convenience method `destroy` to remove a model from it's parent and mark it as dead.
 -   Introduced the concept of protected trees. If a tree is protected using `protect`, it can only be modified through action, and not by mutating it directly anymore.
 
