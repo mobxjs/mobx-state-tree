@@ -9,35 +9,19 @@ import {
     CoreType
 } from "../../internal"
 
-/**
- * @internal
- * @private
- */
 export interface IContextEntry {
     path: string
     type?: IAnyType
 }
 
-/**
- * @internal
- * @private
- */
 export type IContext = IContextEntry[]
 
-/**
- * @internal
- * @private
- */
 export interface IValidationError {
     context: IContext
     value: any
     message?: string
 }
 
-/**
- * @internal
- * @private
- */
 export type IValidationResult = IValidationError[]
 
 function safeStringify(value: any) {

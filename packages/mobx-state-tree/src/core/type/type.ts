@@ -18,7 +18,6 @@ import {
     ObjectNode,
     IChildNodesMap,
     ModelPrimitive,
-    IReferenceType,
     EMPTY_OBJECT
 } from "../../internal"
 
@@ -51,26 +50,15 @@ export interface IType<C, S, T> {
     name: string
 
     create(snapshot?: C, environment?: any): T
+    is(thing: any): thing is C | S | T
+    validate(thing: any, context: IContext): IValidationResult
+    describe(): string
+
     Type: T
     SnapshotType: S
     CreationType: C
 
     // Internal api's
-    /**
-     * @internal
-     * @private
-     */
-    is(thing: any): thing is C | S | T
-    /**
-     * @internal
-     * @private
-     */
-    validate(thing: any, context: IContext): IValidationResult
-    /**
-     * @internal
-     * @private
-     */
-    describe(): string
     /**
      * @internal
      * @private
