@@ -8,7 +8,7 @@ import {
     getStateTreeNode,
     IContext,
     IValidationResult,
-    typecheck,
+    typecheckInternal,
     typeCheckFailure,
     typeCheckSuccess,
     INode,
@@ -18,10 +18,13 @@ import {
     ObjectNode,
     IChildNodesMap,
     ModelPrimitive,
-    IReferenceType,
     EMPTY_OBJECT
 } from "../../internal"
 
+/**
+ * @internal
+ * @private
+ */
 export enum TypeFlags {
     String = 1,
     Number = 2,
@@ -45,35 +48,105 @@ export enum TypeFlags {
 
 export interface IType<C, S, T> {
     name: string
-    flags: TypeFlags
+
+    create(snapshot?: C, environment?: any): T
     is(thing: any): thing is C | S | T
     validate(thing: any, context: IContext): IValidationResult
-    create(snapshot?: C, environment?: any): T
-    isType: boolean
     describe(): string
+
     Type: T
     SnapshotType: S
     CreationType: C
 
     // Internal api's
+    /**
+     * @internal
+     * @private
+     */
+    flags: TypeFlags
+    /**
+     * @internal
+     * @private
+     */
+    isType: boolean
+    /**
+     * @internal
+     * @private
+     */
     instantiate(parent: INode | null, subpath: string, environment: any, initialValue?: any): INode
+    /**
+     * @internal
+     * @private
+     */
     initializeChildNodes(node: INode, snapshot: any): IChildNodesMap
+    /**
+     * @internal
+     * @private
+     */
     createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any
+    /**
+     * @internal
+     * @private
+     */
     finalizeNewInstance(node: INode, instance: any): void
+    /**
+     * @internal
+     * @private
+     */
     reconcile(current: INode, newValue: any): INode
+    /**
+     * @internal
+     * @private
+     */
     getValue(node: INode): T
+    /**
+     * @internal
+     * @private
+     */
     getSnapshot(node: INode, applyPostProcess?: boolean): S
+    /**
+     * @internal
+     * @private
+     */
     applySnapshot(node: INode, snapshot: C): void
+    /**
+     * @internal
+     * @private
+     */
     applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void
+    /**
+     * @internal
+     * @private
+     */
     getChildren(node: INode): ReadonlyArray<INode>
+    /**
+     * @internal
+     * @private
+     */
     getChildNode(node: INode, key: string): INode
+    /**
+     * @internal
+     * @private
+     */
     getChildType(key: string): IAnyType
+    /**
+     * @internal
+     * @private
+     */
     removeChild(node: INode, subpath: string): void
+    /**
+     * @internal
+     * @private
+     */
     isAssignableFrom(type: IAnyType): boolean
+    /**
+     * @internal
+     * @private
+     */
     shouldAttachNode: boolean
 }
 
-export type IAnyType = IType<any, any, any>
+export interface IAnyType extends IType<any, any, any> {}
 
 export interface ISimpleType<T> extends IType<T, T, T> {}
 
@@ -89,7 +162,7 @@ export interface IComplexType<C, S, T> extends IType<C, S, T> {
     ): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>
 }
 
-export type IAnyComplexType = IComplexType<any, any, any>
+export interface IAnyComplexType extends IComplexType<any, any, any> {}
 
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
@@ -135,8 +208,11 @@ export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
  */
 export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
 
-/*
+/**
  * A complex type produces a MST node (Node in the state tree)
+ *
+ * @internal
+ * @private
  */
 export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
     readonly isType = true
@@ -148,7 +224,7 @@ export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
 
     @action
     create(snapshot: C = this.getDefaultSnapshot(), environment?: any) {
-        typecheck(this, snapshot)
+        typecheckInternal(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).value
     }
 
@@ -256,6 +332,10 @@ export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
     }
 }
 
+/**
+ * @internal
+ * @private
+ */
 export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements IType<C, S, T> {
     constructor(name: string) {
         super(name)
@@ -318,6 +398,13 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
     }
 }
 
+/**
+ * Returns if a given value represents a type.
+ *
+ * @export
+ * @param {*} value
+ * @returns {value is IAnyType}
+ */
 export function isType(value: any): value is IAnyType {
     return typeof value === "object" && value && value.isType === true
 }

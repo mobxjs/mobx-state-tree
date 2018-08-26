@@ -5,7 +5,8 @@ import {
     getStateTreeNode,
     isStateTreeNode,
     isPrimitiveType,
-    IAnyType
+    IAnyType,
+    CoreType
 } from "../../internal"
 
 export interface IContextEntry {
@@ -14,11 +15,13 @@ export interface IContextEntry {
 }
 
 export type IContext = IContextEntry[]
+
 export interface IValidationError {
     context: IContext
     value: any
     message?: string
 }
+
 export type IValidationResult = IValidationError[]
 
 function safeStringify(value: any) {
@@ -29,6 +32,10 @@ function safeStringify(value: any) {
     }
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function prettyPrintValue(value: any) {
     return typeof value === "function"
         ? `<function${value.name ? " " + value.name : ""}>`
@@ -72,8 +79,12 @@ function toErrorString(error: IValidationError): string {
             ? isPrimitiveType(type) || isPrimitive(value)
                 ? `.`
                 : `, expected an instance of \`${
-                      type.name
-                  }\` or a snapshot like \`${type.describe()}\` instead.` +
+                      (type as CoreType<any, any, any>).name
+                  }\` or a snapshot like \`${(type as CoreType<
+                      any,
+                      any,
+                      any
+                  >).describe()}\` instead.` +
                   (isSnapshotCompatible
                       ? " (Note that a snapshot of the provided value is compatible with the targeted type)"
                       : "")
@@ -81,18 +92,34 @@ function toErrorString(error: IValidationError): string {
     )
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function getDefaultContext(type: IAnyType): IContext {
     return [{ type, path: "" }]
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function getContextForPath(context: IContext, path: string, type?: IAnyType): IContext {
     return context.concat([{ path, type }])
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function typeCheckSuccess(): IValidationResult {
     return EMPTY_ARRAY as any
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function typeCheckFailure(
     context: IContext,
     value: any,
@@ -101,15 +128,23 @@ export function typeCheckFailure(
     return [{ context, value, message }]
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function flattenTypeErrors(errors: IValidationResult[]): IValidationResult {
     return errors.reduce((a, i) => a.concat(i), [])
 }
 
 // TODO; doublecheck: typecheck should only needed to be invoked from: type.create and array / map / value.property will change
-export function typecheck(type: IAnyType, value: any): void {
+/**
+ * @internal
+ * @private
+ */
+export function typecheckInternal(type: IAnyType, value: any): void {
     // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
     if (process.env.NODE_ENV === "production") return
-    typecheckPublic(type, value)
+    typecheck(type, value)
 }
 
 /**
@@ -117,12 +152,11 @@ export function typecheck(type: IAnyType, value: any): void {
  * Throws if the given value is not according the provided type specification.
  * Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
  *
- * @alias typecheck
  * @export
  * @param {IAnyType} type
  * @param {*} value
  */
-export function typecheckPublic(type: IAnyType, value: any): void {
+export function typecheck(type: IAnyType, value: any): void {
     const errors = type.validate(value, [{ path: "", type }])
 
     if (errors.length > 0) {

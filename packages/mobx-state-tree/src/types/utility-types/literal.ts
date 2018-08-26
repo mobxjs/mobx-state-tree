@@ -11,10 +11,14 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    ObjectNode
+    ObjectNode,
+    Primitives
 } from "../../internal"
-import { Primitives } from "../../core/type/type"
 
+/**
+ * @internal
+ * @private
+ */
 export class Literal<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     readonly value: any
@@ -70,6 +74,14 @@ export function literal<S extends Primitives>(value: S): ISimpleType<S> {
     return new Literal<S>(value)
 }
 
+/**
+ * Returns if a given value represents a literal type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isLiteralType<IT extends ISimpleType<any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Literal) > 0
 }

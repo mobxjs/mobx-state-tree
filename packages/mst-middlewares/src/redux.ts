@@ -51,7 +51,7 @@ function runMiddleWare(action: any, runners: any[], next: any) {
  * @param {*} remoteDevDep
  * @param {*} model
  */
-export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: any, model: any) {
+export function connectReduxDevtools(remoteDevDep: any, model: any) {
     // Connect to the monitor
     const remotedev = remoteDevDep.connectViaExtension({ name: mst.getType(model).name })
     let applyingSnapshot = false
@@ -79,32 +79,32 @@ export const connectReduxDevtools = function connectReduxDevtools(remoteDevDep: 
         true
     )
 
-    function handleMonitorActions(remotedev: any, model: any, message: any) {
+    function handleMonitorActions(remotedev2: any, model2: any, message: any) {
         switch (message.payload.type) {
             case "RESET":
-                applySnapshot(model, initialState)
-                return remotedev.init(initialState)
+                applySnapshot(model2, initialState)
+                return remotedev2.init(initialState)
             case "COMMIT":
-                return remotedev.init(mst.getSnapshot(model))
+                return remotedev2.init(mst.getSnapshot(model2))
             case "ROLLBACK":
-                return remotedev.init(remoteDevDep.extractState(message))
+                return remotedev2.init(remoteDevDep.extractState(message))
             case "JUMP_TO_STATE":
             case "JUMP_TO_ACTION":
-                applySnapshot(model, remoteDevDep.extractState(message))
+                applySnapshot(model2, remoteDevDep.extractState(message))
                 return
             case "IMPORT_STATE":
                 const nextLiftedState = message.payload.nextLiftedState
                 const computedStates = nextLiftedState.computedStates
-                applySnapshot(model, computedStates[computedStates.length - 1].state)
-                remotedev.send(null, nextLiftedState)
+                applySnapshot(model2, computedStates[computedStates.length - 1].state)
+                remotedev2.send(null, nextLiftedState)
                 return
             default:
         }
     }
 
-    function applySnapshot(model: any, state: any) {
+    function applySnapshot(model2: any, state: any) {
         applyingSnapshot = true
-        mst.applySnapshot(model, state)
+        mst.applySnapshot(model2, state)
         applyingSnapshot = false
     }
 }

@@ -47,10 +47,7 @@ import {
     optional,
     OptionalValue,
     MapType,
-    ExtractT,
-    ExtractS,
-    ExtractC,
-    typecheck,
+    typecheckInternal,
     typeCheckFailure,
     TypeFlags
 } from "../../internal"
@@ -58,6 +55,10 @@ import {
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
 
+/**
+ * @internal
+ * @private
+ */
 export enum HookNames {
     afterCreate = "afterCreate",
     afterAttach = "afterAttach",
@@ -80,27 +81,25 @@ export interface ModelPropertiesDeclaration {
  */
 export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
     [K in keyof T]: T[K] extends string
-        ? IType<string | undefined, string, string> & { flags: TypeFlags.Optional }
+        ? IType<string | undefined, string, string> & OptionalProperty
         : T[K] extends number
-            ? IType<number | undefined, number, number> & { flags: TypeFlags.Optional }
+            ? IType<number | undefined, number, number> & OptionalProperty
             : T[K] extends boolean
-                ? IType<boolean | undefined, boolean, boolean> & { flags: TypeFlags.Optional }
+                ? IType<boolean | undefined, boolean, boolean> & OptionalProperty
                 : T[K] extends Date
-                    ? IType<number | Date | undefined, number, Date> & {
-                          flags: TypeFlags.Optional
-                      }
+                    ? IType<number | Date | undefined, number, Date> & OptionalProperty
                     : T[K] extends IAnyType ? T[K] : never
 }
 
-export interface OptionalPropertyTypes {
-    flags: TypeFlags.Optional
+export interface OptionalProperty {
+    optional: true
 }
 
 export type RequiredPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalPropertyTypes ? never : K
+    [K in keyof T]: T[K] extends OptionalProperty ? never : K
 }[keyof T]
 export type OptionalPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalPropertyTypes ? K : never
+    [K in keyof T]: T[K] extends OptionalProperty ? K : never
 }[keyof T]
 
 export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
@@ -162,7 +161,7 @@ export interface IModelType<
     ): IModelType<PROPS, OTHERS, S1>
 }
 
-export type IAnyModelType = IModelType<any, any, any, any, any>
+export interface IAnyModelType extends IModelType<any, any, any, any, any> {}
 
 export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any> ? P : never
 export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O> ? O : never
@@ -171,6 +170,10 @@ function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
 }
 
+/**
+ * @internal
+ * @private
+ */
 export interface ModelTypeConfig {
     name?: string
     properties?: ModelProperties
@@ -242,6 +245,10 @@ function toPropertiesObject<T>(declaredProps: ModelPropertiesDeclaration): Model
     )
 }
 
+/**
+ * @internal
+ * @private
+ */
 export class ModelType<S extends ModelProperties, T> extends ComplexType<any, any, any>
     implements IModelType<S, T> {
     readonly flags = TypeFlags.Object
@@ -488,7 +495,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         const type = (node.type as ModelType<any, any>).properties[change.name]
         // only properties are typed, state are stored as-is references
         if (type) {
-            typecheck(type, change.newValue)
+            typecheckInternal(type, change.newValue)
             change.newValue = type.reconcile(node.getChildNode(change.name), change.newValue)
         }
         return change
@@ -562,7 +569,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     @action
     applySnapshot(node: ObjectNode, snapshot: any): void {
         const s = this.applySnapshotPreProcessor(snapshot)
-        typecheck(this, s)
+        typecheckInternal(this, s)
         this.forAllProps((name, type) => {
             node.storedValue[name] = s[name]
         })
@@ -727,6 +734,14 @@ export function compose(...args: any[]): any {
         .named(typeName)
 }
 
+/**
+ * Returns if a given value represents a model type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isModelType<IT extends IModelType<any, any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }

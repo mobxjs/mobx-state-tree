@@ -7,7 +7,6 @@ import {
     resolvePath,
     getPath,
     IModelType,
-    TypeFlags,
     IComplexType,
     IMSTArray,
     IType

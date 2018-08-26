@@ -1,6 +1,7 @@
 # x.x.x
 
 -   Further improvements for Typescript support for enumeration by [@xaviergonz](https://github.com/xaviergonz)
+-   Smaller generated .d.ts files through [#990](https://github.com/mobxjs/mobx-state-tree/pull/990) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.2.3
 

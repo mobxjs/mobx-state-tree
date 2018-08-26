@@ -845,4 +845,3 @@ import {
     ExtractIStateTreeNode,
     IMSTArray
 } from "../internal"
-import { ModelPrimitive } from "../types/complex-types/model"

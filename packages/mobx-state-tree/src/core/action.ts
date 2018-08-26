@@ -31,10 +31,15 @@ export type IMiddlewareEvent = {
     args: any[]
 }
 
+/**
+ * @internal
+ * @private
+ */
 export type IMiddleware = {
     handler: IMiddlewareHandler
     includeHooks: boolean
 }
+
 export type IMiddlewareHandler = (
     actionCall: IMiddlewareEvent,
     next: (actionCall: IMiddlewareEvent, callback?: (value: any) => any) => void,
@@ -44,11 +49,19 @@ export type IMiddlewareHandler = (
 let nextActionId = 1
 let currentActionContext: IMiddlewareEvent | null = null
 
+/**
+ * @internal
+ * @private
+ */
 export function getNextActionId() {
     return nextActionId++
 }
 
 // TODO: optimize away entire action context if there is no middleware in tree?
+/**
+ * @internal
+ * @private
+ */
 export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const node = getStateTreeNode(context.context)
     const baseIsRunningAction = node._isRunningAction
@@ -68,11 +81,19 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     }
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function getActionContext(): IMiddlewareEvent {
     if (!currentActionContext) return fail("Not running an action!")
     return currentActionContext
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function createActionInvoker<T extends Function>(
     target: IAnyStateTreeNode,
     name: string,
@@ -124,7 +145,6 @@ export function addMiddleware(
     return node.addMiddleWare(handler, includeHooks)
 }
 
-export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn: T): T
 /**
  * Binds middleware to a specific action
  *
@@ -147,10 +167,11 @@ export function decorate<T extends Function>(middleware: IMiddlewareHandler, fn:
  * @param Function} fn
  * @returns the original function
  */
-export function decorate<T extends Function>(handler: IMiddlewareHandler, fn: any) {
+export function decorate<T extends Function>(handler: IMiddlewareHandler, fn: T): T {
     const middleware: IMiddleware = { handler, includeHooks: true }
-    if (fn.$mst_middleware) fn.$mst_middleware.push(middleware)
-    else fn.$mst_middleware = [middleware]
+    if ((fn as any).$mst_middleware) (fn as any).$mst_middleware.push(middleware)
+    else;
+    ;(fn as any).$mst_middleware = [middleware]
     return fn
 }
 
