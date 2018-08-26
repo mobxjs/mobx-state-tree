@@ -4957,8 +4957,8 @@ mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
     minimist "0.0.8"
 
 mobx@^5.0.2, mobx@^5.0.3:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/mobx/-/mobx-5.0.4.tgz#3f0faa74d4214b012d957f6a559e2e3e1aae421e"
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-5.0.5.tgz#e69abe62fd54e7d3b19d339c97ea27f8c6d5e76e"
 
 modify-values@^1.0.0:
   version "1.0.1"
@@ -6259,9 +6259,9 @@ rollup-pluginutils@^2.0.1:
     estree-walker "^0.5.2"
     micromatch "^2.3.11"
 
-rollup@^0.64.0:
-  version "0.64.1"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.64.1.tgz#9188ee368e5fcd43ffbc00ec414e72eeb5de87ba"
+rollup@^0.65.0:
+  version "0.65.0"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.65.0.tgz#280db1252169b68fc3043028346b337dde453fba"
   dependencies:
     "@types/estree" "0.0.39"
     "@types/node" "*"

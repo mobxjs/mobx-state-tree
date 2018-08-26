@@ -9,28 +9,34 @@ const globals = {
 
 export default [
     {
-        entry: "./lib/index.js",
-        dest: "./dist/mst-middlewares.js",
-        format: "cjs",
+        input: "./lib/index.js",
+        output: {
+            file: "./dist/mst-middlewares.js",
+            format: "cjs",
+            globals: globals
+        },
         external: externals,
-        globals: globals,
         plugins: [resolve()]
     },
     {
-        entry: "./lib/index.js",
-        dest: "./dist/mst-middlewares.umd.js",
-        format: "umd",
-        moduleName: "mobxStateTree",
+        input: "./lib/index.js",
+        output: {
+            file: "./dist/mst-middlewares.umd.js",
+            format: "umd",
+            globals: globals,
+            name: "mobxStateTree"
+        },
         external: externals,
-        globals: globals,
         plugins: [resolve(), uglify()]
     },
     {
-        entry: "./lib/index.js",
-        dest: "./dist/mst-middlewares.module.js",
-        format: "es",
+        input: "./lib/index.js",
+        output: {
+            file: "./dist/mst-middlewares.module.js",
+            format: "es",
+            globals: globals
+        },
         external: externals,
-        globals: globals,
         plugins: [resolve()]
     }
 ]

@@ -7,42 +7,42 @@ function getEnvVariables(production) {
     return { "process.env.NODE_ENV": production ? "'production'" : "'development'" }
 }
 
+const input = "./lib/index.js"
+const externals = ["mobx"]
+const globals = {
+    mobx: "mobx"
+}
+
 export default [
     {
-        input: "./lib/index.js",
+        input: input,
         output: {
             file: "./dist/mobx-state-tree.js",
             format: "cjs",
-            globals: {
-                mobx: "mobx"
-            }
+            globals: globals
         },
-        external: ["mobx"],
+        external: externals,
         plugins: [resolve(), filesize()]
     },
     {
-        input: "./lib/index.js",
+        input: input,
         output: {
             file: "./dist/mobx-state-tree.umd.js",
             format: "umd",
-            globals: {
-                mobx: "mobx"
-            },
+            globals: globals,
             name: "mobxStateTree"
         },
-        external: ["mobx"],
+        external: externals,
         plugins: [resolve(), replace(getEnvVariables(true)), uglify(), filesize()]
     },
     {
-        input: "./lib/index.js",
+        input: input,
         output: {
             file: "./dist/mobx-state-tree.module.js",
             format: "es",
-            globals: {
-                mobx: "mobx"
-            }
+            globals: globals
         },
-        external: ["mobx"],
+        external: externals,
         plugins: [resolve(), filesize()]
     }
 ]
