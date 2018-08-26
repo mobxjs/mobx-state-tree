@@ -640,7 +640,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     removeChild(node: ObjectNode, subpath: string) {
-        node.storedValue[subpath] = null
+        node.storedValue[subpath] = undefined
     }
 }
 
