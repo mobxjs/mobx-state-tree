@@ -620,6 +620,8 @@ if (process.env.NODE_ENV !== "production") {
             detach(a)
             destroy(a)
         }).not.toThrow()
+        expect(b.a).toBe(undefined)
+        expect(getSnapshot(b).a).toBe(undefined)
     })
     test("it should be possible to remove a node from a parent if it is defined as type maybeNull ", () => {
         const A = types.model("A", { x: 3 })
@@ -631,6 +633,8 @@ if (process.env.NODE_ENV !== "production") {
             detach(a)
             destroy(a)
         }).not.toThrow()
+        expect(b.a).toBe(null)
+        expect(getSnapshot(b).a).toBe(null)
     })
 }
 test("it should be possible to share states between views and actions using enhance", () => {
