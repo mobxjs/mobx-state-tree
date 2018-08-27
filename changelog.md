@@ -1,7 +1,8 @@
-# x.x.x
+# 3.2.4
 
 -   Further improvements for Typescript support for enumeration by [@xaviergonz](https://github.com/xaviergonz)
 -   Smaller generated .d.ts files through [#990](https://github.com/mobxjs/mobx-state-tree/pull/990) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fix for exception when destroying children of types.maybe through [#985](https://github.com/mobxjs/mobx-state-tree/pull/985) by [@dsabanin](https://github.com/dsabanin)
 
 # 3.2.3
 
