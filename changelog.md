@@ -1,3 +1,7 @@
+# 3.2.5
+
+-   Fix for TS3 issues with reference type [#994](https://github.com/mobxjs/mobx-state-tree/issues/994) through [#995](https://github.com/mobxjs/mobx-state-tree/pull/995) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.2.4
 
 -   Further improvements for Typescript support for enumeration by [@xaviergonz](https://github.com/xaviergonz)
