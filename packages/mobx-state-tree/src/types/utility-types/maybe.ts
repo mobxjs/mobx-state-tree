@@ -4,7 +4,6 @@ import {
     IType,
     isType,
     fail,
-    TypeFlags,
     undefinedType,
     nullType,
     IComplexType,
