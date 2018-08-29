@@ -61,7 +61,7 @@ export class IdentifierCache {
             case 0:
                 return null
             case 1:
-                // make sure we instantiate all nodes up to the root if available and if not done before
+                // make sure we instantiate all nodes up to the root (if available and if not done before)
                 // fixes #993
                 const matched = matches[0]
                 if (matched) {
