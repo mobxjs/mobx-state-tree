@@ -156,7 +156,7 @@ export type Primitives = ModelPrimitive | null | undefined
 export type TAndInterface<T, I> = (Exclude<T, Primitives> & I) | Extract<T, Primitives>
 
 export interface IComplexType<C, S, T> extends IType<C, S, T> {
-    // fake, only used for tying
+    // fake, only used for typing
     readonly $complexType: undefined
 
     create(
