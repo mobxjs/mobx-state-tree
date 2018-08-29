@@ -92,7 +92,8 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
 }
 
 export interface OptionalProperty {
-    optional: true
+    // fake, only used for typing
+    readonly $optionalType: undefined
 }
 
 export type RequiredPropNames<T> = {
@@ -153,15 +154,12 @@ export interface IModelType<
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
         fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS>
-    preProcessSnapshot<S0 = ModelCreationType<PROPS>>(
-        fn: (snapshot: S0) => ModelCreationType<PROPS>
-    ): IModelType<PROPS, OTHERS, S0>
-    postProcessSnapshot<S1 = ModelCreationType<PROPS>>(
-        fn: (snapshot: ModelSnapshotType<PROPS>) => S1
-    ): IModelType<PROPS, OTHERS, S1>
+    preProcessSnapshot<NewC = C>(fn: (snapshot: NewC) => C): IModelType<PROPS, OTHERS, NewC, S>
+    postProcessSnapshot<NewS = S>(fn: (snapshot: S) => NewS): IModelType<PROPS, OTHERS, C, NewS>
 }
 
-export interface IAnyModelType extends IModelType<any, any, any, any, any> {}
+// do not make this an interface (#994 will happen again if done)
+export type IAnyModelType = IModelType<any, any, any, any, any>
 
 export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any> ? P : never
 export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O> ? O : never
