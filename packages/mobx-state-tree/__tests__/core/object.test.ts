@@ -10,7 +10,8 @@ import {
     getSnapshot,
     unprotect,
     types,
-    setLivelynessChecking
+    setLivelynessChecking,
+    getParent
 } from "../../src"
 
 import { autorun, reaction, observable } from "mobx"
@@ -706,3 +707,48 @@ if (process.env.NODE_ENV === "development")
             "Invalid type definition for property 'x', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?"
         )
     })
+
+test("#993 - references should have a parent event when the parent has not been accesed before", () => {
+    const Todo = types
+        .model("Todo", {
+            id: types.identifier,
+            finished: false
+        })
+        .actions(self => ({
+            toggle() {
+                self.finished = !self.finished
+            }
+        }))
+
+    const TodoStore = types.model("TodoStore", {
+        todos: types.array(Todo),
+        selectedTodo: types.reference(Todo)
+    })
+
+    const store = TodoStore.create({
+        todos: [
+            {
+                id: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+            },
+            {
+                id: "23424091-11c1-4dda-b2ed-7dd6323491a6"
+            }
+        ],
+        selectedTodo: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+    })
+
+    let calls = 0
+    onSnapshot(store, () => {
+        calls++
+    })
+
+    expect(getParent(store.selectedTodo)).not.toBeFalsy()
+
+    expect(calls).toBe(0)
+    store.selectedTodo.toggle()
+    expect(calls).toBe(1)
+    store.todos[0].toggle()
+    expect(calls).toBe(2)
+    store.selectedTodo.toggle()
+    expect(calls).toBe(3)
+})

@@ -61,7 +61,20 @@ export class IdentifierCache {
             case 0:
                 return null
             case 1:
-                return matches[0]
+                // make sure we instantiate all nodes up to the root if available and if not done before
+                // fixes #993
+                const matched = matches[0]
+                if (matched) {
+                    let parent = matched.parent
+                    while (parent && !parent.storedValue) {
+                        // accessing the value will ensure the node is initialized
+                        // tslint:disable-next-line:no-unused-expression
+                        parent.value
+
+                        parent = parent.parent
+                    }
+                }
+                return matched
             default:
                 return fail(
                     `Cannot resolve a reference to type '${
