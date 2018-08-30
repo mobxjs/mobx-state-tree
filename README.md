@@ -635,7 +635,7 @@ References are looked up through the entire tree, but per type. So identifiers n
 
 The default implementation uses the `identifier` cache to resolve references (See [`resolveIdentifier`](API.md#resolveIdentifier)).
 However, it is also possible to override the resolve logic, and provide your own custom resolve logic.
-This also makes it possible to, for example, trigger a data fetch when trying to resolve the reference ([example](https://github.com/mobxjs/mobx-state-tree/blob/cdb3298a5621c3229b3856bb469327da6deb31ea/packages/mobx-state-tree/__tests__/core/reference-custom.ts#L150)).
+This also makes it possible to, for example, trigger a data fetch when trying to resolve the reference ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mobx-state-tree/__tests__/core/reference-custom.test.ts#L148)).
 
 Example:
 
@@ -1295,18 +1295,18 @@ const Example = types
 
 _**NOTE: the above approach will incur runtime performance penalty as accessing such computed values (e.g. inside `render()` method of an observed component) always leads to full recompute (see [this issue](https://github.com/mobxjs/mobx-state-tree/issues/818#issue-323164363) for details). For a heavily-used computed properties it's recommended to use one of below approaches.**_
 
-Alternatively, you can manually override the inferred type of `self`:
+Alternatively, you can use `this` whenever you intend to use the newly declared computed values:
 
 ```typescript
 const Example = types
     .model("Example", { prop: types.string })
-    .views((self: typeof Example.Type) => ({
+    .views(self => ({
         // use typeof instead of predefined type to avoid circular references
         get upperProp(): string {
             return self.prop.toUpperCase()
         },
         get twiceUpperProp(): string {
-            return self.upperProp + self.upperProp
+            return this.upperProp + this.upperProp
         }
     }))
 ```

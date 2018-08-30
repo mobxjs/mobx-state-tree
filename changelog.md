@@ -1,12 +1,17 @@
-# 4.x.x
+# 4.0.0
 
 -   **[BREAKING]** MobX-state-tree now requires at least TypeScript 3.0 when using MST with typescript.
 -   The `create` method is now able to infer in TS if it can be called parameterless or not for a certan type by [@xaviergonz](https://github.com/xaviergonz).
 
-# x.x.x
+# 3.2.5
+
+-   Fix for TS3 issues with reference type [#994](https://github.com/mobxjs/mobx-state-tree/issues/994) through [#995](https://github.com/mobxjs/mobx-state-tree/pull/995) by [@xaviergonz](https://github.com/xaviergonz)
+
+# 3.2.4
 
 -   Further improvements for Typescript support for enumeration by [@xaviergonz](https://github.com/xaviergonz)
 -   Smaller generated .d.ts files through [#990](https://github.com/mobxjs/mobx-state-tree/pull/990) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fix for exception when destroying children of types.maybe through [#985](https://github.com/mobxjs/mobx-state-tree/pull/985) by [@dsabanin](https://github.com/dsabanin)
 
 # 3.2.3
 

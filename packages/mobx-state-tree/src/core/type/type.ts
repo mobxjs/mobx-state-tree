@@ -178,6 +178,9 @@ export type Primitives = ModelPrimitive | null | undefined
 export type TAndInterface<T, I> = (Exclude<T, Primitives> & I) | Extract<T, Primitives>
 
 export interface IComplexType<C, S, T> extends IType<C, S, T> {
+    // fake, only used for typing
+    readonly $complexType: undefined
+
     create(...args: CreateParams<C>): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>
 }
 
@@ -234,6 +237,8 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  * @private
  */
 export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
+    readonly $complexType = undefined
+
     readonly isType = true
     readonly name: string
 

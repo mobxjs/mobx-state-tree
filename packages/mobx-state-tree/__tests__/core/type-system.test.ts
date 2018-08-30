@@ -802,3 +802,12 @@ test("cast and SnapshotOrInstance", () => {
     // cast({a: 2, b: 5})
     // cast(NumberMap({a: 2, b: 3}))
 })
+
+test("#994", () => {
+    const Cinema = types.model("Cinema", {
+        id: types.identifier,
+        name: types.maybe(types.string)
+    })
+
+    types.reference(Cinema) // should compile ok on TS3
+})

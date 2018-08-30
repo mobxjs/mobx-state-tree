@@ -447,7 +447,7 @@ export class MapType<C, S, T> extends ComplexType<
  */
 export function map<C, S, T>(subtype: IType<C, S, T>): IMapType<C, S, T> {
     const ret = new MapType<C, S, T>(`map<string, ${subtype.name}>`, subtype)
-    return ret as typeof ret & { optional: true }
+    return ret as typeof ret & OptionalProperty
 }
 
 /**
