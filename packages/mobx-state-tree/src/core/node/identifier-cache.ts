@@ -65,13 +65,23 @@ export class IdentifierCache {
                 // fixes #993
                 const matched = matches[0]
                 if (matched) {
-                    let parent = matched.parent
-                    while (parent && !parent.storedValue) {
-                        // accessing the value will ensure the node is initialized
-                        // tslint:disable-next-line:no-unused-expression
-                        parent.value
+                    // array with parent chain from parent to child
+                    const parentChain = []
 
+                    let parent = matched.parent
+                    // for performance reasons we never go back further than the most direct
+                    // uninitialized parent
+                    // this is done to avoid traversing the whole tree to the root when using
+                    // the same reference again
+                    while (parent && !parent.isObservableInstanceCreated) {
+                        parentChain.unshift(parent)
                         parent = parent.parent
+                    }
+
+                    // initialize the uninitialized parent chain from parent to child
+                    for (const p of parentChain) {
+                        // accessing the value will ensure the node is initialized
+                        p.createObservableInstanceIfNeeded()
                     }
                 }
                 return matched

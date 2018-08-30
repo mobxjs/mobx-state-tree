@@ -709,7 +709,9 @@ if (process.env.NODE_ENV === "development")
     })
 
 test("#993 - references should have a parent event when the parent has not been accesed before", () => {
-    const Todo = types
+    const events: string[] = []
+
+    const L4 = types
         .model("Todo", {
             id: types.identifier,
             finished: false
@@ -717,38 +719,103 @@ test("#993 - references should have a parent event when the parent has not been 
         .actions(self => ({
             toggle() {
                 self.finished = !self.finished
+            },
+            afterCreate() {
+                events.push("l4-ac")
+            },
+            afterAttach() {
+                events.push("l4-at")
             }
         }))
 
-    const TodoStore = types.model("TodoStore", {
-        todos: types.array(Todo),
-        selectedTodo: types.reference(Todo)
-    })
+    const L3 = types.model({ l4: L4 }).actions(self => ({
+        afterCreate() {
+            events.push("l3-ac")
+        },
+        afterAttach() {
+            events.push("l3-at")
+        }
+    }))
 
-    const store = TodoStore.create({
-        todos: [
-            {
-                id: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+    const L2 = types
+        .model({
+            l3: L3
+        })
+        .actions(self => ({
+            afterCreate() {
+                events.push("l2-ac")
             },
-            {
-                id: "23424091-11c1-4dda-b2ed-7dd6323491a6"
+            afterAttach() {
+                events.push("l2-at")
             }
-        ],
-        selectedTodo: "11124091-11c1-4dda-b2ed-7dd6323491a5"
-    })
+        }))
 
-    let calls = 0
-    onSnapshot(store, () => {
-        calls++
-    })
+    const L1 = types
+        .model({
+            l2: L2,
+            selected: types.reference(L4)
+        })
+        .actions(self => ({
+            afterCreate() {
+                events.push("l1-ac")
+            },
+            afterAttach() {
+                events.push("l1-at")
+            }
+        }))
 
-    expect(getParent(store.selectedTodo)).not.toBeFalsy()
+    const createL1 = () =>
+        L1.create({
+            l2: {
+                l3: {
+                    l4: {
+                        id: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+                    }
+                }
+            },
+            selected: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+        })
 
-    expect(calls).toBe(0)
-    store.selectedTodo.toggle()
-    expect(calls).toBe(1)
-    store.todos[0].toggle()
-    expect(calls).toBe(2)
-    store.selectedTodo.toggle()
-    expect(calls).toBe(3)
+    const expectedEvents = [
+        "l1-ac",
+        "l2-ac",
+        "l2-at",
+        "l3-ac",
+        "l3-at",
+        "l4-ac",
+        "l4-at",
+        "onSnapshot",
+        "onSnapshot"
+    ]
+
+    // test 1, real child first
+    {
+        const l1 = createL1()
+        onSnapshot(l1, () => {
+            events.push("onSnapshot")
+        })
+
+        l1.l2.l3.l4.toggle()
+        l1.selected.toggle()
+        expect(events).toEqual(expectedEvents)
+    }
+
+    // test 2, reference first
+    events.length = 0
+    {
+        const l1 = createL1()
+        onSnapshot(l1, () => {
+            events.push("onSnapshot")
+        })
+
+        l1.selected.toggle()
+        l1.l2.l3.l4.toggle()
+        expect(events).toEqual(expectedEvents)
+    }
+
+    // test 3, reference get parent should be available from the beginning
+    {
+        const l1 = createL1()
+        expect(getParent(l1.selected)).toBeTruthy()
+    }
 })

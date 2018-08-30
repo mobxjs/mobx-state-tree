@@ -128,8 +128,8 @@ export class ObjectNode implements INode {
         // so we safely can read it from initial snapshot
         this.identifier =
             this.identifierAttribute && this._initialSnapshot
-                ? "" + this._initialSnapshot[this.identifierAttribute] // normalize internal identifier to string
-                : null
+                ? "" + this._initialSnapshot[this.identifierAttribute]
+                : null // normalize internal identifier to string
 
         if (!parent) {
             this.identifierCache = new IdentifierCache()
@@ -246,8 +246,16 @@ export class ObjectNode implements INode {
         if (typeof fn === "function") fn.apply(this.storedValue)
     }
 
-    public get value(): any {
+    public createObservableInstanceIfNeeded() {
         if (!this._observableInstanceCreated) this._createObservableInstance()
+    }
+
+    public get isObservableInstanceCreated() {
+        return this._observableInstanceCreated
+    }
+
+    public get value(): any {
+        this.createObservableInstanceIfNeeded()
         if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
