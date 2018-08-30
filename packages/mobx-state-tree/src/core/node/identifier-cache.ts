@@ -80,7 +80,6 @@ export class IdentifierCache {
 
                     // initialize the uninitialized parent chain from parent to child
                     for (const p of parentChain) {
-                        // accessing the value will ensure the node is initialized
                         p.createObservableInstanceIfNeeded()
                     }
                 }
