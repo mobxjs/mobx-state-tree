@@ -140,7 +140,7 @@ test("it should support dynamic loading", done => {
                     setTimeout(resolve, 200)
                 })
                 events.push("loaded " + name)
-                const user = (self.users.find(u => u.name === name)!.age = name.length * 3) // wonderful!
+                const user = (self.users.find(u => u.name === name).age = name.length * 3) // wonderful!
             })
         }))
         .views(self => ({
