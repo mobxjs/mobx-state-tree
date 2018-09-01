@@ -15,6 +15,7 @@ import {
     IComplexType,
     OptionalProperty
 } from "../../internal"
+import { getSnapshot } from "../.."
 
 /**
  * @internal
@@ -25,7 +26,7 @@ export type IFunctionReturn<T> = () => T
  * @internal
  * @private
  */
-export type IOptionalValue<C, S, T> = C | S | T | IFunctionReturn<C | S | T>
+export type IOptionalValue<C, S, T> = C | S | IFunctionReturn<C | S | T>
 
 /**
  * @internal
@@ -64,22 +65,25 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
     reconcile(current: INode, newValue: any): INode {
         return this.type.reconcile(
             current,
-            this.type.is(newValue) && newValue !== undefined ? newValue : this.getDefaultValue()
+            this.type.is(newValue) && newValue !== undefined
+                ? newValue
+                : this.getDefaultValueSnapshot()
         )
     }
 
-    private getDefaultValue() {
+    public getDefaultValueSnapshot() {
         const defaultValue =
             typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
-        if (typeof this.defaultValue === "function") typecheckInternal(this, defaultValue)
-        return defaultValue
-    }
 
-    public getDefaultValueSnapshot() {
-        const defaultValue = this.getDefaultValue()
-        return isStateTreeNode(defaultValue)
+        const defaultValueSnapshot = isStateTreeNode(defaultValue)
             ? getStateTreeNode(defaultValue).snapshot
             : defaultValue
+
+        // while static values are already snapshots and checked on types.optional
+        // generator functions must always be rechecked just in case
+        if (typeof this.defaultValue === "function") typecheckInternal(this, defaultValueSnapshot)
+
+        return defaultValueSnapshot
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
@@ -98,21 +102,13 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
 
 export function optional<C, S, T>(
     type: IComplexType<C, S, T>,
-    defaultValueOrFunction: C | S | T
+    defaultValueOrFunction: C | S | (() => C | S | T)
 ): IComplexType<C | undefined, S, T> & OptionalProperty
 export function optional<C, S, T>(
-    type: IComplexType<C, S, T>,
-    defaultValueOrFunction: () => C | S | T
-): IComplexType<C | undefined, S, T> & OptionalProperty
+    type: IType<C, S, T>,
+    defaultValueOrFunction: C | S | (() => C | S | T)
+): IType<C | undefined, S, T> & OptionalProperty
 
-export function optional<C, S, T>(
-    type: IType<C, S, T>,
-    defaultValueOrFunction: C | S | T
-): IType<C | undefined, S, T> & OptionalProperty
-export function optional<C, S, T>(
-    type: IType<C, S, T>,
-    defaultValueOrFunction: () => C | S | T
-): IType<C | undefined, S, T> & OptionalProperty
 /**
  * `types.optional` can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
@@ -132,7 +128,17 @@ export function optional<C, S, T>(
  * @export
  * @alias types.optional
  */
-export function optional(type: IAnyType, defaultValueOrFunction: any): IAnyType & OptionalProperty {
+export function optional<C, S, T>(
+    type: IType<C, S, T>,
+    defaultValueOrFunction: C | S | (() => C | S | T)
+): IType<C | undefined, S, T> & OptionalProperty {
+    // make sure we never pass direct instances
+    if (typeof defaultValueOrFunction !== "function" && isStateTreeNode(defaultValueOrFunction)) {
+        fail(
+            "default value cannot be an instance, pass a snapshot or a function that creates an instance/snapshot instead"
+        )
+    }
+
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
             fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
@@ -145,6 +151,7 @@ export function optional(type: IAnyType, defaultValueOrFunction: any): IAnyType 
             : defaultValue
         typecheckInternal(type, defaultSnapshot)
     }
+
     const ret = new OptionalValue(type, defaultValueOrFunction)
     return ret as typeof ret & OptionalProperty
 }

@@ -48,14 +48,14 @@ if (process.env.NODE_ENV !== "production") {
     })
 }
 test("it should accept a function to provide dynamic values", () => {
-    let defaultValue: any = 1
+    let defaultValue = 1
     const Factory = types.model({
         a: types.optional(types.number, () => defaultValue)
     })
     expect(getSnapshot(Factory.create())).toEqual({ a: 1 })
     defaultValue = 2
     expect(getSnapshot(Factory.create())).toEqual({ a: 2 })
-    defaultValue = "hello world!"
+    defaultValue = "hello world!" as any
     if (process.env.NODE_ENV !== "production") {
         expect(() => Factory.create()).toThrowError(
             `[mobx-state-tree] Error while converting \`"hello world!"\` to \`number\`:\n\n    value \`"hello world!"\` is not assignable to type: \`number\` (Value is not a number).`
@@ -92,13 +92,21 @@ test("optional frozen should fallback to default value if snapshot is undefined"
     expect(store.thing).toEqual({})
 })
 
-test("a model is a valid default value, snapshot will be used", () => {
-    const Row = types.model({
+test("an instance is not a valid default value, snapshot or function that creates instance must be used", () => {
+    const Row = types.model("Row", {
         name: "",
         quantity: 0
     })
-    const Factory = types.model({
-        rows: types.optional(types.array(Row), types.array(Row).create())
+
+    expect(() => {
+        types.model({ rows: types.optional(types.array(Row), types.array(Row).create()) })
+    }).toThrow(
+        "default value cannot be an instance, pass a snapshot or a function that creates an instance/snapshot instead"
+    )
+
+    // this however should be ok
+    const Factory = types.model("Factory", {
+        rows: types.optional(types.array(Row), () => types.array(Row).create())
     })
     const doc = Factory.create()
     expect(getSnapshot(doc)).toEqual({ rows: [] })
