@@ -1,5 +1,12 @@
 // noinspection ES6UnusedImports
-import { action, computed, createAtom, reaction, IAtom } from "mobx"
+import {
+    action,
+    computed,
+    createAtom,
+    reaction,
+    IAtom,
+    _allowStateChangesInsideComputed
+} from "mobx"
 import {
     addHiddenFinalProp,
     addReadOnlyProp,
@@ -243,7 +250,11 @@ export class ObjectNode implements INode {
     fireHook(name: string) {
         const fn =
             this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
-        if (typeof fn === "function") fn.apply(this.storedValue)
+        if (typeof fn === "function") {
+            _allowStateChangesInsideComputed(() => {
+                fn.apply(this.storedValue)
+            })
+        }
     }
 
     public get value(): any {

@@ -706,3 +706,52 @@ if (process.env.NODE_ENV === "development")
             "Invalid type definition for property 'x', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?"
         )
     })
+
+test("#967 - changing values in afterCreate/afterAttach when node is instantiated from view", () => {
+    const Answer = types
+        .model("Answer", {
+            title: types.string,
+            selected: false
+        })
+        .actions(self => ({
+            toggle() {
+                self.selected = !self.selected
+            }
+        }))
+    const Question = types
+        .model("Question", { title: types.string, answers: types.array(Answer) })
+        .actions(self => ({
+            afterCreate() {
+                // we should allow changes even when inside a computed property when done inside afterCreate/afterAttach
+                self.answers[0].toggle()
+            },
+            afterAttach() {
+                // we should allow changes even when inside a computed property when done inside afterCreate/afterAttach
+                self.answers[0].toggle()
+            }
+        }))
+
+    const Product = types
+        .model("Product", {
+            questions: types.array(Question)
+        })
+        .views(self => ({
+            get selectedAnswers() {
+                const result = []
+                for (const question of self.questions) {
+                    result.push(question.answers.find(a => a.selected))
+                }
+                return result
+            }
+        }))
+
+    const product = Product.create({
+        questions: [
+            { title: "Q 0", answers: [{ title: "A 0.0" }, { title: "A 0.1" }] },
+            { title: "Q 1", answers: [{ title: "A 1.0" }, { title: "A 1.1" }] }
+        ]
+    })
+
+    // tslint:disable-next-line:no-unused-expression
+    product.selectedAnswers
+})
