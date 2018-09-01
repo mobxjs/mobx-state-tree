@@ -1,6 +1,7 @@
 # 3.2.5
 
 -   Fix for TS3 issues with reference type [#994](https://github.com/mobxjs/mobx-state-tree/issues/994) through [#995](https://github.com/mobxjs/mobx-state-tree/pull/995) by [@xaviergonz](https://github.com/xaviergonz)
+-   types.optional will now throw if an instance is passed as default value [#1002](https://github.com/mobxjs/mobx-state-tree/issues/1002), fixes related to functions that generate instances inside types.optional incorrectly throwing through [#1003](https://github.com/mobxjs/mobx-state-tree/pull/1003) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.2.4
 

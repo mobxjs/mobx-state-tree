@@ -15,7 +15,6 @@ import {
     IComplexType,
     OptionalProperty
 } from "../../internal"
-import { getSnapshot } from "../.."
 
 /**
  * @internal
