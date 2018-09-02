@@ -49,7 +49,10 @@ import {
     MapType,
     typecheckInternal,
     typeCheckFailure,
-    TypeFlags
+    TypeFlags,
+    ExtractC,
+    ExtractS,
+    ExtractT
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"

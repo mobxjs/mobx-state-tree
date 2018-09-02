@@ -15,7 +15,13 @@ import {
     IValidationError,
     IComplexType,
     IModelType,
-    ModelProperties
+    IAnyModelType,
+    ExtractProps,
+    ExtractC,
+    ExtractS,
+    ExtractT,
+    IAnyComplexType,
+    ExtractOthers
 } from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
