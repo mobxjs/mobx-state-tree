@@ -892,6 +892,8 @@ These are the types available in MST. All types can be found in the `types` name
 -   `types.array(type)` Declares an array of the specified type.
 -   `types.map(type)` Declares a map of the specified type.
 
+When used in a model type as property type, `types.array` and `types.map` will be wrapped in `types.optional` by default, with `[]` and `{}` set as their default values, respectively.
+
 ## Primitive types
 
 -   `types.string`
