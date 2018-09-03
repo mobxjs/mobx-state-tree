@@ -203,7 +203,7 @@ To run the examples:
 2.  navigate to the example folder (e.g. `packages/mst-example-bookshop`)
 3.  run `yarn install` and `yarn start`
 
--   [Bookshop](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-bookshop) Example webshop application with references, identifiers, routing, testing etc.
+-   [Bookshop](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-bookshop) Example webshop application with references, identifiers, routing, testing, etc.
 -   [Boxes](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-boxes) Example app where one can draw, drag, and drop boxes. With time-travelling and multi-client synchronization over websockets.
 -   [TodoMVC](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-todomvc) Classic example app using React and MST.
 -   [Redux TodoMVC](https://github.com/mobxjs/mobx-state-tree/tree/master/packages/mst-example-redux-todomvc) Redux TodoMVC application, except that the reducers are replaced with a MST. Tip: open the Redux devtools; they will work!
@@ -233,7 +233,7 @@ const coffeeTodo = Todo.create({
 ```
 
 The `types.model` type declaration is used to describe the shape of an object.
-Other built-in types include arrays, maps, primitives etc. See the [types overview](#types-overview).
+Other built-in types include arrays, maps, primitives, etc. See the [types overview](#types-overview).
 The type information will be used for both.
 
 ### Creating models
@@ -323,7 +323,7 @@ const TodoStore = types
     })
 ```
 
-It is perfectly fine to chain multiple `views`, `props` calls etc in arbitrary order. This can be a great way to structure complex types, mix-in utility functions etc. Each call in the chain creates a new, immutable type which can itself be stored and reused as part of other types, etc.
+It is perfectly fine to chain multiple `views`, `props` calls etc in arbitrary order. This can be a great way to structure complex types, mix-in utility functions, etc. Each call in the chain creates a new, immutable type which can itself be stored and reused as part of other types, etc.
 
 It is also possible to define lifecycle hooks in the _actions_ object. These are actions with a predefined name that are run at a specific moment. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel).
 
@@ -375,7 +375,7 @@ The _snapshot_ passed to the `create` method of a type will recursively be turne
 storeInstance.todos[0].setTitle("Chocolate instead plz")
 ```
 
-Because any node in a tree is an tree in itself, any built-in method in MST can be invoked on any node in the tree, not just the root.
+Because any node in a tree is a tree in itself, any built-in method in MST can be invoked on any node in the tree, not just the root.
 This makes it possible to get a patch stream of a certain subtree, or to apply middleware to a certain subtree only.
 
 ### Actions
@@ -468,7 +468,7 @@ someModel.actions(self => {
 
 #### Action listeners versus middleware
 
-The difference between action listeners and middleware is: middleware can intercept the action that is about to be invoked, modify arguments, return types etc. Action listeners cannot intercept and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receives the raw arguments. (`onAction` is actually just a built-in middleware).
+The difference between action listeners and middleware is: middleware can intercept the action that is about to be invoked, modify arguments, return types, etc. Action listeners cannot intercept and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receives the raw arguments. (`onAction` is actually just a built-in middleware).
 
 For more details on creating middleware, see the [docs](docs/middleware.md).
 
@@ -524,7 +524,7 @@ If you want to share volatile state between views and actions, use `.extend` ins
 
 Snapshots are the immutable serialization, in plain objects, of a tree at a specific point in time.
 Snapshots can be inspected through `getSnapshot(node, applyPostProcess)`.
-Snapshots don't contain any type information and are stripped from all actions etc., so they are perfectly suitable for transportation.
+Snapshots don't contain any type information and are stripped from all actions, etc., so they are perfectly suitable for transportation.
 Requesting a snapshot is cheap as MST always maintains a snapshot of each node in the background and uses structural sharing.
 
 ```javascript
@@ -741,7 +741,7 @@ Finally, it is not only possible to be notified about snapshots, patches or acti
 <i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-use-volatile-state-and-lifecycle-methods-to-manage-private-state">egghead.io lesson 15: Use Volatile State and Lifecycle Methods to Manage Private State</a></i>
 
 MST models primarily aid in storing _persistable_ state. State that can be persisted, serialized, transferred, patched, replaced, etc.
-However, sometimes you need to keep track of temporary, non-persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements etc. - state which is needed for local purposes as long as the object is alive.
+However, sometimes you need to keep track of temporary, non-persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements, etc. - state which is needed for local purposes as long as the object is alive.
 
 Volatile state (which is also private) can be introduced by creating variables inside any of the action initializer functions.
 
@@ -837,7 +837,7 @@ The object that is returned from the `volatile` initializer function can contain
 When creating a new state tree it is possible to pass in environment specific data by passing an object as the second argument to a `.create` call.
 This object should be (shallowly) immutable and can be accessed by any model in the tree by calling `getEnv(self)`.
 
-This is useful to inject environment or test-specific utilities like a transport layer, loggers etc. This is also very useful to mock behavior in unit tests or provide instantiated utilities to models without requiring singleton modules.
+This is useful to inject environment or test-specific utilities like a transport layer, loggers, etc. This is also very useful to mock behavior in unit tests or provide instantiated utilities to models without requiring singleton modules.
 See also the [bookshop example](https://github.com/mobxjs/mobx-state-tree/blob/a4f25de0c88acf0e239acb85e690e91147a8f0f0/examples/bookshop/src/stores/ShopStore.test.js#L9) for inspiration.
 
 ```javascript
@@ -960,7 +960,7 @@ Note: pre and post processing are just meant to convert your data into types tha
 
 | Hook                  | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preProcessSnapshot`  | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be a _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames etc. This hook is not called for individual property updates. _\*\*Note 1: Unlike the other hooks, this one is \_not_ created as part of the `actions` initializer, but directly on the type!**\_ \_**Note 2: The `preProcessSnapshot` transformation must be pure; it should not modify its original input argument!\*\*\_ |
+| `preProcessSnapshot`  | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be a _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames, etc. This hook is not called for individual property updates. _\*\*Note 1: Unlike the other hooks, this one is \_not_ created as part of the `actions` initializer, but directly on the type!**\_ \_**Note 2: The `preProcessSnapshot` transformation must be pure; it should not modify its original input argument!\*\*\_ |
 | `afterCreate`         | Immediately after an instance is created and initial values are applied. Children will fire this event before parents. You can't make assumptions about the parent safely, use `afterAttach` if you need to.                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `afterAttach`         | As soon as the _direct_ parent is assigned (this node is attached to another node). If an element is created as part of a parent, `afterAttach` is also fired. Unlike `afterCreate`, `afterAttach` will fire breadth first. So, in `afterAttach` one can safely make assumptions about the parent, but in `afterCreate` not                                                                                                                                                                                                                                                                                                                  |
 | `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot. _\*\*Note: Unlike the other hooks, this one is \_not_ created as part of the `actions` initializer, but directly on the type!\*\*\_                                                                                                                                                                                                                                                                                                     |
@@ -1190,7 +1190,7 @@ See [creating asynchronous flow](docs/async-actions.md).
 
 <i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react">egghead.io lesson 5: Render mobx-state-tree Models in React</a></i>
 
-Yep, perfectly fine. No problem. Go on. `observer`, `autorun` etc. will work as expected.
+Yep, perfectly fine. No problem. Go on. `observer`, `autorun`, etc. will work as expected.
 
 ### Should all state of my app be stored in `mobx-state-tree`?
 
