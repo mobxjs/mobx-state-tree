@@ -11,7 +11,8 @@ import {
     unprotect,
     types,
     setLivelynessChecking,
-    getParent
+    getParent,
+    hasParent
 } from "../../src"
 
 import { autorun, reaction, observable } from "mobx"
@@ -708,7 +709,75 @@ if (process.env.NODE_ENV === "development")
         )
     })
 
-test("#993 - references should have a parent event when the parent has not been accesed before", () => {
+test("#993-1 - after attach should have a parent when accesing a reference directly", () => {
+    const L4 = types
+        .model("Todo", {
+            id: types.identifier,
+            finished: false
+        })
+        .actions(self => ({
+            afterAttach() {
+                expect(getParent(self)).toBeTruthy()
+            }
+        }))
+
+    const L3 = types.model({ l4: L4 }).actions(self => ({
+        afterAttach() {
+            expect(getParent(self)).toBeTruthy()
+        }
+    }))
+
+    const L2 = types
+        .model({
+            l3: L3
+        })
+        .actions(self => ({
+            afterAttach() {
+                expect(getParent(self)).toBeTruthy()
+            }
+        }))
+
+    const L1 = types
+        .model({
+            l2: L2,
+            selected: types.reference(L4)
+        })
+        .actions(self => ({
+            afterAttach() {
+                fail("should never be called")
+            }
+        }))
+
+    const createL1 = () =>
+        L1.create({
+            l2: {
+                l3: {
+                    l4: {
+                        id: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+                    }
+                }
+            },
+            selected: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+        })
+
+    // test 1, real child first
+    {
+        const l1 = createL1()
+
+        const a = l1.l2.l3.l4
+        const b = l1.selected
+    }
+
+    // test 2, reference first
+    {
+        const l1 = createL1()
+
+        const a = l1.selected
+        const b = l1.l2.l3.l4
+    }
+})
+
+test("#993-2 - references should have a parent event when the parent has not been accesed before", () => {
     const events: string[] = []
 
     const L4 = types
@@ -813,9 +882,20 @@ test("#993 - references should have a parent event when the parent has not been 
         expect(events).toEqual(expectedEvents)
     }
 
-    // test 3, reference get parent should be available from the beginning
+    // test 3, reference get parent should be available from the beginning and all the way to the root
     {
-        const l1 = createL1()
-        expect(getParent(l1.selected)).toBeTruthy()
+        const rootL1 = createL1()
+        const l4 = rootL1.selected
+        const l3 = getParent(l4)
+        expect(l3).toBeTruthy()
+        const l2 = getParent(l3)
+        expect(l2).toBeTruthy()
+        const l1 = getParent(l2)
+        expect(l1).toBeTruthy()
+
+        expect(l1).toBe(rootL1)
+        expect(l2).toBe(rootL1.l2)
+        expect(l3).toBe(rootL1.l2.l3)
+        expect(l4).toBe(rootL1.l2.l3.l4)
     }
 })
