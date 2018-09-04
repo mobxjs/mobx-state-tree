@@ -98,16 +98,29 @@ test("an instance is not a valid default value, snapshot or function that create
         quantity: 0
     })
 
+    // passing a node directly, without a generator function
     expect(() => {
         types.model({ rows: types.optional(types.array(Row), types.array(Row).create()) })
     }).toThrow(
         "default value cannot be an instance, pass a snapshot or a function that creates an instance/snapshot instead"
     )
 
-    // this however should be ok
-    const Factory = types.model("Factory", {
-        rows: types.optional(types.array(Row), () => types.array(Row).create())
-    })
-    const doc = Factory.create()
-    expect(getSnapshot(doc)).toEqual({ rows: [] })
+    // an alike node but created from a different yet equivalent type
+    expect(() => {
+        const Factory = types.model({
+            rows: types.optional(types.array(Row), () => types.array(Row).create())
+        })
+        // we need to create the node for it to throw, since generator functions are typechecked when nodes are created
+        Factory.create()
+    }).toThrow()
+
+    {
+        // a node created on a generator function of the exact same type
+        const RowArray = types.array(Row)
+        const Factory = types.model("Factory", {
+            rows: types.optional(RowArray, () => RowArray.create())
+        })
+        const doc = Factory.create()
+        expect(getSnapshot(doc)).toEqual({ rows: [] })
+    }
 })

@@ -55,8 +55,8 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
 
     instantiate(parent: INode, subpath: string, environment: any, value: S): INode {
         if (typeof value === "undefined") {
-            const defaultSnapshot = this.getDefaultValueSnapshot()
-            return this.type.instantiate(parent, subpath, environment, defaultSnapshot)
+            const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
+            return this.type.instantiate(parent, subpath, environment, defaultInstanceOrSnapshot)
         }
         return this.type.instantiate(parent, subpath, environment, value)
     }
@@ -66,23 +66,21 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
             current,
             this.type.is(newValue) && newValue !== undefined
                 ? newValue
-                : this.getDefaultValueSnapshot()
+                : this.getDefaultInstanceOrSnapshot()
         )
     }
 
-    public getDefaultValueSnapshot() {
-        const defaultValue =
+    public getDefaultInstanceOrSnapshot() {
+        const defaultInstanceOrSnapshot =
             typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
-
-        const defaultValueSnapshot = isStateTreeNode(defaultValue)
-            ? getStateTreeNode(defaultValue).snapshot
-            : defaultValue
 
         // while static values are already snapshots and checked on types.optional
         // generator functions must always be rechecked just in case
-        if (typeof this.defaultValue === "function") typecheckInternal(this, defaultValueSnapshot)
+        if (typeof this.defaultValue === "function") {
+            typecheckInternal(this, defaultInstanceOrSnapshot)
+        }
 
-        return defaultValueSnapshot
+        return defaultInstanceOrSnapshot
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
@@ -141,14 +139,14 @@ export function optional<C, S, T>(
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
             fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
-        const defaultValue =
-            typeof defaultValueOrFunction === "function"
-                ? defaultValueOrFunction()
-                : defaultValueOrFunction
-        const defaultSnapshot = isStateTreeNode(defaultValue)
-            ? getStateTreeNode(defaultValue).snapshot
-            : defaultValue
-        typecheckInternal(type, defaultSnapshot)
+
+        // we only check default values if they are passed directly
+        // if they are generator functions they will be checked once they are generated
+        // we don't check generator function results here to avoid generating a node just for type-checking purposes
+        // which might generate side-effects
+        if (typeof defaultValueOrFunction !== "function") {
+            typecheckInternal(type, defaultValueOrFunction)
+        }
     }
 
     const ret = new OptionalValue(type, defaultValueOrFunction)
