@@ -106,13 +106,19 @@ test("an instance is not a valid default value, snapshot or function that create
     )
 
     // an alike node but created from a different yet equivalent type
-    expect(() => {
+    const e = expect(() => {
         const Factory = types.model({
             rows: types.optional(types.array(Row), () => types.array(Row).create())
         })
         // we need to create the node for it to throw, since generator functions are typechecked when nodes are created
+        // tslint:disable-next-line:no-unused-expression
         Factory.create()
-    }).toThrow()
+    })
+    if (process.env.NODE_ENV === "production") {
+        e.not.toThrow()
+    } else {
+        e.toThrow("Error while converting <> to `Row[]`")
+    }
 
     {
         // a node created on a generator function of the exact same type
