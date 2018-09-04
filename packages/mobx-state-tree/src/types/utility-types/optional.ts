@@ -70,7 +70,7 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
         )
     }
 
-    public getDefaultInstanceOrSnapshot() {
+    getDefaultInstanceOrSnapshot() {
         const defaultInstanceOrSnapshot =
             typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
 
@@ -81,6 +81,13 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
         }
 
         return defaultInstanceOrSnapshot
+    }
+
+    public getDefaultValueSnapshot() {
+        const instanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
+        return isStateTreeNode(instanceOrSnapshot)
+            ? getStateTreeNode(instanceOrSnapshot).snapshot
+            : instanceOrSnapshot
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
