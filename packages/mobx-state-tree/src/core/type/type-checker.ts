@@ -6,7 +6,8 @@ import {
     isStateTreeNode,
     isPrimitiveType,
     IAnyType,
-    CoreType
+    CoreType,
+    IType
 } from "../../internal"
 
 export interface IContextEntry {
@@ -141,7 +142,7 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
  * @internal
  * @private
  */
-export function typecheckInternal(type: IAnyType, value: any): void {
+export function typecheckInternal<C, S, T>(type: IType<C, S, T>, value: C | S | T): void {
     // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
     if (process.env.NODE_ENV === "production") return
     typecheck(type, value)
@@ -156,7 +157,7 @@ export function typecheckInternal(type: IAnyType, value: any): void {
  * @param {IAnyType} type
  * @param {*} value
  */
-export function typecheck(type: IAnyType, value: any): void {
+export function typecheck<C, S, T>(type: IType<C, S, T>, value: C | S | T): void {
     const errors = type.validate(value, [{ path: "", type }])
 
     if (errors.length > 0) {

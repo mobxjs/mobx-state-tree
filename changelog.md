@@ -2,6 +2,7 @@
 
 -   Fix for references sometimes not intializing its parents [#993](https://github.com/mobxjs/mobx-state-tree/issues/993) through [#997](https://github.com/mobxjs/mobx-state-tree/pull/997) by [@xaviergonz](https://github.com/xaviergonz)
 -   Fix for TS3 issues with reference type [#994](https://github.com/mobxjs/mobx-state-tree/issues/994) through [#995](https://github.com/mobxjs/mobx-state-tree/pull/995) by [@xaviergonz](https://github.com/xaviergonz)
+-   types.optional will now throw if an instance is directly passed as default value [#1002](https://github.com/mobxjs/mobx-state-tree/issues/1002) through [#1003](https://github.com/mobxjs/mobx-state-tree/pull/1003) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.2.4
 

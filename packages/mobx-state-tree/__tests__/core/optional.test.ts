@@ -48,14 +48,14 @@ if (process.env.NODE_ENV !== "production") {
     })
 }
 test("it should accept a function to provide dynamic values", () => {
-    let defaultValue: any = 1
+    let defaultValue = 1
     const Factory = types.model({
         a: types.optional(types.number, () => defaultValue)
     })
     expect(getSnapshot(Factory.create())).toEqual({ a: 1 })
     defaultValue = 2
     expect(getSnapshot(Factory.create())).toEqual({ a: 2 })
-    defaultValue = "hello world!"
+    defaultValue = "hello world!" as any
     if (process.env.NODE_ENV !== "production") {
         expect(() => Factory.create()).toThrowError(
             `[mobx-state-tree] Error while converting \`"hello world!"\` to \`number\`:\n\n    value \`"hello world!"\` is not assignable to type: \`number\` (Value is not a number).`
@@ -92,14 +92,41 @@ test("optional frozen should fallback to default value if snapshot is undefined"
     expect(store.thing).toEqual({})
 })
 
-test("a model is a valid default value, snapshot will be used", () => {
-    const Row = types.model({
+test("an instance is not a valid default value, snapshot or function that creates instance must be used", () => {
+    const Row = types.model("Row", {
         name: "",
         quantity: 0
     })
-    const Factory = types.model({
-        rows: types.optional(types.array(Row), types.array(Row).create())
+
+    // passing a node directly, without a generator function
+    expect(() => {
+        types.model({ rows: types.optional(types.array(Row), types.array(Row).create()) })
+    }).toThrow(
+        "default value cannot be an instance, pass a snapshot or a function that creates an instance/snapshot instead"
+    )
+
+    // an alike node but created from a different yet equivalent type
+    const e = expect(() => {
+        const Factory = types.model({
+            rows: types.optional(types.array(Row), () => types.array(Row).create())
+        })
+        // we need to create the node for it to throw, since generator functions are typechecked when nodes are created
+        // tslint:disable-next-line:no-unused-expression
+        Factory.create()
     })
-    const doc = Factory.create()
-    expect(getSnapshot(doc)).toEqual({ rows: [] })
+    if (process.env.NODE_ENV === "production") {
+        e.not.toThrow()
+    } else {
+        e.toThrow("Error while converting <> to `Row[]`")
+    }
+
+    {
+        // a node created on a generator function of the exact same type
+        const RowArray = types.array(Row)
+        const Factory = types.model("Factory", {
+            rows: types.optional(RowArray, () => RowArray.create())
+        })
+        const doc = Factory.create()
+        expect(getSnapshot(doc)).toEqual({ rows: [] })
+    }
 })
