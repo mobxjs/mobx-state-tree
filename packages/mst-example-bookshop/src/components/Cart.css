@@ -7,11 +7,9 @@
 
 .Page-cart-item-details {
   width: 200px;
-  margin-left: auto;
-  margin-right: 0px;
+  margin: 26px 0 8px auto;
   background-color: #e2e2e2;
   padding: 8px 20px;
-  margin-bottom: 8px;
   border-radius: 4px;
   font-size: 0.8em;
   text-align: right;
