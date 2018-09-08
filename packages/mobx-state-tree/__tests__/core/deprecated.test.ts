@@ -1,4 +1,3 @@
-import { spy } from "sinon"
 import { deprecated } from "../../src/utils"
 import { flow, createFlowSpawner } from "../../src/core/flow"
 import { process as mstProcess, createProcessSpawner } from "../../src/core/process"
@@ -9,15 +8,15 @@ function createDeprecationListener() {
     // save console.warn native implementation
     const originalWarn = console.warn
     // create spy to track warning call
-    const spyWarn = (console.warn = spy())
+    const spyWarn = (console.warn = jest.fn())
     // return callback to check if warn was called properly
     return function isDeprecated() {
         // replace original implementation
         console.warn = originalWarn
         // test for correct log message, if in development
         if (process.env.NODE_ENV !== "production") {
-            expect(spyWarn.called).toBe(true)
-            expect(spyWarn.getCall(0).args[0]).toMatch(/Deprecation warning:/)
+            expect(spyWarn).toHaveBeenCalledTimes(1)
+            expect(spyWarn.mock.calls[0][0]).toMatch(/Deprecation warning:/)
         }
     }
 }
