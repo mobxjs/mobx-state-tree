@@ -7,16 +7,17 @@
     "module": "dist/mst-middlewares.module.js",
     "typings": "dist/index.d.ts",
     "scripts": {
-        "build-tests": "tsc -p test/",
-        "test": "yarn run build-tests && cross-env NODE_ENV=development ava && cross-env NODE_ENV=production ava",
+        "jest": "jest",
+        "test": "cross-env NODE_ENV=development yarn jest --ci && cross-env NODE_ENV=production yarn jest --ci",
         "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && rollup -c"
     },
     "author": "",
     "license": "MIT",
     "devDependencies": {
-        "ava": "^0.25.0",
+        "@types/jest": "^23.3.2",
         "cpr": "^3.0.1",
         "cross-env": "^5.1.1",
+        "jest": "^23.5.0",
         "lint-staged": "^7.0.0",
         "mobx": "^5.0.2",
         "mobx-state-tree": "^3.3.0",
@@ -24,7 +25,7 @@
         "rollup-plugin-commonjs": "^9.0.0",
         "rollup-plugin-node-resolve": "^3.0.0",
         "rollup-plugin-uglify": "^5.0.0",
-        "sinon": "^6.0.0",
+        "ts-jest": "^23.1.4",
         "typescript": "^2.9.2"
     },
     "peerDependencies": {
@@ -32,13 +33,5 @@
     },
     "files": [
         "dist/"
-    ],
-    "ava": {
-        "files": [
-            "test-lib/test/*.js"
-        ],
-        "source": [
-            "test-lib/src/**/*.js"
-        ]
-    }
+    ]
 }

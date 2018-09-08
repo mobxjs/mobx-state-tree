@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "rootDir": "../",
+        "module": "commonjs",
+        "lib": ["es2017", "dom"],
+        "target": "es6",
+        "experimentalDecorators": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "noImplicitAny": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "sourceMap": false,
+        "noEmit": true
+    },
+    "include": ["**/*.ts"]
+}
