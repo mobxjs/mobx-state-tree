@@ -29,7 +29,8 @@ import {
     identifierNumber,
     late,
     undefinedType,
-    nullType
+    nullType,
+    selfType
 } from "./internal"
 
 export const types = {
@@ -56,7 +57,8 @@ export const types = {
     identifierNumber,
     late,
     undefined: undefinedType,
-    null: nullType
+    null: nullType,
+    self: selfType
 }
 
 // we import these values here to re-export them later so build-docs is happy

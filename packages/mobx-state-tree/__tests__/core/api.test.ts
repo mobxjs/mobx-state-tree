@@ -99,7 +99,8 @@ const TYPES = stringToArray(`
     identifierNumber,
     late,
     undefined,
-    null
+    null,
+    self
 `)
 
 test("correct api exposed", () => {
