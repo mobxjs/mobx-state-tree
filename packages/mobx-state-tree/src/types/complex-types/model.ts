@@ -709,17 +709,10 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
 
 export function model<T extends ModelPropertiesDeclaration = {}>(
     name: string,
-    properties?: (selfType: SelfType) => T
+    properties?: T | ((selfType: SelfType) => T)
 ): ResolveSelfTypeModel<IModelType<ModelPropertiesDeclarationToProperties<T>, {}>, 0>
 export function model<T extends ModelPropertiesDeclaration = {}>(
-    properties?: (selfType: SelfType) => T
-): ResolveSelfTypeModel<IModelType<ModelPropertiesDeclarationToProperties<T>, {}>, 0>
-export function model<T extends ModelPropertiesDeclaration = {}>(
-    name: string,
-    properties?: T
-): ResolveSelfTypeModel<IModelType<ModelPropertiesDeclarationToProperties<T>, {}>, 0>
-export function model<T extends ModelPropertiesDeclaration = {}>(
-    properties?: T
+    properties?: T | ((selfType: SelfType) => T)
 ): ResolveSelfTypeModel<IModelType<ModelPropertiesDeclarationToProperties<T>, {}>, 0>
 /**
  * Creates a new model type by providing a name, properties, volatile state and actions.
