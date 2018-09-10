@@ -57,11 +57,11 @@ test("typecheck should throw an Error when called at runtime, but not log the er
     })
 
     expect(() => {
-        typecheck(NodeObject, { id: 1, text: 1 })
+        typecheck(NodeObject, { id: 1, text: 1 } as any)
     }).toThrow()
 
     try {
-        typecheck(NodeObject, { id: 1, text: 1 })
+        typecheck(NodeObject, { id: 1, text: 1 } as any)
     } catch (error) {
         expect(error).toBeDefined()
         expect(consoleSpy).not.toHaveBeenCalled()
