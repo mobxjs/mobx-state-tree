@@ -100,28 +100,3 @@ test("model inside model", () => {
 
     expect(getSnapshot(m)).toMatchObject(snapshot)
 })
-
-// TODO
-/*
-test("double reference", () => {
-  const M = types.model(selfType => ({
-    x: types.number,
-    me: types.maybe(selfType),
-    other: types.model({
-      y: types.number,
-      otherMe: types.maybe(selfType)
-    })
-  }))
-
-  const snapshot: SnapshotIn<typeof M> = {
-    x: 0,
-    me: { x: 1, other: { y: 10 } },
-    other: { y: 11, otherMe: { y: 12, otherMe: { y: 13 } } }
-  }
-
-  const m = M.create(snapshot)
-  m.other.otherMe!.
-
-  expect(getSnapshot(m)).toMatchObject(snapshot)
-})
-*/
