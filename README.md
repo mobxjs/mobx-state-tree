@@ -915,7 +915,7 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 -   `types.null` the type of `null`.
 -   `types.undefined` the type of `undefined`.
 -   `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
--   `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is **immutable** and - - - `types.self()` Syntantic sugar for the same model it is being declared. Useful when using TypeScript to be able to get proper typings. There are some constraints though detailed in the API documentation.
+-   `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is **immutable** and **serializable**.
 -   `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one.
 
 ## Property types
@@ -1419,17 +1419,21 @@ const task = Task.create({ done: true })
 const s = Store.create({ tasks: [cast(task)] })
 ```
 
-#### Self-referencing model with TypeScript
+#### Self-referencing models with TypeScript
 
-In order to avoid typing issues in TypeScript when creating a self-referencing model please use `types.self()` as shown below:
+In order to avoid typing issues in TypeScript when creating a self-referencing model you can use the construct as shown below:
 
 ```ts
-const BinaryTreeNode = types.model({
+const BinaryTreeNode = types.model(selfType => ({
     data: types.number,
-    leftNode: types.maybe(types.self()),
-    rightNode: types.maybe(types.self())
-})
+    leftNode: types.maybe(selfType),
+    rightNode: types.maybe(selfType)
+}))
 ```
+
+Note that proper typings can only be inferred when selfType is used inside `types.array`, `types.map`, `types.maybe` and `types.maybeNull` for now.
+
+**Note**: Although a plain `propName: selfType` is inferred properly as well, it shouldn't be used since it would end up in an infinitely recursive object.
 
 #### Known Typescript Issue 5938
 

@@ -58,7 +58,8 @@ import {
     IMaybeNullType,
     ExtractC,
     ExtractS,
-    ExtractT
+    ExtractT,
+    late
 } from "../../internal"
 import { Suc } from "./type-utils"
 
@@ -150,7 +151,7 @@ export interface IModelType<
     readonly properties: PROPS
     named(newName: string): this
     props<PROPS2 extends ModelPropertiesDeclaration>(
-        props: PROPS2
+        props: PROPS2 | ((selfType: SelfType) => PROPS2)
     ): ResolveSelfTypeModel<
         IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS>,
         0
@@ -177,7 +178,15 @@ export type IAnyModelType = IModelType<any, any, any, any, any>
 export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any> ? P : never
 export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O> ? O : never
 
-// types for types.self resolution
+// types for self resolution
+
+// these two types are fake and only for typings
+export interface SelfTypeC {
+    readonly $typeRef: "self"
+}
+
+export interface SelfType extends IComplexType<SelfTypeC, SelfTypeC, SelfTypeC> {}
+
 // resolution up to 10 levels deep
 export type ResolveSelfTypeModel<M extends IAnyModelType, Times extends number> = Times extends 10
     ? M
@@ -216,7 +225,7 @@ function objectTypeToString(this: any) {
  */
 export interface ModelTypeConfig {
     name?: string
-    properties?: ModelProperties
+    properties?: ModelProperties | ((selfType: SelfType) => ModelProperties)
     initializers?: ReadonlyArray<((instance: any) => any)>
     preProcessor?: (snapshot: any) => any
     postProcessor?: (snapshot: any) => any
@@ -305,9 +314,16 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     private postProcessor!: (snapshot: any) => any | undefined
     private readonly propertyNames: string[]
 
-    constructor(opts: ModelTypeConfig) {
+    constructor(opts: ModelTypeConfig, oldProps: ModelProperties) {
         super(opts.name || defaultObjectOptions.name)
         const name = opts.name || defaultObjectOptions.name
+
+        const newProps =
+            typeof opts.properties === "function"
+                ? opts.properties(late(() => this))
+                : opts.properties
+        opts.properties = { ...oldProps, ...newProps }
+
         // TODO: this test still needed?
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
         Object.assign(this, defaultObjectOptions, opts)
@@ -333,13 +349,16 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     cloneAndEnhance(opts: ModelTypeConfig): ModelType<any, any> {
-        return new ModelType({
-            name: opts.name || this.name,
-            properties: Object.assign({}, this.properties, opts.properties),
-            initializers: this.initializers.concat((opts.initializers as any) || []),
-            preProcessor: opts.preProcessor || this.preProcessor,
-            postProcessor: opts.postProcessor || this.postProcessor
-        })
+        return new ModelType(
+            {
+                name: opts.name || this.name,
+                properties: opts.properties,
+                initializers: this.initializers.concat((opts.initializers as any) || []),
+                preProcessor: opts.preProcessor || this.preProcessor,
+                postProcessor: opts.postProcessor || this.postProcessor
+            },
+            this.properties
+        )
     }
 
     actions(fn: (self: any) => any): any {
@@ -390,7 +409,11 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         return this.cloneAndEnhance({ name }) as this
     }
 
-    props(properties: ModelPropertiesDeclaration): any {
+    props(
+        properties:
+            | ModelPropertiesDeclaration
+            | ((selfType: SelfType) => ModelPropertiesDeclaration)
+    ): any {
         return this.cloneAndEnhance({ properties } as any)
     }
 
@@ -686,6 +709,13 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
 
 export function model<T extends ModelPropertiesDeclaration = {}>(
     name: string,
+    properties?: (selfType: SelfType) => T
+): ResolveSelfTypeModel<IModelType<ModelPropertiesDeclarationToProperties<T>, {}>, 0>
+export function model<T extends ModelPropertiesDeclaration = {}>(
+    properties?: (selfType: SelfType) => T
+): ResolveSelfTypeModel<IModelType<ModelPropertiesDeclarationToProperties<T>, {}>, 0>
+export function model<T extends ModelPropertiesDeclaration = {}>(
+    name: string,
     properties?: T
 ): ResolveSelfTypeModel<IModelType<ModelPropertiesDeclarationToProperties<T>, {}>, 0>
 export function model<T extends ModelPropertiesDeclaration = {}>(
@@ -702,7 +732,7 @@ export function model<T extends ModelPropertiesDeclaration = {}>(
 export function model(...args: any[]): any {
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
     const properties = args.shift() || {}
-    return new ModelType({ name, properties })
+    return new ModelType({ name, properties }, {})
 }
 
 // generated with mobx-state-tree\packages\mobx-state-tree\scripts\generate-compose-type.js

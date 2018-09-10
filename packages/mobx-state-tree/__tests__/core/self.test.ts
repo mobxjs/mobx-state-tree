@@ -2,15 +2,15 @@ import { types, getSnapshot, SnapshotIn } from "../../src"
 
 test("arrays, maps, maybe, maybeNull", () => {
     const M = types
-        .model({
+        .model(selfType => ({
             x: 5,
-            array: types.array(types.self((): any => M)),
-            map: types.map(types.self((): any => M))
-        })
-        .props({
-            maybeChild: types.maybe(types.self((): any => M)),
-            maybeNullChild: types.maybeNull(types.self((): any => M))
-        })
+            array: types.array(selfType),
+            map: types.map(selfType)
+        }))
+        .props(selfType => ({
+            maybeChild: types.maybe(selfType),
+            maybeNullChild: types.maybeNull(selfType)
+        }))
 
     const e1 = M.create({ array: [{ array: [{ x: 6 }] }] })
 
@@ -51,11 +51,11 @@ test("arrays, maps, maybe, maybeNull", () => {
 })
 
 test("binary tree", () => {
-    const BinaryTreeNode = types.model({
+    const BinaryTreeNode = types.model(selfType => ({
         data: types.string,
-        leftNode: types.maybe(types.self((): any => BinaryTreeNode)),
-        rightNode: types.maybe(types.self((): any => BinaryTreeNode))
-    })
+        leftNode: types.maybe(selfType),
+        rightNode: types.maybe(selfType)
+    }))
 
     const bt = BinaryTreeNode.create({
         data: "root",
@@ -80,16 +80,15 @@ test("binary tree", () => {
     expect(bt.rightNode!.leftNode!.data).toBe("rl")
 })
 
-/*
 test("model inside model", () => {
-    const M = types.model({
+    const M = types.model(selfType => ({
         x: types.number,
-        me: types.maybe(types.self((): any => M)),
-        other: types.model({
+        me: types.maybe(selfType),
+        other: types.model(selfType2 => ({
             y: types.number,
-            otherMe: types.maybe(types.self((): any => this))
-        })
-    })
+            otherMe: types.maybe(selfType2)
+        }))
+    }))
 
     const snapshot: SnapshotIn<typeof M> = {
         x: 0,
@@ -100,5 +99,29 @@ test("model inside model", () => {
     const m = M.create(snapshot)
 
     expect(getSnapshot(m)).toMatchObject(snapshot)
+})
+
+// TODO
+/*
+test("double reference", () => {
+  const M = types.model(selfType => ({
+    x: types.number,
+    me: types.maybe(selfType),
+    other: types.model({
+      y: types.number,
+      otherMe: types.maybe(selfType)
+    })
+  }))
+
+  const snapshot: SnapshotIn<typeof M> = {
+    x: 0,
+    me: { x: 1, other: { y: 10 } },
+    other: { y: 11, otherMe: { y: 12, otherMe: { y: 13 } } }
+  }
+
+  const m = M.create(snapshot)
+  m.other.otherMe!.
+
+  expect(getSnapshot(m)).toMatchObject(snapshot)
 })
 */
