@@ -1,4 +1,17 @@
-import { getSnapshot, unprotect, recordPatches, types, IType, IJsonPatch } from "../../src"
+import {
+    getSnapshot,
+    unprotect,
+    recordPatches,
+    types,
+    IType,
+    IJsonPatch,
+    Instance,
+    cast,
+    IAnyModelType,
+    IMSTMap,
+    SnapshotIn,
+    SnapshotOut
+} from "../../src"
 
 function testPatches<C, S, T>(
     type: IType<C, S, T>,
@@ -19,16 +32,16 @@ function testPatches<C, S, T>(
     recorder.undo()
     expect(getSnapshot(instance)).toEqual(baseSnapshot)
 }
-const Node: any = types.model("Node", {
+const Node = types.model("Node", {
     id: types.identifierNumber,
     text: "Hi",
-    children: types.optional(types.array(types.late(() => Node)), [])
+    children: types.optional(types.array(types.late((): IAnyModelType => Node)), [])
 })
 test("it should apply simple patch", () => {
     testPatches(
         Node,
         { id: 1 },
-        (n: any) => {
+        (n: Instance<typeof Node>) => {
             n.text = "test"
         },
         [
@@ -44,12 +57,13 @@ test("it should apply deep patches to arrays", () => {
     testPatches(
         Node,
         { id: 1, children: [{ id: 2 }] },
-        (n: any) => {
-            n.children[0].text = "test" // update
-            n.children[0] = { id: 2, text: "world" } // this reconciles; just an update
-            n.children[0] = { id: 4, text: "coffee" } // new object
-            n.children[1] = { id: 3, text: "world" } // addition
-            n.children.splice(0, 1) // removal
+        (n: Instance<typeof Node>) => {
+            const children = n.children as Instance<typeof Node>[]
+            children[0].text = "test" // update
+            children[0] = cast({ id: 2, text: "world" }) // this reconciles; just an update
+            children[0] = cast({ id: 4, text: "coffee" }) // new object
+            children[1] = cast({ id: 3, text: "world" }) // addition
+            children.splice(0, 1) // removal
         },
         [
             {
@@ -91,10 +105,11 @@ test("it should apply deep patches to arrays with object instances", () => {
     testPatches(
         Node,
         { id: 1, children: [{ id: 2 }] },
-        (n: any) => {
-            n.children[0].text = "test" // update
-            n.children[0] = Node.create({ id: 2, text: "world" }) // this does not reconcile, new instance is provided
-            n.children[0] = Node.create({ id: 4, text: "coffee" }) // new object
+        (n: Instance<typeof Node>) => {
+            const children = n.children as Instance<typeof Node>[]
+            children[0].text = "test" // update
+            children[0] = Node.create({ id: 2, text: "world" }) // this does not reconcile, new instance is provided
+            children[0] = Node.create({ id: 4, text: "coffee" }) // new object
         },
         [
             {
@@ -127,11 +142,14 @@ test("it should apply non flat patches", () => {
     testPatches(
         Node,
         { id: 1 },
-        (n: any) => {
-            n.children.push({
-                id: 2,
-                children: [{ id: 4 }, { id: 5, text: "Tea" }]
-            })
+        (n: Instance<typeof Node>) => {
+            const children = n.children as Instance<typeof Node>[]
+            children.push(
+                cast({
+                    id: 2,
+                    children: [{ id: 4 }, { id: 5, text: "Tea" }]
+                })
+            )
         },
         [
             {
@@ -161,8 +179,9 @@ test("it should apply non flat patches with object instances", () => {
     testPatches(
         Node,
         { id: 1 },
-        (n: any) => {
-            n.children.push(
+        (n: Instance<typeof Node>) => {
+            const children = n.children as Instance<typeof Node>[]
+            children.push(
                 Node.create({
                     id: 2,
                     children: [{ id: 5, text: "Tea" }]
@@ -192,23 +211,28 @@ test("it should apply deep patches to maps", () => {
     // If user does not transpile const/let to var, trying to call Late' subType
     // property getter during map's tryCollectModelTypes() will throw ReferenceError.
     // But if it's transpiled to var, then subType will become 'undefined'.
-    const NodeMap: any = types.model("NodeMap", {
+    const NodeMap = types.model("NodeMap", {
         id: types.identifierNumber,
         text: "Hi",
-        children: types.optional(types.map(types.late(() => NodeMap)), {})
+        children: types.optional(types.map(types.late((): IAnyModelType => NodeMap)), {})
     })
     testPatches(
         NodeMap,
         { id: 1, children: { 2: { id: 2 } } },
-        (n: any) => {
-            n.children.get("2").text = "test" // update
-            n.children.put({ id: 2, text: "world" }) // this reconciles; just an update
-            n.children.set(
+        (n: Instance<typeof NodeMap>) => {
+            const children = n.children as IMSTMap<
+                SnapshotIn<typeof NodeMap>,
+                SnapshotOut<typeof NodeMap>,
+                Instance<typeof NodeMap>
+            >
+            children.get("2")!.text = "test" // update
+            children.put({ id: 2, text: "world" }) // this reconciles; just an update
+            children.set(
                 "4",
                 NodeMap.create({ id: 4, text: "coffee", children: { 23: { id: 23 } } })
             ) // new object
-            n.children.put({ id: 3, text: "world", children: { 7: { id: 7 } } }) // addition
-            n.children.delete("2") // removal
+            children.put({ id: 3, text: "world", children: { 7: { id: 7 } } }) // addition
+            children.delete("2") // removal
         },
         [
             {
@@ -259,19 +283,19 @@ test("it should apply deep patches to maps", () => {
     )
 })
 test("it should apply deep patches to objects", () => {
-    const NodeObject: any = types.model("NodeObject", {
+    const NodeObject = types.model("NodeObject", {
         id: types.identifierNumber,
         text: "Hi",
-        child: types.maybe(types.late(() => NodeObject))
+        child: types.maybe(types.late((): IAnyModelType => NodeObject))
     })
     testPatches(
         NodeObject,
         { id: 1, child: { id: 2 } },
-        (n: any) => {
+        (n: Instance<typeof NodeObject>) => {
             n.child.text = "test" // update
-            n.child = { id: 2, text: "world" } // this reconciles; just an update
+            n.child = cast({ id: 2, text: "world" }) // this reconciles; just an update
             n.child = NodeObject.create({ id: 2, text: "coffee", child: { id: 23 } })
-            n.child = { id: 3, text: "world", child: { id: 7 } } // addition
+            n.child = cast({ id: 3, text: "world", child: { id: 7 } }) // addition
             n.child = undefined // removal
         },
         [

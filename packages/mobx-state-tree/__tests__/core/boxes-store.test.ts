@@ -96,7 +96,7 @@ test("store is deserialized correctly", () => {
     expect(s.selection === s.boxes.get("aa")).toBe(true)
     expect(s.arrows[0].from.name).toBe("Rotterdam")
     expect(s.arrows[0].to.name).toBe("Bratislava")
-    expect(values(s.boxes).map((b: any) => b.isSelected)).toEqual([false, true])
+    expect(values(s.boxes).map(b => b.isSelected)).toEqual([false, true])
 })
 test("store emits correct patch paths", () => {
     const s = createStore()

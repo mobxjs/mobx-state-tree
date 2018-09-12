@@ -72,7 +72,7 @@ function createTestStore(listener: (s: string) => void) {
 // NOTE: as we defer creation (and thus, hooks) till first real access,
 // some of original hooks do not fire at all
 test("it should trigger lifecycle hooks", () => {
-    const events: any[] = []
+    const events: string[] = []
     const { store, Todo } = createTestStore(e => events.push(e))
     const talk = detach(store.todos[2])
     events.push("-")
@@ -152,7 +152,7 @@ test("it should postprocess snapshots when generating snapshot - 1", () => {
 })
 test("it should not apply postprocessor to snapshot on getSnapshot", () => {
     const car = Car.create({ id: "1" })
-    let error: any = false
+    let error = false
     onSnapshot(car, snapshot => {
         error = true
     })
@@ -184,7 +184,7 @@ test("it should postprocess non-initialized children", () => {
 })
 
 test("base hooks can be composed", () => {
-    const events: any[] = []
+    const events: string[] = []
     function listener(message: string) {
         events.push(message)
     }
