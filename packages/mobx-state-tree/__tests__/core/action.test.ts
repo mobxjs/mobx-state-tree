@@ -299,7 +299,7 @@ test("volatile state survives reonciliation", () => {
 test("middleware events are correct", () => {
     const A = types.model({}).actions(self => ({
         a(x: number) {
-            return this.b(x * 2)
+            return (self as any).b(x * 2)
         },
         b(y: number) {
             return y + 1
@@ -308,7 +308,7 @@ test("middleware events are correct", () => {
     const a = A.create()
     const events: IMiddlewareEvent[] = []
     addMiddleware(a, function(call, next) {
-        events.push({ ...call, context: {}, tree: {} }) // TODO: streep of some fields, since jest doesn't compare properly, restore in next jest version
+        events.push(call)
         return next(call)
     })
     a.a(7)
