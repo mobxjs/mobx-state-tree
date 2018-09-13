@@ -386,6 +386,37 @@ test("it should type compose correctly", () => {
     x.drive()
     x.log("z")
 })
+test("it should extend {pre,post}ProcessSnapshot on compose", () => {
+    const CompositionTracker = types
+        .model({
+            composedOf: types.array(types.string)
+        })
+        .preProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedOf: (snapshot.composedOf || []).concat("CompositionTracker")
+        }))
+    const Car = types.model({}).preProcessSnapshot(snapshot => ({
+        ...snapshot,
+        composedOf: (snapshot.composedOf || []).concat("Car")
+    }))
+    const Logger = types.model({}).preProcessSnapshot(snapshot => ({
+        ...snapshot,
+        composedOf: (snapshot.composedOf || []).concat("Logger")
+    }))
+    const LoggableCar = types
+        .compose(
+            CompositionTracker,
+            Car,
+            Logger
+        )
+        .props({
+            composedOf: types.array(types.string)
+        })
+    const x = LoggableCar.create({})
+    expect(x.composedOf).toContain("CompositionTracker")
+    expect(x.composedOf).toContain("Car")
+    expect(x.composedOf).toContain("Logger")
+})
 test("it should extend types correctly", () => {
     const Car = types
         .model({
