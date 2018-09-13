@@ -958,14 +958,14 @@ types
 
 Note: pre and post processing are just meant to convert your data into types that are more acceptable to MST. Typically it should be the case that `postProcess(preProcess(snapshot)) === snapshot. If that isn't the case, consider whether you shouldn't be using a dedicated a view instead to normalize your snapshot to some other format you need.
 
-| Hook                  | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hook                  | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `preProcessSnapshot`  | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be a _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames, etc. This hook is not called for individual property updates. _\*\*Note 1: Unlike the other hooks, this one is \_not_ created as part of the `actions` initializer, but directly on the type!**\_ \_**Note 2: The `preProcessSnapshot` transformation must be pure; it should not modify its original input argument!\*\*\_ |
-| `afterCreate`         | Immediately after an instance is created and initial values are applied. Children will fire this event before parents. You can't make assumptions about the parent safely, use `afterAttach` if you need to.                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `afterAttach`         | As soon as the _direct_ parent is assigned (this node is attached to another node). If an element is created as part of a parent, `afterAttach` is also fired. Unlike `afterCreate`, `afterAttach` will fire breadth first. So, in `afterAttach` one can safely make assumptions about the parent, but in `afterCreate` not                                                                                                                                                                                                                                                                                                                  |
-| `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot. _\*\*Note: Unlike the other hooks, this one is \_not_ created as part of the `actions` initializer, but directly on the type!\*\*\_                                                                                                                                                                                                                                                                                                     |
-| `beforeDetach`        | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `beforeDestroy`       | Called before the node is destroyed, as a result of calling `destroy`, or by removing or replacing the node from the tree. Child destructors will fire before parents                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `afterCreate`         | Immediately after an instance is created and initial values are applied. Children will fire this event before parents. You can't make assumptions about the parent safely, use `afterAttach` if you need to.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `afterAttach`         | As soon as the _direct_ parent is assigned (this node is attached to another node). If an element is created as part of a parent, `afterAttach` is also fired. Unlike `afterCreate`, `afterAttach` will fire breadth first. So, in `afterAttach` one can safely make assumptions about the parent, but in `afterCreate` not                                                                                                                                                                                                                                                                                                                   |
+| `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot. _\*\*Note: Unlike the other hooks, this one is \_not_ created as part of the `actions` initializer, but directly on the type!\*\*\_                                                                                                                                                                                                                                                                                                      |
+| `beforeDetach`        | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `beforeDestroy`       | Called before the node is destroyed, as a result of calling `destroy`, or by removing or replacing the node from the tree. Child destructors will fire before parents                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 Note, except for `preProcessSnapshot`, all hooks should be defined as actions.
 
@@ -1277,7 +1277,37 @@ const Example = types
     }))
 ```
 
-You can circumvent this situation by declaring the views in two steps:
+You can circumvent this situation by using `this` whenever you intend to use the newly declared computed values:
+
+```typescript
+const Example = types.model("Example", { prop: types.string }).views(self => ({
+    get upperProp(): string {
+        return self.prop.toUpperCase()
+    },
+    get twiceUpperProp(): string {
+        return this.upperProp + this.upperProp
+    }
+}))
+```
+
+Alternatively you can also declare multiple `.views` block, in which case the `self` parameter gets extended after each block.
+
+```typescript
+const Example = types
+  .model('Example', { prop: types.string })
+  .views(self => {
+    get upperProp(): string {
+      return self.prop.toUpperCase();
+    },
+  }))
+  .views(self => ({
+    get twiceUpperProp(): string {
+      return self.upperProp + self.upperProp;
+    },
+  }));
+```
+
+As a last resort, although not recommended due to the performance penalty (see the note below), you may declare the views in two steps:
 
 ```typescript
 const Example = types
@@ -1296,39 +1326,6 @@ const Example = types
 ```
 
 _**NOTE: the above approach will incur runtime performance penalty as accessing such computed values (e.g. inside `render()` method of an observed component) always leads to full recompute (see [this issue](https://github.com/mobxjs/mobx-state-tree/issues/818#issue-323164363) for details). For a heavily used computed properties it's recommended to use one of below approaches.**_
-
-Alternatively, you can use `this` whenever you intend to use the newly declared computed values:
-
-```typescript
-const Example = types
-    .model("Example", { prop: types.string })
-    .views(self => ({
-        // use typeof instead of predefined type to avoid circular references
-        get upperProp(): string {
-            return self.prop.toUpperCase()
-        },
-        get twiceUpperProp(): string {
-            return this.upperProp + this.upperProp
-        }
-    }))
-```
-
-Note that you can also declare multiple `.views` block, in which case the `self` parameter gets extended after each block.
-
-```typescript
-const Example = types
-  .model('Example', { prop: types.string })
-  .views(self => {
-    get upperProp(): string {
-      return self.prop.toUpperCase();
-    },
-  }))
-  .views(self => ({
-    get twiceUpperProp(): string {
-      return self.upperProp + self.upperProp;
-    },
-  }));
-```
 
 Similarly, when writing actions or views one can use helper functions:
 
@@ -1483,7 +1480,7 @@ map: types.optional(types.map(OtherType), {})
 So far this might look a lot like an immutable state tree as found for example in Redux apps, but there're are only so many reasons to use Redux as per [article linked at the very top of Redux guide](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367) that MST covers too, meanwhile:
 
 -   Like Redux, and unlike MobX, MST prescribes a very specific state architecture.
--   mobx-state-tree allows direct modification of any value in the tree.  It is not necessary to construct a new tree in your actions.
+-   mobx-state-tree allows direct modification of any value in the tree. It is not necessary to construct a new tree in your actions.
 -   mobx-state-tree allows for fine-grained and efficient observation of any point in the state tree.
 -   mobx-state-tree generates JSON patches for any modification that is made.
 -   mobx-state-tree provides utilities to turn any MST tree into a valid Redux store.
