@@ -1,53 +1,52 @@
-import { test } from "ava"
 import { UndoManager } from "../src"
-import { types, flow, clone, getSnapshot } from "mobx-state-tree"
+import { types, clone, getSnapshot } from "mobx-state-tree"
 
 let undoManager: any = {}
-const setUndoManagerSameTree = targetStore => {
+const setUndoManagerSameTree = (targetStore: any) => {
     undoManager = targetStore.history
 }
-const setUndoManagerDifferentTree = targetStore => {
+const setUndoManagerDifferentTree = (targetStore: any) => {
     undoManager = UndoManager.create({}, { targetStore })
 }
 
-const canTimeTravel = (t, store) => {
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, false)
-    t.is(store.x, 1)
+const canTimeTravel = (store: any) => {
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(false)
+    expect(store.x).toBe(1)
 
     store.inc()
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, false)
-    t.is(store.x, 2)
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(false)
+    expect(store.x).toBe(2)
 
     store.inc()
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, false)
-    t.is(store.x, 3)
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(false)
+    expect(store.x).toBe(3)
 
     undoManager.undo()
-    t.is(store.x, 2)
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, true)
+    expect(store.x).toBe(2)
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(true)
 
     undoManager.undo()
-    t.is(store.x, 1)
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, true)
+    expect(store.x).toBe(1)
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(true)
 
     undoManager.redo()
-    t.is(store.x, 2)
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, true)
+    expect(store.x).toBe(2)
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(true)
 
     // resets 'future'
     store.inc()
-    t.is(store.x, 3)
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, false)
+    expect(store.x).toBe(3)
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(false)
 }
 
-test("same tree - can time travel", t => {
+test("same tree - can time travel", () => {
     const HistoryOnTreeStoreModel = types
         .model({
             x: 1,
@@ -62,10 +61,10 @@ test("same tree - can time travel", t => {
             }
         })
     const store = HistoryOnTreeStoreModel.create()
-    canTimeTravel(t, store)
+    canTimeTravel(store)
 })
 
-test("different tree - can time travel", t => {
+test("different tree - can time travel", () => {
     const HistoryDifferentTreeStoreModel = types
         .model({
             x: 1
@@ -79,10 +78,10 @@ test("different tree - can time travel", t => {
             }
         })
     const store = HistoryDifferentTreeStoreModel.create()
-    canTimeTravel(t, store)
+    canTimeTravel(store)
 })
 
-test("same tree - can time travel and persist state", t => {
+test("same tree - can time travel and persist state", () => {
     const HistoryOnTreeStoreModel = types
         .model({
             x: 1,
@@ -98,48 +97,48 @@ test("same tree - can time travel and persist state", t => {
         })
     const store = HistoryOnTreeStoreModel.create()
 
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, false)
-    t.is(store.x, 1)
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(false)
+    expect(store.x).toBe(1)
 
     store.inc()
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, false)
-    t.is(store.x, 2)
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(false)
+    expect(store.x).toBe(2)
 
     store.inc()
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, false)
-    t.is(store.x, 3)
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(false)
+    expect(store.x).toBe(3)
 
     undoManager.undo()
-    t.is(store.x, 2)
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, true)
+    expect(store.x).toBe(2)
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(true)
 
     // Clone of the store should inherit the same state!
     const store2 = clone(store)
     const undoManager2 = store2.history
 
     undoManager2.undo()
-    t.is(store2.x, 1)
-    t.is(undoManager2.canUndo, false)
-    t.is(undoManager2.canRedo, true)
+    expect(store2.x).toBe(1)
+    expect(undoManager2.canUndo).toBe(false)
+    expect(undoManager2.canRedo).toBe(true)
 
     undoManager2.redo()
-    t.is(store2.x, 2)
-    t.is(undoManager2.canUndo, true)
-    t.is(undoManager2.canRedo, true)
+    expect(store2.x).toBe(2)
+    expect(undoManager2.canUndo).toBe(true)
+    expect(undoManager2.canRedo).toBe(true)
 
     // resets 'future'
     store2.inc()
-    t.is(store2.x, 3)
-    t.is(undoManager2.canUndo, true)
-    t.is(undoManager2.canRedo, false)
+    expect(store2.x).toBe(3)
+    expect(undoManager2.canUndo).toBe(true)
+    expect(undoManager2.canRedo).toBe(false)
 })
 
-test("can time travel with Mutable object", t => {
-    const MutableUnion = types.union(
+test("can time travel with Mutable object", () => {
+    const MutableUnion: any = types.union(
         types.string,
         types.boolean,
         types.number,
@@ -153,7 +152,7 @@ test("can time travel with Mutable object", t => {
         .actions(self => {
             setUndoManagerDifferentTree(self)
             return {
-                setProp(k, v) {
+                setProp(k: string, v: any) {
                     ;(self.mutable as any).set(k, v)
                 }
             }
@@ -161,48 +160,48 @@ test("can time travel with Mutable object", t => {
     const store = MutableStoreModel.create({ mutable: {} })
     const mutable = store.mutable
 
-    t.deepEqual(getSnapshot(mutable), {})
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, false)
-    t.is(undoManager.history.length, 0)
+    expect(getSnapshot(mutable)).toEqual({})
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(false)
+    expect(undoManager.history.length).toBe(0)
 
     store.setProp("foo", 1)
-    t.deepEqual(getSnapshot(mutable), { foo: 1 })
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, false)
-    t.is(undoManager.history.length, 1)
+    expect(getSnapshot(mutable)).toEqual({ foo: 1 })
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(false)
+    expect(undoManager.history.length).toBe(1)
 
     store.setProp("foo", {})
-    t.deepEqual(getSnapshot(mutable), { foo: {} })
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, false)
-    t.is(undoManager.history.length, 2)
+    expect(getSnapshot(mutable)).toEqual({ foo: {} })
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(false)
+    expect(undoManager.history.length).toBe(2)
 
     undoManager.undo()
-    t.deepEqual(getSnapshot(mutable), { foo: 1 })
-    t.is(undoManager.canUndo, true)
-    t.is(undoManager.canRedo, true)
-    t.is(undoManager.history.length, 2)
+    expect(getSnapshot(mutable)).toEqual({ foo: 1 })
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(true)
+    expect(undoManager.history.length).toBe(2)
 
     undoManager.undo()
-    t.deepEqual(getSnapshot(mutable), {})
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, true)
-    t.is(undoManager.history.length, 2)
+    expect(getSnapshot(mutable)).toEqual({})
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(true)
+    expect(undoManager.history.length).toBe(2)
 })
 
-const withoutUndo = (t, store) => {
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, false)
-    t.is(store.x, 1)
+const withoutUndo = (store: any) => {
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(false)
+    expect(store.x).toBe(1)
 
     undoManager.withoutUndo(() => store.inc())
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, false)
-    t.is(store.x, 2)
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(false)
+    expect(store.x).toBe(2)
 }
 
-test("same tree - withoutUndo", t => {
+test("same tree - withoutUndo", () => {
     const HistoryOnTreeStoreModel = types
         .model({
             x: 1,
@@ -217,10 +216,10 @@ test("same tree - withoutUndo", t => {
             }
         })
     const store = HistoryOnTreeStoreModel.create()
-    withoutUndo(t, store)
+    withoutUndo(store)
 })
 
-test("different tree - withoutUndo", t => {
+test("different tree - withoutUndo", () => {
     const HistoryOnTreeStoreModel = types
         .model({
             x: 1
@@ -234,10 +233,10 @@ test("different tree - withoutUndo", t => {
             }
         })
     const store = HistoryOnTreeStoreModel.create()
-    withoutUndo(t, store)
+    withoutUndo(store)
 })
 
-test("same tree - withoutUndo declaratively", t => {
+test("same tree - withoutUndo declaratively", () => {
     const HistoryOnTreeStoreModel = types
         .model({
             x: 1,
@@ -254,18 +253,18 @@ test("same tree - withoutUndo declaratively", t => {
         })
 
     const store = HistoryOnTreeStoreModel.create()
-    withoutUndo(t, store)
+    withoutUndo(store)
 })
 
-test("on tree - withoutUndoFlow declaratively", async t => {
+test("on tree - withoutUndoFlow declaratively", async () => {
     // because async would allow overwriting the history within later tests
     // we need a another _undoManager
     let _undoManager: any = {}
-    const _setUndoManagerSameTree = targetStore => {
+    const _setUndoManagerSameTree = (targetStore: any) => {
         _undoManager = targetStore.history
     }
 
-    function delay(time) {
+    function delay(time: number) {
         return new Promise(resolve => {
             setTimeout(resolve, time)
         })
@@ -298,19 +297,19 @@ test("on tree - withoutUndoFlow declaratively", async t => {
         })
     const store = HistoryOnTreeStoreModel.create()
 
-    t.is(_undoManager.canUndo, false)
-    t.is(_undoManager.canRedo, false)
-    t.is(store.x, 1)
-    t.is(store.y, 1)
+    expect(_undoManager.canUndo).toBe(false)
+    expect(_undoManager.canRedo).toBe(false)
+    expect(store.x).toBe(1)
+    expect(store.y).toBe(1)
 
     const value = await store.loadPosition()
-    t.is(value.x, 4)
-    t.is(store.y, 2)
-    t.is(_undoManager.canUndo, false)
-    t.is(_undoManager.canRedo, false)
+    expect(value.x).toBe(4)
+    expect(store.y).toBe(2)
+    expect(_undoManager.canUndo).toBe(false)
+    expect(_undoManager.canRedo).toBe(false)
 })
 
-test("on tree - group", t => {
+test("on tree - group", () => {
     const HistoryOnTreeStoreModel = types
         .model({
             x: 1,
@@ -323,16 +322,16 @@ test("on tree - group", t => {
                 inc() {
                     self.x += 1
                 },
-                addNumber(number) {
-                    self.numbers.push(number)
+                addNumber(n: number) {
+                    self.numbers.push(n)
                 }
             }
         })
     const store = HistoryOnTreeStoreModel.create()
 
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, false)
-    t.is(store.x, 1)
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(false)
+    expect(store.x).toBe(1)
 
     undoManager.startGroup(() => {
         store.inc()
@@ -341,12 +340,12 @@ test("on tree - group", t => {
         store.inc()
     })
     undoManager.stopGroup()
-    t.is(store.x, 5)
-    t.is(undoManager.canUndo, true)
+    expect(store.x).toBe(5)
+    expect(undoManager.canUndo).toBe(true)
     undoManager.undo()
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, true)
-    t.is(store.x, 1)
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(true)
+    expect(store.x).toBe(1)
 
     undoManager.startGroup(() => {
         store.addNumber(1)
@@ -354,7 +353,7 @@ test("on tree - group", t => {
     })
     undoManager.stopGroup()
     undoManager.undo()
-    t.is(undoManager.canUndo, false)
-    t.is(undoManager.canRedo, true)
-    t.is(store.numbers.length, 0)
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(true)
+    expect(store.numbers.length).toBe(0)
 })

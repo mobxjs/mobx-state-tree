@@ -1,27 +1,24 @@
 import * as mst from "mobx-state-tree"
 import { flow } from "mobx-state-tree"
-import { test } from "ava"
-import * as sinon from "sinon"
 import { actionLogger } from "../src"
 
-test.beforeEach(t => {
-    t.context.log = console.log
-
-    console.log = sinon.spy()
+let log: jest.Mock
+beforeAll(() => {
+    log = console.log = jest.fn()
 })
 
-test.afterEach(t => {
-    console.log = t.context.log
+beforeEach(() => {
+    log.mockClear()
 })
 
-test("it logs", t => {
+test("it logs", () => {
     const Todo = mst.types
         .model({
             title: ""
         })
         .actions(self => ({
             helper() {},
-            setTitle(newTitle) {
+            setTitle(newTitle: string) {
                 ;(self as any).helper() // should not be logged
                 self.title = newTitle
             }
@@ -38,10 +35,11 @@ test("it logs", t => {
 
     store.todos[0].setTitle("hello world")
 
-    t.deepEqual((console.log as any).args, [["[MST] #1 action - /todos/0/setTitle"]])
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(log.mock.calls[0][0]).toBe("[MST] #1 action - /todos/0/setTitle")
 })
 
-test("it logs flows", async t => {
+test("it logs flows", async () => {
     const Todo = mst.types
         .model({
             title: ""
@@ -53,7 +51,7 @@ test("it logs flows", async t => {
             })
         }))
         .actions(self => ({
-            setTitle: flow(function* setTitle(newTitle) {
+            setTitle: flow(function* setTitle(newTitle: string) {
                 self.helper() // should not be logged
                 yield self.helper2() // should be logged
                 self.title = newTitle
@@ -71,11 +69,15 @@ test("it logs flows", async t => {
     mst.addMiddleware(store, actionLogger)
 
     await store.todos[0].setTitle("hello world")
-    t.deepEqual((console.log as any).args.map(([x]) => x), [
+    const expectedLog = [
         "[MST] #3 action - /todos/0/setTitle",
         "[MST] #3 flow_spawn - /todos/0/setTitle",
         "[MST] #3 flow_spawn - /todos/0/helper2",
         "[MST] #3 flow_return - /todos/0/helper2",
         "[MST] #3 flow_return - /todos/0/setTitle"
-    ])
+    ]
+    expect(log).toHaveBeenCalledTimes(expectedLog.length)
+    log.mock.calls.forEach((c, idx) => {
+        expect(c[0]).toBe(expectedLog[idx])
+    })
 })

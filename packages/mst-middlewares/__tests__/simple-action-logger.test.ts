@@ -1,26 +1,23 @@
 import * as mst from "mobx-state-tree"
-import { test } from "ava"
-import * as sinon from "sinon"
 import { simpleActionLogger } from "../src"
 
-test.beforeEach(t => {
-    t.context.log = console.log
-
-    console.log = sinon.spy()
+let log: jest.Mock
+beforeAll(() => {
+    log = console.log = jest.fn()
 })
 
-test.afterEach(t => {
-    console.log = t.context.log
+beforeEach(() => {
+    log.mockClear()
 })
 
-test("it logs", t => {
+test("it logs", () => {
     const Todo = mst.types
         .model({
             title: ""
         })
         .actions(self => ({
             helper() {},
-            setTitle(newTitle) {
+            setTitle(newTitle: string) {
                 ;(self as any).helper() // should not be logged
                 self.title = newTitle
             }
@@ -37,5 +34,6 @@ test("it logs", t => {
 
     store.todos[0].setTitle("hello world")
 
-    t.deepEqual((console.log as any).args, [["[MST] /todos/0/setTitle"]])
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(log.mock.calls[0][0]).toBe("[MST] /todos/0/setTitle")
 })

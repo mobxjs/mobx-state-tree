@@ -1,57 +1,56 @@
-import { test } from "ava"
-import { decorate, types, addMiddleware, onSnapshot, flow, destroy } from "mobx-state-tree"
+import { decorate, types, addMiddleware, flow, destroy, IMiddlewareHandler } from "mobx-state-tree"
 
 let error: any = null
 
-function omitNextAbort(call, next) {
+const omitNextAbort: IMiddlewareHandler = (call, next) => {
     // omit next() / abort()
 }
-function nextAndAbort(call, next, abort) {
+const nextAndAbort: IMiddlewareHandler = (call, next, abort) => {
     abort("someValue")
     next(call)
 }
 
-function abortString(call, next, abort) {
+const abortString: IMiddlewareHandler = (call, next, abort) => {
     abort("someValue")
 }
-function abortNumeric(call, next, abort) {
+const abortNumeric: IMiddlewareHandler = (call, next, abort) => {
     abort(5)
 }
-function abortPromise(call, next, abort) {
+const abortPromise: IMiddlewareHandler = (call, next, abort) => {
     abort(Promise.resolve(5))
 }
-function nextNoAlter(call, next) {
+const nextNoAlter: IMiddlewareHandler = (call, next, abort) => {
     next(call)
 }
-function nextAlter(call, next, abort) {
+const nextAlter: IMiddlewareHandler = (call, next, abort) => {
     next(call, value => value + 1)
 }
-function nextAlter2(call, next, abort) {
+const nextAlter2: IMiddlewareHandler = (call, next, abort) => {
     next(call, value => value + 2)
 }
-function alterArguments(call, next, abort) {
+const alterArguments: IMiddlewareHandler = (call, next, abort) => {
     next({ ...call, args: [call.args[0].toUpperCase()] })
 }
-function alterArguments2(call, next, abort) {
+const alterArguments2: IMiddlewareHandler = (call, next, abort) => {
     // cut last char
     next({ ...call, args: [call.args[0].slice(0, -1)] })
 }
-function nextAlterAsync(call, next, abort) {
+const nextAlterAsync: IMiddlewareHandler = (call, next, abort) => {
     next(call, async value => (await value) + 2)
 }
 
-function noHooksMiddleware(call, next, abort) {
+const noHooksMiddleware: IMiddlewareHandler = (call, next, abort) => {
     // throwing errors will lead to the aborting of further middlewares
     // => don't throw here but set a global var instead
     if (call.name === "beforeDestroy") error = Error("hook in middleware")
     next(call)
 }
-function shouldNeverBeInvoked(call, next, abort) {
+const shouldNeverBeInvoked: IMiddlewareHandler = (call, next, abort) => {
     error = Error("customMiddleware called even though the queue was aborted")
     next(call)
 }
 
-function delay(time) {
+function delay(time: number) {
     return new Promise(resolve => {
         setTimeout(resolve, time)
     })
@@ -66,143 +65,144 @@ const TestModel = types
     })
     .actions(self => {
         return {
-            asyncInc: flow(function*(x) {
+            asyncInc: flow(function*(x: number) {
                 yield delay(2)
                 self.z += x
                 yield delay(2)
                 return self.z
             }),
-            asyncIncSuccess: flow(function*(x) {
+            asyncIncSuccess: flow(function*(x: number) {
                 yield (self as any).asyncAbortedPromise() // will return a string instead of a promise.
                 self.z += x
                 return self.z
             }),
-            asyncIncFailing: flow(function*(x) {
+            asyncIncFailing: flow(function*(x: number) {
                 yield (self as any).asyncAbortedString() // will return a string instead of a promise.
                 self.z += x
                 return self.z
             }),
             asyncAbortedString: decorate(
-                abortString, // this will fail since "Only promises can be yielded" within flows.
-                flow(function*(x) {
+                abortString,
+                flow(function*(x: number) {
+                    // this will fail since "Only promises can be yielded" within flows.
                     yield delay(2)
                     return 205
                 })
             ),
             asyncAbortedPromise: decorate(
                 abortPromise,
-                flow(function*(x) {
+                flow(function*(x: number) {
                     yield delay(2)
                     return 205
                 })
             ),
-            inc(x) {
+            inc(x: number) {
                 self.z += x
                 return self.z
             },
-            addName(name) {
+            addName(name: string) {
                 return name
             },
             beforeDestroy() {}
         }
     })
 
-test("next() middleware queue ", t => {
+test("next() middleware queue ", () => {
     const m = TestModel.create()
     addMiddleware(m, nextNoAlter) // no alterations
     const valueFromMiddleware: any = m.inc(1)
-    t.is(valueFromMiddleware, 2)
+    expect(valueFromMiddleware).toBe(2)
 })
 
-test("next() middleware queue and alter the call arguments", t => {
+test("next() middleware queue and alter the call arguments", () => {
     const m = TestModel.create()
     addMiddleware(m, alterArguments)
     addMiddleware(m, alterArguments2)
     const valueFromMiddleware: any = m.addName("Freddy")
-    t.is(valueFromMiddleware, "FREDD")
+    expect(valueFromMiddleware).toBe("FREDD")
 })
 
-test("next() middleware queue and alter the action value", t => {
+test("next() middleware queue and alter the action value", () => {
     const m = TestModel.create()
     addMiddleware(m, nextAlter) // contains the manipulation + 1
     addMiddleware(m, nextAlter2) // contains another manipulation + 2
     const valueFromMiddleware: any = m.inc(1) // value should be 2(inc) + all the maniuplations = 5
-    t.is(valueFromMiddleware, 5)
+    expect(valueFromMiddleware).toBe(5)
 })
 
-test("next() middleware queue and alter the async action value", async t => {
+test("next() middleware queue and alter the async action value", async () => {
     const m = TestModel.create()
     addMiddleware(m, nextAlterAsync) // contains another manipulation + 2
     const valueFromMiddleware: any = await m.asyncInc(1) // value should be 2(inc) + all the maniuplations = 5
-    t.is(valueFromMiddleware, 4)
+    expect(valueFromMiddleware).toBe(4)
 })
 
-test("abort() middleware queue", t => {
+test("abort() middleware queue", () => {
     error = null
     const m = TestModel.create()
     addMiddleware(m, abortString) // contains abort()
     addMiddleware(m, shouldNeverBeInvoked) // would contain next() - should never be invoked
 
     const valueFromMiddleware: any = m.inc(1) // the return value should be the one from the aborting middleware
-    t.is(valueFromMiddleware, "someValue")
-    t.is(error, null) // make sure the cutomMiddleware4 was never invoked
+    expect(valueFromMiddleware).toBe("someValue")
+    expect(error).toBe(null) // make sure the cutomMiddleware4 was never invoked
 })
 
-test("abort() middleware queue and alter the abort value", t => {
+test("abort() middleware queue and alter the abort value", () => {
     const m = TestModel.create()
     addMiddleware(m, nextAlter) // contains the manipulation
     addMiddleware(m, abortNumeric) // does abort with numeric
 
     const valueFromMiddleware: any = m.inc(1)
-    t.is(valueFromMiddleware, 6)
+    expect(valueFromMiddleware).toBe(6)
 })
 
-test("next() middleware queue and alter the async action value", async t => {
+test("next() middleware queue and alter the async action value", async () => {
     const m = TestModel.create()
     addMiddleware(m, nextAlterAsync) // + 2
     addMiddleware(m, abortPromise) // => 5
     const valueFromMiddleware: any = await m.asyncInc(1) // => 7
-    t.is(valueFromMiddleware, 7)
+    expect(valueFromMiddleware).toBe(7)
 })
 
-test("abort() within nested async actions with string", async t => {
+test("abort() within nested async actions with string", async () => {
     const m = TestModel.create()
     try {
         const valueFromMiddleware: any = await m.asyncIncFailing(1) // contains 2 delays
     } catch (e) {
         // TODO: once we'd change flow to be able to yield more than just a promise
         // this test must be changed.
-        t.is(!!e, true)
+        expect(e).toBeTruthy()
     }
 })
 
-test("abort() within nested async actions with promise", async t => {
+test("abort() within nested async actions with promise", async () => {
     const m = TestModel.create()
     const valueFromMiddleware: any = await m.asyncIncSuccess(1) // should only abort inner.
-    t.is(valueFromMiddleware, 2)
+    expect(valueFromMiddleware).toBe(2)
 })
 
-test("middleware should be invoked on hooks", t => {
+test("middleware should be invoked on hooks", () => {
     error = null
     const m = TestModel.create()
     addMiddleware(m, noHooksMiddleware)
     m.inc(1)
     destroy(m)
-    t.is(!!error, true)
+    expect(error).toBeTruthy()
 })
 
-test("middleware should not be invoked on hooks", t => {
+test("middleware should not be invoked on hooks", () => {
     error = null
     const m = TestModel.create()
     addMiddleware(m, noHooksMiddleware, false)
     m.inc(1)
     destroy(m)
-    t.is(!error, true)
+    expect(error).toBeFalsy()
 })
 
 // These tests will leave MST in a bad state since they're throwing. Leave the at the bottom.
 if (process.env.NODE_ENV === "development") {
-    test("next()/ abort() omitted within middleware", t => {
+    test("next()/ abort() omitted within middleware", () => {
         const m = TestModel.create()
         addMiddleware(m, omitNextAbort)
         let thrownError: any = null
@@ -211,12 +211,12 @@ if (process.env.NODE_ENV === "development") {
         } catch (e) {
             thrownError = e
         }
-        t.is(!!thrownError, true)
+        expect(thrownError).toBeTruthy()
     })
 }
 
 if (process.env.NODE_ENV === "development") {
-    test("abort() and next() invoked within middleware", t => {
+    test("abort() and next() invoked within middleware", () => {
         const m = TestModel.create()
         addMiddleware(m, nextAndAbort)
         let thrownError: any = null
@@ -225,6 +225,6 @@ if (process.env.NODE_ENV === "development") {
         } catch (e) {
             thrownError = e
         }
-        t.is(!!thrownError, true)
+        expect(thrownError).toBeTruthy()
     })
 }
