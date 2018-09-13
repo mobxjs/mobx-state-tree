@@ -1,8 +1,7 @@
-import { test } from "ava"
 import atomic from "../src/atomic"
 import { types, addMiddleware, flow } from "mobx-state-tree"
 
-function delay(time) {
+function delay(time: number) {
     return new Promise(resolve => {
         setTimeout(resolve, time)
     })
@@ -15,22 +14,22 @@ const TestModel = types
     .actions(self => {
         addMiddleware(self, atomic)
         return {
-            inc(x) {
+            inc(x: number) {
                 self.z += x
                 return self.z
             },
-            throwingFn(x) {
+            throwingFn(x: number) {
                 self.z += x
                 throw "Oops"
             },
-            incProcess: flow(function*(x) {
+            incProcess: flow(function*(x: number) {
                 yield delay(2)
                 self.z += x
                 yield delay(2)
                 self.z += x
                 return self.z
             }),
-            throwingProcess: flow(function*(x) {
+            throwingProcess: flow(function*(x: number) {
                 yield delay(2)
                 self.z += x
                 yield delay(2)
@@ -40,31 +39,33 @@ const TestModel = types
         }
     })
 
-test("should run action normally", t => {
+test("should run action normally", () => {
     const m = TestModel.create()
-    t.is(m.inc(3), 4)
-    t.is(m.z, 4)
+    expect(m.inc(3)).toBe(4)
+    expect(m.z).toBe(4)
 })
 
-test("should rollback on action failure", t => {
+test("should rollback on action failure", () => {
     const m = TestModel.create()
-    t.throws(() => m.throwingFn(3), /Oops/)
-    t.is(m.z, 1)
+    expect(() => {
+        m.throwingFn(3)
+    }).toThrow(/Oops/)
+    expect(m.z).toBe(1)
 })
 
-test("should run async action normally on action failure", async t => {
+test("should run async action normally on action failure", async () => {
     const m = TestModel.create()
     const value = await m.incProcess(3)
-    t.is(value, 7)
-    t.is(m.z, 7)
+    expect(value).toBe(7)
+    expect(m.z).toBe(7)
 })
 
-test("should rollback on async action failure", async t => {
+test("should rollback on async action failure", async () => {
     const m = TestModel.create()
     try {
         await m.throwingProcess(3)
     } catch (e) {
-        t.is(e, "Oops")
-        t.is(m.z, 1)
+        expect(e).toBe("Oops")
+        expect(m.z).toBe(1)
     }
 })
