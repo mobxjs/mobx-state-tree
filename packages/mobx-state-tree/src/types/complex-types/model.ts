@@ -325,8 +325,10 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                     `Cannot define action '${POST_PROCESS_SNAPSHOT}', it should be defined using 'type.postProcessSnapshot(fn)' instead`
                 )
 
+            let action2 = actions[name].bind(self) // bind to self to allow 'this' to always work
+            action2.$mst_middleware = actions[name].$mst_middleware // make sure middlewares are not lost
+
             // apply hook composition
-            let action2 = actions[name]
             let baseAction = (self as any)[name]
             if (name in HookNames && baseAction) {
                 let specializedAction = action2

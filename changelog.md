@@ -1,3 +1,7 @@
+# next
+
+-   Fix for actions sometimes failing to resolve this to self through[#???] by (https://github.com/mobxjs/mobx-state-tree/pull/???) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.3.0
 
 -   Fix for references sometimes not intializing its parents [#993](https://github.com/mobxjs/mobx-state-tree/issues/993) through [#997](https://github.com/mobxjs/mobx-state-tree/pull/997) by [@xaviergonz](https://github.com/xaviergonz)
