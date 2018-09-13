@@ -297,7 +297,7 @@ test("volatile state survives reonciliation", () => {
 test("middleware events are correct", () => {
     const A = types.model({}).actions(self => ({
         a(x: number) {
-            return (self as any).b(x * 2)
+            return this.b(x * 2)
         },
         b(y: number) {
             return y + 1

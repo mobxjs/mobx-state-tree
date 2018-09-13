@@ -1,6 +1,6 @@
 # next
 
--   Fix for actions sometimes failing to resolve this to self through[#???] by (https://github.com/mobxjs/mobx-state-tree/pull/???) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fix for actions sometimes failing to resolve this to self through[#1014] by (https://github.com/mobxjs/mobx-state-tree/pull/1014) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.3.0
 
