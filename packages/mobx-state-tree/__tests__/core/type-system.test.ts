@@ -255,7 +255,7 @@ test("types instances with compatible snapshots should not be interchangeable", 
         c.x = undefined
     }).not.toThrow()
     expect(() => {
-        ;(c as any).x = {}
+        c.x = cast({})
     }).not.toThrow()
     expect(() => {
         c.x = A.create()
@@ -434,31 +434,6 @@ test("self referring views", () => {
         return views
     })
     expect(Car.create().tripple).toBe(9)
-})
-
-test("Alternative typeof syntax #885", () => {
-    const Car = types
-        .model({
-            wheels: 3
-        })
-        .actions(self => {
-            function drive() {}
-            return {
-                drive
-            }
-        })
-
-    type TypeOf<T extends IType<any, any, any>> = T extends IType<any, any, infer T2> ? T2 : never
-    type SnapshotTypeOf<T extends IType<any, any, any>> = T extends IType<any, infer S, any>
-        ? S
-        : never
-    type CreationTypeOf<T extends IType<any, any, any>> = T extends IType<infer C, any, any>
-        ? C
-        : never
-
-    type CarT = TypeOf<typeof Car>
-    type Car2 = typeof Car.Type
-    type CarSnapshot = SnapshotTypeOf<typeof Car>
 })
 
 test("#922", () => {

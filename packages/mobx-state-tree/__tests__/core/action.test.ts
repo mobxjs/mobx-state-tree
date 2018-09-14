@@ -7,7 +7,9 @@ import {
     applySnapshot,
     addMiddleware,
     getRoot,
-    cast
+    cast,
+    IMiddlewareEvent,
+    ISerializedActionCall
 } from "../../src"
 
 /// Simple action replay and invocation
@@ -228,7 +230,7 @@ test("snapshot should be available and updated during an action", () => {
             x: types.number
         })
         .actions(self => {
-            function inc(): any {
+            function inc() {
                 self.x += 1
                 const res = getSnapshot(self).x
                 self.x += 1
@@ -241,7 +243,7 @@ test("snapshot should be available and updated during an action", () => {
     const a = Model.create({ x: 2 })
     expect(a.inc()).toBe(3)
     expect(a.x).toBe(4)
-    expect(getSnapshot<any>(a).x).toBe(4)
+    expect(getSnapshot(a).x).toBe(4)
 })
 
 test("indirectly called private functions should be able to modify state", () => {
@@ -304,9 +306,9 @@ test("middleware events are correct", () => {
         }
     }))
     const a = A.create()
-    const events: any[] = []
+    const events: IMiddlewareEvent[] = []
     addMiddleware(a, function(call, next) {
-        events.push({ ...call, context: {}, tree: {} }) // TODO: streep of some fields, since jest doesn't compare properly, restore in next jest version
+        events.push(call)
         return next(call)
     })
     a.a(7)
@@ -394,7 +396,7 @@ test("after attach action should work correctly", () => {
     const s = S.create({
         todos: [{ title: "todo" }]
     })
-    const events: any[] = []
+    const events: ISerializedActionCall[] = []
     onAction(
         s,
         call => {

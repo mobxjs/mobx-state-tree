@@ -48,7 +48,7 @@ export interface IStateTreeNode<C = any, S = any> {
     readonly $treenode?: any
     // fake, will never be present, just for typing
     // we use this weird trick to allow reference types to work
-    readonly $types?: [C, S] | [any, any]
+    readonly "!!types"?: [C, S] | [any, any]
 }
 
 export interface IAnyStateTreeNode extends IStateTreeNode<any, any> {}
