@@ -741,7 +741,11 @@ export function compose(...args: any[]): any {
             prev.cloneAndEnhance({
                 name: prev.name + "_" + cur.name,
                 properties: cur.properties,
-                initializers: cur.initializers
+                initializers: cur.initializers,
+                preProcessor: (snapshot: any) =>
+                    cur.applySnapshotPreProcessor(prev.applySnapshotPreProcessor(snapshot)),
+                postProcessor: (snapshot: any) =>
+                    cur.applySnapshotPostProcessor(prev.applySnapshotPostProcessor(snapshot))
             })
         )
         .named(typeName)

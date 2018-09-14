@@ -10,6 +10,9 @@ import {
     SnapshotIn,
     Instance
 } from "../../src"
+import { COPYFILE_EXCL } from "constants"
+import { toJSON } from "../../src/core/node/node-utils"
+import { getSnapshot } from "mobx-state-tree"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -385,6 +388,61 @@ test("it should type compose correctly", () => {
     // x.test() // compile error
     x.drive()
     x.log("z")
+})
+test("it should extend {pre,post}ProcessSnapshot on compose", () => {
+    const CompositionTracker = types
+        .model({
+            composedOf: types.array(types.string),
+            composedWith: types.array(types.string)
+        })
+        .preProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedOf: (snapshot.composedOf || []).concat("CompositionTracker")
+        }))
+        .postProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedWith: (snapshot.composedWith || []).concat("WagonTracker")
+        }))
+    const Car = types
+        .model({})
+        .preProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedOf: (snapshot.composedOf || []).concat("Car")
+        }))
+        .postProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedWith: (snapshot.composedWith || []).concat("Wagon")
+        }))
+    const Logger = types
+        .model({})
+        .preProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedOf: (snapshot.composedOf || []).concat("CarLogger")
+        }))
+        .postProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedWith: (snapshot.composedWith || []).concat("WagonLogger")
+        }))
+
+    const LoggableCar = types
+        .compose(
+            CompositionTracker,
+            Car,
+            Logger
+        )
+        .props({
+            composedOf: types.array(types.string),
+            composedWith: types.array(types.string)
+        })
+    const x = LoggableCar.create({})
+    expect(x.composedOf).toContain("CompositionTracker")
+    expect(x.composedOf).toContain("Car")
+    expect(x.composedOf).toContain("CarLogger")
+    expect(x.composedOf).toEqual(["CompositionTracker", "Car", "CarLogger"])
+    expect(x.toJSON().composedWith).toContain("WagonTracker")
+    expect(x.toJSON().composedWith).toContain("Wagon")
+    expect(x.toJSON().composedWith).toContain("WagonLogger")
+    expect(x.toJSON().composedWith).toEqual(["WagonTracker", "Wagon", "WagonLogger"])
 })
 test("it should extend types correctly", () => {
     const Car = types
