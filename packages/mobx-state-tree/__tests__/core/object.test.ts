@@ -12,7 +12,9 @@ import {
     types,
     setLivelynessChecking,
     getParent,
-    hasParent
+    SnapshotOut,
+    IJsonPatch,
+    ISerializedActionCall
 } from "../../src"
 
 import { autorun, reaction, observable } from "mobx"
@@ -112,7 +114,7 @@ test("it should emit snapshots", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let snapshots: any[] = []
+    let snapshots: SnapshotOut<typeof doc>[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
     doc.to = "universe"
     expect(snapshots).toEqual([{ to: "universe" }])
@@ -131,8 +133,8 @@ test("it should emit snapshots for children", () => {
             }
         ]
     })
-    let snapshotsP: any[] = []
-    let snapshotsC: any[] = []
+    let snapshotsP: SnapshotOut<typeof folder>[] = []
+    let snapshotsC: SnapshotOut<typeof folder.files[0]>[] = []
     onSnapshot(folder, snapshot => snapshotsP.push(snapshot))
     folder.rename("Vacation photos")
     expect(snapshotsP[0]).toEqual({
@@ -197,7 +199,7 @@ test("it should emit patches", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches: any[] = []
+    let patches: IJsonPatch[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.to = "universe"
     expect(patches).toEqual([{ op: "replace", path: "/to", value: "universe" }])
@@ -221,7 +223,7 @@ test("it should stop listening to patches patches", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches: any[] = []
+    let patches: IJsonPatch[] = []
     let disposer = onPatch(doc, patch => patches.push(patch))
     doc.to = "universe"
     disposer()
@@ -238,7 +240,7 @@ test("it should call actions correctly", () => {
 test("it should emit action calls", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
-    let actions: any[] = []
+    let actions: ISerializedActionCall[] = []
     onAction(doc, action => actions.push(action))
     doc.setTo("universe")
     expect(actions).toEqual([{ name: "setTo", path: "", args: ["universe"] }])
@@ -543,7 +545,7 @@ test("view functions should be tracked", () => {
         }))
         .create()
     unprotect(model)
-    const values: any[] = []
+    const values: number[] = []
     const d = autorun(() => {
         values.push(model.doubler())
     })
@@ -669,7 +671,7 @@ test("it should be possible to share states between views and actions using enha
     d()
 })
 test("It should throw if any other key is returned from extend", () => {
-    const A = types.model({}).extend(() => ({ stuff() {} } as any)) // TODO: fix typing
+    const A = types.model({}).extend(() => ({ stuff() {} } as any))
     expect(() => A.create()).toThrowError(/stuff/)
 })
 

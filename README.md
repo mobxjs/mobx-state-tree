@@ -1062,7 +1062,7 @@ The following service can generate MST models based on JSON: https://transform.n
 
 For debugging you might want to use `getSnapshot(model, applyPostProcess)` to print the state of a model. If you didn't import `getSnapshot` while debugging in some debugger, don't worry, `model.toJSON()` will produce the same snapshot. (For API consistency, this feature is not part of the typed API).
 
-### Handle circular dependencies between files using `late`
+### Handle circular dependencies between files and types using `late`
 
 In the exporting file:
 
@@ -1079,10 +1079,25 @@ In the importing file:
 ```javascript
 import { LateStore } from "./circular-dep"
 
-const Store = types.late(LateStore)
+const Store = types.late(() => LateStore)
 ```
 
 Thanks to function hoisting in combination with `types.late`, this lets you have circular dependencies between types, across files.
+
+If you are using TypeScript and you get errors about circular or self-referencing types then you can partially fix it by doing:
+
+```ts
+const Node = types.model({
+    x: 5, // as an example
+    me: types.maybe(types.late((): IAnyModeType => Node))
+})
+```
+
+In this case, while "me" will become any, any other properties (such as x) will be strongly typed, so you can typecast the self referencing properties (me in this case) once more to get typings. For example:
+
+```ts
+node.((me) as Instance<typeof Node>).x // x here will be number
+```
 
 ### Simulate inheritance by using type composition
 
@@ -1209,7 +1224,7 @@ Yes, with MST it is pretty straight forward to setup hot reloading for your stor
 TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 2.8 or later with `noImplicitThis` and `strictNullChecks` enabled.
 Actually, the more strict options that are enabled, the better the type system will behave.
 
-We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occassionally you will need to fallback to `any` or manually adding type annotations.
+We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occasionally you will need to fallback to `any` or manually adding type annotations.
 
 Flow is not supported.
 
@@ -1277,7 +1292,7 @@ const Example = types
     }))
 ```
 
-You can circumvent this situation by using `this` whenever you intend to use the newly declared computed values:
+You can circumvent this situation by using `this` whenever you intend to use the newly declared computed values that are local to the current object:
 
 ```typescript
 const Example = types.model("Example", { prop: types.string }).views(self => ({

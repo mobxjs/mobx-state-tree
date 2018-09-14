@@ -1,4 +1,4 @@
-import { types, typecheck } from "../../src"
+import { types, typecheck, IAnyModelType } from "../../src"
 
 if (process.env.NODE_ENV !== "production") {
     test("it should throw if late doesnt received a function as parameter", () => {
@@ -20,29 +20,29 @@ test("it should accept a type and infer it correctly", () => {
 })
 test("late should allow circular references", () => {
     // TypeScript is'nt smart enough to infer self referencing types.
-    const Node: any = types.model({
-        childs: types.optional(types.array(types.late(() => Node)), [])
+    const Node = types.model({
+        childs: types.optional(types.array(types.late((): IAnyModelType => Node)), [])
     })
     expect(() => Node.create()).not.toThrow()
     expect(() => Node.create({ childs: [{}, { childs: [] }] })).not.toThrow()
 })
 test("late should describe correctly circular references", () => {
     // TypeScript is'nt smart enough to infer self referencing types.
-    const Node: any = types.model("Node", {
-        childs: types.array(types.late(() => Node))
+    const Node = types.model("Node", {
+        childs: types.array(types.late((): IAnyModelType => Node))
     })
     expect(Node.describe()).toEqual("{ childs: Node[]? }")
 })
 test("should typecheck", () => {
-    const NodeObject: any = types.model("NodeObject", {
+    const NodeObject = types.model("NodeObject", {
         id: types.identifierNumber,
         text: "Hi",
-        child: types.maybe(types.late(() => NodeObject))
+        child: types.maybe(types.late((): IAnyModelType => NodeObject))
     })
     const x = NodeObject.create({ id: 1 })
     try {
         x.child = 3 // TODO: better typings, should give compilation error!
-        x.floepie = 3 // TODO: better typings, should give compilation error!
+        ;(x as any).floepie = 3
     } catch (e) {
         // ignore, this is about TS
     }
@@ -57,11 +57,11 @@ test("typecheck should throw an Error when called at runtime, but not log the er
     })
 
     expect(() => {
-        typecheck(NodeObject, { id: 1, text: 1 })
+        typecheck(NodeObject, { id: 1, text: 1 } as any)
     }).toThrow()
 
     try {
-        typecheck(NodeObject, { id: 1, text: 1 })
+        typecheck(NodeObject, { id: 1, text: 1 } as any)
     } catch (error) {
         expect(error).toBeDefined()
         expect(consoleSpy).not.toHaveBeenCalled()
@@ -81,16 +81,16 @@ test("#825, late type checking ", () => {
 })
 
 test("#916 - 0", () => {
-    const Todo: any = types.model("Todo", {
+    const Todo = types.model("Todo", {
         title: types.string,
-        newTodo: types.optional(types.late(() => Todo), {}) // N.B. this definition is never instantiateable!
+        newTodo: types.optional(types.late((): IAnyModelType => Todo), {}) // N.B. this definition is never instantiateable!
     })
 })
 
 test("#916 - 1", () => {
-    const Todo: any = types.model("Todo", {
+    const Todo = types.model("Todo", {
         title: types.string,
-        newTodo: types.maybe(types.late(() => Todo))
+        newTodo: types.maybe(types.late((): IAnyModelType => Todo))
     })
     const t = Todo.create({
         title: "Get Coffee"
@@ -98,9 +98,9 @@ test("#916 - 1", () => {
 })
 
 test("#916 - 2", () => {
-    const Todo: any = types.model("Todo", {
+    const Todo = types.model("Todo", {
         title: types.string,
-        newTodo: types.maybe(types.late(() => Todo))
+        newTodo: types.maybe(types.late((): IAnyModelType => Todo))
     })
     expect(
         Todo.is({
@@ -117,9 +117,9 @@ test("#916 - 2", () => {
 })
 
 test("#916 - 3", () => {
-    const Todo: any = types.model("Todo", {
+    const Todo = types.model("Todo", {
         title: types.string,
-        newTodo: types.maybe(types.late(() => Todo))
+        newTodo: types.maybe(types.late((): IAnyModelType => Todo))
     })
     const t = Todo.create({
         title: "Get Coffee",

@@ -1,4 +1,12 @@
-import { types, tryResolve, resolvePath, cast, SnapshotOrInstance } from "../../src"
+import {
+    types,
+    tryResolve,
+    resolvePath,
+    cast,
+    SnapshotOrInstance,
+    IAnyModelType,
+    IAnyComplexType
+} from "../../src"
 
 if (process.env.NODE_ENV !== "production") {
     test("#275 - Identifiers should check refinement", () => {
@@ -56,9 +64,9 @@ test("#158 - #88 - Identifiers should accept any string character", () => {
 })
 test("#187 - identifiers should not break late types", () => {
     expect(() => {
-        const MstNode: any = types.model("MstNode", {
+        const MstNode = types.model("MstNode", {
             value: types.number,
-            next: types.maybe(types.late(() => MstNode))
+            next: types.maybe(types.late((): IAnyModelType => MstNode))
         })
     }).not.toThrow()
 })
@@ -144,10 +152,10 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 test("it can resolve through refrences", () => {
-    const Folder: any = types.model("Folder", {
+    const Folder = types.model("Folder", {
         type: types.literal("folder"),
         name: types.identifier,
-        children: types.array(types.late(() => types.union(Folder, SymLink)))
+        children: types.array(types.late((): IAnyComplexType => types.union(Folder, SymLink)))
     })
     const SymLink = types.model({
         type: types.literal("link"),

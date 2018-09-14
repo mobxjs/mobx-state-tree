@@ -2,7 +2,7 @@ import { types, unprotect, IAnyModelType } from "../../src"
 
 function Pointer<IT extends IAnyModelType>(Model: IT) {
     return types.model("PointerOf" + Model.name, {
-        value: types.maybe(types.reference(Model as any))
+        value: types.maybe(types.reference(Model))
     })
 }
 const Todo = types.model("Todo", {

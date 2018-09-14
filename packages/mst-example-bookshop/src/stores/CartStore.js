@@ -1,5 +1,5 @@
 import { when, reaction } from "mobx"
-import { types, getParent, getSnapshot, applySnapshot } from "mobx-state-tree"
+import { types, getParent, getSnapshot, applySnapshot, destroy } from "mobx-state-tree"
 import { Book } from "./BookStore"
 
 const CartEntry = types
@@ -21,6 +21,9 @@ const CartEntry = types
         },
         setQuantity(number) {
             self.quantity = number
+        },
+        remove() {
+            getParent(self, 2).remove(self)
         }
     }))
 
@@ -76,6 +79,9 @@ export const CartStore = types
             }
             entry.increaseQuantity(quantity)
             if (notify) self.shop.alert("Added to cart")
+        },
+        remove(book) {
+            destroy(book)
         },
         checkout() {
             const total = self.total

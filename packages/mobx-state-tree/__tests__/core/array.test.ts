@@ -68,7 +68,7 @@ test("it should emit add patches", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches: any[] = []
+    let patches: IJsonPatch[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.push(ItemFactory.create({ to: "universe" }))
     expect(patches).toEqual([{ op: "add", path: "/0", value: { to: "universe" } }])
@@ -393,7 +393,7 @@ test("it should keep unchanged for structrual equalled snapshot", () => {
         numbers: [1, 2, 3]
     })
 
-    const values: any = []
+    const values: boolean[][] = []
     autorun(() => {
         values.push(store.todos.map(todo => todo.done))
     })
@@ -409,7 +409,7 @@ test("it should keep unchanged for structrual equalled snapshot", () => {
     ])
     expect(values).toEqual([[false, false, false], [false, false, true]])
 
-    const values1: any = []
+    const values1: number[][] = []
     autorun(() => {
         values1.push(store.numbers.slice())
     })
