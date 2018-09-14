@@ -1,3 +1,7 @@
+# next
+
+-   Fix for preProcessSnapshot not copied on compose [#613](https://github.com/mobxjs/mobx-state-tree/issues/613) through [#1013]((https://github.com/mobxjs/mobx-state-tree/pull/1013) by [@theRealScoobaSteve](https://github.com/theRealScoobaSteve)
+
 # 3.3.0
 
 -   Fix for references sometimes not intializing its parents [#993](https://github.com/mobxjs/mobx-state-tree/issues/993) through [#997](https://github.com/mobxjs/mobx-state-tree/pull/997) by [@xaviergonz](https://github.com/xaviergonz)
