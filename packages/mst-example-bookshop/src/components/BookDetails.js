@@ -8,7 +8,11 @@ const BookDetails = inject("shop")(
             <p>
                 <i>By: {book.author}</i>
             </p>
-            <p>Price: ${book.price}€</p>
+            <p>Genre: {book.genre_s}</p>
+            {book.series_t && <p>Series: {book.series_t}</p>}
+            {book.series_t && <p>Sequence: {book.sequence_i}</p>}
+            <p>Pages: {book.pages_i}</p>
+            <p>Price: {book.price}€</p>
             <button
                 onClick={() => {
                     shop.cart.addBook(book)
