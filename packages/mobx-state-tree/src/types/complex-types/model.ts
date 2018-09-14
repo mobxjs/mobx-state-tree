@@ -327,6 +327,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         // check if return is correct
         if (!isPlainObject(actions))
             fail(`actions initializer should return a plain object containing actions`)
+
         // bind actions to the object created
         Object.keys(actions).forEach(name => {
             // warn if preprocessor was given
@@ -340,8 +341,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                     `Cannot define action '${POST_PROCESS_SNAPSHOT}', it should be defined using 'type.postProcessSnapshot(fn)' instead`
                 )
 
-            let action2 = actions[name].bind(self) // bind to self to allow 'this' to always work
-            action2.$mst_middleware = actions[name].$mst_middleware // make sure middlewares are not lost
+            let action2 = actions[name]
 
             // apply hook composition
             let baseAction = (self as any)[name]
@@ -352,11 +352,20 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                     specializedAction.apply(null, arguments)
                 }
             }
+
+            // the goal of this is to make sure actions using "this" can call themselves,
+            // while still allowing the middlewares to register them
+            const middlewares = action2.$mst_middleware // make sure middlewares are not lost
+            let boundAction = action2.bind(actions)
+            boundAction.$mst_middleware = middlewares
+            const actionInvoker = createActionInvoker(self, name, boundAction)
+            actions[name] = actionInvoker
+
             // See #646, allow models to be mocked
             ;(process.env.NODE_ENV === "production" ? addHiddenFinalProp : addHiddenWritableProp)(
                 self,
                 name,
-                createActionInvoker(self, name, action2)
+                actionInvoker
             )
         })
     }

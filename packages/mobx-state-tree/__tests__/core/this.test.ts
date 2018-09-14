@@ -44,6 +44,9 @@ test("this support", () => {
                 setX(x: number) {
                     self.x = x
                 },
+                setThisX(x: number) {
+                    ;(this as any).x = x // this should not affect self.x
+                },
                 setXBy(x: number) {
                     this.setX(this.xBy(x))
                 },
@@ -82,4 +85,9 @@ test("this support", () => {
 
     mi.setLocalState(7)
     expect(mi.localState).toBe(7)
+
+    // make sure attempts to modify this (as long as it is not an action) doesn't affect self
+    const oldX = mi.x
+    mi.setThisX(oldX + 1)
+    expect(mi.x).toBe(oldX)
 })
