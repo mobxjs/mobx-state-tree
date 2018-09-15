@@ -1,5 +1,28 @@
 import { isComputedProp, isObservableProp } from "mobx"
-import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC, IType, IAnyModelType } from "../internal"
+import {
+    ExtractS,
+    ExtractT,
+    IAnyStateTreeNode,
+    ExtractC,
+    IType,
+    IAnyModelType,
+    getStateTreeNode,
+    IStateTreeNode,
+    isStateTreeNode,
+    IJsonPatch,
+    splitJsonPath,
+    asArray,
+    EMPTY_OBJECT,
+    fail,
+    IDisposer,
+    isType,
+    resolveNodeByPath,
+    getRelativePathBetweenNodes,
+    freeze,
+    IAnyType,
+    ExtractIStateTreeNode,
+    isModelType
+} from "../internal"
 
 export type TypeOrStateTreeNodeToStateTreeNode<
     T extends IAnyType | IAnyStateTreeNode
@@ -845,26 +868,3 @@ export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
 export function cast<T = never>(snapshotOrInstance: CastedType<T>): T {
     return snapshotOrInstance as T
 }
-
-import {
-    INode,
-    getStateTreeNode,
-    IStateTreeNode,
-    isStateTreeNode,
-    IJsonPatch,
-    splitJsonPath,
-    asArray,
-    EMPTY_OBJECT,
-    fail,
-    IDisposer,
-    isType,
-    resolveNodeByPath,
-    getRelativePathBetweenNodes,
-    ModelType,
-    freeze,
-    IAnyType,
-    IMSTMap,
-    ExtractIStateTreeNode,
-    IMSTArray,
-    isModelType
-} from "../internal"
