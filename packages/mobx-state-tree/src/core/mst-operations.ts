@@ -21,7 +21,8 @@ import {
     freeze,
     IAnyType,
     ExtractIStateTreeNode,
-    isModelType
+    isModelType,
+    INode
 } from "../internal"
 
 export type TypeOrStateTreeNodeToStateTreeNode<
