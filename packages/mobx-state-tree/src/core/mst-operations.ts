@@ -745,13 +745,23 @@ export interface IModelReflectionPropertiesData {
 }
 
 /**
- * Returns a reflection of the model type properties and name.
+ * Returns a reflection of the model type properties and name for either a model type or model node.
  *
  * @export
- * @param {IAnyModelType} type
+ * @param {IAnyModelType | IStateTreeNode} typeOrNode
  * @returns {IModelReflectionPropertiesData}
  */
-export function getPropertyMembers(type: IAnyModelType): IModelReflectionPropertiesData {
+export function getPropertyMembers(
+    typeOrNode: IAnyModelType | IStateTreeNode
+): IModelReflectionPropertiesData {
+    let type
+
+    if (isStateTreeNode(typeOrNode)) {
+        type = getType(typeOrNode) as IAnyModelType
+    } else {
+        type = typeOrNode
+    }
+
     if (process.env.NODE_ENV !== "production") {
         if (!isModelType(type)) fail("expected a model type, but got " + type + " instead.")
     }
@@ -776,7 +786,7 @@ export interface IModelReflectionData extends IModelReflectionPropertiesData {
  * @returns {IModelReflectionData}
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    const type = getStateTreeNode(target).type as ModelType<any, any>
+    const type = getStateTreeNode(target).type as IAnyModelType
 
     const reflected: IModelReflectionData = {
         ...getPropertyMembers(type),
