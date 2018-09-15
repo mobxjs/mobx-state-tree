@@ -60,6 +60,8 @@ test("reflection - model", () => {
 
     const typeReflection = getPropertyMembers(Model)
     expectPropertyMembersToMatchMembers(typeReflection, reflection)
+    const reflection2 = getPropertyMembers(node)
+    expectPropertyMembersToMatchMembers(reflection2, reflection)
 })
 test("reflection - map", () => {
     const node = Model.create({
@@ -73,6 +75,8 @@ test("reflection - map", () => {
 
     const typeReflection = getPropertyMembers(getType(node2) as IAnyModelType)
     expectPropertyMembersToMatchMembers(typeReflection, reflection)
+    const reflection2 = getPropertyMembers(node2)
+    expectPropertyMembersToMatchMembers(reflection2, reflection)
 })
 test("reflection - array", () => {
     const node = Model.create({
@@ -85,6 +89,8 @@ test("reflection - array", () => {
 
     const typeReflection = getPropertyMembers(getType(node2) as IAnyModelType)
     expectPropertyMembersToMatchMembers(typeReflection, reflection)
+    const reflection2 = getPropertyMembers(node2)
+    expectPropertyMembersToMatchMembers(reflection2, reflection)
 })
 test("reflection - late", () => {
     const node = Model.create({
@@ -97,19 +103,20 @@ test("reflection - late", () => {
     expect(reflection.properties.name.describe()).toBe("string")
 })
 if (process.env.NODE_ENV !== "production") {
-    test("reflection - throw on non model node", () => {
+    test("reflection - throw on non model node for getMembers", () => {
         const node = Model.create({
             users: { "1": { id: "1", name: "Test" } }
         })
         expect(() => (node.users ? getMembers(node.users) : {})).toThrowError()
     })
-}
-if (process.env.NODE_ENV !== "production") {
-    test("reflection - throw on non model type", () => {
+
+    test("reflection - throw on non model type/node for getMembers", () => {
+        expect(() => getPropertyMembers(types.array(types.number) as any)).toThrowError()
+
         const node = Model.create({
             users: { "1": { id: "1", name: "Test" } }
         })
-        expect(() => getPropertyMembers(types.array(types.number) as any)).toThrowError()
+        expect(() => getPropertyMembers(node.users)).toThrowError()
     })
 }
 test("reflection - can retrieve property names", () => {
