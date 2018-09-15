@@ -539,11 +539,11 @@ Returns **[Array][210]&lt;[string][216]>**
 
 ## getPropertyMembers
 
-Returns a reflection of the model type properties and name.
+Returns a reflection of the model type properties and name for either a model type or model node.
 
 ### Parameters
 
--   `type` **IAnyModelType** 
+-   `typeOrNode` **(IAnyModelType | IStateTreeNode)** 
 
 Returns **IModelReflectionPropertiesData** 
 
