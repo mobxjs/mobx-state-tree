@@ -1,5 +1,5 @@
 import { isComputedProp, isObservableProp } from "mobx"
-import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC, IType } from "../internal"
+import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC, IType, IAnyModelType } from "../internal"
 
 export type TypeOrStateTreeNodeToStateTreeNode<
     T extends IAnyType | IAnyStateTreeNode
@@ -739,41 +739,53 @@ export function walk(target: IAnyStateTreeNode, processor: (item: IAnyStateTreeN
     processor(node.storedValue)
 }
 
-export interface IModelReflectionData {
+export interface IModelReflectionPropertiesData {
     name: string
     properties: { [K: string]: IAnyType }
+}
+
+/**
+ * Returns a reflection of the model type properties and name.
+ *
+ * @export
+ * @param {IAnyModelType} type
+ * @returns {IModelReflectionPropertiesData}
+ */
+export function getPropertyMembers(type: IAnyModelType): IModelReflectionPropertiesData {
+    if (process.env.NODE_ENV !== "production") {
+        if (!isModelType(type)) fail("expected a model type, but got " + type + " instead.")
+    }
+
+    return {
+        name: type.name,
+        properties: { ...type.properties }
+    }
+}
+
+export interface IModelReflectionData extends IModelReflectionPropertiesData {
     actions: string[]
     views: string[]
     volatile: string[]
 }
+
 /**
- * Returns a reflection of the node
+ * Returns a reflection of the model node, including name, properties, views, volatile and actions.
  *
  * @export
- * @param {IStateTreeNode} target
+ * @param {IAnyStateTreeNode} target
  * @returns {IModelReflectionData}
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        const node2: any = getStateTreeNode(target)
-        if (!(node2.type instanceof ModelType))
-            fail(
-                "expected the node's type to be of the type: model" +
-                    target +
-                    " instead. It's likely you passed an array or a map."
-            )
-    }
-    const node: any = getStateTreeNode(target)
-    const type = node.type as ModelType<any, any>
-    const props = Object.getOwnPropertyNames(target)
+    const type = getStateTreeNode(target).type as ModelType<any, any>
+
     const reflected: IModelReflectionData = {
-        name: type.name,
-        properties: { ...type.properties },
+        ...getPropertyMembers(type),
         actions: [],
         volatile: [],
         views: []
     }
+
+    const props = Object.getOwnPropertyNames(target)
     props.forEach(key => {
         if (key in reflected.properties) return
         const descriptor = Object.getOwnPropertyDescriptor(target, key)!
@@ -843,5 +855,6 @@ import {
     IAnyType,
     IMSTMap,
     ExtractIStateTreeNode,
-    IMSTArray
+    IMSTArray,
+    isModelType
 } from "../internal"
