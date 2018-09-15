@@ -1,13 +1,15 @@
-export interface FlowStep {
+export interface FlowYield {
     // fake, only for typing
-    "!!flowStep": undefined
+    "!!flowYield": undefined
 }
 
 // we skip promises that are the result of yielding promises
-export type FlowReturnType<R> = FlowStepOnlyToVoid<R extends Promise<any> ? FlowStep : R>
+export type FlowReturnType<R> = IfAllAreFlowYieldThenVoid<R extends Promise<any> ? FlowYield : R>
 
 // we extract yielded promises from the return type
-export type FlowStepOnlyToVoid<R> = Exclude<R, FlowStep> extends never ? void : Exclude<R, FlowStep>
+export type IfAllAreFlowYieldThenVoid<R> = Exclude<R, FlowYield> extends never
+    ? void
+    : Exclude<R, FlowYield>
 
 /**
  * See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
