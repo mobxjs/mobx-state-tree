@@ -5,7 +5,8 @@ import {
     cast,
     SnapshotOrInstance,
     IAnyModelType,
-    IAnyComplexType
+    IAnyComplexType,
+    resolveIdentifier
 } from "../../src"
 
 if (process.env.NODE_ENV !== "production") {
@@ -207,4 +208,48 @@ test("it can resolve through refrences", () => {
     expect(() => resolvePath(root, "/children/3/target/children/0").name).toThrow(
         "[mobx-state-tree] Failed to resolve reference 'e' to type 'Folder' (from node: /children/3/target)"
     )
+})
+
+test("#1019", () => {
+    let calls = 0
+    function randomUuid() {
+        calls++
+        let pattern = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+        return pattern.replace(/[xy]/g, function(cc) {
+            const r = (Math.random() * 16) | 0,
+                v = cc === "x" ? r : (r & 0x3) | 0x8
+            return v.toString(16)
+        })
+    }
+
+    const TOptionalId = types.optional(
+        types.refinement(types.identifier, identifier =>
+            /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(identifier)
+        ),
+        randomUuid
+    )
+
+    const CommentModel = types.model("CommentModel", {
+        uid: TOptionalId
+    })
+
+    const CommentStore = types
+        .model("CommentStore", {
+            items: types.array(CommentModel)
+        })
+        .actions(self => ({
+            test1() {
+                expect(calls).toBe(0)
+                const comment = CommentModel.create({})
+                expect(calls).toBe(1)
+
+                self.items.push(comment)
+                const item = resolveIdentifier(CommentModel, self.items, comment.uid)
+                const item2 = self.items.find(i => i.uid === comment.uid)
+                expect(item).toBe(item2)
+            }
+        }))
+
+    const c = CommentStore.create({})
+    c.test1()
 })

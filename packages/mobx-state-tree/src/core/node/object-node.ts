@@ -123,19 +123,32 @@ export class ObjectNode implements INode {
         this.parent = parent
         this.subpath = subpath
         this.escapedSubpath = escapeJsonPath(this.subpath)
+
         this.identifierAttribute = (type as any).identifierAttribute
-        // identifier can not be changed during lifecycle of a node
-        // so we safely can read it from initial snapshot
-        this.identifier =
-            this.identifierAttribute && this._initialSnapshot
-                ? "" + this._initialSnapshot[this.identifierAttribute]
-                : null // normalize internal identifier to string
 
         if (!parent) {
             this.identifierCache = new IdentifierCache()
         }
 
         this._childNodes = type.initializeChildNodes(this, this._initialSnapshot)
+
+        // identifier can not be changed during lifecycle of a node
+        // so we safely can read it from initial snapshot
+        this.identifier = null
+        if (this.identifierAttribute && this._initialSnapshot) {
+            this.identifier = "" + this._initialSnapshot[this.identifierAttribute]
+            let id = this._initialSnapshot[this.identifierAttribute]
+            if (id === undefined) {
+                // try with the actual node if not (for optional identifiers)
+                const childNode = this._childNodes[this.identifierAttribute]
+                if (childNode) {
+                    id = childNode.value
+                }
+            }
+
+            // normalize internal identifier to string
+            this.identifier = "" + id
+        }
 
         if (!parent) {
             this.identifierCache!.addNodeToCache(this)
