@@ -260,4 +260,5 @@ test("#1019-2", () => {
         id: types.optional(types.identifier, "dummykey")
     })
     expect(getIdentifier(Item.create())).toBe("dummykey")
+    expect(Item.create().id).toBe("dummykey")
 })
