@@ -6,7 +6,8 @@ import {
     SnapshotOrInstance,
     IAnyModelType,
     IAnyComplexType,
-    resolveIdentifier
+    resolveIdentifier,
+    getIdentifier
 } from "../../src"
 
 if (process.env.NODE_ENV !== "production") {
@@ -252,4 +253,11 @@ test("#1019", () => {
 
     const c = CommentStore.create({})
     c.test1()
+})
+
+test("#1019-2", () => {
+    const Item = types.model({
+        id: types.optional(types.identifier, "dummykey")
+    })
+    expect(getIdentifier(Item.create())).toBe("dummykey")
 })
