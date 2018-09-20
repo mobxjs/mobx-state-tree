@@ -2,7 +2,6 @@ import {
     types,
     getSnapshot,
     unprotect,
-    IType,
     getRoot,
     getParent,
     SnapshotOrInstance,
@@ -10,9 +9,6 @@ import {
     SnapshotIn,
     Instance
 } from "../../src"
-import { COPYFILE_EXCL } from "constants"
-import { toJSON } from "../../src/core/node/node-utils"
-import { getSnapshot } from "mobx-state-tree"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -407,21 +403,21 @@ test("it should extend {pre,post}ProcessSnapshot on compose", () => {
         .model({})
         .preProcessSnapshot(snapshot => ({
             ...snapshot,
-            composedOf: (snapshot.composedOf || []).concat("Car")
+            composedOf: ((snapshot as any).composedOf || []).concat("Car")
         }))
         .postProcessSnapshot(snapshot => ({
             ...snapshot,
-            composedWith: (snapshot.composedWith || []).concat("Wagon")
+            composedWith: ((snapshot as any).composedWith || []).concat("Wagon")
         }))
     const Logger = types
         .model({})
         .preProcessSnapshot(snapshot => ({
             ...snapshot,
-            composedOf: (snapshot.composedOf || []).concat("CarLogger")
+            composedOf: ((snapshot as any).composedOf || []).concat("CarLogger")
         }))
         .postProcessSnapshot(snapshot => ({
             ...snapshot,
-            composedWith: (snapshot.composedWith || []).concat("WagonLogger")
+            composedWith: ((snapshot as any).composedWith || []).concat("WagonLogger")
         }))
 
     const LoggableCar = types
@@ -439,10 +435,10 @@ test("it should extend {pre,post}ProcessSnapshot on compose", () => {
     expect(x.composedOf).toContain("Car")
     expect(x.composedOf).toContain("CarLogger")
     expect(x.composedOf).toEqual(["CompositionTracker", "Car", "CarLogger"])
-    expect(x.toJSON().composedWith).toContain("WagonTracker")
-    expect(x.toJSON().composedWith).toContain("Wagon")
-    expect(x.toJSON().composedWith).toContain("WagonLogger")
-    expect(x.toJSON().composedWith).toEqual(["WagonTracker", "Wagon", "WagonLogger"])
+    expect(x.toJSON!().composedWith).toContain("WagonTracker")
+    expect(x.toJSON!().composedWith).toContain("Wagon")
+    expect(x.toJSON!().composedWith).toContain("WagonLogger")
+    expect(x.toJSON!().composedWith).toEqual(["WagonTracker", "Wagon", "WagonLogger"])
 })
 test("it should extend types correctly", () => {
     const Car = types
