@@ -2,8 +2,8 @@
 
 -   Added getPropertyMembers(typeOrNode) through [#1016](https://github.com/mobxjs/mobx-state-tree/pull/1016) by [@xaviergonz](https://github.com/xaviergonz)
 -   Fix for preProcessSnapshot not copied on compose [#613](https://github.com/mobxjs/mobx-state-tree/issues/613) through [#1013](https://github.com/mobxjs/mobx-state-tree/pull/1013) by [@theRealScoobaSteve](https://github.com/theRealScoobaSteve)
--   Fix for actions sometimes failing to resolve this to self through[#1014] by (https://github.com/mobxjs/mobx-state-tree/pull/1014) by [@xaviergonz](https://github.com/xaviergonz)
--   Fix for preProcessSnapshot not copied on compose [#613](https://github.com/mobxjs/mobx-state-tree/issues/613) through [#1013]((https://github.com/mobxjs/mobx-state-tree/pull/1013) by [@theRealScoobaSteve](https://github.com/theRealScoobaSteve)
+-   Fix for actions sometimes failing to resolve this to self through [#1014](https://github.com/mobxjs/mobx-state-tree/pull/1014) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fix for preProcessSnapshot not copied on compose [#613](https://github.com/mobxjs/mobx-state-tree/issues/613) through [#1013](https://github.com/mobxjs/mobx-state-tree/pull/1013) by [@theRealScoobaSteve](https://github.com/theRealScoobaSteve)
 -   Improvements to the bookshop example through [#1009](https://github.com/mobxjs/mobx-state-tree/pull/1009) by [@programmer4web](https://github.com/programmer4web)
 
 # 3.3.0
