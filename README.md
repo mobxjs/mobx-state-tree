@@ -1296,7 +1296,37 @@ const Example = types
     }))
 ```
 
-You can circumvent this situation by declaring the views in two steps:
+You can circumvent this situation by using `this` whenever you intend to use the newly declared computed values that are local to the current object:
+
+```typescript
+const Example = types.model("Example", { prop: types.string }).views(self => ({
+    get upperProp(): string {
+        return self.prop.toUpperCase()
+    },
+    get twiceUpperProp(): string {
+        return this.upperProp + this.upperProp
+    }
+}))
+```
+
+Alternatively you can also declare multiple `.views` block, in which case the `self` parameter gets extended after each block.
+
+```typescript
+const Example = types
+  .model('Example', { prop: types.string })
+  .views(self => {
+    get upperProp(): string {
+      return self.prop.toUpperCase();
+    },
+  }))
+  .views(self => ({
+    get twiceUpperProp(): string {
+      return self.upperProp + self.upperProp;
+    },
+  }));
+```
+
+As a last resort, although not recommended due to the performance penalty (see the note below), you may declare the views in two steps:
 
 ```typescript
 const Example = types
@@ -1315,37 +1345,6 @@ const Example = types
 ```
 
 _**NOTE: the above approach will incur runtime performance penalty as accessing such computed values (e.g. inside `render()` method of an observed component) always leads to full recompute (see [this issue](https://github.com/mobxjs/mobx-state-tree/issues/818#issue-323164363) for details). For a heavily used computed properties it's recommended to use one of below approaches.**_
-
-Alternatively, you can use `this` whenever you intend to use the newly declared computed values:
-
-```typescript
-const Example = types.model("Example", { prop: types.string }).views(self => ({
-    // use typeof instead of predefined type to avoid circular references
-    get upperProp(): string {
-        return self.prop.toUpperCase()
-    },
-    get twiceUpperProp(): string {
-        return this.upperProp + this.upperProp
-    }
-}))
-```
-
-Note that you can also declare multiple `.views` block, in which case the `self` parameter gets extended after each block.
-
-```typescript
-const Example = types
-  .model('Example', { prop: types.string })
-  .views(self => {
-    get upperProp(): string {
-      return self.prop.toUpperCase();
-    },
-  }))
-  .views(self => ({
-    get twiceUpperProp(): string {
-      return self.upperProp + self.upperProp;
-    },
-  }));
-```
 
 Similarly, when writing actions or views one can use helper functions:
 
