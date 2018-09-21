@@ -5,6 +5,7 @@
 -   Fix for actions sometimes failing to resolve this to self through [#1014](https://github.com/mobxjs/mobx-state-tree/pull/1014) by [@xaviergonz](https://github.com/xaviergonz)
 -   Fix for preProcessSnapshot not copied on compose [#613](https://github.com/mobxjs/mobx-state-tree/issues/613) through [#1013](https://github.com/mobxjs/mobx-state-tree/pull/1013) by [@theRealScoobaSteve](https://github.com/theRealScoobaSteve)
 -   Improvements to the bookshop example through [#1009](https://github.com/mobxjs/mobx-state-tree/pull/1009) by [@programmer4web](https://github.com/programmer4web)
+-   Fix for a regression with optional identifiers [#1019](https://github.com/mobxjs/mobx-state-tree/issues/1019) through [#1020](https://github.com/mobxjs/mobx-state-tree/pull/1020) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.3.0
 
