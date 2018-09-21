@@ -166,7 +166,7 @@ class MSTMap<C, S, T> extends ObservableMap {
             >
             if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
             if (mapType.identifierMode === MapIdentifierMode.YES) {
-                key = "" + (value as any)[mapType.identifierAttribute!]
+                key = "" + (value as any)[mapType.mapIdentifierAttribute!]
                 this.set(key, value)
                 return this.get(key) as any
             }
@@ -187,7 +187,7 @@ export class MapType<C, S, T> extends ComplexType<
     shouldAttachNode = true
     subType: IAnyType
     identifierMode: MapIdentifierMode = MapIdentifierMode.UNKNOWN
-    identifierAttribute: string | undefined = undefined
+    mapIdentifierAttribute: string | undefined = undefined
     readonly flags = TypeFlags.Map
 
     constructor(name: string, subType: IAnyType) {
@@ -221,7 +221,7 @@ export class MapType<C, S, T> extends ComplexType<
             })
             if (identifierAttribute) {
                 this.identifierMode = MapIdentifierMode.YES
-                this.identifierAttribute = identifierAttribute
+                this.mapIdentifierAttribute = identifierAttribute
             } else {
                 this.identifierMode = MapIdentifierMode.NO
             }

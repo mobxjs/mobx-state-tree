@@ -136,7 +136,6 @@ export class ObjectNode implements INode {
         // so we safely can read it from initial snapshot
         this.identifier = null
         if (this.identifierAttribute && this._initialSnapshot) {
-            this.identifier = "" + this._initialSnapshot[this.identifierAttribute]
             let id = this._initialSnapshot[this.identifierAttribute]
             if (id === undefined) {
                 // try with the actual node if not (for optional identifiers)
@@ -144,6 +143,14 @@ export class ObjectNode implements INode {
                 if (childNode) {
                     id = childNode.value
                 }
+            }
+
+            if (id === null || id === undefined) {
+                fail(
+                    `Instance identifier '${this.identifierAttribute}' for type '${
+                        this.type.name
+                    }' must not be null or undefined`
+                )
             }
 
             // normalize internal identifier to string
