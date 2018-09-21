@@ -145,11 +145,11 @@ export class ObjectNode implements INode {
                 }
             }
 
-            if (id === null || id === undefined) {
+            if (typeof id !== "string" && typeof id !== "number") {
                 fail(
                     `Instance identifier '${this.identifierAttribute}' for type '${
                         this.type.name
-                    }' must not be null or undefined`
+                    }' must be a string or a number`
                 )
             }
 
