@@ -155,7 +155,7 @@ test("can handle throw from yielded promise works", t => {
 test("typings", done => {
     const M = types.model({ title: types.string }).actions(self => {
         function* a(x: string) {
-            const aa = yield delay(10, "x", false)
+            yield delay(10, "x", false)
             self.title = "7"
             return 23
         }
