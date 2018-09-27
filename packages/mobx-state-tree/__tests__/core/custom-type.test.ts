@@ -5,7 +5,8 @@ import {
     unprotect,
     applySnapshot,
     applyPatch,
-    cast
+    cast,
+    SnapshotOut
 } from "../../src"
 
 class Decimal {
@@ -74,7 +75,7 @@ class Decimal {
         unprotect(w1)
 
         const p = recordPatches(w1)
-        const snapshots: any[] = []
+        const snapshots: SnapshotOut<typeof Wallet>[] = []
         onSnapshot(w1, s => {
             snapshots.push(s)
         })
@@ -154,7 +155,7 @@ class Decimal {
         unprotect(w1)
 
         const p = recordPatches(w1)
-        const snapshots: any[] = []
+        const snapshots: SnapshotOut<typeof Wallet>[] = []
         onSnapshot(w1, s => {
             snapshots.push(s)
         })

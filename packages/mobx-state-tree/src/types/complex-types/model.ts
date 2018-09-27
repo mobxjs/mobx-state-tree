@@ -49,7 +49,10 @@ import {
     MapType,
     typecheckInternal,
     typeCheckFailure,
-    TypeFlags
+    TypeFlags,
+    ExtractC,
+    ExtractS,
+    ExtractT
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -93,7 +96,7 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
 
 export interface OptionalProperty {
     // fake, only used for typing
-    readonly $optionalType: undefined
+    readonly "!!optionalType": undefined
 }
 
 export type RequiredPropNames<T> = {
@@ -109,19 +112,15 @@ export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
 /**
  * Maps property types to the snapshot, including omitted optional attributes
  */
-export type ModelCreationType<T extends ModelPropertiesDeclarationToProperties<any>> = {
-    [K in keyof RequiredProps<T>]: T[K] extends IType<infer C, any, any> ? C : never
+export type ModelCreationType<T extends ModelProperties> = {
+    [K in keyof RequiredProps<T>]: ExtractC<T[K]>
 } &
-    { [K in keyof OptionalProps<T>]?: T[K] extends IType<infer C, any, any> ? C : never }
+    { [K in keyof OptionalProps<T>]?: ExtractC<T[K]> }
 
-export type ModelSnapshotType<T extends ModelPropertiesDeclarationToProperties<any>> = {
-    [K in keyof T]: T[K] extends IType<any, infer S, any> ? S : never
-}
+export type ModelSnapshotType<T extends ModelProperties> = { [K in keyof T]: ExtractS<T[K]> }
 
-export type ModelInstanceType<T extends ModelPropertiesDeclarationToProperties<any>, O, C, S> = {
-    [K in keyof T]: T[K] extends IType<infer TC, infer TS, infer TM>
-        ? ExtractIStateTreeNode<TC, TS, TM>
-        : never
+export type ModelInstanceType<T extends ModelProperties, O, C, S> = {
+    [K in keyof T]: ExtractIStateTreeNode<ExtractC<T[K]>, ExtractS<T[K]>, ExtractT<T[K]>>
 } &
     O &
     IStateTreeNode<C, S>
@@ -161,8 +160,24 @@ export interface IModelType<
 // do not make this an interface (#994 will happen again if done)
 export type IAnyModelType = IModelType<any, any, any, any, any>
 
-export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any> ? P : never
-export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O> ? O : never
+export type ExtractProps<T extends IAnyModelType> = T extends IModelType<
+    infer P,
+    any,
+    any,
+    any,
+    any
+>
+    ? P
+    : never
+export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<
+    any,
+    infer O,
+    any,
+    any,
+    any
+>
+    ? O
+    : never
 
 function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
@@ -312,6 +327,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         // check if return is correct
         if (!isPlainObject(actions))
             fail(`actions initializer should return a plain object containing actions`)
+
         // bind actions to the object created
         Object.keys(actions).forEach(name => {
             // warn if preprocessor was given
@@ -325,8 +341,9 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                     `Cannot define action '${POST_PROCESS_SNAPSHOT}', it should be defined using 'type.postProcessSnapshot(fn)' instead`
                 )
 
-            // apply hook composition
             let action2 = actions[name]
+
+            // apply hook composition
             let baseAction = (self as any)[name]
             if (name in HookNames && baseAction) {
                 let specializedAction = action2
@@ -335,11 +352,20 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
                     specializedAction.apply(null, arguments)
                 }
             }
+
+            // the goal of this is to make sure actions using "this" can call themselves,
+            // while still allowing the middlewares to register them
+            const middlewares = action2.$mst_middleware // make sure middlewares are not lost
+            let boundAction = action2.bind(actions)
+            boundAction.$mst_middleware = middlewares
+            const actionInvoker = createActionInvoker(self, name, boundAction)
+            actions[name] = actionInvoker
+
             // See #646, allow models to be mocked
             ;(process.env.NODE_ENV === "production" ? addHiddenFinalProp : addHiddenWritableProp)(
                 self,
                 name,
-                createActionInvoker(self, name, action2)
+                actionInvoker
             )
         })
     }
@@ -726,7 +752,11 @@ export function compose(...args: any[]): any {
             prev.cloneAndEnhance({
                 name: prev.name + "_" + cur.name,
                 properties: cur.properties,
-                initializers: cur.initializers
+                initializers: cur.initializers,
+                preProcessor: (snapshot: any) =>
+                    cur.applySnapshotPreProcessor(prev.applySnapshotPreProcessor(snapshot)),
+                postProcessor: (snapshot: any) =>
+                    cur.applySnapshotPostProcessor(prev.applySnapshotPostProcessor(snapshot))
             })
         )
         .named(typeName)
@@ -740,7 +770,7 @@ export function compose(...args: any[]): any {
  * @param {IT} type
  * @returns {type is IT}
  */
-export function isModelType<IT extends IModelType<any, any>>(type: IT): type is IT {
+export function isModelType<IT extends IAnyModelType>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 

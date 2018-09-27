@@ -2,7 +2,6 @@ import {
     types,
     getSnapshot,
     unprotect,
-    IType,
     getRoot,
     getParent,
     SnapshotOrInstance,
@@ -255,7 +254,7 @@ test("types instances with compatible snapshots should not be interchangeable", 
         c.x = undefined
     }).not.toThrow()
     expect(() => {
-        ;(c as any).x = {}
+        c.x = cast({})
     }).not.toThrow()
     expect(() => {
         c.x = A.create()
@@ -386,6 +385,61 @@ test("it should type compose correctly", () => {
     x.drive()
     x.log("z")
 })
+test("it should extend {pre,post}ProcessSnapshot on compose", () => {
+    const CompositionTracker = types
+        .model({
+            composedOf: types.array(types.string),
+            composedWith: types.array(types.string)
+        })
+        .preProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedOf: (snapshot.composedOf || []).concat("CompositionTracker")
+        }))
+        .postProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedWith: (snapshot.composedWith || []).concat("WagonTracker")
+        }))
+    const Car = types
+        .model({})
+        .preProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedOf: ((snapshot as any).composedOf || []).concat("Car")
+        }))
+        .postProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedWith: ((snapshot as any).composedWith || []).concat("Wagon")
+        }))
+    const Logger = types
+        .model({})
+        .preProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedOf: ((snapshot as any).composedOf || []).concat("CarLogger")
+        }))
+        .postProcessSnapshot(snapshot => ({
+            ...snapshot,
+            composedWith: ((snapshot as any).composedWith || []).concat("WagonLogger")
+        }))
+
+    const LoggableCar = types
+        .compose(
+            CompositionTracker,
+            Car,
+            Logger
+        )
+        .props({
+            composedOf: types.array(types.string),
+            composedWith: types.array(types.string)
+        })
+    const x = LoggableCar.create({})
+    expect(x.composedOf).toContain("CompositionTracker")
+    expect(x.composedOf).toContain("Car")
+    expect(x.composedOf).toContain("CarLogger")
+    expect(x.composedOf).toEqual(["CompositionTracker", "Car", "CarLogger"])
+    expect(x.toJSON!().composedWith).toContain("WagonTracker")
+    expect(x.toJSON!().composedWith).toContain("Wagon")
+    expect(x.toJSON!().composedWith).toContain("WagonLogger")
+    expect(x.toJSON!().composedWith).toEqual(["WagonTracker", "Wagon", "WagonLogger"])
+})
 test("it should extend types correctly", () => {
     const Car = types
         .model({
@@ -434,31 +488,6 @@ test("self referring views", () => {
         return views
     })
     expect(Car.create().tripple).toBe(9)
-})
-
-test("Alternative typeof syntax #885", () => {
-    const Car = types
-        .model({
-            wheels: 3
-        })
-        .actions(self => {
-            function drive() {}
-            return {
-                drive
-            }
-        })
-
-    type TypeOf<T extends IType<any, any, any>> = T extends IType<any, any, infer T2> ? T2 : never
-    type SnapshotTypeOf<T extends IType<any, any, any>> = T extends IType<any, infer S, any>
-        ? S
-        : never
-    type CreationTypeOf<T extends IType<any, any, any>> = T extends IType<infer C, any, any>
-        ? C
-        : never
-
-    type CarT = TypeOf<typeof Car>
-    type Car2 = typeof Car.Type
-    type CarSnapshot = SnapshotTypeOf<typeof Car>
 })
 
 test("#922", () => {

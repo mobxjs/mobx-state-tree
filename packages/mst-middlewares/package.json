@@ -1,30 +1,35 @@
 {
     "name": "mst-middlewares",
-    "version": "3.2.4",
+    "version": "3.4.0",
     "description": "The MST package ships with some prebuilt middlewares, which serves mainly as examples on how to write your own middleware. The source of each middleware can be found in this github directory, you are encouraged to read them!",
     "main": "dist/mst-middlewares.js",
     "umd:main": "dist/mst-middlewares.umd.js",
     "module": "dist/mst-middlewares.module.js",
     "typings": "dist/index.d.ts",
     "scripts": {
-        "build-tests": "tsc -p test/",
-        "test": "yarn run build-tests && cross-env NODE_ENV=development ava && cross-env NODE_ENV=production ava",
-        "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && rollup -c"
+        "jest": "jest",
+        "test": "cross-env NODE_ENV=development yarn jest --ci && cross-env NODE_ENV=production yarn jest --ci",
+        "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && rollup -c",
+        "lint": "tslint -c ../../tslint.json 'src/**/*.ts'"
     },
     "author": "",
     "license": "MIT",
     "devDependencies": {
-        "ava": "^0.25.0",
+        "@types/jest": "^23.0.0",
+        "@types/node": "^10.0.0",
+        "babel-core": "^6.26.3",
+        "babel-jest": "^23.4.2",
         "cpr": "^3.0.1",
         "cross-env": "^5.1.1",
+        "jest": "^23.5.0",
         "lint-staged": "^7.0.0",
         "mobx": "^5.0.2",
-        "mobx-state-tree": "^3.2.4",
+        "mobx-state-tree": "^3.4.0",
         "rollup": "^0.65.0",
         "rollup-plugin-commonjs": "^9.0.0",
         "rollup-plugin-node-resolve": "^3.0.0",
-        "rollup-plugin-uglify": "^4.0.0",
-        "sinon": "^6.0.0",
+        "rollup-plugin-uglify": "^5.0.0",
+        "ts-jest": "^23.0.1",
         "typescript": "^2.9.2"
     },
     "peerDependencies": {
@@ -32,13 +37,5 @@
     },
     "files": [
         "dist/"
-    ],
-    "ava": {
-        "files": [
-            "test-lib/test/*.js"
-        ],
-        "source": [
-            "test-lib/src/**/*.js"
-        ]
-    }
+    ]
 }

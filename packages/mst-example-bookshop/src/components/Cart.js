@@ -7,7 +7,9 @@ const Cart = inject("shop")(
         <section className="Page-cart">
             <h2>Your cart</h2>
             <section className="Page-cart-items">
-                {cart.entries.map(entry => <CartEntry key={entry.book.id} entry={entry} />)}
+                {cart.entries.map(entry => (
+                    <CartEntry key={entry.book.id} entry={entry} />
+                ))}
             </section>
             <p>Subtotal: {cart.subTotal} €</p>
             {cart.hasDiscount && (
@@ -32,12 +34,14 @@ const CartEntry = inject("shop")(
                 <a href={`/book/${entry.book.id}`} onClick={onEntryClick.bind(entry, shop)}>
                     {entry.book.name}
                 </a>
+                <button onClick={() => entry.remove()}>Remove</button>
             </p>
             {!entry.book.isAvailable && (
                 <p>
                     <b>Not available anymore</b>
                 </p>
             )}
+
             <div className="Page-cart-item-details">
                 <p>
                     Amount:

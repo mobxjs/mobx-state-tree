@@ -6,7 +6,10 @@ import {
     getSnapshot,
     types,
     unprotect,
-    isStateTreeNode
+    isStateTreeNode,
+    SnapshotOut,
+    IJsonPatch,
+    IAnyModelType
 } from "../../src"
 
 const createTestFactories = () => {
@@ -44,7 +47,7 @@ test("it should emit snapshots", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let snapshots: any[] = []
+    let snapshots: SnapshotOut<typeof doc>[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
     doc.set("hello", ItemFactory.create())
     expect(snapshots).toEqual([{ hello: { to: "world" } }])
@@ -81,7 +84,7 @@ test("it should emit add patches", () => {
     const { Factory, ItemFactory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches: any[] = []
+    let patches: IJsonPatch[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.set("hello", ItemFactory.create({ to: "universe" }))
     expect(patches).toEqual([{ op: "add", path: "/hello", value: { to: "universe" } }])
@@ -97,7 +100,7 @@ test("it should emit update patches", () => {
     const doc = Factory.create()
     unprotect(doc)
     doc.set("hello", ItemFactory.create())
-    let patches: any[] = []
+    let patches: IJsonPatch[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.set("hello", ItemFactory.create({ to: "universe" }))
     expect(patches).toEqual([{ op: "replace", path: "/hello", value: { to: "universe" } }])
@@ -114,7 +117,7 @@ test("it should emit remove patches", () => {
     const doc = Factory.create()
     unprotect(doc)
     doc.set("hello", ItemFactory.create())
-    let patches: any[] = []
+    let patches: IJsonPatch[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.delete("hello")
     expect(patches).toEqual([{ op: "remove", path: "/hello" }])
@@ -376,9 +379,9 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
 })
 
 test("map can resolve late identifiers", () => {
-    const Late: any = types.model({
+    const Late = types.model({
         id: types.identifier,
-        children: types.map(types.late(() => Late))
+        children: types.map(types.late((): IAnyModelType => Late))
     })
     const snapshot = {
         id: "1",
@@ -417,7 +420,7 @@ test("get should return value when key is a number", () => {
     }
 
     todoStore.addTodo(todo)
-    expect(todoStore.todos.get(1 as any)!.title).toEqual("Test")
+    expect(todoStore.todos.get((1 as any) as string)!.title).toEqual("Test")
 })
 
 test("numeric keys should work", () => {
@@ -436,30 +439,30 @@ test("numeric keys should work", () => {
     unprotect(s)
 
     s.mies.set(7 as any, { id: "7" })
-    const i7 = s.mies.get(7 as any)!
+    const i7 = s.mies.get((7 as any) as string)!
     expect(i7.title).toBe("test")
     expect(s.mies.has("7")).toBeTruthy()
-    expect(s.mies.has(7 as any)).toBeTruthy()
+    expect(s.mies.has((7 as any) as string)).toBeTruthy()
     expect(s.mies.get("7")).toBeTruthy()
-    expect(s.mies.get(7 as any)).toBeTruthy()
+    expect(s.mies.get((7 as any) as string)).toBeTruthy()
 
     s.mies.set("8", { id: "8" })
     expect(s.mies.has("8")).toBeTruthy()
-    expect(s.mies.has(8 as any)).toBeTruthy()
+    expect(s.mies.has((8 as any) as string)).toBeTruthy()
     expect(s.mies.get("8")).toBeTruthy()
-    expect(s.mies.get(8 as any)).toBeTruthy()
+    expect(s.mies.get((8 as any) as string)).toBeTruthy()
 
     expect(Array.from(s.mies.keys())).toEqual(["7", "8"])
 
     s.mies.put({ id: "7", title: "coffee" })
     expect(s.mies.size).toBe(2)
     expect(s.mies.has("7")).toBeTruthy()
-    expect(s.mies.has(7 as any)).toBeTruthy()
+    expect(s.mies.has((7 as any) as string)).toBeTruthy()
     expect(s.mies.get("7")).toBeTruthy()
-    expect(s.mies.get(7 as any)).toBeTruthy()
+    expect(s.mies.get((7 as any) as string)).toBeTruthy()
     expect(i7.title).toBe("coffee")
 
-    expect(s.mies.delete(8 as any)).toBeTruthy()
+    expect(s.mies.delete((8 as any) as string)).toBeTruthy()
     expect(s.mies.size).toBe(1)
 })
 
@@ -505,10 +508,10 @@ test("#751 restore from snapshot should work", () => {
 
     // We add an item with a number id
     unprotect(server)
-    server.map.set(1 as any, { id: 1 })
+    server.map.set((1 as any) as string, { id: 1 })
 
     // We can access it using a number
-    expect(server.map.get(1 as any)!.id).toBe(1)
+    expect(server.map.get((1 as any) as string)!.id).toBe(1)
 
     // But if we get a snapshot...
     const snapshot = getSnapshot(server)
@@ -519,7 +522,7 @@ test("#751 restore from snapshot should work", () => {
     expect(server.map.get("1")!.id).toBe(1)
 
     // And as number
-    expect(server.map.get(1 as any)!.id).toBe(1)
+    expect(server.map.get((1 as any) as string)!.id).toBe(1)
 
     expect(server.map.size).toBe(1)
 })

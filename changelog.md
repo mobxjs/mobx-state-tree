@@ -1,6 +1,18 @@
-# 3.2.5
+# 3.4.0
 
+-   Added getPropertyMembers(typeOrNode) through [#1016](https://github.com/mobxjs/mobx-state-tree/pull/1016) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fix for preProcessSnapshot not copied on compose [#613](https://github.com/mobxjs/mobx-state-tree/issues/613) through [#1013](https://github.com/mobxjs/mobx-state-tree/pull/1013) by [@theRealScoobaSteve](https://github.com/theRealScoobaSteve)
+-   Fix for actions sometimes failing to resolve this to self through [#1014](https://github.com/mobxjs/mobx-state-tree/pull/1014) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fix for preProcessSnapshot not copied on compose [#613](https://github.com/mobxjs/mobx-state-tree/issues/613) through [#1013](https://github.com/mobxjs/mobx-state-tree/pull/1013) by [@theRealScoobaSteve](https://github.com/theRealScoobaSteve)
+-   Improvements to the bookshop example through [#1009](https://github.com/mobxjs/mobx-state-tree/pull/1009) by [@programmer4web](https://github.com/programmer4web)
+-   Fix for a regression with optional identifiers [#1019](https://github.com/mobxjs/mobx-state-tree/issues/1019) through [#1020](https://github.com/mobxjs/mobx-state-tree/pull/1020) by [@xaviergonz](https://github.com/xaviergonz)
+
+# 3.3.0
+
+-   Fix for references sometimes not intializing its parents [#993](https://github.com/mobxjs/mobx-state-tree/issues/993) through [#997](https://github.com/mobxjs/mobx-state-tree/pull/997) by [@xaviergonz](https://github.com/xaviergonz)
 -   Fix for TS3 issues with reference type [#994](https://github.com/mobxjs/mobx-state-tree/issues/994) through [#995](https://github.com/mobxjs/mobx-state-tree/pull/995) by [@xaviergonz](https://github.com/xaviergonz)
+-   types.optional will now throw if an instance is directly passed as default value [#1002](https://github.com/mobxjs/mobx-state-tree/issues/1002) through [#1003](https://github.com/mobxjs/mobx-state-tree/pull/1003) by [@xaviergonz](https://github.com/xaviergonz)
+-   Doc fixes and improvements by [@AjaxSolutions](https://github.com/AjaxSolutions) and [@agilgur5](https://github.com/agilgur5)
 
 # 3.2.4
 

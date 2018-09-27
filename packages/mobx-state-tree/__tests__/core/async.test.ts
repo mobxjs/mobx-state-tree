@@ -4,7 +4,10 @@ import {
     recordActions,
     flow,
     decorate,
-    destroy
+    destroy,
+    IMiddlewareHandler,
+    IMiddlewareEvent,
+    IMiddlewareEventType
     // TODO: export IRawActionCall
 } from "../../src"
 import { reaction, configure } from "mobx"
@@ -33,7 +36,7 @@ function testCoffeeTodo(
         .actions(self => ({
             startFetch: flow(generator(self)) as (str: string) => Promise<string>
         }))
-    const events: any[] = []
+    const events: IMiddlewareEvent[] = []
     const coffees: any[] = []
     const t1 = Todo.create({})
     addMiddleware(t1, (c, next) => {
@@ -75,7 +78,7 @@ test("flow happens in single ticks", done => {
             })
         }))
     const x = X.create()
-    const values: any[] = []
+    const values: number[] = []
     reaction(() => x.y, v => values.push(v))
     x.p().then(() => {
         expect(x.y).toBe(5)
@@ -148,26 +151,22 @@ test("can handle throw from yielded promise works", t => {
     )
 })
 test("typings", done => {
-    const M = types
-        .model({
-            title: types.string
+    const M = types.model({ title: types.string }).actions(self => {
+        function* a(x: string) {
+            yield delay(10, "x", false)
+            self.title = "7"
+            return 23
+        }
+        // tslint:disable-next-line:no-shadowed-variable
+        const b = flow(function* b(x: string) {
+            yield delay(10, "x", false)
+            self.title = "7"
+            return 24
         })
-        .actions(self => {
-            function* a(x: string) {
-                yield delay(10, "x", false)
-                self.title = "7"
-                return 23
-            }
-            // tslint:disable-next-line:no-shadowed-variable
-            const b = flow(function* b(x: string) {
-                yield delay(10, "x", false)
-                self.title = "7"
-                return 24
-            })
-            return { a: flow(a), b }
-        })
+        return { a: flow(a), b }
+    })
     const m1 = M.create({ title: "test " })
-    const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
+    const resA = m1.a("z") // Arg typings are correct. TODO: Result is correctly promise, but incorrect generic arg
     const resB = m1.b("z") // Arg typings are correct, TODO: Result is correctly promise, but incorrect generic arg
     Promise.all([resA, resB]).then(([x1, x2]) => {
         expect(x1).toBe(23)
@@ -176,26 +175,22 @@ test("typings", done => {
     })
 })
 test("typings", done => {
-    const M = types
-        .model({
-            title: types.string
+    const M = types.model({ title: types.string }).actions(self => {
+        function* a(x: string) {
+            yield delay(10, "x", false)
+            self.title = "7"
+            return 23
+        }
+        // tslint:disable-next-line:no-shadowed-variable
+        const b = flow(function* b(x: string) {
+            yield delay(10, "x", false)
+            self.title = "7"
+            return 24
         })
-        .actions(self => {
-            function* a(x: string) {
-                yield delay(10, "x", false)
-                self.title = "7"
-                return 23
-            }
-            // tslint:disable-next-line:no-shadowed-variable
-            const b = flow(function* b(x: string) {
-                yield delay(10, "x", false)
-                self.title = "7"
-                return 24
-            })
-            return { a: flow(a), b }
-        })
+        return { a: flow(a), b }
+    })
     const m1 = M.create({ title: "test " })
-    const resA = m1.a("z") // Arg typings are correct. TODO: Result type is incorrect; any
+    const resA = m1.a("z") // Arg typings are correct. TODO: Result is correctly promise, but incorrect generic arg
     const resB = m1.b("z") // Arg typings are correct, TODO: Result is correctly promise, but incorrect generic arg
     Promise.all([resA, resB]).then(([x1, x2]) => {
         expect(x1).toBe(23)
@@ -257,8 +252,8 @@ test("can handle nested async actions", t => {
     )
 })
 test("can handle nested async actions when using decorate", done => {
-    const events: any[] = []
-    function middleware(call: any, next: any) {
+    const events: [IMiddlewareEventType, string][] = []
+    const middleware: IMiddlewareHandler = (call, next) => {
         events.push([call.type, call.name])
         return next(call)
     }

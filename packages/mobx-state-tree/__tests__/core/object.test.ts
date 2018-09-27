@@ -10,7 +10,11 @@ import {
     getSnapshot,
     unprotect,
     types,
-    setLivelynessChecking
+    setLivelynessChecking,
+    getParent,
+    SnapshotOut,
+    IJsonPatch,
+    ISerializedActionCall
 } from "../../src"
 
 import { autorun, reaction, observable } from "mobx"
@@ -110,7 +114,7 @@ test("it should emit snapshots", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let snapshots: any[] = []
+    let snapshots: SnapshotOut<typeof doc>[] = []
     onSnapshot(doc, snapshot => snapshots.push(snapshot))
     doc.to = "universe"
     expect(snapshots).toEqual([{ to: "universe" }])
@@ -129,8 +133,8 @@ test("it should emit snapshots for children", () => {
             }
         ]
     })
-    let snapshotsP: any[] = []
-    let snapshotsC: any[] = []
+    let snapshotsP: SnapshotOut<typeof folder>[] = []
+    let snapshotsC: SnapshotOut<typeof folder.files[0]>[] = []
     onSnapshot(folder, snapshot => snapshotsP.push(snapshot))
     folder.rename("Vacation photos")
     expect(snapshotsP[0]).toEqual({
@@ -195,7 +199,7 @@ test("it should emit patches", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches: any[] = []
+    let patches: IJsonPatch[] = []
     onPatch(doc, patch => patches.push(patch))
     doc.to = "universe"
     expect(patches).toEqual([{ op: "replace", path: "/to", value: "universe" }])
@@ -219,7 +223,7 @@ test("it should stop listening to patches patches", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
     unprotect(doc)
-    let patches: any[] = []
+    let patches: IJsonPatch[] = []
     let disposer = onPatch(doc, patch => patches.push(patch))
     doc.to = "universe"
     disposer()
@@ -236,7 +240,7 @@ test("it should call actions correctly", () => {
 test("it should emit action calls", () => {
     const { Factory } = createTestFactories()
     const doc = Factory.create()
-    let actions: any[] = []
+    let actions: ISerializedActionCall[] = []
     onAction(doc, action => actions.push(action))
     doc.setTo("universe")
     expect(actions).toEqual([{ name: "setTo", path: "", args: ["universe"] }])
@@ -541,7 +545,7 @@ test("view functions should be tracked", () => {
         }))
         .create()
     unprotect(model)
-    const values: any[] = []
+    const values: number[] = []
     const d = autorun(() => {
         values.push(model.doubler())
     })
@@ -667,7 +671,7 @@ test("it should be possible to share states between views and actions using enha
     d()
 })
 test("It should throw if any other key is returned from extend", () => {
-    const A = types.model({}).extend(() => ({ stuff() {} } as any)) // TODO: fix typing
+    const A = types.model({}).extend(() => ({ stuff() {} } as any))
     expect(() => A.create()).toThrowError(/stuff/)
 })
 
@@ -754,4 +758,195 @@ test("#967 - changing values in afterCreate/afterAttach when node is instantiate
 
     // tslint:disable-next-line:no-unused-expression
     product.selectedAnswers
+})
+
+test("#993-1 - after attach should have a parent when accesing a reference directly", () => {
+    const L4 = types
+        .model("Todo", {
+            id: types.identifier,
+            finished: false
+        })
+        .actions(self => ({
+            afterAttach() {
+                expect(getParent(self)).toBeTruthy()
+            }
+        }))
+
+    const L3 = types.model({ l4: L4 }).actions(self => ({
+        afterAttach() {
+            expect(getParent(self)).toBeTruthy()
+        }
+    }))
+
+    const L2 = types
+        .model({
+            l3: L3
+        })
+        .actions(self => ({
+            afterAttach() {
+                expect(getParent(self)).toBeTruthy()
+            }
+        }))
+
+    const L1 = types
+        .model({
+            l2: L2,
+            selected: types.reference(L4)
+        })
+        .actions(self => ({
+            afterAttach() {
+                fail("should never be called")
+            }
+        }))
+
+    const createL1 = () =>
+        L1.create({
+            l2: {
+                l3: {
+                    l4: {
+                        id: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+                    }
+                }
+            },
+            selected: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+        })
+
+    // test 1, real child first
+    {
+        const l1 = createL1()
+
+        const a = l1.l2.l3.l4
+        const b = l1.selected
+    }
+
+    // test 2, reference first
+    {
+        const l1 = createL1()
+
+        const a = l1.selected
+        const b = l1.l2.l3.l4
+    }
+})
+
+test("#993-2 - references should have a parent event when the parent has not been accesed before", () => {
+    const events: string[] = []
+
+    const L4 = types
+        .model("Todo", {
+            id: types.identifier,
+            finished: false
+        })
+        .actions(self => ({
+            toggle() {
+                self.finished = !self.finished
+            },
+            afterCreate() {
+                events.push("l4-ac")
+            },
+            afterAttach() {
+                events.push("l4-at")
+            }
+        }))
+
+    const L3 = types.model({ l4: L4 }).actions(self => ({
+        afterCreate() {
+            events.push("l3-ac")
+        },
+        afterAttach() {
+            events.push("l3-at")
+        }
+    }))
+
+    const L2 = types
+        .model({
+            l3: L3
+        })
+        .actions(self => ({
+            afterCreate() {
+                events.push("l2-ac")
+            },
+            afterAttach() {
+                events.push("l2-at")
+            }
+        }))
+
+    const L1 = types
+        .model({
+            l2: L2,
+            selected: types.reference(L4)
+        })
+        .actions(self => ({
+            afterCreate() {
+                events.push("l1-ac")
+            },
+            afterAttach() {
+                events.push("l1-at")
+            }
+        }))
+
+    const createL1 = () =>
+        L1.create({
+            l2: {
+                l3: {
+                    l4: {
+                        id: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+                    }
+                }
+            },
+            selected: "11124091-11c1-4dda-b2ed-7dd6323491a5"
+        })
+
+    const expectedEvents = [
+        "l1-ac",
+        "l2-ac",
+        "l2-at",
+        "l3-ac",
+        "l3-at",
+        "l4-ac",
+        "l4-at",
+        "onSnapshot",
+        "onSnapshot"
+    ]
+
+    // test 1, real child first
+    {
+        const l1 = createL1()
+        onSnapshot(l1, () => {
+            events.push("onSnapshot")
+        })
+
+        l1.l2.l3.l4.toggle()
+        l1.selected.toggle()
+        expect(events).toEqual(expectedEvents)
+    }
+
+    // test 2, reference first
+    events.length = 0
+    {
+        const l1 = createL1()
+        onSnapshot(l1, () => {
+            events.push("onSnapshot")
+        })
+
+        l1.selected.toggle()
+        l1.l2.l3.l4.toggle()
+        expect(events).toEqual(expectedEvents)
+    }
+
+    // test 3, reference get parent should be available from the beginning and all the way to the root
+    {
+        const rootL1 = createL1()
+        const l4 = rootL1.selected
+        const l3 = getParent(l4)
+        expect(l3).toBeTruthy()
+        const l2 = getParent(l3)
+        expect(l2).toBeTruthy()
+        const l1 = getParent(l2)
+        expect(l1).toBeTruthy()
+
+        expect(l1).toBe(rootL1)
+        expect(l2).toBe(rootL1.l2)
+        expect(l3).toBe(rootL1.l2.l3)
+        expect(l4).toBe(rootL1.l2.l3.l4)
+    }
 })
