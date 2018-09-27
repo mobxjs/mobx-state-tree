@@ -724,14 +724,26 @@ test("#967 - changing values in afterCreate/afterAttach when node is instantiate
         }))
     const Question = types
         .model("Question", { title: types.string, answers: types.array(Answer) })
+        .views(self => ({
+            get brokenView() {
+                // this should not be allowed
+                expect(() => {
+                    self.answers[0].toggle()
+                }).toThrow()
+                return 0
+            }
+        }))
         .actions(self => ({
             afterCreate() {
                 // we should allow changes even when inside a computed property when done inside afterCreate/afterAttach
                 self.answers[0].toggle()
+                // but not further computed changes
+                expect(self.brokenView).toBe(0)
             },
             afterAttach() {
                 // we should allow changes even when inside a computed property when done inside afterCreate/afterAttach
                 self.answers[0].toggle()
+                expect(self.brokenView).toBe(0)
             }
         }))
 

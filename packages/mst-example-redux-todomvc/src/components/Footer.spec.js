@@ -1,5 +1,5 @@
 import React from "react"
-import TestUtils from "react-dom/test-utils"
+import ShallowRenderer from "react-test-renderer/shallow"
 import Footer from "./Footer"
 import { SHOW_ALL, SHOW_ACTIVE } from "../constants/TodoFilters"
 
@@ -15,7 +15,7 @@ const setup = propOverrides => {
         propOverrides
     )
 
-    const renderer = TestUtils.createRenderer()
+    const renderer = new ShallowRenderer()
     renderer.render(<Footer {...props} />)
     const output = renderer.getRenderOutput()
 

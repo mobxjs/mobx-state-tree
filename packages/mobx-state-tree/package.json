@@ -14,7 +14,7 @@
         "test": "cross-env NODE_ENV=development yarn jest --ci && cross-env NODE_ENV=production yarn jest --ci && yarn run test:cyclic && yarn run test:mobx4",
         "test:perf": "yarn build && yarn jest:perf && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register __tests__/perf/report.ts",
         "test:cyclic": "yarn run build && node -e \"require('.')\"",
-        "test:mobx4": "yarn add -D mobx@4.3.1 && yarn build && yarn jest --ci && git checkout package.json ../../yarn.lock && yarn install",
+        "test:mobx4": "yarn add -D mobx@4.5.0 && yarn build && yarn jest --ci && git checkout package.json ../../yarn.lock && yarn install",
         "_prepublish": "yarn run build && yarn run build-docs",
         "coverage": "yarn jest --coverage",
         "lint-docs": "tsc && documentation lint lib/index.js",
@@ -39,19 +39,18 @@
         "babel-core": "^6.26.3",
         "babel-jest": "^23.4.2",
         "concat": "^1.0.3",
-        "concurrently": "^3.6.0",
         "coveralls": "^3.0.0",
         "cpr": "^3.0.0",
         "cross-env": "^5.1.1",
         "documentation": "^8.0.0",
         "jest": "^23.4.0",
-        "mobx": "^5.0.3",
-        "rollup": "^0.65.0",
+        "mobx": "^5.5.0",
+        "rollup": "^0.66.0",
         "rollup-plugin-commonjs": "^9.0.0",
         "rollup-plugin-filesize": "^4.0.0",
         "rollup-plugin-node-resolve": "^3.0.0",
         "rollup-plugin-replace": "^2.0.0",
-        "rollup-plugin-uglify": "^4.0.0",
+        "rollup-plugin-uglify": "^6.0.0",
         "shx": "^0.3.2",
         "ts-jest": "^23.0.1",
         "ts-node": "^7.0.0",
@@ -59,7 +58,7 @@
         "typescript": "^2.9.2"
     },
     "peerDependencies": {
-        "mobx": "^4.3.1 || ^5.0.3"
+        "mobx": ">=4.5.0 <5.0.0 || >=5.5.0 <6.0.0"
     },
     "keywords": [
         "mobx",

@@ -1,5 +1,5 @@
 import React from "react"
-import TestUtils from "react-dom/test-utils"
+import ShallowRenderer from "react-test-renderer/shallow"
 import MainSection from "./MainSection"
 import TodoItem from "./TodoItem"
 import Footer from "./Footer"
@@ -31,7 +31,7 @@ const setup = propOverrides => {
         propOverrides
     )
 
-    const renderer = TestUtils.createRenderer()
+    const renderer = new ShallowRenderer()
     renderer.render(<MainSection {...props} />)
     const output = renderer.getRenderOutput()
 

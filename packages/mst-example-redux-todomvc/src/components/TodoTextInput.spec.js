@@ -1,5 +1,5 @@
 import React from "react"
-import TestUtils from "react-dom/test-utils"
+import ShallowRenderer from "react-test-renderer/shallow"
 import TodoTextInput from "./TodoTextInput"
 
 const setup = propOverrides => {
@@ -14,7 +14,7 @@ const setup = propOverrides => {
         propOverrides
     )
 
-    const renderer = TestUtils.createRenderer()
+    const renderer = new ShallowRenderer()
 
     renderer.render(<TodoTextInput {...props} />)
 
