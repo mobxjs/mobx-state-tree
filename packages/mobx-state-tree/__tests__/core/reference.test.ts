@@ -475,9 +475,9 @@ test("References are non-nullable by default", () => {
         expect(() => store.ref).toThrow(
             "[mobx-state-tree] Failed to resolve reference '4' to type 'AnonymousModel' (from node: /ref)"
         )
-        store.maybeRef = cast(3) // valid assignment
+        store.maybeRef = 3 as any // valid assignment
         expect(store.maybeRef).toBe(store.todo)
-        store.maybeRef = cast(4) // valid assignment
+        store.maybeRef = 4 as any // valid assignment
         expect(() => store.maybeRef).toThrow(
             "[mobx-state-tree] Failed to resolve reference '4' to type 'AnonymousModel' (from node: /maybeRef)"
         )
@@ -748,11 +748,11 @@ test("should serialize references correctly", () => {
     })
     expect(Array.from(s.mies.keys())).toEqual(["7", "8"])
 
-    s.ref = cast(8)
+    s.ref = 8 as any
     expect(s.ref!.id).toBe(8) // resolved from number
     expect(getSnapshot(s).ref).toBe(8) // ref serialized as number
 
-    s.ref = cast("7") // resolved from string
+    s.ref = "7" as any // resolved from string
     expect(s.ref!.id).toBe(7) // resolved from string
     expect(getSnapshot(s).ref).toBe("7") // ref serialized as string (number would be ok as well)
 
@@ -760,7 +760,7 @@ test("should serialize references correctly", () => {
     expect(s.ref.id).toBe(8) // resolved from instance
     expect(getSnapshot(s).ref).toBe(8) // ref serialized as number
 
-    s.ref = cast("9") // unresolvable
+    s.ref = "9" as any // unresolvable
     expect(getSnapshot(s).ref).toBe("9") // snapshot preserved as it was unresolvable
 
     s.mies.set(9 as any, {
