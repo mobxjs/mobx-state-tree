@@ -870,7 +870,7 @@ export function cast<T extends IAnyStateTreeNode>(instance: T): T
  * }))
  *
  * @export
- * @param {CastedType<T>} snapshotOrInstance
+ * @param snapshotOrInstance
  * @returns {T}
  */
 export function cast<T extends never>(snapshotOrInstance: T): never {
