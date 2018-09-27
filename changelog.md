@@ -1,3 +1,8 @@
+# next
+
+-   Requires mobx >=5.5.0 / >=4.5.0
+-   Fix for afterCreate/afterAttach sometimes throwing an exception when a node was created as part of a view/computed property [#967](https://github.com/mobxjs/mobx-state-tree/issues/967) through [#1026](https://github.com/mobxjs/mobx-state-tree/pull/1026) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.4.0
 
 -   Added getPropertyMembers(typeOrNode) through [#1016](https://github.com/mobxjs/mobx-state-tree/pull/1016) by [@xaviergonz](https://github.com/xaviergonz)
