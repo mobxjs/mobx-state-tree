@@ -57,9 +57,17 @@ export interface IMSTMap<C, S, T> {
     forEach(callbackfn: (value: T, key: string, map: IMSTMap<C, S, T>) => void, thisArg?: any): void
     get(key: string): T | undefined
     has(key: string): boolean
-    set(key: string, value: C | S | T): this
+
+    // the method needs separate overrides for cast to work properly
+    set(key: string, value: T): this
+    set(key: string, value: C | S): this
+
     readonly size: number
-    put(value: C | S | T): T
+
+    // the method needs separate overrides for cast to work properly
+    put(value: T): T
+    put(value: C | S): T
+
     keys(): IterableIterator<string>
     values(): IterableIterator<T>
     entries(): IterableIterator<[string, T]>

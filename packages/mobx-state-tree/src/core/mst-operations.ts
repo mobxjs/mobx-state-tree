@@ -835,14 +835,21 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     return reflected
 }
 
-export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
-
+// the order matters!
+// instance to snapshot
+export function cast<T extends IStateTreeNode<C, S>, C, S>(instance: T): S
+// snapshot to instance
+export function cast<T extends IStateTreeNode<C, S>, C, S>(snapshot: C): T
+// snapshot to instance
+export function cast<T extends IStateTreeNode<C, S>, C, S>(snapshot: S): T
+// instance to instance
+export function cast<T extends IAnyStateTreeNode>(instance: T): T
 /**
  * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
  * Alternatively also casts a node snapshot or instance to an snapshot type so it can be assigned to a type snapshot.
  * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance
  * (or vice-versa), but just fool typescript into thinking so.
- * Casting only works on assignation operations, it won't work (compile) stand-alone.
+ * Casting only works on assignation operations, it will yield an object with no properties otherwise.
  *
  * @example
  * const ModelA = types.model({
@@ -863,9 +870,9 @@ export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
  * }))
  *
  * @export
- * @param {CastedType<T>} snapshotOrInstance
+ * @param snapshotOrInstance
  * @returns {T}
  */
-export function cast<T = never>(snapshotOrInstance: CastedType<T>): T {
-    return snapshotOrInstance as T
+export function cast<T extends never>(snapshotOrInstance: T): never {
+    return snapshotOrInstance as never
 }

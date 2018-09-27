@@ -1,3 +1,7 @@
+# next
+
+-   Fix for cast in Typescript 3.1.1 through [#1027](https://github.com/mobxjs/mobx-state-tree/pull/1027) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.4.0
 
 -   Added getPropertyMembers(typeOrNode) through [#1016](https://github.com/mobxjs/mobx-state-tree/pull/1016) by [@xaviergonz](https://github.com/xaviergonz)

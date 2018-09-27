@@ -651,24 +651,30 @@ test("cast and SnapshotOrInstance", () => {
     const NumberArray = types.array(types.number)
     const NumberMap = types.map(types.number)
     const A = types
-        .model({ n: 123, n2: types.number, arr: NumberArray, map: NumberMap })
+        .model({
+            n: 123,
+            n2: types.number,
+            arr: NumberArray,
+            map: NumberMap
+        })
         .actions(self => ({
+            // Not applicable anymore since TS 3.1.1
             // for primitives (although not needed)
-            setN(nn: SnapshotOrInstance<typeof self.n>) {
-                self.n = cast(nn)
-            },
-            setN2(nn: SnapshotOrInstance<typeof types.number>) {
-                self.n = cast(nn)
-            },
-            setN3(nn: SnapshotOrInstance<number>) {
-                self.n = cast(nn)
-            },
-            setN4(nn: number) {
-                self.n = cast(nn)
-            },
-            setN5() {
-                self.n = cast(5)
-            },
+            // setN(nn: SnapshotOrInstance<typeof self.n>) {
+            //     self.n = cast(nn)
+            // },
+            // setN2(nn: SnapshotOrInstance<typeof types.number>) {
+            //     self.n = cast(nn)
+            // },
+            // setN3(nn: SnapshotOrInstance<number>) {
+            //     self.n = cast(nn)
+            // },
+            // setN4(nn: number) {
+            //     self.n = cast(nn)
+            // },
+            // setN5() {
+            //     self.n = cast(5)
+            // },
 
             // for arrays
             setArr(nn: SnapshotOrInstance<typeof self.arr>) {
@@ -698,51 +704,92 @@ test("cast and SnapshotOrInstance", () => {
             },
             setMap4() {
                 // it works even without specifying the target type, magic!
-                self.map = cast({ a: 2, b: 3 })
-                self.map = cast(NumberMap.create({ a: 2, b: 3 }))
+                self.map = cast({
+                    a: 2,
+                    b: 3
+                })
+                self.map = cast(
+                    NumberMap.create({
+                        a: 2,
+                        b: 3
+                    })
+                )
             }
         }))
 
-    const C = types.model({ a: A }).actions(self => ({
-        // for submodels, using typeof self.var
-        setA(na: SnapshotOrInstance<typeof self.a>) {
-            self.a = cast(na)
-        },
-        // for submodels, using the type directly
-        setA2(na: SnapshotOrInstance<typeof A>) {
-            self.a = cast(na)
-        },
-        setA3(na: SnapshotIn<typeof A>) {
-            self.a = cast(na)
-        },
-        setA4(na: Instance<typeof self.a>) {
-            self.a = cast(na)
-        },
-        setA5() {
-            // it works even without specifying the target type, magic!
-            self.a = cast({ n2: 5 })
-            self.a = cast(A.create({ n2: 5 }))
-        }
-    }))
+    const C = types
+        .model({
+            a: A
+        })
+        .actions(self => ({
+            // for submodels, using typeof self.var
+            setA(na: SnapshotOrInstance<typeof self.a>) {
+                self.a = cast(na)
+            },
+            // for submodels, using the type directly
+            setA2(na: SnapshotOrInstance<typeof A>) {
+                self.a = cast(na)
+            },
+            setA3(na: SnapshotIn<typeof A>) {
+                self.a = cast(na)
+            },
+            setA4(na: Instance<typeof self.a>) {
+                self.a = cast(na)
+            },
+            setA5() {
+                // it works even without specifying the target type, magic!
+                self.a = cast({
+                    n2: 5
+                })
+                self.a = cast(
+                    A.create({
+                        n2: 5
+                    })
+                )
+            }
+        }))
 
-    const c = C.create({ a: { n2: 5 } })
+    const c = C.create({
+        a: {
+            n2: 5
+        }
+    })
     unprotect(c)
     // all below works
-    c.setA({ n2: 5 })
-    c.setA(A.create({ n2: 5 }))
-    c.setA2({ n2: 5 })
-    c.setA2(A.create({ n2: 5 }))
-    c.setA3({ n2: 5 })
+    c.setA({
+        n2: 5
+    })
+    c.setA(
+        A.create({
+            n2: 5
+        })
+    )
+    c.setA2({
+        n2: 5
+    })
+    c.setA2(
+        A.create({
+            n2: 5
+        })
+    )
+    c.setA3({
+        n2: 5
+    })
     // c.setA3(A.create({ n2: 5 })) // this one doesn't work (as expected, it wants the creation type)
     // c.setA4({n2: 5}) // this one doesn't work (as expected, it wants the instance type)
-    c.setA4(A.create({ n2: 5 }))
+    c.setA4(
+        A.create({
+            n2: 5
+        })
+    )
     c.setA5()
 
-    c.a.setN(1)
-    c.a.setN2(1)
-    c.a.setN3(1)
-    c.a.setN4(1)
-    c.a.setN5()
+    // Not applicable anymore since TS 3.1.1
+    // c.a.setN(1)
+    // c.a.setN2(1)
+    // c.a.setN3(1)
+    // c.a.setN4(1)
+    // c.a.setN5()
 
     c.a.setArr([])
     c.a.setArr(NumberArray.create([]))
@@ -752,30 +799,55 @@ test("cast and SnapshotOrInstance", () => {
     c.a.setArr3(NumberArray.create([]))
     c.a.setArr4()
 
-    c.a.setMap({ a: 2, b: 3 })
-    c.a.setMap(NumberMap.create({ a: 2, b: 3 }))
-    c.a.setMap2({ a: 2, b: 3 })
-    c.a.setMap2(NumberMap.create({ a: 2, b: 3 }))
-    c.a.setMap3({ a: 2, b: 3 })
+    c.a.setMap({
+        a: 2,
+        b: 3
+    })
+    c.a.setMap(
+        NumberMap.create({
+            a: 2,
+            b: 3
+        })
+    )
+    c.a.setMap2({
+        a: 2,
+        b: 3
+    })
+    c.a.setMap2(
+        NumberMap.create({
+            a: 2,
+            b: 3
+        })
+    )
+    c.a.setMap3({
+        a: 2,
+        b: 3
+    })
     // c.a.setMap3(NumberMap.create({ a: 2, b: 3 })) // doesn't work (as expected, wants a plain object)
     c.a.setMap4()
 
     const arr = types.array(A).create()
     unprotect(arr)
-    arr[0] = cast({ n2: 5 })
+    arr[0] = cast({
+        n2: 5
+    })
 
     const map = types.map(A).create()
     unprotect(map)
-    map.set("a", cast({ n2: 5 })) // not really needed in this case, but whatever :)
+    map.set(
+        "a",
+        cast({
+            n2: 5
+        })
+    ) // not really needed in this case, but whatever :)
 
-    // and the best part, it actually doesn't work outside assignments :DDDD
-    // all this fails to compile
-    // cast([])
-    // cast({a:5})
-    // cast(NumberArray.create([]))
-    // cast(A.create({n2: 5}))
-    // cast({a: 2, b: 5})
-    // cast(NumberMap({a: 2, b: 3}))
+    // although this compiles, it yields an empty type without any properties
+    cast([])
+    cast({ a: 5 })
+    cast(NumberArray.create([]))
+    cast(A.create({ n2: 5 }))
+    cast({ a: 2, b: 5 })
+    cast(NumberMap.create({ a: 2, b: 3 }))
 })
 
 test("#994", () => {
