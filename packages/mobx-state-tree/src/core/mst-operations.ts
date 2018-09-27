@@ -842,7 +842,7 @@ export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
  * Alternatively also casts a node snapshot or instance to an snapshot type so it can be assigned to a type snapshot.
  * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance
  * (or vice-versa), but just fool typescript into thinking so.
- * Casting only works on assignation operations, it won't work (compile) stand-alone.
+ * Either way, casting when outside an assignation operation will only yield an unusable type (never).
  *
  * @example
  * const ModelA = types.model({
@@ -866,6 +866,6 @@ export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
  * @param {CastedType<T>} snapshotOrInstance
  * @returns {T}
  */
-export function cast<T = never>(snapshotOrInstance: CastedType<T>): T {
-    return snapshotOrInstance as T
+export function cast<T = never, C = CastedType<T>>(snapshotOrInstance: C): T {
+    return snapshotOrInstance as any
 }
