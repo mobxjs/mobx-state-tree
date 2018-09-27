@@ -768,14 +768,13 @@ test("cast and SnapshotOrInstance", () => {
     unprotect(map)
     map.set("a", cast({ n2: 5 })) // not really needed in this case, but whatever :)
 
-    // and the best part, it actually doesn't work outside assignments :DDDD
-    // all this fails to compile
-    // cast([])
-    // cast({a:5})
-    // cast(NumberArray.create([]))
-    // cast(A.create({n2: 5}))
-    // cast({a: 2, b: 5})
-    // cast(NumberMap({a: 2, b: 3}))
+    // although this compiles, it yields a never type
+    cast([])
+    cast({ a: 5 })
+    cast(NumberArray.create([]))
+    cast(A.create({ n2: 5 }))
+    cast({ a: 2, b: 5 })
+    cast(NumberMap.create({ a: 2, b: 3 }))
 })
 
 test("#994", () => {
