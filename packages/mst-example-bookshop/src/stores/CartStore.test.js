@@ -10,7 +10,10 @@ const testBook = {
     id: "1",
     price: 3,
     author: "test",
-    name: "test"
+    name: "test",
+    sequence_i: 0,
+    genre_s: "action",
+    pages_i: 100
 }
 
 it("cart store can add new entries", () => {

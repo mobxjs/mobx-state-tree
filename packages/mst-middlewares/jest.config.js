@@ -6,5 +6,10 @@ module.exports = {
         "^.+\\.jsx?$": "babel-jest"
     },
     testRegex: ".*\\.test\\.tsx?$",
-    moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"]
+    moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
+    globals: {
+        "ts-jest": {
+            tsConfig: "__tests__/tsconfig.json"
+        }
+    }
 }

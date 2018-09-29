@@ -711,6 +711,67 @@ if (process.env.NODE_ENV === "development")
         )
     })
 
+test("#967 - changing values in afterCreate/afterAttach when node is instantiated from view", () => {
+    const Answer = types
+        .model("Answer", {
+            title: types.string,
+            selected: false
+        })
+        .actions(self => ({
+            toggle() {
+                self.selected = !self.selected
+            }
+        }))
+    const Question = types
+        .model("Question", { title: types.string, answers: types.array(Answer) })
+        .views(self => ({
+            get brokenView() {
+                // this should not be allowed
+                expect(() => {
+                    self.answers[0].toggle()
+                }).toThrow()
+                return 0
+            }
+        }))
+        .actions(self => ({
+            afterCreate() {
+                // we should allow changes even when inside a computed property when done inside afterCreate/afterAttach
+                self.answers[0].toggle()
+                // but not further computed changes
+                expect(self.brokenView).toBe(0)
+            },
+            afterAttach() {
+                // we should allow changes even when inside a computed property when done inside afterCreate/afterAttach
+                self.answers[0].toggle()
+                expect(self.brokenView).toBe(0)
+            }
+        }))
+
+    const Product = types
+        .model("Product", {
+            questions: types.array(Question)
+        })
+        .views(self => ({
+            get selectedAnswers() {
+                const result = []
+                for (const question of self.questions) {
+                    result.push(question.answers.find(a => a.selected))
+                }
+                return result
+            }
+        }))
+
+    const product = Product.create({
+        questions: [
+            { title: "Q 0", answers: [{ title: "A 0.0" }, { title: "A 0.1" }] },
+            { title: "Q 1", answers: [{ title: "A 1.0" }, { title: "A 1.1" }] }
+        ]
+    })
+
+    // tslint:disable-next-line:no-unused-expression
+    product.selectedAnswers
+})
+
 test("#993-1 - after attach should have a parent when accesing a reference directly", () => {
     const L4 = types
         .model("Todo", {

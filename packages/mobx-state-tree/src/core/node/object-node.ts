@@ -1,5 +1,12 @@
 // noinspection ES6UnusedImports
-import { action, computed, createAtom, reaction, IAtom } from "mobx"
+import {
+    action,
+    computed,
+    createAtom,
+    reaction,
+    IAtom,
+    _allowStateChangesInsideComputed
+} from "mobx"
 import {
     addHiddenFinalProp,
     addReadOnlyProp,
@@ -263,7 +270,16 @@ export class ObjectNode implements INode {
     fireHook(name: string) {
         const fn =
             this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
-        if (typeof fn === "function") fn.apply(this.storedValue)
+        if (typeof fn === "function") {
+            // we check for it to allow old mobx peer dependencies that don't have the method to work (even when still bugged)
+            if (_allowStateChangesInsideComputed) {
+                _allowStateChangesInsideComputed(() => {
+                    fn.apply(this.storedValue)
+                })
+            } else {
+                fn.apply(this.storedValue)
+            }
+        }
     }
 
     public createObservableInstanceIfNeeded() {
