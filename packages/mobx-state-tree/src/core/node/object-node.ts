@@ -271,9 +271,14 @@ export class ObjectNode implements INode {
         const fn =
             this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
         if (typeof fn === "function") {
-            _allowStateChangesInsideComputed(() => {
+            // we check for it to allow old mobx peer dependencies that don't have the method to work (even when still bugged)
+            if (_allowStateChangesInsideComputed) {
+                _allowStateChangesInsideComputed(() => {
+                    fn.apply(this.storedValue)
+                })
+            } else {
                 fn.apply(this.storedValue)
-            })
+            }
         }
     }
 
