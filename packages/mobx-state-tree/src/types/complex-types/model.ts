@@ -744,7 +744,7 @@ export function compose(...args: any[]): any {
     // check all parameters
     if (process.env.NODE_ENV !== "production") {
         args.forEach(type => {
-            if (!isType(type)) fail("expected a mobx-state-tree type, got " + type + " instead")
+            if (!isModelType(type)) fail("expected a mobx-state-tree model type, got " + type + " instead")
         })
     }
     return (args as ModelType<any, any>[])
