@@ -79,6 +79,28 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
         true
     )
 
+    // Fix for issue #750
+    //
+    // By only hooking into the 'onAction' notification, the Redux middleware
+    // was handling flow (async) actions at their beginning, where the state
+    // has not changed yet. So we define another middleware to intercept
+    // "flow_return" action types, which is when the async action is done and
+    // the new state is available. Ideally, we would exclude the regular "action"
+    // type for these, but at the time the middleware is invoked with
+    // `call.type = "action"` there is no way to determine if this is in fact
+    // an async action.
+    mst.addMiddleware(model, actionMiddleware)
+    function actionMiddleware(call: mst.IMiddlewareEvent, next: any) {
+        if (!applyingSnapshot && call.type === "flow_return") {
+            const copy: any = {}
+            copy.type = `${call.name} [${call.type}]`
+            if (call.args) call.args.forEach((value, index) => (copy[index] = value))
+            remotedev.send(copy, mst.getSnapshot(model))
+        }
+
+        next(call)
+    }
+
     function handleMonitorActions(remotedev2: any, model2: any, message: any) {
         switch (message.payload.type) {
             case "RESET":
