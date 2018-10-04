@@ -971,7 +971,7 @@ Note: pre and post processing are just meant to convert your data into types tha
 | `beforeDetach`        | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `beforeDestroy`       | Called before the node is destroyed, as a result of calling `destroy`, or by removing or replacing the node from the tree. Child destructors will fire before parents                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
-Note, except for `preProcessSnapshot`, all hooks should be defined as actions.
+Note, except for `preProcessSnapshot` and `postProcessSnapshot`, all hooks should be defined as actions.
 
 All hooks can be defined multiple times and can be composed automatically.
 
