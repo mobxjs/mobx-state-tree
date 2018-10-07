@@ -3,7 +3,7 @@ import { connectReduxDevtools } from "mst-middlewares/src"
 
 const waitAsync = (ms: number) => new Promise(r => setTimeout(r, ms))
 const waitAsyncReject = (ms: number) =>
-    new Promise((_, rej) => setTimeout(rej(new Error("dead")), ms))
+    new Promise((_, rej) => setTimeout(rej(new Error("thrown")), ms))
 
 describe("redux devtools middleware", async () => {
     const M = types
@@ -62,13 +62,13 @@ describe("redux devtools middleware", async () => {
                 self.y = val1
                 yield waitAsyncReject(50)
                 self.y = val2
-            })
+            }),
+            setXY(x: number, y: number) {
+                this.setX(x)
+                this.setY(y)
+            }
         }))
         .actions(self => ({
-            setXY(x: number, y: number) {
-                self.setX(x)
-                self.setY(y)
-            },
             setXYAsync: flow(function*(x: number, y: number) {
                 yield self.setXAsync(x / 2, x)
                 yield self.setYAsync(y / 2, y)

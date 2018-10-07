@@ -1,7 +1,7 @@
 # next
 
 -   Middleware events now also contain `allParentIds` (chan of causing ids, from root until (excluding) current)
--   Improved redux dev tools integration, now supporting flows and showing action chains
+-   Improved redux dev tools integration, now supporting flows and showing action chains through [#1035](https://github.com/mobxjs/mobx-state-tree/pull/1035) based on a fix by [@bourquep](https://github.com/bourquep)
 
 # 3.5.0
 
