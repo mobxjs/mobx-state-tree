@@ -82,7 +82,13 @@ function getActionContextName(actionContext: ActionContext) {
  * @param {*} remoteDevDep
  * @param {*} model
  */
-export function connectReduxDevtools(remoteDevDep: any, model: any) {
+export function connectReduxDevtools(
+    remoteDevDep: any,
+    model: any,
+    options?: { skipIdempotentActionSteps: boolean }
+) {
+    options = { skipIdempotentActionSteps: true, ...options }
+
     // Connect to the monitor
     const remotedev = remoteDevDep.connectViaExtension({
         name: mst.getType(model).name
@@ -100,6 +106,15 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
     remotedev.init(initialState)
 
     const actionContexts = new Map<number, ActionContext>()
+
+    let changesMade = 0
+    if (options.skipIdempotentActionSteps) {
+        mst.onPatch(model, () => {
+            if (!applyingSnapshot) {
+                changesMade++
+            }
+        })
+    }
 
     mst.addMiddleware(model, actionMiddleware, false)
     function actionMiddleware(call: mst.IMiddlewareEvent, next: any) {
@@ -145,6 +160,8 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
             actionContexts.set(call.id, context)
         }
 
+        changesMade = 0
+
         // capture any errors and rethrow them later (after it is logged)
         let errorThrown
         try {
@@ -153,6 +170,9 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
             errorThrown = e
             context.errored = true
         }
+
+        const changedTheModel = !options!.skipIdempotentActionSteps || changesMade > 0
+        changesMade = 0
 
         switch (call.type) {
             case "flow_spawn":
@@ -177,19 +197,22 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
         // - a flow_throw that wasn't reported as an error before
         // we don't include other kinds since flow_spawn never contain state changes and flow_resume_error might be caught by and handled the parent
         const syncAction = call.type === "action" && !context.runningAsync
-        const log =
+        let log =
             syncAction ||
             call.type === "flow_resume" ||
             (call.type === "flow_throw" && !context.errorReported)
 
         if (log) {
-            const sn = mst.getSnapshot(model)
+            // we don't have to log if it didn't change the model (unless it didn't change it because it errored)
+            if (changedTheModel || (context.errored && !context.errorReported)) {
+                const sn = mst.getSnapshot(model)
 
-            const copy = { type: getActionContextName(context), ...context.callArgs }
-            remotedev.send(copy, sn)
+                const copy = { type: getActionContextName(context), ...context.callArgs }
+                remotedev.send(copy, sn)
 
-            if (context.errored) {
-                context.errorReported = true
+                if (context.errored) {
+                    context.errorReported = true
+                }
             }
 
             // increase the step for logging purposes, as well as any parent steps (since child steps count as a parent step)

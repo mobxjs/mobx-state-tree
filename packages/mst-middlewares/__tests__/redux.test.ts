@@ -1,5 +1,6 @@
 import { types, flow } from "mobx-state-tree"
 import { connectReduxDevtools } from "mst-middlewares/src"
+import { inherits } from "util"
 
 const waitAsync = (ms: number) => new Promise(r => setTimeout(r, ms))
 const waitAsyncReject = (ms: number) =>
@@ -27,6 +28,10 @@ describe("redux devtools middleware", async () => {
                 self.x = val1
                 yield waitAsync(20)
                 self.x = val2
+            }),
+            setXAsyncWithEmptyFirstPart: flow(function*(val1: number) {
+                yield waitAsync(20)
+                self.x = val1
             }),
             setXAsyncThrowSync: flow(function*(val1: number, val2: number) {
                 self.x = val1
@@ -89,7 +94,7 @@ describe("redux devtools middleware", async () => {
     }
     let devTools = mockDevTools()
 
-    beforeEach(() => {
+    function initTest(skipIdempotentActionSteps: boolean) {
         devTools = mockDevTools()
 
         const devToolsManager = {
@@ -98,7 +103,11 @@ describe("redux devtools middleware", async () => {
         }
 
         m = M.create()
-        connectReduxDevtools(devToolsManager, m)
+        connectReduxDevtools(devToolsManager, m, { skipIdempotentActionSteps })
+    }
+
+    beforeEach(() => {
+        initTest(true)
     })
 
     test("sync action", () => {
@@ -312,17 +321,6 @@ Array [
       "y": 600,
     },
   ],
-  Array [
-    Object {
-      "0": 500,
-      "1": 600,
-      "type": "setXY",
-    },
-    Object {
-      "x": 500,
-      "y": 600,
-    },
-  ],
 ]
 `)
     })
@@ -336,17 +334,6 @@ Array [
       "0": 250,
       "1": 500,
       "type": "setXYAsync [0] > setXAsync [0]",
-    },
-    Object {
-      "x": 250,
-      "y": 20,
-    },
-  ],
-  Array [
-    Object {
-      "0": 500,
-      "1": 600,
-      "type": "setXYAsync [1]",
     },
     Object {
       "x": 250,
@@ -377,31 +364,9 @@ Array [
   ],
   Array [
     Object {
-      "0": 500,
-      "1": 600,
-      "type": "setXYAsync [4]",
-    },
-    Object {
-      "x": 500,
-      "y": 300,
-    },
-  ],
-  Array [
-    Object {
       "0": 300,
       "1": 600,
       "type": "setXYAsync [5] > setYAsync [1]",
-    },
-    Object {
-      "x": 500,
-      "y": 600,
-    },
-  ],
-  Array [
-    Object {
-      "0": 500,
-      "1": 600,
-      "type": "setXYAsync [6]",
     },
     Object {
       "x": 500,
@@ -424,17 +389,6 @@ Array [
       "0": 250,
       "1": 500,
       "type": "setXYAsyncThrowSync [0] > setXAsyncThrowSync [0]",
-    },
-    Object {
-      "x": 250,
-      "y": 20,
-    },
-  ],
-  Array [
-    Object {
-      "0": 500,
-      "1": 600,
-      "type": "setXYAsyncThrowSync [1]",
     },
     Object {
       "x": 250,
@@ -487,17 +441,6 @@ Array [
   ],
   Array [
     Object {
-      "0": 500,
-      "1": 600,
-      "type": "setXYAsyncThrowAsync [1]",
-    },
-    Object {
-      "x": 250,
-      "y": 20,
-    },
-  ],
-  Array [
-    Object {
       "0": 250,
       "1": 500,
       "type": "setXYAsyncThrowAsync [2] > setXAsyncThrowAsync [1] (error thrown)",
@@ -515,6 +458,54 @@ Array [
     },
     Object {
       "x": 250,
+      "y": 20,
+    },
+  ],
+]
+`)
+    })
+
+    test("async action should not show empty first yields", async () => {
+        await m.setXAsyncWithEmptyFirstPart(500)
+        expect(devTools.send.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "0": 500,
+      "type": "setXAsyncWithEmptyFirstPart [1]",
+    },
+    Object {
+      "x": 500,
+      "y": 20,
+    },
+  ],
+]
+`)
+    })
+
+    test("async action should show empty first yields when the option is set", async () => {
+        initTest(false)
+
+        await m.setXAsyncWithEmptyFirstPart(500)
+        expect(devTools.send.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "0": 500,
+      "type": "setXAsyncWithEmptyFirstPart [0]",
+    },
+    Object {
+      "x": 30,
+      "y": 20,
+    },
+  ],
+  Array [
+    Object {
+      "0": 500,
+      "type": "setXAsyncWithEmptyFirstPart [1]",
+    },
+    Object {
+      "x": 500,
       "y": 20,
     },
   ],
