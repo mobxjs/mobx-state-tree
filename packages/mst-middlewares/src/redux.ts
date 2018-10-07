@@ -112,15 +112,15 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
 
         for (let i = call.allParentIds.length - 1; i >= 0; i--) {
             const parentId = call.allParentIds[i]
-            const foundFlow = actionContexts.get(parentId)
-            if (foundFlow) {
-                context = foundFlow
+            const foundContext = actionContexts.get(parentId)
+            if (foundContext) {
+                context = foundContext
                 break
             }
         }
 
         if (call.type === "action") {
-            const previousFlow = context
+            const parentContext = context
             context = {
                 name: call.name,
                 id: call.id,
@@ -137,7 +137,7 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
 
             if (call.parentId) {
                 // subaction
-                context.parent = previousFlow
+                context.parent = parentContext
             }
 
             actionContexts.set(call.id, context)
