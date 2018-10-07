@@ -320,6 +320,7 @@ test("middleware events are correct", () => {
             name: "a",
             parentId: 0,
             rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
+            allParentIds: [],
             tree: {},
             type: "action"
         },
@@ -330,6 +331,7 @@ test("middleware events are correct", () => {
             name: "b",
             parentId: process.env.NODE_ENV !== "production" ? 28 : 27,
             rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
+            allParentIds: [process.env.NODE_ENV !== "production" ? 28 : 27],
             tree: {},
             type: "action"
         }

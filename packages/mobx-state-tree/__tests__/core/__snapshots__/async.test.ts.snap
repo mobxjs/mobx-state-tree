@@ -3,6 +3,7 @@
 exports[`can handle async actions 1`] = `
 Array [
   Object {
+    "allParentIds": Array [],
     "args": Array [
       "black",
     ],
@@ -13,6 +14,9 @@ Array [
     "type": "action",
   },
   Object {
+    "allParentIds": Array [
+      3,
+    ],
     "args": Array [
       "black",
     ],
@@ -23,6 +27,9 @@ Array [
     "type": "flow_spawn",
   },
   Object {
+    "allParentIds": Array [
+      3,
+    ],
     "args": Array [
       undefined,
     ],
@@ -33,6 +40,9 @@ Array [
     "type": "flow_resume",
   },
   Object {
+    "allParentIds": Array [
+      3,
+    ],
     "args": Array [
       "drinking coffee",
     ],
@@ -43,6 +53,9 @@ Array [
     "type": "flow_resume",
   },
   Object {
+    "allParentIds": Array [
+      3,
+    ],
     "args": Array [
       "awake",
     ],
@@ -58,6 +71,7 @@ Array [
 exports[`can handle erroring actions 1`] = `
 Array [
   Object {
+    "allParentIds": Array [],
     "args": Array [
       "black",
     ],
@@ -68,6 +82,9 @@ Array [
     "type": "action",
   },
   Object {
+    "allParentIds": Array [
+      5,
+    ],
     "args": Array [
       "black",
     ],
@@ -78,6 +95,9 @@ Array [
     "type": "flow_spawn",
   },
   Object {
+    "allParentIds": Array [
+      5,
+    ],
     "args": Array [
       undefined,
     ],
@@ -88,6 +108,9 @@ Array [
     "type": "flow_resume",
   },
   Object {
+    "allParentIds": Array [
+      5,
+    ],
     "args": Array [
       "black",
     ],
@@ -103,6 +126,7 @@ Array [
 exports[`can handle nested async actions 1`] = `
 Array [
   Object {
+    "allParentIds": Array [],
     "args": Array [
       "black",
     ],
@@ -113,6 +137,9 @@ Array [
     "type": "action",
   },
   Object {
+    "allParentIds": Array [
+      25,
+    ],
     "args": Array [
       "black",
     ],
@@ -123,6 +150,9 @@ Array [
     "type": "flow_spawn",
   },
   Object {
+    "allParentIds": Array [
+      25,
+    ],
     "args": Array [
       undefined,
     ],
@@ -133,6 +163,10 @@ Array [
     "type": "flow_resume",
   },
   Object {
+    "allParentIds": Array [
+      25,
+      26,
+    ],
     "args": Array [
       "drinking black",
     ],
@@ -143,6 +177,10 @@ Array [
     "type": "flow_spawn",
   },
   Object {
+    "allParentIds": Array [
+      25,
+      26,
+    ],
     "args": Array [
       undefined,
     ],
@@ -153,6 +191,10 @@ Array [
     "type": "flow_resume",
   },
   Object {
+    "allParentIds": Array [
+      25,
+      26,
+    ],
     "args": Array [
       "DRINKING BLACK",
     ],
@@ -163,6 +205,10 @@ Array [
     "type": "flow_resume",
   },
   Object {
+    "allParentIds": Array [
+      25,
+      26,
+    ],
     "args": Array [
       "DRINKING BLACK",
     ],
@@ -173,6 +219,9 @@ Array [
     "type": "flow_return",
   },
   Object {
+    "allParentIds": Array [
+      25,
+    ],
     "args": Array [
       "DRINKING BLACK",
     ],
@@ -183,6 +232,9 @@ Array [
     "type": "flow_resume",
   },
   Object {
+    "allParentIds": Array [
+      25,
+    ],
     "args": Array [
       "DRINKING BLACK",
     ],
@@ -198,6 +250,7 @@ Array [
 exports[`can handle throw from yielded promise works 1`] = `
 Array [
   Object {
+    "allParentIds": Array [],
     "args": Array [
       "black",
     ],
@@ -208,6 +261,9 @@ Array [
     "type": "action",
   },
   Object {
+    "allParentIds": Array [
+      11,
+    ],
     "args": Array [
       "black",
     ],
@@ -218,6 +274,9 @@ Array [
     "type": "flow_spawn",
   },
   Object {
+    "allParentIds": Array [
+      11,
+    ],
     "args": Array [
       undefined,
     ],
@@ -228,6 +287,9 @@ Array [
     "type": "flow_resume",
   },
   Object {
+    "allParentIds": Array [
+      11,
+    ],
     "args": Array [
       "x",
     ],
@@ -238,6 +300,9 @@ Array [
     "type": "flow_resume_error",
   },
   Object {
+    "allParentIds": Array [
+      11,
+    ],
     "args": Array [
       "x",
     ],
@@ -253,6 +318,7 @@ Array [
 exports[`can handle try catch 1`] = `
 Array [
   Object {
+    "allParentIds": Array [],
     "args": Array [
       "black",
     ],
@@ -263,6 +329,9 @@ Array [
     "type": "action",
   },
   Object {
+    "allParentIds": Array [
+      7,
+    ],
     "args": Array [
       "black",
     ],
@@ -273,6 +342,9 @@ Array [
     "type": "flow_spawn",
   },
   Object {
+    "allParentIds": Array [
+      7,
+    ],
     "args": Array [
       undefined,
     ],
@@ -283,6 +355,9 @@ Array [
     "type": "flow_resume",
   },
   Object {
+    "allParentIds": Array [
+      7,
+    ],
     "args": Array [
       "tea",
     ],
@@ -293,6 +368,9 @@ Array [
     "type": "flow_resume_error",
   },
   Object {
+    "allParentIds": Array [
+      7,
+    ],
     "args": Array [
       "biscuit",
     ],
@@ -308,6 +386,7 @@ Array [
 exports[`empty sequence works 1`] = `
 Array [
   Object {
+    "allParentIds": Array [],
     "args": Array [
       "black",
     ],
@@ -318,6 +397,9 @@ Array [
     "type": "action",
   },
   Object {
+    "allParentIds": Array [
+      9,
+    ],
     "args": Array [
       "black",
     ],
@@ -328,6 +410,9 @@ Array [
     "type": "flow_spawn",
   },
   Object {
+    "allParentIds": Array [
+      9,
+    ],
     "args": Array [
       undefined,
     ],
@@ -338,6 +423,9 @@ Array [
     "type": "flow_resume",
   },
   Object {
+    "allParentIds": Array [
+      9,
+    ],
     "args": Array [
       undefined,
     ],

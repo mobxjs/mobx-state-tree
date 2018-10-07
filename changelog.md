@@ -1,3 +1,8 @@
+# next
+
+-   Middleware events now also contain `allParentIds` (chan of causing ids, from root until (excluding) current)
+-   Improved redux dev tools integration, now supporting flows and showing action chains
+
 # 3.5.0
 
 -   Fix for afterCreate/afterAttach sometimes throwing an exception when a node was created as part of a view/computed property [#967](https://github.com/mobxjs/mobx-state-tree/issues/967) through [#1026](https://github.com/mobxjs/mobx-state-tree/pull/1026) by [@xaviergonz](https://github.com/xaviergonz). Note that this fix will only work if your installed peer mobx version is >= 4.5.0 or >= 5.5.0

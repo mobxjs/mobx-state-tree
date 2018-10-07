@@ -1,4 +1,7 @@
 import * as mst from "mobx-state-tree"
+
+// tslint:disable:no-shadowed-variable
+
 /**
  * Creates a tiny proxy around a MST tree that conforms to the redux store api.
  * This makes it possible to use MST inside a redux application.
@@ -43,9 +46,39 @@ function runMiddleWare(action: any, runners: any[], next: any) {
     n(action)
 }
 
+interface ActionContext {
+    parent?: ActionContext
+    name: string
+    id: number
+    runningAsync: boolean
+    errored: boolean
+    errorReported: boolean
+    step: number
+    callArgs: { [k: number]: any }
+}
+
+function getActionContextName(actionContext: ActionContext) {
+    let name = actionContext.name
+
+    if (actionContext.runningAsync) {
+        name += ` [${actionContext.step}]`
+    }
+
+    if (actionContext.errored) {
+        name += ` (error thrown)`
+    }
+
+    if (actionContext.parent) {
+        name = `${getActionContextName(actionContext.parent)} > ${name}`
+    }
+
+    return name
+}
+
 /**
  * Connects a MST tree to the Redux devtools.
- * See this [example](https://github.com/mobxjs/mobx-state-tree/blob/e9e804c8c43e1edde4aabbd52675544e2b3a905b/examples/redux-todomvc/src/index.js#L21) for a setup example.
+ * See this [example](https://github.com/mobxjs/mobx-state-tree/blob/e9e804c8c43e1edde4aabbd52675544e2b3a905b/examples/redux-todomvc/src/index.js#L21)
+ * for a setup example.
  *
  * @export
  * @param {*} remoteDevDep
@@ -53,8 +86,10 @@ function runMiddleWare(action: any, runners: any[], next: any) {
  */
 export function connectReduxDevtools(remoteDevDep: any, model: any) {
     // Connect to the monitor
-    const remotedev = remoteDevDep.connectViaExtension({ name: mst.getType(model).name })
-    let applyingSnapshot = false
+    const remotedev = remoteDevDep.connectViaExtension({
+        name: mst.getType(model).name
+    })
+    let applyingSnapshot = 0
 
     // Subscribe to change state (if need more than just logging)
     remotedev.subscribe((message: any) => {
@@ -66,18 +101,108 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
     const initialState = mst.getSnapshot(model)
     remotedev.init(initialState)
 
-    // Send changes to the remote monitor
-    mst.onAction(
-        model,
-        action => {
-            if (applyingSnapshot) return
-            const copy: any = {}
-            copy.type = action.name
-            if (action.args) action.args.forEach((value, index) => (copy[index] = value))
-            remotedev.send(copy, mst.getSnapshot(model))
-        },
-        true
-    )
+    const actionContexts = new Map<number, ActionContext>()
+
+    mst.addMiddleware(model, actionMiddleware, false)
+    function actionMiddleware(call: mst.IMiddlewareEvent, next: any) {
+        if (applyingSnapshot) {
+            next(call)
+            return
+        }
+
+        let context!: ActionContext
+
+        for (let i = call.allParentIds.length - 1; i >= 0; i--) {
+            const parentId = call.allParentIds[i]
+            const foundFlow = actionContexts.get(parentId)
+            if (foundFlow) {
+                context = foundFlow
+                break
+            }
+        }
+
+        if (call.type === "action") {
+            const previousFlow = context
+            context = {
+                name: call.name,
+                id: call.id,
+                runningAsync: false,
+                errored: false,
+                errorReported: false,
+                step: 0,
+                callArgs: {}
+            }
+
+            if (call.args) {
+                call.args.forEach((value, index) => (context.callArgs[index] = value))
+            }
+
+            if (call.parentId) {
+                // subaction
+                context.parent = previousFlow
+            }
+
+            actionContexts.set(call.id, context)
+        }
+
+        let errorThrown
+        try {
+            next(call)
+        } catch (e) {
+            errorThrown = e
+            context.errored = true
+        }
+
+        switch (call.type) {
+            case "flow_spawn":
+            case "flow_resume":
+            case "flow_resume_error": // not errored since the promise error might be caught
+                context.runningAsync = true
+                let parent = context.parent
+                while (parent) {
+                    parent.runningAsync = true
+                    parent = parent.parent
+                }
+                break
+            case "flow_throw":
+                context.errored = true
+                break
+        }
+
+        // only log if it is a sync (notStarted) action or a flow_resume or a flow_throw
+        const syncAction = call.type === "action" && !context.runningAsync
+        const log =
+            syncAction ||
+            call.type === "flow_resume" ||
+            (call.type === "flow_throw" && !context.errorReported)
+
+        if (log) {
+            const sn = mst.getSnapshot(model)
+
+            const copy = { type: getActionContextName(context), ...context.callArgs }
+            remotedev.send(copy, sn)
+
+            if (context.errored) {
+                context.errorReported = true
+            }
+
+            context.step++
+
+            let parent = context.parent
+            while (parent) {
+                parent.step++
+                parent = parent.parent
+            }
+        }
+
+        if (call.type === "flow_return" || call.type === "flow_throw" || !context!.runningAsync) {
+            actionContexts.delete(context!.id!)
+        }
+
+        if (errorThrown) {
+            throw errorThrown
+        }
+    }
 
     function handleMonitorActions(remotedev2: any, model2: any, message: any) {
         switch (message.payload.type) {
@@ -103,8 +228,11 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
     }
 
     function applySnapshot(model2: any, state: any) {
-        applyingSnapshot = true
-        mst.applySnapshot(model2, state)
-        applyingSnapshot = false
+        applyingSnapshot++
+        try {
+            mst.applySnapshot(model2, state)
+        } finally {
+            applyingSnapshot--
+        }
     }
 }
