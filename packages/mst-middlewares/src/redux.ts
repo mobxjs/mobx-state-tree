@@ -110,6 +110,7 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
 
         let context!: ActionContext
 
+        // find the context of the parent action (if any)
         for (let i = call.allParentIds.length - 1; i >= 0; i--) {
             const parentId = call.allParentIds[i]
             const foundContext = actionContexts.get(parentId)
@@ -119,6 +120,7 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
             }
         }
 
+        // if it is an action we need to create a new action context
         if (call.type === "action") {
             const parentContext = context
             context = {
@@ -135,14 +137,15 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
                 call.args.forEach((value, index) => (context.callArgs[index] = value))
             }
 
+            // subaction, assign the parent action context
             if (call.parentId) {
-                // subaction
                 context.parent = parentContext
             }
 
             actionContexts.set(call.id, context)
         }
 
+        // capture any errors and rethrow them later (after it is logged)
         let errorThrown
         try {
             next(call)
@@ -155,6 +158,7 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
             case "flow_spawn":
             case "flow_resume":
             case "flow_resume_error": // not errored since the promise error might be caught
+                // when this events come we can be sure that this action is being run async, as well as its parent actions
                 context.runningAsync = true
                 let parent = context.parent
                 while (parent) {
@@ -167,7 +171,11 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
                 break
         }
 
-        // only log if it is a sync (notStarted) action or a flow_resume or a flow_throw
+        // only log if:
+        // - it is a sync (never run async code) action
+        // - a flow_resume
+        // - a flow_throw that wasn't reported as an error before
+        // we don't include other kinds since flow_spawn never contain state changes and flow_resume_error might be caught by and handled the parent
         const syncAction = call.type === "action" && !context.runningAsync
         const log =
             syncAction ||
@@ -184,6 +192,7 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
                 context.errorReported = true
             }
 
+            // increase the step for logging purposes, as well as any parent steps (since child steps count as a parent step)
             context.step++
 
             let parent = context.parent
@@ -193,10 +202,12 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
             }
         }
 
+        // once the action is totally finished remove it from the context list to avoid mem leaks
         if (call.type === "flow_return" || call.type === "flow_throw" || !context!.runningAsync) {
             actionContexts.delete(context!.id!)
         }
 
+        // rethrow previously captured excepton if needed
         if (errorThrown) {
             throw errorThrown
         }
