@@ -87,7 +87,7 @@ export function connectReduxDevtools(
     model: any,
     options?: { skipIdempotentActionSteps: boolean }
 ) {
-    options = { skipIdempotentActionSteps: true, ...options }
+    options = { skipIdempotentActionSteps: false, ...options }
 
     // Connect to the monitor
     const remotedev = remoteDevDep.connectViaExtension({
