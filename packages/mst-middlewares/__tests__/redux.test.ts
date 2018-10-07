@@ -1,6 +1,5 @@
 import { types, flow } from "mobx-state-tree"
 import { connectReduxDevtools } from "mst-middlewares/src"
-import { inherits } from "util"
 
 const waitAsync = (ms: number) => new Promise(r => setTimeout(r, ms))
 const waitAsyncReject = (ms: number) =>
