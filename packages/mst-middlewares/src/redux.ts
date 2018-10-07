@@ -81,6 +81,7 @@ function getActionContextName(actionContext: ActionContext) {
  * @export
  * @param {*} remoteDevDep
  * @param {*} model
+ * @param {{ skipIdempotentActionSteps: boolean }} [options]
  */
 export function connectReduxDevtools(
     remoteDevDep: any,
