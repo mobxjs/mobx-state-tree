@@ -1,7 +1,5 @@
 import * as mst from "mobx-state-tree"
 
-// tslint:disable:no-shadowed-variable
-
 /**
  * Creates a tiny proxy around a MST tree that conforms to the redux store api.
  * This makes it possible to use MST inside a redux application.
