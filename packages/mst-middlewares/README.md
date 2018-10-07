@@ -37,10 +37,7 @@ const store = Store.create({
 mst.addMiddleware(store, logger)
 
 // Prints:
-store.todos[0].setTitle("hello world")[MST] /
-    todos /
-    0 /
-    setTitle
+store.todos[0].setTitle("hello world")[MST] / todos / 0 / setTitle
 ```
 
 For a more sophisticated logger, see [action-logger](#action-logger) which also logs process invocations and continuations
@@ -411,6 +408,7 @@ See the [redux-todomvc example](https://github.com/mobxjs/mobx-state-tree/blob/m
 ## connectReduxDevtools
 
 `connectReduxDevtools(remoteDevDependency, mstStore, options?)` connects a MST tree to the Redux devtools. Pass in the `remoteDev` dependency to set up the connect (only one at a time). See this [example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-redux-todomvc/src/index.js#L21) for a setup example.
+
 The options object is optional and has the following options:
 
 -   `skipIdempotentActionSteps`: `false` by default due to possible performance penalty because of the internal usage of onPatch. When set to `true` it will skip reporting of actions and flow action "steps" that do not end up in an actual change in the model (except when an error is thrown), thus reducing the amount of noise in the logs.
