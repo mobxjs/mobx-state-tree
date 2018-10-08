@@ -1,21 +1,52 @@
-import { types, flow } from "mobx-state-tree"
+import { types, flow, SnapshotOrInstance, cast } from "mobx-state-tree"
 import { connectReduxDevtools } from "mst-middlewares/src"
 
-const waitAsync = (ms: number) => new Promise(r => setTimeout(r, ms))
-const waitAsyncReject = (ms: number) =>
-    new Promise((_, rej) => setTimeout(rej(new Error("thrown")), ms))
+jest.useRealTimers()
+
+const waitAsync = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+const waitAsyncReject = async (ms: number) => {
+    await waitAsync(ms)
+    throw new Error("thrown")
+}
 
 describe("redux devtools middleware", async () => {
+    test("waitAsync helper works", async () => {
+        await waitAsync(10)
+    })
+
+    test("waitAsyncReject helper works", async () => {
+        try {
+            await waitAsyncReject(10)
+            fail("should have failed")
+        } catch {
+            // do nothing
+        }
+    })
+
+    const M2 = types
+        .model("SubModel", {
+            a: 10
+        })
+        .actions(self => ({
+            setA(val: number) {
+                self.a = val
+            }
+        }))
+
     const M = types
-        .model({
+        .model("TestModel", {
             x: 10,
-            y: 20
+            y: 20,
+            array: types.array(M2)
         })
         .actions(self => ({
             afterCreate() {
                 self.x = 30
             },
 
+            addtoArray(val: SnapshotOrInstance<typeof M2>) {
+                self.array.push(cast(val))
+            },
             setX(val: number) {
                 self.x = val
             },
@@ -115,10 +146,14 @@ describe("redux devtools middleware", async () => {
 Array [
   Array [
     Object {
-      "0": 50,
-      "type": "setX",
+      "args": Object {
+        "0": 50,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setX",
     },
     Object {
+      "array": Array [],
       "x": 50,
       "y": 20,
     },
@@ -133,10 +168,14 @@ Array [
 Array [
   Array [
     Object {
-      "0": 70,
-      "type": "setXThrow (error thrown)",
+      "args": Object {
+        "0": 70,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXThrow -error thrown-",
     },
     Object {
+      "array": Array [],
       "x": 70,
       "y": 20,
     },
@@ -151,22 +190,30 @@ Array [
 Array [
   Array [
     Object {
-      "0": 100,
-      "1": 200,
-      "type": "setXAsync [0]",
+      "args": Object {
+        "0": 100,
+        "1": 200,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (0)",
     },
     Object {
+      "array": Array [],
       "x": 100,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 100,
-      "1": 200,
-      "type": "setXAsync [1]",
+      "args": Object {
+        "0": 100,
+        "1": 200,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (1)",
     },
     Object {
+      "array": Array [],
       "x": 200,
       "y": 20,
     },
@@ -184,22 +231,30 @@ Array [
 Array [
   Array [
     Object {
-      "0": 100,
-      "1": 200,
-      "type": "setXAsyncThrowSync [0]",
+      "args": Object {
+        "0": 100,
+        "1": 200,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowSync (0)",
     },
     Object {
+      "array": Array [],
       "x": 100,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 100,
-      "1": 200,
-      "type": "setXAsyncThrowSync [1] (error thrown)",
+      "args": Object {
+        "0": 100,
+        "1": 200,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowSync (1) -error thrown-",
     },
     Object {
+      "array": Array [],
       "x": 100,
       "y": 20,
     },
@@ -217,22 +272,30 @@ Array [
 Array [
   Array [
     Object {
-      "0": 100,
-      "1": 200,
-      "type": "setXAsyncThrowAsync [0]",
+      "args": Object {
+        "0": 100,
+        "1": 200,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowAsync (0)",
     },
     Object {
+      "array": Array [],
       "x": 100,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 100,
-      "1": 200,
-      "type": "setXAsyncThrowAsync [1] (error thrown)",
+      "args": Object {
+        "0": 100,
+        "1": 200,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowAsync (1) -error thrown-",
     },
     Object {
+      "array": Array [],
       "x": 100,
       "y": 20,
     },
@@ -250,44 +313,60 @@ Array [
 Array [
   Array [
     Object {
-      "0": 1000,
-      "1": 2000,
-      "type": "setYAsync [0]",
+      "args": Object {
+        "0": 1000,
+        "1": 2000,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setYAsync (0)",
     },
     Object {
+      "array": Array [],
       "x": 30,
       "y": 1000,
     },
   ],
   Array [
     Object {
-      "0": 100,
-      "1": 200,
-      "type": "setXAsync [0]",
+      "args": Object {
+        "0": 100,
+        "1": 200,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (0)",
     },
     Object {
+      "array": Array [],
       "x": 100,
       "y": 1000,
     },
   ],
   Array [
     Object {
-      "0": 100,
-      "1": 200,
-      "type": "setXAsync [1]",
+      "args": Object {
+        "0": 100,
+        "1": 200,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (1)",
     },
     Object {
+      "array": Array [],
       "x": 200,
       "y": 1000,
     },
   ],
   Array [
     Object {
-      "0": 1000,
-      "1": 2000,
-      "type": "setYAsync [1]",
+      "args": Object {
+        "0": 1000,
+        "1": 2000,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setYAsync (1)",
     },
     Object {
+      "array": Array [],
       "x": 200,
       "y": 2000,
     },
@@ -302,20 +381,28 @@ Array [
 Array [
   Array [
     Object {
-      "0": 500,
-      "type": "setXY > setX",
+      "args": Object {
+        "0": 500,
+      },
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXY >>> [root].setX",
     },
     Object {
+      "array": Array [],
       "x": 500,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 600,
-      "type": "setXY > setY",
+      "args": Object {
+        "0": 600,
+      },
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXY >>> [root].setY",
     },
     Object {
+      "array": Array [],
       "x": 500,
       "y": 600,
     },
@@ -330,44 +417,60 @@ Array [
 Array [
   Array [
     Object {
-      "0": 250,
-      "1": 500,
-      "type": "setXYAsync [0] > setXAsync [0]",
+      "args": Object {
+        "0": 250,
+        "1": 500,
+      },
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (0) >>> [root].setXAsync (0)",
     },
     Object {
+      "array": Array [],
       "x": 250,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 250,
-      "1": 500,
-      "type": "setXYAsync [2] > setXAsync [1]",
+      "args": Object {
+        "0": 250,
+        "1": 500,
+      },
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (2) >>> [root].setXAsync (1)",
     },
     Object {
+      "array": Array [],
       "x": 500,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 300,
-      "1": 600,
-      "type": "setXYAsync [3] > setYAsync [0]",
+      "args": Object {
+        "0": 300,
+        "1": 600,
+      },
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (3) >>> [root].setYAsync (0)",
     },
     Object {
+      "array": Array [],
       "x": 500,
       "y": 300,
     },
   ],
   Array [
     Object {
-      "0": 300,
-      "1": 600,
-      "type": "setXYAsync [5] > setYAsync [1]",
+      "args": Object {
+        "0": 300,
+        "1": 600,
+      },
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (5) >>> [root].setYAsync (1)",
     },
     Object {
+      "array": Array [],
       "x": 500,
       "y": 600,
     },
@@ -385,33 +488,45 @@ Array [
 Array [
   Array [
     Object {
-      "0": 250,
-      "1": 500,
-      "type": "setXYAsyncThrowSync [0] > setXAsyncThrowSync [0]",
+      "args": Object {
+        "0": 250,
+        "1": 500,
+      },
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowSync (0) >>> [root].setXAsyncThrowSync (0)",
     },
     Object {
+      "array": Array [],
       "x": 250,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 250,
-      "1": 500,
-      "type": "setXYAsyncThrowSync [2] > setXAsyncThrowSync [1] (error thrown)",
+      "args": Object {
+        "0": 250,
+        "1": 500,
+      },
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowSync (2) >>> [root].setXAsyncThrowSync (1) -error thrown-",
     },
     Object {
+      "array": Array [],
       "x": 250,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 500,
-      "1": 600,
-      "type": "setXYAsyncThrowSync [3] (error thrown)",
+      "args": Object {
+        "0": 500,
+        "1": 600,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowSync (3) -error thrown-",
     },
     Object {
+      "array": Array [],
       "x": 250,
       "y": 20,
     },
@@ -429,33 +544,45 @@ Array [
 Array [
   Array [
     Object {
-      "0": 250,
-      "1": 500,
-      "type": "setXYAsyncThrowAsync [0] > setXAsyncThrowAsync [0]",
+      "args": Object {
+        "0": 250,
+        "1": 500,
+      },
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowAsync (0) >>> [root].setXAsyncThrowAsync (0)",
     },
     Object {
+      "array": Array [],
       "x": 250,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 250,
-      "1": 500,
-      "type": "setXYAsyncThrowAsync [2] > setXAsyncThrowAsync [1] (error thrown)",
+      "args": Object {
+        "0": 250,
+        "1": 500,
+      },
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowAsync (2) >>> [root].setXAsyncThrowAsync (1) -error thrown-",
     },
     Object {
+      "array": Array [],
       "x": 250,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 500,
-      "1": 600,
-      "type": "setXYAsyncThrowAsync [3] (error thrown)",
+      "args": Object {
+        "0": 500,
+        "1": 600,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowAsync (3) -error thrown-",
     },
     Object {
+      "array": Array [],
       "x": 250,
       "y": 20,
     },
@@ -470,10 +597,14 @@ Array [
 Array [
   Array [
     Object {
-      "0": 500,
-      "type": "setXAsyncWithEmptyFirstPart [1]",
+      "args": Object {
+        "0": 500,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncWithEmptyFirstPart (1)",
     },
     Object {
+      "array": Array [],
       "x": 500,
       "y": 20,
     },
@@ -490,21 +621,76 @@ Array [
 Array [
   Array [
     Object {
-      "0": 500,
-      "type": "setXAsyncWithEmptyFirstPart [0]",
+      "args": Object {
+        "0": 500,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncWithEmptyFirstPart (0)",
     },
     Object {
+      "array": Array [],
       "x": 30,
       "y": 20,
     },
   ],
   Array [
     Object {
-      "0": 500,
-      "type": "setXAsyncWithEmptyFirstPart [1]",
+      "args": Object {
+        "0": 500,
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncWithEmptyFirstPart (1)",
     },
     Object {
+      "array": Array [],
       "x": 500,
+      "y": 20,
+    },
+  ],
+]
+`)
+    })
+
+    test("sync action that adds to an array", () => {
+        m.addtoArray({ a: 50 })
+        m.array[0]!.setA(100)
+        expect(devTools.send.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "args": Object {
+        "0": Object {
+          "a": 50,
+        },
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].addtoArray",
+    },
+    Object {
+      "array": Array [
+        Object {
+          "a": 50,
+        },
+      ],
+      "x": 30,
+      "y": 20,
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {
+        "0": 100,
+      },
+      "targetTypePath": "TestModel/SubModel[]/SubModel",
+      "type": "[root/array/0].setA",
+    },
+    Object {
+      "array": Array [
+        Object {
+          "a": 100,
+        },
+      ],
+      "x": 30,
       "y": 20,
     },
   ],

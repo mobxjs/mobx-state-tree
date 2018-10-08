@@ -44,9 +44,12 @@ function runMiddleWare(action: any, runners: any[], next: any) {
     n(action)
 }
 
+// devtools
+
 interface ActionContext {
     parent?: ActionContext
     name: string
+    targetTypePath: string
     id: number
     runningAsync: boolean
     errored: boolean
@@ -55,22 +58,44 @@ interface ActionContext {
     callArgs: { [k: number]: any }
 }
 
-function getActionContextName(actionContext: ActionContext) {
+function getActionContextNameAndTypePath(actionContext: ActionContext) {
     let name = actionContext.name
+    let targetTypePath = actionContext.targetTypePath
 
     if (actionContext.runningAsync) {
-        name += ` [${actionContext.step}]`
+        name += ` (${actionContext.step})`
     }
 
     if (actionContext.errored) {
-        name += ` (error thrown)`
+        name += ` -error thrown-`
     }
 
     if (actionContext.parent) {
-        name = `${getActionContextName(actionContext.parent)} > ${name}`
+        const ret = getActionContextNameAndTypePath(actionContext.parent)
+        if (ret) {
+            name = `${ret.name} >>> ${name}`
+            targetTypePath = `${ret.targetTypePath} >>> ${targetTypePath}`
+        }
     }
 
-    return name
+    return {
+        name,
+        targetTypePath
+    }
+}
+
+function getTypeName(node: mst.IAnyStateTreeNode) {
+    return mst.getType(node).name || "(UnnamedType)"
+}
+
+function getTargetTypePath(node: mst.IAnyStateTreeNode): string[] {
+    let current: mst.IAnyStateTreeNode | undefined = node
+    const names = []
+    while (current) {
+        names.unshift(getTypeName(current))
+        current = mst.hasParent(current) ? mst.getParent(current) : undefined
+    }
+    return names
 }
 
 /**
@@ -85,16 +110,25 @@ function getActionContextName(actionContext: ActionContext) {
  */
 export function connectReduxDevtools(
     remoteDevDep: any,
-    model: any,
+    model: mst.IAnyStateTreeNode,
     options?: { skipIdempotentActionSteps: boolean }
 ) {
     options = { skipIdempotentActionSteps: false, ...options }
+
+    let applyingSnapshot = 0
+    function applySnapshot(model2: any, state: any) {
+        applyingSnapshot++
+        try {
+            mst.applySnapshot(model2, state)
+        } finally {
+            applyingSnapshot--
+        }
+    }
 
     // Connect to the monitor
     const remotedev = remoteDevDep.connectViaExtension({
         name: mst.getType(model).name
     })
-    let applyingSnapshot = 0
 
     // Subscribe to change state (if need more than just logging)
     remotedev.subscribe((message: any) => {
@@ -138,9 +172,12 @@ export function connectReduxDevtools(
 
         // if it is an action we need to create a new action context
         if (call.type === "action") {
+            const targetTypePath = getTargetTypePath(call.context).join("/")
+
             const parentContext = context
             context = {
-                name: call.name,
+                name: `[root${mst.getPath(call.context)}].${call.name}`,
+                targetTypePath: targetTypePath,
                 id: call.id,
                 runningAsync: false,
                 errored: false,
@@ -208,7 +245,13 @@ export function connectReduxDevtools(
             if (changedTheModel || (context.errored && !context.errorReported)) {
                 const sn = mst.getSnapshot(model)
 
-                const copy = { type: getActionContextName(context), ...context.callArgs }
+                const names = getActionContextNameAndTypePath(context)
+
+                const copy = {
+                    type: names.name,
+                    targetTypePath: names.targetTypePath,
+                    args: { ...context.callArgs }
+                }
                 remotedev.send(copy, sn)
 
                 if (context.errored) {
@@ -257,15 +300,6 @@ export function connectReduxDevtools(
                 remotedev2.send(null, nextLiftedState)
                 return
             default:
-        }
-    }
-
-    function applySnapshot(model2: any, state: any) {
-        applyingSnapshot++
-        try {
-            mst.applySnapshot(model2, state)
-        } finally {
-            applyingSnapshot--
         }
     }
 }
