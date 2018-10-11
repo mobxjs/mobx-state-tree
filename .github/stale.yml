@@ -22,3 +22,8 @@ markComment: >
     activity occurs. Thank you for your contributions.
 # Comment to post when closing a stale issue. Set to `false` to disable
 closeComment: false
+# Limit to only `issues` or `pulls`
+only: issues
+# Comment to post when removing the stale label.
+unmarkComment: >
+    This issue has been automatically unmarked as stale. Please disregard previous warnings.
