@@ -248,7 +248,7 @@ export function connectReduxDevtools(
         }
 
         if (log) {
-            function logStep(logContext: ActionContext) {
+            const logStep = (logContext: ActionContext) => {
                 const sn = mst.getSnapshot(model)
 
                 const names = getActionContextNameAndTypePath(logContext)
