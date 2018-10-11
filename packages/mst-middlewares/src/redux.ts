@@ -46,6 +46,8 @@ function runMiddleWare(action: any, runners: any[], next: any) {
 
 // devtools
 
+type ChangesMadeSetter = () => void
+
 interface ActionContext {
     parent?: ActionContext
     name: string
@@ -56,6 +58,7 @@ interface ActionContext {
     errorReported: boolean
     step: number
     callArgs: { [k: number]: any }
+    changesMadeSetter: ChangesMadeSetter | undefined
 }
 
 function getActionContextNameAndTypePath(actionContext: ActionContext) {
@@ -134,11 +137,11 @@ export function connectReduxDevtools(
 
     const actionContexts = new Map<number, ActionContext>()
 
-    let changesMade = 0
+    let changesMadeSetter: ChangesMadeSetter | undefined = undefined
     if (!options.logIdempotentActionSteps) {
         mst.onPatch(model, () => {
-            if (!handlingMonitorAction) {
-                changesMade++
+            if (!handlingMonitorAction && changesMadeSetter) {
+                changesMadeSetter()
             }
         })
     }
@@ -175,7 +178,8 @@ export function connectReduxDevtools(
                 errored: false,
                 errorReported: false,
                 step: 0,
-                callArgs: {}
+                callArgs: {},
+                changesMadeSetter: undefined
             }
 
             if (call.args) {
@@ -190,8 +194,12 @@ export function connectReduxDevtools(
             actionContexts.set(call.id, context)
         }
 
-        let oldChangesMade = changesMade
-        changesMade = 0
+        let changesMade = false
+        context.changesMadeSetter = () => {
+            changesMade = true
+        }
+        let oldChangesMadeSetter = changesMadeSetter
+        changesMadeSetter = context.changesMadeSetter
 
         // capture any errors and rethrow them later (after it is logged)
         let errorThrown
@@ -202,15 +210,10 @@ export function connectReduxDevtools(
             context.errored = true
         }
 
-        let changedTheModel = options!.logIdempotentActionSteps ? true : changesMade > 0
-        oldChangesMade += changesMade
+        changesMadeSetter = oldChangesMadeSetter
+        context.changesMadeSetter = undefined
 
-        // TODO: this should be removed once onPatch reacts to applySnapshot appropiately
-        if (call.name === "@APPLY_SNAPSHOT") {
-            changedTheModel = true
-        }
-
-        changesMade = 0
+        const changedTheModel = options!.logIdempotentActionSteps ? true : changesMade
 
         switch (call.type) {
             case "flow_spawn":
@@ -244,7 +247,9 @@ export function connectReduxDevtools(
         if (!options!.logChildActions && context.parent && !context.runningAsync) {
             log = false
             // give the child action changes to the parent action
-            changesMade = oldChangesMade
+            if (changesMade && context.parent.changesMadeSetter) {
+                context.parent.changesMadeSetter()
+            }
         }
 
         if (log) {

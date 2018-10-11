@@ -386,20 +386,6 @@ Array [
   Array [
     Object {
       "args": Object {
-        "0": Array [],
-      },
-      "targetTypePath": "TestModel >>> TestModel/SubModel[]",
-      "type": "[root].@APPLY_SNAPSHOT >>> [root/array].@APPLY_SNAPSHOT",
-    },
-    Object {
-      "array": Array [],
-      "x": "snapshotX",
-      "y": "",
-    },
-  ],
-  Array [
-    Object {
-      "args": Object {
         "0": Object {
           "x": "snapshotX",
         },
