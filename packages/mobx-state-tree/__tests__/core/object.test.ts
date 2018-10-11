@@ -962,3 +962,12 @@ test("#993-2 - references should have a parent event when the parent has not bee
         expect(l4).toBe(rootL1.l2.l3.l4)
     }
 })
+
+test("it should emit patches when applySnapshot is used", () => {
+    const { Factory } = createTestFactories()
+    const doc = Factory.create()
+    let patches: IJsonPatch[] = []
+    onPatch(doc, patch => patches.push(patch))
+    applySnapshot(doc, { ...getSnapshot(doc), to: "universe" })
+    expect(patches).toEqual([{ op: "replace", path: "/to", value: "universe" }])
+})
