@@ -411,4 +411,5 @@ See the [redux-todomvc example](https://github.com/mobxjs/mobx-state-tree/blob/m
 
 The options object is optional and has the following options:
 
--   `skipIdempotentActionSteps`: `false` by default due to possible performance penalty because of the internal usage of onPatch. When set to `true` it will skip reporting of actions and flow action "steps" that do not end up in an actual change in the model (except when an error is thrown), thus reducing the amount of noise in the logs.
+-   `logIdempotentActionSteps`: `true` by default due to possible performance penalty because of the internal usage of onPatch. When set to `false` it will skip reporting of actions and flow action "steps" that do not end up in an actual change in the model (except when an error is thrown), thus reducing the amount of noise in the logs.
+-   `logChildActions`: `false` by default. When set to `true` it will report actions that are executed inside a root actions. When set to `false` it will not.

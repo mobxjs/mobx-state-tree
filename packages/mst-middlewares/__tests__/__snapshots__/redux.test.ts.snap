@@ -1,0 +1,1805 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) applySnapshot(m, { x: "snapshotX" }) 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {
+        "0": Object {
+          "x": "snapshotX",
+        },
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].@APPLY_SNAPSHOT",
+    },
+    Object {
+      "array": Array [],
+      "x": "snapshotX",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) concurrent [m.setYAsync() / m.setXAsync()] 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setYAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setYAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +50",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.addtoArray({ a: "otherA" }), m.array[0].setA() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {
+        "0": Object {
+          "a": "otherA",
+        },
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].addtoArray",
+    },
+    Object {
+      "array": Array [
+        Object {
+          "a": "otherA",
+        },
+      ],
+      "x": "",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel/SubModel[]/SubModel",
+      "type": "[root/array/0].setA",
+    },
+    Object {
+      "array": Array [
+        Object {
+          "a": "setA",
+        },
+      ],
+      "x": "",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setX() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setX",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXAsyncThrowAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowAsync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXAsyncThrowSync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowSync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowSync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXAsyncWithEmptyFirstPart() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncWithEmptyFirstPart (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncWithEmptyFirstPart +20",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXThrow() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXThrow -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXThrow",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXY() -> m.setX(), m.setY() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXY",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "setY",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXYAsync() -> m.setXAsync(), m.setYAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (2)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (3)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +50",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXYAsyncThrowAsync() -> m.setXYAsyncThrowAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowAsync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXYAsyncThrowSync() -> m.setXAsyncThrowSync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowSync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowSync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) applySnapshot(m, { x: "snapshotX" }) 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {
+        "0": Array [],
+      },
+      "targetTypePath": "TestModel >>> TestModel/SubModel[]",
+      "type": "[root].@APPLY_SNAPSHOT >>> [root/array].@APPLY_SNAPSHOT",
+    },
+    Object {
+      "array": Array [],
+      "x": "snapshotX",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {
+        "0": Object {
+          "x": "snapshotX",
+        },
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].@APPLY_SNAPSHOT",
+    },
+    Object {
+      "array": Array [],
+      "x": "snapshotX",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) concurrent [m.setYAsync() / m.setXAsync()] 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setYAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setYAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +50",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.addtoArray({ a: "otherA" }), m.array[0].setA() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {
+        "0": Object {
+          "a": "otherA",
+        },
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].addtoArray",
+    },
+    Object {
+      "array": Array [
+        Object {
+          "a": "otherA",
+        },
+      ],
+      "x": "",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel/SubModel[]/SubModel",
+      "type": "[root/array/0].setA",
+    },
+    Object {
+      "array": Array [
+        Object {
+          "a": "setA",
+        },
+      ],
+      "x": "",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setX() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setX",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXAsyncThrowAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowAsync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXAsyncThrowSync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowSync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowSync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXAsyncWithEmptyFirstPart() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncWithEmptyFirstPart (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncWithEmptyFirstPart +20",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXThrow() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXThrow -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXThrow",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXY() -> m.setX(), m.setY() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXY >>> [root].setX",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXY >>> [root].setY",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "setY",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXYAsync() -> m.setXAsync(), m.setYAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (0) >>> [root].setXAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (1) >>> [root].setXAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (2) >>> [root].setYAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (3) >>> [root].setYAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +50",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXYAsyncThrowAsync() -> m.setXYAsyncThrowAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowAsync (0) >>> [root].setXAsyncThrowAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowAsync (1) >>> [root].setXAsyncThrowAsync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowAsync (2) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXYAsyncThrowSync() -> m.setXAsyncThrowSync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowSync (0) >>> [root].setXAsyncThrowSync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowSync (1) >>> [root].setXAsyncThrowSync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowSync (2) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) applySnapshot(m, { x: "snapshotX" }) 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {
+        "0": Object {
+          "x": "snapshotX",
+        },
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].@APPLY_SNAPSHOT",
+    },
+    Object {
+      "array": Array [],
+      "x": "snapshotX",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) concurrent [m.setYAsync() / m.setXAsync()] 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setYAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setYAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +50",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.addtoArray({ a: "otherA" }), m.array[0].setA() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {
+        "0": Object {
+          "a": "otherA",
+        },
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].addtoArray",
+    },
+    Object {
+      "array": Array [
+        Object {
+          "a": "otherA",
+        },
+      ],
+      "x": "",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel/SubModel[]/SubModel",
+      "type": "[root/array/0].setA",
+    },
+    Object {
+      "array": Array [
+        Object {
+          "a": "setA",
+        },
+      ],
+      "x": "",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setX() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setX",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXAsyncThrowAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowAsync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXAsyncThrowSync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowSync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowSync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXAsyncWithEmptyFirstPart() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncWithEmptyFirstPart (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncWithEmptyFirstPart (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncWithEmptyFirstPart +20",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXThrow() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXThrow -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXThrow",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXY() -> m.setX(), m.setY() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXY",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "setY",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXYAsync() -> m.setXAsync(), m.setYAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (2)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (3)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (4)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (5)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +50",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (6)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +50",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXYAsyncThrowAsync() -> m.setXYAsyncThrowAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowAsync (2)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowAsync (3) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXYAsyncThrowSync() -> m.setXAsyncThrowSync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowSync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowSync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowSync (2)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowSync (3) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) applySnapshot(m, { x: "snapshotX" }) 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {
+        "0": Array [],
+      },
+      "targetTypePath": "TestModel >>> TestModel/SubModel[]",
+      "type": "[root].@APPLY_SNAPSHOT >>> [root/array].@APPLY_SNAPSHOT",
+    },
+    Object {
+      "array": Array [],
+      "x": "snapshotX",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {
+        "0": Object {
+          "x": "snapshotX",
+        },
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].@APPLY_SNAPSHOT",
+    },
+    Object {
+      "array": Array [],
+      "x": "snapshotX",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) concurrent [m.setYAsync() / m.setXAsync()] 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setYAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setYAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +50",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.addtoArray({ a: "otherA" }), m.array[0].setA() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {
+        "0": Object {
+          "a": "otherA",
+        },
+      },
+      "targetTypePath": "TestModel",
+      "type": "[root].addtoArray",
+    },
+    Object {
+      "array": Array [
+        Object {
+          "a": "otherA",
+        },
+      ],
+      "x": "",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel/SubModel[]/SubModel",
+      "type": "[root/array/0].setA",
+    },
+    Object {
+      "array": Array [
+        Object {
+          "a": "setA",
+        },
+      ],
+      "x": "",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setX() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setX",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXAsyncThrowAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowAsync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXAsyncThrowSync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowSync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncThrowSync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXAsyncWithEmptyFirstPart() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncWithEmptyFirstPart (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXAsyncWithEmptyFirstPart (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncWithEmptyFirstPart +20",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXThrow() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXThrow -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXThrow",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXY() -> m.setX(), m.setY() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXY >>> [root].setX",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXY >>> [root].setY",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "setY",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXY",
+    },
+    Object {
+      "array": Array [],
+      "x": "setX",
+      "y": "setY",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXYAsync() -> m.setXAsync(), m.setYAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (0) >>> [root].setXAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (2) >>> [root].setXAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (3) >>> [root].setYAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (4)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +0",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsync (5) >>> [root].setYAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +50",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsync (6)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsync +20",
+      "y": "setYAsync +50",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXYAsyncThrowAsync() -> m.setXYAsyncThrowAsync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowAsync (0) >>> [root].setXAsyncThrowAsync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowAsync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowAsync (2) >>> [root].setXAsyncThrowAsync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowAsync (3) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowAsync +0",
+      "y": "",
+    },
+  ],
+]
+`;
+
+exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXYAsyncThrowSync() -> m.setXAsyncThrowSync() 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowSync (0) >>> [root].setXAsyncThrowSync (0)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowSync (1)",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel >>> TestModel",
+      "type": "[root].setXYAsyncThrowSync (2) >>> [root].setXAsyncThrowSync (1) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "TestModel",
+      "type": "[root].setXYAsyncThrowSync (3) -error thrown-",
+    },
+    Object {
+      "array": Array [],
+      "x": "setXAsyncThrowSync +0",
+      "y": "",
+    },
+  ],
+]
+`;

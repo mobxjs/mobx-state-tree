@@ -106,24 +106,16 @@ function getTargetTypePath(node: mst.IAnyStateTreeNode): string[] {
  * @export
  * @param {*} remoteDevDep
  * @param {*} model
- * @param {{ skipIdempotentActionSteps: boolean }} [options]
+ * @param {{ logIdempotentActionSteps: boolean; logChildActions: boolean }} [options]
  */
 export function connectReduxDevtools(
     remoteDevDep: any,
     model: mst.IAnyStateTreeNode,
-    options?: { skipIdempotentActionSteps: boolean }
+    options?: { logIdempotentActionSteps: boolean; logChildActions: boolean }
 ) {
-    options = { skipIdempotentActionSteps: false, ...options }
+    options = { logIdempotentActionSteps: true, logChildActions: false, ...options }
 
-    let applyingSnapshot = 0
-    function applySnapshot(model2: any, state: any) {
-        applyingSnapshot++
-        try {
-            mst.applySnapshot(model2, state)
-        } finally {
-            applyingSnapshot--
-        }
-    }
+    let handlingMonitorAction = 0
 
     // Connect to the monitor
     const remotedev = remoteDevDep.connectViaExtension({
@@ -143,9 +135,9 @@ export function connectReduxDevtools(
     const actionContexts = new Map<number, ActionContext>()
 
     let changesMade = 0
-    if (options.skipIdempotentActionSteps) {
+    if (!options.logIdempotentActionSteps) {
         mst.onPatch(model, () => {
-            if (!applyingSnapshot) {
+            if (!handlingMonitorAction) {
                 changesMade++
             }
         })
@@ -153,7 +145,7 @@ export function connectReduxDevtools(
 
     mst.addMiddleware(model, actionMiddleware, false)
     function actionMiddleware(call: mst.IMiddlewareEvent, next: any) {
-        if (applyingSnapshot) {
+        if (handlingMonitorAction) {
             next(call)
             return
         }
@@ -198,6 +190,7 @@ export function connectReduxDevtools(
             actionContexts.set(call.id, context)
         }
 
+        let oldChangesMade = changesMade
         changesMade = 0
 
         // capture any errors and rethrow them later (after it is logged)
@@ -209,7 +202,14 @@ export function connectReduxDevtools(
             context.errored = true
         }
 
-        const changedTheModel = !options!.skipIdempotentActionSteps || changesMade > 0
+        let changedTheModel = options!.logIdempotentActionSteps ? true : changesMade > 0
+        oldChangesMade += changesMade
+
+        // TODO: this should be removed once onPatch reacts to applySnapshot appropiately
+        if (call.name === "@APPLY_SNAPSHOT") {
+            changedTheModel = true
+        }
+
         changesMade = 0
 
         switch (call.type) {
@@ -240,32 +240,55 @@ export function connectReduxDevtools(
             call.type === "flow_resume" ||
             (call.type === "flow_throw" && !context.errorReported)
 
+        // do not log child actions if asked not to, but only for sync actions
+        if (!options!.logChildActions && context.parent && !context.runningAsync) {
+            log = false
+            // give the child action changes to the parent action
+            changesMade = oldChangesMade
+        }
+
         if (log) {
-            // we don't have to log if it didn't change the model (unless it didn't change it because it errored)
-            if (changedTheModel || (context.errored && !context.errorReported)) {
+            function logStep(logContext: ActionContext) {
                 const sn = mst.getSnapshot(model)
 
-                const names = getActionContextNameAndTypePath(context)
+                const names = getActionContextNameAndTypePath(logContext)
 
                 const copy = {
                     type: names.name,
                     targetTypePath: names.targetTypePath,
-                    args: { ...context.callArgs }
+                    args: { ...logContext.callArgs }
                 }
                 remotedev.send(copy, sn)
 
+                // we do it over the original context, not the log context, since the original context might throw but the original context might not
                 if (context.errored) {
                     context.errorReported = true
                 }
+
+                // increase the step for logging purposes, as well as any parent steps (since child steps count as a parent step)
+                context.step++
+
+                let parent = context.parent
+                while (parent) {
+                    parent.step++
+                    parent = parent.parent
+                }
             }
 
-            // increase the step for logging purposes, as well as any parent steps (since child steps count as a parent step)
-            context.step++
+            // if it is an async subaction we need to log it since it made a change, but we will log it as if it were the root
+            const logAsRoot = context.parent && !options!.logChildActions
 
-            let parent = context.parent
-            while (parent) {
-                parent.step++
-                parent = parent.parent
+            if (changedTheModel) {
+                let logContext = context
+                if (logAsRoot) {
+                    while (logContext.parent) {
+                        logContext = logContext.parent
+                    }
+                }
+
+                logStep(logContext)
+            } else if (!logAsRoot && context.errored && !context.errorReported) {
+                logStep(context)
             }
         }
 
@@ -281,25 +304,31 @@ export function connectReduxDevtools(
     }
 
     function handleMonitorActions(remotedev2: any, model2: any, message: any) {
-        switch (message.payload.type) {
-            case "RESET":
-                applySnapshot(model2, initialState)
-                return remotedev2.init(initialState)
-            case "COMMIT":
-                return remotedev2.init(mst.getSnapshot(model2))
-            case "ROLLBACK":
-                return remotedev2.init(remoteDevDep.extractState(message))
-            case "JUMP_TO_STATE":
-            case "JUMP_TO_ACTION":
-                applySnapshot(model2, remoteDevDep.extractState(message))
-                return
-            case "IMPORT_STATE":
-                const nextLiftedState = message.payload.nextLiftedState
-                const computedStates = nextLiftedState.computedStates
-                applySnapshot(model2, computedStates[computedStates.length - 1].state)
-                remotedev2.send(null, nextLiftedState)
-                return
-            default:
+        try {
+            handlingMonitorAction++
+
+            switch (message.payload.type) {
+                case "RESET":
+                    mst.applySnapshot(model2, initialState)
+                    return remotedev2.init(initialState)
+                case "COMMIT":
+                    return remotedev2.init(mst.getSnapshot(model2))
+                case "ROLLBACK":
+                    return remotedev2.init(remoteDevDep.extractState(message))
+                case "JUMP_TO_STATE":
+                case "JUMP_TO_ACTION":
+                    mst.applySnapshot(model2, remoteDevDep.extractState(message))
+                    return
+                case "IMPORT_STATE":
+                    const nextLiftedState = message.payload.nextLiftedState
+                    const computedStates = nextLiftedState.computedStates
+                    mst.applySnapshot(model2, computedStates[computedStates.length - 1].state)
+                    remotedev2.send(null, nextLiftedState)
+                    return
+                default:
+            }
+        } finally {
+            handlingMonitorAction--
         }
     }
 }
