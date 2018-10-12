@@ -136,22 +136,22 @@ const MotorcycleFactory = types.model("MotorcycleFactory", {
 })
 
 test("it should preprocess snapshots when creating", () => {
-    const car = Car.create({ id: "1" })
+    const car = Car.create({ id: ("1" as any) as number })
     expect(car.id).toBe(2)
 })
 test("it should preprocess snapshots when updating", () => {
-    const car = Car.create({ id: "1" })
+    const car = Car.create({ id: ("1" as any) as number })
     expect(car.id).toBe(2)
-    applySnapshot(car, { id: "6" })
+    applySnapshot(car, { id: ("6" as any) as number })
     expect(car.id).toBe(12)
 })
 test("it should postprocess snapshots when generating snapshot - 1", () => {
-    const car = Car.create({ id: "1" })
+    const car = Car.create({ id: ("1" as any) as number })
     expect(car.id).toBe(2)
     expect(getSnapshot(car)).toEqual({ id: "1" })
 })
 test("it should not apply postprocessor to snapshot on getSnapshot", () => {
-    const car = Car.create({ id: "1" })
+    const car = Car.create({ id: ("1" as any) as number })
     let error = false
     onSnapshot(car, snapshot => {
         error = true
@@ -161,19 +161,17 @@ test("it should not apply postprocessor to snapshot on getSnapshot", () => {
     expect(error).toBeFalsy()
 })
 test("it should preprocess snapshots when creating as property type", () => {
-    const f = Factory.create({
-        car: { id: "1" }
-    })
+    const f = Factory.create({ car: { id: ("1" as any) as number } })
     expect(f.car.id).toBe(2)
 })
 test("it should preprocess snapshots when updating", () => {
-    const f = Factory.create({ car: { id: "1" } })
+    const f = Factory.create({ car: { id: ("1" as any) as number } })
     expect(f.car.id).toBe(2)
-    applySnapshot(f, { car: { id: "6" } })
+    applySnapshot(f, { car: { id: ("6" as any) as number } })
     expect(f.car.id).toBe(12)
 })
 test("it should postprocess snapshots when generating snapshot - 2", () => {
-    const f = Factory.create({ car: { id: "1" } })
+    const f = Factory.create({ car: { id: ("1" as any) as number } })
     expect(f.car.id).toBe(2)
     expect(getSnapshot(f)).toEqual({ car: { id: "1" } })
 })

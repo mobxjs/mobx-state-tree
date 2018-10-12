@@ -14,7 +14,9 @@ exports.getDeclaration = function getDeclaration(
     templateVars,
     args,
     preParam,
-    operationChar
+    operationChar,
+    outType = type,
+    allReturnTypesTransform = x => x
 ) {
     let str = "// prettier-ignore\n"
 
@@ -38,15 +40,16 @@ exports.getDeclaration = function getDeclaration(
     str += `${allParams.join(", ")}`
     str += ")"
 
-    const allReturnTypes = []
+    let allReturnTypes = []
     for (const templateVar of templateVars) {
         let union = []
         for (let i = 0; i < args; i++) {
             union.push(getTemplateVar(templateVar, i))
         }
-        allReturnTypes.push(union.join(` ${operationChar} `))
+        allReturnTypes.push(union)
     }
-    str += `: ${type}<${allReturnTypes.join(", ")}>`
+    allReturnTypes = allReturnTypesTransform(allReturnTypes)
+    str += `: ${outType}<${allReturnTypes.map(u => u.join(` ${operationChar} `)).join(", ")}>`
 
     return str + "\n"
 }
