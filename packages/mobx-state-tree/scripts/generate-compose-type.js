@@ -6,8 +6,8 @@ const minArgs = 2
 const maxArgs = 10
 const preParam = "name: string, "
 for (let i = minArgs; i < maxArgs; i++) {
-    str += getDeclaration("compose", "IModelType", ["P", "O", "C", "S", "T"], i, preParam, "&")
-    str += getDeclaration("compose", "IModelType", ["P", "O", "C", "S", "T"], i, null, "&")
+    str += getDeclaration("compose", "IModelType", ["P", "O"], i, preParam, "&")
+    str += getDeclaration("compose", "IModelType", ["P", "O"], i, null, "&")
 }
 
 console.log(str)

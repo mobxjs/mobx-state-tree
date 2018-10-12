@@ -119,65 +119,60 @@ export type ModelCreationType<T extends ModelProperties> = {
 
 export type ModelSnapshotType<T extends ModelProperties> = { [K in keyof T]: ExtractS<T[K]> }
 
-export type ModelInstanceType<T extends ModelProperties, O, C, S> = {
+export type ModelInstanceType<T extends ModelProperties, O> = {
     [K in keyof T]: ExtractIStateTreeNode<ExtractC<T[K]>, ExtractS<T[K]>, ExtractT<T[K]>>
 } &
     O &
-    IStateTreeNode<C, S>
+    IStateTreeNode<ModelCreationType<T>, ModelSnapshotType<T>>
 
 export interface ModelActions {
     [key: string]: Function
 }
 
-export interface IModelType<
-    PROPS extends ModelProperties,
-    OTHERS,
-    C = ModelCreationType<PROPS>,
-    S = ModelSnapshotType<PROPS>,
-    T = ModelInstanceType<PROPS, OTHERS, C, S>
-> extends IComplexType<C, S, T> {
+export interface IModelType<PROPS extends ModelProperties, OTHERS>
+    extends IComplexType<
+            ModelCreationType<PROPS>,
+            ModelSnapshotType<PROPS>,
+            ModelInstanceType<PROPS, OTHERS>
+        > {
     readonly properties: PROPS
+
     named(newName: string): this
+
     props<PROPS2 extends ModelPropertiesDeclaration>(
         props: PROPS2
     ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS>
+
     views<V extends Object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => V
+        fn: (self: ModelInstanceType<PROPS, OTHERS>) => V
     ): IModelType<PROPS, OTHERS & V>
+
     actions<A extends ModelActions>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => A
+        fn: (self: ModelInstanceType<PROPS, OTHERS>) => A
     ): IModelType<PROPS, OTHERS & A>
+
     volatile<TP extends object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => TP
+        fn: (self: ModelInstanceType<PROPS, OTHERS>) => TP
     ): IModelType<PROPS, OTHERS & TP>
+
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, C, S>) => { actions?: A; views?: V; state?: VS }
+        fn: (self: ModelInstanceType<PROPS, OTHERS>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS>
-    preProcessSnapshot<NewC = C>(fn: (snapshot: NewC) => C): IModelType<PROPS, OTHERS, NewC, S>
-    postProcessSnapshot<NewS = S>(fn: (snapshot: S) => NewS): IModelType<PROPS, OTHERS, C, NewS>
+
+    preProcessSnapshot<NewC = ModelCreationType<PROPS>>(
+        fn: (snapshot: NewC) => ModelCreationType<PROPS>
+    ): IModelType<PROPS, OTHERS>
+
+    postProcessSnapshot<NewS = ModelSnapshotType<PROPS>>(
+        fn: (snapshot: ModelSnapshotType<PROPS>) => NewS
+    ): IModelType<PROPS, OTHERS>
 }
 
 // do not make this an interface (#994 will happen again if done)
-export type IAnyModelType = IModelType<any, any, any, any, any>
+export type IAnyModelType = IModelType<any, any>
 
-export type ExtractProps<T extends IAnyModelType> = T extends IModelType<
-    infer P,
-    any,
-    any,
-    any,
-    any
->
-    ? P
-    : never
-export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<
-    any,
-    infer O,
-    any,
-    any,
-    any
->
-    ? O
-    : never
+export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any> ? P : never
+export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O> ? O : never
 
 function objectTypeToString(this: any) {
     return getStateTreeNode(this).toString()
@@ -689,44 +684,39 @@ export function model(...args: any[]): any {
     return new ModelType({ name, properties })
 }
 
-// generated with mobx-state-tree\packages\mobx-state-tree\scripts\generate-compose-type.js
+// generated with C:\VSProjects\github\mobx-state-tree-upstream\packages\mobx-state-tree\scripts\generate-compose-type.js
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB>(name: string, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>): IModelType<PA & PB, OA & OB, CA & CB, SA & SB, TA & TB>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB>(name: string, A: IModelType<PA, OA>, B: IModelType<PB, OB>): IModelType<PA & PB, OA & OB>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>): IModelType<PA & PB, OA & OB, CA & CB, SA & SB, TA & TB>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB>(A: IModelType<PA, OA>, B: IModelType<PB, OB>): IModelType<PA & PB, OA & OB>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC>(name: string, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>): IModelType<PA & PB & PC, OA & OB & OC, CA & CB & CC, SA & SB & SC, TA & TB & TC>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC>(name: string, A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>): IModelType<PA & PB & PC, OA & OB & OC>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>): IModelType<PA & PB & PC, OA & OB & OC, CA & CB & CC, SA & SB & SC, TA & TB & TC>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC>(A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>): IModelType<PA & PB & PC, OA & OB & OC>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD>(name: string, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>): IModelType<PA & PB & PC & PD, OA & OB & OC & OD, CA & CB & CC & CD, SA & SB & SC & SD, TA & TB & TC & TD>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD>(name: string, A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>): IModelType<PA & PB & PC & PD, OA & OB & OC & OD>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>): IModelType<PA & PB & PC & PD, OA & OB & OC
-    & OD, CA & CB & CC & CD, SA & SB & SC & SD, TA & TB & TC & TD>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD>(A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>): IModelType<PA & PB & PC & PD, OA & OB & OC & OD>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE>(name: string, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>): IModelType<PA & PB & PC & PD & PE, OA & OB & OC & OD & OE, CA & CB & CC & CD & CE, SA & SB & SC & SD & SE, TA & TB & TC & TD & TE>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD, PE extends ModelProperties, OE>(name: string, A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>, E: IModelType<PE, OE>): IModelType<PA & PB & PC & PD & PE, OA & OB & OC & OD & OE>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>,
-    E: IModelType<PE, OE, CE, SE, TE>): IModelType<PA & PB & PC & PD & PE, OA & OB & OC & OD & OE, CA & CB & CC & CD & CE, SA & SB & SC & SD & SE, TA & TB & TC & TD & TE>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD, PE extends ModelProperties, OE>(A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>, E: IModelType<PE, OE>): IModelType<PA & PB & PC & PD & PE, OA & OB & OC & OD & OE>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF>(name: string, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>): IModelType<PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF, CA & CB & CC & CD & CE & CF, SA & SB & SC & SD & SE & SF, TA & TB & TC & TD & TE & TF>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD, PE extends ModelProperties, OE, PF extends ModelProperties, OF>(name: string, A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>, E: IModelType<PE, OE>, F: IModelType<PF, OF>): IModelType<PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC,
-    SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>): IModelType<PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF, CA & CB & CC & CD & CE & CF, SA & SB & SC & SD & SE & SF, TA & TB & TC & TD & TE & TF>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD, PE extends ModelProperties, OE, PF extends ModelProperties, OF>(A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>, E: IModelType<PE, OE>, F: IModelType<PF, OF>): IModelType<PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG>(name: string, A: IModelType<PA, OA, CA, SA, TA>, B:
-    IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>): IModelType<PA & PB & PC & PD & PE & PF & PG, OA & OB & OC & OD & OE & OF & OG, CA & CB & CC & CD & CE & CF & CG, SA & SB & SC & SD & SE & SF & SG, TA & TB & TC & TD & TE & TF & TG>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD, PE extends ModelProperties, OE, PF extends ModelProperties, OF, PG extends ModelProperties, OG>(name: string, A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>, E: IModelType<PE, OE>, F: IModelType<PF, OF>, G: IModelType<PG, OG>): IModelType<PA & PB & PC & PD & PE & PF & PG, OA & OB & OC & OD & OE & OF & OG>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>): IModelType<PA & PB & PC & PD & PE & PF & PG, OA & OB & OC & OD & OE & OF & OG, CA & CB & CC & CD & CE & CF & CG, SA & SB & SC & SD & SE & SF & SG, TA & TB & TC & TD & TE & TF & TG>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD, PE extends ModelProperties, OE, PF extends ModelProperties, OF, PG extends ModelProperties, OG>(A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>, E: IModelType<PE, OE>, F: IModelType<PF, OF>, G: IModelType<PG, OG>): IModelType<PA & PB & PC & PD & PE & PF & PG, OA & OB & OC & OD & OE & OF & OG>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG, PH extends ModelProperties, OH, CH, SH, TH>(name: string, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>, H: IModelType<PH, OH, CH, SH, TH>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH, OA & OB & OC & OD & OE & OF & OG & OH, CA & CB
-    & CC & CD & CE & CF & CG & CH, SA & SB & SC & SD & SE & SF & SG & SH, TA & TB & TC & TD & TE & TF & TG & TH>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD, PE extends ModelProperties, OE, PF extends ModelProperties, OF, PG extends ModelProperties, OG, PH extends ModelProperties, OH>(name: string, A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>, E: IModelType<PE, OE>, F: IModelType<PF, OF>, G: IModelType<PG, OG>, H: IModelType<PH, OH>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH, OA & OB & OC & OD & OE & OF & OG & OH>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG, PH extends ModelProperties, OH, CH, SH, TH>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>, H: IModelType<PH, OH, CH, SH, TH>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH, OA & OB & OC & OD & OE & OF & OG & OH, CA & CB & CC & CD & CE & CF & CG & CH, SA & SB & SC & SD & SE & SF & SG & SH, TA & TB & TC & TD & TE & TF & TG & TH>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD, PE extends ModelProperties, OE, PF extends ModelProperties, OF, PG extends ModelProperties, OG, PH extends ModelProperties, OH>(A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>, E: IModelType<PE, OE>, F: IModelType<PF, OF>, G: IModelType<PG, OG>, H: IModelType<PH, OH>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH, OA & OB & OC & OD & OE & OF & OG & OH>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG, PH extends ModelProperties, OH, CH, SH, TH, PI extends ModelProperties, OI, CI, SI, TI>(name: string, A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>, H: IModelType<PH, OH, CH, SH, TH>, I: IModelType<PI, OI, CI, SI, TI>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI, CA & CB & CC & CD & CE & CF & CG & CH & CI, SA & SB & SC & SD & SE & SF & SG & SH & SI, TA & TB & TC & TD & TE & TF & TG & TH & TI>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD, PE extends ModelProperties, OE, PF extends ModelProperties, OF, PG extends ModelProperties, OG, PH extends ModelProperties, OH, PI extends ModelProperties, OI>(name: string, A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>, E: IModelType<PE, OE>, F: IModelType<PF, OF>, G: IModelType<PG, OG>, H: IModelType<PH, OH>, I: IModelType<PI, OI>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, CA, SA, TA, PB extends ModelProperties, OB, CB, SB, TB, PC extends ModelProperties, OC, CC, SC, TC, PD extends ModelProperties, OD, CD, SD, TD, PE extends ModelProperties, OE, CE, SE, TE, PF extends ModelProperties, OF, CF, SF, TF, PG extends ModelProperties, OG, CG, SG, TG, PH extends ModelProperties, OH, CH, SH, TH, PI extends ModelProperties, OI, CI, SI, TI>(A: IModelType<PA, OA, CA, SA, TA>, B: IModelType<PB, OB, CB, SB, TB>, C: IModelType<PC, OC, CC, SC, TC>, D: IModelType<PD, OD, CD, SD, TD>, E: IModelType<PE, OE, CE, SE, TE>, F: IModelType<PF, OF, CF, SF, TF>, G: IModelType<PG, OG, CG, SG, TG>, H: IModelType<PH, OH, CH, SH, TH>, I: IModelType<PI, OI, CI, SI, TI>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI, CA & CB & CC & CD & CE & CF & CG & CH & CI, SA & SB & SC & SD & SE & SF & SG & SH & SI, TA & TB & TC & TD & TE & TF & TG & TH & TI>
+export function compose<PA extends ModelProperties, OA, PB extends ModelProperties, OB, PC extends ModelProperties, OC, PD extends ModelProperties, OD, PE extends ModelProperties, OE, PF extends ModelProperties, OF, PG extends ModelProperties, OG, PH extends ModelProperties, OH, PI extends ModelProperties, OI>(A: IModelType<PA, OA>, B: IModelType<PB, OB>, C: IModelType<PC, OC>, D: IModelType<PD, OD>, E: IModelType<PE, OE>, F: IModelType<PF, OF>, G: IModelType<PG, OG>, H: IModelType<PH, OH>, I: IModelType<PI, OI>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI>
 
 /**
  * Composes a new model from one or more existing model types.
@@ -744,7 +734,8 @@ export function compose(...args: any[]): any {
     // check all parameters
     if (process.env.NODE_ENV !== "production") {
         args.forEach(type => {
-            if (!isModelType(type)) fail("expected a mobx-state-tree model type, got " + type + " instead")
+            if (!isModelType(type))
+                fail("expected a mobx-state-tree model type, got " + type + " instead")
         })
     }
     return (args as ModelType<any, any>[])
