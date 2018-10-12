@@ -6,10 +6,12 @@ const minArgs = 2
 const maxArgs = 10
 const preParam = "options: UnionOptions, "
 const returnTypeTransform = rt => {
-    // [[PA, PB], [OA, OB]]
-    // -> [[ModelCreationType<PA>, ModelCreationType<PB>], [ModelSnapshotType<PA>, ModelSnapshotType<PB>], [ModelInstanceType<PA, OA>, ModelInstanceType<PB, OB]]
-    const props = rt[0]
-    const others = rt[1]
+    // [['PA', 'PB'], ['OA', 'OB'], ['FCA', 'FCB'], ['FSA', 'FSB']]
+    // ->
+    // [['ModelCreationType<PA, FCA>', 'ModelCreationType<PB, FCB>>'],
+    //  ['ModelSnapshotType<PA, FSA>',  'ModelSnapshotType<PB, FSB>>'],
+    //  ['ModelInstanceType<PA, OA, FCA, FSA>', 'ModelInstanceType<PB, OB, FCB, FSB']]
+    const [props, others, fixedC, fixedS] = rt
 
     const c = [],
         s = [],
@@ -17,32 +19,35 @@ const returnTypeTransform = rt => {
     for (let i = 0; i < props.length; i++) {
         const p = props[i]
         const o = others[i]
+        const fc = fixedC[i]
+        const fs = fixedS[i]
 
-        c.push(`ModelCreationType<${p}>`)
-        s.push(`ModelSnapshotType<${p}>`)
-        t.push(`ModelInstanceType<${p}, ${o}>`)
+        c.push(`ModelCreationType<${p}, ${fc}>`)
+        s.push(`ModelSnapshotType<${p}, ${fs}>`)
+        t.push(`ModelInstanceType<${p}, ${o}, ${fc}, ${fs}>`)
     }
     return [c, s, t]
 }
+
 for (let i = minArgs; i < maxArgs; i++) {
     str += getDeclaration(
         "union",
         "IModelType",
-        ["P", "O"],
+        ["P", "O", "FC", "FS"],
         i,
         null,
         "|",
-        "IComplexType",
+        "ModelUnion",
         returnTypeTransform
     )
     str += getDeclaration(
         "union",
         "IModelType",
-        ["P", "O"],
+        ["P", "O", "FC", "FS"],
         i,
         preParam,
         "|",
-        "IComplexType",
+        "ModelUnion",
         returnTypeTransform
     )
 }
