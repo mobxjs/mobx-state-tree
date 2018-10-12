@@ -141,7 +141,7 @@ export interface ModelActions {
     [key: string]: Function
 }
 
-export interface IModelType<PROPS extends ModelProperties, OTHERS, FixedC, FixedS>
+export interface IModelType<PROPS extends ModelProperties, OTHERS, FixedC = false, FixedS = false>
     extends IComplexType<
             ModelCreationType2<PROPS, FixedC>,
             ModelSnapshotType2<PROPS, FixedS>,
@@ -151,7 +151,7 @@ export interface IModelType<PROPS extends ModelProperties, OTHERS, FixedC, Fixed
 
     named(newName: string): this
 
-    // warning: redefining props after a process snapshot is used ends up on the fixed (custom) C, S typings being outdated
+    // warning: redefining props after a process snapshot is used ends up on the fixed (custom) C, S typings being overridden
     // so it is recommended to use pre/post process snapshot after all props have been defined
     props<PROPS2 extends ModelPropertiesDeclaration>(
         props: PROPS2
@@ -686,10 +686,10 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
 export function model<T extends ModelPropertiesDeclaration = {}>(
     name: string,
     properties?: T
-): IModelType<ModelPropertiesDeclarationToProperties<T>, {}, false, false>
+): IModelType<ModelPropertiesDeclarationToProperties<T>, {}>
 export function model<T extends ModelPropertiesDeclaration = {}>(
     properties?: T
-): IModelType<ModelPropertiesDeclarationToProperties<T>, {}, false, false>
+): IModelType<ModelPropertiesDeclarationToProperties<T>, {}>
 /**
  * Creates a new model type by providing a name, properties, volatile state and actions.
  *
