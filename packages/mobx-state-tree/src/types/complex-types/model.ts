@@ -168,8 +168,7 @@ export interface IModelType<PROPS extends ModelProperties, OTHERS>
     ): IModelType<PROPS, OTHERS>
 }
 
-// do not make this an interface (#994 will happen again if done)
-export type IAnyModelType = IModelType<any, any>
+export interface IAnyModelType extends IModelType<any, any> {}
 
 export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any> ? P : never
 export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O> ? O : never

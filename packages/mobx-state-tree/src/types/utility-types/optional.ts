@@ -72,7 +72,9 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
 
     getDefaultInstanceOrSnapshot() {
         const defaultInstanceOrSnapshot =
-            typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
+            typeof this.defaultValue === "function"
+                ? (this.defaultValue as IFunctionReturn<C | S | T>)()
+                : this.defaultValue
 
         // while static values are already snapshots and checked on types.optional
         // generator functions must always be rechecked just in case
