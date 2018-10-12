@@ -87,7 +87,7 @@ Example:
 
 ```javascript
 import { types, addMiddleware, flow } from "mobx-state-tree"
-import {atomic} form "mst-middlewares"
+import { atomic } from "mst-middlewares"
 
 const TestModel = types
     .model({
