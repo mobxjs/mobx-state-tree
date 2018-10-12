@@ -114,28 +114,28 @@ export type FixedOrOther<F, O> = F extends false ? O : F
 /**
  * Maps property types to the snapshot, including omitted optional attributes
  */
-export type ModelCreationType2<T extends ModelProperties> = {
+export type ModelCreationType<T extends ModelProperties> = {
     [K in keyof RequiredProps<T>]: ExtractC<T[K]>
 } &
     { [K in keyof OptionalProps<T>]?: ExtractC<T[K]> }
 
-export type ModelCreationType<T extends ModelProperties, FixedC> = FixedOrOther<
+export type ModelCreationType2<T extends ModelProperties, FixedC> = FixedOrOther<
     FixedC,
-    ModelCreationType2<T>
+    ModelCreationType<T>
 >
 
-export type ModelSnapshotType2<T extends ModelProperties> = { [K in keyof T]: ExtractS<T[K]> }
+export type ModelSnapshotType<T extends ModelProperties> = { [K in keyof T]: ExtractS<T[K]> }
 
-export type ModelSnapshotType<T extends ModelProperties, FixedS> = FixedOrOther<
+export type ModelSnapshotType2<T extends ModelProperties, FixedS> = FixedOrOther<
     FixedS,
-    ModelSnapshotType2<T>
+    ModelSnapshotType<T>
 >
 
 export type ModelInstanceType<T extends ModelProperties, O, FixedC, FixedS> = {
     [K in keyof T]: ExtractIStateTreeNode<ExtractC<T[K]>, ExtractS<T[K]>, ExtractT<T[K]>>
 } &
     O &
-    IStateTreeNode<ModelCreationType<T, FixedC>, ModelSnapshotType<T, FixedS>>
+    IStateTreeNode<ModelCreationType2<T, FixedC>, ModelSnapshotType2<T, FixedS>>
 
 export interface ModelActions {
     [key: string]: Function
@@ -143,8 +143,8 @@ export interface ModelActions {
 
 export interface IModelType<PROPS extends ModelProperties, OTHERS, FixedC, FixedS>
     extends IComplexType<
-            ModelCreationType<PROPS, FixedC>,
-            ModelSnapshotType<PROPS, FixedS>,
+            ModelCreationType2<PROPS, FixedC>,
+            ModelSnapshotType2<PROPS, FixedS>,
             ModelInstanceType<PROPS, OTHERS, FixedC, FixedS>
         > {
     readonly properties: PROPS
@@ -175,12 +175,12 @@ export interface IModelType<PROPS extends ModelProperties, OTHERS, FixedC, Fixed
         ) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS, FixedC, FixedS>
 
-    preProcessSnapshot<NewC = ModelCreationType<PROPS, FixedC>>(
-        fn: (snapshot: NewC) => ModelCreationType<PROPS, FixedC>
+    preProcessSnapshot<NewC = ModelCreationType2<PROPS, FixedC>>(
+        fn: (snapshot: NewC) => ModelCreationType2<PROPS, FixedC>
     ): IModelType<PROPS, OTHERS, NewC, FixedS>
 
-    postProcessSnapshot<NewS = ModelSnapshotType<PROPS, FixedS>>(
-        fn: (snapshot: ModelSnapshotType<PROPS, FixedS>) => NewS
+    postProcessSnapshot<NewS = ModelSnapshotType2<PROPS, FixedS>>(
+        fn: (snapshot: ModelSnapshotType2<PROPS, FixedS>) => NewS
     ): IModelType<PROPS, OTHERS, FixedC, NewS>
 }
 

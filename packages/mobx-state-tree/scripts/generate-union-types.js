@@ -8,8 +8,8 @@ const preParam = "options: UnionOptions, "
 const returnTypeTransform = rt => {
     // [['PA', 'PB'], ['OA', 'OB'], ['FCA', 'FCB'], ['FSA', 'FSB']]
     // ->
-    // [['ModelCreationType<PA, FCA>', 'ModelCreationType<PB, FCB>>'],
-    //  ['ModelSnapshotType<PA, FSA>',  'ModelSnapshotType<PB, FSB>>'],
+    // [['ModelCreationType2<PA, FCA>', 'ModelCreationType2<PB, FCB>>'],
+    //  ['ModelSnapshotType2<PA, FSA>',  'ModelSnapshotType2<PB, FSB>>'],
     //  ['ModelInstanceType<PA, OA, FCA, FSA>', 'ModelInstanceType<PB, OB, FCB, FSB']]
     const [props, others, fixedC, fixedS] = rt
 
@@ -22,8 +22,8 @@ const returnTypeTransform = rt => {
         const fc = fixedC[i]
         const fs = fixedS[i]
 
-        c.push(`ModelCreationType<${p}, ${fc}>`)
-        s.push(`ModelSnapshotType<${p}, ${fs}>`)
+        c.push(`ModelCreationType2<${p}, ${fc}>`)
+        s.push(`ModelSnapshotType2<${p}, ${fs}>`)
         t.push(`ModelInstanceType<${p}, ${o}, ${fc}, ${fs}>`)
     }
     return [c, s, t]
