@@ -13,8 +13,12 @@ import {
     fail,
     IAnyType,
     IComplexType,
-    OptionalProperty
+    OptionalProperty,
+    ExtractT,
+    ExtractS,
+    ExtractC
 } from "../../internal"
+import { IAnyComplexType } from "../.."
 
 /**
  * @internal
@@ -106,15 +110,23 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
     }
 }
 
-export function optional<C, S, T>(
-    type: IComplexType<C, S, T>,
-    defaultValueOrFunction: C | S | (() => C | S | T)
-): IComplexType<C | undefined, S, T> & OptionalProperty
-export function optional<C, S, T>(
-    type: IType<C, S, T>,
-    defaultValueOrFunction: C | S | (() => C | S | T)
-): IType<C | undefined, S, T> & OptionalProperty
+export interface IOptionalIComplexType<IT extends IAnyComplexType>
+    extends IComplexType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
+        OptionalProperty {}
+export interface IOptionalIType<IT extends IAnyType>
+    extends IType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
+        OptionalProperty {}
 
+export function optional<
+    IT extends IAnyComplexType,
+    C = ExtractC<IT>,
+    S = ExtractS<IT>,
+    T = ExtractT<IT>
+>(type: IT, defaultValueOrFunction: C | S | (() => C | S | T)): IOptionalIComplexType<IT>
+export function optional<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>, T = ExtractT<IT>>(
+    type: IT,
+    defaultValueOrFunction: C | S | (() => C | S | T)
+): IOptionalIType<IT>
 /**
  * `types.optional` can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
@@ -134,10 +146,10 @@ export function optional<C, S, T>(
  * @export
  * @alias types.optional
  */
-export function optional<C, S, T>(
-    type: IType<C, S, T>,
+export function optional<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>, T = ExtractT<IT>>(
+    type: IT,
     defaultValueOrFunction: C | S | (() => C | S | T)
-): IType<C | undefined, S, T> & OptionalProperty {
+): IOptionalIType<IT> {
     // make sure we never pass direct instances
     if (typeof defaultValueOrFunction !== "function" && isStateTreeNode(defaultValueOrFunction)) {
         fail(
