@@ -250,7 +250,7 @@ An example:
 ```javascript
 const TodoStore = types
     .model("TodoStore", {                             // 1
-        loaded: types.boolean                         // 2
+        loaded: types.boolean,                        // 2
         endpoint: "http://localhost",                 // 3
         todos: types.array(Todo),                     // 4
         selectedTodo: types.reference(Todo)           // 5
