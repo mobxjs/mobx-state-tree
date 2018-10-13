@@ -220,11 +220,7 @@ test("it should apply deep patches to maps", () => {
         NodeMap,
         { id: 1, children: { 2: { id: 2 } } },
         (n: Instance<typeof NodeMap>) => {
-            const children = n.children as IMSTMap<
-                SnapshotIn<typeof NodeMap>,
-                SnapshotOut<typeof NodeMap>,
-                Instance<typeof NodeMap>
-            >
+            const children = n.children as IMSTMap<typeof NodeMap>
             children.get("2")!.text = "test" // update
             children.put({ id: 2, text: "world" }) // this reconciles; just an update
             children.set(

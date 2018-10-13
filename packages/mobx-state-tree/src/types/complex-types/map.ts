@@ -42,43 +42,58 @@ import {
     TypeFlags,
     Union,
     EMPTY_OBJECT,
-    OptionalProperty
+    OptionalProperty,
+    ExtractC,
+    ExtractS,
+    ExtractT
 } from "../../internal"
 
-export interface IMapType<C, S, T>
-    extends IComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<C, S, T>>,
+export interface IMapType<IT extends IAnyType>
+    extends IComplexType<
+            IKeyValueMap<ExtractC<IT>> | undefined,
+            IKeyValueMap<ExtractS<IT>>,
+            IMSTMap<IT>
+        >,
         OptionalProperty {}
 
-export interface IMSTMap<C, S, T> {
+export interface IMSTMap<IT extends IAnyType> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
 
     clear(): void
     delete(key: string): boolean
-    forEach(callbackfn: (value: T, key: string, map: IMSTMap<C, S, T>) => void, thisArg?: any): void
-    get(key: string): T | undefined
+    forEach(
+        callbackfn: (value: ExtractT<IT>, key: string, map: IMSTMap<IT>) => void,
+        thisArg?: any
+    ): void
+    get(key: string): ExtractT<IT> | undefined
     has(key: string): boolean
-    set(key: string, value: C | S | T): this
+    set(key: string, value: ExtractC<IT> | ExtractS<IT> | ExtractT<IT>): this
     readonly size: number
-    put(value: C | S | T): T
+    put(value: ExtractC<IT> | ExtractS<IT> | ExtractT<IT>): ExtractT<IT>
     keys(): IterableIterator<string>
-    values(): IterableIterator<T>
-    entries(): IterableIterator<[string, T]>
-    [Symbol.iterator](): IterableIterator<[string, T]>
+    values(): IterableIterator<ExtractT<IT>>
+    entries(): IterableIterator<[string, ExtractT<IT>]>
+    [Symbol.iterator](): IterableIterator<[string, ExtractT<IT>]>
     /** Merge another object into this map, returns self. */
-    merge(other: IMSTMap<any, any, T> | IKeyValueMap<C | S | T> | any): this
-    replace(values: IMSTMap<any, any, T> | IKeyValueMap<T>): this
+    merge(
+        other:
+            | IMSTMap<IType<any, any, ExtractT<IT>>>
+            | IKeyValueMap<ExtractC<IT> | ExtractS<IT> | ExtractT<IT>>
+            | any
+    ): this
+    replace(values: IMSTMap<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractT<IT>>): this
     /**
      * Returns a plain object that represents this map.
      * Note that all the keys being stringified.
      * If there are duplicating keys after converting them to strings, behaviour is undetermined.
      */
-    toPOJO(): IKeyValueMap<T>
+    toPOJO(): IKeyValueMap<ExtractT<IT>>
     /**
      * Returns a shallow non observable object clone of this map.
      * Note that the values migth still be observable. For a deep clone use mobx.toJS.
      */
-    toJS(): Map<string, T>
-    toJSON(): IKeyValueMap<T>
+    toJS(): Map<string, ExtractT<IT>>
+    toJSON(): IKeyValueMap<ExtractT<IT>>
     toString(): string
     [Symbol.toStringTag]: "Map"
     /**
@@ -87,10 +102,10 @@ export interface IMSTMap<C, S, T> {
      * for callback details
      */
     observe(
-        listener: (changes: IMapDidChange<string, T>) => void,
+        listener: (changes: IMapDidChange<string, ExtractT<IT>>) => void,
         fireImmediately?: boolean
     ): Lambda
-    intercept(handler: IInterceptor<IMapWillChange<string, T>>): Lambda
+    intercept(handler: IInterceptor<IMapWillChange<string, ExtractT<IT>>>): Lambda
 }
 
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
@@ -179,11 +194,12 @@ class MSTMap<C, S, T> extends ObservableMap {
  * @internal
  * @private
  */
-export class MapType<C, S, T> extends ComplexType<
-    IKeyValueMap<C> | undefined,
-    IKeyValueMap<S>,
-    IMSTMap<C, S, T>
-> {
+export class MapType<
+    IT extends IAnyType,
+    C = ExtractC<IT>,
+    S = ExtractS<IT>,
+    T = ExtractT<IT>
+> extends ComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<IT>> {
     shouldAttachNode = true
     subType: IAnyType
     identifierMode: MapIdentifierMode = MapIdentifierMode.UNKNOWN
@@ -239,12 +255,8 @@ export class MapType<C, S, T> extends ComplexType<
         return result
     }
 
-    createNewInstance(
-        node: INode,
-        childNodes: IChildNodesMap,
-        snapshot: any
-    ): IMSTMap<any, any, any> {
-        return (new MSTMap(childNodes) as any) as IMSTMap<any, any, any>
+    createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): IMSTMap<any> {
+        return (new MSTMap(childNodes) as any) as IMSTMap<any>
     }
 
     finalizeNewInstance(node: ObjectNode, instance: any) {
@@ -445,8 +457,8 @@ export class MapType<C, S, T> extends ComplexType<
  * @param {IType<S, T>} subtype
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
-export function map<C, S, T>(subtype: IType<C, S, T>): IMapType<C, S, T> {
-    const ret = new MapType<C, S, T>(`map<string, ${subtype.name}>`, subtype)
+export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
+    const ret = new MapType<IT>(`map<string, ${subtype.name}>`, subtype)
     return ret as typeof ret & OptionalProperty
 }
 
@@ -458,6 +470,6 @@ export function map<C, S, T>(subtype: IType<C, S, T>): IMapType<C, S, T> {
  * @param {IT} type
  * @returns {type is IT}
  */
-export function isMapType<IT extends IMapType<any, any, any>>(type: IT): type is IT {
+export function isMapType<IT extends IMapType<any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Map) > 0
 }
