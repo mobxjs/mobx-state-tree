@@ -11,20 +11,20 @@ const returnTypeTransform = rt => {
     // ->
     // [['PA', 'PB', 'PC'], no change
     //  ['OA', 'OB', 'OC'], no change
-    //  ['FixedJoin<FCA, FixedJoin<FCB, FCC>>']
-    //  ['FixedJoin<FSA, FixedJoin<FSB, FSC>>']]
+    //  ['_CustomJoin<FCA, _CustomJoin<FCB, FCC>>']
+    //  ['_CustomJoin<FSA, _CustomJoin<FSB, FSC>>']]
 
     const [props, others, fixedC, fixedS] = rt
 
-    function fixJoin(left) {
+    function customJoin(left) {
         if (left.length === 1) {
             return left[0]
         }
         const [a, ...rest] = left
-        return `FixedJoin<${a}, ${fixJoin(rest)}>`
+        return `_CustomJoin<${a}, ${customJoin(rest)}>`
     }
 
-    return [props, others, [fixJoin(fixedC)], [fixJoin(fixedS)]]
+    return [props, others, [customJoin(fixedC)], [customJoin(fixedS)]]
 }
 
 for (let i = minArgs; i < maxArgs; i++) {

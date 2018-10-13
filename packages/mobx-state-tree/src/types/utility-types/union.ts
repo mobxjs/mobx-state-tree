@@ -18,7 +18,8 @@ import {
     ModelProperties,
     ModelInstanceType,
     ModelSnapshotType2,
-    ModelCreationType2
+    ModelCreationType2,
+    _NotCustomized
 } from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
@@ -113,11 +114,13 @@ export class Union extends Type<any, any, any> {
     }
 }
 
-// transform false | false... to false, false | other to other
-export type FixedCSProcessor<T> = Exclude<T, false> extends never ? false : Exclude<T, false>
+// transform _NotCustomized | _NotCustomized... to _NotCustomized, _NotCustomized | A | B to A | B
+export type _CustomCSProcessor<T> = Exclude<T, _NotCustomized> extends never
+    ? _NotCustomized
+    : Exclude<T, _NotCustomized>
 
 export interface ModelUnion<C, S, T>
-    extends IComplexType<FixedCSProcessor<C>, FixedCSProcessor<S>, T> {}
+    extends IComplexType<_CustomCSProcessor<C>, _CustomCSProcessor<S>, T> {}
 
 // generated with C:\VSProjects\github\mobx-state-tree-upstream\packages\mobx-state-tree\scripts\generate-union-types.js
 // prettier-ignore

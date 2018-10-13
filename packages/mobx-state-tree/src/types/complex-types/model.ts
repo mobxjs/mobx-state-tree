@@ -109,7 +109,12 @@ export type OptionalPropNames<T> = {
 export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
 export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
 
-export type FixedOrOther<F, O> = F extends false ? O : F
+// tslint:disable-next-line:class-name
+export interface _NotCustomized {
+    // only for typings
+    readonly "!!mstNotCustomized": undefined
+}
+export type _CustomOrOther<Custom, Other> = Custom extends _NotCustomized ? Other : Custom
 
 /**
  * Maps property types to the snapshot, including omitted optional attributes
@@ -119,33 +124,38 @@ export type ModelCreationType<T extends ModelProperties> = {
 } &
     { [K in keyof OptionalProps<T>]?: ExtractC<T[K]> }
 
-export type ModelCreationType2<T extends ModelProperties, FixedC> = FixedOrOther<
-    FixedC,
+export type ModelCreationType2<T extends ModelProperties, CustomC> = _CustomOrOther<
+    CustomC,
     ModelCreationType<T>
 >
 
 export type ModelSnapshotType<T extends ModelProperties> = { [K in keyof T]: ExtractS<T[K]> }
 
-export type ModelSnapshotType2<T extends ModelProperties, FixedS> = FixedOrOther<
-    FixedS,
+export type ModelSnapshotType2<T extends ModelProperties, CustomS> = _CustomOrOther<
+    CustomS,
     ModelSnapshotType<T>
 >
 
-export type ModelInstanceType<T extends ModelProperties, O, FixedC, FixedS> = {
+export type ModelInstanceType<T extends ModelProperties, O, CustomC, CustomS> = {
     [K in keyof T]: ExtractIStateTreeNode<ExtractC<T[K]>, ExtractS<T[K]>, ExtractT<T[K]>>
 } &
     O &
-    IStateTreeNode<ModelCreationType2<T, FixedC>, ModelSnapshotType2<T, FixedS>>
+    IStateTreeNode<ModelCreationType2<T, CustomC>, ModelSnapshotType2<T, CustomS>>
 
 export interface ModelActions {
     [key: string]: Function
 }
 
-export interface IModelType<PROPS extends ModelProperties, OTHERS, FixedC = false, FixedS = false>
+export interface IModelType<
+    PROPS extends ModelProperties,
+    OTHERS,
+    CustomC = _NotCustomized,
+    CustomS = _NotCustomized
+>
     extends IComplexType<
-            ModelCreationType2<PROPS, FixedC>,
-            ModelSnapshotType2<PROPS, FixedS>,
-            ModelInstanceType<PROPS, OTHERS, FixedC, FixedS>
+            ModelCreationType2<PROPS, CustomC>,
+            ModelSnapshotType2<PROPS, CustomS>,
+            ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>
         > {
     readonly properties: PROPS
 
@@ -155,33 +165,33 @@ export interface IModelType<PROPS extends ModelProperties, OTHERS, FixedC = fals
     // so it is recommended to use pre/post process snapshot after all props have been defined
     props<PROPS2 extends ModelPropertiesDeclaration>(
         props: PROPS2
-    ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS, FixedC, FixedS>
+    ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS, CustomC, CustomS>
 
     views<V extends Object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, FixedC, FixedS>) => V
-    ): IModelType<PROPS, OTHERS & V, FixedC, FixedS>
+        fn: (self: ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>) => V
+    ): IModelType<PROPS, OTHERS & V, CustomC, CustomS>
 
     actions<A extends ModelActions>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, FixedC, FixedS>) => A
-    ): IModelType<PROPS, OTHERS & A, FixedC, FixedS>
+        fn: (self: ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>) => A
+    ): IModelType<PROPS, OTHERS & A, CustomC, CustomS>
 
     volatile<TP extends object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, FixedC, FixedS>) => TP
-    ): IModelType<PROPS, OTHERS & TP, FixedC, FixedS>
+        fn: (self: ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>) => TP
+    ): IModelType<PROPS, OTHERS & TP, CustomC, CustomS>
 
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
         fn: (
-            self: ModelInstanceType<PROPS, OTHERS, FixedC, FixedS>
+            self: ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>
         ) => { actions?: A; views?: V; state?: VS }
-    ): IModelType<PROPS, OTHERS & A & V & VS, FixedC, FixedS>
+    ): IModelType<PROPS, OTHERS & A & V & VS, CustomC, CustomS>
 
-    preProcessSnapshot<NewC = ModelCreationType2<PROPS, FixedC>>(
-        fn: (snapshot: NewC) => ModelCreationType2<PROPS, FixedC>
-    ): IModelType<PROPS, OTHERS, NewC, FixedS>
+    preProcessSnapshot<NewC = ModelCreationType2<PROPS, CustomC>>(
+        fn: (snapshot: NewC) => ModelCreationType2<PROPS, CustomC>
+    ): IModelType<PROPS, OTHERS, NewC, CustomS>
 
-    postProcessSnapshot<NewS = ModelSnapshotType2<PROPS, FixedS>>(
-        fn: (snapshot: ModelSnapshotType2<PROPS, FixedS>) => NewS
-    ): IModelType<PROPS, OTHERS, FixedC, NewS>
+    postProcessSnapshot<NewS = ModelSnapshotType2<PROPS, CustomS>>(
+        fn: (snapshot: ModelSnapshotType2<PROPS, CustomS>) => NewS
+    ): IModelType<PROPS, OTHERS, CustomC, NewS>
 }
 
 // do not make this an interface (#994 will happen again if done)
@@ -704,53 +714,53 @@ export function model(...args: any[]): any {
     return new ModelType({ name, properties })
 }
 
-// TODO: this can be simplified in TS3, since we can transform false to unknown, since unkonwn & X = X
-// and then back unkown to false if needed
-export type FixedJoin<A, B> = A extends false ? B : A & B
+// TODO: this can be simplified in TS3, since we can transform _NotCustomized to unknown, since unkonwn & X = X
+// and then back unkown to _NotCustomized if needed
+export type _CustomJoin<A, B> = A extends _NotCustomized ? B : A & B
 
 // generated with C:\VSProjects\github\mobx-state-tree-upstream\packages\mobx-state-tree\scripts\generate-compose-type.js
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>): IModelType<PA & PB, OA & OB, FixedJoin<FCA, FCB>, FixedJoin<FSA, FSB>>
+export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>): IModelType<PA & PB, OA & OB, _CustomJoin<FCA, FCB>, _CustomJoin<FSA, FSB>>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>): IModelType<PA & PB, OA & OB, FixedJoin<FCA, FCB>, FixedJoin<FSA, FSB>>
+export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>): IModelType<PA & PB, OA & OB, _CustomJoin<FCA, FCB>, _CustomJoin<FSA, FSB>>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>): IModelType<PA & PB & PC, OA & OB & OC, FixedJoin<FCA, FixedJoin<FCB, FCC>>, FixedJoin<FSA, FixedJoin<FSB, FSC>>>
+export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>): IModelType<PA & PB & PC, OA & OB & OC, _CustomJoin<FCA, _CustomJoin<FCB, FCC>>, _CustomJoin<FSA, _CustomJoin<FSB, FSC>>>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>): IModelType<PA & PB & PC, OA & OB & OC, FixedJoin<FCA, FixedJoin<FCB, FCC>>, FixedJoin<FSA, FixedJoin<FSB, FSC>>>
+export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>): IModelType<PA & PB & PC, OA & OB & OC, _CustomJoin<FCA, _CustomJoin<FCB, FCC>>, _CustomJoin<FSA, _CustomJoin<FSB, FSC>>>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>): IModelType<PA & PB & PC & PD, OA & OB & OC & OD, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FCD>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FSD>>>>
+export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>): IModelType<PA & PB & PC & PD, OA & OB & OC & OD, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, FCD>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, FSD>>>>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>): IModelType<PA & PB & PC & PD, OA & OB & OC & OD, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FCD>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FSD>>>>
+export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>): IModelType<PA & PB & PC & PD, OA & OB & OC & OD, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, FCD>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, FSD>>>>
 // prettier-ignore
-export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>): IModelType<PA & PB & PC & PD & PE, OA & OB & OC & OD & OE, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FixedJoin<FCD, FCE>>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FixedJoin<FSD, FSE>>>>>
+export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>): IModelType<PA & PB & PC & PD & PE, OA & OB & OC & OD & OE, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, FCE>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, FSE>>>>>
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE>(A:
-    IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>): IModelType<PA & PB & PC & PD & PE, OA & OB & OC & OD & OE, FixedJoin<FCA,
-    FixedJoin<FCB, FixedJoin<FCC, FixedJoin<FCD, FCE>>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FixedJoin<FSD, FSE>>>>>
+    IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>): IModelType<PA & PB & PC & PD & PE, OA & OB & OC & OD & OE, _CustomJoin<FCA,
+    _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, FCE>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, FSE>>>>>
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE, PF
-    extends ModelProperties, OF, FCF, FSF>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>): IModelType<PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FixedJoin<FCD, FixedJoin<FCE, FCF>>>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FixedJoin<FSD, FixedJoin<FSE, FSF>>>>>>
+    extends ModelProperties, OF, FCF, FSF>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>): IModelType<PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, FCF>>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, FSF>>>>>>
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE, PF
-    extends ModelProperties, OF, FCF, FSF>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>): IModelType<PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FixedJoin<FCD, FixedJoin<FCE, FCF>>>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FixedJoin<FSD, FixedJoin<FSE, FSF>>>>>>
+    extends ModelProperties, OF, FCF, FSF>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>): IModelType<PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, FCF>>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, FSF>>>>>>
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE, PF
-    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>): IModelType<PA & PB & PC & PD & PE & PF & PG, OA & OB & OC & OD & OE & OF & OG, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FixedJoin<FCD, FixedJoin<FCE, FixedJoin<FCF, FCG>>>>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FixedJoin<FSD, FixedJoin<FSE, FixedJoin<FSF, FSG>>>>>>>
+    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>): IModelType<PA & PB & PC & PD & PE & PF & PG, OA & OB & OC & OD & OE & OF & OG, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, FCG>>>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, FSG>>>>>>>
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE, PF
-    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>): IModelType<PA & PB & PC & PD & PE & PF & PG, OA & OB & OC & OD & OE & OF & OG, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FixedJoin<FCD, FixedJoin<FCE, FixedJoin<FCF, FCG>>>>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FixedJoin<FSD, FixedJoin<FSE, FixedJoin<FSF, FSG>>>>>>>
+    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>): IModelType<PA & PB & PC & PD & PE & PF & PG, OA & OB & OC & OD & OE & OF & OG, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, FCG>>>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, FSG>>>>>>>
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE, PF
-    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG, PH extends ModelProperties, OH, FCH, FSH>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>, H: IModelType<PH, OH, FCH, FSH>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH, OA & OB & OC & OD & OE & OF & OG & OH, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FixedJoin<FCD, FixedJoin<FCE, FixedJoin<FCF, FixedJoin<FCG, FCH>>>>>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FixedJoin<FSD, FixedJoin<FSE, FixedJoin<FSF, FixedJoin<FSG, FSH>>>>>>>>
+    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG, PH extends ModelProperties, OH, FCH, FSH>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>, H: IModelType<PH, OH, FCH, FSH>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH, OA & OB & OC & OD & OE & OF & OG & OH, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, FCH>>>>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, FSH>>>>>>>>
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE, PF
-    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG, PH extends ModelProperties, OH, FCH, FSH>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>, H: IModelType<PH, OH, FCH, FSH>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH, OA & OB & OC & OD & OE & OF & OG & OH, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FixedJoin<FCD, FixedJoin<FCE, FixedJoin<FCF, FixedJoin<FCG, FCH>>>>>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FixedJoin<FSD, FixedJoin<FSE, FixedJoin<FSF, FixedJoin<FSG, FSH>>>>>>>>
+    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG, PH extends ModelProperties, OH, FCH, FSH>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>, H: IModelType<PH, OH, FCH, FSH>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH, OA & OB & OC & OD & OE & OF & OG & OH, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, FCH>>>>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, FSH>>>>>>>>
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE, PF
-    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG, PH extends ModelProperties, OH, FCH, FSH, PI extends ModelProperties, OI, FCI, FSI>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>, H: IModelType<PH, OH, FCH, FSH>, I: IModelType<PI, OI, FCI, FSI>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FixedJoin<FCD, FixedJoin<FCE, FixedJoin<FCF, FixedJoin<FCG, FixedJoin<FCH, FCI>>>>>>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FixedJoin<FSD, FixedJoin<FSE, FixedJoin<FSF, FixedJoin<FSG, FixedJoin<FSH, FSI>>>>>>>>>
+    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG, PH extends ModelProperties, OH, FCH, FSH, PI extends ModelProperties, OI, FCI, FSI>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>, H: IModelType<PH, OH, FCH, FSH>, I: IModelType<PI, OI, FCI, FSI>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, _CustomJoin<FCH, FCI>>>>>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, _CustomJoin<FSH, FSI>>>>>>>>>
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE, PF
-    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG, PH extends ModelProperties, OH, FCH, FSH, PI extends ModelProperties, OI, FCI, FSI>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>, H: IModelType<PH, OH, FCH, FSH>, I: IModelType<PI, OI, FCI, FSI>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI, FixedJoin<FCA, FixedJoin<FCB, FixedJoin<FCC, FixedJoin<FCD, FixedJoin<FCE, FixedJoin<FCF, FixedJoin<FCG, FixedJoin<FCH, FCI>>>>>>>>, FixedJoin<FSA, FixedJoin<FSB, FixedJoin<FSC, FixedJoin<FSD, FixedJoin<FSE, FixedJoin<FSF, FixedJoin<FSG, FixedJoin<FSH, FSI>>>>>>>>>
+    extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG, PH extends ModelProperties, OH, FCH, FSH, PI extends ModelProperties, OI, FCI, FSI>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>, H: IModelType<PH, OH, FCH, FSH>, I: IModelType<PI, OI, FCI, FSI>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, _CustomJoin<FCH, FCI>>>>>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, _CustomJoin<FSH, FSI>>>>>>>>>
 
 /**
  * Composes a new model from one or more existing model types.
