@@ -1,33 +1,14 @@
-import {
-    types,
-    flow,
-    getEnv,
-    recordPatches,
-    addMiddleware,
-    applyPatch,
-    getRoot,
-    createActionTrackingMiddleware,
-    IStateTreeNode,
-    IModelType,
-    IMiddlewareEvent,
-    IPatchRecorder,
-    IJsonPatch,
-    IComplexType,
-    IMSTArray,
-    ModelSnapshotType,
-    IType,
-    ModelPropertiesDeclarationToProperties
-} from "mobx-state-tree"
+import * as mst from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
-const Entry = types.model("UndoManagerEntry", {
-    patches: types.frozen<ReadonlyArray<IJsonPatch>>(),
-    inversePatches: types.frozen<ReadonlyArray<IJsonPatch>>()
+const Entry = mst.types.model("UndoManagerEntry", {
+    patches: mst.types.frozen<ReadonlyArray<mst.IJsonPatch>>(),
+    inversePatches: mst.types.frozen<ReadonlyArray<mst.IJsonPatch>>()
 })
 
-const UndoManager = types
+const UndoManager = mst.types
     .model("UndoManager", {
-        history: types.optional(types.array(Entry), []),
+        history: mst.types.array(Entry),
         undoIdx: 0
     })
     .views(self => ({
@@ -41,29 +22,26 @@ const UndoManager = types
     .actions(self => {
         let skipping = false
         let flagSkipping = false
-        let targetStore: IStateTreeNode
+        let targetStore: mst.IStateTreeNode
         let replaying = false
         let middlewareDisposer: () => void
         let grouping = false
         let groupRecorder: any = {
-            patches: [] as ReadonlyArray<IJsonPatch>,
-            inversePatches: [] as ReadonlyArray<IJsonPatch>
+            patches: [] as ReadonlyArray<mst.IJsonPatch>,
+            inversePatches: [] as ReadonlyArray<mst.IJsonPatch>
         }
         let recordingActionId: any = null
         let recordingActionLevel = 0
 
-        const startRecordAction = (call: IMiddlewareEvent): any => {
+        const startRecordAction = (call: mst.IMiddlewareEvent): any => {
             // level for the case that actions have the same name
             skipping = flagSkipping
             recordingActionLevel++
             const actionId = call.name + recordingActionLevel
             recordingActionId = actionId
-            return {
-                recorder: recordPatches(call.tree),
-                actionId
-            }
+            return { recorder: mst.recordPatches(call.tree), actionId }
         }
-        const stopRecordingAction = (recorder: IPatchRecorder): void => {
+        const stopRecordingAction = (recorder: mst.IPatchRecorder): void => {
             recordingActionId = null
             if (!skipping) {
                 if (grouping) return cachePatchForGroup(recorder)
@@ -71,13 +49,13 @@ const UndoManager = types
             }
             skipping = flagSkipping
         }
-        const cachePatchForGroup = (recorder: IPatchRecorder): void => {
+        const cachePatchForGroup = (recorder: mst.IPatchRecorder): void => {
             groupRecorder = {
                 patches: groupRecorder.patches.concat(recorder.patches),
                 inversePatches: groupRecorder.inversePatches.concat(recorder.inversePatches)
             }
         }
-        const undoRedoMiddleware = createActionTrackingMiddleware({
+        const undoRedoMiddleware = mst.createActionTrackingMiddleware({
             // the flagSkipping === false check is mainly a performance optimisation
             filter: call => flagSkipping === false && call.context !== self, // don't undo / redo undo redo :)
             onStart: call => {
@@ -134,12 +112,14 @@ const UndoManager = types
                 self.undoIdx = self.history.length
             },
             afterCreate() {
-                targetStore = getEnv(self).targetStore ? getEnv(self).targetStore : getRoot(self)
+                targetStore = mst.getEnv(self).targetStore
+                    ? mst.getEnv(self).targetStore
+                    : mst.getRoot(self)
                 if (!targetStore || targetStore === self)
                     throw new Error(
                         "UndoManager should be created as part of a tree, or with `targetStore` in it's environment"
                     )
-                middlewareDisposer = addMiddleware(targetStore, undoRedoMiddleware, false)
+                middlewareDisposer = mst.addMiddleware(targetStore, undoRedoMiddleware, false)
             },
             beforeDestroy() {
                 middlewareDisposer()
@@ -149,8 +129,8 @@ const UndoManager = types
                 self.undoIdx--
                 // n.b: reverse patches back to forth
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
-                applyPatch(
-                    getRoot(targetStore),
+                mst.applyPatch(
+                    mst.getRoot(targetStore),
                     self.history[self.undoIdx].inversePatches!.slice().reverse()
                 )
                 replaying = false
@@ -158,7 +138,7 @@ const UndoManager = types
             redo() {
                 replaying = true
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
-                applyPatch(getRoot(targetStore), self.history[self.undoIdx].patches as any) // TODO: fix compile error here?
+                mst.applyPatch(mst.getRoot(targetStore), self.history[self.undoIdx].patches)
                 self.undoIdx++
                 replaying = false
             },
@@ -172,7 +152,7 @@ const UndoManager = types
                 }
             },
             withoutUndoFlow(generatorFn: () => any) {
-                return flow(function*() {
+                return mst.flow(function*() {
                     skipping = true
                     flagSkipping = true
                     const result = yield* generatorFn()
@@ -187,7 +167,7 @@ const UndoManager = types
             stopGroup(fn?: () => any) {
                 if (fn) fn()
                 grouping = false
-                ;(self as any).addUndoState(groupRecorder)
+                this.addUndoState(groupRecorder)
                 groupRecorder = { patches: [], inversePatches: [] }
             }
         }

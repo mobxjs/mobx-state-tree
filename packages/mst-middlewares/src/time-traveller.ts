@@ -1,21 +1,9 @@
-import {
-    types,
-    onSnapshot,
-    applySnapshot,
-    getSnapshot,
-    getEnv,
-    resolvePath,
-    getPath,
-    IModelType,
-    IComplexType,
-    IMSTArray,
-    IType
-} from "mobx-state-tree"
+import * as mst from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
-const TimeTraveller = types
+const TimeTraveller = mst.types
     .model("TimeTraveller", {
-        history: types.array(types.frozen()),
+        history: mst.types.array(mst.types.frozen()),
         undoIdx: -1,
         targetPath: ""
     })
@@ -45,8 +33,8 @@ const TimeTraveller = types
             },
             afterCreate() {
                 targetStore = self.targetPath
-                    ? resolvePath(self, self.targetPath)
-                    : getEnv(self).targetStore
+                    ? mst.resolvePath(self, self.targetPath)
+                    : mst.getEnv(self).targetStore
                 if (!targetStore)
                     throw new Error(
                         "Failed to find target store for TimeTraveller. Please provide `targetPath`  property, or a `targetStore` in the environment"
@@ -54,11 +42,13 @@ const TimeTraveller = types
                 // TODO: check if targetStore doesn't contain self
                 // if (contains(targetStore, self)) throw new Error("TimeTraveller shouldn't be recording itself. Please specify a sibling as taret, not some parent")
                 // start listening to changes
-                snapshotDisposer = onSnapshot(targetStore, snapshot =>
-                    (self as any).addUndoState(snapshot)
+                snapshotDisposer = mst.onSnapshot(targetStore, snapshot =>
+                    this.addUndoState(snapshot)
                 )
                 // record an initial state if no known
-                if (self.history.length === 0) (self as any).addUndoState(getSnapshot(targetStore))
+                if (self.history.length === 0) {
+                    this.addUndoState(mst.getSnapshot(targetStore))
+                }
             },
             beforeDestroy() {
                 snapshotDisposer()
@@ -66,12 +56,12 @@ const TimeTraveller = types
             undo() {
                 self.undoIdx--
                 skipNextUndoState = true
-                applySnapshot(targetStore, self.history[self.undoIdx])
+                mst.applySnapshot(targetStore, self.history[self.undoIdx])
             },
             redo() {
                 self.undoIdx++
                 skipNextUndoState = true
-                applySnapshot(targetStore, self.history[self.undoIdx])
+                mst.applySnapshot(targetStore, self.history[self.undoIdx])
             }
         }
     })
