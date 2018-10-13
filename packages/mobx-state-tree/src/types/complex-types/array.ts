@@ -42,16 +42,16 @@ import {
     OptionalProperty
 } from "../../internal"
 
-export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
+export interface IMSTArray<T> extends IObservableArray<T> {}
 export interface IArrayType<C, S, T>
-    extends IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>>,
+    extends IComplexType<C[] | undefined, S[], IMSTArray<T>>,
         OptionalProperty {}
 
 /**
  * @internal
  * @private
  */
-export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> {
+export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTArray<T>> {
     shouldAttachNode = true
     subType: IAnyType
     readonly flags = TypeFlags.Array
