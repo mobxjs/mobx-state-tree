@@ -110,6 +110,11 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
     }
 }
 
+export type OptionalDefaultValueOrFunction<IT extends IAnyType> =
+    | ExtractC<IT>
+    | ExtractS<IT>
+    | (() => ExtractC<IT> | ExtractS<IT> | ExtractT<IT>)
+
 export interface IOptionalIComplexType<IT extends IAnyComplexType>
     extends IComplexType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
         OptionalProperty {}
@@ -117,15 +122,13 @@ export interface IOptionalIType<IT extends IAnyType>
     extends IType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
         OptionalProperty {}
 
-export function optional<
-    IT extends IAnyComplexType,
-    C = ExtractC<IT>,
-    S = ExtractS<IT>,
-    T = ExtractT<IT>
->(type: IT, defaultValueOrFunction: C | S | (() => C | S | T)): IOptionalIComplexType<IT>
-export function optional<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>, T = ExtractT<IT>>(
+export function optional<IT extends IAnyComplexType>(
     type: IT,
-    defaultValueOrFunction: C | S | (() => C | S | T)
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+): IOptionalIComplexType<IT>
+export function optional<IT extends IAnyType>(
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
 ): IOptionalIType<IT>
 /**
  * `types.optional` can be used to create a property with a default value.
@@ -146,9 +149,9 @@ export function optional<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>
  * @export
  * @alias types.optional
  */
-export function optional<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>, T = ExtractT<IT>>(
+export function optional<IT extends IAnyType>(
     type: IT,
-    defaultValueOrFunction: C | S | (() => C | S | T)
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
 ): IOptionalIType<IT> {
     // make sure we never pass direct instances
     if (typeof defaultValueOrFunction !== "function" && isStateTreeNode(defaultValueOrFunction)) {
