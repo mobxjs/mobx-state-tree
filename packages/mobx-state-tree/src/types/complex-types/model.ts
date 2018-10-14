@@ -136,11 +136,20 @@ export type ModelSnapshotType2<T extends ModelProperties, CustomS> = _CustomOrOt
     ModelSnapshotType<T>
 >
 
-export type ModelInstanceType<T extends ModelProperties, O, CustomC, CustomS> = {
-    [K in keyof T]: ExtractIStateTreeNode<ExtractC<T[K]>, ExtractS<T[K]>, ExtractT<T[K]>>
-} &
+// we keep this separate from ModelInstanceType to shorten model instance types generated declarations
+export type ModelInstanceTypeProps<P extends ModelProperties> = {
+    [K in keyof P]: ExtractIStateTreeNode<ExtractC<P[K]>, ExtractS<P[K]>, ExtractT<P[K]>>
+}
+
+// do not transform this to an interface or model instance type generated declarations will be longer
+export type ModelInstanceType<
+    P extends ModelProperties,
+    O,
+    CustomC,
+    CustomS
+> = ModelInstanceTypeProps<P> &
     O &
-    IStateTreeNode<ModelCreationType2<T, CustomC>, ModelSnapshotType2<T, CustomS>>
+    IStateTreeNode<ModelCreationType2<P, CustomC>, ModelSnapshotType2<P, CustomS>>
 
 export interface ModelActions {
     [key: string]: Function
