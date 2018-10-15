@@ -83,10 +83,14 @@ export class Union extends Type<any, any, any> {
 
         // find the most accomodating type
         // if we are using reconciliation try the current node type first (fix for #1045)
-        if (reconcileCurrentType && reconcileCurrentType.is(value)) {
-            return reconcileCurrentType
+        if (reconcileCurrentType) {
+            if (reconcileCurrentType.is(value)) {
+                return reconcileCurrentType
+            }
+            return this.types.filter(t => t !== reconcileCurrentType).find(type => type.is(value))
+        } else {
+            return this.types.find(type => type.is(value))
         }
-        return this.types.filter(t => t !== reconcileCurrentType).find(type => type.is(value))
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
