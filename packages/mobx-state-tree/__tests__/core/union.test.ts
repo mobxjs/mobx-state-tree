@@ -1,4 +1,12 @@
-import { types, hasParent, tryResolve, getSnapshot, applySnapshot } from "../../src"
+import {
+    types,
+    hasParent,
+    tryResolve,
+    getSnapshot,
+    applySnapshot,
+    setLivelynessChecking,
+    getType
+} from "../../src"
 
 const createTestFactories = () => {
     const Box = types.model("Box", {
@@ -169,4 +177,67 @@ test("961 - apply snapshot to union should not throw when union keeps models wit
 
     const u = U.create({ foo: 1 })
     applySnapshot(u, getSnapshot(Bar.create()))
+})
+
+describe("1045 - secondary union types with applySnapshot and ids", () => {
+    function initTest(useCreate: boolean, submodel1First: boolean) {
+        setLivelynessChecking("error")
+
+        const Submodel1 = types.model("Submodel1", {
+            id: types.identifier,
+            extraField1: types.string,
+            extraField2: types.maybe(types.string)
+        })
+
+        const Submodel2 = types.model("Submodel2", {
+            id: types.identifier,
+            extraField1: types.maybe(types.string),
+            extraField2: types.string
+        })
+
+        const Submodel = submodel1First
+            ? types.union(Submodel1, Submodel2)
+            : types.union(Submodel2, Submodel1)
+
+        const Model = types.array(Submodel)
+
+        const store = Model.create([{ id: "id1", extraField1: "extraField1" }])
+
+        return {
+            store,
+            applySn: function() {
+                const sn = {
+                    id: "id1",
+                    extraField1: "new extraField1",
+                    extraField2: "some value"
+                }
+
+                applySnapshot(store, [useCreate ? Submodel1.create(sn) : sn])
+
+                expect(store.length).toBe(1)
+                expect(store[0]).toEqual(sn)
+                expect(getType(store[0])).toBe(Submodel1)
+            }
+        }
+    }
+
+    for (const submodel1First of [true, false]) {
+        describe(submodel1First ? "submodel1 first" : "submodel2 first", () => {
+            for (const useCreate of [true, false]) {
+                describe(useCreate ? "using create" : "not using create", () => {
+                    it(`apply snapshot works when the node is not touched`, () => {
+                        const t = initTest(useCreate, submodel1First)
+                        t.applySn()
+                    })
+
+                    it(`apply snapshot works when the node is touched`, () => {
+                        const t = initTest(useCreate, submodel1First)
+                        // tslint:disable-next-line:no-unused-expression
+                        t.store[0]
+                        t.applySn()
+                    })
+                })
+            }
+        })
+    }
 })
