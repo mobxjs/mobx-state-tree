@@ -17,9 +17,9 @@ import {
     ExtractT,
     ExtractS,
     ExtractC,
-    ExtractCST
+    ExtractCST,
+    IAnyComplexType
 } from "../../internal"
-import { IAnyComplexType } from "../.."
 
 /**
  * @internal
