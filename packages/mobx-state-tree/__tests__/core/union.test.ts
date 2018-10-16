@@ -1,4 +1,12 @@
-import { types, hasParent, tryResolve, getSnapshot, applySnapshot } from "../../src"
+import {
+    types,
+    hasParent,
+    tryResolve,
+    getSnapshot,
+    applySnapshot,
+    setLivelynessChecking,
+    getType
+} from "../../src"
 
 const createTestFactories = () => {
     const Box = types.model("Box", {
@@ -169,4 +177,78 @@ test("961 - apply snapshot to union should not throw when union keeps models wit
 
     const u = U.create({ foo: 1 })
     applySnapshot(u, getSnapshot(Bar.create()))
+})
+
+describe("1045 - secondary union types with applySnapshot and ids", () => {
+    function initTest(useCreate: boolean, submodel1First: boolean, type: number) {
+        setLivelynessChecking("error")
+
+        const Submodel1 = types.model("Submodel1", {
+            id: types.identifier,
+            extraField1: types.string,
+            extraField2: types.maybe(types.string)
+        })
+
+        const Submodel2 = types.model("Submodel2", {
+            id: types.identifier,
+            extraField1: types.maybe(types.string),
+            extraField2: types.string
+        })
+
+        const Submodel = submodel1First
+            ? types.union(Submodel1, Submodel2)
+            : types.union(Submodel2, Submodel1)
+
+        const Model = types.array(Submodel)
+
+        const store = Model.create([{ id: "id1", extraField1: "extraField1" }])
+
+        return {
+            store,
+            applySn: function() {
+                const sn1 = {
+                    id: "id1",
+                    extraField1: "new extraField1",
+                    extraField2: "some value"
+                }
+                const sn2 = {
+                    id: "id1",
+                    extraField1: undefined,
+                    extraField2: "some value"
+                }
+                const sn = type === 1 ? sn1 : sn2
+                const submodel = type === 1 ? Submodel1 : Submodel2
+
+                applySnapshot(store, [useCreate ? (submodel as any).create(sn) : sn])
+
+                expect(store.length).toBe(1)
+                expect(store[0]).toEqual(sn)
+                expect(getType(store[0])).toBe(submodel)
+            }
+        }
+    }
+
+    for (const submodel1First of [true, false]) {
+        describe(submodel1First ? "submodel1 first" : "submodel2 first", () => {
+            for (const useCreate of [false, true]) {
+                describe(useCreate ? "using create" : "not using create", () => {
+                    for (const type of [2, 1]) {
+                        describe(`snapshot is of type Submodel${type}`, () => {
+                            it(`apply snapshot works when the node is not touched`, () => {
+                                const t = initTest(useCreate, submodel1First, type)
+                                t.applySn()
+                            })
+
+                            it(`apply snapshot works when the node is touched`, () => {
+                                const t = initTest(useCreate, submodel1First, type)
+                                // tslint:disable-next-line:no-unused-expression
+                                t.store[0]
+                                t.applySn()
+                            })
+                        })
+                    }
+                })
+            }
+        })
+    }
 })

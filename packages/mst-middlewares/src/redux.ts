@@ -171,7 +171,8 @@ export function connectReduxDevtools(
 
             const parentContext = context
             context = {
-                name: `[root${mst.getPath(call.context)}].${call.name}`,
+                // use a space rather than a dot so that the redux devtools move the actions to the next line if there's not enough space
+                name: `[root${mst.getPath(call.context)}] ${call.name}`,
                 targetTypePath: targetTypePath,
                 id: call.id,
                 runningAsync: false,

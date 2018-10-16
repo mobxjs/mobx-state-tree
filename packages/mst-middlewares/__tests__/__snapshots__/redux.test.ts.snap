@@ -10,7 +10,7 @@ Array [
         },
       },
       "targetTypePath": "TestModel",
-      "type": "[root].@APPLY_SNAPSHOT",
+      "type": "[root] @APPLY_SNAPSHOT",
     },
     Object {
       "array": Array [],
@@ -27,7 +27,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setYAsync (0)",
+      "type": "[root] setYAsync (0)",
     },
     Object {
       "array": Array [],
@@ -39,7 +39,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (0)",
+      "type": "[root] setXAsync (0)",
     },
     Object {
       "array": Array [],
@@ -51,7 +51,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (1)",
+      "type": "[root] setXAsync (1)",
     },
     Object {
       "array": Array [],
@@ -63,7 +63,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setYAsync (1)",
+      "type": "[root] setYAsync (1)",
     },
     Object {
       "array": Array [],
@@ -84,7 +84,7 @@ Array [
         },
       },
       "targetTypePath": "TestModel",
-      "type": "[root].addtoArray",
+      "type": "[root] addtoArray",
     },
     Object {
       "array": Array [
@@ -100,7 +100,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel/SubModel[]/SubModel",
-      "type": "[root/array/0].setA",
+      "type": "[root/array/0] setA",
     },
     Object {
       "array": Array [
@@ -121,7 +121,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setX",
+      "type": "[root] setX",
     },
     Object {
       "array": Array [],
@@ -138,7 +138,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (0)",
+      "type": "[root] setXAsync (0)",
     },
     Object {
       "array": Array [],
@@ -150,7 +150,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (1)",
+      "type": "[root] setXAsync (1)",
     },
     Object {
       "array": Array [],
@@ -167,7 +167,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowAsync (0)",
+      "type": "[root] setXAsyncThrowAsync (0)",
     },
     Object {
       "array": Array [],
@@ -179,7 +179,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowAsync (1) -error thrown-",
+      "type": "[root] setXAsyncThrowAsync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -196,7 +196,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowSync (0)",
+      "type": "[root] setXAsyncThrowSync (0)",
     },
     Object {
       "array": Array [],
@@ -208,7 +208,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowSync (1) -error thrown-",
+      "type": "[root] setXAsyncThrowSync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -225,7 +225,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncWithEmptyFirstPart (0)",
+      "type": "[root] setXAsyncWithEmptyFirstPart (0)",
     },
     Object {
       "array": Array [],
@@ -242,7 +242,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXThrow -error thrown-",
+      "type": "[root] setXThrow -error thrown-",
     },
     Object {
       "array": Array [],
@@ -259,7 +259,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXY",
+      "type": "[root] setXY",
     },
     Object {
       "array": Array [],
@@ -276,7 +276,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (0)",
+      "type": "[root] setXYAsync (0)",
     },
     Object {
       "array": Array [],
@@ -288,7 +288,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (1)",
+      "type": "[root] setXYAsync (1)",
     },
     Object {
       "array": Array [],
@@ -300,7 +300,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (2)",
+      "type": "[root] setXYAsync (2)",
     },
     Object {
       "array": Array [],
@@ -312,7 +312,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (3)",
+      "type": "[root] setXYAsync (3)",
     },
     Object {
       "array": Array [],
@@ -329,7 +329,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowAsync (0)",
+      "type": "[root] setXYAsyncThrowAsync (0)",
     },
     Object {
       "array": Array [],
@@ -341,7 +341,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowAsync (1) -error thrown-",
+      "type": "[root] setXYAsyncThrowAsync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -358,7 +358,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowSync (0)",
+      "type": "[root] setXYAsyncThrowSync (0)",
     },
     Object {
       "array": Array [],
@@ -370,7 +370,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowSync (1) -error thrown-",
+      "type": "[root] setXYAsyncThrowSync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -391,7 +391,7 @@ Array [
         },
       },
       "targetTypePath": "TestModel",
-      "type": "[root].@APPLY_SNAPSHOT",
+      "type": "[root] @APPLY_SNAPSHOT",
     },
     Object {
       "array": Array [],
@@ -408,7 +408,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setYAsync (0)",
+      "type": "[root] setYAsync (0)",
     },
     Object {
       "array": Array [],
@@ -420,7 +420,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (0)",
+      "type": "[root] setXAsync (0)",
     },
     Object {
       "array": Array [],
@@ -432,7 +432,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (1)",
+      "type": "[root] setXAsync (1)",
     },
     Object {
       "array": Array [],
@@ -444,7 +444,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setYAsync (1)",
+      "type": "[root] setYAsync (1)",
     },
     Object {
       "array": Array [],
@@ -465,7 +465,7 @@ Array [
         },
       },
       "targetTypePath": "TestModel",
-      "type": "[root].addtoArray",
+      "type": "[root] addtoArray",
     },
     Object {
       "array": Array [
@@ -481,7 +481,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel/SubModel[]/SubModel",
-      "type": "[root/array/0].setA",
+      "type": "[root/array/0] setA",
     },
     Object {
       "array": Array [
@@ -502,7 +502,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setX",
+      "type": "[root] setX",
     },
     Object {
       "array": Array [],
@@ -519,7 +519,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (0)",
+      "type": "[root] setXAsync (0)",
     },
     Object {
       "array": Array [],
@@ -531,7 +531,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (1)",
+      "type": "[root] setXAsync (1)",
     },
     Object {
       "array": Array [],
@@ -548,7 +548,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowAsync (0)",
+      "type": "[root] setXAsyncThrowAsync (0)",
     },
     Object {
       "array": Array [],
@@ -560,7 +560,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowAsync (1) -error thrown-",
+      "type": "[root] setXAsyncThrowAsync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -577,7 +577,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowSync (0)",
+      "type": "[root] setXAsyncThrowSync (0)",
     },
     Object {
       "array": Array [],
@@ -589,7 +589,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowSync (1) -error thrown-",
+      "type": "[root] setXAsyncThrowSync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -606,7 +606,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncWithEmptyFirstPart (0)",
+      "type": "[root] setXAsyncWithEmptyFirstPart (0)",
     },
     Object {
       "array": Array [],
@@ -623,7 +623,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXThrow -error thrown-",
+      "type": "[root] setXThrow -error thrown-",
     },
     Object {
       "array": Array [],
@@ -640,7 +640,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXY >>> [root].setX",
+      "type": "[root] setXY >>> [root] setX",
     },
     Object {
       "array": Array [],
@@ -652,7 +652,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXY >>> [root].setY",
+      "type": "[root] setXY >>> [root] setY",
     },
     Object {
       "array": Array [],
@@ -669,7 +669,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsync (0) >>> [root].setXAsync (0)",
+      "type": "[root] setXYAsync (0) >>> [root] setXAsync (0)",
     },
     Object {
       "array": Array [],
@@ -681,7 +681,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsync (1) >>> [root].setXAsync (1)",
+      "type": "[root] setXYAsync (1) >>> [root] setXAsync (1)",
     },
     Object {
       "array": Array [],
@@ -693,7 +693,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsync (2) >>> [root].setYAsync (0)",
+      "type": "[root] setXYAsync (2) >>> [root] setYAsync (0)",
     },
     Object {
       "array": Array [],
@@ -705,7 +705,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsync (3) >>> [root].setYAsync (1)",
+      "type": "[root] setXYAsync (3) >>> [root] setYAsync (1)",
     },
     Object {
       "array": Array [],
@@ -722,7 +722,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsyncThrowAsync (0) >>> [root].setXAsyncThrowAsync (0)",
+      "type": "[root] setXYAsyncThrowAsync (0) >>> [root] setXAsyncThrowAsync (0)",
     },
     Object {
       "array": Array [],
@@ -734,7 +734,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsyncThrowAsync (1) >>> [root].setXAsyncThrowAsync (1) -error thrown-",
+      "type": "[root] setXYAsyncThrowAsync (1) >>> [root] setXAsyncThrowAsync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -746,7 +746,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowAsync (2) -error thrown-",
+      "type": "[root] setXYAsyncThrowAsync (2) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -763,7 +763,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsyncThrowSync (0) >>> [root].setXAsyncThrowSync (0)",
+      "type": "[root] setXYAsyncThrowSync (0) >>> [root] setXAsyncThrowSync (0)",
     },
     Object {
       "array": Array [],
@@ -775,7 +775,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsyncThrowSync (1) >>> [root].setXAsyncThrowSync (1) -error thrown-",
+      "type": "[root] setXYAsyncThrowSync (1) >>> [root] setXAsyncThrowSync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -787,7 +787,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowSync (2) -error thrown-",
+      "type": "[root] setXYAsyncThrowSync (2) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -808,7 +808,7 @@ Array [
         },
       },
       "targetTypePath": "TestModel",
-      "type": "[root].@APPLY_SNAPSHOT",
+      "type": "[root] @APPLY_SNAPSHOT",
     },
     Object {
       "array": Array [],
@@ -825,7 +825,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setYAsync (0)",
+      "type": "[root] setYAsync (0)",
     },
     Object {
       "array": Array [],
@@ -837,7 +837,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (0)",
+      "type": "[root] setXAsync (0)",
     },
     Object {
       "array": Array [],
@@ -849,7 +849,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (1)",
+      "type": "[root] setXAsync (1)",
     },
     Object {
       "array": Array [],
@@ -861,7 +861,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setYAsync (1)",
+      "type": "[root] setYAsync (1)",
     },
     Object {
       "array": Array [],
@@ -882,7 +882,7 @@ Array [
         },
       },
       "targetTypePath": "TestModel",
-      "type": "[root].addtoArray",
+      "type": "[root] addtoArray",
     },
     Object {
       "array": Array [
@@ -898,7 +898,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel/SubModel[]/SubModel",
-      "type": "[root/array/0].setA",
+      "type": "[root/array/0] setA",
     },
     Object {
       "array": Array [
@@ -919,7 +919,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setX",
+      "type": "[root] setX",
     },
     Object {
       "array": Array [],
@@ -936,7 +936,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (0)",
+      "type": "[root] setXAsync (0)",
     },
     Object {
       "array": Array [],
@@ -948,7 +948,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (1)",
+      "type": "[root] setXAsync (1)",
     },
     Object {
       "array": Array [],
@@ -965,7 +965,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowAsync (0)",
+      "type": "[root] setXAsyncThrowAsync (0)",
     },
     Object {
       "array": Array [],
@@ -977,7 +977,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowAsync (1) -error thrown-",
+      "type": "[root] setXAsyncThrowAsync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -994,7 +994,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowSync (0)",
+      "type": "[root] setXAsyncThrowSync (0)",
     },
     Object {
       "array": Array [],
@@ -1006,7 +1006,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowSync (1) -error thrown-",
+      "type": "[root] setXAsyncThrowSync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -1023,7 +1023,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncWithEmptyFirstPart (0)",
+      "type": "[root] setXAsyncWithEmptyFirstPart (0)",
     },
     Object {
       "array": Array [],
@@ -1035,7 +1035,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncWithEmptyFirstPart (1)",
+      "type": "[root] setXAsyncWithEmptyFirstPart (1)",
     },
     Object {
       "array": Array [],
@@ -1052,7 +1052,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXThrow -error thrown-",
+      "type": "[root] setXThrow -error thrown-",
     },
     Object {
       "array": Array [],
@@ -1069,7 +1069,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXY",
+      "type": "[root] setXY",
     },
     Object {
       "array": Array [],
@@ -1086,7 +1086,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (0)",
+      "type": "[root] setXYAsync (0)",
     },
     Object {
       "array": Array [],
@@ -1098,7 +1098,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (1)",
+      "type": "[root] setXYAsync (1)",
     },
     Object {
       "array": Array [],
@@ -1110,7 +1110,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (2)",
+      "type": "[root] setXYAsync (2)",
     },
     Object {
       "array": Array [],
@@ -1122,7 +1122,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (3)",
+      "type": "[root] setXYAsync (3)",
     },
     Object {
       "array": Array [],
@@ -1134,7 +1134,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (4)",
+      "type": "[root] setXYAsync (4)",
     },
     Object {
       "array": Array [],
@@ -1146,7 +1146,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (5)",
+      "type": "[root] setXYAsync (5)",
     },
     Object {
       "array": Array [],
@@ -1158,7 +1158,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (6)",
+      "type": "[root] setXYAsync (6)",
     },
     Object {
       "array": Array [],
@@ -1175,7 +1175,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowAsync (0)",
+      "type": "[root] setXYAsyncThrowAsync (0)",
     },
     Object {
       "array": Array [],
@@ -1187,7 +1187,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowAsync (1)",
+      "type": "[root] setXYAsyncThrowAsync (1)",
     },
     Object {
       "array": Array [],
@@ -1199,7 +1199,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowAsync (2)",
+      "type": "[root] setXYAsyncThrowAsync (2)",
     },
     Object {
       "array": Array [],
@@ -1211,7 +1211,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowAsync (3) -error thrown-",
+      "type": "[root] setXYAsyncThrowAsync (3) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -1228,7 +1228,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowSync (0)",
+      "type": "[root] setXYAsyncThrowSync (0)",
     },
     Object {
       "array": Array [],
@@ -1240,7 +1240,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowSync (1)",
+      "type": "[root] setXYAsyncThrowSync (1)",
     },
     Object {
       "array": Array [],
@@ -1252,7 +1252,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowSync (2)",
+      "type": "[root] setXYAsyncThrowSync (2)",
     },
     Object {
       "array": Array [],
@@ -1264,7 +1264,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowSync (3) -error thrown-",
+      "type": "[root] setXYAsyncThrowSync (3) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -1283,7 +1283,7 @@ Array [
         "0": Array [],
       },
       "targetTypePath": "TestModel >>> TestModel/SubModel[]",
-      "type": "[root].@APPLY_SNAPSHOT >>> [root/array].@APPLY_SNAPSHOT",
+      "type": "[root] @APPLY_SNAPSHOT >>> [root/array] @APPLY_SNAPSHOT",
     },
     Object {
       "array": Array [],
@@ -1299,7 +1299,7 @@ Array [
         },
       },
       "targetTypePath": "TestModel",
-      "type": "[root].@APPLY_SNAPSHOT",
+      "type": "[root] @APPLY_SNAPSHOT",
     },
     Object {
       "array": Array [],
@@ -1316,7 +1316,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setYAsync (0)",
+      "type": "[root] setYAsync (0)",
     },
     Object {
       "array": Array [],
@@ -1328,7 +1328,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (0)",
+      "type": "[root] setXAsync (0)",
     },
     Object {
       "array": Array [],
@@ -1340,7 +1340,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (1)",
+      "type": "[root] setXAsync (1)",
     },
     Object {
       "array": Array [],
@@ -1352,7 +1352,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setYAsync (1)",
+      "type": "[root] setYAsync (1)",
     },
     Object {
       "array": Array [],
@@ -1373,7 +1373,7 @@ Array [
         },
       },
       "targetTypePath": "TestModel",
-      "type": "[root].addtoArray",
+      "type": "[root] addtoArray",
     },
     Object {
       "array": Array [
@@ -1389,7 +1389,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel/SubModel[]/SubModel",
-      "type": "[root/array/0].setA",
+      "type": "[root/array/0] setA",
     },
     Object {
       "array": Array [
@@ -1410,7 +1410,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setX",
+      "type": "[root] setX",
     },
     Object {
       "array": Array [],
@@ -1427,7 +1427,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (0)",
+      "type": "[root] setXAsync (0)",
     },
     Object {
       "array": Array [],
@@ -1439,7 +1439,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsync (1)",
+      "type": "[root] setXAsync (1)",
     },
     Object {
       "array": Array [],
@@ -1456,7 +1456,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowAsync (0)",
+      "type": "[root] setXAsyncThrowAsync (0)",
     },
     Object {
       "array": Array [],
@@ -1468,7 +1468,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowAsync (1) -error thrown-",
+      "type": "[root] setXAsyncThrowAsync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -1485,7 +1485,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowSync (0)",
+      "type": "[root] setXAsyncThrowSync (0)",
     },
     Object {
       "array": Array [],
@@ -1497,7 +1497,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncThrowSync (1) -error thrown-",
+      "type": "[root] setXAsyncThrowSync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -1514,7 +1514,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncWithEmptyFirstPart (0)",
+      "type": "[root] setXAsyncWithEmptyFirstPart (0)",
     },
     Object {
       "array": Array [],
@@ -1526,7 +1526,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXAsyncWithEmptyFirstPart (1)",
+      "type": "[root] setXAsyncWithEmptyFirstPart (1)",
     },
     Object {
       "array": Array [],
@@ -1543,7 +1543,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXThrow -error thrown-",
+      "type": "[root] setXThrow -error thrown-",
     },
     Object {
       "array": Array [],
@@ -1560,7 +1560,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXY >>> [root].setX",
+      "type": "[root] setXY >>> [root] setX",
     },
     Object {
       "array": Array [],
@@ -1572,7 +1572,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXY >>> [root].setY",
+      "type": "[root] setXY >>> [root] setY",
     },
     Object {
       "array": Array [],
@@ -1584,7 +1584,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXY",
+      "type": "[root] setXY",
     },
     Object {
       "array": Array [],
@@ -1601,7 +1601,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsync (0) >>> [root].setXAsync (0)",
+      "type": "[root] setXYAsync (0) >>> [root] setXAsync (0)",
     },
     Object {
       "array": Array [],
@@ -1613,7 +1613,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (1)",
+      "type": "[root] setXYAsync (1)",
     },
     Object {
       "array": Array [],
@@ -1625,7 +1625,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsync (2) >>> [root].setXAsync (1)",
+      "type": "[root] setXYAsync (2) >>> [root] setXAsync (1)",
     },
     Object {
       "array": Array [],
@@ -1637,7 +1637,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsync (3) >>> [root].setYAsync (0)",
+      "type": "[root] setXYAsync (3) >>> [root] setYAsync (0)",
     },
     Object {
       "array": Array [],
@@ -1649,7 +1649,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (4)",
+      "type": "[root] setXYAsync (4)",
     },
     Object {
       "array": Array [],
@@ -1661,7 +1661,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsync (5) >>> [root].setYAsync (1)",
+      "type": "[root] setXYAsync (5) >>> [root] setYAsync (1)",
     },
     Object {
       "array": Array [],
@@ -1673,7 +1673,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsync (6)",
+      "type": "[root] setXYAsync (6)",
     },
     Object {
       "array": Array [],
@@ -1690,7 +1690,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsyncThrowAsync (0) >>> [root].setXAsyncThrowAsync (0)",
+      "type": "[root] setXYAsyncThrowAsync (0) >>> [root] setXAsyncThrowAsync (0)",
     },
     Object {
       "array": Array [],
@@ -1702,7 +1702,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowAsync (1)",
+      "type": "[root] setXYAsyncThrowAsync (1)",
     },
     Object {
       "array": Array [],
@@ -1714,7 +1714,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsyncThrowAsync (2) >>> [root].setXAsyncThrowAsync (1) -error thrown-",
+      "type": "[root] setXYAsyncThrowAsync (2) >>> [root] setXAsyncThrowAsync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -1726,7 +1726,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowAsync (3) -error thrown-",
+      "type": "[root] setXYAsyncThrowAsync (3) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -1743,7 +1743,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsyncThrowSync (0) >>> [root].setXAsyncThrowSync (0)",
+      "type": "[root] setXYAsyncThrowSync (0) >>> [root] setXAsyncThrowSync (0)",
     },
     Object {
       "array": Array [],
@@ -1755,7 +1755,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowSync (1)",
+      "type": "[root] setXYAsyncThrowSync (1)",
     },
     Object {
       "array": Array [],
@@ -1767,7 +1767,7 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel >>> TestModel",
-      "type": "[root].setXYAsyncThrowSync (2) >>> [root].setXAsyncThrowSync (1) -error thrown-",
+      "type": "[root] setXYAsyncThrowSync (2) >>> [root] setXAsyncThrowSync (1) -error thrown-",
     },
     Object {
       "array": Array [],
@@ -1779,12 +1779,33 @@ Array [
     Object {
       "args": Object {},
       "targetTypePath": "TestModel",
-      "type": "[root].setXYAsyncThrowSync (3) -error thrown-",
+      "type": "[root] setXYAsyncThrowSync (3) -error thrown-",
     },
     Object {
       "array": Array [],
       "x": "setXAsyncThrowSync +0",
       "y": "",
+    },
+  ],
+]
+`;
+
+exports[`bourquep 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Object {},
+      "targetTypePath": "SchoolYearConfigurationModel/map<string, late(() => ContentDefinitionModel)>/ContentDefinition",
+      "type": "[root/contents/one] toggleState",
+    },
+    Object {
+      "contents": Object {
+        "one": Object {
+          "id": "200",
+          "state": "completed",
+        },
+      },
+      "id": "100",
     },
   ],
 ]

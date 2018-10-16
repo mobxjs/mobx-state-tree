@@ -223,3 +223,46 @@ for (const logIdempotentActionSteps of [false, true]) {
         })
     }
 }
+
+test("bourquep", () => {
+    const SchoolYearConfigurationModel = types.model("SchoolYearConfigurationModel", {
+        id: types.identifier,
+        contents: types.map(types.late(() => ContentDefinitionModel))
+    })
+
+    const ContentDefinitionModel = types
+        .model("ContentDefinition", {
+            id: types.identifier,
+            state: "active"
+        })
+
+        .actions(self => {
+            const _actions = {
+                toggleState() {
+                    if (self.state === "cancelled") {
+                        return
+                    }
+
+                    let newState = self.state === "active" ? "completed" : "active"
+                    self.state = newState
+                }
+            }
+
+            return _actions
+        })
+
+    const store = SchoolYearConfigurationModel.create({
+        id: "100",
+        contents: { one: { id: "200" } }
+    })
+
+    devTools = mockDevTools()
+    const devToolsManager = { connectViaExtension: () => devTools, extractState: jest.fn() }
+    connectReduxDevtools(devToolsManager, store, {
+        logIdempotentActionSteps: false,
+        logChildActions: false
+    })
+
+    store.contents.get("one")!.toggleState()
+    expect(devTools.send.mock.calls).toMatchSnapshot()
+})
