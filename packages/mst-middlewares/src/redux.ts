@@ -57,7 +57,7 @@ interface ActionContext {
     errored: boolean
     errorReported: boolean
     step: number
-    callArgs: { [k: number]: any }
+    callArgs: any[]
     changesMadeSetter: ChangesMadeSetter | undefined
 }
 
@@ -66,9 +66,7 @@ function getActionContextNameAndTypePath(actionContext: ActionContext, logArgsNe
     let targetTypePath = actionContext.targetTypePath
 
     if (logArgsNearName) {
-        let args = Object.values(actionContext.callArgs)
-            .map(a => JSON.stringify(a))
-            .join(", ")
+        let args = actionContext.callArgs.map(a => JSON.stringify(a)).join(", ")
 
         if (args.length > 64) {
             args = args.slice(0, 64) + "..."
@@ -120,19 +118,23 @@ function getTargetTypePath(node: mst.IAnyStateTreeNode): string[] {
  *
  * @export
  * @param {*} remoteDevDep
- * @param {*} model
- * @param {{ logIdempotentActionSteps: boolean; logChildActions: boolean }} [options]
+ * @param {mst.IAnyStateTreeNode} model
+ * @param {{
+ *         logIdempotentActionSteps?: boolean
+ *         logChildActions?: boolean
+ *         logArgsNearName?: boolean
+ *     }} [options]
  */
 export function connectReduxDevtools(
     remoteDevDep: any,
     model: mst.IAnyStateTreeNode,
     options?: {
-        logIdempotentActionSteps: boolean
-        logChildActions: boolean
-        logArgsNearName: boolean
+        logIdempotentActionSteps?: boolean
+        logChildActions?: boolean
+        logArgsNearName?: boolean
     }
 ) {
-    options = {
+    const opts = {
         logIdempotentActionSteps: true,
         logChildActions: false,
         logArgsNearName: true,
@@ -159,7 +161,7 @@ export function connectReduxDevtools(
     const actionContexts = new Map<number, ActionContext>()
 
     let changesMadeSetter: ChangesMadeSetter | undefined = undefined
-    if (!options.logIdempotentActionSteps) {
+    if (!opts.logIdempotentActionSteps) {
         mst.onPatch(model, () => {
             if (!handlingMonitorAction && changesMadeSetter) {
                 changesMadeSetter()
@@ -200,12 +202,12 @@ export function connectReduxDevtools(
                 errored: false,
                 errorReported: false,
                 step: 0,
-                callArgs: {},
+                callArgs: [],
                 changesMadeSetter: undefined
             }
 
             if (call.args) {
-                call.args.forEach((value, index) => (context.callArgs[index] = value))
+                context.callArgs = [...call.args]
             }
 
             // subaction, assign the parent action context
@@ -235,7 +237,7 @@ export function connectReduxDevtools(
         changesMadeSetter = oldChangesMadeSetter
         context.changesMadeSetter = undefined
 
-        const changedTheModel = options!.logIdempotentActionSteps ? true : changesMade
+        const changedTheModel = opts.logIdempotentActionSteps ? true : changesMade
 
         switch (call.type) {
             case "flow_spawn":
@@ -266,7 +268,7 @@ export function connectReduxDevtools(
             (call.type === "flow_throw" && !context.errorReported)
 
         // do not log child actions if asked not to, but only for sync actions
-        if (!options!.logChildActions && context.parent && !context.runningAsync) {
+        if (!opts.logChildActions && context.parent && !context.runningAsync) {
             log = false
             // give the child action changes to the parent action
             if (changesMade && context.parent.changesMadeSetter) {
@@ -278,12 +280,12 @@ export function connectReduxDevtools(
             const logStep = (logContext: ActionContext) => {
                 const sn = mst.getSnapshot(model)
 
-                const names = getActionContextNameAndTypePath(logContext, options!.logArgsNearName)
+                const names = getActionContextNameAndTypePath(logContext, opts.logArgsNearName!)
 
                 const copy = {
                     type: names.name,
                     targetTypePath: names.targetTypePath,
-                    args: { ...logContext.callArgs }
+                    args: logContext.callArgs
                 }
                 remotedev.send(copy, sn)
 
@@ -303,7 +305,7 @@ export function connectReduxDevtools(
             }
 
             // if it is an async subaction we need to log it since it made a change, but we will log it as if it were the root
-            const logAsRoot = context.parent && !options!.logChildActions
+            const logAsRoot = context.parent && !opts.logChildActions
 
             if (changedTheModel) {
                 let logContext = context

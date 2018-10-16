@@ -4,11 +4,11 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) applySnapshot
 Array [
   Array [
     Object {
-      "args": Object {
-        "0": Object {
+      "args": Array [
+        Object {
           "x": "snapshotX",
         },
-      },
+      ],
       "targetTypePath": "TestModel",
       "type": "[root] @APPLY_SNAPSHOT({\\"x\\":\\"snapshotX\\"})",
     },
@@ -25,7 +25,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) concurrent [m
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setYAsync() (0)",
     },
@@ -37,7 +37,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (0)",
     },
@@ -49,7 +49,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (1)",
     },
@@ -61,7 +61,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setYAsync() (1)",
     },
@@ -78,11 +78,11 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.addtoArray(
 Array [
   Array [
     Object {
-      "args": Object {
-        "0": Object {
+      "args": Array [
+        Object {
           "a": "otherA",
         },
-      },
+      ],
       "targetTypePath": "TestModel",
       "type": "[root] addtoArray({\\"a\\":\\"otherA\\"})",
     },
@@ -98,7 +98,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel/SubModel[]/SubModel",
       "type": "[root/array/0] setA()",
     },
@@ -119,7 +119,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setX() 1`] 
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setX()",
     },
@@ -136,7 +136,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXAsync()
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (0)",
     },
@@ -148,7 +148,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (1)",
     },
@@ -165,7 +165,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXAsyncTh
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowAsync() (0)",
     },
@@ -177,7 +177,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowAsync() (1) -error thrown-",
     },
@@ -194,7 +194,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXAsyncTh
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowSync() (0)",
     },
@@ -206,7 +206,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowSync() (1) -error thrown-",
     },
@@ -223,7 +223,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXAsyncWi
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncWithEmptyFirstPart() (0)",
     },
@@ -240,7 +240,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXThrow()
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXThrow() -error thrown-",
     },
@@ -257,7 +257,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXY() -> 
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXY()",
     },
@@ -274,7 +274,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXYAsync(
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (0)",
     },
@@ -286,7 +286,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (1)",
     },
@@ -298,7 +298,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (2)",
     },
@@ -310,7 +310,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (3)",
     },
@@ -327,7 +327,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXYAsyncT
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowAsync() (0)",
     },
@@ -339,7 +339,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowAsync() (1) -error thrown-",
     },
@@ -356,7 +356,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: false) m.setXYAsyncT
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowSync() (0)",
     },
@@ -368,7 +368,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowSync() (1) -error thrown-",
     },
@@ -385,11 +385,11 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) applySnapshot(
 Array [
   Array [
     Object {
-      "args": Object {
-        "0": Object {
+      "args": Array [
+        Object {
           "x": "snapshotX",
         },
-      },
+      ],
       "targetTypePath": "TestModel",
       "type": "[root] @APPLY_SNAPSHOT({\\"x\\":\\"snapshotX\\"})",
     },
@@ -406,7 +406,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) concurrent [m.
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setYAsync() (0)",
     },
@@ -418,7 +418,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (0)",
     },
@@ -430,7 +430,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (1)",
     },
@@ -442,7 +442,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setYAsync() (1)",
     },
@@ -459,11 +459,11 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.addtoArray({
 Array [
   Array [
     Object {
-      "args": Object {
-        "0": Object {
+      "args": Array [
+        Object {
           "a": "otherA",
         },
-      },
+      ],
       "targetTypePath": "TestModel",
       "type": "[root] addtoArray({\\"a\\":\\"otherA\\"})",
     },
@@ -479,7 +479,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel/SubModel[]/SubModel",
       "type": "[root/array/0] setA()",
     },
@@ -500,7 +500,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setX() 1`] =
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setX()",
     },
@@ -517,7 +517,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXAsync() 
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (0)",
     },
@@ -529,7 +529,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (1)",
     },
@@ -546,7 +546,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXAsyncThr
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowAsync() (0)",
     },
@@ -558,7 +558,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowAsync() (1) -error thrown-",
     },
@@ -575,7 +575,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXAsyncThr
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowSync() (0)",
     },
@@ -587,7 +587,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowSync() (1) -error thrown-",
     },
@@ -604,7 +604,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXAsyncWit
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncWithEmptyFirstPart() (0)",
     },
@@ -621,7 +621,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXThrow() 
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXThrow() -error thrown-",
     },
@@ -638,7 +638,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXY() -> m
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXY() >>> [root] setX()",
     },
@@ -650,7 +650,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXY() >>> [root] setY()",
     },
@@ -667,7 +667,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXYAsync()
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsync() (0) >>> [root] setXAsync() (0)",
     },
@@ -679,7 +679,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsync() (1) >>> [root] setXAsync() (1)",
     },
@@ -691,7 +691,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsync() (2) >>> [root] setYAsync() (0)",
     },
@@ -703,7 +703,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsync() (3) >>> [root] setYAsync() (1)",
     },
@@ -720,7 +720,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXYAsyncTh
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsyncThrowAsync() (0) >>> [root] setXAsyncThrowAsync() (0)",
     },
@@ -732,7 +732,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsyncThrowAsync() (1) >>> [root] setXAsyncThrowAsync() (1) -error thrown-",
     },
@@ -744,7 +744,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowAsync() (2) -error thrown-",
     },
@@ -761,7 +761,7 @@ exports[`(logIdempotentActionSteps: false, logChildActions: true) m.setXYAsyncTh
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsyncThrowSync() (0) >>> [root] setXAsyncThrowSync() (0)",
     },
@@ -773,7 +773,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsyncThrowSync() (1) >>> [root] setXAsyncThrowSync() (1) -error thrown-",
     },
@@ -785,7 +785,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowSync() (2) -error thrown-",
     },
@@ -802,11 +802,11 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) applySnapshot(
 Array [
   Array [
     Object {
-      "args": Object {
-        "0": Object {
+      "args": Array [
+        Object {
           "x": "snapshotX",
         },
-      },
+      ],
       "targetTypePath": "TestModel",
       "type": "[root] @APPLY_SNAPSHOT({\\"x\\":\\"snapshotX\\"})",
     },
@@ -823,7 +823,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) concurrent [m.
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setYAsync() (0)",
     },
@@ -835,7 +835,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (0)",
     },
@@ -847,7 +847,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (1)",
     },
@@ -859,7 +859,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setYAsync() (1)",
     },
@@ -876,11 +876,11 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.addtoArray({
 Array [
   Array [
     Object {
-      "args": Object {
-        "0": Object {
+      "args": Array [
+        Object {
           "a": "otherA",
         },
-      },
+      ],
       "targetTypePath": "TestModel",
       "type": "[root] addtoArray({\\"a\\":\\"otherA\\"})",
     },
@@ -896,7 +896,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel/SubModel[]/SubModel",
       "type": "[root/array/0] setA()",
     },
@@ -917,7 +917,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setX() 1`] =
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setX()",
     },
@@ -934,7 +934,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXAsync() 
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (0)",
     },
@@ -946,7 +946,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (1)",
     },
@@ -963,7 +963,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXAsyncThr
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowAsync() (0)",
     },
@@ -975,7 +975,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowAsync() (1) -error thrown-",
     },
@@ -992,7 +992,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXAsyncThr
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowSync() (0)",
     },
@@ -1004,7 +1004,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowSync() (1) -error thrown-",
     },
@@ -1021,7 +1021,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXAsyncWit
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncWithEmptyFirstPart() (0)",
     },
@@ -1033,7 +1033,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncWithEmptyFirstPart() (1)",
     },
@@ -1050,7 +1050,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXThrow() 
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXThrow() -error thrown-",
     },
@@ -1067,7 +1067,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXY() -> m
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXY()",
     },
@@ -1084,7 +1084,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXYAsync()
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (0)",
     },
@@ -1096,7 +1096,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (1)",
     },
@@ -1108,7 +1108,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (2)",
     },
@@ -1120,7 +1120,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (3)",
     },
@@ -1132,7 +1132,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (4)",
     },
@@ -1144,7 +1144,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (5)",
     },
@@ -1156,7 +1156,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (6)",
     },
@@ -1173,7 +1173,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXYAsyncTh
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowAsync() (0)",
     },
@@ -1185,7 +1185,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowAsync() (1)",
     },
@@ -1197,7 +1197,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowAsync() (2)",
     },
@@ -1209,7 +1209,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowAsync() (3) -error thrown-",
     },
@@ -1226,7 +1226,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: false) m.setXYAsyncTh
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowSync() (0)",
     },
@@ -1238,7 +1238,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowSync() (1)",
     },
@@ -1250,7 +1250,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowSync() (2)",
     },
@@ -1262,7 +1262,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowSync() (3) -error thrown-",
     },
@@ -1279,9 +1279,9 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) applySnapshot(m
 Array [
   Array [
     Object {
-      "args": Object {
-        "0": Array [],
-      },
+      "args": Array [
+        Array [],
+      ],
       "targetTypePath": "TestModel >>> TestModel/SubModel[]",
       "type": "[root] @APPLY_SNAPSHOT({\\"x\\":\\"snapshotX\\"}) >>> [root/array] @APPLY_SNAPSHOT([])",
     },
@@ -1293,11 +1293,11 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {
-        "0": Object {
+      "args": Array [
+        Object {
           "x": "snapshotX",
         },
-      },
+      ],
       "targetTypePath": "TestModel",
       "type": "[root] @APPLY_SNAPSHOT({\\"x\\":\\"snapshotX\\"})",
     },
@@ -1314,7 +1314,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) concurrent [m.s
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setYAsync() (0)",
     },
@@ -1326,7 +1326,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (0)",
     },
@@ -1338,7 +1338,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (1)",
     },
@@ -1350,7 +1350,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setYAsync() (1)",
     },
@@ -1367,11 +1367,11 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.addtoArray({ 
 Array [
   Array [
     Object {
-      "args": Object {
-        "0": Object {
+      "args": Array [
+        Object {
           "a": "otherA",
         },
-      },
+      ],
       "targetTypePath": "TestModel",
       "type": "[root] addtoArray({\\"a\\":\\"otherA\\"})",
     },
@@ -1387,7 +1387,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel/SubModel[]/SubModel",
       "type": "[root/array/0] setA()",
     },
@@ -1408,7 +1408,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setX() 1`] = 
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setX()",
     },
@@ -1425,7 +1425,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXAsync() 1
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (0)",
     },
@@ -1437,7 +1437,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsync() (1)",
     },
@@ -1454,7 +1454,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXAsyncThro
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowAsync() (0)",
     },
@@ -1466,7 +1466,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowAsync() (1) -error thrown-",
     },
@@ -1483,7 +1483,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXAsyncThro
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowSync() (0)",
     },
@@ -1495,7 +1495,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncThrowSync() (1) -error thrown-",
     },
@@ -1512,7 +1512,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXAsyncWith
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncWithEmptyFirstPart() (0)",
     },
@@ -1524,7 +1524,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXAsyncWithEmptyFirstPart() (1)",
     },
@@ -1541,7 +1541,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXThrow() 1
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXThrow() -error thrown-",
     },
@@ -1558,7 +1558,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXY() -> m.
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXY() >>> [root] setX()",
     },
@@ -1570,7 +1570,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXY() >>> [root] setY()",
     },
@@ -1582,7 +1582,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXY()",
     },
@@ -1599,7 +1599,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXYAsync() 
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsync() (0) >>> [root] setXAsync() (0)",
     },
@@ -1611,7 +1611,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (1)",
     },
@@ -1623,7 +1623,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsync() (2) >>> [root] setXAsync() (1)",
     },
@@ -1635,7 +1635,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsync() (3) >>> [root] setYAsync() (0)",
     },
@@ -1647,7 +1647,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (4)",
     },
@@ -1659,7 +1659,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsync() (5) >>> [root] setYAsync() (1)",
     },
@@ -1671,7 +1671,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsync() (6)",
     },
@@ -1688,7 +1688,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXYAsyncThr
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsyncThrowAsync() (0) >>> [root] setXAsyncThrowAsync() (0)",
     },
@@ -1700,7 +1700,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowAsync() (1)",
     },
@@ -1712,7 +1712,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsyncThrowAsync() (2) >>> [root] setXAsyncThrowAsync() (1) -error thrown-",
     },
@@ -1724,7 +1724,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowAsync() (3) -error thrown-",
     },
@@ -1741,7 +1741,7 @@ exports[`(logIdempotentActionSteps: true, logChildActions: true) m.setXYAsyncThr
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsyncThrowSync() (0) >>> [root] setXAsyncThrowSync() (0)",
     },
@@ -1753,7 +1753,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowSync() (1)",
     },
@@ -1765,7 +1765,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel >>> TestModel",
       "type": "[root] setXYAsyncThrowSync() (2) >>> [root] setXAsyncThrowSync() (1) -error thrown-",
     },
@@ -1777,7 +1777,7 @@ Array [
   ],
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "TestModel",
       "type": "[root] setXYAsyncThrowSync() (3) -error thrown-",
     },
@@ -1794,7 +1794,7 @@ exports[`bourquep 1`] = `
 Array [
   Array [
     Object {
-      "args": Object {},
+      "args": Array [],
       "targetTypePath": "SchoolYearConfigurationModel/map<string, late(() => ContentDefinitionModel)>/ContentDefinition",
       "type": "[root/contents/one] toggleState()",
     },
