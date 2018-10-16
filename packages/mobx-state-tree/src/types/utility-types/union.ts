@@ -50,8 +50,13 @@ export class Union extends Type<any, any, any> {
 
     constructor(name: string, types: IAnyType[], options?: UnionOptions) {
         super(name)
-        this.dispatcher = options && options.dispatcher
-        if (options && !options.eager) this.eager = false
+        options = {
+            eager: true,
+            dispatcher: undefined,
+            ...options
+        }
+        this.dispatcher = options.dispatcher
+        if (!options.eager) this.eager = false
         this.types = types
     }
 
