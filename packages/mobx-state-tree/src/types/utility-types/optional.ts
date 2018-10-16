@@ -16,7 +16,8 @@ import {
     OptionalProperty,
     ExtractT,
     ExtractS,
-    ExtractC
+    ExtractC,
+    ExtractCST
 } from "../../internal"
 import { IAnyComplexType } from "../.."
 
@@ -113,7 +114,7 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
 export type OptionalDefaultValueOrFunction<IT extends IAnyType> =
     | ExtractC<IT>
     | ExtractS<IT>
-    | (() => ExtractC<IT> | ExtractS<IT> | ExtractT<IT>)
+    | (() => ExtractCST<IT>)
 
 export interface IOptionalIComplexType<IT extends IAnyComplexType>
     extends IComplexType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
