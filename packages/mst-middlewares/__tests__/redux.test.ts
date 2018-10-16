@@ -225,6 +225,32 @@ for (const logIdempotentActionSteps of [false, true]) {
 }
 
 test("bourquep", () => {
+    enum ContentState {
+        Active,
+        Cancelled,
+        Completed
+    }
+
+    const ContentStateEnumDef = types.custom<number, ContentState>({
+        name: "ContentStateEnumDef",
+        fromSnapshot(value: number): ContentState {
+            let cs = ContentState as any
+            return cs[cs[value]]
+        },
+        toSnapshot(value: ContentState): number {
+            return value
+        },
+        isTargetType(value: number): boolean {
+            return value in ContentState
+        },
+        getValidationMessage(value: number): string {
+            if (value in ContentState) {
+                return ""
+            }
+            return value + " is not a real value of ContentState."
+        }
+    })
+
     const SchoolYearConfigurationModel = types.model("SchoolYearConfigurationModel", {
         id: types.identifier,
         contents: types.map(types.late(() => ContentDefinitionModel))
@@ -233,17 +259,20 @@ test("bourquep", () => {
     const ContentDefinitionModel = types
         .model("ContentDefinition", {
             id: types.identifier,
-            state: "active"
+            state: types.optional(ContentStateEnumDef, 0)
         })
 
         .actions(self => {
             const _actions = {
                 toggleState() {
-                    if (self.state === "cancelled") {
+                    if (self.state === ContentState.Cancelled) {
                         return
                     }
 
-                    let newState = self.state === "active" ? "completed" : "active"
+                    let newState =
+                        self.state === ContentState.Active
+                            ? ContentState.Completed
+                            : ContentState.Active
                     self.state = newState
                 }
             }

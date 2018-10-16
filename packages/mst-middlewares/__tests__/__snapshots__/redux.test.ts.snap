@@ -1802,7 +1802,7 @@ Array [
       "contents": Object {
         "one": Object {
           "id": "200",
-          "state": "completed",
+          "state": 2,
         },
       },
       "id": "100",
