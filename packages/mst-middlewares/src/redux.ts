@@ -61,9 +61,21 @@ interface ActionContext {
     changesMadeSetter: ChangesMadeSetter | undefined
 }
 
-function getActionContextNameAndTypePath(actionContext: ActionContext) {
+function getActionContextNameAndTypePath(actionContext: ActionContext, logArgsNearName: boolean) {
     let name = actionContext.name
     let targetTypePath = actionContext.targetTypePath
+
+    if (logArgsNearName) {
+        let args = Object.values(actionContext.callArgs)
+            .map(a => JSON.stringify(a))
+            .join(", ")
+
+        if (args.length > 64) {
+            args = args.slice(0, 64) + "..."
+        }
+
+        name += `(${args})`
+    }
 
     if (actionContext.runningAsync) {
         name += ` (${actionContext.step})`
@@ -74,7 +86,7 @@ function getActionContextNameAndTypePath(actionContext: ActionContext) {
     }
 
     if (actionContext.parent) {
-        const ret = getActionContextNameAndTypePath(actionContext.parent)
+        const ret = getActionContextNameAndTypePath(actionContext.parent, logArgsNearName)
         if (ret) {
             name = `${ret.name} >>> ${name}`
             targetTypePath = `${ret.targetTypePath} >>> ${targetTypePath}`
@@ -114,9 +126,18 @@ function getTargetTypePath(node: mst.IAnyStateTreeNode): string[] {
 export function connectReduxDevtools(
     remoteDevDep: any,
     model: mst.IAnyStateTreeNode,
-    options?: { logIdempotentActionSteps: boolean; logChildActions: boolean }
+    options?: {
+        logIdempotentActionSteps: boolean
+        logChildActions: boolean
+        logArgsNearName: boolean
+    }
 ) {
-    options = { logIdempotentActionSteps: true, logChildActions: false, ...options }
+    options = {
+        logIdempotentActionSteps: true,
+        logChildActions: false,
+        logArgsNearName: true,
+        ...options
+    }
 
     let handlingMonitorAction = 0
 
@@ -257,7 +278,7 @@ export function connectReduxDevtools(
             const logStep = (logContext: ActionContext) => {
                 const sn = mst.getSnapshot(model)
 
-                const names = getActionContextNameAndTypePath(logContext)
+                const names = getActionContextNameAndTypePath(logContext, options!.logArgsNearName)
 
                 const copy = {
                     type: names.name,
