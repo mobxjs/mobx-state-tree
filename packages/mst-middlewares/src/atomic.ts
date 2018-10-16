@@ -1,8 +1,8 @@
-import * as mst from "mobx-state-tree"
+import { createActionTrackingMiddleware, recordPatches } from "mobx-state-tree"
 
-const atomic = mst.createActionTrackingMiddleware({
+const atomic = createActionTrackingMiddleware({
     filter: call => call.parentId === 0,
-    onStart: call => mst.recordPatches(call.tree),
+    onStart: call => recordPatches(call.tree),
     onResume: (call, recorder) => recorder.resume(),
     onSuspend: (call, recorder) => recorder.stop(),
     onSuccess: (call, recorder) => {},

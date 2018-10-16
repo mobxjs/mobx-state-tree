@@ -1,9 +1,9 @@
-import * as mst from "mobx-state-tree"
+import { types, resolvePath, getEnv, onSnapshot, getSnapshot, applySnapshot } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
-const TimeTraveller = mst.types
+const TimeTraveller = types
     .model("TimeTraveller", {
-        history: mst.types.array(mst.types.frozen()),
+        history: types.array(types.frozen()),
         undoIdx: -1,
         targetPath: ""
     })
@@ -33,8 +33,8 @@ const TimeTraveller = mst.types
             },
             afterCreate() {
                 targetStore = self.targetPath
-                    ? mst.resolvePath(self, self.targetPath)
-                    : mst.getEnv(self).targetStore
+                    ? resolvePath(self, self.targetPath)
+                    : getEnv(self).targetStore
                 if (!targetStore)
                     throw new Error(
                         "Failed to find target store for TimeTraveller. Please provide `targetPath`  property, or a `targetStore` in the environment"
@@ -42,12 +42,10 @@ const TimeTraveller = mst.types
                 // TODO: check if targetStore doesn't contain self
                 // if (contains(targetStore, self)) throw new Error("TimeTraveller shouldn't be recording itself. Please specify a sibling as taret, not some parent")
                 // start listening to changes
-                snapshotDisposer = mst.onSnapshot(targetStore, snapshot =>
-                    this.addUndoState(snapshot)
-                )
+                snapshotDisposer = onSnapshot(targetStore, snapshot => this.addUndoState(snapshot))
                 // record an initial state if no known
                 if (self.history.length === 0) {
-                    this.addUndoState(mst.getSnapshot(targetStore))
+                    this.addUndoState(getSnapshot(targetStore))
                 }
             },
             beforeDestroy() {
@@ -56,12 +54,12 @@ const TimeTraveller = mst.types
             undo() {
                 self.undoIdx--
                 skipNextUndoState = true
-                mst.applySnapshot(targetStore, self.history[self.undoIdx])
+                applySnapshot(targetStore, self.history[self.undoIdx])
             },
             redo() {
                 self.undoIdx++
                 skipNextUndoState = true
-                mst.applySnapshot(targetStore, self.history[self.undoIdx])
+                applySnapshot(targetStore, self.history[self.undoIdx])
             }
         }
     })

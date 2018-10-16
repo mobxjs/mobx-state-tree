@@ -1,4 +1,14 @@
-import * as mst from "mobx-state-tree"
+import {
+    IStateTreeNode,
+    isStateTreeNode,
+    getSnapshot,
+    applyAction,
+    onSnapshot,
+    onAction,
+    getType,
+    applySnapshot as mstApplySnapshot
+} from "mobx-state-tree"
+
 /**
  * Creates a tiny proxy around a MST tree that conforms to the redux store api.
  * This makes it possible to use MST inside a redux application.
@@ -10,16 +20,16 @@ import * as mst from "mobx-state-tree"
  * @param {...MiddleWare[]} middlewares
  * @returns {IReduxStore}
  */
-export const asReduxStore = function(model: mst.IStateTreeNode, ...middlewares: any[]) {
-    if (!mst.isStateTreeNode(model)) throw new Error("Expected model object")
+export const asReduxStore = function(model: IStateTreeNode, ...middlewares: any[]) {
+    if (!isStateTreeNode(model)) throw new Error("Expected model object")
     let store = {
-        getState: () => mst.getSnapshot(model),
+        getState: () => getSnapshot(model),
         dispatch: (action: any) => {
             runMiddleWare(action, runners.slice(), (newAction: any) =>
-                mst.applyAction(model, reduxActionToAction(newAction))
+                applyAction(model, reduxActionToAction(newAction))
             )
         },
-        subscribe: (listener: any) => mst.onSnapshot(model, listener)
+        subscribe: (listener: any) => onSnapshot(model, listener)
     }
     let runners = middlewares.map(mw => mw(store))
     return store
@@ -53,7 +63,7 @@ function runMiddleWare(action: any, runners: any[], next: any) {
  */
 export function connectReduxDevtools(remoteDevDep: any, model: any) {
     // Connect to the monitor
-    const remotedev = remoteDevDep.connectViaExtension({ name: mst.getType(model).name })
+    const remotedev = remoteDevDep.connectViaExtension({ name: getType(model).name })
     let applyingSnapshot = false
 
     // Subscribe to change state (if need more than just logging)
@@ -63,18 +73,18 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
         }
     })
 
-    const initialState = mst.getSnapshot(model)
+    const initialState = getSnapshot(model)
     remotedev.init(initialState)
 
     // Send changes to the remote monitor
-    mst.onAction(
+    onAction(
         model,
         action => {
             if (applyingSnapshot) return
             const copy: any = {}
             copy.type = action.name
             if (action.args) action.args.forEach((value, index) => (copy[index] = value))
-            remotedev.send(copy, mst.getSnapshot(model))
+            remotedev.send(copy, getSnapshot(model))
         },
         true
     )
@@ -85,7 +95,7 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
                 applySnapshot(model2, initialState)
                 return remotedev2.init(initialState)
             case "COMMIT":
-                return remotedev2.init(mst.getSnapshot(model2))
+                return remotedev2.init(getSnapshot(model2))
             case "ROLLBACK":
                 return remotedev2.init(remoteDevDep.extractState(message))
             case "JUMP_TO_STATE":
@@ -104,7 +114,7 @@ export function connectReduxDevtools(remoteDevDep: any, model: any) {
 
     function applySnapshot(model2: any, state: any) {
         applyingSnapshot = true
-        mst.applySnapshot(model2, state)
+        mstApplySnapshot(model2, state)
         applyingSnapshot = false
     }
 }
