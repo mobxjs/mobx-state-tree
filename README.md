@@ -250,7 +250,7 @@ An example:
 ```javascript
 const TodoStore = types
     .model("TodoStore", {                             // 1
-        loaded: types.boolean                         // 2
+        loaded: types.boolean,                        // 2
         endpoint: "http://localhost",                 // 3
         todos: types.array(Todo),                     // 4
         selectedTodo: types.reference(Todo)           // 5
@@ -909,7 +909,7 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 
 ## Utility types
 
--   `types.union(options?: { dispatcher?: (snapshot) => Type, eager?: boolean }, types...)` create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function to determine the type. When `eager` flag is set to `true` - the first matching type will be used, if not (default) the type check will pass only if exactly 1 type matches.
+-   `types.union(options?: { dispatcher?: (snapshot) => Type, eager?: boolean }, types...)` create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function to determine the type. When `eager` flag is set to `true` (default) - the first matching type will be used, if set to `false` the type check will pass only if exactly 1 type matches.
 -   `types.optional(type, defaultValue)` marks an value as being optional (in e.g. a model). If a value is not provided the `defaultValue` will be used instead. If `defaultValue` is a function, it will be evaluated. This can be used to generate, for example, IDs or timestamps upon creation.
 -   `types.literal(value)` can be used to create a literal type, where the only possible value is specifically that value. This is very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
 -   `types.enumeration(name?, options: string[])` creates an enumeration. This method is a shorthand for a union of string literals. If you are using typescript and want to create a type based on an string enum (e.g. `enum Color { ... }`) then use `types.enumeration<Color>("Color", Object.values(Color))`, where the `"Color"` name argument is optional.

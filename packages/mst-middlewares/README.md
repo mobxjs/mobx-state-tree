@@ -36,8 +36,10 @@ const store = Store.create({
 
 mst.addMiddleware(store, logger)
 
+store.todos[0].setTitle("hello world")
+
 // Prints:
-store.todos[0].setTitle("hello world")[MST] / todos / 0 / setTitle
+// [MST] /todos/0/setTitle
 ```
 
 For a more sophisticated logger, see [action-logger](#action-logger) which also logs process invocations and continuations
@@ -79,20 +81,21 @@ For more details on the meaning of the action types see the [middleware docs](ht
 
 # atomic
 
-This middleware rolls back if an (asynchronous) action process fails.
+This middleware rolls back if a synchronous or asynchronous action process fails.
 
-The exception itself is not eaten, but any modifications that are made during the (async) action will be rollback, by reverse applying any pending patches. Can be connected to a model by using either `addMiddleware` or `decoratore`
+The exception itself is not eaten, but any modifications that are made during the sync/async action will be rollback, by reverse applying any pending patches. Can be connected to a model by using either `addMiddleware` or `decorate`
 
 Example:
 
 ```javascript
 import { types, addMiddleware, flow } from "mobx-state-tree"
-import {atomic} form "mst-middlewares"
+import { atomic } from "mst-middlewares"
 
 const TestModel = types
     .model({
         z: 1
     })
+    // example with addMiddleware
     .actions(self => {
         addMiddleware(self, atomic)
 
@@ -104,6 +107,18 @@ const TestModel = types
                 self.z += x
                 throw "Oops"
             })
+        }
+    })
+    // example with decorate
+    .actions(self => {
+        return {
+            inc: decorate(atomic, flow(function*(x) {
+                yield delay(2)
+                self.z += x
+                yield delay(2)
+                self.z += x
+                throw "Oops"
+            }))
         }
     })
 
