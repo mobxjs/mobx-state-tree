@@ -45,7 +45,8 @@ import {
     OptionalProperty,
     ExtractC,
     ExtractS,
-    ExtractT
+    ExtractT,
+    ExtractCST
 } from "../../internal"
 
 export interface IMapType<IT extends IAnyType>
@@ -67,20 +68,15 @@ export interface IMSTMap<IT extends IAnyType> {
     ): void
     get(key: string): ExtractT<IT> | undefined
     has(key: string): boolean
-    set(key: string, value: ExtractC<IT> | ExtractS<IT> | ExtractT<IT>): this
+    set(key: string, value: ExtractCST<IT>): this
     readonly size: number
-    put(value: ExtractC<IT> | ExtractS<IT> | ExtractT<IT>): ExtractT<IT>
+    put(value: ExtractCST<IT>): ExtractT<IT>
     keys(): IterableIterator<string>
     values(): IterableIterator<ExtractT<IT>>
     entries(): IterableIterator<[string, ExtractT<IT>]>
     [Symbol.iterator](): IterableIterator<[string, ExtractT<IT>]>
     /** Merge another object into this map, returns self. */
-    merge(
-        other:
-            | IMSTMap<IType<any, any, ExtractT<IT>>>
-            | IKeyValueMap<ExtractC<IT> | ExtractS<IT> | ExtractT<IT>>
-            | any
-    ): this
+    merge(other: IMSTMap<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractCST<IT>> | any): this
     replace(values: IMSTMap<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractT<IT>>): this
     /**
      * Returns a plain object that represents this map.
@@ -194,12 +190,11 @@ class MSTMap<C, S, T> extends ObservableMap {
  * @internal
  * @private
  */
-export class MapType<
-    IT extends IAnyType,
-    C = ExtractC<IT>,
-    S = ExtractS<IT>,
-    T = ExtractT<IT>
-> extends ComplexType<IKeyValueMap<C> | undefined, IKeyValueMap<S>, IMSTMap<IT>> {
+export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> extends ComplexType<
+    IKeyValueMap<C> | undefined,
+    IKeyValueMap<S>,
+    IMSTMap<IT>
+> {
     shouldAttachNode = true
     subType: IAnyType
     identifierMode: MapIdentifierMode = MapIdentifierMode.UNKNOWN

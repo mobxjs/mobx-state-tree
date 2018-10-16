@@ -170,6 +170,8 @@ export interface IAnyComplexType extends IComplexType<any, any, any> {}
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
 export type ExtractT<T extends IAnyType> = T extends IType<any, any, infer X> ? X : never
+export type ExtractCST<T extends IAnyType> = ExtractC<T> | ExtractS<T> | ExtractT<T>
+
 export type ExtractIStateTreeNode<C, S, T> =
     // if the instance is a primitive then keep it as is (it is not a state tree node)
     // else it is a state tree node, but respect primitives
