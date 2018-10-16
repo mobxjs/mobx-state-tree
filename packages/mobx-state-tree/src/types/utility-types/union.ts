@@ -54,8 +54,13 @@ export class Union extends Type<any, any, any> {
 
     constructor(name: string, types: IAnyType[], options?: UnionOptions) {
         super(name)
-        this.dispatcher = options && options.dispatcher
-        if (options && !options.eager) this.eager = false
+        options = {
+            eager: true,
+            dispatcher: undefined,
+            ...options
+        }
+        this.dispatcher = options.dispatcher
+        if (!options.eager) this.eager = false
         this.types = types
     }
 
@@ -68,25 +73,33 @@ export class Union extends Type<any, any, any> {
     }
 
     instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
-        const type = this.determineType(value)
+        const type = this.determineType(value, undefined)
         if (!type) return fail("No matching type for union " + this.describe()) // can happen in prod builds
         return type.instantiate(parent, subpath, environment, value)
     }
 
     reconcile(current: INode, newValue: any): INode {
-        const type = this.determineType(newValue)
+        const type = this.determineType(newValue, current.type)
         if (!type) return fail("No matching type for union " + this.describe()) // can happen in prod builds
         return type.reconcile(current, newValue)
     }
 
-    determineType(value: any): IAnyType | undefined {
+    determineType(value: any, reconcileCurrentType: IAnyType | undefined): IAnyType | undefined {
         // try the dispatcher, if defined
         if (this.dispatcher) {
             return this.dispatcher(value)
         }
 
         // find the most accomodating type
-        return this.types.find(type => type.is(value))
+        // if we are using reconciliation try the current node type first (fix for #1045)
+        if (reconcileCurrentType) {
+            if (reconcileCurrentType.is(value)) {
+                return reconcileCurrentType
+            }
+            return this.types.filter(t => t !== reconcileCurrentType).find(type => type.is(value))
+        } else {
+            return this.types.find(type => type.is(value))
+        }
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {

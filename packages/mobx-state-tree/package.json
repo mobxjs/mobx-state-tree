@@ -7,7 +7,7 @@
     "module": "dist/mobx-state-tree.module.js",
     "typings": "dist/index.d.ts",
     "scripts": {
-        "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
+        "build": "shx cp ../../README.md . && tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
         "rollup": "rollup -c",
         "jest": "jest --testPathPattern=/__tests__/core/",
         "jest:perf": "jest --testPathPattern=/__tests__/perf/",

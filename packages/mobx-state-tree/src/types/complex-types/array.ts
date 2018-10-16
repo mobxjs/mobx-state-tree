@@ -409,7 +409,8 @@ function areSame(oldNode: INode, newValue: any) {
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&
-        oldNode.identifier === "" + newValue[oldNode.identifierAttribute]
+        oldNode.identifier === "" + newValue[oldNode.identifierAttribute] &&
+        oldNode.type.is(newValue)
     )
         return true
     return false

@@ -1,6 +1,8 @@
 # next
 
 -   Made type Typescript compilation when 'declarations' is set to true + type completion faster thanks to some type optimizations through [#1043](https://github.com/mobxjs/mobx-state-tree/pull/1043) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fix for array reconciliation of union types with ids [#1045](https://github.com/mobxjs/mobx-state-tree/issues/1045) through [#1047](https://github.com/mobxjs/mobx-state-tree/pull/1047) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fixed bug where the eager option for the union type defaulted to true when no options argument was passed but false when it was passed. Now they both default to true when not specified. Fixed through [#1046](https://github.com/mobxjs/mobx-state-tree/pull/1046) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.5.0
 
