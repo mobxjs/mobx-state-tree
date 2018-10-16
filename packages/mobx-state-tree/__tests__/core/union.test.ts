@@ -180,7 +180,7 @@ test("961 - apply snapshot to union should not throw when union keeps models wit
 })
 
 describe("1045 - secondary union types with applySnapshot and ids", () => {
-    function initTest(useCreate: boolean, submodel1First: boolean) {
+    function initTest(useCreate: boolean, submodel1First: boolean, type: number) {
         setLivelynessChecking("error")
 
         const Submodel1 = types.model("Submodel1", {
@@ -206,36 +206,47 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
         return {
             store,
             applySn: function() {
-                const sn = {
+                const sn1 = {
                     id: "id1",
                     extraField1: "new extraField1",
                     extraField2: "some value"
                 }
+                const sn2 = {
+                    id: "id1",
+                    extraField1: undefined,
+                    extraField2: "some value"
+                }
+                const sn = type === 1 ? sn1 : sn2
+                const submodel = type === 1 ? Submodel1 : Submodel2
 
-                applySnapshot(store, [useCreate ? Submodel1.create(sn) : sn])
+                applySnapshot(store, [useCreate ? (submodel as any).create(sn) : sn])
 
                 expect(store.length).toBe(1)
                 expect(store[0]).toEqual(sn)
-                expect(getType(store[0])).toBe(Submodel1)
+                expect(getType(store[0])).toBe(submodel)
             }
         }
     }
 
     for (const submodel1First of [true, false]) {
         describe(submodel1First ? "submodel1 first" : "submodel2 first", () => {
-            for (const useCreate of [true, false]) {
+            for (const useCreate of [false, true]) {
                 describe(useCreate ? "using create" : "not using create", () => {
-                    it(`apply snapshot works when the node is not touched`, () => {
-                        const t = initTest(useCreate, submodel1First)
-                        t.applySn()
-                    })
+                    for (const type of [2, 1]) {
+                        describe(`snapshot is of type Submodel${type}`, () => {
+                            it(`apply snapshot works when the node is not touched`, () => {
+                                const t = initTest(useCreate, submodel1First, type)
+                                t.applySn()
+                            })
 
-                    it(`apply snapshot works when the node is touched`, () => {
-                        const t = initTest(useCreate, submodel1First)
-                        // tslint:disable-next-line:no-unused-expression
-                        t.store[0]
-                        t.applySn()
-                    })
+                            it(`apply snapshot works when the node is touched`, () => {
+                                const t = initTest(useCreate, submodel1First, type)
+                                // tslint:disable-next-line:no-unused-expression
+                                t.store[0]
+                                t.applySn()
+                            })
+                        })
+                    }
                 })
             }
         })
