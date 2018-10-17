@@ -1,7 +1,21 @@
 # next
 
--   Fix for preProcessSnapshot not copied on compose [#613](https://github.com/mobxjs/mobx-state-tree/issues/613) through [#1013]((https://github.com/mobxjs/mobx-state-tree/pull/1013) by [@theRealScoobaSteve](https://github.com/theRealScoobaSteve)
+-   Fix for array reconciliation of union types with ids [#1045](https://github.com/mobxjs/mobx-state-tree/issues/1045) through [#1047](https://github.com/mobxjs/mobx-state-tree/pull/1047) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fixed bug where the eager option for the union type defaulted to true when no options argument was passed but false when it was passed. Now they both default to true when not specified. Fixed through [#1046](https://github.com/mobxjs/mobx-state-tree/pull/1046) by [@xaviergonz](https://github.com/xaviergonz)
+
+# 3.5.0
+
+-   Fix for afterCreate/afterAttach sometimes throwing an exception when a node was created as part of a view/computed property [#967](https://github.com/mobxjs/mobx-state-tree/issues/967) through [#1026](https://github.com/mobxjs/mobx-state-tree/pull/1026) by [@xaviergonz](https://github.com/xaviergonz). Note that this fix will only work if your installed peer mobx version is >= 4.5.0 or >= 5.5.0
+-   Fix for cast method being broken in Typescript 3.1.1 through [#1028](https://github.com/mobxjs/mobx-state-tree/pull/1028) by [@xaviergonz](https://github.com/xaviergonz)
+
+# 3.4.0
+
+-   Added getPropertyMembers(typeOrNode) through [#1016](https://github.com/mobxjs/mobx-state-tree/pull/1016) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fix for preProcessSnapshot not copied on compose [#613](https://github.com/mobxjs/mobx-state-tree/issues/613) through [#1013](https://github.com/mobxjs/mobx-state-tree/pull/1013) by [@theRealScoobaSteve](https://github.com/theRealScoobaSteve)
+-   Fix for actions sometimes failing to resolve this to self through [#1014](https://github.com/mobxjs/mobx-state-tree/pull/1014) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fix for preProcessSnapshot not copied on compose [#613](https://github.com/mobxjs/mobx-state-tree/issues/613) through [#1013](https://github.com/mobxjs/mobx-state-tree/pull/1013) by [@theRealScoobaSteve](https://github.com/theRealScoobaSteve)
 -   Improvements to the bookshop example through [#1009](https://github.com/mobxjs/mobx-state-tree/pull/1009) by [@programmer4web](https://github.com/programmer4web)
+-   Fix for a regression with optional identifiers [#1019](https://github.com/mobxjs/mobx-state-tree/issues/1019) through [#1020](https://github.com/mobxjs/mobx-state-tree/pull/1020) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.3.0
 

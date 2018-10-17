@@ -1,5 +1,12 @@
 // noinspection ES6UnusedImports
-import { action, computed, createAtom, reaction, IAtom } from "mobx"
+import {
+    action,
+    computed,
+    createAtom,
+    reaction,
+    IAtom,
+    _allowStateChangesInsideComputed
+} from "mobx"
 import {
     addHiddenFinalProp,
     addReadOnlyProp,
@@ -123,19 +130,39 @@ export class ObjectNode implements INode {
         this.parent = parent
         this.subpath = subpath
         this.escapedSubpath = escapeJsonPath(this.subpath)
+
         this.identifierAttribute = (type as any).identifierAttribute
-        // identifier can not be changed during lifecycle of a node
-        // so we safely can read it from initial snapshot
-        this.identifier =
-            this.identifierAttribute && this._initialSnapshot
-                ? "" + this._initialSnapshot[this.identifierAttribute]
-                : null // normalize internal identifier to string
 
         if (!parent) {
             this.identifierCache = new IdentifierCache()
         }
 
         this._childNodes = type.initializeChildNodes(this, this._initialSnapshot)
+
+        // identifier can not be changed during lifecycle of a node
+        // so we safely can read it from initial snapshot
+        this.identifier = null
+        if (this.identifierAttribute && this._initialSnapshot) {
+            let id = this._initialSnapshot[this.identifierAttribute]
+            if (id === undefined) {
+                // try with the actual node if not (for optional identifiers)
+                const childNode = this._childNodes[this.identifierAttribute]
+                if (childNode) {
+                    id = childNode.value
+                }
+            }
+
+            if (typeof id !== "string" && typeof id !== "number") {
+                fail(
+                    `Instance identifier '${this.identifierAttribute}' for type '${
+                        this.type.name
+                    }' must be a string or a number`
+                )
+            }
+
+            // normalize internal identifier to string
+            this.identifier = "" + id
+        }
 
         if (!parent) {
             this.identifierCache!.addNodeToCache(this)
@@ -243,7 +270,16 @@ export class ObjectNode implements INode {
     fireHook(name: string) {
         const fn =
             this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
-        if (typeof fn === "function") fn.apply(this.storedValue)
+        if (typeof fn === "function") {
+            // we check for it to allow old mobx peer dependencies that don't have the method to work (even when still bugged)
+            if (_allowStateChangesInsideComputed) {
+                _allowStateChangesInsideComputed(() => {
+                    fn.apply(this.storedValue)
+                })
+            } else {
+                fn.apply(this.storedValue)
+            }
+        }
     }
 
     public createObservableInstanceIfNeeded() {

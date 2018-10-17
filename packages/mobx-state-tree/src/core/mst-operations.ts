@@ -1,5 +1,29 @@
 import { isComputedProp, isObservableProp } from "mobx"
-import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC, IType } from "../internal"
+import {
+    ExtractS,
+    ExtractT,
+    IAnyStateTreeNode,
+    ExtractC,
+    IType,
+    IAnyModelType,
+    getStateTreeNode,
+    IStateTreeNode,
+    isStateTreeNode,
+    IJsonPatch,
+    splitJsonPath,
+    asArray,
+    EMPTY_OBJECT,
+    fail,
+    IDisposer,
+    isType,
+    resolveNodeByPath,
+    getRelativePathBetweenNodes,
+    freeze,
+    IAnyType,
+    ExtractIStateTreeNode,
+    isModelType,
+    INode
+} from "../internal"
 
 export type TypeOrStateTreeNodeToStateTreeNode<
     T extends IAnyType | IAnyStateTreeNode
@@ -739,41 +763,63 @@ export function walk(target: IAnyStateTreeNode, processor: (item: IAnyStateTreeN
     processor(node.storedValue)
 }
 
-export interface IModelReflectionData {
+export interface IModelReflectionPropertiesData {
     name: string
     properties: { [K: string]: IAnyType }
+}
+
+/**
+ * Returns a reflection of the model type properties and name for either a model type or model node.
+ *
+ * @export
+ * @param {IAnyModelType | IStateTreeNode} typeOrNode
+ * @returns {IModelReflectionPropertiesData}
+ */
+export function getPropertyMembers(
+    typeOrNode: IAnyModelType | IStateTreeNode
+): IModelReflectionPropertiesData {
+    let type
+
+    if (isStateTreeNode(typeOrNode)) {
+        type = getType(typeOrNode) as IAnyModelType
+    } else {
+        type = typeOrNode
+    }
+
+    if (process.env.NODE_ENV !== "production") {
+        if (!isModelType(type)) fail("expected a model type, but got " + type + " instead.")
+    }
+
+    return {
+        name: type.name,
+        properties: { ...type.properties }
+    }
+}
+
+export interface IModelReflectionData extends IModelReflectionPropertiesData {
     actions: string[]
     views: string[]
     volatile: string[]
 }
+
 /**
- * Returns a reflection of the node
+ * Returns a reflection of the model node, including name, properties, views, volatile and actions.
  *
  * @export
- * @param {IStateTreeNode} target
+ * @param {IAnyStateTreeNode} target
  * @returns {IModelReflectionData}
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        const node2: any = getStateTreeNode(target)
-        if (!(node2.type instanceof ModelType))
-            fail(
-                "expected the node's type to be of the type: model" +
-                    target +
-                    " instead. It's likely you passed an array or a map."
-            )
-    }
-    const node: any = getStateTreeNode(target)
-    const type = node.type as ModelType<any, any>
-    const props = Object.getOwnPropertyNames(target)
+    const type = getStateTreeNode(target).type as IAnyModelType
+
     const reflected: IModelReflectionData = {
-        name: type.name,
-        properties: { ...type.properties },
+        ...getPropertyMembers(type),
         actions: [],
         volatile: [],
         views: []
     }
+
+    const props = Object.getOwnPropertyNames(target)
     props.forEach(key => {
         if (key in reflected.properties) return
         const descriptor = Object.getOwnPropertyDescriptor(target, key)!
@@ -796,7 +842,7 @@ export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
  * Alternatively also casts a node snapshot or instance to an snapshot type so it can be assigned to a type snapshot.
  * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance
  * (or vice-versa), but just fool typescript into thinking so.
- * Casting only works on assignation operations, it won't work (compile) stand-alone.
+ * Either way, casting when outside an assignation operation will only yield an unusable type (never).
  *
  * @example
  * const ModelA = types.model({
@@ -820,28 +866,6 @@ export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
  * @param {CastedType<T>} snapshotOrInstance
  * @returns {T}
  */
-export function cast<T = never>(snapshotOrInstance: CastedType<T>): T {
-    return snapshotOrInstance as T
+export function cast<T = never, C = CastedType<T>>(snapshotOrInstance: C): T {
+    return snapshotOrInstance as any
 }
-
-import {
-    INode,
-    getStateTreeNode,
-    IStateTreeNode,
-    isStateTreeNode,
-    IJsonPatch,
-    splitJsonPath,
-    asArray,
-    EMPTY_OBJECT,
-    fail,
-    IDisposer,
-    isType,
-    resolveNodeByPath,
-    getRelativePathBetweenNodes,
-    ModelType,
-    freeze,
-    IAnyType,
-    IMSTMap,
-    ExtractIStateTreeNode,
-    IMSTArray
-} from "../internal"

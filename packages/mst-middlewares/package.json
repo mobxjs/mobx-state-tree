@@ -1,6 +1,6 @@
 {
     "name": "mst-middlewares",
-    "version": "3.3.0",
+    "version": "3.5.0",
     "description": "The MST package ships with some prebuilt middlewares, which serves mainly as examples on how to write your own middleware. The source of each middleware can be found in this github directory, you are encouraged to read them!",
     "main": "dist/mst-middlewares.js",
     "umd:main": "dist/mst-middlewares.umd.js",
@@ -22,18 +22,20 @@
         "cpr": "^3.0.1",
         "cross-env": "^5.1.1",
         "jest": "^23.5.0",
+        "lerna": "^3.3.0",
         "lint-staged": "^7.0.0",
-        "mobx": "^5.0.2",
-        "mobx-state-tree": "^3.3.0",
-        "rollup": "^0.65.0",
+        "mobx": "^5.5.0",
+        "mobx-state-tree": "^3.5.0",
+        "prettier": "^1.13.6",
+        "rollup": "^0.66.0",
         "rollup-plugin-commonjs": "^9.0.0",
         "rollup-plugin-node-resolve": "^3.0.0",
-        "rollup-plugin-uglify": "^5.0.0",
+        "rollup-plugin-uglify": "^6.0.0",
         "ts-jest": "^23.0.1",
         "typescript": "^3.0.0"
     },
     "peerDependencies": {
-        "mobx-state-tree": "^3.1.1"
+        "mobx-state-tree": "^3.4.0"
     },
     "files": [
         "dist/"

@@ -1,5 +1,5 @@
 import React from "react"
-import TestUtils from "react-dom/test-utils"
+import ShallowRenderer from "react-test-renderer/shallow"
 import Header from "./Header"
 import TodoTextInput from "./TodoTextInput"
 
@@ -8,7 +8,7 @@ const setup = () => {
         addTodo: jest.fn()
     }
 
-    const renderer = TestUtils.createRenderer()
+    const renderer = new ShallowRenderer()
     renderer.render(<Header {...props} />)
     const output = renderer.getRenderOutput()
 

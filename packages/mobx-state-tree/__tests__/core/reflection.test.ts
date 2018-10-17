@@ -1,9 +1,19 @@
-import { types, getMembers, IAnyStateTreeNode } from "../../src"
+import {
+    types,
+    getMembers,
+    getPropertyMembers,
+    IAnyStateTreeNode,
+    getType,
+    IAnyModelType,
+    IModelReflectionData,
+    IModelReflectionPropertiesData
+} from "../../src"
 
 const User = types.model("User", {
     id: types.identifier,
     name: types.string
 })
+
 const Model = types
     .model({
         isPerson: false,
@@ -27,6 +37,17 @@ const Model = types
             return 1
         }
     }))
+
+function expectPropertyMembersToMatchMembers(
+    propertyMembers: IModelReflectionPropertiesData,
+    members: IModelReflectionData
+) {
+    expect(propertyMembers).toEqual({
+        name: members.name,
+        properties: members.properties
+    })
+}
+
 test("reflection - model", () => {
     const node = Model.create()
     const reflection = getMembers(node)
@@ -36,23 +57,40 @@ test("reflection - model", () => {
     expect(reflection.volatile.includes("volatileProperty")).toBe(true)
     expect(!!reflection.properties.users).toBe(true)
     expect(!!reflection.properties.isPerson).toBe(true)
+
+    const typeReflection = getPropertyMembers(Model)
+    expectPropertyMembersToMatchMembers(typeReflection, reflection)
+    const reflection2 = getPropertyMembers(node)
+    expectPropertyMembersToMatchMembers(reflection2, reflection)
 })
 test("reflection - map", () => {
     const node = Model.create({
         users: { "1": { id: "1", name: "Test" } }
     })
-    const reflection = getMembers(node.users.get("1")!)
+    const node2 = node.users.get("1")!
+    const reflection = getMembers(node2)
     expect(reflection.name).toBe("User")
     expect(!!reflection.properties.id).toBe(true)
     expect(!!reflection.properties.name).toBe(true)
+
+    const typeReflection = getPropertyMembers(getType(node2) as IAnyModelType)
+    expectPropertyMembersToMatchMembers(typeReflection, reflection)
+    const reflection2 = getPropertyMembers(node2)
+    expectPropertyMembersToMatchMembers(reflection2, reflection)
 })
 test("reflection - array", () => {
     const node = Model.create({
         dogs: [{ id: "1", name: "Test" }]
     })
-    const reflection = getMembers(node.dogs[0])
+    const node2 = node.dogs[0]
+    const reflection = getMembers(node2)
     expect(!!reflection.properties.id).toBe(true)
     expect(!!reflection.properties.name).toBe(true)
+
+    const typeReflection = getPropertyMembers(getType(node2) as IAnyModelType)
+    expectPropertyMembersToMatchMembers(typeReflection, reflection)
+    const reflection2 = getPropertyMembers(node2)
+    expectPropertyMembersToMatchMembers(reflection2, reflection)
 })
 test("reflection - late", () => {
     const node = Model.create({
@@ -65,11 +103,20 @@ test("reflection - late", () => {
     expect(reflection.properties.name.describe()).toBe("string")
 })
 if (process.env.NODE_ENV !== "production") {
-    test("reflection - throw on non model node", () => {
+    test("reflection - throw on non model node for getMembers", () => {
         const node = Model.create({
             users: { "1": { id: "1", name: "Test" } }
         })
         expect(() => (node.users ? getMembers(node.users) : {})).toThrowError()
+    })
+
+    test("reflection - throw on non model type/node for getMembers", () => {
+        expect(() => getPropertyMembers(types.array(types.number) as any)).toThrowError()
+
+        const node = Model.create({
+            users: { "1": { id: "1", name: "Test" } }
+        })
+        expect(() => getPropertyMembers(node.users)).toThrowError()
     })
 }
 test("reflection - can retrieve property names", () => {

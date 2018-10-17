@@ -164,6 +164,10 @@ Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](http
 Even cooler, because it supports snapshots, middleware and replayable actions out of the box, it is possible to replace a Redux store and reducer with a MobX state tree.
 This makes it possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/redux-todomvc/src/index.js#L6).
 
+---
+
+For futher reading: the conceptual difference between snapshots, patches and actions in relation to distributing state changes is extensively discussed in this [blog post](https://medium.com/@mweststrate/distributing-state-changes-using-snapshots-patches-and-actions-part-1-2811a2fcd65f)
+
 ![devtools](docs/reduxdevtools.png)
 
 Finally, MST has built-in support for references, identifiers, dependency injection, change recording and circular type definitions (even across files).
@@ -246,7 +250,7 @@ An example:
 ```javascript
 const TodoStore = types
     .model("TodoStore", {                             // 1
-        loaded: types.boolean                         // 2
+        loaded: types.boolean,                        // 2
         endpoint: "http://localhost",                 // 3
         todos: types.array(Todo),                     // 4
         selectedTodo: types.reference(Todo)           // 5
@@ -905,7 +909,7 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 
 ## Utility types
 
--   `types.union(dispatcher?, types...)` create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
+-   `types.union(options?: { dispatcher?: (snapshot) => Type, eager?: boolean }, types...)` create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function to determine the type. When `eager` flag is set to `true` (default) - the first matching type will be used, if set to `false` the type check will pass only if exactly 1 type matches.
 -   `types.optional(type, defaultValue)` marks an value as being optional (in e.g. a model). If a value is not provided the `defaultValue` will be used instead. If `defaultValue` is a function, it will be evaluated. This can be used to generate, for example, IDs or timestamps upon creation.
 -   `types.literal(value)` can be used to create a literal type, where the only possible value is specifically that value. This is very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
 -   `types.enumeration(name?, options: string[])` creates an enumeration. This method is a shorthand for a union of string literals. If you are using typescript and want to create a type based on an string enum (e.g. `enum Color { ... }`) then use `types.enumeration<Color>("Color", Object.values(Color))`, where the `"Color"` name argument is optional.
@@ -967,7 +971,7 @@ Note: pre and post processing are just meant to convert your data into types tha
 | `beforeDetach`        | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `beforeDestroy`       | Called before the node is destroyed, as a result of calling `destroy`, or by removing or replacing the node from the tree. Child destructors will fire before parents                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
-Note, except for `preProcessSnapshot`, all hooks should be defined as actions.
+Note, except for `preProcessSnapshot` and `postProcessSnapshot`, all hooks should be defined as actions.
 
 All hooks can be defined multiple times and can be composed automatically.
 
@@ -1014,7 +1018,8 @@ See the [full API docs](API.md) for more details.
 | [`protect(node)`](API.md#protect)                                                                         | Protects an unprotected tree against modifications from outside actions                                                                                                                                                                               |
 | [`recordActions(node)`](API.md#recordactions)                                                             | Creates a recorder that listens to all actions in `node`. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded actions on another tree                                                                           |
 | [`recordPatches(node)`](API.md#recordpatches)                                                             | Creates a recorder that listens to all patches emitted by the node. Call `.stop()` on the recorder to stop this, and `.replay(target)` to replay the recorded patches on another tree                                                                 |
-| [`getMembers(node)`](API.md#getMembers)                                                                   | Returns the model name, properties, actions, views, volatiles                                                                                                                                                                                         |
+| [`getMembers(node)`](API.md#getMembers)                                                                   | Returns the model name, properties, actions, views, volatiles of a model node instance                                                                                                                                                                |
+| [`getPropertyMembers(typeOrNode)`](API.md#getPropertyMembers)                                             | Returns the model name and properties of a model type for either a model type or a model node                                                                                                                                                         |
 | [`resolve(node, path)`](API.md#resolve)                                                                   | Resolves a `path` (json path) relatively to the given `node`                                                                                                                                                                                          |
 | [`resolveIdentifier(type, target, identifier)`](API.md#resolveidentifier)                                 | resolves an identifier of a given type in a model tree                                                                                                                                                                                                |
 | [`resolvePath(target, path)`](API.md#resolvepath)                                                         | resolves a JSON path, starting at the specified target                                                                                                                                                                                                |
@@ -1292,7 +1297,37 @@ const Example = types
     }))
 ```
 
-You can circumvent this situation by declaring the views in two steps:
+You can circumvent this situation by using `this` whenever you intend to use the newly declared computed values that are local to the current object:
+
+```typescript
+const Example = types.model("Example", { prop: types.string }).views(self => ({
+    get upperProp(): string {
+        return self.prop.toUpperCase()
+    },
+    get twiceUpperProp(): string {
+        return this.upperProp + this.upperProp
+    }
+}))
+```
+
+Alternatively you can also declare multiple `.views` block, in which case the `self` parameter gets extended after each block.
+
+```typescript
+const Example = types
+  .model('Example', { prop: types.string })
+  .views(self => {
+    get upperProp(): string {
+      return self.prop.toUpperCase();
+    },
+  }))
+  .views(self => ({
+    get twiceUpperProp(): string {
+      return self.upperProp + self.upperProp;
+    },
+  }));
+```
+
+As a last resort, although not recommended due to the performance penalty (see the note below), you may declare the views in two steps:
 
 ```typescript
 const Example = types
@@ -1311,37 +1346,6 @@ const Example = types
 ```
 
 _**NOTE: the above approach will incur runtime performance penalty as accessing such computed values (e.g. inside `render()` method of an observed component) always leads to full recompute (see [this issue](https://github.com/mobxjs/mobx-state-tree/issues/818#issue-323164363) for details). For a heavily used computed properties it's recommended to use one of below approaches.**_
-
-Alternatively, you can use `this` whenever you intend to use the newly declared computed values:
-
-```typescript
-const Example = types.model("Example", { prop: types.string }).views(self => ({
-    // use typeof instead of predefined type to avoid circular references
-    get upperProp(): string {
-        return self.prop.toUpperCase()
-    },
-    get twiceUpperProp(): string {
-        return this.upperProp + this.upperProp
-    }
-}))
-```
-
-Note that you can also declare multiple `.views` block, in which case the `self` parameter gets extended after each block.
-
-```typescript
-const Example = types
-  .model('Example', { prop: types.string })
-  .views(self => {
-    get upperProp(): string {
-      return self.prop.toUpperCase();
-    },
-  }))
-  .views(self => ({
-    get twiceUpperProp(): string {
-      return self.upperProp + self.upperProp;
-    },
-  }));
-```
 
 Similarly, when writing actions or views one can use helper functions:
 

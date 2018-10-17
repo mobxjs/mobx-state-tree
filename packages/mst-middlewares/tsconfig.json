@@ -10,20 +10,15 @@
         "noImplicitAny": true,
         "moduleResolution": "node",
         "experimentalDecorators": true,
+        "strict": true,
+        "strictPropertyInitialization": false,
         "strictNullChecks": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "importHelpers": true,
         "stripInternal": true,
-        "lib": [
-            "dom",
-            "es2015",
-            "scripthost",
-            "es2015.promise",
-            "es2015.generator",
-            "es2015.iterable"
-        ]
+        "lib": ["es6"]
     },
     "files": ["src/index.ts"]
 }
