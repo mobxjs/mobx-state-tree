@@ -1,4 +1,19 @@
-import * as mst from "mobx-state-tree"
+import {
+    IStateTreeNode,
+    isStateTreeNode,
+    getSnapshot,
+    applyAction,
+    onSnapshot,
+    IAnyStateTreeNode,
+    getType,
+    hasParent,
+    getParent,
+    onPatch,
+    addMiddleware,
+    IMiddlewareEvent,
+    getPath,
+    applySnapshot
+} from "mobx-state-tree"
 
 /**
  * Creates a tiny proxy around a MST tree that conforms to the redux store api.
@@ -11,16 +26,16 @@ import * as mst from "mobx-state-tree"
  * @param {...MiddleWare[]} middlewares
  * @returns {IReduxStore}
  */
-export const asReduxStore = function(model: mst.IStateTreeNode, ...middlewares: any[]) {
-    if (!mst.isStateTreeNode(model)) throw new Error("Expected model object")
+export const asReduxStore = function(model: IStateTreeNode, ...middlewares: any[]) {
+    if (!isStateTreeNode(model)) throw new Error("Expected model object")
     let store = {
-        getState: () => mst.getSnapshot(model),
+        getState: () => getSnapshot(model),
         dispatch: (action: any) => {
             runMiddleWare(action, runners.slice(), (newAction: any) =>
-                mst.applyAction(model, reduxActionToAction(newAction))
+                applyAction(model, reduxActionToAction(newAction))
             )
         },
-        subscribe: (listener: any) => mst.onSnapshot(model, listener)
+        subscribe: (listener: any) => onSnapshot(model, listener)
     }
     let runners = middlewares.map(mw => mw(store))
     return store
@@ -97,16 +112,16 @@ function getActionContextNameAndTypePath(actionContext: ActionContext, logArgsNe
     }
 }
 
-function getTypeName(node: mst.IAnyStateTreeNode) {
-    return mst.getType(node).name || "(UnnamedType)"
+function getTypeName(node: IAnyStateTreeNode) {
+    return getType(node).name || "(UnnamedType)"
 }
 
-function getTargetTypePath(node: mst.IAnyStateTreeNode): string[] {
-    let current: mst.IAnyStateTreeNode | undefined = node
+function getTargetTypePath(node: IAnyStateTreeNode): string[] {
+    let current: IAnyStateTreeNode | undefined = node
     const names = []
     while (current) {
         names.unshift(getTypeName(current))
-        current = mst.hasParent(current) ? mst.getParent(current) : undefined
+        current = hasParent(current) ? getParent(current) : undefined
     }
     return names
 }
@@ -118,7 +133,7 @@ function getTargetTypePath(node: mst.IAnyStateTreeNode): string[] {
  *
  * @export
  * @param {*} remoteDevDep
- * @param {mst.IAnyStateTreeNode} model
+ * @param {IAnyStateTreeNode} model
  * @param {{
  *         logIdempotentActionSteps?: boolean
  *         logChildActions?: boolean
@@ -127,7 +142,7 @@ function getTargetTypePath(node: mst.IAnyStateTreeNode): string[] {
  */
 export function connectReduxDevtools(
     remoteDevDep: any,
-    model: mst.IAnyStateTreeNode,
+    model: IAnyStateTreeNode,
     options?: {
         logIdempotentActionSteps?: boolean
         logChildActions?: boolean
@@ -145,7 +160,7 @@ export function connectReduxDevtools(
 
     // Connect to the monitor
     const remotedev = remoteDevDep.connectViaExtension({
-        name: mst.getType(model).name
+        name: getType(model).name
     })
 
     // Subscribe to change state (if need more than just logging)
@@ -155,22 +170,22 @@ export function connectReduxDevtools(
         }
     })
 
-    const initialState = mst.getSnapshot(model)
+    const initialState = getSnapshot(model)
     remotedev.init(initialState)
 
     const actionContexts = new Map<number, ActionContext>()
 
     let changesMadeSetter: ChangesMadeSetter | undefined = undefined
     if (!opts.logIdempotentActionSteps) {
-        mst.onPatch(model, () => {
+        onPatch(model, () => {
             if (!handlingMonitorAction && changesMadeSetter) {
                 changesMadeSetter()
             }
         })
     }
 
-    mst.addMiddleware(model, actionMiddleware, false)
-    function actionMiddleware(call: mst.IMiddlewareEvent, next: any) {
+    addMiddleware(model, actionMiddleware, false)
+    function actionMiddleware(call: IMiddlewareEvent, next: any) {
         if (handlingMonitorAction) {
             next(call)
             return
@@ -195,7 +210,7 @@ export function connectReduxDevtools(
             const parentContext = context
             context = {
                 // use a space rather than a dot so that the redux devtools move the actions to the next line if there's not enough space
-                name: `[root${mst.getPath(call.context)}] ${call.name}`,
+                name: `[root${getPath(call.context)}] ${call.name}`,
                 targetTypePath: targetTypePath,
                 id: call.id,
                 runningAsync: false,
@@ -278,7 +293,7 @@ export function connectReduxDevtools(
 
         if (log) {
             const logStep = (logContext: ActionContext) => {
-                const sn = mst.getSnapshot(model)
+                const sn = getSnapshot(model)
 
                 const names = getActionContextNameAndTypePath(logContext, opts.logArgsNearName!)
 
@@ -338,20 +353,20 @@ export function connectReduxDevtools(
 
             switch (message.payload.type) {
                 case "RESET":
-                    mst.applySnapshot(model2, initialState)
+                    applySnapshot(model2, initialState)
                     return remotedev2.init(initialState)
                 case "COMMIT":
-                    return remotedev2.init(mst.getSnapshot(model2))
+                    return remotedev2.init(getSnapshot(model2))
                 case "ROLLBACK":
                     return remotedev2.init(remoteDevDep.extractState(message))
                 case "JUMP_TO_STATE":
                 case "JUMP_TO_ACTION":
-                    mst.applySnapshot(model2, remoteDevDep.extractState(message))
+                    applySnapshot(model2, remoteDevDep.extractState(message))
                     return
                 case "IMPORT_STATE":
                     const nextLiftedState = message.payload.nextLiftedState
                     const computedStates = nextLiftedState.computedStates
-                    mst.applySnapshot(model2, computedStates[computedStates.length - 1].state)
+                    applySnapshot(model2, computedStates[computedStates.length - 1].state)
                     remotedev2.send(null, nextLiftedState)
                     return
                 default:

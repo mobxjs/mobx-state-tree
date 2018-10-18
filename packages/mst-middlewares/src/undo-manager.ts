@@ -1,22 +1,16 @@
 import {
     types,
-    flow,
-    getEnv,
-    recordPatches,
-    addMiddleware,
-    applyPatch,
-    getRoot,
-    createActionTrackingMiddleware,
-    IStateTreeNode,
-    IModelType,
-    IMiddlewareEvent,
-    IPatchRecorder,
     IJsonPatch,
-    IComplexType,
-    IMSTArray,
-    ModelSnapshotType,
-    IType,
-    ModelPropertiesDeclarationToProperties
+    IStateTreeNode,
+    IMiddlewareEvent,
+    recordPatches,
+    IPatchRecorder,
+    createActionTrackingMiddleware,
+    getEnv,
+    getRoot,
+    applyPatch,
+    flow,
+    addMiddleware
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
@@ -27,7 +21,7 @@ const Entry = types.model("UndoManagerEntry", {
 
 const UndoManager = types
     .model("UndoManager", {
-        history: types.optional(types.array(Entry), []),
+        history: types.array(Entry),
         undoIdx: 0
     })
     .views(self => ({
@@ -58,10 +52,7 @@ const UndoManager = types
             recordingActionLevel++
             const actionId = call.name + recordingActionLevel
             recordingActionId = actionId
-            return {
-                recorder: recordPatches(call.tree),
-                actionId
-            }
+            return { recorder: recordPatches(call.tree), actionId }
         }
         const stopRecordingAction = (recorder: IPatchRecorder): void => {
             recordingActionId = null
@@ -158,7 +149,7 @@ const UndoManager = types
             redo() {
                 replaying = true
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
-                applyPatch(getRoot(targetStore), self.history[self.undoIdx].patches as any) // TODO: fix compile error here?
+                applyPatch(getRoot(targetStore), self.history[self.undoIdx].patches)
                 self.undoIdx++
                 replaying = false
             },
@@ -187,7 +178,7 @@ const UndoManager = types
             stopGroup(fn?: () => any) {
                 if (fn) fn()
                 grouping = false
-                ;(self as any).addUndoState(groupRecorder)
+                this.addUndoState(groupRecorder)
                 groupRecorder = { patches: [], inversePatches: [] }
             }
         }

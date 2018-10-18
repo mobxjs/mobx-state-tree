@@ -17,7 +17,8 @@ import {
     ExtractT,
     IComplexType,
     IAnyStateTreeNode,
-    IAnyModelType
+    IAnyModelType,
+    IAnyComplexType
 } from "../../internal"
 import { computed } from "mobx"
 
@@ -201,7 +202,7 @@ export interface ReferenceOptions<T> {
     set(value: T, parent: IAnyStateTreeNode | null): string | number
 }
 
-export interface IReferenceType<IR extends IAnyModelType>
+export interface IReferenceType<IR extends IAnyComplexType>
     extends IComplexType<string | number | ExtractT<IR>, string | number, ExtractT<IR>> {}
 
 /**
@@ -211,7 +212,7 @@ export interface IReferenceType<IR extends IAnyModelType>
  * @export
  * @alias types.reference
  */
-export function reference<IT extends IAnyModelType>(
+export function reference<IT extends IAnyComplexType>(
     subType: IT,
     options?: ReferenceOptions<ExtractT<IT>>
 ): IReferenceType<IT> {

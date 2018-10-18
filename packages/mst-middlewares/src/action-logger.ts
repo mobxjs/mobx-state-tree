@@ -1,4 +1,4 @@
-import { getPath, IMiddlewareEvent } from "mobx-state-tree"
+import { IMiddlewareEvent, getPath } from "mobx-state-tree"
 
 export function actionLogger(call: IMiddlewareEvent, next: any) {
     const skip =

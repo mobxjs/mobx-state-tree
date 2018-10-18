@@ -18,14 +18,18 @@ import {
 const optionalUndefinedType = optional(undefinedType, undefined)
 const optionalNullType = optional(nullType, null)
 
-export type IMaybeTypeBase<IT extends IAnyType, C, O> = IT extends IAnyComplexType
-    ? IComplexType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractT<IT> | O> & OptionalProperty
-    : IT extends IAnyType
-        ? IType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractT<IT> | O> & OptionalProperty
-        : never
+export interface IMaybeIComplexType<IT extends IAnyComplexType, C, O>
+    extends IComplexType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractT<IT> | O>,
+        OptionalProperty {}
 
-export type IMaybeType<IT extends IAnyType> = IMaybeTypeBase<IT, undefined, undefined>
+export interface IMaybeIType<IT extends IAnyType, C, O>
+    extends IType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractT<IT> | O>,
+        OptionalProperty {}
 
+export function maybe<IT extends IAnyComplexType>(
+    type: IT
+): IMaybeIComplexType<IT, undefined, undefined>
+export function maybe<IT extends IAnyType>(type: IT): IMaybeIType<IT, undefined, undefined>
 /**
  * Maybe will make a type nullable, and also optional.
  * The value `undefined` will be used to represent nullability.
@@ -38,14 +42,16 @@ export type IMaybeType<IT extends IAnyType> = IMaybeTypeBase<IT, undefined, unde
  * @param {IType<C, S, M>} type The type to make nullable
  * @returns {(IType<C | undefined, S | undefined, T | undefined>)}
  */
-export function maybe<IT extends IAnyType>(type: IT): IMaybeType<IT> {
+export function maybe<IT extends IAnyType>(type: IT): IMaybeIType<IT, undefined, undefined> {
     if (process.env.NODE_ENV !== "production" && !isType(type))
         fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
     return union(type, optionalUndefinedType) as any
 }
 
-export type IMaybeNullType<IT extends IAnyType> = IMaybeTypeBase<IT, null | undefined, null>
-
+export function maybeNull<IT extends IAnyComplexType>(
+    type: IT
+): IMaybeIComplexType<IT, null | undefined, null>
+export function maybeNull<IT extends IAnyType>(type: IT): IMaybeIType<IT, null | undefined, null>
 /**
  * Maybe will make a type nullable, and also optional.
  * The value `null` will be used to represent no value.
@@ -58,7 +64,7 @@ export type IMaybeNullType<IT extends IAnyType> = IMaybeTypeBase<IT, null | unde
  * @param {IType<C, S, M>} type The type to make nullable
  * @returns {(IType<C | null | undefined, S | null, T | null>)}
  */
-export function maybeNull<IT extends IAnyType>(type: IT): IMaybeNullType<IT> {
+export function maybeNull<IT extends IAnyType>(type: IT): IMaybeIType<IT, null | undefined, null> {
     if (process.env.NODE_ENV !== "production" && !isType(type))
         fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
     return union(type, optionalNullType) as any
