@@ -1,4 +1,4 @@
-# next
+# 3.6.0
 
 -   Made type Typescript compilation when 'declarations' is set to true + type completion faster thanks to some type optimizations through [#1043](https://github.com/mobxjs/mobx-state-tree/pull/1043) by [@xaviergonz](https://github.com/xaviergonz)
 -   Fix for array reconciliation of union types with ids [#1045](https://github.com/mobxjs/mobx-state-tree/issues/1045) through [#1047](https://github.com/mobxjs/mobx-state-tree/pull/1047) by [@xaviergonz](https://github.com/xaviergonz)
