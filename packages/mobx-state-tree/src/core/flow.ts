@@ -65,6 +65,7 @@ export function createFlowSpawner(name: string, generator: Function) {
                     tree: baseContext.tree,
                     context: baseContext.context,
                     parentId: baseContext.id,
+                    allParentIds: [...baseContext.allParentIds, baseContext.id],
                     rootId: baseContext.rootId
                 },
                 fn
@@ -88,6 +89,7 @@ export function createFlowSpawner(name: string, generator: Function) {
                     tree: baseContext.tree,
                     context: baseContext.context,
                     parentId: baseContext.id,
+                    allParentIds: [...baseContext.allParentIds, baseContext.id],
                     rootId: baseContext.rootId
                 },
                 init

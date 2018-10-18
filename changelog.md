@@ -1,3 +1,8 @@
+# 3.7.0
+
+-   Middleware events now also contain `allParentIds` (chain of causing ids, from root until (excluding) current)
+-   Improved redux dev tools integration, now supporting flows and showing action chains through [#1035](https://github.com/mobxjs/mobx-state-tree/pull/1035) based on a fix by [@bourquep](https://github.com/bourquep)
+
 # 3.6.0
 
 -   Made type Typescript compilation when 'declarations' is set to true + type completion faster thanks to some type optimizations through [#1043](https://github.com/mobxjs/mobx-state-tree/pull/1043) by [@xaviergonz](https://github.com/xaviergonz)

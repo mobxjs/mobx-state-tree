@@ -36,6 +36,8 @@ const store = Store.create({
 
 mst.addMiddleware(store, logger)
 
+store.todos[0].setTitle("hello world")
+
 // Prints:
 // [MST] /todos/0/setTitle
 ```
@@ -110,13 +112,16 @@ const TestModel = types
     // example with decorate
     .actions(self => {
         return {
-            inc: decorate(atomic, flow(function*(x) {
-                yield delay(2)
-                self.z += x
-                yield delay(2)
-                self.z += x
-                throw "Oops"
-            }))
+            inc: decorate(
+                atomic,
+                flow(function*(x) {
+                    yield delay(2)
+                    self.z += x
+                    yield delay(2)
+                    self.z += x
+                    throw "Oops"
+                })
+            )
         }
     })
 
@@ -420,4 +425,10 @@ See the [redux-todomvc example](https://github.com/mobxjs/mobx-state-tree/blob/m
 
 ## connectReduxDevtools
 
-`connectReduxDevtools(remoteDevDependency, mstStore)` connects a MST tree to the Redux devtools. Pass in the `remoteDev` dependency to set up the connect (only one at a time). See this [example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-redux-todomvc/src/index.js#L21) for a setup example.
+`connectReduxDevtools(remoteDevDependency, mstStore, options?)` connects a MST tree to the Redux devtools. Pass in the `remoteDev` dependency to set up the connect (only one at a time). See this [example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-redux-todomvc/src/index.js#L21) for a setup example.
+
+The options object is optional and has the following options:
+
+-   `logIdempotentActionSteps`: `true` by default due to possible performance penalty because of the internal usage of onPatch. When set to `false` it will skip reporting of actions and flow action "steps" that do not end up in an actual change in the model (except when an error is thrown), thus reducing the amount of noise in the logs.
+-   `logChildActions`: `false` by default. When set to `true` it will report actions that are executed inside a root actions. When set to `false` it will not.
+-   `logArgsNearName`: `true` by default. When `true` it will log the arguments near the action name (truncated if too long), when `false` it won't.

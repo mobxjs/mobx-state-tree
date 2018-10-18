@@ -26,6 +26,7 @@ export type IMiddlewareEvent = {
     id: number
     parentId: number
     rootId: number
+    allParentIds: number[]
     context: IAnyStateTreeNode
     tree: IAnyStateTreeNode
     args: any[]
@@ -110,7 +111,10 @@ export function createActionInvoker<T extends Function>(
                 context: target,
                 tree: getRoot(target),
                 rootId: currentActionContext ? currentActionContext.rootId : id,
-                parentId: currentActionContext ? currentActionContext.id : 0
+                parentId: currentActionContext ? currentActionContext.id : 0,
+                allParentIds: currentActionContext
+                    ? [...currentActionContext.allParentIds, currentActionContext.id]
+                    : []
             },
             fn
         )
