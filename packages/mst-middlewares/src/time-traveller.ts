@@ -1,16 +1,4 @@
-import {
-    types,
-    onSnapshot,
-    applySnapshot,
-    getSnapshot,
-    getEnv,
-    resolvePath,
-    getPath,
-    IModelType,
-    IComplexType,
-    IMSTArray,
-    IType
-} from "mobx-state-tree"
+import { types, resolvePath, getEnv, onSnapshot, getSnapshot, applySnapshot } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
 const TimeTraveller = types
@@ -54,11 +42,11 @@ const TimeTraveller = types
                 // TODO: check if targetStore doesn't contain self
                 // if (contains(targetStore, self)) throw new Error("TimeTraveller shouldn't be recording itself. Please specify a sibling as taret, not some parent")
                 // start listening to changes
-                snapshotDisposer = onSnapshot(targetStore, snapshot =>
-                    (self as any).addUndoState(snapshot)
-                )
+                snapshotDisposer = onSnapshot(targetStore, snapshot => this.addUndoState(snapshot))
                 // record an initial state if no known
-                if (self.history.length === 0) (self as any).addUndoState(getSnapshot(targetStore))
+                if (self.history.length === 0) {
+                    this.addUndoState(getSnapshot(targetStore))
+                }
             },
             beforeDestroy() {
                 snapshotDisposer()

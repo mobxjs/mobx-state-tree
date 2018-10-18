@@ -39,19 +39,28 @@ import {
     typecheckInternal,
     typeCheckFailure,
     TypeFlags,
-    OptionalProperty
+    OptionalProperty,
+    ExtractS,
+    ExtractC,
+    ExtractT
 } from "../../internal"
 
-export interface IMSTArray<C, S, T> extends IObservableArray<T> {}
-export interface IArrayType<C, S, T>
-    extends IComplexType<C[] | undefined, S[], IMSTArray<C, S, T>>,
+export interface IMSTArray<T> extends IObservableArray<T> {}
+
+export interface IArrayType<IT extends IAnyType>
+    extends IComplexType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<ExtractT<IT>>>,
         OptionalProperty {}
 
 /**
  * @internal
  * @private
  */
-export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTArray<C, S, T>> {
+export class ArrayType<
+    IT extends IAnyType,
+    C = ExtractC<IT>,
+    S = ExtractS<IT>,
+    T = ExtractT<IT>
+> extends ComplexType<C[] | undefined, S[], IMSTArray<T>> {
     shouldAttachNode = true
     subType: IAnyType
     readonly flags = TypeFlags.Array
@@ -273,12 +282,12 @@ export class ArrayType<C, S, T> extends ComplexType<C[] | undefined, S[], IMSTAr
  * @param {IType<S, T>} subtype
  * @returns {IComplexType<S[], IObservableArray<T>>}
  */
-export function array<C, S, T>(subtype: IType<C, S, T>): IArrayType<C, S, T> {
+export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subtype))
             fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")
     }
-    const ret = new ArrayType<C, S, T>(subtype.name + "[]", subtype)
+    const ret = new ArrayType<IT>(subtype.name + "[]", subtype)
     return ret as typeof ret & OptionalProperty
 }
 
@@ -415,6 +424,6 @@ function areSame(oldNode: INode, newValue: any) {
  * @param {IT} type
  * @returns {type is IT}
  */
-export function isArrayType<IT extends IArrayType<any, any, any>>(type: IT): type is IT {
+export function isArrayType<IT extends IArrayType<any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Array) > 0
 }

@@ -161,9 +161,7 @@ test("it should not apply postprocessor to snapshot on getSnapshot", () => {
     expect(error).toBeFalsy()
 })
 test("it should preprocess snapshots when creating as property type", () => {
-    const f = Factory.create({
-        car: { id: "1" }
-    })
+    const f = Factory.create({ car: { id: "1" } })
     expect(f.car.id).toBe(2)
 })
 test("it should preprocess snapshots when updating", () => {

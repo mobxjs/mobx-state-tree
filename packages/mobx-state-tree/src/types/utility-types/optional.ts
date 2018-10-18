@@ -13,7 +13,12 @@ import {
     fail,
     IAnyType,
     IComplexType,
-    OptionalProperty
+    OptionalProperty,
+    ExtractT,
+    ExtractS,
+    ExtractC,
+    ExtractCST,
+    IAnyComplexType
 } from "../../internal"
 
 /**
@@ -72,7 +77,9 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
 
     getDefaultInstanceOrSnapshot() {
         const defaultInstanceOrSnapshot =
-            typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
+            typeof this.defaultValue === "function"
+                ? (this.defaultValue as IFunctionReturn<C | S | T>)()
+                : this.defaultValue
 
         // while static values are already snapshots and checked on types.optional
         // generator functions must always be rechecked just in case
@@ -104,15 +111,26 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
     }
 }
 
-export function optional<C, S, T>(
-    type: IComplexType<C, S, T>,
-    defaultValueOrFunction: C | S | (() => C | S | T)
-): IComplexType<C | undefined, S, T> & OptionalProperty
-export function optional<C, S, T>(
-    type: IType<C, S, T>,
-    defaultValueOrFunction: C | S | (() => C | S | T)
-): IType<C | undefined, S, T> & OptionalProperty
+export type OptionalDefaultValueOrFunction<IT extends IAnyType> =
+    | ExtractC<IT>
+    | ExtractS<IT>
+    | (() => ExtractCST<IT>)
 
+export interface IOptionalIComplexType<IT extends IAnyComplexType>
+    extends IComplexType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
+        OptionalProperty {}
+export interface IOptionalIType<IT extends IAnyType>
+    extends IType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
+        OptionalProperty {}
+
+export function optional<IT extends IAnyComplexType>(
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+): IOptionalIComplexType<IT>
+export function optional<IT extends IAnyType>(
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+): IOptionalIType<IT>
 /**
  * `types.optional` can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
@@ -132,10 +150,10 @@ export function optional<C, S, T>(
  * @export
  * @alias types.optional
  */
-export function optional<C, S, T>(
-    type: IType<C, S, T>,
-    defaultValueOrFunction: C | S | (() => C | S | T)
-): IType<C | undefined, S, T> & OptionalProperty {
+export function optional<IT extends IAnyType>(
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+): IOptionalIType<IT> {
     // make sure we never pass direct instances
     if (typeof defaultValueOrFunction !== "function" && isStateTreeNode(defaultValueOrFunction)) {
         fail(
