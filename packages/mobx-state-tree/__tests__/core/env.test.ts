@@ -1,4 +1,4 @@
-import { types, getEnv, clone, detach, unprotect } from "../../src"
+import { types, getEnv, clone, detach, unprotect, hasEnv } from "../../src"
 
 const Todo = types
     .model({

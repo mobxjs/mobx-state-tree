@@ -7,6 +7,7 @@ import {
     IPatchRecorder,
     createActionTrackingMiddleware,
     getEnv,
+    hasEnv,
     getRoot,
     applyPatch,
     flow,
@@ -58,7 +59,7 @@ const UndoManager = types
             recordingActionId = null
             if (!skipping) {
                 if (grouping) return cachePatchForGroup(recorder)
-                    ; (self as any).addUndoState(recorder)
+                ;(self as any).addUndoState(recorder)
             }
             skipping = flagSkipping
         }
@@ -163,7 +164,7 @@ const UndoManager = types
                 }
             },
             withoutUndoFlow(generatorFn: () => any) {
-                return flow(function* () {
+                return flow(function*() {
                     skipping = true
                     flagSkipping = true
                     const result = yield* generatorFn()
