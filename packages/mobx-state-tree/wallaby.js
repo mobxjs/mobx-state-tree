@@ -2,7 +2,7 @@ module.exports = function(wallaby) {
     return {
         files: ["src/**/*.ts"],
 
-        tests: ["test/**/*.ts"],
+        tests: ["__tests__/**/*.ts"],
 
         compilers: {
             "**/*.ts": wallaby.compilers.typeScript({

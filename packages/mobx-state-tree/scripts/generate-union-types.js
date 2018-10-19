@@ -1,33 +1,63 @@
+const { getDeclaration } = require("./generate-shared")
+
 let str = `// generated with ${__filename}\n`
 
-const alfa = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const minArgs = 2
+const maxArgs = 10
+const preParam = "options: UnionOptions, "
+const returnTypeTransform = rt => {
+    // [['PA', 'PB'], ['OA', 'OB'], ['FCA', 'FCB'], ['FSA', 'FSB']]
+    // ->
+    // [['ModelCreationType2<PA, FCA>', 'ModelCreationType2<PB, FCB>>'],
+    //  ['ModelSnapshotType2<PA, FSA>',  'ModelSnapshotType2<PB, FSB>>'],
+    //  ['ModelInstanceType<PA, OA, FCA, FSA>', 'ModelInstanceType<PB, OB, FCB, FSB']]
+    const [props, others, fixedC, fixedS] = rt
 
-function withChars(amount, fn) {
-    return alfa
-        .substr(0, amount)
-        .split("")
-        .map(fn)
+    const c = [],
+        s = [],
+        t = []
+    for (let i = 0; i < props.length; i++) {
+        const p = props[i]
+        const o = others[i]
+        const fc = fixedC[i]
+        const fs = fixedS[i]
+
+        c.push(`ModelCreationType2<${p}, ${fc}>`)
+        s.push(`ModelSnapshotType2<${p}, ${fs}>`)
+        t.push(`ModelInstanceType<${p}, ${o}, ${fc}, ${fs}>`)
+    }
+    return [c, s, t]
 }
-function getNames(char) {
-    return `C${char}, S${char}, T${char}`
-}
-for (let i = 2; i < 10; i++) {
-    str += `// prettier-ignore\nexport function union<${withChars(i, getNames).join(
-        ", "
-    )}>(options: UnionOptions, ${withChars(i, char => `${char}: IType<${getNames(char)}>`).join(
-        ","
-    )}): IType<${withChars(i, char => "C" + char).join(" | ")}, ${withChars(
+
+for (let i = minArgs; i < maxArgs; i++) {
+    str += getDeclaration(
+        "union",
+        "IModelType",
+        ["P", "O", "FC", "FS"],
         i,
-        char => "S" + char
-    ).join(" | ")}, ${withChars(i, char => "T" + char).join(
-        " | "
-    )}>\n// prettier-ignore\nexport function union<${withChars(i, getNames).join(
-        ", "
-    )}>(    ${withChars(i, char => `${char}: IType<${getNames(char)}>`).join(
-        ","
-    )}): IType<${withChars(i, char => "C" + char).join(" | ")}, ${withChars(
+        null,
+        "|",
+        "ModelUnion",
+        returnTypeTransform
+    )
+    str += getDeclaration(
+        "union",
+        "IModelType",
+        ["P", "O", "FC", "FS"],
         i,
-        char => "S" + char
-    ).join(" | ")}, ${withChars(i, char => "T" + char).join(" | ")}>\n`
+        preParam,
+        "|",
+        "ModelUnion",
+        returnTypeTransform
+    )
 }
+for (let i = minArgs; i < maxArgs; i++) {
+    str += getDeclaration("union", "IComplexType", ["C", "S", "T"], i, null, "|")
+    str += getDeclaration("union", "IComplexType", ["C", "S", "T"], i, preParam, "|")
+}
+for (let i = minArgs; i < maxArgs; i++) {
+    str += getDeclaration("union", "IType", ["C", "S", "T"], i, null, "|")
+    str += getDeclaration("union", "IType", ["C", "S", "T"], i, preParam, "|")
+}
+
 console.log(str)

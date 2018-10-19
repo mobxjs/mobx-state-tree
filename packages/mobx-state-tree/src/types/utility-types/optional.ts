@@ -8,16 +8,34 @@ import {
     isType,
     IContext,
     IValidationResult,
-    typecheck,
+    typecheckInternal,
     typeCheckSuccess,
     fail,
     IAnyType,
-    IComplexType
+    IComplexType,
+    OptionalProperty,
+    ExtractT,
+    ExtractS,
+    ExtractC,
+    ExtractCST,
+    IAnyComplexType
 } from "../../internal"
 
+/**
+ * @internal
+ * @private
+ */
 export type IFunctionReturn<T> = () => T
-export type IOptionalValue<C, S, T> = C | S | T | IFunctionReturn<C | S | T>
+/**
+ * @internal
+ * @private
+ */
+export type IOptionalValue<C, S, T> = C | S | IFunctionReturn<C | S | T>
 
+/**
+ * @internal
+ * @private
+ */
 export class OptionalValue<C, S, T> extends Type<C, S, T> {
     readonly type: IType<C, S, T>
     readonly defaultValue: IOptionalValue<C, S, T>
@@ -42,8 +60,8 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
 
     instantiate(parent: INode, subpath: string, environment: any, value: S): INode {
         if (typeof value === "undefined") {
-            const defaultSnapshot = this.getDefaultValueSnapshot()
-            return this.type.instantiate(parent, subpath, environment, defaultSnapshot)
+            const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
+            return this.type.instantiate(parent, subpath, environment, defaultInstanceOrSnapshot)
         }
         return this.type.instantiate(parent, subpath, environment, value)
     }
@@ -51,22 +69,32 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
     reconcile(current: INode, newValue: any): INode {
         return this.type.reconcile(
             current,
-            this.type.is(newValue) && newValue !== undefined ? newValue : this.getDefaultValue()
+            this.type.is(newValue) && newValue !== undefined
+                ? newValue
+                : this.getDefaultInstanceOrSnapshot()
         )
     }
 
-    private getDefaultValue() {
-        const defaultValue =
-            typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue
-        if (typeof this.defaultValue === "function") typecheck(this, defaultValue)
-        return defaultValue
+    getDefaultInstanceOrSnapshot() {
+        const defaultInstanceOrSnapshot =
+            typeof this.defaultValue === "function"
+                ? (this.defaultValue as IFunctionReturn<C | S | T>)()
+                : this.defaultValue
+
+        // while static values are already snapshots and checked on types.optional
+        // generator functions must always be rechecked just in case
+        if (typeof this.defaultValue === "function") {
+            typecheckInternal(this, defaultInstanceOrSnapshot)
+        }
+
+        return defaultInstanceOrSnapshot
     }
 
     public getDefaultValueSnapshot() {
-        const defaultValue = this.getDefaultValue()
-        return isStateTreeNode(defaultValue)
-            ? getStateTreeNode(defaultValue).snapshot
-            : defaultValue
+        const instanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
+        return isStateTreeNode(instanceOrSnapshot)
+            ? getStateTreeNode(instanceOrSnapshot).snapshot
+            : instanceOrSnapshot
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {
@@ -83,23 +111,26 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
     }
 }
 
-export function optional<C, S, T>(
-    type: IComplexType<C, S, T>,
-    defaultValueOrFunction: C | S | T
-): IComplexType<C | undefined, S, T> & { flags: TypeFlags.Optional }
-export function optional<C, S, T>(
-    type: IComplexType<C, S, T>,
-    defaultValueOrFunction: () => C | S | T
-): IComplexType<C | undefined, S, T> & { flags: TypeFlags.Optional }
+export type OptionalDefaultValueOrFunction<IT extends IAnyType> =
+    | ExtractC<IT>
+    | ExtractS<IT>
+    | (() => ExtractCST<IT>)
 
-export function optional<C, S, T>(
-    type: IType<C, S, T>,
-    defaultValueOrFunction: C | S | T
-): IType<C | undefined, S, T> & { flags: TypeFlags.Optional }
-export function optional<C, S, T>(
-    type: IType<C, S, T>,
-    defaultValueOrFunction: () => C | S | T
-): IType<C | undefined, S, T> & { flags: TypeFlags.Optional }
+export interface IOptionalIComplexType<IT extends IAnyComplexType>
+    extends IComplexType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
+        OptionalProperty {}
+export interface IOptionalIType<IT extends IAnyType>
+    extends IType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
+        OptionalProperty {}
+
+export function optional<IT extends IAnyComplexType>(
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+): IOptionalIComplexType<IT>
+export function optional<IT extends IAnyType>(
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+): IOptionalIType<IT>
 /**
  * `types.optional` can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
@@ -119,27 +150,44 @@ export function optional<C, S, T>(
  * @export
  * @alias types.optional
  */
-export function optional(
-    type: IAnyType,
-    defaultValueOrFunction: any
-): IAnyType & { flags: TypeFlags.Optional } {
+export function optional<IT extends IAnyType>(
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+): IOptionalIType<IT> {
+    // make sure we never pass direct instances
+    if (typeof defaultValueOrFunction !== "function" && isStateTreeNode(defaultValueOrFunction)) {
+        fail(
+            "default value cannot be an instance, pass a snapshot or a function that creates an instance/snapshot instead"
+        )
+    }
+
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
             fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
-        const defaultValue =
-            typeof defaultValueOrFunction === "function"
-                ? defaultValueOrFunction()
-                : defaultValueOrFunction
-        const defaultSnapshot = isStateTreeNode(defaultValue)
-            ? getStateTreeNode(defaultValue).snapshot
-            : defaultValue
-        typecheck(type, defaultSnapshot)
+
+        // we only check default values if they are passed directly
+        // if they are generator functions they will be checked once they are generated
+        // we don't check generator function results here to avoid generating a node just for type-checking purposes
+        // which might generate side-effects
+        if (typeof defaultValueOrFunction !== "function") {
+            typecheckInternal(type, defaultValueOrFunction)
+        }
     }
-    return new OptionalValue(type, defaultValueOrFunction)
+
+    const ret = new OptionalValue(type, defaultValueOrFunction)
+    return ret as typeof ret & OptionalProperty
 }
 
-export function isOptionalType<
-    IT extends IType<any | undefined, any, any> & { flags: TypeFlags.Optional }
->(type: IT): type is IT {
+/**
+ * Returns if a value represents an optional type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
+export function isOptionalType<IT extends IType<any | undefined, any, any> & OptionalProperty>(
+    type: IT
+): type is IT {
     return isType(type) && (type.flags & TypeFlags.Optional) > 0
 }

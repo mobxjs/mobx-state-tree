@@ -2,7 +2,7 @@ node_modules
 *.log
 lib
 dist
-test-lib/**/*.js
+/test-lib/
 coverage
 .nyc_output
 .idea

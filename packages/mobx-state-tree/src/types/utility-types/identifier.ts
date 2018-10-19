@@ -14,6 +14,10 @@ import {
     ISimpleType
 } from "../../internal"
 
+/**
+ * @internal
+ * @private
+ */
 export class IdentifierType extends Type<string, string, string> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Identifier
@@ -60,6 +64,10 @@ export class IdentifierType extends Type<string, string, string> {
     }
 }
 
+/**
+ * @internal
+ * @private
+ */
 export class IdentifierNumberType extends IdentifierType {
     constructor() {
         super()
@@ -135,6 +143,14 @@ export const identifier: ISimpleType<string> = new IdentifierType()
  */
 export const identifierNumber: ISimpleType<number> = new IdentifierNumberType() as any
 
+/**
+ * Returns if a given value represents an identifier type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isIdentifierType<IT extends typeof identifier | typeof identifierNumber>(
     type: IT
 ): type is IT {

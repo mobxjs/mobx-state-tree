@@ -1,21 +1,20 @@
 language: node_js
 sudo: required
-cache:
-  yarn: true
+cache: yarn
 script:
-  - yarn install
-  - cd packages/mobx-state-tree
-  - yarn install
-  - yarn build
-  - yarn test
-  - yarn run coverage
-  - yarn link
-  - cd ../mst-middlewares
-  - yarn install
-  - yarn link mobx-state-tree
-  - yarn build
-  - yarn test
+    - yarn install
+    - cd packages/mobx-state-tree
+    - yarn install
+    - yarn build
+    - yarn test
+    - yarn run coverage
+    - yarn link
+    - cd ../mst-middlewares
+    - yarn install
+    - yarn link mobx-state-tree
+    - yarn build
+    - yarn test
 after_success:
-  - cat ./packages/mobx-state-tree/coverage/lcov.info|./packages/mobx-state-tree/node_modules/coveralls/bin/coveralls.js
+    - cat ./packages/mobx-state-tree/coverage/lcov.info|./packages/mobx-state-tree/node_modules/coveralls/bin/coveralls.js
 node_js:
-  - 9.3.0
+    - "node"

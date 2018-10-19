@@ -43,6 +43,10 @@ export function flow(asyncAction: any): any {
     return createFlowSpawner(asyncAction.name, asyncAction)
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function createFlowSpawner(name: string, generator: Function) {
     const spawner = function flowSpawner(this: any) {
         // Implementation based on https://github.com/tj/co/blob/master/index.js
@@ -61,6 +65,7 @@ export function createFlowSpawner(name: string, generator: Function) {
                     tree: baseContext.tree,
                     context: baseContext.context,
                     parentId: baseContext.id,
+                    allParentIds: [...baseContext.allParentIds, baseContext.id],
                     rootId: baseContext.rootId
                 },
                 fn
@@ -84,6 +89,7 @@ export function createFlowSpawner(name: string, generator: Function) {
                     tree: baseContext.tree,
                     context: baseContext.context,
                     parentId: baseContext.id,
+                    allParentIds: [...baseContext.allParentIds, baseContext.id],
                     rootId: baseContext.rootId
                 },
                 init

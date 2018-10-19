@@ -1,32 +1,41 @@
-import { reaction, computed, action, createAtom, IAtom } from "mobx"
+// noinspection ES6UnusedImports
 import {
-    INode,
-    isStateTreeNode,
-    getStateTreeNode,
-    IJsonPatch,
-    IReversibleJsonPatch,
-    splitJsonPath,
-    splitPatch,
-    IDisposer,
+    action,
+    computed,
+    createAtom,
+    reaction,
+    IAtom,
+    _allowStateChangesInsideComputed
+} from "mobx"
+import {
+    addHiddenFinalProp,
+    addReadOnlyProp,
+    ComplexType,
+    convertChildNodesToArray,
+    createActionInvoker,
+    EMPTY_OBJECT,
+    escapeJsonPath,
     extend,
     fail,
-    registerEventHandler,
-    addReadOnlyProp,
-    walk,
+    freeze,
+    getStateTreeNode,
+    IAnyType,
+    IdentifierCache,
+    IDisposer,
+    IJsonPatch,
     IMiddleware,
     IMiddlewareHandler,
-    createActionInvoker,
-    NodeLifeCycle,
-    IdentifierCache,
-    escapeJsonPath,
-    addHiddenFinalProp,
-    toJSON,
-    freeze,
-    resolveNodeByPathParts,
-    convertChildNodesToArray,
-    ModelType,
+    INode,
     invalidateComputed,
-    IAnyType
+    IReversibleJsonPatch,
+    isStateTreeNode,
+    NodeLifeCycle,
+    registerEventHandler,
+    resolveNodeByPathParts,
+    splitJsonPath,
+    splitPatch,
+    toJSON,
+    walk
 } from "../../internal"
 
 let nextNodeId = 1
@@ -48,6 +57,10 @@ export function setLivelynessChecking(mode: LivelynessMode) {
     livelynessChecking = mode
 }
 
+/**
+ * @internal
+ * @private
+ */
 export interface IChildNodesMap {
     [key: string]: INode
 }
@@ -58,6 +71,10 @@ const snapshotReactionOptions = {
     }
 }
 
+/**
+ * @internal
+ * @private
+ */
 export class ObjectNode implements INode {
     nodeId = ++nextNodeId
     readonly type: IAnyType
@@ -95,42 +112,57 @@ export class ObjectNode implements INode {
     private _snapshotSubscribers: ((snapshot: any) => void)[] | null = null
 
     private _observableInstanceCreated: boolean = false
-    private _childNodes: IChildNodesMap | null
+    private _childNodes: IChildNodesMap
     private _initialSnapshot: any
-    private _createNewInstance: ((initialValue: any) => any) | null
-    private _finalizeNewInstance: ((node: INode, initialValue: any) => void) | null
+    private _cachedInitialSnapshot: any = null
 
     constructor(
         type: IAnyType,
         parent: ObjectNode | null,
         subpath: string,
         environment: any,
-        initialSnapshot: any,
-        createNewInstance: (initialValue: any) => any,
-        finalizeNewInstance: (node: INode, initialValue: any) => void
+        initialSnapshot: any
     ) {
         this._environment = environment
-        this._initialSnapshot = initialSnapshot
-        this._createNewInstance = createNewInstance
-        this._finalizeNewInstance = finalizeNewInstance
+        this._initialSnapshot = freeze(initialSnapshot)
 
         this.type = type
         this.parent = parent
         this.subpath = subpath
         this.escapedSubpath = escapeJsonPath(this.subpath)
-        this.identifierAttribute = type instanceof ModelType ? type.identifierAttribute : undefined
-        // identifier can not be changed during lifecycle of a node
-        // so we safely can read it from initial snapshot
-        this.identifier =
-            this.identifierAttribute && this._initialSnapshot
-                ? "" + this._initialSnapshot[this.identifierAttribute] // normalize internal identifier to string
-                : null
+
+        this.identifierAttribute = (type as any).identifierAttribute
 
         if (!parent) {
             this.identifierCache = new IdentifierCache()
         }
 
         this._childNodes = type.initializeChildNodes(this, this._initialSnapshot)
+
+        // identifier can not be changed during lifecycle of a node
+        // so we safely can read it from initial snapshot
+        this.identifier = null
+        if (this.identifierAttribute && this._initialSnapshot) {
+            let id = this._initialSnapshot[this.identifierAttribute]
+            if (id === undefined) {
+                // try with the actual node if not (for optional identifiers)
+                const childNode = this._childNodes[this.identifierAttribute]
+                if (childNode) {
+                    id = childNode.value
+                }
+            }
+
+            if (typeof id !== "string" && typeof id !== "number") {
+                fail(
+                    `Instance identifier '${this.identifierAttribute}' for type '${
+                        this.type.name
+                    }' must be a string or a number`
+                )
+            }
+
+            // normalize internal identifier to string
+            this.identifier = "" + id
+        }
 
         if (!parent) {
             this.identifierCache!.addNodeToCache(this)
@@ -141,17 +173,15 @@ export class ObjectNode implements INode {
 
     @action
     private _createObservableInstance() {
-        this.storedValue = this._createNewInstance!(this._childNodes)
+        const type = this.type
+        this.storedValue = type.createNewInstance(this, this._childNodes, this._initialSnapshot)
         this.preboot()
 
-        addHiddenFinalProp(this.storedValue, "$treenode", this)
-        addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
-
-        this._observableInstanceCreated = true
         let sawException = true
+        this._observableInstanceCreated = true
         try {
             this._isRunningAction = true
-            this._finalizeNewInstance!(this, this._childNodes)
+            type.finalizeNewInstance(this, this.storedValue)
             this._isRunningAction = false
 
             this.fireHook("afterCreate")
@@ -171,10 +201,7 @@ export class ObjectNode implements INode {
 
         this.finalizeCreation()
 
-        this._childNodes = null
-        this._initialSnapshot = null
-        this._createNewInstance = null
-        this._finalizeNewInstance = null
+        this._childNodes = EMPTY_OBJECT
     }
 
     /*
@@ -243,15 +270,28 @@ export class ObjectNode implements INode {
     fireHook(name: string) {
         const fn =
             this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
-        if (typeof fn === "function") fn.apply(this.storedValue)
+        if (typeof fn === "function") {
+            // we check for it to allow old mobx peer dependencies that don't have the method to work (even when still bugged)
+            if (_allowStateChangesInsideComputed) {
+                _allowStateChangesInsideComputed(() => {
+                    fn.apply(this.storedValue)
+                })
+            } else {
+                fn.apply(this.storedValue)
+            }
+        }
     }
 
-    public get value() {
+    public createObservableInstanceIfNeeded() {
         if (!this._observableInstanceCreated) this._createObservableInstance()
-        return this._value
     }
 
-    private get _value(): any {
+    public get isObservableInstanceCreated() {
+        return this._observableInstanceCreated
+    }
+
+    public get value(): any {
+        this.createObservableInstanceIfNeeded()
         if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
@@ -260,21 +300,32 @@ export class ObjectNode implements INode {
     @computed
     public get snapshot(): any {
         if (!this.isAlive) return undefined
-        const snapshot = this._observableInstanceCreated
-            ? this._getActualSnapshot()
-            : this._getInitialSnapshot()
-        return freeze(snapshot)
+        return freeze(this.getSnapshot())
     }
 
-    private _getActualSnapshot() {
+    // NOTE: we use this method to get snapshot without creating @computed overhead
+    public getSnapshot(): any {
+        if (!this.isAlive) return undefined
+        return this._observableInstanceCreated
+            ? this._getActualSnapshot()
+            : this._getInitialSnapshot()
+    }
+
+    private _getActualSnapshot(): any {
         return this.type.getSnapshot(this)
     }
 
-    private _getInitialSnapshot() {
+    private _getInitialSnapshot(): any {
+        if (!this.isAlive) return undefined
+        if (!this._initialSnapshot) return this._initialSnapshot
+        if (this._cachedInitialSnapshot) return this._cachedInitialSnapshot
+
+        const type = this.type as ComplexType<any, any, any>
+        const childNodes = this._childNodes!
         const snapshot = this._initialSnapshot
-        return this.type instanceof ModelType
-            ? this.type.applySnapshotPostProcessor(snapshot)
-            : snapshot
+
+        this._cachedInitialSnapshot = type.processInitialSnapshot(childNodes, snapshot)
+        return this._cachedInitialSnapshot
     }
 
     isRunningAction(): boolean {
@@ -419,6 +470,9 @@ export class ObjectNode implements INode {
                 return self.type.applySnapshot(self, snapshot)
             }
         )
+
+        addHiddenFinalProp(this.storedValue, "$treenode", this)
+        addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
     }
 
     @action

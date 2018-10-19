@@ -47,9 +47,6 @@ export interface CustomTypeOptions<S, T> {
  * }
  * ```
  *
- * @export
- * @alias types.custom
- *
  * @example
  * const DecimalPrimitive = types.custom<string, Decimal>({
  *     name: "Decimal",
@@ -71,11 +68,22 @@ export interface CustomTypeOptions<S, T> {
  * const Wallet = types.model({
  *     balance: DecimalPrimitive
  * })
+ *
+ * @export
+ * @alias types.custom
+ * @template S
+ * @template T
+ * @param {CustomTypeOptions<S, T>} options
+ * @returns {(IType<S | T, S, T>)}
  */
 export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S | T, S, T> {
     return new CustomType(options)
 }
 
+/**
+ * @internal
+ * @private
+ */
 export class CustomType<S, T> extends Type<S, S, T> {
     readonly flags = TypeFlags.Reference
     readonly shouldAttachNode = false

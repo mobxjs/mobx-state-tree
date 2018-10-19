@@ -1,5 +1,35 @@
 import { isComputedProp, isObservableProp } from "mobx"
-import { ExtractS, ExtractT, IAnyStateTreeNode, ExtractC } from "../internal"
+import {
+    ExtractS,
+    ExtractT,
+    IAnyStateTreeNode,
+    ExtractC,
+    IType,
+    IAnyModelType,
+    getStateTreeNode,
+    IStateTreeNode,
+    isStateTreeNode,
+    IJsonPatch,
+    splitJsonPath,
+    asArray,
+    EMPTY_OBJECT,
+    fail,
+    IDisposer,
+    isType,
+    resolveNodeByPath,
+    getRelativePathBetweenNodes,
+    freeze,
+    IAnyType,
+    ExtractIStateTreeNode,
+    isModelType,
+    INode
+} from "../internal"
+
+export type TypeOrStateTreeNodeToStateTreeNode<
+    T extends IAnyType | IAnyStateTreeNode
+> = T extends IAnyStateTreeNode
+    ? T
+    : T extends IType<infer TC, infer TS, infer TT> ? ExtractIStateTreeNode<TC, TS, TT> : never
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -313,10 +343,10 @@ export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean
  * @param {number} depth = 1, how far should we look upward?
  * @returns {*}
  */
-export function getParent<IT extends IAnyType>(
+export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
     target: IAnyStateTreeNode,
     depth = 1
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): TypeOrStateTreeNodeToStateTreeNode<IT> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -370,7 +400,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
 export function getParentOfType<IT extends IAnyType>(
     target: IAnyStateTreeNode,
     type: IT
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -397,9 +427,9 @@ export function getParentOfType<IT extends IAnyType>(
  * @param {Object} target
  * @returns {*}
  */
-export function getRoot<IT extends IAnyType>(
+export function getRoot<IT extends IAnyType | IAnyStateTreeNode>(
     target: IAnyStateTreeNode
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): TypeOrStateTreeNodeToStateTreeNode<IT> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -491,7 +521,7 @@ export function resolveIdentifier<IT extends IAnyType>(
     type: IT,
     target: IAnyStateTreeNode,
     identifier: string | number
-): ExtractIStateTreeNode<IT, ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | undefined {
+): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | undefined {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
@@ -753,41 +783,63 @@ export function walk(target: IAnyStateTreeNode, processor: (item: IAnyStateTreeN
     processor(node.storedValue)
 }
 
-export interface IModelReflectionData {
+export interface IModelReflectionPropertiesData {
     name: string
     properties: { [K: string]: IAnyType }
+}
+
+/**
+ * Returns a reflection of the model type properties and name for either a model type or model node.
+ *
+ * @export
+ * @param {IAnyModelType | IStateTreeNode} typeOrNode
+ * @returns {IModelReflectionPropertiesData}
+ */
+export function getPropertyMembers(
+    typeOrNode: IAnyModelType | IStateTreeNode
+): IModelReflectionPropertiesData {
+    let type
+
+    if (isStateTreeNode(typeOrNode)) {
+        type = getType(typeOrNode) as IAnyModelType
+    } else {
+        type = typeOrNode
+    }
+
+    if (process.env.NODE_ENV !== "production") {
+        if (!isModelType(type)) fail("expected a model type, but got " + type + " instead.")
+    }
+
+    return {
+        name: type.name,
+        properties: { ...type.properties }
+    }
+}
+
+export interface IModelReflectionData extends IModelReflectionPropertiesData {
     actions: string[]
     views: string[]
     volatile: string[]
 }
+
 /**
- * Returns a reflection of the node
+ * Returns a reflection of the model node, including name, properties, views, volatile and actions.
  *
  * @export
- * @param {IStateTreeNode} target
+ * @param {IAnyStateTreeNode} target
  * @returns {IModelReflectionData}
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        const node: any = getStateTreeNode(target)
-        if (!(node.type instanceof ModelType))
-            fail(
-                "expected the node's type to be of the type: model" +
-                    target +
-                    " instead. It's likely you passed an array or a map."
-            )
-    }
-    const node: any = getStateTreeNode(target)
-    const type = node.type as ModelType<any, any>
-    const props = Object.getOwnPropertyNames(target)
+    const type = getStateTreeNode(target).type as IAnyModelType
+
     const reflected: IModelReflectionData = {
-        name: type.name,
-        properties: { ...type.properties },
+        ...getPropertyMembers(type),
         actions: [],
         volatile: [],
         views: []
     }
+
+    const props = Object.getOwnPropertyNames(target)
     props.forEach(key => {
         if (key in reflected.properties) return
         const descriptor = Object.getOwnPropertyDescriptor(target, key)!
@@ -803,24 +855,37 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     return reflected
 }
 
-import {
-    INode,
-    getStateTreeNode,
-    IStateTreeNode,
-    isStateTreeNode,
-    IJsonPatch,
-    splitJsonPath,
-    asArray,
-    EMPTY_OBJECT,
-    fail,
-    IDisposer,
-    isType,
-    resolveNodeByPath,
-    getRelativePathBetweenNodes,
-    ModelType,
-    freeze,
-    IAnyType,
-    IMSTMap,
-    ExtractIStateTreeNode,
-    IMSTArray
-} from "../internal"
+export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
+
+/**
+ * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
+ * Alternatively also casts a node snapshot or instance to an snapshot type so it can be assigned to a type snapshot.
+ * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance
+ * (or vice-versa), but just fool typescript into thinking so.
+ * Either way, casting when outside an assignation operation will only yield an unusable type (never).
+ *
+ * @example
+ * const ModelA = types.model({
+ *   n: types.number
+ * }).actions(self => ({
+ *   setN(aNumber: number) {
+ *     self.n = aNumber
+ *   }
+ * }))
+ *
+ * const ModelB = types.model({
+ *   innerModel: ModelA
+ * }).actions(self => ({
+ *   someAction() {
+ *     // this will allow the compiler to assign an snapshot to the property
+ *     self.innerModel = cast({ a: 5 })
+ *   }
+ * }))
+ *
+ * @export
+ * @param {CastedType<T>} snapshotOrInstance
+ * @returns {T}
+ */
+export function cast<T = never, C = CastedType<T>>(snapshotOrInstance: C): T {
+    return snapshotOrInstance as any
+}

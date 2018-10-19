@@ -4,18 +4,22 @@ import {
     fail,
     freeze,
     NodeLifeCycle,
-    noop,
     ObjectNode,
     IAnyType
 } from "../../internal"
 
+/**
+ * @internal
+ * @private
+ */
 export class ScalarNode implements INode {
     readonly type: IAnyType
     readonly storedValue: any
-    readonly parent: ObjectNode | null
-    readonly subpath: string = ""
+    parent: ObjectNode | null = null
+    subpath: string = ""
 
     private state = NodeLifeCycle.INITIALIZING
+    private readonly _initialSnapshot: any
     _environment: any = undefined
 
     constructor(
@@ -23,19 +27,17 @@ export class ScalarNode implements INode {
         parent: ObjectNode | null,
         subpath: string,
         environment: any,
-        initialSnapshot: any,
-        createNewInstance: (initialValue: any) => any,
-        finalizeNewInstance: (node: INode, initialValue: any) => void = noop
+        initialSnapshot: any
     ) {
+        this._initialSnapshot = initialSnapshot
+
         this.type = type
         this.parent = parent
         this.subpath = subpath
 
-        this.storedValue = createNewInstance(initialSnapshot)
         let sawException = true
         try {
-            finalizeNewInstance(this, initialSnapshot)
-
+            this.storedValue = type.createNewInstance(this, {}, initialSnapshot)
             this.state = NodeLifeCycle.CREATED
             sawException = false
         } finally {
@@ -64,18 +66,33 @@ export class ScalarNode implements INode {
         return this.parent.root
     }
 
-    setParent(newParent: INode | null, subpath: string | null = null) {
-        fail("setParent is not supposed to be called on scalar nodes")
+    setParent(newParent: ObjectNode | null, subpath: string | null = null) {
+        if (this.parent === newParent && this.subpath === subpath) return
+        if (this.parent && !newParent) {
+            this.die()
+        } else {
+            const newPath = subpath === null ? "" : subpath
+            if (this.subpath !== newPath) {
+                this.subpath = newPath
+            }
+            if (newParent && newParent !== this.parent) {
+                this.parent = newParent
+            }
+        }
     }
 
     public get value(): any {
         return this.type.getValue(this)
     }
 
-    public get snapshot() {
-        const snapshot = this.type.getSnapshot(this)
+    public get snapshot(): any {
+        const snapshot = this.getSnapshot()
         // avoid any external modification in dev mode
         return freeze(snapshot)
+    }
+
+    public getSnapshot(): any {
+        return this.type.getSnapshot(this)
     }
 
     public get isAlive() {

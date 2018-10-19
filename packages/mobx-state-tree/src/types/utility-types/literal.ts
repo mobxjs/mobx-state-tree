@@ -11,9 +11,14 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    ObjectNode
+    ObjectNode,
+    Primitives
 } from "../../internal"
 
+/**
+ * @internal
+ * @private
+ */
 export class Literal<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     readonly value: any
@@ -61,7 +66,7 @@ export class Literal<T> extends Type<T, T, T> {
  * @param {S} value The value to use in the strict equal check
  * @returns {ISimpleType<S>}
  */
-export function literal<S>(value: S): ISimpleType<S> {
+export function literal<S extends Primitives>(value: S): ISimpleType<S> {
     // check that the given value is a primitive
     if (process.env.NODE_ENV !== "production") {
         if (!isPrimitive(value)) fail(`Literal types can be built only on top of primitives`)
@@ -69,6 +74,14 @@ export function literal<S>(value: S): ISimpleType<S> {
     return new Literal<S>(value)
 }
 
+/**
+ * Returns if a given value represents a literal type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isLiteralType<IT extends ISimpleType<any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Literal) > 0
 }

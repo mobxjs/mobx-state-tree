@@ -16,7 +16,9 @@ import {
     IAnyType,
     ExtractT,
     IComplexType,
-    IAnyStateTreeNode
+    IAnyStateTreeNode,
+    IAnyModelType,
+    IAnyComplexType
 } from "../../internal"
 import { computed } from "mobx"
 
@@ -52,6 +54,10 @@ class StoredReference {
     }
 }
 
+/**
+ * @internal
+ * @private
+ */
 export abstract class BaseReferenceType<T> extends Type<string | number | T, string | number, T> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Reference
@@ -79,6 +85,10 @@ export abstract class BaseReferenceType<T> extends Type<string | number | T, str
     }
 }
 
+/**
+ * @internal
+ * @private
+ */
 export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
     constructor(targetType: IType<any, any, T>) {
         super(targetType)
@@ -139,6 +149,10 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
     }
 }
 
+/**
+ * @internal
+ * @private
+ */
 export class CustomReferenceType<T> extends BaseReferenceType<T> {
     constructor(targetType: IType<any, any, T>, private readonly options: ReferenceOptions<T>) {
         super(targetType)
@@ -188,10 +202,8 @@ export interface ReferenceOptions<T> {
     set(value: T, parent: IAnyStateTreeNode | null): string | number
 }
 
-export interface IReferenceType<IR extends IComplexType<any, any, any>>
-    extends IType<string | number | ExtractT<IR>, string | number, ExtractT<IR>> {
-    flags: TypeFlags.Reference
-}
+export interface IReferenceType<IR extends IAnyComplexType>
+    extends IComplexType<string | number | ExtractT<IR>, string | number, ExtractT<IR>> {}
 
 /**
  * Creates a reference to another type, which should have defined an identifier.
@@ -200,7 +212,7 @@ export interface IReferenceType<IR extends IComplexType<any, any, any>>
  * @export
  * @alias types.reference
  */
-export function reference<IT extends IComplexType<any, any, any>>(
+export function reference<IT extends IAnyComplexType>(
     subType: IT,
     options?: ReferenceOptions<ExtractT<IT>>
 ): IReferenceType<IT> {
@@ -216,6 +228,14 @@ export function reference<IT extends IComplexType<any, any, any>>(
     else return new IdentifierReferenceType(subType)
 }
 
+/**
+ * Returns if a given value represents a reference type.
+ *
+ * @export
+ * @template IT
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type is IT {
     return (type.flags & TypeFlags.Reference) > 0
 }

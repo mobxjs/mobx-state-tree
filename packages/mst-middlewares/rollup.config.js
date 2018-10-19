@@ -1,6 +1,7 @@
 import resolve from "rollup-plugin-node-resolve"
-import uglify from "rollup-plugin-uglify"
+import { uglify } from "rollup-plugin-uglify"
 
+const input = "./lib/index.js"
 const externals = ["mobx", "mobx-state-tree"]
 const globals = {
     mobx: "mobx",
@@ -9,28 +10,34 @@ const globals = {
 
 export default [
     {
-        entry: "./lib/index.js",
-        dest: "./dist/mst-middlewares.js",
-        format: "cjs",
+        input: input,
+        output: {
+            file: "./dist/mst-middlewares.js",
+            format: "cjs",
+            globals: globals
+        },
         external: externals,
-        globals: globals,
         plugins: [resolve()]
     },
     {
-        entry: "./lib/index.js",
-        dest: "./dist/mst-middlewares.umd.js",
-        format: "umd",
-        moduleName: "mobxStateTree",
+        input: input,
+        output: {
+            file: "./dist/mst-middlewares.umd.js",
+            format: "umd",
+            globals: globals,
+            name: "mobxStateTree"
+        },
         external: externals,
-        globals: globals,
         plugins: [resolve(), uglify()]
     },
     {
-        entry: "./lib/index.js",
-        dest: "./dist/mst-middlewares.module.js",
-        format: "es",
+        input: input,
+        output: {
+            file: "./dist/mst-middlewares.module.js",
+            format: "es",
+            globals: globals
+        },
         external: externals,
-        globals: globals,
         plugins: [resolve()]
     }
 ]

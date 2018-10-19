@@ -1,24 +1,53 @@
-let all = `// generated with ${__filename}\n`
+const { getDeclaration } = require("./generate-shared")
 
-for (let i = 2; i < 10; i++) {
-    let s = "// prettier-ignore\nexport function compose<"
-    for (let j = 1; j <= i; j++) s += `T${j} extends ModelProperties, S${j}, `
-    s = drop(s, 2)
-    s += ">("
-    for (let j = 1; j <= i; j++) s += `t${j}: IModelType<T${j}, S${j}>, `
-    s = drop(s, 2)
-    s += "): IModelType<"
-    for (let j = 1; j <= i; j++) s += `T${j} & `
-    s = drop(s, 3)
-    s += ", "
-    for (let j = 1; j <= i; j++) s += `S${j} & `
-    s = drop(s, 3)
-    s += ">\n"
-    all += s
+let str = `// generated with ${__filename}\n`
+
+const minArgs = 2
+const maxArgs = 10
+const preParam = "name: string, "
+
+const returnTypeTransform = rt => {
+    // [['PA', 'PB', 'PC'], ['OA', 'OB', 'OC'], ['FCA', 'FCB', 'FCC'], ['FSA', 'FSB', 'FSC']]
+    // ->
+    // [['PA', 'PB', 'PC'], no change
+    //  ['OA', 'OB', 'OC'], no change
+    //  ['_CustomJoin<FCA, _CustomJoin<FCB, FCC>>']
+    //  ['_CustomJoin<FSA, _CustomJoin<FSB, FSC>>']]
+
+    const [props, others, fixedC, fixedS] = rt
+
+    function customJoin(left) {
+        if (left.length === 1) {
+            return left[0]
+        }
+        const [a, ...rest] = left
+        return `_CustomJoin<${a}, ${customJoin(rest)}>`
+    }
+
+    return [props, others, [customJoin(fixedC)], [customJoin(fixedS)]]
 }
 
-function drop(str, nr) {
-    return str.substr(0, str.length - nr)
+for (let i = minArgs; i < maxArgs; i++) {
+    str += getDeclaration(
+        "compose",
+        "IModelType",
+        ["P", "O", "FC", "FS"],
+        i,
+        preParam,
+        "&",
+        "IModelType",
+        returnTypeTransform
+    )
+    str += getDeclaration(
+        "compose",
+        "IModelType",
+        ["P", "O", "FC", "FS"],
+        i,
+        null,
+        "&",
+        "IModelType",
+        returnTypeTransform
+    )
 }
 
-console.log(all)
+console.log(str)

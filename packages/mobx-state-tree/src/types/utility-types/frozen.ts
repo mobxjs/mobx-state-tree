@@ -13,9 +13,14 @@ import {
     ObjectNode,
     optional,
     IType,
-    IAnyType
+    IAnyType,
+    OptionalProperty
 } from "../../internal"
 
+/**
+ * @internal
+ * @private
+ */
 export class Frozen<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     flags = TypeFlags.Frozen
@@ -49,12 +54,10 @@ export class Frozen<T> extends Type<T, T, T> {
 const untypedFrozenInstance = new Frozen()
 
 export function frozen<C>(subType: IType<C, any, any>): IType<C, C, C>
-export function frozen<T>(
-    defaultValue: T
-): IType<T | undefined | null, T, T> & { flags: TypeFlags.Optional }
+export function frozen<T>(defaultValue: T): IType<T | undefined | null, T, T> & OptionalProperty
 export function frozen<T = any>(): IType<T, T, T> // do not assume undefined by default, let the user specify it if needed
 /**
- * Frozen can be used to story any value that is serializable in itself (that is valid JSON).
+ * Frozen can be used to store any value that is serializable in itself (that is valid JSON).
  * Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
  * Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
  *
@@ -91,12 +94,21 @@ export function frozen<T = any>(): IType<T, T, T> // do not assume undefined by 
  * @param {Type|value} defaultValueOrType
  * @returns {Type}
  */
-export function frozen<T>(arg?: any): any {
+export function frozen(arg?: any): any {
     if (arguments.length === 0) return untypedFrozenInstance
     else if (isType(arg)) return new Frozen(arg)
     else return optional(untypedFrozenInstance, arg)
 }
 
+/**
+ * Returns if a given value represents a frozen type.
+ *
+ * @export
+ * @template IT
+ * @template T
+ * @param {IT} type
+ * @returns {type is IT}
+ */
 export function isFrozenType<IT extends IType<T | any, T, T>, T = any>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Frozen) > 0
 }

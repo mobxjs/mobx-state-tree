@@ -9,6 +9,10 @@ import {
     EMPTY_ARRAY
 } from "../../internal"
 
+/**
+ * @internal
+ * @private
+ */
 export enum NodeLifeCycle {
     INITIALIZING, // setting up
     CREATED, // afterCreate has run
@@ -17,6 +21,10 @@ export enum NodeLifeCycle {
     DEAD // no coming back from this one
 }
 
+/**
+ * @internal
+ * @private
+ */
 export interface INode {
     readonly type: IAnyType
     readonly storedValue: any
@@ -30,6 +38,7 @@ export interface INode {
     isAlive: boolean
     readonly value: any
     readonly snapshot: any
+    getSnapshot(): any
 
     setParent(newParent: ObjectNode | null, subpath?: string | null): void
     die(): void
@@ -38,18 +47,11 @@ export interface INode {
 export interface IStateTreeNode<C = any, S = any> {
     readonly $treenode?: any
     // fake, will never be present, just for typing
-    readonly $creationType?: C
-    readonly $snapshotType?: S
+    // we use this weird trick to allow reference types to work
+    readonly "!!types"?: [C, S] | [any, any]
 }
 
 export interface IAnyStateTreeNode extends IStateTreeNode<any, any> {}
-
-export interface IMembers {
-    properties: { [name: string]: IAnyType }
-    actions: Object
-    views: Object
-    volatile: Object
-}
 
 /**
  * Returns true if the given value is a node in a state tree.
@@ -64,11 +66,27 @@ export function isStateTreeNode<C = any, S = any>(value: any): value is IStateTr
     return !!(value && value.$treenode)
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function getStateTreeNode(value: IAnyStateTreeNode): ObjectNode {
     if (isStateTreeNode(value)) return value.$treenode!
     else return fail(`Value ${value} is no MST Node`)
 }
 
+/**
+ * @internal
+ * @private
+ */
+export function getStateTreeNodeSafe(value: IAnyStateTreeNode): ObjectNode {
+    return (value && value.$treenode) || null
+}
+
+/**
+ * @internal
+ * @private
+ */
 export function canAttachNode(value: any) {
     return (
         value &&
@@ -79,12 +97,20 @@ export function canAttachNode(value: any) {
     )
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function toJSON<S>(this: IStateTreeNode<any, S>): S {
     return getStateTreeNode(this).snapshot
 }
 
 const doubleDot = (_: any) => ".."
 
+/**
+ * @internal
+ * @private
+ */
 export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode): string {
     // PRE condition target is (a child of) base!
     if (base.root !== target.root)
@@ -107,12 +133,24 @@ export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode
     )
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPath(base: ObjectNode, pathParts: string): INode
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPath(
     base: ObjectNode,
     pathParts: string,
     failIfResolveFails: boolean
 ): INode | undefined
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPath(
     base: ObjectNode,
     path: string,
@@ -121,12 +159,24 @@ export function resolveNodeByPath(
     return resolveNodeByPathParts(base, splitJsonPath(path), failIfResolveFails)
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPathParts(base: ObjectNode, pathParts: string[]): INode
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPathParts(
     base: ObjectNode,
     pathParts: string[],
     failIfResolveFails: boolean
 ): INode | undefined
+/**
+ * @internal
+ * @private
+ */
 export function resolveNodeByPathParts(
     base: ObjectNode,
     pathParts: string[],
@@ -183,6 +233,10 @@ export function resolveNodeByPathParts(
     return current!
 }
 
+/**
+ * @internal
+ * @private
+ */
 export function convertChildNodesToArray(childNodes: IChildNodesMap | null): INode[] {
     if (!childNodes) return EMPTY_ARRAY as INode[]
 
