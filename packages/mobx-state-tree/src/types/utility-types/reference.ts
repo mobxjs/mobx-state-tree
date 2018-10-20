@@ -28,11 +28,17 @@ class StoredReference {
     constructor(mode: "identifier" | "object", value: any, private readonly targetType: IAnyType) {
         if (mode === "object") {
             if (!isStateTreeNode(value))
-                return fail(`Can only store references to tree nodes, got: '${value}'`)
+                return fail(
+                    `Can only store references to tree nodes or identifiers, got: '${value}'`
+                )
             const targetNode = getStateTreeNode(value)
             if (!targetNode.identifierAttribute)
                 return fail(`Can only store references with a defined identifier attribute.`)
-            this.value = targetNode.unnormalizedIdentifier!
+            const id = targetNode.unnormalizedIdentifier
+            if (id === null || id === undefined) {
+                return fail(`Can only store references to tree nodes with a defined identifier.`)
+            }
+            this.value = id
         } else {
             this.value = value
         }
