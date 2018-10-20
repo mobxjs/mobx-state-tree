@@ -13,7 +13,8 @@ import {
     SnapshotOut,
     IAnyModelType,
     Instance,
-    SnapshotOrInstance
+    SnapshotOrInstance,
+    isAlive
 } from "../../src"
 
 test("it should support prefixed paths in maps", () => {
@@ -769,4 +770,46 @@ test("should serialize references correctly", () => {
     expect(Array.from(s.mies.keys())).toEqual(["7", "8", "9"])
     expect(s.mies.get("9")!.id).toBe(9)
     expect(getSnapshot(s).ref).toBe("9") // ref serialized as string (number would be ok as well)
+})
+
+test("#1052 - Reference returns destroyed model after subtree replacing", () => {
+    const Todo = types.model("Todo", {
+        id: types.identifierNumber,
+        title: types.string
+    })
+
+    const Todos = types.model("Todos", {
+        items: types.array(Todo)
+    })
+
+    const Store = types
+        .model("Store", {
+            todos: Todos,
+            last: types.maybe(types.reference(Todo)),
+            counter: -1
+        })
+        .actions(self => ({
+            load() {
+                self.counter++
+                self.todos = Todos.create({
+                    items: [
+                        { id: 1, title: "Get Coffee " + self.counter },
+                        { id: 2, title: "Write simpler code " + self.counter }
+                    ]
+                })
+            },
+            select(todo: Instance<typeof Todo>) {
+                self.last = todo
+            }
+        }))
+
+    const store = Store.create({ todos: {} })
+    store.load()
+    store.select(store.todos.items[0])
+    expect(isAlive(store.last!)).toBe(true)
+    expect(store.last!.title).toBe("Get Coffee 0")
+
+    store.load()
+    expect(isAlive(store.last!)).toBe(true)
+    expect(store.last!.title).toBe("Get Coffee 1")
 })

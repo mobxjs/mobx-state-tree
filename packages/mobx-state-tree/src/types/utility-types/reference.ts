@@ -17,25 +17,24 @@ import {
     ExtractT,
     IComplexType,
     IAnyStateTreeNode,
-    IAnyModelType,
     IAnyComplexType
 } from "../../internal"
 import { computed } from "mobx"
 
 class StoredReference {
     node!: INode
+    readonly value!: string | number
 
-    constructor(
-        public readonly mode: "identifier" | "object",
-        public readonly value: any,
-        private readonly targetType: IAnyType
-    ) {
+    constructor(mode: "identifier" | "object", value: any, private readonly targetType: IAnyType) {
         if (mode === "object") {
             if (!isStateTreeNode(value))
                 return fail(`Can only store references to tree nodes, got: '${value}'`)
             const targetNode = getStateTreeNode(value)
             if (!targetNode.identifierAttribute)
                 return fail(`Can only store references with a defined identifier attribute.`)
+            this.value = targetNode.unnormalizedIdentifier!
+        } else {
+            this.value = value
         }
     }
 
@@ -43,7 +42,7 @@ class StoredReference {
     get resolvedValue() {
         // reference was initialized with the identifier of the target
         const { node, targetType } = this
-        const target = node.root.identifierCache!.resolve(targetType, this.value)
+        const target = node.root.identifierCache!.resolve(targetType, "" + this.value)
         if (!target)
             return fail(
                 `Failed to resolve reference '${this.value}' to type '${
@@ -98,19 +97,12 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         if (!node.isAlive) return undefined
         const ref = node.storedValue as StoredReference
 
-        // id already resolved, return
-        if (ref.mode === "object") return ref.value
         return ref.resolvedValue
     }
 
     getSnapshot(node: INode): any {
         const ref = node.storedValue as StoredReference
-        switch (ref.mode) {
-            case "identifier":
-                return ref.value
-            case "object":
-                return ref.value[getStateTreeNode(ref.value).identifierAttribute!]
-        }
+        return ref.value
     }
 
     instantiate(
@@ -136,7 +128,7 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         if (current.type === this) {
             const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
             const ref = current.storedValue as StoredReference
-            if (targetMode === ref.mode && ref.value === newValue) return current
+            if (targetMode === "identifier" && ref.value === newValue) return current
         }
         const newNode = this.instantiate(
             current.parent,
