@@ -9,7 +9,7 @@
         "mobx": "^5.5.0",
         "mobx-react": "^5.0.0",
         "mobx-react-devtools": "^6.0.0",
-        "mobx-state-tree": "3.4.0",
+        "mobx-state-tree": "^3.7.0",
         "mobx-utils": "^5.0.0",
         "path-match": "^1.2.4",
         "react": "^16.5.0",
