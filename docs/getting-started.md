@@ -76,7 +76,7 @@ The above code will create two models, a `Todo` and a `User` model, but as we sa
 This can be easily done by calling `.create()` on the `Todo` and `User` models we just defined.
 
 ```javascript
-import { types } from "mobx-state-tree"
+import { types, getSnapshot } from "mobx-state-tree"
 
 const Todo = types.model({
     name: "",
@@ -90,8 +90,8 @@ const User = types.model({
 const john = User.create()
 const eat = Todo.create()
 
-console.log("John:", john.toJSON())
-console.log("Eat TODO:", eat.toJSON())
+console.log("John:", getSnapshot(john))
+console.log("Eat TODO:", getSnapshot(eat))
 ```
 
 [View sample in the playground](https://codesandbox.io/s/6jo1o9n9qk)
@@ -101,7 +101,7 @@ As you will see, using models ensures that all the attributes defined will alway
 ```javascript
 const eat = Todo.create({ name: "eat" })
 
-console.log("Eat TODO:", eat.toJSON()) // => will print {name: "eat", done: false}
+console.log("Eat TODO:", getSnapshot(eat)) // => will print {name: "eat", done: false}
 ```
 
 [View sample in the playground](https://codesandbox.io/s/ymqpj71oj9)
@@ -155,7 +155,7 @@ const RootStore = types.model({
 })
 
 const store = RootStore.create({
-    users: { } // users is required here because it's not marked as optional
+    users: { } // users is not required really since arrays and maps are optional by default since MST3
 })
 ```
 
@@ -172,17 +172,15 @@ For example, the following actions will be defined on the `Todo` model, and will
 const Todo = types.model({
     name: types.optional(types.string, ""),
     done: types.optional(types.boolean, false)
-}).actions(self => {
-    function setName(newName) {
+}).actions(self => ({
+    setName(newName) {
         self.name = newName
-    }
+    },
 
-    function toggle() {
+    toggle() {
         self.done = !self.done
-    }
-
-    return { setName, toggle }
-})
+    },
+}))
 
 const User = types.model({
     name: types.optional(types.string, "")
@@ -190,14 +188,12 @@ const User = types.model({
 
 const RootStore = types.model({
     users: types.map(User),
-    todos: types.optional(types.map(Todo), {})
-}).actions(self => {
-    function addTodo(id, name) {
+    todos: types.map(Todo)
+}).actions(self => ({
+    addTodo(id, name) {
         self.todos.set(id, Todo.create({ name }))
     }
-
-    return { addTodo }
-})
+}))
 ```
 
 [View sample in the playground](https://codesandbox.io/s/928l6pw7pr)
@@ -232,8 +228,6 @@ console.log(getSnapshot(store))
 }
 */
 ```
-
-**Note**: The `.toJSON()` you have used before in the tutorial is just a shortcut to `getSnapshot`!
 
 Because the nature of state is mutable, a snapshot will be emitted whenever the state is mutated. To listen to the new snapshots, you can use `onSnapshot(store, snapshot => console.log(snapshot))` and log them as they are emitted.
 
@@ -361,13 +355,11 @@ const RootStore = types.model({
     get completedCount() {
         return self.todos.values().filter(todo => todo.done).length
     }
-})).actions(self => {
-    function addTodo(id, name) {
+})).actions(self => ({
+    addTodo(id, name) {
         self.todos.set(id, Todo.create({ name }))
     }
-
-    return {addTodo}
-})
+}))
 ```
 
 [View sample in the playground](https://codesandbox.io/s/x3qlr3xpjo)
@@ -404,7 +396,7 @@ MST solves that by providing the ability to declare model views. A model's `.vie
 ```javascript
 const RootStore = types.model({
     users: types.map(User),
-    todos: types.optional(types.map(Todo), {})
+    todos: types.map(Todo),
 }).views(self => ({
     get pendingCount() {
         return self.todos.values().filter(todo => !todo.done).length
@@ -415,13 +407,11 @@ const RootStore = types.model({
     getTodosWhereDoneIs(done) {
         return self.todos.values().filter(todo => todo.done === done)
     }
-})).actions(self => {
-    function addTodo(id, name) {
+})).actions(self => ({
+    addTodo(id, name) {
         self.todos.set(id, Todo.create({ name }))
     }
-
-    return {addTodo}
-})
+}))
 ```
 
 [View sample in the playground](https://codesandbox.io/s/zkrkwj91p3)
@@ -523,16 +513,14 @@ const Todo = types.model({
     name: types.optional(types.string, ""),
     done: types.optional(types.boolean, false),
     user: types.maybe(types.reference(types.late(() => User)))
-}).actions(self => {
-    function setName(newName) {
+}).actions(self => ({
+    setName(newName) {
         self.name = newName
-    }
-    function toggle() {
+    },
+    toggle() {
         self.done = !self.done
     }
-
-    return {setName, toggle}
-})
+}))
 ```
 
 [View sample in the playground](https://codesandbox.io/s/mzvx6o7r0j)
@@ -545,23 +533,21 @@ const Todo = types.model({
     name: types.optional(types.string, ""),
     done: types.optional(types.boolean, false),
     user: types.maybe(types.reference(types.late(() => User)))
-}).actions(self => {
-    function setName(newName) {
+}).actions(self => ({
+    setName(newName) {
         self.name = newName
-    }
-    function setUser(user) {
+    },
+    setUser(user) {
         if (user === "") { // When selected value is empty, set as null
             self.user = null
         } else {
             self.user = user
         }
-    }
-    function toggle() {
+    },
+    toggle() {
         self.done = !self.done
     }
-
-    return {setName, setUser, toggle}
-})
+}))
 ```
 
 Now we need to edit our views to display a select along with each `TodoView`, where the user can choose the assignee for that task. To do so, we will create a separate component `UserPickerView` and use it inside the `TodoView` component to trigger the `setUser` call. That's it!
@@ -607,4 +593,4 @@ One neat feature of references, is that they will throw an error if you accident
 ```
 
 ## Next up
-In part 2 of this tutorial, we will discover how to use MST life cycle hooks and local state to fetch user data from an XHR endpoint, and see how environments will help dealing with dependency injection of the parameters needed to fetch our endpoint. We will implement auto-save using MobX helpers and learn more about patches and actions event streams.
+In (the still TODO) part 2 of this tutorial, we will discover how to use MST life cycle hooks and local state to fetch user data from an XHR endpoint, and see how environments will help dealing with dependency injection of the parameters needed to fetch our endpoint. We will implement auto-save using MobX helpers and learn more about patches and actions event streams.
