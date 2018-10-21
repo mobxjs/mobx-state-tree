@@ -26,7 +26,7 @@ class StoredReference {
 
     private resolvedNode?: {
         node: ObjectNode
-        lastCacheModification: number
+        lastCacheModification: string
     }
 
     constructor(mode: "identifier" | "object", value: any, private readonly targetType: IAnyType) {

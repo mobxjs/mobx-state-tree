@@ -1,11 +1,15 @@
-import { IObservableArray, values, observable } from "mobx"
+import { IObservableArray, values, observable, entries } from "mobx"
 import { fail, ObjectNode, mobxShallow, IAnyType } from "../../internal"
+
+let identifierCacheId = 0
 
 /**
  * @internal
  * @private
  */
 export class IdentifierCache {
+    private cacheId = identifierCacheId++
+
     // n.b. in cache all identifiers are normalized to strings
     private cache = observable.map<string, IObservableArray<ObjectNode>>()
 
@@ -17,15 +21,16 @@ export class IdentifierCache {
 
     private updateLastCacheModificationPerId(identifier: string) {
         const lcm = this.lastCacheModificationPerId.get(identifier)
-        // we start at 1 since 0 means no node was ever added
+        // we start at 1 since 0 means no update since cache creation
         this.lastCacheModificationPerId.set(identifier, lcm === undefined ? 1 : lcm + 1)
     }
 
-    getLastCacheModificationPerId(identifier: string) {
-        return this.lastCacheModificationPerId.get(identifier) || 0
+    getLastCacheModificationPerId(identifier: string): string {
+        const modificationId = this.lastCacheModificationPerId.get(identifier) || 0
+        return `${this.cacheId}-${modificationId}`
     }
 
-    addNodeToCache(node: ObjectNode) {
+    addNodeToCache(node: ObjectNode, lastCacheUpdate = true) {
         if (node.identifierAttribute) {
             const identifier = node.identifier!
             if (!this.cache.has(identifier)) {
@@ -34,9 +39,10 @@ export class IdentifierCache {
             const set = this.cache.get(identifier)!
             if (set.indexOf(node) !== -1) fail(`Already registered`)
             set.push(node)
-            this.updateLastCacheModificationPerId(identifier)
+            if (lastCacheUpdate) {
+                this.updateLastCacheModificationPerId(identifier)
+            }
         }
-        return this
     }
 
     mergeCache(node: ObjectNode) {
@@ -49,9 +55,14 @@ export class IdentifierCache {
 
     notifyDied(node: ObjectNode) {
         if (node.identifierAttribute) {
-            const set = this.cache.get(node.identifier!)
+            const id = node.identifier!
+            const set = this.cache.get(id)
             if (set) {
                 set.remove(node)
+                // remove empty sets from cache
+                if (!set.length) {
+                    this.cache.delete(id)
+                }
                 this.updateLastCacheModificationPerId(node.identifier!)
             }
         }
@@ -60,12 +71,17 @@ export class IdentifierCache {
     splitCache(node: ObjectNode): IdentifierCache {
         const res = new IdentifierCache()
         const basePath = node.path
-        values(this.cache).forEach(nodes => {
+        entries(this.cache).forEach(([id, nodes]) => {
+            let modified = false
             for (let i = nodes.length - 1; i >= 0; i--) {
                 if (nodes[i].path.indexOf(basePath) === 0) {
-                    res.addNodeToCache(nodes[i])
+                    res.addNodeToCache(nodes[i], false) // no need to update lastUpdated since it is a whole new cache
                     nodes.splice(i, 1)
+                    modified = true
                 }
+            }
+            if (modified) {
+                this.updateLastCacheModificationPerId(id)
             }
         })
         return res
