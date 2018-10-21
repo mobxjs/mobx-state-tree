@@ -19,11 +19,15 @@ import {
     IAnyStateTreeNode,
     IAnyComplexType
 } from "../../internal"
-import { computed } from "mobx"
 
 class StoredReference {
     node!: INode
-    readonly value!: string | number
+    readonly identifier!: string | number
+
+    private resolvedNode?: {
+        node: ObjectNode
+        lastCacheModification: number
+    }
 
     constructor(mode: "identifier" | "object", value: any, private readonly targetType: IAnyType) {
         if (mode === "object") {
@@ -38,24 +42,40 @@ class StoredReference {
             if (id === null || id === undefined) {
                 return fail(`Can only store references to tree nodes with a defined identifier.`)
             }
-            this.value = id
+            this.identifier = id
         } else {
-            this.value = value
+            this.identifier = value
         }
     }
 
-    @computed
+    updateResolvedNode() {
+        const normalizedId = "" + this.identifier
+        const { node } = this
+        const lastCacheModification = node.root.identifierCache!.getLastCacheModificationPerId(
+            normalizedId
+        )
+        if (
+            !this.resolvedNode ||
+            this.resolvedNode.lastCacheModification !== lastCacheModification
+        ) {
+            const { targetType } = this
+            // reference was initialized with the identifier of the target
+            const target = node.root.identifierCache!.resolve(targetType, normalizedId)
+            if (!target)
+                fail(
+                    `Failed to resolve reference '${this.identifier}' to type '${
+                        this.targetType.name
+                    }' (from node: ${node.path})`
+                )
+            this.resolvedNode = {
+                node: target!,
+                lastCacheModification: lastCacheModification
+            }
+        }
+    }
+
     get resolvedValue() {
-        // reference was initialized with the identifier of the target
-        const { node, targetType } = this
-        const target = node.root.identifierCache!.resolve(targetType, "" + this.value)
-        if (!target)
-            return fail(
-                `Failed to resolve reference '${this.value}' to type '${
-                    this.targetType.name
-                }' (from node: ${node.path})`
-            )
-        return target.value
+        return this.resolvedNode!.node.value
     }
 }
 
@@ -103,12 +123,13 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         if (!node.isAlive) return undefined
         const ref = node.storedValue as StoredReference
 
+        ref.updateResolvedNode()
         return ref.resolvedValue
     }
 
     getSnapshot(node: INode): any {
         const ref = node.storedValue as StoredReference
-        return ref.value
+        return ref.identifier
     }
 
     instantiate(
@@ -134,7 +155,11 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         if (current.type === this) {
             const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
             const ref = current.storedValue as StoredReference
-            if (targetMode === "identifier" && ref.value === newValue) return current
+            if (targetMode === "identifier" && ref.identifier === newValue) return current
+            else if (targetMode === "object") {
+                ref.updateResolvedNode()
+                if (ref.resolvedValue === newValue) return current
+            }
         }
         const newNode = this.instantiate(
             current.parent,

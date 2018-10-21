@@ -1,5 +1,6 @@
 import { IObservableArray, values, observable } from "mobx"
 import { fail, ObjectNode, mobxShallow, IAnyType } from "../../internal"
+import { string } from "../../types/primitives"
 
 /**
  * @internal
@@ -8,8 +9,19 @@ import { fail, ObjectNode, mobxShallow, IAnyType } from "../../internal"
 export class IdentifierCache {
     // n.b. in cache all identifiers are normalized to strings
     private cache = observable.map<string, IObservableArray<ObjectNode>>()
+    private lastCacheModificationPerId = observable.map<string, number>()
 
     constructor() {}
+
+    private updateLastCacheModificationPerId(identifier: string) {
+        const lcm = this.lastCacheModificationPerId.get(identifier)
+        // we start at 1 since 0 means no node was ever added
+        this.lastCacheModificationPerId.set(identifier, lcm === undefined ? 1 : lcm + 1)
+    }
+
+    getLastCacheModificationPerId(identifier: string) {
+        return this.lastCacheModificationPerId.get(identifier) || 0
+    }
 
     addNodeToCache(node: ObjectNode) {
         if (node.identifierAttribute) {
@@ -20,6 +32,7 @@ export class IdentifierCache {
             const set = this.cache.get(identifier)!
             if (set.indexOf(node) !== -1) fail(`Already registered`)
             set.push(node)
+            this.updateLastCacheModificationPerId(identifier)
         }
         return this
     }
@@ -35,7 +48,10 @@ export class IdentifierCache {
     notifyDied(node: ObjectNode) {
         if (node.identifierAttribute) {
             const set = this.cache.get(node.identifier!)
-            if (set) set.remove(node)
+            if (set) {
+                set.remove(node)
+                this.updateLastCacheModificationPerId(node.identifier!)
+            }
         }
     }
 
