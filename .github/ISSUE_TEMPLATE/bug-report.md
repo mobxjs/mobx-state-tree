@@ -10,8 +10,10 @@ about: I think something is not working as it should
 
 * [ ] I've checked documentation and searched for existing issues
 * [ ] I've made sure your project is based on the latest MST version
-* [ ] Fork [this](https://codesandbox.io/s/jlnmjqr7xv) code sandbox or another minimal reproduction. 
-* **Sandbox link:**
+* [ ] Fork [this](https://codesandbox.io/s/y64pzxj01) code sandbox or another minimal reproduction. 
+
+**Sandbox link or minimal reproduction code**
+<!-- link to your sandbox or alternatively minimal reproduction code-->
 
 **Describe the expected behavior**
 <!-- What should happen? -->
