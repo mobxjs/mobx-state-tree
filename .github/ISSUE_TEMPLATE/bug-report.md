@@ -9,7 +9,7 @@ about: I think something is not working as it should
 **_Bug report_**
 
 * [ ] I've checked documentation and searched for existing issues
-* [ ] I've made sure your project is based on the latest MST version
+* [ ] I've made sure my project is based on the latest MST version
 * [ ] Fork [this](https://codesandbox.io/s/y64pzxj01) code sandbox or another minimal reproduction. 
 
 **Sandbox link or minimal reproduction code**
