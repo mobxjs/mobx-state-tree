@@ -1,6 +1,5 @@
 import { IObservableArray, values, observable } from "mobx"
 import { fail, ObjectNode, mobxShallow, IAnyType } from "../../internal"
-import { string } from "../../types/primitives"
 
 /**
  * @internal
