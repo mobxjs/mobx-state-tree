@@ -8,6 +8,9 @@ import { fail, ObjectNode, mobxShallow, IAnyType } from "../../internal"
 export class IdentifierCache {
     // n.b. in cache all identifiers are normalized to strings
     private cache = observable.map<string, IObservableArray<ObjectNode>>()
+
+    // last time the cache (array) for a given time changed
+    // n.b. it is not really the time, but just an integer that gets increased after each modification to the array
     private lastCacheModificationPerId = observable.map<string, number>()
 
     constructor() {}
