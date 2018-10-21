@@ -48,7 +48,7 @@ class StoredReference {
         }
     }
 
-    updateResolvedNode() {
+    private updateResolvedNode() {
         const normalizedId = "" + this.identifier
         const { node } = this
         const lastCacheModification = node.root.identifierCache!.getLastCacheModificationPerId(
@@ -75,6 +75,7 @@ class StoredReference {
     }
 
     get resolvedValue() {
+        this.updateResolvedNode()
         return this.resolvedNode!.node.value
     }
 }
@@ -123,7 +124,6 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         if (!node.isAlive) return undefined
         const ref = node.storedValue as StoredReference
 
-        ref.updateResolvedNode()
         return ref.resolvedValue
     }
 
@@ -156,10 +156,7 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
             const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
             const ref = current.storedValue as StoredReference
             if (targetMode === "identifier" && ref.identifier === newValue) return current
-            else if (targetMode === "object") {
-                ref.updateResolvedNode()
-                if (ref.resolvedValue === newValue) return current
-            }
+            else if (targetMode === "object" && ref.resolvedValue === newValue) return current
         }
         const newNode = this.instantiate(
             current.parent,
