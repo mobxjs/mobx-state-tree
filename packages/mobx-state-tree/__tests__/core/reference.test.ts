@@ -1,4 +1,4 @@
-import { reaction, autorun } from "mobx"
+import { reaction, autorun, isObservable } from "mobx"
 import {
     types,
     getSnapshot,
@@ -805,11 +805,27 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
 
     const store = Store.create({ todos: {} })
     store.load()
+
+    expect(store.last).toBe(undefined)
+    let reactions = 0
+    let reactionDisposer = reaction(
+        () => store.last,
+        () => {
+            reactions++
+        }
+    )
+
     store.select(store.todos.items[0])
     expect(isAlive(store.last!)).toBe(true)
+    expect(isObservable(store.last)).toBe(true)
+    expect(reactions).toBe(1)
     expect(store.last!.title).toBe("Get Coffee 0")
 
     store.load()
     expect(isAlive(store.last!)).toBe(true)
+    expect(isObservable(store.last)).toBe(true)
+    expect(reactions).toBe(2)
     expect(store.last!.title).toBe("Get Coffee 1")
+
+    reactionDisposer()
 })
