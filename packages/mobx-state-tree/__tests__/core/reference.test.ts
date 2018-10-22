@@ -786,6 +786,7 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
         .model("Store", {
             todos: Todos,
             last: types.maybe(types.reference(Todo)),
+            lastWithId: types.maybe(types.reference(Todo)),
             counter: -1
         })
         .actions(self => ({
@@ -800,6 +801,7 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
             },
             select(todo: Instance<typeof Todo>) {
                 self.last = todo
+                self.lastWithId = cast(todo.id)
             }
         }))
 
@@ -807,26 +809,39 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
     store.load()
 
     expect(store.last).toBe(undefined)
-    let reactions = 0
-    let reactionDisposer = reaction(
-        () => store.last,
-        () => {
-            reactions++
-        }
-    )
+    expect(store.lastWithId).toBe(undefined)
+
+    const reactionFn = jest.fn()
+    const reactionDisposer = reaction(() => store.last, reactionFn)
+    const reactionFn2 = jest.fn()
+    const reactionDisposer2 = reaction(() => store.lastWithId, reactionFn2)
+
     try {
         store.select(store.todos.items[0])
+
         expect(isAlive(store.last!)).toBe(true)
         expect(isObservable(store.last)).toBe(true)
-        expect(reactions).toBe(1)
+        expect(reactionFn).toHaveBeenCalledTimes(1)
         expect(store.last!.title).toBe("Get Coffee 0")
 
+        expect(isAlive(store.lastWithId!)).toBe(true)
+        expect(isObservable(store.lastWithId)).toBe(true)
+        expect(reactionFn2).toHaveBeenCalledTimes(1)
+        expect(store.lastWithId!.title).toBe("Get Coffee 0")
+
         store.load()
+
         expect(isAlive(store.last!)).toBe(true)
         expect(isObservable(store.last)).toBe(true)
-        expect(reactions).toBe(2)
+        expect(reactionFn).toHaveBeenCalledTimes(2)
         expect(store.last!.title).toBe("Get Coffee 1")
+
+        expect(isAlive(store.lastWithId!)).toBe(true)
+        expect(isObservable(store.lastWithId)).toBe(true)
+        expect(reactionFn2).toHaveBeenCalledTimes(2)
+        expect(store.lastWithId!.title).toBe("Get Coffee 1")
     } finally {
         reactionDisposer()
+        reactionDisposer2()
     }
 })
