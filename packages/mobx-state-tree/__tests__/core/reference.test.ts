@@ -814,18 +814,19 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
             reactions++
         }
     )
+    try {
+        store.select(store.todos.items[0])
+        expect(isAlive(store.last!)).toBe(true)
+        expect(isObservable(store.last)).toBe(true)
+        expect(reactions).toBe(1)
+        expect(store.last!.title).toBe("Get Coffee 0")
 
-    store.select(store.todos.items[0])
-    expect(isAlive(store.last!)).toBe(true)
-    expect(isObservable(store.last)).toBe(true)
-    expect(reactions).toBe(1)
-    expect(store.last!.title).toBe("Get Coffee 0")
-
-    store.load()
-    expect(isAlive(store.last!)).toBe(true)
-    expect(isObservable(store.last)).toBe(true)
-    expect(reactions).toBe(2)
-    expect(store.last!.title).toBe("Get Coffee 1")
-
-    reactionDisposer()
+        store.load()
+        expect(isAlive(store.last!)).toBe(true)
+        expect(isObservable(store.last)).toBe(true)
+        expect(reactions).toBe(2)
+        expect(store.last!.title).toBe("Get Coffee 1")
+    } finally {
+        reactionDisposer()
+    }
 })
