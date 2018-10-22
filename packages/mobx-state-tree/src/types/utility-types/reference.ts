@@ -48,7 +48,7 @@ class StoredReference {
         }
     }
 
-    private updateResolvedNode() {
+    private updateResolvedReference() {
         const normalizedId = "" + this.identifier
         const { node } = this
         const lastCacheModification = node.root.identifierCache!.getLastCacheModificationPerId(
@@ -75,7 +75,7 @@ class StoredReference {
     }
 
     get resolvedValue() {
-        this.updateResolvedNode()
+        this.updateResolvedReference()
         return this.resolvedReference!.node.value
     }
 }
