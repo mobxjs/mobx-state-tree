@@ -24,13 +24,13 @@ class StoredReference {
     node!: INode
     readonly identifier!: string | number
 
-    private resolvedNode?: {
+    private resolvedReference?: {
         node: ObjectNode
         lastCacheModification: string
     }
 
-    constructor(mode: "identifier" | "object", value: any, private readonly targetType: IAnyType) {
-        if (mode === "object") {
+    constructor(value: any, private readonly targetType: IAnyType) {
+        if (isStateTreeNode(value)) {
             if (!isStateTreeNode(value))
                 return fail(
                     `Can only store references to tree nodes or identifiers, got: '${value}'`
@@ -55,8 +55,8 @@ class StoredReference {
             normalizedId
         )
         if (
-            !this.resolvedNode ||
-            this.resolvedNode.lastCacheModification !== lastCacheModification
+            !this.resolvedReference ||
+            this.resolvedReference.lastCacheModification !== lastCacheModification
         ) {
             const { targetType } = this
             // reference was initialized with the identifier of the target
@@ -67,7 +67,7 @@ class StoredReference {
                         this.targetType.name
                     }' (from node: ${node.path})`
                 )
-            this.resolvedNode = {
+            this.resolvedReference = {
                 node: target!,
                 lastCacheModification: lastCacheModification
             }
@@ -76,7 +76,7 @@ class StoredReference {
 
     get resolvedValue() {
         this.updateResolvedNode()
-        return this.resolvedNode!.node.value
+        return this.resolvedReference!.node.value
     }
 }
 
@@ -138,14 +138,13 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         environment: any,
         snapshot: any
     ): INode {
-        const mode = isStateTreeNode(snapshot) ? "object" : "identifier"
         let r
         const node = createNode(
             this,
             parent,
             subpath,
             environment,
-            (r = new StoredReference(mode, snapshot, this.targetType))
+            (r = new StoredReference(snapshot, this.targetType))
         )
         r.node = node
         return node
@@ -153,10 +152,10 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
 
     reconcile(current: INode, newValue: any): INode {
         if (current.type === this) {
-            const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
+            const compareByValue = isStateTreeNode(newValue)
             const ref = current.storedValue as StoredReference
-            if (targetMode === "identifier" && ref.identifier === newValue) return current
-            else if (targetMode === "object" && ref.resolvedValue === newValue) return current
+            if (!compareByValue && ref.identifier === newValue) return current
+            else if (compareByValue && ref.resolvedValue === newValue) return current
         }
         const newNode = this.instantiate(
             current.parent,
