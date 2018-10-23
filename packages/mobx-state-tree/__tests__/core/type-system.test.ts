@@ -599,8 +599,13 @@ test("#923", () => {
 test("snapshot type of reference must be string | number", () => {
     const M = types.model({ id: types.identifier, a: "bar" })
     const R = types.reference(M)
-    const r = R.create(M.create({ id: "5" }))
-    const sn: string | number = getSnapshot(r)
+
+    const S = types.model({ realM: M, refM: R })
+    const s = S.create({
+        realM: { id: "5" },
+        refM: "5"
+    })
+    const sn: string | number = getSnapshot(s.refM)
 })
 
 test("#951", () => {

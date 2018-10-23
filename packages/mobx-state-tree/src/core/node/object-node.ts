@@ -80,6 +80,7 @@ export class ObjectNode implements INode {
     readonly type: IAnyType
     readonly identifierAttribute: string | undefined
     readonly identifier: string | null // Identifier is always normalized to string, even if the identifier property isn't
+    readonly unnormalizedIdentifier: string | number | null
 
     subpathAtom = createAtom(`path`)
     subpath: string = ""
@@ -142,6 +143,7 @@ export class ObjectNode implements INode {
         // identifier can not be changed during lifecycle of a node
         // so we safely can read it from initial snapshot
         this.identifier = null
+        this.unnormalizedIdentifier = null
         if (this.identifierAttribute && this._initialSnapshot) {
             let id = this._initialSnapshot[this.identifierAttribute]
             if (id === undefined) {
@@ -162,6 +164,7 @@ export class ObjectNode implements INode {
 
             // normalize internal identifier to string
             this.identifier = "" + id
+            this.unnormalizedIdentifier = id
         }
 
         if (!parent) {

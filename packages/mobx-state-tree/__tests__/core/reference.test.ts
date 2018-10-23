@@ -1,4 +1,4 @@
-import { reaction, autorun } from "mobx"
+import { reaction, autorun, isObservable } from "mobx"
 import {
     types,
     getSnapshot,
@@ -13,7 +13,8 @@ import {
     SnapshotOut,
     IAnyModelType,
     Instance,
-    SnapshotOrInstance
+    SnapshotOrInstance,
+    isAlive
 } from "../../src"
 
 test("it should support prefixed paths in maps", () => {
@@ -769,4 +770,78 @@ test("should serialize references correctly", () => {
     expect(Array.from(s.mies.keys())).toEqual(["7", "8", "9"])
     expect(s.mies.get("9")!.id).toBe(9)
     expect(getSnapshot(s).ref).toBe("9") // ref serialized as string (number would be ok as well)
+})
+
+test("#1052 - Reference returns destroyed model after subtree replacing", () => {
+    const Todo = types.model("Todo", {
+        id: types.identifierNumber,
+        title: types.string
+    })
+
+    const Todos = types.model("Todos", {
+        items: types.array(Todo)
+    })
+
+    const Store = types
+        .model("Store", {
+            todos: Todos,
+            last: types.maybe(types.reference(Todo)),
+            lastWithId: types.maybe(types.reference(Todo)),
+            counter: -1
+        })
+        .actions(self => ({
+            load() {
+                self.counter++
+                self.todos = Todos.create({
+                    items: [
+                        { id: 1, title: "Get Coffee " + self.counter },
+                        { id: 2, title: "Write simpler code " + self.counter }
+                    ]
+                })
+            },
+            select(todo: Instance<typeof Todo>) {
+                self.last = todo
+                self.lastWithId = cast(todo.id)
+            }
+        }))
+
+    const store = Store.create({ todos: {} })
+    store.load()
+
+    expect(store.last).toBe(undefined)
+    expect(store.lastWithId).toBe(undefined)
+
+    const reactionFn = jest.fn()
+    const reactionDisposer = reaction(() => store.last, reactionFn)
+    const reactionFn2 = jest.fn()
+    const reactionDisposer2 = reaction(() => store.lastWithId, reactionFn2)
+
+    try {
+        store.select(store.todos.items[0])
+
+        expect(isAlive(store.last!)).toBe(true)
+        expect(isObservable(store.last)).toBe(true)
+        expect(reactionFn).toHaveBeenCalledTimes(1)
+        expect(store.last!.title).toBe("Get Coffee 0")
+
+        expect(isAlive(store.lastWithId!)).toBe(true)
+        expect(isObservable(store.lastWithId)).toBe(true)
+        expect(reactionFn2).toHaveBeenCalledTimes(1)
+        expect(store.lastWithId!.title).toBe("Get Coffee 0")
+
+        store.load()
+
+        expect(isAlive(store.last!)).toBe(true)
+        expect(isObservable(store.last)).toBe(true)
+        expect(reactionFn).toHaveBeenCalledTimes(2)
+        expect(store.last!.title).toBe("Get Coffee 1")
+
+        expect(isAlive(store.lastWithId!)).toBe(true)
+        expect(isObservable(store.lastWithId)).toBe(true)
+        expect(reactionFn2).toHaveBeenCalledTimes(2)
+        expect(store.lastWithId!.title).toBe("Get Coffee 1")
+    } finally {
+        reactionDisposer()
+        reactionDisposer2()
+    }
 })

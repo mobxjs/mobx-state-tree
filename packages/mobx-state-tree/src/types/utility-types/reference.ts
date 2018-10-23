@@ -17,40 +17,64 @@ import {
     ExtractT,
     IComplexType,
     IAnyStateTreeNode,
-    IAnyModelType,
     IAnyComplexType
 } from "../../internal"
-import { computed } from "mobx"
 
 class StoredReference {
     node!: INode
+    readonly identifier!: string | number
 
-    constructor(
-        public readonly mode: "identifier" | "object",
-        public readonly value: any,
-        private readonly targetType: IAnyType
-    ) {
-        if (mode === "object") {
-            if (!isStateTreeNode(value))
-                return fail(`Can only store references to tree nodes, got: '${value}'`)
+    private resolvedReference?: {
+        node: ObjectNode
+        lastCacheModification: string
+    }
+
+    constructor(value: any, private readonly targetType: IAnyType) {
+        if (typeof value === "string" || typeof value === "number") {
+            this.identifier = value
+        } else if (isStateTreeNode(value)) {
             const targetNode = getStateTreeNode(value)
             if (!targetNode.identifierAttribute)
                 return fail(`Can only store references with a defined identifier attribute.`)
+            const id = targetNode.unnormalizedIdentifier
+            if (id === null || id === undefined) {
+                return fail(`Can only store references to tree nodes with a defined identifier.`)
+            }
+            this.identifier = id
+        } else {
+            return fail(`Can only store references to tree nodes or identifiers, got: '${value}'`)
         }
     }
 
-    @computed
+    private updateResolvedReference() {
+        const normalizedId = "" + this.identifier
+        const { node } = this
+        const lastCacheModification = node.root.identifierCache!.getLastCacheModificationPerId(
+            normalizedId
+        )
+        if (
+            !this.resolvedReference ||
+            this.resolvedReference.lastCacheModification !== lastCacheModification
+        ) {
+            const { targetType } = this
+            // reference was initialized with the identifier of the target
+            const target = node.root.identifierCache!.resolve(targetType, normalizedId)
+            if (!target)
+                fail(
+                    `Failed to resolve reference '${this.identifier}' to type '${
+                        this.targetType.name
+                    }' (from node: ${node.path})`
+                )
+            this.resolvedReference = {
+                node: target!,
+                lastCacheModification: lastCacheModification
+            }
+        }
+    }
+
     get resolvedValue() {
-        // reference was initialized with the identifier of the target
-        const { node, targetType } = this
-        const target = node.root.identifierCache!.resolve(targetType, this.value)
-        if (!target)
-            return fail(
-                `Failed to resolve reference '${this.value}' to type '${
-                    this.targetType.name
-                }' (from node: ${node.path})`
-            )
-        return target.value
+        this.updateResolvedReference()
+        return this.resolvedReference!.node.value
     }
 }
 
@@ -98,19 +122,12 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         if (!node.isAlive) return undefined
         const ref = node.storedValue as StoredReference
 
-        // id already resolved, return
-        if (ref.mode === "object") return ref.value
         return ref.resolvedValue
     }
 
     getSnapshot(node: INode): any {
         const ref = node.storedValue as StoredReference
-        switch (ref.mode) {
-            case "identifier":
-                return ref.value
-            case "object":
-                return ref.value[getStateTreeNode(ref.value).identifierAttribute!]
-        }
+        return ref.identifier
     }
 
     instantiate(
@@ -119,14 +136,13 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
         environment: any,
         snapshot: any
     ): INode {
-        const mode = isStateTreeNode(snapshot) ? "object" : "identifier"
         let r
         const node = createNode(
             this,
             parent,
             subpath,
             environment,
-            (r = new StoredReference(mode, snapshot, this.targetType))
+            (r = new StoredReference(snapshot, this.targetType))
         )
         r.node = node
         return node
@@ -134,9 +150,10 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
 
     reconcile(current: INode, newValue: any): INode {
         if (current.type === this) {
-            const targetMode = isStateTreeNode(newValue) ? "object" : "identifier"
+            const compareByValue = isStateTreeNode(newValue)
             const ref = current.storedValue as StoredReference
-            if (targetMode === ref.mode && ref.value === newValue) return current
+            if (!compareByValue && ref.identifier === newValue) return current
+            else if (compareByValue && ref.resolvedValue === newValue) return current
         }
         const newNode = this.instantiate(
             current.parent,
