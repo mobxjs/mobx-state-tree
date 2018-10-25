@@ -235,7 +235,7 @@ const defaultObjectOptions = {
     initializers: EMPTY_ARRAY
 }
 
-function toPropertiesObject<T>(declaredProps: ModelPropertiesDeclaration): ModelProperties {
+function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelProperties {
     // loop through properties and ensures that all items are types
     return Object.keys(declaredProps).reduce(
         (props, key) => {
