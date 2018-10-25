@@ -689,6 +689,8 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
  * targeted state tree node is destroyed. This is a useful alternative to managing
  * cleanup methods yourself using the `beforeDestroy` hook.
  *
+ * This methods returns the same disposer that was passed as argument.
+ *
  * @example
  * const Todo = types.model({
  *   title: types.string
@@ -707,8 +709,9 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
  * @export
  * @param {IStateTreeNode} target
  * @param {() => void} disposer
+ * @returns {() => void} the same disposer that was passed as argument
  */
-export function addDisposer(target: IAnyStateTreeNode, disposer: () => void) {
+export function addDisposer(target: IAnyStateTreeNode, disposer: () => void): (() => void) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -716,7 +719,9 @@ export function addDisposer(target: IAnyStateTreeNode, disposer: () => void) {
         if (typeof disposer !== "function")
             fail("expected second argument to be a function, got " + disposer + " instead")
     }
-    getStateTreeNode(target).addDisposer(disposer)
+    const node = getStateTreeNode(target)
+    node.addDisposer(disposer)
+    return disposer
 }
 
 /**

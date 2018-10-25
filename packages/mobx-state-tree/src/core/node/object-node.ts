@@ -496,11 +496,14 @@ export class ObjectNode implements INode {
     }
 
     public aboutToDie() {
+        // beforeDestroy should run before the disposers since else we could end up in a situation where
+        // a disposer added with addDisposer at this stage (beforeDestroy) is actually never released
+        this.fireHook("beforeDestroy")
+
         if (this._disposers) {
             this._disposers.forEach(f => f())
             this._disposers = null
         }
-        this.fireHook("beforeDestroy")
     }
 
     public finalizeDeath() {
@@ -544,9 +547,33 @@ export class ObjectNode implements INode {
         if (this.parent) this.parent.emitPatch(basePatch, source)
     }
 
-    addDisposer(disposer: () => void) {
-        if (!this._disposers) this._disposers = [disposer]
-        else this._disposers.unshift(disposer)
+    hasDisposer(disposer: () => void): boolean {
+        if (!this._disposers) return false
+        return this._disposers.indexOf(disposer) >= 0
+    }
+
+    addDisposer(disposer: () => void): void {
+        if (!this._disposers) {
+            this._disposers = [disposer]
+            return
+        }
+        if (!this.hasDisposer(disposer)) {
+            this._disposers.unshift(disposer)
+            return
+        }
+        fail("cannot add a disposer when it is already registered for execution")
+    }
+
+    removeDisposer(disposer: () => void): void {
+        const errMsg = "cannot remove a disposer which was never registered for execution"
+        if (!this._disposers) {
+            return fail(errMsg)
+        }
+        const index = this._disposers.indexOf(disposer)
+        if (index < 0) {
+            return fail(errMsg)
+        }
+        this._disposers.splice(index, 1)
     }
 
     removeMiddleware(handler: IMiddlewareHandler) {

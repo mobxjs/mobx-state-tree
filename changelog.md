@@ -1,3 +1,5 @@
+-   Made `addDisposer` return the passed disposer.
+
 # 3.7.1
 
 -   Fixed references to nodes being broken after the node was replaced [#1052](https://github.com/mobxjs/mobx-state-tree/issues/1052), plus speed up of reference resolving when using IDs through [#1053](https://github.com/mobxjs/mobx-state-tree/pull/1053) by [@xaviergonz](https://github.com/xaviergonz)
