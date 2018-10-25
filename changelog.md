@@ -1,4 +1,4 @@
--   Made `addDisposer` return the passed disposer.
+-   Made `addDisposer` return the passed disposer through [#1059](https://github.com/mobxjs/mobx-state-tree/pull/1059) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.7.1
 
