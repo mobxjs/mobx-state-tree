@@ -249,21 +249,24 @@ An example:
 
 ```javascript
 const TodoStore = types
-    .model("TodoStore", {                             // 1
-        loaded: types.boolean,                        // 2
-        endpoint: "http://localhost",                 // 3
-        todos: types.array(Todo),                     // 4
-        selectedTodo: types.reference(Todo)           // 5
+    // 1
+    .model("TodoStore", {
+        loaded: types.boolean, // 2
+        endpoint: "http://localhost", // 3
+        todos: types.array(Todo), // 4
+        selectedTodo: types.reference(Todo) // 5
     })
     .views(self => {
         return {
-            get completedTodos() {                    // 6
+            // 6
+            get completedTodos() {
                 return self.todos.filter(t => t.done)
             },
-            findTodosByUser(user) {                   // 7
+            // 7
+            findTodosByUser(user) {
                 return self.todos.filter(t => t.assignee === user)
             }
-        };
+        }
     })
     .actions(self => {
         return {
@@ -273,7 +276,7 @@ const TodoStore = types
                     title
                 })
             }
-        };
+        }
     })
 ```
 
@@ -1487,12 +1490,18 @@ export type ITodo = typeof Todo.Type
 
 It ain't pretty, but it works.
 
-#### Optional/empty maps
+#### Optional/empty maps/arrays
 
-Optional parameters, including "empty" maps, should be either a valid snapshot or a MST instance. To fix type errors such as `Error while converting {} to map`, define your type as such:
+Since v3, maps and arrays are optional by default, this is:
 
-```typescript
-map: types.optional(types.map(OtherType), {})
+```javascript
+types.map(OtherType)
+// is the same as
+types.optional(types.map(OtherType), {})
+
+types.array(OtherType)
+// is the same as
+types.optional(types.array(OtherType), [])
 ```
 
 ### How does MST compare to Redux
