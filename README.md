@@ -1097,7 +1097,7 @@ If you are using TypeScript and you get errors about circular or self-referencin
 ```ts
 const Node = types.model({
     x: 5, // as an example
-    me: types.maybe(types.late((): any => Node))
+    me: types.maybe(types.late((): IAnyModelType => Node))
 })
 ```
 
