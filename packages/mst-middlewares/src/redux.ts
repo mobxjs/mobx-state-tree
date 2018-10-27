@@ -62,12 +62,13 @@ function runMiddleWare(action: any, runners: any[], next: any) {
 // devtools
 
 type ChangesMadeSetter = () => void
+type ActionContextWithNameAndTypePath = Pick<ActionContext, "name" | "targetTypePath">
 
 interface ActionContext {
     parent?: ActionContext
-    name: string
-    targetTypePath: string
-    id: number
+    name?: string
+    targetTypePath?: string
+    id?: number
     runningAsync: boolean
     errored: boolean
     errorReported: boolean
@@ -76,7 +77,10 @@ interface ActionContext {
     changesMadeSetter: ChangesMadeSetter | undefined
 }
 
-function getActionContextNameAndTypePath(actionContext: ActionContext, logArgsNearName: boolean) {
+function getActionContextNameAndTypePath(
+    actionContext: ActionContext,
+    logArgsNearName: boolean
+): ActionContextWithNameAndTypePath {
     let name = actionContext.name
     let targetTypePath = actionContext.targetTypePath
 
@@ -191,7 +195,14 @@ export function connectReduxDevtools(
             return
         }
 
-        let context!: ActionContext
+        let context: ActionContext = {
+            runningAsync: false,
+            errored: false,
+            errorReported: false,
+            step: 0,
+            callArgs: [],
+            changesMadeSetter: undefined
+        }
 
         // find the context of the parent action (if any)
         for (let i = call.allParentIds.length - 1; i >= 0; i--) {
