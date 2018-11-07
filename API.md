@@ -223,6 +223,8 @@ Use this utility to register a function that should be called whenever the
 targeted state tree node is destroyed. This is a useful alternative to managing
 cleanup methods yourself using the `beforeDestroy` hook.
 
+This methods returns the same disposer that was passed as argument.
+
 ### Parameters
 
 -   `target` **IStateTreeNode** 

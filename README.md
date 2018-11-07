@@ -922,7 +922,12 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 -   `types.null` the type of `null`.
 -   `types.undefined` the type of `undefined`.
 -   `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
--   `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is **immutable** and **serializable**.
+-   `types.frozen(subType? | defaultValue?)` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is **immutable** and **serializable**.
+    `frozen` can be invoked in a few different ways:
+    - `types.frozen()` - behaves the same as types.frozen in MST 2.
+    - `types.frozen(subType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type. Note that the type will not actually be instantiated, so it can only be used to check the shape of the data. Adding views or actions to SubType would be pointless.
+    - `types.frozen(someDefaultValue)` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
+    - (Typescript) `types.frozen<TypeScriptType>(...)` - provide a typescript type, to help in strongly typing the field (design time only)
 -   `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one.
 
 ## Property types
@@ -984,7 +989,7 @@ See the [full API docs](API.md) for more details.
 
 | signature                                                                                                 |                                                                                                                                                                                                                                                       |
 | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`addDisposer(node, () => void)`](API.md#adddisposer)                                                     | Function to be invoked whenever the target node is to be destroyed                                                                                                                                                                                    |
+| [`addDisposer(node, () => void)`](API.md#adddisposer)                                                     | Add a function to be invoked whenever the target node is about to be destroyed                                                                                                                                                                        |
 | [`addMiddleware(node, middleware: (actionDescription, next) => any, includeHooks)`](API.md#addmiddleware) | Attaches middleware to a node. See [middleware](docs/middleware.md). Returns disposer.                                                                                                                                                                |
 | [`applyAction(node, actionDescription)`](API.md#applyaction)                                              | Replays an action on the targeted node                                                                                                                                                                                                                |
 | [`applyPatch(node, jsonPatch)`](API.md#applypatch)                                                        | Applies a JSON patch, or array of patches, to a node in the tree                                                                                                                                                                                      |
@@ -1194,7 +1199,7 @@ Likewise, if your application mainly processes stateless information (such as a 
 
 MST doesn't offer an any type because it can't reason about it. For example, given a snapshot and a field with `any`, how should MST know how to deserialize it or apply patches to it, etc.? If you need `any`, there are following options:
 
-1.  Use `types.frozen`. Frozen values need to be immutable and serializable (so MST can treat them verbatim)
+1.  Use `types.frozen()`. Frozen values need to be immutable and serializable (so MST can treat them verbatim)
 2.  Use volatile state. Volatile state can store anything, but won't appear in snapshots, patches etc.
 3.  If your type is regular, and you just are too lazy to type the model, you could also consider generating the type at runtime once (after all, MST types are just JS...). However, you will loose static typing, and any confusion it causes is up to you to handle :-).
 

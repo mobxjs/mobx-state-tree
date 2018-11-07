@@ -95,16 +95,17 @@ test("it should trigger lifecycle hooks", () => {
         "new todo: add sugar",
         "attach todo: add sugar",
         "---",
+        "destroy todo: add sugar",
         "custom disposer 2 for add sugar",
         "custom disposer 1 for add sugar",
-        "destroy todo: add sugar",
-        "custom disposer for store",
         "destroy store: 2",
+        "custom disposer for store",
+        "destroy todo: Give talk",
         "custom disposer 2 for Give talk",
-        "custom disposer 1 for Give talk",
-        "destroy todo: Give talk"
+        "custom disposer 1 for Give talk"
     ])
 })
+
 type CarSnapshot = { id: string }
 const Car = types
     .model("Car", {
@@ -257,4 +258,13 @@ test("snapshot processors can be composed", () => {
     const x = X.create({ x: 25 })
     expect(x.x).toBe(2)
     expect(getSnapshot(x).x).toBe(25)
+})
+
+test("addDisposer must return the passed disposer", () => {
+    const listener = jest.fn()
+    const M = types.model({}).actions(self => {
+        expect(addDisposer(self, listener)).toBe(listener)
+        return {}
+    })
+    M.create()
 })
