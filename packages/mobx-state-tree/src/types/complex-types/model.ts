@@ -99,16 +99,6 @@ export interface OptionalProperty {
     readonly "!!optionalType": undefined
 }
 
-export type RequiredPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalProperty ? never : K
-}[keyof T]
-export type OptionalPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalProperty ? K : never
-}[keyof T]
-
-export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
-export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
-
 // tslint:disable-next-line:class-name
 export interface _NotCustomized {
     // only for typings
@@ -119,21 +109,36 @@ export type _CustomOrOther<Custom, Other> = Custom extends _NotCustomized ? Othe
 /**
  * Maps property types to the snapshot, including omitted optional attributes
  */
-export type ModelCreationType<T extends ModelProperties> = {
-    [K in keyof RequiredProps<T>]: ExtractC<T[K]>
-} &
-    { [K in keyof OptionalProps<T>]?: ExtractC<T[K]> }
+export type RequiredPropNames<T> = {
+    [K in keyof T]: T[K] extends OptionalProperty ? never : K
+}[keyof T]
+export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
+export type RequiredPropsObject<P extends ModelProperties> = { [K in keyof RequiredProps<P>]: P[K] }
 
-export type ModelCreationType2<T extends ModelProperties, CustomC> = _CustomOrOther<
-    CustomC,
-    ModelCreationType<T>
+export type OptionalPropNames<T> = {
+    [K in keyof T]: T[K] extends OptionalProperty ? K : never
+}[keyof T]
+export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
+export type OptionalPropsObject<P extends ModelProperties> = {
+    [K in keyof OptionalProps<P>]?: P[K]
+}
+
+export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: ExtractC<P[k]> }
+
+export type ModelCreationType<P extends ModelProperties> = ExtractCFromProps<
+    RequiredPropsObject<P> & OptionalPropsObject<P>
 >
 
-export type ModelSnapshotType<T extends ModelProperties> = { [K in keyof T]: ExtractS<T[K]> }
+export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOther<
+    CustomC,
+    ModelCreationType<P>
+>
 
-export type ModelSnapshotType2<T extends ModelProperties, CustomS> = _CustomOrOther<
+export type ModelSnapshotType<P extends ModelProperties> = { [K in keyof P]: ExtractS<P[K]> }
+
+export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOther<
     CustomS,
-    ModelSnapshotType<T>
+    ModelSnapshotType<P>
 >
 
 // we keep this separate from ModelInstanceType to shorten model instance types generated declarations

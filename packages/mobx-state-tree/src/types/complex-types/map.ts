@@ -46,7 +46,8 @@ import {
     ExtractC,
     ExtractS,
     ExtractT,
-    ExtractCST
+    ExtractCST,
+    IStateTreeNode
 } from "../../internal"
 
 export interface IMapType<IT extends IAnyType>
@@ -57,7 +58,7 @@ export interface IMapType<IT extends IAnyType>
         >,
         OptionalProperty {}
 
-export interface IMSTMap<IT extends IAnyType> {
+export interface IMSTMap<IT extends IAnyType> extends IStateTreeNode<ExtractC<IT>, ExtractS<IT>> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
 
     clear(): void
@@ -68,9 +69,21 @@ export interface IMSTMap<IT extends IAnyType> {
     ): void
     get(key: string): ExtractT<IT> | undefined
     has(key: string): boolean
-    set(key: string, value: ExtractCST<IT>): this
+
+    // the order matters to keep cast happy
+    // set(key: string, value: ExtractCST<IT>): this
+    set(key: string, value: ExtractT<IT>): this
+    set(key: string, value: ExtractC<IT>): this
+    set(key: string, value: ExtractS<IT>): this
+
     readonly size: number
-    put(value: ExtractCST<IT>): ExtractT<IT>
+
+    // the order matters to keep cast happy
+    // put(value: ExtractCST<IT>): ExtractT<IT>
+    put(value: ExtractT<IT>): ExtractT<IT>
+    put(value: ExtractC<IT>): ExtractT<IT>
+    put(value: ExtractS<IT>): ExtractT<IT>
+
     keys(): IterableIterator<string>
     values(): IterableIterator<ExtractT<IT>>
     entries(): IterableIterator<[string, ExtractT<IT>]>

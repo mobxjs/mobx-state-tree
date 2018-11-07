@@ -22,7 +22,9 @@ import {
     IAnyType,
     ExtractIStateTreeNode,
     isModelType,
-    INode
+    INode,
+    ModelPrimitive,
+    ExtractNodeC
 } from "../internal"
 
 export type TypeOrStateTreeNodeToStateTreeNode<
@@ -835,14 +837,18 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     return reflected
 }
 
-export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
-
+export function cast<O extends ModelPrimitive = never>(snapshotOrInstance: O): O
+export function cast<I extends ExtractNodeC<O>, O extends IAnyStateTreeNode = never>(
+    snapshotOrInstance: I
+): O
+export function cast<I extends ExtractNodeC<O>, O extends IAnyStateTreeNode = never>(
+    snapshotOrInstance: I | O
+): O
 /**
  * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
- * Alternatively also casts a node snapshot or instance to an snapshot type so it can be assigned to a type snapshot.
- * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance
- * (or vice-versa), but just fool typescript into thinking so.
- * Either way, casting when outside an assignation operation will only yield an unusable type (never).
+ * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,
+ * but just fool typescript into thinking so.
+ * Either way, casting when outside an assignation operation won't compile.
  *
  * @example
  * const ModelA = types.model({
@@ -857,15 +863,45 @@ export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
  *   innerModel: ModelA
  * }).actions(self => ({
  *   someAction() {
- *     // this will allow the compiler to assign an snapshot to the property
+ *     // this will allow the compiler to assign a snapshot to the property
  *     self.innerModel = cast({ a: 5 })
  *   }
  * }))
  *
  * @export
- * @param {CastedType<T>} snapshotOrInstance
- * @returns {T}
+ * @param snapshotOrInstance Snapshot or instance
+ * @returns The same object casted as an instance
  */
-export function cast<T = never, C = CastedType<T>>(snapshotOrInstance: C): T {
+export function cast(snapshotOrInstance: any): any {
     return snapshotOrInstance as any
+}
+
+/**
+ * Casts a node instance type to an snapshot type so it can be assigned to a type snapshot (e.g. to be used inside a create call).
+ * Note that this is just a cast for the type system, this is, it won't actually convert an instance to a snapshot,
+ * but just fool typescript into thinking so.
+ *
+ * @example
+ * const ModelA = types.model({
+ *   n: types.number
+ * }).actions(self => ({
+ *   setN(aNumber: number) {
+ *     self.n = aNumber
+ *   }
+ * }))
+ *
+ * const ModelB = types.model({
+ *   innerModel: ModelA
+ * })
+ *
+ * const a = ModelA.create({ n: 5 });
+ * // this will allow the compiler to use a model as if it were a snapshot
+ * const b = ModelB.create({ innerModel: castToSnapshot(a)})
+ *
+ * @export
+ * @param instance Instance
+ * @returns The same object casted as an input (creation) snapshot
+ */
+export function castToSnapshot<I extends IAnyStateTreeNode>(instance: I): ExtractNodeC<I> {
+    return instance as any
 }

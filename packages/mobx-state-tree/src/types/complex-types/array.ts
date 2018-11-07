@@ -45,22 +45,23 @@ import {
     ExtractT
 } from "../../internal"
 
-export interface IMSTArray<T> extends IObservableArray<T> {}
+export interface IMSTArray<IT extends IAnyType>
+    extends IObservableArray<ExtractT<IT>>,
+        IStateTreeNode<ExtractC<IT>, ExtractS<IT>> {}
 
 export interface IArrayType<IT extends IAnyType>
-    extends IComplexType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<ExtractT<IT>>>,
+    extends IComplexType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>>,
         OptionalProperty {}
 
 /**
  * @internal
  * @private
  */
-export class ArrayType<
-    IT extends IAnyType,
-    C = ExtractC<IT>,
-    S = ExtractS<IT>,
-    T = ExtractT<IT>
-> extends ComplexType<C[] | undefined, S[], IMSTArray<T>> {
+export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> extends ComplexType<
+    C[] | undefined,
+    S[],
+    IMSTArray<IT>
+> {
     shouldAttachNode = true
     subType: IAnyType
     readonly flags = TypeFlags.Array

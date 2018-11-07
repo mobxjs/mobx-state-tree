@@ -7,7 +7,8 @@ import {
     SnapshotOrInstance,
     cast,
     SnapshotIn,
-    Instance
+    Instance,
+    castToSnapshot
 } from "../../src"
 
 const createTestFactories = () => {
@@ -254,7 +255,7 @@ test("types instances with compatible snapshots should not be interchangeable", 
         c.x = undefined
     }).not.toThrow()
     expect(() => {
-        c.x = cast({})
+        c.x = {} as any
     }).not.toThrow()
     expect(() => {
         c.x = A.create()
@@ -682,7 +683,7 @@ test("cast and SnapshotOrInstance", () => {
             setArr2(nn: SnapshotOrInstance<typeof NumberArray>) {
                 self.arr = cast(nn)
             },
-            setArr3(nn: number[]) {
+            setArr3(nn: SnapshotIn<typeof NumberArray>) {
                 self.arr = cast(nn)
             },
             setArr4() {
@@ -698,7 +699,7 @@ test("cast and SnapshotOrInstance", () => {
             setMap2(nn: SnapshotOrInstance<typeof NumberMap>) {
                 self.map = cast(nn)
             },
-            setMap3(nn: { [k: string]: number }) {
+            setMap3(nn: SnapshotIn<typeof NumberMap>) {
                 self.map = cast(nn)
             },
             setMap4() {
@@ -773,13 +774,15 @@ test("cast and SnapshotOrInstance", () => {
     unprotect(map)
     map.set("a", cast({ n2: 5 })) // not really needed in this case, but whatever :)
 
-    // although this compiles, it yields a never type
+    // this does not compile, yay!
+    /*
     cast([])
     cast({ a: 5 })
     cast(NumberArray.create([]))
     cast(A.create({ n2: 5 }))
     cast({ a: 2, b: 5 })
     cast(NumberMap.create({ a: 2, b: 3 }))
+    */
 })
 
 test("#994", () => {
@@ -789,4 +792,15 @@ test("#994", () => {
     })
 
     types.reference(Cinema) // should compile ok on TS3
+})
+
+test("castToSnapshot", () => {
+    const firstModel = types.model({ brew1: types.map(types.number) })
+    const secondModel = types.model({ brew2: types.map(firstModel) })
+    const appMod = types.model({ aaa: secondModel })
+
+    const store = secondModel.create({ brew2: { outside: { brew1: { inner: 222 } } } })
+
+    const appStore = appMod.create({ aaa: castToSnapshot(store) })
+    // const appStore2 = appMod.create({ aaa: castToSnapshot(5) }) // should not compile
 })
