@@ -688,6 +688,8 @@ test("cast and SnapshotOrInstance", () => {
             },
             setArr4() {
                 // it works even without specifying the target type, magic!
+                // TODO: but there's no strong typing in this case
+                // (there's for objects though)
                 self.arr = cast([2, 3, 4])
                 self.arr = cast(NumberArray.create([2, 3, 4]))
             },
@@ -704,6 +706,8 @@ test("cast and SnapshotOrInstance", () => {
             },
             setMap4() {
                 // it works even without specifying the target type, magic!
+                // TODO: but there's no strong typing in this case
+                // (there's for objects though)
                 self.map = cast({ a: 2, b: 3 })
                 self.map = cast(NumberMap.create({ a: 2, b: 3 }))
             }
