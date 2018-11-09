@@ -69,21 +69,9 @@ export interface IMSTMap<IT extends IAnyType> extends IStateTreeNode<ExtractC<IT
     ): void
     get(key: string): ExtractT<IT> | undefined
     has(key: string): boolean
-
-    // the order matters to keep cast happy
-    // set(key: string, value: ExtractCST<IT>): this
-    set(key: string, value: ExtractT<IT>): this
-    set(key: string, value: ExtractC<IT>): this
-    set(key: string, value: ExtractS<IT>): this
-
+    set(key: string, value: ExtractCST<IT>): this
     readonly size: number
-
-    // the order matters to keep cast happy
-    // put(value: ExtractCST<IT>): ExtractT<IT>
-    put(value: ExtractT<IT>): ExtractT<IT>
-    put(value: ExtractC<IT>): ExtractT<IT>
-    put(value: ExtractS<IT>): ExtractT<IT>
-
+    put(value: ExtractCST<IT>): ExtractT<IT>
     keys(): IterableIterator<string>
     values(): IterableIterator<ExtractT<IT>>
     entries(): IterableIterator<[string, ExtractT<IT>]>
