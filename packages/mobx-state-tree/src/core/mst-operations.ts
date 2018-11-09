@@ -843,12 +843,8 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
 }
 
 export function cast<O extends ModelPrimitive = never>(snapshotOrInstance: O): O
-export function cast<I extends ExtractNodeC<O>, O extends IAnyStateTreeNode = never>(
-    snapshotOrInstance: I
-): O
-export function cast<I extends ExtractNodeC<O>, O extends IAnyStateTreeNode = never>(
-    snapshotOrInstance: I | O
-): O
+export function cast<I extends ExtractNodeC<O>, O = never>(snapshotOrInstance: I): O
+export function cast<I extends ExtractNodeC<O>, O = never>(snapshotOrInstance: I | O): O
 /**
  * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
  * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,

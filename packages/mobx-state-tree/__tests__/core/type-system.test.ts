@@ -709,27 +709,41 @@ test("cast and SnapshotOrInstance", () => {
             }
         }))
 
-    const C = types.model({ a: A }).actions(self => ({
-        // for submodels, using typeof self.var
-        setA(na: SnapshotOrInstance<typeof self.a>) {
-            self.a = cast(na)
-        },
-        // for submodels, using the type directly
-        setA2(na: SnapshotOrInstance<typeof A>) {
-            self.a = cast(na)
-        },
-        setA3(na: SnapshotIn<typeof A>) {
-            self.a = cast(na)
-        },
-        setA4(na: Instance<typeof self.a>) {
-            self.a = cast(na)
-        },
-        setA5() {
-            // it works even without specifying the target type, magic!
-            self.a = cast({ n2: 5 })
-            self.a = cast(A.create({ n2: 5 }))
-        }
-    }))
+    const C = types
+        .model({ a: A, maybeA: types.maybe(A), maybeNullA: types.maybeNull(A) })
+        .actions(self => ({
+            // for submodels, using typeof self.var
+            setA(na: SnapshotOrInstance<typeof self.a>) {
+                self.a = cast(na)
+                // self.maybeA = cast(na)
+                // self.maybeNullA = cast(na)
+            },
+            // for submodels, using the type directly
+            setA2(na: SnapshotOrInstance<typeof A>) {
+                self.a = cast(na)
+                // self.maybeA = cast(na)
+                // self.maybeNullA = cast(na)
+            },
+            setA3(na: SnapshotIn<typeof A>) {
+                self.a = cast(na)
+                // self.maybeA = cast(na)
+                // self.maybeNullA = cast(na)
+            },
+            setA4(na: Instance<typeof self.a>) {
+                self.a = cast(na)
+                // self.maybeA = cast(na)
+                // self.maybeNullA = cast(na)
+            },
+            setA5() {
+                // it works even without specifying the target type, magic!
+                self.a = cast({ n2: 5 })
+                self.a = cast(A.create({ n2: 5 }))
+                // self.maybeA = cast({ n2: 5 })
+                // self.maybeA = cast(A.create({ n2: 5 }))
+                // self.maybeNullA = cast({ n2: 5 })
+                // self.maybeNullA = cast(A.create({ n2: 5 }))
+            }
+        }))
 
     const c = C.create({ a: { n2: 5 } })
     unprotect(c)
