@@ -803,7 +803,9 @@ test("castToSnapshot", () => {
         brew2: { outside: { brew1: { inner: 222 } } }
     }
     const storeInstance = secondModel.create(storeSnapshot)
-    const storeSnapshotOrInstance1: SnapshotOrInstance<typeof secondModel> = storeInstance
+    const storeSnapshotOrInstance1: SnapshotOrInstance<typeof secondModel> = secondModel.create(
+        storeSnapshot
+    )
     const storeSnapshotOrInstance2: SnapshotOrInstance<typeof secondModel> = storeSnapshot
 
     appMod.create({ aaa: castToSnapshot(storeInstance) })
