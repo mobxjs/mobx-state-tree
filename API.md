@@ -341,7 +341,7 @@ but just fool typescript into thinking so.
 
 ### Parameters
 
--   `instance`  Instance
+-   `snapshotOrInstance`  Snapshot or instance
 
 ### Examples
 

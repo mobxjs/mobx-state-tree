@@ -904,9 +904,11 @@ export function cast(snapshotOrInstance: any): any {
  * const b = ModelB.create({ innerModel: castToSnapshot(a)})
  *
  * @export
- * @param instance Instance
+ * @param snapshotOrInstance Snapshot or instance
  * @returns The same object casted as an input (creation) snapshot
  */
-export function castToSnapshot<I extends IAnyStateTreeNode>(instance: I): ExtractNodeC<I> {
-    return instance as any
+export function castToSnapshot<I>(
+    snapshotOrInstance: I
+): Extract<I, IAnyStateTreeNode> extends IAnyStateTreeNode ? ExtractNodeC<I> : I {
+    return snapshotOrInstance as any
 }

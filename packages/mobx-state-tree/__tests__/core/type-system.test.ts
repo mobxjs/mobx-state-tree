@@ -796,11 +796,19 @@ test("#994", () => {
 
 test("castToSnapshot", () => {
     const firstModel = types.model({ brew1: types.map(types.number) })
-    const secondModel = types.model({ brew2: types.map(firstModel) })
+    const secondModel = types.model({ brew2: types.map(firstModel) }).actions(self => ({ do() {} }))
     const appMod = types.model({ aaa: secondModel })
 
-    const store = secondModel.create({ brew2: { outside: { brew1: { inner: 222 } } } })
+    const storeSnapshot: SnapshotIn<typeof secondModel> = {
+        brew2: { outside: { brew1: { inner: 222 } } }
+    }
+    const storeInstance = secondModel.create(storeSnapshot)
+    const storeSnapshotOrInstance1: SnapshotOrInstance<typeof secondModel> = storeInstance
+    const storeSnapshotOrInstance2: SnapshotOrInstance<typeof secondModel> = storeSnapshot
 
-    const appStore = appMod.create({ aaa: castToSnapshot(store) })
-    // const appStore2 = appMod.create({ aaa: castToSnapshot(5) }) // should not compile
+    appMod.create({ aaa: castToSnapshot(storeInstance) })
+    appMod.create({ aaa: castToSnapshot(storeSnapshot) })
+    appMod.create({ aaa: castToSnapshot(storeSnapshotOrInstance1) })
+    appMod.create({ aaa: castToSnapshot(storeSnapshotOrInstance2) })
+    // appMod.create({ aaa: castToSnapshot(5) }) // should not compile
 })
