@@ -139,7 +139,7 @@ test("it should support dynamic loading", done => {
         .actions(self => ({
             loadUser: flow(function* loadUser(name: string) {
                 events.push("loading " + name)
-                self.users.push(cast({ name }))
+                self.users.push({ name })
                 yield new Promise(resolve => {
                     setTimeout(resolve, 200)
                 })

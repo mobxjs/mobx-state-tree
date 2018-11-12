@@ -17,7 +17,9 @@ import {
     ExtractT,
     IComplexType,
     IAnyStateTreeNode,
-    IAnyComplexType
+    IAnyComplexType,
+    IStateTreeNode,
+    RedefineIStateTreeNode
 } from "../../internal"
 
 class StoredReference {
@@ -82,11 +84,15 @@ class StoredReference {
  * @internal
  * @private
  */
-export abstract class BaseReferenceType<T> extends Type<string | number | T, string | number, T> {
+export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type<
+    string | number,
+    string | number,
+    ExtractT<IT>
+> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Reference
 
-    constructor(protected readonly targetType: IType<any, any, T>) {
+    constructor(protected readonly targetType: IT) {
         super(`reference(${targetType.name})`)
     }
 
@@ -113,8 +119,8 @@ export abstract class BaseReferenceType<T> extends Type<string | number | T, str
  * @internal
  * @private
  */
-export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
-    constructor(targetType: IType<any, any, T>) {
+export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseReferenceType<IT> {
+    constructor(targetType: IT) {
         super(targetType)
     }
 
@@ -170,8 +176,8 @@ export class IdentifierReferenceType<T> extends BaseReferenceType<T> {
  * @internal
  * @private
  */
-export class CustomReferenceType<T> extends BaseReferenceType<T> {
-    constructor(targetType: IType<any, any, T>, private readonly options: ReferenceOptions<T>) {
+export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferenceType<IT> {
+    constructor(targetType: IT, private readonly options: ReferenceOptions<IT>) {
         super(targetType)
     }
 
@@ -191,14 +197,14 @@ export class CustomReferenceType<T> extends BaseReferenceType<T> {
         snapshot: any
     ): INode {
         const identifier = isStateTreeNode(snapshot)
-            ? this.options.set(snapshot as T, parent ? parent.storedValue : null)
+            ? this.options.set(snapshot as ExtractT<IT>, parent ? parent.storedValue : null)
             : snapshot
         return createNode(this, parent, subpath, environment, identifier)
     }
 
     reconcile(current: INode, snapshot: any): INode {
         const newIdentifier = isStateTreeNode(snapshot)
-            ? this.options.set(snapshot as T, current ? current.storedValue : null)
+            ? this.options.set(snapshot as ExtractT<IT>, current ? current.storedValue : null)
             : snapshot
         if (current.type === this) {
             if (current.storedValue === newIdentifier) return current
@@ -214,13 +220,17 @@ export class CustomReferenceType<T> extends BaseReferenceType<T> {
     }
 }
 
-export interface ReferenceOptions<T> {
-    get(identifier: string | number, parent: IAnyStateTreeNode | null): T
-    set(value: T, parent: IAnyStateTreeNode | null): string | number
+export interface ReferenceOptions<IT extends IAnyComplexType> {
+    get(identifier: string | number, parent: IAnyStateTreeNode | null): ExtractT<IT>
+    set(value: ExtractT<IT>, parent: IAnyStateTreeNode | null): string | number
 }
 
-export interface IReferenceType<IR extends IAnyComplexType>
-    extends IComplexType<string | number | ExtractT<IR>, string | number, ExtractT<IR>> {}
+export interface IReferenceType<IT extends IAnyComplexType>
+    extends IComplexType<
+            string | number,
+            string | number,
+            RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<string | number, string | number>>
+        > {}
 
 /**
  * Creates a reference to another type, which should have defined an identifier.
@@ -231,7 +241,7 @@ export interface IReferenceType<IR extends IAnyComplexType>
  */
 export function reference<IT extends IAnyComplexType>(
     subType: IT,
-    options?: ReferenceOptions<ExtractT<IT>>
+    options?: ReferenceOptions<IT>
 ): IReferenceType<IT> {
     // check that a type is given
     if (process.env.NODE_ENV !== "production") {

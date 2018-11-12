@@ -1,6 +1,6 @@
 # 3.8.0
 
--   Added a new castToSnapshot method for TypeScript and fixed some TypeScript typings not being properly detected when using SnapshotIn types through [#1074](https://github.com/mobxjs/mobx-state-tree/pull/1074) by [@xaviergonz](https://github.com/xaviergonz)
+-   Added castToSnapshot/castToReferenceSnapshot methods for TypeScript and fixed some TypeScript typings not being properly detected when using SnapshotIn types through [#1074](https://github.com/mobxjs/mobx-state-tree/pull/1074) by [@xaviergonz](https://github.com/xaviergonz)
 -   Made `addDisposer` return the passed disposer through [#1059](https://github.com/mobxjs/mobx-state-tree/pull/1059) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.7.1

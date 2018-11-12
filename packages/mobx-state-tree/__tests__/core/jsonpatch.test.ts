@@ -288,7 +288,7 @@ test("it should apply deep patches to objects", () => {
         NodeObject,
         { id: 1, child: { id: 2 } },
         (n: Instance<typeof NodeObject>) => {
-            n.child.text = "test" // update
+            n.child!.text = "test" // update
             n.child = cast({ id: 2, text: "world" }) // this reconciles; just an update
             n.child = NodeObject.create({ id: 2, text: "coffee", child: { id: 23 } })
             n.child = cast({ id: 3, text: "world", child: { id: 7 } }) // addition

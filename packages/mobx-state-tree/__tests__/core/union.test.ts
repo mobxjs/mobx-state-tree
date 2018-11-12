@@ -5,7 +5,8 @@ import {
     getSnapshot,
     applySnapshot,
     setLivelynessChecking,
-    getType
+    getType,
+    SnapshotIn
 } from "../../src"
 
 const createTestFactories = () => {
@@ -176,7 +177,7 @@ test("961 - apply snapshot to union should not throw when union keeps models wit
     const U = types.union(Foo, Bar)
 
     const u = U.create({ foo: 1 })
-    applySnapshot(u, getSnapshot(Bar.create()))
+    applySnapshot(u, getSnapshot(Bar.create()) as SnapshotIn<typeof U>)
 })
 
 describe("1045 - secondary union types with applySnapshot and ids", () => {

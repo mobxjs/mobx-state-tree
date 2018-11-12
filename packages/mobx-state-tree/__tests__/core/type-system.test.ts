@@ -436,10 +436,10 @@ test("it should extend {pre,post}ProcessSnapshot on compose", () => {
     expect(x.composedOf).toContain("Car")
     expect(x.composedOf).toContain("CarLogger")
     expect(x.composedOf).toEqual(["CompositionTracker", "Car", "CarLogger"])
-    expect(x.toJSON!().composedWith).toContain("WagonTracker")
-    expect(x.toJSON!().composedWith).toContain("Wagon")
-    expect(x.toJSON!().composedWith).toContain("WagonLogger")
-    expect(x.toJSON!().composedWith).toEqual(["WagonTracker", "Wagon", "WagonLogger"])
+    expect(getSnapshot(x).composedWith).toContain("WagonTracker")
+    expect(getSnapshot(x).composedWith).toContain("Wagon")
+    expect(getSnapshot(x).composedWith).toContain("WagonLogger")
+    expect(getSnapshot(x).composedWith).toEqual(["WagonTracker", "Wagon", "WagonLogger"])
 })
 test("it should extend types correctly", () => {
     const Car = types
@@ -686,10 +686,11 @@ test("cast and SnapshotOrInstance", () => {
             setArr3(nn: SnapshotIn<typeof NumberArray>) {
                 self.arr = cast(nn)
             },
+            setArr31(nn: number[]) {
+                self.arr = cast(nn)
+            },
             setArr4() {
                 // it works even without specifying the target type, magic!
-                // TODO: but there's no strong typing in this case
-                // (there's for objects though)
                 self.arr = cast([2, 3, 4])
                 self.arr = cast(NumberArray.create([2, 3, 4]))
             },
@@ -704,10 +705,11 @@ test("cast and SnapshotOrInstance", () => {
             setMap3(nn: SnapshotIn<typeof NumberMap>) {
                 self.map = cast(nn)
             },
+            setMap31(nn: { [k: string]: number }) {
+                self.map = cast(nn)
+            },
             setMap4() {
                 // it works even without specifying the target type, magic!
-                // TODO: but there's no strong typing in this case
-                // (there's for objects though)
                 self.map = cast({ a: 2, b: 3 })
                 self.map = cast(NumberMap.create({ a: 2, b: 3 }))
             }
@@ -719,33 +721,48 @@ test("cast and SnapshotOrInstance", () => {
             // for submodels, using typeof self.var
             setA(na: SnapshotOrInstance<typeof self.a>) {
                 self.a = cast(na)
-                // self.maybeA = cast(na)
-                // self.maybeNullA = cast(na)
+                // we just want to check it compiles
+                if (0 !== 0) {
+                    self.maybeA = cast(na)
+                    self.maybeNullA = cast(na)
+                }
             },
             // for submodels, using the type directly
             setA2(na: SnapshotOrInstance<typeof A>) {
                 self.a = cast(na)
-                // self.maybeA = cast(na)
-                // self.maybeNullA = cast(na)
+                // we just want to check it compiles
+                if (0 !== 0) {
+                    self.maybeA = cast(na)
+                    self.maybeNullA = cast(na)
+                }
             },
             setA3(na: SnapshotIn<typeof A>) {
                 self.a = cast(na)
-                // self.maybeA = cast(na)
-                // self.maybeNullA = cast(na)
+                // we just want to check it compiles
+                if (0 !== 0) {
+                    self.maybeA = cast(na)
+                    self.maybeNullA = cast(na)
+                }
             },
             setA4(na: Instance<typeof self.a>) {
                 self.a = cast(na)
-                // self.maybeA = cast(na)
-                // self.maybeNullA = cast(na)
+                // we just want to check it compiles
+                if (0 !== 0) {
+                    self.maybeA = cast(na)
+                    self.maybeNullA = cast(na)
+                }
             },
             setA5() {
                 // it works even without specifying the target type, magic!
                 self.a = cast({ n2: 5 })
                 self.a = cast(A.create({ n2: 5 }))
-                // self.maybeA = cast({ n2: 5 })
-                // self.maybeA = cast(A.create({ n2: 5 }))
-                // self.maybeNullA = cast({ n2: 5 })
-                // self.maybeNullA = cast(A.create({ n2: 5 }))
+                // we just want to check it compiles
+                if (0 !== 0) {
+                    self.maybeA = cast({ n2: 5 })
+                    self.maybeA = cast(A.create({ n2: 5 }))
+                    self.maybeNullA = cast({ n2: 5 })
+                    self.maybeNullA = cast(A.create({ n2: 5 }))
+                }
             }
         }))
 

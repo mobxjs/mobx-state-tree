@@ -996,6 +996,7 @@ See the [full API docs](API.md) for more details.
 | [`applySnapshot(node, snapshot)`](API.md#applysnapshot)                                                   | Updates a node with the given snapshot                                                                                                                                                                                                                |
 | [`cast(nodeOrSnapshot)`](API.md#cast)                                                                     | Cast a node instance or snapshot to a node instance so it can be used in assignment operations                                                                                                                                                        |
 | [`castToSnapshot(nodeOrSnapshot)`](API.md#casttosnapshot)                                                 | Cast a node instance to a snapshot so it can be used inside create operations                                                                                                                                                                         |
+| [`castToReferenceSnapshot(node)`](API.md#casttoreferencesnapshot)                                         | Cast a node instance to a reference snapshot so it can be used inside create operations                                                                                                                                                               |
 | [`createActionTrackingMiddleware`](API.md#createactiontrackingmiddleware)                                 | Utility to make writing middleware that tracks async actions less cumbersome                                                                                                                                                                          |
 | [`clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone)                          | Creates a full clone of the given node. By default preserves the same environment                                                                                                                                                                     |
 | [`decorate(handler, function)`](API.md#decorate)                                                          | Attaches middleware to a specific action (or flow)                                                                                                                                                                                                    |
@@ -1437,14 +1438,32 @@ s.replaceTasks([{ done: true }])
 s.replaceTasks(types.array(Task).create([{ done: true }]))
 ```
 
-Additionally, the `cast` function can be also used in the inverse case, this is when you want to use an instance inside an snapshot.
-In this case MST will internally convert the instance to an snapshot before using it, but we need once more to fool TypeScript into
+Additionally, the `castToSnapshot` function can be also used in the inverse case, this is when you want to use an instance inside an snapshot.
+In this case MST will internally convert the instance to a snapshot before using it, but we need once more to fool TypeScript into
 thinking that this instance is actually a snapshot.
 
 ```typescript
 const task = Task.create({ done: true })
+const Store = types.model({
+    tasks: types.array(Task)
+})
+
 // we cast the task instance to a snapshot so it can be used as part of another snapshot without typing errors
-const s = Store.create({ tasks: [cast(task)] })
+const s = Store.create({ tasks: [castToSnapshot(task)] })
+```
+
+Finally, the `castToReferenceSnapshot` can be used when we want to use an instance to actually use a reference snapshot (a string or number).
+In this case MST will internally convert the instance to a reference snapshot before using it, but we need once more to fool TypeScript into
+thinking that this instance is actually a snapshot of a reference.
+
+```typescript
+const task = Task.create({ id: types.identifier, done: true })
+const Store = types.model({
+    tasks: types.array(types.reference(Task))
+})
+
+// we cast the task instance to a reference snapshot so it can be used as part of another snapshot without typing errors
+const s = Store.create({ tasks: [castToReferenceSnapshot(task)] })
 ```
 
 #### Known Typescript Issue 5938

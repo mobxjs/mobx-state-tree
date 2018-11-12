@@ -18,7 +18,9 @@ import {
     ExtractS,
     ExtractC,
     ExtractCST,
-    IAnyComplexType
+    IAnyComplexType,
+    RedefineIStateTreeNode,
+    IStateTreeNode
 } from "../../internal"
 
 /**
@@ -117,12 +119,23 @@ export type OptionalDefaultValueOrFunction<IT extends IAnyType> =
     | (() => ExtractCST<IT>)
 
 export interface IOptionalIComplexType<IT extends IAnyComplexType>
-    extends IComplexType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
+    extends IComplexType<
+            ExtractC<IT> | undefined,
+            ExtractS<IT>,
+            RedefineIStateTreeNode<
+                ExtractT<IT>,
+                IStateTreeNode<ExtractC<IT> | undefined, ExtractS<IT>>
+            >
+        >,
         OptionalProperty {}
 export interface IOptionalIType<IT extends IAnyType>
     extends IType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
         OptionalProperty {}
 
+export function optional<IT extends IAnyType & OptionalProperty>(
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+): IT
 export function optional<IT extends IAnyComplexType>(
     type: IT,
     defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>

@@ -167,6 +167,7 @@ import {
     ExtractNodeS,
     cast,
     castToSnapshot,
+    castToReferenceSnapshot,
     isType,
     isArrayType,
     isFrozenType,
@@ -179,8 +180,7 @@ import {
     isPrimitiveType,
     isReferenceType,
     isRefinementType,
-    isUnionType,
-    ExtractIStateTreeNode
+    isUnionType
 } from "./internal"
 
 export {
@@ -290,6 +290,7 @@ export {
     ExtractNodeS,
     cast,
     castToSnapshot,
+    castToReferenceSnapshot,
     isType,
     isArrayType,
     isFrozenType,
@@ -302,6 +303,5 @@ export {
     isPrimitiveType,
     isReferenceType,
     isRefinementType,
-    isUnionType,
-    ExtractIStateTreeNode
+    isUnionType
 }

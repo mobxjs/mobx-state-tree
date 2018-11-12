@@ -58,7 +58,8 @@ export interface IMapType<IT extends IAnyType>
         >,
         OptionalProperty {}
 
-export interface IMSTMap<IT extends IAnyType> extends IStateTreeNode<ExtractC<IT>, ExtractS<IT>> {
+export interface IMSTMap<IT extends IAnyType>
+    extends IStateTreeNode<IKeyValueMap<ExtractC<IT>> | undefined, IKeyValueMap<ExtractS<IT>>> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
 
     clear(): void
@@ -79,20 +80,24 @@ export interface IMSTMap<IT extends IAnyType> extends IStateTreeNode<ExtractC<IT
     /** Merge another object into this map, returns self. */
     merge(other: IMSTMap<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractCST<IT>> | any): this
     replace(values: IMSTMap<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractT<IT>>): this
+
     /**
      * Returns a plain object that represents this map.
      * Note that all the keys being stringified.
      * If there are duplicating keys after converting them to strings, behaviour is undetermined.
      */
-    toPOJO(): IKeyValueMap<ExtractT<IT>>
+    toPOJO(): IKeyValueMap<ExtractS<IT>>
+    toJSON(): IKeyValueMap<ExtractS<IT>>
+
     /**
      * Returns a shallow non observable object clone of this map.
      * Note that the values migth still be observable. For a deep clone use mobx.toJS.
      */
     toJS(): Map<string, ExtractT<IT>>
-    toJSON(): IKeyValueMap<ExtractT<IT>>
+
     toString(): string
     [Symbol.toStringTag]: "Map"
+
     /**
      * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
      * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe

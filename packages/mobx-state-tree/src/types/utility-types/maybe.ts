@@ -12,14 +12,24 @@ import {
     ExtractS,
     ExtractT,
     IAnyComplexType,
-    OptionalProperty
+    OptionalProperty,
+    IStateTreeNode,
+    RedefineIStateTreeNode
 } from "../../internal"
 
 const optionalUndefinedType = optional(undefinedType, undefined)
 const optionalNullType = optional(nullType, null)
 
 export interface IMaybeIComplexType<IT extends IAnyComplexType, C, O>
-    extends IComplexType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractT<IT> | O>,
+    extends IComplexType<
+            ExtractC<IT> | C,
+            ExtractS<IT> | O,
+            | RedefineIStateTreeNode<
+                  ExtractT<IT>,
+                  IStateTreeNode<ExtractC<IT> | C, ExtractS<IT> | O>
+              >
+            | O
+        >,
         OptionalProperty {}
 
 export interface IMaybeIType<IT extends IAnyType, C, O>

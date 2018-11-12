@@ -20,7 +20,6 @@ import {
     getRelativePathBetweenNodes,
     freeze,
     IAnyType,
-    ExtractIStateTreeNode,
     isModelType,
     INode,
     ModelPrimitive,
@@ -29,9 +28,7 @@ import {
 
 export type TypeOrStateTreeNodeToStateTreeNode<
     T extends IAnyType | IAnyStateTreeNode
-> = T extends IAnyStateTreeNode
-    ? T
-    : T extends IType<infer TC, infer TS, infer TT> ? ExtractIStateTreeNode<TC, TS, TT> : never
+> = T extends IType<any, any, infer TT> ? TT : T
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -402,7 +399,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
 export function getParentOfType<IT extends IAnyType>(
     target: IAnyStateTreeNode,
     type: IT
-): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): ExtractT<IT> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -523,7 +520,7 @@ export function resolveIdentifier<IT extends IAnyType>(
     type: IT,
     target: IAnyStateTreeNode,
     identifier: string | number
-): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | undefined {
+): ExtractT<IT> | undefined {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
@@ -905,6 +902,39 @@ export function cast(snapshotOrInstance: any): any {
  */
 export function castToSnapshot<I>(
     snapshotOrInstance: I
-): Extract<I, IAnyStateTreeNode> extends IAnyStateTreeNode ? ExtractNodeC<I> : I {
+): Extract<I, IAnyStateTreeNode> extends never ? I : ExtractNodeC<I> {
     return snapshotOrInstance as any
+}
+
+/**
+ * Casts a node instance type to a reference snapshot type so it can be assigned to a refernence snapshot (e.g. to be used inside a create call).
+ * Note that this is just a cast for the type system, this is, it won't actually convert an instance to a refererence snapshot,
+ * but just fool typescript into thinking so.
+ *
+ * @example
+ * const ModelA = types.model({
+ *   id: types.identifier,
+ *   n: types.number
+ * }).actions(self => ({
+ *   setN(aNumber: number) {
+ *     self.n = aNumber
+ *   }
+ * }))
+ *
+ * const ModelB = types.model({
+ *   refA: types.reference(ModelA)
+ * })
+ *
+ * const a = ModelA.create({ id: 'someId', n: 5 });
+ * // this will allow the compiler to use a model as if it were a reference snapshot
+ * const b = ModelB.create({ refA: castToReference(a)})
+ *
+ * @export
+ * @param snapshotOrInstance Instance
+ * @returns The same object casted as an reference snapshot (string or number)
+ */
+export function castToReferenceSnapshot<I>(
+    instance: I
+): Extract<I, IAnyStateTreeNode> extends never ? I : string | number {
+    return instance as any
 }

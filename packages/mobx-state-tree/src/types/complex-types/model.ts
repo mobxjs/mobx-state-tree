@@ -22,7 +22,6 @@ import {
     EMPTY_ARRAY,
     EMPTY_OBJECT,
     escapeJsonPath,
-    ExtractIStateTreeNode,
     fail,
     flattenTypeErrors,
     freeze,
@@ -142,9 +141,7 @@ export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOt
 >
 
 // we keep this separate from ModelInstanceType to shorten model instance types generated declarations
-export type ModelInstanceTypeProps<P extends ModelProperties> = {
-    [K in keyof P]: ExtractIStateTreeNode<ExtractC<P[K]>, ExtractS<P[K]>, ExtractT<P[K]>>
-}
+export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]: ExtractT<P[K]> }
 
 // do not transform this to an interface or model instance type generated declarations will be longer
 export type ModelInstanceType<
@@ -301,8 +298,8 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
  * @internal
  * @private
  */
-export class ModelType<S extends ModelProperties, T> extends ComplexType<any, any, any>
-    implements IModelType<S, T, any, any> {
+export class ModelType<P extends ModelProperties, O> extends ComplexType<any, any, any>
+    implements IModelType<P, O, any, any> {
     readonly flags = TypeFlags.Object
     shouldAttachNode = true
 
@@ -324,7 +321,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
         Object.assign(this, defaultObjectOptions, opts)
         // ensures that any default value gets converted to its related type
-        this.properties = toPropertiesObject(this.properties) as S
+        this.properties = toPropertiesObject(this.properties) as P
         freeze(this.properties) // make sure nobody messes with it
         this.propertyNames = Object.keys(this.properties)
         this.identifierAttribute = this._getIdentifierAttribute()
@@ -355,14 +352,14 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     actions(fn: (self: any) => any): any {
-        const actionInitializer = (self: T) => {
+        const actionInitializer = (self: any) => {
             this.instantiateActions(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [actionInitializer] })
     }
 
-    instantiateActions(self: T, actions: any) {
+    instantiateActions(self: any, actions: any) {
         // check if return is correct
         if (!isPlainObject(actions))
             fail(`actions initializer should return a plain object containing actions`)
@@ -418,14 +415,14 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     volatile(fn: (self: any) => any): any {
-        const stateInitializer = (self: T) => {
+        const stateInitializer = (self: any) => {
             this.instantiateVolatileState(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [stateInitializer] })
     }
 
-    instantiateVolatileState(self: T, state: Object) {
+    instantiateVolatileState(self: any, state: Object) {
         // check views return
         if (!isPlainObject(state))
             fail(`volatile state initializer should return a plain object containing state`)
@@ -433,7 +430,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     extend(fn: (self: any) => any): any {
-        const initializer = (self: T) => {
+        const initializer = (self: any) => {
             const { actions, views, state, ...rest } = fn(self)
             for (let key in rest)
                 fail(
@@ -448,14 +445,14 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     views(fn: (self: any) => any): any {
-        const viewInitializer = (self: T) => {
+        const viewInitializer = (self: any) => {
             this.instantiateViews(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [viewInitializer] })
     }
 
-    instantiateViews(self: T, views: Object) {
+    instantiateViews(self: any, views: Object) {
         // check views return
         if (!isPlainObject(views))
             fail(`views initializer should return a plain object containing views`)
@@ -707,13 +704,13 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 }
 
-export function model<T extends ModelPropertiesDeclaration = {}>(
+export function model<P extends ModelPropertiesDeclaration = {}>(
     name: string,
-    properties?: T
-): IModelType<ModelPropertiesDeclarationToProperties<T>, {}>
-export function model<T extends ModelPropertiesDeclaration = {}>(
-    properties?: T
-): IModelType<ModelPropertiesDeclarationToProperties<T>, {}>
+    properties?: P
+): IModelType<ModelPropertiesDeclarationToProperties<P>, {}>
+export function model<P extends ModelPropertiesDeclaration = {}>(
+    properties?: P
+): IModelType<ModelPropertiesDeclarationToProperties<P>, {}>
 /**
  * Creates a new model type by providing a name, properties, volatile state and actions.
  *

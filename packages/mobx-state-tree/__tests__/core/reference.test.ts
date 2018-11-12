@@ -14,7 +14,8 @@ import {
     IAnyModelType,
     Instance,
     SnapshotOrInstance,
-    isAlive
+    isAlive,
+    castToReferenceSnapshot
 } from "../../src"
 
 test("it should support prefixed paths in maps", () => {
@@ -44,7 +45,7 @@ test("it should support prefixed paths in maps", () => {
     expect(getSnapshot(store)).toEqual({
         user: "18",
         users: { "17": { id: "17", name: "Michel" }, "18": { id: "18", name: "Noa" } }
-    }) // TODO: better typings
+    } as SnapshotOut<typeof store>)
 })
 test("it should support prefixed paths in arrays", () => {
     const User = types.model({
@@ -121,10 +122,10 @@ test("it should resolve refs during creation, when using path", () => {
     })
     unprotect(s)
     reaction(() => s.entries.reduce((a, e) => a + e.price, 0), v => values.push(v))
-    s.entries.push(cast({ book: s.books[0] }))
+    s.entries.push({ book: castToReferenceSnapshot(s.books[0]) })
     expect(s.entries[0].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
-    const entry = BookEntry.create({ book: s.books[0] }) // N.B. ref is initially not resolvable!
+    const entry = BookEntry.create({ book: castToReferenceSnapshot(s.books[0]) }) // N.B. ref is initially not resolvable!
     s.entries.push(entry)
     expect(s.entries[1].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(8)
@@ -152,7 +153,7 @@ test("it should resolve refs over late types", () => {
         books: [{ id: "3", price: 2 }]
     })
     unprotect(s)
-    s.entries.push(cast({ book: s.books[0] }))
+    s.entries.push({ book: castToReferenceSnapshot(s.books[0]) })
     expect(s.entries[0].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
 })
@@ -180,10 +181,10 @@ test("it should resolve refs during creation, when using generic reference", () 
     })
     unprotect(s)
     reaction(() => s.entries.reduce((a, e) => a + e.price, 0), v => values.push(v))
-    s.entries.push(cast({ book: s.books[0] }))
+    s.entries.push({ book: castToReferenceSnapshot(s.books[0]) })
     expect(s.entries[0].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
-    const entry = BookEntry.create({ book: s.books[0] }) // can refer to book, even when not part of tree yet
+    const entry = BookEntry.create({ book: castToReferenceSnapshot(s.books[0]) }) // can refer to book, even when not part of tree yet
     expect(getSnapshot(entry)).toEqual({ book: "3" })
     s.entries.push(entry)
     expect(values).toEqual([4, 8])
@@ -246,7 +247,7 @@ test("self reference with a late type", () => {
             books: types.array(Book)
         })
         .actions(self => {
-            function addBook(book: typeof Book.Type | typeof Book.CreationType) {
+            function addBook(book: SnapshotOrInstance<typeof Book>) {
                 self.books.push(book)
             }
             return {
@@ -259,7 +260,7 @@ test("self reference with a late type", () => {
     const book2 = Book.create({
         id: "2",
         genre: "romance",
-        reference: s.books[0]
+        reference: castToReferenceSnapshot(s.books[0])
     })
     s.addBook(book2)
     expect((s.books[1].reference as Instance<typeof Book>).genre).toBe("thriller")
@@ -317,7 +318,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
         }
     })
     expect(store.selected).toBe(store.boxes[0]) // unambigous identifier
-    store.arrows.push(cast({ id: 1, name: "oops" }))
+    store.arrows.push({ id: 1, name: "oops" })
     expect(err.message).toBe(
         "[mobx-state-tree] Cannot resolve a reference to type '(Box | Arrow)' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
     )
@@ -516,7 +517,9 @@ test("References in recursive structures", () => {
             function addFolder(data: SnapshotOrInstance<typeof Folder>) {
                 const folder3 = Folder.create(data)
                 getRoot<typeof Storage>(self).putFolderHelper(folder3)
-                self.children.push(Tree.create({ data: folder3, children: [] }))
+                self.children.push(
+                    Tree.create({ data: castToReferenceSnapshot(folder3), children: [] })
+                )
             }
             return { addFolder }
         })
