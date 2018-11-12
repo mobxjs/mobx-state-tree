@@ -18,7 +18,8 @@ import {
     ObjectNode,
     IChildNodesMap,
     ModelPrimitive,
-    EMPTY_OBJECT
+    EMPTY_OBJECT,
+    IAnyStateTreeNode
 } from "../../internal"
 
 /**
@@ -152,12 +153,7 @@ export interface ISimpleType<T> extends IType<T, T, T> {}
 
 export type Primitives = ModelPrimitive | null | undefined
 
-export interface IComplexType<C, S, T> extends IType<C, S, T> {
-    // fake, only used for typing
-    readonly "!!complexType": undefined
-}
-
-export interface IAnyComplexType extends IComplexType<any, any, any> {}
+export interface IAnyComplexType extends IType<any, any, IAnyStateTreeNode> {}
 
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
@@ -208,9 +204,7 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  * @internal
  * @private
  */
-export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
-    readonly "!!complexType" = undefined
-
+export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTreeNode<C, S>> {
     readonly isType = true
     readonly name: string
 

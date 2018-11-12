@@ -23,7 +23,6 @@ import {
     IAnyStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IComplexType,
     IContext,
     IJsonPatch,
     INode,
@@ -51,11 +50,7 @@ import {
 } from "../../internal"
 
 export interface IMapType<IT extends IAnyType>
-    extends IComplexType<
-            IKeyValueMap<ExtractC<IT>> | undefined,
-            IKeyValueMap<ExtractS<IT>>,
-            IMSTMap<IT>
-        >,
+    extends IType<IKeyValueMap<ExtractC<IT>> | undefined, IKeyValueMap<ExtractS<IT>>, IMSTMap<IT>>,
         OptionalProperty {}
 
 export interface IMSTMap<IT extends IAnyType>
@@ -456,7 +451,7 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
  * @export
  * @alias types.map
  * @param {IType<S, T>} subtype
- * @returns {IComplexType<S[], IObservableArray<T>>}
+ * @returns {IMapType<IT>}
  */
 export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
     const ret = new MapType<IT>(`map<string, ${subtype.name}>`, subtype)

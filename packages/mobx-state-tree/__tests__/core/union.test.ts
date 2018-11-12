@@ -177,7 +177,7 @@ test("961 - apply snapshot to union should not throw when union keeps models wit
     const U = types.union(Foo, Bar)
 
     const u = U.create({ foo: 1 })
-    applySnapshot(u, getSnapshot(Bar.create()) as SnapshotIn<typeof U>)
+    applySnapshot(u, getSnapshot(Bar.create()))
 })
 
 describe("1045 - secondary union types with applySnapshot and ids", () => {

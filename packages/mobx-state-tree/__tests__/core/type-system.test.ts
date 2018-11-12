@@ -826,7 +826,7 @@ test("#994", () => {
         name: types.maybe(types.string)
     })
 
-    types.reference(Cinema) // should compile ok on TS3
+    const ref = types.reference(Cinema) // should compile ok on TS3
 })
 
 test("castToSnapshot", () => {

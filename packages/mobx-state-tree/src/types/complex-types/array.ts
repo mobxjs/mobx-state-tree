@@ -21,7 +21,6 @@ import {
     getStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IComplexType,
     IContext,
     IJsonPatch,
     INode,
@@ -67,7 +66,7 @@ export interface IMSTArray<IT extends IAnyType>
 }
 
 export interface IArrayType<IT extends IAnyType>
-    extends IComplexType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>>,
+    extends IType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>>,
         OptionalProperty {}
 
 /**
@@ -298,7 +297,7 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
  * @export
  * @alias types.array
  * @param {IType<S, T>} subtype
- * @returns {IComplexType<S[], IObservableArray<T>>}
+ * @returns {IArrayType<IT>}
  */
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     if (process.env.NODE_ENV !== "production") {

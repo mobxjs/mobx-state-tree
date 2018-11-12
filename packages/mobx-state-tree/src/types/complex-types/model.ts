@@ -30,7 +30,6 @@ import {
     getStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IComplexType,
     IContext,
     IJsonPatch,
     INode,
@@ -163,7 +162,7 @@ export interface IModelType<
     CustomC = _NotCustomized,
     CustomS = _NotCustomized
 >
-    extends IComplexType<
+    extends IType<
             ModelCreationType2<PROPS, CustomC>,
             ModelSnapshotType2<PROPS, CustomS>,
             ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>
@@ -205,8 +204,7 @@ export interface IModelType<
     ): IModelType<PROPS, OTHERS, CustomC, NewS>
 }
 
-// do not make this an interface (#994 will happen again if done)
-export type IAnyModelType = IModelType<any, any, any, any>
+export interface IAnyModelType extends IModelType<any, any, any, any> {}
 
 export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any, any, any>
     ? P

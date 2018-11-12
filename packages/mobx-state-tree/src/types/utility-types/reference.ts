@@ -15,7 +15,6 @@ import {
     ObjectNode,
     IAnyType,
     ExtractT,
-    IComplexType,
     IAnyStateTreeNode,
     IAnyComplexType,
     IStateTreeNode,
@@ -87,7 +86,7 @@ class StoredReference {
 export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type<
     string | number,
     string | number,
-    ExtractT<IT>
+    RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<string | number, string | number>>
 > {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Reference
@@ -226,7 +225,7 @@ export interface ReferenceOptions<IT extends IAnyComplexType> {
 }
 
 export interface IReferenceType<IT extends IAnyComplexType>
-    extends IComplexType<
+    extends IType<
             string | number,
             string | number,
             RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<string | number, string | number>>

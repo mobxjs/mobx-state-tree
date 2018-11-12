@@ -1117,7 +1117,7 @@ s.todos.push({ task: "Grab coffee" })
 console.log(s.todos[0]) // prints: "Grab coffee"
 ```
 
-Returns **IComplexType&lt;[Array][216]&lt;S>, IObservableArray&lt;T>>** 
+Returns **IArrayType&lt;IT>** 
 
 ## types.boolean
 
@@ -1400,7 +1400,7 @@ s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the iden
 console.log(s.todos.get(17).task) // prints: "Grab coffee"
 ```
 
-Returns **IComplexType&lt;[Array][216]&lt;S>, IObservableArray&lt;T>>** 
+Returns **IMapType&lt;IT>** 
 
 ## types.maybe
 
@@ -1409,9 +1409,9 @@ The value `undefined` will be used to represent nullability.
 
 ### Parameters
 
--   `type` **IType&lt;C, S, M>** The type to make nullable
+-   `type` **IT** 
 
-Returns **(IType&lt;(C | [undefined][231]), (S | [undefined][231]), (T | [undefined][231])>)** 
+Returns **IMaybe&lt;IT>** 
 
 ## types.maybeNull
 
@@ -1420,15 +1420,15 @@ The value `null` will be used to represent no value.
 
 ### Parameters
 
--   `type` **IType&lt;C, S, M>** The type to make nullable
+-   `type` **IT** 
 
-Returns **(IType&lt;(C | null | [undefined][231]), (S | null), (T | null)>)** 
+Returns **IMaybeNull&lt;IT>** 
 
 ## types.model
 
 Creates a new model type by providing a name, properties, volatile state and actions.
 
-See the [model type][232] description or the [getting started][233] tutorial.
+See the [model type][231] description or the [getting started][232] tutorial.
 
 ## types.null
 
@@ -1457,8 +1457,8 @@ Applying a snapshot in which the optional value is _not_ present, causes the val
 
 ### Parameters
 
--   `type`  
--   `defaultValueOrFunction`  
+-   `type` **IT** 
+-   `defaultValueOrFunction` **OptionalDefaultValueOrFunction&lt;IT>** 
 
 ### Examples
 
@@ -1476,7 +1476,7 @@ const todo = Todo.create({ title: "Get coffee "})
 ## types.reference
 
 Creates a reference to another type, which should have defined an identifier.
-See also the [reference and identifiers][234] section.
+See also the [reference and identifiers][233] section.
 
 ### Parameters
 
@@ -2030,10 +2030,8 @@ Performs a depth first walk through a tree
 
 [230]: https://mobx.js.org/refguide/map.html
 
-[231]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
+[231]: https://github.com/mobxjs/mobx-state-tree#creating-models
 
-[232]: https://github.com/mobxjs/mobx-state-tree#creating-models
+[232]: https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1
 
-[233]: https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1
-
-[234]: https://github.com/mobxjs/mobx-state-tree#references-and-identifiers
+[233]: https://github.com/mobxjs/mobx-state-tree#references-and-identifiers
