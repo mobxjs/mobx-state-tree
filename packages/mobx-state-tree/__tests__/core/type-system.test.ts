@@ -255,7 +255,7 @@ test("types instances with compatible snapshots should not be interchangeable", 
         c.x = undefined
     }).not.toThrow()
     expect(() => {
-        c.x = {} as any
+        c.x = cast({})
     }).not.toThrow()
     expect(() => {
         c.x = A.create()
