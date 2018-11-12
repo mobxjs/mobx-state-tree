@@ -56,6 +56,7 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     getPropertyMembers,
     cast,
     castToSnapshot,
+    castToReferenceSnapshot,
     isType,
     isArrayType,
     isFrozenType,
