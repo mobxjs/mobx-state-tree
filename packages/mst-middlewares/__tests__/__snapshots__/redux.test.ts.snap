@@ -1,5 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`#1065 - flows in root afterCreate shouldn't crash 1`] = `Array []`;
+
+exports[`#1065 - flows in root afterCreate shouldn't crash 2`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [],
+      "targetTypePath": "Root/SubModel",
+      "type": "[root/sub] *unknownAction*() (?)",
+    },
+    Object {
+      "sub": Object {
+        "num": 1,
+      },
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [],
+      "targetTypePath": "Root/SubModel",
+      "type": "[root/sub] *unknownAction*() (?)",
+    },
+    Object {
+      "sub": Object {
+        "num": 2,
+      },
+    },
+  ],
+]
+`;
+
 exports[`(logIdempotentActionSteps: false, logChildActions: false) applySnapshot(m, { x: "snapshotX" }) 1`] = `
 Array [
   Array [
