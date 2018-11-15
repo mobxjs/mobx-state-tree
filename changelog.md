@@ -1,3 +1,4 @@
+-   Fixed redux middleware throwing an error when a flow is called before it is connected [#1065](https://github.com/mobxjs/mobx-state-tree/issues/1065) through ()[] by [@mkramb](https://github.com/mkramb) and [@xaviergonz](https://github.com/xaviergonz)
 -   Made `addDisposer` return the passed disposer through [#1059](https://github.com/mobxjs/mobx-state-tree/pull/1059) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.7.1
