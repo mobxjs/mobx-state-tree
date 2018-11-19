@@ -46,7 +46,7 @@ test("protect should protect against any update", () => {
         "[mobx-state-tree] Cannot modify 'Todo@<root>', the object is protected and can only be modified by using an action."
     )
     expect(() => {
-        store.todos.push(cast({ title: "test" }))
+        store.todos.push({ title: "test" })
     }).toThrowError(
         "[mobx-state-tree] Cannot modify 'Todo[]@/todos', the object is protected and can only be modified by using an action."
     )

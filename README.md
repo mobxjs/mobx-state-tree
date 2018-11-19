@@ -924,10 +924,10 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 -   `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
 -   `types.frozen(subType? | defaultValue?)` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is **immutable** and **serializable**.
     `frozen` can be invoked in a few different ways:
-    - `types.frozen()` - behaves the same as types.frozen in MST 2.
-    - `types.frozen(subType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type. Note that the type will not actually be instantiated, so it can only be used to check the shape of the data. Adding views or actions to SubType would be pointless.
-    - `types.frozen(someDefaultValue)` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
-    - (Typescript) `types.frozen<TypeScriptType>(...)` - provide a typescript type, to help in strongly typing the field (design time only)
+    -   `types.frozen()` - behaves the same as types.frozen in MST 2.
+    -   `types.frozen(subType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type. Note that the type will not actually be instantiated, so it can only be used to check the shape of the data. Adding views or actions to SubType would be pointless.
+    -   `types.frozen(someDefaultValue)` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
+    -   (Typescript) `types.frozen<TypeScriptType>(...)` - provide a typescript type, to help in strongly typing the field (design time only)
 -   `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one.
 
 ## Property types
@@ -993,8 +993,10 @@ See the [full API docs](API.md) for more details.
 | [`addMiddleware(node, middleware: (actionDescription, next) => any, includeHooks)`](API.md#addmiddleware) | Attaches middleware to a node. See [middleware](docs/middleware.md). Returns disposer.                                                                                                                                                                |
 | [`applyAction(node, actionDescription)`](API.md#applyaction)                                              | Replays an action on the targeted node                                                                                                                                                                                                                |
 | [`applyPatch(node, jsonPatch)`](API.md#applypatch)                                                        | Applies a JSON patch, or array of patches, to a node in the tree                                                                                                                                                                                      |
-| [`cast(nodeOrSnapshot)`](API.md#cast)                                                                     | Cast a node instance or snapshot to a node so it can be used in assignment operations                                                                                                                                                                 |
 | [`applySnapshot(node, snapshot)`](API.md#applysnapshot)                                                   | Updates a node with the given snapshot                                                                                                                                                                                                                |
+| [`cast(nodeOrSnapshot)`](API.md#cast)                                                                     | Cast a node instance or snapshot to a node instance so it can be used in assignment operations                                                                                                                                                        |
+| [`castToSnapshot(nodeOrSnapshot)`](API.md#casttosnapshot)                                                 | Cast a node instance to a snapshot so it can be used inside create operations                                                                                                                                                                         |
+| [`castToReferenceSnapshot(node)`](API.md#casttoreferencesnapshot)                                         | Cast a node instance to a reference snapshot so it can be used inside create operations                                                                                                                                                               |
 | [`createActionTrackingMiddleware`](API.md#createactiontrackingmiddleware)                                 | Utility to make writing middleware that tracks async actions less cumbersome                                                                                                                                                                          |
 | [`clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone)                          | Creates a full clone of the given node. By default preserves the same environment                                                                                                                                                                     |
 | [`decorate(handler, function)`](API.md#decorate)                                                          | Attaches middleware to a specific action (or flow)                                                                                                                                                                                                    |
@@ -1436,14 +1438,32 @@ s.replaceTasks([{ done: true }])
 s.replaceTasks(types.array(Task).create([{ done: true }]))
 ```
 
-Additionally, the `cast` function can be also used in the inverse case, this is when you want to use an instance inside an snapshot.
-In this case MST will internally convert the instance to an snapshot before using it, but we need once more to fool TypeScript into
+Additionally, the `castToSnapshot` function can be also used in the inverse case, this is when you want to use an instance inside an snapshot.
+In this case MST will internally convert the instance to a snapshot before using it, but we need once more to fool TypeScript into
 thinking that this instance is actually a snapshot.
 
 ```typescript
 const task = Task.create({ done: true })
+const Store = types.model({
+    tasks: types.array(Task)
+})
+
 // we cast the task instance to a snapshot so it can be used as part of another snapshot without typing errors
-const s = Store.create({ tasks: [cast(task)] })
+const s = Store.create({ tasks: [castToSnapshot(task)] })
+```
+
+Finally, the `castToReferenceSnapshot` can be used when we want to use an instance to actually use a reference snapshot (a string or number).
+In this case MST will internally convert the instance to a reference snapshot before using it, but we need once more to fool TypeScript into
+thinking that this instance is actually a snapshot of a reference.
+
+```typescript
+const task = Task.create({ id: types.identifier, done: true })
+const Store = types.model({
+    tasks: types.array(types.reference(Task))
+})
+
+// we cast the task instance to a reference snapshot so it can be used as part of another snapshot without typing errors
+const s = Store.create({ tasks: [castToReferenceSnapshot(task)] })
 ```
 
 #### Known Typescript Issue 5938

@@ -23,7 +23,6 @@ import {
     IAnyStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IComplexType,
     IContext,
     IJsonPatch,
     INode,
@@ -46,18 +45,16 @@ import {
     ExtractC,
     ExtractS,
     ExtractT,
-    ExtractCST
+    ExtractCST,
+    IStateTreeNode
 } from "../../internal"
 
 export interface IMapType<IT extends IAnyType>
-    extends IComplexType<
-            IKeyValueMap<ExtractC<IT>> | undefined,
-            IKeyValueMap<ExtractS<IT>>,
-            IMSTMap<IT>
-        >,
+    extends IType<IKeyValueMap<ExtractC<IT>> | undefined, IKeyValueMap<ExtractS<IT>>, IMSTMap<IT>>,
         OptionalProperty {}
 
-export interface IMSTMap<IT extends IAnyType> {
+export interface IMSTMap<IT extends IAnyType>
+    extends IStateTreeNode<IKeyValueMap<ExtractC<IT>> | undefined, IKeyValueMap<ExtractS<IT>>> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
 
     clear(): void
@@ -78,20 +75,24 @@ export interface IMSTMap<IT extends IAnyType> {
     /** Merge another object into this map, returns self. */
     merge(other: IMSTMap<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractCST<IT>> | any): this
     replace(values: IMSTMap<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractT<IT>>): this
+
     /**
      * Returns a plain object that represents this map.
      * Note that all the keys being stringified.
      * If there are duplicating keys after converting them to strings, behaviour is undetermined.
      */
-    toPOJO(): IKeyValueMap<ExtractT<IT>>
+    toPOJO(): IKeyValueMap<ExtractS<IT>>
+    toJSON(): IKeyValueMap<ExtractS<IT>>
+
     /**
      * Returns a shallow non observable object clone of this map.
      * Note that the values migth still be observable. For a deep clone use mobx.toJS.
      */
     toJS(): Map<string, ExtractT<IT>>
-    toJSON(): IKeyValueMap<ExtractT<IT>>
+
     toString(): string
     [Symbol.toStringTag]: "Map"
+
     /**
      * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
      * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
@@ -450,7 +451,7 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
  * @export
  * @alias types.map
  * @param {IType<S, T>} subtype
- * @returns {IComplexType<S[], IObservableArray<T>>}
+ * @returns {IMapType<IT>}
  */
 export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
     const ret = new MapType<IT>(`map<string, ${subtype.name}>`, subtype)

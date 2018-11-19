@@ -51,6 +51,15 @@ export interface IStateTreeNode<C = any, S = any> {
     readonly "!!types"?: [C, S] | [any, any]
 }
 
+type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
+
+export type RedefineIStateTreeNode<T, STN extends IAnyStateTreeNode> = T extends IAnyStateTreeNode
+    ? Omit<T, "!!types"> & STN
+    : T
+
+export type ExtractNodeC<T> = T extends IStateTreeNode<infer C, any> ? C : never
+export type ExtractNodeS<T> = T extends IStateTreeNode<any, infer S> ? S : never
+
 export interface IAnyStateTreeNode extends IStateTreeNode<any, any> {}
 
 /**

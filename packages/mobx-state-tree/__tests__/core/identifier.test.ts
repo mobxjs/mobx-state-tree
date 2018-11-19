@@ -31,7 +31,7 @@ if (process.env.NODE_ENV !== "production") {
             })
             .actions(self => ({
                 addModel(model: SnapshotOrInstance<typeof Model>) {
-                    self.models.push(cast(model))
+                    self.models.push(model)
                 }
             }))
         expect(() => {

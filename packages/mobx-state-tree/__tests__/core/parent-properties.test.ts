@@ -95,16 +95,14 @@ test("#917", () => {
         }))
         .actions(self => ({
             addTodo(title: string) {
-                self.todos.push(
-                    cast({
-                        title,
-                        subTodos: [
-                            {
-                                title
-                            }
-                        ]
-                    })
-                )
+                self.todos.push({
+                    title,
+                    subTodos: [
+                        {
+                            title
+                        }
+                    ]
+                })
             }
         }))
 

@@ -41,7 +41,7 @@ test("should typecheck", () => {
     })
     const x = NodeObject.create({ id: 1 })
     try {
-        x.child = 3 // TODO: better typings, should give compilation error!
+        ;(x as any).child = 3
         ;(x as any).floepie = 3
     } catch (e) {
         // ignore, this is about TS
@@ -126,5 +126,5 @@ test("#916 - 3", () => {
         newTodo: { title: "test" }
     })
 
-    expect(t.newTodo.title).toBe("test")
+    expect(t.newTodo!.title).toBe("test")
 })

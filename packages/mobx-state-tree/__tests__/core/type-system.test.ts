@@ -7,7 +7,8 @@ import {
     SnapshotOrInstance,
     cast,
     SnapshotIn,
-    Instance
+    Instance,
+    castToSnapshot
 } from "../../src"
 
 const createTestFactories = () => {
@@ -435,10 +436,10 @@ test("it should extend {pre,post}ProcessSnapshot on compose", () => {
     expect(x.composedOf).toContain("Car")
     expect(x.composedOf).toContain("CarLogger")
     expect(x.composedOf).toEqual(["CompositionTracker", "Car", "CarLogger"])
-    expect(x.toJSON!().composedWith).toContain("WagonTracker")
-    expect(x.toJSON!().composedWith).toContain("Wagon")
-    expect(x.toJSON!().composedWith).toContain("WagonLogger")
-    expect(x.toJSON!().composedWith).toEqual(["WagonTracker", "Wagon", "WagonLogger"])
+    expect(getSnapshot(x).composedWith).toContain("WagonTracker")
+    expect(getSnapshot(x).composedWith).toContain("Wagon")
+    expect(getSnapshot(x).composedWith).toContain("WagonLogger")
+    expect(getSnapshot(x).composedWith).toEqual(["WagonTracker", "Wagon", "WagonLogger"])
 })
 test("it should extend types correctly", () => {
     const Car = types
@@ -682,7 +683,10 @@ test("cast and SnapshotOrInstance", () => {
             setArr2(nn: SnapshotOrInstance<typeof NumberArray>) {
                 self.arr = cast(nn)
             },
-            setArr3(nn: number[]) {
+            setArr3(nn: SnapshotIn<typeof NumberArray>) {
+                self.arr = cast(nn)
+            },
+            setArr31(nn: number[]) {
                 self.arr = cast(nn)
             },
             setArr4() {
@@ -698,7 +702,10 @@ test("cast and SnapshotOrInstance", () => {
             setMap2(nn: SnapshotOrInstance<typeof NumberMap>) {
                 self.map = cast(nn)
             },
-            setMap3(nn: { [k: string]: number }) {
+            setMap3(nn: SnapshotIn<typeof NumberMap>) {
+                self.map = cast(nn)
+            },
+            setMap31(nn: { [k: string]: number }) {
                 self.map = cast(nn)
             },
             setMap4() {
@@ -708,27 +715,56 @@ test("cast and SnapshotOrInstance", () => {
             }
         }))
 
-    const C = types.model({ a: A }).actions(self => ({
-        // for submodels, using typeof self.var
-        setA(na: SnapshotOrInstance<typeof self.a>) {
-            self.a = cast(na)
-        },
-        // for submodels, using the type directly
-        setA2(na: SnapshotOrInstance<typeof A>) {
-            self.a = cast(na)
-        },
-        setA3(na: SnapshotIn<typeof A>) {
-            self.a = cast(na)
-        },
-        setA4(na: Instance<typeof self.a>) {
-            self.a = cast(na)
-        },
-        setA5() {
-            // it works even without specifying the target type, magic!
-            self.a = cast({ n2: 5 })
-            self.a = cast(A.create({ n2: 5 }))
-        }
-    }))
+    const C = types
+        .model({ a: A, maybeA: types.maybe(A), maybeNullA: types.maybeNull(A) })
+        .actions(self => ({
+            // for submodels, using typeof self.var
+            setA(na: SnapshotOrInstance<typeof self.a>) {
+                self.a = cast(na)
+                // we just want to check it compiles
+                if (0 !== 0) {
+                    self.maybeA = cast(na)
+                    self.maybeNullA = cast(na)
+                }
+            },
+            // for submodels, using the type directly
+            setA2(na: SnapshotOrInstance<typeof A>) {
+                self.a = cast(na)
+                // we just want to check it compiles
+                if (0 !== 0) {
+                    self.maybeA = cast(na)
+                    self.maybeNullA = cast(na)
+                }
+            },
+            setA3(na: SnapshotIn<typeof A>) {
+                self.a = cast(na)
+                // we just want to check it compiles
+                if (0 !== 0) {
+                    self.maybeA = cast(na)
+                    self.maybeNullA = cast(na)
+                }
+            },
+            setA4(na: Instance<typeof self.a>) {
+                self.a = cast(na)
+                // we just want to check it compiles
+                if (0 !== 0) {
+                    self.maybeA = cast(na)
+                    self.maybeNullA = cast(na)
+                }
+            },
+            setA5() {
+                // it works even without specifying the target type, magic!
+                self.a = cast({ n2: 5 })
+                self.a = cast(A.create({ n2: 5 }))
+                // we just want to check it compiles
+                if (0 !== 0) {
+                    self.maybeA = cast({ n2: 5 })
+                    self.maybeA = cast(A.create({ n2: 5 }))
+                    self.maybeNullA = cast({ n2: 5 })
+                    self.maybeNullA = cast(A.create({ n2: 5 }))
+                }
+            }
+        }))
 
     const c = C.create({ a: { n2: 5 } })
     unprotect(c)
@@ -773,13 +809,15 @@ test("cast and SnapshotOrInstance", () => {
     unprotect(map)
     map.set("a", cast({ n2: 5 })) // not really needed in this case, but whatever :)
 
-    // although this compiles, it yields a never type
+    // this does not compile, yay!
+    /*
     cast([])
     cast({ a: 5 })
     cast(NumberArray.create([]))
     cast(A.create({ n2: 5 }))
     cast({ a: 2, b: 5 })
     cast(NumberMap.create({ a: 2, b: 3 }))
+    */
 })
 
 test("#994", () => {
@@ -788,5 +826,26 @@ test("#994", () => {
         name: types.maybe(types.string)
     })
 
-    types.reference(Cinema) // should compile ok on TS3
+    const ref = types.reference(Cinema) // should compile ok on TS3
+})
+
+test("castToSnapshot", () => {
+    const firstModel = types.model({ brew1: types.map(types.number) })
+    const secondModel = types.model({ brew2: types.map(firstModel) }).actions(self => ({ do() {} }))
+    const appMod = types.model({ aaa: secondModel })
+
+    const storeSnapshot: SnapshotIn<typeof secondModel> = {
+        brew2: { outside: { brew1: { inner: 222 } } }
+    }
+    const storeInstance = secondModel.create(storeSnapshot)
+    const storeSnapshotOrInstance1: SnapshotOrInstance<typeof secondModel> = secondModel.create(
+        storeSnapshot
+    )
+    const storeSnapshotOrInstance2: SnapshotOrInstance<typeof secondModel> = storeSnapshot
+
+    appMod.create({ aaa: castToSnapshot(storeInstance) })
+    appMod.create({ aaa: castToSnapshot(storeSnapshot) })
+    appMod.create({ aaa: castToSnapshot(storeSnapshotOrInstance1) })
+    appMod.create({ aaa: castToSnapshot(storeSnapshotOrInstance2) })
+    // appMod.create({ aaa: castToSnapshot(5) }) // should not compile
 })
