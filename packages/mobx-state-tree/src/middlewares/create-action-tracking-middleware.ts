@@ -81,13 +81,13 @@ export function createActionTrackingMiddleware<T = any>(hooks: {
             }
             case "flow_throw": {
                 const root = runningActions.get(call.rootId)!
-                runningActions.delete(call.id)
+                runningActions.delete(call.rootId)
                 hooks.onFail(call, root.context, call.args[0])
                 return next(call)
             }
             case "flow_return": {
                 const root = runningActions.get(call.rootId)!
-                runningActions.delete(call.id)
+                runningActions.delete(call.rootId)
                 hooks.onSuccess(call, root.context, call.args[0])
                 return next(call)
             }

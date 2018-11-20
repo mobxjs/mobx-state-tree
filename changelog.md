@@ -1,6 +1,7 @@
 # 3.8.1
 
 -   Fixed non-initialized nodes not being destroyed [#1080](https://github.com/mobxjs/mobx-state-tree/issues/1080) through [#1082](https://github.com/mobxjs/mobx-state-tree/pull/1082) by [@k-g-a](https://github.com/k-g-a)
+-   Fixed a memory leak in createActionTrackingMiddleware when using flow [#1083](https://github.com/mobxjs/mobx-state-tree/issues/1083) through [#1084](https://github.com/mobxjs/mobx-state-tree/pull/1084) by [@robinfehr](https://github.com/robinfehr)
 
 # 3.8.0
 
