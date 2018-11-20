@@ -481,21 +481,17 @@ export class ObjectNode implements INode {
     @action
     public die() {
         if (this.state === NodeLifeCycle.DETACHING) return
-
         if (isStateTreeNode(this.storedValue)) {
-            // optimization: don't use walk, but getChildNodes for more efficiency
-            walk(this.storedValue, child => {
-                const node = getStateTreeNode(child)
-                if (node instanceof ObjectNode) node.aboutToDie()
-            })
-            walk(this.storedValue, child => {
-                const node = getStateTreeNode(child)
-                if (node instanceof ObjectNode) node.finalizeDeath()
-            })
+            this.aboutToDie()
+            this.finalizeDeath()
         }
     }
 
     public aboutToDie() {
+        this.getChildren().forEach(node => {
+            if (node instanceof ObjectNode) node.aboutToDie()
+        })
+
         // beforeDestroy should run before the disposers since else we could end up in a situation where
         // a disposer added with addDisposer at this stage (beforeDestroy) is actually never released
         this.fireHook("beforeDestroy")
@@ -508,6 +504,9 @@ export class ObjectNode implements INode {
 
     public finalizeDeath() {
         // invariant: not called directly but from "die"
+        this.getChildren().forEach(node => {
+            if (node instanceof ObjectNode) node.finalizeDeath()
+        })
         this.root.identifierCache!.notifyDied(this)
         addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
 
