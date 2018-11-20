@@ -847,7 +847,7 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
     }
 })
 
-it("crashes trying to resolve a reference to a destroyed/recreated model", () => {
+it("#1080 - does not crash trying to resolve a reference to a destroyed+recreated model", () => {
     const Branch = types.model("Branch", {
         id: types.identifierNumber,
         name: types.string
