@@ -22,7 +22,6 @@ import {
     EMPTY_ARRAY,
     EMPTY_OBJECT,
     escapeJsonPath,
-    ExtractIStateTreeNode,
     fail,
     flattenTypeErrors,
     freeze,
@@ -31,7 +30,6 @@ import {
     getStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IComplexType,
     IContext,
     IJsonPatch,
     INode,
@@ -99,16 +97,6 @@ export interface OptionalProperty {
     readonly "!!optionalType": undefined
 }
 
-export type RequiredPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalProperty ? never : K
-}[keyof T]
-export type OptionalPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalProperty ? K : never
-}[keyof T]
-
-export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
-export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
-
 // tslint:disable-next-line:class-name
 export interface _NotCustomized {
     // only for typings
@@ -119,27 +107,40 @@ export type _CustomOrOther<Custom, Other> = Custom extends _NotCustomized ? Othe
 /**
  * Maps property types to the snapshot, including omitted optional attributes
  */
-export type ModelCreationType<T extends ModelProperties> = {
-    [K in keyof RequiredProps<T>]: ExtractC<T[K]>
-} &
-    { [K in keyof OptionalProps<T>]?: ExtractC<T[K]> }
+export type RequiredPropNames<T> = {
+    [K in keyof T]: T[K] extends OptionalProperty ? never : K
+}[keyof T]
+export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
+export type RequiredPropsObject<P extends ModelProperties> = { [K in keyof RequiredProps<P>]: P[K] }
 
-export type ModelCreationType2<T extends ModelProperties, CustomC> = _CustomOrOther<
-    CustomC,
-    ModelCreationType<T>
+export type OptionalPropNames<T> = {
+    [K in keyof T]: T[K] extends OptionalProperty ? K : never
+}[keyof T]
+export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
+export type OptionalPropsObject<P extends ModelProperties> = {
+    [K in keyof OptionalProps<P>]?: P[K]
+}
+
+export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: ExtractC<P[k]> }
+
+export type ModelCreationType<P extends ModelProperties> = ExtractCFromProps<
+    RequiredPropsObject<P> & OptionalPropsObject<P>
 >
 
-export type ModelSnapshotType<T extends ModelProperties> = { [K in keyof T]: ExtractS<T[K]> }
+export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOther<
+    CustomC,
+    ModelCreationType<P>
+>
 
-export type ModelSnapshotType2<T extends ModelProperties, CustomS> = _CustomOrOther<
+export type ModelSnapshotType<P extends ModelProperties> = { [K in keyof P]: ExtractS<P[K]> }
+
+export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOther<
     CustomS,
-    ModelSnapshotType<T>
+    ModelSnapshotType<P>
 >
 
 // we keep this separate from ModelInstanceType to shorten model instance types generated declarations
-export type ModelInstanceTypeProps<P extends ModelProperties> = {
-    [K in keyof P]: ExtractIStateTreeNode<ExtractC<P[K]>, ExtractS<P[K]>, ExtractT<P[K]>>
-}
+export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]: ExtractT<P[K]> }
 
 // do not transform this to an interface or model instance type generated declarations will be longer
 export type ModelInstanceType<
@@ -161,7 +162,7 @@ export interface IModelType<
     CustomC = _NotCustomized,
     CustomS = _NotCustomized
 >
-    extends IComplexType<
+    extends IType<
             ModelCreationType2<PROPS, CustomC>,
             ModelSnapshotType2<PROPS, CustomS>,
             ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>
@@ -203,8 +204,7 @@ export interface IModelType<
     ): IModelType<PROPS, OTHERS, CustomC, NewS>
 }
 
-// do not make this an interface (#994 will happen again if done)
-export type IAnyModelType = IModelType<any, any, any, any>
+export interface IAnyModelType extends IModelType<any, any, any, any> {}
 
 export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any, any, any>
     ? P
@@ -235,7 +235,7 @@ const defaultObjectOptions = {
     initializers: EMPTY_ARRAY
 }
 
-function toPropertiesObject<T>(declaredProps: ModelPropertiesDeclaration): ModelProperties {
+function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelProperties {
     // loop through properties and ensures that all items are types
     return Object.keys(declaredProps).reduce(
         (props, key) => {
@@ -296,8 +296,8 @@ function toPropertiesObject<T>(declaredProps: ModelPropertiesDeclaration): Model
  * @internal
  * @private
  */
-export class ModelType<S extends ModelProperties, T> extends ComplexType<any, any, any>
-    implements IModelType<S, T, any, any> {
+export class ModelType<P extends ModelProperties, O> extends ComplexType<any, any, any>
+    implements IModelType<P, O, any, any> {
     readonly flags = TypeFlags.Object
     shouldAttachNode = true
 
@@ -319,7 +319,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
         if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
         Object.assign(this, defaultObjectOptions, opts)
         // ensures that any default value gets converted to its related type
-        this.properties = toPropertiesObject(this.properties) as S
+        this.properties = toPropertiesObject(this.properties) as P
         freeze(this.properties) // make sure nobody messes with it
         this.propertyNames = Object.keys(this.properties)
         this.identifierAttribute = this._getIdentifierAttribute()
@@ -350,14 +350,14 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     actions(fn: (self: any) => any): any {
-        const actionInitializer = (self: T) => {
+        const actionInitializer = (self: any) => {
             this.instantiateActions(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [actionInitializer] })
     }
 
-    instantiateActions(self: T, actions: any) {
+    instantiateActions(self: any, actions: any) {
         // check if return is correct
         if (!isPlainObject(actions))
             fail(`actions initializer should return a plain object containing actions`)
@@ -413,14 +413,14 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     volatile(fn: (self: any) => any): any {
-        const stateInitializer = (self: T) => {
+        const stateInitializer = (self: any) => {
             this.instantiateVolatileState(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [stateInitializer] })
     }
 
-    instantiateVolatileState(self: T, state: Object) {
+    instantiateVolatileState(self: any, state: Object) {
         // check views return
         if (!isPlainObject(state))
             fail(`volatile state initializer should return a plain object containing state`)
@@ -428,7 +428,7 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     extend(fn: (self: any) => any): any {
-        const initializer = (self: T) => {
+        const initializer = (self: any) => {
             const { actions, views, state, ...rest } = fn(self)
             for (let key in rest)
                 fail(
@@ -443,14 +443,14 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 
     views(fn: (self: any) => any): any {
-        const viewInitializer = (self: T) => {
+        const viewInitializer = (self: any) => {
             this.instantiateViews(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [viewInitializer] })
     }
 
-    instantiateViews(self: T, views: Object) {
+    instantiateViews(self: any, views: Object) {
         // check views return
         if (!isPlainObject(views))
             fail(`views initializer should return a plain object containing views`)
@@ -702,13 +702,13 @@ export class ModelType<S extends ModelProperties, T> extends ComplexType<any, an
     }
 }
 
-export function model<T extends ModelPropertiesDeclaration = {}>(
+export function model<P extends ModelPropertiesDeclaration = {}>(
     name: string,
-    properties?: T
-): IModelType<ModelPropertiesDeclarationToProperties<T>, {}>
-export function model<T extends ModelPropertiesDeclaration = {}>(
-    properties?: T
-): IModelType<ModelPropertiesDeclarationToProperties<T>, {}>
+    properties?: P
+): IModelType<ModelPropertiesDeclarationToProperties<P>, {}>
+export function model<P extends ModelPropertiesDeclaration = {}>(
+    properties?: P
+): IModelType<ModelPropertiesDeclarationToProperties<P>, {}>
 /**
  * Creates a new model type by providing a name, properties, volatile state and actions.
  *

@@ -295,3 +295,45 @@ test("bourquep", () => {
     store.contents.get("one")!.toggleState()
     expect(devTools.send.mock.calls).toMatchSnapshot()
 })
+
+test("#1065 - flows in root afterCreate shouldn't crash", async () => {
+    const SubModel = types
+        .model("SubModel", {
+            num: 0
+        })
+        .actions(self => {
+            return {
+                someFlow: flow(function*() {
+                    yield waitAsync(50)
+                    self.num++
+                    yield waitAsync(50)
+                    self.num++
+                })
+            }
+        })
+
+    const Root = types
+        .model("Root", {
+            sub: types.optional(SubModel, {})
+        })
+        .actions(self => {
+            return {
+                afterCreate: () => {
+                    self.sub.someFlow()
+                }
+            }
+        })
+
+    const store = Root.create({})
+
+    devTools = mockDevTools()
+    const devToolsManager = { connectViaExtension: () => devTools, extractState: jest.fn() }
+    connectReduxDevtools(devToolsManager, store, {
+        logIdempotentActionSteps: false,
+        logChildActions: false
+    })
+
+    expect(devTools.send.mock.calls).toMatchSnapshot()
+    await waitAsync(200)
+    expect(devTools.send.mock.calls).toMatchSnapshot()
+})

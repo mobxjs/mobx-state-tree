@@ -12,13 +12,13 @@ import {
     typeCheckSuccess,
     fail,
     IAnyType,
-    IComplexType,
     OptionalProperty,
     ExtractT,
     ExtractS,
     ExtractC,
     ExtractCST,
-    IAnyComplexType
+    RedefineIStateTreeNode,
+    IStateTreeNode
 } from "../../internal"
 
 /**
@@ -116,21 +116,17 @@ export type OptionalDefaultValueOrFunction<IT extends IAnyType> =
     | ExtractS<IT>
     | (() => ExtractCST<IT>)
 
-export interface IOptionalIComplexType<IT extends IAnyComplexType>
-    extends IComplexType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
-        OptionalProperty {}
 export interface IOptionalIType<IT extends IAnyType>
-    extends IType<ExtractC<IT> | undefined, ExtractS<IT>, ExtractT<IT>>,
+    extends IType<
+            ExtractC<IT> | undefined,
+            ExtractS<IT>,
+            RedefineIStateTreeNode<
+                ExtractT<IT>,
+                IStateTreeNode<ExtractC<IT> | undefined, ExtractS<IT>>
+            >
+        >,
         OptionalProperty {}
 
-export function optional<IT extends IAnyComplexType>(
-    type: IT,
-    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
-): IOptionalIComplexType<IT>
-export function optional<IT extends IAnyType>(
-    type: IT,
-    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
-): IOptionalIType<IT>
 /**
  * `types.optional` can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
@@ -149,11 +145,15 @@ export function optional<IT extends IAnyType>(
  *
  * @export
  * @alias types.optional
+ * @template IT
+ * @param {IT} type
+ * @param {OptionalDefaultValueOrFunction<IT>} defaultValueOrFunction
+ * @returns {IT extends OptionalProperty ? IT : IOptionalIType<IT>}
  */
 export function optional<IT extends IAnyType>(
     type: IT,
     defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
-): IOptionalIType<IT> {
+): IT extends OptionalProperty ? IT : IOptionalIType<IT> {
     // make sure we never pass direct instances
     if (typeof defaultValueOrFunction !== "function" && isStateTreeNode(defaultValueOrFunction)) {
         fail(
@@ -175,7 +175,7 @@ export function optional<IT extends IAnyType>(
     }
 
     const ret = new OptionalValue(type, defaultValueOrFunction)
-    return ret as typeof ret & OptionalProperty
+    return ret as any
 }
 
 /**

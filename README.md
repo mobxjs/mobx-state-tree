@@ -249,21 +249,24 @@ An example:
 
 ```javascript
 const TodoStore = types
-    .model("TodoStore", {                             // 1
-        loaded: types.boolean,                        // 2
-        endpoint: "http://localhost",                 // 3
-        todos: types.array(Todo),                     // 4
-        selectedTodo: types.reference(Todo)           // 5
+    // 1
+    .model("TodoStore", {
+        loaded: types.boolean, // 2
+        endpoint: "http://localhost", // 3
+        todos: types.array(Todo), // 4
+        selectedTodo: types.reference(Todo) // 5
     })
     .views(self => {
         return {
-            get completedTodos() {                    // 6
+            // 6
+            get completedTodos() {
                 return self.todos.filter(t => t.done)
             },
-            findTodosByUser(user) {                   // 7
+            // 7
+            findTodosByUser(user) {
                 return self.todos.filter(t => t.assignee === user)
             }
-        };
+        }
     })
     .actions(self => {
         return {
@@ -273,7 +276,7 @@ const TodoStore = types
                     title
                 })
             }
-        };
+        }
     })
 ```
 
@@ -919,7 +922,12 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 -   `types.null` the type of `null`.
 -   `types.undefined` the type of `undefined`.
 -   `types.late(() => type)` can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
--   `types.frozen` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is **immutable** and **serializable**.
+-   `types.frozen(subType? | defaultValue?)` Accepts any kind of serializable value (both primitive and complex), but assumes that the value itself is **immutable** and **serializable**.
+    `frozen` can be invoked in a few different ways:
+    -   `types.frozen()` - behaves the same as types.frozen in MST 2.
+    -   `types.frozen(subType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type. Note that the type will not actually be instantiated, so it can only be used to check the shape of the data. Adding views or actions to SubType would be pointless.
+    -   `types.frozen(someDefaultValue)` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
+    -   (Typescript) `types.frozen<TypeScriptType>(...)` - provide a typescript type, to help in strongly typing the field (design time only)
 -   `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one.
 
 ## Property types
@@ -981,12 +989,14 @@ See the [full API docs](API.md) for more details.
 
 | signature                                                                                                 |                                                                                                                                                                                                                                                       |
 | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`addDisposer(node, () => void)`](API.md#adddisposer)                                                     | Function to be invoked whenever the target node is to be destroyed                                                                                                                                                                                    |
+| [`addDisposer(node, () => void)`](API.md#adddisposer)                                                     | Add a function to be invoked whenever the target node is about to be destroyed                                                                                                                                                                        |
 | [`addMiddleware(node, middleware: (actionDescription, next) => any, includeHooks)`](API.md#addmiddleware) | Attaches middleware to a node. See [middleware](docs/middleware.md). Returns disposer.                                                                                                                                                                |
 | [`applyAction(node, actionDescription)`](API.md#applyaction)                                              | Replays an action on the targeted node                                                                                                                                                                                                                |
 | [`applyPatch(node, jsonPatch)`](API.md#applypatch)                                                        | Applies a JSON patch, or array of patches, to a node in the tree                                                                                                                                                                                      |
-| [`cast(nodeOrSnapshot)`](API.md#cast)                                                                     | Cast a node instance or snapshot to a node so it can be used in assignment operations                                                                                                                                                                 |
 | [`applySnapshot(node, snapshot)`](API.md#applysnapshot)                                                   | Updates a node with the given snapshot                                                                                                                                                                                                                |
+| [`cast(nodeOrSnapshot)`](API.md#cast)                                                                     | Cast a node instance or snapshot to a node instance so it can be used in assignment operations                                                                                                                                                        |
+| [`castToSnapshot(nodeOrSnapshot)`](API.md#casttosnapshot)                                                 | Cast a node instance to a snapshot so it can be used inside create operations                                                                                                                                                                         |
+| [`castToReferenceSnapshot(node)`](API.md#casttoreferencesnapshot)                                         | Cast a node instance to a reference snapshot so it can be used inside create operations                                                                                                                                                               |
 | [`createActionTrackingMiddleware`](API.md#createactiontrackingmiddleware)                                 | Utility to make writing middleware that tracks async actions less cumbersome                                                                                                                                                                          |
 | [`clone(node, keepEnvironment?: true \| false \| newEnvironment)`](API.md#clone)                          | Creates a full clone of the given node. By default preserves the same environment                                                                                                                                                                     |
 | [`decorate(handler, function)`](API.md#decorate)                                                          | Attaches middleware to a specific action (or flow)                                                                                                                                                                                                    |
@@ -1094,7 +1104,7 @@ If you are using TypeScript and you get errors about circular or self-referencin
 ```ts
 const Node = types.model({
     x: 5, // as an example
-    me: types.maybe(types.late((): IAnyModeType => Node))
+    me: types.maybe(types.late((): IAnyModelType => Node))
 })
 ```
 
@@ -1190,7 +1200,7 @@ Likewise, if your application mainly processes stateless information (such as a 
 
 MST doesn't offer an any type because it can't reason about it. For example, given a snapshot and a field with `any`, how should MST know how to deserialize it or apply patches to it, etc.? If you need `any`, there are following options:
 
-1.  Use `types.frozen`. Frozen values need to be immutable and serializable (so MST can treat them verbatim)
+1.  Use `types.frozen()`. Frozen values need to be immutable and serializable (so MST can treat them verbatim)
 2.  Use volatile state. Volatile state can store anything, but won't appear in snapshots, patches etc.
 3.  If your type is regular, and you just are too lazy to type the model, you could also consider generating the type at runtime once (after all, MST types are just JS...). However, you will loose static typing, and any confusion it causes is up to you to handle :-).
 
@@ -1428,14 +1438,32 @@ s.replaceTasks([{ done: true }])
 s.replaceTasks(types.array(Task).create([{ done: true }]))
 ```
 
-Additionally, the `cast` function can be also used in the inverse case, this is when you want to use an instance inside an snapshot.
-In this case MST will internally convert the instance to an snapshot before using it, but we need once more to fool TypeScript into
+Additionally, the `castToSnapshot` function can be also used in the inverse case, this is when you want to use an instance inside an snapshot.
+In this case MST will internally convert the instance to a snapshot before using it, but we need once more to fool TypeScript into
 thinking that this instance is actually a snapshot.
 
 ```typescript
 const task = Task.create({ done: true })
+const Store = types.model({
+    tasks: types.array(Task)
+})
+
 // we cast the task instance to a snapshot so it can be used as part of another snapshot without typing errors
-const s = Store.create({ tasks: [cast(task)] })
+const s = Store.create({ tasks: [castToSnapshot(task)] })
+```
+
+Finally, the `castToReferenceSnapshot` can be used when we want to use an instance to actually use a reference snapshot (a string or number).
+In this case MST will internally convert the instance to a reference snapshot before using it, but we need once more to fool TypeScript into
+thinking that this instance is actually a snapshot of a reference.
+
+```typescript
+const task = Task.create({ id: types.identifier, done: true })
+const Store = types.model({
+    tasks: types.array(types.reference(Task))
+})
+
+// we cast the task instance to a reference snapshot so it can be used as part of another snapshot without typing errors
+const s = Store.create({ tasks: [castToReferenceSnapshot(task)] })
 ```
 
 #### Known Typescript Issue 5938
@@ -1487,12 +1515,18 @@ export type ITodo = typeof Todo.Type
 
 It ain't pretty, but it works.
 
-#### Optional/empty maps
+#### Optional/empty maps/arrays
 
-Optional parameters, including "empty" maps, should be either a valid snapshot or a MST instance. To fix type errors such as `Error while converting {} to map`, define your type as such:
+Since v3, maps and arrays are optional by default, this is:
 
-```typescript
-map: types.optional(types.map(OtherType), {})
+```javascript
+types.map(OtherType)
+// is the same as
+types.optional(types.map(OtherType), {})
+
+types.array(OtherType)
+// is the same as
+types.optional(types.array(OtherType), [])
 ```
 
 ### How does MST compare to Redux

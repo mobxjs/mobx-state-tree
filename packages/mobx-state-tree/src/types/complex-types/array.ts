@@ -21,12 +21,10 @@ import {
     getStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IComplexType,
     IContext,
     IJsonPatch,
     INode,
     isArray,
-    isMutable,
     isNode,
     isPlainObject,
     isStateTreeNode,
@@ -42,25 +40,44 @@ import {
     OptionalProperty,
     ExtractS,
     ExtractC,
-    ExtractT
+    ExtractT,
+    ExtractCST
 } from "../../internal"
 
-export interface IMSTArray<T> extends IObservableArray<T> {}
+export interface IMSTArray<IT extends IAnyType>
+    extends IObservableArray<ExtractT<IT>>,
+        IStateTreeNode<ExtractC<IT>[] | undefined, ExtractS<IT>[]> {
+    // needs to be split or else it will complain about not being compatible with the array interface
+    push(...items: ExtractT<IT>[]): number
+    push(...items: ExtractCST<IT>[]): number
+
+    concat(...items: ConcatArray<ExtractT<IT>>[]): ExtractT<IT>[]
+    concat(...items: ConcatArray<ExtractCST<IT>>[]): ExtractT<IT>[]
+
+    concat(...items: (ExtractT<IT> | ConcatArray<ExtractT<IT>>)[]): ExtractT<IT>[]
+    concat(...items: (ExtractCST<IT> | ConcatArray<ExtractCST<IT>>)[]): ExtractT<IT>[]
+
+    splice(start: number, deleteCount?: number): ExtractT<IT>[]
+    splice(start: number, deleteCount: number, ...items: ExtractT<IT>[]): ExtractT<IT>[]
+    splice(start: number, deleteCount: number, ...items: ExtractCST<IT>[]): ExtractT<IT>[]
+
+    unshift(...items: ExtractT<IT>[]): number
+    unshift(...items: ExtractCST<IT>[]): number
+}
 
 export interface IArrayType<IT extends IAnyType>
-    extends IComplexType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<ExtractT<IT>>>,
+    extends IType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>>,
         OptionalProperty {}
 
 /**
  * @internal
  * @private
  */
-export class ArrayType<
-    IT extends IAnyType,
-    C = ExtractC<IT>,
-    S = ExtractS<IT>,
-    T = ExtractT<IT>
-> extends ComplexType<C[] | undefined, S[], IMSTArray<T>> {
+export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> extends ComplexType<
+    C[] | undefined,
+    S[],
+    IMSTArray<IT>
+> {
     shouldAttachNode = true
     subType: IAnyType
     readonly flags = TypeFlags.Array
@@ -113,9 +130,9 @@ export class ArrayType<
     }
 
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
-        const node = getStateTreeNode(change.object as IStateTreeNode<C, S>)
+        const node = getStateTreeNode(change.object as IMSTArray<IT>)
         node.assertWritable()
-        const subType = (node.type as ArrayType<any, any, any>).subType
+        const subType = (node.type as ArrayType<IT>).subType
         const childNodes = node.getChildren()
         let nodes = null
 
@@ -174,7 +191,7 @@ export class ArrayType<
     }
 
     didChange(this: {}, change: IArrayChange<any> | IArraySplice<any>): void {
-        const node = getStateTreeNode(change.object as IStateTreeNode<C, S>)
+        const node = getStateTreeNode(change.object as IMSTArray<IT>)
         switch (change.type) {
             case "update":
                 return void node.emitPatch(
@@ -280,7 +297,7 @@ export class ArrayType<
  * @export
  * @alias types.array
  * @param {IType<S, T>} subtype
- * @returns {IComplexType<S[], IObservableArray<T>>}
+ * @returns {IArrayType<IT>}
  */
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     if (process.env.NODE_ENV !== "production") {

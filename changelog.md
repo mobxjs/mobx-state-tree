@@ -1,3 +1,13 @@
+# 3.8.1
+
+-   Fixed non-initialized nodes not being destroyed [#1080](https://github.com/mobxjs/mobx-state-tree/issues/1080) through [#1082](https://github.com/mobxjs/mobx-state-tree/pull/1082) by [@k-g-a](https://github.com/k-g-a)
+
+# 3.8.0
+
+-   Added castToSnapshot/castToReferenceSnapshot methods for TypeScript and fixed some TypeScript typings not being properly detected when using SnapshotIn types through [#1074](https://github.com/mobxjs/mobx-state-tree/pull/1074) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fixed redux middleware throwing an error when a flow is called before it is connected [#1065](https://github.com/mobxjs/mobx-state-tree/issues/1065) through [#1079](https://github.com/mobxjs/mobx-state-tree/pull/1079) by [@mkramb](https://github.com/mkramb) and [@xaviergonz](https://github.com/xaviergonz)
+-   Made `addDisposer` return the passed disposer through [#1059](https://github.com/mobxjs/mobx-state-tree/pull/1059) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.7.1
 
 -   Fixed references to nodes being broken after the node was replaced [#1052](https://github.com/mobxjs/mobx-state-tree/issues/1052), plus speed up of reference resolving when using IDs through [#1053](https://github.com/mobxjs/mobx-state-tree/pull/1053) by [@xaviergonz](https://github.com/xaviergonz)

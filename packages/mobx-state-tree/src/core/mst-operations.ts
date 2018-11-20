@@ -20,16 +20,15 @@ import {
     getRelativePathBetweenNodes,
     freeze,
     IAnyType,
-    ExtractIStateTreeNode,
     isModelType,
-    INode
+    INode,
+    ModelPrimitive,
+    ExtractNodeC
 } from "../internal"
 
 export type TypeOrStateTreeNodeToStateTreeNode<
     T extends IAnyType | IAnyStateTreeNode
-> = T extends IAnyStateTreeNode
-    ? T
-    : T extends IType<infer TC, infer TS, infer TT> ? ExtractIStateTreeNode<TC, TS, TT> : never
+> = T extends IType<any, any, infer TT> ? TT : T
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -400,7 +399,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
 export function getParentOfType<IT extends IAnyType>(
     target: IAnyStateTreeNode,
     type: IT
-): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> {
+): ExtractT<IT> {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -521,7 +520,7 @@ export function resolveIdentifier<IT extends IAnyType>(
     type: IT,
     target: IAnyStateTreeNode,
     identifier: string | number
-): ExtractIStateTreeNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | undefined {
+): ExtractT<IT> | undefined {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
@@ -689,6 +688,8 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
  * targeted state tree node is destroyed. This is a useful alternative to managing
  * cleanup methods yourself using the `beforeDestroy` hook.
  *
+ * This methods returns the same disposer that was passed as argument.
+ *
  * @example
  * const Todo = types.model({
  *   title: types.string
@@ -707,8 +708,9 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
  * @export
  * @param {IStateTreeNode} target
  * @param {() => void} disposer
+ * @returns {() => void} the same disposer that was passed as argument
  */
-export function addDisposer(target: IAnyStateTreeNode, disposer: () => void) {
+export function addDisposer(target: IAnyStateTreeNode, disposer: () => void): (() => void) {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))
@@ -716,7 +718,9 @@ export function addDisposer(target: IAnyStateTreeNode, disposer: () => void) {
         if (typeof disposer !== "function")
             fail("expected second argument to be a function, got " + disposer + " instead")
     }
-    getStateTreeNode(target).addDisposer(disposer)
+    const node = getStateTreeNode(target)
+    node.addDisposer(disposer)
+    return disposer
 }
 
 /**
@@ -835,14 +839,14 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     return reflected
 }
 
-export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
-
+export function cast<O extends ModelPrimitive = never>(snapshotOrInstance: O): O
+export function cast<I extends ExtractNodeC<O>, O = never>(snapshotOrInstance: I): O
+export function cast<I extends ExtractNodeC<O>, O = never>(snapshotOrInstance: I | O): O
 /**
  * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
- * Alternatively also casts a node snapshot or instance to an snapshot type so it can be assigned to a type snapshot.
- * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance
- * (or vice-versa), but just fool typescript into thinking so.
- * Either way, casting when outside an assignation operation will only yield an unusable type (never).
+ * Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,
+ * but just fool typescript into thinking so.
+ * Either way, casting when outside an assignation operation won't compile.
  *
  * @example
  * const ModelA = types.model({
@@ -857,15 +861,80 @@ export type CastedType<T> = T extends IStateTreeNode<infer C> ? C | T : T
  *   innerModel: ModelA
  * }).actions(self => ({
  *   someAction() {
- *     // this will allow the compiler to assign an snapshot to the property
+ *     // this will allow the compiler to assign a snapshot to the property
  *     self.innerModel = cast({ a: 5 })
  *   }
  * }))
  *
  * @export
- * @param {CastedType<T>} snapshotOrInstance
- * @returns {T}
+ * @param snapshotOrInstance Snapshot or instance
+ * @returns The same object casted as an instance
  */
-export function cast<T = never, C = CastedType<T>>(snapshotOrInstance: C): T {
+export function cast(snapshotOrInstance: any): any {
     return snapshotOrInstance as any
+}
+
+/**
+ * Casts a node instance type to an snapshot type so it can be assigned to a type snapshot (e.g. to be used inside a create call).
+ * Note that this is just a cast for the type system, this is, it won't actually convert an instance to a snapshot,
+ * but just fool typescript into thinking so.
+ *
+ * @example
+ * const ModelA = types.model({
+ *   n: types.number
+ * }).actions(self => ({
+ *   setN(aNumber: number) {
+ *     self.n = aNumber
+ *   }
+ * }))
+ *
+ * const ModelB = types.model({
+ *   innerModel: ModelA
+ * })
+ *
+ * const a = ModelA.create({ n: 5 });
+ * // this will allow the compiler to use a model as if it were a snapshot
+ * const b = ModelB.create({ innerModel: castToSnapshot(a)})
+ *
+ * @export
+ * @param snapshotOrInstance Snapshot or instance
+ * @returns The same object casted as an input (creation) snapshot
+ */
+export function castToSnapshot<I>(
+    snapshotOrInstance: I
+): Extract<I, IAnyStateTreeNode> extends never ? I : ExtractNodeC<I> {
+    return snapshotOrInstance as any
+}
+
+/**
+ * Casts a node instance type to a reference snapshot type so it can be assigned to a refernence snapshot (e.g. to be used inside a create call).
+ * Note that this is just a cast for the type system, this is, it won't actually convert an instance to a refererence snapshot,
+ * but just fool typescript into thinking so.
+ *
+ * @example
+ * const ModelA = types.model({
+ *   id: types.identifier,
+ *   n: types.number
+ * }).actions(self => ({
+ *   setN(aNumber: number) {
+ *     self.n = aNumber
+ *   }
+ * }))
+ *
+ * const ModelB = types.model({
+ *   refA: types.reference(ModelA)
+ * })
+ *
+ * const a = ModelA.create({ id: 'someId', n: 5 });
+ * // this will allow the compiler to use a model as if it were a reference snapshot
+ * const b = ModelB.create({ refA: castToReference(a)})
+ *
+ * @export
+ * @param snapshotOrInstance Instance
+ * @returns The same object casted as an reference snapshot (string or number)
+ */
+export function castToReferenceSnapshot<I>(
+    instance: I
+): Extract<I, IAnyStateTreeNode> extends never ? I : string | number {
+    return instance as any
 }

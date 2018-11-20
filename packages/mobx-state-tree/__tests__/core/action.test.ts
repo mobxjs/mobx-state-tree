@@ -9,7 +9,8 @@ import {
     getRoot,
     cast,
     IMiddlewareEvent,
-    ISerializedActionCall
+    ISerializedActionCall,
+    Instance
 } from "../../src"
 
 /// Simple action replay and invocation
@@ -93,10 +94,10 @@ const Order = types
         customer: types.maybeNull(types.reference(Customer))
     })
     .actions(self => {
-        function setCustomer(customer: typeof Customer.Type) {
+        function setCustomer(customer: Instance<typeof Customer>) {
             self.customer = customer
         }
-        function noopSetCustomer(_: typeof Customer.Type) {
+        function noopSetCustomer(_: Instance<typeof Customer>) {
             // noop
         }
         return {
@@ -390,7 +391,7 @@ test("after attach action should work correctly", () => {
             todos: types.array(Todo)
         })
         .actions(self => ({
-            remove(todo: typeof Todo.Type) {
+            remove(todo: Instance<typeof Todo>) {
                 self.todos.remove(todo)
             }
         }))

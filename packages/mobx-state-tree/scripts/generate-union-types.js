@@ -5,7 +5,7 @@ let str = `// generated with ${__filename}\n`
 const minArgs = 2
 const maxArgs = 10
 const preParam = "options: UnionOptions, "
-const returnTypeTransform = rt => {
+const modelReturnTypeTransform = rt => {
     // [['PA', 'PB'], ['OA', 'OB'], ['FCA', 'FCB'], ['FSA', 'FSB']]
     // ->
     // [['ModelCreationType2<PA, FCA>', 'ModelCreationType2<PB, FCB>>'],
@@ -37,8 +37,8 @@ for (let i = minArgs; i < maxArgs; i++) {
         i,
         null,
         "|",
-        "ModelUnion",
-        returnTypeTransform
+        "ITypeUnion",
+        modelReturnTypeTransform
     )
     str += getDeclaration(
         "union",
@@ -47,17 +47,23 @@ for (let i = minArgs; i < maxArgs; i++) {
         i,
         preParam,
         "|",
-        "ModelUnion",
-        returnTypeTransform
+        "ITypeUnion",
+        modelReturnTypeTransform
     )
 }
+
 for (let i = minArgs; i < maxArgs; i++) {
-    str += getDeclaration("union", "IComplexType", ["C", "S", "T"], i, null, "|")
-    str += getDeclaration("union", "IComplexType", ["C", "S", "T"], i, preParam, "|")
-}
-for (let i = minArgs; i < maxArgs; i++) {
-    str += getDeclaration("union", "IType", ["C", "S", "T"], i, null, "|")
-    str += getDeclaration("union", "IType", ["C", "S", "T"], i, preParam, "|")
+    str += getDeclaration("union", "IType", ["C", "S", "T"], i, null, "|", "ITypeUnion", undefined)
+    str += getDeclaration(
+        "union",
+        "IType",
+        ["C", "S", "T"],
+        i,
+        preParam,
+        "|",
+        "ITypeUnion",
+        undefined
+    )
 }
 
 console.log(str)

@@ -71,7 +71,7 @@ interface ActionContext {
     runningAsync: boolean
     errored: boolean
     errorReported: boolean
-    step: number
+    step: number | undefined
     callArgs: any[]
     changesMadeSetter: ChangesMadeSetter | undefined
 }
@@ -91,7 +91,7 @@ function getActionContextNameAndTypePath(actionContext: ActionContext, logArgsNe
     }
 
     if (actionContext.runningAsync) {
-        name += ` (${actionContext.step})`
+        name += ` (${actionContext.step !== undefined ? actionContext.step : "?"})`
     }
 
     if (actionContext.errored) {
@@ -204,33 +204,37 @@ export function connectReduxDevtools(
         }
 
         // if it is an action we need to create a new action context
-        if (call.type === "action") {
+        // and also if there's no context (e.g. the middleware was connected in the middle of an action with a flow)
+        if (call.type === "action" || !context) {
             const targetTypePath = getTargetTypePath(call.context).join("/")
 
             const parentContext = context
+            const path = call.context ? `root${getPath(call.context)}` : "*unknown*"
             context = {
                 // use a space rather than a dot so that the redux devtools move the actions to the next line if there's not enough space
-                name: `[root${getPath(call.context)}] ${call.name}`,
+                name: `[${path}] ${call.name || "*unknownAction*"}`,
                 targetTypePath: targetTypePath,
                 id: call.id,
                 runningAsync: false,
                 errored: false,
                 errorReported: false,
-                step: 0,
+                step: call.type === "action" ? 0 : undefined,
                 callArgs: [],
                 changesMadeSetter: undefined
             }
 
-            if (call.args) {
-                context.callArgs = [...call.args]
-            }
+            if (call.type === "action") {
+                if (call.args) {
+                    context.callArgs = [...call.args]
+                }
 
-            // subaction, assign the parent action context
-            if (call.parentId) {
-                context.parent = parentContext
-            }
+                // subaction, assign the parent action context
+                if (call.parentId) {
+                    context.parent = parentContext
+                }
 
-            actionContexts.set(call.id, context)
+                actionContexts.set(call.id, context)
+            }
         }
 
         let changesMade = false
@@ -310,11 +314,15 @@ export function connectReduxDevtools(
                 }
 
                 // increase the step for logging purposes, as well as any parent steps (since child steps count as a parent step)
-                context.step++
+                if (context.step !== undefined) {
+                    context.step++
+                }
 
                 let parent = context.parent
                 while (parent) {
-                    parent.step++
+                    if (parent.step !== undefined) {
+                        parent.step++
+                    }
                     parent = parent.parent
                 }
             }

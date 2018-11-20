@@ -5,7 +5,8 @@ import {
     getSnapshot,
     applySnapshot,
     setLivelynessChecking,
-    getType
+    getType,
+    SnapshotIn
 } from "../../src"
 
 const createTestFactories = () => {

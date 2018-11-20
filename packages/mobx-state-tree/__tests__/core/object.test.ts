@@ -102,7 +102,7 @@ test("it should create a factory", () => {
     const instance = Factory.create()
     const snapshot = getSnapshot(instance)
     expect(snapshot).toEqual({ to: "world" })
-    expect(Factory.create().toJSON!()).toEqual({ to: "world" }) // toJSON is there as shortcut for getSnapshot(), primarily for debugging convenience
+    expect(getSnapshot(Factory.create())).toEqual({ to: "world" }) // toJSON is there as shortcut for getSnapshot(), primarily for debugging convenience
     expect(Factory.create().toString()).toEqual("AnonymousModel@<root>")
 })
 test("it should restore the state from the snapshot", () => {

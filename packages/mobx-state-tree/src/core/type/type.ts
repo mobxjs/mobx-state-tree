@@ -18,7 +18,8 @@ import {
     ObjectNode,
     IChildNodesMap,
     ModelPrimitive,
-    EMPTY_OBJECT
+    EMPTY_OBJECT,
+    IAnyStateTreeNode
 } from "../../internal"
 
 /**
@@ -152,20 +153,7 @@ export interface ISimpleType<T> extends IType<T, T, T> {}
 
 export type Primitives = ModelPrimitive | null | undefined
 
-// add the interface to the object, but respect the primitives
-export type TAndInterface<T, I> = (Exclude<T, Primitives> & I) | Extract<T, Primitives>
-
-export interface IComplexType<C, S, T> extends IType<C, S, T> {
-    // fake, only used for typing
-    readonly "!!complexType": undefined
-
-    create(
-        snapshot?: C,
-        environment?: any
-    ): TAndInterface<T, { toJSON?(): S } & IStateTreeNode<C, S>>
-}
-
-export interface IAnyComplexType extends IComplexType<any, any, any> {}
+export interface IAnyComplexType extends IType<any, any, IAnyStateTreeNode> {}
 
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
@@ -173,11 +161,6 @@ export type ExtractT<T extends IAnyType> = T extends IType<any, any, infer X> ? 
 export type ExtractCST<IT extends IAnyType> = IT extends IType<infer C, infer S, infer T>
     ? C | S | T
     : never
-
-export type ExtractIStateTreeNode<C, S, T> =
-    // if the instance is a primitive then keep it as is (it is not a state tree node)
-    // else it is a state tree node, but respect primitives
-    T extends ModelPrimitive ? T : TAndInterface<T, IStateTreeNode<C, S>>
 
 export type Instance<T> = T extends IStateTreeNode
     ? T
@@ -221,9 +204,7 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  * @internal
  * @private
  */
-export abstract class ComplexType<C, S, T> implements IComplexType<C, S, T> {
-    readonly "!!complexType" = undefined
-
+export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTreeNode<C, S>> {
     readonly isType = true
     readonly name: string
 
