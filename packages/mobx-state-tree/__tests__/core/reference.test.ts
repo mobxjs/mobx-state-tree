@@ -14,7 +14,8 @@ import {
     IAnyModelType,
     Instance,
     SnapshotOrInstance,
-    isAlive
+    isAlive,
+    destroy
 } from "../../src"
 
 test("it should support prefixed paths in maps", () => {
@@ -844,4 +845,83 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
         reactionDisposer()
         reactionDisposer2()
     }
+})
+
+it("crashes trying to resolve a reference to a destroyed/recreated model", () => {
+    const Branch = types.model("Branch", {
+        id: types.identifierNumber,
+        name: types.string
+    })
+
+    const User = types.model("User", {
+        id: types.identifierNumber,
+        email: types.maybeNull(types.string),
+        branches: types.maybeNull(types.array(Branch))
+    })
+
+    const BranchStore = types
+        .model("BranchStore", {
+            activeBranch: types.maybeNull(types.reference(Branch))
+        })
+        .actions(self => ({
+            setActiveBranch(branchId: any) {
+                self.activeBranch = branchId
+            }
+        }))
+
+    const RootStore = types
+        .model("RootStore", {
+            user: types.maybeNull(User),
+            branchStore: types.maybeNull(BranchStore)
+        })
+        .actions(self => ({
+            setUser(snapshot: typeof userSnapshot) {
+                self.user = cast(snapshot)
+            },
+            setBranchStore(snapshot: typeof branchStoreSnapshot) {
+                self.branchStore = cast(snapshot)
+            },
+            destroyUser() {
+                destroy(self.user!)
+            },
+            destroyBranchStore() {
+                destroy(self.branchStore!)
+            }
+        }))
+
+    const userSnapshot = {
+        id: 1,
+        email: "test@test.com",
+        branches: [
+            {
+                id: 1,
+                name: "Branch 1"
+            },
+            {
+                id: 2,
+                name: "Branch 2"
+            }
+        ]
+    }
+
+    const branchStoreSnapshot = {}
+    const rootStore = RootStore.create({ user: userSnapshot, branchStore: branchStoreSnapshot })
+
+    rootStore.branchStore!.setActiveBranch(1)
+    expect(rootStore.branchStore!.activeBranch).toEqual({
+        id: 1,
+        name: "Branch 1"
+    })
+
+    rootStore.destroyUser()
+    rootStore.destroyBranchStore()
+
+    rootStore.setUser(userSnapshot)
+    rootStore.setBranchStore(branchStoreSnapshot)
+
+    rootStore.branchStore!.setActiveBranch(2)
+    expect(rootStore.branchStore!.activeBranch).toEqual({
+        id: 2,
+        name: "Branch 2"
+    })
 })
