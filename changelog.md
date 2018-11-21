@@ -1,3 +1,5 @@
+-   Added `tryReference` and `isValidReference` to use references that might be no longer pointing to any nodes in a safe way through [#1087](https://github.com/mobxjs/mobx-state-tree/pull/1087) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.8.1
 
 -   Fixed non-initialized nodes not being destroyed [#1080](https://github.com/mobxjs/mobx-state-tree/issues/1080) through [#1082](https://github.com/mobxjs/mobx-state-tree/pull/1082) by [@k-g-a](https://github.com/k-g-a)
