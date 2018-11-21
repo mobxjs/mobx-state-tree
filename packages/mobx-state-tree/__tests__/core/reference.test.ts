@@ -16,7 +16,10 @@ import {
     SnapshotOrInstance,
     isAlive,
     destroy,
-    castToReferenceSnapshot
+    castToReferenceSnapshot,
+    getSafeReference,
+    isValidReference,
+    isStateTreeNode
 } from "../../src"
 
 test("it should support prefixed paths in maps", () => {
@@ -48,6 +51,7 @@ test("it should support prefixed paths in maps", () => {
         users: { "17": { id: "17", name: "Michel" }, "18": { id: "18", name: "Noa" } }
     } as SnapshotOut<typeof store>)
 })
+
 test("it should support prefixed paths in arrays", () => {
     const User = types.model({
         id: types.identifier,
@@ -74,6 +78,7 @@ test("it should support prefixed paths in arrays", () => {
         users: [{ id: "17", name: "Michel" }, { id: "18", name: "Noa" }]
     } as SnapshotOut<typeof store>)
 })
+
 if (process.env.NODE_ENV !== "production") {
     test("identifiers are required", () => {
         const Todo = types.model({
@@ -85,6 +90,7 @@ if (process.env.NODE_ENV !== "production") {
             " `undefined` is not assignable to type: `identifier` (Value is not a valid identifier, expected a string)"
         )
     })
+
     test("identifiers cannot be modified", () => {
         const Todo = types.model({
             id: types.identifier
@@ -99,6 +105,7 @@ if (process.env.NODE_ENV !== "production") {
         )
     })
 }
+
 test("it should resolve refs during creation, when using path", () => {
     const values: number[] = []
     const Book = types.model({
@@ -132,6 +139,7 @@ test("it should resolve refs during creation, when using path", () => {
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(8)
     expect(values).toEqual([4, 8])
 })
+
 test("it should resolve refs over late types", () => {
     const Book = types.model({
         id: types.identifier,
@@ -158,6 +166,7 @@ test("it should resolve refs over late types", () => {
     expect(s.entries[0].price).toBe(4)
     expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
 })
+
 test("it should resolve refs during creation, when using generic reference", () => {
     const values: number[] = []
     const Book = types.model({
@@ -223,6 +232,7 @@ test("string identifiers should not accept numbers", () => {
     expect(F2.is({ id: "4" })).toBe(true)
     expect(F2.is({ id: 4 })).toBe(false)
 })
+
 test("122 - identifiers should support numbers as well", () => {
     const F = types.model({
         id: types.identifierNumber
@@ -237,6 +247,7 @@ test("122 - identifiers should support numbers as well", () => {
     expect(F.is({ id: "4" })).toBe(false)
     expect(F.is({ id: "bla" })).toBe(false)
 })
+
 test("self reference with a late type", () => {
     const Book = types.model("Book", {
         id: types.identifier,
@@ -266,6 +277,7 @@ test("self reference with a late type", () => {
     s.addBook(book2)
     expect((s.books[1].reference as Instance<typeof Book>).genre).toBe("thriller")
 })
+
 test("when applying a snapshot, reference should resolve correctly if value added after", () => {
     const Box = types.model({
         id: types.identifierNumber,
@@ -282,6 +294,7 @@ test("when applying a snapshot, reference should resolve correctly if value adde
         })
     ).not.toThrow()
 })
+
 test("it should fail when reference snapshot is ambiguous", () => {
     const Box = types.model("Box", {
         id: types.identifierNumber,
@@ -324,6 +337,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
         "[mobx-state-tree] Cannot resolve a reference to type '(Box | Arrow)' with id: '1' unambigously, there are multiple candidates: /boxes/0, /arrows/1"
     )
 })
+
 test("it should support array of references", () => {
     const Box = types.model({
         id: types.identifierNumber,
@@ -347,6 +361,7 @@ test("it should support array of references", () => {
     }).not.toThrow()
     expect(getSnapshot(store.selected)).toEqual([1, 2])
 })
+
 test("it should restore array of references from snapshot", () => {
     const Box = types.model({
         id: types.identifierNumber,
@@ -364,6 +379,7 @@ test("it should restore array of references from snapshot", () => {
     expect(store.selected[0] === store.boxes[0]).toEqual(true)
     expect(store.selected[1] === store.boxes[1]).toEqual(true)
 })
+
 test("it should support map of references", () => {
     const Box = types.model({
         id: types.identifierNumber,
@@ -387,6 +403,7 @@ test("it should support map of references", () => {
     }).not.toThrow()
     expect(getSnapshot(store.selected)).toEqual({ from: 1, to: 2 })
 })
+
 test("it should restore map of references from snapshot", () => {
     const Box = types.model({
         id: types.identifierNumber,
@@ -404,6 +421,7 @@ test("it should restore map of references from snapshot", () => {
     expect(store.selected.get("from") === store.boxes[0]).toEqual(true)
     expect(store.selected.get("to") === store.boxes[1]).toEqual(true)
 })
+
 test("it should support relative lookups", () => {
     const Node = types.model({
         id: types.identifierNumber,
@@ -447,6 +465,7 @@ test("it should support relative lookups", () => {
     expect(resolveIdentifier(Node, n5, 4)).toBe(n2.children[0])
     expect(resolveIdentifier(Node, n2.children[0], 5)).toBe(n5)
 })
+
 test("References are non-nullable by default", () => {
     const Todo = types.model({
         id: types.identifierNumber
@@ -489,6 +508,7 @@ test("References are non-nullable by default", () => {
         expect(() => ((store as any).ref = undefined)).toThrow(/Error while converting/)
     }
 })
+
 test("References are described properly", () => {
     const Todo = types.model({
         id: types.identifierNumber
@@ -502,6 +522,7 @@ test("References are described properly", () => {
         "{ todo: ({ id: identifierNumber } | undefined?); ref: reference(AnonymousModel); maybeRef: (reference(AnonymousModel) | undefined?) }"
     )
 })
+
 test("References in recursive structures", () => {
     const Folder = types.model("Folder", {
         id: types.identifierNumber,
@@ -590,6 +611,7 @@ test("References in recursive structures", () => {
     expect(store.objects.get("1")).toBe(store.tree.children[0].data)
     expect(store.objects.get("2")).toBe(store.tree.children[0].children[0].data)
 })
+
 test("it should applyPatch references in array", () => {
     const Item = types.model("Item", {
         id: types.identifier,
@@ -648,6 +670,7 @@ test("it should applyPatch references in array", () => {
         hovers: []
     })
 })
+
 test("it should applySnapshot references in array", () => {
     const Item = types.model("Item", {
         id: types.identifier,
@@ -850,7 +873,7 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
     }
 })
 
-it("#1080 - does not crash trying to resolve a reference to a destroyed+recreated model", () => {
+test("#1080 - does not crash trying to resolve a reference to a destroyed+recreated model", () => {
     const Branch = types.model("Branch", {
         id: types.identifierNumber,
         name: types.string
@@ -927,4 +950,49 @@ it("#1080 - does not crash trying to resolve a reference to a destroyed+recreate
         id: 2,
         name: "Branch 2"
     })
+})
+
+test("getSafeReference / isValidReference", () => {
+    const Todo = types.model({ id: types.identifier })
+
+    const TodoStore = types.model({
+        todos: types.array(Todo),
+        ref1: types.maybe(types.reference(Todo)),
+        ref2: types.maybeNull(types.reference(Todo))
+    })
+
+    const store = TodoStore.create({
+        todos: [{ id: "1" }, { id: "2" }]
+    })
+
+    expect(getSafeReference(() => store.ref1)).toBeUndefined()
+    expect(getSafeReference(() => store.ref2)).toBeUndefined()
+    expect(isValidReference(() => store.ref1)).toBe(false)
+    expect(isValidReference(() => store.ref2)).toBe(false)
+
+    unprotect(store)
+    store.ref1 = store.todos[0]
+    store.ref2 = store.todos[1]
+
+    expect(isStateTreeNode(store.ref1)).toBe(true)
+    expect(isStateTreeNode(store.ref2)).toBe(true)
+
+    expect(getSafeReference(() => store.ref1)).toBeDefined()
+    expect(getSafeReference(() => store.ref2)).toBeDefined()
+    expect(isValidReference(() => store.ref1)).toBe(true)
+    expect(isValidReference(() => store.ref2)).toBe(true)
+
+    store.todos = cast([])
+
+    expect(getSafeReference(() => store.ref1)).toBeUndefined()
+    expect(getSafeReference(() => store.ref2)).toBeUndefined()
+    expect(isValidReference(() => store.ref1)).toBe(false)
+    expect(isValidReference(() => store.ref2)).toBe(false)
+
+    expect(() => getSafeReference(() => 5 as any)).toThrowError(
+        "The reference to be checked is not one of node, null or undefined"
+    )
+    expect(() => isValidReference(() => 5 as any)).toThrowError(
+        "The reference to be checked is not one of node, null or undefined"
+    )
 })

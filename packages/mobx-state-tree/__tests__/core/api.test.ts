@@ -70,6 +70,8 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     isReferenceType,
     isRefinementType,
     isUnionType,
+    isValidReference,
+    getSafeReference,
 
     types
 `)

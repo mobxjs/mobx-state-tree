@@ -23,7 +23,8 @@ import {
     isModelType,
     INode,
     ModelPrimitive,
-    ExtractNodeC
+    ExtractNodeC,
+    InvalidReferenceError
 } from "../internal"
 
 export type TypeOrStateTreeNodeToStateTreeNode<
@@ -553,6 +554,71 @@ export function getIdentifier(target: IAnyStateTreeNode): string | null {
     }
 
     return getStateTreeNode(target).identifier
+}
+
+/**
+ * Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if it the check passes,
+ * else it returns undefined.
+ *
+ * @export
+ * @template N
+ * @param {(() => N | null | undefined)} getter Function to access the reference.
+ * @param {boolean} [checkIfAlive=true] true to also make sure the referenced node is alive (default), false to skip this check.
+ * @returns {(N | undefined)}
+ */
+export function getSafeReference<N extends IAnyStateTreeNode>(
+    getter: () => N | null | undefined,
+    checkIfAlive = true
+): N | undefined {
+    try {
+        const node = getter()
+        if (node === undefined || node === null) {
+            return undefined
+        } else if (isStateTreeNode(node)) {
+            if (!checkIfAlive) {
+                return node
+            } else {
+                return isAlive(node) ? node : undefined
+            }
+        } else {
+            return fail("The reference to be checked is not one of node, null or undefined")
+        }
+    } catch (e) {
+        if (e instanceof InvalidReferenceError) {
+            return undefined
+        }
+        throw e
+    }
+}
+
+/**
+ * Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns if the check passes or not.
+ *
+ * @export
+ * @template N
+ * @param {(() => N | null | undefined)} getter Function to access the reference.
+ * @param {boolean} [checkIfAlive=true] true to also make sure the referenced node is alive (default), false to skip this check.
+ * @returns {boolean}
+ */
+export function isValidReference<N extends IAnyStateTreeNode>(
+    getter: () => N | null | undefined,
+    checkIfAlive = true
+): boolean {
+    try {
+        const node = getter()
+        if (node === undefined || node === null) {
+            return false
+        } else if (isStateTreeNode(node)) {
+            return checkIfAlive ? isAlive(node) : true
+        } else {
+            return fail("The reference to be checked is not one of node, null or undefined")
+        }
+    } catch (e) {
+        if (e instanceof InvalidReferenceError) {
+            return false
+        }
+        throw e
+    }
 }
 
 /**

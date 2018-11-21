@@ -60,12 +60,13 @@ class StoredReference {
             const { targetType } = this
             // reference was initialized with the identifier of the target
             const target = node.root.identifierCache!.resolve(targetType, normalizedId)
-            if (!target)
-                fail(
-                    `Failed to resolve reference '${this.identifier}' to type '${
+            if (!target) {
+                throw new InvalidReferenceError(
+                    `[mobx-state-tree] Failed to resolve reference '${this.identifier}' to type '${
                         this.targetType.name
                     }' (from node: ${node.path})`
                 )
+            }
             this.resolvedReference = {
                 node: target!,
                 lastCacheModification: lastCacheModification
@@ -76,6 +77,18 @@ class StoredReference {
     get resolvedValue() {
         this.updateResolvedReference()
         return this.resolvedReference!.node.value
+    }
+}
+
+/**
+ * @internal
+ * @private
+ */
+export class InvalidReferenceError extends Error {
+    constructor(m: string) {
+        super(m)
+
+        Object.setPrototypeOf(this, InvalidReferenceError.prototype)
     }
 }
 
