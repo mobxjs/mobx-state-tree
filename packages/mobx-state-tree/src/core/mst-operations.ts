@@ -566,7 +566,7 @@ export function getIdentifier(target: IAnyStateTreeNode): string | null {
  * @param {boolean} [checkIfAlive=true] true to also make sure the referenced node is alive (default), false to skip this check.
  * @returns {(N | undefined)}
  */
-export function getSafeReference<N extends IAnyStateTreeNode>(
+export function tryReference<N extends IAnyStateTreeNode>(
     getter: () => N | null | undefined,
     checkIfAlive = true
 ): N | undefined {

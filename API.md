@@ -72,85 +72,85 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
     -   [Parameters][64]
 -   [getRoot][65]
     -   [Parameters][66]
--   [getSafeReference][67]
+-   [getSnapshot][67]
     -   [Parameters][68]
--   [getSnapshot][69]
+-   [getType][69]
     -   [Parameters][70]
--   [getType][71]
+-   [hasParent][71]
     -   [Parameters][72]
--   [hasParent][73]
+-   [hasParentOfType][73]
     -   [Parameters][74]
--   [hasParentOfType][75]
-    -   [Parameters][76]
--   [IdentifierCache][77]
--   [IdentifierType][78]
--   [isAlive][79]
+-   [IdentifierCache][75]
+-   [IdentifierType][76]
+-   [isAlive][77]
+    -   [Parameters][78]
+-   [isArrayType][79]
     -   [Parameters][80]
--   [isArrayType][81]
+-   [isFrozenType][81]
     -   [Parameters][82]
--   [isFrozenType][83]
+-   [isIdentifierType][83]
     -   [Parameters][84]
--   [isIdentifierType][85]
+-   [isLateType][85]
     -   [Parameters][86]
--   [isLateType][87]
+-   [isLiteralType][87]
     -   [Parameters][88]
--   [isLiteralType][89]
+-   [isMapType][89]
     -   [Parameters][90]
--   [isMapType][91]
+-   [isModelType][91]
     -   [Parameters][92]
--   [isModelType][93]
+-   [isOptionalType][93]
     -   [Parameters][94]
--   [isOptionalType][95]
+-   [isPrimitiveType][95]
     -   [Parameters][96]
--   [isPrimitiveType][97]
+-   [isProtected][97]
     -   [Parameters][98]
--   [isProtected][99]
+-   [isReferenceType][99]
     -   [Parameters][100]
--   [isReferenceType][101]
+-   [isRefinementType][101]
     -   [Parameters][102]
--   [isRefinementType][103]
+-   [isRoot][103]
     -   [Parameters][104]
--   [isRoot][105]
+-   [isStateTreeNode][105]
     -   [Parameters][106]
--   [isStateTreeNode][107]
+-   [isType][107]
     -   [Parameters][108]
--   [isType][109]
+-   [isUnionType][109]
     -   [Parameters][110]
--   [isUnionType][111]
+-   [isValidReference][111]
     -   [Parameters][112]
--   [isValidReference][113]
+-   [joinJsonPath][113]
     -   [Parameters][114]
--   [joinJsonPath][115]
-    -   [Parameters][116]
--   [ObjectNode][117]
--   [ObservableMap][118]
--   [onAction][119]
-    -   [Parameters][120]
-    -   [Examples][121]
--   [onPatch][122]
+-   [ObjectNode][115]
+-   [ObservableMap][116]
+-   [onAction][117]
+    -   [Parameters][118]
+    -   [Examples][119]
+-   [onPatch][120]
+    -   [Parameters][121]
+-   [onSnapshot][122]
     -   [Parameters][123]
--   [onSnapshot][124]
+-   [process][124]
     -   [Parameters][125]
--   [process][126]
+-   [protect][126]
     -   [Parameters][127]
--   [protect][128]
+-   [recordActions][128]
     -   [Parameters][129]
--   [recordActions][130]
-    -   [Parameters][131]
-    -   [Examples][132]
--   [recordPatches][133]
-    -   [Parameters][134]
-    -   [Examples][135]
--   [resolveIdentifier][136]
+    -   [Examples][130]
+-   [recordPatches][131]
+    -   [Parameters][132]
+    -   [Examples][133]
+-   [resolveIdentifier][134]
+    -   [Parameters][135]
+-   [resolvePath][136]
     -   [Parameters][137]
--   [resolvePath][138]
-    -   [Parameters][139]
--   [ScalarNode][140]
--   [setLivelynessChecking][141]
+-   [ScalarNode][138]
+-   [setLivelynessChecking][139]
+    -   [Parameters][140]
+-   [splitJsonPath][141]
     -   [Parameters][142]
--   [splitJsonPath][143]
-    -   [Parameters][144]
--   [StoredReference][145]
+-   [StoredReference][143]
+-   [tryReference][144]
+    -   [Parameters][145]
 -   [tryResolve][146]
     -   [Parameters][147]
 -   [Type][148]
@@ -652,18 +652,6 @@ once the `afterAttach` hook has fired
 
 Returns **any** 
 
-## getSafeReference
-
-Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if it the check passes,
-else it returns undefined.
-
-### Parameters
-
--   `getter`  
--   `checkIfAlive` **[boolean][223]** true to also make sure the referenced node is alive (default), false to skip this check. (optional, default `true`)
-
-Returns **(N | [undefined][230])** 
-
 ## getSnapshot
 
 Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
@@ -885,7 +873,7 @@ Returns **[string][227]**
 ## onAction
 
 Registers a function that will be invoked for each action that is called on the provided model instance, or to any of its children.
-See [actions][231] for more details. onAction events are emitted only for the outermost called action in the stack.
+See [actions][230] for more details. onAction events are emitted only for the outermost called action in the stack.
 Action can also be intercepted by middleware using addMiddleware to change the function call before it will be run.
 
 Not all action arguments might be serializable. For unserializable arguments, a struct like `{ $MST_UNSERIALIZABLE: true, type: "someType" }` will be generated.
@@ -942,7 +930,7 @@ Returns **IDisposer** function to remove the listener
 
 Registers a function that is invoked whenever a new snapshot for the given model instance is available.
 The listener will only be fire at the and of the current MobX (trans)action.
-See [snapshots][232] for more details.
+See [snapshots][231] for more details.
 
 ### Parameters
 
@@ -962,7 +950,7 @@ Returns **[Promise][226]**
 **Meta**
 
 -   **deprecated**: has been renamed to `flow()`.
-    See [https://github.com/mobxjs/mobx-state-tree/issues/399][233] for more information.
+    See [https://github.com/mobxjs/mobx-state-tree/issues/399][232] for more information.
     Note that the middleware event types starting with `process` now start with `flow`.
 
 
@@ -1079,6 +1067,18 @@ Splits and decodes a json path into several parts
 Returns **[Array][221]&lt;[string][227]>** 
 
 ## StoredReference
+
+## tryReference
+
+Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if it the check passes,
+else it returns undefined.
+
+### Parameters
+
+-   `getter`  
+-   `checkIfAlive` **[boolean][223]** true to also make sure the referenced node is alive (default), false to skip this check. (optional, default `true`)
+
+Returns **(N | [undefined][233])** 
 
 ## tryResolve
 
@@ -1732,163 +1732,163 @@ Performs a depth first walk through a tree
 
 [66]: #parameters-25
 
-[67]: #getsafereference
+[67]: #getsnapshot
 
 [68]: #parameters-26
 
-[69]: #getsnapshot
+[69]: #gettype
 
 [70]: #parameters-27
 
-[71]: #gettype
+[71]: #hasparent
 
 [72]: #parameters-28
 
-[73]: #hasparent
+[73]: #hasparentoftype
 
 [74]: #parameters-29
 
-[75]: #hasparentoftype
+[75]: #identifiercache
 
-[76]: #parameters-30
+[76]: #identifiertype
 
-[77]: #identifiercache
+[77]: #isalive
 
-[78]: #identifiertype
+[78]: #parameters-30
 
-[79]: #isalive
+[79]: #isarraytype
 
 [80]: #parameters-31
 
-[81]: #isarraytype
+[81]: #isfrozentype
 
 [82]: #parameters-32
 
-[83]: #isfrozentype
+[83]: #isidentifiertype
 
 [84]: #parameters-33
 
-[85]: #isidentifiertype
+[85]: #islatetype
 
 [86]: #parameters-34
 
-[87]: #islatetype
+[87]: #isliteraltype
 
 [88]: #parameters-35
 
-[89]: #isliteraltype
+[89]: #ismaptype
 
 [90]: #parameters-36
 
-[91]: #ismaptype
+[91]: #ismodeltype
 
 [92]: #parameters-37
 
-[93]: #ismodeltype
+[93]: #isoptionaltype
 
 [94]: #parameters-38
 
-[95]: #isoptionaltype
+[95]: #isprimitivetype
 
 [96]: #parameters-39
 
-[97]: #isprimitivetype
+[97]: #isprotected
 
 [98]: #parameters-40
 
-[99]: #isprotected
+[99]: #isreferencetype
 
 [100]: #parameters-41
 
-[101]: #isreferencetype
+[101]: #isrefinementtype
 
 [102]: #parameters-42
 
-[103]: #isrefinementtype
+[103]: #isroot
 
 [104]: #parameters-43
 
-[105]: #isroot
+[105]: #isstatetreenode
 
 [106]: #parameters-44
 
-[107]: #isstatetreenode
+[107]: #istype
 
 [108]: #parameters-45
 
-[109]: #istype
+[109]: #isuniontype
 
 [110]: #parameters-46
 
-[111]: #isuniontype
+[111]: #isvalidreference
 
 [112]: #parameters-47
 
-[113]: #isvalidreference
+[113]: #joinjsonpath
 
 [114]: #parameters-48
 
-[115]: #joinjsonpath
+[115]: #objectnode
 
-[116]: #parameters-49
+[116]: #observablemap
 
-[117]: #objectnode
+[117]: #onaction
 
-[118]: #observablemap
+[118]: #parameters-49
 
-[119]: #onaction
+[119]: #examples-6
 
-[120]: #parameters-50
+[120]: #onpatch
 
-[121]: #examples-6
+[121]: #parameters-50
 
-[122]: #onpatch
+[122]: #onsnapshot
 
 [123]: #parameters-51
 
-[124]: #onsnapshot
+[124]: #process
 
 [125]: #parameters-52
 
-[126]: #process
+[126]: #protect
 
 [127]: #parameters-53
 
-[128]: #protect
+[128]: #recordactions
 
 [129]: #parameters-54
 
-[130]: #recordactions
+[130]: #examples-7
 
-[131]: #parameters-55
+[131]: #recordpatches
 
-[132]: #examples-7
+[132]: #parameters-55
 
-[133]: #recordpatches
+[133]: #examples-8
 
-[134]: #parameters-56
+[134]: #resolveidentifier
 
-[135]: #examples-8
+[135]: #parameters-56
 
-[136]: #resolveidentifier
+[136]: #resolvepath
 
 [137]: #parameters-57
 
-[138]: #resolvepath
+[138]: #scalarnode
 
-[139]: #parameters-58
+[139]: #setlivelynesschecking
 
-[140]: #scalarnode
+[140]: #parameters-58
 
-[141]: #setlivelynesschecking
+[141]: #splitjsonpath
 
 [142]: #parameters-59
 
-[143]: #splitjsonpath
+[143]: #storedreference
 
-[144]: #parameters-60
+[144]: #tryreference
 
-[145]: #storedreference
+[145]: #parameters-60
 
 [146]: #tryresolve
 
@@ -2058,13 +2058,13 @@ Performs a depth first walk through a tree
 
 [229]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[230]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
+[230]: https://github.com/mobxjs/mobx-state-tree#actions
 
-[231]: https://github.com/mobxjs/mobx-state-tree#actions
+[231]: https://github.com/mobxjs/mobx-state-tree#snapshots
 
-[232]: https://github.com/mobxjs/mobx-state-tree#snapshots
+[232]: https://github.com/mobxjs/mobx-state-tree/issues/399
 
-[233]: https://github.com/mobxjs/mobx-state-tree/issues/399
+[233]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
 
 [234]: https://mobx.js.org/refguide/array.html
 

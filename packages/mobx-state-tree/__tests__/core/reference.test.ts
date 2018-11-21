@@ -17,7 +17,7 @@ import {
     isAlive,
     destroy,
     castToReferenceSnapshot,
-    getSafeReference,
+    tryReference,
     isValidReference,
     isStateTreeNode
 } from "../../src"
@@ -952,7 +952,7 @@ test("#1080 - does not crash trying to resolve a reference to a destroyed+recrea
     })
 })
 
-test("getSafeReference / isValidReference", () => {
+test("tryReference / isValidReference", () => {
     const Todo = types.model({ id: types.identifier })
 
     const TodoStore = types.model({
@@ -965,8 +965,8 @@ test("getSafeReference / isValidReference", () => {
         todos: [{ id: "1" }, { id: "2" }]
     })
 
-    expect(getSafeReference(() => store.ref1)).toBeUndefined()
-    expect(getSafeReference(() => store.ref2)).toBeUndefined()
+    expect(tryReference(() => store.ref1)).toBeUndefined()
+    expect(tryReference(() => store.ref2)).toBeUndefined()
     expect(isValidReference(() => store.ref1)).toBe(false)
     expect(isValidReference(() => store.ref2)).toBe(false)
 
@@ -977,19 +977,19 @@ test("getSafeReference / isValidReference", () => {
     expect(isStateTreeNode(store.ref1)).toBe(true)
     expect(isStateTreeNode(store.ref2)).toBe(true)
 
-    expect(getSafeReference(() => store.ref1)).toBeDefined()
-    expect(getSafeReference(() => store.ref2)).toBeDefined()
+    expect(tryReference(() => store.ref1)).toBeDefined()
+    expect(tryReference(() => store.ref2)).toBeDefined()
     expect(isValidReference(() => store.ref1)).toBe(true)
     expect(isValidReference(() => store.ref2)).toBe(true)
 
     store.todos = cast([])
 
-    expect(getSafeReference(() => store.ref1)).toBeUndefined()
-    expect(getSafeReference(() => store.ref2)).toBeUndefined()
+    expect(tryReference(() => store.ref1)).toBeUndefined()
+    expect(tryReference(() => store.ref2)).toBeUndefined()
     expect(isValidReference(() => store.ref1)).toBe(false)
     expect(isValidReference(() => store.ref2)).toBe(false)
 
-    expect(() => getSafeReference(() => 5 as any)).toThrowError(
+    expect(() => tryReference(() => 5 as any)).toThrowError(
         "The reference to be checked is not one of node, null or undefined"
     )
     expect(() => isValidReference(() => 5 as any)).toThrowError(

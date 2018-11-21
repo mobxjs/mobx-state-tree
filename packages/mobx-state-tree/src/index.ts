@@ -180,7 +180,7 @@ import {
     isReferenceType,
     isRefinementType,
     isUnionType,
-    getSafeReference,
+    tryReference,
     isValidReference
 } from "./internal"
 
@@ -304,6 +304,6 @@ export {
     isReferenceType,
     isRefinementType,
     isUnionType,
-    getSafeReference,
+    tryReference,
     isValidReference
 }
