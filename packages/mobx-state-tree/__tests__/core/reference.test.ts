@@ -19,7 +19,8 @@ import {
     castToReferenceSnapshot,
     tryReference,
     isValidReference,
-    isStateTreeNode
+    isStateTreeNode,
+    addDisposer
 } from "../../src"
 
 test("it should support prefixed paths in maps", () => {
@@ -955,14 +956,35 @@ test("#1080 - does not crash trying to resolve a reference to a destroyed+recrea
 test("tryReference / isValidReference", () => {
     const Todo = types.model({ id: types.identifier })
 
-    const TodoStore = types.model({
-        todos: types.array(Todo),
-        ref1: types.maybe(types.reference(Todo)),
-        ref2: types.maybeNull(types.reference(Todo))
-    })
+    const TodoStore = types
+        .model({
+            todos: types.array(Todo),
+            ref1: types.maybe(types.reference(Todo)),
+            ref2: types.maybeNull(types.reference(Todo)),
+            ref3: types.maybe(types.reference(Todo))
+        })
+        .actions(self => ({
+            clearRef3() {
+                self.ref3 = undefined
+            },
+            afterCreate() {
+                addDisposer(
+                    self,
+                    reaction(
+                        () => isValidReference(() => self.ref3),
+                        valid => {
+                            if (!valid) {
+                                this.clearRef3()
+                            }
+                        },
+                        { fireImmediately: true }
+                    )
+                )
+            }
+        }))
 
     const store = TodoStore.create({
-        todos: [{ id: "1" }, { id: "2" }]
+        todos: [{ id: "1" }, { id: "2" }, { id: "3" }]
     })
 
     expect(tryReference(() => store.ref1)).toBeUndefined()
@@ -973,6 +995,7 @@ test("tryReference / isValidReference", () => {
     unprotect(store)
     store.ref1 = store.todos[0]
     store.ref2 = store.todos[1]
+    store.ref3 = store.todos[2]
 
     expect(isStateTreeNode(store.ref1)).toBe(true)
     expect(isStateTreeNode(store.ref2)).toBe(true)
@@ -988,6 +1011,9 @@ test("tryReference / isValidReference", () => {
     expect(tryReference(() => store.ref2)).toBeUndefined()
     expect(isValidReference(() => store.ref1)).toBe(false)
     expect(isValidReference(() => store.ref2)).toBe(false)
+
+    // the reaction should have triggered and set this to undefined
+    expect(store.ref3).toBe(undefined)
 
     expect(() => tryReference(() => 5 as any)).toThrowError(
         "The reference to be checked is not one of node, null or undefined"
