@@ -302,7 +302,7 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTree
             return newNode
         }
         // nothing to do, we have to create a new node
-        return this.instantiate(parent, subpath, current._environment, newValue)
+        return this.instantiate(parent, subpath, current.environment, newValue)
     }
 
     get Type(): T {
@@ -373,12 +373,7 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
     reconcile(current: INode, newValue: any): INode {
         // reconcile only if type and value are still the same
         if (current.type === this && current.storedValue === newValue) return current
-        const res = this.instantiate(
-            current.parent,
-            current.subpath,
-            current._environment,
-            newValue
-        )
+        const res = this.instantiate(current.parent, current.subpath, current.environment, newValue)
         current.die()
         return res
     }

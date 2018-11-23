@@ -144,7 +144,7 @@ export class CustomType<S, T> extends Type<S, S, T> {
         const newNode = this.instantiate(
             current.parent,
             current.subpath,
-            current._environment,
+            current.environment,
             valueToStore
         )
         current.die()

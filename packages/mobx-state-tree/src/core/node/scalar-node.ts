@@ -1,27 +1,20 @@
 import {
-    INode,
-    escapeJsonPath,
     fail,
     freeze,
     NodeLifeCycle,
     ObjectNode,
-    IAnyType
+    IAnyType,
+    Hook,
+    BaseNode,
+    escapeJsonPath
 } from "../../internal"
+import { action } from "mobx"
 
 /**
  * @internal
  * @private
  */
-export class ScalarNode implements INode {
-    readonly type: IAnyType
-    readonly storedValue: any
-    parent: ObjectNode | null = null
-    subpath: string = ""
-
-    private state = NodeLifeCycle.INITIALIZING
-    private readonly _initialSnapshot: any
-    _environment: any = undefined
-
+export class ScalarNode extends BaseNode {
     constructor(
         type: IAnyType,
         parent: ObjectNode | null,
@@ -29,16 +22,13 @@ export class ScalarNode implements INode {
         environment: any,
         initialSnapshot: any
     ) {
-        this._initialSnapshot = initialSnapshot
-
-        this.type = type
-        this.parent = parent
-        this.subpath = subpath
+        super(type, parent, subpath, environment)
 
         let sawException = true
         try {
             this.storedValue = type.createNewInstance(this, {}, initialSnapshot)
             this.state = NodeLifeCycle.CREATED
+            this.fireHook(Hook.AfterCreate)
             sawException = false
         } finally {
             if (sawException) {
@@ -46,21 +36,11 @@ export class ScalarNode implements INode {
                 this.state = NodeLifeCycle.DEAD
             }
         }
+
+        this.finalizeCreation()
     }
 
-    /*
-     * Returnes (escaped) path representation as string
-     */
-    public get path(): string {
-        if (!this.parent) return ""
-        return this.parent.path + "/" + escapeJsonPath(this.subpath)
-    }
-
-    public get isRoot(): boolean {
-        return this.parent === null
-    }
-
-    public get root(): ObjectNode {
+    get root(): ObjectNode {
         // future optimization: store root ref in the node and maintain it
         if (!this.parent) return fail(`This scalar node is not part of a tree`)
         return this.parent.root
@@ -74,36 +54,54 @@ export class ScalarNode implements INode {
             const newPath = subpath === null ? "" : subpath
             if (this.subpath !== newPath) {
                 this.subpath = newPath
+                this.escapedSubpath = escapeJsonPath(this.subpath)
+                this.subpathAtom.reportChanged()
             }
             if (newParent && newParent !== this.parent) {
+                // newParent.root.identifierCache!.mergeCache(this)
                 this.parent = newParent
+                this.subpathAtom.reportChanged()
+                this.fireHook(Hook.AfterAttach)
             }
         }
     }
 
-    public get value(): any {
+    get value(): any {
         return this.type.getValue(this)
     }
 
-    public get snapshot(): any {
-        const snapshot = this.getSnapshot()
-        // avoid any external modification in dev mode
-        return freeze(snapshot)
+    get snapshot(): any {
+        return freeze(this.getSnapshot())
     }
 
-    public getSnapshot(): any {
+    getSnapshot(): any {
         return this.type.getSnapshot(this)
-    }
-
-    public get isAlive() {
-        return this.state !== NodeLifeCycle.DEAD
     }
 
     toString(): string {
         return `${this.type.name}@${this.path || "<root>"}${this.isAlive ? "" : "[dead]"}`
     }
 
+    @action
     die() {
-        this.state = NodeLifeCycle.DEAD
+        if (this.state === NodeLifeCycle.DETACHING) return
+        this.aboutToDie()
+        this.finalizeDeath()
+    }
+
+    finalizeCreation() {
+        this.internalFinalizeCreation()
+    }
+
+    aboutToDie() {
+        this.internalAboutToDie()
+    }
+
+    finalizeDeath() {
+        this.internalFinalizeDeath()
+    }
+
+    protected fireHook(name: Hook) {
+        this.internalFireHook(name)
     }
 }

@@ -290,10 +290,53 @@ export function remove<T>(collection: T[], item: T) {
  * @internal
  * @private
  */
-export function registerEventHandler(handlers: Function[], handler: Function): IDisposer {
-    handlers.push(handler)
-    return () => {
-        remove(handlers, handler)
+export class EventHandler<F extends Function> {
+    private handlers?: F[]
+
+    get hasSubscribers() {
+        return this.handlers && this.handlers.length > 0
+    }
+
+    register(fn: F, atTheBeginning = false): IDisposer {
+        if (!this.handlers) {
+            this.handlers = []
+        }
+        if (atTheBeginning) {
+            this.handlers.unshift(fn)
+        } else {
+            this.handlers.push(fn)
+        }
+        return () => {
+            this.unregister(fn)
+        }
+    }
+
+    private indexOf(fn: F): number {
+        if (!this.handlers) {
+            return -1
+        }
+        return this.handlers.indexOf(fn)
+    }
+
+    has(fn: F): boolean {
+        return this.indexOf(fn) >= 0
+    }
+
+    unregister(fn: F) {
+        const index = this.indexOf(fn)
+        if (index >= 0) {
+            this.handlers!.splice(index, 1)
+        }
+    }
+
+    clear() {
+        this.handlers = undefined
+    }
+
+    emit(...args: any[]) {
+        if (this.handlers) {
+            this.handlers.forEach(f => f(...args))
+        }
     }
 }
 

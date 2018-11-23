@@ -3,7 +3,10 @@
  * Why? It gives us full control over the module load order, preventing circular dependency isses
  */
 
+export * from "./core/node/livelynessChecking"
+export * from "./core/node/Hook"
 export * from "./core/mst-operations"
+export * from "./core/node/BaseNode"
 export * from "./core/node/scalar-node"
 export * from "./core/node/object-node"
 export * from "./core/type/type"

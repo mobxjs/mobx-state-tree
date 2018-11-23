@@ -525,7 +525,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
             result[name] = childType.instantiate(
                 objNode,
                 name,
-                objNode._environment,
+                objNode.environment,
                 initialSnapshot[name]
             )
         })
@@ -535,6 +535,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
     createNewInstance(node: ObjectNode, childNodes: IChildNodesMap, snapshot: any): any {
         return observable.object(childNodes, EMPTY_OBJECT, mobxShallow)
     }
+
     finalizeNewInstance(node: ObjectNode, instance: IObservableObject): void {
         addHiddenFinalProp(instance, "toString", objectTypeToString)
 

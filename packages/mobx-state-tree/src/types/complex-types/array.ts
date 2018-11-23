@@ -93,7 +93,7 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
 
     initializeChildNodes(objNode: ObjectNode, snapshot: S[] = []): IChildNodesMap {
         const subType = (objNode.type as ArrayType<any, any, any>).subType
-        const environment = objNode._environment
+        const environment = objNode.environment
         const result = {} as IChildNodesMap
         snapshot.forEach((item, index) => {
             const subpath = `${index}`
@@ -109,6 +109,7 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
     ): IObservableArray<any> {
         return observable.array(convertChildNodesToArray(childNodes), mobxShallow)
     }
+
     finalizeNewInstance(node: ObjectNode, instance: IObservableArray<any>): void {
         _getAdministration(instance).dehancer = node.unbox
         intercept(instance, this.willChange as any)
@@ -409,7 +410,7 @@ function valueAsNode(
         return childNode
     }
     // nothing to do, create from scratch
-    return childType.instantiate(parent, subpath, parent._environment, newValue)
+    return childType.instantiate(parent, subpath, parent.environment, newValue)
 }
 
 // given a value

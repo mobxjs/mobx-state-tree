@@ -242,7 +242,7 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
 
     initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
         const subType = (objNode.type as MapType<any, any, any>).subType
-        const environment = objNode._environment
+        const environment = objNode.environment
         const result = {} as IChildNodesMap
         Object.keys(initialSnapshot).forEach(name => {
             result[name] = subType.instantiate(objNode, name, environment, initialSnapshot[name])
