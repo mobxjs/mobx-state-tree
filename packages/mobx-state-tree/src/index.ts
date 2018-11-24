@@ -11,6 +11,7 @@ import {
     compose,
     custom,
     reference,
+    safeReference,
     union,
     optional,
     literal,
@@ -38,6 +39,7 @@ export const types = {
     compose,
     custom,
     reference,
+    safeReference,
     union,
     optional,
     literal,
@@ -181,7 +183,13 @@ import {
     isRefinementType,
     isUnionType,
     tryReference,
-    isValidReference
+    isValidReference,
+    OnReferenceInvalidated,
+    OnReferenceInvalidatedEvent,
+    ReferenceOptions,
+    ReferenceOptionsGetSet,
+    ReferenceOptionsOnInvalidated,
+    ReferenceIdentifier
 } from "./internal"
 
 export {
@@ -305,5 +313,11 @@ export {
     isRefinementType,
     isUnionType,
     tryReference,
-    isValidReference
+    isValidReference,
+    OnReferenceInvalidated,
+    OnReferenceInvalidatedEvent,
+    ReferenceOptions,
+    ReferenceOptionsGetSet,
+    ReferenceOptionsOnInvalidated,
+    ReferenceIdentifier
 }

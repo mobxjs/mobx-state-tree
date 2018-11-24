@@ -6,7 +6,8 @@ import {
     IAnyType,
     Hook,
     BaseNode,
-    escapeJsonPath
+    escapeJsonPath,
+    EventHandler
 } from "../../internal"
 import { action } from "mobx"
 
@@ -15,6 +16,14 @@ import { action } from "mobx"
  * @private
  */
 export class ScalarNode extends BaseNode {
+    readonly hookSubscribers = {
+        // afterCreate in scalar nodes is executed in the constructor, so it cannot be registered before it is already executed
+        // [Hook.AfterCreate]: new EventHandler<(node: ScalarNode) => void>(),
+        [Hook.AfterAttach]: new EventHandler<(node: ScalarNode) => void>(),
+        // beforeDetach is never executed for scalar nodes, since they cannot be detached
+        // [Hook.BeforeDetach]: new EventHandler<(node: ScalarNode) => void>(),
+        [Hook.BeforeDestroy]: new EventHandler<(node: ScalarNode) => void>()
+    }
     constructor(
         type: IAnyType,
         parent: ObjectNode | null,
@@ -28,7 +37,9 @@ export class ScalarNode extends BaseNode {
         try {
             this.storedValue = type.createNewInstance(this, {}, initialSnapshot)
             this.state = NodeLifeCycle.CREATED
-            this.fireHook(Hook.AfterCreate)
+            // there's no point in firing this event since it fires on the constructor, before
+            // nobody can actually register for it
+            // this.fireHook(Hook.AfterCreate)
             sawException = false
         } finally {
             if (sawException) {

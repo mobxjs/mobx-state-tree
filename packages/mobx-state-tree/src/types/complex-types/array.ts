@@ -438,10 +438,12 @@ function areSame(oldNode: INode, newValue: any) {
  * Returns if a given value represents an array type.
  *
  * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @template Items
+ * @param {IAnyType} type
+ * @returns {type is IArrayType<Items>}
  */
-export function isArrayType<IT extends IArrayType<any>>(type: IT): type is IT {
+export function isArrayType<Items extends IAnyType = IAnyType>(
+    type: IAnyType
+): type is IArrayType<Items> {
     return isType(type) && (type.flags & TypeFlags.Array) > 0
 }

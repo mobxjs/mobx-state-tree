@@ -62,6 +62,13 @@ export class ObjectNode extends BaseNode {
     isProtectionEnabled = true
     middlewares: IMiddleware[] | null = null
 
+    readonly hookSubscribers = {
+        [Hook.AfterCreate]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
+        [Hook.AfterAttach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
+        [Hook.BeforeDetach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
+        [Hook.BeforeDestroy]: new EventHandler<(node: ObjectNode, hook: Hook) => void>()
+    }
+
     applyPatches(patches: IJsonPatch[]): void {
         if (!this._observableInstanceCreated) this._createObservableInstance()
         this.applyPatches(patches)

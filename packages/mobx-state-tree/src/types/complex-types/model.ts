@@ -815,7 +815,7 @@ export function compose(...args: any[]): any {
  * @param {IT} type
  * @returns {type is IT}
  */
-export function isModelType<IT extends IAnyModelType>(type: IT): type is IT {
+export function isModelType<IT extends IAnyModelType = IAnyModelType>(type: IAnyType): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 

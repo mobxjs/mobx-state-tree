@@ -18,17 +18,42 @@ import {
     IAnyStateTreeNode,
     IAnyComplexType,
     IStateTreeNode,
-    RedefineIStateTreeNode
+    RedefineIStateTreeNode,
+    Hook,
+    IDisposer,
+    ScalarNode,
+    IMSTArray,
+    maybe,
+    getType,
+    isArrayType,
+    isMapType,
+    IMSTMap,
+    isModelType,
+    IMaybe,
+    NodeLifeCycle
 } from "../../internal"
 
+export interface OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> {
+    parent: IAnyStateTreeNode
+    oldRef: STN
+    setNewRef: (newRef: STN | undefined | null) => void
+    cause: "detach" | "destroy"
+}
+
 export type OnReferenceInvalidated<STN extends IAnyStateTreeNode> = (
-    event: {
-        parent: IAnyStateTreeNode | undefined
-        oldRef: STN
-        setNewRef: (newRef: STN | undefined | null) => void
-        cause: "detach" | "destroy"
-    }
+    event: OnReferenceInvalidatedEvent<STN>
 ) => void
+
+function getInvalidationCause(hook: Hook): "detach" | "destroy" | undefined {
+    switch (hook) {
+        case Hook.BeforeDestroy:
+            return "destroy"
+        case Hook.BeforeDetach:
+            return "detach"
+        default:
+            return undefined
+    }
+}
 
 export type ReferenceIdentifier = string | number
 
@@ -117,7 +142,10 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Reference
 
-    constructor(protected readonly targetType: IT) {
+    constructor(
+        protected readonly targetType: IT,
+        private readonly onInvalidated?: OnReferenceInvalidated<ExtractT<IT>>
+    ) {
         super(`reference(${targetType.name})`)
     }
 
@@ -138,6 +166,82 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
                   "Value is not a valid identifier, which is a string or a number"
               )
     }
+
+    private addTargetNodeWatcher(referenceNode: ScalarNode): IDisposer | undefined {
+        const targetValue = this.getValue(referenceNode)
+        if (!targetValue) {
+            return undefined
+        }
+        const targetNode = getStateTreeNode(targetValue)
+
+        const hookHandler = (_: ObjectNode, targetNodeHook: Hook) => {
+            const cause = getInvalidationCause(targetNodeHook)
+            if (!cause) {
+                return
+            }
+            // to actually invalidate a reference we need an alive parent,
+            // since it is a scalar value (immutable-ish) and we need to change it
+            // from the parent
+            const parentNode = referenceNode.parent
+            if (!parentNode || !parentNode.isAlive) {
+                return
+            }
+            const parent = parentNode.storedValue
+            if (!parent) {
+                return
+            }
+            this.onInvalidated!({
+                cause,
+                parent,
+                oldRef: targetNode.storedValue,
+                setNewRef(newRef) {
+                    parentNode.applyPatchLocally(referenceNode.subpath, {
+                        op: "replace",
+                        value: newRef,
+                        path: referenceNode.path // this part is actually ignored for local paths
+                    })
+                }
+            })
+        }
+
+        const detachHookDisposer = targetNode.hookSubscribers[Hook.BeforeDetach].register(
+            hookHandler
+        )
+        const destroyHookDisposer = targetNode.hookSubscribers[Hook.BeforeDestroy].register(
+            hookHandler
+        )
+
+        return () => {
+            detachHookDisposer()
+            destroyHookDisposer()
+        }
+    }
+
+    protected watchTargetNodeForInvalidations(referenceNode: ScalarNode) {
+        if (!this.onInvalidated) {
+            return
+        }
+
+        let onTargetDestroyedHookDisposer: IDisposer | undefined
+
+        // get rid of the watcher hook when the reference node is destroyed
+        // detached is ignored since scalar nodes (where the reference resides) cannot be detached
+        referenceNode.hookSubscribers[Hook.BeforeDestroy].register(() => {
+            if (onTargetDestroyedHookDisposer) {
+                onTargetDestroyedHookDisposer()
+            }
+        })
+
+        if (referenceNode.state === NodeLifeCycle.FINALIZED) {
+            // already attached, so the whole tree is ready
+            onTargetDestroyedHookDisposer = this.addTargetNodeWatcher(referenceNode)
+        } else {
+            // start watching once the whole tree is ready
+            referenceNode.hookSubscribers[Hook.AfterAttach].register(() => {
+                onTargetDestroyedHookDisposer = this.addTargetNodeWatcher(referenceNode)
+            })
+        }
+    }
 }
 
 /**
@@ -145,11 +249,8 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
  * @private
  */
 export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseReferenceType<IT> {
-    constructor(
-        targetType: IT,
-        private readonly onInvalidated?: OnReferenceInvalidated<ExtractT<IT>>
-    ) {
-        super(targetType)
+    constructor(targetType: IT, onInvalidated?: OnReferenceInvalidated<ExtractT<IT>>) {
+        super(targetType, onInvalidated)
     }
 
     getValue(node: INode) {
@@ -170,9 +271,9 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
         newValue: ExtractT<IT> | ReferenceIdentifier
     ): INode {
         const storedRef = new StoredReference(newValue, this.targetType)
-        const node = createNode(this, parent, subpath, environment, storedRef)
+        const node = createNode(this, parent, subpath, environment, storedRef) as ScalarNode
         storedRef.node = node
-        // TODO: add reaction on after creation
+        this.watchTargetNodeForInvalidations(node)
         return node
     }
 
@@ -202,9 +303,9 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
     constructor(
         targetType: IT,
         private readonly options: ReferenceOptionsGetSet<IT>,
-        private readonly onInvalidated?: OnReferenceInvalidated<ExtractT<IT>>
+        onInvalidated?: OnReferenceInvalidated<ExtractT<IT>>
     ) {
-        super(targetType)
+        super(targetType, onInvalidated)
     }
 
     getValue(node: INode) {
@@ -229,8 +330,8 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
         const identifier = isStateTreeNode(newValue)
             ? this.options.set(newValue, parent ? parent.storedValue : null)
             : newValue
-        const node = createNode(this, parent, subpath, environment, identifier)
-        // TODO: add reaction on after creation
+        const node = createNode(this, parent, subpath, environment, identifier) as ScalarNode
+        this.watchTargetNodeForInvalidations(node)
         return node
     }
 
@@ -333,4 +434,49 @@ export function reference<IT extends IAnyComplexType>(
  */
 export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type is IT {
     return (type.flags & TypeFlags.Reference) > 0
+}
+
+/**
+ * A safe reference is like a standard reference, except that it accepts the undefined value by default
+ * and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
+ * when the reference it is pointing to gets detached/destroyed.
+ *
+ * Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `onInvalidate` option.
+ *
+ * @export
+ * @alias types.safeReference
+ * @template IT
+ * @param {IT} subType
+ * @param {ReferenceOptionsGetSet<IT>} [options]
+ * @returns {IMaybe<IReferenceType<IT>>}
+ */
+export function safeReference<IT extends IAnyComplexType>(
+    subType: IT,
+    options?: ReferenceOptionsGetSet<IT>
+): IMaybe<IReferenceType<IT>> {
+    return maybe(
+        reference(subType, {
+            ...options,
+            onInvalidated(ev) {
+                const parentType = getType(ev.parent)
+
+                if (isModelType(parentType)) {
+                    // model property, set it to undefined
+                    ev.setNewRef(undefined)
+                } else if (isArrayType<IT>(parentType)) {
+                    const arr = ev.parent as IMSTArray<IT>
+                    arr.remove(ev.oldRef)
+                } else if (isMapType<IT>(parentType)) {
+                    const map = ev.parent as IMSTMap<IT>
+                    map.forEach((val, key) => {
+                        if (val === ev.oldRef) {
+                            map.delete(key)
+                        }
+                    })
+                } else {
+                    fail(`unknown parent type '${parentType}', safeReference cannot be invalidated`)
+                }
+            }
+        })
+    )
 }

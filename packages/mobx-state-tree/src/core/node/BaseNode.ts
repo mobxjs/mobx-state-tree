@@ -15,11 +15,11 @@ import { createAtom } from "mobx"
 export abstract class BaseNode {
     protected readonly subpathAtom = createAtom(`path`)
     protected escapedSubpath: string
-    protected state = NodeLifeCycle.INITIALIZING
+    state = NodeLifeCycle.INITIALIZING
     storedValue: any
 
     readonly type: IAnyType
-    readonly hookSubscribers = new EventHandler<(node: BaseNode, hook: Hook) => void>()
+    readonly hookSubscribers: { [k: string]: EventHandler<(node: any, hook: Hook) => void> } = {}
 
     environment: any = undefined
     subpath: string = ""
@@ -53,7 +53,7 @@ export abstract class BaseNode {
     protected abstract fireHook(name: Hook): void
 
     protected internalFireHook(name: Hook) {
-        this.hookSubscribers.emit(this, name)
+        this.hookSubscribers[name].emit(this, name)
     }
 
     value: any
@@ -89,7 +89,7 @@ export abstract class BaseNode {
     abstract finalizeDeath(): void
 
     protected internalFinalizeDeath() {
-        this.hookSubscribers.clear()
+        Object.keys(this.hookSubscribers).forEach(k => this.hookSubscribers[k].clear())
         this.state = NodeLifeCycle.DEAD
         this.subpath = this.escapedSubpath = ""
         this.subpathAtom.reportChanged()
