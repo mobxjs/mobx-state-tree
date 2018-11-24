@@ -459,7 +459,7 @@ export class ObjectNode extends BaseNode {
         this._snapshotSubscribers.clear()
         this.parent = null
 
-        super.internalFinalizeDeath()
+        this.internalFinalizeDeath()
     }
 
     onSnapshot(onChange: (snapshot: any) => void): IDisposer {
