@@ -239,27 +239,25 @@ This methods returns the same disposer that was passed as argument.
 
 ### Parameters
 
--   `target` **IStateTreeNode**
--   `disposer`
+-   `target` **IStateTreeNode** 
+-   `disposer`  
 
 ### Examples
 
 ```javascript
-const Todo = types
-    .model({
-        title: types.string
-    })
-    .actions(self => ({
-        afterCreate() {
-            const autoSaveDisposer = reaction(
-                () => getSnapshot(self),
-                snapshot => sendSnapshotToServerSomehow(snapshot)
-            )
-            // stop sending updates to server if this
-            // instance is destroyed
-            addDisposer(self, autoSaveDisposer)
-        }
-    }))
+const Todo = types.model({
+  title: types.string
+}).actions(self => ({
+  afterCreate() {
+    const autoSaveDisposer = reaction(
+      () => getSnapshot(self),
+      snapshot => sendSnapshotToServerSomehow(snapshot)
+    )
+    // stop sending updates to server if this
+    // instance is destroyed
+    addDisposer(self, autoSaveDisposer)
+  }
+}))
 ```
 
 ## addMiddleware
@@ -271,11 +269,11 @@ For more details, see the [middleware docs][223]
 
 ### Parameters
 
--   `target` **IStateTreeNode**
--   `handler`
--   `includeHooks`
+-   `target` **IStateTreeNode** 
+-   `handler`  
+-   `includeHooks`  
 
-Returns **IDisposer**
+Returns **IDisposer** 
 
 ## applyAction
 
@@ -285,8 +283,8 @@ Takes an action description as produced by the `onAction` middleware.
 
 ### Parameters
 
--   `target` **[Object][224]**
--   `actions` **[Array][225]&lt;IActionCall>**
+-   `target` **[Object][224]** 
+-   `actions` **[Array][225]&lt;IActionCall>** 
 
 ## applyPatch
 
@@ -297,8 +295,8 @@ Can apply a single past, or an array of patches.
 
 ### Parameters
 
--   `target` **[Object][224]**
--   `patch` **IJsonPatch**
+-   `target` **[Object][224]** 
+-   `patch` **IJsonPatch** 
 
 ## applySnapshot
 
@@ -306,8 +304,8 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 
 ### Parameters
 
--   `target` **[Object][224]**
--   `snapshot` **[Object][224]**
+-   `target` **[Object][224]** 
+-   `snapshot` **[Object][224]** 
 
 ## BaseNode
 
@@ -328,31 +326,27 @@ Either way, casting when outside an assignation operation won't compile.
 
 ### Parameters
 
--   `snapshotOrInstance` Snapshot or instance
+-   `snapshotOrInstance`  Snapshot or instance
 
 ### Examples
 
 ```javascript
-const ModelA = types
-    .model({
-        n: types.number
-    })
-    .actions(self => ({
-        setN(aNumber: number) {
-            self.n = aNumber
-        }
-    }))
+const ModelA = types.model({
+  n: types.number
+}).actions(self => ({
+  setN(aNumber: number) {
+    self.n = aNumber
+  }
+}))
 
-const ModelB = types
-    .model({
-        innerModel: ModelA
-    })
-    .actions(self => ({
-        someAction() {
-            // this will allow the compiler to assign a snapshot to the property
-            self.innerModel = cast({ a: 5 })
-        }
-    }))
+const ModelB = types.model({
+  innerModel: ModelA
+}).actions(self => ({
+  someAction() {
+    // this will allow the compiler to assign a snapshot to the property
+    self.innerModel = cast({ a: 5 })
+  }
+}))
 ```
 
 Returns **any** The same object casted as an instance
@@ -365,30 +359,28 @@ but just fool typescript into thinking so.
 
 ### Parameters
 
--   `instance`
--   `snapshotOrInstance` Instance
+-   `instance`  
+-   `snapshotOrInstance`  Instance
 
 ### Examples
 
 ```javascript
-const ModelA = types
-    .model({
-        id: types.identifier,
-        n: types.number
-    })
-    .actions(self => ({
-        setN(aNumber: number) {
-            self.n = aNumber
-        }
-    }))
+const ModelA = types.model({
+  id: types.identifier,
+  n: types.number
+}).actions(self => ({
+  setN(aNumber: number) {
+    self.n = aNumber
+  }
+}))
 
 const ModelB = types.model({
-    refA: types.reference(ModelA)
+  refA: types.reference(ModelA)
 })
 
-const a = ModelA.create({ id: "someId", n: 5 })
+const a = ModelA.create({ id: 'someId', n: 5 });
 // this will allow the compiler to use a model as if it were a reference snapshot
-const b = ModelB.create({ refA: castToReference(a) })
+const b = ModelB.create({ refA: castToReference(a)})
 ```
 
 Returns **any** The same object casted as an reference snapshot (string or number)
@@ -401,28 +393,26 @@ but just fool typescript into thinking so.
 
 ### Parameters
 
--   `snapshotOrInstance` Snapshot or instance
+-   `snapshotOrInstance`  Snapshot or instance
 
 ### Examples
 
 ```javascript
-const ModelA = types
-    .model({
-        n: types.number
-    })
-    .actions(self => ({
-        setN(aNumber: number) {
-            self.n = aNumber
-        }
-    }))
+const ModelA = types.model({
+  n: types.number
+}).actions(self => ({
+  setN(aNumber: number) {
+    self.n = aNumber
+  }
+}))
 
 const ModelB = types.model({
-    innerModel: ModelA
+  innerModel: ModelA
 })
 
-const a = ModelA.create({ n: 5 })
+const a = ModelA.create({ n: 5 });
 // this will allow the compiler to use a model as if it were a snapshot
-const b = ModelB.create({ innerModel: castToSnapshot(a) })
+const b = ModelB.create({ innerModel: castToSnapshot(a)})
 ```
 
 Returns **any** The same object casted as an input (creation) snapshot
@@ -436,10 +426,10 @@ _Tip: clone will create a literal copy, including the same identifiers. To modif
 
 ### Parameters
 
--   `source` **T**
+-   `source` **T** 
 -   `keepEnvironment` **([boolean][227] | any)** indicates whether the clone should inherit the same environment (`true`, the default), or not have an environment (`false`). If an object is passed in as second argument, that will act as the environment for the cloned tree.
 
-Returns **T**
+Returns **T** 
 
 ## ComplexType
 
@@ -463,9 +453,9 @@ See the `atomic` middleware for an example
 
 ### Parameters
 
--   `hooks`
+-   `hooks`  
 
-Returns **IMiddlewareHandler**
+Returns **IMiddlewareHandler** 
 
 ## decorate
 
@@ -473,23 +463,23 @@ Binds middleware to a specific action
 
 ### Parameters
 
--   `handler` **IMiddlewareHandler**
--   `fn`
--   `Function` } fn
+-   `handler` **IMiddlewareHandler** 
+-   `fn`  
+-   `Function`  } fn
 
 ### Examples
 
 ```javascript
 type.actions(self => {
-    function takeA____() {
-        self.toilet.donate()
-        self.wipe()
-        self.wipe()
-        self.toilet.flush()
-    }
-    return {
-        takeA____: decorate(atomic, takeA____)
-    }
+  function takeA____() {
+      self.toilet.donate()
+      self.wipe()
+      self.wipe()
+      self.toilet.flush()
+  }
+  return {
+    takeA____: decorate(atomic, takeA____)
+  }
 })
 ```
 
@@ -501,7 +491,7 @@ Removes a model element from the state tree, and mark it as end-of-life; the ele
 
 ### Parameters
 
--   `target`
+-   `target`  
 
 ## detach
 
@@ -509,7 +499,7 @@ Removes a model element from the state tree, and let it live on as a new state t
 
 ### Parameters
 
--   `target`
+-   `target`  
 
 ## Error
 
@@ -520,7 +510,7 @@ escape slashes and backslashes
 
 ### Parameters
 
--   `str`
+-   `str`  
 
 ## EventHandler
 
@@ -530,9 +520,9 @@ See [asynchronous actions][229].
 
 ### Parameters
 
--   `asyncAction`
+-   `asyncAction`  
 
-Returns **[Promise][230]**
+Returns **[Promise][230]** 
 
 ## getChildType
 
@@ -540,8 +530,8 @@ Returns the _declared_ type of the given sub property of an object, array or map
 
 ### Parameters
 
--   `object` **IStateTreeNode**
--   `child` **[string][231]**
+-   `object` **IStateTreeNode** 
+-   `child` **[string][231]** 
 
 ### Examples
 
@@ -552,7 +542,7 @@ const box = Box.create()
 console.log(getChildType(box, "x").name) // 'number'
 ```
 
-Returns **IAnyType**
+Returns **IAnyType** 
 
 ## getEnv
 
@@ -566,9 +556,9 @@ Returns an empty environment if the tree wasn't initialized with an environment
 
 ### Parameters
 
--   `target` **IStateTreeNode**
+-   `target` **IStateTreeNode** 
 
-Returns **any**
+Returns **any** 
 
 ## getIdentifier
 
@@ -577,9 +567,9 @@ This is the _string normalized_ identifier, which might not match the type of th
 
 ### Parameters
 
--   `target` **IStateTreeNode**
+-   `target` **IStateTreeNode** 
 
-Returns **([string][231] | null)**
+Returns **([string][231] | null)** 
 
 ## getMembers
 
@@ -587,9 +577,9 @@ Returns a reflection of the model node, including name, properties, views, volat
 
 ### Parameters
 
--   `target` **IAnyStateTreeNode**
+-   `target` **IAnyStateTreeNode** 
 
-Returns **IModelReflectionData**
+Returns **IModelReflectionData** 
 
 ## getParent
 
@@ -603,10 +593,10 @@ once the `afterAttach` hook has fired
 
 ### Parameters
 
--   `target` **[Object][224]**
+-   `target` **[Object][224]** 
 -   `depth` **[number][233]** = 1, how far should we look upward?
 
-Returns **any**
+Returns **any** 
 
 ## getParentOfType
 
@@ -614,10 +604,10 @@ Returns the target's parent of a given type, or throws.
 
 ### Parameters
 
--   `target` **IStateTreeNode**
--   `type` **IType&lt;any, any, T>**
+-   `target` **IStateTreeNode** 
+-   `type` **IType&lt;any, any, T>** 
 
-Returns **T**
+Returns **T** 
 
 ## getPath
 
@@ -625,9 +615,9 @@ Returns the path of the given object in the model tree
 
 ### Parameters
 
--   `target` **[Object][224]**
+-   `target` **[Object][224]** 
 
-Returns **[string][231]**
+Returns **[string][231]** 
 
 ## getPathParts
 
@@ -635,9 +625,9 @@ Returns the path of the given object as unescaped string array
 
 ### Parameters
 
--   `target` **[Object][224]**
+-   `target` **[Object][224]** 
 
-Returns **[Array][225]&lt;[string][231]>**
+Returns **[Array][225]&lt;[string][231]>** 
 
 ## getPropertyMembers
 
@@ -645,9 +635,9 @@ Returns a reflection of the model type properties and name for either a model ty
 
 ### Parameters
 
--   `typeOrNode` **(IAnyModelType | IStateTreeNode)**
+-   `typeOrNode` **(IAnyModelType | IStateTreeNode)** 
 
-Returns **IModelReflectionPropertiesData**
+Returns **IModelReflectionPropertiesData** 
 
 ## getRelativePath
 
@@ -656,10 +646,10 @@ returns the shortest jsonpath needed to navigate from the one to the other
 
 ### Parameters
 
--   `base` **IStateTreeNode**
--   `target` **IStateTreeNode**
+-   `base` **IStateTreeNode** 
+-   `target` **IStateTreeNode** 
 
-Returns **[string][231]**
+Returns **[string][231]** 
 
 ## getRoot
 
@@ -670,9 +660,9 @@ once the `afterAttach` hook has fired
 
 ### Parameters
 
--   `target` **[Object][224]**
+-   `target` **[Object][224]** 
 
-Returns **any**
+Returns **any** 
 
 ## getSnapshot
 
@@ -681,10 +671,10 @@ structural sharing where possible. Doesn't require MobX transactions to be compl
 
 ### Parameters
 
--   `target` **[Object][224]**
+-   `target` **[Object][224]** 
 -   `applyPostProcess` **[boolean][227]** = true, by default the postProcessSnapshot gets applied
 
-Returns **any**
+Returns **any** 
 
 ## getType
 
@@ -692,9 +682,9 @@ Returns the _actual_ type of the given tree node. (Or throws)
 
 ### Parameters
 
--   `object` **IStateTreeNode**
+-   `object` **IStateTreeNode** 
 
-Returns **IAnyType**
+Returns **IAnyType** 
 
 ## hasParent
 
@@ -702,10 +692,10 @@ Given a model instance, returns `true` if the object has a parent, that is, is p
 
 ### Parameters
 
--   `target` **[Object][224]**
+-   `target` **[Object][224]** 
 -   `depth` **[number][233]** = 1, how far should we look upward?
 
-Returns **[boolean][227]**
+Returns **[boolean][227]** 
 
 ## hasParentOfType
 
@@ -713,10 +703,10 @@ Given a model instance, returns `true` if the object has a parent of given type,
 
 ### Parameters
 
--   `target` **[Object][224]**
--   `type` **IAnyType**
+-   `target` **[Object][224]** 
+-   `type` **IAnyType** 
 
-Returns **[boolean][227]**
+Returns **[boolean][227]** 
 
 ## IdentifierCache
 
@@ -731,9 +721,9 @@ is requesting it's last path and snapshot
 
 ### Parameters
 
--   `target` **IStateTreeNode**
+-   `target` **IStateTreeNode** 
 
-Returns **[boolean][227]**
+Returns **[boolean][227]** 
 
 ## isArrayType
 
@@ -741,7 +731,7 @@ Returns if a given value represents an array type.
 
 ### Parameters
 
--   `type` **IAnyType**
+-   `type` **IAnyType** 
 
 ## isFrozenType
 
@@ -749,7 +739,7 @@ Returns if a given value represents a frozen type.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
 ## isIdentifierType
 
@@ -757,7 +747,7 @@ Returns if a given value represents an identifier type.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
 ## isLateType
 
@@ -765,7 +755,7 @@ Returns if a given value represents a late type.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
 ## isLiteralType
 
@@ -773,7 +763,7 @@ Returns if a given value represents a literal type.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
 ## isMapType
 
@@ -781,7 +771,7 @@ Returns if a given value represents a map type.
 
 ### Parameters
 
--   `type` **IAnyType**
+-   `type` **IAnyType** 
 
 ## isModelType
 
@@ -789,7 +779,7 @@ Returns if a given value represents a model type.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
 ## isOptionalType
 
@@ -797,7 +787,7 @@ Returns if a value represents an optional type.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
 ## isPrimitiveType
 
@@ -805,7 +795,7 @@ Returns if a given value represents a primitive type.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
 ## isProtected
 
@@ -813,7 +803,7 @@ Returns true if the object is in protected mode, @see protect
 
 ### Parameters
 
--   `target`
+-   `target`  
 
 ## isReferenceType
 
@@ -821,7 +811,7 @@ Returns if a given value represents a reference type.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
 ## isRefinementType
 
@@ -829,7 +819,7 @@ Returns if a given value is a refinement type.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
 ## isRoot
 
@@ -837,9 +827,9 @@ Returns true if the given object is the root of a model tree
 
 ### Parameters
 
--   `target` **[Object][224]**
+-   `target` **[Object][224]** 
 
-Returns **[boolean][227]**
+Returns **[boolean][227]** 
 
 ## isStateTreeNode
 
@@ -849,7 +839,7 @@ More precisely, that is, if the value is an instance of a
 
 ### Parameters
 
--   `value` **any**
+-   `value` **any** 
 
 ## isType
 
@@ -857,7 +847,7 @@ Returns if a given value represents a type.
 
 ### Parameters
 
--   `value` **any**
+-   `value` **any** 
 
 ## isUnionType
 
@@ -865,7 +855,7 @@ Returns if a given value represents a union type.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
 ## isValidReference
 
@@ -873,10 +863,10 @@ Tests if a reference is valid (pointing to an existing node and optionally if al
 
 ### Parameters
 
--   `getter`
+-   `getter`  
 -   `checkIfAlive` **[boolean][227]** true to also make sure the referenced node is alive (default), false to skip this check. (optional, default `true`)
 
-Returns **[boolean][227]**
+Returns **[boolean][227]** 
 
 ## joinJsonPath
 
@@ -884,9 +874,9 @@ Generates a json-path compliant json path from path parts
 
 ### Parameters
 
--   `path` **[Array][225]&lt;[string][231]>**
+-   `path` **[Array][225]&lt;[string][231]>** 
 
-Returns **[string][231]**
+Returns **[string][231]** 
 
 ## ObservableMap
 
@@ -902,38 +892,36 @@ Rather, when using `onAction` middleware, one should consider in passing argumen
 
 ### Parameters
 
--   `target` **IStateTreeNode**
--   `listener`
--   `attachAfter` {boolean} (default false) fires the listener _after_ the action has executed instead of before.
+-   `target` **IStateTreeNode** 
+-   `listener`  
+-   `attachAfter`  {boolean} (default false) fires the listener _after_ the action has executed instead of before.
 
 ### Examples
 
 ```javascript
 const Todo = types.model({
-    task: types.string
+  task: types.string
 })
 
-const TodoStore = types
-    .model({
-        todos: types.array(Todo)
-    })
-    .actions(self => ({
-        add(todo) {
-            self.todos.push(todo)
-        }
-    }))
+const TodoStore = types.model({
+  todos: types.array(Todo)
+}).actions(self => ({
+  add(todo) {
+    self.todos.push(todo);
+  }
+}))
 
 const s = TodoStore.create({ todos: [] })
 
-let disposer = onAction(s, call => {
-    console.log(call)
+let disposer = onAction(s, (call) => {
+  console.log(call);
 })
 
 s.add({ task: "Grab a coffee" })
 // Logs: { name: "add", path: "", args: [{ task: "Grab a coffee" }] }
 ```
 
-Returns **IDisposer**
+Returns **IDisposer** 
 
 ## onPatch
 
@@ -944,7 +932,7 @@ Patches can be used to deep observe a model tree.
 ### Parameters
 
 -   `target` **[Object][224]** the model instance from which to receive patches
--   `callback`
+-   `callback`  
 
 Returns **IDisposer** function to remove the listener
 
@@ -956,18 +944,18 @@ See [snapshots][235] for more details.
 
 ### Parameters
 
--   `target` **[Object][224]**
--   `callback`
+-   `target` **[Object][224]** 
+-   `callback`  
 
-Returns **IDisposer**
+Returns **IDisposer** 
 
 ## process
 
 ### Parameters
 
--   `asyncAction`
+-   `asyncAction`  
 
-Returns **[Promise][230]**
+Returns **[Promise][230]** 
 
 **Meta**
 
@@ -975,13 +963,14 @@ Returns **[Promise][230]**
     See [https://github.com/mobxjs/mobx-state-tree/issues/399][236] for more information.
     Note that the middleware event types starting with `process` now start with `flow`.
 
+
 ## protect
 
 The inverse of `unprotect`
 
 ### Parameters
 
--   `target` **IStateTreeNode**
+-   `target` **IStateTreeNode** 
 
 ## recordActions
 
@@ -990,7 +979,7 @@ Returns an recorder object with the following signature:
 
 ### Parameters
 
--   `subject` **IStateTreeNode**
+-   `subject` **IStateTreeNode** 
 
 ### Examples
 
@@ -1005,7 +994,7 @@ export interface IActionRecorder {
 }
 ```
 
-Returns **IPatchRecorder**
+Returns **IPatchRecorder** 
 
 ## recordPatches
 
@@ -1014,7 +1003,7 @@ Returns an recorder object with the following signature:
 
 ### Parameters
 
--   `subject` **IStateTreeNode**
+-   `subject` **IStateTreeNode** 
 
 ### Examples
 
@@ -1036,7 +1025,7 @@ export interface IPatchRecorder {
 }
 ```
 
-Returns **IPatchRecorder**
+Returns **IPatchRecorder** 
 
 ## resolveIdentifier
 
@@ -1045,11 +1034,11 @@ Returns undefined if no value can be found.
 
 ### Parameters
 
--   `type` **IAnyType**
--   `target` **IStateTreeNode**
--   `identifier` **([string][231] \| [number][233])**
+-   `type` **IAnyType** 
+-   `target` **IStateTreeNode** 
+-   `identifier` **([string][231] \| [number][233])** 
 
-Returns **any**
+Returns **any** 
 
 ## resolvePath
 
@@ -1058,10 +1047,10 @@ Returns undefined if no value can be found.
 
 ### Parameters
 
--   `target` **[Object][224]**
+-   `target` **[Object][224]** 
 -   `path` **[string][231]** escaped json path
 
-Returns **any**
+Returns **any** 
 
 ## setLivelynessChecking
 
@@ -1073,7 +1062,7 @@ Possible values: `"warn"`, `"error"` and `"ignore"`
 
 ### Parameters
 
--   `mode` **LivelynessMode**
+-   `mode` **LivelynessMode** 
 
 ## splitJsonPath
 
@@ -1081,9 +1070,9 @@ Splits and decodes a json path into several parts
 
 ### Parameters
 
--   `path` **[string][231]**
+-   `path` **[string][231]** 
 
-Returns **[Array][225]&lt;[string][231]>**
+Returns **[Array][225]&lt;[string][231]>** 
 
 ## StoredReference
 
@@ -1094,19 +1083,19 @@ else it returns undefined.
 
 ### Parameters
 
--   `getter`
+-   `getter`  
 -   `checkIfAlive` **[boolean][227]** true to also make sure the referenced node is alive (default), false to skip this check. (optional, default `true`)
 
-Returns **(N | [undefined][237])**
+Returns **(N | [undefined][237])** 
 
 ## tryResolve
 
 ### Parameters
 
--   `target` **[Object][224]**
--   `path` **[string][231]**
+-   `target` **[Object][224]** 
+-   `path` **[string][231]** 
 
-Returns **any**
+Returns **any** 
 
 ## Type
 
@@ -1136,8 +1125,8 @@ Use this if you need typechecks even in a production build (by default all autom
 
 ### Parameters
 
--   `type` **IAnyType**
--   `value` **any**
+-   `type` **IAnyType** 
+-   `value` **any** 
 
 ## types.array
 
@@ -1147,17 +1136,17 @@ This type will always produce [observable arrays][238]
 
 ### Parameters
 
--   `subtype` **IType&lt;S, T>**
+-   `subtype` **IType&lt;S, T>** 
 
 ### Examples
 
 ```javascript
 const Todo = types.model({
-    task: types.string
+  task: types.string
 })
 
 const TodoStore = types.model({
-    todos: types.array(Todo)
+  todos: types.array(Todo)
 })
 
 const s = TodoStore.create({ todos: [] })
@@ -1166,7 +1155,7 @@ s.todos.push({ task: "Grab coffee" })
 console.log(s.todos[0]) // prints: "Grab coffee"
 ```
 
-Returns **IArrayType&lt;IT>**
+Returns **IArrayType&lt;IT>** 
 
 ## types.boolean
 
@@ -1177,8 +1166,8 @@ This type is used for boolean values by default
 
 ```javascript
 const Thing = types.model({
-    isCool: types.boolean,
-    isAwesome: false
+  isCool: types.boolean,
+  isAwesome: false
 })
 ```
 
@@ -1213,7 +1202,7 @@ export interface CustomTypeOptions<S, T> {
 
 ### Parameters
 
--   `options` **CustomTypeOptions&lt;S, T>**
+-   `options` **CustomTypeOptions&lt;S, T>** 
 
 ### Examples
 
@@ -1240,7 +1229,7 @@ const Wallet = types.model({
 })
 ```
 
-Returns **(IType&lt;(S | T), S, T>)**
+Returns **(IType&lt;(S | T), S, T>)** 
 
 ## types.Date
 
@@ -1250,7 +1239,7 @@ Creates a type that can only contain a javascript Date value.
 
 ```javascript
 const LogLine = types.model({
-    timestamp: types.Date
+  timestamp: types.Date,
 })
 
 LogLine.create({ timestamp: new Date() })
@@ -1270,11 +1259,11 @@ Can be used to create an string based enumeration.
 
 ```javascript
 const TrafficLight = types.model({
-    color: types.enumeration("Color", ["Red", "Orange", "Green"])
+  color: types.enumeration("Color", ["Red", "Orange", "Green"])
 })
 ```
 
-Returns **ISimpleType&lt;[string][231]>**
+Returns **ISimpleType&lt;[string][231]>** 
 
 ## types.frozen
 
@@ -1293,20 +1282,20 @@ Frozen properties can be defined in three different ways
 
 ### Parameters
 
--   `arg`
--   `defaultValueOrType` **([Type][239] | value)**
+-   `arg`  
+-   `defaultValueOrType` **([Type][239] | value)** 
 
 ### Examples
 
 ```javascript
 const GameCharacter = types.model({
-    name: string,
-    location: types.frozen({ x: 0, y: 0 })
+  name: string,
+  location: types.frozen({ x: 0, y: 0})
 })
 
 const hero = GameCharacter.create({
-    name: "Mario",
-    location: { x: 7, y: 4 }
+  name: "Mario",
+  location: { x: 7, y: 4 }
 })
 
 hero.location = { x: 10, y: 2 } // OK
@@ -1320,7 +1309,7 @@ type Point = { x: number, y: number }
    })
 ```
 
-Returns **[Type][239]**
+Returns **[Type][239]** 
 
 ## types.identifier
 
@@ -1334,12 +1323,12 @@ This type accepts as parameter the value type of the identifier field that can b
 
 ```javascript
 const Todo = types.model("Todo", {
-    id: types.identifier,
-    title: types.string
-})
+     id: types.identifier,
+     title: types.string
+ })
 ```
 
-Returns **IType&lt;T, T>**
+Returns **IType&lt;T, T>** 
 
 ## types.identifierNumber
 
@@ -1349,12 +1338,12 @@ Similar to `types.identifier`, but `identifierNumber` will serialize from / to a
 
 ```javascript
 const Todo = types.model("Todo", {
-    id: types.identifierNumber,
-    title: types.string
-})
+     id: types.identifierNumber,
+     title: types.string
+ })
 ```
 
-Returns **IType&lt;T, T>**
+Returns **IType&lt;T, T>** 
 
 ## types.integer
 
@@ -1365,8 +1354,8 @@ This type is used for integer values by default
 
 ```javascript
 const Size = types.model({
-    width: types.integer,
-    height: 10
+  width: types.integer,
+  height: 10
 })
 ```
 
@@ -1378,8 +1367,8 @@ You need to declare an interface to explicit the return type of the late paramet
 
 ### Parameters
 
--   `nameOrType`
--   `maybeType`
+-   `nameOrType`  
+-   `maybeType`  
 -   `name` **[string][231]?** The name to use for the type that will be returned.
 -   `type` **ILateType&lt;S, T>** A function that returns the type that will be defined.
 
@@ -1387,16 +1376,16 @@ You need to declare an interface to explicit the return type of the late paramet
 
 ```javascript
 interface INode {
-    childs: INode[];
-}
+      childs: INode[]
+ }
 
-// TypeScript is'nt smart enough to infer self referencing types.
-const Node = types.model({
-    childs: types.optional(types.array(types.late < any, INode > (() => Node)), [])
-})
+  // TypeScript is'nt smart enough to infer self referencing types.
+ const Node = types.model({
+      childs: types.optional(types.array(types.late<any, INode>(() => Node)), [])
+ })
 ```
 
-Returns **IType&lt;S, T>**
+Returns **IType&lt;S, T>** 
 
 ## types.literal
 
@@ -1413,11 +1402,11 @@ You can use literal to match exact strings for example the exact male or female 
 ```javascript
 const Person = types.model({
     name: types.string,
-    gender: types.union(types.literal("male"), types.literal("female"))
+    gender: types.union(types.literal('male'), types.literal('female'))
 })
 ```
 
-Returns **ISimpleType&lt;S>**
+Returns **ISimpleType&lt;S>** 
 
 ## types.map
 
@@ -1428,18 +1417,18 @@ This type will always produce [observable maps][240]
 
 ### Parameters
 
--   `subtype` **IType&lt;S, T>**
+-   `subtype` **IType&lt;S, T>** 
 
 ### Examples
 
 ```javascript
 const Todo = types.model({
-    id: types.identifier,
-    task: types.string
+  id: types.identifier,
+  task: types.string
 })
 
 const TodoStore = types.model({
-    todos: types.map(Todo)
+  todos: types.map(Todo)
 })
 
 const s = TodoStore.create({ todos: {} })
@@ -1449,7 +1438,7 @@ s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the iden
 console.log(s.todos.get(17).task) // prints: "Grab coffee"
 ```
 
-Returns **IMapType&lt;IT>**
+Returns **IMapType&lt;IT>** 
 
 ## types.maybe
 
@@ -1458,9 +1447,9 @@ The value `undefined` will be used to represent nullability.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
-Returns **IMaybe&lt;IT>**
+Returns **IMaybe&lt;IT>** 
 
 ## types.maybeNull
 
@@ -1469,9 +1458,9 @@ The value `null` will be used to represent no value.
 
 ### Parameters
 
--   `type` **IT**
+-   `type` **IT** 
 
-Returns **IMaybeNull&lt;IT>**
+Returns **IMaybeNull&lt;IT>** 
 
 ## types.model
 
@@ -1492,8 +1481,8 @@ This type is used for numeric values by default
 
 ```javascript
 const Vector = types.model({
-    x: types.number,
-    y: 1.5
+  x: types.number,
+  y: 1.5
 })
 ```
 
@@ -1506,20 +1495,20 @@ Applying a snapshot in which the optional value is _not_ present, causes the val
 
 ### Parameters
 
--   `type` **IT**
--   `defaultValueOrFunction` **OptionalDefaultValueOrFunction&lt;IT>**
+-   `type` **IT** 
+-   `defaultValueOrFunction` **OptionalDefaultValueOrFunction&lt;IT>** 
 
 ### Examples
 
 ```javascript
 const Todo = types.model({
-    title: types.optional(types.string, "Test"),
-    done: types.optional(types.boolean, false),
-    created: types.optional(types.Date, () => new Date())
+  title: types.optional(types.string, "Test"),
+  done: types.optional(types.boolean, false),
+  created: types.optional(types.Date, () => new Date())
 })
 
 // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
-const todo = Todo.create({ title: "Get coffee " })
+const todo = Todo.create({ title: "Get coffee "})
 ```
 
 ## types.reference
@@ -1529,8 +1518,8 @@ See also the [reference and identifiers][243] section.
 
 ### Parameters
 
--   `subType`
--   `options`
+-   `subType`  
+-   `options`  
 
 ## types.refinement
 
@@ -1538,10 +1527,10 @@ See also the [reference and identifiers][243] section.
 
 ### Parameters
 
--   `name` **[string][231]**
--   `type` **IType&lt;T, T>**
+-   `name` **[string][231]** 
+-   `type` **IType&lt;T, T>** 
 
-Returns **IType&lt;T, T>**
+Returns **IType&lt;T, T>** 
 
 ## types.safeReference
 
@@ -1553,10 +1542,10 @@ Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `o
 
 ### Parameters
 
--   `subType` **IT**
--   `options` **ReferenceOptionsGetSet&lt;IT>?**
+-   `subType` **IT** 
+-   `options` **ReferenceOptionsGetSet&lt;IT>?** 
 
-Returns **IMaybe&lt;IReferenceType&lt;IT>>**
+Returns **IMaybe&lt;IReferenceType&lt;IT>>** 
 
 ## types.string
 
@@ -1567,8 +1556,8 @@ This type is used for string values by default
 
 ```javascript
 const Person = types.model({
-    firstName: types.string,
-    lastName: "Doe"
+  firstName: types.string,
+  lastName: "Doe"
 })
 ```
 
@@ -1582,10 +1571,10 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 ### Parameters
 
--   `optionsOrType` **(ITypeDispatcher | IAnyType)**
--   `otherTypes` **...[Array][225]&lt;IAnyType>**
+-   `optionsOrType` **(ITypeDispatcher | IAnyType)** 
+-   `otherTypes` **...[Array][225]&lt;IAnyType>** 
 
-Returns **IAnyType**
+Returns **IAnyType** 
 
 ## unescapeJsonPath
 
@@ -1593,7 +1582,7 @@ unescape slashes and backslashes
 
 ### Parameters
 
--   `str`
+-   `str`  
 
 ## unprotect
 
@@ -1605,20 +1594,18 @@ In that case you can disable this protection by calling `unprotect` on the root 
 
 ### Parameters
 
--   `target`
+-   `target`  
 
 ### Examples
 
 ```javascript
-const Todo = types
-    .model({
-        done: false
-    })
-    .actions(self => ({
-        toggle() {
-            self.done = !self.done
-        }
-    }))
+const Todo = types.model({
+    done: false
+}).actions(self => ({
+    toggle() {
+        self.done = !self.done
+    }
+}))
 
 const todo = Todo.create()
 todo.done = true // throws!
@@ -1633,249 +1620,491 @@ Performs a depth first walk through a tree
 
 ### Parameters
 
--   `target`
--   `processor`
+-   `target`  
+-   `processor`  
 
 [1]: #adddisposer
+
 [2]: #parameters
+
 [3]: #examples
+
 [4]: #addmiddleware
+
 [5]: #parameters-1
+
 [6]: #applyaction
+
 [7]: #parameters-2
+
 [8]: #applypatch
+
 [9]: #parameters-3
+
 [10]: #applysnapshot
+
 [11]: #parameters-4
+
 [12]: #basenode
+
 [13]: #basenode-1
+
 [14]: #basenode-2
+
 [15]: #basereferencetype
+
 [16]: #basereferencetype-1
+
 [17]: #cast
+
 [18]: #parameters-5
+
 [19]: #examples-1
+
 [20]: #casttoreferencesnapshot
+
 [21]: #parameters-6
+
 [22]: #examples-2
+
 [23]: #casttosnapshot
+
 [24]: #parameters-7
+
 [25]: #examples-3
+
 [26]: #clone
+
 [27]: #parameters-8
+
 [28]: #complextype
+
 [29]: #complextype-1
+
 [30]: #complextype-2
+
 [31]: #complextype-3
+
 [32]: #complextype-4
+
 [33]: #createactiontrackingmiddleware
+
 [34]: #parameters-9
+
 [35]: #decorate
+
 [36]: #parameters-10
+
 [37]: #examples-4
+
 [38]: #destroy
+
 [39]: #parameters-11
+
 [40]: #detach
+
 [41]: #parameters-12
+
 [42]: #error
+
 [43]: #escapejsonpath
+
 [44]: #parameters-13
+
 [45]: #eventhandler
+
 [46]: #flow
+
 [47]: #parameters-14
+
 [48]: #getchildtype
+
 [49]: #parameters-15
+
 [50]: #examples-5
+
 [51]: #getenv
+
 [52]: #parameters-16
+
 [53]: #getidentifier
+
 [54]: #parameters-17
+
 [55]: #getmembers
+
 [56]: #parameters-18
+
 [57]: #getparent
+
 [58]: #parameters-19
+
 [59]: #getparentoftype
+
 [60]: #parameters-20
+
 [61]: #getpath
+
 [62]: #parameters-21
+
 [63]: #getpathparts
+
 [64]: #parameters-22
+
 [65]: #getpropertymembers
+
 [66]: #parameters-23
+
 [67]: #getrelativepath
+
 [68]: #parameters-24
+
 [69]: #getroot
+
 [70]: #parameters-25
+
 [71]: #getsnapshot
+
 [72]: #parameters-26
+
 [73]: #gettype
+
 [74]: #parameters-27
+
 [75]: #hasparent
+
 [76]: #parameters-28
+
 [77]: #hasparentoftype
+
 [78]: #parameters-29
+
 [79]: #identifiercache
+
 [80]: #identifiertype
+
 [81]: #isalive
+
 [82]: #parameters-30
+
 [83]: #isarraytype
+
 [84]: #parameters-31
+
 [85]: #isfrozentype
+
 [86]: #parameters-32
+
 [87]: #isidentifiertype
+
 [88]: #parameters-33
+
 [89]: #islatetype
+
 [90]: #parameters-34
+
 [91]: #isliteraltype
+
 [92]: #parameters-35
+
 [93]: #ismaptype
+
 [94]: #parameters-36
+
 [95]: #ismodeltype
+
 [96]: #parameters-37
+
 [97]: #isoptionaltype
+
 [98]: #parameters-38
+
 [99]: #isprimitivetype
+
 [100]: #parameters-39
+
 [101]: #isprotected
+
 [102]: #parameters-40
+
 [103]: #isreferencetype
+
 [104]: #parameters-41
+
 [105]: #isrefinementtype
+
 [106]: #parameters-42
+
 [107]: #isroot
+
 [108]: #parameters-43
+
 [109]: #isstatetreenode
+
 [110]: #parameters-44
+
 [111]: #istype
+
 [112]: #parameters-45
+
 [113]: #isuniontype
+
 [114]: #parameters-46
+
 [115]: #isvalidreference
+
 [116]: #parameters-47
+
 [117]: #joinjsonpath
+
 [118]: #parameters-48
+
 [119]: #observablemap
+
 [120]: #onaction
+
 [121]: #parameters-49
+
 [122]: #examples-6
+
 [123]: #onpatch
+
 [124]: #parameters-50
+
 [125]: #onsnapshot
+
 [126]: #parameters-51
+
 [127]: #process
+
 [128]: #parameters-52
+
 [129]: #protect
+
 [130]: #parameters-53
+
 [131]: #recordactions
+
 [132]: #parameters-54
+
 [133]: #examples-7
+
 [134]: #recordpatches
+
 [135]: #parameters-55
+
 [136]: #examples-8
+
 [137]: #resolveidentifier
+
 [138]: #parameters-56
+
 [139]: #resolvepath
+
 [140]: #parameters-57
+
 [141]: #setlivelynesschecking
+
 [142]: #parameters-58
+
 [143]: #splitjsonpath
+
 [144]: #parameters-59
+
 [145]: #storedreference
+
 [146]: #tryreference
+
 [147]: #parameters-60
+
 [148]: #tryresolve
+
 [149]: #parameters-61
+
 [150]: #type
+
 [151]: #type-1
+
 [152]: #type-2
+
 [153]: #type-3
+
 [154]: #type-4
+
 [155]: #type-5
+
 [156]: #type-6
+
 [157]: #type-7
+
 [158]: #type-8
+
 [159]: #type-9
+
 [160]: #typecheck
+
 [161]: #parameters-62
+
 [162]: #typesarray
+
 [163]: #parameters-63
+
 [164]: #examples-9
+
 [165]: #typesboolean
+
 [166]: #examples-10
+
 [167]: #typescompose
+
 [168]: #typescustom
+
 [169]: #parameters-64
+
 [170]: #examples-11
+
 [171]: #typesdate
+
 [172]: #examples-12
+
 [173]: #typesenumeration
+
 [174]: #parameters-65
+
 [175]: #examples-13
+
 [176]: #typesfrozen
+
 [177]: #parameters-66
+
 [178]: #examples-14
+
 [179]: #typesidentifier
+
 [180]: #examples-15
+
 [181]: #typesidentifiernumber
+
 [182]: #examples-16
+
 [183]: #typesinteger
+
 [184]: #examples-17
+
 [185]: #typeslate
+
 [186]: #parameters-67
+
 [187]: #examples-18
+
 [188]: #typesliteral
+
 [189]: #parameters-68
+
 [190]: #examples-19
+
 [191]: #typesmap
+
 [192]: #parameters-69
+
 [193]: #examples-20
+
 [194]: #typesmaybe
+
 [195]: #parameters-70
+
 [196]: #typesmaybenull
+
 [197]: #parameters-71
+
 [198]: #typesmodel
+
 [199]: #typesnull
+
 [200]: #typesnumber
+
 [201]: #examples-21
+
 [202]: #typesoptional
+
 [203]: #parameters-72
+
 [204]: #examples-22
+
 [205]: #typesreference
+
 [206]: #parameters-73
+
 [207]: #typesrefinement
+
 [208]: #parameters-74
+
 [209]: #typessafereference
+
 [210]: #parameters-75
+
 [211]: #typesstring
+
 [212]: #examples-23
+
 [213]: #typesundefined
+
 [214]: #typesunion
+
 [215]: #parameters-76
+
 [216]: #unescapejsonpath
+
 [217]: #parameters-77
+
 [218]: #unprotect
+
 [219]: #parameters-78
+
 [220]: #examples-24
+
 [221]: #walk
+
 [222]: #parameters-79
+
 [223]: docs/middleware.md
+
 [224]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
 [225]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
 [226]: https://github.com/mobxjs/mobx-state-tree#patches
+
 [227]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
 [228]: http://tools.ietf.org/html/rfc6901
+
 [229]: https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md
+
 [230]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
 [231]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
 [232]: https://github.com/mobxjs/mobx-state-tree#dependency-injection
+
 [233]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
 [234]: https://github.com/mobxjs/mobx-state-tree#actions
+
 [235]: https://github.com/mobxjs/mobx-state-tree#snapshots
+
 [236]: https://github.com/mobxjs/mobx-state-tree/issues/399
+
 [237]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
+
 [238]: https://mobx.js.org/refguide/array.html
+
 [239]: #type
+
 [240]: https://mobx.js.org/refguide/map.html
+
 [241]: https://github.com/mobxjs/mobx-state-tree#creating-models
+
 [242]: https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1
+
 [243]: https://github.com/mobxjs/mobx-state-tree#references-and-identifiers
