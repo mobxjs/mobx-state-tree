@@ -149,11 +149,12 @@ export class ObjectNode extends BaseNode {
     @action
     private _createObservableInstance() {
         const type = this.type
-        this.storedValue = type.createNewInstance(this, this._childNodes, this._initialSnapshot)
-        this.preboot()
 
-        this._isRunningAction = true
         try {
+            this.storedValue = type.createNewInstance(this, this._childNodes, this._initialSnapshot)
+            this.preboot()
+
+            this._isRunningAction = true
             type.finalizeNewInstance(this, this.storedValue)
         } catch (e) {
             // short-cut to die the instance, to avoid the snapshot computed starting to throw...
