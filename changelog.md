@@ -1,4 +1,4 @@
-- Added `onInvalidated` option for references and `types.safeReference` (see readme) through [#1091](https://github.com/mobxjs/mobx-state-tree/pull/1091) by [@xaviergonz](https://github.com/xaviergonz)
+- Added `onInvalidated` option for references and `types.weakReference` (see readme) through [#1091](https://github.com/mobxjs/mobx-state-tree/pull/1091) by [@xaviergonz](https://github.com/xaviergonz)
 -   Added `tryReference` and `isValidReference` to use references that might be no longer pointing to any nodes in a safe way through [#1087](https://github.com/mobxjs/mobx-state-tree/pull/1087) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.8.1

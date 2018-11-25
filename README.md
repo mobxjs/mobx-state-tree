@@ -676,7 +676,7 @@ const s = Store.create({
 })
 ```
 
-#### Reference validation: `isValidReference`, `tryReference`, `onInvalidate` hook and `types.safeReference`
+#### Reference validation: `isValidReference`, `tryReference`, `onInvalidate` hook and `types.weakReference`
 
 Acessing an invalid reference (a reference to a dead/detached node) triggers an exception.
 
@@ -710,7 +710,7 @@ const refWithOnInvalidated = types.reference(Todo, {
 ```
 Note that invalidation will only trigger while the reference is attached to a parent (be it a model, an array, a map, etc.).
 
-A default implementation of such `onInvalidated` hook is provided by the `types.safeReference` type. It is like a standard reference, except that once the target node becomes invalidated it will:
+A default implementation of such `onInvalidated` hook is provided by the `types.weakReference` type. It is like a standard reference, except that once the target node becomes invalidated it will:
 - If its parent is a model: Set its own property to `undefined`
 - If its parent is an array: Remove itself from the array
 - If its parent is a map: Remove itself from the map
@@ -721,7 +721,7 @@ Strictly speaking it is a `types.maybe(types.reference(Type))` with a custom `on
 const Todo = types.model({ id: types.identifier })
 const Store = types.model({
     todos: types.array(Todo),
-    selectedTodo: types.safeReference(Todo)
+    selectedTodo: types.weakReference(Todo)
 })
 
 // given selectedTodo points to a valid Todo and that Todo is later removed from the todos
@@ -983,7 +983,7 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
     -   (Typescript) `types.frozen<TypeScriptType>(...)` - provide a typescript type, to help in strongly typing the field (design time only)
 -   `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one.
 -   `types.reference(targetType)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
--   `types.safeReference(targetType)` is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed. See [references](#references) for more details.
+-   `types.weakReference(targetType)` is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed. See [references](#references) for more details.
 
 ## Property types
 

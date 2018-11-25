@@ -437,20 +437,20 @@ export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type 
 }
 
 /**
- * A safe reference is like a standard reference, except that it accepts the undefined value by default
+ * A weak reference is like a standard reference, except that it accepts the undefined value by default
  * and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
  * when the reference it is pointing to gets detached/destroyed.
  *
  * Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `onInvalidate` option.
  *
  * @export
- * @alias types.safeReference
+ * @alias types.weakReference
  * @template IT
  * @param {IT} subType
  * @param {ReferenceOptionsGetSet<IT>} [options]
  * @returns {IMaybe<IReferenceType<IT>>}
  */
-export function safeReference<IT extends IAnyComplexType>(
+export function weakReference<IT extends IAnyComplexType>(
     subType: IT,
     options?: ReferenceOptionsGetSet<IT>
 ): IMaybe<IReferenceType<IT>> {
@@ -474,7 +474,7 @@ export function safeReference<IT extends IAnyComplexType>(
                         }
                     })
                 } else {
-                    fail(`unknown parent type '${parentType}', safeReference cannot be invalidated`)
+                    fail(`unknown parent type '${parentType}', weakReference cannot be invalidated`)
                 }
             }
         })

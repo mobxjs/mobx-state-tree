@@ -86,7 +86,7 @@ const TYPES = stringToArray(`
     compose,
     custom,
     reference,
-    safeReference,
+    weakReference,
     union,
     optional,
     literal,

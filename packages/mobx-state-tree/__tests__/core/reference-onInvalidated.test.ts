@@ -40,18 +40,16 @@ const createStore = (
 
     const Store = types.model({
         todos: types.array(Todo),
-
         onInv: types.maybe(types.reference(Todo, refOptions as any)),
-
-        single: types.safeReference(Todo),
+        single: types.weakReference(Todo),
         deep: types.optional(
             types.model({
-                single: types.safeReference(Todo)
+                single: types.weakReference(Todo)
             }),
             {}
         ),
-        arr: types.array(types.safeReference(Todo)),
-        map: types.map(types.safeReference(Todo))
+        arr: types.array(types.weakReference(Todo)),
+        map: types.map(types.weakReference(Todo))
     })
 
     const s = Store.create(createSnapshot(partialSnapshot))
@@ -232,7 +230,7 @@ for (const customRef of [false, true]) {
     })
 }
 
-describe("safeReference", () => {
+describe("weakReference", () => {
     test("model property", () => {
         const store = createStore({})
         expect(store.single).toBeUndefined()
