@@ -67,7 +67,7 @@ for (const customRef of [false, true]) {
                 calls++
                 oldRefId = ev1.oldRef.id
                 ev = ev1
-                ev1.setNewRef(undefined)
+                ev1.removeRef()
             }
             const store = createStore({ onInv: "1" }, onInv)
 
@@ -76,7 +76,8 @@ for (const customRef of [false, true]) {
             expect(calls).toBe(1)
             expect(ev!.parent).toBe(store)
             expect(oldRefId).toBe("1")
-            expect(ev!.setNewRef).toBeTruthy()
+            expect(ev!.removeRef).toBeTruthy()
+            expect(ev!.replaceRef).toBeTruthy()
             expect(store.onInv).toBe(undefined)
             expect(getSnapshot(store).onInv).toBeUndefined()
 
@@ -86,7 +87,8 @@ for (const customRef of [false, true]) {
             expect(calls).toBe(2)
             expect(ev!.parent).toBe(store)
             expect(oldRefId).toBe("2")
-            expect(ev!.setNewRef).toBeTruthy()
+            expect(ev!.removeRef).toBeTruthy()
+            expect(ev!.replaceRef).toBeTruthy()
             expect(store.onInv).toBe(undefined)
             expect(getSnapshot(store).onInv).toBeUndefined()
         })
@@ -99,7 +101,7 @@ for (const customRef of [false, true]) {
                 calls++
                 oldRefId = ev1.oldRef.id
                 ev = ev1
-                ev1.setNewRef(undefined)
+                ev1.removeRef()
             }
             const store = createStore({}, onInv)
             expect(calls).toBe(0)
@@ -109,7 +111,8 @@ for (const customRef of [false, true]) {
             expect(calls).toBe(1)
             expect(ev!.parent).toBe(store)
             expect(oldRefId).toBe("1")
-            expect(ev!.setNewRef).toBeTruthy()
+            expect(ev!.removeRef).toBeTruthy()
+            expect(ev!.replaceRef).toBeTruthy()
             expect(store.onInv).toBe(undefined)
             expect(getSnapshot(store).onInv).toBeUndefined()
 
@@ -119,7 +122,8 @@ for (const customRef of [false, true]) {
             expect(calls).toBe(2)
             expect(ev!.parent).toBe(store)
             expect(oldRefId).toBe("2")
-            expect(ev!.setNewRef).toBeTruthy()
+            expect(ev!.removeRef).toBeTruthy()
+            expect(ev!.replaceRef).toBeTruthy()
             expect(store.onInv).toBe(undefined)
             expect(getSnapshot(store).onInv).toBeUndefined()
         })
@@ -132,7 +136,7 @@ for (const customRef of [false, true]) {
                 calls++
                 oldRefId = ev1.oldRef.id
                 ev = ev1
-                ev1.setNewRef(undefined)
+                ev1.removeRef()
             }
             const store = createStore({}, onInv)
 
@@ -145,7 +149,8 @@ for (const customRef of [false, true]) {
             expect(calls).toBe(1)
             expect(ev!.parent).toBe(store)
             expect(oldRefId).toBe("1")
-            expect(ev!.setNewRef).toBeTruthy()
+            expect(ev!.removeRef).toBeTruthy()
+            expect(ev!.replaceRef).toBeTruthy()
             expect(store.onInv).toBe(undefined)
             expect(getSnapshot(store).onInv).toBeUndefined()
 
@@ -155,12 +160,13 @@ for (const customRef of [false, true]) {
             expect(calls).toBe(2)
             expect(ev!.parent).toBe(store)
             expect(oldRefId).toBe("2")
-            expect(ev!.setNewRef).toBeTruthy()
+            expect(ev!.removeRef).toBeTruthy()
+            expect(ev!.replaceRef).toBeTruthy()
             expect(store.onInv).toBe(undefined)
             expect(getSnapshot(store).onInv).toBeUndefined()
         })
 
-        test("runtime change", () => {
+        test("replacing ref", () => {
             let ev: OnReferenceInvalidatedEvent<Instance<typeof Todo>> | undefined
             let oldRefId!: string
             let calls = 0
@@ -168,12 +174,10 @@ for (const customRef of [false, true]) {
                 calls++
                 oldRefId = ev1.oldRef.id
                 ev = ev1
-                ev1.setNewRef(undefined)
+                ev1.replaceRef(store.todos[1])
             }
             const store = createStore({}, onInv)
 
-            expect(calls).toBe(0)
-            store.onInv = store.todos[1]
             expect(calls).toBe(0)
             store.onInv = store.todos[0]
             expect(calls).toBe(0)
@@ -181,19 +185,10 @@ for (const customRef of [false, true]) {
             expect(calls).toBe(1)
             expect(ev!.parent).toBe(store)
             expect(oldRefId).toBe("1")
-            expect(ev!.setNewRef).toBeTruthy()
-            expect(store.onInv).toBe(undefined)
-            expect(getSnapshot(store).onInv).toBeUndefined()
-
-            store.onInv = store.todos[0]
-            expect(calls).toBe(1)
-            store.todos.remove(store.todos[0])
-            expect(calls).toBe(2)
-            expect(ev!.parent).toBe(store)
-            expect(oldRefId).toBe("2")
-            expect(ev!.setNewRef).toBeTruthy()
-            expect(store.onInv).toBe(undefined)
-            expect(getSnapshot(store).onInv).toBeUndefined()
+            expect(ev!.removeRef).toBeTruthy()
+            expect(ev!.replaceRef).toBeTruthy()
+            expect(store.onInv!.id).toBe("2")
+            expect(getSnapshot(store).onInv).toBe("2")
         })
 
         test("cloning works", () => {
@@ -204,7 +199,7 @@ for (const customRef of [false, true]) {
                 calls++
                 oldRefId = ev1.oldRef.id
                 ev = ev1
-                ev1.setNewRef(undefined)
+                ev1.removeRef()
             }
             const store1 = createStore({}, onInv)
 
@@ -221,7 +216,8 @@ for (const customRef of [false, true]) {
             expect(calls).toBe(1)
             expect(ev!.parent).toBe(store)
             expect(oldRefId).toBe("1")
-            expect(ev!.setNewRef).toBeTruthy()
+            expect(ev!.removeRef).toBeTruthy()
+            expect(ev!.replaceRef).toBeTruthy()
             expect(store.onInv).toBe(undefined)
             expect(getSnapshot(store).onInv).toBeUndefined()
             // make sure other ref stil points to the right one

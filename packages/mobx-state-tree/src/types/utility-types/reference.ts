@@ -22,12 +22,7 @@ import {
     Hook,
     IDisposer,
     ScalarNode,
-    IMSTArray,
     maybe,
-    getType,
-    isArrayType,
-    isMapType,
-    IMSTMap,
     isModelType,
     IMaybe,
     NodeLifeCycle
@@ -36,7 +31,8 @@ import {
 export interface OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> {
     parent: IAnyStateTreeNode
     oldRef: STN
-    setNewRef: (newRef: STN | undefined | null) => void
+    replaceRef: (newRef: STN | null | undefined) => void
+    removeRef: () => void
     cause: "detach" | "destroy"
 }
 
@@ -194,12 +190,22 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
                 cause,
                 parent,
                 oldRef: targetNode.storedValue,
-                setNewRef(newRef) {
+                replaceRef(newRef) {
                     parentNode.applyPatchLocally(referenceNode.subpath, {
                         op: "replace",
                         value: newRef,
                         path: referenceNode.path // this part is actually ignored for local paths
                     })
+                },
+                removeRef() {
+                    if (isModelType(parentNode.type)) {
+                        this.replaceRef(undefined as any)
+                    } else {
+                        parentNode.applyPatchLocally(referenceNode.subpath, {
+                            op: "remove",
+                            path: referenceNode.path // this part is actually ignored for local paths
+                        })
+                    }
                 }
             })
         }
@@ -458,24 +464,7 @@ export function weakReference<IT extends IAnyComplexType>(
         reference(subType, {
             ...options,
             onInvalidated(ev) {
-                const parentType = getType(ev.parent)
-
-                if (isModelType(parentType)) {
-                    // model property, set it to undefined
-                    ev.setNewRef(undefined)
-                } else if (isArrayType<IT>(parentType)) {
-                    const arr = ev.parent as IMSTArray<IT>
-                    arr.remove(ev.oldRef)
-                } else if (isMapType<IT>(parentType)) {
-                    const map = ev.parent as IMSTMap<IT>
-                    map.forEach((val, key) => {
-                        if (val === ev.oldRef) {
-                            map.delete(key)
-                        }
-                    })
-                } else {
-                    fail(`unknown parent type '${parentType}', weakReference cannot be invalidated`)
-                }
+                ev.removeRef()
             }
         })
     )
