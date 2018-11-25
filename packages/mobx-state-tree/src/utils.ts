@@ -47,14 +47,6 @@ export function identity<T>(_: T): T {
  * @internal
  * @private
  */
-export function nothing(): null {
-    return null
-}
-
-/**
- * @internal
- * @private
- */
 export function noop() {}
 
 // pollyfill (for IE) suggested in MDN:
@@ -73,7 +65,7 @@ export const isInteger =
  * @internal
  * @private
  */
-export function isArray(val: any): boolean {
+export function isArray(val: any): val is any[] {
     return !!(Array.isArray(val) || isObservableArray(val)) as boolean
 }
 
@@ -123,46 +115,7 @@ export function extend(a: any, ...b: any[]) {
  * @internal
  * @private
  */
-export function extendKeepGetter<A, B>(a: A, b: B): A & B
-/**
- * @internal
- * @private
- */
-export function extendKeepGetter<A, B, C>(a: A, b: B, c: C): A & B & C
-/**
- * @internal
- * @private
- */
-export function extendKeepGetter<A, B, C, D>(a: A, b: B, c: C, d: D): A & B & C & D
-/**
- * @internal
- * @private
- */
-export function extendKeepGetter(a: any, ...b: any[]): any
-/**
- * @internal
- * @private
- */
-export function extendKeepGetter(a: any, ...b: any[]) {
-    for (let i = 0; i < b.length; i++) {
-        const current = b[i]
-        for (let key in current) {
-            const descriptor = Object.getOwnPropertyDescriptor(current, key)!
-            if ("get" in descriptor) {
-                Object.defineProperty(a, key, { ...descriptor, configurable: true })
-                continue
-            }
-            a[key] = current[key]
-        }
-    }
-    return a
-}
-
-/**
- * @internal
- * @private
- */
-export function isPlainObject(value: any) {
+export function isPlainObject(value: any): value is any {
     if (value === null || typeof value !== "object") return false
     const proto = Object.getPrototypeOf(value)
     return proto === Object.prototype || proto === null
@@ -185,7 +138,7 @@ export function isMutable(value: any) {
  * @internal
  * @private
  */
-export function isPrimitive(value: any): boolean {
+export function isPrimitive(value: any): value is string | number | boolean | Date {
     if (value === null || value === undefined) return true
     if (
         typeof value === "string" ||
@@ -275,15 +228,6 @@ export function addReadOnlyProp(object: any, propName: string, value: any) {
         configurable: true,
         value
     })
-}
-
-/**
- * @internal
- * @private
- */
-export function remove<T>(collection: T[], item: T) {
-    const idx = collection.indexOf(item)
-    if (idx !== -1) collection.splice(idx, 1)
 }
 
 /**

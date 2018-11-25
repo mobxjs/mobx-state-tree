@@ -42,7 +42,8 @@ function serializeArgument(node: INode, actionName: string, index: number, arg: 
     if (typeof arg === "function") return serializeTheUnserializable(`[function]`)
     if (typeof arg === "object" && !isPlainObject(arg) && !isArray(arg))
         return serializeTheUnserializable(
-            `[object ${(arg && arg.constructor && arg.constructor.name) || "Complex Object"}]`
+            `[object ${(arg && (arg as any).constructor && (arg as any).constructor.name) ||
+                "Complex Object"}]`
         )
     try {
         // Check if serializable, cycle free etc...
