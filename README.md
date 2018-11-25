@@ -717,7 +717,15 @@ A default implementation of such `onInvalidated` hook is provided by the `types.
 - If its parent is an array: Remove itself from the array
 - If its parent is a map: Remove itself from the map
 
-Strictly speaking it is a `types.maybe(types.reference(Type))` with a custom `onInvalidate` option.
+Strictly speaking it is implemented as
+```js
+types.maybe(types.reference(Type, {
+    ...customGetSetIfAvailable,
+    onInvalidated(ev) {
+        ev.removeRef()
+    }
+}))
+```
 
 ```js
 const Todo = types.model({ id: types.identifier })
