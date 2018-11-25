@@ -90,6 +90,8 @@ export abstract class BaseNode {
 
     protected internalFinalizeDeath() {
         Object.keys(this.hookSubscribers).forEach(k => this.hookSubscribers[k].clear())
+
+        this.parent = null
         this.state = NodeLifeCycle.DEAD
         this.subpath = this.escapedSubpath = ""
         this.subpathAtom.reportChanged()

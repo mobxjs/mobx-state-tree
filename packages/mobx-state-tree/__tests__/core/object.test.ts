@@ -331,19 +331,15 @@ test("it should warn if a replaced object is read or written to", () => {
     expect(s.todo.title).toBe("4")
 
     // try reading old todo
-    setLivelynessChecking("warn")
-    const bwarn = console.warn
-    try {
-        const mock = (console.warn = jest.fn())
-        todo.fn()
-        // tslint:disable-next-line:no-unused-expression
-        todo.title
-        unprotect(todo)
+    setLivelynessChecking("error")
+    const error =
+        "You are trying to read or write to an object that is no longer part of a state tree"
+    expect(() => todo.fn()).toThrow(error)
+    expect(() => todo.title).toThrow(error)
+    unprotect(todo)
+    expect(() => {
         todo.title = "5"
-        expect(mock.mock.calls).toMatchSnapshot()
-    } finally {
-        console.warn = bwarn
-    }
+    }).toThrow(error)
 })
 
 // === COMPOSE FACTORY ===

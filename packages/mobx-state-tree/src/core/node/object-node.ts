@@ -360,9 +360,10 @@ export class ObjectNode extends BaseNode {
         this.type.removeChild(this, subpath)
     }
 
-    unbox(childNode: INode): any {
-        if (childNode && childNode.parent) childNode.parent.assertAlive()
-        if (childNode && childNode.parent && childNode.parent._autoUnbox) return childNode.value
+    // this method must be bound
+    unbox = (childNode: INode): any => {
+        if (childNode) this.assertAlive()
+        if (childNode && this._autoUnbox) return childNode.value
         return childNode
     }
 
@@ -457,7 +458,6 @@ export class ObjectNode extends BaseNode {
 
         this._patchSubscribers.clear()
         this._snapshotSubscribers.clear()
-        this.parent = null
 
         this.internalFinalizeDeath()
     }
