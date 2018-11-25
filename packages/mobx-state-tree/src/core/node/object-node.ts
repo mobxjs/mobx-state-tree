@@ -152,22 +152,21 @@ export class ObjectNode extends BaseNode {
         this.storedValue = type.createNewInstance(this, this._childNodes, this._initialSnapshot)
         this.preboot()
 
-        let sawException = true
-        this._observableInstanceCreated = true
+        this._isRunningAction = true
         try {
-            this._isRunningAction = true
             type.finalizeNewInstance(this, this.storedValue)
-            this._isRunningAction = false
-
-            this.state = NodeLifeCycle.CREATED
-            this.fireHook(Hook.AfterCreate)
-            sawException = false
+        } catch (e) {
+            // short-cut to die the instance, to avoid the snapshot computed starting to throw...
+            this.state = NodeLifeCycle.DEAD
+            throw e
         } finally {
-            if (sawException) {
-                // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-                this.state = NodeLifeCycle.DEAD
-            }
+            this._isRunningAction = false
         }
+
+        this._observableInstanceCreated = true
+        this.state = NodeLifeCycle.CREATED
+        this.fireHook(Hook.AfterCreate)
+
         // NOTE: we need to touch snapshot, because non-observable
         // "observableInstanceCreated" field was touched
         invalidateComputed(this, "snapshot")

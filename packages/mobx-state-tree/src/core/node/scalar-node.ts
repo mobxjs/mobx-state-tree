@@ -33,20 +33,18 @@ export class ScalarNode extends BaseNode {
     ) {
         super(type, parent, subpath, environment)
 
-        let sawException = true
         try {
             this.storedValue = type.createNewInstance(this, {}, initialSnapshot)
-            this.state = NodeLifeCycle.CREATED
-            // there's no point in firing this event since it fires on the constructor, before
-            // nobody can actually register for it
-            // this.fireHook(Hook.AfterCreate)
-            sawException = false
-        } finally {
-            if (sawException) {
-                // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-                this.state = NodeLifeCycle.DEAD
-            }
+        } catch (e) {
+            // short-cut to die the instance, to avoid the snapshot computed starting to throw...
+            this.state = NodeLifeCycle.DEAD
+            throw e
         }
+
+        this.state = NodeLifeCycle.CREATED
+        // there's no point in firing this event since it fires on the constructor, before
+        // nobody can actually register for it
+        // this.fireHook(Hook.AfterCreate)
 
         this.finalizeCreation()
     }
