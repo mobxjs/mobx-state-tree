@@ -702,7 +702,7 @@ const refWithOnInvalidated = types.reference(Todo, {
         // parent node of the reference (not the reference target)
         parent: IAnyStateTreeNode 
         // a function to remove the reference from its parent (or set to undefined in the case of models)
-        removeRef: (newRef: STN) => void 
+        removeRef: (newRef: STN | null | undefined) => void 
         // a function to set our reference to a new target
         replaceRef: (newRef: STN) => void 
     }) {
