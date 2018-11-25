@@ -179,7 +179,9 @@ import {
     isPrimitiveType,
     isReferenceType,
     isRefinementType,
-    isUnionType
+    isUnionType,
+    tryReference,
+    isValidReference
 } from "./internal"
 
 export {
@@ -301,5 +303,7 @@ export {
     isPrimitiveType,
     isReferenceType,
     isRefinementType,
-    isUnionType
+    isUnionType,
+    tryReference,
+    isValidReference
 }
