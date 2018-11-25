@@ -7,7 +7,8 @@ import {
     unprotect,
     OnReferenceInvalidatedEvent,
     getSnapshot,
-    applySnapshot
+    applySnapshot,
+    clone
 } from "../../src"
 
 const Todo = types.model({ id: types.identifier })
@@ -195,6 +196,38 @@ for (const customRef of [false, true]) {
             expect(ev!.setNewRef).toBeTruthy()
             expect(store.onInv).toBe(undefined)
             expect(getSnapshot(store).onInv).toBeUndefined()
+        })
+
+        test("cloning works", () => {
+            let ev: OnReferenceInvalidatedEvent<Instance<typeof Todo>> | undefined
+            let oldRefId!: string
+            let calls = 0
+            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
+                calls++
+                oldRefId = ev1.oldRef.id
+                ev = ev1
+                ev1.setNewRef(undefined)
+            }
+            const store1 = createStore({}, onInv)
+
+            expect(calls).toBe(0)
+            store1.onInv = store1.todos[0]
+            expect(calls).toBe(0)
+
+            const store = clone(store1)
+            unprotect(store)
+            expect(calls).toBe(0)
+            store.onInv = store.todos[0]
+            expect(calls).toBe(0)
+            store.todos.remove(store.todos[0])
+            expect(calls).toBe(1)
+            expect(ev!.parent).toBe(store)
+            expect(oldRefId).toBe("1")
+            expect(ev!.setNewRef).toBeTruthy()
+            expect(store.onInv).toBe(undefined)
+            expect(getSnapshot(store).onInv).toBeUndefined()
+            // make sure other ref stil points to the right one
+            expect(store1.onInv).toBe(store1.todos[0])
         })
     })
 }
