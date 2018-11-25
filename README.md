@@ -678,7 +678,7 @@ const s = Store.create({
 
 #### Reference validation: `isValidReference`, `tryReference`, `onInvalidate` hook and `types.weakReference`
 
-Acessing an invalid reference (a reference to a dead/detached node) triggers an exception.
+Accessing an invalid reference (a reference to a dead/detached node) triggers an exception.
 
 In order to check if a reference is valid, MST offers the `isValidReference(() => ref): boolean` function:
 ```ts
