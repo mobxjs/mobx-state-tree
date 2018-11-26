@@ -19,7 +19,8 @@ import {
     IChildNodesMap,
     ModelPrimitive,
     EMPTY_OBJECT,
-    IAnyStateTreeNode
+    IAnyStateTreeNode,
+    normalizeIdentifier
 } from "../../internal"
 
 /**
@@ -284,7 +285,7 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTree
             isMutable(newValue) &&
             !isStateTreeNode(newValue) &&
             (!current.identifierAttribute ||
-                current.identifier === "" + newValue[current.identifierAttribute])
+                current.identifier === normalizeIdentifier(newValue[current.identifierAttribute]))
         ) {
             // the newValue has no node, so can be treated like a snapshot
             // we can reconcile

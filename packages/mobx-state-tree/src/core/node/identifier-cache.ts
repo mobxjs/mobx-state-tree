@@ -87,8 +87,14 @@ export class IdentifierCache {
         return res
     }
 
+    has(type: IAnyType, identifier: string): boolean {
+        const set = this.cache.get(identifier)
+        if (!set) return false
+        return set.some(candidate => type.isAssignableFrom(candidate.type))
+    }
+
     resolve(type: IAnyType, identifier: string): ObjectNode | null {
-        const set = this.cache.get("" + identifier)
+        const set = this.cache.get(identifier)
         if (!set) return null
         const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))
         switch (matches.length) {

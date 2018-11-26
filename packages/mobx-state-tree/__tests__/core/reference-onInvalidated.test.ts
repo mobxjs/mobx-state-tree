@@ -65,7 +65,7 @@ for (const customRef of [false, true]) {
             let calls = 0
             const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
                 calls++
-                oldRefId = ev1.oldRef.id
+                oldRefId = ev1.oldRef!.id
                 ev = ev1
                 ev1.removeRef()
             }
@@ -99,7 +99,7 @@ for (const customRef of [false, true]) {
             let calls = 0
             const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
                 calls++
-                oldRefId = ev1.oldRef.id
+                oldRefId = ev1.oldRef!.id
                 ev = ev1
                 ev1.removeRef()
             }
@@ -134,7 +134,7 @@ for (const customRef of [false, true]) {
             let calls = 0
             const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
                 calls++
-                oldRefId = ev1.oldRef.id
+                oldRefId = ev1.oldRef!.id
                 ev = ev1
                 ev1.removeRef()
             }
@@ -172,7 +172,7 @@ for (const customRef of [false, true]) {
             let calls = 0
             const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
                 calls++
-                oldRefId = ev1.oldRef.id
+                oldRefId = ev1.oldRef!.id
                 ev = ev1
                 ev1.replaceRef(store.todos[1])
             }
@@ -197,7 +197,7 @@ for (const customRef of [false, true]) {
             let calls = 0
             const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
                 calls++
-                oldRefId = ev1.oldRef.id
+                oldRefId = ev1.oldRef!.id
                 ev = ev1
                 ev1.removeRef()
             }
@@ -273,5 +273,24 @@ describe("weakReference", () => {
         store.todos.splice(0, 1)
         expect(store.map.size).toBe(1)
         expect(store.map.get("c")!.id).toBe("3")
+    })
+
+    test("snapshot with invalid reference should be set to undefined", () => {
+        const store = createStore({ single: "100" })
+        expect(store.single).toBeUndefined()
+
+        // check reassignation still works
+        store.single = store.todos[0]
+        expect(store.single).toBe(store.todos[0])
+        store.todos.remove(store.todos[0])
+        expect(store.single).toBeUndefined()
+    })
+
+    test("setting it to an invalid id and then accessing it should still result in undefined", () => {
+        const store = createStore({})
+        store.single = "100" as any
+        expect(() => {
+            const s = store.single
+        }).toThrow("Failed to resolve reference")
     })
 })

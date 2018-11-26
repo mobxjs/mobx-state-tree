@@ -699,9 +699,9 @@ The options parameter for references also accepts an optional `onInvalidated` ho
 const refWithOnInvalidated = types.reference(Todo, {
     onInvalidated(event: {
         // what is causing the target to become invalidated
-        cause: "detach" | "destroy"
-        // the target that is about to become invalidated
-        oldRef: STN
+        cause: "detach" | "destroy" | "invalidSnapshotReference"
+        // the target that is about to become invalidated (undefined if "invalidSnapshotReference")
+        oldRef: STN | undefined
         // parent node of the reference (not the reference target)
         parent: IAnyStateTreeNode
         // a function to remove the reference from its parent (or set to undefined in the case of models)

@@ -46,7 +46,8 @@ import {
     ExtractS,
     ExtractT,
     ExtractCST,
-    IStateTreeNode
+    IStateTreeNode,
+    normalizeIdentifier
 } from "../../internal"
 
 export interface IMapType<IT extends IAnyType>
@@ -178,7 +179,7 @@ class MSTMap<C, S, T> extends ObservableMap {
             >
             if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
             if (mapType.identifierMode === MapIdentifierMode.YES) {
-                key = "" + (value as any)[mapType.mapIdentifierAttribute!]
+                key = normalizeIdentifier((value as any)[mapType.mapIdentifierAttribute!])
                 this.set(key, value)
                 return this.get(key) as any
             }

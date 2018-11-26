@@ -29,7 +29,9 @@ import {
     Hook,
     BaseNode,
     escapeJsonPath,
-    getLivelinessChecking
+    getLivelinessChecking,
+    normalizeIdentifier,
+    ReferenceIdentifier
 } from "../../internal"
 
 let nextNodeId = 1
@@ -56,7 +58,7 @@ export class ObjectNode extends BaseNode {
     readonly nodeId = ++nextNodeId
     readonly identifierAttribute: string | undefined
     readonly identifier: string | null // Identifier is always normalized to string, even if the identifier property isn't
-    readonly unnormalizedIdentifier: string | number | null
+    readonly unnormalizedIdentifier: ReferenceIdentifier | null
 
     identifierCache: IdentifierCache | undefined
     isProtectionEnabled = true
@@ -69,14 +71,18 @@ export class ObjectNode extends BaseNode {
         [Hook.beforeDestroy]: new EventHandler<(node: ObjectNode, hook: Hook) => void>()
     }
 
+    _applyPatches?: (patches: IJsonPatch[]) => void
+
     applyPatches(patches: IJsonPatch[]): void {
         if (!this._observableInstanceCreated) this._createObservableInstance()
-        this.applyPatches(patches)
+        this._applyPatches!(patches)
     }
+
+    _applySnapshot?: (snapshot: any) => void
 
     applySnapshot(snapshot: any): void {
         if (!this._observableInstanceCreated) this._createObservableInstance()
-        this.applySnapshot(snapshot)
+        this._applySnapshot!(snapshot)
     }
 
     private _autoUnbox = true // unboxing is disabled when reading child nodes
@@ -135,7 +141,7 @@ export class ObjectNode extends BaseNode {
             }
 
             // normalize internal identifier to string
-            this.identifier = "" + id
+            this.identifier = normalizeIdentifier(id)
             this.unnormalizedIdentifier = id
         }
 
@@ -400,7 +406,7 @@ export class ObjectNode extends BaseNode {
 
     private preboot() {
         const self = this
-        this.applyPatches = createActionInvoker(
+        this._applyPatches = createActionInvoker(
             this.storedValue,
             "@APPLY_PATCHES",
             (patches: IJsonPatch[]) => {
@@ -411,7 +417,7 @@ export class ObjectNode extends BaseNode {
                 })
             }
         )
-        this.applySnapshot = createActionInvoker(
+        this._applySnapshot = createActionInvoker(
             this.storedValue,
             "@APPLY_SNAPSHOT",
             (snapshot: any) => {

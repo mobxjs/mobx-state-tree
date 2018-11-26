@@ -25,15 +25,19 @@ import {
     maybe,
     isModelType,
     IMaybe,
-    NodeLifeCycle
+    NodeLifeCycle,
+    ReferenceIdentifier,
+    normalizeIdentifier,
+    getIdentifier,
+    applyPatch
 } from "../../internal"
 
-export interface OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> {
+export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
     parent: IAnyStateTreeNode
-    oldRef: STN
+    oldRef: STN | undefined
     replaceRef: (newRef: STN | null | undefined) => void
     removeRef: () => void
-    cause: "detach" | "destroy"
+    cause: "detach" | "destroy" | "invalidSnapshotReference"
 }
 
 export type OnReferenceInvalidated<STN extends IAnyStateTreeNode> = (
@@ -50,8 +54,6 @@ function getInvalidationCause(hook: Hook): "detach" | "destroy" | undefined {
             return undefined
     }
 }
-
-export type ReferenceIdentifier = string | number
 
 class StoredReference<IT extends IAnyType> {
     readonly identifier!: ReferenceIdentifier
@@ -80,7 +82,7 @@ class StoredReference<IT extends IAnyType> {
     }
 
     private updateResolvedReference(node: INode) {
-        const normalizedId = "" + this.identifier
+        const normalizedId = normalizeIdentifier(this.identifier)
         const lastCacheModification = node.root.identifierCache!.getLastCacheModificationPerId(
             normalizedId
         )
@@ -163,6 +165,46 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
               )
     }
 
+    private fireInvalidated(
+        cause: "detach" | "destroy" | "invalidSnapshotReference",
+        referenceNode: ScalarNode,
+        targetNode: ObjectNode | null
+    ) {
+        // to actually invalidate a reference we need an alive parent,
+        // since it is a scalar value (immutable-ish) and we need to change it
+        // from the parent
+        const parentNode = referenceNode.parent
+        if (!parentNode || !parentNode.isAlive) {
+            return
+        }
+        const parent = parentNode.storedValue
+        if (!parent) {
+            return
+        }
+        this.onInvalidated!({
+            cause,
+            parent,
+            oldRef: targetNode ? targetNode.storedValue : undefined,
+            replaceRef(newRef) {
+                applyPatch(parent, {
+                    op: "replace",
+                    value: newRef,
+                    path: referenceNode.subpath
+                })
+            },
+            removeRef() {
+                if (isModelType(parentNode.type)) {
+                    this.replaceRef(undefined as any)
+                } else {
+                    applyPatch(parent, {
+                        op: "remove",
+                        path: referenceNode.subpath
+                    })
+                }
+            }
+        })
+    }
+
     private addTargetNodeWatcher(referenceNode: ScalarNode): IDisposer | undefined {
         const targetValue = this.getValue(referenceNode)
         if (!targetValue) {
@@ -175,39 +217,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
             if (!cause) {
                 return
             }
-            // to actually invalidate a reference we need an alive parent,
-            // since it is a scalar value (immutable-ish) and we need to change it
-            // from the parent
-            const parentNode = referenceNode.parent
-            if (!parentNode || !parentNode.isAlive) {
-                return
-            }
-            const parent = parentNode.storedValue
-            if (!parent) {
-                return
-            }
-            this.onInvalidated!({
-                cause,
-                parent,
-                oldRef: targetNode.storedValue,
-                replaceRef(newRef) {
-                    parentNode.applyPatchLocally(referenceNode.subpath, {
-                        op: "replace",
-                        value: newRef,
-                        path: referenceNode.path // this part is actually ignored for local paths
-                    })
-                },
-                removeRef() {
-                    if (isModelType(parentNode.type)) {
-                        this.replaceRef(undefined as any)
-                    } else {
-                        parentNode.applyPatchLocally(referenceNode.subpath, {
-                            op: "remove",
-                            path: referenceNode.path // this part is actually ignored for local paths
-                        })
-                    }
-                }
-            })
+            this.fireInvalidated(cause, referenceNode, targetNode)
         }
 
         const detachHookDisposer = targetNode.hookSubscribers[Hook.beforeDetach].register(
@@ -223,7 +233,11 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
         }
     }
 
-    protected watchTargetNodeForInvalidations(referenceNode: ScalarNode) {
+    protected watchTargetNodeForInvalidations(
+        referenceNode: ScalarNode,
+        identifier: ReferenceIdentifier,
+        customGetSet: ReferenceOptionsGetSet<IT> | undefined
+    ) {
         if (!this.onInvalidated) {
             return
         }
@@ -238,13 +252,44 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
             }
         })
 
+        const startWatching = (sync: boolean) => {
+            // make sure the target node is actually there
+            const parentNode = referenceNode.parent
+            const parent = parentNode && parentNode.storedValue
+            if (parentNode && parentNode.isAlive && parent) {
+                let targetNodeExists: boolean
+                if (customGetSet) {
+                    targetNodeExists = !!customGetSet.get(identifier, parent)
+                } else {
+                    const rootNode = referenceNode.root
+                    targetNodeExists = rootNode.identifierCache!.has(
+                        this.targetType,
+                        normalizeIdentifier(identifier)
+                    )
+                }
+
+                if (!targetNodeExists) {
+                    // we cannot change the reference in sync mode
+                    // since we are in the middle of a reconciliation/instantiation and the change would be overwritten
+                    // for those cases just let the wrong reference be assigned and fail upon usage
+                    // (like current references do)
+                    // this means that effectively this code will only run when it is created from a snapshot
+                    if (!sync) {
+                        this.fireInvalidated("invalidSnapshotReference", referenceNode, null)
+                    }
+                } else {
+                    onTargetDestroyedHookDisposer = this.addTargetNodeWatcher(referenceNode)
+                }
+            }
+        }
+
         if (referenceNode.state === NodeLifeCycle.FINALIZED) {
             // already attached, so the whole tree is ready
-            onTargetDestroyedHookDisposer = this.addTargetNodeWatcher(referenceNode)
+            startWatching(true)
         } else {
             // start watching once the whole tree is ready
             referenceNode.hookSubscribers[Hook.afterAttach].register(() => {
-                onTargetDestroyedHookDisposer = this.addTargetNodeWatcher(referenceNode)
+                startWatching(false)
             })
         }
     }
@@ -276,10 +321,11 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
         environment: any,
         newValue: ExtractT<IT> | ReferenceIdentifier
     ): INode {
+        const identifier = isStateTreeNode(newValue) ? getIdentifier(newValue)! : newValue
         const storedRef = new StoredReference(newValue, this.targetType)
         const node = createNode(this, parent, subpath, environment, storedRef) as ScalarNode
         storedRef.node = node
-        this.watchTargetNodeForInvalidations(node)
+        this.watchTargetNodeForInvalidations(node, identifier, undefined)
         return node
     }
 
@@ -337,7 +383,7 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
             ? this.options.set(newValue, parent ? parent.storedValue : null)
             : newValue
         const node = createNode(this, parent, subpath, environment, identifier) as ScalarNode
-        this.watchTargetNodeForInvalidations(node)
+        this.watchTargetNodeForInvalidations(node, identifier, this.options)
         return node
     }
 

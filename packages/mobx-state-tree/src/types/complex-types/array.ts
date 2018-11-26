@@ -41,7 +41,8 @@ import {
     ExtractS,
     ExtractC,
     ExtractT,
-    ExtractCST
+    ExtractCST,
+    normalizeIdentifier
 } from "../../internal"
 
 export interface IMSTArray<IT extends IAnyType>
@@ -427,7 +428,7 @@ function areSame(oldNode: INode, newValue: any) {
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&
-        oldNode.identifier === "" + newValue[oldNode.identifierAttribute] &&
+        oldNode.identifier === normalizeIdentifier(newValue[oldNode.identifierAttribute]) &&
         oldNode.type.is(newValue)
     )
         return true
