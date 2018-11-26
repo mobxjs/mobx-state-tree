@@ -275,9 +275,13 @@ describe("weakReference", () => {
         expect(store.map.get("c")!.id).toBe("3")
     })
 
-    test("snapshot with invalid reference should be set to undefined", () => {
-        const store = createStore({ single: "100" })
+    test("invalid references in a snapshot should be removed", () => {
+        const store = createStore({ single: "100", arr: ["100", "1"], map: { a: "100", b: "1" } })
         expect(store.single).toBeUndefined()
+        expect(store.arr.length).toBe(1)
+        expect(store.arr[0]!.id).toBe("1")
+        expect(store.map.size).toBe(1)
+        expect(store.map.get("b")!.id).toBe("1")
 
         // check reassignation still works
         store.single = store.todos[0]
