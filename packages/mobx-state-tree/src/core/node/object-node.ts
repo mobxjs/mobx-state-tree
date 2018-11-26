@@ -27,9 +27,9 @@ import {
     toJSON,
     EventHandler,
     Hook,
-    getLivelynessChecking,
     BaseNode,
-    escapeJsonPath
+    escapeJsonPath,
+    getLivelinessChecking
 } from "../../internal"
 
 let nextNodeId = 1
@@ -63,10 +63,10 @@ export class ObjectNode extends BaseNode {
     middlewares: IMiddleware[] | null = null
 
     readonly hookSubscribers = {
-        [Hook.AfterCreate]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
-        [Hook.AfterAttach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
-        [Hook.BeforeDetach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
-        [Hook.BeforeDestroy]: new EventHandler<(node: ObjectNode, hook: Hook) => void>()
+        [Hook.afterCreate]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
+        [Hook.afterAttach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
+        [Hook.beforeDetach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
+        [Hook.beforeDestroy]: new EventHandler<(node: ObjectNode, hook: Hook) => void>()
     }
 
     applyPatches(patches: IJsonPatch[]): void {
@@ -166,7 +166,7 @@ export class ObjectNode extends BaseNode {
 
         this._observableInstanceCreated = true
         this.state = NodeLifeCycle.CREATED
-        this.fireHook(Hook.AfterCreate)
+        this.fireHook(Hook.afterCreate)
 
         // NOTE: we need to touch snapshot, because non-observable
         // "observableInstanceCreated" field was touched
@@ -224,13 +224,13 @@ export class ObjectNode extends BaseNode {
                 newParent.root.identifierCache!.mergeCache(this)
                 this.parent = newParent
                 this.subpathAtom.reportChanged()
-                this.fireHook(Hook.AfterAttach)
+                this.fireHook(Hook.afterAttach)
             }
         }
     }
 
     protected fireHook(name: Hook) {
-        this.internalFireHook(name)
+        this.fireInternalHook(name)
 
         const fn =
             this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
@@ -303,13 +303,13 @@ export class ObjectNode extends BaseNode {
             const baseMsg = `[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${
                 this.type.name
             }'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
-            switch (getLivelynessChecking()) {
+            switch (getLivelinessChecking()) {
                 case "error":
                     throw new Error(baseMsg)
                 case "warn":
                     console.warn(
                         baseMsg +
-                            ' Use setLivelynessChecking("error") to simplify debugging this error.'
+                            ' Use setLivelinessChecking("error") to simplify debugging this error.'
                     )
             }
         }
@@ -375,7 +375,7 @@ export class ObjectNode extends BaseNode {
     }
 
     finalizeCreation() {
-        if (this.internalFinalizeCreation()) {
+        if (this.partialFinalizeCreation()) {
             for (let child of this.getChildren()) {
                 child.finalizeCreation()
             }
@@ -387,7 +387,7 @@ export class ObjectNode extends BaseNode {
         if (!this.isAlive) fail(`Error while detaching, node is not alive.`)
         if (this.isRoot) return
 
-        this.fireHook(Hook.BeforeDetach)
+        this.fireHook(Hook.beforeDetach)
         this.environment = this.root.environment // make backup of environment
         this.state = NodeLifeCycle.DETACHING
         this.identifierCache = this.root.identifierCache!.splitCache(this)
@@ -442,7 +442,7 @@ export class ObjectNode extends BaseNode {
 
         // beforeDestroy should run before the disposers since else we could end up in a situation where
         // a disposer added with addDisposer at this stage (beforeDestroy) is actually never released
-        this.internalAboutToDie()
+        this.partialAboutToDie()
 
         this._disposers.emit()
         this._disposers.clear()
@@ -459,7 +459,7 @@ export class ObjectNode extends BaseNode {
         this._patchSubscribers.clear()
         this._snapshotSubscribers.clear()
 
-        this.internalFinalizeDeath()
+        this.partialFinalizeDeath()
     }
 
     onSnapshot(onChange: (snapshot: any) => void): IDisposer {

@@ -4,9 +4,8 @@ import {
     tryResolve,
     getSnapshot,
     applySnapshot,
-    setLivelynessChecking,
     getType,
-    SnapshotIn
+    setLivelinessChecking
 } from "../../src"
 
 const createTestFactories = () => {
@@ -182,7 +181,7 @@ test("961 - apply snapshot to union should not throw when union keeps models wit
 
 describe("1045 - secondary union types with applySnapshot and ids", () => {
     function initTest(useCreate: boolean, submodel1First: boolean, type: number) {
-        setLivelynessChecking("error")
+        setLivelinessChecking("error")
 
         const Submodel1 = types.model("Submodel1", {
             id: types.identifier,

@@ -18,11 +18,11 @@ import { action } from "mobx"
 export class ScalarNode extends BaseNode {
     readonly hookSubscribers = {
         // afterCreate in scalar nodes is executed in the constructor, so it cannot be registered before it is already executed
-        // [Hook.AfterCreate]: new EventHandler<(node: ScalarNode) => void>(),
-        [Hook.AfterAttach]: new EventHandler<(node: ScalarNode) => void>(),
+        // [Hook.afterCreate]: new EventHandler<(node: ScalarNode) => void>(),
+        [Hook.afterAttach]: new EventHandler<(node: ScalarNode) => void>(),
         // beforeDetach is never executed for scalar nodes, since they cannot be detached
-        // [Hook.BeforeDetach]: new EventHandler<(node: ScalarNode) => void>(),
-        [Hook.BeforeDestroy]: new EventHandler<(node: ScalarNode) => void>()
+        // [Hook.beforeDetach]: new EventHandler<(node: ScalarNode) => void>(),
+        [Hook.beforeDestroy]: new EventHandler<(node: ScalarNode) => void>()
     }
     constructor(
         type: IAnyType,
@@ -42,8 +42,8 @@ export class ScalarNode extends BaseNode {
         }
 
         this.state = NodeLifeCycle.CREATED
-        // there's no point in firing this event since it fires on the constructor, before
-        // nobody can actually register for it
+        // for scalar nodes there's no point in firing this event since it would fire on the constructor, before
+        // anybody can actually register for/listen to it
         // this.fireHook(Hook.AfterCreate)
 
         this.finalizeCreation()
@@ -67,10 +67,7 @@ export class ScalarNode extends BaseNode {
                 this.subpathAtom.reportChanged()
             }
             if (newParent && newParent !== this.parent) {
-                // newParent.root.identifierCache!.mergeCache(this)
-                this.parent = newParent
-                this.subpathAtom.reportChanged()
-                this.fireHook(Hook.AfterAttach)
+                fail("assertion failed: scalar nodes cannot change their parent")
             }
         }
     }
@@ -99,18 +96,18 @@ export class ScalarNode extends BaseNode {
     }
 
     finalizeCreation() {
-        this.internalFinalizeCreation()
+        this.partialFinalizeCreation()
     }
 
     aboutToDie() {
-        this.internalAboutToDie()
+        this.partialAboutToDie()
     }
 
     finalizeDeath() {
-        this.internalFinalizeDeath()
+        this.partialFinalizeDeath()
     }
 
     protected fireHook(name: Hook) {
-        this.internalFireHook(name)
+        this.fireInternalHook(name)
     }
 }

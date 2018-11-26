@@ -7,7 +7,7 @@ import {
     getRoot,
     EMPTY_ARRAY,
     ObjectNode,
-    HookNames,
+    Hook,
     IAnyStateTreeNode
 } from "../internal"
 
@@ -257,7 +257,7 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
         if (handler && middleware.includeHooks) {
             return invokeHandler()
         } else if (handler && !middleware.includeHooks) {
-            if ((HookNames as any)[call.name]) return runNextMiddleware(call)
+            if ((Hook as any)[call.name]) return runNextMiddleware(call)
             return invokeHandler()
         } else {
             return mobxAction(originalFn).apply(null, call.args)

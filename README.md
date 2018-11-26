@@ -681,50 +681,58 @@ const s = Store.create({
 Accessing an invalid reference (a reference to a dead/detached node) triggers an exception.
 
 In order to check if a reference is valid, MST offers the `isValidReference(() => ref): boolean` function:
+
 ```ts
 const isValid = isValidReference(() => store.myRef)
 ```
 
 Also, if you are unsure if a reference is valid or not you can use the `tryReference(() => ref): ref | undefined` function:
+
 ```ts
 // the result will be the passed ref if ok, or undefined if invalid
 const maybeValidRef = tryReference(() => store.myRef)
 ```
 
 The options parameter for references also accepts an optional `onInvalidated` hook, which will be called when the reference target node that the reference is pointing to is about to be detached/destroyed. It has the following signature:
+
 ```ts
 const refWithOnInvalidated = types.reference(Todo, {
     onInvalidated(event: {
         // what is causing the target to become invalidated
         cause: "detach" | "destroy"
         // the target that is about to become invalidated
-        oldRef: STN 
+        oldRef: STN
         // parent node of the reference (not the reference target)
-        parent: IAnyStateTreeNode 
+        parent: IAnyStateTreeNode
         // a function to remove the reference from its parent (or set to undefined in the case of models)
-        removeRef: () => void 
+        removeRef: () => void
         // a function to set our reference to a new target
-        replaceRef: (newRef: STN | null | undefined) => void 
+        replaceRef: (newRef: STN | null | undefined) => void
     }) {
         // do something
     }
 })
 ```
+
 Note that invalidation will only trigger while the reference is attached to a parent (be it a model, an array, a map, etc.).
 
 A default implementation of such `onInvalidated` hook is provided by the `types.weakReference` type. It is like a standard reference, except that once the target node becomes invalidated it will:
-- If its parent is a model: Set its own property to `undefined`
-- If its parent is an array: Remove itself from the array
-- If its parent is a map: Remove itself from the map
+
+-   If its parent is a model: Set its own property to `undefined`
+-   If its parent is an array: Remove itself from the array
+-   If its parent is a map: Remove itself from the map
 
 Strictly speaking it is implemented as
+
 ```js
-types.maybe(types.reference(Type, {
-    ...customGetSetIfAvailable,
-    onInvalidated(ev) {
-        ev.removeRef()
-    }
-}))
+types.maybe(
+    types.reference(Type, {
+        ...customGetSetIfAvailable,
+        onInvalidated(ev) {
+            ev.removeRef()
+        }
+    })
+)
 ```
 
 ```js
@@ -737,7 +745,6 @@ const Store = types.model({
 // given selectedTodo points to a valid Todo and that Todo is later removed from the todos
 // array, then selectedTodo will automatically become undefined
 ```
-
 
 ### Listening to observables, snapshots, patches or actions
 
@@ -1098,7 +1105,8 @@ See the [full API docs](API.md) for more details.
 | [`resolve(node, path)`](API.md#resolve)                                                                   | Resolves a `path` (json path) relatively to the given `node`                                                                                                                                                                                          |
 | [`resolveIdentifier(type, target, identifier)`](API.md#resolveidentifier)                                 | resolves an identifier of a given type in a model tree                                                                                                                                                                                                |
 | [`resolvePath(target, path)`](API.md#resolvepath)                                                         | resolves a JSON path, starting at the specified target                                                                                                                                                                                                |
-| [`setLivelynessChecking("warn" \| "ignore" \| "error")`](API.md#setlivelynesschecking)                    | Defines what MST should do when running into reads / writes to objects that have died. By default it will print a warning. Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place |
+| [`setLivelinessChecking("warn" \| "ignore" \| "error")`](API.md#setlivelinesschecking)                    | Defines what MST should do when running into reads / writes to objects that have died. By default it will print a warning. Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place |
+| [`getLivelinessChecking()`](API.md#getlivelinesschecking)                                                 | Returns the current liveliness checking mode.                                                                                                                                                                                                         |
 | [`splitJsonPath(path)`](API.md#splitjsonpath)                                                             | Splits and unescapes the given JSON `path` into path parts                                                                                                                                                                                            |
 | [`typecheck(type, value)`](API.md#typecheck)                                                              | Typechecks a value against a type. Throws on errors. Use this if you need typechecks even in a production build.                                                                                                                                      |
 | [`tryResolve(node, path)`](API.md#tryresolve)                                                             | Like `resolve`, but just returns `null` if resolving fails at any point in the path                                                                                                                                                                   |

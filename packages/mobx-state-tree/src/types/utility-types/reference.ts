@@ -42,9 +42,9 @@ export type OnReferenceInvalidated<STN extends IAnyStateTreeNode> = (
 
 function getInvalidationCause(hook: Hook): "detach" | "destroy" | undefined {
     switch (hook) {
-        case Hook.BeforeDestroy:
+        case Hook.beforeDestroy:
             return "destroy"
-        case Hook.BeforeDetach:
+        case Hook.beforeDetach:
             return "detach"
         default:
             return undefined
@@ -210,10 +210,10 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
             })
         }
 
-        const detachHookDisposer = targetNode.hookSubscribers[Hook.BeforeDetach].register(
+        const detachHookDisposer = targetNode.hookSubscribers[Hook.beforeDetach].register(
             hookHandler
         )
-        const destroyHookDisposer = targetNode.hookSubscribers[Hook.BeforeDestroy].register(
+        const destroyHookDisposer = targetNode.hookSubscribers[Hook.beforeDestroy].register(
             hookHandler
         )
 
@@ -232,7 +232,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
 
         // get rid of the watcher hook when the reference node is destroyed
         // detached is ignored since scalar nodes (where the reference resides) cannot be detached
-        referenceNode.hookSubscribers[Hook.BeforeDestroy].register(() => {
+        referenceNode.hookSubscribers[Hook.beforeDestroy].register(() => {
             if (onTargetDestroyedHookDisposer) {
                 onTargetDestroyedHookDisposer()
             }
@@ -243,7 +243,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
             onTargetDestroyedHookDisposer = this.addTargetNodeWatcher(referenceNode)
         } else {
             // start watching once the whole tree is ready
-            referenceNode.hookSubscribers[Hook.AfterAttach].register(() => {
+            referenceNode.hookSubscribers[Hook.afterAttach].register(() => {
                 onTargetDestroyedHookDisposer = this.addTargetNodeWatcher(referenceNode)
             })
         }

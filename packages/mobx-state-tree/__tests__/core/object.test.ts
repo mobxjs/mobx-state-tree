@@ -10,7 +10,7 @@ import {
     getSnapshot,
     unprotect,
     types,
-    setLivelynessChecking,
+    setLivelinessChecking,
     getParent,
     SnapshotOut,
     IJsonPatch,
@@ -292,7 +292,7 @@ test("it should throw if a replaced object is read or written to", () => {
     s.todo = Todo.create({ title: "4" })
     expect(s.todo.title).toBe("4")
 
-    setLivelynessChecking("error")
+    setLivelinessChecking("error")
     // try reading old todo
     const err =
         "You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo'). Either detach nodes first, or don't use objects after removing / replacing them in the tree"
@@ -331,7 +331,7 @@ test("it should warn if a replaced object is read or written to", () => {
     expect(s.todo.title).toBe("4")
 
     // try reading old todo
-    setLivelynessChecking("error")
+    setLivelinessChecking("error")
     const error =
         "You are trying to read or write to an object that is no longer part of a state tree"
     expect(() => todo.fn()).toThrow(error)

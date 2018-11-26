@@ -353,7 +353,7 @@ test("it can record and replay actions", () => {
     expect(getSnapshot(source)).toEqual(getSnapshot(target))
 })
 
-test("Livelyness issue #683", () => {
+test("Liveliness issue #683", () => {
     const User = types.model({ id: types.identifierNumber, name: types.string })
 
     const Users = types

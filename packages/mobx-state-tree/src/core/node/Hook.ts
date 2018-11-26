@@ -3,8 +3,8 @@
  * @private
  */
 export enum Hook {
-    AfterCreate = "afterCreate",
-    AfterAttach = "afterAttach",
-    BeforeDetach = "beforeDetach",
-    BeforeDestroy = "beforeDestroy"
+    afterCreate = "afterCreate",
+    afterAttach = "afterAttach",
+    beforeDetach = "beforeDetach",
+    beforeDestroy = "beforeDestroy"
 }

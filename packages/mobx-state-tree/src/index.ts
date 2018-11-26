@@ -101,8 +101,11 @@ import {
     ISerializedActionCall,
     recordActions,
     createActionTrackingMiddleware,
-    setLivelynessChecking,
-    LivelynessMode,
+    setLivelinessChecking,
+    getLivelinessChecking,
+    LivelinessMode,
+    setLivelynessChecking, // to be deprecated
+    LivelynessMode, // to be deprecated
     ModelSnapshotType,
     ModelCreationType,
     ModelSnapshotType2,
@@ -231,8 +234,11 @@ export {
     ISerializedActionCall,
     recordActions,
     createActionTrackingMiddleware,
-    setLivelynessChecking,
-    LivelynessMode,
+    setLivelinessChecking,
+    getLivelinessChecking,
+    LivelinessMode,
+    setLivelynessChecking, // to be deprecated
+    LivelynessMode, // to be deprecated
     ModelSnapshotType,
     ModelCreationType,
     ModelSnapshotType2,

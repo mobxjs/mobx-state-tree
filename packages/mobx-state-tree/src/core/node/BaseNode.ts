@@ -52,7 +52,7 @@ export abstract class BaseNode {
 
     protected abstract fireHook(name: Hook): void
 
-    protected internalFireHook(name: Hook) {
+    protected fireInternalHook(name: Hook) {
         this.hookSubscribers[name].emit(this, name)
     }
 
@@ -69,7 +69,7 @@ export abstract class BaseNode {
 
     abstract finalizeCreation(): void
 
-    protected internalFinalizeCreation() {
+    protected partialFinalizeCreation() {
         // goal: afterCreate hooks runs depth-first. After attach runs parent first, so on afterAttach the parent has completed already
         if (this.state === NodeLifeCycle.CREATED) {
             if (this.parent) {
@@ -77,7 +77,7 @@ export abstract class BaseNode {
                     // parent not ready yet, postpone
                     return false
                 }
-                this.fireHook(Hook.AfterAttach)
+                this.fireHook(Hook.afterAttach)
             }
             this.state = NodeLifeCycle.FINALIZED
 
@@ -88,7 +88,7 @@ export abstract class BaseNode {
 
     abstract finalizeDeath(): void
 
-    protected internalFinalizeDeath() {
+    protected partialFinalizeDeath() {
         Object.keys(this.hookSubscribers).forEach(k => this.hookSubscribers[k].clear())
 
         this.parent = null
@@ -99,8 +99,8 @@ export abstract class BaseNode {
 
     abstract aboutToDie(): void
 
-    protected internalAboutToDie() {
-        this.fireHook(Hook.BeforeDestroy)
+    protected partialAboutToDie() {
+        this.fireHook(Hook.beforeDestroy)
     }
 }
 
