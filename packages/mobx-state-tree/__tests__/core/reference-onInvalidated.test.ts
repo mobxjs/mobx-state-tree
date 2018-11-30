@@ -290,7 +290,7 @@ describe("safeReference", () => {
         expect(store.single).toBeUndefined()
     })
 
-    test("setting it to an invalid id and then accessing it should still result in undefined", () => {
+    test("setting it to an invalid id and then accessing it should still result in an error", () => {
         const store = createStore({})
         store.single = "100" as any
         expect(() => {
