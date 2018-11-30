@@ -217,12 +217,12 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
     -   [Parameters][209]
 -   [types.refinement][210]
     -   [Parameters][211]
--   [types.string][212]
-    -   [Examples][213]
--   [types.undefined][214]
--   [types.union][215]
-    -   [Parameters][216]
--   [types.weakReference][217]
+-   [types.safeReference][212]
+    -   [Parameters][213]
+-   [types.string][214]
+    -   [Examples][215]
+-   [types.undefined][216]
+-   [types.union][217]
     -   [Parameters][218]
 -   [unescapeJsonPath][219]
     -   [Parameters][220]
@@ -1560,6 +1560,21 @@ See also the [reference and identifiers][246] section.
 
 Returns **IType&lt;T, T>** 
 
+## types.safeReference
+
+A safe reference is like a standard reference, except that it accepts the undefined value by default
+and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
+when the reference it is pointing to gets detached/destroyed.
+
+Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `onInvalidate` option.
+
+### Parameters
+
+-   `subType` **IT** 
+-   `options` **ReferenceOptionsGetSet&lt;IT>?** 
+
+Returns **IMaybe&lt;IReferenceType&lt;IT>>** 
+
 ## types.string
 
 Creates a type that can only contain a string value.
@@ -1588,21 +1603,6 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 -   `otherTypes` **...[Array][228]&lt;IAnyType>** 
 
 Returns **IAnyType** 
-
-## types.weakReference
-
-A weak reference is like a standard reference, except that it accepts the undefined value by default
-and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
-when the reference it is pointing to gets detached/destroyed.
-
-Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `onInvalidate` option.
-
-### Parameters
-
--   `subType` **IT** 
--   `options` **ReferenceOptionsGetSet&lt;IT>?** 
-
-Returns **IMaybe&lt;IReferenceType&lt;IT>>** 
 
 ## unescapeJsonPath
 
@@ -2073,17 +2073,17 @@ Performs a depth first walk through a tree
 
 [211]: #parameters-75
 
-[212]: #typesstring
+[212]: #typessafereference
 
-[213]: #examples-23
+[213]: #parameters-76
 
-[214]: #typesundefined
+[214]: #typesstring
 
-[215]: #typesunion
+[215]: #examples-23
 
-[216]: #parameters-76
+[216]: #typesundefined
 
-[217]: #typesweakreference
+[217]: #typesunion
 
 [218]: #parameters-77
 
