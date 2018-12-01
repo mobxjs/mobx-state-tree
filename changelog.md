@@ -1,3 +1,5 @@
+- TypeScript 3.0 or later is now required. This brings a bunch of improvements:
+    - `flow` arguments and return types are now correctly inferred automatically (except when the final return type of a `flow` is a `Promise`, then `castFlowReturn` needs to be used)
 -   Added `tryReference` and `isValidReference` to use references that might be no longer pointing to any nodes in a safe way through [#1087](https://github.com/mobxjs/mobx-state-tree/pull/1087) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.8.1

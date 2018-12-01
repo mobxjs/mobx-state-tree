@@ -473,6 +473,12 @@ someModel.actions(self => {
 })
 ```
 
+Note that, since MST v3.9, TypeScript correctly infers `flow` arguments and usually infers correctly `flow` return types,
+but one exception to this case is when a `Promise` is returned as final value. In this case (and only in this case) this construct needs to be used:
+```ts
+return castFlowReturn(somePromise)
+```
+
 #### Action listeners versus middleware
 
 The difference between action listeners and middleware is: middleware can intercept the action that is about to be invoked, modify arguments, return types, etc. Action listeners cannot intercept and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receives the raw arguments. (`onAction` is actually just a built-in middleware).
@@ -785,11 +791,11 @@ const Store = types
 Some tips:
 
 1.  Note that multiple `actions` calls can be chained. This makes it possible to create multiple closures with their own protected volatile state.
-1.  Although in the above example the `pendingRequest` could be initialized directly in the action initializer, it is recommended to do this in the `afterCreate` hook, which will only once the entire instance has been set up (there might be many action and property initializers for a single type).
+2.  Although in the above example the `pendingRequest` could be initialized directly in the action initializer, it is recommended to do this in the `afterCreate` hook, which will only once the entire instance has been set up (there might be many action and property initializers for a single type).
 
-1.  The above example doesn't actually use the promise. For how to work with promises / asynchronous flows, see the [asynchronous actions](#asynchronous-actions) section above.
+3.  The above example doesn't actually use the promise. For how to work with promises / asynchronous flows, see the [asynchronous actions](#asynchronous-actions) section above.
 
-1.  It is possible to share volatile state between views and actions by using `extend`. `.extend` works like a combination of `.actions` and `.views` and should return an object with a `actions` and `views` field:
+4.  It is possible to share volatile state between views and actions by using `extend`. `.extend` works like a combination of `.actions` and `.views` and should return an object with a `actions` and `views` field:
 
 ```javascript
 const Todo = types.model({}).extend(self => {
@@ -1002,7 +1008,8 @@ See the [full API docs](API.md) for more details.
 | [`decorate(handler, function)`](API.md#decorate)                                                          | Attaches middleware to a specific action (or flow)                                                                                                                                                                                                    |
 | [`destroy(node)`](API.md#destroy)                                                                         | Kills `node`, making it unusable. Removes it from any parent in the process                                                                                                                                                                           |
 | [`detach(node)`](API.md#detach)                                                                           | Removes `node` from its current parent, and lets it live on as standalone tree                                                                                                                                                                        |
-| [`flow(generator)`](API.md#flow)                                                                          | creates an asynchronous flow based on a generator function                                                                                                                                                                                            |
+| [`flow(generator)`](API.md#flow)                                                                          | Creates an asynchronous flow based on a generator function                                                                                                                                                                                            |
+| [`castFlowReturn(value)`](API.md#castflowreturn)                                                          | Casts a flow return value so it can be correctly inferred as return type. Only needed when using TypeScript and when returning a Promise.                                                                                                             |
 | [`getChildType(node, property?)`](API.md#getchildtype)                                                    | Returns the declared type of the given `property` of `node`. For arrays and maps `property` can be omitted as they all have the same type                                                                                                             |
 | [`getEnv(node)`](API.md#getenv)                                                                           | Returns the environment of `node`, see [environments](#environments)                                                                                                                                                                                  |
 | [`getParent(node, depth=1)`](API.md#getparent)                                                            | Returns the intermediate parent of the `node`, or a higher one if `depth > 1`                                                                                                                                                                         |
@@ -1238,7 +1245,7 @@ Yes, with MST it is pretty straight forward to setup hot reloading for your stor
 
 ### TypeScript and MST
 
-TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 2.8 or later with `noImplicitThis` and `strictNullChecks` enabled.
+TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 3.0 or later with `noImplicitThis` and `strictNullChecks` enabled.
 Actually, the more strict options that are enabled, the better the type system will behave.
 
 We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occasionally you will need to fallback to `any` or manually adding type annotations.
