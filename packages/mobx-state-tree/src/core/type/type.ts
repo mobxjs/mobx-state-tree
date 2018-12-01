@@ -48,10 +48,30 @@ export enum TypeFlags {
     Integer = 131072
 }
 
+// name of the properties of an object that can't be set to undefined
+export type DefinablePropsNames<T> = {
+    [K in keyof T]: Extract<T[K], undefined> extends never ? K : never
+}[keyof T]
+
+// checks if a type is any or unknown
+export type IsTypeAnyOrUnknown<T> = unknown extends T ? true : false
+
+// checks if a type supports an empty create() function
+// basically !any, !unknown, X | undefined, objects with all properties being optional
+export type IsEmptyCreationType<O> = IsTypeAnyOrUnknown<O> extends true
+    ? true
+    : Extract<O, undefined> extends never
+    ? (DefinablePropsNames<O> extends never | undefined ? true : false)
+    : true
+
+// chooses a create function based on the creation type
+export type CreateParams<C> = IsEmptyCreationType<C> extends false ? [C, any?] : [C?, any?]
+
 export interface IType<C, S, T> {
     name: string
 
-    create(snapshot?: C, environment?: any): T
+    create(...args: CreateParams<C>): T
+
     is(thing: any): thing is C | S | T
     validate(thing: any, context: IContext): IValidationResult
     describe(): string
@@ -148,13 +168,18 @@ export interface IType<C, S, T> {
     shouldAttachNode: boolean
 }
 
-export interface IAnyType extends IType<any, any, any> {}
+// do not convert to an interface
+export type IAnyType = IType<any, any, any>
 
 export interface ISimpleType<T> extends IType<T, T, T> {}
 
 export type Primitives = ModelPrimitive | null | undefined
 
-export interface IAnyComplexType extends IType<any, any, IAnyStateTreeNode> {}
+// just for compatibility with old versions, could be deprecated on the next major version
+export interface IComplexType<C, S, T> extends IType<C, S, T & IStateTreeNode<C, S>> {}
+
+// do not convert to an interface
+export type IAnyComplexType = IType<any, any, IAnyStateTreeNode>
 
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
@@ -165,13 +190,19 @@ export type ExtractCST<IT extends IAnyType> = IT extends IType<infer C, infer S,
 
 export type Instance<T> = T extends IStateTreeNode
     ? T
-    : T extends IType<any, any, infer TT> ? TT : T
+    : T extends IType<any, any, infer TT>
+    ? TT
+    : T
 export type SnapshotIn<T> = T extends IStateTreeNode<infer STNC, any>
     ? STNC
-    : T extends IType<infer TC, any, any> ? TC : T
+    : T extends IType<infer TC, any, any>
+    ? TC
+    : T
 export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
     ? STNS
-    : T extends IType<any, infer TS, any> ? TS : T
+    : T extends IType<any, infer TS, any>
+    ? TS
+    : T
 
 /**
  * A type which is equivalent to the union of SnapshotIn and Instance types of a given typeof TYPE or typeof VARIABLE.

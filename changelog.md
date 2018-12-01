@@ -1,6 +1,10 @@
+- TypeScript 3.0 or later is now required when using TypeScript. This brings some improvements:
+    - `flow` arguments and return types are now correctly inferred automatically. One exception is when the last return of a `flow` is a `Promise`. In these cases `castFlowReturn(somePromise)` needs to be used so the return type can be inferred properly.
+    - `create` method is now smart enough to warn when no snapshot argument is provided on types that have some mandatory properties.
+-   Added `setLivelinessChecking` and `getLivelinessChecking`, the old `setLivelynessChecking` will eventually be deprecated.
 -   Added `onInvalidated` option for references and `types.safeReference` (see readme) through [#1091](https://github.com/mobxjs/mobx-state-tree/pull/1091) by [@xaviergonz](https://github.com/xaviergonz)
 -   Added `tryReference` and `isValidReference` to use references that might be no longer pointing to any nodes in a safe way through [#1087](https://github.com/mobxjs/mobx-state-tree/pull/1087) by [@xaviergonz](https://github.com/xaviergonz)
--   Added `setLivelinessChecking` and `getLivelinessChecking`, the old `setLivelynessChecking` will eventually be deprecated.
+-   Readded `IComplexType` for backwards compatibility.
 
 # 3.8.1
 
@@ -123,9 +127,9 @@ Also, the 'object has died' exception can be suppressed now. One should still ad
 -   **[BREAKING]** `types.maybe` now serializes to / from `undefined` by default, as it is more and more the common best practice to don't use `null` at all and MST follows this practice. Use `types.maybeNull` for the old behavior (see [#830](https://github.com/mobxjs/mobx-state-tree/issues/830))
 -   **[BREAKING]** `types.frozen` is now a function, and can now be invoked in a few different ways:
     1.  `types.frozen()` - behaves the same as `types.frozen` in MST 2.
-    1.  `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type. Note that the type will not actually be instantiated, so it can only be used to check the _shape_ of the data. Adding views or actions to `SubType` would be pointless.
-    1.  `types.frozen(someDefaultValue)` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
-    1.  `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
+    2.  `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type. Note that the type will not actually be instantiated, so it can only be used to check the _shape_ of the data. Adding views or actions to `SubType` would be pointless.
+    3.  `types.frozen(someDefaultValue)` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
+    4.  `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
 -   It is no longer necessary to wrap `types.map` or `types.array` in `types.optional` when used in a `model` type, `map` and `array` are now optional by default when used as property type. See [#906](https://github.com/mobxjs/mobx-state-tree/issues/906)
 -   **[BREAKING]** `postProcessSnapshot` can no longer be declared as action, but, like `preProcessSnapshot`, needs to be defined on the type rather than on the instance.
 -   **[BREAKING]** `types.union` is now eager, which means that if multiple valid types for a value are encountered, the first valid type is picked, rather then throwing. #907 / #804, `dispatcher` param => option,
