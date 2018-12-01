@@ -63,12 +63,13 @@ export type IsEmptyCreationType<O> = IsTypeAnyOrUnknown<O> extends true
         ? (DefinablePropsNames<O> extends never | undefined ? true : false)
         : true
 
+// chooses a create function based on the creation type
+export type CreateParams<C> = IsEmptyCreationType<C> extends false ? [C, any?] : [C?, any?]
+
 export interface IType<C, S, T> {
     name: string
 
-    create: IsEmptyCreationType<C> extends false
-        ? (snapshot: C, env?: any) => T
-        : (snapshot?: C, env?: any) => T
+    create(...args: CreateParams<C>): T
 
     is(thing: any): thing is C | S | T
     validate(thing: any, context: IContext): IValidationResult
@@ -166,13 +167,15 @@ export interface IType<C, S, T> {
     shouldAttachNode: boolean
 }
 
-export interface IAnyType extends IType<any, any, any> {}
+// do not convert to an interface
+export type IAnyType = IType<any, any, any>
 
 export interface ISimpleType<T> extends IType<T, T, T> {}
 
 export type Primitives = ModelPrimitive | null | undefined
 
-export interface IAnyComplexType extends IType<any, any, IAnyStateTreeNode> {}
+// do not convert to an interface
+export type IAnyComplexType = IType<any, any, IAnyStateTreeNode>
 
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
@@ -231,9 +234,8 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTree
         this.name = name
     }
 
-    // we have to make this a property to keep TS happy
     @action
-    create: any = (snapshot: C = this.getDefaultSnapshot(), environment?: any) => {
+    create(snapshot: C = this.getDefaultSnapshot(), environment?: any) {
         typecheckInternal(this, snapshot)
         return this.instantiate(null, "", environment, snapshot).value
     }
