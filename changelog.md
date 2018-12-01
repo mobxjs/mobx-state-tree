@@ -2,6 +2,7 @@
     - `flow` arguments and return types are now correctly inferred automatically. One exception is when the last return of a `flow` is a `Promise`. In these cases `castFlowReturn(somePromise)` needs to be used so the return type can be inferred properly.
     - `create` method is now smart enough to warn when no snapshot argument is provided on types that have some mandatory properties.
 -   Added `tryReference` and `isValidReference` to use references that might be no longer pointing to any nodes in a safe way through [#1087](https://github.com/mobxjs/mobx-state-tree/pull/1087) by [@xaviergonz](https://github.com/xaviergonz)
+-   Readded `IComplexType` for backwards compatibility.
 
 # 3.8.1
 

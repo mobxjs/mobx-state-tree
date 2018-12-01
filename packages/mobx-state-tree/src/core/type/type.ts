@@ -174,6 +174,9 @@ export interface ISimpleType<T> extends IType<T, T, T> {}
 
 export type Primitives = ModelPrimitive | null | undefined
 
+// just for compatibility with old versions, could be deprecated on the next major version
+export interface IComplexType<C, S, T> extends IType<C, S, T & IStateTreeNode<C, S>> {}
+
 // do not convert to an interface
 export type IAnyComplexType = IType<any, any, IAnyStateTreeNode>
 
