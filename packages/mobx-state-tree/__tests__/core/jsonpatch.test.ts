@@ -8,9 +8,7 @@ import {
     Instance,
     cast,
     IAnyModelType,
-    IMSTMap,
-    SnapshotIn,
-    SnapshotOut
+    IMSTMap
 } from "../../src"
 
 function testPatches<C, S, T>(
