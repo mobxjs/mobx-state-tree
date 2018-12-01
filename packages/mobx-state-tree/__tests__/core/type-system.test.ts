@@ -849,3 +849,61 @@ test("castToSnapshot", () => {
     appMod.create({ aaa: castToSnapshot(storeSnapshotOrInstance2) })
     // appMod.create({ aaa: castToSnapshot(5) }) // should not compile
 })
+
+test("create correctly chooses if the snapshot is needed or not - #920", () => {
+    const X = types.model({
+        test: types.string
+    })
+    const T = types.model({
+        test: types.refinement(X, s => s.test.length > 5)
+    })
+    // T.create() // manual test: expects compilation error
+    // T.create({}) // manual test: expects compilation error
+    T.create({
+        test: { test: "hellothere" }
+    })
+
+    const T2 = types.model({
+        test: types.maybe(X)
+    })
+    T2.create() // ok
+    T2.create({}) // ok
+
+    const A = types.model({
+        test: "bla"
+    })
+    A.create() // ok
+    A.create({}) // ok
+
+    const B = types.array(types.string)
+    B.create() // ok
+    B.create(["hi"]) // ok
+
+    const C = types.map(types.string)
+    C.create() // ok
+    C.create({ hi: "hi" }) // ok
+
+    const D = types.number
+    // D.create() // manual test: expects compilation error
+    D.create(5) // ok
+
+    const E = types.optional(types.number, 5)
+    E.create() // ok
+    E.create(6) // ok
+
+    const F = types.frozen<number>()
+    // F.create() // manual test: compilation error
+    F.create(6) // ok
+
+    const FF = types.frozen<number | undefined>()
+    FF.create() // ok
+    FF.create(undefined) // ok
+
+    const G = types.frozen(5)
+    G.create() // ok
+    G.create(6) // ok
+
+    const H = types.frozen<any>(5)
+    H.create() // ok
+    H.create(6) // ok
+})

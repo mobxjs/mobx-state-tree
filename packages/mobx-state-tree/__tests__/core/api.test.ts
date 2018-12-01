@@ -16,6 +16,7 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     process,
     isStateTreeNode,
     flow,
+    castFlowReturn,
     applyAction,
     onAction,
     recordActions,

@@ -45,7 +45,7 @@
         "documentation": "^8.0.0",
         "jest": "^23.4.0",
         "mobx": "^5.5.0",
-        "rollup": "^0.66.0",
+        "rollup": "^0.67.0",
         "rollup-plugin-commonjs": "^9.0.0",
         "rollup-plugin-filesize": "^5.0.0",
         "rollup-plugin-node-resolve": "^3.0.0",
@@ -55,7 +55,7 @@
         "ts-jest": "^23.0.1",
         "ts-node": "^7.0.0",
         "tslib": "^1.7.1",
-        "typescript": "^2.9.2"
+        "typescript": "~3.0.0"
     },
     "peerDependencies": {
         "mobx": ">=4.5.0 <5.0.0 || >=5.5.0 <6.0.0"

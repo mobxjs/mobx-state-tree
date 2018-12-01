@@ -23,11 +23,11 @@
         "cross-env": "^5.1.1",
         "husky": "^1.0.0",
         "lerna": "^3.3.0",
-        "lint-staged": "^7.0.0",
+        "lint-staged": "^8.0.0",
         "prettier": "^1.13.6",
         "tslint": "^5.0.0",
         "tslint-config-prettier": "^1.14.0",
-        "typescript": "^2.9.2"
+        "typescript": "~3.0.0"
     },
     "husky": {
         "hooks": {
