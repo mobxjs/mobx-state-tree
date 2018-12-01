@@ -1,4 +1,5 @@
 -   Added `tryReference` and `isValidReference` to use references that might be no longer pointing to any nodes in a safe way through [#1087](https://github.com/mobxjs/mobx-state-tree/pull/1087) by [@xaviergonz](https://github.com/xaviergonz)
+-   Readded `IComplexType` for backwards compatibility.
 
 # 3.8.1
 
