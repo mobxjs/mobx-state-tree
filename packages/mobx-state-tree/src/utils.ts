@@ -230,6 +230,8 @@ export function addReadOnlyProp(object: any, propName: string, value: any) {
     })
 }
 
+type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never
+
 /**
  * @internal
  * @private
@@ -277,7 +279,7 @@ export class EventHandler<F extends Function> {
         this.handlers = undefined
     }
 
-    emit(...args: any[]) {
+    emit(...args: ArgumentTypes<F>) {
         if (this.handlers) {
             this.handlers.forEach(f => f(...args))
         }
