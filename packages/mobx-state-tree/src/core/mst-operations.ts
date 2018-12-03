@@ -24,7 +24,9 @@ import {
     INode,
     ModelPrimitive,
     ExtractNodeC,
-    InvalidReferenceError
+    InvalidReferenceError,
+    normalizeIdentifier,
+    ReferenceIdentifier
 } from "../internal"
 
 export type TypeOrStateTreeNodeToStateTreeNode<
@@ -520,7 +522,7 @@ export function resolvePath(target: IAnyStateTreeNode, path: string): any {
 export function resolveIdentifier<IT extends IAnyType>(
     type: IT,
     target: IAnyStateTreeNode,
-    identifier: string | number
+    identifier: ReferenceIdentifier
 ): ExtractT<IT> | undefined {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
@@ -533,7 +535,10 @@ export function resolveIdentifier<IT extends IAnyType>(
         if (!(typeof identifier === "string" || typeof identifier === "number"))
             fail("expected third argument to be a string or number, got " + identifier + " instead")
     }
-    const node = getStateTreeNode(target).root.identifierCache!.resolve(type, "" + identifier)
+    const node = getStateTreeNode(target).root.identifierCache!.resolve(
+        type,
+        normalizeIdentifier(identifier)
+    )
     return node ? node.value : undefined
 }
 
@@ -696,7 +701,7 @@ export function clone<T extends IAnyStateTreeNode>(
     return node.type.create(
         node.snapshot,
         keepEnvironment === true
-            ? node.root._environment
+            ? node.root.environment
             : keepEnvironment === false
                 ? undefined
                 : keepEnvironment
@@ -809,7 +814,7 @@ export function getEnv<T = any>(target: IAnyStateTreeNode): T {
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
     const node = getStateTreeNode(target)
-    const env = node.root._environment
+    const env = node.root.environment
     if (!!!env) return EMPTY_OBJECT as T
     return env
 }
@@ -1001,6 +1006,6 @@ export function castToSnapshot<I>(
  */
 export function castToReferenceSnapshot<I>(
     instance: I
-): Extract<I, IAnyStateTreeNode> extends never ? I : string | number {
+): Extract<I, IAnyStateTreeNode> extends never ? I : ReferenceIdentifier {
     return instance as any
 }

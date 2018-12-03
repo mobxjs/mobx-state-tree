@@ -631,7 +631,7 @@ console.log(storeInstance.selectedTodo.title)
 -   The `map.put()` method can be used to simplify adding objects that have identifiers to [maps](API.md#typesmap)
 -   The primary goal of identifiers is not validation, but reconciliation and reference resolving. For this reason identifiers cannot be defined or updated after creation. If you want to check if some value just looks as an identifier, without providing the above semantics; use something like: `types.refinement(types.string, v => v.match(/someregex/))`
 
-_Tip: If you know the format of the identifiers in your application, leverage `types.refinement` to actively check this, for example the following definition enforces that identifiers of `Car` always start with the string `Car_`:\_
+_Tip: If you know the format of the identifiers in your application, leverage `types.refinement` to actively check this, for example the following definition enforces that identifiers of `Car` always start with the string `"Car_"`:
 
 ```javascript
 const Car = types.model("Car", {
@@ -680,6 +680,78 @@ const s = Store.create({
     users: [{ id: "1", name: "Michel" }, { id: "2", name: "Mattia" }],
     selection: "Mattia"
 })
+```
+
+#### Reference validation: `isValidReference`, `tryReference`, `onInvalidate` hook and `types.safeReference`
+
+Accessing an invalid reference (a reference to a dead/detached node) triggers an exception.
+
+In order to check if a reference is valid, MST offers the `isValidReference(() => ref): boolean` function:
+
+```ts
+const isValid = isValidReference(() => store.myRef)
+```
+
+Also, if you are unsure if a reference is valid or not you can use the `tryReference(() => ref): ref | undefined` function:
+
+```ts
+// the result will be the passed ref if ok, or undefined if invalid
+const maybeValidRef = tryReference(() => store.myRef)
+```
+
+The options parameter for references also accepts an optional `onInvalidated` hook, which will be called when the reference target node that the reference is pointing to is about to be detached/destroyed. It has the following signature:
+
+```ts
+const refWithOnInvalidated = types.reference(Todo, {
+    onInvalidated(event: {
+        // what is causing the target to become invalidated
+        cause: "detach" | "destroy" | "invalidSnapshotReference"
+        // the target that is about to become invalidated (undefined if "invalidSnapshotReference")
+        invalidTarget: STN | undefined
+        // the identifier that is about to become invalidated
+        invalidId: string | number
+        // parent node of the reference (not the reference target)
+        parent: IAnyStateTreeNode
+        // a function to remove the reference from its parent (or set to undefined in the case of models)
+        removeRef: () => void
+        // a function to set our reference to a new target
+        replaceRef: (newRef: STN | null | undefined) => void
+    }) {
+        // do something
+    }
+})
+```
+
+Note that invalidation will only trigger while the reference is attached to a parent (be it a model, an array, a map, etc.).
+
+A default implementation of such `onInvalidated` hook is provided by the `types.safeReference` type. It is like a standard reference, except that once the target node becomes invalidated it will:
+
+-   If its parent is a model: Set its own property to `undefined`
+-   If its parent is an array: Remove itself from the array
+-   If its parent is a map: Remove itself from the map
+
+Strictly speaking it is implemented as
+
+```js
+types.maybe(
+    types.reference(Type, {
+        ...customGetSetIfAvailable,
+        onInvalidated(ev) {
+            ev.removeRef()
+        }
+    })
+)
+```
+
+```js
+const Todo = types.model({ id: types.identifier })
+const Store = types.model({
+    todos: types.array(Todo),
+    selectedTodo: types.safeReference(Todo)
+})
+
+// given selectedTodo points to a valid Todo and that Todo is later removed from the todos
+// array, then selectedTodo will automatically become undefined
 ```
 
 ### Listening to observables, snapshots, patches or actions
@@ -935,6 +1007,8 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
     -   `types.frozen(someDefaultValue)` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
     -   (Typescript) `types.frozen<TypeScriptType>(...)` - provide a typescript type, to help in strongly typing the field (design time only)
 -   `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one.
+-   `types.reference(targetType)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
+-   `types.safeReference(targetType)` is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed. See [references](#references) for more details.
 
 ## Property types
 
@@ -942,7 +1016,6 @@ Property types can only be used as a direct member of a `types.model` type and n
 
 -   `types.identifier` Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](#identifiers) for more details. `subType` should be either `types.string` or `types.number`, defaulting to the first if not specified.
 -   `types.identifierNumber` Similar to `types.identifier`. However, during serialization, the identifier value will be parsed from / serialized to a number.
--   `types.reference(targetType)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
 
 ## LifeCycle hooks for `types.model`
 
@@ -1041,7 +1114,8 @@ See the [full API docs](API.md) for more details.
 | [`resolve(node, path)`](API.md#resolve)                                                                   | Resolves a `path` (json path) relatively to the given `node`                                                                                                                                                                                          |
 | [`resolveIdentifier(type, target, identifier)`](API.md#resolveidentifier)                                 | resolves an identifier of a given type in a model tree                                                                                                                                                                                                |
 | [`resolvePath(target, path)`](API.md#resolvepath)                                                         | resolves a JSON path, starting at the specified target                                                                                                                                                                                                |
-| [`setLivelynessChecking("warn" \| "ignore" \| "error")`](API.md#setlivelynesschecking)                    | Defines what MST should do when running into reads / writes to objects that have died. By default it will print a warning. Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place |
+| [`setLivelinessChecking("warn" \| "ignore" \| "error")`](API.md#setlivelinesschecking)                    | Defines what MST should do when running into reads / writes to objects that have died. By default it will print a warning. Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place |
+| [`getLivelinessChecking()`](API.md#getlivelinesschecking)                                                 | Returns the current liveliness checking mode.                                                                                                                                                                                                         |
 | [`splitJsonPath(path)`](API.md#splitjsonpath)                                                             | Splits and unescapes the given JSON `path` into path parts                                                                                                                                                                                            |
 | [`typecheck(type, value)`](API.md#typecheck)                                                              | Typechecks a value against a type. Throws on errors. Use this if you need typechecks even in a production build.                                                                                                                                      |
 | [`tryResolve(node, path)`](API.md#tryresolve)                                                             | Like `resolve`, but just returns `null` if resolving fails at any point in the path                                                                                                                                                                   |

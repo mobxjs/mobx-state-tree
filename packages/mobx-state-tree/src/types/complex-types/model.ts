@@ -50,22 +50,12 @@ import {
     TypeFlags,
     ExtractC,
     ExtractS,
-    ExtractT
+    ExtractT,
+    Hook
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
-
-/**
- * @internal
- * @private
- */
-export enum HookNames {
-    afterCreate = "afterCreate",
-    afterAttach = "afterAttach",
-    beforeDetach = "beforeDetach",
-    beforeDestroy = "beforeDestroy"
-}
 
 export interface ModelProperties {
     [key: string]: IAnyType
@@ -240,7 +230,7 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
     return Object.keys(declaredProps).reduce(
         (props, key) => {
             // warn if user intended a HOOK
-            if (key in HookNames)
+            if (key in Hook)
                 return fail(
                     `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
                 )
@@ -379,7 +369,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
 
             // apply hook composition
             let baseAction = (self as any)[name]
-            if (name in HookNames && baseAction) {
+            if (name in Hook && baseAction) {
                 let specializedAction = action2
                 action2 = function() {
                     baseAction.apply(null, arguments)
@@ -525,7 +515,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
             result[name] = childType.instantiate(
                 objNode,
                 name,
-                objNode._environment,
+                objNode.environment,
                 initialSnapshot[name]
             )
         })
@@ -535,6 +525,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
     createNewInstance(node: ObjectNode, childNodes: IChildNodesMap, snapshot: any): any {
         return observable.object(childNodes, EMPTY_OBJECT, mobxShallow)
     }
+
     finalizeNewInstance(node: ObjectNode, instance: IObservableObject): void {
         addHiddenFinalProp(instance, "toString", objectTypeToString)
 
@@ -814,7 +805,7 @@ export function compose(...args: any[]): any {
  * @param {IT} type
  * @returns {type is IT}
  */
-export function isModelType<IT extends IAnyModelType>(type: IT): type is IT {
+export function isModelType<IT extends IAnyModelType = IAnyModelType>(type: IAnyType): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 

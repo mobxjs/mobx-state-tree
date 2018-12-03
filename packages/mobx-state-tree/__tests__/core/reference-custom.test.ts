@@ -9,8 +9,8 @@ import {
     getRoot,
     onSnapshot,
     flow,
-    cast,
-    Instance
+    Instance,
+    resolveIdentifier
 } from "../../src"
 
 test("it should support custom references - basics", () => {
@@ -177,4 +177,74 @@ test("it should support dynamic loading", done => {
             done()
         }
     )
+})
+
+test("custom reference / safe custom reference to another store works", () => {
+    const Todo = types.model({ id: types.identifier })
+    const TodoStore = types.model({ todos: types.array(Todo) })
+    const OtherStore = types.model({
+        todoRef: types.maybe(
+            types.reference(Todo, {
+                get(id) {
+                    const node = resolveIdentifier(Todo, todos, id)
+                    if (!node) {
+                        throw new Error("Invalid ref")
+                    }
+                    return node
+                },
+                set(value) {
+                    return value.id
+                }
+            })
+        ),
+        safeRef: types.safeReference(Todo, {
+            get(id) {
+                const node = resolveIdentifier(Todo, todos, id)
+                if (!node) {
+                    throw new Error("Invalid ref")
+                }
+                return node
+            },
+            set(value) {
+                return value.id
+            }
+        })
+    })
+    const todos = TodoStore.create({
+        todos: [{ id: "1" }, { id: "2" }, { id: "3" }]
+    })
+    unprotect(todos)
+
+    // from a snapshot
+    const otherStore = OtherStore.create({
+        todoRef: "1",
+        safeRef: "1"
+    })
+    unprotect(otherStore)
+    expect(otherStore.todoRef!.id).toBe("1")
+    expect(otherStore.safeRef!.id).toBe("1")
+
+    // assigning an id
+    otherStore.todoRef = "2" as any
+    otherStore.safeRef = "2" as any
+    expect(otherStore.todoRef!.id).toBe("2")
+    expect(otherStore.safeRef!.id).toBe("2")
+
+    // assigning a node directly
+    otherStore.todoRef = todos.todos[2]
+    otherStore.safeRef = todos.todos[2]
+    expect(otherStore.todoRef!.id).toBe("3")
+    expect(otherStore.safeRef!.id).toBe("3")
+
+    // getting the snapshot
+    expect(getSnapshot(otherStore)).toEqual({
+        todoRef: "3",
+        safeRef: "3"
+    })
+
+    // the removed node should throw on standard refs access
+    // and be set to undefined on safe ones
+    todos.todos.splice(2, 1)
+    expect(() => otherStore.todoRef).toThrow("Invalid ref")
+    expect(otherStore.safeRef).toBe(undefined)
 })

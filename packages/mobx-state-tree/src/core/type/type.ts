@@ -19,7 +19,8 @@ import {
     IChildNodesMap,
     ModelPrimitive,
     EMPTY_OBJECT,
-    IAnyStateTreeNode
+    IAnyStateTreeNode,
+    normalizeIdentifier
 } from "../../internal"
 
 /**
@@ -60,8 +61,8 @@ export type IsTypeAnyOrUnknown<T> = unknown extends T ? true : false
 export type IsEmptyCreationType<O> = IsTypeAnyOrUnknown<O> extends true
     ? true
     : Extract<O, undefined> extends never
-        ? (DefinablePropsNames<O> extends never | undefined ? true : false)
-        : true
+    ? (DefinablePropsNames<O> extends never | undefined ? true : false)
+    : true
 
 // chooses a create function based on the creation type
 export type CreateParams<C> = IsEmptyCreationType<C> extends false ? [C, any?] : [C?, any?]
@@ -189,13 +190,19 @@ export type ExtractCST<IT extends IAnyType> = IT extends IType<infer C, infer S,
 
 export type Instance<T> = T extends IStateTreeNode
     ? T
-    : T extends IType<any, any, infer TT> ? TT : T
+    : T extends IType<any, any, infer TT>
+    ? TT
+    : T
 export type SnapshotIn<T> = T extends IStateTreeNode<infer STNC, any>
     ? STNC
-    : T extends IType<infer TC, any, any> ? TC : T
+    : T extends IType<infer TC, any, any>
+    ? TC
+    : T
 export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
     ? STNS
-    : T extends IType<any, infer TS, any> ? TS : T
+    : T extends IType<any, infer TS, any>
+    ? TS
+    : T
 
 /**
  * A type which is equivalent to the union of SnapshotIn and Instance types of a given typeof TYPE or typeof VARIABLE.
@@ -309,7 +316,7 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTree
             isMutable(newValue) &&
             !isStateTreeNode(newValue) &&
             (!current.identifierAttribute ||
-                current.identifier === "" + newValue[current.identifierAttribute])
+                current.identifier === normalizeIdentifier(newValue[current.identifierAttribute]))
         ) {
             // the newValue has no node, so can be treated like a snapshot
             // we can reconcile
@@ -327,7 +334,7 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTree
             return newNode
         }
         // nothing to do, we have to create a new node
-        return this.instantiate(parent, subpath, current._environment, newValue)
+        return this.instantiate(parent, subpath, current.environment, newValue)
     }
 
     get Type(): T {
@@ -398,12 +405,7 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
     reconcile(current: INode, newValue: any): INode {
         // reconcile only if type and value are still the same
         if (current.type === this && current.storedValue === newValue) return current
-        const res = this.instantiate(
-            current.parent,
-            current.subpath,
-            current._environment,
-            newValue
-        )
+        const res = this.instantiate(current.parent, current.subpath, current.environment, newValue)
         current.die()
         return res
     }

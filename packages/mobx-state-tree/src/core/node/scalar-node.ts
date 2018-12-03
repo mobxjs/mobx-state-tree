@@ -1,27 +1,29 @@
 import {
-    INode,
-    escapeJsonPath,
     fail,
     freeze,
     NodeLifeCycle,
     ObjectNode,
-    IAnyType
+    IAnyType,
+    Hook,
+    BaseNode,
+    escapeJsonPath,
+    EventHandler
 } from "../../internal"
+import { action } from "mobx"
 
 /**
  * @internal
  * @private
  */
-export class ScalarNode implements INode {
-    readonly type: IAnyType
-    readonly storedValue: any
-    parent: ObjectNode | null = null
-    subpath: string = ""
-
-    private state = NodeLifeCycle.INITIALIZING
-    private readonly _initialSnapshot: any
-    _environment: any = undefined
-
+export class ScalarNode extends BaseNode {
+    readonly hookSubscribers = {
+        // afterCreate in scalar nodes is executed in the constructor, so it cannot be registered before it is already executed
+        // [Hook.afterCreate]: new EventHandler<(node: ScalarNode) => void>(),
+        [Hook.afterAttach]: new EventHandler<(node: ScalarNode) => void>(),
+        // beforeDetach is never executed for scalar nodes, since they cannot be detached
+        // [Hook.beforeDetach]: new EventHandler<(node: ScalarNode) => void>(),
+        [Hook.beforeDestroy]: new EventHandler<(node: ScalarNode) => void>()
+    }
     constructor(
         type: IAnyType,
         parent: ObjectNode | null,
@@ -29,38 +31,25 @@ export class ScalarNode implements INode {
         environment: any,
         initialSnapshot: any
     ) {
-        this._initialSnapshot = initialSnapshot
+        super(type, parent, subpath, environment)
 
-        this.type = type
-        this.parent = parent
-        this.subpath = subpath
-
-        let sawException = true
         try {
             this.storedValue = type.createNewInstance(this, {}, initialSnapshot)
-            this.state = NodeLifeCycle.CREATED
-            sawException = false
-        } finally {
-            if (sawException) {
-                // short-cut to die the instance, to avoid the snapshot computed starting to throw...
-                this.state = NodeLifeCycle.DEAD
-            }
+        } catch (e) {
+            // short-cut to die the instance, to avoid the snapshot computed starting to throw...
+            this.state = NodeLifeCycle.DEAD
+            throw e
         }
+
+        this.state = NodeLifeCycle.CREATED
+        // for scalar nodes there's no point in firing this event since it would fire on the constructor, before
+        // anybody can actually register for/listen to it
+        // this.fireHook(Hook.AfterCreate)
+
+        this.finalizeCreation()
     }
 
-    /*
-     * Returnes (escaped) path representation as string
-     */
-    public get path(): string {
-        if (!this.parent) return ""
-        return this.parent.path + "/" + escapeJsonPath(this.subpath)
-    }
-
-    public get isRoot(): boolean {
-        return this.parent === null
-    }
-
-    public get root(): ObjectNode {
+    get root(): ObjectNode {
         // future optimization: store root ref in the node and maintain it
         if (!this.parent) return fail(`This scalar node is not part of a tree`)
         return this.parent.root
@@ -74,36 +63,51 @@ export class ScalarNode implements INode {
             const newPath = subpath === null ? "" : subpath
             if (this.subpath !== newPath) {
                 this.subpath = newPath
+                this.escapedSubpath = escapeJsonPath(this.subpath)
+                this.subpathAtom.reportChanged()
             }
             if (newParent && newParent !== this.parent) {
-                this.parent = newParent
+                fail("assertion failed: scalar nodes cannot change their parent")
             }
         }
     }
 
-    public get value(): any {
+    get value(): any {
         return this.type.getValue(this)
     }
 
-    public get snapshot(): any {
-        const snapshot = this.getSnapshot()
-        // avoid any external modification in dev mode
-        return freeze(snapshot)
+    get snapshot(): any {
+        return freeze(this.getSnapshot())
     }
 
-    public getSnapshot(): any {
+    getSnapshot(): any {
         return this.type.getSnapshot(this)
-    }
-
-    public get isAlive() {
-        return this.state !== NodeLifeCycle.DEAD
     }
 
     toString(): string {
         return `${this.type.name}@${this.path || "<root>"}${this.isAlive ? "" : "[dead]"}`
     }
 
+    @action
     die() {
-        this.state = NodeLifeCycle.DEAD
+        if (this.state === NodeLifeCycle.DETACHING) return
+        this.aboutToDie()
+        this.finalizeDeath()
+    }
+
+    finalizeCreation() {
+        this.partialFinalizeCreation()
+    }
+
+    aboutToDie() {
+        this.partialAboutToDie()
+    }
+
+    finalizeDeath() {
+        this.partialFinalizeDeath()
+    }
+
+    protected fireHook(name: Hook) {
+        this.fireInternalHook(name)
     }
 }

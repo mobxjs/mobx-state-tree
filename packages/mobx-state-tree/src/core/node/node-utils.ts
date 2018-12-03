@@ -5,8 +5,8 @@ import {
     joinJsonPath,
     ScalarNode,
     IChildNodesMap,
-    IAnyType,
-    EMPTY_ARRAY
+    EMPTY_ARRAY,
+    INode
 } from "../../internal"
 
 /**
@@ -19,29 +19,6 @@ export enum NodeLifeCycle {
     FINALIZED, // afterAttach has run
     DETACHING, // being detached from the tree
     DEAD // no coming back from this one
-}
-
-/**
- * @internal
- * @private
- */
-export interface INode {
-    readonly type: IAnyType
-    readonly storedValue: any
-    readonly path: string
-    readonly isRoot: boolean
-    readonly parent: ObjectNode | null
-    readonly root: ObjectNode
-    readonly _environment: any
-    subpath: string
-
-    isAlive: boolean
-    readonly value: any
-    readonly snapshot: any
-    getSnapshot(): any
-
-    setParent(newParent: ObjectNode | null, subpath?: string | null): void
-    die(): void
 }
 
 export interface IStateTreeNode<C = any, S = any> {

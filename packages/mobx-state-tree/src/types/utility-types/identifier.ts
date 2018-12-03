@@ -156,3 +156,13 @@ export function isIdentifierType<IT extends typeof identifier | typeof identifie
 ): type is IT {
     return isType(type) && (type.flags & TypeFlags.Identifier) > 0
 }
+
+export type ReferenceIdentifier = string | number
+
+/**
+ * @internal
+ * @private
+ */
+export function normalizeIdentifier(id: ReferenceIdentifier): string {
+    return "" + id
+}

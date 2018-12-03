@@ -41,7 +41,8 @@ import {
     ExtractS,
     ExtractC,
     ExtractT,
-    ExtractCST
+    ExtractCST,
+    normalizeIdentifier
 } from "../../internal"
 
 export interface IMSTArray<IT extends IAnyType>
@@ -93,7 +94,7 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
 
     initializeChildNodes(objNode: ObjectNode, snapshot: S[] = []): IChildNodesMap {
         const subType = (objNode.type as ArrayType<any, any, any>).subType
-        const environment = objNode._environment
+        const environment = objNode.environment
         const result = {} as IChildNodesMap
         snapshot.forEach((item, index) => {
             const subpath = `${index}`
@@ -109,6 +110,7 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
     ): IObservableArray<any> {
         return observable.array(convertChildNodesToArray(childNodes), mobxShallow)
     }
+
     finalizeNewInstance(node: ObjectNode, instance: IObservableArray<any>): void {
         _getAdministration(instance).dehancer = node.unbox
         intercept(instance, this.willChange as any)
@@ -409,7 +411,7 @@ function valueAsNode(
         return childNode
     }
     // nothing to do, create from scratch
-    return childType.instantiate(parent, subpath, parent._environment, newValue)
+    return childType.instantiate(parent, subpath, parent.environment, newValue)
 }
 
 // given a value
@@ -426,7 +428,7 @@ function areSame(oldNode: INode, newValue: any) {
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&
-        oldNode.identifier === "" + newValue[oldNode.identifierAttribute] &&
+        oldNode.identifier === normalizeIdentifier(newValue[oldNode.identifierAttribute]) &&
         oldNode.type.is(newValue)
     )
         return true
@@ -437,10 +439,12 @@ function areSame(oldNode: INode, newValue: any) {
  * Returns if a given value represents an array type.
  *
  * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @template Items
+ * @param {IAnyType} type
+ * @returns {type is IArrayType<Items>}
  */
-export function isArrayType<IT extends IArrayType<any>>(type: IT): type is IT {
+export function isArrayType<Items extends IAnyType = IAnyType>(
+    type: IAnyType
+): type is IArrayType<Items> {
     return isType(type) && (type.flags & TypeFlags.Array) > 0
 }

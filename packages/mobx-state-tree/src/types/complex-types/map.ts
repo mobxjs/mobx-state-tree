@@ -46,7 +46,8 @@ import {
     ExtractS,
     ExtractT,
     ExtractCST,
-    IStateTreeNode
+    IStateTreeNode,
+    normalizeIdentifier
 } from "../../internal"
 
 export interface IMapType<IT extends IAnyType>
@@ -178,7 +179,7 @@ class MSTMap<C, S, T> extends ObservableMap {
             >
             if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
             if (mapType.identifierMode === MapIdentifierMode.YES) {
-                key = "" + (value as any)[mapType.mapIdentifierAttribute!]
+                key = normalizeIdentifier((value as any)[mapType.mapIdentifierAttribute!])
                 this.set(key, value)
                 return this.get(key) as any
             }
@@ -242,7 +243,7 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
 
     initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
         const subType = (objNode.type as MapType<any, any, any>).subType
-        const environment = objNode._environment
+        const environment = objNode.environment
         const result = {} as IChildNodesMap
         Object.keys(initialSnapshot).forEach(name => {
             result[name] = subType.instantiate(objNode, name, environment, initialSnapshot[name])
@@ -462,10 +463,12 @@ export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
  * Returns if a given value represents a map type.
  *
  * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @template Items
+ * @param {IAnyType} type
+ * @returns {type is IMapType<Items>}
  */
-export function isMapType<IT extends IMapType<any>>(type: IT): type is IT {
+export function isMapType<Items extends IAnyType = IAnyType>(
+    type: IAnyType
+): type is IMapType<Items> {
     return isType(type) && (type.flags & TypeFlags.Map) > 0
 }

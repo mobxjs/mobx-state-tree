@@ -10,8 +10,7 @@ import {
     getSnapshot,
     types,
     IJsonPatch,
-    setLivelynessChecking,
-    cast
+    setLivelinessChecking
 } from "../../src"
 import { observable, autorun } from "mobx"
 
@@ -186,7 +185,7 @@ test("items should be reconciled correctly when splicing - 1", () => {
     expect(isAlive(b)).toBe(true)
     expect(isAlive(c)).toBe(false)
 
-    setLivelynessChecking("error")
+    setLivelinessChecking("error")
     expect(() => store.todos.splice(0, 1, a, c, d)).toThrowError(
         "[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Task'). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
     )

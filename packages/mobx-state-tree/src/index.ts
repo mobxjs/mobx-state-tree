@@ -11,6 +11,7 @@ import {
     compose,
     custom,
     reference,
+    safeReference,
     union,
     optional,
     literal,
@@ -38,6 +39,7 @@ export const types = {
     compose,
     custom,
     reference,
+    safeReference,
     union,
     optional,
     literal,
@@ -101,8 +103,11 @@ import {
     ISerializedActionCall,
     recordActions,
     createActionTrackingMiddleware,
-    setLivelynessChecking,
-    LivelynessMode,
+    setLivelinessChecking,
+    getLivelinessChecking,
+    LivelinessMode,
+    setLivelynessChecking, // to be deprecated
+    LivelynessMode, // to be deprecated
     ModelSnapshotType,
     ModelCreationType,
     ModelSnapshotType2,
@@ -183,7 +188,13 @@ import {
     isRefinementType,
     isUnionType,
     tryReference,
-    isValidReference
+    isValidReference,
+    OnReferenceInvalidated,
+    OnReferenceInvalidatedEvent,
+    ReferenceOptions,
+    ReferenceOptionsGetSet,
+    ReferenceOptionsOnInvalidated,
+    ReferenceIdentifier
 } from "./internal"
 
 export {
@@ -227,8 +238,11 @@ export {
     ISerializedActionCall,
     recordActions,
     createActionTrackingMiddleware,
-    setLivelynessChecking,
-    LivelynessMode,
+    setLivelinessChecking,
+    getLivelinessChecking,
+    LivelinessMode,
+    setLivelynessChecking, // to be deprecated
+    LivelynessMode, // to be deprecated
     ModelSnapshotType,
     ModelCreationType,
     ModelSnapshotType2,
@@ -309,5 +323,11 @@ export {
     isRefinementType,
     isUnionType,
     tryReference,
-    isValidReference
+    isValidReference,
+    OnReferenceInvalidated,
+    OnReferenceInvalidatedEvent,
+    ReferenceOptions,
+    ReferenceOptionsGetSet,
+    ReferenceOptionsOnInvalidated,
+    ReferenceIdentifier
 }
