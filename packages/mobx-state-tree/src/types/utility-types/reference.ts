@@ -34,7 +34,8 @@ import {
 
 export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
     parent: IAnyStateTreeNode
-    oldRef: STN | undefined
+    invalidTarget: STN | undefined
+    invalidId: ReferenceIdentifier
     replaceRef: (newRef: STN | null | undefined) => void
     removeRef: () => void
     cause: "detach" | "destroy" | "invalidSnapshotReference"
@@ -168,6 +169,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
     private fireInvalidated(
         cause: "detach" | "destroy" | "invalidSnapshotReference",
         referenceNode: ScalarNode,
+        referenceId: ReferenceIdentifier,
         targetNode: ObjectNode | null
     ) {
         // to actually invalidate a reference we need an alive parent,
@@ -184,7 +186,8 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
         this.onInvalidated!({
             cause,
             parent,
-            oldRef: targetNode ? targetNode.storedValue : undefined,
+            invalidTarget: targetNode ? targetNode.storedValue : undefined,
+            invalidId: referenceId,
             replaceRef(newRef) {
                 applyPatch(parent, {
                     op: "replace",
@@ -205,7 +208,10 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
         })
     }
 
-    private addTargetNodeWatcher(referenceNode: ScalarNode): IDisposer | undefined {
+    private addTargetNodeWatcher(
+        referenceNode: ScalarNode,
+        referenceId: ReferenceIdentifier
+    ): IDisposer | undefined {
         const targetValue = this.getValue(referenceNode)
         if (!targetValue) {
             return undefined
@@ -217,7 +223,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
             if (!cause) {
                 return
             }
-            this.fireInvalidated(cause, referenceNode, targetNode)
+            this.fireInvalidated(cause, referenceNode, referenceId, targetNode)
         }
 
         const detachHookDisposer = targetNode.hookSubscribers[Hook.beforeDetach].register(
@@ -275,10 +281,18 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
                     // (like current references do)
                     // this means that effectively this code will only run when it is created from a snapshot
                     if (!sync) {
-                        this.fireInvalidated("invalidSnapshotReference", referenceNode, null)
+                        this.fireInvalidated(
+                            "invalidSnapshotReference",
+                            referenceNode,
+                            identifier,
+                            null
+                        )
                     }
                 } else {
-                    onTargetDestroyedHookDisposer = this.addTargetNodeWatcher(referenceNode)
+                    onTargetDestroyedHookDisposer = this.addTargetNodeWatcher(
+                        referenceNode,
+                        identifier
+                    )
                 }
             }
         }
@@ -422,13 +436,13 @@ export type ReferenceOptions<IT extends IAnyComplexType> =
 
 export interface IReferenceType<IT extends IAnyComplexType>
     extends IType<
-            ReferenceIdentifier,
-            ReferenceIdentifier,
-            RedefineIStateTreeNode<
-                ExtractT<IT>,
-                IStateTreeNode<ReferenceIdentifier, ReferenceIdentifier>
-            >
-        > {}
+        ReferenceIdentifier,
+        ReferenceIdentifier,
+        RedefineIStateTreeNode<
+            ExtractT<IT>,
+            IStateTreeNode<ReferenceIdentifier, ReferenceIdentifier>
+        >
+    > {}
 
 /**
  * Creates a reference to another type, which should have defined an identifier.

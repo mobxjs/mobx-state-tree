@@ -707,7 +707,9 @@ const refWithOnInvalidated = types.reference(Todo, {
         // what is causing the target to become invalidated
         cause: "detach" | "destroy" | "invalidSnapshotReference"
         // the target that is about to become invalidated (undefined if "invalidSnapshotReference")
-        oldRef: STN | undefined
+        invalidTarget: STN | undefined
+        // the identifier that is about to become invalidated
+        invalidId: string | null
         // parent node of the reference (not the reference target)
         parent: IAnyStateTreeNode
         // a function to remove the reference from its parent (or set to undefined in the case of models)

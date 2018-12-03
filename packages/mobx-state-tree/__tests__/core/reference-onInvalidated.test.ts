@@ -65,7 +65,8 @@ for (const customRef of [false, true]) {
             let calls = 0
             const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
                 calls++
-                oldRefId = ev1.oldRef!.id
+                oldRefId = ev1.invalidTarget!.id
+                expect(ev1.invalidId).toBe(oldRefId)
                 ev = ev1
                 ev1.removeRef()
             }
@@ -99,7 +100,8 @@ for (const customRef of [false, true]) {
             let calls = 0
             const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
                 calls++
-                oldRefId = ev1.oldRef!.id
+                oldRefId = ev1.invalidTarget!.id
+                expect(ev1.invalidId).toBe(oldRefId)
                 ev = ev1
                 ev1.removeRef()
             }
@@ -134,7 +136,8 @@ for (const customRef of [false, true]) {
             let calls = 0
             const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
                 calls++
-                oldRefId = ev1.oldRef!.id
+                oldRefId = ev1.invalidTarget!.id
+                expect(ev1.invalidId).toBe(oldRefId)
                 ev = ev1
                 ev1.removeRef()
             }
@@ -172,7 +175,8 @@ for (const customRef of [false, true]) {
             let calls = 0
             const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
                 calls++
-                oldRefId = ev1.oldRef!.id
+                oldRefId = ev1.invalidTarget!.id
+                expect(ev1.invalidId).toBe(oldRefId)
                 ev = ev1
                 ev1.replaceRef(store.todos[1])
             }
@@ -197,7 +201,8 @@ for (const customRef of [false, true]) {
             let calls = 0
             const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
                 calls++
-                oldRefId = ev1.oldRef!.id
+                oldRefId = ev1.invalidTarget!.id
+                expect(ev1.invalidId).toBe(oldRefId)
                 ev = ev1
                 ev1.removeRef()
             }
