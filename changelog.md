@@ -1,3 +1,5 @@
+# 3.9.0
+
 - TypeScript 3.0 or later is now required when using TypeScript. This brings some improvements:
     - `flow` arguments and return types are now correctly inferred automatically. One exception is when the last return of a `flow` is a `Promise`. In these cases `castFlowReturn(somePromise)` needs to be used so the return type can be inferred properly.
     - `create` method is now smart enough to warn when no snapshot argument is provided on types that have some mandatory properties.
