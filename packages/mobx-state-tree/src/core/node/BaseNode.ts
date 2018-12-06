@@ -17,15 +17,15 @@ export abstract class BaseNode {
     protected escapedSubpath: string
     storedValue: any
 
-    protected readonly aliveAtom = createAtom(`alive`)
+    private readonly aliveAtom = createAtom(`alive`)
     private _state = NodeLifeCycle.INITIALIZING
     get state() {
         return this._state
     }
     set state(val: NodeLifeCycle) {
-        const wasAlive = this._state !== NodeLifeCycle.DEAD
+        const wasAlive = this.isAlive
         this._state = val
-        const isAlive = this._state !== NodeLifeCycle.DEAD
+        const isAlive = this.isAlive
 
         if (wasAlive !== isAlive) {
             this.aliveAtom.reportChanged()
