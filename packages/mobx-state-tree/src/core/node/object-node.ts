@@ -171,8 +171,6 @@ export class ObjectNode extends BaseNode {
         }
 
         this._observableInstanceCreated = true
-        this.state = NodeLifeCycle.CREATED
-        this.fireHook(Hook.afterCreate)
 
         // NOTE: we need to touch snapshot, because non-observable
         // "observableInstanceCreated" field was touched
@@ -180,9 +178,12 @@ export class ObjectNode extends BaseNode {
 
         if (this.isRoot) this._addSnapshotReaction()
 
-        this.finalizeCreation()
-
         this._childNodes = EMPTY_OBJECT
+
+        this.state = NodeLifeCycle.CREATED
+        this.fireHook(Hook.afterCreate)
+
+        this.finalizeCreation()
     }
 
     get root(): ObjectNode {
@@ -394,13 +395,15 @@ export class ObjectNode extends BaseNode {
         if (this.isRoot) return
 
         this.fireHook(Hook.beforeDetach)
-        this.environment = this.root.environment // make backup of environment
         this.state = NodeLifeCycle.DETACHING
+
+        this.environment = this.root.environment // make backup of environment
         this.identifierCache = this.root.identifierCache!.splitCache(this)
         this.parent!.removeChild(this.subpath)
         this.parent = null
         this.subpath = this.escapedSubpath = ""
         this.subpathAtom.reportChanged()
+
         this.state = NodeLifeCycle.FINALIZED
     }
 
