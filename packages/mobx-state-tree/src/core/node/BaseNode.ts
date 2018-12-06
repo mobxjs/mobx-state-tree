@@ -6,7 +6,7 @@ import {
     Hook,
     escapeJsonPath
 } from "../../internal"
-import { createAtom, observable } from "mobx"
+import { createAtom } from "mobx"
 
 /**
  * @internal
