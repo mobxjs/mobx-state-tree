@@ -1,3 +1,5 @@
+- Made `isAlive(node)` reactive, so it can be reacted upon.
+
 # 3.9.0
 
 - TypeScript 3.0 or later is now required when using TypeScript. This brings some improvements:

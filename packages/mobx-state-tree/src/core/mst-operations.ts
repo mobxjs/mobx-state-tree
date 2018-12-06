@@ -703,8 +703,8 @@ export function clone<T extends IAnyStateTreeNode>(
         keepEnvironment === true
             ? node.root.environment
             : keepEnvironment === false
-                ? undefined
-                : keepEnvironment
+            ? undefined
+            : keepEnvironment
     ) as T // it's an object or something else
 }
 
@@ -751,7 +751,7 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
     }
-    return getStateTreeNode(target).isAlive
+    return getStateTreeNode(target).observableIsAlive
 }
 
 /**

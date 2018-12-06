@@ -14,7 +14,9 @@ import {
     getParent,
     SnapshotOut,
     IJsonPatch,
-    ISerializedActionCall
+    ISerializedActionCall,
+    isAlive,
+    cast
 } from "../../src"
 
 import { autorun, reaction, observable } from "mobx"
@@ -966,4 +968,56 @@ test("it should emit patches when applySnapshot is used", () => {
     onPatch(doc, patch => patches.push(patch))
     applySnapshot(doc, { ...getSnapshot(doc), to: "universe" })
     expect(patches).toEqual([{ op: "replace", path: "/to", value: "universe" }])
+})
+
+test("isAlive must be reactive", () => {
+    const Todo = types.model({ text: types.string })
+    const TodoStore = types.model({
+        todos: types.array(Todo),
+        todo: types.maybe(Todo)
+    })
+
+    const store = TodoStore.create({
+        todos: [{ text: "1" }, { text: "2" }],
+        todo: { text: "3" }
+    })
+    unprotect(store)
+
+    const t1 = store.todos[0]!
+    const t2 = store.todos[1]!
+    const t3 = store.todo!
+
+    let calls = 0
+    const r1 = reaction(
+        () => isAlive(t1),
+        v => {
+            expect(v).toBe(false)
+            calls++
+        }
+    )
+    const r2 = reaction(
+        () => isAlive(t2),
+        v => {
+            expect(v).toBe(false)
+            calls++
+        }
+    )
+    const r3 = reaction(
+        () => isAlive(t3),
+        v => {
+            expect(v).toBe(false)
+            calls++
+        }
+    )
+
+    try {
+        store.todos = cast([])
+        store.todo = undefined
+
+        expect(calls).toBe(3)
+    } finally {
+        r1()
+        r2()
+        r3()
+    }
 })

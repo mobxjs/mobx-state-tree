@@ -6,7 +6,7 @@ import {
     Hook,
     escapeJsonPath
 } from "../../internal"
-import { createAtom } from "mobx"
+import { createAtom, observable } from "mobx"
 
 /**
  * @internal
@@ -15,8 +15,22 @@ import { createAtom } from "mobx"
 export abstract class BaseNode {
     protected readonly subpathAtom = createAtom(`path`)
     protected escapedSubpath: string
-    state = NodeLifeCycle.INITIALIZING
     storedValue: any
+
+    protected readonly aliveAtom = createAtom(`alive`)
+    private _state = NodeLifeCycle.INITIALIZING
+    get state() {
+        return this._state
+    }
+    set state(val: NodeLifeCycle) {
+        const wasAlive = this._state !== NodeLifeCycle.DEAD
+        this._state = val
+        const isAlive = this._state !== NodeLifeCycle.DEAD
+
+        if (wasAlive !== isAlive) {
+            this.aliveAtom.reportChanged()
+        }
+    }
 
     readonly type: IAnyType
     readonly hookSubscribers: { [k: string]: EventHandler<(node: any, hook: Hook) => void> } = {}
@@ -63,6 +77,11 @@ export abstract class BaseNode {
 
     get isAlive() {
         return this.state !== NodeLifeCycle.DEAD
+    }
+
+    get observableIsAlive() {
+        this.aliveAtom.reportObserved()
+        return this.isAlive
     }
 
     abstract die(): void
