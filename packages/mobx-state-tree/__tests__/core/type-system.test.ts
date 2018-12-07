@@ -906,4 +906,8 @@ test("create correctly chooses if the snapshot is needed or not - #920", () => {
     const H = types.frozen<any>(5)
     H.create() // ok
     H.create(6) // ok
+
+    const I = types.optional(types.frozen<number>(), 6)
+    I.create()
+    I.create(7)
 })
