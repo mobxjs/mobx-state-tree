@@ -6,7 +6,7 @@ import {
     Hook,
     escapeJsonPath
 } from "../../internal"
-import { createAtom } from "mobx"
+import { createAtom, IAtom } from "mobx"
 
 /**
  * @internal
@@ -17,7 +17,7 @@ export abstract class BaseNode {
     protected escapedSubpath: string
     storedValue: any
 
-    private readonly aliveAtom = createAtom(`alive`)
+    private aliveAtom?: IAtom
     private _state = NodeLifeCycle.INITIALIZING
     get state() {
         return this._state
@@ -27,7 +27,7 @@ export abstract class BaseNode {
         this._state = val
         const isAlive = this.isAlive
 
-        if (wasAlive !== isAlive) {
+        if (this.aliveAtom && wasAlive !== isAlive) {
             this.aliveAtom.reportChanged()
         }
     }
@@ -80,6 +80,9 @@ export abstract class BaseNode {
     }
 
     get observableIsAlive() {
+        if (!this.aliveAtom) {
+            this.aliveAtom = createAtom(`alive`)
+        }
         this.aliveAtom.reportObserved()
         return this.isAlive
     }
