@@ -13,8 +13,13 @@ import { createAtom, IAtom } from "mobx"
  * @private
  */
 export abstract class BaseNode {
-    protected readonly subpathAtom = createAtom(`path`)
-    protected escapedSubpath: string
+    private _escapedSubpath?: string
+
+    private _subpath!: string
+    get subpath() {
+        return this._subpath
+    }
+
     storedValue: any
 
     private aliveAtom?: IAtom
@@ -36,24 +41,42 @@ export abstract class BaseNode {
     readonly hookSubscribers: { [k: string]: EventHandler<(node: any, hook: Hook) => void> } = {}
 
     environment: any = undefined
-    subpath: string = ""
-    parent: ObjectNode | null = null
+
+    private _parent!: ObjectNode | null
+    get parent() {
+        return this._parent
+    }
 
     constructor(type: IAnyType, parent: ObjectNode | null, subpath: string, environment: any) {
         this.environment = environment
         this.type = type
-        this.parent = parent
-        this.subpath = subpath
-        this.escapedSubpath = escapeJsonPath(this.subpath)
+        this.partialSetParent(parent, subpath)
+    }
+
+    private pathAtom?: IAtom
+    protected partialSetParent(parent: ObjectNode | null, subpath: string) {
+        this._parent = parent
+        this._subpath = subpath
+        this._escapedSubpath = undefined // regenerate when needed
+        if (this.pathAtom) {
+            this.pathAtom.reportChanged()
+        }
     }
 
     /*
      * Returns (escaped) path representation as string
      */
     get path(): string {
-        this.subpathAtom.reportObserved()
+        if (!this.pathAtom) {
+            this.pathAtom = createAtom(`path`)
+        }
+        this.pathAtom.reportObserved()
         if (!this.parent) return ""
-        return this.parent.path + "/" + this.escapedSubpath
+        // regenerate escaped subpath if needed
+        if (this._escapedSubpath === undefined) {
+            this._escapedSubpath = !this._subpath ? "" : escapeJsonPath(this._subpath)
+        }
+        return this.parent.path + "/" + this._escapedSubpath
     }
 
     get isRoot(): boolean {
@@ -113,9 +136,7 @@ export abstract class BaseNode {
     protected partialFinalizeDeath() {
         Object.keys(this.hookSubscribers).forEach(k => this.hookSubscribers[k].clear())
 
-        this.parent = null
-        this.subpath = this.escapedSubpath = ""
-        this.subpathAtom.reportChanged()
+        this.partialSetParent(null, "")
         this.state = NodeLifeCycle.DEAD
     }
 

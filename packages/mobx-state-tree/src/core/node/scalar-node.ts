@@ -61,13 +61,10 @@ export class ScalarNode extends BaseNode {
             this.die()
         } else {
             const newPath = subpath === null ? "" : subpath
-            if (this.subpath !== newPath) {
-                this.subpath = newPath
-                this.escapedSubpath = escapeJsonPath(this.subpath)
-                this.subpathAtom.reportChanged()
-            }
             if (newParent && newParent !== this.parent) {
                 fail("assertion failed: scalar nodes cannot change their parent")
+            } else if (this.subpath !== newPath) {
+                this.partialSetParent(this.parent, newPath)
             }
         }
     }

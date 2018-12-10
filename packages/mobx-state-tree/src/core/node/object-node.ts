@@ -222,16 +222,12 @@ export class ObjectNode extends BaseNode {
             this.die()
         } else {
             const newPath = subpath === null ? "" : subpath
-            if (this.subpath !== newPath) {
-                this.subpath = newPath
-                this.escapedSubpath = escapeJsonPath(this.subpath)
-                this.subpathAtom.reportChanged()
-            }
             if (newParent && newParent !== this.parent) {
                 newParent.root.identifierCache!.mergeCache(this)
-                this.parent = newParent
-                this.subpathAtom.reportChanged()
+                this.partialSetParent(newParent, newPath)
                 this.fireHook(Hook.afterAttach)
+            } else if (this.subpath !== newPath) {
+                this.partialSetParent(this.parent, newPath)
             }
         }
     }
@@ -400,9 +396,7 @@ export class ObjectNode extends BaseNode {
         this.environment = this.root.environment // make backup of environment
         this.identifierCache = this.root.identifierCache!.splitCache(this)
         this.parent!.removeChild(this.subpath)
-        this.parent = null
-        this.subpath = this.escapedSubpath = ""
-        this.subpathAtom.reportChanged()
+        this.partialSetParent(null, "")
 
         this.state = NodeLifeCycle.FINALIZED
     }
