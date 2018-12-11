@@ -1,3 +1,5 @@
+- Little fix for `castFlowReturn` not typecasting the promise to its actual result.
+
 # 3.9.0
 
 - TypeScript 3.0 or later is now required when using TypeScript. This brings some improvements:
