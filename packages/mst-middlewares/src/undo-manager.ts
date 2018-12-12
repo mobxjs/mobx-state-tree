@@ -135,7 +135,7 @@ const UndoManager = types
             beforeDestroy() {
                 middlewareDisposer()
             },
-            undo(fn?: () => any) {
+            undo() {
                 replaying = true
                 self.undoIdx--
                 // n.b: reverse patches back to forth
@@ -145,15 +145,13 @@ const UndoManager = types
                     self.history[self.undoIdx].inversePatches!.slice().reverse()
                 )
                 replaying = false
-                if (fn) fn()
             },
-            redo(fn?: () => any) {
+            redo() {
                 replaying = true
                 // TODO: add error handling when patching fails? E.g. make the operation atomic?
                 applyPatch(getRoot(targetStore), self.history[self.undoIdx].patches)
                 self.undoIdx++
                 replaying = false
-                if (fn) fn()
             },
             withoutUndo(fn: () => any) {
                 try {

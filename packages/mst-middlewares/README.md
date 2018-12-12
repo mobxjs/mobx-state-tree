@@ -208,8 +208,8 @@ API:
 -   `history: { patches: [], inversePatches [] }[]`
 -   `canUndo: boolean`
 -   `canRedo: boolean`
--   `undo(fn?)` optional function to execute a callback after undo action
--   `redo(fn?)` optional function to execute a callback after redo action
+-   `undo()`
+-   `redo()`
 -   `withoutUndo(() => fn)` patches for actions / processes within the fn are not recorded.
 -   `withoutUndoFlow(fn*)` patches the fn\* are not recorded.
 -   `startGroup(() => fn)` can be used to start a group, all patches within a group are saved as one history entry.
