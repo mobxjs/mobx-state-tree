@@ -357,3 +357,26 @@ test("on tree - group", () => {
     expect(undoManager.canRedo).toBe(true)
     expect(store.numbers.length).toBe(0)
 })
+
+test("same tree - clean", () => {
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            setUndoManagerSameTree(self)
+            return {
+                inc() {
+                    self.x += 1
+                }
+            }
+        })
+    const store = HistoryOnTreeStoreModel.create()
+    store.inc()
+    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.canRedo).toBe(false)
+    store.history.clear()
+    expect(undoManager.canUndo).toBe(false)
+    expect(undoManager.canRedo).toBe(false)
+})
