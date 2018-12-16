@@ -180,6 +180,10 @@ const UndoManager = types
                 grouping = false
                 this.addUndoState(groupRecorder)
                 groupRecorder = { patches: [], inversePatches: [] }
+            },
+            clear() {
+                self.history.clear()
+                self.undoIdx = 0
             }
         }
     })
