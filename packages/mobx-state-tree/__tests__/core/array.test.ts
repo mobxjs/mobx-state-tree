@@ -13,6 +13,7 @@ import {
     setLivelinessChecking
 } from "../../src"
 import { observable, autorun } from "mobx"
+import { ExtractC } from "../../src/core/type/type"
 
 const createTestFactories = () => {
     const ItemFactory = types.optional(
@@ -415,4 +416,46 @@ test("it should keep unchanged for structrual equalled snapshot", () => {
     applySnapshot(store.numbers, [1, 2, 4])
     applySnapshot(store.numbers, [1, 2, 4])
     expect(values1).toEqual([[1, 2, 3], [1, 2, 4]])
+})
+
+// === OPERATIONS TESTS ===
+test("#1105 - it should return pop/shift'ed values for scalar arrays", () => {
+    const ScalarArray = types
+        .model({
+            array: types.array(types.number)
+        })
+        .actions(self => {
+            return {
+                shift() {
+                    return self.array.shift()
+                }
+            }
+        })
+
+    const test = ScalarArray.create({ array: [3, 5] })
+
+    expect(test.shift()).toEqual(3)
+    expect(test.shift()).toEqual(5)
+})
+
+test("it should return pop/shift'ed values for object arrays", () => {
+    const TestObject = types.model({ id: types.string })
+    const ObjectArray = types
+        .model({
+            array: types.array(TestObject)
+        })
+        .actions(self => {
+            return {
+                shift() {
+                    return self.array.shift()
+                }
+            }
+        })
+
+    const test = ObjectArray.create({
+        array: [{ id: "foo" }, { id: "bar" }]
+    })
+
+    expect(test.shift()).toEqual({ id: "foo" })
+    expect(test.shift()).toEqual({ id: "bar" })
 })

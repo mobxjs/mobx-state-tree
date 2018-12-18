@@ -436,7 +436,7 @@ Actions are replayable and are therefore constrained in several ways:
 Useful methods:
 
 -   [`onAction`](API.md#onaction) listens to any action that is invoked on the model or any of its descendants.
--   [`addMiddleware`](API.md#addmiddleware) listens to any action that is invoked on the model or any of its descendants.
+-   [`addMiddleware`](API.md#addmiddleware) adds an interceptor function to any action invoked on the subtree.
 -   [`applyAction`](API.md#applyaction) invokes an action on the model according to the given action description
 
 #### Asynchronous actions
@@ -1438,7 +1438,7 @@ const Example = types
   }))
 ```
 
-_**NOTE: the above approach will incur runtime performance penalty as accessing such computed values (e.g. inside `render()` method of an observed component) always leads to full recompute (see [this issue](https://github.com/mobxjs/mobx-state-tree/issues/818#issue-323164363) for details). For a heavily used computed properties it's recommended to use one of below approaches.**_
+_**NOTE: the last approach will incur runtime performance penalty as accessing such computed values (e.g. inside `render()` method of an observed component) always leads to full recompute (see [this issue](https://github.com/mobxjs/mobx-state-tree/issues/818#issue-323164363) for details). For a heavily used computed properties it's recommended to use one of above approaches.**_
 
 Similarly, when writing actions or views one can use helper functions:
 
@@ -1611,6 +1611,14 @@ types.array(OtherType)
 // is the same as
 types.optional(types.array(OtherType), [])
 ```
+
+#### ```.shift()/.pop()```'ing last item of ```types.array(PRIMITIVE_TYPE)``` does not return correct value
+```javascript
+const array = types.array(types.number).create([1, 2])
+array.shift() // will return 1
+array.shift() // will return ScalarNode
+```
+This is a mobx bug, which was fixed in version 4.8.0/5.8.0. Please upgrade you peer dependency to corresponding version to get expected value.   
 
 ### How does MST compare to Redux
 

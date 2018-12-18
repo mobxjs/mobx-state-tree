@@ -1,10 +1,11 @@
-- Made `isAlive(node)` reactive, so it can be reacted upon.
+-   Made `isAlive(node)` reactive, so it can be reacted upon.
+-   Added `clear()` to `UndoManager` middleware through [#1118](https://github.com/mobxjs/mobx-state-tree/pull/1118) by [@chemitaxis](https://github.com/chemitaxis)
 
 # 3.9.0
 
-- TypeScript 3.0 or later is now required when using TypeScript. This brings some improvements:
-    - `flow` arguments and return types are now correctly inferred automatically. One exception is when the last return of a `flow` is a `Promise`. In these cases `castFlowReturn(somePromise)` needs to be used so the return type can be inferred properly.
-    - `create` method is now smart enough to warn when no snapshot argument is provided on types that have some mandatory properties.
+-   TypeScript 3.0 or later is now required when using TypeScript. This brings some improvements:
+    -   `flow` arguments and return types are now correctly inferred automatically. One exception is when the last return of a `flow` is a `Promise`. In these cases `castFlowReturn(somePromise)` needs to be used so the return type can be inferred properly.
+    -   `create` method is now smart enough to warn when no snapshot argument is provided on types that have some mandatory properties.
 -   Added `setLivelinessChecking` and `getLivelinessChecking`, the old `setLivelynessChecking` will eventually be deprecated.
 -   Added `onInvalidated` option for references and `types.safeReference` (see readme) through [#1091](https://github.com/mobxjs/mobx-state-tree/pull/1091) by [@xaviergonz](https://github.com/xaviergonz)
 -   Added `tryReference` and `isValidReference` to use references that might be no longer pointing to any nodes in a safe way through [#1087](https://github.com/mobxjs/mobx-state-tree/pull/1087) by [@xaviergonz](https://github.com/xaviergonz)
