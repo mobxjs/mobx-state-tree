@@ -436,7 +436,7 @@ Actions are replayable and are therefore constrained in several ways:
 Useful methods:
 
 -   [`onAction`](API.md#onaction) listens to any action that is invoked on the model or any of its descendants.
--   [`addMiddleware`](API.md#addmiddleware) listens to any action that is invoked on the model or any of its descendants.
+-   [`addMiddleware`](API.md#addmiddleware) adds an interceptor function to any action invoked on the subtree.
 -   [`applyAction`](API.md#applyaction) invokes an action on the model according to the given action description
 
 #### Asynchronous actions

@@ -214,6 +214,7 @@ API:
 -   `withoutUndoFlow(fn*)` patches the fn\* are not recorded.
 -   `startGroup(() => fn)` can be used to start a group, all patches within a group are saved as one history entry.
 -   `stopGroup()` can be used to stop the recording of patches for the grouped history entry.
+-   `clear()` clear the history.
 
 Setup and API usage examples:
 
