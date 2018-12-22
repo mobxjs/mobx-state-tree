@@ -212,6 +212,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
         referenceNode: ScalarNode,
         referenceId: ReferenceIdentifier
     ): IDisposer | undefined {
+        // this will make sure the target node becomes created
         const targetValue = this.getValue(referenceNode)
         if (!targetValue) {
             return undefined
@@ -259,10 +260,15 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
         })
 
         const startWatching = (sync: boolean) => {
-            // make sure the target node is actually there
+            // re-create hook in case the reference get reattached
+            if (onTargetDestroyedHookDisposer) {
+                onTargetDestroyedHookDisposer()
+            }
+
+            // make sure the target node is actually there and initialized
             const parentNode = referenceNode.parent
             const parent = parentNode && parentNode.storedValue
-            if (parentNode && parentNode.isAlive && parent) {
+            if (parentNode && parentNode.isAlive) {
                 let targetNodeExists: boolean
                 if (customGetSet) {
                     targetNodeExists = !!customGetSet.get(identifier, parent)
@@ -301,7 +307,17 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
             // already attached, so the whole tree is ready
             startWatching(true)
         } else {
-            // start watching once the whole tree is ready
+            if (!referenceNode.isRoot) {
+                // start watching once the whole tree is ready
+                referenceNode.root.hookSubscribers[Hook.afterCreationFinalization].register(() => {
+                    // make sure to attach it so it can start listening
+                    if (referenceNode.parent) {
+                        // tslint:disable-next-line:no-unused-expression
+                        referenceNode.parent.value
+                    }
+                })
+            }
+            // start watching once the node is attached somewhere / parent changes
             referenceNode.hookSubscribers[Hook.afterAttach].register(() => {
                 startWatching(false)
             })

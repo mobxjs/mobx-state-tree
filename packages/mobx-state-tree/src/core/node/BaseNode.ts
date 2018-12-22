@@ -80,6 +80,7 @@ export abstract class BaseNode {
                 this.fireHook(Hook.afterAttach)
             }
             this.state = NodeLifeCycle.FINALIZED
+            this.fireInternalHook(Hook.afterCreationFinalization)
 
             return true
         }

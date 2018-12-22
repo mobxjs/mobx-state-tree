@@ -138,7 +138,9 @@ export function isMutable(value: any) {
  * @internal
  * @private
  */
-export function isPrimitive(value: any): value is string | number | boolean | Date {
+export function isPrimitive(
+    value: any
+): value is string | number | boolean | Date | null | undefined {
     if (value === null || value === undefined) return true
     if (
         typeof value === "string" ||
@@ -240,7 +242,7 @@ export class EventHandler<F extends Function> {
     private handlers?: F[]
 
     get hasSubscribers() {
-        return this.handlers && this.handlers.length > 0
+        return !!this.handlers && this.handlers.length > 0
     }
 
     register(fn: F, atTheBeginning = false): IDisposer {
@@ -281,7 +283,9 @@ export class EventHandler<F extends Function> {
 
     emit(...args: ArgumentTypes<F>) {
         if (this.handlers) {
-            this.handlers.forEach(f => f(...args))
+            // make a copy just in case it changes
+            const handlers = this.handlers.slice()
+            handlers.forEach(f => f(...args))
         }
     }
 }

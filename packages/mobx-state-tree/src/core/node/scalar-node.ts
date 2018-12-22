@@ -19,9 +19,15 @@ export class ScalarNode extends BaseNode {
     readonly hookSubscribers = {
         // afterCreate in scalar nodes is executed in the constructor, so it cannot be registered before it is already executed
         // [Hook.afterCreate]: new EventHandler<(node: ScalarNode) => void>(),
+
         [Hook.afterAttach]: new EventHandler<(node: ScalarNode) => void>(),
+        [Hook.afterCreationFinalization]: new EventHandler<
+            (node: ObjectNode, hook: Hook) => void
+        >(),
+
         // beforeDetach is never executed for scalar nodes, since they cannot be detached
         // [Hook.beforeDetach]: new EventHandler<(node: ScalarNode) => void>(),
+
         [Hook.beforeDestroy]: new EventHandler<(node: ScalarNode) => void>()
     }
     constructor(
@@ -73,6 +79,10 @@ export class ScalarNode extends BaseNode {
     }
 
     get value(): any {
+        // make sure the parent chain is created when this is accessed
+        if (this.parent) {
+            this.parent.createObservableInstanceIfNeeded()
+        }
         return this.type.getValue(this)
     }
 

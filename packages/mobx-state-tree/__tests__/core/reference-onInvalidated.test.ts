@@ -303,3 +303,84 @@ describe("safeReference", () => {
         }).toThrow("Failed to resolve reference")
     })
 })
+
+test("#1115 - safe reference doesn't become invalidated when the reference has never been acessed", () => {
+    const MyRefModel = types.model("MyRefModel", {
+        id: types.identifier
+    })
+
+    const SafeRef = types.model("SafeRef", {
+        ref: types.safeReference(MyRefModel)
+    })
+
+    const RootModel = types
+        .model("RootModel", {
+            mapOfRef: types.map(MyRefModel),
+            arrayOfSafeRef: types.array(SafeRef)
+        })
+        .actions(self => ({
+            deleteSqr(id: string) {
+                self.mapOfRef.delete(id)
+            }
+        }))
+
+    const rootModel = RootModel.create({
+        mapOfRef: {
+            sqr1: {
+                id: "sqr1"
+            },
+            sqr2: {
+                id: "sqr2"
+            }
+        },
+        arrayOfSafeRef: [
+            {
+                ref: "sqr2"
+            },
+            {
+                ref: "sqr1"
+            },
+            {
+                ref: "sqr2"
+            }
+        ]
+    })
+
+    expect(getSnapshot(rootModel.arrayOfSafeRef)).toEqual([
+        {
+            ref: "sqr2"
+        },
+        {
+            ref: "sqr1"
+        },
+        {
+            ref: "sqr2"
+        }
+    ])
+
+    rootModel.deleteSqr("sqr1")
+    expect(getSnapshot(rootModel.arrayOfSafeRef)).toEqual([
+        {
+            ref: "sqr2"
+        },
+        {
+            ref: undefined
+        },
+        {
+            ref: "sqr2"
+        }
+    ])
+
+    rootModel.deleteSqr("sqr2")
+    expect(getSnapshot(rootModel.arrayOfSafeRef)).toEqual([
+        {
+            ref: undefined
+        },
+        {
+            ref: undefined
+        },
+        {
+            ref: undefined
+        }
+    ])
+})

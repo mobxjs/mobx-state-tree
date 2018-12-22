@@ -19,7 +19,6 @@ import {
     INode,
     invalidateComputed,
     IReversibleJsonPatch,
-    isStateTreeNode,
     NodeLifeCycle,
     resolveNodeByPathParts,
     splitJsonPath,
@@ -67,6 +66,9 @@ export class ObjectNode extends BaseNode {
     readonly hookSubscribers = {
         [Hook.afterCreate]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
         [Hook.afterAttach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
+        [Hook.afterCreationFinalization]: new EventHandler<
+            (node: ObjectNode, hook: Hook) => void
+        >(),
         [Hook.beforeDetach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
         [Hook.beforeDestroy]: new EventHandler<(node: ObjectNode, hook: Hook) => void>()
     }
@@ -154,6 +156,26 @@ export class ObjectNode extends BaseNode {
 
     @action
     private _createObservableInstance() {
+        // make sure the parent chain is created as well
+
+        // array with parent chain from parent to child
+        const parentChain = []
+
+        let parent = this.parent
+        // for performance reasons we never go back further than the most direct
+        // uninitialized parent
+        // this is done to avoid traversing the whole tree to the root when using
+        // the same reference again
+        while (parent && !parent.isObservableInstanceCreated) {
+            parentChain.unshift(parent)
+            parent = parent.parent
+        }
+
+        // initialize the uninitialized parent chain from parent to child
+        for (const p of parentChain) {
+            p.createObservableInstanceIfNeeded()
+        }
+
         const type = this.type
 
         try {
@@ -435,7 +457,7 @@ export class ObjectNode extends BaseNode {
     @action
     die() {
         if (this.state === NodeLifeCycle.DETACHING) return
-        if (isStateTreeNode(this.storedValue)) {
+        if (this.isObservableInstanceCreated) {
             this.aboutToDie()
             this.finalizeDeath()
         } else {
