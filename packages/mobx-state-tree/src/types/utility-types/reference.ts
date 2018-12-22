@@ -268,7 +268,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
             // make sure the target node is actually there and initialized
             const parentNode = referenceNode.parent
             const parent = parentNode && parentNode.storedValue
-            if (parentNode && parentNode.isAlive) {
+            if (parentNode && parentNode.isAlive && parent) {
                 let targetNodeExists: boolean
                 if (customGetSet) {
                     targetNodeExists = !!customGetSet.get(identifier, parent)
