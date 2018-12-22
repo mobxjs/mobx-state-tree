@@ -76,14 +76,14 @@ export class ObjectNode extends BaseNode {
     _applyPatches?: (patches: IJsonPatch[]) => void
 
     applyPatches(patches: IJsonPatch[]): void {
-        if (!this._observableInstanceCreated) this._createObservableInstance()
+        if (!this._observableInstanceCreated) this.createObservableInstanceIfNeeded()
         this._applyPatches!(patches)
     }
 
     _applySnapshot?: (snapshot: any) => void
 
     applySnapshot(snapshot: any): void {
-        if (!this._observableInstanceCreated) this._createObservableInstance()
+        if (!this._observableInstanceCreated) this.createObservableInstanceIfNeeded()
         this._applySnapshot!(snapshot)
     }
 
@@ -97,7 +97,8 @@ export class ObjectNode extends BaseNode {
     >()
     private readonly _snapshotSubscribers = new EventHandler<(snapshot: any) => void>()
 
-    private _observableInstanceCreated: boolean = false
+    private _observableInstanceCreated = false
+    private _observableInstanceBeingCreated = false
     private _childNodes: IChildNodesMap
     private _initialSnapshot: any
     private _cachedInitialSnapshot: any = null
@@ -155,7 +156,12 @@ export class ObjectNode extends BaseNode {
     }
 
     @action
-    private _createObservableInstance() {
+    createObservableInstanceIfNeeded() {
+        if (this._observableInstanceCreated || this._observableInstanceBeingCreated) {
+            return
+        }
+        this._observableInstanceBeingCreated = true
+
         // make sure the parent chain is created as well
 
         // array with parent chain from parent to child
@@ -193,6 +199,7 @@ export class ObjectNode extends BaseNode {
         }
 
         this._observableInstanceCreated = true
+        this._observableInstanceBeingCreated = false
         this.state = NodeLifeCycle.CREATED
         this.fireHook(Hook.afterCreate)
 
@@ -272,10 +279,6 @@ export class ObjectNode extends BaseNode {
                 fn.apply(this.storedValue)
             }
         }
-    }
-
-    createObservableInstanceIfNeeded() {
-        if (!this._observableInstanceCreated) this._createObservableInstance()
     }
 
     get isObservableInstanceCreated() {
@@ -563,7 +566,7 @@ export class ObjectNode extends BaseNode {
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.assertWritable()
-        if (!this._observableInstanceCreated) this._createObservableInstance()
+        this.createObservableInstanceIfNeeded()
         this.type.applyPatchLocally(this, subpath, patch)
     }
 
