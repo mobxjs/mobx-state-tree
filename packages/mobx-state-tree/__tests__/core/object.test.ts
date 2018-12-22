@@ -14,7 +14,8 @@ import {
     getParent,
     SnapshotOut,
     IJsonPatch,
-    ISerializedActionCall
+    ISerializedActionCall,
+    resolveIdentifier
 } from "../../src"
 
 import { autorun, reaction, observable } from "mobx"
@@ -966,4 +967,41 @@ test("it should emit patches when applySnapshot is used", () => {
     onPatch(doc, patch => patches.push(patch))
     applySnapshot(doc, { ...getSnapshot(doc), to: "universe" })
     expect(patches).toEqual([{ op: "replace", path: "/to", value: "universe" }])
+})
+
+test("#1112 - identifier cache should be cleared for unaccessed wrapped objects", () => {
+    const mock1 = [{ id: "1", name: "Kate" }, { id: "2", name: "John" }]
+    const mock2 = [{ id: "3", name: "Andrew" }, { id: "2", name: "John" }]
+
+    const mock1_2 = mock1.map((i, index) => ({ text: `Text${index}`, entity: i }))
+    const mock2_2 = mock2.map((i, index) => ({ text: `Text${index}`, entity: i }))
+
+    const Entity = types.model({
+        id: types.identifier,
+        name: types.string
+    })
+
+    const Wrapper = types.model({
+        text: types.string,
+        entity: Entity
+    })
+
+    const Store = types
+        .model({
+            list: types.optional(types.array(Wrapper), []),
+            selectedId: 2
+        })
+        .views(self => ({
+            get selectedEntity() {
+                return resolveIdentifier(Entity, self, self.selectedId)
+            }
+        }))
+
+    const store = Store.create()
+    unprotect(store)
+
+    store.list.replace(mock1_2)
+    store.list.replace(mock2_2)
+
+    expect(store.selectedEntity!.id).toBe("2")
 })
