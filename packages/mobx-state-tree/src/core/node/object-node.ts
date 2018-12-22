@@ -435,7 +435,7 @@ export class ObjectNode extends BaseNode {
     @action
     die() {
         if (this.state === NodeLifeCycle.DETACHING) return
-        if (isStateTreeNode(this.storedValue)) {
+        if (this.isObservableInstanceCreated) {
             this.aboutToDie()
             this.finalizeDeath()
         } else {
