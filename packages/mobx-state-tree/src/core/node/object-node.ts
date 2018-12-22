@@ -76,14 +76,14 @@ export class ObjectNode extends BaseNode {
     _applyPatches?: (patches: IJsonPatch[]) => void
 
     applyPatches(patches: IJsonPatch[]): void {
-        if (!this._observableInstanceCreated) this.createObservableInstanceIfNeeded()
+        this.createObservableInstanceIfNeeded()
         this._applyPatches!(patches)
     }
 
     _applySnapshot?: (snapshot: any) => void
 
     applySnapshot(snapshot: any): void {
-        if (!this._observableInstanceCreated) this.createObservableInstanceIfNeeded()
+        this.createObservableInstanceIfNeeded()
         this._applySnapshot!(snapshot)
     }
 
