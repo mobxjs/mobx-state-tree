@@ -6,40 +6,77 @@ import {
     Hook,
     escapeJsonPath
 } from "../../internal"
-import { createAtom } from "mobx"
+import { createAtom, IAtom } from "mobx"
 
 /**
  * @internal
  * @private
  */
 export abstract class BaseNode {
-    protected readonly subpathAtom = createAtom(`path`)
-    protected escapedSubpath: string
-    state = NodeLifeCycle.INITIALIZING
+    private _escapedSubpath?: string
+
+    private _subpath!: string
+    get subpath() {
+        return this._subpath
+    }
+
     storedValue: any
+
+    private aliveAtom?: IAtom
+    private _state = NodeLifeCycle.INITIALIZING
+    get state() {
+        return this._state
+    }
+    set state(val: NodeLifeCycle) {
+        const wasAlive = this.isAlive
+        this._state = val
+        const isAlive = this.isAlive
+
+        if (this.aliveAtom && wasAlive !== isAlive) {
+            this.aliveAtom.reportChanged()
+        }
+    }
 
     readonly type: IAnyType
     readonly hookSubscribers: { [k: string]: EventHandler<(node: any, hook: Hook) => void> } = {}
 
     environment: any = undefined
-    subpath: string = ""
-    parent: ObjectNode | null = null
+
+    private _parent!: ObjectNode | null
+    get parent() {
+        return this._parent
+    }
 
     constructor(type: IAnyType, parent: ObjectNode | null, subpath: string, environment: any) {
         this.environment = environment
         this.type = type
-        this.parent = parent
-        this.subpath = subpath
-        this.escapedSubpath = escapeJsonPath(this.subpath)
+        this.baseSetParent(parent, subpath)
+    }
+
+    private pathAtom?: IAtom
+    protected baseSetParent(parent: ObjectNode | null, subpath: string) {
+        this._parent = parent
+        this._subpath = subpath
+        this._escapedSubpath = undefined // regenerate when needed
+        if (this.pathAtom) {
+            this.pathAtom.reportChanged()
+        }
     }
 
     /*
      * Returns (escaped) path representation as string
      */
     get path(): string {
-        this.subpathAtom.reportObserved()
+        if (!this.pathAtom) {
+            this.pathAtom = createAtom(`path`)
+        }
+        this.pathAtom.reportObserved()
         if (!this.parent) return ""
-        return this.parent.path + "/" + this.escapedSubpath
+        // regenerate escaped subpath if needed
+        if (this._escapedSubpath === undefined) {
+            this._escapedSubpath = !this._subpath ? "" : escapeJsonPath(this._subpath)
+        }
+        return this.parent.path + "/" + this._escapedSubpath
     }
 
     get isRoot(): boolean {
@@ -65,42 +102,51 @@ export abstract class BaseNode {
         return this.state !== NodeLifeCycle.DEAD
     }
 
+    get observableIsAlive() {
+        if (!this.aliveAtom) {
+            this.aliveAtom = createAtom(`alive`)
+        }
+        this.aliveAtom.reportObserved()
+        return this.isAlive
+    }
+
     abstract die(): void
 
     abstract finalizeCreation(): void
 
-    protected partialFinalizeCreation() {
+    protected baseFinalizeCreation(whenFinalized?: () => void) {
         // goal: afterCreate hooks runs depth-first. After attach runs parent first, so on afterAttach the parent has completed already
         if (this.state === NodeLifeCycle.CREATED) {
             if (this.parent) {
                 if (this.parent.state !== NodeLifeCycle.FINALIZED) {
                     // parent not ready yet, postpone
-                    return false
+                    return
                 }
                 this.fireHook(Hook.afterAttach)
             }
-            this.state = NodeLifeCycle.FINALIZED
-            this.fireInternalHook(Hook.afterCreationFinalization)
 
-            return true
+            this.state = NodeLifeCycle.FINALIZED
+
+            if (whenFinalized) {
+                whenFinalized()
+            }
+
+            this.fireInternalHook(Hook.afterCreationFinalization)
         }
-        return false
     }
 
     abstract finalizeDeath(): void
 
-    protected partialFinalizeDeath() {
+    protected baseFinalizeDeath() {
         Object.keys(this.hookSubscribers).forEach(k => this.hookSubscribers[k].clear())
 
-        this.parent = null
+        this.baseSetParent(null, "")
         this.state = NodeLifeCycle.DEAD
-        this.subpath = this.escapedSubpath = ""
-        this.subpathAtom.reportChanged()
     }
 
     abstract aboutToDie(): void
 
-    protected partialAboutToDie() {
+    protected baseAboutToDie() {
         this.fireHook(Hook.beforeDestroy)
     }
 }
