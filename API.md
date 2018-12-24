@@ -358,7 +358,7 @@ Returns **any** The same object casted as an instance
 
 ## castFlowReturn
 
-Used for TypeScript to force a flow to return a promise.
+Used for TypeScript to make flows that return a promise return the actual promise result.
 
 ### Parameters
 
