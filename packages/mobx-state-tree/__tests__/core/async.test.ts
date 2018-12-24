@@ -7,7 +7,8 @@ import {
     destroy,
     IMiddlewareHandler,
     IMiddlewareEvent,
-    IMiddlewareEventType
+    IMiddlewareEventType,
+    castFlowReturn
     // TODO: export IRawActionCall
 } from "../../src"
 import { reaction, configure } from "mobx"
@@ -321,3 +322,32 @@ function filterRelevantStuff(stuff: IMiddlewareEvent[]) {
         return x
     })
 }
+
+test("flow typings", async () => {
+    const promise = Promise.resolve()
+
+    const M = types.model({ x: 5 }).actions(self => ({
+        // should be () => Promise<void>
+        voidToVoid: flow(function*() {
+            yield promise
+        }), // should be (val: number) => Promise<number>
+        numberToNumber: flow(function*(val: number) {
+            yield promise
+            return val
+        }), // should be () => Promise<number>
+        voidToNumber: flow(function*() {
+            yield promise
+            return castFlowReturn(Promise.resolve(2))
+        })
+    }))
+
+    const m = M.create()
+
+    // these should compile
+    const a: void = await m.voidToVoid()
+    expect(a).toBe(undefined)
+    const b: number = await m.numberToNumber(4)
+    expect(b).toBe(4)
+    const c: number = await m.voidToNumber()
+    expect(c).toBe(2)
+})

@@ -1,4 +1,5 @@
--   Fix for safeReference doesn't work when multiple nodes reference the a single reference that gets deleted [#1115](https://github.com/mobxjs/mobx-state-tree/issues/1115) through [#1121](https://github.com/mobxjs/mobx-state-tree/pull/1121) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fix for safeReference doesn't work when multiple nodes reference a single reference that gets deleted [#1115](https://github.com/mobxjs/mobx-state-tree/issues/1115) through [#1121](https://github.com/mobxjs/mobx-state-tree/pull/1121) by [@xaviergonz](https://github.com/xaviergonz)
+-   Little fix for `castFlowReturn` not typecasting the promise to its actual result.
 -   Made `isAlive(node)` reactive, so it can be reacted upon through [#1100](https://github.com/mobxjs/mobx-state-tree/pull/1100) by [@xaviergonz](https://github.com/xaviergonz)
 -   Fix for unaccessed nodes not unregistering their identifiers [#1112](https://github.com/mobxjs/mobx-state-tree/issues/1112) through [#1113](https://github.com/mobxjs/mobx-state-tree/pull/1113) by [@xaviergonz](https://github.com/xaviergonz)
 -   Added `clear()` to `UndoManager` middleware through [#1118](https://github.com/mobxjs/mobx-state-tree/pull/1118) by [@chemitaxis](https://github.com/chemitaxis)
