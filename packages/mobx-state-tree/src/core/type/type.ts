@@ -71,6 +71,7 @@ export interface IType<C, S, T> {
     name: string
 
     create(...args: CreateParams<C>): T
+    create(snapshot: C, env?: any): T // fallback
 
     is(thing: any): thing is C | S | T
     validate(thing: any, context: IContext): IValidationResult
