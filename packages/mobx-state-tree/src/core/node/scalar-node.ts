@@ -64,7 +64,7 @@ export class ScalarNode extends BaseNode {
             if (newParent && newParent !== this.parent) {
                 fail("assertion failed: scalar nodes cannot change their parent")
             } else if (this.subpath !== newPath) {
-                this.partialSetParent(this.parent, newPath)
+                this.baseSetParent(this.parent, newPath)
             }
         }
     }
@@ -93,15 +93,15 @@ export class ScalarNode extends BaseNode {
     }
 
     finalizeCreation() {
-        this.partialFinalizeCreation()
+        this.baseFinalizeCreation()
     }
 
     aboutToDie() {
-        this.partialAboutToDie()
+        this.baseAboutToDie()
     }
 
     finalizeDeath() {
-        this.partialFinalizeDeath()
+        this.baseFinalizeDeath()
     }
 
     protected fireHook(name: Hook) {

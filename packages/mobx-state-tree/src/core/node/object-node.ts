@@ -224,10 +224,10 @@ export class ObjectNode extends BaseNode {
             const newPath = subpath === null ? "" : subpath
             if (newParent && newParent !== this.parent) {
                 newParent.root.identifierCache!.mergeCache(this)
-                this.partialSetParent(newParent, newPath)
+                this.baseSetParent(newParent, newPath)
                 this.fireHook(Hook.afterAttach)
             } else if (this.subpath !== newPath) {
-                this.partialSetParent(this.parent, newPath)
+                this.baseSetParent(this.parent, newPath)
             }
         }
     }
@@ -378,7 +378,7 @@ export class ObjectNode extends BaseNode {
     }
 
     finalizeCreation() {
-        if (this.partialFinalizeCreation()) {
+        if (this.baseFinalizeCreation()) {
             for (let child of this.getChildren()) {
                 child.finalizeCreation()
             }
@@ -396,7 +396,7 @@ export class ObjectNode extends BaseNode {
         this.environment = this.root.environment // make backup of environment
         this.identifierCache = this.root.identifierCache!.splitCache(this)
         this.parent!.removeChild(this.subpath)
-        this.partialSetParent(null, "")
+        this.baseSetParent(null, "")
 
         this.state = NodeLifeCycle.FINALIZED
     }
@@ -445,7 +445,7 @@ export class ObjectNode extends BaseNode {
 
         // beforeDestroy should run before the disposers since else we could end up in a situation where
         // a disposer added with addDisposer at this stage (beforeDestroy) is actually never released
-        this.partialAboutToDie()
+        this.baseAboutToDie()
 
         this._disposers.emit()
         this._disposers.clear()
@@ -462,7 +462,7 @@ export class ObjectNode extends BaseNode {
         this._patchSubscribers.clear()
         this._snapshotSubscribers.clear()
 
-        this.partialFinalizeDeath()
+        this.baseFinalizeDeath()
     }
 
     onSnapshot(onChange: (snapshot: any) => void): IDisposer {

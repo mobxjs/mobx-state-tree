@@ -50,11 +50,11 @@ export abstract class BaseNode {
     constructor(type: IAnyType, parent: ObjectNode | null, subpath: string, environment: any) {
         this.environment = environment
         this.type = type
-        this.partialSetParent(parent, subpath)
+        this.baseSetParent(parent, subpath)
     }
 
     private pathAtom?: IAtom
-    protected partialSetParent(parent: ObjectNode | null, subpath: string) {
+    protected baseSetParent(parent: ObjectNode | null, subpath: string) {
         this._parent = parent
         this._subpath = subpath
         this._escapedSubpath = undefined // regenerate when needed
@@ -114,7 +114,7 @@ export abstract class BaseNode {
 
     abstract finalizeCreation(): void
 
-    protected partialFinalizeCreation() {
+    protected baseFinalizeCreation() {
         // goal: afterCreate hooks runs depth-first. After attach runs parent first, so on afterAttach the parent has completed already
         if (this.state === NodeLifeCycle.CREATED) {
             if (this.parent) {
@@ -133,16 +133,16 @@ export abstract class BaseNode {
 
     abstract finalizeDeath(): void
 
-    protected partialFinalizeDeath() {
+    protected baseFinalizeDeath() {
         Object.keys(this.hookSubscribers).forEach(k => this.hookSubscribers[k].clear())
 
-        this.partialSetParent(null, "")
+        this.baseSetParent(null, "")
         this.state = NodeLifeCycle.DEAD
     }
 
     abstract aboutToDie(): void
 
-    protected partialAboutToDie() {
+    protected baseAboutToDie() {
         this.fireHook(Hook.beforeDestroy)
     }
 }
