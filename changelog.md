@@ -1,3 +1,4 @@
+-   Made `isAlive(node)` reactive, so it can be reacted upon.
 -   Fix for unaccessed nodes not unregistering their identifiers [#1112](https://github.com/mobxjs/mobx-state-tree/issues/1112) through [#1113](https://github.com/mobxjs/mobx-state-tree/pull/1113) by [@xaviergonz](https://github.com/xaviergonz)
 -   Added `clear()` to `UndoManager` middleware through [#1118](https://github.com/mobxjs/mobx-state-tree/pull/1118) by [@chemitaxis](https://github.com/chemitaxis)
 

@@ -171,8 +171,6 @@ export class ObjectNode extends BaseNode {
         }
 
         this._observableInstanceCreated = true
-        this.state = NodeLifeCycle.CREATED
-        this.fireHook(Hook.afterCreate)
 
         // NOTE: we need to touch snapshot, because non-observable
         // "observableInstanceCreated" field was touched
@@ -180,9 +178,12 @@ export class ObjectNode extends BaseNode {
 
         if (this.isRoot) this._addSnapshotReaction()
 
-        this.finalizeCreation()
-
         this._childNodes = EMPTY_OBJECT
+
+        this.state = NodeLifeCycle.CREATED
+        this.fireHook(Hook.afterCreate)
+
+        this.finalizeCreation()
     }
 
     get root(): ObjectNode {
@@ -221,16 +222,12 @@ export class ObjectNode extends BaseNode {
             this.die()
         } else {
             const newPath = subpath === null ? "" : subpath
-            if (this.subpath !== newPath) {
-                this.subpath = newPath
-                this.escapedSubpath = escapeJsonPath(this.subpath)
-                this.subpathAtom.reportChanged()
-            }
             if (newParent && newParent !== this.parent) {
                 newParent.root.identifierCache!.mergeCache(this)
-                this.parent = newParent
-                this.subpathAtom.reportChanged()
+                this.baseSetParent(newParent, newPath)
                 this.fireHook(Hook.afterAttach)
+            } else if (this.subpath !== newPath) {
+                this.baseSetParent(this.parent, newPath)
             }
         }
     }
@@ -381,7 +378,7 @@ export class ObjectNode extends BaseNode {
     }
 
     finalizeCreation() {
-        if (this.partialFinalizeCreation()) {
+        if (this.baseFinalizeCreation()) {
             for (let child of this.getChildren()) {
                 child.finalizeCreation()
             }
@@ -394,13 +391,13 @@ export class ObjectNode extends BaseNode {
         if (this.isRoot) return
 
         this.fireHook(Hook.beforeDetach)
-        this.environment = this.root.environment // make backup of environment
         this.state = NodeLifeCycle.DETACHING
+
+        this.environment = this.root.environment // make backup of environment
         this.identifierCache = this.root.identifierCache!.splitCache(this)
         this.parent!.removeChild(this.subpath)
-        this.parent = null
-        this.subpath = this.escapedSubpath = ""
-        this.subpathAtom.reportChanged()
+        this.baseSetParent(null, "")
+
         this.state = NodeLifeCycle.FINALIZED
     }
 
@@ -451,7 +448,7 @@ export class ObjectNode extends BaseNode {
 
         // beforeDestroy should run before the disposers since else we could end up in a situation where
         // a disposer added with addDisposer at this stage (beforeDestroy) is actually never released
-        this.partialAboutToDie()
+        this.baseAboutToDie()
 
         this._disposers.emit()
         this._disposers.clear()
@@ -478,7 +475,7 @@ export class ObjectNode extends BaseNode {
         this._patchSubscribers.clear()
         this._snapshotSubscribers.clear()
 
-        this.partialFinalizeDeath()
+        this.baseFinalizeDeath()
     }
 
     onSnapshot(onChange: (snapshot: any) => void): IDisposer {
