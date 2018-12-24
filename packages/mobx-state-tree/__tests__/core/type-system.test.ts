@@ -8,7 +8,10 @@ import {
     cast,
     SnapshotIn,
     Instance,
-    castToSnapshot
+    castToSnapshot,
+    IType,
+    isStateTreeNode,
+    isFrozenType
 } from "../../src"
 
 const createTestFactories = () => {
@@ -910,4 +913,41 @@ test("create correctly chooses if the snapshot is needed or not - #920", () => {
     const I = types.optional(types.frozen<number>(), 6)
     I.create()
     I.create(7)
+})
+
+test("#1117", () => {
+    const Failsafe = <C, S, T>(
+        t: IType<C, S, T>,
+        handleProblem: (
+            value: C,
+            validationError: ReturnType<IType<C, S, T>["validate"]>
+        ) => void = (value, error) => {
+            console.error("Skipping value: typecheck error on", value)
+            console.error(error)
+        }
+    ) =>
+        types.custom<C, T | null>({
+            name: `Failsafe<${t.name}>`,
+            fromSnapshot(snapshot: C) {
+                try {
+                    return t.create(snapshot) // this should compile
+                } catch (e) {
+                    handleProblem(snapshot, e)
+                    return null
+                }
+            },
+            toSnapshot(x) {
+                if (isStateTreeNode(x)) return getSnapshot(x)
+                return (x as any) as C
+            },
+            isTargetType(v) {
+                if (isFrozenType(t)) {
+                    return t.is(v)
+                }
+                return false
+            },
+            getValidationMessage() {
+                return ""
+            }
+        })
 })

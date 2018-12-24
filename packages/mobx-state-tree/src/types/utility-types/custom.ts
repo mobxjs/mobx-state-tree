@@ -84,7 +84,7 @@ export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S | T, S, 
  * @internal
  * @private
  */
-export class CustomType<S, T> extends Type<S, S, T> {
+export class CustomType<C, S, T> extends Type<C, S, T> {
     readonly flags = TypeFlags.Reference
     readonly shouldAttachNode = false
 
