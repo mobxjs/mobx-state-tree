@@ -61,13 +61,10 @@ export class ScalarNode extends BaseNode {
             this.die()
         } else {
             const newPath = subpath === null ? "" : subpath
-            if (this.subpath !== newPath) {
-                this.subpath = newPath
-                this.escapedSubpath = escapeJsonPath(this.subpath)
-                this.subpathAtom.reportChanged()
-            }
             if (newParent && newParent !== this.parent) {
                 fail("assertion failed: scalar nodes cannot change their parent")
+            } else if (this.subpath !== newPath) {
+                this.baseSetParent(this.parent, newPath)
             }
         }
     }
@@ -96,15 +93,15 @@ export class ScalarNode extends BaseNode {
     }
 
     finalizeCreation() {
-        this.partialFinalizeCreation()
+        this.baseFinalizeCreation()
     }
 
     aboutToDie() {
-        this.partialAboutToDie()
+        this.baseAboutToDie()
     }
 
     finalizeDeath() {
-        this.partialFinalizeDeath()
+        this.baseFinalizeDeath()
     }
 
     protected fireHook(name: Hook) {
