@@ -435,9 +435,12 @@ export class ObjectNode extends BaseNode {
     @action
     die() {
         if (this.state === NodeLifeCycle.DETACHING) return
-        if (isStateTreeNode(this.storedValue)) {
+        if (this.isObservableInstanceCreated) {
             this.aboutToDie()
             this.finalizeDeath()
+        } else {
+            // get rid of own and child ids at least
+            this.unregisterIdentifiers()
         }
     }
 
@@ -452,6 +455,16 @@ export class ObjectNode extends BaseNode {
 
         this._disposers.emit()
         this._disposers.clear()
+    }
+
+    private unregisterIdentifiers() {
+        Object.keys(this._childNodes).forEach(k => {
+            const childNode = this._childNodes[k]
+            if (childNode instanceof ObjectNode) {
+                childNode.unregisterIdentifiers()
+            }
+        })
+        this.root.identifierCache!.notifyDied(this)
     }
 
     finalizeDeath() {
