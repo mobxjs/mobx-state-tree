@@ -172,7 +172,11 @@ export class ObjectNode extends BaseNode {
         // uninitialized parent
         // this is done to avoid traversing the whole tree to the root when using
         // the same reference again
-        while (parent && !parent.isObservableInstanceCreated) {
+        while (
+            parent &&
+            !parent._observableInstanceCreated &&
+            !parent._observableInstanceBeingCreated
+        ) {
             parentChain.unshift(parent)
             parent = parent.parent
         }
@@ -276,10 +280,6 @@ export class ObjectNode extends BaseNode {
                 fn.apply(this.storedValue)
             }
         }
-    }
-
-    get isObservableInstanceCreated() {
-        return this._observableInstanceCreated
     }
 
     get value(): any {
@@ -459,7 +459,7 @@ export class ObjectNode extends BaseNode {
     @action
     die() {
         if (this.state === NodeLifeCycle.DETACHING) return
-        if (this.isObservableInstanceCreated) {
+        if (this._observableInstanceCreated) {
             this.aboutToDie()
             this.finalizeDeath()
         } else {
