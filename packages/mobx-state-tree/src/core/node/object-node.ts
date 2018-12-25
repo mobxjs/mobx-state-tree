@@ -27,13 +27,21 @@ import {
     EventHandler,
     Hook,
     BaseNode,
-    escapeJsonPath,
     getLivelinessChecking,
     normalizeIdentifier,
     ReferenceIdentifier
 } from "../../internal"
 
 let nextNodeId = 1
+
+const enum ObservableInstanceLifecycle {
+    // the actual observable instance has not been created yet
+    UNINITIALIZED,
+    // the actual observable instance is being created
+    CREATING,
+    // the actual observable instance has been created
+    CREATED
+}
 
 /**
  * @internal
@@ -97,8 +105,7 @@ export class ObjectNode extends BaseNode {
     >()
     private readonly _snapshotSubscribers = new EventHandler<(snapshot: any) => void>()
 
-    private _observableInstanceCreated = false
-    private _observableInstanceBeingCreated = false
+    private _observableInstanceState = ObservableInstanceLifecycle.UNINITIALIZED
     private _childNodes: IChildNodesMap
     private _initialSnapshot: any
     private _cachedInitialSnapshot: any = null
@@ -157,10 +164,10 @@ export class ObjectNode extends BaseNode {
 
     @action
     createObservableInstanceIfNeeded() {
-        if (this._observableInstanceCreated || this._observableInstanceBeingCreated) {
+        if (this._observableInstanceState !== ObservableInstanceLifecycle.UNINITIALIZED) {
             return
         }
-        this._observableInstanceBeingCreated = true
+        this._observableInstanceState = ObservableInstanceLifecycle.CREATING
 
         // make sure the parent chain is created as well
 
@@ -174,8 +181,7 @@ export class ObjectNode extends BaseNode {
         // the same reference again
         while (
             parent &&
-            !parent._observableInstanceCreated &&
-            !parent._observableInstanceBeingCreated
+            parent._observableInstanceState === ObservableInstanceLifecycle.UNINITIALIZED
         ) {
             parentChain.unshift(parent)
             parent = parent.parent
@@ -202,11 +208,10 @@ export class ObjectNode extends BaseNode {
             this._isRunningAction = false
         }
 
-        this._observableInstanceCreated = true
-        this._observableInstanceBeingCreated = false
+        this._observableInstanceState = ObservableInstanceLifecycle.CREATED
 
         // NOTE: we need to touch snapshot, because non-observable
-        // "observableInstanceCreated" field was touched
+        // "_observableInstanceState" field was touched
         invalidateComputed(this, "snapshot")
 
         if (this.isRoot) this._addSnapshotReaction()
@@ -298,7 +303,7 @@ export class ObjectNode extends BaseNode {
     // NOTE: we use this method to get snapshot without creating @computed overhead
     getSnapshot(): any {
         if (!this.isAlive) return undefined
-        return this._observableInstanceCreated
+        return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
             ? this._getActualSnapshot()
             : this._getInitialSnapshot()
     }
@@ -347,7 +352,7 @@ export class ObjectNode extends BaseNode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this._observableInstanceCreated
+            return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
                 ? this.type.getChildNode(this, subpath)
                 : this._childNodes![subpath]
         } finally {
@@ -359,7 +364,7 @@ export class ObjectNode extends BaseNode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this._observableInstanceCreated
+            return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
                 ? this.type.getChildren(this)
                 : convertChildNodesToArray(this._childNodes)
         } finally {
@@ -459,7 +464,7 @@ export class ObjectNode extends BaseNode {
     @action
     die() {
         if (this.state === NodeLifeCycle.DETACHING) return
-        if (this._observableInstanceCreated) {
+        if (this._observableInstanceState === ObservableInstanceLifecycle.CREATED) {
             this.aboutToDie()
             this.finalizeDeath()
         } else {
