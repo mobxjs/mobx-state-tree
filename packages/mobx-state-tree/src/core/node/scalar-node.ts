@@ -6,7 +6,6 @@ import {
     IAnyType,
     Hook,
     BaseNode,
-    escapeJsonPath,
     EventHandler
 } from "../../internal"
 import { action } from "mobx"
@@ -21,9 +20,11 @@ export class ScalarNode extends BaseNode {
         // [Hook.afterCreate]: new EventHandler<(node: ScalarNode) => void>(),
 
         [Hook.afterAttach]: new EventHandler<(node: ScalarNode) => void>(),
-        [Hook.afterCreationFinalization]: new EventHandler<
-            (node: ObjectNode, hook: Hook) => void
-        >(),
+
+        // not needed right now for scalar nodes
+        // [Hook.afterCreationFinalization]: new EventHandler<
+        //     (node: ScalarNode, hook: Hook) => void
+        // >(),
 
         // beforeDetach is never executed for scalar nodes, since they cannot be detached
         // [Hook.beforeDetach]: new EventHandler<(node: ScalarNode) => void>(),
@@ -76,10 +77,11 @@ export class ScalarNode extends BaseNode {
     }
 
     get value(): any {
-        // make sure the parent chain is created when this is accessed
-        if (this.parent) {
-            this.parent.createObservableInstanceIfNeeded()
-        }
+        // if we ever find a case where scalar nodes can be accessed without iterating through its parent
+        // uncomment this to make sure the parent chain is created when this is accessed
+        // if (this.parent) {
+        //     this.parent.createObservableInstanceIfNeeded()
+        // }
         return this.type.getValue(this)
     }
 

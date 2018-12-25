@@ -130,8 +130,6 @@ export abstract class BaseNode {
             if (whenFinalized) {
                 whenFinalized()
             }
-
-            this.fireInternalHook(Hook.afterCreationFinalization)
         }
     }
 

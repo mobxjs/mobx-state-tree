@@ -407,6 +407,8 @@ export class ObjectNode extends BaseNode {
             for (let child of this.getChildren()) {
                 child.finalizeCreation()
             }
+
+            this.fireInternalHook(Hook.afterCreationFinalization)
         })
     }
 
