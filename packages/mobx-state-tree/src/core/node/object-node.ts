@@ -19,7 +19,6 @@ import {
     INode,
     invalidateComputed,
     IReversibleJsonPatch,
-    isStateTreeNode,
     NodeLifeCycle,
     resolveNodeByPathParts,
     splitJsonPath,
@@ -28,13 +27,21 @@ import {
     EventHandler,
     Hook,
     BaseNode,
-    escapeJsonPath,
     getLivelinessChecking,
     normalizeIdentifier,
     ReferenceIdentifier
 } from "../../internal"
 
 let nextNodeId = 1
+
+const enum ObservableInstanceLifecycle {
+    // the actual observable instance has not been created yet
+    UNINITIALIZED,
+    // the actual observable instance is being created
+    CREATING,
+    // the actual observable instance has been created
+    CREATED
+}
 
 /**
  * @internal
@@ -67,6 +74,9 @@ export class ObjectNode extends BaseNode {
     readonly hookSubscribers = {
         [Hook.afterCreate]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
         [Hook.afterAttach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
+        [Hook.afterCreationFinalization]: new EventHandler<
+            (node: ObjectNode, hook: Hook) => void
+        >(),
         [Hook.beforeDetach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
         [Hook.beforeDestroy]: new EventHandler<(node: ObjectNode, hook: Hook) => void>()
     }
@@ -74,14 +84,14 @@ export class ObjectNode extends BaseNode {
     _applyPatches?: (patches: IJsonPatch[]) => void
 
     applyPatches(patches: IJsonPatch[]): void {
-        if (!this._observableInstanceCreated) this._createObservableInstance()
+        this.createObservableInstanceIfNeeded()
         this._applyPatches!(patches)
     }
 
     _applySnapshot?: (snapshot: any) => void
 
     applySnapshot(snapshot: any): void {
-        if (!this._observableInstanceCreated) this._createObservableInstance()
+        this.createObservableInstanceIfNeeded()
         this._applySnapshot!(snapshot)
     }
 
@@ -95,7 +105,7 @@ export class ObjectNode extends BaseNode {
     >()
     private readonly _snapshotSubscribers = new EventHandler<(snapshot: any) => void>()
 
-    private _observableInstanceCreated: boolean = false
+    private _observableInstanceState = ObservableInstanceLifecycle.UNINITIALIZED
     private _childNodes: IChildNodesMap
     private _initialSnapshot: any
     private _cachedInitialSnapshot: any = null
@@ -153,7 +163,35 @@ export class ObjectNode extends BaseNode {
     }
 
     @action
-    private _createObservableInstance() {
+    createObservableInstanceIfNeeded() {
+        if (this._observableInstanceState !== ObservableInstanceLifecycle.UNINITIALIZED) {
+            return
+        }
+        this._observableInstanceState = ObservableInstanceLifecycle.CREATING
+
+        // make sure the parent chain is created as well
+
+        // array with parent chain from parent to child
+        const parentChain = []
+
+        let parent = this.parent
+        // for performance reasons we never go back further than the most direct
+        // uninitialized parent
+        // this is done to avoid traversing the whole tree to the root when using
+        // the same reference again
+        while (
+            parent &&
+            parent._observableInstanceState === ObservableInstanceLifecycle.UNINITIALIZED
+        ) {
+            parentChain.unshift(parent)
+            parent = parent.parent
+        }
+
+        // initialize the uninitialized parent chain from parent to child
+        for (const p of parentChain) {
+            p.createObservableInstanceIfNeeded()
+        }
+
         const type = this.type
 
         try {
@@ -170,10 +208,10 @@ export class ObjectNode extends BaseNode {
             this._isRunningAction = false
         }
 
-        this._observableInstanceCreated = true
+        this._observableInstanceState = ObservableInstanceLifecycle.CREATED
 
         // NOTE: we need to touch snapshot, because non-observable
-        // "observableInstanceCreated" field was touched
+        // "_observableInstanceState" field was touched
         invalidateComputed(this, "snapshot")
 
         if (this.isRoot) this._addSnapshotReaction()
@@ -249,14 +287,6 @@ export class ObjectNode extends BaseNode {
         }
     }
 
-    createObservableInstanceIfNeeded() {
-        if (!this._observableInstanceCreated) this._createObservableInstance()
-    }
-
-    get isObservableInstanceCreated() {
-        return this._observableInstanceCreated
-    }
-
     get value(): any {
         this.createObservableInstanceIfNeeded()
         if (!this.isAlive) return undefined
@@ -273,7 +303,7 @@ export class ObjectNode extends BaseNode {
     // NOTE: we use this method to get snapshot without creating @computed overhead
     getSnapshot(): any {
         if (!this.isAlive) return undefined
-        return this._observableInstanceCreated
+        return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
             ? this._getActualSnapshot()
             : this._getInitialSnapshot()
     }
@@ -322,7 +352,7 @@ export class ObjectNode extends BaseNode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this._observableInstanceCreated
+            return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
                 ? this.type.getChildNode(this, subpath)
                 : this._childNodes![subpath]
         } finally {
@@ -334,7 +364,7 @@ export class ObjectNode extends BaseNode {
         this.assertAlive()
         this._autoUnbox = false
         try {
-            return this._observableInstanceCreated
+            return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
                 ? this.type.getChildren(this)
                 : convertChildNodesToArray(this._childNodes)
         } finally {
@@ -378,11 +408,13 @@ export class ObjectNode extends BaseNode {
     }
 
     finalizeCreation() {
-        if (this.baseFinalizeCreation()) {
+        this.baseFinalizeCreation(() => {
             for (let child of this.getChildren()) {
                 child.finalizeCreation()
             }
-        }
+
+            this.fireInternalHook(Hook.afterCreationFinalization)
+        })
     }
 
     @action
@@ -432,7 +464,7 @@ export class ObjectNode extends BaseNode {
     @action
     die() {
         if (this.state === NodeLifeCycle.DETACHING) return
-        if (this.isObservableInstanceCreated) {
+        if (this._observableInstanceState === ObservableInstanceLifecycle.CREATED) {
             this.aboutToDie()
             this.finalizeDeath()
         } else {
@@ -538,7 +570,7 @@ export class ObjectNode extends BaseNode {
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
         this.assertWritable()
-        if (!this._observableInstanceCreated) this._createObservableInstance()
+        this.createObservableInstanceIfNeeded()
         this.type.applyPatchLocally(this, subpath, patch)
     }
 

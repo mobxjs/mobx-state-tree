@@ -114,21 +114,23 @@ export abstract class BaseNode {
 
     abstract finalizeCreation(): void
 
-    protected baseFinalizeCreation() {
+    protected baseFinalizeCreation(whenFinalized?: () => void) {
         // goal: afterCreate hooks runs depth-first. After attach runs parent first, so on afterAttach the parent has completed already
         if (this.state === NodeLifeCycle.CREATED) {
             if (this.parent) {
                 if (this.parent.state !== NodeLifeCycle.FINALIZED) {
                     // parent not ready yet, postpone
-                    return false
+                    return
                 }
                 this.fireHook(Hook.afterAttach)
             }
+
             this.state = NodeLifeCycle.FINALIZED
 
-            return true
+            if (whenFinalized) {
+                whenFinalized()
+            }
         }
-        return false
     }
 
     abstract finalizeDeath(): void
