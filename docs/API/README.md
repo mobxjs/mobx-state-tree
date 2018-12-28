@@ -11,6 +11,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 
 * [CustomTypeOptions](interfaces/customtypeoptions.md)
 * [IActionRecorder](interfaces/iactionrecorder.md)
+* [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)
 * [IAnyModelType](interfaces/ianymodeltype.md)
 * [IContextEntry](interfaces/icontextentry.md)
 * [IJsonPatch](interfaces/ijsonpatch.md)
@@ -1624,7 +1625,7 @@ ___
 
 ###  createActionTrackingMiddleware
 
-▸ **createActionTrackingMiddleware**<`T`>(hooks: *`object`*): [IMiddlewareHandler](#imiddlewarehandler)
+▸ **createActionTrackingMiddleware**<`T`>(hooks: *[IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`>*): [IMiddlewareHandler](#imiddlewarehandler)
 
 Convenience utility to create action based middleware that supports async processes more easily. All hooks are called for both synchronous and asynchronous actions. Except that either `onSuccess` or `onFail` is called
 
@@ -1639,7 +1640,7 @@ See the `atomic` middleware for an example
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| hooks | `object` |  \- |
+| hooks | [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`> |  \- |
 
 **Returns:** [IMiddlewareHandler](#imiddlewarehandler)
 

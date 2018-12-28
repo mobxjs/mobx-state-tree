@@ -2,6 +2,15 @@ import { IMiddlewareEvent, IMiddlewareHandler } from "../internal"
 
 const runningActions = new Map<number, { async: boolean; call: IMiddlewareEvent; context: any }>()
 
+export interface IActionTrackingMiddlewareHooks<T> {
+    filter?: (call: IMiddlewareEvent) => boolean
+    onStart: (call: IMiddlewareEvent) => T
+    onResume: (call: IMiddlewareEvent, context: T) => void
+    onSuspend: (call: IMiddlewareEvent, context: T) => void
+    onSuccess: (call: IMiddlewareEvent, context: T, result: any) => void
+    onFail: (call: IMiddlewareEvent, context: T, error: any) => void
+}
+
 /**
  * Convenience utility to create action based middleware that supports async processes more easily.
  * All hooks are called for both synchronous and asynchronous actions. Except that either `onSuccess` or `onFail` is called
@@ -14,14 +23,9 @@ const runningActions = new Map<number, { async: boolean; call: IMiddlewareEvent;
  * @param hooks
  * @returns
  */
-export function createActionTrackingMiddleware<T = any>(hooks: {
-    filter?: (call: IMiddlewareEvent) => boolean
-    onStart: (call: IMiddlewareEvent) => T
-    onResume: (call: IMiddlewareEvent, context: T) => void
-    onSuspend: (call: IMiddlewareEvent, context: T) => void
-    onSuccess: (call: IMiddlewareEvent, context: T, result: any) => void
-    onFail: (call: IMiddlewareEvent, context: T, error: any) => void
-}): IMiddlewareHandler {
+export function createActionTrackingMiddleware<T = any>(
+    hooks: IActionTrackingMiddlewareHooks<T>
+): IMiddlewareHandler {
     return function actionTrackingMiddleware(
         call: IMiddlewareEvent,
         next: (actionCall: IMiddlewareEvent) => any,
