@@ -1,14 +1,17 @@
+/** @hidden */
 export interface FlowYield {
     // fake, only for typing
     "!!flowYield": undefined
 }
 
+/** @hidden */
 export interface FlowReturn<T> {
     // fake, only for typing
     "!!flowReturn": T
 }
 
 // we skip promises that are the result of yielding promises (except if they use flowReturn)
+/** @hidden */
 export type FlowReturnType<R> = IfAllAreFlowYieldThenVoid<
     R extends FlowReturn<infer FR>
         ? FR extends Promise<infer FRP>
@@ -20,6 +23,7 @@ export type FlowReturnType<R> = IfAllAreFlowYieldThenVoid<
 >
 
 // we extract yielded promises from the return type
+/** @hidden */
 export type IfAllAreFlowYieldThenVoid<R> = Exclude<R, FlowYield> extends never
     ? void
     : Exclude<R, FlowYield>
@@ -27,9 +31,7 @@ export type IfAllAreFlowYieldThenVoid<R> = Exclude<R, FlowYield> extends never
 /**
  * See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
  *
- * @export
- * @alias flow
- * @returns {Promise}
+ * @returns The flow as a promise.
  */
 export function flow<R, Args extends any[]>(
     generator: (...args: Args) => IterableIterator<R>
@@ -40,10 +42,8 @@ export function flow<R, Args extends any[]>(
 /**
  *  Used for TypeScript to make flows that return a promise return the actual promise result.
  *
- * @export
- * @template T
- * @param {T} val
- * @returns {FlowReturn<T>}
+ * @param val
+ * @returns
  */
 export function castFlowReturn<T>(val: T): FlowReturn<T> {
     return val as any
@@ -51,7 +51,7 @@ export function castFlowReturn<T>(val: T): FlowReturn<T> {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function createFlowSpawner(name: string, generator: Function) {
     const spawner = function flowSpawner(this: any) {

@@ -57,82 +57,109 @@ import {
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
 
+/** @hidden */
 export interface ModelProperties {
     [key: string]: IAnyType
 }
 
+/** @hidden */
 export type ModelPrimitive = string | number | boolean | Date
 
+/** @hidden */
 export interface ModelPropertiesDeclaration {
     [key: string]: ModelPrimitive | IAnyType
 }
 
 /**
  * Unmaps syntax property declarations to a map of { propName: IType }
+ *
+ * @hidden
  */
 export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
     [K in keyof T]: T[K] extends string
         ? IType<string | undefined, string, string> & OptionalProperty
         : T[K] extends number
-            ? IType<number | undefined, number, number> & OptionalProperty
-            : T[K] extends boolean
-                ? IType<boolean | undefined, boolean, boolean> & OptionalProperty
-                : T[K] extends Date
-                    ? IType<number | Date | undefined, number, Date> & OptionalProperty
-                    : T[K] extends IAnyType ? T[K] : never
+        ? IType<number | undefined, number, number> & OptionalProperty
+        : T[K] extends boolean
+        ? IType<boolean | undefined, boolean, boolean> & OptionalProperty
+        : T[K] extends Date
+        ? IType<number | Date | undefined, number, Date> & OptionalProperty
+        : T[K] extends IAnyType
+        ? T[K]
+        : never
 }
 
+/** @hidden */
 export interface OptionalProperty {
     // fake, only used for typing
     readonly "!!optionalType": undefined
 }
 
+/** @hidden */
 // tslint:disable-next-line:class-name
 export interface _NotCustomized {
     // only for typings
     readonly "!!mstNotCustomized": undefined
 }
+/** @hidden */
 export type _CustomOrOther<Custom, Other> = Custom extends _NotCustomized ? Other : Custom
 
 /**
  * Maps property types to the snapshot, including omitted optional attributes
+ * @hidden
  */
 export type RequiredPropNames<T> = {
     [K in keyof T]: T[K] extends OptionalProperty ? never : K
 }[keyof T]
+/** @hidden */
 export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
+/** @hidden */
 export type RequiredPropsObject<P extends ModelProperties> = { [K in keyof RequiredProps<P>]: P[K] }
 
+/** @hidden */
 export type OptionalPropNames<T> = {
     [K in keyof T]: T[K] extends OptionalProperty ? K : never
 }[keyof T]
+/** @hidden */
 export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
+/** @hidden */
 export type OptionalPropsObject<P extends ModelProperties> = {
     [K in keyof OptionalProps<P>]?: P[K]
 }
 
+/** @hidden */
 export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: ExtractC<P[k]> }
 
+/** @hidden */
 export type ModelCreationType<P extends ModelProperties> = ExtractCFromProps<
     RequiredPropsObject<P> & OptionalPropsObject<P>
 >
 
+/** @hidden */
 export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOther<
     CustomC,
     ModelCreationType<P>
 >
 
+/** @hidden */
 export type ModelSnapshotType<P extends ModelProperties> = { [K in keyof P]: ExtractS<P[K]> }
 
+/** @hidden */
 export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOther<
     CustomS,
     ModelSnapshotType<P>
 >
 
-// we keep this separate from ModelInstanceType to shorten model instance types generated declarations
+/**
+ * @hidden
+ * we keep this separate from ModelInstanceType to shorten model instance types generated declarations
+ */
 export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]: ExtractT<P[K]> }
 
-// do not transform this to an interface or model instance type generated declarations will be longer
+/**
+ * @hidden
+ * do not transform this to an interface or model instance type generated declarations will be longer
+ */
 export type ModelInstanceType<
     P extends ModelProperties,
     O,
@@ -142,6 +169,7 @@ export type ModelInstanceType<
     O &
     IStateTreeNode<ModelCreationType2<P, CustomC>, ModelSnapshotType2<P, CustomS>>
 
+/** @hidden */
 export interface ModelActions {
     [key: string]: Function
 }
@@ -153,10 +181,10 @@ export interface IModelType<
     CustomS = _NotCustomized
 >
     extends IType<
-            ModelCreationType2<PROPS, CustomC>,
-            ModelSnapshotType2<PROPS, CustomS>,
-            ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>
-        > {
+        ModelCreationType2<PROPS, CustomC>,
+        ModelSnapshotType2<PROPS, CustomS>,
+        ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>
+    > {
     readonly properties: PROPS
 
     named(newName: string): this
@@ -194,11 +222,16 @@ export interface IModelType<
     ): IModelType<PROPS, OTHERS, CustomC, NewS>
 }
 
+/**
+ * Any model type.
+ */
 export interface IAnyModelType extends IModelType<any, any, any, any> {}
 
+/** @hidden */
 export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any, any, any>
     ? P
     : never
+/** @hidden */
 export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O, any, any>
     ? O
     : never
@@ -209,7 +242,7 @@ function objectTypeToString(this: any) {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export interface ModelTypeConfig {
     name?: string
@@ -284,7 +317,7 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class ModelType<P extends ModelProperties, O> extends ComplexType<any, any, any>
     implements IModelType<P, O, any, any> {
@@ -705,7 +738,6 @@ export function model<P extends ModelPropertiesDeclaration = {}>(
  *
  * See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
  *
- * @export
  * @alias types.model
  */
 export function model(...args: any[]): any {
@@ -716,6 +748,7 @@ export function model(...args: any[]): any {
 
 // TODO: this can be simplified in TS3, since we can transform _NotCustomized to unknown, since unkonwn & X = X
 // and then back unkown to _NotCustomized if needed
+/** @hidden */
 export type _CustomJoin<A, B> = A extends _NotCustomized ? B : A & B
 
 // generated with C:\VSProjects\github\mobx-state-tree-upstream\packages\mobx-state-tree\scripts\generate-compose-type.js
@@ -769,7 +802,6 @@ export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends Mod
  * Given first parameter as a string and 2 or more model types,
  * the types are composed into a new Type with the given name
  *
- * @export
  * @alias types.compose
  */
 export function compose(...args: any[]): any {
@@ -800,10 +832,8 @@ export function compose(...args: any[]): any {
 /**
  * Returns if a given value represents a model type.
  *
- * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @param type
+ * @returns
  */
 export function isModelType<IT extends IAnyModelType = IAnyModelType>(type: IAnyType): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0

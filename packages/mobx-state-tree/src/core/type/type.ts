@@ -25,7 +25,7 @@ import {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export enum TypeFlags {
     String = 1,
@@ -48,25 +48,40 @@ export enum TypeFlags {
     Integer = 131072
 }
 
-// name of the properties of an object that can't be set to undefined
+/**
+ * Name of the properties of an object that can't be set to undefined
+ * @hidden
+ */
 export type DefinablePropsNames<T> = {
     [K in keyof T]: Extract<T[K], undefined> extends never ? K : never
 }[keyof T]
 
-// checks if a type is any or unknown
+/**
+ * Checks if a type is any or unknown
+ * @hidden
+ */
 export type IsTypeAnyOrUnknown<T> = unknown extends T ? true : false
 
-// checks if a type supports an empty create() function
-// basically !any, !unknown, X | undefined, objects with all properties being optional
+/**
+ * Checks if a type supports an empty create() function
+ * Basically !any, !unknown, X | undefined, objects with all properties being optional
+ * @hidden
+ */
 export type IsEmptyCreationType<O> = IsTypeAnyOrUnknown<O> extends true
     ? true
     : Extract<O, undefined> extends never
     ? (DefinablePropsNames<O> extends never | undefined ? true : false)
     : true
 
-// chooses a create function based on the creation type
+/**
+ * Chooses a create function based on the creation type.
+ * @hidden
+ */
 export type CreateParams<C> = IsEmptyCreationType<C> extends false ? [C, any?] : [C?, any?]
 
+/**
+ * A type, either complex or simple.
+ */
 export interface IType<C, S, T> {
     name: string
 
@@ -77,128 +92,171 @@ export interface IType<C, S, T> {
     validate(thing: any, context: IContext): IValidationResult
     describe(): string
 
+    /**
+     * @deprecated use `InstanceOf` instead.
+     * @hidden
+     */
     Type: T
+
+    /**
+     * @deprecated use `SnapshotOut` instead.
+     * @hidden
+     */
     SnapshotType: S
+
+    /**
+     * @deprecated use `SnapshotIn` instead.
+     * @hidden
+     */
     CreationType: C
 
     // Internal api's
     /**
      * @internal
-     * @private
+     * @hidden
      */
     flags: TypeFlags
     /**
      * @internal
-     * @private
+     * @hidden
      */
     isType: boolean
     /**
      * @internal
-     * @private
+     * @hidden
      */
     instantiate(parent: INode | null, subpath: string, environment: any, initialValue?: any): INode
     /**
      * @internal
-     * @private
+     * @hidden
      */
     initializeChildNodes(node: INode, snapshot: any): IChildNodesMap
     /**
      * @internal
-     * @private
+     * @hidden
      */
     createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any
     /**
      * @internal
-     * @private
+     * @hidden
      */
     finalizeNewInstance(node: INode, instance: any): void
     /**
      * @internal
-     * @private
+     * @hidden
      */
     reconcile(current: INode, newValue: any): INode
     /**
      * @internal
-     * @private
+     * @hidden
      */
     getValue(node: INode): T
     /**
      * @internal
-     * @private
+     * @hidden
      */
     getSnapshot(node: INode, applyPostProcess?: boolean): S
     /**
      * @internal
-     * @private
+     * @hidden
      */
     applySnapshot(node: INode, snapshot: C): void
     /**
      * @internal
-     * @private
+     * @hidden
      */
     applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void
     /**
      * @internal
-     * @private
+     * @hidden
      */
     getChildren(node: INode): ReadonlyArray<INode>
     /**
      * @internal
-     * @private
+     * @hidden
      */
     getChildNode(node: INode, key: string): INode
     /**
      * @internal
-     * @private
+     * @hidden
      */
     getChildType(key: string): IAnyType
     /**
      * @internal
-     * @private
+     * @hidden
      */
     removeChild(node: INode, subpath: string): void
     /**
      * @internal
-     * @private
+     * @hidden
      */
     isAssignableFrom(type: IAnyType): boolean
     /**
      * @internal
-     * @private
+     * @hidden
      */
     shouldAttachNode: boolean
 }
 
 // do not convert to an interface
+/**
+ * Any kind of type.
+ */
 export type IAnyType = IType<any, any, any>
 
+/**
+ * A simple type, this is, a type where the instance and the snapshot representation are the same.
+ */
 export interface ISimpleType<T> extends IType<T, T, T> {}
 
+/** @hidden */
 export type Primitives = ModelPrimitive | null | undefined
 
-// just for compatibility with old versions, could be deprecated on the next major version
+/**
+ * A complex type.
+ * @deprecated just for compatibility with old versions, could be deprecated on the next major version
+ * @hidden
+ */
 export interface IComplexType<C, S, T> extends IType<C, S, T & IStateTreeNode<C, S>> {}
 
 // do not convert to an interface
+/**
+ * Any kind of complex type.
+ */
 export type IAnyComplexType = IType<any, any, IAnyStateTreeNode>
 
+/** @hidden */
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
+/** @hidden */
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
+/** @hidden */
 export type ExtractT<T extends IAnyType> = T extends IType<any, any, infer X> ? X : never
+/** @hidden */
 export type ExtractCST<IT extends IAnyType> = IT extends IType<infer C, infer S, infer T>
     ? C | S | T
     : never
 
+/**
+ * The instance representation of a given type.
+ */
 export type Instance<T> = T extends IStateTreeNode
     ? T
     : T extends IType<any, any, infer TT>
     ? TT
     : T
+
+/**
+ * The input (creation) snapshot representation of a given type.
+ */
 export type SnapshotIn<T> = T extends IStateTreeNode<infer STNC, any>
     ? STNC
     : T extends IType<infer TC, any, any>
     ? TC
     : T
+
+/**
+ * The output snapshot representation of a given type.
+ */
 export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
     ? STNS
     : T extends IType<any, infer TS, any>
@@ -210,12 +268,13 @@ export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
  * For primitives it defaults to the primitive itself.
  *
  * For example:
- * - SnapshotOrInstance<typeof ModelA> = SnapshotIn<typeof ModelA> | Instance<typeof ModelA>
- * - SnapshotOrInstance<typeof self.a (where self.a is a ModelA)> = SnapshotIn<typeof ModelA> | Instance<typeof ModelA>
+ * - `SnapshotOrInstance<typeof ModelA> = SnapshotIn<typeof ModelA> | Instance<typeof ModelA>`
+ * - `SnapshotOrInstance<typeof self.a (where self.a is a ModelA)> = SnapshotIn<typeof ModelA> | Instance<typeof ModelA>`
  *
  * Usually you might want to use this when your model has a setter action that sets a property.
  *
- * @example
+ * Example:
+ * ```ts
  * const ModelA = types.model({
  *   n: types.number
  * })
@@ -228,6 +287,7 @@ export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
  *     self.innerModel = cast(m)
  *   }
  * }))
+ * ```
  */
 export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
 
@@ -235,7 +295,7 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  * A complex type produces a MST node (Node in the state tree)
  *
  * @internal
- * @private
+ * @hidden
  */
 export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTreeNode<C, S>> {
     readonly isType = true
@@ -357,7 +417,7 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTree
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements IType<C, S, T> {
     constructor(name: string) {
@@ -419,9 +479,8 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
 /**
  * Returns if a given value represents a type.
  *
- * @export
- * @param {*} value
- * @returns {value is IAnyType}
+ * @param value Value to check.
+ * @returns `true` if the value is a type.
  */
 export function isType(value: any): value is IAnyType {
     return typeof value === "object" && value && value.isType === true

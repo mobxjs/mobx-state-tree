@@ -34,7 +34,7 @@ export type IMiddlewareEvent = {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export type IMiddleware = {
     handler: IMiddlewareHandler
@@ -52,7 +52,7 @@ let currentActionContext: IMiddlewareEvent | null = null
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function getNextActionId() {
     return nextActionId++
@@ -61,7 +61,7 @@ export function getNextActionId() {
 // TODO: optimize away entire action context if there is no middleware in tree?
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const node = getStateTreeNode(context.context)
@@ -84,7 +84,7 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function getActionContext(): IMiddlewareEvent {
     if (!currentActionContext) return fail("Not running an action!")
@@ -93,7 +93,7 @@ export function getActionContext(): IMiddlewareEvent {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function createActionInvoker<T extends Function>(
     target: IAnyStateTreeNode,
@@ -129,10 +129,9 @@ export function createActionInvoker<T extends Function>(
  *
  * For more details, see the [middleware docs](docs/middleware.md)
  *
- * @export
- * @param {IStateTreeNode} target
- * @param {(action: IRawActionCall, next: (call: IRawActionCall) => any) => any} middleware
- * @returns {IDisposer}
+ * @param target Node to apply the middleware to.
+ * @param middleware Middleware to apply.
+ * @returns A callable function to dispose the middleware.
  */
 export function addMiddleware(
     target: IAnyStateTreeNode,
@@ -150,9 +149,10 @@ export function addMiddleware(
 }
 
 /**
- * Binds middleware to a specific action
+ * Binds middleware to a specific action.
  *
- * @example
+ * Example:
+ * ```ts
  * type.actions(self => {
  *   function takeA____() {
  *       self.toilet.donate()
@@ -164,12 +164,11 @@ export function addMiddleware(
  *     takeA____: decorate(atomic, takeA____)
  *   }
  * })
+ * ```
  *
- * @export
- * @template T
- * @param {IMiddlewareHandler} handler
- * @param Function} fn
- * @returns the original function
+ * @param handler
+ * @param fn
+ * @returns The original function
  */
 export function decorate<T extends Function>(handler: IMiddlewareHandler, fn: T): T {
     const middleware: IMiddleware = { handler, includeHooks: true }

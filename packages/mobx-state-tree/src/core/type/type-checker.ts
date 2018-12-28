@@ -35,14 +35,14 @@ function safeStringify(value: any) {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function prettyPrintValue(value: any) {
     return typeof value === "function"
         ? `<function${value.name ? " " + value.name : ""}>`
         : isStateTreeNode(value)
-            ? `<${value}>`
-            : `\`${safeStringify(value)}\``
+        ? `<${value}>`
+        : `\`${safeStringify(value)}\``
 }
 
 function shortenPrintValue(valueInString: string) {
@@ -66,8 +66,8 @@ function toErrorString(error: IValidationError): string {
     const currentTypename = isStateTreeNode(value)
         ? `value of type ${getStateTreeNode(value).type.name}:`
         : isPrimitive(value)
-            ? "value"
-            : "snapshot"
+        ? "value"
+        : "snapshot"
     const isSnapshotCompatible =
         type && isStateTreeNode(value) && type.is(getStateTreeNode(value).snapshot)
 
@@ -95,7 +95,7 @@ function toErrorString(error: IValidationError): string {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function getDefaultContext(type: IAnyType): IContext {
     return [{ type, path: "" }]
@@ -103,7 +103,7 @@ export function getDefaultContext(type: IAnyType): IContext {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function getContextForPath(context: IContext, path: string, type?: IAnyType): IContext {
     return context.concat([{ path, type }])
@@ -111,7 +111,7 @@ export function getContextForPath(context: IContext, path: string, type?: IAnyTy
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function typeCheckSuccess(): IValidationResult {
     return EMPTY_ARRAY as any
@@ -119,7 +119,7 @@ export function typeCheckSuccess(): IValidationResult {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function typeCheckFailure(
     context: IContext,
@@ -131,7 +131,7 @@ export function typeCheckFailure(
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function flattenTypeErrors(errors: IValidationResult[]): IValidationResult {
     return errors.reduce((a, i) => a.concat(i), [])
@@ -140,7 +140,7 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
 // TODO; doublecheck: typecheck should only needed to be invoked from: type.create and array / map / value.property will change
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function typecheckInternal<C, S, T>(type: IType<C, S, T>, value: C | S | T): void {
     // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
@@ -153,9 +153,8 @@ export function typecheckInternal<C, S, T>(type: IType<C, S, T>, value: C | S | 
  * Throws if the given value is not according the provided type specification.
  * Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
  *
- * @export
- * @param {IAnyType} type
- * @param {*} value
+ * @param type Type to check against.
+ * @param value Value to be checked.
  */
 export function typecheck<C, S, T>(type: IType<C, S, T>, value: C | S | T): void {
     const errors = type.validate(value, [{ path: "", type }])

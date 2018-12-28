@@ -10,7 +10,7 @@ import { createAtom, IAtom } from "mobx"
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export abstract class BaseNode {
     private _escapedSubpath?: string
@@ -151,6 +151,6 @@ export abstract class BaseNode {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export type INode = BaseNode

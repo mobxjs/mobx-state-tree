@@ -73,9 +73,8 @@ function serializeTheUnserializable(baseType: string) {
  * Does not return any value
  * Takes an action description as produced by the `onAction` middleware.
  *
- * @export
- * @param {Object} target
- * @param {IActionCall[]} actions
+ * @param target
+ * @param actions
  */
 export function applyAction(
     target: IAnyStateTreeNode,
@@ -118,7 +117,8 @@ function baseApplyAction(target: IAnyStateTreeNode, action: ISerializedActionCal
  * Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted.
  * Returns an recorder object with the following signature:
  *
- * @example
+ * Example:
+ * ```ts
  * export interface IActionRecorder {
  *      // the recorded actions
  *      actions: ISerializedActionCall[]
@@ -127,10 +127,10 @@ function baseApplyAction(target: IAnyStateTreeNode, action: ISerializedActionCal
  *      // apply all the recorded actions on the given object
  *      replay(target: IStateTreeNode): any
  * }
+ * ```
  *
- * @export
- * @param {IStateTreeNode} subject
- * @returns {IPatchRecorder}
+ * @param subject
+ * @returns
  */
 export function recordActions(subject: IAnyStateTreeNode): IActionRecorder {
     // check all arguments
@@ -160,7 +160,8 @@ export function recordActions(subject: IAnyStateTreeNode): IActionRecorder {
  * MST Nodes are considered non-serializable as well (they could be serialized as there snapshot, but it is uncertain whether an replaying party will be able to handle such a non-instantiated snapshot).
  * Rather, when using `onAction` middleware, one should consider in passing arguments which are 1: an id, 2: a (relative) path, or 3: a snapshot. Instead of a real MST node.
  *
- * @example
+ * Example:
+ * ```ts
  * const Todo = types.model({
  *   task: types.string
  * })
@@ -181,12 +182,12 @@ export function recordActions(subject: IAnyStateTreeNode): IActionRecorder {
  *
  * s.add({ task: "Grab a coffee" })
  * // Logs: { name: "add", path: "", args: [{ task: "Grab a coffee" }] }
+ * ```
  *
- * @export
- * @param {IStateTreeNode} target
- * @param {(call: ISerializedActionCall) => void} listener
- * @param attachAfter {boolean} (default false) fires the listener *after* the action has executed instead of before.
- * @returns {IDisposer}
+ * @param target
+ * @param listener
+ * @param attachAfter (default false) fires the listener *after* the action has executed instead of before.
+ * @returns
  */
 export function onAction(
     target: IAnyStateTreeNode,

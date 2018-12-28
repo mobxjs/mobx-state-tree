@@ -11,18 +11,8 @@ const runningActions = new Map<number, { async: boolean; call: IMiddlewareEvent;
  *
  * See the `atomic` middleware for an example
  *
- * @export
- * @template T
- * @template any
- * @param {{
- *     filter?: (call: IMiddlewareEvent) => boolean
- *     onStart: (call: IMiddlewareEvent) => T
- *     onResume: (call: IMiddlewareEvent, context: T) => void
- *     onSuspend: (call: IMiddlewareEvent, context: T) => void
- *     onSuccess: (call: IMiddlewareEvent, context: T, result: any) => void
- *     onFail: (call: IMiddlewareEvent, context: T, error: any) => void
- * }} hooks
- * @returns {IMiddlewareHandler}
+ * @param hooks
+ * @returns
  */
 export function createActionTrackingMiddleware<T = any>(hooks: {
     filter?: (call: IMiddlewareEvent) => boolean

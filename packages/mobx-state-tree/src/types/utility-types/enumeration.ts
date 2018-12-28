@@ -1,5 +1,6 @@
 import { ISimpleType, union, literal, fail } from "../../internal"
 
+/** @hidden */
 export type UnionStringArray<T extends string[]> = T[number]
 
 // strongly typed enumeration forms for plain string arrays (when passed directly to the function)
@@ -17,16 +18,17 @@ export function enumeration<T extends string>(
  * Can be used to create an string based enumeration.
  * (note: this methods is just sugar for a union of string literals)
  *
- * @example
+ * Example:
+ * ```ts
  * const TrafficLight = types.model({
  *   color: types.enumeration("Color", ["Red", "Orange", "Green"])
  * })
+ * ```
  *
- * @export
  * @alias types.enumeration
- * @param {string} name descriptive name of the enumeration (optional)
- * @param {string[]} options possible values this enumeration can have
- * @returns {ISimpleType<string>}
+ * @param name descriptive name of the enumeration (optional)
+ * @param options possible values this enumeration can have
+ * @returns
  */
 export function enumeration(name: string | string[], options?: any): ISimpleType<string> {
     const realOptions: string[] = typeof name === "string" ? options! : name

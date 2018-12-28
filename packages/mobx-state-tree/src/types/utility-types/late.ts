@@ -12,7 +12,7 @@ import {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class Late<C, S, T> extends Type<C, S, T> {
     readonly definition: () => IAnyType
@@ -94,7 +94,8 @@ export function late<T extends IAnyType>(name: string, type: () => T): T
  * Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
  * You need to declare an interface to explicit the return type of the late parameter function.
  *
- * @example
+ * Example:
+ * ```ts
  *  interface INode {
  *       childs: INode[]
  *  }
@@ -103,14 +104,12 @@ export function late<T extends IAnyType>(name: string, type: () => T): T
  *  const Node = types.model({
  *       childs: types.optional(types.array(types.late<any, INode>(() => Node)), [])
  *  })
+ * ```
  *
- * @export
  * @alias types.late
- * @template S
- * @template T
- * @param {string} [name] The name to use for the type that will be returned.
- * @param {ILateType<S, T>} type A function that returns the type that will be defined.
- * @returns {IType<S, T>}
+ * @param name The name to use for the type that will be returned.
+ * @param type A function that returns the type that will be defined.
+ * @returns
  */
 export function late(nameOrType: any, maybeType?: () => IAnyType): IAnyType {
     const name = typeof nameOrType === "string" ? nameOrType : `late(${nameOrType.toString()})`
@@ -129,10 +128,8 @@ export function late(nameOrType: any, maybeType?: () => IAnyType): IAnyType {
 /**
  * Returns if a given value represents a late type.
  *
- * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @param type
+ * @returns
  */
 export function isLateType<IT extends IAnyType>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Late) > 0

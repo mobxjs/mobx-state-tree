@@ -16,7 +16,7 @@ import {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class Refinement<C, S, T> extends Type<C, S, T> {
     readonly type: IAnyType
@@ -87,13 +87,11 @@ export function refinement<IT extends IAnyType>(
 /**
  * `types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
  *
- * @export
  * @alias types.refinement
- * @template T
- * @param {string} name
- * @param {IType<T, T>} type
- * @param {(snapshot: T) => boolean} predicate
- * @returns {IType<T, T>}
+ * @param name
+ * @param type
+ * @param predicate
+ * @returns
  */
 export function refinement(...args: any[]): IAnyType {
     const name = typeof args[0] === "string" ? args.shift() : isType(args[0]) ? args[0].name : null
@@ -123,10 +121,8 @@ export function refinement(...args: any[]): IAnyType {
 /**
  * Returns if a given value is a refinement type.
  *
- * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @param type
+ * @returns
  */
 export function isRefinementType<IT extends IAnyType>(type: IT): type is IT {
     return (type.flags & TypeFlags.Refinement) > 0

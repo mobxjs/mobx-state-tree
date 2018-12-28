@@ -45,7 +45,7 @@ const enum ObservableInstanceLifecycle {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export interface IChildNodesMap {
     [key: string]: INode
@@ -59,7 +59,7 @@ const snapshotReactionOptions = {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class ObjectNode extends BaseNode {
     readonly nodeId = ++nextNodeId

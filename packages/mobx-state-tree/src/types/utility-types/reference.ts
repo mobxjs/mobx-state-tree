@@ -119,7 +119,7 @@ class StoredReference<IT extends IAnyType> {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class InvalidReferenceError extends Error {
     constructor(m: string) {
@@ -131,7 +131,7 @@ export class InvalidReferenceError extends Error {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type<
     ReferenceIdentifier,
@@ -325,7 +325,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseReferenceType<IT> {
     constructor(targetType: IT, onInvalidated?: OnReferenceInvalidated<ExtractT<IT>>) {
@@ -383,7 +383,7 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferenceType<IT> {
     constructor(
@@ -460,6 +460,7 @@ export type ReferenceOptions<IT extends IAnyComplexType> =
     | ReferenceOptionsOnInvalidated<IT>
     | (ReferenceOptionsGetSet<IT> & ReferenceOptionsOnInvalidated<IT>)
 
+/** @hidden */
 export interface IReferenceType<IT extends IAnyComplexType>
     extends IType<
         ReferenceIdentifier,
@@ -474,7 +475,6 @@ export interface IReferenceType<IT extends IAnyComplexType>
  * Creates a reference to another type, which should have defined an identifier.
  * See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
  *
- * @export
  * @alias types.reference
  */
 export function reference<IT extends IAnyComplexType>(
@@ -519,10 +519,8 @@ export function reference<IT extends IAnyComplexType>(
 /**
  * Returns if a given value represents a reference type.
  *
- * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @param type
+ * @returns
  */
 export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type is IT {
     return (type.flags & TypeFlags.Reference) > 0
@@ -535,12 +533,10 @@ export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type 
  *
  * Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `onInvalidate` option.
  *
- * @export
  * @alias types.safeReference
- * @template IT
- * @param {IT} subType
- * @param {ReferenceOptionsGetSet<IT>} [options]
- * @returns {IMaybe<IReferenceType<IT>>}
+ * @param subType
+ * @param options
+ * @returns
  */
 export function safeReference<IT extends IAnyComplexType>(
     subType: IT,
