@@ -15,7 +15,7 @@
         "mst-middlewares": "^3.7.0",
         "react": "^16.5.0",
         "react-dom": "^16.5.0",
-        "react-redux": "^5.0.0",
+        "react-redux": "^6.0.0",
         "redux": "^4.0.0",
         "remotedev": "^0.2.7",
         "todomvc-app-css": "^2.0.6"
