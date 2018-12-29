@@ -1,8 +1,9 @@
 import { fail } from "../internal"
 
-// https://tools.ietf.org/html/rfc6902
-// http://jsonpatch.com/
-
+/**
+ * https://tools.ietf.org/html/rfc6902
+ * http://jsonpatch.com/
+ */
 export interface IJsonPatch {
     op: "replace" | "add" | "remove"
     path: string
@@ -15,7 +16,7 @@ export interface IReversibleJsonPatch extends IJsonPatch {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function splitPatch(patch: IReversibleJsonPatch): [IJsonPatch, IJsonPatch] {
     if (!("oldValue" in patch)) fail(`Patches without \`oldValue\` field cannot be inversed`)
@@ -24,7 +25,7 @@ export function splitPatch(patch: IReversibleJsonPatch): [IJsonPatch, IJsonPatch
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function stripPatch(patch: IReversibleJsonPatch): IJsonPatch {
     // strips `oldvalue` information from the patch, so that it becomes a patch conform the json-patch spec
@@ -61,13 +62,16 @@ function invertPatch(patch: IReversibleJsonPatch): IJsonPatch {
     }
 }
 
-// simple simple simple check
+/**
+ * Simple simple check to check it is a number.
+ */
 function isNumber(x: string): boolean {
     return typeof x === "number"
 }
 
 /**
- * escape slashes and backslashes
+ * Escape slashes and backslashes.
+ *
  * http://tools.ietf.org/html/rfc6901
  */
 export function escapeJsonPath(str: string): string {
@@ -78,18 +82,17 @@ export function escapeJsonPath(str: string): string {
 }
 
 /**
- * unescape slashes and backslashes
+ * Unescape slashes and backslashes.
  */
 export function unescapeJsonPath(str: string): string {
     return str.replace(/~0/g, "/").replace(/~1/g, "~")
 }
 
 /**
- * Generates a json-path compliant json path from path parts
+ * Generates a json-path compliant json path from path parts.
  *
- * @export
- * @param {string[]} path
- * @returns {string}
+ * @param path
+ * @returns
  */
 export function joinJsonPath(path: string[]): string {
     // `/` refers to property with an empty name, while `` refers to root itself!
@@ -98,11 +101,10 @@ export function joinJsonPath(path: string[]): string {
 }
 
 /**
- * Splits and decodes a json path into several parts
+ * Splits and decodes a json path into several parts.
  *
- * @export
- * @param {string} path
- * @returns {string[]}
+ * @param path
+ * @returns
  */
 export function splitJsonPath(path: string): string[] {
     // `/` refers to property with an empty name, while `` refers to root itself!

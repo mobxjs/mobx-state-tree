@@ -2,24 +2,25 @@ import { isObservableArray, $mobx, getAtom } from "mobx"
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 declare const global: any
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([])
+
 /**
  * @internal
- * @private
+ * @hidden
  */
 export const EMPTY_OBJECT: {} = Object.freeze({})
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export const mobxShallow =
     typeof $mobx === "string" ? { deep: false } : { deep: false, proxy: false }
@@ -29,7 +30,7 @@ export type IDisposer = () => void
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function fail(message = "Illegal state"): never {
     throw new Error("[mobx-state-tree] " + message)
@@ -37,7 +38,7 @@ export function fail(message = "Illegal state"): never {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function identity<T>(_: T): T {
     return _
@@ -45,15 +46,15 @@ export function identity<T>(_: T): T {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function noop() {}
 
-// pollyfill (for IE) suggested in MDN:
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
 /**
+ * pollyfill (for IE) suggested in MDN:
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
  * @internal
- * @private
+ * @hidden
  */
 export const isInteger =
     Number.isInteger ||
@@ -63,7 +64,7 @@ export const isInteger =
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function isArray(val: any): val is any[] {
     return !!(Array.isArray(val) || isObservableArray(val)) as boolean
@@ -71,7 +72,7 @@ export function isArray(val: any): val is any[] {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function asArray<T>(val: undefined | null | T | T[] | ReadonlyArray<T>): T[] {
     if (!val) return (EMPTY_ARRAY as any) as T[]
@@ -81,27 +82,27 @@ export function asArray<T>(val: undefined | null | T | T[] | ReadonlyArray<T>): 
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function extend<A, B>(a: A, b: B): A & B
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function extend<A, B, C>(a: A, b: B, c: C): A & B & C
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function extend<A, B, C, D>(a: A, b: B, c: C, d: D): A & B & C & D
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function extend(a: any, ...b: any[]): any
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function extend(a: any, ...b: any[]) {
     for (let i = 0; i < b.length; i++) {
@@ -113,7 +114,7 @@ export function extend(a: any, ...b: any[]) {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function isPlainObject(value: any): value is any {
     if (value === null || typeof value !== "object") return false
@@ -123,7 +124,7 @@ export function isPlainObject(value: any): value is any {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function isMutable(value: any) {
     return (
@@ -136,7 +137,7 @@ export function isMutable(value: any) {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function isPrimitive(
     value: any
@@ -154,7 +155,7 @@ export function isPrimitive(
 
 /**
  * @internal
- * @private
+ * @hidden
  * Freeze a value and return it (if not in production)
  */
 export function freeze<T>(value: T): T {
@@ -164,7 +165,7 @@ export function freeze<T>(value: T): T {
 
 /**
  * @internal
- * @private
+ * @hidden
  * Recursively freeze a value (if not in production)
  */
 export function deepFreeze<T>(value: T): T {
@@ -187,7 +188,7 @@ export function deepFreeze<T>(value: T): T {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function isSerializable(value: any) {
     return typeof value !== "function"
@@ -195,7 +196,7 @@ export function isSerializable(value: any) {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function addHiddenFinalProp(object: any, propName: string, value: any) {
     Object.defineProperty(object, propName, {
@@ -208,7 +209,7 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function addHiddenWritableProp(object: any, propName: string, value: any) {
     Object.defineProperty(object, propName, {
@@ -221,7 +222,7 @@ export function addHiddenWritableProp(object: any, propName: string, value: any)
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function addReadOnlyProp(object: any, propName: string, value: any) {
     Object.defineProperty(object, propName, {
@@ -236,7 +237,7 @@ type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class EventHandler<F extends Function> {
     private handlers?: F[]
@@ -291,9 +292,10 @@ export class EventHandler<F extends Function> {
 }
 
 const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
+
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function hasOwnProperty(object: Object, propName: string) {
     return prototypeHasOwnProperty.call(object, propName)
@@ -301,7 +303,7 @@ export function hasOwnProperty(object: Object, propName: string) {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function argsToArray(args: IArguments): any[] {
     const res = new Array(args.length)
@@ -311,7 +313,7 @@ export function argsToArray(args: IArguments): any[] {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function invalidateComputed(target: any, propName: string) {
     const atom = getAtom(target, propName) as any
@@ -320,12 +322,13 @@ export function invalidateComputed(target: any, propName: string) {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export type DeprecatedFunction = Function & { ids?: { [id: string]: true } }
+
 /**
  * @internal
- * @private
+ * @hidden
  */
 export const deprecated: DeprecatedFunction = function(id: string, message: string): void {
     // skip if running production

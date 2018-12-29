@@ -215,11 +215,11 @@ Also, the 'object has died' exception can be suppressed now. One should still ad
 
 **Features**
 
--   It is now possible to create [custom primitive(like) types](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#typescustom)! Implements [#673](https://github.com/mobxjs/mobx-state-tree/issues/673) through [#689](https://github.com/mobxjs/mobx-state-tree/pull/689)
--   [`getIdentifier`](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#getidentifier) is now exposed as function, to get the identifier of a model instance (if any). Fixes [#674](https://github.com/mobxjs/mobx-state-tree/issues/674) through [#678](https://github.com/mobxjs/mobx-state-tree/pull/678) by TimHollies
+-   It is now possible to create [custom primitive(like) types](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/API/README.md#typescustom)! Implements [#673](https://github.com/mobxjs/mobx-state-tree/issues/673) through [#689](https://github.com/mobxjs/mobx-state-tree/pull/689)
+-   [`getIdentifier`](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/API/README.md#getidentifier) is now exposed as function, to get the identifier of a model instance (if any). Fixes [#674](https://github.com/mobxjs/mobx-state-tree/issues/674) through [#678](https://github.com/mobxjs/mobx-state-tree/pull/678) by TimHollies
 -   Writing [middleware](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/middleware.md) has slightly changed, to make it less error prone and more explicit whether a middleware chain should be aborted. For details, see [#675](https://github.com/mobxjs/mobx-state-tree/pull/675) by Robin Fehr
--   It is now possible to configure whether [attached middleware](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#addmiddleware) should be triggered for the built-in hooks / operations. [#653](https://github.com/mobxjs/mobx-state-tree/pull/653) by Robin Fehr
--   We exposed an [api](https://github.com/mobxjs/mobx-state-tree/blob/master/API.md#getmembers) to perform reflection on model instances. [#649](https://github.com/mobxjs/mobx-state-tree/pull/649) by Robin Fehr
+-   It is now possible to configure whether [attached middleware](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/API/README.md#addmiddleware) should be triggered for the built-in hooks / operations. [#653](https://github.com/mobxjs/mobx-state-tree/pull/653) by Robin Fehr
+-   We exposed an [api](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/API/README.md#getmembers) to perform reflection on model instances. [#649](https://github.com/mobxjs/mobx-state-tree/pull/649) by Robin Fehr
 
 **Fixes**
 

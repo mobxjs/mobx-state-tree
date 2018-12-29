@@ -18,6 +18,7 @@ import {
 const optionalUndefinedType = optional(undefinedType, undefined)
 const optionalNullType = optional(nullType, null)
 
+/** @hidden */
 export interface IMaybeIType<IT extends IAnyType, C, O>
     extends IType<
             ExtractC<IT> | C,
@@ -30,18 +31,19 @@ export interface IMaybeIType<IT extends IAnyType, C, O>
         >,
         OptionalProperty {}
 
+/** @hidden */
 export interface IMaybe<IT extends IAnyType> extends IMaybeIType<IT, undefined, undefined> {}
+
+/** @hidden */
 export interface IMaybeNull<IT extends IAnyType> extends IMaybeIType<IT, null | undefined, null> {}
 
 /**
  * Maybe will make a type nullable, and also optional.
  * The value `undefined` will be used to represent nullability.
  *
- * @export
  * @alias types.maybe
- * @template IT
- * @param {IT} type
- * @returns {IMaybe<IT>}
+ * @param type
+ * @returns
  */
 export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
     if (process.env.NODE_ENV !== "production" && !isType(type))
@@ -53,11 +55,9 @@ export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
  * Maybe will make a type nullable, and also optional.
  * The value `null` will be used to represent no value.
  *
- * @export
  * @alias types.maybeNull
- * @template IT
- * @param {IT} type
- * @returns {IMaybeNull<IT>}
+ * @param type
+ * @returns
  */
 export function maybeNull<IT extends IAnyType>(type: IT): IMaybeNull<IT> {
     if (process.env.NODE_ENV !== "production" && !isType(type))

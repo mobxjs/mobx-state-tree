@@ -2,7 +2,7 @@ import { INode, fail, ObjectNode, ScalarNode, IType, getStateTreeNodeSafe } from
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function createNode<C, S, T>(
     type: IType<C, S, T>,
@@ -31,7 +31,7 @@ export function createNode<C, S, T>(
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function isNode(value: any): value is INode {
     return value instanceof ScalarNode || value instanceof ObjectNode

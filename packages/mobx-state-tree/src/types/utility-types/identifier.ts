@@ -16,7 +16,7 @@ import {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class IdentifierType extends Type<string, string, string> {
     readonly shouldAttachNode = false
@@ -66,7 +66,7 @@ export class IdentifierType extends Type<string, string, string> {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class IdentifierNumberType extends IdentifierType {
     constructor() {
@@ -114,42 +114,40 @@ export class IdentifierNumberType extends IdentifierType {
  * Identifier can be used only as type property of a model.
  * This type accepts as parameter the value type of the identifier field that can be either string or number.
  *
- * @example
+ * Example:
+ * ```ts
  *  const Todo = types.model("Todo", {
  *      id: types.identifier,
  *      title: types.string
  *  })
+ * ```
  *
- * @export
  * @alias types.identifier
- * @template T
- * @returns {IType<T, T>}
+ * @returns
  */
 export const identifier: ISimpleType<string> = new IdentifierType()
 
 /**
  * Similar to `types.identifier`, but `identifierNumber` will serialize from / to a number when applying snapshots
  *
- * @example
+ * Example:
+ * ```ts
  *  const Todo = types.model("Todo", {
  *      id: types.identifierNumber,
  *      title: types.string
  *  })
+ * ```
  *
- * @export
  * @alias types.identifierNumber
- * @template T
- * @returns {IType<T, T>}
+ * @returns
  */
 export const identifierNumber: ISimpleType<number> = new IdentifierNumberType() as any
 
 /**
  * Returns if a given value represents an identifier type.
  *
- * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @param type
+ * @returns
  */
 export function isIdentifierType<IT extends typeof identifier | typeof identifierNumber>(
     type: IT
@@ -157,11 +155,14 @@ export function isIdentifierType<IT extends typeof identifier | typeof identifie
     return isType(type) && (type.flags & TypeFlags.Identifier) > 0
 }
 
+/**
+ * Valid types for identifiers.
+ */
 export type ReferenceIdentifier = string | number
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function normalizeIdentifier(id: ReferenceIdentifier): string {
     return "" + id

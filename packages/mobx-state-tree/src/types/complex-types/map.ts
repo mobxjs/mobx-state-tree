@@ -50,10 +50,12 @@ import {
     normalizeIdentifier
 } from "../../internal"
 
+/** @hidden */
 export interface IMapType<IT extends IAnyType>
     extends IType<IKeyValueMap<ExtractC<IT>> | undefined, IKeyValueMap<ExtractS<IT>>, IMSTMap<IT>>,
         OptionalProperty {}
 
+/** @hidden */
 export interface IMSTMap<IT extends IAnyType>
     extends IStateTreeNode<IKeyValueMap<ExtractC<IT>> | undefined, IKeyValueMap<ExtractS<IT>>> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
@@ -128,7 +130,7 @@ function tryCollectModelTypes(type: IAnyType, modelTypes: Array<ModelType<any, a
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export enum MapIdentifierMode {
     UNKNOWN,
@@ -190,7 +192,7 @@ class MSTMap<C, S, T> extends ObservableMap {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> extends ComplexType<
     IKeyValueMap<C> | undefined,
@@ -433,7 +435,8 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
  *
  * This type will always produce [observable maps](https://mobx.js.org/refguide/map.html)
  *
- * @example
+ * Example:
+ * ```ts
  * const Todo = types.model({
  *   id: types.identifier,
  *   task: types.string
@@ -448,11 +451,11 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
  * s.todos.set(17, { task: "Grab coffee", id: 17 })
  * s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the identifier
  * console.log(s.todos.get(17).task) // prints: "Grab coffee"
+ * ```
  *
- * @export
  * @alias types.map
- * @param {IType<S, T>} subtype
- * @returns {IMapType<IT>}
+ * @param subtype
+ * @returns
  */
 export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
     const ret = new MapType<IT>(`map<string, ${subtype.name}>`, subtype)
@@ -462,10 +465,8 @@ export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
 /**
  * Returns if a given value represents a map type.
  *
- * @export
- * @template Items
- * @param {IAnyType} type
- * @returns {type is IMapType<Items>}
+ * @param type
+ * @returns `true` if it is a map type.
  */
 export function isMapType<Items extends IAnyType = IAnyType>(
     type: IAnyType

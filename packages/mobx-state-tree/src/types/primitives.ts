@@ -22,7 +22,7 @@ import {
 // TODO: implement CoreType using types.custom ?
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class CoreType<C, S, T> extends Type<C, S, T> {
     readonly shouldAttachNode = false
@@ -67,13 +67,14 @@ export class CoreType<C, S, T> extends Type<C, S, T> {
  * Creates a type that can only contain a string value.
  * This type is used for string values by default
  *
- * @export
  * @alias types.string
- * @example
+ * Example:
+ * ```ts
  * const Person = types.model({
  *   firstName: types.string,
  *   lastName: "Doe"
  * })
+ * ```
  */
 // tslint:disable-next-line:variable-name
 export const string: ISimpleType<string> = new CoreType<string, string, string>(
@@ -86,13 +87,14 @@ export const string: ISimpleType<string> = new CoreType<string, string, string>(
  * Creates a type that can only contain a numeric value.
  * This type is used for numeric values by default
  *
- * @export
  * @alias types.number
- * @example
+ * Example:
+ * ```ts
  * const Vector = types.model({
  *   x: types.number,
  *   y: 1.5
  * })
+ * ```
  */
 // tslint:disable-next-line:variable-name
 export const number: ISimpleType<number> = new CoreType<number, number, number>(
@@ -105,13 +107,14 @@ export const number: ISimpleType<number> = new CoreType<number, number, number>(
  * Creates a type that can only contain an integer value.
  * This type is used for integer values by default
  *
- * @export
  * @alias types.integer
- * @example
+ * Example:
+ * ```ts
  * const Size = types.model({
  *   width: types.integer,
  *   height: 10
  * })
+ * ```
  */
 // tslint:disable-next-line:variable-name
 export const integer: ISimpleType<number> = new CoreType<number, number, number>(
@@ -124,13 +127,14 @@ export const integer: ISimpleType<number> = new CoreType<number, number, number>
  * Creates a type that can only contain a boolean value.
  * This type is used for boolean values by default
  *
- * @export
  * @alias types.boolean
- * @example
+ * Example:
+ * ```ts
  * const Thing = types.model({
  *   isCool: types.boolean,
  *   isAwesome: false
  * })
+ * ```
  */
 // tslint:disable-next-line:variable-name
 export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean, boolean>(
@@ -142,7 +146,6 @@ export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean, bool
 /**
  * The type of the value `null`
  *
- * @export
  * @alias types.null
  */
 export const nullType: ISimpleType<null> = new CoreType<null, null, null>(
@@ -154,7 +157,6 @@ export const nullType: ISimpleType<null> = new CoreType<null, null, null>(
 /**
  * The type of the value `undefined`
  *
- * @export
  * @alias types.undefined
  */
 export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, undefined, undefined>(
@@ -166,14 +168,15 @@ export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, und
 /**
  * Creates a type that can only contain a javascript Date value.
  *
- * @export
  * @alias types.Date
- * @example
+ * Example:
+ * ```ts
  * const LogLine = types.model({
  *   timestamp: types.Date,
  * })
  *
  * LogLine.create({ timestamp: new Date() })
+ * ```
  */
 // tslint:disable-next-line:variable-name
 export const DatePrimitive: IType<number | Date, number, Date> = new CoreType<
@@ -192,7 +195,7 @@ export const DatePrimitive: IType<number | Date, number, Date> = new CoreType<
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     switch (typeof value) {
@@ -211,10 +214,8 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
 /**
  * Returns if a given value represents a primitive type.
  *
- * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @param type
+ * @returns
  */
 export function isPrimitiveType<
     IT extends

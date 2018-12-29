@@ -17,7 +17,7 @@ import {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class Literal<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
@@ -54,17 +54,17 @@ export class Literal<T> extends Type<T, T, T> {
  * The given value must be a primitive, in order to be serialized to a snapshot correctly.
  * You can use literal to match exact strings for example the exact male or female string.
  *
- * @example
+ * Example:
+ * ```ts
  * const Person = types.model({
  *     name: types.string,
  *     gender: types.union(types.literal('male'), types.literal('female'))
  * })
+ * ```
  *
- * @export
  * @alias types.literal
- * @template S
- * @param {S} value The value to use in the strict equal check
- * @returns {ISimpleType<S>}
+ * @param value The value to use in the strict equal check
+ * @returns
  */
 export function literal<S extends Primitives>(value: S): ISimpleType<S> {
     // check that the given value is a primitive
@@ -77,10 +77,8 @@ export function literal<S extends Primitives>(value: S): ISimpleType<S> {
 /**
  * Returns if a given value represents a literal type.
  *
- * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @param type
+ * @returns
  */
 export function isLiteralType<IT extends ISimpleType<any>>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Literal) > 0

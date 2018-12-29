@@ -45,6 +45,7 @@ import {
     normalizeIdentifier
 } from "../../internal"
 
+/** @hidden */
 export interface IMSTArray<IT extends IAnyType>
     extends IObservableArray<ExtractT<IT>>,
         IStateTreeNode<ExtractC<IT>[] | undefined, ExtractS<IT>[]> {
@@ -66,13 +67,14 @@ export interface IMSTArray<IT extends IAnyType>
     unshift(...items: ExtractCST<IT>[]): number
 }
 
+/** @hidden */
 export interface IArrayType<IT extends IAnyType>
     extends IType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>>,
         OptionalProperty {}
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> extends ComplexType<
     C[] | undefined,
@@ -282,7 +284,8 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
  *
  * This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
  *
- * @example
+ * Example:
+ * ```ts
  * const Todo = types.model({
  *   task: types.string
  * })
@@ -295,11 +298,11 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
  * unprotect(s) // needed to allow modifying outside of an action
  * s.todos.push({ task: "Grab coffee" })
  * console.log(s.todos[0]) // prints: "Grab coffee"
+ * ```
  *
- * @export
  * @alias types.array
- * @param {IType<S, T>} subtype
- * @returns {IArrayType<IT>}
+ * @param subtype
+ * @returns
  */
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     if (process.env.NODE_ENV !== "production") {
@@ -381,7 +384,9 @@ function reconcileArrayChildren<T>(
     return nothingChanged ? null : oldNodes
 }
 
-// convert a value to a node at given parent and subpath. attempts to reuse old node if possible and given
+/**
+ * Convert a value to a node at given parent and subpath. Attempts to reuse old node if possible and given.
+ */
 function valueAsNode(
     childType: IAnyType,
     parent: ObjectNode,
@@ -414,7 +419,9 @@ function valueAsNode(
     return childType.instantiate(parent, subpath, parent.environment, newValue)
 }
 
-// given a value
+/**
+ * Check if a node holds a value.
+ */
 function areSame(oldNode: INode, newValue: any) {
     // the new value has the same node
     if (isStateTreeNode(newValue)) {
@@ -438,10 +445,8 @@ function areSame(oldNode: INode, newValue: any) {
 /**
  * Returns if a given value represents an array type.
  *
- * @export
- * @template Items
- * @param {IAnyType} type
- * @returns {type is IArrayType<Items>}
+ * @param type
+ * @returns `true` if the type is an array type.
  */
 export function isArrayType<Items extends IAnyType = IAnyType>(
     type: IAnyType

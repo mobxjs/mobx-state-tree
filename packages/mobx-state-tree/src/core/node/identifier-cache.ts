@@ -5,7 +5,7 @@ let identifierCacheId = 0
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class IdentifierCache {
     private cacheId = identifierCacheId++

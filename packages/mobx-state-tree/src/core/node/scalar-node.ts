@@ -12,7 +12,7 @@ import { action } from "mobx"
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class ScalarNode extends BaseNode {
     readonly hookSubscribers = {

@@ -32,7 +32,7 @@ export interface UnionOptions {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class Union extends Type<any, any, any> {
     readonly dispatcher?: ITypeDispatcher
@@ -128,17 +128,21 @@ export class Union extends Type<any, any, any> {
     }
 }
 
-// transform _NotCustomized | _NotCustomized... to _NotCustomized, _NotCustomized | A | B to A | B
+/**
+ * Transform _NotCustomized | _NotCustomized... to _NotCustomized, _NotCustomized | A | B to A | B
+ * @hidden
+ */
 export type _CustomCSProcessor<T> = Exclude<T, _NotCustomized> extends never
     ? _NotCustomized
     : Exclude<T, _NotCustomized>
 
+/** @hidden */
 export interface ITypeUnion<C, S, T>
     extends IType<
-            _CustomCSProcessor<C>,
-            _CustomCSProcessor<S>,
-            RedefineIStateTreeNode<T, IStateTreeNode<_CustomCSProcessor<C>, _CustomCSProcessor<S>>>
-        > {}
+        _CustomCSProcessor<C>,
+        _CustomCSProcessor<S>,
+        RedefineIStateTreeNode<T, IStateTreeNode<_CustomCSProcessor<C>, _CustomCSProcessor<S>>>
+    > {}
 
 // generated with C:\VSProjects\github\mobx-state-tree-upstream\packages\mobx-state-tree\scripts\generate-union-types.js
 // prettier-ignore
@@ -217,11 +221,10 @@ export function union(dispatchOrType: UnionOptions | IAnyType, ...otherTypes: IA
 /**
  * types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
  *
- * @export
  * @alias types.union
- * @param {(ITypeDispatcher | IAnyType)} optionsOrType
- * @param {...IAnyType[]} otherTypes
- * @returns {IAnyType}
+ * @param optionsOrType
+ * @param otherTypes
+ * @returns
  */
 export function union(optionsOrType: UnionOptions | IAnyType, ...otherTypes: IAnyType[]): IAnyType {
     const options = isType(optionsOrType) ? undefined : optionsOrType
@@ -249,10 +252,8 @@ export function union(optionsOrType: UnionOptions | IAnyType, ...otherTypes: IAn
 /**
  * Returns if a given value represents a union type.
  *
- * @export
- * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @param type
+ * @returns
  */
 export function isUnionType<IT extends IAnyType>(type: IT): type is IT {
     return (type.flags & TypeFlags.Union) > 0

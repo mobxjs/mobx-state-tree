@@ -23,18 +23,19 @@ import {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export type IFunctionReturn<T> = () => T
+
 /**
  * @internal
- * @private
+ * @hidden
  */
 export type IOptionalValue<C, S, T> = C | S | IFunctionReturn<C | S | T>
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class OptionalValue<C, S, T> extends Type<C, S, T> {
     readonly type: IType<C, S, T>
@@ -111,11 +112,13 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
     }
 }
 
+/** @hidden */
 export type OptionalDefaultValueOrFunction<IT extends IAnyType> =
     | ExtractC<IT>
     | ExtractS<IT>
     | (() => ExtractCST<IT>)
 
+/** @hidden */
 export interface IOptionalIType<IT extends IAnyType>
     extends IType<
             ExtractC<IT> | undefined,
@@ -133,7 +136,8 @@ export interface IOptionalIType<IT extends IAnyType>
  * If `defaultValue` is a function, the function will be invoked for every new instance.
  * Applying a snapshot in which the optional value is _not_ present, causes the value to be reset
  *
- * @example
+ * Example:
+ * ```ts
  * const Todo = types.model({
  *   title: types.optional(types.string, "Test"),
  *   done: types.optional(types.boolean, false),
@@ -142,13 +146,12 @@ export interface IOptionalIType<IT extends IAnyType>
  *
  * // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
  * const todo = Todo.create({ title: "Get coffee "})
+ * ```
  *
- * @export
  * @alias types.optional
- * @template IT
- * @param {IT} type
- * @param {OptionalDefaultValueOrFunction<IT>} defaultValueOrFunction
- * @returns {IT extends OptionalProperty ? IT : IOptionalIType<IT>}
+ * @param type
+ * @param defaultValueOrFunction
+ * @returns
  */
 export function optional<IT extends IAnyType>(
     type: IT,
@@ -181,10 +184,9 @@ export function optional<IT extends IAnyType>(
 /**
  * Returns if a value represents an optional type.
  *
- * @export
  * @template IT
- * @param {IT} type
- * @returns {type is IT}
+ * @param type
+ * @returns
  */
 export function isOptionalType<IT extends IType<any | undefined, any, any> & OptionalProperty>(
     type: IT

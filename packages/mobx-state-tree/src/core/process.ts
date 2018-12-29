@@ -14,35 +14,62 @@ const DEPRECATION_MESSAGE =
     "See https://github.com/mobxjs/mobx-state-tree/issues/399 for more information. " +
     "Note that the middleware event types starting with `process` now start with `flow`."
 
-/** @deprecated has been renamed to `flow()`. */
+/**
+ * @deprecated has been renamed to `flow()`.
+ * @hidden
+ */
 export function process<R>(generator: () => IterableIterator<any>): () => Promise<R>
-/** @deprecated has been renamed to `flow()`. */
+/**
+ * @deprecated has been renamed to `flow()`.
+ * @hidden
+ */
 export function process<A1>(generator: (a1: A1) => IterableIterator<any>): (a1: A1) => Promise<any>
-/** @deprecated has been renamed to `flow()`. */
+/**
+ * @deprecated has been renamed to `flow()`.
+ * @hidden
+ */
 export function process<A1, A2>(
     generator: (a1: A1, a2: A2) => IterableIterator<any>
 ): (a1: A1, a2: A2) => Promise<any>
-/** @deprecated has been renamed to `flow()`. */
+/**
+ * @deprecated has been renamed to `flow()`.
+ * @hidden
+ */
 export function process<A1, A2, A3>(
     generator: (a1: A1, a2: A2, a3: A3) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3) => Promise<any>
-/** @deprecated has been renamed to `flow()`. */
+/**
+ * @deprecated has been renamed to `flow()`.
+ * @hidden
+ */
 export function process<A1, A2, A3, A4>(
     generator: (a1: A1, a2: A2, a3: A3, a4: A4) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4) => Promise<any>
-/** @deprecated has been renamed to `flow()`. */
+/**
+ * @deprecated has been renamed to `flow()`.
+ * @hidden
+ */
 export function process<A1, A2, A3, A4, A5>(
     generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => Promise<any>
-/** @deprecated has been renamed to `flow()`. */
+/**
+ * @deprecated has been renamed to `flow()`.
+ * @hidden
+ */
 export function process<A1, A2, A3, A4, A5, A6>(
     generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => Promise<any>
-/** @deprecated has been renamed to `flow()`. */
+/**
+ * @deprecated has been renamed to `flow()`.
+ * @hidden
+ */
 export function process<A1, A2, A3, A4, A5, A6, A7>(
     generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => Promise<any>
-/** @deprecated has been renamed to `flow()`. */
+/**
+ * @deprecated has been renamed to `flow()`.
+ * @hidden
+ */
 export function process<A1, A2, A3, A4, A5, A6, A7, A8>(
     generator: (
         a1: A1,
@@ -60,7 +87,7 @@ export function process<A1, A2, A3, A4, A5, A6, A7, A8>(
  * See https://github.com/mobxjs/mobx-state-tree/issues/399 for more information.
  * Note that the middleware event types starting with `process` now start with `flow`.
  *
- * @export
+ * @hidden
  * @alias process
  * @returns {Promise}
  */
@@ -71,7 +98,7 @@ export function process(asyncAction: any): any {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export function createProcessSpawner(name: string, generator: Function) {
     deprecated(

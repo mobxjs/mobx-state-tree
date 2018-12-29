@@ -1,6 +1,6 @@
 /**
  * @internal
- * @private
+ * @hidden
  */
 export enum Hook {
     afterCreate = "afterCreate",

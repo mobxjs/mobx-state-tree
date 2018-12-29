@@ -19,7 +19,7 @@ import {
 
 /**
  * @internal
- * @private
+ * @hidden
  */
 export class Frozen<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
@@ -70,7 +70,8 @@ export function frozen<T = any>(): IType<T, T, T> // do not assume undefined by 
  * 2. `types.frozen({ someDefaultValue: true})` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
  * 3. `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
  *
- * @example
+ * Example:
+ * ```ts
  * const GameCharacter = types.model({
  *   name: string,
  *   location: types.frozen({ x: 0, y: 0})
@@ -83,16 +84,18 @@ export function frozen<T = any>(): IType<T, T, T> // do not assume undefined by 
  *
  * hero.location = { x: 10, y: 2 } // OK
  * hero.location.x = 7 // Not ok!
+ * ```
  *
- * @example
+ * ```ts
  * type Point = { x: number, y: number }
  *    const Mouse = types.model({
  *         loc: types.frozen<Point>()
  *    })
+ * ```
  *
  * @alias types.frozen
- * @param {Type|value} defaultValueOrType
- * @returns {Type}
+ * @param defaultValueOrType
+ * @returns
  */
 export function frozen(arg?: any): any {
     if (arguments.length === 0) return untypedFrozenInstance
@@ -103,11 +106,8 @@ export function frozen(arg?: any): any {
 /**
  * Returns if a given value represents a frozen type.
  *
- * @export
- * @template IT
- * @template T
- * @param {IT} type
- * @returns {type is IT}
+ * @param type
+ * @returns
  */
 export function isFrozenType<IT extends IType<T | any, T, T>, T = any>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Frozen) > 0
