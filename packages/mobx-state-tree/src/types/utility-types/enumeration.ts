@@ -15,7 +15,7 @@ export function enumeration<T extends string>(
 ): ISimpleType<UnionStringArray<T[]>>
 
 /**
- * Can be used to create an string based enumeration.
+ * `types.enumeration` - Can be used to create an string based enumeration.
  * (note: this methods is just sugar for a union of string literals)
  *
  * Example:
@@ -25,7 +25,6 @@ export function enumeration<T extends string>(
  * })
  * ```
  *
- * @alias types.enumeration
  * @param name descriptive name of the enumeration (optional)
  * @param options possible values this enumeration can have
  * @returns

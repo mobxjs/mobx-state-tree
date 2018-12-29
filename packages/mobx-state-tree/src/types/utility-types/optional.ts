@@ -131,7 +131,7 @@ export interface IOptionalIType<IT extends IAnyType>
         OptionalProperty {}
 
 /**
- * `types.optional` can be used to create a property with a default value.
+ * `types.optional` - Can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
  * If `defaultValue` is a function, the function will be invoked for every new instance.
  * Applying a snapshot in which the optional value is _not_ present, causes the value to be reset
@@ -148,7 +148,6 @@ export interface IOptionalIType<IT extends IAnyType>
  * const todo = Todo.create({ title: "Get coffee "})
  * ```
  *
- * @alias types.optional
  * @param type
  * @param defaultValueOrFunction
  * @returns

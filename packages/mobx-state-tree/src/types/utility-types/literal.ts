@@ -50,7 +50,7 @@ export class Literal<T> extends Type<T, T, T> {
 }
 
 /**
- * The literal type will return a type that will match only the exact given type.
+ * `types.literal` - The literal type will return a type that will match only the exact given type.
  * The given value must be a primitive, in order to be serialized to a snapshot correctly.
  * You can use literal to match exact strings for example the exact male or female string.
  *
@@ -62,7 +62,6 @@ export class Literal<T> extends Type<T, T, T> {
  * })
  * ```
  *
- * @alias types.literal
  * @param value The value to use in the strict equal check
  * @returns
  */

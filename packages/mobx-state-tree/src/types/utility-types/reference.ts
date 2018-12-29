@@ -472,10 +472,8 @@ export interface IReferenceType<IT extends IAnyComplexType>
     > {}
 
 /**
- * Creates a reference to another type, which should have defined an identifier.
+ * `types.reference` - Creates a reference to another type, which should have defined an identifier.
  * See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
- *
- * @alias types.reference
  */
 export function reference<IT extends IAnyComplexType>(
     subType: IT,
@@ -527,13 +525,12 @@ export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type 
 }
 
 /**
- * A safe reference is like a standard reference, except that it accepts the undefined value by default
+ * `types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default
  * and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
  * when the reference it is pointing to gets detached/destroyed.
  *
  * Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `onInvalidate` option.
  *
- * @alias types.safeReference
  * @param subType
  * @param options
  * @returns

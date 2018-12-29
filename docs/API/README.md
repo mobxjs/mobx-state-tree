@@ -387,8 +387,9 @@ ___
     (v: number | Date) => (v instanceof Date ? v : new Date(v))
 )
 
-Creates a type that can only contain a javascript Date value.
-*__alias__*: types.Date Example:
+`types.Date` - Creates a type that can only contain a javascript Date value.
+
+Example:
 
 ```ts
 const LogLine = types.model({
@@ -409,8 +410,9 @@ ___
     (v: any) => typeof v === "boolean"
 )
 
-Creates a type that can only contain a boolean value. This type is used for boolean values by default
-*__alias__*: types.boolean Example:
+`types.boolean` - Creates a type that can only contain a boolean value. This type is used for boolean values by default
+
+Example:
 
 ```ts
 const Thing = types.model({
@@ -426,7 +428,7 @@ ___
 
 **● identifier**: *[ISimpleType](interfaces/isimpletype.md)<`string`>* =  new IdentifierType()
 
-Identifiers are used to make references, lifecycle events and reconciling works. Inside a state tree, for each type can exist only one instance for each given identifier. For example there couldn't be 2 instances of user with id 1. If you need more, consider using references. Identifier can be used only as type property of a model. This type accepts as parameter the value type of the identifier field that can be either string or number.
+`types.identifier` - Identifiers are used to make references, lifecycle events and reconciling works. Inside a state tree, for each type can exist only one instance for each given identifier. For example there couldn't be 2 instances of user with id 1. If you need more, consider using references. Identifier can be used only as type property of a model. This type accepts as parameter the value type of the identifier field that can be either string or number.
 
 Example:
 
@@ -436,8 +438,6 @@ Example:
      title: types.string
  })
 ```
-*__alias__*: types.identifier
-
 *__returns__*: 
 
 ___
@@ -447,7 +447,7 @@ ___
 
 **● identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)<`number`>* =  new IdentifierNumberType() as any
 
-Similar to `types.identifier`, but `identifierNumber` will serialize from / to a number when applying snapshots
+`types.identifierNumber` - Similar to `types.identifier`. This one will serialize from / to a number when applying snapshots
 
 Example:
 
@@ -457,8 +457,6 @@ Example:
      title: types.string
  })
 ```
-*__alias__*: types.identifierNumber
-
 *__returns__*: 
 
 ___
@@ -472,8 +470,9 @@ ___
     (v: any) => isInteger(v)
 )
 
-Creates a type that can only contain an integer value. This type is used for integer values by default
-*__alias__*: types.integer Example:
+`types.integer` - Creates a type that can only contain an integer value. This type is used for integer values by default
+
+Example:
 
 ```ts
 const Size = types.model({
@@ -493,8 +492,7 @@ ___
     (v: any) => v === null
 )
 
-The type of the value `null`
-*__alias__*: types.null
+`types.null` - The type of the value `null`
 
 ___
 <a id="number"></a>
@@ -507,8 +505,9 @@ ___
     (v: any) => typeof v === "number"
 )
 
-Creates a type that can only contain a numeric value. This type is used for numeric values by default
-*__alias__*: types.number Example:
+`types.number` - Creates a type that can only contain a numeric value. This type is used for numeric values by default
+
+Example:
 
 ```ts
 const Vector = types.model({
@@ -528,8 +527,9 @@ ___
     (v: any) => typeof v === "string"
 )
 
-Creates a type that can only contain a string value. This type is used for string values by default
-*__alias__*: types.string Example:
+`types.string` - Creates a type that can only contain a string value. This type is used for string values by default
+
+Example:
 
 ```ts
 const Person = types.model({
@@ -549,8 +549,7 @@ ___
     (v: any) => v === undefined
 )
 
-The type of the value `undefined`
-*__alias__*: types.undefined
+`types.undefined` - The type of the value `undefined`
 
 ___
 
@@ -682,7 +681,7 @@ ___
 
 ▸ **array**<`IT`>(subtype: *`IT`*): `IArrayType`<`IT`>
 
-Creates an index based collection type who's children are all of a uniform declared type.
+`types.array` - Creates an index based collection type who's children are all of a uniform declared type.
 
 This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
 
@@ -702,7 +701,6 @@ unprotect(s) // needed to allow modifying outside of an action
 s.todos.push({ task: "Grab coffee" })
 console.log(s.todos[0]) // prints: "Grab coffee"
 ```
-*__alias__*: types.array
 
 **Type parameters:**
 
@@ -996,7 +994,7 @@ ___
 
 ▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`,`PI`,`OI`,`FCI`,`FSI`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*, I: *[IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH` & `PI`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH` & `OI`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `_CustomJoin`<`FCH`, `FCI`>>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `_CustomJoin`<`FSH`, `FSI`>>>>>>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1018,7 +1016,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB`, `OA` & `OB`, `_CustomJoin`<`FCA`, `FCB`>, `_CustomJoin`<`FSA`, `FSB`>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1039,7 +1037,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB`, `OA` & `OB`, `_CustomJoin`<`FCA`, `FCB`>, `_CustomJoin`<`FSA`, `FSB`>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1066,7 +1064,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC`, `OA` & `OB` & `OC`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `FCC`>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `FSC`>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1092,7 +1090,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC`, `OA` & `OB` & `OC`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `FCC`>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `FSC`>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1124,7 +1122,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD`, `OA` & `OB` & `OC` & `OD`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `FCD`>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `FSD`>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1155,7 +1153,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD`, `OA` & `OB` & `OC` & `OD`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `FCD`>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `FSD`>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1192,7 +1190,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE`, `OA` & `OB` & `OC` & `OD` & `OE`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `FCE`>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `FSE`>>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1228,7 +1226,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE`, `OA` & `OB` & `OC` & `OD` & `OE`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `FCE`>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `FSE`>>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1270,7 +1268,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `FCF`>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `FSF`>>>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1311,7 +1309,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `FCF`>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `FSF`>>>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1358,7 +1356,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `FCG`>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `FSG`>>>>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1404,7 +1402,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `FCG`>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `FSG`>>>>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1456,7 +1454,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `FCH`>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `FSH`>>>>>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1507,7 +1505,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `FCH`>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `FSH`>>>>>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1564,7 +1562,7 @@ Composes a new model from one or more existing model types. This method can be i
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH` & `PI`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH` & `OI`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `_CustomJoin`<`FCH`, `FCI`>>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `_CustomJoin`<`FSH`, `FSI`>>>>>>>>>
 
-Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
 
 **Type parameters:**
 
@@ -1651,7 +1649,7 @@ ___
 
 ▸ **custom**<`S`,`T`>(options: *[CustomTypeOptions](interfaces/customtypeoptions.md)<`S`, `T`>*): [IType](interfaces/itype.md)<`S` | `T`, `S`, `T`>
 
-Creates a custom type. Custom types can be used for arbitrary immutable values, that have a serializable representation. For example, to create your own Date representation, Decimal type etc.
+`types.custom` - Creates a custom type. Custom types can be used for arbitrary immutable values, that have a serializable representation. For example, to create your own Date representation, Decimal type etc.
 
 The signature of the options is:
 
@@ -1694,7 +1692,6 @@ const Wallet = types.model({
     balance: DecimalPrimitive
 })
 ```
-*__alias__*: types.custom
 
 **Type parameters:**
 
@@ -1792,7 +1789,7 @@ ___
 
 ▸ **enumeration**<`T`>(name: *`string`*, options: *`T`[]*): [ISimpleType](interfaces/isimpletype.md)<`UnionStringArray`<`T`[]>>
 
-Can be used to create an string based enumeration. (note: this methods is just sugar for a union of string literals)
+`types.enumeration` - Can be used to create an string based enumeration. (note: this methods is just sugar for a union of string literals)
 
 Example:
 
@@ -1813,7 +1810,7 @@ const TrafficLight = types.model({
 
 **Returns:** [ISimpleType](interfaces/isimpletype.md)<`UnionStringArray`<`T`[]>>
 
-Can be used to create an string based enumeration. (note: this methods is just sugar for a union of string literals)
+`types.enumeration` - Can be used to create an string based enumeration. (note: this methods is just sugar for a union of string literals)
 
 Example:
 
@@ -1887,7 +1884,7 @@ ___
 
 ▸ **frozen**<`T`>(): [IType](interfaces/itype.md)<`T`, `T`, `T`>
 
-Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
+`types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
 
 This is useful to store complex, but immutable values like vectors etc. It can form a powerful bridge to parts of your application that should be immutable, or that assume data to be immutable.
 
@@ -1934,7 +1931,7 @@ type Point = { x: number, y: number }
 
 **Returns:** [IType](interfaces/itype.md)<`C`, `C`, `C`>
 
-Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
+`types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
 
 This is useful to store complex, but immutable values like vectors etc. It can form a powerful bridge to parts of your application that should be immutable, or that assume data to be immutable.
 
@@ -1981,7 +1978,7 @@ type Point = { x: number, y: number }
 
 **Returns:** [IType](interfaces/itype.md)<`T` | `undefined` | `null`, `T`, `T`> & `OptionalProperty`
 
-Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
+`types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
 
 This is useful to store complex, but immutable values like vectors etc. It can form a powerful bridge to parts of your application that should be immutable, or that assume data to be immutable.
 
@@ -2713,7 +2710,7 @@ ___
 
 ▸ **late**<`T`>(name: *`string`*, type: *`function`*): `T`
 
-Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies. Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them. You need to declare an interface to explicit the return type of the late parameter function.
+`types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies. Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them. You need to declare an interface to explicit the return type of the late parameter function.
 
 Example:
 
@@ -2739,7 +2736,7 @@ Example:
 
 **Returns:** `T`
 
-Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies. Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them. You need to declare an interface to explicit the return type of the late parameter function.
+`types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies. Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them. You need to declare an interface to explicit the return type of the late parameter function.
 
 Example:
 
@@ -2773,7 +2770,7 @@ ___
 
 ▸ **literal**<`S`>(value: *`S`*): [ISimpleType](interfaces/isimpletype.md)<`S`>
 
-The literal type will return a type that will match only the exact given type. The given value must be a primitive, in order to be serialized to a snapshot correctly. You can use literal to match exact strings for example the exact male or female string.
+`types.literal` - The literal type will return a type that will match only the exact given type. The given value must be a primitive, in order to be serialized to a snapshot correctly. You can use literal to match exact strings for example the exact male or female string.
 
 Example:
 
@@ -2783,7 +2780,6 @@ const Person = types.model({
     gender: types.union(types.literal('male'), types.literal('female'))
 })
 ```
-*__alias__*: types.literal
 
 **Type parameters:**
 
@@ -2803,7 +2799,7 @@ ___
 
 ▸ **map**<`IT`>(subtype: *`IT`*): `IMapType`<`IT`>
 
-Creates a key based collection type who's children are all of a uniform declared type. If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
+`types.map` - Creates a key based collection type who's children are all of a uniform declared type. If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
 
 This type will always produce [observable maps](https://mobx.js.org/refguide/map.html)
 
@@ -2825,7 +2821,6 @@ s.todos.set(17, { task: "Grab coffee", id: 17 })
 s.todos.put({ task: "Grab cookie", id: 18 }) // put will infer key from the identifier
 console.log(s.todos.get(17).task) // prints: "Grab coffee"
 ```
-*__alias__*: types.map
 
 **Type parameters:**
 
@@ -2845,8 +2840,7 @@ ___
 
 ▸ **maybe**<`IT`>(type: *`IT`*): `IMaybe`<`IT`>
 
-Maybe will make a type nullable, and also optional. The value `undefined` will be used to represent nullability.
-*__alias__*: types.maybe
+`types.maybe` - Maybe will make a type nullable, and also optional. The value `undefined` will be used to represent nullability.
 
 **Type parameters:**
 
@@ -2866,8 +2860,7 @@ ___
 
 ▸ **maybeNull**<`IT`>(type: *`IT`*): `IMaybeNull`<`IT`>
 
-Maybe will make a type nullable, and also optional. The value `null` will be used to represent no value.
-*__alias__*: types.maybeNull
+`types.maybeNull` - Maybe will make a type nullable, and also optional. The value `null` will be used to represent no value.
 
 **Type parameters:**
 
@@ -2889,7 +2882,7 @@ ___
 
 ▸ **model**<`P`>(properties?: *[P]()*): [IModelType](interfaces/imodeltype.md)<`ModelPropertiesDeclarationToProperties`<`P`>, `__type`>
 
-Creates a new model type by providing a name, properties, volatile state and actions.
+`types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
 
 See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
 
@@ -2905,7 +2898,7 @@ See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) 
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`ModelPropertiesDeclarationToProperties`<`P`>, `__type`>
 
-Creates a new model type by providing a name, properties, volatile state and actions.
+`types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
 
 See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
 
@@ -3013,7 +3006,7 @@ ___
 
 ▸ **optional**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IT extends OptionalProperty ? IT : IOptionalIType<IT>`
 
-`types.optional` can be used to create a property with a default value. If the given value is not provided in the snapshot, it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is _not_ present, causes the value to be reset
+`types.optional` - Can be used to create a property with a default value. If the given value is not provided in the snapshot, it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is _not_ present, causes the value to be reset
 
 Example:
 
@@ -3027,7 +3020,6 @@ const Todo = types.model({
 // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
 const todo = Todo.create({ title: "Get coffee "})
 ```
-*__alias__*: types.optional
 
 **Type parameters:**
 
@@ -3132,8 +3124,7 @@ ___
 
 ▸ **reference**<`IT`>(subType: *`IT`*, options?: *[ReferenceOptions](#referenceoptions)<`IT`>*): `IReferenceType`<`IT`>
 
-Creates a reference to another type, which should have defined an identifier. See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
-*__alias__*: types.reference
+`types.reference` - Creates a reference to another type, which should have defined an identifier. See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
 
 **Type parameters:**
 
@@ -3156,7 +3147,7 @@ ___
 
 ▸ **refinement**<`IT`>(type: *`IT`*, predicate: *`function`*, message?: *`string` | `function`*): `IT`
 
-`types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
+`types.refinement` - Creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 
 **Type parameters:**
 
@@ -3172,7 +3163,7 @@ ___
 
 **Returns:** `IT`
 
-`types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
+`types.refinement` - Creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 
 **Type parameters:**
 
@@ -3234,10 +3225,9 @@ ___
 
 ▸ **safeReference**<`IT`>(subType: *`IT`*, options?: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`>*): `IMaybe`<`IReferenceType`<`IT`>>
 
-A safe reference is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed.
+`types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed.
 
 Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `onInvalidate` option.
-*__alias__*: types.safeReference
 
 **Type parameters:**
 
@@ -3437,7 +3427,7 @@ ___
 
 ▸ **union**(dispatchOrType: *[UnionOptions](interfaces/unionoptions.md) | [IAnyType](#ianytype)*, ...otherTypes: *[IAnyType](#ianytype)[]*): [IAnyType](#ianytype)
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3458,7 +3448,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3480,7 +3470,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3506,7 +3496,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3533,7 +3523,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3564,7 +3554,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3596,7 +3586,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3632,7 +3622,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`> | `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`> | `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> | `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3669,7 +3659,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`> | `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`> | `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> | `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3710,7 +3700,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`> | `ModelCreationType2`<`PE`, `FCE`> | `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`> | `ModelSnapshotType2`<`PE`, `FSE`> | `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> | `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> | `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3752,7 +3742,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`> | `ModelCreationType2`<`PE`, `FCE`> | `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`> | `ModelSnapshotType2`<`PE`, `FSE`> | `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> | `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> | `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3798,7 +3788,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`> | `ModelCreationType2`<`PE`, `FCE`> | `ModelCreationType2`<`PF`, `FCF`> | `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`> | `ModelSnapshotType2`<`PE`, `FSE`> | `ModelSnapshotType2`<`PF`, `FSF`> | `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> | `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> | `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> | `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3845,7 +3835,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`> | `ModelCreationType2`<`PE`, `FCE`> | `ModelCreationType2`<`PF`, `FCF`> | `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`> | `ModelSnapshotType2`<`PE`, `FSE`> | `ModelSnapshotType2`<`PF`, `FSF`> | `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> | `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> | `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> | `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3896,7 +3886,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`> | `ModelCreationType2`<`PE`, `FCE`> | `ModelCreationType2`<`PF`, `FCF`> | `ModelCreationType2`<`PG`, `FCG`> | `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`> | `ModelSnapshotType2`<`PE`, `FSE`> | `ModelSnapshotType2`<`PF`, `FSF`> | `ModelSnapshotType2`<`PG`, `FSG`> | `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> | `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> | `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> | `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> | `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -3948,7 +3938,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`> | `ModelCreationType2`<`PE`, `FCE`> | `ModelCreationType2`<`PF`, `FCF`> | `ModelCreationType2`<`PG`, `FCG`> | `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`> | `ModelSnapshotType2`<`PE`, `FSE`> | `ModelSnapshotType2`<`PF`, `FSF`> | `ModelSnapshotType2`<`PG`, `FSG`> | `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> | `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> | `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> | `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> | `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4004,7 +3994,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`> | `ModelCreationType2`<`PE`, `FCE`> | `ModelCreationType2`<`PF`, `FCF`> | `ModelCreationType2`<`PG`, `FCG`> | `ModelCreationType2`<`PH`, `FCH`> | `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`> | `ModelSnapshotType2`<`PE`, `FSE`> | `ModelSnapshotType2`<`PF`, `FSF`> | `ModelSnapshotType2`<`PG`, `FSG`> | `ModelSnapshotType2`<`PH`, `FSH`> | `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> | `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> | `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> | `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> | `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`> | `ModelInstanceType`<`PI`, `OI`, `FCI`, `FSI`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4061,7 +4051,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> | `ModelCreationType2`<`PB`, `FCB`> | `ModelCreationType2`<`PC`, `FCC`> | `ModelCreationType2`<`PD`, `FCD`> | `ModelCreationType2`<`PE`, `FCE`> | `ModelCreationType2`<`PF`, `FCF`> | `ModelCreationType2`<`PG`, `FCG`> | `ModelCreationType2`<`PH`, `FCH`> | `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> | `ModelSnapshotType2`<`PB`, `FSB`> | `ModelSnapshotType2`<`PC`, `FSC`> | `ModelSnapshotType2`<`PD`, `FSD`> | `ModelSnapshotType2`<`PE`, `FSE`> | `ModelSnapshotType2`<`PF`, `FSF`> | `ModelSnapshotType2`<`PG`, `FSG`> | `ModelSnapshotType2`<`PH`, `FSH`> | `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> | `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> | `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> | `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> | `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> | `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> | `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> | `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`> | `ModelInstanceType`<`PI`, `OI`, `FCI`, `FSI`>>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4080,7 +4070,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB`, `SA` | `SB`, `TA` | `TB`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4100,7 +4090,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB`, `SA` | `SB`, `TA` | `TB`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4123,7 +4113,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC`, `SA` | `SB` | `SC`, `TA` | `TB` | `TC`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4147,7 +4137,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC`, `SA` | `SB` | `SC`, `TA` | `TB` | `TC`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4174,7 +4164,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD`, `SA` | `SB` | `SC` | `SD`, `TA` | `TB` | `TC` | `TD`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4202,7 +4192,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD`, `SA` | `SB` | `SC` | `SD`, `TA` | `TB` | `TC` | `TD`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4233,7 +4223,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD` | `CE`, `SA` | `SB` | `SC` | `SD` | `SE`, `TA` | `TB` | `TC` | `TD` | `TE`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4265,7 +4255,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD` | `CE`, `SA` | `SB` | `SC` | `SD` | `SE`, `TA` | `TB` | `TC` | `TD` | `TE`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4300,7 +4290,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD` | `CE` | `CF`, `SA` | `SB` | `SC` | `SD` | `SE` | `SF`, `TA` | `TB` | `TC` | `TD` | `TE` | `TF`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4336,7 +4326,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD` | `CE` | `CF`, `SA` | `SB` | `SC` | `SD` | `SE` | `SF`, `TA` | `TB` | `TC` | `TD` | `TE` | `TF`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4375,7 +4365,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD` | `CE` | `CF` | `CG`, `SA` | `SB` | `SC` | `SD` | `SE` | `SF` | `SG`, `TA` | `TB` | `TC` | `TD` | `TE` | `TF` | `TG`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4415,7 +4405,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD` | `CE` | `CF` | `CG`, `SA` | `SB` | `SC` | `SD` | `SE` | `SF` | `SG`, `TA` | `TB` | `TC` | `TD` | `TE` | `TF` | `TG`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4458,7 +4448,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD` | `CE` | `CF` | `CG` | `CH`, `SA` | `SB` | `SC` | `SD` | `SE` | `SF` | `SG` | `SH`, `TA` | `TB` | `TC` | `TD` | `TE` | `TF` | `TG` | `TH`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4502,7 +4492,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD` | `CE` | `CF` | `CG` | `CH`, `SA` | `SB` | `SC` | `SD` | `SE` | `SF` | `SG` | `SH`, `TA` | `TB` | `TC` | `TD` | `TE` | `TF` | `TG` | `TH`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4549,7 +4539,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD` | `CE` | `CF` | `CG` | `CH` | `CI`, `SA` | `SB` | `SC` | `SD` | `SE` | `SF` | `SG` | `SH` | `SI`, `TA` | `TB` | `TC` | `TD` | `TE` | `TF` | `TG` | `TH` | `TI`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
@@ -4597,7 +4587,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** `ITypeUnion`<`CA` | `CB` | `CC` | `CD` | `CE` | `CF` | `CG` | `CH` | `CI`, `SA` | `SB` | `SC` | `SD` | `SE` | `SF` | `SG` | `SH` | `SI`, `TA` | `TB` | `TC` | `TD` | `TE` | `TF` | `TG` | `TH` | `TI`>
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Parameters:**
 
@@ -4607,7 +4597,7 @@ types.union(dispatcher?, types...) create a union of multiple types. If the corr
 
 **Returns:** [IAnyType](#ianytype)
 
-types.union(dispatcher?, types...) create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form (snapshot) => Type.
+`types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Parameters:**
 

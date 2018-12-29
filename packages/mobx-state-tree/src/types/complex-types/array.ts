@@ -280,7 +280,7 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
 }
 
 /**
- * Creates an index based collection type who's children are all of a uniform declared type.
+ * `types.array` - Creates an index based collection type who's children are all of a uniform declared type.
  *
  * This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
  *
@@ -300,7 +300,6 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
  * console.log(s.todos[0]) // prints: "Grab coffee"
  * ```
  *
- * @alias types.array
  * @param subtype
  * @returns
  */

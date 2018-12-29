@@ -64,10 +64,9 @@ export class CoreType<C, S, T> extends Type<C, S, T> {
 }
 
 /**
- * Creates a type that can only contain a string value.
+ * `types.string` - Creates a type that can only contain a string value.
  * This type is used for string values by default
  *
- * @alias types.string
  * Example:
  * ```ts
  * const Person = types.model({
@@ -84,10 +83,9 @@ export const string: ISimpleType<string> = new CoreType<string, string, string>(
 )
 
 /**
- * Creates a type that can only contain a numeric value.
+ * `types.number` - Creates a type that can only contain a numeric value.
  * This type is used for numeric values by default
  *
- * @alias types.number
  * Example:
  * ```ts
  * const Vector = types.model({
@@ -104,10 +102,9 @@ export const number: ISimpleType<number> = new CoreType<number, number, number>(
 )
 
 /**
- * Creates a type that can only contain an integer value.
+ * `types.integer` - Creates a type that can only contain an integer value.
  * This type is used for integer values by default
  *
- * @alias types.integer
  * Example:
  * ```ts
  * const Size = types.model({
@@ -124,10 +121,9 @@ export const integer: ISimpleType<number> = new CoreType<number, number, number>
 )
 
 /**
- * Creates a type that can only contain a boolean value.
+ * `types.boolean` - Creates a type that can only contain a boolean value.
  * This type is used for boolean values by default
  *
- * @alias types.boolean
  * Example:
  * ```ts
  * const Thing = types.model({
@@ -144,9 +140,7 @@ export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean, bool
 )
 
 /**
- * The type of the value `null`
- *
- * @alias types.null
+ * `types.null` - The type of the value `null`
  */
 export const nullType: ISimpleType<null> = new CoreType<null, null, null>(
     "null",
@@ -155,9 +149,7 @@ export const nullType: ISimpleType<null> = new CoreType<null, null, null>(
 )
 
 /**
- * The type of the value `undefined`
- *
- * @alias types.undefined
+ * `types.undefined` - The type of the value `undefined`
  */
 export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, undefined, undefined>(
     "undefined",
@@ -166,9 +158,8 @@ export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, und
 )
 
 /**
- * Creates a type that can only contain a javascript Date value.
+ * `types.Date` - Creates a type that can only contain a javascript Date value.
  *
- * @alias types.Date
  * Example:
  * ```ts
  * const LogLine = types.model({

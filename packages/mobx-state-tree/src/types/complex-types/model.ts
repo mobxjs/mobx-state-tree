@@ -734,11 +734,9 @@ export function model<P extends ModelPropertiesDeclaration = {}>(
     properties?: P
 ): IModelType<ModelPropertiesDeclarationToProperties<P>, {}>
 /**
- * Creates a new model type by providing a name, properties, volatile state and actions.
+ * `types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
  *
  * See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
- *
- * @alias types.model
  */
 export function model(...args: any[]): any {
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
@@ -796,13 +794,11 @@ export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends Mod
     extends ModelProperties, OF, FCF, FSF, PG extends ModelProperties, OG, FCG, FSG, PH extends ModelProperties, OH, FCH, FSH, PI extends ModelProperties, OI, FCI, FSI>(A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>, G: IModelType<PG, OG, FCG, FSG>, H: IModelType<PH, OH, FCH, FSH>, I: IModelType<PI, OI, FCI, FSI>): IModelType<PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, _CustomJoin<FCH, FCI>>>>>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, _CustomJoin<FSH, FSI>>>>>>>>>
 
 /**
- * Composes a new model from one or more existing model types.
+ * `types.compose` - Composes a new model from one or more existing model types.
  * This method can be invoked in two forms:
  * Given 2 or more model types, the types are composed into a new Type.
  * Given first parameter as a string and 2 or more model types,
  * the types are composed into a new Type with the given name
- *
- * @alias types.compose
  */
 export function compose(...args: any[]): any {
     // TODO: just join the base type names if no name is provided

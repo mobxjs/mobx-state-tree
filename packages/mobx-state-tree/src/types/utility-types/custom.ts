@@ -28,7 +28,7 @@ export interface CustomTypeOptions<S, T> {
 }
 
 /**
- * Creates a custom type. Custom types can be used for arbitrary immutable values, that have a serializable representation. For example, to create your own Date representation, Decimal type etc.
+ * `types.custom` - Creates a custom type. Custom types can be used for arbitrary immutable values, that have a serializable representation. For example, to create your own Date representation, Decimal type etc.
  *
  * The signature of the options is:
  * ```ts
@@ -70,7 +70,6 @@ export interface CustomTypeOptions<S, T> {
  * })
  * ```
  *
- * @alias types.custom
  * @param options
  * @returns
  */

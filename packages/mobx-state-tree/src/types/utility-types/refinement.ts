@@ -85,9 +85,8 @@ export function refinement<IT extends IAnyType>(
 ): IT
 
 /**
- * `types.refinement(baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
+ * `types.refinement` - Creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
  *
- * @alias types.refinement
  * @param name
  * @param type
  * @param predicate

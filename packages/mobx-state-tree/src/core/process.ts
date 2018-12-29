@@ -83,12 +83,12 @@ export function process<A1, A2, A3, A4, A5, A6, A7, A8>(
     ) => IterableIterator<any>
 ): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7, a8: A8) => Promise<any>
 /**
+ * @hidden
+ *
  * @deprecated has been renamed to `flow()`.
  * See https://github.com/mobxjs/mobx-state-tree/issues/399 for more information.
  * Note that the middleware event types starting with `process` now start with `flow`.
  *
- * @hidden
- * @alias process
  * @returns {Promise}
  */
 export function process(asyncAction: any): any {

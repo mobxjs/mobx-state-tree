@@ -108,7 +108,7 @@ export class IdentifierNumberType extends IdentifierType {
 }
 
 /**
- * Identifiers are used to make references, lifecycle events and reconciling works.
+ * `types.identifier` - Identifiers are used to make references, lifecycle events and reconciling works.
  * Inside a state tree, for each type can exist only one instance for each given identifier.
  * For example there couldn't be 2 instances of user with id 1. If you need more, consider using references.
  * Identifier can be used only as type property of a model.
@@ -122,13 +122,12 @@ export class IdentifierNumberType extends IdentifierType {
  *  })
  * ```
  *
- * @alias types.identifier
  * @returns
  */
 export const identifier: ISimpleType<string> = new IdentifierType()
 
 /**
- * Similar to `types.identifier`, but `identifierNumber` will serialize from / to a number when applying snapshots
+ * `types.identifierNumber` - Similar to `types.identifier`. This one will serialize from / to a number when applying snapshots
  *
  * Example:
  * ```ts
@@ -138,7 +137,6 @@ export const identifier: ISimpleType<string> = new IdentifierType()
  *  })
  * ```
  *
- * @alias types.identifierNumber
  * @returns
  */
 export const identifierNumber: ISimpleType<number> = new IdentifierNumberType() as any

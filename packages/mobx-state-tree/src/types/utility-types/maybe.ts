@@ -38,10 +38,9 @@ export interface IMaybe<IT extends IAnyType> extends IMaybeIType<IT, undefined, 
 export interface IMaybeNull<IT extends IAnyType> extends IMaybeIType<IT, null | undefined, null> {}
 
 /**
- * Maybe will make a type nullable, and also optional.
+ * `types.maybe` - Maybe will make a type nullable, and also optional.
  * The value `undefined` will be used to represent nullability.
  *
- * @alias types.maybe
  * @param type
  * @returns
  */
@@ -52,10 +51,9 @@ export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
 }
 
 /**
- * Maybe will make a type nullable, and also optional.
+ * `types.maybeNull` - Maybe will make a type nullable, and also optional.
  * The value `null` will be used to represent no value.
  *
- * @alias types.maybeNull
  * @param type
  * @returns
  */
