@@ -1,3 +1,5 @@
+# 3.10.0
+
 -   Fix for safeReference doesn't work when multiple nodes reference a single reference that gets deleted [#1115](https://github.com/mobxjs/mobx-state-tree/issues/1115) through [#1121](https://github.com/mobxjs/mobx-state-tree/pull/1121) by [@xaviergonz](https://github.com/xaviergonz)
 -   Little fix for `castFlowReturn` not typecasting the promise to its actual result.
 -   Made `isAlive(node)` reactive, so it can be reacted upon through [#1100](https://github.com/mobxjs/mobx-state-tree/pull/1100) by [@xaviergonz](https://github.com/xaviergonz)
