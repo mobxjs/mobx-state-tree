@@ -6,7 +6,7 @@
 </br>
 
 <p>
-  <img src="https://github.com/mobxjs/mobx-state-tree/blob/master/docs/mobx-state-tree-logo-gradient.svg" align="left" height="145" width="100"
+  <img src="https://raw.githubusercontent.com/mobxjs/mobx-state-tree/master/docs/mobx-state-tree-logo-gradient.svg" align="left" height="145" width="100"
 style="margin-right: 20px"/>
   <h4 style="margin: 0;">mobx-state-tree</h4>
   <p>
