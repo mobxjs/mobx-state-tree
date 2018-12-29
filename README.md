@@ -6,7 +6,7 @@
 </br>
 
 <p>
-  <img src="docs/mobx-state-tree-logo-gradient.png" align="left" height="145" width="100" style="margin-right: 20px"/>
+  <img src="docs/mobx-state-tree-logo-gradient.png" align="left" style="margin-right: 20px; padding-top: 20px;"/>
   <h4 style="margin: 0;">mobx-state-tree</h4>
   <p>
     <i>
