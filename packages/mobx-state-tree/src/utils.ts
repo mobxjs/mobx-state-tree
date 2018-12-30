@@ -312,10 +312,7 @@ export class EventHandlers<E extends { [k: string]: Function }> {
     }
 
     clear<N extends keyof E>(event: N) {
-        const handler = this.eventHandlers[event]
-        if (handler) {
-            handler.clear()
-        }
+        delete this.eventHandlers[event]
     }
 
     clearAll() {
