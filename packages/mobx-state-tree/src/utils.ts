@@ -240,16 +240,13 @@ type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A
  * @hidden
  */
 export class EventHandler<F extends Function> {
-    private handlers?: F[]
+    private handlers: F[] = []
 
-    get hasSubscribers() {
-        return !!this.handlers && this.handlers.length > 0
+    get hasSubscribers(): boolean {
+        return this.handlers.length > 0
     }
 
     register(fn: F, atTheBeginning = false): IDisposer {
-        if (!this.handlers) {
-            this.handlers = []
-        }
         if (atTheBeginning) {
             this.handlers.unshift(fn)
         } else {
@@ -260,33 +257,75 @@ export class EventHandler<F extends Function> {
         }
     }
 
-    private indexOf(fn: F): number {
-        if (!this.handlers) {
-            return -1
-        }
-        return this.handlers.indexOf(fn)
-    }
-
     has(fn: F): boolean {
-        return this.indexOf(fn) >= 0
+        return this.handlers.indexOf(fn) >= 0
     }
 
     unregister(fn: F) {
-        const index = this.indexOf(fn)
+        const index = this.handlers.indexOf(fn)
         if (index >= 0) {
-            this.handlers!.splice(index, 1)
+            this.handlers.splice(index, 1)
         }
     }
 
     clear() {
-        this.handlers = undefined
+        this.handlers.length = 0
     }
 
     emit(...args: ArgumentTypes<F>) {
-        if (this.handlers) {
-            // make a copy just in case it changes
-            const handlers = this.handlers.slice()
-            handlers.forEach(f => f(...args))
+        // make a copy just in case it changes
+        const handlers = this.handlers.slice()
+        handlers.forEach(f => f(...args))
+    }
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export class EventHandlers<E extends { [k: string]: Function }> {
+    private eventHandlers: { [k in keyof E]?: EventHandler<Function> } = {}
+
+    hasSubscribers(event: keyof E): boolean {
+        const handler = this.eventHandlers[event]
+        return !!handler && handler.hasSubscribers
+    }
+
+    register<N extends keyof E>(event: N, fn: E[N], atTheBeginning = false): IDisposer {
+        let handler = this.eventHandlers[event]
+        if (!handler) {
+            handler = this.eventHandlers[event] = new EventHandler()
+        }
+        return handler.register(fn, atTheBeginning)
+    }
+
+    has<N extends keyof E>(event: N, fn: E[N]): boolean {
+        const handler = this.eventHandlers[event]
+        return !!handler && handler.has(fn)
+    }
+
+    unregister<N extends keyof E>(event: N, fn: E[N]) {
+        const handler = this.eventHandlers[event]
+        if (handler) {
+            handler.unregister(fn)
+        }
+    }
+
+    clear<N extends keyof E>(event: N) {
+        const handler = this.eventHandlers[event]
+        if (handler) {
+            handler.clear()
+        }
+    }
+
+    clearAll() {
+        this.eventHandlers = {}
+    }
+
+    emit<N extends keyof E>(event: N, ...args: ArgumentTypes<E[N]>) {
+        const handler = this.eventHandlers[event]
+        if (handler) {
+            ;(handler.emit as any)(...args)
         }
     }
 }

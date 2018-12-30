@@ -24,7 +24,7 @@ import {
     splitJsonPath,
     splitPatch,
     toJSON,
-    EventHandler,
+    EventHandlers,
     Hook,
     BaseNode,
     getLivelinessChecking,
@@ -41,6 +41,12 @@ const enum ObservableInstanceLifecycle {
     CREATING,
     // the actual observable instance has been created
     CREATED
+}
+
+const enum InternalEvents {
+    Dispose = "dispose",
+    Patch = "patch",
+    Snapshot = "snapshot"
 }
 
 /**
@@ -71,16 +77,6 @@ export class ObjectNode extends BaseNode {
     isProtectionEnabled = true
     middlewares: IMiddleware[] | null = null
 
-    readonly hookSubscribers = {
-        [Hook.afterCreate]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
-        [Hook.afterAttach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
-        [Hook.afterCreationFinalization]: new EventHandler<
-            (node: ObjectNode, hook: Hook) => void
-        >(),
-        [Hook.beforeDetach]: new EventHandler<(node: ObjectNode, hook: Hook) => void>(),
-        [Hook.beforeDestroy]: new EventHandler<(node: ObjectNode, hook: Hook) => void>()
-    }
-
     _applyPatches?: (patches: IJsonPatch[]) => void
 
     applyPatches(patches: IJsonPatch[]): void {
@@ -99,11 +95,11 @@ export class ObjectNode extends BaseNode {
     _isRunningAction = false // only relevant for root
     private _hasSnapshotReaction = false
 
-    private readonly _disposers = new EventHandler<() => void>()
-    private readonly _patchSubscribers = new EventHandler<
-        ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)
-    >()
-    private readonly _snapshotSubscribers = new EventHandler<(snapshot: any) => void>()
+    private readonly _internalEvents = new EventHandlers<{
+        [InternalEvents.Dispose]: () => void
+        [InternalEvents.Patch]: ((patch: IJsonPatch, reversePatch: IJsonPatch) => void)
+        [InternalEvents.Snapshot]: (snapshot: any) => void
+    }>()
 
     private _observableInstanceState = ObservableInstanceLifecycle.UNINITIALIZED
     private _childNodes: IChildNodesMap
@@ -482,8 +478,8 @@ export class ObjectNode extends BaseNode {
         // a disposer added with addDisposer at this stage (beforeDestroy) is actually never released
         this.baseAboutToDie()
 
-        this._disposers.emit()
-        this._disposers.clear()
+        this._internalEvents.emit(InternalEvents.Dispose)
+        this._internalEvents.clear(InternalEvents.Dispose)
     }
 
     private unregisterIdentifiers() {
@@ -504,54 +500,53 @@ export class ObjectNode extends BaseNode {
         this.root.identifierCache!.notifyDied(this)
         addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
 
-        this._patchSubscribers.clear()
-        this._snapshotSubscribers.clear()
+        this._internalEvents.clearAll()
 
         this.baseFinalizeDeath()
     }
 
     onSnapshot(onChange: (snapshot: any) => void): IDisposer {
         this._addSnapshotReaction()
-        return this._snapshotSubscribers.register(onChange)
+        return this._internalEvents.register(InternalEvents.Snapshot, onChange)
     }
 
     protected emitSnapshot(snapshot: any) {
-        this._snapshotSubscribers.emit(snapshot)
+        this._internalEvents.emit(InternalEvents.Snapshot, snapshot)
     }
 
     onPatch(handler: (patch: IJsonPatch, reversePatch: IJsonPatch) => void): IDisposer {
-        return this._patchSubscribers.register(handler)
+        return this._internalEvents.register(InternalEvents.Patch, handler)
     }
 
     emitPatch(basePatch: IReversibleJsonPatch, source: INode) {
-        const patchSubscribers = this._patchSubscribers
-        if (patchSubscribers.hasSubscribers) {
+        const intEvs = this._internalEvents
+        if (intEvs.hasSubscribers(InternalEvents.Patch)) {
             const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, {
                 path: source.path.substr(this.path.length) + "/" + basePatch.path // calculate the relative path of the patch
             })
             const [patch, reversePatch] = splitPatch(localizedPatch)
-            patchSubscribers.emit(patch, reversePatch)
+            intEvs.emit(InternalEvents.Patch, patch, reversePatch)
         }
         if (this.parent) this.parent.emitPatch(basePatch, source)
     }
 
     hasDisposer(disposer: () => void): boolean {
-        return this._disposers.has(disposer)
+        return this._internalEvents.has(InternalEvents.Dispose, disposer)
     }
 
     addDisposer(disposer: () => void): void {
         if (!this.hasDisposer(disposer)) {
-            this._disposers.register(disposer, true)
+            this._internalEvents.register(InternalEvents.Dispose, disposer, true)
             return
         }
         fail("cannot add a disposer when it is already registered for execution")
     }
 
     removeDisposer(disposer: () => void): void {
-        if (!this._disposers.has(disposer)) {
+        if (!this._internalEvents.has(InternalEvents.Dispose, disposer)) {
             return fail("cannot remove a disposer which was never registered for execution")
         }
-        this._disposers.unregister(disposer)
+        this._internalEvents.unregister(InternalEvents.Dispose, disposer)
     }
 
     removeMiddleware(handler: IMiddlewareHandler) {
