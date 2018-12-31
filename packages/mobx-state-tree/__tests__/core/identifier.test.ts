@@ -201,11 +201,6 @@ test("it can resolve through refrences", () => {
 
     expect(resolvePath(root, "/children/2/target/children/../children/./0").name).toBe("c")
 
-    // double // resets the path to root!
-    expect(resolvePath(root, "/children/0//children/2/target/children/../children/./0").name).toBe(
-        "c"
-    )
-
     expect(() => resolvePath(root, "/children/3/target/children/0").name).toThrow(
         "[mobx-state-tree] Failed to resolve reference 'e' to type 'Folder' (from node: /children/3/target)"
     )

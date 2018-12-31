@@ -74,18 +74,19 @@ function isNumber(x: string): boolean {
  *
  * http://tools.ietf.org/html/rfc6901
  */
-export function escapeJsonPath(str: string): string {
-    if (isNumber(str) === true) {
-        return "" + str
+export function escapeJsonPath(path: string): string {
+    if (isNumber(path) === true) {
+        return "" + path
     }
-    return str.replace(/~/g, "~1").replace(/\//g, "~0")
+    if (path.indexOf("/") === -1 && path.indexOf("~") === -1) return path
+    return path.replace(/~/g, "~0").replace(/\//g, "~1")
 }
 
 /**
  * Unescape slashes and backslashes.
  */
-export function unescapeJsonPath(str: string): string {
-    return str.replace(/~0/g, "/").replace(/~1/g, "~")
+export function unescapeJsonPath(path: string): string {
+    return path.replace(/~1/g, "/").replace(/~0/g, "~")
 }
 
 /**

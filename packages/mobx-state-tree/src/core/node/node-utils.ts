@@ -134,20 +134,6 @@ export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode
  * @internal
  * @hidden
  */
-export function resolveNodeByPath(base: ObjectNode, pathParts: string): INode
-/**
- * @internal
- * @hidden
- */
-export function resolveNodeByPath(
-    base: ObjectNode,
-    pathParts: string,
-    failIfResolveFails: boolean
-): INode | undefined
-/**
- * @internal
- * @hidden
- */
 export function resolveNodeByPath(
     base: ObjectNode,
     path: string,
@@ -156,20 +142,6 @@ export function resolveNodeByPath(
     return resolveNodeByPathParts(base, splitJsonPath(path), failIfResolveFails)
 }
 
-/**
- * @internal
- * @hidden
- */
-export function resolveNodeByPathParts(base: ObjectNode, pathParts: string[]): INode
-/**
- * @internal
- * @hidden
- */
-export function resolveNodeByPathParts(
-    base: ObjectNode,
-    pathParts: string[],
-    failIfResolveFails: boolean
-): INode | undefined
 /**
  * @internal
  * @hidden
@@ -183,17 +155,22 @@ export function resolveNodeByPathParts(
     // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
     // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
     // so we treat leading ../ apart...
-    let current: INode | null = base
+    let current: INode | null
+
+    if (pathParts.length > 0 && (pathParts[0] === "." || pathParts[0] === "..")) {
+        // extension - relative path
+        current = base
+    } else {
+        // absolute path
+        current = base.root
+    }
+
     for (let i = 0; i < pathParts.length; i++) {
         const part = pathParts[i]
-        if (part === "") {
-            current = current!.root
-            continue
-        } else if (part === "..") {
+        if (part === "..") {
             current = current!.parent
             if (current) continue // not everything has a parent
-        } else if (part === "." || part === "") {
-            // '/bla' or 'a//b' splits to empty strings
+        } else if (part === ".") {
             continue
         } else if (current) {
             if (current instanceof ScalarNode) {

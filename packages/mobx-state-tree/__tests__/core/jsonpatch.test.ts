@@ -8,7 +8,12 @@ import {
     Instance,
     cast,
     IAnyModelType,
-    IMSTMap
+    IMSTMap,
+    escapeJsonPath,
+    getPath,
+    resolvePath,
+    splitJsonPath,
+    joinJsonPath
 } from "../../src"
 
 function testPatches<C, S, T>(
@@ -337,7 +342,27 @@ test("it should apply deep patches to objects", () => {
         ]
     )
 })
+
+test("it should correctly split/join json patches", () => {
+    expect(splitJsonPath("")).toEqual([])
+    expect(joinJsonPath([])).toBe("")
+
+    expect(splitJsonPath("/")).toEqual([""])
+    expect(joinJsonPath([""])).toBe("/")
+
+    expect(splitJsonPath("/a")).toEqual(["a"])
+    expect(joinJsonPath(["a"])).toBe("/a")
+
+    expect(splitJsonPath("/a/")).toEqual(["a", ""])
+    expect(joinJsonPath(["a", ""])).toBe("/a/")
+
+    expect(splitJsonPath("/a//")).toEqual(["a", "", ""])
+    expect(joinJsonPath(["a", "", ""])).toBe("/a//")
+})
+
 test("it should correctly escape/unescape json patches", () => {
+    expect(escapeJsonPath("http://example.com")).toBe("http:~1~1example.com")
+
     const AppStore = types.model({
         items: types.map(types.frozen<any>())
     })
@@ -347,6 +372,45 @@ test("it should correctly escape/unescape json patches", () => {
         (store: typeof AppStore.Type) => {
             store.items.set("with/slash~tilde", 1)
         },
-        [{ op: "add", path: "/items/with~0slash~1tilde", value: 1 }]
+        [{ op: "add", path: "/items/with~1slash~0tilde", value: 1 }]
     )
+})
+
+test("weird keys are handled correctly", () => {
+    const Store = types.model({
+        map: types.map(
+            types.model({
+                model: types.model({
+                    value: types.string
+                })
+            })
+        )
+    })
+
+    const store = Store.create({
+        map: {
+            "": { model: { value: "val1" } },
+            "/": { model: { value: "val2" } },
+            "~": { model: { value: "val3" } }
+        }
+    })
+
+    {
+        const target = store.map.get("")!.model
+        const path = getPath(target)
+        expect(path).toBe("/map//model")
+        expect(resolvePath(store, path)).toBe(target)
+    }
+    {
+        const target = store.map.get("/")!.model
+        const path = getPath(target)
+        expect(path).toBe("/map/~1/model")
+        expect(resolvePath(store, path)).toBe(target)
+    }
+    {
+        const target = store.map.get("~")!.model
+        const path = getPath(target)
+        expect(path).toBe("/map/~0/model")
+        expect(resolvePath(store, path)).toBe(target)
+    }
 })
