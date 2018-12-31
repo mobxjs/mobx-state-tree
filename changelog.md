@@ -1,3 +1,5 @@
+-   Fixed JSON path escaping, where '/' and '~' were incorrectly being encoded/decoded as '~0' and '~1' rather than '~1' and '~0'. Also fixed empty keys not being handled correctly by JSON patches [#1128](https://github.com/mobxjs/mobx-state-tree/issues/1128). Fixed through [#1129](https://github.com/mobxjs/mobx-state-tree/pull/1129) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.10.0
 
 -   Fix for safeReference doesn't work when multiple nodes reference a single reference that gets deleted [#1115](https://github.com/mobxjs/mobx-state-tree/issues/1115) through [#1121](https://github.com/mobxjs/mobx-state-tree/pull/1121) by [@xaviergonz](https://github.com/xaviergonz)
