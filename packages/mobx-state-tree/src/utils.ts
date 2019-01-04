@@ -239,7 +239,7 @@ type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A
  * @internal
  * @hidden
  */
-export class EventHandler<F extends Function> {
+class EventHandler<F extends Function> {
     private handlers: F[] = []
 
     get hasSubscribers(): boolean {
@@ -284,14 +284,17 @@ export class EventHandler<F extends Function> {
  * @hidden
  */
 export class EventHandlers<E extends { [k: string]: Function }> {
-    private eventHandlers: { [k in keyof E]?: EventHandler<Function> } = {}
+    private eventHandlers?: { [k in keyof E]?: EventHandler<Function> }
 
     hasSubscribers(event: keyof E): boolean {
-        const handler = this.eventHandlers[event]
-        return !!handler && handler.hasSubscribers
+        const handler = this.eventHandlers && this.eventHandlers[event]
+        return !!handler && handler!.hasSubscribers
     }
 
     register<N extends keyof E>(event: N, fn: E[N], atTheBeginning = false): IDisposer {
+        if (!this.eventHandlers) {
+            this.eventHandlers = {}
+        }
         let handler = this.eventHandlers[event]
         if (!handler) {
             handler = this.eventHandlers[event] = new EventHandler()
@@ -300,29 +303,31 @@ export class EventHandlers<E extends { [k: string]: Function }> {
     }
 
     has<N extends keyof E>(event: N, fn: E[N]): boolean {
-        const handler = this.eventHandlers[event]
-        return !!handler && handler.has(fn)
+        const handler = this.eventHandlers && this.eventHandlers[event]
+        return !!handler && handler!.has(fn)
     }
 
     unregister<N extends keyof E>(event: N, fn: E[N]) {
-        const handler = this.eventHandlers[event]
+        const handler = this.eventHandlers && this.eventHandlers[event]
         if (handler) {
-            handler.unregister(fn)
+            handler!.unregister(fn)
         }
     }
 
     clear<N extends keyof E>(event: N) {
-        delete this.eventHandlers[event]
+        if (this.eventHandlers) {
+            delete this.eventHandlers[event]
+        }
     }
 
     clearAll() {
-        this.eventHandlers = {}
+        this.eventHandlers = undefined
     }
 
     emit<N extends keyof E>(event: N, ...args: ArgumentTypes<E[N]>) {
-        const handler = this.eventHandlers[event]
+        const handler = this.eventHandlers && this.eventHandlers[event]
         if (handler) {
-            ;(handler.emit as any)(...args)
+            ;(handler!.emit as any)(...args)
         }
     }
 }
