@@ -29,7 +29,8 @@ import {
     ReferenceIdentifier,
     normalizeIdentifier,
     getIdentifier,
-    applyPatch
+    applyPatch,
+    joinJsonPath
 } from "../../internal"
 
 export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
@@ -189,19 +190,19 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
             invalidTarget: refTargetNode ? refTargetNode.storedValue : undefined,
             invalidId: referenceId,
             replaceRef(newRef) {
-                applyPatch(storedRefParentValue, {
+                applyPatch(storedRefNode.root.storedValue, {
                     op: "replace",
                     value: newRef,
-                    path: storedRefNode.subpath
+                    path: storedRefNode.path
                 })
             },
             removeRef() {
                 if (isModelType(storedRefParentNode.type)) {
                     this.replaceRef(undefined as any)
                 } else {
-                    applyPatch(storedRefParentValue, {
+                    applyPatch(storedRefNode.root.storedValue, {
                         op: "remove",
-                        path: storedRefNode.subpath
+                        path: storedRefNode.path
                     })
                 }
             }
