@@ -1,13 +1,4 @@
-import {
-    fail,
-    freeze,
-    NodeLifeCycle,
-    ObjectNode,
-    IAnyType,
-    Hook,
-    BaseNode,
-    EventHandler
-} from "../../internal"
+import { fail, freeze, NodeLifeCycle, ObjectNode, IAnyType, Hook, BaseNode } from "../../internal"
 import { action } from "mobx"
 
 /**
@@ -15,22 +6,12 @@ import { action } from "mobx"
  * @hidden
  */
 export class ScalarNode extends BaseNode {
-    readonly hookSubscribers = {
-        // afterCreate in scalar nodes is executed in the constructor, so it cannot be registered before it is already executed
-        // [Hook.afterCreate]: new EventHandler<(node: ScalarNode) => void>(),
+    // note about hooks:
+    // - afterCreate is not emmited in scalar nodes, since it would be emitted in the
+    //   constructor, before it can be subscribed by anybody
+    // - afterCreationFinalization could be emitted, but there's no need for it right now
+    // - beforeDetach is never emitted for scalar nodes, since they cannot be detached
 
-        [Hook.afterAttach]: new EventHandler<(node: ScalarNode) => void>(),
-
-        // not needed right now for scalar nodes
-        // [Hook.afterCreationFinalization]: new EventHandler<
-        //     (node: ScalarNode, hook: Hook) => void
-        // >(),
-
-        // beforeDetach is never executed for scalar nodes, since they cannot be detached
-        // [Hook.beforeDetach]: new EventHandler<(node: ScalarNode) => void>(),
-
-        [Hook.beforeDestroy]: new EventHandler<(node: ScalarNode) => void>()
-    }
     constructor(
         type: IAnyType,
         parent: ObjectNode | null,

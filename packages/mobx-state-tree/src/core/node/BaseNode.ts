@@ -2,9 +2,9 @@ import {
     IAnyType,
     ObjectNode,
     NodeLifeCycle,
-    EventHandler,
     Hook,
-    escapeJsonPath
+    escapeJsonPath,
+    EventHandlers
 } from "../../internal"
 import { createAtom, IAtom } from "mobx"
 
@@ -38,7 +38,13 @@ export abstract class BaseNode {
     }
 
     readonly type: IAnyType
-    readonly hookSubscribers: { [k: string]: EventHandler<(node: any, hook: Hook) => void> } = {}
+    readonly hookSubscribers = new EventHandlers<{
+        [Hook.afterAttach]: (node: any, hook: Hook) => void
+        [Hook.afterCreate]: (node: any, hook: Hook) => void
+        [Hook.afterCreationFinalization]: (node: any, hook: Hook) => void
+        [Hook.beforeDestroy]: (node: any, hook: Hook) => void
+        [Hook.beforeDetach]: (node: any, hook: Hook) => void
+    }>()
 
     environment: any = undefined
 
@@ -90,7 +96,7 @@ export abstract class BaseNode {
     protected abstract fireHook(name: Hook): void
 
     protected fireInternalHook(name: Hook) {
-        this.hookSubscribers[name].emit(this, name)
+        this.hookSubscribers.emit(name, this, name)
     }
 
     value: any
@@ -136,7 +142,7 @@ export abstract class BaseNode {
     abstract finalizeDeath(): void
 
     protected baseFinalizeDeath() {
-        Object.keys(this.hookSubscribers).forEach(k => this.hookSubscribers[k].clear())
+        this.hookSubscribers.clearAll()
 
         this.baseSetParent(null, "")
         this.state = NodeLifeCycle.DEAD

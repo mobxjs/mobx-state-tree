@@ -228,12 +228,14 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
             this.fireInvalidated(cause, storedRefNode, referenceId, refTargetNode)
         }
 
-        const refTargetDetachHookDisposer = refTargetNode.hookSubscribers[
-            Hook.beforeDetach
-        ].register(hookHandler)
-        const refTargetDestroyHookDisposer = refTargetNode.hookSubscribers[
-            Hook.beforeDestroy
-        ].register(hookHandler)
+        const refTargetDetachHookDisposer = refTargetNode.hookSubscribers.register(
+            Hook.beforeDetach,
+            hookHandler
+        )
+        const refTargetDestroyHookDisposer = refTargetNode.hookSubscribers.register(
+            Hook.beforeDestroy,
+            hookHandler
+        )
 
         return () => {
             refTargetDetachHookDisposer()
@@ -254,7 +256,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
 
         // get rid of the watcher hook when the stored ref node is destroyed
         // detached is ignored since scalar nodes (where the reference resides) cannot be detached
-        storedRefNode.hookSubscribers[Hook.beforeDestroy].register(() => {
+        storedRefNode.hookSubscribers.register(Hook.beforeDestroy, () => {
             if (onRefTargetDestroyedHookDisposer) {
                 onRefTargetDestroyedHookDisposer()
             }
@@ -309,7 +311,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
         } else {
             if (!storedRefNode.isRoot) {
                 // start watching once the whole tree is ready
-                storedRefNode.root.hookSubscribers[Hook.afterCreationFinalization].register(() => {
+                storedRefNode.root.hookSubscribers.register(Hook.afterCreationFinalization, () => {
                     // make sure to attach it so it can start listening
                     if (storedRefNode.parent) {
                         storedRefNode.parent.createObservableInstanceIfNeeded()
@@ -317,7 +319,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
                 })
             }
             // start watching once the node is attached somewhere / parent changes
-            storedRefNode.hookSubscribers[Hook.afterAttach].register(() => {
+            storedRefNode.hookSubscribers.register(Hook.afterAttach, () => {
                 startWatching(false)
             })
         }
