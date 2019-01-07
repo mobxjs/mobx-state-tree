@@ -93,7 +93,7 @@ export interface IType<C, S, T> {
     describe(): string
 
     /**
-     * @deprecated use `InstanceOf` instead.
+     * @deprecated use `Instance` instead.
      * @hidden
      */
     Type: T
