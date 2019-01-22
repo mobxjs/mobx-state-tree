@@ -330,17 +330,16 @@ export class ObjectNode extends BaseNode {
 
     assertAlive() {
         if (!this.isAlive) {
-            const baseMsg = `[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${
-                this.type.name
-            }'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
+            const error = new Error(
+                `[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${
+                    this.type.name
+                }'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
+            )
             switch (getLivelinessChecking()) {
                 case "error":
-                    throw new Error(baseMsg)
+                    throw error
                 case "warn":
-                    console.warn(
-                        baseMsg +
-                            ' Use setLivelinessChecking("error") to simplify debugging this error.'
-                    )
+                    console.warn(error)
             }
         }
     }
