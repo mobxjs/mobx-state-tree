@@ -309,7 +309,6 @@ export class ObjectNode extends BaseNode {
     }
 
     private _getInitialSnapshot(): any {
-        if (!this.isAlive) return undefined
         if (!this._initialSnapshot) return this._initialSnapshot
         if (this._cachedInitialSnapshot) return this._cachedInitialSnapshot
 
