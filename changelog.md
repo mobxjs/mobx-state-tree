@@ -1,3 +1,4 @@
+-   Fixed mobx 5.9.0 compatibility [#1143](https://github.com/mobxjs/mobx-state-tree/issues/1143) through [#1144](https://github.com/mobxjs/mobx-state-tree/pull/1144) by [@xaviergonz](https://github.com/xaviergonz)
 -   Fixed JSON path escaping, where '/' and '~' were incorrectly being encoded/decoded as '~0' and '~1' rather than '~1' and '~0'. Also fixed empty keys not being handled correctly by JSON patches [#1128](https://github.com/mobxjs/mobx-state-tree/issues/1128). Fixed through [#1129](https://github.com/mobxjs/mobx-state-tree/pull/1129) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.10.0
