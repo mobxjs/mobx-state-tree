@@ -1837,7 +1837,7 @@ ___
 
 ###  escapeJsonPath
 
-▸ **escapeJsonPath**(str: *`string`*): `string`
+▸ **escapeJsonPath**(path: *`string`*): `string`
 
 Escape slashes and backslashes.
 
@@ -1847,7 +1847,7 @@ Escape slashes and backslashes.
 
 | Name | Type |
 | ------ | ------ |
-| str | `string` |
+| path | `string` |
 
 **Returns:** `string`
 
@@ -3342,7 +3342,7 @@ ___
 
 ###  unescapeJsonPath
 
-▸ **unescapeJsonPath**(str: *`string`*): `string`
+▸ **unescapeJsonPath**(path: *`string`*): `string`
 
 Unescape slashes and backslashes.
 
@@ -3350,7 +3350,7 @@ Unescape slashes and backslashes.
 
 | Name | Type |
 | ------ | ------ |
-| str | `string` |
+| path | `string` |
 
 **Returns:** `string`
 

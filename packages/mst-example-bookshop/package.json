@@ -6,7 +6,7 @@
         "react-scripts": "1.1.5"
     },
     "dependencies": {
-        "mobx": "^5.5.0",
+        "mobx": "^5.9.0",
         "mobx-react": "^5.0.0",
         "mobx-react-devtools": "^6.0.0",
         "mobx-state-tree": "^3.7.0",

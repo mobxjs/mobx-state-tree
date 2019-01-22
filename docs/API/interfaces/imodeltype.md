@@ -257,7 +257,7 @@ ___
 
 **Type parameters:**
 
-#### TP :  `any`
+#### TP :  `object`
 **Parameters:**
 
 | Name | Type |
