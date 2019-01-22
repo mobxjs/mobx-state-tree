@@ -2,7 +2,6 @@
 import { action, computed, reaction, _allowStateChangesInsideComputed } from "mobx"
 import {
     addHiddenFinalProp,
-    addReadOnlyProp,
     ComplexType,
     convertChildNodesToArray,
     createActionInvoker,
@@ -289,16 +288,17 @@ export class ObjectNode extends BaseNode {
         return this.type.getValue(this)
     }
 
+    private _snapshotUponDeath?: any
+
     // advantage of using computed for a snapshot is that nicely respects transactions etc.
     @computed
     get snapshot(): any {
-        if (!this.isAlive) return undefined
         return freeze(this.getSnapshot())
     }
 
     // NOTE: we use this method to get snapshot without creating @computed overhead
     getSnapshot(): any {
-        if (!this.isAlive) return undefined
+        if (!this.isAlive) return this._snapshotUponDeath
         return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
             ? this._getActualSnapshot()
             : this._getInitialSnapshot()
@@ -309,7 +309,6 @@ export class ObjectNode extends BaseNode {
     }
 
     private _getInitialSnapshot(): any {
-        if (!this.isAlive) return undefined
         if (!this._initialSnapshot) return this._initialSnapshot
         if (this._cachedInitialSnapshot) return this._cachedInitialSnapshot
 
@@ -497,7 +496,10 @@ export class ObjectNode extends BaseNode {
             node.finalizeDeath()
         })
         this.root.identifierCache!.notifyDied(this)
-        addReadOnlyProp(this, "snapshot", this.snapshot) // kill the computed prop and just store the last snapshot
+
+        // "kill" the computed prop and just store the last snapshot
+        const snapshot = this.snapshot
+        this._snapshotUponDeath = snapshot
 
         this._internalEvents.clearAll()
 

@@ -220,19 +220,6 @@ export function addHiddenWritableProp(object: any, propName: string, value: any)
     })
 }
 
-/**
- * @internal
- * @hidden
- */
-export function addReadOnlyProp(object: any, propName: string, value: any) {
-    Object.defineProperty(object, propName, {
-        enumerable: true,
-        writable: false,
-        configurable: true,
-        value
-    })
-}
-
 type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never
 
 /**
