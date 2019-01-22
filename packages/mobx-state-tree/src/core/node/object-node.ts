@@ -293,7 +293,6 @@ export class ObjectNode extends BaseNode {
     // advantage of using computed for a snapshot is that nicely respects transactions etc.
     @computed
     get snapshot(): any {
-        if (!this.isAlive) return this._snapshotUponDeath
         return freeze(this.getSnapshot())
     }
 
