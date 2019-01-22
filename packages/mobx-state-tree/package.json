@@ -14,7 +14,7 @@
         "test": "cross-env NODE_ENV=development yarn jest --ci && cross-env NODE_ENV=production yarn jest --ci && yarn run test:cyclic && yarn run test:mobx4",
         "test:perf": "yarn build && yarn jest:perf && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register __tests__/perf/report.ts",
         "test:cyclic": "yarn run build && node -e \"require('.')\"",
-        "test:mobx4": "yarn add -D mobx@4.8.0 && yarn build && yarn jest --ci && git checkout package.json ../../yarn.lock && yarn install",
+        "test:mobx4": "yarn add -D mobx@4.9.0 && yarn build && yarn jest --ci && git checkout package.json ../../yarn.lock && yarn install",
         "_prepublish": "yarn run build && yarn run build-docs",
         "coverage": "yarn jest --coverage",
         "fix-docs": "replace --quiet \"&lt;\" \"<\" ../../docs/API/README.md && replace --quiet \"&gt;\" \">\" ../../docs/API/README.md && concat -o ../../docs/API/README.md ../../docs/API_header.md ../../docs/API/README.md",
