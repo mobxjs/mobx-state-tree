@@ -1,3 +1,7 @@
+# 3.10.2
+
+-   Fixed a regression regarding json paths not being correctly rooted to the base [#1128](https://github.com/mobxjs/mobx-state-tree/issues/1128) through [#1146](https://github.com/mobxjs/mobx-state-tree/pull/1146) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.10.1
 
 -   Fixed mobx 5.9.0 compatibility [#1143](https://github.com/mobxjs/mobx-state-tree/issues/1143) through [#1144](https://github.com/mobxjs/mobx-state-tree/pull/1144) by [@xaviergonz](https://github.com/xaviergonz)
