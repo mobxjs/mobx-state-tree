@@ -247,7 +247,7 @@ function objectTypeToString(this: any) {
 export interface ModelTypeConfig {
     name?: string
     properties?: ModelProperties
-    initializers?: ReadonlyArray<((instance: any) => any)>
+    initializers?: ReadonlyArray<(instance: any) => any>
     preProcessor?: (snapshot: any) => any
     postProcessor?: (snapshot: any) => any
 }
@@ -573,7 +573,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
 
     willChange(change: any): IObjectWillChange | null {
         const node = getStateTreeNode(change.object)
-        node.assertWritable()
+        node.assertWritable({ subpath: change.name })
         const type = (node.type as ModelType<any, any>).properties[change.name]
         // only properties are typed, state are stored as-is references
         if (type) {

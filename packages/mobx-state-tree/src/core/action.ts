@@ -54,6 +54,14 @@ let currentActionContext: IMiddlewareEvent | null = null
  * @internal
  * @hidden
  */
+export function getCurrentActionContext() {
+    return currentActionContext
+}
+
+/**
+ * @internal
+ * @hidden
+ */
 export function getNextActionId() {
     return nextActionId++
 }
@@ -69,7 +77,9 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const prevContext = currentActionContext
 
     if (context.type === "action") {
-        node.assertAlive()
+        node.assertAlive({
+            actionContext: context
+        })
     }
 
     node._isRunningAction = true

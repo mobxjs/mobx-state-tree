@@ -297,18 +297,22 @@ test("it should throw if a replaced object is read or written to", () => {
 
     setLivelinessChecking("error")
     // try reading old todo
-    const err =
-        "You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo'). Either detach nodes first, or don't use objects after removing / replacing them in the tree"
     expect(() => {
         todo.fn()
-    }).toThrow(err)
+    }).toThrow(
+        "You are trying to read or write to an object that is no longer part of a state tree. (Object type: 'Todo', Path upon death: '/todo', Subpath: '', Action: '/todo.fn()'). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
+    )
     expect(() => {
         // tslint:disable-next-line:no-unused-expression
         todo.title
-    }).toThrow(err)
+    }).toThrow(
+        "You are trying to read or write to an object that is no longer part of a state tree. (Object type: 'Todo', Path upon death: '/todo', Subpath: 'title', Action: ''). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
+    )
     expect(() => {
         todo.title = "5"
-    }).toThrow(err)
+    }).toThrow(
+        "You are trying to read or write to an object that is no longer part of a state tree. (Object type: 'Todo', Path upon death: '/todo', Subpath: 'title', Action: ''). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
+    )
 })
 
 test("it should warn if a replaced object is read or written to", () => {

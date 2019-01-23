@@ -28,7 +28,11 @@ import {
     BaseNode,
     getLivelinessChecking,
     normalizeIdentifier,
-    ReferenceIdentifier
+    ReferenceIdentifier,
+    IMiddlewareEvent,
+    getCurrentActionContext,
+    escapeJsonPath,
+    getPath
 } from "../../internal"
 
 let nextNodeId = 1
@@ -326,14 +330,11 @@ export class ObjectNode extends BaseNode {
         return this.parent!.isRunningAction()
     }
 
-    assertAlive() {
-        if (!this.isAlive) {
-            const error = new Error(
-                `[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${
-                    this.type.name
-                }'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
-            )
-            switch (getLivelinessChecking()) {
+    assertAlive(context: AssertAliveContext) {
+        const livelinessChecking = getLivelinessChecking()
+        if (!this.isAlive && livelinessChecking !== "ignore") {
+            const error = this._getAssertAliveError(context)
+            switch (livelinessChecking) {
                 case "error":
                     throw error
                 case "warn":
@@ -342,8 +343,35 @@ export class ObjectNode extends BaseNode {
         }
     }
 
+    private _getAssertAliveError(context: AssertAliveContext) {
+        const escapedPath = this.getEscapedPath(false) || this.pathUponDeath || ""
+        const subpath = (context.subpath && escapeJsonPath(context.subpath)) || ""
+
+        const actionContext = context.actionContext || getCurrentActionContext()
+        let actionFullPath = ""
+        if (actionContext && actionContext.name != null) {
+            actionFullPath = "." + actionContext.name + "()"
+            let actionPath =
+                (actionContext && actionContext.context && getPath(actionContext.context)) || ""
+            actionPath = [escapedPath, actionPath].join("/")
+            // strip last "/" if needed
+            if (actionPath.length > 0 && actionPath.lastIndexOf("/") === actionPath.length - 1) {
+                actionPath = actionPath.substring(0, actionPath.length - 1)
+            }
+            actionFullPath = actionPath + actionFullPath
+        }
+
+        return new Error(
+            `[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${
+                this.type.name
+            }', Path upon death: '${escapedPath}', Subpath: '${subpath}', Action: '${actionFullPath}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
+        )
+    }
+
     getChildNode(subpath: string): INode {
-        this.assertAlive()
+        this.assertAlive({
+            subpath
+        })
         this._autoUnbox = false
         try {
             return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
@@ -355,7 +383,7 @@ export class ObjectNode extends BaseNode {
     }
 
     getChildren(): ReadonlyArray<INode> {
-        this.assertAlive()
+        this.assertAlive(EMPTY_OBJECT)
         this._autoUnbox = false
         try {
             return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
@@ -374,8 +402,8 @@ export class ObjectNode extends BaseNode {
         return this.root.isProtectionEnabled
     }
 
-    assertWritable() {
-        this.assertAlive()
+    assertWritable(context: AssertAliveContext) {
+        this.assertAlive(context)
         if (!this.isRunningAction() && this.isProtected) {
             fail(
                 `Cannot modify '${this}', the object is protected and can only be modified by using an action.`
@@ -389,7 +417,8 @@ export class ObjectNode extends BaseNode {
 
     // this method must be bound
     unbox = (childNode: INode): any => {
-        if (childNode) this.assertAlive()
+        if (childNode)
+            this.assertAlive({ subpath: childNode.subpath || childNode.subpathUponDeath })
         if (childNode && this._autoUnbox) return childNode.value
         return childNode
     }
@@ -565,7 +594,9 @@ export class ObjectNode extends BaseNode {
     }
 
     applyPatchLocally(subpath: string, patch: IJsonPatch): void {
-        this.assertWritable()
+        this.assertWritable({
+            subpath
+        })
         this.createObservableInstanceIfNeeded()
         this.type.applyPatchLocally(this, subpath, patch)
     }
@@ -581,4 +612,13 @@ export class ObjectNode extends BaseNode {
             this._hasSnapshotReaction = true
         }
     }
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export interface AssertAliveContext {
+    subpath?: string
+    actionContext?: IMiddlewareEvent
 }
