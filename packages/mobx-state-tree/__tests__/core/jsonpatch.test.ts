@@ -434,7 +434,7 @@ test("weird keys are handled correctly", () => {
     }
 })
 
-test("relativePath with a different root works correctly", () => {
+test("relativePath with a different base than the root works correctly", () => {
     const Store = types.model({
         map: types.map(
             types.model({
@@ -455,23 +455,17 @@ test("relativePath with a different root works correctly", () => {
     {
         const target = store.map.get("1")!.model
         expect(resolvePath(store.map, "./1/model")).toBe(target)
-    }
-    {
-        const target = store.map.get("1")!.model
         expect(resolvePath(store.map, "../map/1/model")).toBe(target)
+        // rooted relative should resolve to the given base as root
+        expect(resolvePath(store.map, "/./1/model")).toBe(target)
+        expect(resolvePath(store.map, "/../map/1/model")).toBe(target)
     }
     {
         const target = store.map.get("2")!.model
-        expect(resolvePath(store.map, "/2/model")).toBe(target)
-    }
-
-    // rooted relative should resolve to the given base as root
-    {
-        const target = store.map.get("1")!.model
-        expect(resolvePath(store.map, "/./1/model")).toBe(target)
-    }
-    {
-        const target = store.map.get("1")!.model
-        expect(resolvePath(store.map, "/../map/1/model")).toBe(target)
+        expect(resolvePath(store.map, "./2/model")).toBe(target)
+        expect(resolvePath(store.map, "../map/2/model")).toBe(target)
+        // rooted relative should resolve to the given base as root
+        expect(resolvePath(store.map, "/./2/model")).toBe(target)
+        expect(resolvePath(store.map, "/../map/2/model")).toBe(target)
     }
 })
