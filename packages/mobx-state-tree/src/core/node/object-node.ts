@@ -352,9 +352,10 @@ export class ObjectNode extends BaseNode {
         let actionFullPath = ""
         if (actionContext && actionContext.name != null) {
             actionFullPath = "." + actionContext.name + "()"
-            let actionPath =
-                (actionContext && actionContext.context && getPath(actionContext.context)) || ""
-            actionPath = joinJsonPath([...splitJsonPath(escapedPath), ...splitJsonPath(actionPath)])
+            // try to use the context, and if it not available use the node one
+            const actionPath =
+                (actionContext && actionContext.context && getPath(actionContext.context)) ||
+                escapedPath
             actionFullPath = actionPath + actionFullPath
         }
 
