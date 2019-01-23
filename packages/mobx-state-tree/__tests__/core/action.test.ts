@@ -55,13 +55,13 @@ test("applying patches should be recordable and replayable", () => {
     const t2 = Task.create()
     const recorder = recordActions(t1)
     expect(t1.done).toBe(false)
-    applyPatch(t1, { op: "replace", path: "done", value: true })
+    applyPatch(t1, { op: "replace", path: "/done", value: true })
     expect(t1.done).toBe(true)
     expect(recorder.actions).toEqual([
         {
             name: "@APPLY_PATCHES",
             path: "",
-            args: [[{ op: "replace", path: "done", value: true }]]
+            args: [[{ op: "replace", path: "/done", value: true }]]
         }
     ])
     recorder.replay(t2)

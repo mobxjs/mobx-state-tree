@@ -190,7 +190,7 @@ class Decimal {
 
         applyPatch(w1, {
             op: "replace",
-            path: "balance",
+            path: "/balance",
             value: [5, 0]
         })
         expect(w1.balance.toString()).toBe("5.0")

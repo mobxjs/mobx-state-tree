@@ -344,20 +344,39 @@ test("it should apply deep patches to objects", () => {
 })
 
 test("it should correctly split/join json patches", () => {
-    expect(splitJsonPath("")).toEqual([])
-    expect(joinJsonPath([])).toBe("")
+    function isValid(str: string, array: string[], altStr?: string) {
+        expect(splitJsonPath(str)).toEqual(array)
+        expect(joinJsonPath(array)).toBe(altStr !== undefined ? altStr : str)
+    }
 
-    expect(splitJsonPath("/")).toEqual([""])
-    expect(joinJsonPath([""])).toBe("/")
+    isValid("", [])
+    isValid("/", [""])
+    isValid("//", ["", ""])
+    isValid("/a", ["a"])
+    isValid("/a/", ["a", ""])
+    isValid("/a//", ["a", "", ""])
+    isValid(".", ["."])
+    isValid("..", [".."])
+    isValid("./a", [".", "a"])
+    isValid("../a", ["..", "a"])
+    isValid("/.a", [".a"])
+    isValid("/..a", ["..a"])
 
-    expect(splitJsonPath("/a")).toEqual(["a"])
-    expect(joinJsonPath(["a"])).toBe("/a")
+    // rooted relatives are equivalent to plain relatives
+    isValid("/.", ["."], ".")
+    isValid("/..", [".."], "..")
+    isValid("/./a", [".", "a"], "./a")
+    isValid("/../a", ["..", "a"], "../a")
 
-    expect(splitJsonPath("/a/")).toEqual(["a", ""])
-    expect(joinJsonPath(["a", ""])).toBe("/a/")
+    function isInvalid(str: string) {
+        expect(() => {
+            splitJsonPath(str)
+        }).toThrow("a json path must be either rooted, empty or relative")
+    }
 
-    expect(splitJsonPath("/a//")).toEqual(["a", "", ""])
-    expect(joinJsonPath(["a", "", ""])).toBe("/a//")
+    isInvalid("a")
+    isInvalid("a/")
+    isInvalid("a//")
 })
 
 test("it should correctly escape/unescape json patches", () => {
@@ -412,5 +431,47 @@ test("weird keys are handled correctly", () => {
         const path = getPath(target)
         expect(path).toBe("/map/~0/model")
         expect(resolvePath(store, path)).toBe(target)
+    }
+})
+
+test("relativePath with a different root works correctly", () => {
+    const Store = types.model({
+        map: types.map(
+            types.model({
+                model: types.model({
+                    value: types.string
+                })
+            })
+        )
+    })
+
+    const store = Store.create({
+        map: {
+            "1": { model: { value: "val1" } },
+            "2": { model: { value: "val2" } }
+        }
+    })
+
+    {
+        const target = store.map.get("1")!.model
+        expect(resolvePath(store.map, "./1/model")).toBe(target)
+    }
+    {
+        const target = store.map.get("1")!.model
+        expect(resolvePath(store.map, "../map/1/model")).toBe(target)
+    }
+    {
+        const target = store.map.get("2")!.model
+        expect(resolvePath(store.map, "/2/model")).toBe(target)
+    }
+
+    // rooted relative should resolve to the given base as root
+    {
+        const target = store.map.get("1")!.model
+        expect(resolvePath(store.map, "/./1/model")).toBe(target)
+    }
+    {
+        const target = store.map.get("1")!.model
+        expect(resolvePath(store.map, "/../map/1/model")).toBe(target)
     }
 })

@@ -369,3 +369,11 @@ export const deprecated: DeprecatedFunction = function(id: string, message: stri
     if (deprecated.ids) deprecated.ids[id] = true
 }
 deprecated.ids = {}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function stringStartsWith(str: string, beginning: string) {
+    return str.indexOf(beginning) === 0
+}
