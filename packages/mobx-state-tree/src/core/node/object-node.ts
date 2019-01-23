@@ -34,6 +34,7 @@ import {
     escapeJsonPath,
     getPath
 } from "../../internal"
+import { joinJsonPath } from "../json-patch"
 
 let nextNodeId = 1
 
@@ -353,11 +354,7 @@ export class ObjectNode extends BaseNode {
             actionFullPath = "." + actionContext.name + "()"
             let actionPath =
                 (actionContext && actionContext.context && getPath(actionContext.context)) || ""
-            actionPath = [escapedPath, actionPath].join("/")
-            // strip last "/" if needed
-            if (actionPath.length > 0 && actionPath.lastIndexOf("/") === actionPath.length - 1) {
-                actionPath = actionPath.substring(0, actionPath.length - 1)
-            }
+            actionPath = joinJsonPath([...splitJsonPath(escapedPath), ...splitJsonPath(actionPath)])
             actionFullPath = actionPath + actionFullPath
         }
 
