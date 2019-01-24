@@ -18,7 +18,8 @@ import {
     isArray,
     asArray,
     getRelativePathBetweenNodes,
-    IAnyStateTreeNode
+    IAnyStateTreeNode,
+    warnError
 } from "../internal"
 
 export interface ISerializedActionCall {
@@ -199,12 +200,12 @@ export function onAction(
         if (!isStateTreeNode(target))
             fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
         if (!isRoot(target))
-            console.warn(
-                "[mobx-state-tree] Warning: Attaching onAction listeners to non root nodes is dangerous: No events will be emitted for actions initiated higher up in the tree."
+            warnError(
+                "Warning: Attaching onAction listeners to non root nodes is dangerous: No events will be emitted for actions initiated higher up in the tree."
             )
         if (!isProtected(target))
-            console.warn(
-                "[mobx-state-tree] Warning: Attaching onAction listeners to non protected nodes is dangerous: No events will be emitted for direct modifications without action."
+            warnError(
+                "Warning: Attaching onAction listeners to non protected nodes is dangerous: No events will be emitted for direct modifications without action."
             )
     }
 

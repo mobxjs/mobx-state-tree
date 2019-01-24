@@ -324,7 +324,7 @@ test("it should throw if a replaced object is read or written to", () => {
     setLivelinessChecking("error")
 
     function getError(objType: string, path: string, subpath: string, action: string) {
-        return `[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${objType}', Path upon death: '${path}', Subpath: '${subpath}', Action: '${action}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
+        return `You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${objType}', Path upon death: '${path}', Subpath: '${subpath}', Action: '${action}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
     }
 
     // dead todo

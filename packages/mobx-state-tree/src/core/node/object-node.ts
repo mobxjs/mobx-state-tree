@@ -32,7 +32,8 @@ import {
     IMiddlewareEvent,
     getCurrentActionContext,
     escapeJsonPath,
-    getPath
+    getPath,
+    warnError
 } from "../../internal"
 import { joinJsonPath } from "../json-patch"
 
@@ -331,20 +332,20 @@ export class ObjectNode extends BaseNode {
         return this.parent!.isRunningAction()
     }
 
-    assertAlive(context: AssertAliveContext) {
+    assertAlive(context: AssertAliveContext): void {
         const livelinessChecking = getLivelinessChecking()
         if (!this.isAlive && livelinessChecking !== "ignore") {
             const error = this._getAssertAliveError(context)
             switch (livelinessChecking) {
                 case "error":
-                    throw error
+                    return fail(error)
                 case "warn":
-                    console.warn(error)
+                    warnError(error)
             }
         }
     }
 
-    private _getAssertAliveError(context: AssertAliveContext) {
+    private _getAssertAliveError(context: AssertAliveContext): string {
         const escapedPath = this.getEscapedPath(false) || this.pathUponDeath || ""
         const subpath = (context.subpath && escapeJsonPath(context.subpath)) || ""
 
@@ -359,11 +360,9 @@ export class ObjectNode extends BaseNode {
             actionFullPath = actionPath + actionFullPath
         }
 
-        return new Error(
-            `[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${
-                this.type.name
-            }', Path upon death: '${escapedPath}', Subpath: '${subpath}', Action: '${actionFullPath}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
-        )
+        return `You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${
+            this.type.name
+        }', Path upon death: '${escapedPath}', Subpath: '${subpath}', Action: '${actionFullPath}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
     }
 
     getChildNode(subpath: string): INode {

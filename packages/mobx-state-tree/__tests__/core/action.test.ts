@@ -155,7 +155,7 @@ if (process.env.NODE_ENV !== "production") {
         expect(() => {
             store.orders[0].setCustomer(store.orders[0] as any)
         }).toThrowError(
-            "[mobx-state-tree] Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n\n    " +
+            "Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n\n    " +
                 "value of type Order: <Order@/orders/0> is not assignable to type: `(reference(Customer) | null)`, expected an instance of `(reference(Customer) | null)` or a snapshot like `(reference(Customer) | null?)` instead."
         ) // wrong type!
     })

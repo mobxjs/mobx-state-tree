@@ -363,9 +363,17 @@ export const deprecated: DeprecatedFunction = function(id: string, message: stri
     if (process.env.NODE_ENV === "production") return
     // warn if hasn't been warned before
     if (deprecated.ids && !deprecated.ids.hasOwnProperty(id)) {
-        console.warn("[mobx-state-tree] Deprecation warning: " + message)
+        warnError("Deprecation warning: " + message)
     }
     // mark as warned to avoid duplicate warn message
     if (deprecated.ids) deprecated.ids[id] = true
 }
 deprecated.ids = {}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function warnError(msg: string) {
+    console.warn(new Error(`[mobx-state-tree] ${msg}`))
+}
