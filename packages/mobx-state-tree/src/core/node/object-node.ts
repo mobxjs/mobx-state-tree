@@ -28,7 +28,8 @@ import {
     BaseNode,
     getLivelinessChecking,
     normalizeIdentifier,
-    ReferenceIdentifier
+    ReferenceIdentifier,
+    warnError
 } from "../../internal"
 
 let nextNodeId = 1
@@ -326,18 +327,17 @@ export class ObjectNode extends BaseNode {
         return this.parent!.isRunningAction()
     }
 
-    assertAlive() {
+    assertAlive(): void {
         if (!this.isAlive) {
-            const error = new Error(
-                `[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${
-                    this.type.name
-                }'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
-            )
+            const error = `You are trying to read or write to an object that is no longer part of a state tree. (Object type was '${
+                this.type.name
+            }'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
+
             switch (getLivelinessChecking()) {
                 case "error":
-                    throw error
+                    return fail(error)
                 case "warn":
-                    console.warn(error)
+                    warnError(error)
             }
         }
     }
