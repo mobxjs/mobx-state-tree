@@ -8,7 +8,8 @@ import {
     EMPTY_ARRAY,
     ObjectNode,
     Hook,
-    IAnyStateTreeNode
+    IAnyStateTreeNode,
+    warnError
 } from "../internal"
 
 export type IMiddlewareEventType =
@@ -140,10 +141,11 @@ export function addMiddleware(
 ): IDisposer {
     const node = getStateTreeNode(target)
     if (process.env.NODE_ENV !== "production") {
-        if (!node.isProtectionEnabled)
-            console.warn(
+        if (!node.isProtectionEnabled) {
+            warnError(
                 "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
             )
+        }
     }
     return node.addMiddleWare(handler, includeHooks)
 }

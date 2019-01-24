@@ -16,7 +16,7 @@ function createDeprecationListener() {
         // test for correct log message, if in development
         if (process.env.NODE_ENV !== "production") {
             expect(spyWarn).toHaveBeenCalledTimes(1)
-            expect(spyWarn.mock.calls[0][0]).toMatch(/Deprecation warning:/)
+            expect(spyWarn.mock.calls[0][0].message).toMatch(/Deprecation warning:/)
         }
     }
 }

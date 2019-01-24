@@ -188,7 +188,7 @@ test("items should be reconciled correctly when splicing - 1", () => {
 
     setLivelinessChecking("error")
     expect(() => store.todos.splice(0, 1, a, c, d)).toThrowError(
-        "[mobx-state-tree][error] You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Task'). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
+        "You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Task'). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
     )
     store.todos.splice(0, 1, clone(a), clone(c), clone(d))
     expect(store.todos.map(_ => _.x)).toEqual(["a", "c", "d"])
@@ -324,13 +324,13 @@ test("it should not be allowed to add the same item twice to the same store", ()
     expect(() => {
         s.todos.push(a)
     }).toThrowError(
-        "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/1', but it lives already at '/todos/0'"
+        "Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/1', but it lives already at '/todos/0'"
     )
     const b = Task.create()
     expect(() => {
         s.todos.push(b, b)
     }).toThrowError(
-        "[mobx-state-tree] Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/2', but it lives already at '/todos/1'"
+        "Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/2', but it lives already at '/todos/1'"
     )
 })
 test("it should support observable arrays", () => {
