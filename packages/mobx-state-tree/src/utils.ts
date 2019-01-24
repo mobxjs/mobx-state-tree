@@ -32,8 +32,8 @@ export type IDisposer = () => void
  * @internal
  * @hidden
  */
-export function fail(message = "Illegal state"): never {
-    throw new Error("[mobx-state-tree] " + message)
+export function fail(message = "Illegal state"): Error {
+    return new Error("[mobx-state-tree] " + message)
 }
 
 /**

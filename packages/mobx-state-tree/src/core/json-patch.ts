@@ -19,7 +19,7 @@ export interface IReversibleJsonPatch extends IJsonPatch {
  * @hidden
  */
 export function splitPatch(patch: IReversibleJsonPatch): [IJsonPatch, IJsonPatch] {
-    if (!("oldValue" in patch)) fail(`Patches without \`oldValue\` field cannot be inversed`)
+    if (!("oldValue" in patch)) throw fail(`Patches without \`oldValue\` field cannot be inversed`)
     return [stripPatch(patch), invertPatch(patch)]
 }
 

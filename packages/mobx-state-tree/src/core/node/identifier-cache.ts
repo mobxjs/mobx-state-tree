@@ -30,14 +30,14 @@ export class IdentifierCache {
         return `${this.cacheId}-${modificationId}`
     }
 
-    addNodeToCache(node: ObjectNode, lastCacheUpdate = true) {
+    addNodeToCache(node: ObjectNode, lastCacheUpdate = true): void {
         if (node.identifierAttribute) {
             const identifier = node.identifier!
             if (!this.cache.has(identifier)) {
                 this.cache.set(identifier, observable.array<ObjectNode>([], mobxShallow))
             }
             const set = this.cache.get(identifier)!
-            if (set.indexOf(node) !== -1) fail(`Already registered`)
+            if (set.indexOf(node) !== -1) throw fail(`Already registered`)
             set.push(node)
             if (lastCacheUpdate) {
                 this.updateLastCacheModificationPerId(identifier)
@@ -103,7 +103,7 @@ export class IdentifierCache {
             case 1:
                 return matches[0]
             default:
-                return fail(
+                throw fail(
                     `Cannot resolve a reference to type '${
                         type.name
                     }' with id: '${identifier}' unambigously, there are multiple candidates: ${matches

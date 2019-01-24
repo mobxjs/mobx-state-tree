@@ -399,17 +399,17 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTree
     }
 
     get Type(): T {
-        return fail(
+        throw fail(
             "Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`"
         )
     }
     get SnapshotType(): S {
-        return fail(
+        throw fail(
             "Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`"
         )
     }
     get CreationType(): C {
-        return fail(
+        throw fail(
             "Factory.CreationType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.CreationType`"
         )
     }
@@ -444,11 +444,11 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
     }
 
     applySnapshot(node: INode, snapshot: C): void {
-        fail("Immutable types do not support applying snapshots")
+        throw fail("Immutable types do not support applying snapshots")
     }
 
     applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void {
-        fail("Immutable types do not support applying patches")
+        throw fail("Immutable types do not support applying patches")
     }
 
     getChildren(node: INode): INode[] {
@@ -456,11 +456,11 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
     }
 
     getChildNode(node: INode, key: string): INode {
-        return fail(`No child '${key}' available in type: ${this.name}`)
+        throw fail(`No child '${key}' available in type: ${this.name}`)
     }
 
     getChildType(key: string): IAnyType {
-        return fail(`No child '${key}' available in type: ${this.name}`)
+        throw fail(`No child '${key}' available in type: ${this.name}`)
     }
 
     reconcile(current: INode, newValue: any): INode {
@@ -472,7 +472,7 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
     }
 
     removeChild(node: INode, subpath: string): void {
-        return fail(`No child '${subpath}' available in type: ${this.name}`)
+        throw fail(`No child '${subpath}' available in type: ${this.name}`)
     }
 }
 

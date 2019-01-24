@@ -158,14 +158,16 @@ export function optional<IT extends IAnyType>(
 ): IT extends OptionalProperty ? IT : IOptionalIType<IT> {
     // make sure we never pass direct instances
     if (typeof defaultValueOrFunction !== "function" && isStateTreeNode(defaultValueOrFunction)) {
-        fail(
+        throw fail(
             "default value cannot be an instance, pass a snapshot or a function that creates an instance/snapshot instead"
         )
     }
 
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type))
-            fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
+            throw fail(
+                "expected a mobx-state-tree type as first argument, got " + type + " instead"
+            )
 
         // we only check default values if they are passed directly
         // if they are generator functions they will be checked once they are generated

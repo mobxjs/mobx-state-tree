@@ -161,17 +161,17 @@ class MSTMap<C, S, T> extends ObservableMap {
     }
 
     put(value: C | S | T): T {
-        if (!!!value) fail(`Map.put cannot be used to set empty values`)
+        if (!!!value) throw fail(`Map.put cannot be used to set empty values`)
         if (isStateTreeNode(value)) {
             const node = getStateTreeNode(value)
             if (process.env.NODE_ENV !== "production") {
-                if (!node.identifierAttribute) return fail(needsIdentifierError)
+                if (!node.identifierAttribute) throw fail(needsIdentifierError)
             }
             let key = node.identifier!
             this.set(key, node.value)
             return node.value
         } else if (!isMutable(value)) {
-            return fail(`Map.put can only be used to store complex values`)
+            throw fail(`Map.put can only be used to store complex values`)
         } else {
             let key: string
             const mapType = getStateTreeNode(this as IAnyStateTreeNode).type as MapType<
@@ -179,13 +179,13 @@ class MSTMap<C, S, T> extends ObservableMap {
                 any,
                 any
             >
-            if (mapType.identifierMode === MapIdentifierMode.NO) return fail(needsIdentifierError)
+            if (mapType.identifierMode === MapIdentifierMode.NO) throw fail(needsIdentifierError)
             if (mapType.identifierMode === MapIdentifierMode.YES) {
                 key = normalizeIdentifier((value as any)[mapType.mapIdentifierAttribute!])
                 this.set(key, value)
                 return this.get(key) as any
             }
-            return fail(needsIdentifierError)
+            throw fail(needsIdentifierError)
         }
     }
 }
@@ -225,7 +225,7 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
             modelTypes.forEach(type => {
                 if (type.identifierAttribute) {
                     if (identifierAttribute && identifierAttribute !== type.identifierAttribute) {
-                        fail(
+                        throw fail(
                             `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${
                                 type.name
                             }' declared attribute '${type.identifierAttribute}' as identifier`
@@ -275,7 +275,7 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
 
     getChildNode(node: ObjectNode, key: string): INode {
         const childNode = node.storedValue.get("" + key)
-        if (!childNode) fail("Not a child " + key)
+        if (!childNode) throw fail("Not a child " + key)
         return childNode
     }
 
@@ -308,11 +308,11 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
         return change
     }
 
-    private processIdentifier(expected: string, node: INode) {
+    private processIdentifier(expected: string, node: INode): void {
         if (this.identifierMode === MapIdentifierMode.YES && node instanceof ObjectNode) {
             const identifier = node.identifier!
             if (identifier !== expected)
-                fail(
+                throw fail(
                     `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
                 )
         }
@@ -367,7 +367,11 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
                 change.oldValue.die()
                 // emit the patch
                 return void node.emitPatch(
-                    { op: "remove", path: escapeJsonPath(change.name), oldValue: oldSnapshot },
+                    {
+                        op: "remove",
+                        path: escapeJsonPath(change.name),
+                        oldValue: oldSnapshot
+                    },
                     node
                 )
         }

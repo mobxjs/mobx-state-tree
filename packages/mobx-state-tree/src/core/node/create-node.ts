@@ -18,7 +18,7 @@ export function createNode<C, S, T>(
             return existingNode
         }
 
-        fail(
+        throw fail(
             `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
                 parent ? parent.path : ""
             }/${subpath}', but it lives already at '${existingNode.path}'`

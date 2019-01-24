@@ -33,14 +33,14 @@ export class IdentifierType extends Type<string, string, string> {
         snapshot: string
     ): INode {
         if (!parent || !(parent.type instanceof ModelType))
-            fail(`Identifier types can only be instantiated as direct child of a model type`)
+            throw fail(`Identifier types can only be instantiated as direct child of a model type`)
 
         return createNode(this, parent, subpath, environment, snapshot)
     }
 
     reconcile(current: INode, newValue: string) {
         if (current.storedValue !== newValue)
-            return fail(
+            throw fail(
                 `Tried to change identifier from '${
                     current.storedValue
                 }' to '${newValue}'. Changing identifiers is not allowed.`

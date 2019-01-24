@@ -72,14 +72,14 @@ class StoredReference<IT extends IAnyType> {
         } else if (isStateTreeNode(value)) {
             const targetNode = getStateTreeNode(value)
             if (!targetNode.identifierAttribute)
-                return fail(`Can only store references with a defined identifier attribute.`)
+                throw fail(`Can only store references with a defined identifier attribute.`)
             const id = targetNode.unnormalizedIdentifier
             if (id === null || id === undefined) {
-                return fail(`Can only store references to tree nodes with a defined identifier.`)
+                throw fail(`Can only store references to tree nodes with a defined identifier.`)
             }
             this.identifier = id
         } else {
-            return fail(`Can only store references to tree nodes or identifiers, got: '${value}'`)
+            throw fail(`Can only store references to tree nodes or identifiers, got: '${value}'`)
         }
     }
 
@@ -485,9 +485,13 @@ export function reference<IT extends IAnyComplexType>(
     // check that a type is given
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subType))
-            fail("expected a mobx-state-tree type as first argument, got " + subType + " instead")
+            throw fail(
+                "expected a mobx-state-tree type as first argument, got " + subType + " instead"
+            )
         if (arguments.length === 2 && typeof arguments[1] === "string")
-            fail("References with base path are no longer supported. Please remove the base path.")
+            throw fail(
+                "References with base path are no longer supported. Please remove the base path."
+            )
     }
 
     const getSetOptions = options ? (options as ReferenceOptionsGetSet<IT>) : undefined
@@ -498,7 +502,7 @@ export function reference<IT extends IAnyComplexType>(
     if (getSetOptions && (getSetOptions.get || getSetOptions.set)) {
         if (process.env.NODE_ENV !== "production") {
             if (!getSetOptions.get || !getSetOptions.set) {
-                fail(
+                throw fail(
                     "reference options must either contain both a 'get' and a 'set' method or none of them"
                 )
             }

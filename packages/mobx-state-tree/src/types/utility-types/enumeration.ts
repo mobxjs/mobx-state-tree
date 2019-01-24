@@ -35,7 +35,7 @@ export function enumeration(name: string | string[], options?: any): ISimpleType
     if (process.env.NODE_ENV !== "production") {
         realOptions.forEach(option => {
             if (typeof option !== "string")
-                fail("expected all options to be string, got " + type + " instead")
+                throw fail("expected all options to be string, got " + type + " instead")
         })
     }
     const type = union(...realOptions.map(option => literal("" + option)))

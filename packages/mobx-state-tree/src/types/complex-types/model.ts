@@ -247,7 +247,7 @@ function objectTypeToString(this: any) {
 export interface ModelTypeConfig {
     name?: string
     properties?: ModelProperties
-    initializers?: ReadonlyArray<((instance: any) => any)>
+    initializers?: ReadonlyArray<(instance: any) => any>
     preProcessor?: (snapshot: any) => any
     postProcessor?: (snapshot: any) => any
 }
@@ -264,19 +264,19 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
         (props, key) => {
             // warn if user intended a HOOK
             if (key in Hook)
-                return fail(
+                throw fail(
                     `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
                 )
 
             // the user intended to use a view
             const descriptor = Object.getOwnPropertyDescriptor(props, key)!
             if ("get" in descriptor) {
-                fail("Getters are not supported as properties. Please use views instead")
+                throw fail("Getters are not supported as properties. Please use views instead")
             }
             // undefined and null are not valid
             const value = descriptor.value
             if (value === null || value === undefined) {
-                fail(
+                throw fail(
                     "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
                 )
                 // its a primitive, convert to its type
@@ -296,17 +296,17 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
                 return props
                 // its a function, maybe the user wanted a view?
             } else if (process.env.NODE_ENV !== "production" && typeof value === "function") {
-                fail(
+                throw fail(
                     `Invalid type definition for property '${key}', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?`
                 )
                 // no other complex values
             } else if (process.env.NODE_ENV !== "production" && typeof value === "object") {
-                fail(
+                throw fail(
                     `Invalid type definition for property '${key}', it looks like you passed an object. Try passing another model type or a types.frozen.`
                 )
                 // WTF did you pass in mate?
             } else {
-                fail(
+                throw fail(
                     `Invalid type definition for property '${key}', cannot infer a type from a value like '${value}' (${typeof value})`
                 )
             }
@@ -339,7 +339,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         super(opts.name || defaultObjectOptions.name)
         const name = opts.name || defaultObjectOptions.name
         // TODO: this test still needed?
-        if (!/^\w[\w\d_]*$/.test(name)) fail(`Typename should be a valid identifier: ${name}`)
+        if (!/^\w[\w\d_]*$/.test(name)) throw fail(`Typename should be a valid identifier: ${name}`)
         Object.assign(this, defaultObjectOptions, opts)
         // ensures that any default value gets converted to its related type
         this.properties = toPropertiesObject(this.properties) as P
@@ -353,7 +353,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         this.forAllProps((propName, propType) => {
             if (propType.flags & TypeFlags.Identifier) {
                 if (identifierAttribute)
-                    fail(
+                    throw fail(
                         `Cannot define property '${propName}' as object identifier, property '${identifierAttribute}' is already defined as identifier property`
                     )
                 identifierAttribute = propName
@@ -380,21 +380,21 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         return this.cloneAndEnhance({ initializers: [actionInitializer] })
     }
 
-    instantiateActions(self: any, actions: any) {
+    instantiateActions(self: any, actions: any): void {
         // check if return is correct
         if (!isPlainObject(actions))
-            fail(`actions initializer should return a plain object containing actions`)
+            throw fail(`actions initializer should return a plain object containing actions`)
 
         // bind actions to the object created
         Object.keys(actions).forEach(name => {
             // warn if preprocessor was given
             if (name === PRE_PROCESS_SNAPSHOT)
-                fail(
+                throw fail(
                     `Cannot define action '${PRE_PROCESS_SNAPSHOT}', it should be defined using 'type.preProcessSnapshot(fn)' instead`
                 )
             // warn if postprocessor was given
             if (name === POST_PROCESS_SNAPSHOT)
-                fail(
+                throw fail(
                     `Cannot define action '${POST_PROCESS_SNAPSHOT}', it should be defined using 'type.postProcessSnapshot(fn)' instead`
                 )
 
@@ -443,10 +443,10 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         return this.cloneAndEnhance({ initializers: [stateInitializer] })
     }
 
-    instantiateVolatileState(self: any, state: Object) {
+    instantiateVolatileState(self: any, state: Object): void {
         // check views return
         if (!isPlainObject(state))
-            fail(`volatile state initializer should return a plain object containing state`)
+            throw fail(`volatile state initializer should return a plain object containing state`)
         set(self, state)
     }
 
@@ -454,7 +454,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         const initializer = (self: any) => {
             const { actions, views, state, ...rest } = fn(self)
             for (let key in rest)
-                fail(
+                throw fail(
                     `The \`extend\` function should return an object with a subset of the fields 'actions', 'views' and 'state'. Found invalid key '${key}'`
                 )
             if (state) this.instantiateVolatileState(self, state)
@@ -473,10 +473,10 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         return this.cloneAndEnhance({ initializers: [viewInitializer] })
     }
 
-    instantiateViews(self: any, views: Object) {
+    instantiateViews(self: any, views: Object): void {
         // check views return
         if (!isPlainObject(views))
-            fail(`views initializer should return a plain object containing views`)
+            throw fail(`views initializer should return a plain object containing views`)
         Object.keys(views).forEach(key => {
             // is this a computed property?
             const descriptor = Object.getOwnPropertyDescriptor(views, key)!
@@ -504,7 +504,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
                     ? addHiddenFinalProp
                     : addHiddenWritableProp)(self, key, value)
             } else {
-                fail(`A view member should either be a function or getter based property`)
+                throw fail(`A view member should either be a function or getter based property`)
             }
         })
     }
@@ -611,9 +611,9 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
     }
 
     getChildNode(node: ObjectNode, key: string): INode {
-        if (!(key in this.properties)) return fail("Not a value property: " + key)
+        if (!(key in this.properties)) throw fail("Not a value property: " + key)
         const childNode = _getAdministration(node.storedValue, key).value // TODO: blegh!
-        if (!childNode) return fail("Node not available for property " + key)
+        if (!childNode) throw fail("Node not available for property " + key)
         return childNode
     }
 
@@ -644,7 +644,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
 
     applyPatchLocally(node: ObjectNode, subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add"))
-            fail(`object does not support operation ${patch.op}`)
+            throw fail(`object does not support operation ${patch.op}`)
         node.storedValue[subpath] = patch.value
     }
 
@@ -807,7 +807,7 @@ export function compose(...args: any[]): any {
     if (process.env.NODE_ENV !== "production") {
         args.forEach(type => {
             if (!isModelType(type))
-                fail("expected a mobx-state-tree model type, got " + type + " instead")
+                throw fail("expected a mobx-state-tree model type, got " + type + " instead")
         })
     }
     return (args as ModelType<any, any>[])

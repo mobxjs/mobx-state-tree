@@ -139,7 +139,7 @@ export class ObjectNode extends BaseNode {
             }
 
             if (typeof id !== "string" && typeof id !== "number") {
-                fail(
+                throw fail(
                     `Instance identifier '${this.identifierAttribute}' for type '${
                         this.type.name
                     }' must be a string or a number`
@@ -225,18 +225,18 @@ export class ObjectNode extends BaseNode {
         return parent ? parent.root : this
     }
 
-    setParent(newParent: ObjectNode | null, subpath: string | null = null) {
+    setParent(newParent: ObjectNode | null, subpath: string | null = null): void {
         if (this.parent === newParent && this.subpath === subpath) return
         if (newParent && process.env.NODE_ENV !== "production") {
             if (this.parent && newParent !== this.parent) {
-                fail(
+                throw fail(
                     `A node cannot exists twice in the state tree. Failed to add ${this} to path '${
                         newParent.path
                     }/${subpath}'.`
                 )
             }
             if (!this.parent && newParent.root === this) {
-                fail(
+                throw fail(
                     `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${
                         newParent.path
                     }/${subpath}'`
@@ -247,7 +247,7 @@ export class ObjectNode extends BaseNode {
                 !!this.root.environment &&
                 this.root.environment !== newParent.root.environment
             ) {
-                fail(
+                throw fail(
                     `A state tree cannot be made part of another state tree as long as their environments are different.`
                 )
             }
@@ -335,7 +335,7 @@ export class ObjectNode extends BaseNode {
 
             switch (getLivelinessChecking()) {
                 case "error":
-                    return fail(error)
+                    throw fail(error)
                 case "warn":
                     warnError(error)
             }
@@ -374,10 +374,10 @@ export class ObjectNode extends BaseNode {
         return this.root.isProtectionEnabled
     }
 
-    assertWritable() {
+    assertWritable(): void {
         this.assertAlive()
         if (!this.isRunningAction() && this.isProtected) {
-            fail(
+            throw fail(
                 `Cannot modify '${this}', the object is protected and can only be modified by using an action.`
             )
         }
@@ -412,8 +412,8 @@ export class ObjectNode extends BaseNode {
     }
 
     @action
-    detach() {
-        if (!this.isAlive) fail(`Error while detaching, node is not alive.`)
+    detach(): void {
+        if (!this.isAlive) throw fail(`Error while detaching, node is not alive.`)
         if (this.isRoot) return
 
         this.fireHook(Hook.beforeDetach)
@@ -540,12 +540,12 @@ export class ObjectNode extends BaseNode {
             this._internalEvents.register(InternalEvents.Dispose, disposer, true)
             return
         }
-        fail("cannot add a disposer when it is already registered for execution")
+        throw fail("cannot add a disposer when it is already registered for execution")
     }
 
     removeDisposer(disposer: () => void): void {
         if (!this._internalEvents.has(InternalEvents.Dispose, disposer)) {
-            return fail("cannot remove a disposer which was never registered for execution")
+            throw fail("cannot remove a disposer which was never registered for execution")
         }
         this._internalEvents.unregister(InternalEvents.Dispose, disposer)
     }

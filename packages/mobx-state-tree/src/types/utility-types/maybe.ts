@@ -46,7 +46,7 @@ export interface IMaybeNull<IT extends IAnyType> extends IMaybeIType<IT, null | 
  */
 export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
     if (process.env.NODE_ENV !== "production" && !isType(type))
-        fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
+        throw fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
     return union(type, optionalUndefinedType) as any
 }
 
@@ -59,6 +59,6 @@ export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
  */
 export function maybeNull<IT extends IAnyType>(type: IT): IMaybeNull<IT> {
     if (process.env.NODE_ENV !== "production" && !isType(type))
-        fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
+        throw fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
     return union(type, optionalNullType) as any
 }

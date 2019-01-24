@@ -160,7 +160,7 @@ export function typecheck<C, S, T>(type: IType<C, S, T>, value: C | S | T): void
     const errors = type.validate(value, [{ path: "", type }])
 
     if (errors.length > 0) {
-        fail(
+        throw fail(
             `Error while converting ${shortenPrintValue(prettyPrintValue(value))} to \`${
                 type.name
             }\`:\n\n    ` + errors.map(toErrorString).join("\n    ")

@@ -75,13 +75,13 @@ export class Union extends Type<any, any, any> {
 
     instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
         const type = this.determineType(value, undefined)
-        if (!type) return fail("No matching type for union " + this.describe()) // can happen in prod builds
+        if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
         return type.instantiate(parent, subpath, environment, value)
     }
 
     reconcile(current: INode, newValue: any): INode {
         const type = this.determineType(newValue, current.type)
-        if (!type) return fail("No matching type for union " + this.describe()) // can happen in prod builds
+        if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
         return type.reconcile(current, newValue)
     }
 
@@ -233,12 +233,12 @@ export function union(optionsOrType: UnionOptions | IAnyType, ...otherTypes: IAn
     // check all options
     if (process.env.NODE_ENV !== "production") {
         if (!isType(optionsOrType) && !isPlainObject(optionsOrType))
-            fail(
+            throw fail(
                 "First argument to types.union should either be a type, or an objects object of the form: { eager?: boolean, dispatcher?: Function }"
             )
         types.forEach(type => {
             if (!isType(type))
-                fail(
+                throw fail(
                     "expected all possible types to be a mobx-state-tree type, got " +
                         type +
                         " instead"
