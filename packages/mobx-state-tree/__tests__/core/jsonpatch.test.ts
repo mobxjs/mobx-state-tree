@@ -40,6 +40,7 @@ const Node = types.model("Node", {
     text: "Hi",
     children: types.optional(types.array(types.late((): IAnyModelType => Node)), [])
 })
+
 test("it should apply simple patch", () => {
     testPatches(
         Node,
@@ -56,6 +57,7 @@ test("it should apply simple patch", () => {
         ]
     )
 })
+
 test("it should apply deep patches to arrays", () => {
     testPatches(
         Node,
@@ -104,6 +106,7 @@ test("it should apply deep patches to arrays", () => {
         ]
     )
 })
+
 test("it should apply deep patches to arrays with object instances", () => {
     testPatches(
         Node,
@@ -141,6 +144,7 @@ test("it should apply deep patches to arrays with object instances", () => {
         ]
     )
 })
+
 test("it should apply non flat patches", () => {
     testPatches(
         Node,
@@ -178,6 +182,7 @@ test("it should apply non flat patches", () => {
         ]
     )
 })
+
 test("it should apply non flat patches with object instances", () => {
     testPatches(
         Node,
@@ -210,6 +215,7 @@ test("it should apply non flat patches with object instances", () => {
         ]
     )
 })
+
 test("it should apply deep patches to maps", () => {
     // If user does not transpile const/let to var, trying to call Late' subType
     // property getter during map's tryCollectModelTypes() will throw ReferenceError.
@@ -281,6 +287,7 @@ test("it should apply deep patches to maps", () => {
         ]
     )
 })
+
 test("it should apply deep patches to objects", () => {
     const NodeObject = types.model("NodeObject", {
         id: types.identifierNumber,
@@ -377,6 +384,10 @@ test("it should correctly split/join json patches", () => {
     isInvalid("a")
     isInvalid("a/")
     isInvalid("a//")
+    isInvalid(".a")
+    isInvalid(".a/")
+    isInvalid("..a")
+    isInvalid("..a/")
 })
 
 test("it should correctly escape/unescape json patches", () => {
