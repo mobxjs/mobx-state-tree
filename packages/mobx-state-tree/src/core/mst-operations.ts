@@ -491,6 +491,7 @@ export function resolvePath(target: IAnyStateTreeNode, path: string): any {
         if (typeof path !== "string")
             fail("expected second argument to be a number, got " + path + " instead")
     }
+
     const node = resolveNodeByPath(getStateTreeNode(target), path)
     return node ? node.value : undefined
 }
@@ -757,7 +758,7 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
  * @param disposer
  * @returns The same disposer that was passed as argument
  */
-export function addDisposer(target: IAnyStateTreeNode, disposer: () => void): (() => void) {
+export function addDisposer(target: IAnyStateTreeNode, disposer: () => void): () => void {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))

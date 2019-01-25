@@ -110,10 +110,11 @@ const doubleDot = (_: any) => ".."
  */
 export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode): string {
     // PRE condition target is (a child of) base!
-    if (base.root !== target.root)
-        fail(
+    if (base.root !== target.root) {
+        return fail(
             `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
         )
+    }
 
     const baseParts = splitJsonPath(base.path)
     const targetParts = splitJsonPath(target.path)
@@ -151,19 +152,7 @@ export function resolveNodeByPathParts(
     pathParts: string[],
     failIfResolveFails: boolean = true
 ): INode | undefined {
-    // counter part of getRelativePath
-    // note that `../` is not part of the JSON pointer spec, which is actually a prefix format
-    // in json pointer: "" = current, "/a", attribute a, "/" is attribute "" etc...
-    // so we treat leading ../ apart...
-    let current: INode | null
-
-    if (pathParts.length > 0 && (pathParts[0] === "." || pathParts[0] === "..")) {
-        // extension - relative path
-        current = base
-    } else {
-        // absolute path
-        current = base.root
-    }
+    let current: INode | null = base
 
     for (let i = 0; i < pathParts.length; i++) {
         const part = pathParts[i]
