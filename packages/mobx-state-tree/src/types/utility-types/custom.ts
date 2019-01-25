@@ -40,7 +40,7 @@ export interface CustomTypeOptions<S, T> {
  *     // return the serialization of the current value
  *     toSnapshot(value: T): S
  *     // if true, this is a converted value, if false, it's a snapshot
- *     isTargetType(value: T | S): boolean
+ *     isTargetType(value: T | S): value is T
  *     // a non empty string is assumed to be a validation error
  *     getValidationMessage?(snapshot: S): string
  * }
