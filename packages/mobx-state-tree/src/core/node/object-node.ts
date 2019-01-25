@@ -35,7 +35,6 @@ import {
     getPath,
     warnError
 } from "../../internal"
-import { joinJsonPath } from "../json-patch"
 
 let nextNodeId = 1
 
@@ -352,12 +351,11 @@ export class ObjectNode extends BaseNode {
         const actionContext = context.actionContext || getCurrentActionContext()
         let actionFullPath = ""
         if (actionContext && actionContext.name != null) {
-            actionFullPath = "." + actionContext.name + "()"
             // try to use the context, and if it not available use the node one
             const actionPath =
                 (actionContext && actionContext.context && getPath(actionContext.context)) ||
                 escapedPath
-            actionFullPath = actionPath + actionFullPath
+            actionFullPath = `${actionPath}.${actionContext.name}()`
         }
 
         return `You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${
