@@ -39,18 +39,18 @@ export class ScalarNode extends BaseNode {
 
     get root(): ObjectNode {
         // future optimization: store root ref in the node and maintain it
-        if (!this.parent) return fail(`This scalar node is not part of a tree`)
+        if (!this.parent) throw fail(`This scalar node is not part of a tree`)
         return this.parent.root
     }
 
-    setParent(newParent: ObjectNode | null, subpath: string | null = null) {
+    setParent(newParent: ObjectNode | null, subpath: string | null = null): void {
         if (this.parent === newParent && this.subpath === subpath) return
         if (this.parent && !newParent) {
             this.die()
         } else {
             const newPath = subpath === null ? "" : subpath
             if (newParent && newParent !== this.parent) {
-                fail("assertion failed: scalar nodes cannot change their parent")
+                throw fail("assertion failed: scalar nodes cannot change their parent")
             } else if (this.subpath !== newPath) {
                 this.baseSetParent(this.parent, newPath)
             }

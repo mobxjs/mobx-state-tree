@@ -98,7 +98,7 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
  * @hidden
  */
 export function getActionContext(): IMiddlewareEvent {
-    if (!currentActionContext) return fail("Not running an action!")
+    if (!currentActionContext) throw fail("Not running an action!")
     return currentActionContext
 }
 
@@ -243,7 +243,7 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
             if (process.env.NODE_ENV !== "production") {
                 if (!nextInvoked && !abortInvoked) {
                     const node2 = getStateTreeNode(call.tree)
-                    fail(
+                    throw fail(
                         `Neither the next() nor the abort() callback within the middleware ${
                             handler.name
                         } for the action: "${call.name}" on the node: ${
@@ -253,7 +253,7 @@ function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn
                 }
                 if (nextInvoked && abortInvoked) {
                     const node2 = getStateTreeNode(call.tree)
-                    fail(
+                    throw fail(
                         `The next() and abort() callback within the middleware ${
                             handler.name
                         } for the action: "${call.name}" on the node: ${

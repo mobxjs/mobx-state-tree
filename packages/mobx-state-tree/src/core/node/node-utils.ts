@@ -69,7 +69,7 @@ export function isStateTreeNode<C = any, S = any>(value: any): value is IStateTr
  */
 export function getStateTreeNode(value: IAnyStateTreeNode): ObjectNode {
     if (isStateTreeNode(value)) return value.$treenode!
-    else return fail(`Value ${value} is no MST Node`)
+    else throw fail(`Value ${value} is no MST Node`)
 }
 
 /**
@@ -111,7 +111,7 @@ const doubleDot = (_: any) => ".."
 export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode): string {
     // PRE condition target is (a child of) base!
     if (base.root !== target.root) {
-        return fail(
+        throw fail(
             `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
         )
     }
@@ -187,7 +187,7 @@ export function resolveNodeByPathParts(
             }
         }
         if (failIfResolveFails)
-            return fail(
+            throw fail(
                 `Could not resolve '${part}' in path '${joinJsonPath(pathParts.slice(0, i)) ||
                     "/"}' while resolving '${joinJsonPath(pathParts)}'`
             )

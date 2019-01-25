@@ -16,7 +16,7 @@ test("waitAsync helper works", async () => {
 test("waitAsyncReject helper works", async () => {
     try {
         await waitAsyncReject(10)
-        fail("should have failed")
+        throw fail("should have failed")
     } catch {
         // do nothing
     }
@@ -148,7 +148,7 @@ function addStandardTests() {
     test("m.setXAsyncThrowSync()", async () => {
         try {
             await m.setXAsyncThrowSync()
-            fail("should have thrown")
+            throw fail("should have thrown")
         } catch {}
         expect(devTools.send.mock.calls).toMatchSnapshot()
     })
@@ -156,7 +156,7 @@ function addStandardTests() {
     test("m.setXAsyncThrowAsync()", async () => {
         try {
             await m.setXAsyncThrowAsync()
-            fail("should have thrown")
+            throw fail("should have thrown")
         } catch {}
         expect(devTools.send.mock.calls).toMatchSnapshot()
     })
@@ -182,7 +182,7 @@ function addStandardTests() {
     test("m.setXYAsyncThrowSync() -> m.setXAsyncThrowSync()", async () => {
         try {
             await m.setXYAsyncThrowSync()
-            fail("should have thrown")
+            throw fail("should have thrown")
         } catch {}
         expect(devTools.send.mock.calls).toMatchSnapshot()
     })
@@ -190,7 +190,7 @@ function addStandardTests() {
     test("m.setXYAsyncThrowAsync() -> m.setXYAsyncThrowAsync()", async () => {
         try {
             await m.setXYAsyncThrowAsync()
-            fail("should have thrown")
+            throw fail("should have thrown")
         } catch {}
         expect(devTools.send.mock.calls).toMatchSnapshot()
     })

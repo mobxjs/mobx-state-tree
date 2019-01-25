@@ -102,17 +102,17 @@ export function refinement(...args: any[]): IAnyType {
     // ensures all parameters are correct
     if (process.env.NODE_ENV !== "production") {
         if (typeof name !== "string")
-            fail("expected a string as first argument, got " + name + " instead")
+            throw fail("expected a string as first argument, got " + name + " instead")
         if (!isType(type))
-            fail(
+            throw fail(
                 "expected a mobx-state-tree type as first or second argument, got " +
                     type +
                     " instead"
             )
         if (typeof predicate !== "function")
-            fail("expected a function as third argument, got " + predicate + " instead")
+            throw fail("expected a function as third argument, got " + predicate + " instead")
         if (typeof message !== "function")
-            fail("expected a function as fourth argument, got " + message + " instead")
+            throw fail("expected a function as fourth argument, got " + message + " instead")
     }
     return new Refinement(name, type, predicate, message)
 }

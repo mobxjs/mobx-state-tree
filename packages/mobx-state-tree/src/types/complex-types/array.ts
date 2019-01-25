@@ -131,7 +131,7 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
     getChildNode(node: ObjectNode, key: string): INode {
         const index = parseInt(key, 10)
         if (index < node.storedValue.length) return node.storedValue[index]
-        return fail("Not a child: " + key)
+        throw fail("Not a child: " + key)
     }
 
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
@@ -307,7 +307,9 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(subtype))
-            fail("expected a mobx-state-tree type as first argument, got " + subtype + " instead")
+            throw fail(
+                "expected a mobx-state-tree type as first argument, got " + subtype + " instead"
+            )
     }
     const ret = new ArrayType<IT>(subtype.name + "[]", subtype)
     return ret as typeof ret & OptionalProperty
@@ -349,7 +351,7 @@ function reconcileArrayChildren<T>(
             // check if already belongs to the same parent. if so, avoid pushing item in. only swapping can occur.
             if (isStateTreeNode(newValue) && getStateTreeNode(newValue).parent === parent) {
                 // this node is owned by this parent, but not in the reconcilable set, so it must be double
-                fail(
+                throw fail(
                     `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
                         parent.path
                     }/${newPaths[i]}', but it lives already at '${getStateTreeNode(newValue).path}'`

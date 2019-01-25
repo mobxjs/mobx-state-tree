@@ -40,12 +40,12 @@ export class Late<C, S, T> extends Type<C, S, T> {
                 else throw e
             }
             if (mustSucceed && t === undefined)
-                fail(
+                throw fail(
                     "Late type seems to be used too early, the definition (still) returns undefined"
                 )
             if (t) {
                 if (process.env.NODE_ENV !== "production" && !isType(t))
-                    fail(
+                    throw fail(
                         "Failed to determine subtype, make sure types.late returns a type definition."
                     )
                 this._subType = t
@@ -116,7 +116,7 @@ export function late(nameOrType: any, maybeType?: () => IAnyType): IAnyType {
     // checks that the type is actually a late type
     if (process.env.NODE_ENV !== "production") {
         if (!(typeof type === "function" && type.length === 0))
-            fail(
+            throw fail(
                 "Invalid late type, expected a function with zero arguments that returns a type, got: " +
                     type
             )
