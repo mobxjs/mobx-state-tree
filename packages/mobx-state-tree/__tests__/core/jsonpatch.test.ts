@@ -40,6 +40,7 @@ const Node = types.model("Node", {
     text: "Hi",
     children: types.optional(types.array(types.late((): IAnyModelType => Node)), [])
 })
+
 test("it should apply simple patch", () => {
     testPatches(
         Node,
@@ -56,6 +57,7 @@ test("it should apply simple patch", () => {
         ]
     )
 })
+
 test("it should apply deep patches to arrays", () => {
     testPatches(
         Node,
@@ -104,6 +106,7 @@ test("it should apply deep patches to arrays", () => {
         ]
     )
 })
+
 test("it should apply deep patches to arrays with object instances", () => {
     testPatches(
         Node,
@@ -141,6 +144,7 @@ test("it should apply deep patches to arrays with object instances", () => {
         ]
     )
 })
+
 test("it should apply non flat patches", () => {
     testPatches(
         Node,
@@ -178,6 +182,7 @@ test("it should apply non flat patches", () => {
         ]
     )
 })
+
 test("it should apply non flat patches with object instances", () => {
     testPatches(
         Node,
@@ -210,6 +215,7 @@ test("it should apply non flat patches with object instances", () => {
         ]
     )
 })
+
 test("it should apply deep patches to maps", () => {
     // If user does not transpile const/let to var, trying to call Late' subType
     // property getter during map's tryCollectModelTypes() will throw ReferenceError.
@@ -281,6 +287,7 @@ test("it should apply deep patches to maps", () => {
         ]
     )
 })
+
 test("it should apply deep patches to objects", () => {
     const NodeObject = types.model("NodeObject", {
         id: types.identifierNumber,
@@ -344,20 +351,43 @@ test("it should apply deep patches to objects", () => {
 })
 
 test("it should correctly split/join json patches", () => {
-    expect(splitJsonPath("")).toEqual([])
-    expect(joinJsonPath([])).toBe("")
+    function isValid(str: string, array: string[], altStr?: string) {
+        expect(splitJsonPath(str)).toEqual(array)
+        expect(joinJsonPath(array)).toBe(altStr !== undefined ? altStr : str)
+    }
 
-    expect(splitJsonPath("/")).toEqual([""])
-    expect(joinJsonPath([""])).toBe("/")
+    isValid("", [])
+    isValid("/", [""])
+    isValid("//", ["", ""])
+    isValid("/a", ["a"])
+    isValid("/a/", ["a", ""])
+    isValid("/a//", ["a", "", ""])
+    isValid(".", ["."])
+    isValid("..", [".."])
+    isValid("./a", [".", "a"])
+    isValid("../a", ["..", "a"])
+    isValid("/.a", [".a"])
+    isValid("/..a", ["..a"])
 
-    expect(splitJsonPath("/a")).toEqual(["a"])
-    expect(joinJsonPath(["a"])).toBe("/a")
+    // rooted relatives are equivalent to plain relatives
+    isValid("/.", ["."], ".")
+    isValid("/..", [".."], "..")
+    isValid("/./a", [".", "a"], "./a")
+    isValid("/../a", ["..", "a"], "../a")
 
-    expect(splitJsonPath("/a/")).toEqual(["a", ""])
-    expect(joinJsonPath(["a", ""])).toBe("/a/")
+    function isInvalid(str: string) {
+        expect(() => {
+            splitJsonPath(str)
+        }).toThrow("a json path must be either rooted, empty or relative")
+    }
 
-    expect(splitJsonPath("/a//")).toEqual(["a", "", ""])
-    expect(joinJsonPath(["a", "", ""])).toBe("/a//")
+    isInvalid("a")
+    isInvalid("a/")
+    isInvalid("a//")
+    isInvalid(".a")
+    isInvalid(".a/")
+    isInvalid("..a")
+    isInvalid("..a/")
 })
 
 test("it should correctly escape/unescape json patches", () => {
@@ -412,5 +442,41 @@ test("weird keys are handled correctly", () => {
         const path = getPath(target)
         expect(path).toBe("/map/~0/model")
         expect(resolvePath(store, path)).toBe(target)
+    }
+})
+
+test("relativePath with a different base than the root works correctly", () => {
+    const Store = types.model({
+        map: types.map(
+            types.model({
+                model: types.model({
+                    value: types.string
+                })
+            })
+        )
+    })
+
+    const store = Store.create({
+        map: {
+            "1": { model: { value: "val1" } },
+            "2": { model: { value: "val2" } }
+        }
+    })
+
+    {
+        const target = store.map.get("1")!.model
+        expect(resolvePath(store.map, "./1/model")).toBe(target)
+        expect(resolvePath(store.map, "../map/1/model")).toBe(target)
+        // rooted relative should resolve to the given base as root
+        expect(resolvePath(store.map, "/./1/model")).toBe(target)
+        expect(resolvePath(store.map, "/../map/1/model")).toBe(target)
+    }
+    {
+        const target = store.map.get("2")!.model
+        expect(resolvePath(store.map, "./2/model")).toBe(target)
+        expect(resolvePath(store.map, "../map/2/model")).toBe(target)
+        // rooted relative should resolve to the given base as root
+        expect(resolvePath(store.map, "/./2/model")).toBe(target)
+        expect(resolvePath(store.map, "/../map/2/model")).toBe(target)
     }
 })
