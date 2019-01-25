@@ -529,6 +529,7 @@ export function resolvePath(target: IAnyStateTreeNode, path: string): any {
         if (typeof path !== "string")
             throw fail("expected second argument to be a number, got " + path + " instead")
     }
+
     const node = resolveNodeByPath(getStateTreeNode(target), path)
     return node ? node.value : undefined
 }

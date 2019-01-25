@@ -352,6 +352,14 @@ export function invalidateComputed(target: any, propName: string) {
  * @internal
  * @hidden
  */
+export function stringStartsWith(str: string, beginning: string) {
+    return str.indexOf(beginning) === 0
+}
+
+/**
+ * @internal
+ * @hidden
+ */
 export type DeprecatedFunction = Function & { ids?: { [id: string]: true } }
 
 /**

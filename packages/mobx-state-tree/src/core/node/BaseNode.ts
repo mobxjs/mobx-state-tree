@@ -20,6 +20,16 @@ export abstract class BaseNode {
         return this._subpath
     }
 
+    private _subpathUponDeath?: string
+    get subpathUponDeath() {
+        return this._subpathUponDeath
+    }
+
+    private _pathUponDeath?: string
+    protected get pathUponDeath() {
+        return this._pathUponDeath
+    }
+
     storedValue: any
 
     private aliveAtom?: IAtom
@@ -73,16 +83,22 @@ export abstract class BaseNode {
      * Returns (escaped) path representation as string
      */
     get path(): string {
-        if (!this.pathAtom) {
-            this.pathAtom = createAtom(`path`)
+        return this.getEscapedPath(true)
+    }
+
+    protected getEscapedPath(reportObserved: boolean): string {
+        if (reportObserved) {
+            if (!this.pathAtom) {
+                this.pathAtom = createAtom(`path`)
+            }
+            this.pathAtom.reportObserved()
         }
-        this.pathAtom.reportObserved()
         if (!this.parent) return ""
         // regenerate escaped subpath if needed
         if (this._escapedSubpath === undefined) {
             this._escapedSubpath = !this._subpath ? "" : escapeJsonPath(this._subpath)
         }
-        return this.parent.path + "/" + this._escapedSubpath
+        return this.parent.getEscapedPath(reportObserved) + "/" + this._escapedSubpath
     }
 
     get isRoot(): boolean {
@@ -144,6 +160,8 @@ export abstract class BaseNode {
     protected baseFinalizeDeath() {
         this.hookSubscribers.clearAll()
 
+        this._subpathUponDeath = this._subpath
+        this._pathUponDeath = this.getEscapedPath(false)
         this.baseSetParent(null, "")
         this.state = NodeLifeCycle.DEAD
     }

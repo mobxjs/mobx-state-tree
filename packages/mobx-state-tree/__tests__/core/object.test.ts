@@ -276,39 +276,126 @@ test("it should have computed properties", () => {
 test("it should throw if a replaced object is read or written to", () => {
     const Todo = types
         .model("Todo", {
-            title: "test"
+            title: "test",
+            arr: types.array(types.string),
+            map: types.map(types.string),
+            sub: types.optional(
+                types
+                    .model("Sub", {
+                        title: "test2"
+                    })
+                    .actions(self => ({
+                        fn2() {}
+                    })),
+                {}
+            )
         })
-        .actions(self => {
-            function fn() {}
-            return {
-                fn
+        .actions(self => ({
+            fn() {
+                self.sub.fn2()
             }
-        })
+        }))
     const Store = types.model("Store", {
         todo: Todo
     })
-    const s = Store.create({
-        todo: { title: "3" }
-    })
+    const data = {
+        title: "alive",
+        arr: ["arr0"],
+        map: { mapkey0: "mapval0" },
+        sub: { title: "title" }
+    }
+    const s = Store.create({ todo: { ...data, title: "dead" } })
     unprotect(s)
-    const todo = s.todo
-    s.todo = Todo.create({ title: "4" })
-    expect(s.todo.title).toBe("4")
+
+    const deadArr = s.todo.arr
+    s.todo.arr = cast(data.arr)
+
+    const deadMap = s.todo.map
+    s.todo.map = cast(data.map)
+
+    const deadSub = s.todo.sub
+    s.todo.sub = cast(data.sub)
+
+    const deadTodo = s.todo
+    s.todo = Todo.create(data)
+
+    expect(s.todo.title).toBe("alive")
 
     setLivelinessChecking("error")
-    // try reading old todo
-    const err =
-        "You are trying to read or write to an object that is no longer part of a state tree. (Object type was 'Todo'). Either detach nodes first, or don't use objects after removing / replacing them in the tree"
+
+    function getError(objType: string, path: string, subpath: string, action: string) {
+        return `You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${objType}', Path upon death: '${path}', Subpath: '${subpath}', Action: '${action}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
+    }
+
+    // dead todo
     expect(() => {
-        todo.fn()
-    }).toThrow(err)
+        deadTodo.fn()
+    }).toThrow(getError("Todo", "/todo", "", "/todo.fn()"))
     expect(() => {
         // tslint:disable-next-line:no-unused-expression
-        todo.title
-    }).toThrow(err)
+        deadTodo.title
+    }).toThrow(getError("Todo", "/todo", "title", ""))
     expect(() => {
-        todo.title = "5"
-    }).toThrow(err)
+        deadTodo.title = "5"
+    }).toThrow(getError("Todo", "/todo", "title", ""))
+
+    expect(() => {
+        // tslint:disable-next-line:no-unused-expression
+        deadTodo.arr[0]
+    }).toThrow(getError("Todo", "/todo", "arr", ""))
+    expect(() => {
+        deadTodo.arr.push("arr1")
+    }).toThrow(getError("Todo", "/todo", "arr", ""))
+
+    expect(() => {
+        deadTodo.map.get("mapkey0")
+    }).toThrow(getError("Todo", "/todo", "map", ""))
+    expect(() => {
+        deadTodo.map.set("mapkey1", "val")
+    }).toThrow(getError("Todo", "/todo", "map", ""))
+
+    expect(() => {
+        deadTodo.sub.fn2()
+    }).toThrow(getError("Todo", "/todo", "sub", ""))
+    expect(() => {
+        // tslint:disable-next-line:no-unused-expression
+        deadTodo.sub.title
+    }).toThrow(getError("Todo", "/todo", "sub", ""))
+    expect(() => {
+        deadTodo.sub.title = "hi"
+    }).toThrow(getError("Todo", "/todo", "sub", ""))
+
+    // dead array
+    expect(() => {
+        // tslint:disable-next-line:no-unused-expression
+        deadArr[0]
+    }).toThrow(getError("string[]", "/todo/arr", "0", ""))
+    expect(() => {
+        deadArr[0] = "hi"
+    }).toThrow(getError("string[]", "/todo/arr", "0", ""))
+    expect(() => {
+        deadArr.push("hi")
+    }).toThrow(getError("string[]", "/todo/arr", "1", ""))
+
+    // dead map
+    expect(() => {
+        deadMap.get("mapkey0")
+    }).toThrow(getError("map<string, string>", "/todo/map", "mapkey0", ""))
+    expect(() => {
+        deadMap.set("mapkey0", "val")
+    }).toThrow(getError("map<string, string>", "/todo/map", "mapkey0", ""))
+
+    // dead subobj
+    expect(() => {
+        deadSub.fn2()
+    }).toThrow(getError("Sub", "/todo/sub", "", "/todo/sub.fn2()"))
+    expect(() => {
+        // tslint:disable-next-line:no-unused-expression
+        deadSub.title
+    }).toThrow(getError("Sub", "/todo/sub", "title", ""))
+    expect(() => {
+        deadSub.title = "ho"
+    }).toThrow(getError("Sub", "/todo/sub", "title", ""))
 })
 
 test("it should warn if a replaced object is read or written to", () => {

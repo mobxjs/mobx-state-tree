@@ -42,7 +42,8 @@ import {
     ExtractC,
     ExtractT,
     ExtractCST,
-    normalizeIdentifier
+    normalizeIdentifier,
+    EMPTY_OBJECT
 } from "../../internal"
 
 /** @hidden */
@@ -135,7 +136,7 @@ export class ArrayType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> 
 
     willChange(change: IArrayWillChange<any> | IArrayWillSplice<any>): Object | null {
         const node = getStateTreeNode(change.object as IMSTArray<IT>)
-        node.assertWritable()
+        node.assertWritable({ subpath: String(change.index) })
         const subType = (node.type as ArrayType<IT>).subType
         const childNodes = node.getChildren()
         let nodes = null
@@ -401,7 +402,7 @@ function valueAsNode(
     // the new value has a MST node
     if (isStateTreeNode(newValue)) {
         const childNode = getStateTreeNode(newValue)
-        childNode.assertAlive()
+        childNode.assertAlive(EMPTY_OBJECT)
 
         // the node lives here
         if (childNode.parent !== null && childNode.parent === parent) {

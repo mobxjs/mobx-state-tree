@@ -1,4 +1,4 @@
-import { fail } from "../internal"
+import { fail, stringStartsWith } from "../internal"
 
 /**
  * https://tools.ietf.org/html/rfc6902
@@ -98,7 +98,15 @@ export function unescapeJsonPath(path: string): string {
 export function joinJsonPath(path: string[]): string {
     // `/` refers to property with an empty name, while `` refers to root itself!
     if (path.length === 0) return ""
-    return "/" + path.map(escapeJsonPath).join("/")
+
+    const getPathStr = (p: string[]) => p.map(escapeJsonPath).join("/")
+    if (path[0] === "." || path[0] === "..") {
+        // relative
+        return getPathStr(path)
+    } else {
+        // absolute
+        return "/" + getPathStr(path)
+    }
 }
 
 /**
@@ -111,7 +119,26 @@ export function splitJsonPath(path: string): string[] {
     // `/` refers to property with an empty name, while `` refers to root itself!
     const parts = path.split("/").map(unescapeJsonPath)
 
-    // path '/a/b/c' -> a b c
-    // path '../../b/c -> .. .. b c
-    return parts[0] === "" ? parts.slice(1) : parts
+    const valid =
+        path === "" ||
+        path === "." ||
+        path === ".." ||
+        stringStartsWith(path, "/") ||
+        stringStartsWith(path, "./") ||
+        stringStartsWith(path, "../")
+    if (!valid) {
+        throw fail(`a json path must be either rooted, empty or relative, but got '${path}'`)
+    }
+
+    // '/a/b/c' -> ["a", "b", "c"]
+    // '../../b/c' -> ["..", "..", "b", "c"]
+    // '' -> []
+    // '/' -> ['']
+    // './a' -> [".", "a"]
+    // /./a' -> [".", "a"] equivalent to './a'
+
+    if (parts[0] === "") {
+        parts.shift()
+    }
+    return parts
 }
