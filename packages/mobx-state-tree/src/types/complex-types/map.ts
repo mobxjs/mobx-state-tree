@@ -282,7 +282,7 @@ export class MapType<IT extends IAnyType, C = ExtractC<IT>, S = ExtractS<IT>> ex
     willChange(change: IMapWillChange<any, any>): IMapWillChange<any, any> | null {
         const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         const key = change.name
-        node.assertWritable()
+        node.assertWritable({ subpath: key })
         const mapType = node.type as MapType<any, any, any>
         const subType = mapType.subType
 

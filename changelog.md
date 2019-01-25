@@ -1,3 +1,5 @@
+-   Make liveliness errors give more info to trace their cause [#1142](https://github.com/mobxjs/mobx-state-tree/issues/1142) through [#1147](https://github.com/mobxjs/mobx-state-tree/pull/1147) by [@xaviergonz](https://github.com/xaviergonz)
+
 # 3.10.2
 
 -   Fixed a regression regarding json paths not being correctly rooted to the base [#1128](https://github.com/mobxjs/mobx-state-tree/issues/1128) through [#1146](https://github.com/mobxjs/mobx-state-tree/pull/1146) by [@xaviergonz](https://github.com/xaviergonz)
