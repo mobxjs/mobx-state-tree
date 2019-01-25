@@ -1,12 +1,22 @@
-import { INode, fail, ObjectNode, ScalarNode, IType, getStateTreeNodeSafe } from "../../internal"
+import {
+    fail,
+    ObjectNode,
+    ScalarNode,
+    AnyNode,
+    getStateTreeNodeSafe,
+    AnyObjectNode,
+    IAnyType,
+    ExtractS,
+    ExtractT
+} from "../../internal"
 
 /**
  * @internal
  * @hidden
  */
-export function createNode<C, S, T>(
-    type: IType<C, S, T>,
-    parent: ObjectNode | null,
+export function createNode<IT extends IAnyType>(
+    type: IT,
+    parent: AnyObjectNode | null,
     subpath: string,
     environment: any,
     initialValue: any
@@ -25,14 +35,29 @@ export function createNode<C, S, T>(
         )
     }
 
-    const Node = type.shouldAttachNode ? ObjectNode : ScalarNode
-    return new Node(type, parent, subpath, environment, initialValue)
+    if (type.shouldAttachNode) {
+        return new ObjectNode<ExtractS<IT>, ExtractT<IT>>(
+            type,
+            parent,
+            subpath,
+            environment,
+            initialValue
+        )
+    } else {
+        return new ScalarNode<ExtractS<IT>, ExtractT<IT>>(
+            type,
+            parent,
+            subpath,
+            environment,
+            initialValue
+        )
+    }
 }
 
 /**
  * @internal
  * @hidden
  */
-export function isNode(value: any): value is INode {
+export function isNode(value: any): value is AnyNode {
     return value instanceof ScalarNode || value instanceof ObjectNode
 }

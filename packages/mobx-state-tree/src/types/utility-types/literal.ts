@@ -1,7 +1,6 @@
 import {
     fail,
     isPrimitive,
-    INode,
     createNode,
     ISimpleType,
     Type,
@@ -11,15 +10,16 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    ObjectNode,
-    Primitives
+    ScalarNode,
+    Primitives,
+    AnyObjectNode
 } from "../../internal"
 
 /**
  * @internal
  * @hidden
  */
-export class Literal<T> extends Type<T, T, T> {
+export class Literal<T, N extends ScalarNode<T, T> = any> extends Type<T, T, T, N> {
     readonly shouldAttachNode = false
     readonly value: any
     readonly flags = TypeFlags.Literal
@@ -29,8 +29,8 @@ export class Literal<T> extends Type<T, T, T> {
         this.value = value
     }
 
-    instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: T): INode {
-        return createNode(this, parent, subpath, environment, snapshot)
+    instantiate(parent: AnyObjectNode | null, subpath: string, environment: any, snapshot: T): N {
+        return createNode(this, parent, subpath, environment, snapshot) as any
     }
 
     describe() {

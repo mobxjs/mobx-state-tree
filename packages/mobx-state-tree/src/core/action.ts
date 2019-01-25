@@ -6,10 +6,10 @@ import {
     IDisposer,
     getRoot,
     EMPTY_ARRAY,
-    ObjectNode,
     Hook,
     IAnyStateTreeNode,
-    warnError
+    warnError,
+    AnyObjectNode
 } from "../internal"
 
 export type IMiddlewareEventType =
@@ -191,12 +191,12 @@ export function decorate<T extends Function>(handler: IMiddlewareHandler, fn: T)
 }
 
 function collectMiddlewares(
-    node: ObjectNode,
+    node: AnyObjectNode,
     baseCall: IMiddlewareEvent,
     fn: Function
 ): IMiddleware[] {
     let middlewares: IMiddleware[] = (fn as any).$mst_middleware || EMPTY_ARRAY
-    let n: ObjectNode | null = node
+    let n: AnyObjectNode | null = node
     // Find all middlewares. Optimization: cache this?
     while (n) {
         if (n.middlewares) middlewares = middlewares.concat(n.middlewares)
@@ -205,7 +205,11 @@ function collectMiddlewares(
     return middlewares
 }
 
-function runMiddleWares(node: ObjectNode, baseCall: IMiddlewareEvent, originalFn: Function): any {
+function runMiddleWares(
+    node: AnyObjectNode,
+    baseCall: IMiddlewareEvent,
+    originalFn: Function
+): any {
     const middlewares = collectMiddlewares(node, baseCall, originalFn)
     // Short circuit
     if (!middlewares.length) return mobxAction(originalFn).apply(null, baseCall.args)

@@ -8,7 +8,6 @@ import {
     TypeFlags,
     IType,
     Type,
-    INode,
     fail,
     isPlainObject,
     IAnyType,
@@ -20,7 +19,9 @@ import {
     ModelCreationType2,
     _NotCustomized,
     RedefineIStateTreeNode,
-    IStateTreeNode
+    IStateTreeNode,
+    BaseNode,
+    AnyObjectNode
 } from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
@@ -34,7 +35,7 @@ export interface UnionOptions {
  * @internal
  * @hidden
  */
-export class Union extends Type<any, any, any> {
+export class Union<N extends BaseNode<any, any> = any> extends Type<any, any, any, N> {
     readonly dispatcher?: ITypeDispatcher
     readonly eager: boolean = true
     readonly types: IAnyType[]
@@ -73,16 +74,16 @@ export class Union extends Type<any, any, any> {
         return "(" + this.types.map(factory => factory.describe()).join(" | ") + ")"
     }
 
-    instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
+    instantiate(parent: AnyObjectNode | null, subpath: string, environment: any, value: any): N {
         const type = this.determineType(value, undefined)
         if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
-        return type.instantiate(parent, subpath, environment, value)
+        return type.instantiate(parent, subpath, environment, value) as any
     }
 
-    reconcile(current: INode, newValue: any): INode {
+    reconcile(current: N, newValue: any): N {
         const type = this.determineType(newValue, current.type)
         if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
-        return type.reconcile(current, newValue)
+        return type.reconcile(current, newValue) as any
     }
 
     determineType(value: any, reconcileCurrentType: IAnyType | undefined): IAnyType | undefined {

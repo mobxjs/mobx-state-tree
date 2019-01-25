@@ -15,7 +15,6 @@ import {
     IJsonPatch,
     IMiddleware,
     IMiddlewareHandler,
-    INode,
     invalidateComputed,
     IReversibleJsonPatch,
     NodeLifeCycle,
@@ -33,7 +32,8 @@ import {
     getCurrentActionContext,
     escapeJsonPath,
     getPath,
-    warnError
+    warnError,
+    AnyNode
 } from "../../internal"
 
 let nextNodeId = 1
@@ -58,7 +58,7 @@ const enum InternalEvents {
  * @hidden
  */
 export interface IChildNodesMap {
-    [key: string]: INode
+    [key: string]: AnyNode
 }
 
 const snapshotReactionOptions = {
@@ -71,7 +71,7 @@ const snapshotReactionOptions = {
  * @internal
  * @hidden
  */
-export class ObjectNode extends BaseNode {
+export class ObjectNode<S, T> extends BaseNode<S, T> {
     readonly nodeId = ++nextNodeId
     readonly identifierAttribute: string | undefined
     readonly identifier: string | null // Identifier is always normalized to string, even if the identifier property isn't
@@ -81,14 +81,14 @@ export class ObjectNode extends BaseNode {
     isProtectionEnabled = true
     middlewares: IMiddleware[] | null = null
 
-    _applyPatches?: (patches: IJsonPatch[]) => void
+    private _applyPatches?: (patches: IJsonPatch[]) => void
 
     applyPatches(patches: IJsonPatch[]): void {
         this.createObservableInstanceIfNeeded()
         this._applyPatches!(patches)
     }
 
-    _applySnapshot?: (snapshot: any) => void
+    private _applySnapshot?: (snapshot: any) => void
 
     applySnapshot(snapshot: any): void {
         this.createObservableInstanceIfNeeded()
@@ -102,7 +102,7 @@ export class ObjectNode extends BaseNode {
     private readonly _internalEvents = new EventHandlers<{
         [InternalEvents.Dispose]: () => void
         [InternalEvents.Patch]: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
-        [InternalEvents.Snapshot]: (snapshot: any) => void
+        [InternalEvents.Snapshot]: (snapshot: S) => void
     }>()
 
     private _observableInstanceState = ObservableInstanceLifecycle.UNINITIALIZED
@@ -112,14 +112,14 @@ export class ObjectNode extends BaseNode {
 
     constructor(
         type: IAnyType,
-        parent: ObjectNode | null,
+        parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialSnapshot: any
+        initialValue: any
     ) {
         super(type, parent, subpath, environment)
 
-        this._initialSnapshot = freeze(initialSnapshot)
+        this._initialSnapshot = freeze(initialValue)
         this.identifierAttribute = (type as any).identifierAttribute
 
         if (!parent) {
@@ -224,12 +224,12 @@ export class ObjectNode extends BaseNode {
         this.finalizeCreation()
     }
 
-    get root(): ObjectNode {
+    get root(): AnyObjectNode {
         const parent = this.parent
         return parent ? parent.root : this
     }
 
-    setParent(newParent: ObjectNode | null, subpath: string | null = null): void {
+    setParent(newParent: AnyObjectNode | null, subpath: string | null = null): void {
         if (this.parent === newParent && this.subpath === subpath) return
         if (newParent && process.env.NODE_ENV !== "production") {
             if (this.parent && newParent !== this.parent) {
@@ -274,7 +274,9 @@ export class ObjectNode extends BaseNode {
         this.fireInternalHook(name)
 
         const fn =
-            this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
+            this.storedValue &&
+            typeof this.storedValue === "object" &&
+            (this.storedValue as any)[name]
         if (typeof fn === "function") {
             // we check for it to allow old mobx peer dependencies that don't have the method to work (even when still bugged)
             if (_allowStateChangesInsideComputed) {
@@ -287,23 +289,22 @@ export class ObjectNode extends BaseNode {
         }
     }
 
-    get value(): any {
+    get value(): T {
         this.createObservableInstanceIfNeeded()
-        if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
 
-    private _snapshotUponDeath?: any
+    private _snapshotUponDeath?: S
 
     // advantage of using computed for a snapshot is that nicely respects transactions etc.
     @computed
-    get snapshot(): any {
+    get snapshot(): S {
         return freeze(this.getSnapshot())
     }
 
     // NOTE: we use this method to get snapshot without creating @computed overhead
-    getSnapshot(): any {
-        if (!this.isAlive) return this._snapshotUponDeath
+    getSnapshot(): S {
+        if (!this.isAlive) return this._snapshotUponDeath!
         return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
             ? this._getActualSnapshot()
             : this._getInitialSnapshot()
@@ -317,7 +318,7 @@ export class ObjectNode extends BaseNode {
         if (!this._initialSnapshot) return this._initialSnapshot
         if (this._cachedInitialSnapshot) return this._cachedInitialSnapshot
 
-        const type = this.type as ComplexType<any, any, any>
+        const type = (this.type as unknown) as ComplexType<any, any, any, any>
         const childNodes = this._childNodes!
         const snapshot = this._initialSnapshot
 
@@ -363,7 +364,7 @@ export class ObjectNode extends BaseNode {
         }', Path upon death: '${escapedPath}', Subpath: '${subpath}', Action: '${actionFullPath}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
     }
 
-    getChildNode(subpath: string): INode {
+    getChildNode(subpath: string): AnyNode {
         this.assertAlive({
             subpath
         })
@@ -377,7 +378,7 @@ export class ObjectNode extends BaseNode {
         }
     }
 
-    getChildren(): ReadonlyArray<INode> {
+    getChildren(): ReadonlyArray<AnyNode> {
         this.assertAlive(EMPTY_OBJECT)
         this._autoUnbox = false
         try {
@@ -411,9 +412,11 @@ export class ObjectNode extends BaseNode {
     }
 
     // this method must be bound
-    unbox = (childNode: INode): any => {
+    unbox = (childNode: AnyNode): any => {
         if (childNode)
-            this.assertAlive({ subpath: childNode.subpath || childNode.subpathUponDeath })
+            this.assertAlive({
+                subpath: childNode.subpath || childNode.subpathUponDeath
+            })
         if (childNode && this._autoUnbox) return childNode.value
         return childNode
     }
@@ -459,7 +462,7 @@ export class ObjectNode extends BaseNode {
             (patches: IJsonPatch[]) => {
                 patches.forEach(patch => {
                     const parts = splitJsonPath(patch.path)
-                    const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as ObjectNode
+                    const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as AnyObjectNode
                     node.applyPatchLocally(parts[parts.length - 1], patch)
                 })
             }
@@ -543,7 +546,7 @@ export class ObjectNode extends BaseNode {
         return this._internalEvents.register(InternalEvents.Patch, handler)
     }
 
-    emitPatch(basePatch: IReversibleJsonPatch, source: INode) {
+    emitPatch(basePatch: IReversibleJsonPatch, source: AnyNode) {
         const intEvs = this._internalEvents
         if (intEvs.hasSubscribers(InternalEvents.Patch)) {
             const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, {
@@ -608,6 +611,12 @@ export class ObjectNode extends BaseNode {
         }
     }
 }
+
+/**
+ * @internal
+ * @hidden
+ */
+export type AnyObjectNode = ObjectNode<any, any>
 
 /**
  * @internal

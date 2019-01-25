@@ -2,7 +2,6 @@ import {
     isSerializable,
     deepFreeze,
     createNode,
-    INode,
     Type,
     IContext,
     IValidationResult,
@@ -10,18 +9,19 @@ import {
     typeCheckFailure,
     TypeFlags,
     isType,
-    ObjectNode,
     optional,
     IType,
     IAnyType,
-    OptionalProperty
+    OptionalProperty,
+    ScalarNode,
+    AnyObjectNode
 } from "../../internal"
 
 /**
  * @internal
  * @hidden
  */
-export class Frozen<T> extends Type<T, T, T> {
+export class Frozen<T, N extends ScalarNode<T, T> = any> extends Type<T, T, T, N> {
     readonly shouldAttachNode = false
     flags = TypeFlags.Frozen
 
@@ -33,9 +33,9 @@ export class Frozen<T> extends Type<T, T, T> {
         return "<any immutable value>"
     }
 
-    instantiate(parent: ObjectNode | null, subpath: string, environment: any, value: any): INode {
+    instantiate(parent: AnyObjectNode | null, subpath: string, environment: any, value: T): N {
         // create the node
-        return createNode(this, parent, subpath, environment, deepFreeze(value))
+        return createNode(this, parent, subpath, environment, deepFreeze(value)) as any
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {

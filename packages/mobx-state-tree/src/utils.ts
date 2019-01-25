@@ -1,4 +1,5 @@
 import { isObservableArray, $mobx, getAtom } from "mobx"
+import { Primitives } from "./core/type/type"
 
 /**
  * @internal
@@ -40,7 +41,7 @@ export function fail(message = "Illegal state"): Error {
  * @internal
  * @hidden
  */
-export function identity<T>(_: T): T {
+export function identity(_: any): any {
     return _
 }
 
@@ -139,9 +140,7 @@ export function isMutable(value: any) {
  * @internal
  * @hidden
  */
-export function isPrimitive(
-    value: any
-): value is string | number | boolean | Date | null | undefined {
+export function isPrimitive(value: any): value is Primitives {
     if (value === null || value === undefined) return true
     if (
         typeof value === "string" ||

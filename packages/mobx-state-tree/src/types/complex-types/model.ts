@@ -10,7 +10,8 @@ import {
     isComputedProp,
     observable,
     observe,
-    set
+    set,
+    IObjectDidChange
 } from "mobx"
 import {
     addHiddenFinalProp,
@@ -32,7 +33,6 @@ import {
     IChildNodesMap,
     IContext,
     IJsonPatch,
-    INode,
     isPlainObject,
     isPrimitive,
     isStateTreeNode,
@@ -51,7 +51,9 @@ import {
     ExtractC,
     ExtractS,
     ExtractT,
-    Hook
+    Hook,
+    AnyObjectNode,
+    AnyNode
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -187,7 +189,7 @@ export interface IModelType<
     > {
     readonly properties: PROPS
 
-    named(newName: string): this
+    named(newName: string): IModelType<PROPS, OTHERS, CustomC, CustomS>
 
     // warning: redefining props after a process snapshot is used ends up on the fixed (custom) C, S typings being overridden
     // so it is recommended to use pre/post process snapshot after all props have been defined
@@ -246,7 +248,7 @@ function objectTypeToString(this: any) {
  */
 export interface ModelTypeConfig {
     name?: string
-    properties?: ModelProperties
+    properties?: ModelPropertiesDeclaration
     initializers?: ReadonlyArray<(instance: any) => any>
     preProcessor?: (snapshot: any) => any
     postProcessor?: (snapshot: any) => any
@@ -319,8 +321,33 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
  * @internal
  * @hidden
  */
-export class ModelType<P extends ModelProperties, O> extends ComplexType<any, any, any>
-    implements IModelType<P, O, any, any> {
+export type AnyModelType = ModelType<any, any, any, any>
+
+/**
+ * @internal
+ * @hidden
+ */
+export class ModelType<
+    PROPS extends ModelProperties,
+    OTHERS,
+    CustomC = _NotCustomized,
+    CustomS = _NotCustomized,
+    MT extends IModelType<PROPS, OTHERS, CustomC, CustomS> = IModelType<
+        PROPS,
+        OTHERS,
+        CustomC,
+        CustomS
+    >,
+    C extends ModelCreationType2<PROPS, CustomC> = ModelCreationType2<PROPS, CustomC>,
+    S extends ModelSnapshotType2<PROPS, CustomS> = ModelSnapshotType2<PROPS, CustomS>,
+    T extends ModelInstanceType<PROPS, OTHERS, CustomC, CustomS> = ModelInstanceType<
+        PROPS,
+        OTHERS,
+        CustomC,
+        CustomS
+    >,
+    N extends ObjectNode<S, T> = any
+> extends ComplexType<C, S, T, N> implements IModelType<PROPS, OTHERS, CustomC, CustomS> {
     readonly flags = TypeFlags.Object
     shouldAttachNode = true
 
@@ -329,7 +356,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
      */
     public readonly identifierAttribute: string | undefined
     public readonly initializers!: ((instance: any) => any)[]
-    public readonly properties: any
+    public readonly properties!: PROPS
 
     private preProcessor!: (snapshot: any) => any | undefined
     private postProcessor!: (snapshot: any) => any | undefined
@@ -342,10 +369,15 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         if (!/^\w[\w\d_]*$/.test(name)) throw fail(`Typename should be a valid identifier: ${name}`)
         Object.assign(this, defaultObjectOptions, opts)
         // ensures that any default value gets converted to its related type
-        this.properties = toPropertiesObject(this.properties) as P
+        this.properties = toPropertiesObject(this.properties) as PROPS
         freeze(this.properties) // make sure nobody messes with it
         this.propertyNames = Object.keys(this.properties)
         this.identifierAttribute = this._getIdentifierAttribute()
+    }
+
+    create(...args: any[]) {
+        // just to keep TS happy
+        return super.create(...args)
     }
 
     private _getIdentifierAttribute(): string | undefined {
@@ -362,7 +394,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         return identifierAttribute
     }
 
-    cloneAndEnhance(opts: ModelTypeConfig): ModelType<any, any> {
+    cloneAndEnhance(opts: ModelTypeConfig): IAnyModelType {
         return new ModelType({
             name: opts.name || this.name,
             properties: Object.assign({}, this.properties, opts.properties),
@@ -372,15 +404,15 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         })
     }
 
-    actions(fn: (self: any) => any): any {
-        const actionInitializer = (self: any) => {
+    actions: MT["actions"] = fn => {
+        const actionInitializer = (self: T) => {
             this.instantiateActions(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [actionInitializer] })
     }
 
-    instantiateActions(self: any, actions: any): void {
+    private instantiateActions(self: T, actions: ModelActions): void {
         // check if return is correct
         if (!isPlainObject(actions))
             throw fail(`actions initializer should return a plain object containing actions`)
@@ -412,7 +444,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
 
             // the goal of this is to make sure actions using "this" can call themselves,
             // while still allowing the middlewares to register them
-            const middlewares = action2.$mst_middleware // make sure middlewares are not lost
+            const middlewares = (action2 as any).$mst_middleware // make sure middlewares are not lost
             let boundAction = action2.bind(actions)
             boundAction.$mst_middleware = middlewares
             const actionInvoker = createActionInvoker(self, name, boundAction)
@@ -427,31 +459,36 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         })
     }
 
-    named(name: string): this {
-        return this.cloneAndEnhance({ name }) as this
+    named: MT["named"] = name => {
+        return this.cloneAndEnhance({ name })
     }
 
-    props(properties: ModelPropertiesDeclaration): any {
-        return this.cloneAndEnhance({ properties } as any)
+    props: MT["props"] = properties => {
+        return this.cloneAndEnhance({ properties })
     }
 
-    volatile(fn: (self: any) => any): any {
-        const stateInitializer = (self: any) => {
+    volatile: MT["volatile"] = fn => {
+        const stateInitializer = (self: T) => {
             this.instantiateVolatileState(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [stateInitializer] })
     }
 
-    instantiateVolatileState(self: any, state: Object): void {
+    private instantiateVolatileState(
+        self: T,
+        state: {
+            [key: string]: any
+        }
+    ): void {
         // check views return
         if (!isPlainObject(state))
             throw fail(`volatile state initializer should return a plain object containing state`)
         set(self, state)
     }
 
-    extend(fn: (self: any) => any): any {
-        const initializer = (self: any) => {
+    extend: MT["extend"] = fn => {
+        const initializer = (self: T) => {
             const { actions, views, state, ...rest } = fn(self)
             for (let key in rest)
                 throw fail(
@@ -465,15 +502,15 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         return this.cloneAndEnhance({ initializers: [initializer] })
     }
 
-    views(fn: (self: any) => any): any {
-        const viewInitializer = (self: any) => {
+    views: MT["views"] = fn => {
+        const viewInitializer = (self: T) => {
             this.instantiateViews(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [viewInitializer] })
     }
 
-    instantiateViews(self: any, views: Object): void {
+    private instantiateViews(self: T, views: Object): void {
         // check views return
         if (!isPlainObject(views))
             throw fail(`views initializer should return a plain object containing views`)
@@ -509,16 +546,16 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         })
     }
 
-    preProcessSnapshot(preProcessor: (snapshot: any) => any): any {
+    preProcessSnapshot: MT["preProcessSnapshot"] = preProcessor => {
         const currentPreprocessor = this.preProcessor
-        if (!currentPreprocessor) return this.cloneAndEnhance({ preProcessor }) as this
+        if (!currentPreprocessor) return this.cloneAndEnhance({ preProcessor })
         else
             return this.cloneAndEnhance({
                 preProcessor: snapshot => currentPreprocessor(preProcessor(snapshot))
-            }) as this
+            })
     }
 
-    postProcessSnapshot(postProcessor: (snapshot: any) => any): any {
+    postProcessSnapshot: MT["postProcessSnapshot"] = postProcessor => {
         const currentPostprocessor = this.postProcessor
         if (!currentPostprocessor) return this.cloneAndEnhance({ postProcessor })
         else
@@ -528,38 +565,38 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
     }
 
     instantiate(
-        parent: ObjectNode | null,
+        parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        snapshot: any
-    ): INode {
-        const initialValue = isStateTreeNode(snapshot)
-            ? snapshot
-            : this.applySnapshotPreProcessor(snapshot)
-        return createNode(this, parent, subpath, environment, initialValue)
+        initialValue: C | S | T
+    ): N {
+        const value = isStateTreeNode(initialValue)
+            ? initialValue
+            : this.applySnapshotPreProcessor(initialValue)
+        return createNode(this, parent, subpath, environment, value) as N
         // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
         // that pre-reserves all these fields for fast object-member lookups
     }
 
-    initializeChildNodes(objNode: ObjectNode, initialSnapshot: any = {}): IChildNodesMap {
-        const type = objNode.type as ModelType<any, any>
+    initializeChildNodes(objNode: N, initialSnapshot: any = {}): IChildNodesMap {
+        const type = objNode.type as this
         const result = {} as IChildNodesMap
         type.forAllProps((name, childType) => {
             result[name] = childType.instantiate(
                 objNode,
                 name,
                 objNode.environment,
-                initialSnapshot[name]
+                (initialSnapshot as any)[name]
             )
         })
         return result
     }
 
-    createNewInstance(node: ObjectNode, childNodes: IChildNodesMap, snapshot: any): any {
-        return observable.object(childNodes, EMPTY_OBJECT, mobxShallow)
+    createNewInstance(node: N, childNodes: IChildNodesMap, snapshot: C): T {
+        return observable.object(childNodes, EMPTY_OBJECT, mobxShallow) as any
     }
 
-    finalizeNewInstance(node: ObjectNode, instance: IObservableObject): void {
+    finalizeNewInstance(node: N, instance: T): void {
         addHiddenFinalProp(instance, "toString", objectTypeToString)
 
         this.forAllProps(name => {
@@ -571,10 +608,13 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         observe(instance, this.didChange)
     }
 
-    willChange(change: any): IObjectWillChange | null {
+    private willChange(chg: IObjectWillChange): IObjectWillChange | null {
+        // TODO: mobx typings don't seem to take into account that newValue can be set even when removing a prop
+        const change = chg as IObjectWillChange & { newValue?: any }
+
         const node = getStateTreeNode(change.object)
         node.assertWritable({ subpath: change.name })
-        const type = (node.type as ModelType<any, any>).properties[change.name]
+        const type = (node.type as this).properties[change.name]
         // only properties are typed, state are stored as-is references
         if (type) {
             typecheckInternal(type, change.newValue)
@@ -583,9 +623,12 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         return change
     }
 
-    didChange(change: any) {
+    private didChange(chg: IObjectDidChange) {
+        // TODO: mobx typings don't seem to take into account that newValue can be set even when removing a prop
+        const change = chg as IObjectWillChange & { newValue?: any; oldValue?: any }
+
         const node = getStateTreeNode(change.object)
-        const type = (node.type as ModelType<any, any>).properties[change.name]
+        const type = (node.type as this).properties[change.name]
         if (!type) {
             // don't emit patches for volatile state
             return
@@ -602,26 +645,26 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         )
     }
 
-    getChildren(node: ObjectNode): INode[] {
-        const res: INode[] = []
-        this.forAllProps((name, type) => {
+    getChildren(node: N): ReadonlyArray<AnyNode> {
+        const res: AnyNode[] = []
+        this.forAllProps(name => {
             res.push(this.getChildNode(node, name))
         })
         return res
     }
 
-    getChildNode(node: ObjectNode, key: string): INode {
+    getChildNode(node: N, key: string): AnyNode {
         if (!(key in this.properties)) throw fail("Not a value property: " + key)
         const childNode = _getAdministration(node.storedValue, key).value // TODO: blegh!
         if (!childNode) throw fail("Node not available for property " + key)
         return childNode
     }
 
-    getValue(node: ObjectNode): any {
+    getValue(node: N): T {
         return node.storedValue
     }
 
-    getSnapshot(node: ObjectNode, applyPostProcess = true): any {
+    getSnapshot(node: N, applyPostProcess = true): S {
         const res = {} as any
         this.forAllProps((name, type) => {
             // TODO: FIXME, make sure the observable ref is used!
@@ -634,7 +677,7 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         return res
     }
 
-    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: C): S {
         const processed = {} as any
         Object.keys(childNodes).forEach(key => {
             processed[key] = childNodes[key].getSnapshot()
@@ -642,18 +685,19 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         return this.applySnapshotPostProcessor(this.applyOptionalValuesToSnapshot(processed))
     }
 
-    applyPatchLocally(node: ObjectNode, subpath: string, patch: IJsonPatch): void {
-        if (!(patch.op === "replace" || patch.op === "add"))
+    applyPatchLocally(node: N, subpath: string, patch: IJsonPatch): void {
+        if (!(patch.op === "replace" || patch.op === "add")) {
             throw fail(`object does not support operation ${patch.op}`)
-        node.storedValue[subpath] = patch.value
+        }
+        ;(node.storedValue as any)[subpath] = patch.value
     }
 
     @action
-    applySnapshot(node: ObjectNode, snapshot: any): void {
+    applySnapshot(node: N, snapshot: S): void {
         const s = this.applySnapshotPreProcessor(snapshot)
         typecheckInternal(this, s)
         this.forAllProps((name, type) => {
-            node.storedValue[name] = s[name]
+            ;(node.storedValue as any)[name] = s[name]
         })
     }
 
@@ -717,12 +761,12 @@ export class ModelType<P extends ModelProperties, O> extends ComplexType<any, an
         )
     }
 
-    getDefaultSnapshot(): any {
-        return EMPTY_OBJECT
+    getDefaultSnapshot(): C {
+        return EMPTY_OBJECT as C
     }
 
-    removeChild(node: ObjectNode, subpath: string) {
-        node.storedValue[subpath] = undefined
+    removeChild(node: N, subpath: string) {
+        ;(node.storedValue as any)[subpath] = undefined
     }
 }
 
@@ -810,17 +854,18 @@ export function compose(...args: any[]): any {
                 throw fail("expected a mobx-state-tree model type, got " + type + " instead")
         })
     }
-    return (args as ModelType<any, any>[])
-        .reduce((prev, cur) =>
-            prev.cloneAndEnhance({
-                name: prev.name + "_" + cur.name,
-                properties: cur.properties,
-                initializers: cur.initializers,
-                preProcessor: (snapshot: any) =>
-                    cur.applySnapshotPreProcessor(prev.applySnapshotPreProcessor(snapshot)),
-                postProcessor: (snapshot: any) =>
-                    cur.applySnapshotPostProcessor(prev.applySnapshotPostProcessor(snapshot))
-            })
+    return (args as AnyModelType[])
+        .reduce(
+            (prev, cur) =>
+                prev.cloneAndEnhance({
+                    name: prev.name + "_" + cur.name,
+                    properties: cur.properties,
+                    initializers: cur.initializers,
+                    preProcessor: (snapshot: any) =>
+                        cur.applySnapshotPreProcessor(prev.applySnapshotPreProcessor(snapshot)),
+                    postProcessor: (snapshot: any) =>
+                        cur.applySnapshotPostProcessor(prev.applySnapshotPostProcessor(snapshot))
+                }) as any
         )
         .named(typeName)
 }

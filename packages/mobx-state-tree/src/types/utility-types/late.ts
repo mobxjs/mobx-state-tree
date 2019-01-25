@@ -1,20 +1,21 @@
 import {
     fail,
-    INode,
     Type,
     IContext,
     IValidationResult,
     TypeFlags,
     isType,
     IAnyType,
-    typeCheckSuccess
+    typeCheckSuccess,
+    AnyObjectNode,
+    ScalarNode
 } from "../../internal"
 
 /**
  * @internal
  * @hidden
  */
-export class Late<C, S, T> extends Type<C, S, T> {
+export class Late<C, S, T, N extends ScalarNode<S, T> = any> extends Type<C, S, T, N> {
     readonly definition: () => IAnyType
     private _subType: IAnyType | null = null
 
@@ -54,17 +55,23 @@ export class Late<C, S, T> extends Type<C, S, T> {
         }
         return this._subType
     }
+
     constructor(name: string, definition: () => IAnyType) {
         super(name)
         this.definition = definition
     }
 
-    instantiate(parent: INode | null, subpath: string, environment: any, snapshot: any): INode {
-        return this.getSubType(true).instantiate(parent, subpath, environment, snapshot)
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        initialValue: any
+    ): N {
+        return this.getSubType(true).instantiate(parent, subpath, environment, initialValue) as any
     }
 
-    reconcile(current: INode, newValue: any): INode {
-        return this.getSubType(true).reconcile(current, newValue)
+    reconcile(current: N, newValue: any): N {
+        return this.getSubType(true).reconcile(current, newValue) as any
     }
 
     describe() {
@@ -92,17 +99,12 @@ export function late<T extends IAnyType>(name: string, type: () => T): T
 /**
  * `types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies.
  * Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
- * You need to declare an interface to explicit the return type of the late parameter function.
  *
  * Example:
  * ```ts
- *  interface INode {
- *       childs: INode[]
- *  }
- *
- *   // TypeScript is'nt smart enough to infer self referencing types.
+ *   // TypeScript isn't smart enough to infer self referencing types.
  *  const Node = types.model({
- *       childs: types.optional(types.array(types.late<any, INode>(() => Node)), [])
+ *       children: types.array(types.late((): IAnyModelType => Node)) // then typecast each array element to Instance<typeof Node>
  *  })
  * ```
  *

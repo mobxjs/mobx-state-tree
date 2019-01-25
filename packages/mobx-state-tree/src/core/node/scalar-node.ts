@@ -1,11 +1,19 @@
-import { fail, freeze, NodeLifeCycle, ObjectNode, IAnyType, Hook, BaseNode } from "../../internal"
+import {
+    fail,
+    freeze,
+    NodeLifeCycle,
+    IAnyType,
+    Hook,
+    BaseNode,
+    AnyObjectNode
+} from "../../internal"
 import { action } from "mobx"
 
 /**
  * @internal
  * @hidden
  */
-export class ScalarNode extends BaseNode {
+export class ScalarNode<S, T> extends BaseNode<S, T> {
     // note about hooks:
     // - afterCreate is not emmited in scalar nodes, since it would be emitted in the
     //   constructor, before it can be subscribed by anybody
@@ -14,7 +22,7 @@ export class ScalarNode extends BaseNode {
 
     constructor(
         type: IAnyType,
-        parent: ObjectNode | null,
+        parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
         initialSnapshot: any
@@ -37,13 +45,13 @@ export class ScalarNode extends BaseNode {
         this.finalizeCreation()
     }
 
-    get root(): ObjectNode {
+    get root(): AnyObjectNode {
         // future optimization: store root ref in the node and maintain it
         if (!this.parent) throw fail(`This scalar node is not part of a tree`)
         return this.parent.root
     }
 
-    setParent(newParent: ObjectNode | null, subpath: string | null = null): void {
+    setParent(newParent: AnyObjectNode | null, subpath: string | null = null): void {
         if (this.parent === newParent && this.subpath === subpath) return
         if (this.parent && !newParent) {
             this.die()

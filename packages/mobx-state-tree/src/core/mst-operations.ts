@@ -1,9 +1,7 @@
 import { isComputedProp, isObservableProp } from "mobx"
 import {
-    ExtractS,
     ExtractT,
     IAnyStateTreeNode,
-    ExtractC,
     IType,
     IAnyModelType,
     getStateTreeNode,
@@ -21,12 +19,12 @@ import {
     freeze,
     IAnyType,
     isModelType,
-    INode,
     ModelPrimitive,
     ExtractNodeC,
     InvalidReferenceError,
     normalizeIdentifier,
-    ReferenceIdentifier
+    ReferenceIdentifier,
+    AnyObjectNode
 } from "../internal"
 
 /** @hidden */
@@ -336,7 +334,7 @@ export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean
             throw fail("expected second argument to be a number, got " + depth + " instead")
         if (depth < 0) throw fail(`Invalid depth: ${depth}, should be >= 1`)
     }
-    let parent: INode | null = getStateTreeNode(target).parent
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
         if (--depth === 0) return true
         parent = parent.parent
@@ -372,9 +370,9 @@ export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
         if (depth < 0) throw fail(`Invalid depth: ${depth}, should be >= 1`)
     }
     let d = depth
-    let parent: INode | null = getStateTreeNode(target).parent
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
-        if (--d === 0) return parent.storedValue
+        if (--d === 0) return parent.storedValue as any
         parent = parent.parent
     }
     throw fail(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
@@ -399,7 +397,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
                 "expected second argument to be a mobx-state-tree type, got " + type + " instead"
             )
     }
-    let parent: INode | null = getStateTreeNode(target).parent
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
         if (type.is(parent.storedValue)) return true
         parent = parent.parent
@@ -430,9 +428,9 @@ export function getParentOfType<IT extends IAnyType>(
             )
     }
 
-    let parent: INode | null = getStateTreeNode(target).parent
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
-        if (type.is(parent.storedValue)) return parent.storedValue
+        if (type.is(parent.storedValue)) return parent.storedValue as any
         parent = parent.parent
     }
     throw fail(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
@@ -457,7 +455,7 @@ export function getRoot<IT extends IAnyType | IAnyStateTreeNode>(
                 "expected first argument to be a mobx-state-tree node, got " + target + " instead"
             )
     }
-    return getStateTreeNode(target).root.storedValue
+    return getStateTreeNode(target).root.storedValue as any
 }
 
 /**

@@ -1,7 +1,6 @@
 import {
     isStateTreeNode,
     getStateTreeNode,
-    INode,
     Type,
     IContext,
     IValidationResult,
@@ -11,17 +10,19 @@ import {
     fail,
     TypeFlags,
     IAnyType,
-    ExtractC
+    ExtractC,
+    AnyObjectNode,
+    BaseNode
 } from "../../internal"
 
 /**
  * @internal
  * @hidden
  */
-export class Refinement<C, S, T> extends Type<C, S, T> {
+export class Refinement<C, S, T, N extends BaseNode<S, T>> extends Type<C, S, T, N> {
     readonly type: IAnyType
-    readonly predicate: (v: any) => boolean
-    readonly message: (v: any) => string
+    readonly predicate: (v: C) => boolean
+    readonly message: (v: C) => string
 
     get flags() {
         return this.type.flags | TypeFlags.Refinement
@@ -34,8 +35,8 @@ export class Refinement<C, S, T> extends Type<C, S, T> {
     constructor(
         name: string,
         type: IAnyType,
-        predicate: (v: any) => boolean,
-        message: (v: any) => string
+        predicate: (v: C) => boolean,
+        message: (v: C) => string
     ) {
         super(name)
         this.type = type
@@ -47,11 +48,9 @@ export class Refinement<C, S, T> extends Type<C, S, T> {
         return this.name
     }
 
-    instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
+    instantiate(parent: AnyObjectNode | null, subpath: string, environment: any, value: any): N {
         // create the child type
-        const inst = this.type.instantiate(parent, subpath, environment, value)
-
-        return inst
+        return this.type.instantiate(parent, subpath, environment, value) as any
     }
 
     isAssignableFrom(type: IAnyType) {
@@ -76,12 +75,12 @@ export function refinement<IT extends IAnyType>(
     name: string,
     type: IT,
     predicate: (snapshot: ExtractC<IT>) => boolean,
-    message?: string | ((v: any) => string)
+    message?: string | ((v: ExtractC<IT>) => string)
 ): IT
 export function refinement<IT extends IAnyType>(
     type: IT,
     predicate: (snapshot: ExtractC<IT>) => boolean,
-    message?: string | ((v: any) => string)
+    message?: string | ((v: ExtractC<IT>) => string)
 ): IT
 
 /**

@@ -1,7 +1,6 @@
 import { runInAction } from "mobx"
 
 import {
-    INode,
     getStateTreeNode,
     isStateTreeNode,
     addMiddleware,
@@ -19,7 +18,8 @@ import {
     asArray,
     getRelativePathBetweenNodes,
     IAnyStateTreeNode,
-    warnError
+    warnError,
+    AnyNode
 } from "../internal"
 
 export interface ISerializedActionCall {
@@ -34,7 +34,7 @@ export interface IActionRecorder {
     replay(target: IAnyStateTreeNode): any
 }
 
-function serializeArgument(node: INode, actionName: string, index: number, arg: any): any {
+function serializeArgument(node: AnyNode, actionName: string, index: number, arg: any): any {
     if (arg instanceof Date) return { $MST_DATE: arg.getTime() }
     if (isPrimitive(arg)) return arg
     // We should not serialize MST nodes, even if we can, because we don't know if the receiving party can handle a raw snapshot instead of an
@@ -56,7 +56,7 @@ function serializeArgument(node: INode, actionName: string, index: number, arg: 
     }
 }
 
-function deserializeArgument(adm: INode, value: any): any {
+function deserializeArgument(adm: AnyNode, value: any): any {
     if (value && typeof value === "object" && "$MST_DATE" in value)
         return new Date(value["$MST_DATE"])
     return value
