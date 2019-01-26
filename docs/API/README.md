@@ -602,7 +602,7 @@ ___
 
 Middleware can be used to intercept any action is invoked on the subtree where it is attached. If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
 
-For more details, see the [middleware docs](docs/middleware.md)
+For more details, see the [middleware docs](../middleware.md)
 
 **Parameters:**
 
