@@ -35,7 +35,7 @@ ___
 
 ###  replay
 
-▸ **replay**(target: *`IAnyStateTreeNode`*): `any`
+▸ **replay**(target: *`IAnyStateTreeNode`*): `void`
 
 **Parameters:**
 
@@ -43,16 +43,16 @@ ___
 | ------ | ------ |
 | target | `IAnyStateTreeNode` |
 
-**Returns:** `any`
+**Returns:** `void`
 
 ___
 <a id="stop"></a>
 
 ###  stop
 
-▸ **stop**(): `any`
+▸ **stop**(): `void`
 
-**Returns:** `any`
+**Returns:** `void`
 
 ___
 

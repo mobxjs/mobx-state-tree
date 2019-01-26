@@ -602,7 +602,7 @@ ___
 
 Middleware can be used to intercept any action is invoked on the subtree where it is attached. If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
 
-For more details, see the [middleware docs](docs/middleware.md)
+For more details, see the [middleware docs](../middleware.md)
 
 **Parameters:**
 
@@ -3090,11 +3090,11 @@ export interface IPatchRecorder {
      // the inverse of the recorded patches
      inversePatches: IJsonPatch[]
      // stop recording patches
-     stop(target?: IStateTreeNode): any
+     stop(): void
      // resume recording patches
      resume()
      // apply all the recorded patches on the given target (the original subject if omitted)
-     replay(target?: IStateTreeNode): any
+     replay(target?: IAnyStateTreeNode): void
      // reverse apply the recorded patches on the given target  (the original subject if omitted)
      // stops the recorder if not already stopped
      undo(): void

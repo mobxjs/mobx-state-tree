@@ -16,6 +16,7 @@
 ### Methods
 
 * [replay](ipatchrecorder.md#replay)
+* [resume](ipatchrecorder.md#resume)
 * [stop](ipatchrecorder.md#stop)
 * [undo](ipatchrecorder.md#undo)
 
@@ -44,7 +45,7 @@ ___
 
 ###  replay
 
-▸ **replay**(target?: *`IAnyStateTreeNode`*): `any`
+▸ **replay**(target?: *`IAnyStateTreeNode`*): `void`
 
 **Parameters:**
 
@@ -52,16 +53,25 @@ ___
 | ------ | ------ |
 | `Optional` target | `IAnyStateTreeNode` |
 
-**Returns:** `any`
+**Returns:** `void`
+
+___
+<a id="resume"></a>
+
+###  resume
+
+▸ **resume**(): `void`
+
+**Returns:** `void`
 
 ___
 <a id="stop"></a>
 
 ###  stop
 
-▸ **stop**(): `any`
+▸ **stop**(): `void`
 
-**Returns:** `any`
+**Returns:** `void`
 
 ___
 <a id="undo"></a>
