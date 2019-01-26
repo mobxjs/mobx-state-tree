@@ -9,8 +9,7 @@ The value returned by the action invoked/ the aborted value gets passed through 
 
 MST ships with a small set of [pre-built / example middlewares](../packages/mst-middlewares/README.md).
 
-Custom middleware example:
-[SandBox example](https://codesandbox.io/s/88jrqlzm1l)
+Play around with a simple example of middleware in action with [this CodeSandbox](https://codesandbox.io/s/24qq4924oj).
 
 ## Custom Middleware
 
@@ -130,7 +129,7 @@ use next to call the next middleware.
 
 #### abort
 
-use abort if you wan't kill the queue of middlewares and immediately return.
+use `abort` if you want to kill the queue of middlewares and immediately return.
 the implementation of the targeted action won't be reached if you abort the queue.
 
 `abort(value: any) : void`
@@ -139,7 +138,7 @@ the implementation of the targeted action won't be reached if you abort the queu
 
 ### includeHooks
 
-set this flag to `false` if you wan't to avoid having hooks passed to the middleware.
+set this flag to `false` if you want to avoid having hooks passed to the middleware.
 
 ## FAQ
 
