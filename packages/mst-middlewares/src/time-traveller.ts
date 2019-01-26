@@ -17,7 +17,7 @@ const TimeTraveller = types
     }))
     .actions(self => {
         let targetStore: any
-        let snapshotDisposer: any
+        let snapshotDisposer: () => void
         let skipNextUndoState = false
 
         return {
@@ -37,7 +37,7 @@ const TimeTraveller = types
                     : getEnv(self).targetStore
                 if (!targetStore)
                     throw new Error(
-                        "Failed to find target store for TimeTraveller. Please provide `targetPath`  property, or a `targetStore` in the environment"
+                        "Failed to find target store for TimeTraveller. Please provide `targetPath` property, or a `targetStore` in the environment"
                     )
                 // TODO: check if targetStore doesn't contain self
                 // if (contains(targetStore, self)) throw new Error("TimeTraveller shouldn't be recording itself. Please specify a sibling as taret, not some parent")

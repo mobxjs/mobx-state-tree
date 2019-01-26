@@ -39,20 +39,26 @@ const UndoManager = types
         let replaying = false
         let middlewareDisposer: () => void
         let grouping = false
-        let groupRecorder: any = {
-            patches: [] as ReadonlyArray<IJsonPatch>,
-            inversePatches: [] as ReadonlyArray<IJsonPatch>
+
+        type GroupRecorder = Pick<IPatchRecorder, "patches" | "inversePatches">
+        let groupRecorder: GroupRecorder = {
+            patches: [],
+            inversePatches: []
         }
-        let recordingActionId: any = null
+
+        let recordingActionId: string | null = null
         let recordingActionLevel = 0
 
-        const startRecordAction = (call: IMiddlewareEvent): any => {
+        const startRecordAction = (call: IMiddlewareEvent) => {
             // level for the case that actions have the same name
             skipping = flagSkipping
             recordingActionLevel++
             const actionId = call.name + recordingActionLevel
             recordingActionId = actionId
-            return { recorder: recordPatches(call.tree), actionId }
+            return {
+                recorder: recordPatches(call.tree),
+                actionId
+            }
         }
         const stopRecordingAction = (recorder: IPatchRecorder): void => {
             recordingActionId = null
@@ -68,50 +74,34 @@ const UndoManager = types
                 inversePatches: groupRecorder.inversePatches.concat(recorder.inversePatches)
             }
         }
-        const undoRedoMiddleware = createActionTrackingMiddleware({
+
+        interface Context {
+            recorder?: IPatchRecorder
+            actionId?: string
+        }
+        const defaultContext: Context = {}
+
+        const undoRedoMiddleware = createActionTrackingMiddleware<Context>({
             // the flagSkipping === false check is mainly a performance optimisation
             filter: call => flagSkipping === false && call.context !== self, // don't undo / redo undo redo :)
             onStart: call => {
                 if (!recordingActionId) {
                     return startRecordAction(call)
                 }
+                return {}
             },
-            onResume: (
-                call,
-                { recorder, actionId }: { recorder: any; actionId: any } = {
-                    recorder: undefined,
-                    actionId: undefined
-                }
-            ) => recorder && recorder.resume(),
-            onSuspend: (
-                call,
-                { recorder, actionId }: { recorder: any; actionId: any } = {
-                    recorder: undefined,
-                    actionId: undefined
-                }
-            ) => recorder && recorder.stop(),
-            onSuccess: (
-                call,
-                { recorder, actionId }: { recorder: any; actionId: any } = {
-                    recorder: undefined,
-                    actionId: undefined
-                }
-            ) => {
+            onResume: (call, { recorder } = defaultContext) => recorder && recorder.resume(),
+            onSuspend: (call, { recorder } = defaultContext) => recorder && recorder.stop(),
+            onSuccess: (call, { recorder, actionId } = defaultContext) => {
                 if (recordingActionId === actionId) {
-                    stopRecordingAction(recorder)
+                    stopRecordingAction(recorder!)
                 }
             },
-            onFail: (
-                call,
-                { recorder, actionId }: { recorder: any; actionId: any } = {
-                    recorder: undefined,
-                    actionId: undefined
-                }
-            ) => recorder && recorder.undo()
+            onFail: (call, { recorder } = defaultContext) => recorder && recorder.undo()
         })
 
         return {
-            addUndoState(recorder: any) {
+            addUndoState(recorder: GroupRecorder) {
                 if (replaying || (recorder.patches && recorder.patches.length === 0)) {
                     // skip recording if this state was caused by undo / redo
                     // or if patches is empty
@@ -153,7 +143,7 @@ const UndoManager = types
                 self.undoIdx++
                 replaying = false
             },
-            withoutUndo(fn: () => any) {
+            withoutUndo<T>(fn: () => T): T {
                 try {
                     skipping = true
                     flagSkipping = true
@@ -171,15 +161,18 @@ const UndoManager = types
                     return result
                 })
             },
-            startGroup(fn: () => any) {
+            startGroup<T>(fn: () => T): T {
                 grouping = true
                 return fn()
             },
-            stopGroup(fn?: () => any) {
+            stopGroup(fn?: () => void) {
                 if (fn) fn()
                 grouping = false
                 this.addUndoState(groupRecorder)
-                groupRecorder = { patches: [], inversePatches: [] }
+                groupRecorder = {
+                    patches: [],
+                    inversePatches: []
+                }
             },
             clear() {
                 self.history.clear()
