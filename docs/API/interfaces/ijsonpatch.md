@@ -26,7 +26,7 @@
 
 ###  op
 
-**● op**: *"replace" | "add" | "remove"*
+**● op**: *"replace" \| "add" \| "remove"*
 
 ___
 <a id="path"></a>

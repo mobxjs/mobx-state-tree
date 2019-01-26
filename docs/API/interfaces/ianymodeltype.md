@@ -145,7 +145,7 @@ ___
 
 ###  named
 
-▸ **named**(newName: *`string`*): `this`
+▸ **named**(newName: *`string`*): [IModelType](imodeltype.md)<`any`, `any`, `any`, `any`>
 
 **Parameters:**
 
@@ -153,7 +153,7 @@ ___
 | ------ | ------ |
 | newName | `string` |
 
-**Returns:** `this`
+**Returns:** [IModelType](imodeltype.md)<`any`, `any`, `any`, `any`>
 
 ___
 <a id="postprocesssnapshot"></a>

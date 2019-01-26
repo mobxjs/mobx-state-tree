@@ -940,7 +940,7 @@ test("#1117", () => {
                 if (isStateTreeNode(x)) return getSnapshot(x)
                 return (x as any) as C
             },
-            isTargetType(v) {
+            isTargetType(v): v is T | null {
                 if (isFrozenType(t)) {
                     return t.is(v)
                 }
