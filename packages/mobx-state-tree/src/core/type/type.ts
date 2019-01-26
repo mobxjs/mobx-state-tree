@@ -131,58 +131,58 @@ export interface IType<C, S, T> {
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue?: any
-    ): BaseNode<S, T>
+        initialValue: any
+    ): BaseNode<C, S, T>
     /**
      * @internal
      * @hidden
      */
-    initializeChildNodes(node: BaseNode<S, T>, snapshot: C): IChildNodesMap
+    initializeChildNodes(node: BaseNode<C, S, T>, snapshot: C): IChildNodesMap
     /**
      * @internal
      * @hidden
      */
-    createNewInstance(node: BaseNode<S, T>, childNodes: IChildNodesMap, snapshot: C): T
+    createNewInstance(node: BaseNode<C, S, T>, childNodes: IChildNodesMap, snapshot: C): T
     /**
      * @internal
      * @hidden
      */
-    finalizeNewInstance(node: BaseNode<S, T>, instance: any): void
+    finalizeNewInstance(node: BaseNode<C, S, T>, instance: any): void
     /**
      * @internal
      * @hidden
      */
-    reconcile(current: BaseNode<S, T>, newValue: any): BaseNode<S, T>
+    reconcile(current: BaseNode<C, S, T>, newValue: any): BaseNode<C, S, T>
     /**
      * @internal
      * @hidden
      */
-    getValue(node: BaseNode<S, T>): T
+    getValue(node: BaseNode<C, S, T>): T
     /**
      * @internal
      * @hidden
      */
-    getSnapshot(node: BaseNode<S, T>, applyPostProcess?: boolean): S
+    getSnapshot(node: BaseNode<C, S, T>, applyPostProcess?: boolean): S
     /**
      * @internal
      * @hidden
      */
-    applySnapshot(node: BaseNode<S, T>, snapshot: S): void
+    applySnapshot(node: BaseNode<C, S, T>, snapshot: S): void
     /**
      * @internal
      * @hidden
      */
-    applyPatchLocally(node: BaseNode<S, T>, subpath: string, patch: IJsonPatch): void
+    applyPatchLocally(node: BaseNode<C, S, T>, subpath: string, patch: IJsonPatch): void
     /**
      * @internal
      * @hidden
      */
-    getChildren(node: BaseNode<S, T>): ReadonlyArray<AnyNode>
+    getChildren(node: BaseNode<C, S, T>): ReadonlyArray<AnyNode>
     /**
      * @internal
      * @hidden
      */
-    getChildNode(node: BaseNode<S, T>, key: string): AnyNode
+    getChildNode(node: BaseNode<C, S, T>, key: string): AnyNode
     /**
      * @internal
      * @hidden
@@ -192,7 +192,7 @@ export interface IType<C, S, T> {
      * @internal
      * @hidden
      */
-    removeChild(node: BaseNode<S, T>, subpath: string): void
+    removeChild(node: BaseNode<C, S, T>, subpath: string): void
     /**
      * @internal
      * @hidden
@@ -304,7 +304,7 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  * @internal
  * @hidden
  */
-export abstract class BaseType<C, S, T, N extends BaseNode<S, T>>
+export abstract class BaseType<C, S, T, N extends BaseNode<C, S, T>>
     implements IType<C, S, T & IStateTreeNode<C, S>> {
     readonly isType = true
     readonly name: string
@@ -398,12 +398,14 @@ export abstract class BaseType<C, S, T, N extends BaseNode<S, T>>
  * @internal
  * @hidden
  */
-export abstract class ComplexType<C, S, T, N extends ObjectNode<S, T>> extends BaseType<
+export abstract class ComplexType<C, S, T, N extends ObjectNode<C, S, T>> extends BaseType<
     C,
     S,
     T,
     N
 > {
+    identifierAttribute: string | undefined
+
     constructor(name: string) {
         super(name)
     }
@@ -419,8 +421,7 @@ export abstract class ComplexType<C, S, T, N extends ObjectNode<S, T>> extends B
             isMutable(newValue) &&
             !isStateTreeNode(newValue) &&
             (!current.identifierAttribute ||
-                current.identifier ===
-                    normalizeIdentifier((newValue as any)[current.identifierAttribute]))
+                current.identifier === normalizeIdentifier(newValue[current.identifierAttribute]))
         ) {
             // the newValue has no node, so can be treated like a snapshot
             // we can reconcile
@@ -435,7 +436,7 @@ export abstract class ComplexType<C, S, T, N extends ObjectNode<S, T>> extends B
             // newValue is a Node as well, move it here..
             const newNode = getStateTreeNode(newValue)
             newNode.setParent(parent, subpath)
-            return newNode as any
+            return newNode as N
         }
         // nothing to do, we have to create a new node
         return this.instantiate(parent, subpath, current.environment, newValue)
@@ -446,7 +447,7 @@ export abstract class ComplexType<C, S, T, N extends ObjectNode<S, T>> extends B
  * @internal
  * @hidden
  */
-export abstract class Type<C, S, T, N extends BaseNode<S, T>> extends BaseType<C, S, T, N> {
+export abstract class Type<C, S, T, N extends BaseNode<C, S, T>> extends BaseType<C, S, T, N> {
     constructor(name: string) {
         super(name)
     }
@@ -458,7 +459,7 @@ export abstract class Type<C, S, T, N extends BaseNode<S, T>> extends BaseType<C
         initialValue: any
     ): N
 
-    getValue(node: N) {
+    getValue(node: N): T {
         return node.storedValue
     }
 
@@ -479,7 +480,7 @@ export abstract class Type<C, S, T, N extends BaseNode<S, T>> extends BaseType<C
     }
 
     getChildren(node: N): AnyNode[] {
-        return EMPTY_ARRAY as any
+        return EMPTY_ARRAY as AnyNode[]
     }
 
     getChildNode(node: N, key: string): AnyNode {

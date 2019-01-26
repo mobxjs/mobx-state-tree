@@ -7,7 +7,8 @@ import {
     AnyObjectNode,
     IAnyType,
     ExtractS,
-    ExtractT
+    ExtractT,
+    ExtractC
 } from "../../internal"
 
 /**
@@ -36,16 +37,16 @@ export function createNode<IT extends IAnyType>(
     }
 
     if (type.shouldAttachNode) {
-        return new ObjectNode<ExtractS<IT>, ExtractT<IT>>(
-            type,
+        return new ObjectNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>>(
+            type as any,
             parent,
             subpath,
             environment,
             initialValue
         )
     } else {
-        return new ScalarNode<ExtractS<IT>, ExtractT<IT>>(
-            type,
+        return new ScalarNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>>(
+            type as any,
             parent,
             subpath,
             environment,

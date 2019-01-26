@@ -75,17 +75,16 @@ export interface IArrayType<IT extends IAnyType>
     extends IType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>>,
         OptionalProperty {}
 
+type C<IT extends IAnyType> = ExtractC<IT>[] | undefined
+type S<IT extends IAnyType> = ExtractS<IT>[]
+type T<IT extends IAnyType> = IMSTArray<IT>
+type N<IT extends IAnyType> = ObjectNode<C<IT>, S<IT>, T<IT>>
+
 /**
  * @internal
  * @hidden
  */
-export class ArrayType<
-    IT extends IAnyType,
-    C extends ExtractC<IT>[] | undefined = ExtractC<IT>[] | undefined,
-    S extends ExtractS<IT>[] = ExtractS<IT>[],
-    T extends IMSTArray<IT> = IMSTArray<IT>,
-    N extends ObjectNode<S, T> = any
-> extends ComplexType<C, S, T, N> {
+export class ArrayType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT>, N<IT>> {
     shouldAttachNode = true
     subType: IAnyType
     readonly flags = TypeFlags.Array
@@ -99,15 +98,15 @@ export class ArrayType<
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: C | S | T
-    ): N {
-        return createNode(this, parent, subpath, environment, initialValue) as N
+        initialValue: C<IT> | S<IT> | T<IT>
+    ): N<IT> {
+        return createNode(this, parent, subpath, environment, initialValue) as N<IT>
     }
 
-    initializeChildNodes(objNode: N, snapshot: C = [] as any): IChildNodesMap {
+    initializeChildNodes(objNode: N<IT>, snapshot: C<IT> = []): IChildNodesMap {
         const subType = (objNode.type as this).subType
         const environment = objNode.environment
-        const result = {} as IChildNodesMap
+        const result: IChildNodesMap = {}
         snapshot.forEach((item, index) => {
             const subpath = `${index}`
             result[subpath] = subType.instantiate(objNode, subpath, environment, item)
@@ -115,25 +114,25 @@ export class ArrayType<
         return result
     }
 
-    createNewInstance(node: N, childNodes: IChildNodesMap, snapshot: C): T {
-        return observable.array(convertChildNodesToArray(childNodes), mobxShallow) as T
+    createNewInstance(node: N<IT>, childNodes: IChildNodesMap): T<IT> {
+        return observable.array(convertChildNodesToArray(childNodes), mobxShallow) as T<IT>
     }
 
-    finalizeNewInstance(node: N, instance: T): void {
+    finalizeNewInstance(node: N<IT>, instance: T<IT>): void {
         _getAdministration(instance).dehancer = node.unbox
-        intercept(instance as IObservableArray, this.willChange)
-        observe(instance as IObservableArray, this.didChange)
+        intercept(instance as IObservableArray<AnyNode>, this.willChange)
+        observe(instance as IObservableArray<AnyNode>, this.didChange)
     }
 
     describe() {
         return this.subType.describe() + "[]"
     }
 
-    getChildren(node: N): AnyNode[] {
+    getChildren(node: N<IT>): AnyNode[] {
         return node.storedValue.slice()
     }
 
-    getChildNode(node: N, key: string): AnyNode {
+    getChildNode(node: N<IT>, key: string): AnyNode {
         const index = parseInt(key, 10)
         if (index < node.storedValue.length) return node.storedValue[index]
         throw fail("Not a child: " + key)
@@ -142,7 +141,7 @@ export class ArrayType<
     willChange(
         change: IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode>
     ): IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode> | null {
-        const node = getStateTreeNode(change.object as T)
+        const node = getStateTreeNode(change.object as T<IT>)
         node.assertWritable({ subpath: String(change.index) })
         const subType = (node.type as this).subType
         const childNodes = node.getChildren()
@@ -186,23 +185,23 @@ export class ArrayType<
         return change
     }
 
-    getValue(node: N): T {
+    getValue(node: N<IT>): T<IT> {
         return node.storedValue
     }
 
-    getSnapshot(node: N): S {
-        return node.getChildren().map(childNode => childNode.snapshot) as S
+    getSnapshot(node: N<IT>): S<IT> {
+        return node.getChildren().map(childNode => childNode.snapshot)
     }
 
-    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: C): S {
-        const processed: S = [] as any
+    processInitialSnapshot(childNodes: IChildNodesMap): S<IT> {
+        const processed: S<IT> = []
         Object.keys(childNodes).forEach(key => {
             processed.push(childNodes[key].getSnapshot())
         })
         return processed
     }
 
-    didChange(change: IArrayChange<any> | IArraySplice<any>): void {
+    didChange(change: IArrayChange<AnyNode> | IArraySplice<AnyNode>): void {
         const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         switch (change.type) {
             case "update":
@@ -239,8 +238,8 @@ export class ArrayType<
         }
     }
 
-    applyPatchLocally(node: N, subpath: string, patch: IJsonPatch): void {
-        const target = node.storedValue as IObservableArray<any>
+    applyPatchLocally(node: N<IT>, subpath: string, patch: IJsonPatch): void {
+        const target = node.storedValue
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
             case "replace":
@@ -256,10 +255,10 @@ export class ArrayType<
     }
 
     @action
-    applySnapshot(node: N, snapshot: S): void {
+    applySnapshot(node: N<IT>, snapshot: S<IT>): void {
         typecheckInternal(this, snapshot)
-        const target = node.storedValue as IObservableArray<any>
-        target.replace(snapshot)
+        const target = node.storedValue
+        target.replace(snapshot as any)
     }
 
     getChildType(key: string): IAnyType {
@@ -272,17 +271,17 @@ export class ArrayType<
         }
 
         return flattenTypeErrors(
-            value.map((item: any, index: any) =>
+            value.map((item, index) =>
                 this.subType.validate(item, getContextForPath(context, "" + index, this.subType))
             )
         )
     }
 
-    getDefaultSnapshot(): C {
-        return EMPTY_ARRAY as C
+    getDefaultSnapshot(): C<IT> {
+        return EMPTY_ARRAY as C<IT>
     }
 
-    removeChild(node: N, subpath: string) {
+    removeChild(node: N<IT>, subpath: string) {
         node.storedValue.splice(parseInt(subpath, 10), 1)
     }
 }
@@ -322,11 +321,11 @@ export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     return ret as typeof ret & OptionalProperty
 }
 
-function reconcileArrayChildren<T>(
+function reconcileArrayChildren<TT>(
     parent: AnyObjectNode,
-    childType: IType<any, any, T>,
+    childType: IType<any, any, TT>,
     oldNodes: AnyNode[],
-    newValues: T[],
+    newValues: TT[],
     newPaths: (string | number)[]
 ): AnyNode[] | null {
     let oldNode: AnyNode,

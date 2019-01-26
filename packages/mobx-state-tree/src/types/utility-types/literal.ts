@@ -19,7 +19,12 @@ import {
  * @internal
  * @hidden
  */
-export class Literal<T, N extends ScalarNode<T, T> = any> extends Type<T, T, T, N> {
+export class Literal<T, N extends ScalarNode<T, T, T> = ScalarNode<T, T, T>> extends Type<
+    T,
+    T,
+    T,
+    N
+> {
     readonly shouldAttachNode = false
     readonly value: any
     readonly flags = TypeFlags.Literal

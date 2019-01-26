@@ -33,7 +33,8 @@ import {
     escapeJsonPath,
     getPath,
     warnError,
-    AnyNode
+    AnyNode,
+    IStateTreeNode
 } from "../../internal"
 
 let nextNodeId = 1
@@ -71,13 +72,16 @@ const snapshotReactionOptions = {
  * @internal
  * @hidden
  */
-export class ObjectNode<S, T> extends BaseNode<S, T> {
+export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
+    readonly type!: ComplexType<C, S, T, this>
+    storedValue!: T & IStateTreeNode<C, S>
+
     readonly nodeId = ++nextNodeId
-    readonly identifierAttribute: string | undefined
+    readonly identifierAttribute?: string
     readonly identifier: string | null // Identifier is always normalized to string, even if the identifier property isn't
     readonly unnormalizedIdentifier: ReferenceIdentifier | null
 
-    identifierCache: IdentifierCache | undefined
+    identifierCache?: IdentifierCache
     isProtectionEnabled = true
     middlewares: IMiddleware[] | null = null
 
@@ -88,9 +92,9 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         this._applyPatches!(patches)
     }
 
-    private _applySnapshot?: (snapshot: any) => void
+    private _applySnapshot?: (snapshot: C) => void
 
-    applySnapshot(snapshot: any): void {
+    applySnapshot(snapshot: C): void {
         this.createObservableInstanceIfNeeded()
         this._applySnapshot!(snapshot)
     }
@@ -107,11 +111,12 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
 
     private _observableInstanceState = ObservableInstanceLifecycle.UNINITIALIZED
     private _childNodes: IChildNodesMap
-    private _initialSnapshot: any
-    private _cachedInitialSnapshot: any = null
+    private _initialSnapshot: C
+    private _cachedInitialSnapshot?: S
+    private _cachedInitialSnapshotCreated = false
 
     constructor(
-        type: IAnyType,
+        type: ComplexType<C, S, T, any>,
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
@@ -120,7 +125,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         super(type, parent, subpath, environment)
 
         this._initialSnapshot = freeze(initialValue)
-        this.identifierAttribute = (type as any).identifierAttribute
+        this.identifierAttribute = type.identifierAttribute
 
         if (!parent) {
             this.identifierCache = new IdentifierCache()
@@ -133,7 +138,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         this.identifier = null
         this.unnormalizedIdentifier = null
         if (this.identifierAttribute && this._initialSnapshot) {
-            let id = this._initialSnapshot[this.identifierAttribute]
+            let id = (this._initialSnapshot as any)[this.identifierAttribute]
             if (id === undefined) {
                 // try with the actual node if not (for optional identifiers)
                 const childNode = this._childNodes[this.identifierAttribute]
@@ -163,7 +168,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
     }
 
     @action
-    createObservableInstanceIfNeeded() {
+    createObservableInstanceIfNeeded(): void {
         if (this._observableInstanceState !== ObservableInstanceLifecycle.UNINITIALIZED) {
             return
         }
@@ -270,7 +275,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         }
     }
 
-    protected fireHook(name: Hook) {
+    protected fireHook(name: Hook): void {
         this.fireInternalHook(name)
 
         const fn =
@@ -307,23 +312,24 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         if (!this.isAlive) return this._snapshotUponDeath!
         return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
             ? this._getActualSnapshot()
-            : this._getInitialSnapshot()
+            : this._getCachedInitialSnapshot()
     }
 
-    private _getActualSnapshot(): any {
+    private _getActualSnapshot(): S {
         return this.type.getSnapshot(this)
     }
 
-    private _getInitialSnapshot(): any {
-        if (!this._initialSnapshot) return this._initialSnapshot
-        if (this._cachedInitialSnapshot) return this._cachedInitialSnapshot
+    private _getCachedInitialSnapshot(): S {
+        if (!this._cachedInitialSnapshotCreated) {
+            const type = this.type
+            const childNodes = this._childNodes
+            const snapshot = this._initialSnapshot
 
-        const type = (this.type as unknown) as ComplexType<any, any, any, any>
-        const childNodes = this._childNodes!
-        const snapshot = this._initialSnapshot
+            this._cachedInitialSnapshot = type.processInitialSnapshot(childNodes, snapshot)
+            this._cachedInitialSnapshotCreated = true
+        }
 
-        this._cachedInitialSnapshot = type.processInitialSnapshot(childNodes, snapshot)
-        return this._cachedInitialSnapshot
+        return this._cachedInitialSnapshot!
     }
 
     private isRunningAction(): boolean {
@@ -407,7 +413,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         }
     }
 
-    removeChild(subpath: string) {
+    removeChild(subpath: string): void {
         this.type.removeChild(this, subpath)
     }
 
@@ -428,7 +434,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         }`
     }
 
-    finalizeCreation() {
+    finalizeCreation(): void {
         this.baseFinalizeCreation(() => {
             for (let child of this.getChildren()) {
                 child.finalizeCreation()
@@ -454,7 +460,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         this.state = NodeLifeCycle.FINALIZED
     }
 
-    private preboot() {
+    private preboot(): void {
         const self = this
         this._applyPatches = createActionInvoker(
             this.storedValue,
@@ -470,7 +476,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         this._applySnapshot = createActionInvoker(
             this.storedValue,
             "@APPLY_SNAPSHOT",
-            (snapshot: any) => {
+            (snapshot: S) => {
                 // if the snapshot is the same as the current one, avoid performing a reconcile
                 if (snapshot === self.snapshot) return
                 // else, apply it by calling the type logic
@@ -483,7 +489,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
     }
 
     @action
-    die() {
+    die(): void {
         if (this.state === NodeLifeCycle.DETACHING) return
         if (this._observableInstanceState === ObservableInstanceLifecycle.CREATED) {
             this.aboutToDie()
@@ -494,7 +500,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         }
     }
 
-    aboutToDie() {
+    aboutToDie(): void {
         this.getChildren().forEach(node => {
             node.aboutToDie()
         })
@@ -507,7 +513,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         this._internalEvents.clear(InternalEvents.Dispose)
     }
 
-    private unregisterIdentifiers() {
+    private unregisterIdentifiers(): void {
         Object.keys(this._childNodes).forEach(k => {
             const childNode = this._childNodes[k]
             if (childNode instanceof ObjectNode) {
@@ -517,7 +523,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         this.root.identifierCache!.notifyDied(this)
     }
 
-    finalizeDeath() {
+    finalizeDeath(): void {
         // invariant: not called directly but from "die"
         this.getChildren().forEach(node => {
             node.finalizeDeath()
@@ -533,12 +539,12 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         this.baseFinalizeDeath()
     }
 
-    onSnapshot(onChange: (snapshot: any) => void): IDisposer {
+    onSnapshot(onChange: (snapshot: S) => void): IDisposer {
         this._addSnapshotReaction()
         return this._internalEvents.register(InternalEvents.Snapshot, onChange)
     }
 
-    protected emitSnapshot(snapshot: any) {
+    protected emitSnapshot(snapshot: S): void {
         this._internalEvents.emit(InternalEvents.Snapshot, snapshot)
     }
 
@@ -546,7 +552,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         return this._internalEvents.register(InternalEvents.Patch, handler)
     }
 
-    emitPatch(basePatch: IReversibleJsonPatch, source: AnyNode) {
+    emitPatch(basePatch: IReversibleJsonPatch, source: AnyNode): void {
         const intEvs = this._internalEvents
         if (intEvs.hasSubscribers(InternalEvents.Patch)) {
             const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, {
@@ -577,12 +583,12 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         this._internalEvents.unregister(InternalEvents.Dispose, disposer)
     }
 
-    removeMiddleware(handler: IMiddlewareHandler) {
+    removeMiddleware(handler: IMiddlewareHandler): void {
         if (this.middlewares)
             this.middlewares = this.middlewares.filter(middleware => middleware.handler !== handler)
     }
 
-    addMiddleWare(handler: IMiddlewareHandler, includeHooks: boolean = true) {
+    addMiddleWare(handler: IMiddlewareHandler, includeHooks: boolean = true): IDisposer {
         if (!this.middlewares) this.middlewares = [{ handler, includeHooks }]
         else this.middlewares.push({ handler, includeHooks })
 
@@ -599,7 +605,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
         this.type.applyPatchLocally(this, subpath, patch)
     }
 
-    private _addSnapshotReaction() {
+    private _addSnapshotReaction(): void {
         if (!this._hasSnapshotReaction) {
             const snapshotDisposer = reaction(
                 () => this.snapshot,
@@ -616,7 +622,7 @@ export class ObjectNode<S, T> extends BaseNode<S, T> {
  * @internal
  * @hidden
  */
-export type AnyObjectNode = ObjectNode<any, any>
+export type AnyObjectNode = ObjectNode<any, any, any>
 
 /**
  * @internal

@@ -1,10 +1,11 @@
 import {
-    IAnyType,
     AnyObjectNode,
     NodeLifeCycle,
     Hook,
     escapeJsonPath,
-    EventHandlers
+    EventHandlers,
+    IType,
+    IAnyType
 } from "../../internal"
 import { createAtom, IAtom } from "mobx"
 
@@ -12,7 +13,7 @@ import { createAtom, IAtom } from "mobx"
  * @internal
  * @hidden
  */
-export abstract class BaseNode<S, T> {
+export abstract class BaseNode<C, S, T> {
     private _escapedSubpath?: string
 
     private _subpath!: string
@@ -30,7 +31,7 @@ export abstract class BaseNode<S, T> {
         return this._pathUponDeath
     }
 
-    storedValue!: T
+    storedValue!: any // usually the same type as the value, but not always (such as with references)
     value!: T
 
     private aliveAtom?: IAtom
@@ -64,7 +65,12 @@ export abstract class BaseNode<S, T> {
         return this._parent
     }
 
-    constructor(type: IAnyType, parent: AnyObjectNode | null, subpath: string, environment: any) {
+    constructor(
+        type: IType<C, S, T>,
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any
+    ) {
         this.environment = environment
         this.type = type
         this.baseSetParent(parent, subpath)
@@ -176,4 +182,4 @@ export abstract class BaseNode<S, T> {
  * @internal
  * @hidden
  */
-export type AnyNode = BaseNode<any, any>
+export type AnyNode = BaseNode<any, any, any>

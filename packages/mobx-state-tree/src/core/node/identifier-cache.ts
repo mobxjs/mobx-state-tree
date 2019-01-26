@@ -6,7 +6,8 @@ import {
     IAnyType,
     AnyObjectNode,
     ExtractS,
-    ExtractT
+    ExtractT,
+    ExtractC
 } from "../../internal"
 
 let identifierCacheId = 0
@@ -104,7 +105,7 @@ export class IdentifierCache {
     resolve<IT extends IAnyType>(
         type: IT,
         identifier: string
-    ): ObjectNode<ExtractS<IT>, ExtractT<IT>> | null {
+    ): ObjectNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | null {
         const set = this.cache.get(identifier)
         if (!set) return null
         const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))

@@ -35,7 +35,7 @@ export interface UnionOptions {
  * @internal
  * @hidden
  */
-export class Union<N extends BaseNode<any, any> = any> extends Type<any, any, any, N> {
+export class Union<N extends BaseNode<any, any, any>> extends Type<any, any, any, N> {
     readonly dispatcher?: ITypeDispatcher
     readonly eager: boolean = true
     readonly types: IAnyType[]

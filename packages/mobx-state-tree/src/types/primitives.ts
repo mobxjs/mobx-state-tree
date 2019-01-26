@@ -24,7 +24,12 @@ import {
  * @internal
  * @hidden
  */
-export class CoreType<C, S, T, N extends ScalarNode<S, T> = any> extends Type<C, S, T, N> {
+export class CoreType<C, S, T, N extends ScalarNode<C, S, T> = ScalarNode<C, S, T>> extends Type<
+    C,
+    S,
+    T,
+    N
+> {
     readonly shouldAttachNode = false
 
     constructor(

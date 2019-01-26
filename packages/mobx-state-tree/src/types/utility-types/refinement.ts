@@ -19,7 +19,7 @@ import {
  * @internal
  * @hidden
  */
-export class Refinement<C, S, T, N extends BaseNode<S, T>> extends Type<C, S, T, N> {
+export class Refinement<C, S, T, N extends BaseNode<C, S, T>> extends Type<C, S, T, N> {
     readonly type: IAnyType
     readonly predicate: (v: C) => boolean
     readonly message: (v: C) => string

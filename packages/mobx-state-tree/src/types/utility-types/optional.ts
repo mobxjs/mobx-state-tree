@@ -38,7 +38,12 @@ export type IOptionalValue<C, S, T> = C | S | IFunctionReturn<C | S | T>
  * @internal
  * @hidden
  */
-export class OptionalValue<C, S, T, N extends BaseNode<S, T> = any> extends Type<C, S, T, N> {
+export class OptionalValue<C, S, T, N extends BaseNode<C, S, T> = BaseNode<C, S, T>> extends Type<
+    C,
+    S,
+    T,
+    N
+> {
     readonly type: IType<C, S, T>
     readonly defaultValue: IOptionalValue<C, S, T>
 

@@ -321,7 +321,7 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
  * @internal
  * @hidden
  */
-export type AnyModelType = ModelType<any, any, any, any>
+export type AnyModelType = ModelType<any, any, any, any, any, any, any, any, any>
 
 /**
  * @internal
@@ -330,23 +330,13 @@ export type AnyModelType = ModelType<any, any, any, any>
 export class ModelType<
     PROPS extends ModelProperties,
     OTHERS,
-    CustomC = _NotCustomized,
-    CustomS = _NotCustomized,
-    MT extends IModelType<PROPS, OTHERS, CustomC, CustomS> = IModelType<
-        PROPS,
-        OTHERS,
-        CustomC,
-        CustomS
-    >,
-    C extends ModelCreationType2<PROPS, CustomC> = ModelCreationType2<PROPS, CustomC>,
-    S extends ModelSnapshotType2<PROPS, CustomS> = ModelSnapshotType2<PROPS, CustomS>,
-    T extends ModelInstanceType<PROPS, OTHERS, CustomC, CustomS> = ModelInstanceType<
-        PROPS,
-        OTHERS,
-        CustomC,
-        CustomS
-    >,
-    N extends ObjectNode<S, T> = any
+    CustomC,
+    CustomS,
+    MT extends IModelType<PROPS, OTHERS, CustomC, CustomS>,
+    C extends ModelCreationType2<PROPS, CustomC>,
+    S extends ModelSnapshotType2<PROPS, CustomS>,
+    T extends ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>,
+    N extends ObjectNode<C, S, T>
 > extends ComplexType<C, S, T, N> implements IModelType<PROPS, OTHERS, CustomC, CustomS> {
     readonly flags = TypeFlags.Object
     shouldAttachNode = true
@@ -354,7 +344,6 @@ export class ModelType<
     /*
      * The original object definition
      */
-    public readonly identifierAttribute: string | undefined
     public readonly initializers!: ((instance: any) => any)[]
     public readonly properties!: PROPS
 
@@ -375,7 +364,7 @@ export class ModelType<
         this.identifierAttribute = this._getIdentifierAttribute()
     }
 
-    create(...args: any[]) {
+    create(...args: any[]): T {
         // just to keep TS happy
         return super.create(...args)
     }

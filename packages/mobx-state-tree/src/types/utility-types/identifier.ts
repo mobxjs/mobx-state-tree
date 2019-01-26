@@ -14,7 +14,10 @@ import {
     ScalarNode
 } from "../../internal"
 
-abstract class BaseIdentifierType<S, N extends ScalarNode<S, S> = any> extends Type<S, S, S, N> {
+abstract class BaseIdentifierType<
+    S,
+    N extends ScalarNode<S, S, S> = ScalarNode<S, S, S>
+> extends Type<S, S, S, N> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Identifier
 
@@ -82,7 +85,7 @@ export class IdentifierNumberType extends BaseIdentifierType<number> {
         super("identifierNumber", "number")
     }
 
-    getSnapshot(node: ScalarNode<number, number>): number {
+    getSnapshot(node: ScalarNode<number, number, number>): number {
         return node.storedValue
     }
 

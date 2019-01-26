@@ -81,7 +81,12 @@ export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S | T, S, 
  * @internal
  * @hidden
  */
-export class CustomType<C, S, T, N extends ScalarNode<S, T> = any> extends Type<C, S, T, N> {
+export class CustomType<C, S, T, N extends ScalarNode<C, S, T> = ScalarNode<C, S, T>> extends Type<
+    C,
+    S,
+    T,
+    N
+> {
     readonly flags = TypeFlags.Reference
     readonly shouldAttachNode = false
 

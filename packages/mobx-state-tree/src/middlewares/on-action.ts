@@ -30,8 +30,8 @@ export interface ISerializedActionCall {
 
 export interface IActionRecorder {
     actions: ReadonlyArray<ISerializedActionCall>
-    stop(): any
-    replay(target: IAnyStateTreeNode): any
+    stop(): void
+    replay(target: IAnyStateTreeNode): void
 }
 
 function serializeArgument(node: AnyNode, actionName: string, index: number, arg: any): any {

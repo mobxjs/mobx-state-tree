@@ -21,7 +21,12 @@ import {
  * @internal
  * @hidden
  */
-export class Frozen<T, N extends ScalarNode<T, T> = any> extends Type<T, T, T, N> {
+export class Frozen<T, N extends ScalarNode<T, T, T> = ScalarNode<T, T, T>> extends Type<
+    T,
+    T,
+    T,
+    N
+> {
     readonly shouldAttachNode = false
     flags = TypeFlags.Frozen
 

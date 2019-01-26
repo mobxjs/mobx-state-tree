@@ -24,7 +24,8 @@ import {
     InvalidReferenceError,
     normalizeIdentifier,
     ReferenceIdentifier,
-    AnyObjectNode
+    AnyObjectNode,
+    AnyModelType
 } from "../internal"
 
 /** @hidden */
@@ -142,8 +143,9 @@ export function applyPatch(
 export interface IPatchRecorder {
     patches: ReadonlyArray<IJsonPatch>
     inversePatches: ReadonlyArray<IJsonPatch>
-    stop(): any
-    replay(target?: IAnyStateTreeNode): any
+    stop(): void
+    resume(): void
+    replay(target?: IAnyStateTreeNode): void
     undo(target?: IAnyStateTreeNode): void
 }
 
@@ -159,11 +161,11 @@ export interface IPatchRecorder {
  *      // the inverse of the recorded patches
  *      inversePatches: IJsonPatch[]
  *      // stop recording patches
- *      stop(target?: IStateTreeNode): any
+ *      stop(): void
  *      // resume recording patches
  *      resume()
  *      // apply all the recorded patches on the given target (the original subject if omitted)
- *      replay(target?: IStateTreeNode): any
+ *      replay(target?: IAnyStateTreeNode): void
  *      // reverse apply the recorded patches on the given target  (the original subject if omitted)
  *      // stops the recorder if not already stopped
  *      undo(): void
@@ -217,7 +219,7 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
 /**
  * The inverse of `unprotect`.
  *
- * @param {IStateTreeNode} target
+ * @param target
  */
 export function protect(target: IAnyStateTreeNode): void {
     // check all arguments
@@ -922,7 +924,7 @@ export interface IModelReflectionData extends IModelReflectionPropertiesData {
  * @returns
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    const type = getStateTreeNode(target).type as IAnyModelType
+    const type = getStateTreeNode(target).type as AnyModelType
 
     const reflected: IModelReflectionData = {
         ...getPropertyMembers(type),

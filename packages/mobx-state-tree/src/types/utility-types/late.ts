@@ -8,14 +8,19 @@ import {
     IAnyType,
     typeCheckSuccess,
     AnyObjectNode,
-    ScalarNode
+    BaseNode
 } from "../../internal"
 
 /**
  * @internal
  * @hidden
  */
-export class Late<C, S, T, N extends ScalarNode<S, T> = any> extends Type<C, S, T, N> {
+export class Late<C, S, T, N extends BaseNode<C, S, T> = BaseNode<C, S, T>> extends Type<
+    C,
+    S,
+    T,
+    N
+> {
     readonly definition: () => IAnyType
     private _subType: IAnyType | null = null
 
