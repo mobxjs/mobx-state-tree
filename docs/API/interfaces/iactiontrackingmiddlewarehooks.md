@@ -27,7 +27,7 @@
 
 ### `<Optional>` filter
 
-**● filter**: *`undefined` | `function`*
+**● filter**: *`undefined` \| `function`*
 
 ___
 <a id="onfail"></a>

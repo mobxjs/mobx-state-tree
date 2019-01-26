@@ -9,7 +9,7 @@ The value returned by the action invoked/ the aborted value gets passed through 
 
 MST ships with a small set of [pre-built / example middlewares](../packages/mst-middlewares/README.md).
 
-Play around with a simple example of middleware in action with [this CodeSandbox](https://codesandbox.io/s/24qq4924oj).
+Play around with a simple example of middleware in action with [this CodeSandbox](https://codesandbox.io/s/vjoql07ool).
 
 ## Custom Middleware
 

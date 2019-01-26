@@ -29,7 +29,7 @@ ___
 
 ### `<Optional>` message
 
-**● message**: *`undefined` | `string`*
+**● message**: *`undefined` \| `string`*
 
 ___
 <a id="value"></a>

@@ -76,7 +76,7 @@ ___
 
 ###  isTargetType
 
-▸ **isTargetType**(value: *`T` | `S`*): `boolean`
+▸ **isTargetType**(value: *`T` \| `S`*): `boolean`
 
 if true, this is a converted value, if false, it's a snapshot
 
@@ -84,7 +84,7 @@ if true, this is a converted value, if false, it's a snapshot
 
 | Name | Type |
 | ------ | ------ |
-| value | `T` | `S` |
+| value | `T` \| `S` |
 
 **Returns:** `boolean`
 

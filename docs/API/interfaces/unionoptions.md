@@ -28,7 +28,7 @@ ___
 
 ### `<Optional>` eager
 
-**● eager**: *`undefined` | `false` | `true`*
+**● eager**: *`undefined` \| `false` \| `true`*
 
 ___
 

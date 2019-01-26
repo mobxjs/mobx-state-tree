@@ -36,7 +36,7 @@ ___
 
 ### `<Optional>` path
 
-**● path**: *`undefined` | `string`*
+**● path**: *`undefined` \| `string`*
 
 ___
 
