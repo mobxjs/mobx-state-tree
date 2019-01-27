@@ -199,11 +199,6 @@ export interface IType<C, S, T> {
      * @hidden
      */
     isAssignableFrom(type: IAnyType): boolean
-    /**
-     * @internal
-     * @hidden
-     */
-    shouldAttachNode: boolean
 }
 
 // do not convert to an interface
@@ -356,7 +351,6 @@ export abstract class BaseType<C, S, T, N extends BaseNode<C, S, T>>
     abstract getChildType(key: string): IAnyType
     abstract removeChild(node: N, subpath: string): void
     abstract isValidSnapshot(value: any, context: IContext): IValidationResult
-    abstract shouldAttachNode: boolean
 
     processInitialSnapshot(childNodes: IChildNodesMap, snapshot: C): S {
         return snapshot as any

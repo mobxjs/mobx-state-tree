@@ -11,8 +11,7 @@ import {
     TypeFlags,
     IAnyType,
     ExtractC,
-    AnyObjectNode,
-    BaseNode
+    AnyObjectNode
 } from "../../internal"
 
 /**
@@ -26,10 +25,6 @@ export class Refinement<C, S, T> extends Type<C, S, T, false> {
 
     get flags() {
         return this.type.flags | TypeFlags.Refinement
-    }
-
-    get shouldAttachNode() {
-        return this.type.shouldAttachNode
     }
 
     constructor(

@@ -1,5 +1,5 @@
 import {
-    createNode,
+    createScalarNode,
     Type,
     IType,
     TypeFlags,
@@ -7,7 +7,6 @@ import {
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    ScalarNode,
     IAnyType,
     AnyObjectNode
 } from "../../internal"
@@ -83,7 +82,6 @@ export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S | T, S, 
  */
 export class CustomType<C, S, T> extends Type<C, S, T> {
     readonly flags = TypeFlags.Reference
-    readonly shouldAttachNode = false
 
     constructor(protected readonly options: CustomTypeOptions<S, T>) {
         super(options.name)
@@ -127,7 +125,7 @@ export class CustomType<C, S, T> extends Type<C, S, T> {
         const valueToStore: T = this.options.isTargetType(initialValue)
             ? (initialValue as T)
             : this.options.fromSnapshot(initialValue as S)
-        return createNode(this, parent, subpath, environment, valueToStore) as any
+        return createScalarNode(this, parent, subpath, environment, valueToStore)
     }
 
     reconcile(current: this["N"], value: S | T): this["N"] {

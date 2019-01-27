@@ -14,7 +14,7 @@ import {
 } from "mobx"
 import {
     ComplexType,
-    createNode,
+    createObjectNode,
     escapeJsonPath,
     fail,
     flattenTypeErrors,
@@ -197,7 +197,6 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     IKeyValueMap<ExtractS<IT>>,
     IMSTMap<IT>
 > {
-    shouldAttachNode = true
     subType: IAnyType
     identifierMode: MapIdentifierMode = MapIdentifierMode.UNKNOWN
     mapIdentifierAttribute: string | undefined = undefined
@@ -218,7 +217,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         if (this.identifierMode === MapIdentifierMode.UNKNOWN) {
             this._determineIdentifierMode()
         }
-        return createNode(this, parent, subpath, environment, initialValue) as this["N"]
+        return createObjectNode(this, parent, subpath, environment, initialValue)
     }
 
     private _determineIdentifierMode() {

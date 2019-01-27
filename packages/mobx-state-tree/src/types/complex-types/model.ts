@@ -6,7 +6,6 @@ import {
     intercept,
     getAtom,
     IObjectWillChange,
-    IObservableObject,
     isComputedProp,
     observable,
     observe,
@@ -19,7 +18,7 @@ import {
     ArrayType,
     ComplexType,
     createActionInvoker,
-    createNode,
+    createObjectNode,
     EMPTY_ARRAY,
     EMPTY_OBJECT,
     escapeJsonPath,
@@ -41,7 +40,6 @@ import {
     IType,
     IValidationResult,
     mobxShallow,
-    ObjectNode,
     optional,
     OptionalValue,
     MapType,
@@ -341,7 +339,6 @@ export class ModelType<
     >
     implements IModelType<PROPS, OTHERS, CustomC, CustomS> {
     readonly flags = TypeFlags.Object
-    shouldAttachNode = true
 
     /*
      * The original object definition
@@ -559,7 +556,7 @@ export class ModelType<
         const value = isStateTreeNode(initialValue)
             ? initialValue
             : this.applySnapshotPreProcessor(initialValue)
-        return createNode(this, parent, subpath, environment, value) as this["N"]
+        return createObjectNode(this, parent, subpath, environment, value)
         // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
         // that pre-reserves all these fields for fast object-member lookups
     }

@@ -7,8 +7,7 @@ import {
     isType,
     IAnyType,
     typeCheckSuccess,
-    AnyObjectNode,
-    BaseNode
+    AnyObjectNode
 } from "../../internal"
 
 /**
@@ -21,10 +20,6 @@ export class Late<C, S, T> extends Type<C, S, T, false> {
 
     get flags() {
         return (this._subType ? this._subType.flags : 0) | TypeFlags.Late
-    }
-
-    get shouldAttachNode() {
-        return this.getSubType(true).shouldAttachNode
     }
 
     getSubType(mustSucceed: true): IAnyType

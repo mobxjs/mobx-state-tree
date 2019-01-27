@@ -50,10 +50,6 @@ export class Union extends Type<any, any, any, false> {
         return result
     }
 
-    get shouldAttachNode() {
-        return this.types.some(type => type.shouldAttachNode)
-    }
-
     constructor(name: string, types: IAnyType[], options?: UnionOptions) {
         super(name)
         options = {

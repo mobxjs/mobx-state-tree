@@ -1,6 +1,6 @@
 import {
     fail,
-    createNode,
+    createScalarNode,
     Type,
     TypeFlags,
     isType,
@@ -15,7 +15,6 @@ import {
 } from "../../internal"
 
 abstract class BaseIdentifierType<S> extends Type<S, S, S> {
-    readonly shouldAttachNode = false
     readonly flags = TypeFlags.Identifier
 
     constructor(name: string, private readonly validType: "string" | "number") {
@@ -31,7 +30,7 @@ abstract class BaseIdentifierType<S> extends Type<S, S, S> {
         if (!parent || !(parent.type instanceof ModelType))
             throw fail(`Identifier types can only be instantiated as direct child of a model type`)
 
-        return createNode(this, parent, subpath, environment, initialValue) as this["N"]
+        return createScalarNode(this, parent, subpath, environment, initialValue)
     }
 
     reconcile(current: this["N"], newValue: S) {
@@ -61,7 +60,6 @@ abstract class BaseIdentifierType<S> extends Type<S, S, S> {
  * @hidden
  */
 export class IdentifierType extends BaseIdentifierType<string> {
-    readonly shouldAttachNode = false
     readonly flags = TypeFlags.Identifier
 
     constructor() {

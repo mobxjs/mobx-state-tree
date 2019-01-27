@@ -3,7 +3,7 @@ import {
     isPrimitive,
     fail,
     identity,
-    createNode,
+    createScalarNode,
     ISimpleType,
     IType,
     TypeFlags,
@@ -24,8 +24,6 @@ import {
  * @hidden
  */
 export class CoreType<C, S, T> extends Type<C, S, T> {
-    readonly shouldAttachNode = false
-
     constructor(
         name: string,
         readonly flags: TypeFlags,
@@ -46,7 +44,7 @@ export class CoreType<C, S, T> extends Type<C, S, T> {
         environment: any,
         snapshot: T
     ): this["N"] {
-        return createNode(this, parent, subpath, environment, snapshot) as this["N"]
+        return createScalarNode(this, parent, subpath, environment, snapshot)
     }
 
     createNewInstance(node: this["N"], childNodes: IChildNodesMap, initialValue: any) {

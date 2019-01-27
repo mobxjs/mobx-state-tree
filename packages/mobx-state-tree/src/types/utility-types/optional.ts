@@ -18,8 +18,7 @@ import {
     ExtractCST,
     RedefineIStateTreeNode,
     IStateTreeNode,
-    AnyObjectNode,
-    BaseNode
+    AnyObjectNode
 } from "../../internal"
 
 /**
@@ -44,10 +43,6 @@ export class OptionalValue<C, S, T> extends Type<C, S, T, false> {
 
     get flags() {
         return this.type.flags | TypeFlags.Optional
-    }
-
-    get shouldAttachNode() {
-        return this.type.shouldAttachNode
     }
 
     constructor(type: IType<C, S, T>, defaultValue: IOptionalValue<C, S, T>) {

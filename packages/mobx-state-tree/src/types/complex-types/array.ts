@@ -13,7 +13,6 @@ import {
 import {
     ComplexType,
     convertChildNodesToArray,
-    createNode,
     EMPTY_ARRAY,
     fail,
     flattenTypeErrors,
@@ -45,7 +44,8 @@ import {
     EMPTY_OBJECT,
     IAnyStateTreeNode,
     AnyObjectNode,
-    AnyNode
+    AnyNode,
+    createObjectNode
 } from "../../internal"
 
 /** @hidden */
@@ -84,7 +84,6 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     ExtractS<IT>[],
     IMSTArray<IT>
 > {
-    shouldAttachNode = true
     subType: IAnyType
     readonly flags = TypeFlags.Array
 
@@ -99,7 +98,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         environment: any,
         initialValue: this["C"] | this["S"] | this["T"]
     ): this["N"] {
-        return createNode(this, parent, subpath, environment, initialValue) as this["N"]
+        return createObjectNode(this, parent, subpath, environment, initialValue)
     }
 
     initializeChildNodes(objNode: this["N"], snapshot: this["C"] = []): IChildNodesMap {

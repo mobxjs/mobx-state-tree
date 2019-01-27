@@ -1,7 +1,7 @@
 import {
     getStateTreeNode,
     isStateTreeNode,
-    createNode,
+    createScalarNode,
     Type,
     IType,
     TypeFlags,
@@ -19,7 +19,6 @@ import {
     RedefineIStateTreeNode,
     Hook,
     IDisposer,
-    ScalarNode,
     maybe,
     isModelType,
     IMaybe,
@@ -138,7 +137,6 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
     ReferenceIdentifier,
     RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<ReferenceIdentifier, ReferenceIdentifier>>
 > {
-    readonly shouldAttachNode = false
     readonly flags = TypeFlags.Reference
 
     constructor(
@@ -353,13 +351,13 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
     ): this["N"] {
         const identifier = isStateTreeNode(newValue) ? getIdentifier(newValue)! : newValue
         const storedRef = new StoredReference(newValue, this.targetType)
-        const storedRefNode: this["N"] = createNode(
+        const storedRefNode: this["N"] = createScalarNode(
             this,
             parent,
             subpath,
             environment,
             storedRef
-        ) as any
+        )
         storedRef.node = storedRefNode
         this.watchTargetNodeForInvalidations(storedRefNode, identifier, undefined)
         return storedRefNode
@@ -418,7 +416,7 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
         const identifier = isStateTreeNode(newValue)
             ? this.options.set(newValue, parent ? parent.storedValue : null)
             : newValue
-        const storedRefNode = createNode(this, parent, subpath, environment, identifier) as any
+        const storedRefNode = createScalarNode(this, parent, subpath, environment, identifier)
         this.watchTargetNodeForInvalidations(storedRefNode, identifier, this.options)
         return storedRefNode
     }
