@@ -334,12 +334,12 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
 
     getValue(storedRefNode: this["N"]) {
         if (!storedRefNode.isAlive) return undefined
-        const storedRef = storedRefNode.storedValue as StoredReference<IT>
+        const storedRef: StoredReference<IT> = storedRefNode.storedValue
         return storedRef.resolvedValue as any
     }
 
     getSnapshot(storedRefNode: this["N"]) {
-        const ref = storedRefNode.storedValue as StoredReference<IT>
+        const ref: StoredReference<IT> = storedRefNode.storedValue
         return ref.identifier
     }
 
@@ -366,7 +366,7 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
     reconcile(current: this["N"], newValue: ExtractT<IT> | ReferenceIdentifier): this["N"] {
         if (current.type === this) {
             const compareByValue = isStateTreeNode(newValue)
-            const ref = current.storedValue as StoredReference<IT>
+            const ref: StoredReference<IT> = current.storedValue
             if (!compareByValue && ref.identifier === newValue) return current
             else if (compareByValue && ref.resolvedValue === newValue) return current
         }
@@ -506,9 +506,9 @@ export function reference<IT extends IAnyComplexType>(
                 set: getSetOptions.set
             },
             onInvalidated
-        ) as any
+        )
     } else {
-        return new IdentifierReferenceType(subType, onInvalidated) as any
+        return new IdentifierReferenceType(subType, onInvalidated)
     }
 }
 

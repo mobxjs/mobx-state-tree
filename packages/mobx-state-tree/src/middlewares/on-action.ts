@@ -145,14 +145,15 @@ export function recordActions(subject: IAnyStateTreeNode): IActionRecorder {
                 "expected first argument to be a mobx-state-tree node, got " + subject + " instead"
             )
     }
-    let recorder = {
-        actions: [] as ISerializedActionCall[],
+    const actions: ISerializedActionCall[] = []
+    let recorder: IActionRecorder = {
+        actions,
         stop: () => disposer(),
-        replay: (target: IAnyStateTreeNode) => {
-            applyAction(target, recorder.actions)
+        replay: target => {
+            applyAction(target, actions)
         }
     }
-    let disposer = onAction(subject, recorder.actions.push.bind(recorder.actions))
+    let disposer = onAction(subject, actions.push.bind(recorder.actions))
     return recorder
 }
 

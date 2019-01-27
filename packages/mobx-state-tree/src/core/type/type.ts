@@ -465,7 +465,7 @@ export abstract class Type<C, S, T, ScalarN extends boolean = true> extends Base
     }
 
     getSnapshot(node: this["N"]): S {
-        return node.storedValue as any
+        return node.storedValue
     }
 
     getDefaultSnapshot(): C {

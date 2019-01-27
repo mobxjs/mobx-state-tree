@@ -381,7 +381,7 @@ export class ModelType<
         return new ModelType({
             name: opts.name || this.name,
             properties: Object.assign({}, this.properties, opts.properties),
-            initializers: this.initializers.concat((opts.initializers as any) || []),
+            initializers: this.initializers.concat(opts.initializers || []),
             preProcessor: opts.preProcessor || this.preProcessor,
             postProcessor: opts.postProcessor || this.postProcessor
         })
@@ -563,7 +563,7 @@ export class ModelType<
 
     initializeChildNodes(objNode: this["N"], initialSnapshot: any = {}): IChildNodesMap {
         const type = objNode.type as this
-        const result = {} as IChildNodesMap
+        const result: IChildNodesMap = {}
         type.forAllProps((name, childType) => {
             result[name] = childType.instantiate(
                 objNode,
@@ -575,7 +575,7 @@ export class ModelType<
         return result
     }
 
-    createNewInstance(node: this["N"], childNodes: IChildNodesMap, snapshot: this["C"]): this["T"] {
+    createNewInstance(node: this["N"], childNodes: IChildNodesMap): this["T"] {
         return observable.object(childNodes, EMPTY_OBJECT, mobxShallow) as any
     }
 
@@ -672,7 +672,7 @@ export class ModelType<
         if (!(patch.op === "replace" || patch.op === "add")) {
             throw fail(`object does not support operation ${patch.op}`)
         }
-        ;(node.storedValue as any)[subpath] = patch.value
+        node.storedValue[subpath] = patch.value
     }
 
     @action
@@ -680,7 +680,7 @@ export class ModelType<
         const s = this.applySnapshotPreProcessor(snapshot)
         typecheckInternal(this, s)
         this.forAllProps(name => {
-            ;(node.storedValue as any)[name] = s[name]
+            node.storedValue[name] = s[name]
         })
     }
 
@@ -837,18 +837,17 @@ export function compose(...args: any[]): any {
                 throw fail("expected a mobx-state-tree model type, got " + type + " instead")
         })
     }
-    return (args as AnyModelType[])
-        .reduce(
-            (prev, cur) =>
-                prev.cloneAndEnhance({
-                    name: prev.name + "_" + cur.name,
-                    properties: cur.properties,
-                    initializers: cur.initializers,
-                    preProcessor: (snapshot: any) =>
-                        cur.applySnapshotPreProcessor(prev.applySnapshotPreProcessor(snapshot)),
-                    postProcessor: (snapshot: any) =>
-                        cur.applySnapshotPostProcessor(prev.applySnapshotPostProcessor(snapshot))
-                }) as any
+    return args
+        .reduce((prev, cur) =>
+            prev.cloneAndEnhance({
+                name: prev.name + "_" + cur.name,
+                properties: cur.properties,
+                initializers: cur.initializers,
+                preProcessor: (snapshot: any) =>
+                    cur.applySnapshotPreProcessor(prev.applySnapshotPreProcessor(snapshot)),
+                postProcessor: (snapshot: any) =>
+                    cur.applySnapshotPostProcessor(prev.applySnapshotPostProcessor(snapshot))
+            })
         )
         .named(typeName)
 }

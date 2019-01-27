@@ -66,7 +66,7 @@ export class Late<C, S, T> extends Type<C, S, T, false> {
     }
 
     reconcile(current: this["N"], newValue: any): this["N"] {
-        return this.getSubType(true).reconcile(current, newValue) as any
+        return this.getSubType(true).reconcile(current, newValue)
     }
 
     describe() {

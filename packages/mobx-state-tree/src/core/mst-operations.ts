@@ -432,7 +432,7 @@ export function getParentOfType<IT extends IAnyType>(
 
     let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
-        if (type.is(parent.storedValue)) return parent.storedValue as any
+        if (type.is(parent.storedValue)) return parent.storedValue
         parent = parent.parent
     }
     throw fail(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
@@ -457,7 +457,7 @@ export function getRoot<IT extends IAnyType | IAnyStateTreeNode>(
                 "expected first argument to be a mobx-state-tree node, got " + target + " instead"
             )
     }
-    return getStateTreeNode(target).root.storedValue as any
+    return getStateTreeNode(target).root.storedValue
 }
 
 /**
@@ -732,7 +732,7 @@ export function clone<T extends IAnyStateTreeNode>(
             : keepEnvironment === false
             ? undefined
             : keepEnvironment
-    ) as T // it's an object or something else
+    ) // it's an object or something else
 }
 
 /**

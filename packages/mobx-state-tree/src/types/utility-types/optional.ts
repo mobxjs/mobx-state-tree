@@ -65,7 +65,7 @@ export class OptionalValue<C, S, T> extends Type<C, S, T, false> {
             const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
             return this.type.instantiate(parent, subpath, environment, defaultInstanceOrSnapshot)
         }
-        return this.type.instantiate(parent, subpath, environment, initialValue) as any
+        return this.type.instantiate(parent, subpath, environment, initialValue)
     }
 
     reconcile(current: this["N"], newValue: any): this["N"] {

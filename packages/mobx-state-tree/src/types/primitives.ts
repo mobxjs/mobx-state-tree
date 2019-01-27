@@ -177,7 +177,7 @@ export const DatePrimitive: IType<number | Date, number, Date> = new CoreType<
     v => typeof v === "number" || v instanceof Date,
     v => (v instanceof Date ? v : new Date(v))
 )
-;(DatePrimitive as any).getSnapshot = function(node: AnyNode) {
+DatePrimitive.getSnapshot = function(node: AnyNode) {
     return node.storedValue.getTime()
 }
 

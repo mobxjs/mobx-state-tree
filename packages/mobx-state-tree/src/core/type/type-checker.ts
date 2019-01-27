@@ -57,7 +57,7 @@ function shortenPrintValue(valueInString: string) {
 
 function toErrorString(error: IValidationError): string {
     const { value } = error
-    const type: IAnyType = error.context[error.context.length - 1].type as any
+    const type = error.context[error.context.length - 1].type!
     const fullPath = error.context
         .map(({ path }) => path)
         .filter(path => path.length > 0)
@@ -82,12 +82,8 @@ function toErrorString(error: IValidationError): string {
             ? isPrimitiveType(type) || isPrimitive(value)
                 ? `.`
                 : `, expected an instance of \`${
-                      (type as CoreType<any, any, any>).name
-                  }\` or a snapshot like \`${(type as CoreType<
-                      any,
-                      any,
-                      any
-                  >).describe()}\` instead.` +
+                      (type as IAnyType).name
+                  }\` or a snapshot like \`${(type as IAnyType).describe()}\` instead.` +
                   (isSnapshotCompatible
                       ? " (Note that a snapshot of the provided value is compatible with the targeted type)"
                       : "")

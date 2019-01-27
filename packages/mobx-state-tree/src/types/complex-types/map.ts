@@ -179,7 +179,7 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
             const mapType = getStateTreeNode(this as IAnyStateTreeNode).type as MapType<any>
             if (mapType.identifierMode === MapIdentifierMode.NO) throw fail(needsIdentifierError)
             if (mapType.identifierMode === MapIdentifierMode.YES) {
-                key = normalizeIdentifier((value as any)[mapType.mapIdentifierAttribute!])
+                key = normalizeIdentifier(value[mapType.mapIdentifierAttribute!])
                 this.set(key, value)
                 return this.get(key) as any
             }

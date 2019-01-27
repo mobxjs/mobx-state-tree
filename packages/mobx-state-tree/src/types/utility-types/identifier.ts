@@ -121,7 +121,7 @@ export const identifier: ISimpleType<string> = new IdentifierType()
  *
  * @returns
  */
-export const identifierNumber: ISimpleType<number> = new IdentifierNumberType() as any
+export const identifierNumber: ISimpleType<number> = new IdentifierNumberType()
 
 /**
  * Returns if a given value represents an identifier type.
