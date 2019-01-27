@@ -14,10 +14,7 @@ import {
     ScalarNode
 } from "../../internal"
 
-abstract class BaseIdentifierType<
-    S,
-    N extends ScalarNode<S, S, S> = ScalarNode<S, S, S>
-> extends Type<S, S, S, N> {
+abstract class BaseIdentifierType<S> extends Type<S, S, S> {
     readonly shouldAttachNode = false
     readonly flags = TypeFlags.Identifier
 
@@ -30,14 +27,14 @@ abstract class BaseIdentifierType<
         subpath: string,
         environment: any,
         initialValue: S
-    ): N {
+    ): this["N"] {
         if (!parent || !(parent.type instanceof ModelType))
             throw fail(`Identifier types can only be instantiated as direct child of a model type`)
 
-        return createNode(this, parent, subpath, environment, initialValue) as any
+        return createNode(this, parent, subpath, environment, initialValue) as this["N"]
     }
 
-    reconcile(current: N, newValue: S) {
+    reconcile(current: this["N"], newValue: S) {
         if (current.storedValue !== newValue)
             throw fail(
                 `Tried to change identifier from '${

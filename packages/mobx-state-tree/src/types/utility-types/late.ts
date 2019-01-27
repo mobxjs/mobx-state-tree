@@ -15,12 +15,7 @@ import {
  * @internal
  * @hidden
  */
-export class Late<C, S, T, N extends BaseNode<C, S, T> = BaseNode<C, S, T>> extends Type<
-    C,
-    S,
-    T,
-    N
-> {
+export class Late<C, S, T> extends Type<C, S, T, false> {
     readonly definition: () => IAnyType
     private _subType: IAnyType | null = null
 
@@ -71,11 +66,11 @@ export class Late<C, S, T, N extends BaseNode<C, S, T> = BaseNode<C, S, T>> exte
         subpath: string,
         environment: any,
         initialValue: any
-    ): N {
-        return this.getSubType(true).instantiate(parent, subpath, environment, initialValue) as any
+    ): this["N"] {
+        return this.getSubType(true).instantiate(parent, subpath, environment, initialValue)
     }
 
-    reconcile(current: N, newValue: any): N {
+    reconcile(current: this["N"], newValue: any): this["N"] {
         return this.getSubType(true).reconcile(current, newValue) as any
     }
 

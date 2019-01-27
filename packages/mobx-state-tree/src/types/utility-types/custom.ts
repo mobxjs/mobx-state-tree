@@ -20,7 +20,7 @@ export interface CustomTypeOptions<S, T> {
     /** return the serialization of the current value */
     toSnapshot(value: T): S
     /** if true, this is a converted value, if false, it's a snapshot */
-    isTargetType(value: T | S): value is T
+    isTargetType(value: T | S): boolean
     /** a non empty string is assumed to be a validation error */
     getValidationMessage(snapshot: S): string
     // TODO: isSnapshotEqual
@@ -81,12 +81,7 @@ export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S | T, S, 
  * @internal
  * @hidden
  */
-export class CustomType<C, S, T, N extends ScalarNode<C, S, T> = ScalarNode<C, S, T>> extends Type<
-    C,
-    S,
-    T,
-    N
-> {
+export class CustomType<C, S, T> extends Type<C, S, T> {
     readonly flags = TypeFlags.Reference
     readonly shouldAttachNode = false
 
@@ -115,11 +110,11 @@ export class CustomType<C, S, T, N extends ScalarNode<C, S, T> = ScalarNode<C, S
         return typeCheckSuccess()
     }
 
-    getValue(node: N): T {
+    getValue(node: this["N"]): T {
         return node.storedValue
     }
 
-    getSnapshot(node: N): S {
+    getSnapshot(node: this["N"]): S {
         return this.options.toSnapshot(node.storedValue)
     }
 
@@ -128,14 +123,14 @@ export class CustomType<C, S, T, N extends ScalarNode<C, S, T> = ScalarNode<C, S
         subpath: string,
         environment: any,
         initialValue: S | T
-    ): N {
+    ): this["N"] {
         const valueToStore: T = this.options.isTargetType(initialValue)
-            ? initialValue
-            : this.options.fromSnapshot(initialValue)
+            ? (initialValue as T)
+            : this.options.fromSnapshot(initialValue as S)
         return createNode(this, parent, subpath, environment, valueToStore) as any
     }
 
-    reconcile(current: N, value: S | T): N {
+    reconcile(current: this["N"], value: S | T): this["N"] {
         const isSnapshot = !this.options.isTargetType(value)
         const unchanged =
             current.type === this &&

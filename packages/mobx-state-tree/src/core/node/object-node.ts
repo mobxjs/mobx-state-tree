@@ -73,7 +73,7 @@ const snapshotReactionOptions = {
  * @hidden
  */
 export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
-    readonly type!: ComplexType<C, S, T, this>
+    readonly type!: ComplexType<C, S, T>
     storedValue!: T & IStateTreeNode<C, S>
 
     readonly nodeId = ++nextNodeId
@@ -116,7 +116,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     private _cachedInitialSnapshotCreated = false
 
     constructor(
-        type: ComplexType<C, S, T, any>,
+        type: ComplexType<C, S, T>,
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,

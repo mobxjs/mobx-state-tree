@@ -188,16 +188,15 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
     }
 }
 
-type C<IT extends IAnyType> = IKeyValueMap<ExtractC<IT>> | undefined
-type S<IT extends IAnyType> = IKeyValueMap<ExtractS<IT>>
-type T<IT extends IAnyType> = IMSTMap<IT>
-type N<IT extends IAnyType> = ObjectNode<C<IT>, S<IT>, T<IT>>
-
 /**
  * @internal
  * @hidden
  */
-export class MapType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT>, N<IT>> {
+export class MapType<IT extends IAnyType> extends ComplexType<
+    IKeyValueMap<ExtractC<IT>> | undefined,
+    IKeyValueMap<ExtractS<IT>>,
+    IMSTMap<IT>
+> {
     shouldAttachNode = true
     subType: IAnyType
     identifierMode: MapIdentifierMode = MapIdentifierMode.UNKNOWN
@@ -214,12 +213,12 @@ export class MapType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: C<IT> | S<IT> | T<IT>
-    ): N<IT> {
+        initialValue: this["C"] | this["S"] | this["T"]
+    ): this["N"] {
         if (this.identifierMode === MapIdentifierMode.UNKNOWN) {
             this._determineIdentifierMode()
         }
-        return createNode(this, parent, subpath, environment, initialValue) as N<IT>
+        return createNode(this, parent, subpath, environment, initialValue) as this["N"]
     }
 
     private _determineIdentifierMode() {
@@ -247,7 +246,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT
         }
     }
 
-    initializeChildNodes(objNode: N<IT>, initialSnapshot: C<IT> = {}): IChildNodesMap {
+    initializeChildNodes(objNode: this["N"], initialSnapshot: this["C"] = {}): IChildNodesMap {
         const subType = (objNode.type as this).subType
         const environment = objNode.environment
         const result: IChildNodesMap = {}
@@ -258,11 +257,11 @@ export class MapType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT
         return result
     }
 
-    createNewInstance(node: N<IT>, childNodes: IChildNodesMap): T<IT> {
+    createNewInstance(node: this["N"], childNodes: IChildNodesMap): this["T"] {
         return new MSTMap(childNodes) as any
     }
 
-    finalizeNewInstance(node: N<IT>, instance: ObservableMap<string, any>): void {
+    finalizeNewInstance(node: this["N"], instance: ObservableMap<string, any>): void {
         _interceptReads(instance, node.unbox)
         intercept(instance, this.willChange)
         observe(instance, this.didChange)
@@ -272,12 +271,12 @@ export class MapType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT
         return "Map<string, " + this.subType.describe() + ">"
     }
 
-    getChildren(node: N<IT>): ReadonlyArray<AnyNode> {
+    getChildren(node: this["N"]): ReadonlyArray<AnyNode> {
         // return (node.storedValue as ObservableMap<any>).values()
         return values(node.storedValue)
     }
 
-    getChildNode(node: N<IT>, key: string): AnyNode {
+    getChildNode(node: this["N"], key: string): AnyNode {
         const childNode = node.storedValue.get("" + key)
         if (!childNode) throw fail("Not a child " + key)
         return childNode
@@ -322,20 +321,20 @@ export class MapType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT
         }
     }
 
-    getValue(node: N<IT>): T<IT> {
+    getValue(node: this["N"]): this["T"] {
         return node.storedValue
     }
 
-    getSnapshot(node: N<IT>): S<IT> {
-        const res: S<IT> = {}
+    getSnapshot(node: this["N"]): this["S"] {
+        const res: this["S"] = {}
         node.getChildren().forEach(childNode => {
             res[childNode.subpath] = childNode.snapshot
         })
         return res
     }
 
-    processInitialSnapshot(childNodes: IChildNodesMap): S<IT> {
-        const processed: S<IT> = {}
+    processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
+        const processed: this["S"] = {}
         Object.keys(childNodes).forEach(key => {
             processed[key] = childNodes[key].getSnapshot()
         })
@@ -381,7 +380,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT
         }
     }
 
-    applyPatchLocally(node: N<IT>, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
         const target = node.storedValue
         switch (patch.op) {
             case "add":
@@ -395,7 +394,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT
     }
 
     @action
-    applySnapshot(node: N<IT>, snapshot: S<IT>): void {
+    applySnapshot(node: this["N"], snapshot: this["S"]): void {
         typecheckInternal(this, snapshot)
         const target = node.storedValue
         const currentKeys: { [key: string]: boolean } = {}
@@ -428,11 +427,11 @@ export class MapType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT
         )
     }
 
-    getDefaultSnapshot(): C<IT> {
-        return EMPTY_OBJECT as C<IT>
+    getDefaultSnapshot(): this["C"] {
+        return EMPTY_OBJECT as this["C"]
     }
 
-    removeChild(node: N<IT>, subpath: string) {
+    removeChild(node: this["N"], subpath: string) {
         node.storedValue.delete(subpath)
     }
 }

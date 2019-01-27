@@ -75,16 +75,15 @@ export interface IArrayType<IT extends IAnyType>
     extends IType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>>,
         OptionalProperty {}
 
-type C<IT extends IAnyType> = ExtractC<IT>[] | undefined
-type S<IT extends IAnyType> = ExtractS<IT>[]
-type T<IT extends IAnyType> = IMSTArray<IT>
-type N<IT extends IAnyType> = ObjectNode<C<IT>, S<IT>, T<IT>>
-
 /**
  * @internal
  * @hidden
  */
-export class ArrayType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<IT>, N<IT>> {
+export class ArrayType<IT extends IAnyType> extends ComplexType<
+    ExtractC<IT>[] | undefined,
+    ExtractS<IT>[],
+    IMSTArray<IT>
+> {
     shouldAttachNode = true
     subType: IAnyType
     readonly flags = TypeFlags.Array
@@ -98,12 +97,12 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: C<IT> | S<IT> | T<IT>
-    ): N<IT> {
-        return createNode(this, parent, subpath, environment, initialValue) as N<IT>
+        initialValue: this["C"] | this["S"] | this["T"]
+    ): this["N"] {
+        return createNode(this, parent, subpath, environment, initialValue) as this["N"]
     }
 
-    initializeChildNodes(objNode: N<IT>, snapshot: C<IT> = []): IChildNodesMap {
+    initializeChildNodes(objNode: this["N"], snapshot: this["C"] = []): IChildNodesMap {
         const subType = (objNode.type as this).subType
         const environment = objNode.environment
         const result: IChildNodesMap = {}
@@ -114,11 +113,11 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<
         return result
     }
 
-    createNewInstance(node: N<IT>, childNodes: IChildNodesMap): T<IT> {
-        return observable.array(convertChildNodesToArray(childNodes), mobxShallow) as T<IT>
+    createNewInstance(node: this["N"], childNodes: IChildNodesMap): this["T"] {
+        return observable.array(convertChildNodesToArray(childNodes), mobxShallow) as this["T"]
     }
 
-    finalizeNewInstance(node: N<IT>, instance: T<IT>): void {
+    finalizeNewInstance(node: this["N"], instance: this["T"]): void {
         _getAdministration(instance).dehancer = node.unbox
         intercept(instance as IObservableArray<AnyNode>, this.willChange)
         observe(instance as IObservableArray<AnyNode>, this.didChange)
@@ -128,11 +127,11 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<
         return this.subType.describe() + "[]"
     }
 
-    getChildren(node: N<IT>): AnyNode[] {
+    getChildren(node: this["N"]): AnyNode[] {
         return node.storedValue.slice()
     }
 
-    getChildNode(node: N<IT>, key: string): AnyNode {
+    getChildNode(node: this["N"], key: string): AnyNode {
         const index = parseInt(key, 10)
         if (index < node.storedValue.length) return node.storedValue[index]
         throw fail("Not a child: " + key)
@@ -141,7 +140,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<
     willChange(
         change: IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode>
     ): IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode> | null {
-        const node = getStateTreeNode(change.object as T<IT>)
+        const node = getStateTreeNode(change.object as this["T"])
         node.assertWritable({ subpath: String(change.index) })
         const subType = (node.type as this).subType
         const childNodes = node.getChildren()
@@ -185,16 +184,16 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<
         return change
     }
 
-    getValue(node: N<IT>): T<IT> {
+    getValue(node: this["N"]): this["T"] {
         return node.storedValue
     }
 
-    getSnapshot(node: N<IT>): S<IT> {
+    getSnapshot(node: this["N"]): this["S"] {
         return node.getChildren().map(childNode => childNode.snapshot)
     }
 
-    processInitialSnapshot(childNodes: IChildNodesMap): S<IT> {
-        const processed: S<IT> = []
+    processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
+        const processed: this["S"] = []
         Object.keys(childNodes).forEach(key => {
             processed.push(childNodes[key].getSnapshot())
         })
@@ -238,7 +237,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<
         }
     }
 
-    applyPatchLocally(node: N<IT>, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
         const target = node.storedValue
         const index = subpath === "-" ? target.length : parseInt(subpath)
         switch (patch.op) {
@@ -255,7 +254,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<
     }
 
     @action
-    applySnapshot(node: N<IT>, snapshot: S<IT>): void {
+    applySnapshot(node: this["N"], snapshot: this["S"]): void {
         typecheckInternal(this, snapshot)
         const target = node.storedValue
         target.replace(snapshot as any)
@@ -277,11 +276,11 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<C<IT>, S<IT>, T<
         )
     }
 
-    getDefaultSnapshot(): C<IT> {
-        return EMPTY_ARRAY as C<IT>
+    getDefaultSnapshot(): this["C"] {
+        return EMPTY_ARRAY as this["C"]
     }
 
-    removeChild(node: N<IT>, subpath: string) {
+    removeChild(node: this["N"], subpath: string) {
         node.storedValue.splice(parseInt(subpath, 10), 1)
     }
 }

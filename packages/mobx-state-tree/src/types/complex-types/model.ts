@@ -321,7 +321,7 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
  * @internal
  * @hidden
  */
-export type AnyModelType = ModelType<any, any, any, any, any, any, any, any, any>
+export type AnyModelType = ModelType<any, any, any, any, any>
 
 /**
  * @internal
@@ -332,12 +332,14 @@ export class ModelType<
     OTHERS,
     CustomC,
     CustomS,
-    MT extends IModelType<PROPS, OTHERS, CustomC, CustomS>,
-    C extends ModelCreationType2<PROPS, CustomC>,
-    S extends ModelSnapshotType2<PROPS, CustomS>,
-    T extends ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>,
-    N extends ObjectNode<C, S, T>
-> extends ComplexType<C, S, T, N> implements IModelType<PROPS, OTHERS, CustomC, CustomS> {
+    MT extends IModelType<PROPS, OTHERS, CustomC, CustomS>
+>
+    extends ComplexType<
+        ModelCreationType2<PROPS, CustomC>,
+        ModelSnapshotType2<PROPS, CustomS>,
+        ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>
+    >
+    implements IModelType<PROPS, OTHERS, CustomC, CustomS> {
     readonly flags = TypeFlags.Object
     shouldAttachNode = true
 
@@ -362,11 +364,6 @@ export class ModelType<
         freeze(this.properties) // make sure nobody messes with it
         this.propertyNames = Object.keys(this.properties)
         this.identifierAttribute = this._getIdentifierAttribute()
-    }
-
-    create(...args: any[]): T {
-        // just to keep TS happy
-        return super.create(...args)
     }
 
     private _getIdentifierAttribute(): string | undefined {
@@ -394,14 +391,14 @@ export class ModelType<
     }
 
     actions: MT["actions"] = fn => {
-        const actionInitializer = (self: T) => {
+        const actionInitializer = (self: this["T"]) => {
             this.instantiateActions(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [actionInitializer] })
     }
 
-    private instantiateActions(self: T, actions: ModelActions): void {
+    private instantiateActions(self: this["T"], actions: ModelActions): void {
         // check if return is correct
         if (!isPlainObject(actions))
             throw fail(`actions initializer should return a plain object containing actions`)
@@ -457,7 +454,7 @@ export class ModelType<
     }
 
     volatile: MT["volatile"] = fn => {
-        const stateInitializer = (self: T) => {
+        const stateInitializer = (self: this["T"]) => {
             this.instantiateVolatileState(self, fn(self))
             return self
         }
@@ -465,7 +462,7 @@ export class ModelType<
     }
 
     private instantiateVolatileState(
-        self: T,
+        self: this["T"],
         state: {
             [key: string]: any
         }
@@ -477,7 +474,7 @@ export class ModelType<
     }
 
     extend: MT["extend"] = fn => {
-        const initializer = (self: T) => {
+        const initializer = (self: this["T"]) => {
             const { actions, views, state, ...rest } = fn(self)
             for (let key in rest)
                 throw fail(
@@ -492,14 +489,14 @@ export class ModelType<
     }
 
     views: MT["views"] = fn => {
-        const viewInitializer = (self: T) => {
+        const viewInitializer = (self: this["T"]) => {
             this.instantiateViews(self, fn(self))
             return self
         }
         return this.cloneAndEnhance({ initializers: [viewInitializer] })
     }
 
-    private instantiateViews(self: T, views: Object): void {
+    private instantiateViews(self: this["T"], views: Object): void {
         // check views return
         if (!isPlainObject(views))
             throw fail(`views initializer should return a plain object containing views`)
@@ -557,17 +554,17 @@ export class ModelType<
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: C | S | T
-    ): N {
+        initialValue: this["C"] | this["S"] | this["T"]
+    ): this["N"] {
         const value = isStateTreeNode(initialValue)
             ? initialValue
             : this.applySnapshotPreProcessor(initialValue)
-        return createNode(this, parent, subpath, environment, value) as N
+        return createNode(this, parent, subpath, environment, value) as this["N"]
         // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
         // that pre-reserves all these fields for fast object-member lookups
     }
 
-    initializeChildNodes(objNode: N, initialSnapshot: any = {}): IChildNodesMap {
+    initializeChildNodes(objNode: this["N"], initialSnapshot: any = {}): IChildNodesMap {
         const type = objNode.type as this
         const result = {} as IChildNodesMap
         type.forAllProps((name, childType) => {
@@ -581,11 +578,11 @@ export class ModelType<
         return result
     }
 
-    createNewInstance(node: N, childNodes: IChildNodesMap, snapshot: C): T {
+    createNewInstance(node: this["N"], childNodes: IChildNodesMap, snapshot: this["C"]): this["T"] {
         return observable.object(childNodes, EMPTY_OBJECT, mobxShallow) as any
     }
 
-    finalizeNewInstance(node: N, instance: T): void {
+    finalizeNewInstance(node: this["N"], instance: this["T"]): void {
         addHiddenFinalProp(instance, "toString", objectTypeToString)
 
         this.forAllProps(name => {
@@ -634,7 +631,7 @@ export class ModelType<
         )
     }
 
-    getChildren(node: N): ReadonlyArray<AnyNode> {
+    getChildren(node: this["N"]): ReadonlyArray<AnyNode> {
         const res: AnyNode[] = []
         this.forAllProps(name => {
             res.push(this.getChildNode(node, name))
@@ -642,18 +639,18 @@ export class ModelType<
         return res
     }
 
-    getChildNode(node: N, key: string): AnyNode {
+    getChildNode(node: this["N"], key: string): AnyNode {
         if (!(key in this.properties)) throw fail("Not a value property: " + key)
         const childNode = _getAdministration(node.storedValue, key).value // TODO: blegh!
         if (!childNode) throw fail("Node not available for property " + key)
         return childNode
     }
 
-    getValue(node: N): T {
+    getValue(node: this["N"]): this["T"] {
         return node.storedValue
     }
 
-    getSnapshot(node: N, applyPostProcess = true): S {
+    getSnapshot(node: this["N"], applyPostProcess = true): this["S"] {
         const res = {} as any
         this.forAllProps((name, type) => {
             // TODO: FIXME, make sure the observable ref is used!
@@ -666,7 +663,7 @@ export class ModelType<
         return res
     }
 
-    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: C): S {
+    processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
         const processed = {} as any
         Object.keys(childNodes).forEach(key => {
             processed[key] = childNodes[key].getSnapshot()
@@ -674,7 +671,7 @@ export class ModelType<
         return this.applySnapshotPostProcessor(this.applyOptionalValuesToSnapshot(processed))
     }
 
-    applyPatchLocally(node: N, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
         if (!(patch.op === "replace" || patch.op === "add")) {
             throw fail(`object does not support operation ${patch.op}`)
         }
@@ -682,10 +679,10 @@ export class ModelType<
     }
 
     @action
-    applySnapshot(node: N, snapshot: S): void {
+    applySnapshot(node: this["N"], snapshot: this["S"]): void {
         const s = this.applySnapshotPreProcessor(snapshot)
         typecheckInternal(this, s)
-        this.forAllProps((name, type) => {
+        this.forAllProps(name => {
             ;(node.storedValue as any)[name] = s[name]
         })
     }
@@ -750,11 +747,11 @@ export class ModelType<
         )
     }
 
-    getDefaultSnapshot(): C {
-        return EMPTY_OBJECT as C
+    getDefaultSnapshot(): this["C"] {
+        return EMPTY_OBJECT as this["C"]
     }
 
-    removeChild(node: N, subpath: string) {
+    removeChild(node: this["N"], subpath: string) {
         ;(node.storedValue as any)[subpath] = undefined
     }
 }

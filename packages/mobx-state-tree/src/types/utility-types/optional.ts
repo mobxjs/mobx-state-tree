@@ -38,12 +38,7 @@ export type IOptionalValue<C, S, T> = C | S | IFunctionReturn<C | S | T>
  * @internal
  * @hidden
  */
-export class OptionalValue<C, S, T, N extends BaseNode<C, S, T> = BaseNode<C, S, T>> extends Type<
-    C,
-    S,
-    T,
-    N
-> {
+export class OptionalValue<C, S, T> extends Type<C, S, T, false> {
     readonly type: IType<C, S, T>
     readonly defaultValue: IOptionalValue<C, S, T>
 
@@ -70,27 +65,22 @@ export class OptionalValue<C, S, T, N extends BaseNode<C, S, T> = BaseNode<C, S,
         subpath: string,
         environment: any,
         initialValue: any
-    ): N {
+    ): this["N"] {
         if (typeof initialValue === "undefined") {
             const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
-            return this.type.instantiate(
-                parent,
-                subpath,
-                environment,
-                defaultInstanceOrSnapshot
-            ) as any
+            return this.type.instantiate(parent, subpath, environment, defaultInstanceOrSnapshot)
         }
         return this.type.instantiate(parent, subpath, environment, initialValue) as any
     }
 
-    reconcile(current: N, newValue: any): N {
+    reconcile(current: this["N"], newValue: any): this["N"] {
         const ret = this.type.reconcile(
             current,
             this.type.is(newValue) && newValue !== undefined
                 ? newValue
                 : this.getDefaultInstanceOrSnapshot()
         )
-        return ret as any
+        return ret
     }
 
     getDefaultInstanceOrSnapshot(): C | S | T {

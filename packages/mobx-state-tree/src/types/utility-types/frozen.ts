@@ -21,12 +21,7 @@ import {
  * @internal
  * @hidden
  */
-export class Frozen<T, N extends ScalarNode<T, T, T> = ScalarNode<T, T, T>> extends Type<
-    T,
-    T,
-    T,
-    N
-> {
+export class Frozen<T> extends Type<T, T, T> {
     readonly shouldAttachNode = false
     flags = TypeFlags.Frozen
 
@@ -38,9 +33,14 @@ export class Frozen<T, N extends ScalarNode<T, T, T> = ScalarNode<T, T, T>> exte
         return "<any immutable value>"
     }
 
-    instantiate(parent: AnyObjectNode | null, subpath: string, environment: any, value: T): N {
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        value: T
+    ): this["N"] {
         // create the node
-        return createNode(this, parent, subpath, environment, deepFreeze(value)) as any
+        return createNode(this, parent, subpath, environment, deepFreeze(value)) as this["N"]
     }
 
     isValidSnapshot(value: any, context: IContext): IValidationResult {

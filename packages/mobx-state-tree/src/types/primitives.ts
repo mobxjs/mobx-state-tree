@@ -12,7 +12,6 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    ScalarNode,
     IChildNodesMap,
     isInteger,
     AnyObjectNode,
@@ -24,12 +23,7 @@ import {
  * @internal
  * @hidden
  */
-export class CoreType<C, S, T, N extends ScalarNode<C, S, T> = ScalarNode<C, S, T>> extends Type<
-    C,
-    S,
-    T,
-    N
-> {
+export class CoreType<C, S, T> extends Type<C, S, T> {
     readonly shouldAttachNode = false
 
     constructor(
@@ -46,11 +40,16 @@ export class CoreType<C, S, T, N extends ScalarNode<C, S, T> = ScalarNode<C, S, 
         return this.name
     }
 
-    instantiate(parent: AnyObjectNode | null, subpath: string, environment: any, snapshot: T): N {
-        return createNode(this, parent, subpath, environment, snapshot) as any
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        snapshot: T
+    ): this["N"] {
+        return createNode(this, parent, subpath, environment, snapshot) as this["N"]
     }
 
-    createNewInstance(node: N, childNodes: IChildNodesMap, initialValue: any) {
+    createNewInstance(node: this["N"], childNodes: IChildNodesMap, initialValue: any) {
         return this.initializer(initialValue)
     }
 

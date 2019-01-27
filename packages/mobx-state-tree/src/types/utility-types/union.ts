@@ -35,7 +35,7 @@ export interface UnionOptions {
  * @internal
  * @hidden
  */
-export class Union<N extends BaseNode<any, any, any>> extends Type<any, any, any, N> {
+export class Union extends Type<any, any, any, false> {
     readonly dispatcher?: ITypeDispatcher
     readonly eager: boolean = true
     readonly types: IAnyType[]
@@ -74,16 +74,21 @@ export class Union<N extends BaseNode<any, any, any>> extends Type<any, any, any
         return "(" + this.types.map(factory => factory.describe()).join(" | ") + ")"
     }
 
-    instantiate(parent: AnyObjectNode | null, subpath: string, environment: any, value: any): N {
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        value: any
+    ): this["N"] {
         const type = this.determineType(value, undefined)
         if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
-        return type.instantiate(parent, subpath, environment, value) as any
+        return type.instantiate(parent, subpath, environment, value)
     }
 
-    reconcile(current: N, newValue: any): N {
+    reconcile(current: this["N"], newValue: any): this["N"] {
         const type = this.determineType(newValue, current.type)
         if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
-        return type.reconcile(current, newValue) as any
+        return type.reconcile(current, newValue)
     }
 
     determineType(value: any, reconcileCurrentType: IAnyType | undefined): IAnyType | undefined {

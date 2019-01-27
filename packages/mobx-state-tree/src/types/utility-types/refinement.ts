@@ -19,7 +19,7 @@ import {
  * @internal
  * @hidden
  */
-export class Refinement<C, S, T, N extends BaseNode<C, S, T>> extends Type<C, S, T, N> {
+export class Refinement<C, S, T> extends Type<C, S, T, false> {
     readonly type: IAnyType
     readonly predicate: (v: C) => boolean
     readonly message: (v: C) => string
@@ -48,9 +48,14 @@ export class Refinement<C, S, T, N extends BaseNode<C, S, T>> extends Type<C, S,
         return this.name
     }
 
-    instantiate(parent: AnyObjectNode | null, subpath: string, environment: any, value: any): N {
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        value: any
+    ): this["N"] {
         // create the child type
-        return this.type.instantiate(parent, subpath, environment, value) as any
+        return this.type.instantiate(parent, subpath, environment, value)
     }
 
     isAssignableFrom(type: IAnyType) {

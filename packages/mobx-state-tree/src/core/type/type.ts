@@ -22,7 +22,8 @@ import {
     normalizeIdentifier,
     AnyObjectNode,
     AnyNode,
-    BaseNode
+    BaseNode,
+    ScalarNode
 } from "../../internal"
 
 /**
@@ -306,6 +307,12 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  */
 export abstract class BaseType<C, S, T, N extends BaseNode<C, S, T>>
     implements IType<C, S, T & IStateTreeNode<C, S>> {
+    // these are just to make inner types avaialable to inherited classes
+    readonly C!: C
+    readonly S!: S
+    readonly T!: T
+    readonly N!: N
+
     readonly isType = true
     readonly name: string
 
@@ -398,18 +405,13 @@ export abstract class BaseType<C, S, T, N extends BaseNode<C, S, T>>
  * @internal
  * @hidden
  */
-export abstract class ComplexType<C, S, T, N extends ObjectNode<C, S, T>> extends BaseType<
-    C,
-    S,
-    T,
-    N
-> {
+export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<C, S, T>> {
     identifierAttribute: string | undefined
 
     constructor(name: string) {
         super(name)
     }
-    reconcile(current: N, newValue: any): N {
+    reconcile(current: this["N"], newValue: any): this["N"] {
         if (current.snapshot === newValue)
             // newValue is the current snapshot of the node, noop
             return current
@@ -436,7 +438,7 @@ export abstract class ComplexType<C, S, T, N extends ObjectNode<C, S, T>> extend
             // newValue is a Node as well, move it here..
             const newNode = getStateTreeNode(newValue)
             newNode.setParent(parent, subpath)
-            return newNode as N
+            return newNode
         }
         // nothing to do, we have to create a new node
         return this.instantiate(parent, subpath, current.environment, newValue)
@@ -447,7 +449,12 @@ export abstract class ComplexType<C, S, T, N extends ObjectNode<C, S, T>> extend
  * @internal
  * @hidden
  */
-export abstract class Type<C, S, T, N extends BaseNode<C, S, T>> extends BaseType<C, S, T, N> {
+export abstract class Type<C, S, T, ScalarN extends boolean = true> extends BaseType<
+    C,
+    S,
+    T,
+    ScalarN extends true ? ScalarNode<C, S, T> : BaseNode<C, S, T>
+> {
     constructor(name: string) {
         super(name)
     }
@@ -457,13 +464,13 @@ export abstract class Type<C, S, T, N extends BaseNode<C, S, T>> extends BaseTyp
         subpath: string,
         environment: any,
         initialValue: any
-    ): N
+    ): this["N"]
 
-    getValue(node: N): T {
+    getValue(node: this["N"]): T {
         return node.storedValue
     }
 
-    getSnapshot(node: N): S {
+    getSnapshot(node: this["N"]): S {
         return node.storedValue as any
     }
 
@@ -471,19 +478,19 @@ export abstract class Type<C, S, T, N extends BaseNode<C, S, T>> extends BaseTyp
         return undefined as any
     }
 
-    applySnapshot(node: N, snapshot: S): void {
+    applySnapshot(node: this["N"], snapshot: S): void {
         throw fail("Immutable types do not support applying snapshots")
     }
 
-    applyPatchLocally(node: N, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
         throw fail("Immutable types do not support applying patches")
     }
 
-    getChildren(node: N): AnyNode[] {
+    getChildren(node: this["N"]): AnyNode[] {
         return EMPTY_ARRAY as AnyNode[]
     }
 
-    getChildNode(node: N, key: string): AnyNode {
+    getChildNode(node: this["N"], key: string): AnyNode {
         throw fail(`No child '${key}' available in type: ${this.name}`)
     }
 
@@ -491,7 +498,7 @@ export abstract class Type<C, S, T, N extends BaseNode<C, S, T>> extends BaseTyp
         throw fail(`No child '${key}' available in type: ${this.name}`)
     }
 
-    reconcile(current: N, newValue: any): N {
+    reconcile(current: this["N"], newValue: any): this["N"] {
         // reconcile only if type and value are still the same
         if (current.type === this && current.storedValue === newValue) return current
         const res = this.instantiate(current.parent, current.subpath, current.environment, newValue)
@@ -499,7 +506,7 @@ export abstract class Type<C, S, T, N extends BaseNode<C, S, T>> extends BaseTyp
         return res
     }
 
-    removeChild(node: N, subpath: string): void {
+    removeChild(node: this["N"], subpath: string): void {
         throw fail(`No child '${subpath}' available in type: ${this.name}`)
     }
 }
