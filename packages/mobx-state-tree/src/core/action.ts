@@ -213,70 +213,65 @@ function runMiddleWares(
     const middlewares = collectMiddlewares(node, baseCall, originalFn)
     // Short circuit
     if (!middlewares.length) return mobxAction(originalFn).apply(null, baseCall.args)
+
     let index = 0
     let result: any = null
 
     function runNextMiddleware(call: IMiddlewareEvent): any {
         const middleware = middlewares[index++]
         const handler = middleware && middleware.handler
-        let nextInvoked = false
-        let abortInvoked = false
 
-        function next(call2: IMiddlewareEvent): void
-        function next(call2: IMiddlewareEvent, callback: (value: any) => any): void
-        function next(call2: IMiddlewareEvent, callback?: (value: any) => any) {
+        if (!handler) {
+            return mobxAction(originalFn).apply(null, call.args)
+        }
+
+        // skip hooks if asked to
+        if (!middleware.includeHooks && (Hook as any)[call.name]) {
+            return runNextMiddleware(call)
+        }
+
+        let nextInvoked = false
+        function next(call2: IMiddlewareEvent, callback?: (value: any) => any): void {
             nextInvoked = true
             // the result can contain
             // - the non manipulated return value from an action
             // - the non manipulated abort value
             // - one of the above but manipulated through the callback function
+            const innerResult = runNextMiddleware(call2)
             if (callback) {
-                result = callback(runNextMiddleware(call2) || result)
+                result = callback(innerResult)
             } else {
-                result = runNextMiddleware(call2)
+                result = innerResult
             }
         }
+
+        let abortInvoked = false
         function abort(value: any) {
             abortInvoked = true
             // overwrite the result
             // can be manipulated through middlewares earlier in the queue using the callback fn
             result = value
         }
-        const invokeHandler = () => {
-            handler(call, next, abort)
-            if (process.env.NODE_ENV !== "production") {
-                if (!nextInvoked && !abortInvoked) {
-                    const node2 = getStateTreeNode(call.tree)
-                    throw fail(
-                        `Neither the next() nor the abort() callback within the middleware ${
-                            handler.name
-                        } for the action: "${call.name}" on the node: ${
-                            node2.type.name
-                        } was invoked.`
-                    )
-                }
-                if (nextInvoked && abortInvoked) {
-                    const node2 = getStateTreeNode(call.tree)
-                    throw fail(
-                        `The next() and abort() callback within the middleware ${
-                            handler.name
-                        } for the action: "${call.name}" on the node: ${
-                            node2.type.name
-                        } were invoked.`
-                    )
-                }
-            }
-            return result
-        }
 
-        if (handler && middleware.includeHooks) {
-            return invokeHandler()
-        } else if (handler && !middleware.includeHooks) {
-            if ((Hook as any)[call.name]) return runNextMiddleware(call)
-            return invokeHandler()
-        } else {
-            return mobxAction(originalFn).apply(null, call.args)
+        handler(call, next, abort)
+        if (process.env.NODE_ENV !== "production") {
+            if (!nextInvoked && !abortInvoked) {
+                const node2 = getStateTreeNode(call.tree)
+                throw fail(
+                    `Neither the next() nor the abort() callback within the middleware ${
+                        handler.name
+                    } for the action: "${call.name}" on the node: ${node2.type.name} was invoked.`
+                )
+            } else if (nextInvoked && abortInvoked) {
+                const node2 = getStateTreeNode(call.tree)
+                throw fail(
+                    `The next() and abort() callback within the middleware ${
+                        handler.name
+                    } for the action: "${call.name}" on the node: ${node2.type.name} were invoked.`
+                )
+            }
         }
+        return result
     }
     return runNextMiddleware(baseCall)
 }
