@@ -22,6 +22,9 @@ export enum NodeLifeCycle {
     DEAD // no coming back from this one
 }
 
+/** @hidden */
+declare const $stateTreeNodeTypes: unique symbol
+
 /**
  * Common interface that represents a node instance.
  * @hidden
@@ -31,16 +34,17 @@ export interface IStateTreeNode<C = any, S = any> {
      * @internal
      */
     readonly $treenode?: any
+
     // fake, will never be present, just for typing
     // we use this weird trick to allow reference types to work
-    readonly "!!types"?: [C, S] | [any, any]
+    readonly [$stateTreeNodeTypes]?: [C, S] | [any, any]
 }
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
 /** @hidden */
 export type RedefineIStateTreeNode<T, STN extends IAnyStateTreeNode> = T extends IAnyStateTreeNode
-    ? Omit<T, "!!types"> & STN
+    ? Omit<T, typeof $stateTreeNodeTypes> & STN
     : T
 
 /** @hidden */

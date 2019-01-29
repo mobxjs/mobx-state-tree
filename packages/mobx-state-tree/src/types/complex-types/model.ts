@@ -90,16 +90,22 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
 }
 
 /** @hidden */
+declare const $optionalProperty: unique symbol
+
+/** @hidden */
 export interface OptionalProperty {
     // fake, only used for typing
-    readonly "!!optionalType": undefined
+    readonly [$optionalProperty]: undefined
 }
+
+/** @hidden */
+declare const $mstNotCustomized: unique symbol
 
 /** @hidden */
 // tslint:disable-next-line:class-name
 export interface _NotCustomized {
     // only for typings
-    readonly "!!mstNotCustomized": undefined
+    readonly [$mstNotCustomized]: undefined
 }
 /** @hidden */
 export type _CustomOrOther<Custom, Other> = Custom extends _NotCustomized ? Other : Custom
