@@ -13,7 +13,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [IActionRecorder](interfaces/iactionrecorder.md)
 * [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)
 * [IAnyModelType](interfaces/ianymodeltype.md)
-* [IContextEntry](interfaces/icontextentry.md)
 * [IJsonPatch](interfaces/ijsonpatch.md)
 * [IModelReflectionData](interfaces/imodelreflectiondata.md)
 * [IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)
@@ -23,6 +22,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [ISerializedActionCall](interfaces/iserializedactioncall.md)
 * [ISimpleType](interfaces/isimpletype.md)
 * [IType](interfaces/itype.md)
+* [IValidationContextEntry](interfaces/ivalidationcontextentry.md)
 * [IValidationError](interfaces/ivalidationerror.md)
 * [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)
 * [ReferenceOptionsOnInvalidated](interfaces/referenceoptionsoninvalidated.md)
@@ -32,12 +32,12 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 
 * [IAnyComplexType](#ianycomplextype)
 * [IAnyType](#ianytype)
-* [IContext](#icontext)
 * [IDisposer](#idisposer)
 * [IMiddlewareEvent](#imiddlewareevent)
 * [IMiddlewareEventType](#imiddlewareeventtype)
 * [IMiddlewareHandler](#imiddlewarehandler)
 * [ITypeDispatcher](#itypedispatcher)
+* [IValidationContext](#ivalidationcontext)
 * [IValidationResult](#ivalidationresult)
 * [Instance](#instance)
 * [LivelinessMode](#livelinessmode)
@@ -173,13 +173,6 @@ ___
 Any kind of type.
 
 ___
-<a id="icontext"></a>
-
-###  IContext
-
-**Ƭ IContext**: *[IContextEntry](interfaces/icontextentry.md)[]*
-
-___
 <a id="idisposer"></a>
 
 ###  IDisposer
@@ -246,11 +239,22 @@ ___
 **Returns:** [IAnyType](#ianytype)
 
 ___
+<a id="ivalidationcontext"></a>
+
+###  IValidationContext
+
+**Ƭ IValidationContext**: *[IValidationContextEntry](interfaces/ivalidationcontextentry.md)[]*
+
+Array of validation context entries
+
+___
 <a id="ivalidationresult"></a>
 
 ###  IValidationResult
 
 **Ƭ IValidationResult**: *[IValidationError](interfaces/ivalidationerror.md)[]*
+
+Type validation result, which is an array of type validation errors
 
 ___
 <a id="instance"></a>
@@ -445,7 +449,7 @@ ___
 
 ### `<Const>` identifierNumber
 
-**● identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)<`number`>* =  new IdentifierNumberType() as any
+**● identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)<`number`>* =  new IdentifierNumberType()
 
 `types.identifierNumber` - Similar to `types.identifier`. This one will serialize from / to a number when applying snapshots
 
@@ -3313,7 +3317,7 @@ ___
 
 ▸ **typecheck**<`IT`>(type: *[IAnyType](#ianytype)*, value: *`ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`>*): `void`
 
-Run's the typechecker on the given type. Throws if the given value is not according the provided type specification. Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
+Run's the typechecker for the given type on the given value, which can be a snapshot or an instance. Throws if the given value is not according the provided type specification. Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
 
 **Type parameters:**
 
@@ -3323,7 +3327,7 @@ Run's the typechecker on the given type. Throws if the given value is not accord
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | type | [IAnyType](#ianytype) |  Type to check against. |
-| value | `ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`> |  Value to be checked. |
+| value | `ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`> |  Value to be checked, either a snapshot or an instance. |
 
 **Returns:** `void`
 

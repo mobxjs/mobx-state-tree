@@ -13,7 +13,6 @@ import {
     setLivelinessChecking
 } from "../../src"
 import { observable, autorun } from "mobx"
-import { ExtractC } from "../../src/core/type/type"
 
 const createTestFactories = () => {
     const ItemFactory = types.optional(

@@ -3,7 +3,7 @@ import {
     Type,
     IType,
     TypeFlags,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
@@ -95,7 +95,7 @@ export class CustomType<C, S, T> extends Type<C, S, T> {
         return type === this
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (this.options.isTargetType(value)) return typeCheckSuccess()
         const typeError: string = this.options.getValidationMessage(value)
         if (typeError) {

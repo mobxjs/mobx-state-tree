@@ -4,7 +4,7 @@ import {
     Type,
     TypeFlags,
     isType,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckFailure,
     ModelType,
@@ -43,7 +43,7 @@ abstract class BaseIdentifierType<S> extends Type<S, S, S> {
         return current
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (typeof value !== this.validType) {
             return typeCheckFailure(
                 context,

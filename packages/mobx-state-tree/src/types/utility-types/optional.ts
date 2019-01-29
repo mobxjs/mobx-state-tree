@@ -5,7 +5,7 @@ import {
     IType,
     TypeFlags,
     isType,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typecheckInternal,
     typeCheckSuccess,
@@ -100,7 +100,7 @@ export class OptionalValue<C, S, T> extends Type<C, S, T, false> {
             : instanceOrSnapshot
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         // defaulted values can be skipped
         if (value === undefined) {
             return typeCheckSuccess()

@@ -3,7 +3,7 @@ import {
     deepFreeze,
     createScalarNode,
     Type,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
@@ -41,7 +41,7 @@ export class Frozen<T> extends Type<T, T, T> {
         return createScalarNode(this, parent, subpath, environment, deepFreeze(value))
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (!isSerializable(value)) {
             return typeCheckFailure(
                 context,

@@ -27,6 +27,9 @@ export enum NodeLifeCycle {
  * @hidden
  */
 export interface IStateTreeNode<C = any, S = any> {
+    /**
+     * @internal
+     */
     readonly $treenode?: any
     // fake, will never be present, just for typing
     // we use this weird trick to allow reference types to work

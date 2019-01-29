@@ -12,19 +12,28 @@ import {
     ExtractT
 } from "../../internal"
 
-export interface IContextEntry {
+/** Validation context entry, this is, where the validation should run against which type */
+export interface IValidationContextEntry {
+    /** Subpath where the validation should be run, or an empty string to validate it all */
     path: string
-    type?: IAnyType
+    /** Type to validate the subpath against */
+    type: IAnyType
 }
 
-export type IContext = IContextEntry[]
+/** Array of validation context entries */
+export type IValidationContext = IValidationContextEntry[]
 
+/** Type validation error */
 export interface IValidationError {
-    context: IContext
+    /** Validation context */
+    context: IValidationContext
+    /** Value that was being validated, either a snapshot or an instance */
     value: any
+    /** Error message */
     message?: string
 }
 
+/** Type validation result, which is an array of type validation errors */
 export type IValidationResult = IValidationError[]
 
 function safeStringify(value: any) {
@@ -95,7 +104,7 @@ function toErrorString(error: IValidationError): string {
  * @internal
  * @hidden
  */
-export function getDefaultContext(type: IAnyType): IContext {
+export function getDefaultContext(type: IAnyType): IValidationContext {
     return [{ type, path: "" }]
 }
 
@@ -103,7 +112,11 @@ export function getDefaultContext(type: IAnyType): IContext {
  * @internal
  * @hidden
  */
-export function getContextForPath(context: IContext, path: string, type?: IAnyType): IContext {
+export function getContextForPath(
+    context: IValidationContext,
+    path: string,
+    type: IAnyType
+): IValidationContext {
     return context.concat([{ path, type }])
 }
 
@@ -120,7 +133,7 @@ export function typeCheckSuccess(): IValidationResult {
  * @hidden
  */
 export function typeCheckFailure(
-    context: IContext,
+    context: IValidationContext,
     value: any,
     message?: string
 ): IValidationResult {
@@ -147,12 +160,12 @@ export function typecheckInternal(type: IAnyType, value: any): void {
 }
 
 /**
- * Run's the typechecker on the given type.
+ * Run's the typechecker for the given type on the given value, which can be a snapshot or an instance.
  * Throws if the given value is not according the provided type specification.
  * Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
  *
  * @param type Type to check against.
- * @param value Value to be checked.
+ * @param value Value to be checked, either a snapshot or an instance.
  */
 export function typecheck<IT extends IAnyType>(
     type: IAnyType,

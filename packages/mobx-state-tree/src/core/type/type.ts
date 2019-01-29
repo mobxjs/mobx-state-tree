@@ -6,7 +6,7 @@ import {
     isMutable,
     isStateTreeNode,
     getStateTreeNode,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typecheckInternal,
     typeCheckFailure,
@@ -86,29 +86,55 @@ export type CreateParams<C> = IsEmptyCreationType<C> extends false ? [C, any?] :
  * A type, either complex or simple.
  */
 export interface IType<C, S, T> {
+    /**
+     * The type name.
+     */
     name: string
 
     create(...args: CreateParams<C>): T
+    /**
+     * Creates an instance for the type given an snapshot input.
+     *
+     * @returns An instance of that type.
+     */
     create(snapshot: C, env?: any): T // fallback
 
+    /**
+     * Checks if a given snapshot / instance is of the given type.
+     *
+     * @param thing Snapshot or instance to be checked.
+     * @returns true if the value is of the current type, false otherwise.
+     */
     is(thing: any): thing is C | S | T
-    validate(thing: any, context: IContext): IValidationResult
+
+    /**
+     * Run's the type's typechecker on the given value with the given validation context.
+     *
+     * @param thing Value to be checked, either a snapshot or an instance.
+     * @param context Validation context, an array of { subpaths, subtypes } that should be validated
+     * @returns The validation result, an array with the list of validation errors.
+     */
+    validate(thing: any, context: IValidationContext): IValidationResult
+
+    /**
+     * Gets the textual representation of the type as a string.
+     */
     describe(): string
 
     /**
-     * @deprecated use `Instance` instead.
+     * @deprecated use `Instance<typeof MyType>` instead.
      * @hidden
      */
     Type: T
 
     /**
-     * @deprecated use `SnapshotOut` instead.
+     * @deprecated use `SnapshotOut<typeof MyType>` instead.
      * @hidden
      */
     SnapshotType: S
 
     /**
-     * @deprecated use `SnapshotIn` instead.
+     * @deprecated use `SnapshotIn<typeof MyType>` instead.
      * @hidden
      */
     CreationType: C
@@ -350,7 +376,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<C, S, T>>
     abstract applyPatchLocally(node: N, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IAnyType
     abstract removeChild(node: N, subpath: string): void
-    abstract isValidSnapshot(value: any, context: IContext): IValidationResult
+    abstract isValidSnapshot(value: any, context: IValidationContext): IValidationResult
 
     processInitialSnapshot(childNodes: IChildNodesMap, snapshot: C): S {
         return snapshot as any
@@ -360,7 +386,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<C, S, T>>
         return type === this
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    validate(value: any, context: IValidationContext): IValidationResult {
         if (isStateTreeNode(value)) {
             return getType(value) === this || this.isAssignableFrom(getType(value))
                 ? typeCheckSuccess()

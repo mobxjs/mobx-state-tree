@@ -23,7 +23,7 @@ import {
     IAnyStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IContext,
+    IValidationContext,
     IJsonPatch,
     isMutable,
     isPlainObject,
@@ -414,7 +414,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         return this.subType
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (!isPlainObject(value)) {
             return typeCheckFailure(context, value, "Value is not a plain object")
         }

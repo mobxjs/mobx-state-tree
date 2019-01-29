@@ -1,5 +1,5 @@
 import {
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
@@ -105,7 +105,7 @@ export class Union extends Type<any, any, any, false> {
         }
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (this.dispatcher) {
             return this.dispatcher(value).validate(value, context)
         }

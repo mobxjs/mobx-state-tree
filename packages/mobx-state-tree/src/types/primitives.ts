@@ -7,7 +7,7 @@ import {
     ISimpleType,
     IType,
     TypeFlags,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
@@ -51,7 +51,7 @@ export class CoreType<C, S, T> extends Type<C, S, T> {
         return this.initializer(initialValue)
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (isPrimitive(value) && this.checker(value as any)) {
             return typeCheckSuccess()
         }

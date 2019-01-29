@@ -30,7 +30,7 @@ import {
     getStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IContext,
+    IValidationContext,
     IJsonPatch,
     isPlainObject,
     isPrimitive,
@@ -714,7 +714,7 @@ export class ModelType<
         return this.properties[key]
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         let snapshot = this.applySnapshotPreProcessor(value)
 
         if (!isPlainObject(snapshot)) {

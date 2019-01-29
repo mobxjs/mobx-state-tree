@@ -1,7 +1,7 @@
 import {
     fail,
     Type,
-    IContext,
+    IValidationContext,
     IValidationResult,
     TypeFlags,
     isType,
@@ -74,7 +74,7 @@ export class Late<C, S, T> extends Type<C, S, T, false> {
         return t ? t.name : "<uknown late type>"
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         const t = this.getSubType(false)
         if (!t) {
             // See #916; the variable the definition closure is pointing to wasn't defined yet, so can't be evaluted yet here

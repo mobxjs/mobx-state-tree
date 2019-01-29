@@ -20,7 +20,7 @@ import {
     getStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IContext,
+    IValidationContext,
     IJsonPatch,
     isArray,
     isNode,
@@ -263,7 +263,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         return this.subType
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (!isArray(value)) {
             return typeCheckFailure(context, value, "Value is not an array")
         }

@@ -2,7 +2,7 @@ import {
     isStateTreeNode,
     getStateTreeNode,
     Type,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
@@ -57,7 +57,7 @@ export class Refinement<C, S, T> extends Type<C, S, T, false> {
         return this.type.isAssignableFrom(type)
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         const subtypeErrors = this.type.validate(value, context)
         if (subtypeErrors.length > 0) return subtypeErrors
 

@@ -6,7 +6,7 @@ import {
     IType,
     TypeFlags,
     isType,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
@@ -154,7 +154,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
         return this.targetType.isAssignableFrom(type)
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         return typeof value === "string" || typeof value === "number"
             ? typeCheckSuccess()
             : typeCheckFailure(

@@ -5,7 +5,7 @@ import {
     ISimpleType,
     Type,
     TypeFlags,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
@@ -40,7 +40,7 @@ export class Literal<T> extends Type<T, T, T> {
         return JSON.stringify(this.value)
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (isPrimitive(value) && value === this.value) {
             return typeCheckSuccess()
         }
