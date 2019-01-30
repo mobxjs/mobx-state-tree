@@ -87,7 +87,7 @@ export type CreateParams<C> = IsEmptyCreationType<C> extends false ? [C, any?] :
  */
 export interface IType<C, S, T> {
     /**
-     * The type name.
+     * Friendly type name.
      */
     name: string
 
