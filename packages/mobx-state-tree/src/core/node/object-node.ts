@@ -69,7 +69,7 @@ const snapshotReactionOptions = {
     }
 }
 
-type IInternalEvents<S> = {
+type InternalEventHandlers<S> = {
     [InternalEvents.Dispose]: () => void
     [InternalEvents.Patch]: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
     [InternalEvents.Snapshot]: (snapshot: S) => void
@@ -619,7 +619,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     // #region internal event handling
 
-    private _internalEvents?: EventHandlers<IInternalEvents<S>>
+    private _internalEvents?: EventHandlers<InternalEventHandlers<S>>
 
     // we proxy the methods to avoid creating an EventHandlers instance when it is not needed
 
@@ -629,7 +629,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     private _internalEventsRegister<IE extends InternalEvents>(
         event: IE,
-        eventHandler: IInternalEvents<S>[IE],
+        eventHandler: InternalEventHandlers<S>[IE],
         atTheBeginning = false
     ): IDisposer {
         if (!this._internalEvents) {
@@ -640,14 +640,14 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     private _internalEventsHas<IE extends InternalEvents>(
         event: IE,
-        eventHandler: IInternalEvents<S>[IE]
+        eventHandler: InternalEventHandlers<S>[IE]
     ): boolean {
         return !!this._internalEvents && this._internalEvents.has(event, eventHandler)
     }
 
     private _internalEventsUnregister<IE extends InternalEvents>(
         event: IE,
-        eventHandler: IInternalEvents<S>[IE]
+        eventHandler: InternalEventHandlers<S>[IE]
     ): void {
         if (this._internalEvents) {
             this._internalEvents.unregister(event, eventHandler)
@@ -656,7 +656,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     private _internalEventsEmit<IE extends InternalEvents>(
         event: IE,
-        ...args: ArgumentTypes<IInternalEvents<S>[IE]>
+        ...args: ArgumentTypes<InternalEventHandlers<S>[IE]>
     ): void {
         if (this._internalEvents) {
             this._internalEvents.emit(event, ...args)
