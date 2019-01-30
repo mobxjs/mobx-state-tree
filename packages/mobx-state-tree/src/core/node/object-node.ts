@@ -34,7 +34,8 @@ import {
     getPath,
     warnError,
     AnyNode,
-    IStateTreeNode
+    IStateTreeNode,
+    ArgumentTypes
 } from "../../internal"
 
 let nextNodeId = 1
@@ -66,6 +67,12 @@ const snapshotReactionOptions = {
     onError(e: any) {
         throw e
     }
+}
+
+type IInternalEvents<S> = {
+    [InternalEvents.Dispose]: () => void
+    [InternalEvents.Patch]: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
+    [InternalEvents.Snapshot]: (snapshot: S) => void
 }
 
 /**
@@ -102,12 +109,6 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     private _autoUnbox = true // unboxing is disabled when reading child nodes
     _isRunningAction = false // only relevant for root
     private _hasSnapshotReaction = false
-
-    private readonly _internalEvents = new EventHandlers<{
-        [InternalEvents.Dispose]: () => void
-        [InternalEvents.Patch]: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
-        [InternalEvents.Snapshot]: (snapshot: S) => void
-    }>()
 
     private _observableInstanceState = ObservableInstanceLifecycle.UNINITIALIZED
     private _childNodes: IChildNodesMap
@@ -509,8 +510,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         // a disposer added with addDisposer at this stage (beforeDestroy) is actually never released
         this.baseAboutToDie()
 
-        this._internalEvents.emit(InternalEvents.Dispose)
-        this._internalEvents.clear(InternalEvents.Dispose)
+        this._internalEventsEmit(InternalEvents.Dispose)
+        this._internalEventsClear(InternalEvents.Dispose)
     }
 
     private unregisterIdentifiers(): void {
@@ -534,53 +535,52 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         const snapshot = this.snapshot
         this._snapshotUponDeath = snapshot
 
-        this._internalEvents.clearAll()
+        this._internalEventsClearAll()
 
         this.baseFinalizeDeath()
     }
 
     onSnapshot(onChange: (snapshot: S) => void): IDisposer {
         this._addSnapshotReaction()
-        return this._internalEvents.register(InternalEvents.Snapshot, onChange)
+        return this._internalEventsRegister(InternalEvents.Snapshot, onChange)
     }
 
     protected emitSnapshot(snapshot: S): void {
-        this._internalEvents.emit(InternalEvents.Snapshot, snapshot)
+        this._internalEventsEmit(InternalEvents.Snapshot, snapshot)
     }
 
     onPatch(handler: (patch: IJsonPatch, reversePatch: IJsonPatch) => void): IDisposer {
-        return this._internalEvents.register(InternalEvents.Patch, handler)
+        return this._internalEventsRegister(InternalEvents.Patch, handler)
     }
 
     emitPatch(basePatch: IReversibleJsonPatch, source: AnyNode): void {
-        const intEvs = this._internalEvents
-        if (intEvs.hasSubscribers(InternalEvents.Patch)) {
+        if (this._internalEventsHasSubscribers(InternalEvents.Patch)) {
             const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, {
                 path: source.path.substr(this.path.length) + "/" + basePatch.path // calculate the relative path of the patch
             })
             const [patch, reversePatch] = splitPatch(localizedPatch)
-            intEvs.emit(InternalEvents.Patch, patch, reversePatch)
+            this._internalEventsEmit(InternalEvents.Patch, patch, reversePatch)
         }
         if (this.parent) this.parent.emitPatch(basePatch, source)
     }
 
     hasDisposer(disposer: () => void): boolean {
-        return this._internalEvents.has(InternalEvents.Dispose, disposer)
+        return this._internalEventsHas(InternalEvents.Dispose, disposer)
     }
 
     addDisposer(disposer: () => void): void {
         if (!this.hasDisposer(disposer)) {
-            this._internalEvents.register(InternalEvents.Dispose, disposer, true)
+            this._internalEventsRegister(InternalEvents.Dispose, disposer, true)
             return
         }
         throw fail("cannot add a disposer when it is already registered for execution")
     }
 
     removeDisposer(disposer: () => void): void {
-        if (!this._internalEvents.has(InternalEvents.Dispose, disposer)) {
+        if (!this._internalEventsHas(InternalEvents.Dispose, disposer)) {
             throw fail("cannot remove a disposer which was never registered for execution")
         }
-        this._internalEvents.unregister(InternalEvents.Dispose, disposer)
+        this._internalEventsUnregister(InternalEvents.Dispose, disposer)
     }
 
     removeMiddleware(handler: IMiddlewareHandler): void {
@@ -616,6 +616,66 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             this._hasSnapshotReaction = true
         }
     }
+
+    // #region internal event handling
+
+    private _internalEvents?: EventHandlers<IInternalEvents<S>>
+
+    // we proxy the methods to avoid creating an EventHandlers instance when it is not needed
+
+    private _internalEventsHasSubscribers(event: InternalEvents): boolean {
+        return !!this._internalEvents && this._internalEvents.hasSubscribers(event)
+    }
+
+    private _internalEventsRegister<IE extends InternalEvents>(
+        event: IE,
+        eventHandler: IInternalEvents<S>[IE],
+        atTheBeginning = false
+    ): IDisposer {
+        if (!this._internalEvents) {
+            this._internalEvents = new EventHandlers()
+        }
+        return this._internalEvents.register(event, eventHandler, atTheBeginning)
+    }
+
+    private _internalEventsHas<IE extends InternalEvents>(
+        event: IE,
+        eventHandler: IInternalEvents<S>[IE]
+    ): boolean {
+        return !!this._internalEvents && this._internalEvents.has(event, eventHandler)
+    }
+
+    private _internalEventsUnregister<IE extends InternalEvents>(
+        event: IE,
+        eventHandler: IInternalEvents<S>[IE]
+    ): void {
+        if (this._internalEvents) {
+            this._internalEvents.unregister(event, eventHandler)
+        }
+    }
+
+    private _internalEventsEmit<IE extends InternalEvents>(
+        event: IE,
+        ...args: ArgumentTypes<IInternalEvents<S>[IE]>
+    ): void {
+        if (this._internalEvents) {
+            this._internalEvents.emit(event, ...args)
+        }
+    }
+
+    private _internalEventsClear(event: InternalEvents): void {
+        if (this._internalEvents) {
+            this._internalEvents.clear(event)
+        }
+    }
+
+    private _internalEventsClearAll(): void {
+        if (this._internalEvents) {
+            this._internalEvents.clearAll()
+        }
+    }
+
+    // #endregion
 }
 
 /**
