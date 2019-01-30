@@ -35,6 +35,8 @@ A simple type, this is, a type where the instance and the snapshot representatio
 
 **● name**: *`string`*
 
+The type name.
+
 ___
 
 ## Methods
@@ -55,6 +57,8 @@ ___
 
 **Returns:** `T`
 
+Creates an instance for the type given an snapshot input.
+
 **Parameters:**
 
 | Name | Type |
@@ -63,6 +67,7 @@ ___
 | `Optional` env | `any` |
 
 **Returns:** `T`
+An instance of that type.
 
 ___
 <a id="describe"></a>
@@ -70,6 +75,8 @@ ___
 ###  describe
 
 ▸ **describe**(): `string`
+
+Gets the textual representation of the type as a string.
 
 **Returns:** `string`
 
@@ -80,29 +87,35 @@ ___
 
 ▸ **is**(thing: *`any`*): `boolean`
 
+Checks if a given snapshot / instance is of the given type.
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| thing | `any` |
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| thing | `any` |  Snapshot or instance to be checked. |
 
 **Returns:** `boolean`
+true if the value is of the current type, false otherwise.
 
 ___
 <a id="validate"></a>
 
 ###  validate
 
-▸ **validate**(thing: *`any`*, context: *[IContext](../#icontext)*): [IValidationResult](../#ivalidationresult)
+▸ **validate**(thing: *`any`*, context: *[IValidationContext](../#ivalidationcontext)*): [IValidationResult](../#ivalidationresult)
+
+Run's the type's typechecker on the given value with the given validation context.
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| thing | `any` |
-| context | [IContext](../#icontext) |
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| thing | `any` |  Value to be checked, either a snapshot or an instance. |
+| context | [IValidationContext](../#ivalidationcontext) |  Validation context, an array of { subpaths, subtypes } that should be validated |
 
 **Returns:** [IValidationResult](../#ivalidationresult)
+The validation result, an array with the list of validation errors.
 
 ___
 

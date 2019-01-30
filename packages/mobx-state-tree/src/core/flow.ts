@@ -1,13 +1,19 @@
 /** @hidden */
+declare const $flowYield: unique symbol
+
+/** @hidden */
 export interface FlowYield {
     // fake, only for typing
-    "!!flowYield": undefined
+    [$flowYield]: undefined
 }
+
+/** @hidden */
+declare const $flowReturn: unique symbol
 
 /** @hidden */
 export interface FlowReturn<T> {
     // fake, only for typing
-    "!!flowReturn": T
+    [$flowReturn]: T
 }
 
 // we skip promises that are the result of yielding promises (except if they use flowReturn)

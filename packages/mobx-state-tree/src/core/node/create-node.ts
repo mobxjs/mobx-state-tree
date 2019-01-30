@@ -1,16 +1,25 @@
-import { INode, fail, ObjectNode, ScalarNode, IType, getStateTreeNodeSafe } from "../../internal"
+import {
+    fail,
+    ObjectNode,
+    ScalarNode,
+    AnyNode,
+    getStateTreeNodeSafe,
+    AnyObjectNode,
+    ComplexType,
+    Type
+} from "../../internal"
 
 /**
  * @internal
  * @hidden
  */
-export function createNode<C, S, T>(
-    type: IType<C, S, T>,
-    parent: ObjectNode | null,
+export function createObjectNode<C, S, T>(
+    type: ComplexType<C, S, T>,
+    parent: AnyObjectNode | null,
     subpath: string,
     environment: any,
     initialValue: any
-) {
+): ObjectNode<C, S, T> {
     const existingNode = getStateTreeNodeSafe(initialValue)
     if (existingNode) {
         if (existingNode.isRoot) {
@@ -25,14 +34,27 @@ export function createNode<C, S, T>(
         )
     }
 
-    const Node = type.shouldAttachNode ? ObjectNode : ScalarNode
-    return new Node(type, parent, subpath, environment, initialValue)
+    return new ObjectNode(type, parent, subpath, environment, initialValue)
 }
 
 /**
  * @internal
  * @hidden
  */
-export function isNode(value: any): value is INode {
+export function createScalarNode<C, S, T>(
+    type: Type<C, S, T, any>,
+    parent: AnyObjectNode | null,
+    subpath: string,
+    environment: any,
+    initialValue: any
+): ScalarNode<C, S, T> {
+    return new ScalarNode(type, parent, subpath, environment, initialValue)
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function isNode(value: any): value is AnyNode {
     return value instanceof ScalarNode || value instanceof ObjectNode
 }

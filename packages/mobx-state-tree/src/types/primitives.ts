@@ -3,20 +3,19 @@ import {
     isPrimitive,
     fail,
     identity,
-    INode,
-    createNode,
+    createScalarNode,
     ISimpleType,
     IType,
     TypeFlags,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    ObjectNode,
-    IAnyType,
     IChildNodesMap,
-    isInteger
+    isInteger,
+    AnyObjectNode,
+    AnyNode
 } from "../internal"
 
 // TODO: implement CoreType using types.custom ?
@@ -25,37 +24,35 @@ import {
  * @hidden
  */
 export class CoreType<C, S, T> extends Type<C, S, T> {
-    readonly shouldAttachNode = false
-    readonly checker: (value: any) => boolean
-    readonly flags: TypeFlags
-    readonly initializer: (v: any) => any
-
     constructor(
-        name: any,
-        flags: TypeFlags,
-        checker: any,
-        initializer: (v: any) => any = identity
+        name: string,
+        readonly flags: TypeFlags,
+        private readonly checker: (value: C) => boolean,
+        private readonly initializer: (v: C) => T = identity
     ) {
         super(name)
         this.flags = flags
-        this.checker = checker
-        this.initializer = initializer
     }
 
     describe() {
         return this.name
     }
 
-    instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: T): INode {
-        return createNode(this, parent, subpath, environment, snapshot)
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        snapshot: T
+    ): this["N"] {
+        return createScalarNode(this, parent, subpath, environment, snapshot)
     }
 
-    createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
-        return this.initializer(snapshot)
+    createNewInstance(node: this["N"], childNodes: IChildNodesMap, initialValue: any) {
+        return this.initializer(initialValue)
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (isPrimitive(value) && this.checker(value)) {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+        if (isPrimitive(value) && this.checker(value as any)) {
             return typeCheckSuccess()
         }
         const typeName = this.name === "Date" ? "Date or a unix milliseconds timestamp" : this.name
@@ -79,7 +76,7 @@ export class CoreType<C, S, T> extends Type<C, S, T> {
 export const string: ISimpleType<string> = new CoreType<string, string, string>(
     "string",
     TypeFlags.String,
-    (v: any) => typeof v === "string"
+    v => typeof v === "string"
 )
 
 /**
@@ -98,7 +95,7 @@ export const string: ISimpleType<string> = new CoreType<string, string, string>(
 export const number: ISimpleType<number> = new CoreType<number, number, number>(
     "number",
     TypeFlags.Number,
-    (v: any) => typeof v === "number"
+    v => typeof v === "number"
 )
 
 /**
@@ -117,7 +114,7 @@ export const number: ISimpleType<number> = new CoreType<number, number, number>(
 export const integer: ISimpleType<number> = new CoreType<number, number, number>(
     "integer",
     TypeFlags.Integer,
-    (v: any) => isInteger(v)
+    v => isInteger(v)
 )
 
 /**
@@ -136,7 +133,7 @@ export const integer: ISimpleType<number> = new CoreType<number, number, number>
 export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean, boolean>(
     "boolean",
     TypeFlags.Boolean,
-    (v: any) => typeof v === "boolean"
+    v => typeof v === "boolean"
 )
 
 /**
@@ -145,7 +142,7 @@ export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean, bool
 export const nullType: ISimpleType<null> = new CoreType<null, null, null>(
     "null",
     TypeFlags.Null,
-    (v: any) => v === null
+    v => v === null
 )
 
 /**
@@ -154,7 +151,7 @@ export const nullType: ISimpleType<null> = new CoreType<null, null, null>(
 export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, undefined, undefined>(
     "undefined",
     TypeFlags.Undefined,
-    (v: any) => v === undefined
+    v => v === undefined
 )
 
 /**
@@ -177,10 +174,10 @@ export const DatePrimitive: IType<number | Date, number, Date> = new CoreType<
 >(
     "Date",
     TypeFlags.Date,
-    (v: any) => typeof v === "number" || v instanceof Date,
-    (v: number | Date) => (v instanceof Date ? v : new Date(v))
+    v => typeof v === "number" || v instanceof Date,
+    v => (v instanceof Date ? v : new Date(v))
 )
-;(DatePrimitive as any).getSnapshot = function(node: INode) {
+DatePrimitive.getSnapshot = function(node: AnyNode) {
     return node.storedValue.getTime()
 }
 

@@ -240,7 +240,7 @@ test("bourquep", () => {
         toSnapshot(value: ContentState): number {
             return value
         },
-        isTargetType(value: number): boolean {
+        isTargetType(value: number): value is ContentState {
             return value in ContentState
         },
         getValidationMessage(value: number): string {

@@ -1,5 +1,14 @@
 import { IObservableArray, values, observable, entries } from "mobx"
-import { fail, ObjectNode, mobxShallow, IAnyType } from "../../internal"
+import {
+    fail,
+    ObjectNode,
+    mobxShallow,
+    IAnyType,
+    AnyObjectNode,
+    ExtractS,
+    ExtractT,
+    ExtractC
+} from "../../internal"
 
 let identifierCacheId = 0
 
@@ -11,7 +20,7 @@ export class IdentifierCache {
     private cacheId = identifierCacheId++
 
     // n.b. in cache all identifiers are normalized to strings
-    private cache = observable.map<string, IObservableArray<ObjectNode>>()
+    private cache = observable.map<string, IObservableArray<AnyObjectNode>>()
 
     // last time the cache (array) for a given time changed
     // n.b. it is not really the time, but just an integer that gets increased after each modification to the array
@@ -30,11 +39,11 @@ export class IdentifierCache {
         return `${this.cacheId}-${modificationId}`
     }
 
-    addNodeToCache(node: ObjectNode, lastCacheUpdate = true): void {
+    addNodeToCache(node: AnyObjectNode, lastCacheUpdate = true): void {
         if (node.identifierAttribute) {
             const identifier = node.identifier!
             if (!this.cache.has(identifier)) {
-                this.cache.set(identifier, observable.array<ObjectNode>([], mobxShallow))
+                this.cache.set(identifier, observable.array<AnyObjectNode>([], mobxShallow))
             }
             const set = this.cache.get(identifier)!
             if (set.indexOf(node) !== -1) throw fail(`Already registered`)
@@ -45,7 +54,7 @@ export class IdentifierCache {
         }
     }
 
-    mergeCache(node: ObjectNode) {
+    mergeCache(node: AnyObjectNode) {
         values(node.identifierCache!.cache).forEach(nodes =>
             nodes.forEach(child => {
                 this.addNodeToCache(child)
@@ -53,7 +62,7 @@ export class IdentifierCache {
         )
     }
 
-    notifyDied(node: ObjectNode) {
+    notifyDied(node: AnyObjectNode) {
         if (node.identifierAttribute) {
             const id = node.identifier!
             const set = this.cache.get(id)
@@ -68,7 +77,7 @@ export class IdentifierCache {
         }
     }
 
-    splitCache(node: ObjectNode): IdentifierCache {
+    splitCache(node: AnyObjectNode): IdentifierCache {
         const res = new IdentifierCache()
         const basePath = node.path
         entries(this.cache).forEach(([id, nodes]) => {
@@ -93,7 +102,10 @@ export class IdentifierCache {
         return set.some(candidate => type.isAssignableFrom(candidate.type))
     }
 
-    resolve(type: IAnyType, identifier: string): ObjectNode | null {
+    resolve<IT extends IAnyType>(
+        type: IT,
+        identifier: string
+    ): ObjectNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | null {
         const set = this.cache.get(identifier)
         if (!set) return null
         const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))

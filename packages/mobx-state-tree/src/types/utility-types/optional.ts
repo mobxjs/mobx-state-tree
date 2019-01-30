@@ -1,12 +1,11 @@
 import {
     isStateTreeNode,
     getStateTreeNode,
-    INode,
     Type,
     IType,
     TypeFlags,
     isType,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typecheckInternal,
     typeCheckSuccess,
@@ -18,7 +17,8 @@ import {
     ExtractC,
     ExtractCST,
     RedefineIStateTreeNode,
-    IStateTreeNode
+    IStateTreeNode,
+    AnyObjectNode
 } from "../../internal"
 
 /**
@@ -37,16 +37,12 @@ export type IOptionalValue<C, S, T> = C | S | IFunctionReturn<C | S | T>
  * @internal
  * @hidden
  */
-export class OptionalValue<C, S, T> extends Type<C, S, T> {
+export class OptionalValue<C, S, T> extends Type<C, S, T, false> {
     readonly type: IType<C, S, T>
     readonly defaultValue: IOptionalValue<C, S, T>
 
     get flags() {
         return this.type.flags | TypeFlags.Optional
-    }
-
-    get shouldAttachNode() {
-        return this.type.shouldAttachNode
     }
 
     constructor(type: IType<C, S, T>, defaultValue: IOptionalValue<C, S, T>) {
@@ -59,24 +55,30 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
         return this.type.describe() + "?"
     }
 
-    instantiate(parent: INode, subpath: string, environment: any, value: S): INode {
-        if (typeof value === "undefined") {
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        initialValue: any
+    ): this["N"] {
+        if (typeof initialValue === "undefined") {
             const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
             return this.type.instantiate(parent, subpath, environment, defaultInstanceOrSnapshot)
         }
-        return this.type.instantiate(parent, subpath, environment, value)
+        return this.type.instantiate(parent, subpath, environment, initialValue)
     }
 
-    reconcile(current: INode, newValue: any): INode {
-        return this.type.reconcile(
+    reconcile(current: this["N"], newValue: any): this["N"] {
+        const ret = this.type.reconcile(
             current,
             this.type.is(newValue) && newValue !== undefined
                 ? newValue
                 : this.getDefaultInstanceOrSnapshot()
         )
+        return ret
     }
 
-    getDefaultInstanceOrSnapshot() {
+    getDefaultInstanceOrSnapshot(): C | S | T {
         const defaultInstanceOrSnapshot =
             typeof this.defaultValue === "function"
                 ? (this.defaultValue as IFunctionReturn<C | S | T>)()
@@ -91,14 +93,14 @@ export class OptionalValue<C, S, T> extends Type<C, S, T> {
         return defaultInstanceOrSnapshot
     }
 
-    public getDefaultValueSnapshot() {
+    public getDefaultValueSnapshot(): S {
         const instanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
         return isStateTreeNode(instanceOrSnapshot)
             ? getStateTreeNode(instanceOrSnapshot).snapshot
             : instanceOrSnapshot
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         // defaulted values can be skipped
         if (value === undefined) {
             return typeCheckSuccess()

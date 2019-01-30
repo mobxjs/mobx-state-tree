@@ -2,6 +2,8 @@
 
 # Interface: IValidationError
 
+Type validation error
+
 ## Hierarchy
 
 **IValidationError**
@@ -22,7 +24,9 @@
 
 ###  context
 
-**● context**: *[IContext](../#icontext)*
+**● context**: *[IValidationContext](../#ivalidationcontext)*
+
+Validation context
 
 ___
 <a id="message"></a>
@@ -31,12 +35,16 @@ ___
 
 **● message**: *`undefined` \| `string`*
 
+Error message
+
 ___
 <a id="value"></a>
 
 ###  value
 
 **● value**: *`any`*
+
+Value that was being validated, either a snapshot or an instance
 
 ___
 

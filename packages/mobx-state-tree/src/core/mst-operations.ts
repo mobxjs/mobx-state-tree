@@ -1,9 +1,7 @@
 import { isComputedProp, isObservableProp } from "mobx"
 import {
-    ExtractS,
     ExtractT,
     IAnyStateTreeNode,
-    ExtractC,
     IType,
     IAnyModelType,
     getStateTreeNode,
@@ -21,12 +19,13 @@ import {
     freeze,
     IAnyType,
     isModelType,
-    INode,
     ModelPrimitive,
     ExtractNodeC,
     InvalidReferenceError,
     normalizeIdentifier,
-    ReferenceIdentifier
+    ReferenceIdentifier,
+    AnyObjectNode,
+    AnyModelType
 } from "../internal"
 
 /** @hidden */
@@ -144,8 +143,9 @@ export function applyPatch(
 export interface IPatchRecorder {
     patches: ReadonlyArray<IJsonPatch>
     inversePatches: ReadonlyArray<IJsonPatch>
-    stop(): any
-    replay(target?: IAnyStateTreeNode): any
+    stop(): void
+    resume(): void
+    replay(target?: IAnyStateTreeNode): void
     undo(target?: IAnyStateTreeNode): void
 }
 
@@ -161,11 +161,11 @@ export interface IPatchRecorder {
  *      // the inverse of the recorded patches
  *      inversePatches: IJsonPatch[]
  *      // stop recording patches
- *      stop(target?: IStateTreeNode): any
+ *      stop(): void
  *      // resume recording patches
  *      resume()
  *      // apply all the recorded patches on the given target (the original subject if omitted)
- *      replay(target?: IStateTreeNode): any
+ *      replay(target?: IAnyStateTreeNode): void
  *      // reverse apply the recorded patches on the given target  (the original subject if omitted)
  *      // stops the recorder if not already stopped
  *      undo(): void
@@ -219,7 +219,7 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
 /**
  * The inverse of `unprotect`.
  *
- * @param {IStateTreeNode} target
+ * @param target
  */
 export function protect(target: IAnyStateTreeNode): void {
     // check all arguments
@@ -336,7 +336,7 @@ export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean
             throw fail("expected second argument to be a number, got " + depth + " instead")
         if (depth < 0) throw fail(`Invalid depth: ${depth}, should be >= 1`)
     }
-    let parent: INode | null = getStateTreeNode(target).parent
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
         if (--depth === 0) return true
         parent = parent.parent
@@ -372,9 +372,9 @@ export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
         if (depth < 0) throw fail(`Invalid depth: ${depth}, should be >= 1`)
     }
     let d = depth
-    let parent: INode | null = getStateTreeNode(target).parent
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
-        if (--d === 0) return parent.storedValue
+        if (--d === 0) return parent.storedValue as any
         parent = parent.parent
     }
     throw fail(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
@@ -399,7 +399,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
                 "expected second argument to be a mobx-state-tree type, got " + type + " instead"
             )
     }
-    let parent: INode | null = getStateTreeNode(target).parent
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
         if (type.is(parent.storedValue)) return true
         parent = parent.parent
@@ -430,7 +430,7 @@ export function getParentOfType<IT extends IAnyType>(
             )
     }
 
-    let parent: INode | null = getStateTreeNode(target).parent
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
         if (type.is(parent.storedValue)) return parent.storedValue
         parent = parent.parent
@@ -732,7 +732,7 @@ export function clone<T extends IAnyStateTreeNode>(
             : keepEnvironment === false
             ? undefined
             : keepEnvironment
-    ) as T // it's an object or something else
+    ) // it's an object or something else
 }
 
 /**
@@ -924,7 +924,7 @@ export interface IModelReflectionData extends IModelReflectionPropertiesData {
  * @returns
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    const type = getStateTreeNode(target).type as IAnyModelType
+    const type = getStateTreeNode(target).type as AnyModelType
 
     const reflected: IModelReflectionData = {
         ...getPropertyMembers(type),

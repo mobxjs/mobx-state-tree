@@ -1,44 +1,39 @@
 import {
     fail,
-    INode,
-    createNode,
+    createScalarNode,
     Type,
     TypeFlags,
     isType,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckFailure,
-    ObjectNode,
     ModelType,
     typeCheckSuccess,
-    ISimpleType
+    ISimpleType,
+    AnyObjectNode,
+    ScalarNode
 } from "../../internal"
 
-/**
- * @internal
- * @hidden
- */
-export class IdentifierType extends Type<string, string, string> {
-    readonly shouldAttachNode = false
+abstract class BaseIdentifierType<S> extends Type<S, S, S> {
     readonly flags = TypeFlags.Identifier
 
-    constructor() {
-        super(`identifier`)
+    constructor(name: string, private readonly validType: "string" | "number") {
+        super(name)
     }
 
     instantiate(
-        parent: ObjectNode | null,
+        parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        snapshot: string
-    ): INode {
+        initialValue: S
+    ): this["N"] {
         if (!parent || !(parent.type instanceof ModelType))
             throw fail(`Identifier types can only be instantiated as direct child of a model type`)
 
-        return createNode(this, parent, subpath, environment, snapshot)
+        return createScalarNode(this, parent, subpath, environment, initialValue)
     }
 
-    reconcile(current: INode, newValue: string) {
+    reconcile(current: this["N"], newValue: S) {
         if (current.storedValue !== newValue)
             throw fail(
                 `Tried to change identifier from '${
@@ -48,16 +43,12 @@ export class IdentifierType extends Type<string, string, string> {
         return current
     }
 
-    describe() {
-        return `identifier`
-    }
-
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (typeof value !== "string") {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+        if (typeof value !== this.validType) {
             return typeCheckFailure(
                 context,
                 value,
-                "Value is not a valid identifier, expected a string"
+                `Value is not a valid ${this.describe()}, expected a ${this.validType}`
             )
         }
         return typeCheckSuccess()
@@ -68,37 +59,28 @@ export class IdentifierType extends Type<string, string, string> {
  * @internal
  * @hidden
  */
-export class IdentifierNumberType extends IdentifierType {
+export class IdentifierType extends BaseIdentifierType<string> {
+    readonly flags = TypeFlags.Identifier
+
     constructor() {
-        super()
-        ;(this as any).name = "identifierNumber"
+        super(`identifier`, "string")
     }
 
-    instantiate(
-        parent: ObjectNode | null,
-        subpath: string,
-        environment: any,
-        snapshot: any
-    ): INode {
-        return super.instantiate(parent, subpath, environment, snapshot)
+    describe() {
+        return `identifier`
+    }
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export class IdentifierNumberType extends BaseIdentifierType<number> {
+    constructor() {
+        super("identifierNumber", "number")
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
-        if (typeof value === "number") {
-            return typeCheckSuccess()
-        }
-        return typeCheckFailure(
-            context,
-            value,
-            "Value is not a valid identifierNumber, expected a number"
-        )
-    }
-
-    reconcile(current: INode, newValue: any) {
-        return super.reconcile(current, newValue)
-    }
-
-    getSnapshot(node: INode) {
+    getSnapshot(node: ScalarNode<number, number, number>): number {
         return node.storedValue
     }
 
@@ -139,7 +121,7 @@ export const identifier: ISimpleType<string> = new IdentifierType()
  *
  * @returns
  */
-export const identifierNumber: ISimpleType<number> = new IdentifierNumberType() as any
+export const identifierNumber: ISimpleType<number> = new IdentifierNumberType()
 
 /**
  * Returns if a given value represents an identifier type.

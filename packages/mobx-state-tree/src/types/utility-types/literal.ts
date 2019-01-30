@@ -1,18 +1,17 @@
 import {
     fail,
     isPrimitive,
-    INode,
-    createNode,
+    createScalarNode,
     ISimpleType,
     Type,
     TypeFlags,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    ObjectNode,
-    Primitives
+    Primitives,
+    AnyObjectNode
 } from "../../internal"
 
 /**
@@ -20,7 +19,6 @@ import {
  * @hidden
  */
 export class Literal<T> extends Type<T, T, T> {
-    readonly shouldAttachNode = false
     readonly value: any
     readonly flags = TypeFlags.Literal
 
@@ -29,15 +27,20 @@ export class Literal<T> extends Type<T, T, T> {
         this.value = value
     }
 
-    instantiate(parent: ObjectNode | null, subpath: string, environment: any, snapshot: T): INode {
-        return createNode(this, parent, subpath, environment, snapshot)
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        snapshot: T
+    ): this["N"] {
+        return createScalarNode(this, parent, subpath, environment, snapshot)
     }
 
     describe() {
         return JSON.stringify(this.value)
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (isPrimitive(value) && value === this.value) {
             return typeCheckSuccess()
         }

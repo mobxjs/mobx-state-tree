@@ -1,15 +1,14 @@
 import {
-    INode,
-    createNode,
+    createScalarNode,
     Type,
     IType,
     TypeFlags,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    ObjectNode,
-    IAnyType
+    IAnyType,
+    AnyObjectNode
 } from "../../internal"
 
 export interface CustomTypeOptions<S, T> {
@@ -40,7 +39,7 @@ export interface CustomTypeOptions<S, T> {
  *     // return the serialization of the current value
  *     toSnapshot(value: T): S
  *     // if true, this is a converted value, if false, it's a snapshot
- *     isTargetType(value: T | S): boolean
+ *     isTargetType(value: T | S): value is T
  *     // a non empty string is assumed to be a validation error
  *     getValidationMessage?(snapshot: S): string
  * }
@@ -83,7 +82,6 @@ export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S | T, S, 
  */
 export class CustomType<C, S, T> extends Type<C, S, T> {
     readonly flags = TypeFlags.Reference
-    readonly shouldAttachNode = false
 
     constructor(protected readonly options: CustomTypeOptions<S, T>) {
         super(options.name)
@@ -97,7 +95,7 @@ export class CustomType<C, S, T> extends Type<C, S, T> {
         return type === this
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (this.options.isTargetType(value)) return typeCheckSuccess()
         const typeError: string = this.options.getValidationMessage(value)
         if (typeError) {
@@ -110,34 +108,33 @@ export class CustomType<C, S, T> extends Type<C, S, T> {
         return typeCheckSuccess()
     }
 
-    getValue(node: INode) {
-        if (!node.isAlive) return undefined
+    getValue(node: this["N"]): T {
         return node.storedValue
     }
 
-    getSnapshot(node: INode): any {
+    getSnapshot(node: this["N"]): S {
         return this.options.toSnapshot(node.storedValue)
     }
 
     instantiate(
-        parent: ObjectNode | null,
+        parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        snapshot: any
-    ): INode {
-        const valueToStore: T = this.options.isTargetType(snapshot)
-            ? snapshot
-            : this.options.fromSnapshot(snapshot)
-        return createNode(this, parent, subpath, environment, valueToStore)
+        initialValue: S | T
+    ): this["N"] {
+        const valueToStore: T = this.options.isTargetType(initialValue)
+            ? (initialValue as T)
+            : this.options.fromSnapshot(initialValue as S)
+        return createScalarNode(this, parent, subpath, environment, valueToStore)
     }
 
-    reconcile(current: INode, value: any): INode {
+    reconcile(current: this["N"], value: S | T): this["N"] {
         const isSnapshot = !this.options.isTargetType(value)
         const unchanged =
             current.type === this &&
             (isSnapshot ? value === current.snapshot : value === current.storedValue)
         if (unchanged) return current
-        const valueToStore: T = isSnapshot ? this.options.fromSnapshot(value) : value
+        const valueToStore: T = isSnapshot ? this.options.fromSnapshot(value as S) : (value as T)
         const newNode = this.instantiate(
             current.parent,
             current.subpath,

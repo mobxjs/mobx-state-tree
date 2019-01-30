@@ -6,12 +6,11 @@ import {
     isMutable,
     isStateTreeNode,
     getStateTreeNode,
-    IContext,
+    IValidationContext,
     IValidationResult,
     typecheckInternal,
     typeCheckFailure,
     typeCheckSuccess,
-    INode,
     IStateTreeNode,
     IJsonPatch,
     getType,
@@ -20,7 +19,11 @@ import {
     ModelPrimitive,
     EMPTY_OBJECT,
     IAnyStateTreeNode,
-    normalizeIdentifier
+    normalizeIdentifier,
+    AnyObjectNode,
+    AnyNode,
+    BaseNode,
+    ScalarNode
 } from "../../internal"
 
 /**
@@ -83,29 +86,55 @@ export type CreateParams<C> = IsEmptyCreationType<C> extends false ? [C, any?] :
  * A type, either complex or simple.
  */
 export interface IType<C, S, T> {
+    /**
+     * The type name.
+     */
     name: string
 
     create(...args: CreateParams<C>): T
+    /**
+     * Creates an instance for the type given an snapshot input.
+     *
+     * @returns An instance of that type.
+     */
     create(snapshot: C, env?: any): T // fallback
 
+    /**
+     * Checks if a given snapshot / instance is of the given type.
+     *
+     * @param thing Snapshot or instance to be checked.
+     * @returns true if the value is of the current type, false otherwise.
+     */
     is(thing: any): thing is C | S | T
-    validate(thing: any, context: IContext): IValidationResult
+
+    /**
+     * Run's the type's typechecker on the given value with the given validation context.
+     *
+     * @param thing Value to be checked, either a snapshot or an instance.
+     * @param context Validation context, an array of { subpaths, subtypes } that should be validated
+     * @returns The validation result, an array with the list of validation errors.
+     */
+    validate(thing: any, context: IValidationContext): IValidationResult
+
+    /**
+     * Gets the textual representation of the type as a string.
+     */
     describe(): string
 
     /**
-     * @deprecated use `Instance` instead.
+     * @deprecated use `Instance<typeof MyType>` instead.
      * @hidden
      */
     Type: T
 
     /**
-     * @deprecated use `SnapshotOut` instead.
+     * @deprecated use `SnapshotOut<typeof MyType>` instead.
      * @hidden
      */
     SnapshotType: S
 
     /**
-     * @deprecated use `SnapshotIn` instead.
+     * @deprecated use `SnapshotIn<typeof MyType>` instead.
      * @hidden
      */
     CreationType: C
@@ -125,57 +154,62 @@ export interface IType<C, S, T> {
      * @internal
      * @hidden
      */
-    instantiate(parent: INode | null, subpath: string, environment: any, initialValue?: any): INode
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        initialValue: any
+    ): BaseNode<C, S, T>
     /**
      * @internal
      * @hidden
      */
-    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap
+    initializeChildNodes(node: BaseNode<C, S, T>, snapshot: C): IChildNodesMap
     /**
      * @internal
      * @hidden
      */
-    createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any
+    createNewInstance(node: BaseNode<C, S, T>, childNodes: IChildNodesMap, snapshot: C): T
     /**
      * @internal
      * @hidden
      */
-    finalizeNewInstance(node: INode, instance: any): void
+    finalizeNewInstance(node: BaseNode<C, S, T>, instance: any): void
     /**
      * @internal
      * @hidden
      */
-    reconcile(current: INode, newValue: any): INode
+    reconcile(current: BaseNode<C, S, T>, newValue: any): BaseNode<C, S, T>
     /**
      * @internal
      * @hidden
      */
-    getValue(node: INode): T
+    getValue(node: BaseNode<C, S, T>): T
     /**
      * @internal
      * @hidden
      */
-    getSnapshot(node: INode, applyPostProcess?: boolean): S
+    getSnapshot(node: BaseNode<C, S, T>, applyPostProcess?: boolean): S
     /**
      * @internal
      * @hidden
      */
-    applySnapshot(node: INode, snapshot: C): void
+    applySnapshot(node: BaseNode<C, S, T>, snapshot: S): void
     /**
      * @internal
      * @hidden
      */
-    applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void
+    applyPatchLocally(node: BaseNode<C, S, T>, subpath: string, patch: IJsonPatch): void
     /**
      * @internal
      * @hidden
      */
-    getChildren(node: INode): ReadonlyArray<INode>
+    getChildren(node: BaseNode<C, S, T>): ReadonlyArray<AnyNode>
     /**
      * @internal
      * @hidden
      */
-    getChildNode(node: INode, key: string): INode
+    getChildNode(node: BaseNode<C, S, T>, key: string): AnyNode
     /**
      * @internal
      * @hidden
@@ -185,17 +219,12 @@ export interface IType<C, S, T> {
      * @internal
      * @hidden
      */
-    removeChild(node: INode, subpath: string): void
+    removeChild(node: BaseNode<C, S, T>, subpath: string): void
     /**
      * @internal
      * @hidden
      */
     isAssignableFrom(type: IAnyType): boolean
-    /**
-     * @internal
-     * @hidden
-     */
-    shouldAttachNode: boolean
 }
 
 // do not convert to an interface
@@ -292,12 +321,19 @@ export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
 export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
 
 /**
- * A complex type produces a MST node (Node in the state tree)
+ * A base type produces a MST node (Node in the state tree)
  *
  * @internal
  * @hidden
  */
-export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTreeNode<C, S>> {
+export abstract class BaseType<C, S, T, N extends BaseNode<C, S, T>>
+    implements IType<C, S, T & IStateTreeNode<C, S>> {
+    // these are just to make inner types avaialable to inherited classes
+    readonly C!: C
+    readonly S!: S
+    readonly T!: T
+    readonly N!: N
+
     readonly isType = true
     readonly name: string
 
@@ -311,47 +347,46 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTree
         return this.instantiate(null, "", environment, snapshot).value
     }
 
-    initializeChildNodes(node: INode, snapshot: any): IChildNodesMap {
+    initializeChildNodes(node: N, snapshot: any): IChildNodesMap {
         return EMPTY_OBJECT
     }
 
-    createNewInstance(node: INode, childNodes: IChildNodesMap, snapshot: any): any {
-        return snapshot
+    createNewInstance(node: N, childNodes: IChildNodesMap, snapshot: C): T {
+        return snapshot as any
     }
 
-    finalizeNewInstance(node: INode, instance: any) {}
+    finalizeNewInstance(node: N, instance: any): void {}
 
     abstract instantiate(
-        parent: INode | null,
+        parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
         initialValue: any
-    ): INode
+    ): N
 
     abstract flags: TypeFlags
     abstract describe(): string
 
-    abstract applySnapshot(node: INode, snapshot: any): void
-    abstract getDefaultSnapshot(): any
-    abstract getChildren(node: INode): ReadonlyArray<INode>
-    abstract getChildNode(node: INode, key: string): INode
-    abstract getValue(node: INode): T
-    abstract getSnapshot(node: INode, applyPostProcess?: boolean): any
-    abstract applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void
+    abstract applySnapshot(node: N, snapshot: S): void
+    abstract getDefaultSnapshot(): C
+    abstract getChildren(node: N): ReadonlyArray<AnyNode>
+    abstract getChildNode(node: N, key: string): AnyNode
+    abstract getValue(node: N): T
+    abstract getSnapshot(node: N, applyPostProcess?: boolean): S
+    abstract applyPatchLocally(node: N, subpath: string, patch: IJsonPatch): void
     abstract getChildType(key: string): IAnyType
-    abstract removeChild(node: INode, subpath: string): void
-    abstract isValidSnapshot(value: any, context: IContext): IValidationResult
-    abstract shouldAttachNode: boolean
+    abstract removeChild(node: N, subpath: string): void
+    abstract isValidSnapshot(value: any, context: IValidationContext): IValidationResult
 
-    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: any): any {
-        return snapshot
+    processInitialSnapshot(childNodes: IChildNodesMap, snapshot: C): S {
+        return snapshot as any
     }
 
     isAssignableFrom(type: IAnyType): boolean {
-        return type === (this as any)
+        return type === this
     }
 
-    validate(value: any, context: IContext): IValidationResult {
+    validate(value: any, context: IValidationContext): IValidationResult {
         if (isStateTreeNode(value)) {
             return getType(value) === this || this.isAssignableFrom(getType(value))
                 ? typeCheckSuccess()
@@ -365,7 +400,38 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTree
         return this.validate(value, [{ path: "", type: this }]).length === 0
     }
 
-    reconcile(current: ObjectNode, newValue: any): INode {
+    abstract reconcile(current: N, newValue: any): N
+
+    get Type(): T {
+        throw fail(
+            "Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`"
+        )
+    }
+    get SnapshotType(): S {
+        throw fail(
+            "Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`"
+        )
+    }
+    get CreationType(): C {
+        throw fail(
+            "Factory.CreationType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.CreationType`"
+        )
+    }
+}
+
+/**
+ * A complex type produces a MST node (Node in the state tree)
+ *
+ * @internal
+ * @hidden
+ */
+export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<C, S, T>> {
+    identifierAttribute: string | undefined
+
+    constructor(name: string) {
+        super(name)
+    }
+    reconcile(current: this["N"], newValue: any): this["N"] {
         if (current.snapshot === newValue)
             // newValue is the current snapshot of the node, noop
             return current
@@ -397,65 +463,54 @@ export abstract class ComplexType<C, S, T> implements IType<C, S, T & IStateTree
         // nothing to do, we have to create a new node
         return this.instantiate(parent, subpath, current.environment, newValue)
     }
-
-    get Type(): T {
-        throw fail(
-            "Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`"
-        )
-    }
-    get SnapshotType(): S {
-        throw fail(
-            "Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`"
-        )
-    }
-    get CreationType(): C {
-        throw fail(
-            "Factory.CreationType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.CreationType`"
-        )
-    }
 }
 
 /**
  * @internal
  * @hidden
  */
-export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements IType<C, S, T> {
+export abstract class Type<C, S, T, ScalarN extends boolean = true> extends BaseType<
+    C,
+    S,
+    T,
+    ScalarN extends true ? ScalarNode<C, S, T> : BaseNode<C, S, T>
+> {
     constructor(name: string) {
         super(name)
     }
 
     abstract instantiate(
-        parent: INode | null,
+        parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
         initialValue: any
-    ): INode
+    ): this["N"]
 
-    getValue(node: INode) {
+    getValue(node: this["N"]): T {
         return node.storedValue
     }
 
-    getSnapshot(node: INode) {
+    getSnapshot(node: this["N"]): S {
         return node.storedValue
     }
 
-    getDefaultSnapshot() {
-        return undefined
+    getDefaultSnapshot(): C {
+        return undefined as any
     }
 
-    applySnapshot(node: INode, snapshot: C): void {
+    applySnapshot(node: this["N"], snapshot: S): void {
         throw fail("Immutable types do not support applying snapshots")
     }
 
-    applyPatchLocally(node: INode, subpath: string, patch: IJsonPatch): void {
+    applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
         throw fail("Immutable types do not support applying patches")
     }
 
-    getChildren(node: INode): INode[] {
-        return EMPTY_ARRAY as any
+    getChildren(node: this["N"]): AnyNode[] {
+        return EMPTY_ARRAY as AnyNode[]
     }
 
-    getChildNode(node: INode, key: string): INode {
+    getChildNode(node: this["N"], key: string): AnyNode {
         throw fail(`No child '${key}' available in type: ${this.name}`)
     }
 
@@ -463,7 +518,7 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
         throw fail(`No child '${key}' available in type: ${this.name}`)
     }
 
-    reconcile(current: INode, newValue: any): INode {
+    reconcile(current: this["N"], newValue: any): this["N"] {
         // reconcile only if type and value are still the same
         if (current.type === this && current.storedValue === newValue) return current
         const res = this.instantiate(current.parent, current.subpath, current.environment, newValue)
@@ -471,7 +526,7 @@ export abstract class Type<C, S, T> extends ComplexType<C, S, T> implements ITyp
         return res
     }
 
-    removeChild(node: INode, subpath: string): void {
+    removeChild(node: this["N"], subpath: string): void {
         throw fail(`No child '${subpath}' available in type: ${this.name}`)
     }
 }

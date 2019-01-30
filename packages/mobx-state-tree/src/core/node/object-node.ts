@@ -15,7 +15,6 @@ import {
     IJsonPatch,
     IMiddleware,
     IMiddlewareHandler,
-    INode,
     invalidateComputed,
     IReversibleJsonPatch,
     NodeLifeCycle,
@@ -33,7 +32,9 @@ import {
     getCurrentActionContext,
     escapeJsonPath,
     getPath,
-    warnError
+    warnError,
+    AnyNode,
+    IStateTreeNode
 } from "../../internal"
 
 let nextNodeId = 1
@@ -58,7 +59,7 @@ const enum InternalEvents {
  * @hidden
  */
 export interface IChildNodesMap {
-    [key: string]: INode
+    [key: string]: AnyNode
 }
 
 const snapshotReactionOptions = {
@@ -71,26 +72,29 @@ const snapshotReactionOptions = {
  * @internal
  * @hidden
  */
-export class ObjectNode extends BaseNode {
+export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
+    readonly type!: ComplexType<C, S, T>
+    storedValue!: T & IStateTreeNode<C, S>
+
     readonly nodeId = ++nextNodeId
-    readonly identifierAttribute: string | undefined
+    readonly identifierAttribute?: string
     readonly identifier: string | null // Identifier is always normalized to string, even if the identifier property isn't
     readonly unnormalizedIdentifier: ReferenceIdentifier | null
 
-    identifierCache: IdentifierCache | undefined
+    identifierCache?: IdentifierCache
     isProtectionEnabled = true
     middlewares: IMiddleware[] | null = null
 
-    _applyPatches?: (patches: IJsonPatch[]) => void
+    private _applyPatches?: (patches: IJsonPatch[]) => void
 
     applyPatches(patches: IJsonPatch[]): void {
         this.createObservableInstanceIfNeeded()
         this._applyPatches!(patches)
     }
 
-    _applySnapshot?: (snapshot: any) => void
+    private _applySnapshot?: (snapshot: C) => void
 
-    applySnapshot(snapshot: any): void {
+    applySnapshot(snapshot: C): void {
         this.createObservableInstanceIfNeeded()
         this._applySnapshot!(snapshot)
     }
@@ -102,25 +106,26 @@ export class ObjectNode extends BaseNode {
     private readonly _internalEvents = new EventHandlers<{
         [InternalEvents.Dispose]: () => void
         [InternalEvents.Patch]: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
-        [InternalEvents.Snapshot]: (snapshot: any) => void
+        [InternalEvents.Snapshot]: (snapshot: S) => void
     }>()
 
     private _observableInstanceState = ObservableInstanceLifecycle.UNINITIALIZED
     private _childNodes: IChildNodesMap
-    private _initialSnapshot: any
-    private _cachedInitialSnapshot: any = null
+    private _initialSnapshot: C
+    private _cachedInitialSnapshot?: S
+    private _cachedInitialSnapshotCreated = false
 
     constructor(
-        type: IAnyType,
-        parent: ObjectNode | null,
+        type: ComplexType<C, S, T>,
+        parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialSnapshot: any
+        initialValue: any
     ) {
         super(type, parent, subpath, environment)
 
-        this._initialSnapshot = freeze(initialSnapshot)
-        this.identifierAttribute = (type as any).identifierAttribute
+        this._initialSnapshot = freeze(initialValue)
+        this.identifierAttribute = type.identifierAttribute
 
         if (!parent) {
             this.identifierCache = new IdentifierCache()
@@ -133,7 +138,7 @@ export class ObjectNode extends BaseNode {
         this.identifier = null
         this.unnormalizedIdentifier = null
         if (this.identifierAttribute && this._initialSnapshot) {
-            let id = this._initialSnapshot[this.identifierAttribute]
+            let id = (this._initialSnapshot as any)[this.identifierAttribute]
             if (id === undefined) {
                 // try with the actual node if not (for optional identifiers)
                 const childNode = this._childNodes[this.identifierAttribute]
@@ -163,7 +168,7 @@ export class ObjectNode extends BaseNode {
     }
 
     @action
-    createObservableInstanceIfNeeded() {
+    createObservableInstanceIfNeeded(): void {
         if (this._observableInstanceState !== ObservableInstanceLifecycle.UNINITIALIZED) {
             return
         }
@@ -224,12 +229,12 @@ export class ObjectNode extends BaseNode {
         this.finalizeCreation()
     }
 
-    get root(): ObjectNode {
+    get root(): AnyObjectNode {
         const parent = this.parent
         return parent ? parent.root : this
     }
 
-    setParent(newParent: ObjectNode | null, subpath: string | null = null): void {
+    setParent(newParent: AnyObjectNode | null, subpath: string | null = null): void {
         if (this.parent === newParent && this.subpath === subpath) return
         if (newParent && process.env.NODE_ENV !== "production") {
             if (this.parent && newParent !== this.parent) {
@@ -270,11 +275,13 @@ export class ObjectNode extends BaseNode {
         }
     }
 
-    protected fireHook(name: Hook) {
+    protected fireHook(name: Hook): void {
         this.fireInternalHook(name)
 
         const fn =
-            this.storedValue && typeof this.storedValue === "object" && this.storedValue[name]
+            this.storedValue &&
+            typeof this.storedValue === "object" &&
+            (this.storedValue as any)[name]
         if (typeof fn === "function") {
             // we check for it to allow old mobx peer dependencies that don't have the method to work (even when still bugged)
             if (_allowStateChangesInsideComputed) {
@@ -287,42 +294,42 @@ export class ObjectNode extends BaseNode {
         }
     }
 
-    get value(): any {
+    get value(): T {
         this.createObservableInstanceIfNeeded()
-        if (!this.isAlive) return undefined
         return this.type.getValue(this)
     }
 
-    private _snapshotUponDeath?: any
+    private _snapshotUponDeath?: S
 
     // advantage of using computed for a snapshot is that nicely respects transactions etc.
     @computed
-    get snapshot(): any {
+    get snapshot(): S {
         return freeze(this.getSnapshot())
     }
 
     // NOTE: we use this method to get snapshot without creating @computed overhead
-    getSnapshot(): any {
-        if (!this.isAlive) return this._snapshotUponDeath
+    getSnapshot(): S {
+        if (!this.isAlive) return this._snapshotUponDeath!
         return this._observableInstanceState === ObservableInstanceLifecycle.CREATED
             ? this._getActualSnapshot()
-            : this._getInitialSnapshot()
+            : this._getCachedInitialSnapshot()
     }
 
-    private _getActualSnapshot(): any {
+    private _getActualSnapshot(): S {
         return this.type.getSnapshot(this)
     }
 
-    private _getInitialSnapshot(): any {
-        if (!this._initialSnapshot) return this._initialSnapshot
-        if (this._cachedInitialSnapshot) return this._cachedInitialSnapshot
+    private _getCachedInitialSnapshot(): S {
+        if (!this._cachedInitialSnapshotCreated) {
+            const type = this.type
+            const childNodes = this._childNodes
+            const snapshot = this._initialSnapshot
 
-        const type = this.type as ComplexType<any, any, any>
-        const childNodes = this._childNodes!
-        const snapshot = this._initialSnapshot
+            this._cachedInitialSnapshot = type.processInitialSnapshot(childNodes, snapshot)
+            this._cachedInitialSnapshotCreated = true
+        }
 
-        this._cachedInitialSnapshot = type.processInitialSnapshot(childNodes, snapshot)
-        return this._cachedInitialSnapshot
+        return this._cachedInitialSnapshot!
     }
 
     private isRunningAction(): boolean {
@@ -363,7 +370,7 @@ export class ObjectNode extends BaseNode {
         }', Path upon death: '${escapedPath}', Subpath: '${subpath}', Action: '${actionFullPath}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
     }
 
-    getChildNode(subpath: string): INode {
+    getChildNode(subpath: string): AnyNode {
         this.assertAlive({
             subpath
         })
@@ -377,7 +384,7 @@ export class ObjectNode extends BaseNode {
         }
     }
 
-    getChildren(): ReadonlyArray<INode> {
+    getChildren(): ReadonlyArray<AnyNode> {
         this.assertAlive(EMPTY_OBJECT)
         this._autoUnbox = false
         try {
@@ -406,14 +413,16 @@ export class ObjectNode extends BaseNode {
         }
     }
 
-    removeChild(subpath: string) {
+    removeChild(subpath: string): void {
         this.type.removeChild(this, subpath)
     }
 
     // this method must be bound
-    unbox = (childNode: INode): any => {
+    unbox = (childNode: AnyNode): any => {
         if (childNode)
-            this.assertAlive({ subpath: childNode.subpath || childNode.subpathUponDeath })
+            this.assertAlive({
+                subpath: childNode.subpath || childNode.subpathUponDeath
+            })
         if (childNode && this._autoUnbox) return childNode.value
         return childNode
     }
@@ -425,7 +434,7 @@ export class ObjectNode extends BaseNode {
         }`
     }
 
-    finalizeCreation() {
+    finalizeCreation(): void {
         this.baseFinalizeCreation(() => {
             for (let child of this.getChildren()) {
                 child.finalizeCreation()
@@ -451,7 +460,7 @@ export class ObjectNode extends BaseNode {
         this.state = NodeLifeCycle.FINALIZED
     }
 
-    private preboot() {
+    private preboot(): void {
         const self = this
         this._applyPatches = createActionInvoker(
             this.storedValue,
@@ -459,7 +468,7 @@ export class ObjectNode extends BaseNode {
             (patches: IJsonPatch[]) => {
                 patches.forEach(patch => {
                     const parts = splitJsonPath(patch.path)
-                    const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as ObjectNode
+                    const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as AnyObjectNode
                     node.applyPatchLocally(parts[parts.length - 1], patch)
                 })
             }
@@ -467,7 +476,7 @@ export class ObjectNode extends BaseNode {
         this._applySnapshot = createActionInvoker(
             this.storedValue,
             "@APPLY_SNAPSHOT",
-            (snapshot: any) => {
+            (snapshot: S) => {
                 // if the snapshot is the same as the current one, avoid performing a reconcile
                 if (snapshot === self.snapshot) return
                 // else, apply it by calling the type logic
@@ -480,7 +489,7 @@ export class ObjectNode extends BaseNode {
     }
 
     @action
-    die() {
+    die(): void {
         if (this.state === NodeLifeCycle.DETACHING) return
         if (this._observableInstanceState === ObservableInstanceLifecycle.CREATED) {
             this.aboutToDie()
@@ -491,7 +500,7 @@ export class ObjectNode extends BaseNode {
         }
     }
 
-    aboutToDie() {
+    aboutToDie(): void {
         this.getChildren().forEach(node => {
             node.aboutToDie()
         })
@@ -504,7 +513,7 @@ export class ObjectNode extends BaseNode {
         this._internalEvents.clear(InternalEvents.Dispose)
     }
 
-    private unregisterIdentifiers() {
+    private unregisterIdentifiers(): void {
         Object.keys(this._childNodes).forEach(k => {
             const childNode = this._childNodes[k]
             if (childNode instanceof ObjectNode) {
@@ -514,7 +523,7 @@ export class ObjectNode extends BaseNode {
         this.root.identifierCache!.notifyDied(this)
     }
 
-    finalizeDeath() {
+    finalizeDeath(): void {
         // invariant: not called directly but from "die"
         this.getChildren().forEach(node => {
             node.finalizeDeath()
@@ -530,12 +539,12 @@ export class ObjectNode extends BaseNode {
         this.baseFinalizeDeath()
     }
 
-    onSnapshot(onChange: (snapshot: any) => void): IDisposer {
+    onSnapshot(onChange: (snapshot: S) => void): IDisposer {
         this._addSnapshotReaction()
         return this._internalEvents.register(InternalEvents.Snapshot, onChange)
     }
 
-    protected emitSnapshot(snapshot: any) {
+    protected emitSnapshot(snapshot: S): void {
         this._internalEvents.emit(InternalEvents.Snapshot, snapshot)
     }
 
@@ -543,7 +552,7 @@ export class ObjectNode extends BaseNode {
         return this._internalEvents.register(InternalEvents.Patch, handler)
     }
 
-    emitPatch(basePatch: IReversibleJsonPatch, source: INode) {
+    emitPatch(basePatch: IReversibleJsonPatch, source: AnyNode): void {
         const intEvs = this._internalEvents
         if (intEvs.hasSubscribers(InternalEvents.Patch)) {
             const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, {
@@ -574,12 +583,12 @@ export class ObjectNode extends BaseNode {
         this._internalEvents.unregister(InternalEvents.Dispose, disposer)
     }
 
-    removeMiddleware(handler: IMiddlewareHandler) {
+    removeMiddleware(handler: IMiddlewareHandler): void {
         if (this.middlewares)
             this.middlewares = this.middlewares.filter(middleware => middleware.handler !== handler)
     }
 
-    addMiddleWare(handler: IMiddlewareHandler, includeHooks: boolean = true) {
+    addMiddleWare(handler: IMiddlewareHandler, includeHooks: boolean = true): IDisposer {
         if (!this.middlewares) this.middlewares = [{ handler, includeHooks }]
         else this.middlewares.push({ handler, includeHooks })
 
@@ -596,7 +605,7 @@ export class ObjectNode extends BaseNode {
         this.type.applyPatchLocally(this, subpath, patch)
     }
 
-    private _addSnapshotReaction() {
+    private _addSnapshotReaction(): void {
         if (!this._hasSnapshotReaction) {
             const snapshotDisposer = reaction(
                 () => this.snapshot,
@@ -608,6 +617,12 @@ export class ObjectNode extends BaseNode {
         }
     }
 }
+
+/**
+ * @internal
+ * @hidden
+ */
+export type AnyObjectNode = ObjectNode<any, any, any>
 
 /**
  * @internal

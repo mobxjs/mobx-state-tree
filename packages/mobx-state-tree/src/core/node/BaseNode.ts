@@ -1,10 +1,11 @@
 import {
-    IAnyType,
-    ObjectNode,
+    AnyObjectNode,
     NodeLifeCycle,
     Hook,
     escapeJsonPath,
-    EventHandlers
+    EventHandlers,
+    IType,
+    IAnyType
 } from "../../internal"
 import { createAtom, IAtom } from "mobx"
 
@@ -12,7 +13,7 @@ import { createAtom, IAtom } from "mobx"
  * @internal
  * @hidden
  */
-export abstract class BaseNode {
+export abstract class BaseNode<C, S, T> {
     private _escapedSubpath?: string
 
     private _subpath!: string
@@ -30,7 +31,8 @@ export abstract class BaseNode {
         return this._pathUponDeath
     }
 
-    storedValue: any
+    storedValue!: any // usually the same type as the value, but not always (such as with references)
+    value!: T
 
     private aliveAtom?: IAtom
     private _state = NodeLifeCycle.INITIALIZING
@@ -49,28 +51,33 @@ export abstract class BaseNode {
 
     readonly type: IAnyType
     readonly hookSubscribers = new EventHandlers<{
-        [Hook.afterAttach]: (node: any, hook: Hook) => void
-        [Hook.afterCreate]: (node: any, hook: Hook) => void
-        [Hook.afterCreationFinalization]: (node: any, hook: Hook) => void
-        [Hook.beforeDestroy]: (node: any, hook: Hook) => void
-        [Hook.beforeDetach]: (node: any, hook: Hook) => void
+        [Hook.afterAttach]: (node: AnyNode, hook: Hook) => void
+        [Hook.afterCreate]: (node: AnyNode, hook: Hook) => void
+        [Hook.afterCreationFinalization]: (node: AnyNode, hook: Hook) => void
+        [Hook.beforeDestroy]: (node: AnyNode, hook: Hook) => void
+        [Hook.beforeDetach]: (node: AnyNode, hook: Hook) => void
     }>()
 
     environment: any = undefined
 
-    private _parent!: ObjectNode | null
+    private _parent!: AnyObjectNode | null
     get parent() {
         return this._parent
     }
 
-    constructor(type: IAnyType, parent: ObjectNode | null, subpath: string, environment: any) {
+    constructor(
+        type: IType<C, S, T>,
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any
+    ) {
         this.environment = environment
         this.type = type
         this.baseSetParent(parent, subpath)
     }
 
     private pathAtom?: IAtom
-    protected baseSetParent(parent: ObjectNode | null, subpath: string) {
+    protected baseSetParent(parent: AnyObjectNode | null, subpath: string) {
         this._parent = parent
         this._subpath = subpath
         this._escapedSubpath = undefined // regenerate when needed
@@ -105,9 +112,9 @@ export abstract class BaseNode {
         return this.parent === null
     }
 
-    abstract get root(): ObjectNode
+    abstract get root(): AnyObjectNode
 
-    abstract setParent(newParent: ObjectNode | null, subpath: string | null): void
+    abstract setParent(newParent: AnyObjectNode | null, subpath: string | null): void
 
     protected abstract fireHook(name: Hook): void
 
@@ -115,10 +122,8 @@ export abstract class BaseNode {
         this.hookSubscribers.emit(name, this, name)
     }
 
-    value: any
-
-    snapshot: any
-    abstract getSnapshot(): any
+    snapshot!: S
+    abstract getSnapshot(): S
 
     get isAlive() {
         return this.state !== NodeLifeCycle.DEAD
@@ -177,4 +182,4 @@ export abstract class BaseNode {
  * @internal
  * @hidden
  */
-export type INode = BaseNode
+export type AnyNode = BaseNode<any, any, any>

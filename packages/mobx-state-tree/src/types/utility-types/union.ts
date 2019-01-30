@@ -1,5 +1,5 @@
 import {
-    IContext,
+    IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
@@ -8,7 +8,6 @@ import {
     TypeFlags,
     IType,
     Type,
-    INode,
     fail,
     isPlainObject,
     IAnyType,
@@ -20,7 +19,9 @@ import {
     ModelCreationType2,
     _NotCustomized,
     RedefineIStateTreeNode,
-    IStateTreeNode
+    IStateTreeNode,
+    BaseNode,
+    AnyObjectNode
 } from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
@@ -34,7 +35,7 @@ export interface UnionOptions {
  * @internal
  * @hidden
  */
-export class Union extends Type<any, any, any> {
+export class Union extends Type<any, any, any, false> {
     readonly dispatcher?: ITypeDispatcher
     readonly eager: boolean = true
     readonly types: IAnyType[]
@@ -47,10 +48,6 @@ export class Union extends Type<any, any, any> {
         })
 
         return result
-    }
-
-    get shouldAttachNode() {
-        return this.types.some(type => type.shouldAttachNode)
     }
 
     constructor(name: string, types: IAnyType[], options?: UnionOptions) {
@@ -73,13 +70,18 @@ export class Union extends Type<any, any, any> {
         return "(" + this.types.map(factory => factory.describe()).join(" | ") + ")"
     }
 
-    instantiate(parent: INode, subpath: string, environment: any, value: any): INode {
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        value: any
+    ): this["N"] {
         const type = this.determineType(value, undefined)
         if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
         return type.instantiate(parent, subpath, environment, value)
     }
 
-    reconcile(current: INode, newValue: any): INode {
+    reconcile(current: this["N"], newValue: any): this["N"] {
         const type = this.determineType(newValue, current.type)
         if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
         return type.reconcile(current, newValue)
@@ -103,7 +105,7 @@ export class Union extends Type<any, any, any> {
         }
     }
 
-    isValidSnapshot(value: any, context: IContext): IValidationResult {
+    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
         if (this.dispatcher) {
             return this.dispatcher(value).validate(value, context)
         }

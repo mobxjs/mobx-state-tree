@@ -1,11 +1,11 @@
-import { fail, freeze, NodeLifeCycle, ObjectNode, IAnyType, Hook, BaseNode } from "../../internal"
+import { fail, freeze, NodeLifeCycle, Hook, BaseNode, AnyObjectNode, Type } from "../../internal"
 import { action } from "mobx"
 
 /**
  * @internal
  * @hidden
  */
-export class ScalarNode extends BaseNode {
+export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
     // note about hooks:
     // - afterCreate is not emmited in scalar nodes, since it would be emitted in the
     //   constructor, before it can be subscribed by anybody
@@ -13,8 +13,8 @@ export class ScalarNode extends BaseNode {
     // - beforeDetach is never emitted for scalar nodes, since they cannot be detached
 
     constructor(
-        type: IAnyType,
-        parent: ObjectNode | null,
+        type: Type<C, S, T, any>,
+        parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
         initialSnapshot: any
@@ -37,13 +37,13 @@ export class ScalarNode extends BaseNode {
         this.finalizeCreation()
     }
 
-    get root(): ObjectNode {
+    get root(): AnyObjectNode {
         // future optimization: store root ref in the node and maintain it
         if (!this.parent) throw fail(`This scalar node is not part of a tree`)
         return this.parent.root
     }
 
-    setParent(newParent: ObjectNode | null, subpath: string | null = null): void {
+    setParent(newParent: AnyObjectNode | null, subpath: string | null = null): void {
         if (this.parent === newParent && this.subpath === subpath) return
         if (this.parent && !newParent) {
             this.die()
@@ -57,7 +57,7 @@ export class ScalarNode extends BaseNode {
         }
     }
 
-    get value(): any {
+    get value(): T {
         // if we ever find a case where scalar nodes can be accessed without iterating through its parent
         // uncomment this to make sure the parent chain is created when this is accessed
         // if (this.parent) {
@@ -66,11 +66,11 @@ export class ScalarNode extends BaseNode {
         return this.type.getValue(this)
     }
 
-    get snapshot(): any {
+    get snapshot(): S {
         return freeze(this.getSnapshot())
     }
 
-    getSnapshot(): any {
+    getSnapshot(): S {
         return this.type.getSnapshot(this)
     }
 
@@ -79,25 +79,25 @@ export class ScalarNode extends BaseNode {
     }
 
     @action
-    die() {
+    die(): void {
         if (this.state === NodeLifeCycle.DETACHING) return
         this.aboutToDie()
         this.finalizeDeath()
     }
 
-    finalizeCreation() {
+    finalizeCreation(): void {
         this.baseFinalizeCreation()
     }
 
-    aboutToDie() {
+    aboutToDie(): void {
         this.baseAboutToDie()
     }
 
-    finalizeDeath() {
+    finalizeDeath(): void {
         this.baseFinalizeDeath()
     }
 
-    protected fireHook(name: Hook) {
+    protected fireHook(name: Hook): void {
         this.fireInternalHook(name)
     }
 }

@@ -1,7 +1,6 @@
 import { runInAction } from "mobx"
 
 import {
-    INode,
     getStateTreeNode,
     isStateTreeNode,
     addMiddleware,
@@ -19,7 +18,8 @@ import {
     asArray,
     getRelativePathBetweenNodes,
     IAnyStateTreeNode,
-    warnError
+    warnError,
+    AnyNode
 } from "../internal"
 
 export interface ISerializedActionCall {
@@ -30,11 +30,11 @@ export interface ISerializedActionCall {
 
 export interface IActionRecorder {
     actions: ReadonlyArray<ISerializedActionCall>
-    stop(): any
-    replay(target: IAnyStateTreeNode): any
+    stop(): void
+    replay(target: IAnyStateTreeNode): void
 }
 
-function serializeArgument(node: INode, actionName: string, index: number, arg: any): any {
+function serializeArgument(node: AnyNode, actionName: string, index: number, arg: any): any {
     if (arg instanceof Date) return { $MST_DATE: arg.getTime() }
     if (isPrimitive(arg)) return arg
     // We should not serialize MST nodes, even if we can, because we don't know if the receiving party can handle a raw snapshot instead of an
@@ -56,7 +56,7 @@ function serializeArgument(node: INode, actionName: string, index: number, arg: 
     }
 }
 
-function deserializeArgument(adm: INode, value: any): any {
+function deserializeArgument(adm: AnyNode, value: any): any {
     if (value && typeof value === "object" && "$MST_DATE" in value)
         return new Date(value["$MST_DATE"])
     return value
@@ -145,14 +145,15 @@ export function recordActions(subject: IAnyStateTreeNode): IActionRecorder {
                 "expected first argument to be a mobx-state-tree node, got " + subject + " instead"
             )
     }
-    let recorder = {
-        actions: [] as ISerializedActionCall[],
+    const actions: ISerializedActionCall[] = []
+    let recorder: IActionRecorder = {
+        actions,
         stop: () => disposer(),
-        replay: (target: IAnyStateTreeNode) => {
-            applyAction(target, recorder.actions)
+        replay: target => {
+            applyAction(target, actions)
         }
     }
-    let disposer = onAction(subject, recorder.actions.push.bind(recorder.actions))
+    let disposer = onAction(subject, actions.push.bind(recorder.actions))
     return recorder
 }
 

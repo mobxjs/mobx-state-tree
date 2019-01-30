@@ -6,7 +6,8 @@ import {
     ScalarNode,
     IChildNodesMap,
     EMPTY_ARRAY,
-    INode
+    AnyObjectNode,
+    AnyNode
 } from "../../internal"
 
 /**
@@ -21,22 +22,29 @@ export enum NodeLifeCycle {
     DEAD // no coming back from this one
 }
 
+/** @hidden */
+declare const $stateTreeNodeTypes: unique symbol
+
 /**
  * Common interface that represents a node instance.
  * @hidden
  */
 export interface IStateTreeNode<C = any, S = any> {
+    /**
+     * @internal
+     */
     readonly $treenode?: any
+
     // fake, will never be present, just for typing
     // we use this weird trick to allow reference types to work
-    readonly "!!types"?: [C, S] | [any, any]
+    readonly [$stateTreeNodeTypes]?: [C, S] | [any, any]
 }
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
 /** @hidden */
 export type RedefineIStateTreeNode<T, STN extends IAnyStateTreeNode> = T extends IAnyStateTreeNode
-    ? Omit<T, "!!types"> & STN
+    ? Omit<T, typeof $stateTreeNodeTypes> & STN
     : T
 
 /** @hidden */
@@ -67,7 +75,7 @@ export function isStateTreeNode<C = any, S = any>(value: any): value is IStateTr
  * @internal
  * @hidden
  */
-export function getStateTreeNode(value: IAnyStateTreeNode): ObjectNode {
+export function getStateTreeNode(value: IAnyStateTreeNode): AnyObjectNode {
     if (isStateTreeNode(value)) return value.$treenode!
     else throw fail(`Value ${value} is no MST Node`)
 }
@@ -76,7 +84,7 @@ export function getStateTreeNode(value: IAnyStateTreeNode): ObjectNode {
  * @internal
  * @hidden
  */
-export function getStateTreeNodeSafe(value: IAnyStateTreeNode): ObjectNode {
+export function getStateTreeNodeSafe(value: IAnyStateTreeNode): AnyObjectNode | null {
     return (value && value.$treenode) || null
 }
 
@@ -108,7 +116,7 @@ const doubleDot = (_: any) => ".."
  * @internal
  * @hidden
  */
-export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode): string {
+export function getRelativePathBetweenNodes(base: AnyObjectNode, target: AnyObjectNode): string {
     // PRE condition target is (a child of) base!
     if (base.root !== target.root) {
         throw fail(
@@ -136,10 +144,10 @@ export function getRelativePathBetweenNodes(base: ObjectNode, target: ObjectNode
  * @hidden
  */
 export function resolveNodeByPath(
-    base: ObjectNode,
+    base: AnyObjectNode,
     path: string,
     failIfResolveFails: boolean = true
-): INode | undefined {
+): AnyNode | undefined {
     return resolveNodeByPathParts(base, splitJsonPath(path), failIfResolveFails)
 }
 
@@ -148,11 +156,11 @@ export function resolveNodeByPath(
  * @hidden
  */
 export function resolveNodeByPathParts(
-    base: ObjectNode,
+    base: AnyObjectNode,
     pathParts: string[],
     failIfResolveFails: boolean = true
-): INode | undefined {
-    let current: INode | null = base
+): AnyNode | undefined {
+    let current: AnyNode | null = base
 
     for (let i = 0; i < pathParts.length; i++) {
         const part = pathParts[i]
@@ -166,7 +174,7 @@ export function resolveNodeByPathParts(
                 // check if the value of a scalar resolves to a state tree node (e.g. references)
                 // then we can continue resolving...
                 try {
-                    const value = current.value
+                    const value: any = current.value
                     if (isStateTreeNode(value)) {
                         current = getStateTreeNode(value)
                         // fall through
@@ -200,13 +208,13 @@ export function resolveNodeByPathParts(
  * @internal
  * @hidden
  */
-export function convertChildNodesToArray(childNodes: IChildNodesMap | null): INode[] {
-    if (!childNodes) return EMPTY_ARRAY as INode[]
+export function convertChildNodesToArray(childNodes: IChildNodesMap | null): AnyNode[] {
+    if (!childNodes) return EMPTY_ARRAY as AnyNode[]
 
     const keys = Object.keys(childNodes)
-    if (!keys.length) return EMPTY_ARRAY as INode[]
+    if (!keys.length) return EMPTY_ARRAY as AnyNode[]
 
-    const result = new Array(keys.length) as INode[]
+    const result = new Array(keys.length) as AnyNode[]
     keys.forEach((key, index) => {
         result[index] = childNodes![key]
     })

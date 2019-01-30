@@ -13,7 +13,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [IActionRecorder](interfaces/iactionrecorder.md)
 * [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)
 * [IAnyModelType](interfaces/ianymodeltype.md)
-* [IContextEntry](interfaces/icontextentry.md)
 * [IJsonPatch](interfaces/ijsonpatch.md)
 * [IModelReflectionData](interfaces/imodelreflectiondata.md)
 * [IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)
@@ -23,6 +22,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [ISerializedActionCall](interfaces/iserializedactioncall.md)
 * [ISimpleType](interfaces/isimpletype.md)
 * [IType](interfaces/itype.md)
+* [IValidationContextEntry](interfaces/ivalidationcontextentry.md)
 * [IValidationError](interfaces/ivalidationerror.md)
 * [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)
 * [ReferenceOptionsOnInvalidated](interfaces/referenceoptionsoninvalidated.md)
@@ -32,12 +32,12 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 
 * [IAnyComplexType](#ianycomplextype)
 * [IAnyType](#ianytype)
-* [IContext](#icontext)
 * [IDisposer](#idisposer)
 * [IMiddlewareEvent](#imiddlewareevent)
 * [IMiddlewareEventType](#imiddlewareeventtype)
 * [IMiddlewareHandler](#imiddlewarehandler)
 * [ITypeDispatcher](#itypedispatcher)
+* [IValidationContext](#ivalidationcontext)
 * [IValidationResult](#ivalidationresult)
 * [Instance](#instance)
 * [LivelinessMode](#livelinessmode)
@@ -173,13 +173,6 @@ ___
 Any kind of type.
 
 ___
-<a id="icontext"></a>
-
-###  IContext
-
-**Ƭ IContext**: *[IContextEntry](interfaces/icontextentry.md)[]*
-
-___
 <a id="idisposer"></a>
 
 ###  IDisposer
@@ -246,11 +239,22 @@ ___
 **Returns:** [IAnyType](#ianytype)
 
 ___
+<a id="ivalidationcontext"></a>
+
+###  IValidationContext
+
+**Ƭ IValidationContext**: *[IValidationContextEntry](interfaces/ivalidationcontextentry.md)[]*
+
+Array of validation context entries
+
+___
 <a id="ivalidationresult"></a>
 
 ###  IValidationResult
 
 **Ƭ IValidationResult**: *[IValidationError](interfaces/ivalidationerror.md)[]*
+
+Type validation result, which is an array of type validation errors
 
 ___
 <a id="instance"></a>
@@ -383,8 +387,8 @@ ___
 >(
     "Date",
     TypeFlags.Date,
-    (v: any) => typeof v === "number" || v instanceof Date,
-    (v: number | Date) => (v instanceof Date ? v : new Date(v))
+    v => typeof v === "number" || v instanceof Date,
+    v => (v instanceof Date ? v : new Date(v))
 )
 
 `types.Date` - Creates a type that can only contain a javascript Date value.
@@ -407,7 +411,7 @@ ___
 **● boolean**: *[ISimpleType](interfaces/isimpletype.md)<`boolean`>* =  new CoreType<boolean, boolean, boolean>(
     "boolean",
     TypeFlags.Boolean,
-    (v: any) => typeof v === "boolean"
+    v => typeof v === "boolean"
 )
 
 `types.boolean` - Creates a type that can only contain a boolean value. This type is used for boolean values by default
@@ -445,7 +449,7 @@ ___
 
 ### `<Const>` identifierNumber
 
-**● identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)<`number`>* =  new IdentifierNumberType() as any
+**● identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)<`number`>* =  new IdentifierNumberType()
 
 `types.identifierNumber` - Similar to `types.identifier`. This one will serialize from / to a number when applying snapshots
 
@@ -467,7 +471,7 @@ ___
 **● integer**: *[ISimpleType](interfaces/isimpletype.md)<`number`>* =  new CoreType<number, number, number>(
     "integer",
     TypeFlags.Integer,
-    (v: any) => isInteger(v)
+    v => isInteger(v)
 )
 
 `types.integer` - Creates a type that can only contain an integer value. This type is used for integer values by default
@@ -489,7 +493,7 @@ ___
 **● nullType**: *[ISimpleType](interfaces/isimpletype.md)<`null`>* =  new CoreType<null, null, null>(
     "null",
     TypeFlags.Null,
-    (v: any) => v === null
+    v => v === null
 )
 
 `types.null` - The type of the value `null`
@@ -502,7 +506,7 @@ ___
 **● number**: *[ISimpleType](interfaces/isimpletype.md)<`number`>* =  new CoreType<number, number, number>(
     "number",
     TypeFlags.Number,
-    (v: any) => typeof v === "number"
+    v => typeof v === "number"
 )
 
 `types.number` - Creates a type that can only contain a numeric value. This type is used for numeric values by default
@@ -524,7 +528,7 @@ ___
 **● string**: *[ISimpleType](interfaces/isimpletype.md)<`string`>* =  new CoreType<string, string, string>(
     "string",
     TypeFlags.String,
-    (v: any) => typeof v === "string"
+    v => typeof v === "string"
 )
 
 `types.string` - Creates a type that can only contain a string value. This type is used for string values by default
@@ -546,7 +550,7 @@ ___
 **● undefinedType**: *[ISimpleType](interfaces/isimpletype.md)<`undefined`>* =  new CoreType<undefined, undefined, undefined>(
     "undefined",
     TypeFlags.Undefined,
-    (v: any) => v === undefined
+    v => v === undefined
 )
 
 `types.undefined` - The type of the value `undefined`
@@ -1662,7 +1666,7 @@ export interface CustomTypeOptions<S, T> {
     // return the serialization of the current value
     toSnapshot(value: T): S
     // if true, this is a converted value, if false, it's a snapshot
-    isTargetType(value: T | S): boolean
+    isTargetType(value: T | S): value is T
     // a non empty string is assumed to be a validation error
     getValidationMessage?(snapshot: S): string
 }
@@ -2710,18 +2714,14 @@ ___
 
 ▸ **late**<`T`>(name: *`string`*, type: *`function`*): `T`
 
-`types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies. Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them. You need to declare an interface to explicit the return type of the late parameter function.
+`types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies. Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
 
 Example:
 
 ```ts
- interface INode {
-      childs: INode[]
- }
-
-  // TypeScript is'nt smart enough to infer self referencing types.
+  // TypeScript isn't smart enough to infer self referencing types.
  const Node = types.model({
-      childs: types.optional(types.array(types.late<any, INode>(() => Node)), [])
+      children: types.array(types.late((): IAnyModelType => Node)) // then typecast each array element to Instance<typeof Node>
  })
 ```
 
@@ -2736,18 +2736,14 @@ Example:
 
 **Returns:** `T`
 
-`types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies. Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them. You need to declare an interface to explicit the return type of the late parameter function.
+`types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies. Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
 
 Example:
 
 ```ts
- interface INode {
-      childs: INode[]
- }
-
-  // TypeScript is'nt smart enough to infer self referencing types.
+  // TypeScript isn't smart enough to infer self referencing types.
  const Node = types.model({
-      childs: types.optional(types.array(types.late<any, INode>(() => Node)), [])
+      children: types.array(types.late((): IAnyModelType => Node)) // then typecast each array element to Instance<typeof Node>
  })
 ```
 
@@ -3098,11 +3094,11 @@ export interface IPatchRecorder {
      // the inverse of the recorded patches
      inversePatches: IJsonPatch[]
      // stop recording patches
-     stop(target?: IStateTreeNode): any
+     stop(): void
      // resume recording patches
      resume()
      // apply all the recorded patches on the given target (the original subject if omitted)
-     replay(target?: IStateTreeNode): any
+     replay(target?: IAnyStateTreeNode): void
      // reverse apply the recorded patches on the given target  (the original subject if omitted)
      // stops the recorder if not already stopped
      undo(): void
@@ -3319,21 +3315,19 @@ ___
 
 ###  typecheck
 
-▸ **typecheck**<`C`,`S`,`T`>(type: *[IType](interfaces/itype.md)<`C`, `S`, `T`>*, value: *`C` \| `S` \| `T`*): `void`
+▸ **typecheck**<`IT`>(type: *[IAnyType](#ianytype)*, value: *`ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`>*): `void`
 
-Run's the typechecker on the given type. Throws if the given value is not according the provided type specification. Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
+Run's the typechecker for the given type on the given value, which can be a snapshot or an instance. Throws if the given value is not according the provided type specification. Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
 
 **Type parameters:**
 
-#### C 
-#### S 
-#### T 
+#### IT :  [IAnyType](#ianytype)
 **Parameters:**
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| type | [IType](interfaces/itype.md)<`C`, `S`, `T`> |  Type to check against. |
-| value | `C` \| `S` \| `T` |  Value to be checked. |
+| type | [IAnyType](#ianytype) |  Type to check against. |
+| value | `ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`> |  Value to be checked, either a snapshot or an instance. |
 
 **Returns:** `void`
 

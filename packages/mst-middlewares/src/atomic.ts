@@ -1,6 +1,6 @@
-import { createActionTrackingMiddleware, recordPatches } from "mobx-state-tree"
+import { createActionTrackingMiddleware, recordPatches, IPatchRecorder } from "mobx-state-tree"
 
-const atomic = createActionTrackingMiddleware({
+const atomic = createActionTrackingMiddleware<IPatchRecorder>({
     filter: call => call.parentId === 0,
     onStart: call => recordPatches(call.tree),
     onResume: (call, recorder) => recorder.resume(),

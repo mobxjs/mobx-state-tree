@@ -37,7 +37,7 @@ class Decimal {
         toSnapshot(value: Decimal) {
             return value.toString()
         },
-        isTargetType(value: string | Decimal): boolean {
+        isTargetType(value: string | Decimal): value is Decimal {
             return value instanceof Decimal
         },
         getValidationMessage(value: string): string {
@@ -120,7 +120,7 @@ class Decimal {
         toSnapshot(value: Decimal) {
             return [value.number, value.fraction]
         },
-        isTargetType(value: [number, number] | Decimal): boolean {
+        isTargetType(value: [number, number] | Decimal): value is Decimal {
             return value instanceof Decimal
         },
         getValidationMessage(value: [number, number]): string {
