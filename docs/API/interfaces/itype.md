@@ -39,7 +39,7 @@ A type, either complex or simple.
 
 **● name**: *`string`*
 
-The type name.
+Friendly type name.
 
 ___
 
