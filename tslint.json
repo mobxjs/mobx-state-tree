@@ -12,7 +12,6 @@
         "no-duplicate-variable": true,
         "no-eval": true,
         "no-internal-module": true,
-        "no-trailing-whitespace": true,
         "no-shadowed-variable": true,
         "no-switch-case-fall-through": true,
         "no-unused-expression": true,

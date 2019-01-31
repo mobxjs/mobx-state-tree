@@ -5,9 +5,18 @@ import {
     escapeJsonPath,
     EventHandlers,
     IType,
-    IAnyType
+    IAnyType,
+    IDisposer
 } from "../../internal"
 import { createAtom, IAtom } from "mobx"
+
+type HookSubscribers = {
+    [Hook.afterAttach]: (node: AnyNode, hook: Hook) => void
+    [Hook.afterCreate]: (node: AnyNode, hook: Hook) => void
+    [Hook.afterCreationFinalization]: (node: AnyNode, hook: Hook) => void
+    [Hook.beforeDestroy]: (node: AnyNode, hook: Hook) => void
+    [Hook.beforeDetach]: (node: AnyNode, hook: Hook) => void
+}
 
 /**
  * @internal
@@ -50,13 +59,23 @@ export abstract class BaseNode<C, S, T> {
     }
 
     readonly type: IAnyType
-    readonly hookSubscribers = new EventHandlers<{
-        [Hook.afterAttach]: (node: AnyNode, hook: Hook) => void
-        [Hook.afterCreate]: (node: AnyNode, hook: Hook) => void
-        [Hook.afterCreationFinalization]: (node: AnyNode, hook: Hook) => void
-        [Hook.beforeDestroy]: (node: AnyNode, hook: Hook) => void
-        [Hook.beforeDetach]: (node: AnyNode, hook: Hook) => void
-    }>()
+
+    private _hookSubscribers?: EventHandlers<HookSubscribers>
+
+    protected abstract fireHook(name: Hook): void
+
+    protected fireInternalHook(name: Hook) {
+        if (this._hookSubscribers) {
+            this._hookSubscribers.emit(name, this, name)
+        }
+    }
+
+    registerHook<H extends Hook>(hook: H, hookHandler: HookSubscribers[H]): IDisposer {
+        if (!this._hookSubscribers) {
+            this._hookSubscribers = new EventHandlers()
+        }
+        return this._hookSubscribers.register(hook, hookHandler)
+    }
 
     environment: any = undefined
 
@@ -116,12 +135,6 @@ export abstract class BaseNode<C, S, T> {
 
     abstract setParent(newParent: AnyObjectNode | null, subpath: string | null): void
 
-    protected abstract fireHook(name: Hook): void
-
-    protected fireInternalHook(name: Hook) {
-        this.hookSubscribers.emit(name, this, name)
-    }
-
     snapshot!: S
     abstract getSnapshot(): S
 
@@ -163,7 +176,9 @@ export abstract class BaseNode<C, S, T> {
     abstract finalizeDeath(): void
 
     protected baseFinalizeDeath() {
-        this.hookSubscribers.clearAll()
+        if (this._hookSubscribers) {
+            this._hookSubscribers.clearAll()
+        }
 
         this._subpathUponDeath = this._subpath
         this._pathUponDeath = this.getEscapedPath(false)

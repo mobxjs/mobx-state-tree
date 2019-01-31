@@ -219,7 +219,11 @@ export function addHiddenWritableProp(object: any, propName: string, value: any)
     })
 }
 
-type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never
+/**
+ * @internal
+ * @hidden
+ */
+export type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never
 
 /**
  * @internal

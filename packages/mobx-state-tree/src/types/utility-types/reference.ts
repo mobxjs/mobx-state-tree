@@ -225,11 +225,11 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
             this.fireInvalidated(cause, storedRefNode, referenceId, refTargetNode)
         }
 
-        const refTargetDetachHookDisposer = refTargetNode.hookSubscribers.register(
+        const refTargetDetachHookDisposer = refTargetNode.registerHook(
             Hook.beforeDetach,
             hookHandler
         )
-        const refTargetDestroyHookDisposer = refTargetNode.hookSubscribers.register(
+        const refTargetDestroyHookDisposer = refTargetNode.registerHook(
             Hook.beforeDestroy,
             hookHandler
         )
@@ -253,7 +253,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
 
         // get rid of the watcher hook when the stored ref node is destroyed
         // detached is ignored since scalar nodes (where the reference resides) cannot be detached
-        storedRefNode.hookSubscribers.register(Hook.beforeDestroy, () => {
+        storedRefNode.registerHook(Hook.beforeDestroy, () => {
             if (onRefTargetDestroyedHookDisposer) {
                 onRefTargetDestroyedHookDisposer()
             }
@@ -308,7 +308,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
         } else {
             if (!storedRefNode.isRoot) {
                 // start watching once the whole tree is ready
-                storedRefNode.root.hookSubscribers.register(Hook.afterCreationFinalization, () => {
+                storedRefNode.root.registerHook(Hook.afterCreationFinalization, () => {
                     // make sure to attach it so it can start listening
                     if (storedRefNode.parent) {
                         storedRefNode.parent.createObservableInstanceIfNeeded()
@@ -316,7 +316,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
                 })
             }
             // start watching once the node is attached somewhere / parent changes
-            storedRefNode.hookSubscribers.register(Hook.afterAttach, () => {
+            storedRefNode.registerHook(Hook.afterAttach, () => {
                 startWatching(false)
             })
         }
