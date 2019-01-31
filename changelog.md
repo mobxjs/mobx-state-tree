@@ -1,3 +1,4 @@
+-   Performance improvement for event handlers so they consume less RAM through [#1160](https://github.com/mobxjs/mobx-state-tree/pull/1160) by [@xaviergonz](https://github.com/xaviergonz)
 -   Make liveliness errors give more info to trace their cause [#1142](https://github.com/mobxjs/mobx-state-tree/issues/1142) through [#1147](https://github.com/mobxjs/mobx-state-tree/pull/1147) by [@xaviergonz](https://github.com/xaviergonz)
 
 # 3.10.2
