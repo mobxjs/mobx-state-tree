@@ -289,7 +289,7 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  * @hidden
  */
 export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = BaseNode<C, S, T>>
-    implements IType<C, S, T & IStateTreeNode<C, S>> {
+    implements IType<C, S, T> {
     // these are just to make inner types avaialable to inherited classes
     readonly C!: C
     readonly S!: S
