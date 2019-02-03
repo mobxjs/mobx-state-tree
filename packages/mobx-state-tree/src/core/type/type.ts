@@ -115,7 +115,7 @@ export interface IType<C, S, T> {
      * @param context Validation context, an array of { subpaths, subtypes } that should be validated
      * @returns The validation result, an array with the list of validation errors.
      */
-    validate(thing: any, context: IValidationContext): IValidationResult
+    validate(thing: C, context: IValidationContext): IValidationResult
 
     /**
      * Gets the textual representation of the type as a string.
@@ -317,7 +317,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         return node.type.getValue(node)
     }
 
-    abstract reconcile(current: N, newValue: C | T): this["N"]
+    abstract reconcile(current: N, newValue: C | T): N
 
     abstract instantiate(
         parent: AnyObjectNode | null,
