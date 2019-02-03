@@ -117,7 +117,7 @@ export function extend(a: any, ...b: any[]) {
  * @internal
  * @hidden
  */
-export function isPlainObject(value: any): value is any {
+export function isPlainObject(value: any): value is { [k: string]: any } {
     if (value === null || typeof value !== "object") return false
     const proto = Object.getPrototypeOf(value)
     return proto === Object.prototype || proto === null

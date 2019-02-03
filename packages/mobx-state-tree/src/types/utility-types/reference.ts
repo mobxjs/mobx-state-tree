@@ -2,7 +2,6 @@ import {
     getStateTreeNode,
     isStateTreeNode,
     createScalarNode,
-    Type,
     IType,
     TypeFlags,
     isType,
@@ -28,7 +27,8 @@ import {
     getIdentifier,
     applyPatch,
     AnyNode,
-    AnyObjectNode
+    AnyObjectNode,
+    SimpleType
 } from "../../internal"
 
 export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
@@ -55,6 +55,12 @@ function getInvalidationCause(hook: Hook): "detach" | "destroy" | undefined {
     }
 }
 
+/** @hidden */
+export type ReferenceT<IT extends IAnyType> = RedefineIStateTreeNode<
+    ExtractT<IT>,
+    IStateTreeNode<ReferenceIdentifier, ReferenceIdentifier>
+>
+
 class StoredReference<IT extends IAnyType> {
     readonly identifier!: ReferenceIdentifier
     node!: AnyNode
@@ -64,7 +70,7 @@ class StoredReference<IT extends IAnyType> {
         lastCacheModification: string
     }
 
-    constructor(value: ExtractT<IT> | ReferenceIdentifier, private readonly targetType: IT) {
+    constructor(value: ReferenceT<IT> | ReferenceIdentifier, private readonly targetType: IT) {
         if (typeof value === "string" || typeof value === "number") {
             this.identifier = value
         } else if (isStateTreeNode(value)) {
@@ -110,7 +116,7 @@ class StoredReference<IT extends IAnyType> {
         }
     }
 
-    get resolvedValue(): ExtractT<IT> {
+    get resolvedValue(): ReferenceT<IT> {
         this.updateResolvedReference(this.node)
         return this.resolvedReference!.node.value
     }
@@ -132,16 +138,16 @@ export class InvalidReferenceError extends Error {
  * @internal
  * @hidden
  */
-export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type<
+export abstract class BaseReferenceType<IT extends IAnyComplexType> extends SimpleType<
     ReferenceIdentifier,
     ReferenceIdentifier,
-    RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<ReferenceIdentifier, ReferenceIdentifier>>
+    ReferenceT<IT>
 > {
     readonly flags = TypeFlags.Reference
 
     constructor(
         protected readonly targetType: IT,
-        private readonly onInvalidated?: OnReferenceInvalidated<ExtractT<IT>>
+        private readonly onInvalidated?: OnReferenceInvalidated<ReferenceT<IT>>
     ) {
         super(`reference(${targetType.name})`)
     }
@@ -154,7 +160,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
         return this.targetType.isAssignableFrom(type)
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         return typeof value === "string" || typeof value === "number"
             ? typeCheckSuccess()
             : typeCheckFailure(
@@ -328,7 +334,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Type
  * @hidden
  */
 export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseReferenceType<IT> {
-    constructor(targetType: IT, onInvalidated?: OnReferenceInvalidated<ExtractT<IT>>) {
+    constructor(targetType: IT, onInvalidated?: OnReferenceInvalidated<ReferenceT<IT>>) {
         super(targetType, onInvalidated)
     }
 
@@ -347,23 +353,25 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        newValue: ExtractT<IT> | ReferenceIdentifier
+        initialValue: this["C"] | this["T"]
     ): this["N"] {
-        const identifier = isStateTreeNode(newValue) ? getIdentifier(newValue)! : newValue
-        const storedRef = new StoredReference(newValue, this.targetType)
+        const identifier = isStateTreeNode(initialValue)
+            ? getIdentifier(initialValue)!
+            : initialValue
+        const storedRef = new StoredReference(initialValue, this.targetType)
         const storedRefNode: this["N"] = createScalarNode(
             this,
             parent,
             subpath,
             environment,
-            storedRef
+            storedRef as any
         )
         storedRef.node = storedRefNode
         this.watchTargetNodeForInvalidations(storedRefNode, identifier, undefined)
         return storedRefNode
     }
 
-    reconcile(current: this["N"], newValue: ExtractT<IT> | ReferenceIdentifier): this["N"] {
+    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
         if (current.type === this) {
             const compareByValue = isStateTreeNode(newValue)
             const ref: StoredReference<IT> = current.storedValue
@@ -389,7 +397,7 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
     constructor(
         targetType: IT,
         private readonly options: ReferenceOptionsGetSet<IT>,
-        onInvalidated?: OnReferenceInvalidated<ExtractT<IT>>
+        onInvalidated?: OnReferenceInvalidated<ReferenceT<IT>>
     ) {
         super(targetType, onInvalidated)
     }
@@ -411,17 +419,23 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        newValue: ExtractT<IT> | ReferenceIdentifier
+        newValue: this["C"] | this["T"]
     ): this["N"] {
         const identifier = isStateTreeNode(newValue)
             ? this.options.set(newValue, parent ? parent.storedValue : null)
             : newValue
-        const storedRefNode = createScalarNode(this, parent, subpath, environment, identifier)
+        const storedRefNode: this["N"] = createScalarNode(
+            this,
+            parent,
+            subpath,
+            environment,
+            identifier as any
+        )
         this.watchTargetNodeForInvalidations(storedRefNode, identifier, this.options)
         return storedRefNode
     }
 
-    reconcile(current: this["N"], newValue: ExtractT<IT> | ReferenceIdentifier): this["N"] {
+    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
         const newIdentifier = isStateTreeNode(newValue)
             ? this.options.set(newValue, current ? current.storedValue : null)
             : newValue
@@ -440,13 +454,13 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
 }
 
 export interface ReferenceOptionsGetSet<IT extends IAnyComplexType> {
-    get(identifier: ReferenceIdentifier, parent: IAnyStateTreeNode | null): ExtractT<IT>
-    set(value: ExtractT<IT>, parent: IAnyStateTreeNode | null): ReferenceIdentifier
+    get(identifier: ReferenceIdentifier, parent: IAnyStateTreeNode | null): ReferenceT<IT>
+    set(value: ReferenceT<IT>, parent: IAnyStateTreeNode | null): ReferenceIdentifier
 }
 
 export interface ReferenceOptionsOnInvalidated<IT extends IAnyComplexType> {
     // called when the current reference is about to become invalid
-    onInvalidated: OnReferenceInvalidated<ExtractT<IT>>
+    onInvalidated: OnReferenceInvalidated<ReferenceT<IT>>
 }
 
 export type ReferenceOptions<IT extends IAnyComplexType> =
@@ -456,14 +470,7 @@ export type ReferenceOptions<IT extends IAnyComplexType> =
 
 /** @hidden */
 export interface IReferenceType<IT extends IAnyComplexType>
-    extends IType<
-        ReferenceIdentifier,
-        ReferenceIdentifier,
-        RedefineIStateTreeNode<
-            ExtractT<IT>,
-            IStateTreeNode<ReferenceIdentifier, ReferenceIdentifier>
-        >
-    > {}
+    extends IType<ReferenceIdentifier, ReferenceIdentifier, ReferenceT<IT>> {}
 
 /**
  * `types.reference` - Creates a reference to another type, which should have defined an identifier.

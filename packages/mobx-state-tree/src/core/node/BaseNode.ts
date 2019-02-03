@@ -84,12 +84,7 @@ export abstract class BaseNode<C, S, T> {
         return this._parent
     }
 
-    constructor(
-        type: IType<C, S, T>,
-        parent: AnyObjectNode | null,
-        subpath: string,
-        environment: any
-    ) {
+    constructor(type: IAnyType, parent: AnyObjectNode | null, subpath: string, environment: any) {
         this.environment = environment
         this.type = type
         this.baseSetParent(parent, subpath)

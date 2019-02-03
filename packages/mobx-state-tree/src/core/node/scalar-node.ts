@@ -1,4 +1,12 @@
-import { fail, freeze, NodeLifeCycle, Hook, BaseNode, AnyObjectNode, Type } from "../../internal"
+import {
+    fail,
+    freeze,
+    NodeLifeCycle,
+    Hook,
+    BaseNode,
+    AnyObjectNode,
+    SimpleType
+} from "../../internal"
 import { action } from "mobx"
 
 /**
@@ -12,17 +20,19 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
     // - afterCreationFinalization could be emitted, but there's no need for it right now
     // - beforeDetach is never emitted for scalar nodes, since they cannot be detached
 
+    readonly type!: SimpleType<C, S, T>
+
     constructor(
-        type: Type<C, S, T, any>,
+        simpleType: SimpleType<C, S, T>,
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialSnapshot: any
+        initialSnapshot: C
     ) {
-        super(type, parent, subpath, environment)
+        super(simpleType, parent, subpath, environment)
 
         try {
-            this.storedValue = type.createNewInstance(this, {}, initialSnapshot)
+            this.storedValue = simpleType.createNewInstance(initialSnapshot)
         } catch (e) {
             // short-cut to die the instance, to avoid the snapshot computed starting to throw...
             this.state = NodeLifeCycle.DEAD

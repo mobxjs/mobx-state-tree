@@ -1,13 +1,12 @@
 import {
     createScalarNode,
-    Type,
+    SimpleType,
     IType,
     TypeFlags,
     IValidationContext,
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    IAnyType,
     AnyObjectNode
 } from "../../internal"
 
@@ -73,15 +72,15 @@ export interface CustomTypeOptions<S, T> {
  * @returns
  */
 export function custom<S, T>(options: CustomTypeOptions<S, T>): IType<S | T, S, T> {
-    return new CustomType(options)
+    return new CustomType<S, T>(options)
 }
 
 /**
  * @internal
  * @hidden
  */
-export class CustomType<C, S, T> extends Type<C, S, T> {
-    readonly flags = TypeFlags.Reference
+export class CustomType<S, T> extends SimpleType<S | T, S, T> {
+    readonly flags = TypeFlags.Custom
 
     constructor(protected readonly options: CustomTypeOptions<S, T>) {
         super(options.name)
@@ -91,13 +90,10 @@ export class CustomType<C, S, T> extends Type<C, S, T> {
         return this.name
     }
 
-    isAssignableFrom(type: IAnyType): boolean {
-        return type === this
-    }
-
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         if (this.options.isTargetType(value)) return typeCheckSuccess()
-        const typeError: string = this.options.getValidationMessage(value)
+
+        const typeError: string = this.options.getValidationMessage(value as S)
         if (typeError) {
             return typeCheckFailure(
                 context,

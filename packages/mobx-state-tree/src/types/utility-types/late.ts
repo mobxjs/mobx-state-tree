@@ -1,34 +1,38 @@
 import {
     fail,
-    Type,
+    BaseType,
     IValidationContext,
     IValidationResult,
     TypeFlags,
     isType,
     IAnyType,
     typeCheckSuccess,
-    AnyObjectNode
+    AnyObjectNode,
+    ExtractC,
+    ExtractS,
+    ExtractT,
+    ExtractNodeType
 } from "../../internal"
 
-/**
- * @internal
- * @hidden
- */
-export class Late<C, S, T> extends Type<C, S, T, false> {
-    readonly definition: () => IAnyType
-    private _subType: IAnyType | null = null
+class Late<IT extends IAnyType> extends BaseType<
+    ExtractC<IT>,
+    ExtractS<IT>,
+    ExtractT<IT>,
+    ExtractNodeType<IT>
+> {
+    private _subType?: IT
 
     get flags() {
         return (this._subType ? this._subType.flags : 0) | TypeFlags.Late
     }
 
-    getSubType(mustSucceed: true): IAnyType
-    getSubType(mustSucceed: false): IAnyType | null
-    getSubType(mustSucceed: boolean): IAnyType | null {
-        if (this._subType === null) {
+    getSubType(mustSucceed: true): IT
+    getSubType(mustSucceed: false): IT | undefined
+    getSubType(mustSucceed: boolean): IT | undefined {
+        if (!this._subType) {
             let t = undefined
             try {
-                t = this.definition()
+                t = this._definition()
             } catch (e) {
                 if (e instanceof ReferenceError)
                     // can happen in strict ES5 code when a definition is self refering
@@ -45,27 +49,25 @@ export class Late<C, S, T> extends Type<C, S, T, false> {
                         "Failed to determine subtype, make sure types.late returns a type definition."
                     )
                 this._subType = t
-                return t
             }
         }
         return this._subType
     }
 
-    constructor(name: string, definition: () => IAnyType) {
+    constructor(name: string, private readonly _definition: () => IT) {
         super(name)
-        this.definition = definition
     }
 
     instantiate(
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: any
+        initialValue: this["C"] | this["T"]
     ): this["N"] {
         return this.getSubType(true).instantiate(parent, subpath, environment, initialValue)
     }
 
-    reconcile(current: this["N"], newValue: any): this["N"] {
+    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
         return this.getSubType(true).reconcile(current, newValue)
     }
 
@@ -74,7 +76,7 @@ export class Late<C, S, T> extends Type<C, S, T, false> {
         return t ? t.name : "<uknown late type>"
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         const t = this.getSubType(false)
         if (!t) {
             // See #916; the variable the definition closure is pointing to wasn't defined yet, so can't be evaluted yet here
@@ -86,6 +88,11 @@ export class Late<C, S, T> extends Type<C, S, T, false> {
     isAssignableFrom(type: IAnyType) {
         const t = this.getSubType(false)
         return t ? t.isAssignableFrom(type) : false
+    }
+
+    getSubTypes() {
+        const subtype = this.getSubType(false)
+        return subtype ? [subtype] : undefined
     }
 }
 

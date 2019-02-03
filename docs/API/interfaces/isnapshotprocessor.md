@@ -1,35 +1,31 @@
-[mobx-state-tree](../README.md) > [IType](../interfaces/itype.md)
+[mobx-state-tree](../README.md) > [ISnapshotProcessor](../interfaces/isnapshotprocessor.md)
 
-# Interface: IType
+# Interface: ISnapshotProcessor
 
-A type, either complex or simple.
+A type that has its snapshots processed.
 
 ## Type parameters
-#### C 
-#### S 
-#### T 
+#### IT :  [IAnyType](../#ianytype)
+#### CustomC 
+#### CustomS 
 ## Hierarchy
 
-**IType**
+ [IType](itype.md)<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>, `_CustomOrOther`<`CustomS`, `ExtractS`<`IT`>>, `SnapshotProcessorT`<`IT`, `CustomC`, `CustomS`>>
 
-↳  [ISimpleType](isimpletype.md)
-
-↳  [ISnapshotProcessor](isnapshotprocessor.md)
-
-↳  [IModelType](imodeltype.md)
+**↳ ISnapshotProcessor**
 
 ## Index
 
 ### Properties
 
-* [name](itype.md#name)
+* [name](isnapshotprocessor.md#name)
 
 ### Methods
 
-* [create](itype.md#create)
-* [describe](itype.md#describe)
-* [is](itype.md#is)
-* [validate](itype.md#validate)
+* [create](isnapshotprocessor.md#create)
+* [describe](isnapshotprocessor.md#describe)
+* [is](isnapshotprocessor.md#is)
+* [validate](isnapshotprocessor.md#validate)
 
 ---
 
@@ -51,17 +47,17 @@ ___
 
 ###  create
 
-▸ **create**(...args: *`CreateParams`<`C`>*): `T`
+▸ **create**(...args: *`CreateParams`<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>>*): `SnapshotProcessorT`<`IT`, `CustomC`, `CustomS`>
 
-▸ **create**(snapshot: *`C`*, env?: *`any`*): `T`
+▸ **create**(snapshot: *`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>*, env?: *`any`*): `SnapshotProcessorT`<`IT`, `CustomC`, `CustomS`>
 
 **Parameters:**
 
 | Name | Type |
 | ------ | ------ |
-| `Rest` args | `CreateParams`<`C`> |
+| `Rest` args | `CreateParams`<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>> |
 
-**Returns:** `T`
+**Returns:** `SnapshotProcessorT`<`IT`, `CustomC`, `CustomS`>
 
 Creates an instance for the type given an snapshot input.
 
@@ -69,10 +65,10 @@ Creates an instance for the type given an snapshot input.
 
 | Name | Type |
 | ------ | ------ |
-| snapshot | `C` |
+| snapshot | `_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>> |
 | `Optional` env | `any` |
 
-**Returns:** `T`
+**Returns:** `SnapshotProcessorT`<`IT`, `CustomC`, `CustomS`>
 An instance of that type.
 
 ___

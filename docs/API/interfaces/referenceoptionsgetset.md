@@ -23,7 +23,7 @@
 
 ###  get
 
-▸ **get**(identifier: *[ReferenceIdentifier](../#referenceidentifier)*, parent: *`IAnyStateTreeNode` \| `null`*): `ExtractT`<`IT`>
+▸ **get**(identifier: *[ReferenceIdentifier](../#referenceidentifier)*, parent: *`IAnyStateTreeNode` \| `null`*): `ReferenceT`<`IT`>
 
 **Parameters:**
 
@@ -32,20 +32,20 @@
 | identifier | [ReferenceIdentifier](../#referenceidentifier) |
 | parent | `IAnyStateTreeNode` \| `null` |
 
-**Returns:** `ExtractT`<`IT`>
+**Returns:** `ReferenceT`<`IT`>
 
 ___
 <a id="set"></a>
 
 ###  set
 
-▸ **set**(value: *`ExtractT`<`IT`>*, parent: *`IAnyStateTreeNode` \| `null`*): [ReferenceIdentifier](../#referenceidentifier)
+▸ **set**(value: *`ReferenceT`<`IT`>*, parent: *`IAnyStateTreeNode` \| `null`*): [ReferenceIdentifier](../#referenceidentifier)
 
 **Parameters:**
 
 | Name | Type |
 | ------ | ------ |
-| value | `ExtractT`<`IT`> |
+| value | `ReferenceT`<`IT`> |
 | parent | `IAnyStateTreeNode` \| `null` |
 
 **Returns:** [ReferenceIdentifier](../#referenceidentifier)

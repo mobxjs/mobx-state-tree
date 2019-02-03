@@ -117,22 +117,22 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     private _cachedInitialSnapshotCreated = false
 
     constructor(
-        type: ComplexType<C, S, T>,
+        complexType: ComplexType<C, S, T>,
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: any
+        initialValue: C
     ) {
-        super(type, parent, subpath, environment)
+        super(complexType, parent, subpath, environment)
 
         this._initialSnapshot = freeze(initialValue)
-        this.identifierAttribute = type.identifierAttribute
+        this.identifierAttribute = complexType.identifierAttribute
 
         if (!parent) {
             this.identifierCache = new IdentifierCache()
         }
 
-        this._childNodes = type.initializeChildNodes(this, this._initialSnapshot)
+        this._childNodes = complexType.initializeChildNodes(this, this._initialSnapshot)
 
         // identifier can not be changed during lifecycle of a node
         // so we safely can read it from initial snapshot
@@ -477,9 +477,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this._applySnapshot = createActionInvoker(
             this.storedValue,
             "@APPLY_SNAPSHOT",
-            (snapshot: S) => {
+            (snapshot: C) => {
                 // if the snapshot is the same as the current one, avoid performing a reconcile
-                if (snapshot === self.snapshot) return
+                if (snapshot === (self.snapshot as any)) return
                 // else, apply it by calling the type logic
                 return self.type.applySnapshot(self, snapshot)
             }

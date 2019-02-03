@@ -32,7 +32,7 @@
         "rollup-plugin-node-resolve": "^4.0.0",
         "rollup-plugin-uglify": "^6.0.0",
         "ts-jest": "^23.0.1",
-        "typescript": "~3.0.0"
+        "typescript": "^3.0.0"
     },
     "peerDependencies": {
         "mobx-state-tree": "^3.5.0"

@@ -1,7 +1,7 @@
 import {
     fail,
     createScalarNode,
-    Type,
+    SimpleType,
     TypeFlags,
     isType,
     IValidationContext,
@@ -14,7 +14,7 @@ import {
     ScalarNode
 } from "../../internal"
 
-abstract class BaseIdentifierType<S> extends Type<S, S, S> {
+abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
     readonly flags = TypeFlags.Identifier
 
     constructor(name: string, private readonly validType: "string" | "number") {
@@ -25,7 +25,7 @@ abstract class BaseIdentifierType<S> extends Type<S, S, S> {
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: S
+        initialValue: this["C"]
     ): this["N"] {
         if (!parent || !(parent.type instanceof ModelType))
             throw fail(`Identifier types can only be instantiated as direct child of a model type`)
@@ -33,7 +33,7 @@ abstract class BaseIdentifierType<S> extends Type<S, S, S> {
         return createScalarNode(this, parent, subpath, environment, initialValue)
     }
 
-    reconcile(current: this["N"], newValue: S) {
+    reconcile(current: this["N"], newValue: this["C"]) {
         if (current.storedValue !== newValue)
             throw fail(
                 `Tried to change identifier from '${
@@ -43,7 +43,7 @@ abstract class BaseIdentifierType<S> extends Type<S, S, S> {
         return current
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         if (typeof value !== this.validType) {
             return typeCheckFailure(
                 context,

@@ -7,7 +7,6 @@ import {
     isType,
     TypeFlags,
     IType,
-    Type,
     fail,
     isPlainObject,
     IAnyType,
@@ -20,8 +19,8 @@ import {
     _NotCustomized,
     RedefineIStateTreeNode,
     IStateTreeNode,
-    BaseNode,
-    AnyObjectNode
+    AnyObjectNode,
+    BaseType
 } from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
@@ -35,62 +34,63 @@ export interface UnionOptions {
  * @internal
  * @hidden
  */
-export class Union extends Type<any, any, any, false> {
-    readonly dispatcher?: ITypeDispatcher
-    readonly eager: boolean = true
-    readonly types: IAnyType[]
+export class Union extends BaseType<any, any, any> {
+    private readonly _dispatcher?: ITypeDispatcher
+    private readonly _eager: boolean = true
 
     get flags() {
         let result: TypeFlags = TypeFlags.Union
 
-        this.types.forEach(type => {
+        this._types.forEach(type => {
             result |= type.flags
         })
 
         return result
     }
 
-    constructor(name: string, types: IAnyType[], options?: UnionOptions) {
+    constructor(name: string, private readonly _types: IAnyType[], options?: UnionOptions) {
         super(name)
         options = {
             eager: true,
             dispatcher: undefined,
             ...options
         }
-        this.dispatcher = options.dispatcher
-        if (!options.eager) this.eager = false
-        this.types = types
+        this._dispatcher = options.dispatcher
+        if (!options.eager) this._eager = false
     }
 
     isAssignableFrom(type: IAnyType) {
-        return this.types.some(subType => subType.isAssignableFrom(type))
+        return this._types.some(subType => subType.isAssignableFrom(type))
     }
 
     describe() {
-        return "(" + this.types.map(factory => factory.describe()).join(" | ") + ")"
+        return "(" + this._types.map(factory => factory.describe()).join(" | ") + ")"
     }
 
     instantiate(
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        value: any
+        initialValue: this["C"] | this["T"]
     ): this["N"] {
-        const type = this.determineType(value, undefined)
+        const type = this.determineType(initialValue, undefined)
         if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
-        return type.instantiate(parent, subpath, environment, value)
+        return type.instantiate(parent, subpath, environment, initialValue)
     }
 
-    reconcile(current: this["N"], newValue: any): this["N"] {
+    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
         const type = this.determineType(newValue, current.type)
         if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
         return type.reconcile(current, newValue)
     }
 
-    determineType(value: any, reconcileCurrentType: IAnyType | undefined): IAnyType | undefined {
+    determineType(
+        value: this["C"] | this["T"],
+        reconcileCurrentType: IAnyType | undefined
+    ): IAnyType | undefined {
         // try the dispatcher, if defined
-        if (this.dispatcher) {
-            return this.dispatcher(value)
+        if (this._dispatcher) {
+            return this._dispatcher(value)
         }
 
         // find the most accomodating type
@@ -99,24 +99,24 @@ export class Union extends Type<any, any, any, false> {
             if (reconcileCurrentType.is(value)) {
                 return reconcileCurrentType
             }
-            return this.types.filter(t => t !== reconcileCurrentType).find(type => type.is(value))
+            return this._types.filter(t => t !== reconcileCurrentType).find(type => type.is(value))
         } else {
-            return this.types.find(type => type.is(value))
+            return this._types.find(type => type.is(value))
         }
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
-        if (this.dispatcher) {
-            return this.dispatcher(value).validate(value, context)
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
+        if (this._dispatcher) {
+            return this._dispatcher(value).validate(value, context)
         }
 
         const allErrors: IValidationError[][] = []
         let applicableTypes = 0
-        for (let i = 0; i < this.types.length; i++) {
-            const type = this.types[i]
+        for (let i = 0; i < this._types.length; i++) {
+            const type = this._types[i]
             const errors = type.validate(value, context)
             if (errors.length === 0) {
-                if (this.eager) return typeCheckSuccess()
+                if (this._eager) return typeCheckSuccess()
                 else applicableTypes++
             } else {
                 allErrors.push(errors)
@@ -127,6 +127,10 @@ export class Union extends Type<any, any, any, false> {
         return typeCheckFailure(context, value, "No type is applicable for the union").concat(
             flattenTypeErrors(allErrors)
         )
+    }
+
+    getSubTypes() {
+        return this._types
     }
 }
 

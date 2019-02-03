@@ -3,11 +3,11 @@ import {
     fail,
     ObjectNode,
     mobxShallow,
-    IAnyType,
     AnyObjectNode,
     ExtractS,
     ExtractT,
-    ExtractC
+    ExtractC,
+    IAnyComplexType
 } from "../../internal"
 
 let identifierCacheId = 0
@@ -96,13 +96,13 @@ export class IdentifierCache {
         return res
     }
 
-    has(type: IAnyType, identifier: string): boolean {
+    has(type: IAnyComplexType, identifier: string): boolean {
         const set = this.cache.get(identifier)
         if (!set) return false
         return set.some(candidate => type.isAssignableFrom(candidate.type))
     }
 
-    resolve<IT extends IAnyType>(
+    resolve<IT extends IAnyComplexType>(
         type: IT,
         identifier: string
     ): ObjectNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | null {

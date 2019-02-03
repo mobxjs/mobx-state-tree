@@ -96,7 +96,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: this["C"] | this["S"] | this["T"]
+        initialValue: this["C"] | this["T"]
     ): this["N"] {
         return createObjectNode(this, parent, subpath, environment, initialValue)
     }
@@ -253,7 +253,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     @action
-    applySnapshot(node: this["N"], snapshot: this["S"]): void {
+    applySnapshot(node: this["N"], snapshot: this["C"]): void {
         typecheckInternal(this, snapshot)
         const target = node.storedValue
         target.replace(snapshot as any)
@@ -263,7 +263,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         return this.subType
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         if (!isArray(value)) {
             return typeCheckFailure(context, value, "Value is not an array")
         }

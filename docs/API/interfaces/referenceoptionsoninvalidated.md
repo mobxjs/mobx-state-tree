@@ -22,7 +22,7 @@
 
 ###  onInvalidated
 
-**● onInvalidated**: *[OnReferenceInvalidated](../#onreferenceinvalidated)<`ExtractT`<`IT`>>*
+**● onInvalidated**: *[OnReferenceInvalidated](../#onreferenceinvalidated)<`ReferenceT`<`IT`>>*
 
 ___
 

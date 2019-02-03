@@ -31,14 +31,11 @@ import {
     isType,
     IType,
     IValidationResult,
-    Late,
     ModelType,
     ObjectNode,
-    OptionalValue,
     typecheckInternal,
     typeCheckFailure,
     TypeFlags,
-    Union,
     EMPTY_OBJECT,
     OptionalProperty,
     ExtractC,
@@ -113,19 +110,15 @@ export interface IMSTMap<IT extends IAnyType>
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
 
 function tryCollectModelTypes(type: IAnyType, modelTypes: Array<AnyModelType>): boolean {
+    const subtypes = type.getSubTypes()
+    if (!subtypes) {
+        return false
+    }
+    for (const subtype of subtypes) {
+        if (!tryCollectModelTypes(subtype, modelTypes)) return false
+    }
     if (type instanceof ModelType) {
         modelTypes.push(type)
-    } else if (type instanceof OptionalValue) {
-        if (!tryCollectModelTypes(type.type, modelTypes)) return false
-    } else if (type instanceof Union) {
-        for (let i = 0; i < type.types.length; i++) {
-            const uType = type.types[i]
-            if (!tryCollectModelTypes(uType, modelTypes)) return false
-        }
-    } else if (type instanceof Late) {
-        const t = type.getSubType(false)
-        if (!t) return false
-        tryCollectModelTypes(t, modelTypes)
     }
     return true
 }
@@ -212,7 +205,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: this["C"] | this["S"] | this["T"]
+        initialValue: this["C"] | this["T"]
     ): this["N"] {
         if (this.identifierMode === MapIdentifierMode.UNKNOWN) {
             this._determineIdentifierMode()
@@ -393,17 +386,19 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     @action
-    applySnapshot(node: this["N"], snapshot: this["S"]): void {
+    applySnapshot(node: this["N"], snapshot: this["C"]): void {
         typecheckInternal(this, snapshot)
         const target = node.storedValue
         const currentKeys: { [key: string]: boolean } = {}
         Array.from(target.keys()).forEach(key => {
             currentKeys[key] = false
         })
-        // Don't use target.replace, as it will throw all existing items first
-        for (let key in snapshot) {
-            target.set(key, snapshot[key] as any)
-            currentKeys["" + key] = true
+        if (snapshot) {
+            // Don't use target.replace, as it will throw all existing items first
+            for (let key in snapshot) {
+                target.set(key, snapshot[key])
+                currentKeys["" + key] = true
+            }
         }
         Object.keys(currentKeys).forEach(key => {
             if (currentKeys[key] === false) target.delete(key)
@@ -414,7 +409,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         return this.subType
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         if (!isPlainObject(value)) {
             return typeCheckFailure(context, value, "Value is not a plain object")
         }

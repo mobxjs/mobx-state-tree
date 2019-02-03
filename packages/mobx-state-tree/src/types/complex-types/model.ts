@@ -41,7 +41,6 @@ import {
     IValidationResult,
     mobxShallow,
     optional,
-    OptionalValue,
     MapType,
     typecheckInternal,
     typeCheckFailure,
@@ -51,7 +50,10 @@ import {
     ExtractT,
     Hook,
     AnyObjectNode,
-    AnyNode
+    AnyNode,
+    _CustomOrOther,
+    _NotCustomized,
+    OptionalValue
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -97,18 +99,6 @@ export interface OptionalProperty {
     // fake, only used for typing
     readonly [$optionalProperty]: undefined
 }
-
-/** @hidden */
-declare const $mstNotCustomized: unique symbol
-
-/** @hidden */
-// tslint:disable-next-line:class-name
-export interface _NotCustomized {
-    // only for typings
-    readonly [$mstNotCustomized]: undefined
-}
-/** @hidden */
-export type _CustomOrOther<Custom, Other> = Custom extends _NotCustomized ? Other : Custom
 
 /**
  * Maps property types to the snapshot, including omitted optional attributes
@@ -219,10 +209,12 @@ export interface IModelType<
         ) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS, CustomC, CustomS>
 
+    /** @deprecated See `types.snapshotProcessor` */
     preProcessSnapshot<NewC = ModelCreationType2<PROPS, CustomC>>(
         fn: (snapshot: NewC) => ModelCreationType2<PROPS, CustomC>
     ): IModelType<PROPS, OTHERS, NewC, CustomS>
 
+    /** @deprecated See `types.snapshotProcessor` */
     postProcessSnapshot<NewS = ModelSnapshotType2<PROPS, CustomS>>(
         fn: (snapshot: ModelSnapshotType2<PROPS, CustomS>) => NewS
     ): IModelType<PROPS, OTHERS, CustomC, NewS>
@@ -557,7 +549,7 @@ export class ModelType<
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: this["C"] | this["S"] | this["T"]
+        initialValue: this["C"] | this["T"]
     ): this["N"] {
         const value = isStateTreeNode(initialValue)
             ? initialValue
@@ -682,7 +674,7 @@ export class ModelType<
     }
 
     @action
-    applySnapshot(node: this["N"], snapshot: this["S"]): void {
+    applySnapshot(node: this["N"], snapshot: this["C"]): void {
         const s = this.applySnapshotPreProcessor(snapshot)
         typecheckInternal(this, s)
         this.forAllProps(name => {
@@ -720,7 +712,7 @@ export class ModelType<
         return this.properties[key]
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         let snapshot = this.applySnapshotPreProcessor(value)
 
         if (!isPlainObject(snapshot)) {
@@ -868,12 +860,19 @@ export function isModelType<IT extends IAnyModelType = IAnyModelType>(type: IAny
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 
-function tryGetOptional(type: any): OptionalValue<any, any, any> | undefined {
-    if (!type) return undefined
-    // we need to check for type.types since an optional union doesn't have direct subtypes
-    if (type.flags & TypeFlags.Union && type.types) return type.types.find(tryGetOptional)
-    if (type.flags & TypeFlags.Late && type.getSubType && type.getSubType(false))
-        return tryGetOptional(type.subType)
-    if (type.flags & TypeFlags.Optional) return type
+function tryGetOptional(type: IAnyType): OptionalValue<any> | undefined {
+    if (type instanceof OptionalValue) {
+        return type
+    }
+    const subtypes = type.getSubTypes()
+    if (!subtypes) {
+        return undefined
+    }
+    for (const subtype of subtypes) {
+        const opt = tryGetOptional(subtype)
+        if (opt) {
+            return opt
+        }
+    }
     return undefined
 }
