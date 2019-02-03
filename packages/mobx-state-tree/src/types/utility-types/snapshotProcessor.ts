@@ -62,15 +62,15 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     }
 
     private preProcessSnapshot(sn: this["C"]): ExtractC<IT> {
-        if (this._processors.preSnapshotProcessor) {
-            return this._processors.preSnapshotProcessor.call(null, sn)
+        if (this._processors.preProcessor) {
+            return this._processors.preProcessor.call(null, sn)
         }
         return sn as any
     }
 
     private postProcessSnapshot(sn: ExtractS<IT>): this["S"] {
-        if (this._processors.postSnapshotProcessor) {
-            return this._processors.postSnapshotProcessor.call(null, sn) as any
+        if (this._processors.postProcessor) {
+            return this._processors.postProcessor.call(null, sn) as any
         }
         return sn
     }
@@ -144,12 +144,12 @@ export interface ISnapshotProcessors<C, CustomC, S, CustomS> {
     /**
      * Function that transforms an input snapshot.
      */
-    preSnapshotProcessor?(snapshot: CustomC): C
+    preProcessor?(snapshot: CustomC): C
     /**
      * Function that transforms an output snapshot.
      * @param snapshot
      */
-    postSnapshotProcessor?(snapshot: S): CustomS
+    postProcessor?(snapshot: S): CustomS
 }
 
 /**
@@ -164,13 +164,13 @@ export interface ISnapshotProcessors<C, CustomC, S, CustomS> {
  * }
  * const Todo2 = types.snapshotProcessor(Todo1, {
  *     // from snapshot to instance
- *     preProcessSnapshot(sn: BackendTodo) {
+ *     preProcessor(sn: BackendTodo) {
  *         return {
  *             text: sn.text || "";
  *         }
  *     },
  *     // from instance to snapshot
- *     postProcessSnapshot(sn): BackendTodo {
+ *     postProcessor(sn): BackendTodo {
  *         return {
  *             text: !sn.text ? null : sn.text
  *         }
@@ -198,16 +198,10 @@ export function snapshotProcessor<
                 "expected a mobx-state-tree type as first argument, got " + type + " instead"
             )
 
-        if (
-            processors.postSnapshotProcessor &&
-            typeof processors.postSnapshotProcessor !== "function"
-        ) {
+        if (processors.postProcessor && typeof processors.postProcessor !== "function") {
             throw fail("postSnapshotProcessor must be a function")
         }
-        if (
-            processors.preSnapshotProcessor &&
-            typeof processors.preSnapshotProcessor !== "function"
-        ) {
+        if (processors.preProcessor && typeof processors.preProcessor !== "function") {
             throw fail("preSnapshotProcessor must be a function")
         }
     }

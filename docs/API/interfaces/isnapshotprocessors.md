@@ -17,18 +17,18 @@ Snapshot processors.
 
 ### Methods
 
-* [postSnapshotProcessor](isnapshotprocessors.md#postsnapshotprocessor)
-* [preSnapshotProcessor](isnapshotprocessors.md#presnapshotprocessor)
+* [postProcessor](isnapshotprocessors.md#postprocessor)
+* [preProcessor](isnapshotprocessors.md#preprocessor)
 
 ---
 
 ## Methods
 
-<a id="postsnapshotprocessor"></a>
+<a id="postprocessor"></a>
 
-### `<Optional>` postSnapshotProcessor
+### `<Optional>` postProcessor
 
-▸ **postSnapshotProcessor**(snapshot: *`S`*): `CustomS`
+▸ **postProcessor**(snapshot: *`S`*): `CustomS`
 
 Function that transforms an output snapshot.
 
@@ -41,11 +41,11 @@ Function that transforms an output snapshot.
 **Returns:** `CustomS`
 
 ___
-<a id="presnapshotprocessor"></a>
+<a id="preprocessor"></a>
 
-### `<Optional>` preSnapshotProcessor
+### `<Optional>` preProcessor
 
-▸ **preSnapshotProcessor**(snapshot: *`CustomC`*): `C`
+▸ **preProcessor**(snapshot: *`CustomC`*): `C`
 
 Function that transforms an input snapshot.
 

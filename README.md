@@ -1011,13 +1011,13 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
     }
     const Todo2 = types.snapshotProcessor(Todo1, {
         // from snapshot to instance
-        preProcessSnapshot(sn: BackendTodo) {
+        preProcessor(sn: BackendTodo) {
             return {
                 text: sn.text || "";
             }
         },
         // from instance to snapshot
-        postProcessSnapshot(sn): BackendTodo {
+        postProcessor(sn): BackendTodo {
             return {
                 text: !sn.text ? null : sn.text
             }

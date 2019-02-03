@@ -23,7 +23,7 @@ describe("snapshotProcessor", () => {
         test("pre processor", () => {
             const P = types.model({
                 m: types.snapshotProcessor(M, {
-                    preSnapshotProcessor(sn: { x: number }) {
+                    preProcessor(sn: { x: number }) {
                         return {
                             ...sn,
                             x: String(sn.x)
@@ -44,7 +44,7 @@ describe("snapshotProcessor", () => {
         test("post processor", () => {
             const P = types.model({
                 m: types.snapshotProcessor(M, {
-                    postSnapshotProcessor(sn): { x: number } {
+                    postProcessor(sn): { x: number } {
                         return {
                             ...sn,
                             x: Number(sn.x)
@@ -85,7 +85,7 @@ describe("snapshotProcessor", () => {
         test("pre processor", () => {
             const P = types.model({
                 m: types.snapshotProcessor(M, {
-                    preSnapshotProcessor(sn: number) {
+                    preProcessor(sn: number) {
                         return String(sn)
                     }
                 })
@@ -103,7 +103,7 @@ describe("snapshotProcessor", () => {
         test("post processor", () => {
             const P = types.model({
                 m: types.snapshotProcessor(M, {
-                    postSnapshotProcessor(sn): number {
+                    postProcessor(sn): number {
                         return Number(sn)
                     }
                 })
@@ -141,7 +141,7 @@ describe("snapshotProcessor", () => {
         test("pre processor", () => {
             const P = types.model({
                 m: types.snapshotProcessor(M, {
-                    preSnapshotProcessor(sn: number[]) {
+                    preProcessor(sn: number[]) {
                         return sn.map(n => String(n))
                     }
                 })
@@ -159,7 +159,7 @@ describe("snapshotProcessor", () => {
         test("post processor", () => {
             const P = types.model({
                 m: types.snapshotProcessor(M, {
-                    postSnapshotProcessor(sn): number[] {
+                    postProcessor(sn): number[] {
                         return sn.map(n => Number(n))
                     }
                 })
@@ -197,7 +197,7 @@ describe("snapshotProcessor", () => {
         test("pre processor", () => {
             const P = types.model({
                 m: types.snapshotProcessor(M, {
-                    preSnapshotProcessor(sn: { x: number }) {
+                    preProcessor(sn: { x: number }) {
                         return {
                             ...sn,
                             x: String(sn.x)
@@ -218,7 +218,7 @@ describe("snapshotProcessor", () => {
         test("post processor", () => {
             const P = types.model({
                 m: types.snapshotProcessor(M, {
-                    postSnapshotProcessor(sn): { x: number } {
+                    postProcessor(sn): { x: number } {
                         return {
                             ...sn,
                             x: Number(sn.x)
@@ -241,18 +241,18 @@ describe("snapshotProcessor", () => {
 
     test("chained transforms", () => {
         const TL = types.snapshotProcessor(types.string, {
-            preSnapshotProcessor(sn: string) {
+            preProcessor(sn: string) {
                 return sn.trimLeft()
             },
-            postSnapshotProcessor(sn): string {
+            postProcessor(sn): string {
                 return "_" + sn
             }
         })
         const TB = types.snapshotProcessor(TL, {
-            preSnapshotProcessor(sn: string) {
+            preProcessor(sn: string) {
                 return sn.trimRight()
             },
-            postSnapshotProcessor(sn): string {
+            postProcessor(sn): string {
                 return sn + "_"
             }
         })

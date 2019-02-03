@@ -3270,13 +3270,13 @@ interface BackendTodo {
 }
 const Todo2 = types.snapshotProcessor(Todo1, {
     // from snapshot to instance
-    preProcessSnapshot(sn: BackendTodo) {
+    preProcessor(sn: BackendTodo) {
         return {
             text: sn.text \|\| "";
         }
     },
     // from instance to snapshot
-    postProcessSnapshot(sn): BackendTodo {
+    postProcessor(sn): BackendTodo {
         return {
             text: !sn.text ? null : sn.text
         }
