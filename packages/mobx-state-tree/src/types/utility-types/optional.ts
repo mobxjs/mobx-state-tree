@@ -113,7 +113,7 @@ export class OptionalValue<IT extends IAnyType> extends BaseType<
     }
 
     getSubTypes() {
-        return [this._subtype]
+        return this._subtype
     }
 }
 

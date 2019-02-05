@@ -121,7 +121,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     }
 
     getSubTypes() {
-        return [this._subtype]
+        return this._subtype
     }
 }
 

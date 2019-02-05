@@ -68,7 +68,7 @@ export const isInteger =
  * @hidden
  */
 export function isArray(val: any): val is any[] {
-    return !!(Array.isArray(val) || isObservableArray(val)) as boolean
+    return Array.isArray(val) || isObservableArray(val)
 }
 
 /**

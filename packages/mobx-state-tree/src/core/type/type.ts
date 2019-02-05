@@ -21,8 +21,7 @@ import {
     AnyObjectNode,
     AnyNode,
     BaseNode,
-    ScalarNode,
-    EMPTY_ARRAY
+    ScalarNode
 } from "../../internal"
 
 /**
@@ -186,7 +185,7 @@ export interface IType<C, S, T> {
      * @internal
      * @hidden
      */
-    getSubTypes(): IAnyType[] | undefined
+    getSubTypes(): IAnyType[] | IAnyType | null | "cannotDetermine"
 }
 
 // do not convert to an interface
@@ -365,7 +364,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         )
     }
 
-    abstract getSubTypes(): IAnyType[] | undefined
+    abstract getSubTypes(): IAnyType[] | IAnyType | null | "cannotDetermine"
 }
 
 /**
@@ -450,7 +449,7 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
     }
 
     getSubTypes() {
-        return EMPTY_ARRAY as IAnyType[]
+        return null
     }
 }
 
@@ -487,7 +486,7 @@ export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, ScalarNode<C
     }
 
     getSubTypes() {
-        return EMPTY_ARRAY as IAnyType[]
+        return null
     }
 }
 

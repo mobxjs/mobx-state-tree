@@ -46,7 +46,8 @@ import {
     normalizeIdentifier,
     AnyObjectNode,
     AnyNode,
-    AnyModelType
+    AnyModelType,
+    asArray
 } from "../../internal"
 
 /** @hidden */
@@ -111,11 +112,14 @@ const needsIdentifierError = `Map.put can only be used to store complex values t
 
 function tryCollectModelTypes(type: IAnyType, modelTypes: Array<AnyModelType>): boolean {
     const subtypes = type.getSubTypes()
-    if (!subtypes) {
+    if (subtypes === "cannotDetermine") {
         return false
     }
-    for (const subtype of subtypes) {
-        if (!tryCollectModelTypes(subtype, modelTypes)) return false
+    if (subtypes) {
+        const subtypesArray = asArray(subtypes)
+        for (const subtype of subtypesArray) {
+            if (!tryCollectModelTypes(subtype, modelTypes)) return false
+        }
     }
     if (type instanceof ModelType) {
         modelTypes.push(type)
@@ -207,13 +211,15 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         environment: any,
         initialValue: this["C"] | this["T"]
     ): this["N"] {
-        if (this.identifierMode === MapIdentifierMode.UNKNOWN) {
-            this._determineIdentifierMode()
-        }
+        this._determineIdentifierMode()
         return createObjectNode(this, parent, subpath, environment, initialValue)
     }
 
     private _determineIdentifierMode() {
+        if (this.identifierMode !== MapIdentifierMode.UNKNOWN) {
+            return
+        }
+
         const modelTypes: AnyModelType[] = []
         if (tryCollectModelTypes(this.subType, modelTypes)) {
             let identifierAttribute: string | undefined = undefined

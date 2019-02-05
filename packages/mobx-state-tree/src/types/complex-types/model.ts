@@ -53,7 +53,8 @@ import {
     AnyNode,
     _CustomOrOther,
     _NotCustomized,
-    OptionalValue
+    OptionalValue,
+    asArray
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -865,10 +866,11 @@ function tryGetOptional(type: IAnyType): OptionalValue<any> | undefined {
         return type
     }
     const subtypes = type.getSubTypes()
-    if (!subtypes) {
+    if (!subtypes || subtypes === "cannotDetermine") {
         return undefined
     }
-    for (const subtype of subtypes) {
+    const subtypesArray = asArray(subtypes)
+    for (const subtype of subtypesArray) {
         const opt = tryGetOptional(subtype)
         if (opt) {
             return opt

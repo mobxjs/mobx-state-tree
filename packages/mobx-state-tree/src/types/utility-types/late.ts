@@ -92,7 +92,7 @@ class Late<IT extends IAnyType> extends BaseType<
 
     getSubTypes() {
         const subtype = this.getSubType(false)
-        return subtype ? [subtype] : undefined
+        return subtype ? subtype : "cannotDetermine"
     }
 }
 
