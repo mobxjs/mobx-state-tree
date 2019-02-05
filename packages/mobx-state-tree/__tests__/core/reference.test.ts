@@ -1022,3 +1022,57 @@ test("tryReference / isValidReference", () => {
         "The reference to be checked is not one of node, null or undefined"
     )
 })
+
+test("#1162 - reference to union", () => {
+    const M1 = types.model({ id: types.identifier, type: types.string, sum: types.string })
+    const M2 = types.model({
+        id: types.identifier,
+        type: types.string,
+        data: types.string
+    })
+    const AnyModel = types.union(
+        {
+            dispatcher(snapshot) {
+                switch (snapshot.type) {
+                    case "type1":
+                        return M1
+                    case "type2":
+                        return M2
+                    default:
+                        throw new Error()
+                }
+            }
+        },
+        M1,
+        M2
+    )
+
+    const Store = types.model({
+        arr: types.array(AnyModel),
+        selected: types.reference(AnyModel)
+    })
+
+    const s = Store.create({
+        selected: "num1",
+        arr: [
+            { id: "num1", type: "type1", sum: "1" },
+            { id: "num2", type: "type1", sum: "2" },
+            { id: "num3", type: "type2", data: "3" }
+        ]
+    })
+    unprotect(s)
+
+    expect(s.selected.id).toBe("num1")
+    expect(s.selected.type).toBe("type1")
+    expect((s.selected as Instance<typeof M1>).sum).toBe("1")
+
+    s.selected = "num2" as any
+    expect(s.selected.id).toBe("num2")
+    expect(s.selected.type).toBe("type1")
+    expect((s.selected as Instance<typeof M1>).sum).toBe("2")
+
+    s.selected = "num3" as any
+    expect(s.selected.id).toBe("num3")
+    expect(s.selected.type).toBe("type2")
+    expect((s.selected as Instance<typeof M2>).data).toBe("3")
+})
