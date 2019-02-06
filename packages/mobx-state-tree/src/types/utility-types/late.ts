@@ -11,7 +11,8 @@ import {
     ExtractC,
     ExtractS,
     ExtractT,
-    ExtractNodeType
+    ExtractNodeType,
+    cannotDetermineSubtype
 } from "../../internal"
 
 class Late<IT extends IAnyType> extends BaseType<
@@ -92,7 +93,7 @@ class Late<IT extends IAnyType> extends BaseType<
 
     getSubTypes() {
         const subtype = this.getSubType(false)
-        return subtype ? subtype : "cannotDetermine"
+        return subtype ? subtype : cannotDetermineSubtype
     }
 }
 

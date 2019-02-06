@@ -83,6 +83,12 @@ export type IsEmptyCreationType<O> = IsTypeAnyOrUnknown<O> extends true
 export type CreateParams<C> = IsEmptyCreationType<C> extends false ? [C, any?] : [C?, any?]
 
 /**
+ * @internal
+ * @hidden
+ */
+export const cannotDetermineSubtype = "cannotDetermine"
+
+/**
  * A type, either complex or simple.
  */
 export interface IType<C, S, T> {
@@ -185,7 +191,7 @@ export interface IType<C, S, T> {
      * @internal
      * @hidden
      */
-    getSubTypes(): IAnyType[] | IAnyType | null | "cannotDetermine"
+    getSubTypes(): IAnyType[] | IAnyType | null | typeof cannotDetermineSubtype
 }
 
 // do not convert to an interface
@@ -364,7 +370,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         )
     }
 
-    abstract getSubTypes(): IAnyType[] | IAnyType | null | "cannotDetermine"
+    abstract getSubTypes(): IAnyType[] | IAnyType | null | typeof cannotDetermineSubtype
 }
 
 /**

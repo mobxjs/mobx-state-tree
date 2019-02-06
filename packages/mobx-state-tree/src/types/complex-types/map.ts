@@ -47,7 +47,8 @@ import {
     AnyObjectNode,
     AnyNode,
     AnyModelType,
-    asArray
+    asArray,
+    cannotDetermineSubtype
 } from "../../internal"
 
 /** @hidden */
@@ -112,7 +113,7 @@ const needsIdentifierError = `Map.put can only be used to store complex values t
 
 function tryCollectModelTypes(type: IAnyType, modelTypes: Array<AnyModelType>): boolean {
     const subtypes = type.getSubTypes()
-    if (subtypes === "cannotDetermine") {
+    if (subtypes === cannotDetermineSubtype) {
         return false
     }
     if (subtypes) {
@@ -400,7 +401,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
             currentKeys[key] = false
         })
         if (snapshot) {
-            // Don't use target.replace, as it will throw all existing items first
+            // Don't use target.replace, as it will throw away all existing items first
             for (let key in snapshot) {
                 target.set(key, snapshot[key])
                 currentKeys["" + key] = true
