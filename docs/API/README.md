@@ -182,6 +182,8 @@ ___
 
 **Ƭ IDisposer**: *`function`*
 
+A generic disposer.
+
 #### Type declaration
 ▸(): `void`
 
@@ -559,7 +561,7 @@ ___
 
 ###  addDisposer
 
-▸ **addDisposer**(target: *`IAnyStateTreeNode`*, disposer: *`function`*): `function`
+▸ **addDisposer**(target: *`IAnyStateTreeNode`*, disposer: *[IDisposer](#idisposer)*): [IDisposer](#idisposer)
 
 Use this utility to register a function that should be called whenever the targeted state tree node is destroyed. This is a useful alternative to managing cleanup methods yourself using the `beforeDestroy` hook.
 
@@ -588,9 +590,9 @@ const Todo = types.model({
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | target | `IAnyStateTreeNode` |  \- |
-| disposer | `function` |  \- |
+| disposer | [IDisposer](#idisposer) |  \- |
 
-**Returns:** `function`
+**Returns:** [IDisposer](#idisposer)
 The same disposer that was passed as argument
 
 ___
