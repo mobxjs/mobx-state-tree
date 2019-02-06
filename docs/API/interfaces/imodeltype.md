@@ -47,7 +47,7 @@
 
 **● name**: *`string`*
 
-The type name.
+Friendly type name.
 
 ___
 <a id="properties"></a>

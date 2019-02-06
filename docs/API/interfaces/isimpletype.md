@@ -35,7 +35,7 @@ A simple type, this is, a type where the instance and the snapshot representatio
 
 **● name**: *`string`*
 
-The type name.
+Friendly type name.
 
 ___
 
