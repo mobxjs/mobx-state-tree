@@ -3,4 +3,4 @@
 *.ts text eol=lf
 *.json text eol=lf
 *.md text eol=lf
-docs/API/**/*.md binary
+docs/API/**/*.md -diff
