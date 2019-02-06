@@ -814,7 +814,7 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
  * @param disposer
  * @returns The same disposer that was passed as argument
  */
-export function addDisposer(target: IAnyStateTreeNode, disposer: () => void): () => void {
+export function addDisposer(target: IAnyStateTreeNode, disposer: IDisposer): IDisposer {
     // check all arguments
     if (process.env.NODE_ENV !== "production") {
         if (!isStateTreeNode(target))

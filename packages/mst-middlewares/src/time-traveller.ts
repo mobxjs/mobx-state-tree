@@ -1,4 +1,12 @@
-import { types, resolvePath, getEnv, onSnapshot, getSnapshot, applySnapshot } from "mobx-state-tree"
+import {
+    types,
+    resolvePath,
+    getEnv,
+    onSnapshot,
+    getSnapshot,
+    applySnapshot,
+    IDisposer
+} from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
 const TimeTraveller = types
@@ -17,7 +25,7 @@ const TimeTraveller = types
     }))
     .actions(self => {
         let targetStore: any
-        let snapshotDisposer: () => void
+        let snapshotDisposer: IDisposer
         let skipNextUndoState = false
 
         return {
