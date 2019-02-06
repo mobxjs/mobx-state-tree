@@ -70,7 +70,7 @@ const snapshotReactionOptions = {
 }
 
 type InternalEventHandlers<S> = {
-    [InternalEvents.Dispose]: () => void
+    [InternalEvents.Dispose]: IDisposer
     [InternalEvents.Patch]: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
     [InternalEvents.Snapshot]: (snapshot: S) => void
 }
@@ -481,7 +481,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
                 // if the snapshot is the same as the current one, avoid performing a reconcile
                 if (snapshot === (self.snapshot as any)) return
                 // else, apply it by calling the type logic
-                return self.type.applySnapshot(self, snapshot)
+                return self.type.applySnapshot(self, snapshot as any)
             }
         )
 

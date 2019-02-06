@@ -27,6 +27,9 @@ export const mobxShallow =
     typeof $mobx === "string" ? { deep: false } : { deep: false, proxy: false }
 Object.freeze(mobxShallow)
 
+/**
+ * A generic disposer.
+ */
 export type IDisposer = () => void
 
 /**

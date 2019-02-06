@@ -5,6 +5,7 @@ import { IObservableArray, ObservableMap, IAction } from "mobx"
 export {
     IModelType,
     IAnyModelType,
+    IDisposer,
     IMSTMap,
     IMapType,
     IMSTArray,
