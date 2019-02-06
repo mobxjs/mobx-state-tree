@@ -10,7 +10,8 @@ import {
     getRoot,
     applyPatch,
     flow,
-    addMiddleware
+    addMiddleware,
+    IDisposer
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
 
@@ -37,7 +38,7 @@ const UndoManager = types
         let flagSkipping = false
         let targetStore: IStateTreeNode
         let replaying = false
-        let middlewareDisposer: () => void
+        let middlewareDisposer: IDisposer
         let grouping = false
 
         type GroupRecorder = Pick<IPatchRecorder, "patches" | "inversePatches">
