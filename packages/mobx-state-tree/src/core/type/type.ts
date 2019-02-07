@@ -21,7 +21,8 @@ import {
     AnyObjectNode,
     AnyNode,
     BaseNode,
-    ScalarNode
+    ScalarNode,
+    getStateTreeNodeSafe
 } from "../../internal"
 
 /**
@@ -341,10 +342,13 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
     }
 
     validate(value: C | T, context: IValidationContext): IValidationResult {
-        if (isStateTreeNode(value)) {
-            return getType(value) === this || this.isAssignableFrom(getType(value))
-                ? typeCheckSuccess()
-                : typeCheckFailure(context, value)
+        const node = getStateTreeNodeSafe(value)
+        if (node) {
+            const valueType = getType(value)
+            const assignable = node.validationType
+                ? node.validationType.isAssignableFrom(valueType)
+                : this.isAssignableFrom(valueType)
+            return assignable ? typeCheckSuccess() : typeCheckFailure(context, value)
             // it is tempting to compare snapshots, but in that case we should always clone on assignments...
         }
         return this.isValidSnapshot(value as C, context)

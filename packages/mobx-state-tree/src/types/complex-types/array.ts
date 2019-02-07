@@ -84,12 +84,10 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     ExtractS<IT>[],
     IMSTArray<IT>
 > {
-    subType: IAnyType
     readonly flags = TypeFlags.Array
 
-    constructor(name: string, subType: IAnyType) {
+    constructor(name: string, private readonly _subType: IAnyType) {
         super(name)
-        this.subType = subType
     }
 
     instantiate(
@@ -102,7 +100,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     initializeChildNodes(objNode: this["N"], snapshot: this["C"] = []): IChildNodesMap {
-        const subType = (objNode.type as this).subType
+        const subType = (objNode.type as this)._subType
         const environment = objNode.environment
         const result: IChildNodesMap = {}
         snapshot.forEach((item, index) => {
@@ -123,7 +121,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     describe() {
-        return this.subType.describe() + "[]"
+        return this._subType.describe() + "[]"
     }
 
     getChildren(node: this["N"]): AnyNode[] {
@@ -141,7 +139,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     ): IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode> | null {
         const node = getStateTreeNode(change.object as this["T"])
         node.assertWritable({ subpath: String(change.index) })
-        const subType = (node.type as this).subType
+        const subType = (node.type as this)._subType
         const childNodes = node.getChildren()
         let nodes = null
 
@@ -259,8 +257,8 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         target.replace(snapshot as any)
     }
 
-    getChildType(key: string): IAnyType {
-        return this.subType
+    getChildType(): IAnyType {
+        return this._subType
     }
 
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
@@ -270,7 +268,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
 
         return flattenTypeErrors(
             value.map((item, index) =>
-                this.subType.validate(item, getContextForPath(context, "" + index, this.subType))
+                this._subType.validate(item, getContextForPath(context, "" + index, this._subType))
             )
         )
     }

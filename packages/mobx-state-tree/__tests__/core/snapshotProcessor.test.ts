@@ -1,4 +1,4 @@
-import { types, getSnapshot, unprotect, cast } from "../../src"
+import { types, getSnapshot, unprotect, cast, detach } from "../../src"
 
 describe("snapshotProcessor", () => {
     describe("over a model type", () => {
@@ -268,5 +268,89 @@ describe("snapshotProcessor", () => {
         })
         expect(m.name).toBe("hello")
         expect(getSnapshot(m).name).toBe("_hello_")
+    })
+
+    describe("moving nodes around with a pre-processor", () => {
+        const Task = types.model("Task", { x: types.number })
+        const Store = types.model({
+            a: types.array(
+                types.snapshotProcessor(
+                    Task,
+                    {
+                        preProcessor(sn: { x: string }) {
+                            return {
+                                x: Number(sn.x)
+                            }
+                        }
+                    },
+                    "PTask"
+                )
+            ),
+            b: types.array(Task)
+        })
+
+        test("moving from a to b", () => {
+            const s = Store.create({
+                a: [{ x: "1" }]
+            })
+            unprotect(s)
+            const n = s.a[0]
+            detach(n)
+            expect(s.a.length).toBe(0)
+            expect(getSnapshot(n)).toEqual({ x: 1 })
+            expect(() => s.b.push(n)).toThrow("Error while converting")
+        })
+
+        test("moving from b to a", () => {
+            const s = Store.create({
+                b: [{ x: 1 }]
+            })
+            unprotect(s)
+            const n = s.b[0]
+            detach(n)
+            expect(s.b.length).toBe(0)
+            expect(getSnapshot(n)).toEqual({ x: 1 })
+            expect(() => s.a.push(n)).toThrow("Error while converting")
+        })
+    })
+
+    describe("moving nodes around with a post-processor", () => {
+        const Task = types.model({ x: types.number })
+        const Store = types.model({
+            a: types.array(
+                types.snapshotProcessor(Task, {
+                    postProcessor(sn): { x: string } {
+                        return {
+                            x: String(sn.x)
+                        }
+                    }
+                })
+            ),
+            b: types.array(Task)
+        })
+
+        test("moving from a to b", () => {
+            const s = Store.create({
+                a: [{ x: 1 }]
+            })
+            unprotect(s)
+            const n = s.a[0]
+            detach(n)
+            expect(s.a.length).toBe(0)
+            expect(getSnapshot(n)).toEqual({ x: "1" })
+            expect(() => s.b.push(n)).toThrow("Error while converting")
+        })
+
+        test("moving from b to a", () => {
+            const s = Store.create({
+                b: [{ x: 1 }]
+            })
+            unprotect(s)
+            const n = s.b[0]
+            detach(n)
+            expect(s.b.length).toBe(0)
+            expect(getSnapshot(n)).toEqual({ x: 1 })
+            expect(() => s.a.push(n)).toThrow("Error while converting")
+        })
     })
 })

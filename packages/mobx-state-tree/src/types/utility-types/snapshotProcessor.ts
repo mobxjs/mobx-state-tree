@@ -75,6 +75,14 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         return sn
     }
 
+    private _fixNode(node: this["N"]): void {
+        node.validationType = this
+        const oldGetSnapshot = node.getSnapshot
+        node.getSnapshot = () => {
+            return this.postProcessSnapshot(oldGetSnapshot.call(node)) as any
+        }
+    }
+
     instantiate(
         parent: AnyObjectNode | null,
         subpath: string,
@@ -85,10 +93,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
             ? initialValue
             : this.preProcessSnapshot(initialValue)
         const node = this._subtype.instantiate(parent, subpath, environment, processedInitialValue)
-        const oldGetSnapshot = node.getSnapshot
-        node.getSnapshot = () => {
-            return this.postProcessSnapshot(oldGetSnapshot.call(node)) as any
-        }
+        this._fixNode(node)
         return node
     }
 
@@ -98,10 +103,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
             isStateTreeNode(newValue) ? newValue : this.preProcessSnapshot(newValue)
         )
         if (node !== current) {
-            const oldGetSnapshot = node.getSnapshot
-            node.getSnapshot = () => {
-                return this.postProcessSnapshot(oldGetSnapshot.call(node)) as any
-            }
+            this._fixNode(node)
         }
         return node
     }
@@ -114,10 +116,6 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         const processedSn = this.preProcessSnapshot(value)
         return this._subtype.validate(processedSn, context)
-    }
-
-    isAssignableFrom(type: IAnyType) {
-        return this._subtype.isAssignableFrom(type)
     }
 
     getSubTypes() {
