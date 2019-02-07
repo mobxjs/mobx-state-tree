@@ -89,7 +89,7 @@ export function onPatch(
 
 /**
  * Registers a function that is invoked whenever a new snapshot for the given model instance is available.
- * The listener will only be fire at the and of the current MobX (trans)action.
+ * The listener will only be fire at the end of the current MobX (trans)action.
  * See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
  *
  * @param target
