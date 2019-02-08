@@ -76,7 +76,9 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     }
 
     private _fixNode(node: this["N"]): void {
-        node.validationType = this
+        // the node has to use these methods rather than the original type ones
+        proxyNodeTypeMethods(node.type, this, "isAssignableFrom", "create")
+
         const oldGetSnapshot = node.getSnapshot
         node.getSnapshot = () => {
             return this.postProcessSnapshot(oldGetSnapshot.call(node)) as any
@@ -120,6 +122,16 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     getSubTypes() {
         return this._subtype
+    }
+}
+
+function proxyNodeTypeMethods(
+    nodeType: any,
+    snapshotProcessorType: any,
+    ...methods: (keyof SnapshotProcessor<any, any, any>)[]
+) {
+    for (const method of methods) {
+        nodeType[method] = snapshotProcessorType[method].bind(snapshotProcessorType)
     }
 }
 
