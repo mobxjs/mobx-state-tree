@@ -84,25 +84,23 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     ExtractS<IT>[],
     IMSTArray<IT>
 > {
-    subType: IAnyType
     readonly flags = TypeFlags.Array
 
-    constructor(name: string, subType: IAnyType) {
+    constructor(name: string, private readonly _subType: IT) {
         super(name)
-        this.subType = subType
     }
 
     instantiate(
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: this["C"] | this["S"] | this["T"]
+        initialValue: this["C"] | this["T"]
     ): this["N"] {
         return createObjectNode(this, parent, subpath, environment, initialValue)
     }
 
     initializeChildNodes(objNode: this["N"], snapshot: this["C"] = []): IChildNodesMap {
-        const subType = (objNode.type as this).subType
+        const subType = (objNode.type as this)._subType
         const environment = objNode.environment
         const result: IChildNodesMap = {}
         snapshot.forEach((item, index) => {
@@ -123,7 +121,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     describe() {
-        return this.subType.describe() + "[]"
+        return this._subType.describe() + "[]"
     }
 
     getChildren(node: this["N"]): AnyNode[] {
@@ -141,7 +139,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     ): IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode> | null {
         const node = getStateTreeNode(change.object as this["T"])
         node.assertWritable({ subpath: String(change.index) })
-        const subType = (node.type as this).subType
+        const subType = (node.type as this)._subType
         const childNodes = node.getChildren()
         let nodes = null
 
@@ -253,24 +251,24 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     @action
-    applySnapshot(node: this["N"], snapshot: this["S"]): void {
+    applySnapshot(node: this["N"], snapshot: this["C"]): void {
         typecheckInternal(this, snapshot)
         const target = node.storedValue
         target.replace(snapshot as any)
     }
 
-    getChildType(key: string): IAnyType {
-        return this.subType
+    getChildType(): IAnyType {
+        return this._subType
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         if (!isArray(value)) {
             return typeCheckFailure(context, value, "Value is not an array")
         }
 
         return flattenTypeErrors(
             value.map((item, index) =>
-                this.subType.validate(item, getContextForPath(context, "" + index, this.subType))
+                this._subType.validate(item, getContextForPath(context, "" + index, this._subType))
             )
         )
     }

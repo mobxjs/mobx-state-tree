@@ -71,7 +71,7 @@ export const isInteger =
  * @hidden
  */
 export function isArray(val: any): val is any[] {
-    return !!(Array.isArray(val) || isObservableArray(val)) as boolean
+    return Array.isArray(val) || isObservableArray(val)
 }
 
 /**
@@ -120,7 +120,7 @@ export function extend(a: any, ...b: any[]) {
  * @internal
  * @hidden
  */
-export function isPlainObject(value: any): value is any {
+export function isPlainObject(value: any): value is { [k: string]: any } {
     if (value === null || typeof value !== "object") return false
     const proto = Object.getPrototypeOf(value)
     return proto === Object.prototype || proto === null

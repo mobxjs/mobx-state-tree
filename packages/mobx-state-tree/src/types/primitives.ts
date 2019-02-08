@@ -1,5 +1,5 @@
 import {
-    Type,
+    SimpleType,
     isPrimitive,
     fail,
     identity,
@@ -12,7 +12,6 @@ import {
     typeCheckSuccess,
     typeCheckFailure,
     isType,
-    IChildNodesMap,
     isInteger,
     AnyObjectNode,
     AnyNode
@@ -23,7 +22,7 @@ import {
  * @internal
  * @hidden
  */
-export class CoreType<C, S, T> extends Type<C, S, T> {
+export class CoreType<C, S, T> extends SimpleType<C, S, T> {
     constructor(
         name: string,
         readonly flags: TypeFlags,
@@ -42,16 +41,16 @@ export class CoreType<C, S, T> extends Type<C, S, T> {
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        snapshot: T
+        initialValue: C
     ): this["N"] {
-        return createScalarNode(this, parent, subpath, environment, snapshot)
+        return createScalarNode(this, parent, subpath, environment, initialValue)
     }
 
-    createNewInstance(node: this["N"], childNodes: IChildNodesMap, initialValue: any) {
-        return this.initializer(initialValue)
+    createNewInstance(snapshot: C) {
+        return this.initializer(snapshot)
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: C, context: IValidationContext): IValidationResult {
         if (isPrimitive(value) && this.checker(value as any)) {
             return typeCheckSuccess()
         }
@@ -154,6 +153,16 @@ export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, und
     v => v === undefined
 )
 
+const _DatePrimitive = new CoreType<number | Date, number, Date>(
+    "Date",
+    TypeFlags.Date,
+    v => typeof v === "number" || v instanceof Date,
+    v => (v instanceof Date ? v : new Date(v))
+)
+_DatePrimitive.getSnapshot = function(node: AnyNode) {
+    return node.storedValue.getTime()
+}
+
 /**
  * `types.Date` - Creates a type that can only contain a javascript Date value.
  *
@@ -166,20 +175,7 @@ export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, und
  * LogLine.create({ timestamp: new Date() })
  * ```
  */
-// tslint:disable-next-line:variable-name
-export const DatePrimitive: IType<number | Date, number, Date> = new CoreType<
-    number | Date,
-    number,
-    Date
->(
-    "Date",
-    TypeFlags.Date,
-    v => typeof v === "number" || v instanceof Date,
-    v => (v instanceof Date ? v : new Date(v))
-)
-DatePrimitive.getSnapshot = function(node: AnyNode) {
-    return node.storedValue.getTime()
-}
+export const DatePrimitive: IType<number | Date, number, Date> = _DatePrimitive
 
 /**
  * @internal

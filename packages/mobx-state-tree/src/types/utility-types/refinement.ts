@@ -1,7 +1,6 @@
 import {
     isStateTreeNode,
     getStateTreeNode,
-    Type,
     IValidationContext,
     IValidationResult,
     typeCheckSuccess,
@@ -11,32 +10,30 @@ import {
     TypeFlags,
     IAnyType,
     ExtractC,
-    AnyObjectNode
+    AnyObjectNode,
+    BaseType,
+    ExtractS,
+    ExtractT,
+    ExtractNodeType
 } from "../../internal"
 
-/**
- * @internal
- * @hidden
- */
-export class Refinement<C, S, T> extends Type<C, S, T, false> {
-    readonly type: IAnyType
-    readonly predicate: (v: C) => boolean
-    readonly message: (v: C) => string
-
+class Refinement<IT extends IAnyType> extends BaseType<
+    ExtractC<IT>,
+    ExtractS<IT>,
+    ExtractT<IT>,
+    ExtractNodeType<IT>
+> {
     get flags() {
-        return this.type.flags | TypeFlags.Refinement
+        return this._subtype.flags | TypeFlags.Refinement
     }
 
     constructor(
         name: string,
-        type: IAnyType,
-        predicate: (v: C) => boolean,
-        message: (v: C) => string
+        private readonly _subtype: IT,
+        private readonly _predicate: (v: ExtractC<IT>) => boolean,
+        private readonly _message: (v: ExtractC<IT>) => string
     ) {
         super(name)
-        this.type = type
-        this.predicate = predicate
-        this.message = message
     }
 
     describe() {
@@ -47,27 +44,35 @@ export class Refinement<C, S, T> extends Type<C, S, T, false> {
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        value: any
+        initialValue: this["C"] | this["T"]
     ): this["N"] {
         // create the child type
-        return this.type.instantiate(parent, subpath, environment, value)
+        return this._subtype.instantiate(parent, subpath, environment, initialValue)
     }
 
     isAssignableFrom(type: IAnyType) {
-        return this.type.isAssignableFrom(type)
+        return this._subtype.isAssignableFrom(type)
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
-        const subtypeErrors = this.type.validate(value, context)
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
+        const subtypeErrors = this._subtype.validate(value, context)
         if (subtypeErrors.length > 0) return subtypeErrors
 
         const snapshot = isStateTreeNode(value) ? getStateTreeNode(value).snapshot : value
 
-        if (!this.predicate(snapshot)) {
-            return typeCheckFailure(context, value, this.message(value))
+        if (!this._predicate(snapshot)) {
+            return typeCheckFailure(context, value, this._message(value))
         }
 
         return typeCheckSuccess()
+    }
+
+    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
+        return this._subtype.reconcile(current, newValue)
+    }
+
+    getSubTypes() {
+        return this._subtype
     }
 }
 

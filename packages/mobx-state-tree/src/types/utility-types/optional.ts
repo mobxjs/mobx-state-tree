@@ -1,7 +1,6 @@
 import {
     isStateTreeNode,
     getStateTreeNode,
-    Type,
     IType,
     TypeFlags,
     isType,
@@ -18,99 +17,103 @@ import {
     ExtractCST,
     RedefineIStateTreeNode,
     IStateTreeNode,
-    AnyObjectNode
+    AnyObjectNode,
+    BaseType
 } from "../../internal"
 
-/**
- * @internal
- * @hidden
- */
-export type IFunctionReturn<T> = () => T
+type IFunctionReturn<T> = () => T
+
+type IOptionalValue<C, T> = C | IFunctionReturn<C | T>
 
 /**
- * @internal
  * @hidden
- */
-export type IOptionalValue<C, S, T> = C | S | IFunctionReturn<C | S | T>
-
-/**
  * @internal
- * @hidden
  */
-export class OptionalValue<C, S, T> extends Type<C, S, T, false> {
-    readonly type: IType<C, S, T>
-    readonly defaultValue: IOptionalValue<C, S, T>
-
+export class OptionalValue<IT extends IAnyType> extends BaseType<
+    ExtractC<IT> | undefined,
+    ExtractS<IT>,
+    RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<ExtractC<IT> | undefined, ExtractS<IT>>>
+> {
     get flags() {
-        return this.type.flags | TypeFlags.Optional
+        return this._subtype.flags | TypeFlags.Optional
     }
 
-    constructor(type: IType<C, S, T>, defaultValue: IOptionalValue<C, S, T>) {
-        super(type.name)
-        this.type = type
-        this.defaultValue = defaultValue
+    constructor(
+        private readonly _subtype: IT,
+        private readonly _defaultValue: IOptionalValue<ExtractC<IT>, ExtractT<IT>>
+    ) {
+        super(_subtype.name)
     }
 
     describe() {
-        return this.type.describe() + "?"
+        return this._subtype.describe() + "?"
     }
 
     instantiate(
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: any
+        initialValue: this["C"] | this["T"]
     ): this["N"] {
         if (typeof initialValue === "undefined") {
             const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
-            return this.type.instantiate(parent, subpath, environment, defaultInstanceOrSnapshot)
+            return this._subtype.instantiate(
+                parent,
+                subpath,
+                environment,
+                defaultInstanceOrSnapshot
+            )
         }
-        return this.type.instantiate(parent, subpath, environment, initialValue)
+        return this._subtype.instantiate(parent, subpath, environment, initialValue)
     }
 
-    reconcile(current: this["N"], newValue: any): this["N"] {
-        const ret = this.type.reconcile(
+    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
+        const ret = this._subtype.reconcile(
             current,
-            this.type.is(newValue) && newValue !== undefined
+            newValue !== undefined && this._subtype.is(newValue)
                 ? newValue
                 : this.getDefaultInstanceOrSnapshot()
         )
         return ret
     }
 
-    getDefaultInstanceOrSnapshot(): C | S | T {
+    getDefaultInstanceOrSnapshot(): this["C"] | this["T"] {
         const defaultInstanceOrSnapshot =
-            typeof this.defaultValue === "function"
-                ? (this.defaultValue as IFunctionReturn<C | S | T>)()
-                : this.defaultValue
+            typeof this._defaultValue === "function"
+                ? (this._defaultValue as IFunctionReturn<this["C"] | this["T"]>)()
+                : this._defaultValue
 
         // while static values are already snapshots and checked on types.optional
         // generator functions must always be rechecked just in case
-        if (typeof this.defaultValue === "function") {
+        if (typeof this._defaultValue === "function") {
             typecheckInternal(this, defaultInstanceOrSnapshot)
         }
 
         return defaultInstanceOrSnapshot
     }
 
-    public getDefaultValueSnapshot(): S {
+    getDefaultValueSnapshot(): this["S"] {
         const instanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
         return isStateTreeNode(instanceOrSnapshot)
             ? getStateTreeNode(instanceOrSnapshot).snapshot
             : instanceOrSnapshot
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         // defaulted values can be skipped
         if (value === undefined) {
             return typeCheckSuccess()
         }
         // bounce validation to the sub-type
-        return this.type.validate(value, context)
+        return this._subtype.validate(value, context)
     }
 
     isAssignableFrom(type: IAnyType) {
-        return this.type.isAssignableFrom(type)
+        return this._subtype.isAssignableFrom(type)
+    }
+
+    getSubTypes() {
+        return this._subtype
     }
 }
 

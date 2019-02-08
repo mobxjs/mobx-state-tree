@@ -21,6 +21,8 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [IReversibleJsonPatch](interfaces/ireversiblejsonpatch.md)
 * [ISerializedActionCall](interfaces/iserializedactioncall.md)
 * [ISimpleType](interfaces/isimpletype.md)
+* [ISnapshotProcessor](interfaces/isnapshotprocessor.md)
+* [ISnapshotProcessors](interfaces/isnapshotprocessors.md)
 * [IType](interfaces/itype.md)
 * [IValidationContextEntry](interfaces/ivalidationcontextentry.md)
 * [IValidationError](interfaces/ivalidationerror.md)
@@ -138,6 +140,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [resolvePath](#resolvepath)
 * [safeReference](#safereference)
 * [setLivelinessChecking](#setlivelinesschecking)
+* [snapshotProcessor](#snapshotprocessor)
 * [splitJsonPath](#splitjsonpath)
 * [tryReference](#tryreference)
 * [tryResolve](#tryresolve)
@@ -178,6 +181,8 @@ ___
 ###  IDisposer
 
 **Ƭ IDisposer**: *`function`*
+
+A generic disposer.
 
 #### Type declaration
 ▸(): `void`
@@ -341,8 +346,8 @@ A type which is equivalent to the union of SnapshotIn and Instance types of a gi
 
 For example:
 
-*   `SnapshotOrInstance<typeof ModelA> = SnapshotIn<typeof ModelA> | Instance<typeof ModelA>`
-*   `SnapshotOrInstance<typeof self.a (where self.a is a ModelA)> = SnapshotIn<typeof ModelA> | Instance<typeof ModelA>`
+*   `SnapshotOrInstance<typeof ModelA> = SnapshotIn<typeof ModelA> \| Instance<typeof ModelA>`
+*   `SnapshotOrInstance<typeof self.a (where self.a is a ModelA)> = SnapshotIn<typeof ModelA> \| Instance<typeof ModelA>`
 
 Usually you might want to use this when your model has a setter action that sets a property.
 
@@ -380,16 +385,7 @@ ___
 
 ### `<Const>` DatePrimitive
 
-**● DatePrimitive**: *[IType](interfaces/itype.md)<`number` \| `Date`, `number`, `Date`>* =  new CoreType<
-    number | Date,
-    number,
-    Date
->(
-    "Date",
-    TypeFlags.Date,
-    v => typeof v === "number" || v instanceof Date,
-    v => (v instanceof Date ? v : new Date(v))
-)
+**● DatePrimitive**: *[IType](interfaces/itype.md)<`number` \| `Date`, `number`, `Date`>* =  _DatePrimitive
 
 `types.Date` - Creates a type that can only contain a javascript Date value.
 
@@ -442,6 +438,7 @@ Example:
      title: types.string
  })
 ```
+
 *__returns__*: 
 
 ___
@@ -461,6 +458,7 @@ Example:
      title: types.string
  })
 ```
+
 *__returns__*: 
 
 ___
@@ -563,7 +561,7 @@ ___
 
 ###  addDisposer
 
-▸ **addDisposer**(target: *`IAnyStateTreeNode`*, disposer: *`function`*): `function`
+▸ **addDisposer**(target: *`IAnyStateTreeNode`*, disposer: *[IDisposer](#idisposer)*): [IDisposer](#idisposer)
 
 Use this utility to register a function that should be called whenever the targeted state tree node is destroyed. This is a useful alternative to managing cleanup methods yourself using the `beforeDestroy` hook.
 
@@ -592,9 +590,9 @@ const Todo = types.model({
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | target | `IAnyStateTreeNode` |  \- |
-| disposer | `function` |  \- |
+| disposer | [IDisposer](#idisposer) |  \- |
 
-**Returns:** `function`
+**Returns:** [IDisposer](#idisposer)
 The same disposer that was passed as argument
 
 ___
@@ -1666,7 +1664,7 @@ export interface CustomTypeOptions<S, T> {
     // return the serialization of the current value
     toSnapshot(value: T): S
     // if true, this is a converted value, if false, it's a snapshot
-    isTargetType(value: T | S): value is T
+    isTargetType(value: T \| S): value is T
     // a non empty string is assumed to be a validation error
     getValidationMessage?(snapshot: S): string
 }
@@ -1683,7 +1681,7 @@ const DecimalPrimitive = types.custom<string, Decimal>({
     toSnapshot(value: Decimal) {
         return value.toString()
     },
-    isTargetType(value: string | Decimal): boolean {
+    isTargetType(value: string \| Decimal): boolean {
         return value instanceof Decimal
     },
     getValidationMessage(value: string): string {
@@ -2029,9 +2027,9 @@ ___
 
 ###  getChildType
 
-▸ **getChildType**(object: *`IAnyStateTreeNode`*, child: *`string`*): [IAnyType](#ianytype)
+▸ **getChildType**(object: *`IAnyStateTreeNode`*, propertyName?: *`undefined` \| `string`*): [IAnyType](#ianytype)
 
-Returns the _declared_ type of the given sub property of an object, array or map.
+Returns the _declared_ type of the given sub property of an object, array or map. In the case of arrays and maps the property name is optional and will be ignored.
 
 Example:
 
@@ -2047,7 +2045,7 @@ console.log(getChildType(box, "x").name) // 'number'
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | object | `IAnyStateTreeNode` |  \- |
-| child | `string` |  \- |
+| `Optional` propertyName | `undefined` \| `string` |  \- |
 
 **Returns:** [IAnyType](#ianytype)
 
@@ -2500,6 +2498,7 @@ ___
 ▸ **isOptionalType**<`IT`>(type: *`IT`*): `boolean`
 
 Returns if a value represents an optional type.
+
 *__template__*: IT
 
 **Type parameters:**
@@ -2981,7 +2980,7 @@ ___
 
 ▸ **onSnapshot**<`S`>(target: *`IStateTreeNode`<`any`, `S`>*, callback: *`function`*): [IDisposer](#idisposer)
 
-Registers a function that is invoked whenever a new snapshot for the given model instance is available. The listener will only be fire at the and of the current MobX (trans)action. See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
+Registers a function that is invoked whenever a new snapshot for the given model instance is available. The listener will only be fire at the end of the current MobX (trans)action. See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
 
 **Type parameters:**
 
@@ -3253,6 +3252,54 @@ Defines what MST should do when running into reads / writes to objects that have
 | mode | [LivelinessMode](#livelinessmode) |  \`"warn"\`, \`"error"\` or \`"ignore"\` |
 
 **Returns:** `void`
+
+___
+<a id="snapshotprocessor"></a>
+
+###  snapshotProcessor
+
+▸ **snapshotProcessor**<`IT`,`CustomC`,`CustomS`>(type: *`IT`*, processors: *[ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`ExtractC`<`IT`>, `CustomC`, `ExtractS`<`IT`>, `CustomS`>*, name?: *`undefined` \| `string`*): [ISnapshotProcessor](interfaces/isnapshotprocessor.md)<`IT`, `CustomC`, `CustomS`>
+
+`types.snapshotProcessor` - Runs a pre/post snapshot processor before/after serializing a given type.
+
+Example:
+
+```ts
+const Todo1 = types.model({ text: types.string })
+// in the backend the text type must be null when empty
+interface BackendTodo {
+    text: string \| null
+}
+const Todo2 = types.snapshotProcessor(Todo1, {
+    // from snapshot to instance
+    preProcessor(sn: BackendTodo) {
+        return {
+            text: sn.text \|\| "";
+        }
+    },
+    // from instance to snapshot
+    postProcessor(sn): BackendTodo {
+        return {
+            text: !sn.text ? null : sn.text
+        }
+    }
+})
+```
+
+**Type parameters:**
+
+#### IT :  [IAnyType](#ianytype)
+#### CustomC 
+#### CustomS 
+**Parameters:**
+
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| type | `IT` |  Type to run the processors over. |
+| processors | [ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`ExtractC`<`IT`>, `CustomC`, `ExtractS`<`IT`>, `CustomS`> |  Processors to run. |
+| `Optional` name | `undefined` \| `string` |  Type name, or undefined to inherit the inner type one. |
+
+**Returns:** [ISnapshotProcessor](interfaces/isnapshotprocessor.md)<`IT`, `CustomC`, `CustomS`>
 
 ___
 <a id="splitjsonpath"></a>
@@ -4819,6 +4866,13 @@ ___
 ####  safeReference
 
 **● safeReference**: *[safeReference](#safereference)*
+
+___
+<a id="types.snapshotprocessor"></a>
+
+####  snapshotProcessor
+
+**● snapshotProcessor**: *[snapshotProcessor](#snapshotprocessor)*
 
 ___
 <a id="types.string"></a>

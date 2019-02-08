@@ -111,7 +111,8 @@ const TYPES = stringToArray(`
     identifierNumber,
     late,
     undefined,
-    null
+    null,
+    snapshotProcessor
 `)
 
 test("correct api exposed", () => {

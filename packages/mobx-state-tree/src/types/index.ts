@@ -24,7 +24,8 @@ import {
     identifierNumber,
     late,
     undefinedType,
-    nullType
+    nullType,
+    snapshotProcessor
 } from "../internal"
 
 export const types = {
@@ -52,5 +53,6 @@ export const types = {
     identifierNumber,
     late,
     undefined: undefinedType,
-    null: nullType
+    null: nullType,
+    snapshotProcessor
 }

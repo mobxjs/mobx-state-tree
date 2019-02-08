@@ -103,7 +103,7 @@ ___
 
 ###  validate
 
-▸ **validate**(thing: *`any`*, context: *[IValidationContext](../#ivalidationcontext)*): [IValidationResult](../#ivalidationresult)
+▸ **validate**(thing: *`T`*, context: *[IValidationContext](../#ivalidationcontext)*): [IValidationResult](../#ivalidationresult)
 
 Run's the type's typechecker on the given value with the given validation context.
 
@@ -111,7 +111,7 @@ Run's the type's typechecker on the given value with the given validation contex
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| thing | `any` |  Value to be checked, either a snapshot or an instance. |
+| thing | `T` |  Value to be checked, either a snapshot or an instance. |
 | context | [IValidationContext](../#ivalidationcontext) |  Validation context, an array of { subpaths, subtypes } that should be validated |
 
 **Returns:** [IValidationResult](../#ivalidationresult)

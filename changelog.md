@@ -1,3 +1,4 @@
+-   Added `types.snapshotProcessor` [#947](https://github.com/mobxjs/mobx-state-tree/issues/947) through [#1165](https://github.com/mobxjs/mobx-state-tree/pull/1165) by [@xaviergonz](https://github.com/xaviergonz). This feature will eventually deprecate `postProcessSnapshot` and `preProcessSnapshot` from models in a next major version.
 -   Performance improvement for event handlers so they consume less RAM through [#1160](https://github.com/mobxjs/mobx-state-tree/pull/1160) by [@xaviergonz](https://github.com/xaviergonz)
 -   Make liveliness errors give more info to trace their cause [#1142](https://github.com/mobxjs/mobx-state-tree/issues/1142) through [#1147](https://github.com/mobxjs/mobx-state-tree/pull/1147) by [@xaviergonz](https://github.com/xaviergonz)
 

@@ -6,7 +6,6 @@ import {
     isStateTreeNode,
     isPrimitiveType,
     IAnyType,
-    CoreType,
     ExtractC,
     ExtractS,
     ExtractT

@@ -290,7 +290,8 @@ For that reason a comma between each member of a model is mandatory, unlike clas
 -   `.props(props)` produces a new type, based on the current one, and adds / overrides the specified properties
 -   `.actions(self => object literal with actions)` produces a new type, based on the current one, and adds / overrides the specified actions
 -   `.views(self => object literal with view functions)` produces a new type, based on the current one, and adds / overrides the specified view functions
--   `.preProcessSnapshot(snapshot => snapshot)` can be used to pre-process the raw JSON before instantiating a new model. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel)
+-   `.preProcessSnapshot(snapshot => snapshot)` can be used to pre-process the raw JSON before instantiating a new model. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel) or alternatively `types.snapshotProcessor`
+-   `.postProcessSnapshot(snapshot => snapshot)` can be used to post-process the raw JSON before getting a model snapshot. See [Lifecycle hooks](#lifecycle-hooks-for-typesmodel) or alternatively `types.snapshotProcessor`
 
 Note that `views` and `actions` don't define actions and views directly, but rather they should be given a function.
 The function will be invoked when a new model instance is created. The instance will be passed in as the first and only argument typically called `self`.
@@ -1001,6 +1002,28 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 -   `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one.
 -   `types.reference(targetType)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
 -   `types.safeReference(targetType)` is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed. See [references](#references) for more details.
+-   `types.snapshotProcessor(type, processors, name?)` runs a pre snapshot / post snapshot processor before/after serializing a given type. Example:
+    ```ts
+    const Todo1 = types.model({ text: types.string })
+    // in the backend the text type must be null when empty
+    interface BackendTodo {
+        text: string | null
+    }
+    const Todo2 = types.snapshotProcessor(Todo1, {
+        // from snapshot to instance
+        preProcessor(sn: BackendTodo) {
+            return {
+                text: sn.text || "";
+            }
+        },
+        // from instance to snapshot
+        postProcessor(sn): BackendTodo {
+            return {
+                text: !sn.text ? null : sn.text
+            }
+        }
+    })
+    ```
 
 ## Property types
 
@@ -1023,7 +1046,7 @@ const Todo = types.model("Todo", { done: true }).actions(self => ({
 }))
 ```
 
-The exception to this rule is the `preProcessSnapshot` hook. Because it is needed before instantiating model elements, it needs to be defined on the type itself:
+The exception to this rule are the `preProcessSnapshot` and `postProcessSnapshot` hooks (see `types.snapshotProcessor` as an alternative):
 
 ```javascript
 types
@@ -1043,12 +1066,12 @@ Note: pre and post processing are just meant to convert your data into types tha
 
 | Hook                  | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preProcessSnapshot`  | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be a _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames, etc. This hook is not called for individual property updates. _\*\*Note 1: Unlike the other hooks, this one is \_not_ created as part of the `actions` initializer, but directly on the type!**\_ \_**Note 2: The `preProcessSnapshot` transformation must be pure; it should not modify its original input argument!\*\*\_ |
 | `afterCreate`         | Immediately after an instance is created and initial values are applied. Children will fire this event before parents. You can't make assumptions about the parent safely, use `afterAttach` if you need to.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `afterAttach`         | As soon as the _direct_ parent is assigned (this node is attached to another node). If an element is created as part of a parent, `afterAttach` is also fired. Unlike `afterCreate`, `afterAttach` will fire breadth first. So, in `afterAttach` one can safely make assumptions about the parent, but in `afterCreate` not                                                                                                                                                                                                                                                                                                                   |
-| `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot. _\*\*Note: Unlike the other hooks, this one is \_not_ created as part of the `actions` initializer, but directly on the type!\*\*\_                                                                                                                                                                                                                                                                                                      |
 | `beforeDetach`        | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `beforeDestroy`       | Called before the node is destroyed, as a result of calling `destroy`, or by removing or replacing the node from the tree. Child destructors will fire before parents                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `preProcessSnapshot`  | Before creating an instance or applying a snapshot to an existing instance, this hook is called to give the option to transform the snapshot before it is applied. The hook should be a _pure_ function that returns a new snapshot. This can be useful to do some data conversion, enrichment, property renames, etc. This hook is not called for individual property updates. _\*\*Note 1: Unlike the other hooks, this one is \_not_ created as part of the `actions` initializer, but directly on the type!**\_ \_**Note 2: The `preProcessSnapshot` transformation must be pure; it should not modify its original input argument!\*\*\_ |
+| `postProcessSnapshot` | This hook is called every time a new snapshot is being generated. Typically it is the inverse function of `preProcessSnapshot`. This function should be a pure function that returns a new snapshot. _\*\*Note: Unlike the other hooks, this one is \_not_ created as part of the `actions` initializer, but directly on the type!\*\*\_                                                                                                                                                                                                                                                                                                      |
 
 Note, except for `preProcessSnapshot` and `postProcessSnapshot`, all hooks should be defined as actions.
 

@@ -6,7 +6,7 @@ import {
     getStateTreeNodeSafe,
     AnyObjectNode,
     ComplexType,
-    Type
+    SimpleType
 } from "../../internal"
 
 /**
@@ -18,7 +18,7 @@ export function createObjectNode<C, S, T>(
     parent: AnyObjectNode | null,
     subpath: string,
     environment: any,
-    initialValue: any
+    initialValue: C | T
 ): ObjectNode<C, S, T> {
     const existingNode = getStateTreeNodeSafe(initialValue)
     if (existingNode) {
@@ -34,7 +34,8 @@ export function createObjectNode<C, S, T>(
         )
     }
 
-    return new ObjectNode(type, parent, subpath, environment, initialValue)
+    // not a node, a snapshot
+    return new ObjectNode(type, parent, subpath, environment, initialValue as C)
 }
 
 /**
@@ -42,11 +43,11 @@ export function createObjectNode<C, S, T>(
  * @hidden
  */
 export function createScalarNode<C, S, T>(
-    type: Type<C, S, T, any>,
+    type: SimpleType<C, S, T>,
     parent: AnyObjectNode | null,
     subpath: string,
     environment: any,
-    initialValue: any
+    initialValue: C
 ): ScalarNode<C, S, T> {
     return new ScalarNode(type, parent, subpath, environment, initialValue)
 }

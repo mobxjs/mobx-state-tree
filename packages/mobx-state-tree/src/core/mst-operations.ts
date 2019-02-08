@@ -45,6 +45,7 @@ export function getType(object: IAnyStateTreeNode): IAnyType {
 
 /**
  * Returns the _declared_ type of the given sub property of an object, array or map.
+ * In the case of arrays and maps the property name is optional and will be ignored.
  *
  * Example:
  * ```ts
@@ -55,11 +56,11 @@ export function getType(object: IAnyStateTreeNode): IAnyType {
  * ```
  *
  * @param object
- * @param child
+ * @param propertyName
  * @returns
  */
-export function getChildType(object: IAnyStateTreeNode, child: string): IAnyType {
-    return getStateTreeNode(object).getChildType(child)
+export function getChildType(object: IAnyStateTreeNode, propertyName?: string): IAnyType {
+    return getStateTreeNode(object).getChildType(propertyName)
 }
 
 /**
@@ -89,7 +90,7 @@ export function onPatch(
 
 /**
  * Registers a function that is invoked whenever a new snapshot for the given model instance is available.
- * The listener will only be fire at the and of the current MobX (trans)action.
+ * The listener will only be fire at the end of the current MobX (trans)action.
  * See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
  *
  * @param target

@@ -136,5 +136,7 @@ export {
     ReferenceOptionsGetSet,
     ReferenceOptionsOnInvalidated,
     ReferenceIdentifier,
+    ISnapshotProcessor,
+    ISnapshotProcessors,
     types
 } from "./internal"

@@ -31,14 +31,11 @@ import {
     isType,
     IType,
     IValidationResult,
-    Late,
     ModelType,
     ObjectNode,
-    OptionalValue,
     typecheckInternal,
     typeCheckFailure,
     TypeFlags,
-    Union,
     EMPTY_OBJECT,
     OptionalProperty,
     ExtractC,
@@ -49,7 +46,9 @@ import {
     normalizeIdentifier,
     AnyObjectNode,
     AnyNode,
-    AnyModelType
+    AnyModelType,
+    asArray,
+    cannotDetermineSubtype
 } from "../../internal"
 
 /** @hidden */
@@ -113,19 +112,18 @@ export interface IMSTMap<IT extends IAnyType>
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
 
 function tryCollectModelTypes(type: IAnyType, modelTypes: Array<AnyModelType>): boolean {
+    const subtypes = type.getSubTypes()
+    if (subtypes === cannotDetermineSubtype) {
+        return false
+    }
+    if (subtypes) {
+        const subtypesArray = asArray(subtypes)
+        for (const subtype of subtypesArray) {
+            if (!tryCollectModelTypes(subtype, modelTypes)) return false
+        }
+    }
     if (type instanceof ModelType) {
         modelTypes.push(type)
-    } else if (type instanceof OptionalValue) {
-        if (!tryCollectModelTypes(type.type, modelTypes)) return false
-    } else if (type instanceof Union) {
-        for (let i = 0; i < type.types.length; i++) {
-            const uType = type.types[i]
-            if (!tryCollectModelTypes(uType, modelTypes)) return false
-        }
-    } else if (type instanceof Late) {
-        const t = type.getSubType(false)
-        if (!t) return false
-        tryCollectModelTypes(t, modelTypes)
     }
     return true
 }
@@ -197,14 +195,12 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     IKeyValueMap<ExtractS<IT>>,
     IMSTMap<IT>
 > {
-    subType: IAnyType
     identifierMode: MapIdentifierMode = MapIdentifierMode.UNKNOWN
     mapIdentifierAttribute: string | undefined = undefined
     readonly flags = TypeFlags.Map
 
-    constructor(name: string, subType: IAnyType) {
+    constructor(name: string, private readonly _subType: IAnyType) {
         super(name)
-        this.subType = subType
         this._determineIdentifierMode()
     }
 
@@ -212,17 +208,19 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         parent: AnyObjectNode | null,
         subpath: string,
         environment: any,
-        initialValue: this["C"] | this["S"] | this["T"]
+        initialValue: this["C"] | this["T"]
     ): this["N"] {
-        if (this.identifierMode === MapIdentifierMode.UNKNOWN) {
-            this._determineIdentifierMode()
-        }
+        this._determineIdentifierMode()
         return createObjectNode(this, parent, subpath, environment, initialValue)
     }
 
     private _determineIdentifierMode() {
+        if (this.identifierMode !== MapIdentifierMode.UNKNOWN) {
+            return
+        }
+
         const modelTypes: AnyModelType[] = []
-        if (tryCollectModelTypes(this.subType, modelTypes)) {
+        if (tryCollectModelTypes(this._subType, modelTypes)) {
             let identifierAttribute: string | undefined = undefined
             modelTypes.forEach(type => {
                 if (type.identifierAttribute) {
@@ -246,7 +244,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     initializeChildNodes(objNode: this["N"], initialSnapshot: this["C"] = {}): IChildNodesMap {
-        const subType = (objNode.type as this).subType
+        const subType = (objNode.type as this)._subType
         const environment = objNode.environment
         const result: IChildNodesMap = {}
         Object.keys(initialSnapshot!).forEach(name => {
@@ -267,7 +265,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     describe() {
-        return "Map<string, " + this.subType.describe() + ">"
+        return "Map<string, " + this._subType.describe() + ">"
     }
 
     getChildren(node: this["N"]): ReadonlyArray<AnyNode> {
@@ -286,7 +284,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         const key = change.name
         node.assertWritable({ subpath: key })
         const mapType = node.type as this
-        const subType = mapType.subType
+        const subType = mapType._subType
 
         switch (change.type) {
             case "update":
@@ -393,35 +391,37 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     @action
-    applySnapshot(node: this["N"], snapshot: this["S"]): void {
+    applySnapshot(node: this["N"], snapshot: this["C"]): void {
         typecheckInternal(this, snapshot)
         const target = node.storedValue
         const currentKeys: { [key: string]: boolean } = {}
         Array.from(target.keys()).forEach(key => {
             currentKeys[key] = false
         })
-        // Don't use target.replace, as it will throw all existing items first
-        for (let key in snapshot) {
-            target.set(key, snapshot[key] as any)
-            currentKeys["" + key] = true
+        if (snapshot) {
+            // Don't use target.replace, as it will throw away all existing items first
+            for (let key in snapshot) {
+                target.set(key, snapshot[key])
+                currentKeys["" + key] = true
+            }
         }
         Object.keys(currentKeys).forEach(key => {
             if (currentKeys[key] === false) target.delete(key)
         })
     }
 
-    getChildType(key: string): IAnyType {
-        return this.subType
+    getChildType(): IAnyType {
+        return this._subType
     }
 
-    isValidSnapshot(value: any, context: IValidationContext): IValidationResult {
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         if (!isPlainObject(value)) {
             return typeCheckFailure(context, value, "Value is not a plain object")
         }
 
         return flattenTypeErrors(
             Object.keys(value).map(path =>
-                this.subType.validate(value[path], getContextForPath(context, path, this.subType))
+                this._subType.validate(value[path], getContextForPath(context, path, this._subType))
             )
         )
     }
