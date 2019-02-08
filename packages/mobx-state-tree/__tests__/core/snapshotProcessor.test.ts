@@ -1,4 +1,4 @@
-import { types, getSnapshot, unprotect, cast, detach } from "../../src"
+import { types, getSnapshot, unprotect, cast, detach, clone } from "../../src"
 
 describe("snapshotProcessor", () => {
     describe("over a model type", () => {
@@ -7,21 +7,21 @@ describe("snapshotProcessor", () => {
         })
 
         test("no processors", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {})
             })
-            const m = P.create({ m: { x: "hi" } })
-            unprotect(m)
-            expect(m.m.x).toBe("hi")
-            expect(getSnapshot(m).m.x).toBe("hi")
+            const model = Model.create({ m: { x: "hi" } })
+            unprotect(model)
+            expect(model.m.x).toBe("hi")
+            expect(getSnapshot(model).m.x).toBe("hi")
             // reconciliation
-            m.m = { x: "ho" }
-            expect(m.m.x).toBe("ho")
-            expect(getSnapshot(m).m.x).toBe("ho")
+            model.m = { x: "ho" }
+            expect(model.m.x).toBe("ho")
+            expect(getSnapshot(model).m.x).toBe("ho")
         })
 
         test("pre processor", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     preProcessor(sn: { x: number }) {
                         return {
@@ -31,18 +31,18 @@ describe("snapshotProcessor", () => {
                     }
                 })
             })
-            const m = P.create({ m: { x: 5 } })
-            unprotect(m)
-            expect(m.m.x).toBe("5")
-            expect(getSnapshot(m).m.x).toBe("5")
+            const model = Model.create({ m: { x: 5 } })
+            unprotect(model)
+            expect(model.m.x).toBe("5")
+            expect(getSnapshot(model).m.x).toBe("5")
             // reconciliation
-            m.m = cast({ x: 6 })
-            expect(m.m.x).toBe("6")
-            expect(getSnapshot(m).m.x).toBe("6")
+            model.m = cast({ x: 6 })
+            expect(model.m.x).toBe("6")
+            expect(getSnapshot(model).m.x).toBe("6")
         })
 
         test("post processor", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     postProcessor(sn): { x: number } {
                         return {
@@ -52,16 +52,47 @@ describe("snapshotProcessor", () => {
                     }
                 })
             })
-            const m = P.create({
+            const model = Model.create({
                 m: { x: "5" }
             })
-            unprotect(m)
-            expect(m.m.x).toBe("5")
-            expect(getSnapshot(m).m.x).toBe(5)
+            unprotect(model)
+            expect(model.m.x).toBe("5")
+            expect(getSnapshot(model).m.x).toBe(5)
             // reconciliation
-            m.m = cast({ x: "6" })
-            expect(m.m.x).toBe("6")
-            expect(getSnapshot(m).m.x).toBe(6)
+            model.m = cast({ x: "6" })
+            expect(model.m.x).toBe("6")
+            expect(getSnapshot(model).m.x).toBe(6)
+        })
+
+        test("pre and post processor", () => {
+            const Model = types.model({
+                m: types.snapshotProcessor(M, {
+                    preProcessor(sn: { x: number }) {
+                        return {
+                            ...sn,
+                            x: String(sn.x)
+                        }
+                    },
+                    postProcessor(sn): { x: number } {
+                        return {
+                            ...sn,
+                            x: Number(sn.x)
+                        }
+                    }
+                })
+            })
+            const model = Model.create({
+                m: { x: 5 }
+            })
+            unprotect(model)
+            expect(model.m.x).toBe("5")
+            expect(getSnapshot(model).m.x).toBe(5)
+            // reconciliation
+            model.m = cast({ x: "6" })
+            expect(model.m.x).toBe("6")
+            expect(getSnapshot(model).m.x).toBe(6)
+            // cloning
+            expect(getSnapshot(clone(model.m)).x).toBe(6)
         })
     })
 
@@ -69,55 +100,80 @@ describe("snapshotProcessor", () => {
         const M = types.string
 
         test("no processors", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {})
             })
-            const m = P.create({ m: "hi" })
-            unprotect(m)
-            expect(m.m).toBe("hi")
-            expect(getSnapshot(m).m).toBe("hi")
+            const model = Model.create({ m: "hi" })
+            unprotect(model)
+            expect(model.m).toBe("hi")
+            expect(getSnapshot(model).m).toBe("hi")
             // reconciliation
-            m.m = "ho"
-            expect(m.m).toBe("ho")
-            expect(getSnapshot(m).m).toBe("ho")
+            model.m = "ho"
+            expect(model.m).toBe("ho")
+            expect(getSnapshot(model).m).toBe("ho")
         })
 
         test("pre processor", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     preProcessor(sn: number) {
                         return String(sn)
                     }
                 })
             })
-            const m = P.create({ m: 5 })
-            unprotect(m)
-            expect(m.m).toBe("5")
-            expect(getSnapshot(m).m).toBe("5")
+            const model = Model.create({ m: 5 })
+            unprotect(model)
+            expect(model.m).toBe("5")
+            expect(getSnapshot(model).m).toBe("5")
             // reconciliation
-            m.m = 6 as any
-            expect(m.m).toBe("6")
-            expect(getSnapshot(m).m).toBe("6")
+            model.m = 6 as any
+            expect(model.m).toBe("6")
+            expect(getSnapshot(model).m).toBe("6")
         })
 
         test("post processor", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     postProcessor(sn): number {
                         return Number(sn)
                     }
                 })
             })
-            const m = P.create({
+            const model = Model.create({
                 m: "5"
             })
-            unprotect(m)
-            expect(m.m).toBe("5")
-            expect(getSnapshot(m).m).toBe(5)
+            unprotect(model)
+            expect(model.m).toBe("5")
+            expect(getSnapshot(model).m).toBe(5)
             // reconciliation
-            m.m = "6"
-            expect(m.m).toBe("6")
-            expect(getSnapshot(m).m).toBe(6)
+            model.m = "6"
+            expect(model.m).toBe("6")
+            expect(getSnapshot(model).m).toBe(6)
+        })
+
+        test("pre and post processor", () => {
+            const Model = types.model({
+                m: types.snapshotProcessor(M, {
+                    preProcessor(sn: number) {
+                        return String(sn)
+                    },
+                    postProcessor(sn): number {
+                        return Number(sn)
+                    }
+                })
+            })
+            const model = Model.create({
+                m: 5
+            })
+            unprotect(model)
+            expect(model.m).toBe("5")
+            expect(getSnapshot(model).m).toBe(5)
+            // reconciliation
+            model.m = "6"
+            expect(model.m).toBe("6")
+            expect(getSnapshot(model).m).toBe(6)
+            // cloning
+            expect(getSnapshot(clone(model)).m).toBe(6)
         })
     })
 
@@ -125,55 +181,80 @@ describe("snapshotProcessor", () => {
         const M = types.array(types.string)
 
         test("no processors", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {})
             })
-            const m = P.create({ m: ["hi"] })
-            unprotect(m)
-            expect(m.m[0]).toBe("hi")
-            expect(getSnapshot(m).m[0]).toBe("hi")
+            const model = Model.create({ m: ["hi"] })
+            unprotect(model)
+            expect(model.m[0]).toBe("hi")
+            expect(getSnapshot(model).m[0]).toBe("hi")
             // reconciliation
-            m.m = cast(["ho"])
-            expect(m.m[0]).toBe("ho")
-            expect(getSnapshot(m).m[0]).toBe("ho")
+            model.m = cast(["ho"])
+            expect(model.m[0]).toBe("ho")
+            expect(getSnapshot(model).m[0]).toBe("ho")
         })
 
         test("pre processor", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     preProcessor(sn: number[]) {
                         return sn.map(n => String(n))
                     }
                 })
             })
-            const m = P.create({ m: [5] })
-            unprotect(m)
-            expect(m.m[0]).toBe("5")
-            expect(getSnapshot(m).m[0]).toBe("5")
+            const model = Model.create({ m: [5] })
+            unprotect(model)
+            expect(model.m[0]).toBe("5")
+            expect(getSnapshot(model).m[0]).toBe("5")
             // reconciliation
-            m.m = cast([6])
-            expect(m.m[0]).toBe("6")
-            expect(getSnapshot(m).m[0]).toBe("6")
+            model.m = cast([6])
+            expect(model.m[0]).toBe("6")
+            expect(getSnapshot(model).m[0]).toBe("6")
         })
 
         test("post processor", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     postProcessor(sn): number[] {
                         return sn.map(n => Number(n))
                     }
                 })
             })
-            const m = P.create({
+            const model = Model.create({
                 m: ["5"]
             })
-            unprotect(m)
-            expect(m.m[0]).toBe("5")
-            expect(getSnapshot(m).m[0]).toBe(5)
+            unprotect(model)
+            expect(model.m[0]).toBe("5")
+            expect(getSnapshot(model).m[0]).toBe(5)
             // reconciliation
-            m.m = cast(["6"])
-            expect(m.m[0]).toBe("6")
-            expect(getSnapshot(m).m[0]).toBe(6)
+            model.m = cast(["6"])
+            expect(model.m[0]).toBe("6")
+            expect(getSnapshot(model).m[0]).toBe(6)
+        })
+
+        test("pre and post processor", () => {
+            const Model = types.model({
+                m: types.snapshotProcessor(M, {
+                    preProcessor(sn: number[]) {
+                        return sn.map(n => String(n))
+                    },
+                    postProcessor(sn): number[] {
+                        return sn.map(n => Number(n))
+                    }
+                })
+            })
+            const model = Model.create({
+                m: [5]
+            })
+            unprotect(model)
+            expect(model.m[0]).toBe("5")
+            expect(getSnapshot(model).m[0]).toBe(5)
+            // reconciliation
+            model.m = cast([6])
+            expect(model.m[0]).toBe("6")
+            expect(getSnapshot(model).m[0]).toBe(6)
+            // cloning
+            expect(getSnapshot(clone(model.m))[0]).toBe(6)
         })
     })
 
@@ -181,21 +262,21 @@ describe("snapshotProcessor", () => {
         const M = types.map(types.string)
 
         test("no processors", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {})
             })
-            const m = P.create({ m: { x: "hi" } })
-            unprotect(m)
-            expect(m.m.get("x")).toBe("hi")
-            expect(getSnapshot(m).m.x).toBe("hi")
+            const model = Model.create({ m: { x: "hi" } })
+            unprotect(model)
+            expect(model.m.get("x")).toBe("hi")
+            expect(getSnapshot(model).m.x).toBe("hi")
             // reconciliation
-            m.m.set("x", "ho")
-            expect(m.m.get("x")).toBe("ho")
-            expect(getSnapshot(m).m.x).toBe("ho")
+            model.m.set("x", "ho")
+            expect(model.m.get("x")).toBe("ho")
+            expect(getSnapshot(model).m.x).toBe("ho")
         })
 
         test("pre processor", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     preProcessor(sn: { x: number }) {
                         return {
@@ -205,18 +286,18 @@ describe("snapshotProcessor", () => {
                     }
                 })
             })
-            const m = P.create({ m: { x: 5 } })
-            unprotect(m)
-            expect(m.m.get("x")).toBe("5")
-            expect(getSnapshot(m).m.x).toBe("5")
+            const model = Model.create({ m: { x: 5 } })
+            unprotect(model)
+            expect(model.m.get("x")).toBe("5")
+            expect(getSnapshot(model).m.x).toBe("5")
             // reconciliation
-            m.m = cast({ x: 6 })
-            expect(m.m.get("x")).toBe("6")
-            expect(getSnapshot(m).m.x).toBe("6")
+            model.m = cast({ x: 6 })
+            expect(model.m.get("x")).toBe("6")
+            expect(getSnapshot(model).m.x).toBe("6")
         })
 
         test("post processor", () => {
-            const P = types.model({
+            const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     postProcessor(sn): { x: number } {
                         return {
@@ -226,16 +307,47 @@ describe("snapshotProcessor", () => {
                     }
                 })
             })
-            const m = P.create({
+            const model = Model.create({
                 m: { x: "5" }
             })
-            unprotect(m)
-            expect(m.m.get("x")).toBe("5")
-            expect(getSnapshot(m).m.x).toBe(5)
+            unprotect(model)
+            expect(model.m.get("x")).toBe("5")
+            expect(getSnapshot(model).m.x).toBe(5)
             // reconciliation
-            m.m = cast({ x: "6" })
-            expect(m.m.get("x")).toBe("6")
-            expect(getSnapshot(m).m.x).toBe(6)
+            model.m = cast({ x: "6" })
+            expect(model.m.get("x")).toBe("6")
+            expect(getSnapshot(model).m.x).toBe(6)
+        })
+
+        test("pre and post processor", () => {
+            const Model = types.model({
+                m: types.snapshotProcessor(M, {
+                    preProcessor(sn: { x: number }) {
+                        return {
+                            ...sn,
+                            x: String(sn.x)
+                        }
+                    },
+                    postProcessor(sn): { x: number } {
+                        return {
+                            ...sn,
+                            x: Number(sn.x)
+                        }
+                    }
+                })
+            })
+            const model = Model.create({
+                m: { x: 5 }
+            })
+            unprotect(model)
+            expect(model.m.get("x")).toBe("5")
+            expect(getSnapshot(model).m.x).toBe(5)
+            // reconciliation
+            model.m = cast({ x: 6 })
+            expect(model.m.get("x")).toBe("6")
+            expect(getSnapshot(model).m.x).toBe(6)
+            // cloning
+            expect(getSnapshot(clone(model.m)).x).toBe(6)
         })
     })
 

@@ -59,7 +59,6 @@ export abstract class BaseNode<C, S, T> {
     }
 
     readonly type: IAnyType
-    validationType?: IAnyType
 
     private _hookSubscribers?: EventHandlers<HookSubscribers>
 
