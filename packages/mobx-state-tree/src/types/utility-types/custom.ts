@@ -126,10 +126,13 @@ export class CustomType<S, T> extends SimpleType<S | T, S, T> {
 
     reconcile(current: this["N"], value: S | T): this["N"] {
         const isSnapshot = !this.options.isTargetType(value)
-        const unchanged =
-            current.type === this &&
-            (isSnapshot ? value === current.snapshot : value === current.storedValue)
-        if (unchanged) return current
+        // in theory customs use scalar nodes which cannot be detached, but still...
+        if (!current.isDetaching) {
+            const unchanged =
+                current.type === this &&
+                (isSnapshot ? value === current.snapshot : value === current.storedValue)
+            if (unchanged) return current
+        }
         const valueToStore: T = isSnapshot ? this.options.fromSnapshot(value as S) : (value as T)
         const newNode = this.instantiate(
             current.parent,
@@ -137,7 +140,7 @@ export class CustomType<S, T> extends SimpleType<S | T, S, T> {
             current.environment,
             valueToStore
         )
-        current.die()
+        current.die() // noop if detaching
         return newNode
     }
 }

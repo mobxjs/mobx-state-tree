@@ -339,17 +339,17 @@ function reconcileArrayChildren<TT>(
         // TODO: https://github.com/mobxjs/mobx-state-tree/issues/340#issuecomment-325581681
         if (isNode(newValue)) newValue = newValue.storedValue
 
-        // both are empty, end
         if (!oldNode && !hasNewNode) {
+            // both are empty, end
             break
-            // new one does not exists, old one dies
         } else if (!hasNewNode) {
+            // new one does not exists, old one dies
             oldNode.die()
             oldNodes.splice(i, 1)
             i--
             nothingChanged = false
-            // there is no old node, create it
         } else if (!oldNode) {
+            // there is no old node, create it
             // check if already belongs to the same parent. if so, avoid pushing item in. only swapping can occur.
             if (isStateTreeNode(newValue) && getStateTreeNode(newValue).parent === parent) {
                 // this node is owned by this parent, but not in the reconcilable set, so it must be double
@@ -361,11 +361,11 @@ function reconcileArrayChildren<TT>(
             }
             oldNodes.splice(i, 0, valueAsNode(childType, parent, "" + newPaths[i], newValue))
             nothingChanged = false
-            // both are the same, reconcile
         } else if (areSame(oldNode, newValue)) {
+            // both are the same, reconcile
             oldNodes[i] = valueAsNode(childType, parent, "" + newPaths[i], newValue, oldNode)
-            // nothing to do, try to reorder
         } else {
+            // nothing to do, try to reorder
             oldMatch = undefined
 
             // find a possible candidate to reuse

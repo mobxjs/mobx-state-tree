@@ -4,7 +4,6 @@ import {
     Hook,
     escapeJsonPath,
     EventHandlers,
-    IType,
     IAnyType,
     IDisposer
 } from "../../internal"
@@ -135,6 +134,10 @@ export abstract class BaseNode<C, S, T> {
 
     get isAlive() {
         return this.state !== NodeLifeCycle.DEAD
+    }
+
+    get isDetaching() {
+        return this.state === NodeLifeCycle.DETACHING
     }
 
     get observableIsAlive() {

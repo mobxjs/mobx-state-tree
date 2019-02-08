@@ -68,13 +68,12 @@ export class OptionalValue<IT extends IAnyType> extends BaseType<
     }
 
     reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
-        const ret = this._subtype.reconcile(
+        return this._subtype.reconcile(
             current,
             newValue !== undefined && this._subtype.is(newValue)
                 ? newValue
                 : this.getDefaultInstanceOrSnapshot()
         )
-        return ret
     }
 
     getDefaultInstanceOrSnapshot(): this["C"] | this["T"] {

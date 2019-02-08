@@ -372,7 +372,7 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
     }
 
     reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
-        if (current.type === this) {
+        if (!current.isDetaching && current.type === this) {
             const compareByValue = isStateTreeNode(newValue)
             const ref: StoredReference<IT> = current.storedValue
             if (!compareByValue && ref.identifier === newValue) return current
@@ -384,7 +384,7 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
             current.environment,
             newValue
         )
-        current.die()
+        current.die() // noop if detaching
         return newNode
     }
 }
@@ -439,7 +439,11 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
         const newIdentifier = isStateTreeNode(newValue)
             ? this.options.set(newValue, current ? current.storedValue : null)
             : newValue
-        if (current.type === this && current.storedValue === newIdentifier) {
+        if (
+            !current.isDetaching &&
+            current.type === this &&
+            current.storedValue === newIdentifier
+        ) {
             return current
         }
         const newNode = this.instantiate(
@@ -448,7 +452,7 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
             current.environment,
             newIdentifier
         )
-        current.die()
+        current.die() // noop if detaching
         return newNode
     }
 }

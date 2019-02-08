@@ -10,7 +10,8 @@ import {
     getSnapshot,
     types,
     IJsonPatch,
-    setLivelinessChecking
+    setLivelinessChecking,
+    detach
 } from "../../src"
 import { observable, autorun } from "mobx"
 
@@ -457,4 +458,20 @@ test("it should return pop/shift'ed values for object arrays", () => {
 
     expect(test.shift()).toEqual({ id: "foo" })
     expect(test.shift()).toEqual({ id: "bar" })
+})
+
+test("#1173 - detaching an array should not eliminate its children", () => {
+    const M = types.model({})
+    const AM = types.array(M)
+    const Store = types.model({ items: AM })
+    const s = Store.create({ items: [{}, {}, {}] })
+    const n0 = s.items[0]
+
+    unprotect(s)
+
+    const detachedItems = detach(s.items)
+    expect(s.items).not.toBe(detachedItems)
+    expect(s.items.length).toBe(0)
+    expect(detachedItems.length).toBe(3)
+    expect(detachedItems[0]).toBe(n0)
 })

@@ -1146,3 +1146,18 @@ test("#1112 - identifier cache should be cleared for unaccessed wrapped objects"
 
     expect(store.selectedEntity!.id).toBe("2")
 })
+
+test("#1173 - detaching a model should not screw it", () => {
+    const AM = types.model({ x: 5 })
+    const Store = types.model({ item: types.maybe(AM) })
+    const s = Store.create({ item: { x: 6 } })
+    const n0 = s.item
+
+    unprotect(s)
+
+    const detachedItem = detach(s.item!)
+    expect(s.item).not.toBe(detachedItem)
+    expect(s.item).toBe(undefined)
+    expect(detachedItem.x).toBe(6)
+    expect(detachedItem).toBe(n0)
+})

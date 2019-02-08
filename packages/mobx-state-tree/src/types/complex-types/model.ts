@@ -595,13 +595,16 @@ export class ModelType<
         // TODO: mobx typings don't seem to take into account that newValue can be set even when removing a prop
         const change = chg as IObjectWillChange & { newValue?: any }
 
-        const node = getStateTreeNode(change.object)
-        node.assertWritable({ subpath: change.name })
-        const type = (node.type as this).properties[change.name]
+        const childNode = getStateTreeNode(change.object)
+        childNode.assertWritable({ subpath: change.name })
+        const childType = (childNode.type as this).properties[change.name]
         // only properties are typed, state are stored as-is references
-        if (type) {
-            typecheckInternal(type, change.newValue)
-            change.newValue = type.reconcile(node.getChildNode(change.name), change.newValue)
+        if (childType) {
+            typecheckInternal(childType, change.newValue)
+            change.newValue = childType.reconcile(
+                childNode.getChildNode(change.name),
+                change.newValue
+            )
         }
         return change
     }
@@ -610,21 +613,21 @@ export class ModelType<
         // TODO: mobx typings don't seem to take into account that newValue can be set even when removing a prop
         const change = chg as IObjectWillChange & { newValue?: any; oldValue?: any }
 
-        const node = getStateTreeNode(change.object)
-        const type = (node.type as this).properties[change.name]
-        if (!type) {
+        const childNode = getStateTreeNode(change.object)
+        const childType = (childNode.type as this).properties[change.name]
+        if (!childType) {
             // don't emit patches for volatile state
             return
         }
-        const oldValue = change.oldValue ? change.oldValue.snapshot : undefined
-        node.emitPatch(
+        const oldChildValue = change.oldValue ? change.oldValue.snapshot : undefined
+        childNode.emitPatch(
             {
                 op: "replace",
                 path: escapeJsonPath(change.name),
                 value: change.newValue.snapshot,
-                oldValue
+                oldValue: oldChildValue
             },
-            node
+            childNode
         )
     }
 
@@ -677,10 +680,10 @@ export class ModelType<
 
     @action
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
-        const s = this.applySnapshotPreProcessor(snapshot)
-        typecheckInternal(this, s)
+        const preProcessedSnapshot = this.applySnapshotPreProcessor(snapshot)
+        typecheckInternal(this, preProcessedSnapshot)
         this.forAllProps(name => {
-            node.storedValue[name] = s[name]
+            node.storedValue[name] = preProcessedSnapshot[name]
         })
     }
 
