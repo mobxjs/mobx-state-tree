@@ -86,7 +86,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
 > {
     readonly flags = TypeFlags.Array
 
-    constructor(name: string, private readonly _subType: IAnyType) {
+    constructor(name: string, private readonly _subType: IT) {
         super(name)
     }
 

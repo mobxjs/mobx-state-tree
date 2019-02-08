@@ -45,6 +45,7 @@ export function getType(object: IAnyStateTreeNode): IAnyType {
 
 /**
  * Returns the _declared_ type of the given sub property of an object, array or map.
+ * In the case of arrays and maps the property name is optional and will be ignored.
  *
  * Example:
  * ```ts
@@ -55,11 +56,11 @@ export function getType(object: IAnyStateTreeNode): IAnyType {
  * ```
  *
  * @param object
- * @param child
+ * @param propertyName
  * @returns
  */
-export function getChildType(object: IAnyStateTreeNode, child: string): IAnyType {
-    return getStateTreeNode(object).getChildType(child)
+export function getChildType(object: IAnyStateTreeNode, propertyName?: string): IAnyType {
+    return getStateTreeNode(object).getChildType(propertyName)
 }
 
 /**

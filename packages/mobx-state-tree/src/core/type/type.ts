@@ -420,7 +420,7 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
 
     abstract getChildren(node: this["N"]): ReadonlyArray<AnyNode>
     abstract getChildNode(node: this["N"], key: string): AnyNode
-    abstract getChildType(key: string): IAnyType
+    abstract getChildType(propertyName?: string): IAnyType
     abstract initializeChildNodes(node: this["N"], snapshot: any): IChildNodesMap
     abstract removeChild(node: this["N"], subpath: string): void
 

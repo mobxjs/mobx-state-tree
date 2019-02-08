@@ -710,8 +710,13 @@ export class ModelType<
         return snapshot
     }
 
-    getChildType(key: string): IAnyType {
-        return this.properties[key]
+    getChildType(propertyName: string): IAnyType {
+        if (process.env.NODE_ENV !== "production") {
+            if (propertyName === undefined || propertyName === null) {
+                throw fail("getChildType requires a property name when used over a model type")
+            }
+        }
+        return this.properties[propertyName]
     }
 
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {

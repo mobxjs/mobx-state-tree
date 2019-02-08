@@ -2027,9 +2027,9 @@ ___
 
 ###  getChildType
 
-▸ **getChildType**(object: *`IAnyStateTreeNode`*, child: *`string`*): [IAnyType](#ianytype)
+▸ **getChildType**(object: *`IAnyStateTreeNode`*, propertyName?: *`undefined` \| `string`*): [IAnyType](#ianytype)
 
-Returns the _declared_ type of the given sub property of an object, array or map.
+Returns the _declared_ type of the given sub property of an object, array or map. In the case of arrays and maps the property name is optional and will be ignored.
 
 Example:
 
@@ -2045,7 +2045,7 @@ console.log(getChildType(box, "x").name) // 'number'
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | object | `IAnyStateTreeNode` |  \- |
-| child | `string` |  \- |
+| `Optional` propertyName | `undefined` \| `string` |  \- |
 
 **Returns:** [IAnyType](#ianytype)
 

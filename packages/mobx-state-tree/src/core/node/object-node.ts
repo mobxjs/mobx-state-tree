@@ -397,8 +397,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         }
     }
 
-    getChildType(key: string): IAnyType {
-        return this.type.getChildType(key)
+    getChildType(propertyName?: string): IAnyType {
+        return this.type.getChildType(propertyName)
     }
 
     get isProtected(): boolean {

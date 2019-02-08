@@ -195,14 +195,12 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     IKeyValueMap<ExtractS<IT>>,
     IMSTMap<IT>
 > {
-    subType: IAnyType
     identifierMode: MapIdentifierMode = MapIdentifierMode.UNKNOWN
     mapIdentifierAttribute: string | undefined = undefined
     readonly flags = TypeFlags.Map
 
-    constructor(name: string, subType: IAnyType) {
+    constructor(name: string, private readonly _subType: IAnyType) {
         super(name)
-        this.subType = subType
         this._determineIdentifierMode()
     }
 
@@ -222,7 +220,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         }
 
         const modelTypes: AnyModelType[] = []
-        if (tryCollectModelTypes(this.subType, modelTypes)) {
+        if (tryCollectModelTypes(this._subType, modelTypes)) {
             let identifierAttribute: string | undefined = undefined
             modelTypes.forEach(type => {
                 if (type.identifierAttribute) {
@@ -246,7 +244,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     initializeChildNodes(objNode: this["N"], initialSnapshot: this["C"] = {}): IChildNodesMap {
-        const subType = (objNode.type as this).subType
+        const subType = (objNode.type as this)._subType
         const environment = objNode.environment
         const result: IChildNodesMap = {}
         Object.keys(initialSnapshot!).forEach(name => {
@@ -267,7 +265,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     describe() {
-        return "Map<string, " + this.subType.describe() + ">"
+        return "Map<string, " + this._subType.describe() + ">"
     }
 
     getChildren(node: this["N"]): ReadonlyArray<AnyNode> {
@@ -286,7 +284,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         const key = change.name
         node.assertWritable({ subpath: key })
         const mapType = node.type as this
-        const subType = mapType.subType
+        const subType = mapType._subType
 
         switch (change.type) {
             case "update":
@@ -412,8 +410,8 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         })
     }
 
-    getChildType(key: string): IAnyType {
-        return this.subType
+    getChildType(): IAnyType {
+        return this._subType
     }
 
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
@@ -423,7 +421,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
         return flattenTypeErrors(
             Object.keys(value).map(path =>
-                this.subType.validate(value[path], getContextForPath(context, path, this.subType))
+                this._subType.validate(value[path], getContextForPath(context, path, this._subType))
             )
         )
     }
