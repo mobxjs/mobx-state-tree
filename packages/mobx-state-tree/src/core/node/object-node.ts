@@ -453,12 +453,17 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this.fireHook(Hook.beforeDetach)
         this.state = NodeLifeCycle.DETACHING
 
-        this.environment = this.root.environment // make backup of environment
-        this.identifierCache = this.root.identifierCache!.splitCache(this)
-        this.parent!.removeChild(this.subpath)
-        this.baseSetParent(null, "")
+        const newEnv = this.root.environment
+        const newIdCache = this.root.identifierCache!.splitCache(this)
 
-        this.state = NodeLifeCycle.FINALIZED
+        try {
+            this.parent!.removeChild(this.subpath)
+            this.baseSetParent(null, "")
+            this.environment = newEnv
+            this.identifierCache = newIdCache
+        } finally {
+            this.state = NodeLifeCycle.FINALIZED
+        }
     }
 
     private preboot(): void {
