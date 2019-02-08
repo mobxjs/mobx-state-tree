@@ -177,8 +177,7 @@ ___
 
 ▸ **postProcessSnapshot**<`NewS`>(fn: *`function`*): [IModelType](imodeltype.md)<`PROPS`, `OTHERS`, `CustomC`, `NewS`>
 
-*__deprecated__*:
- See `types.snapshotProcessor`
+*__deprecated__*: See `types.snapshotProcessor`
 
 **Type parameters:**
 
@@ -198,8 +197,7 @@ ___
 
 ▸ **preProcessSnapshot**<`NewC`>(fn: *`function`*): [IModelType](imodeltype.md)<`PROPS`, `OTHERS`, `NewC`, `CustomS`>
 
-*__deprecated__*:
- See `types.snapshotProcessor`
+*__deprecated__*: See `types.snapshotProcessor`
 
 **Type parameters:**
 
