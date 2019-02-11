@@ -167,17 +167,15 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
             if (process.env.NODE_ENV !== "production") {
                 if (!node.identifierAttribute) throw fail(needsIdentifierError)
             }
-            let key = node.identifier!
-            this.set(key, node.value)
-            return node.value
+            this.set(node.identifier!, value)
+            return value as any
         } else if (!isMutable(value)) {
             throw fail(`Map.put can only be used to store complex values`)
         } else {
-            let key: string
             const mapType = getStateTreeNode(this as IAnyStateTreeNode).type as MapType<any>
             if (mapType.identifierMode === MapIdentifierMode.NO) throw fail(needsIdentifierError)
             if (mapType.identifierMode === MapIdentifierMode.YES) {
-                key = normalizeIdentifier(value[mapType.mapIdentifierAttribute!])
+                const key = normalizeIdentifier(value[mapType.mapIdentifierAttribute!])
                 this.set(key, value)
                 return this.get(key) as any
             }
@@ -316,10 +314,6 @@ export class MapType<IT extends IAnyType> extends ComplexType<
                     `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
                 )
         }
-    }
-
-    getValue(node: this["N"]): this["T"] {
-        return node.storedValue
     }
 
     getSnapshot(node: this["N"]): this["S"] {

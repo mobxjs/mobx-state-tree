@@ -5,7 +5,9 @@ import {
     escapeJsonPath,
     EventHandlers,
     IAnyType,
-    IDisposer
+    IDisposer,
+    SimpleType,
+    ComplexType
 } from "../../internal"
 import { createAtom, IAtom } from "mobx"
 
@@ -40,7 +42,11 @@ export abstract class BaseNode<C, S, T> {
     }
 
     storedValue!: any // usually the same type as the value, but not always (such as with references)
-    value!: T
+    get value(): T {
+        return (this.type as SimpleType<any, any, any> | ComplexType<any, any, any>).getValue(
+            this as any
+        )
+    }
 
     private aliveAtom?: IAtom
     private _state = NodeLifeCycle.INITIALIZING
@@ -56,8 +62,6 @@ export abstract class BaseNode<C, S, T> {
             this.aliveAtom.reportChanged()
         }
     }
-
-    readonly type: IAnyType
 
     private _hookSubscribers?: EventHandlers<HookSubscribers>
 
@@ -76,16 +80,18 @@ export abstract class BaseNode<C, S, T> {
         return this._hookSubscribers.register(hook, hookHandler)
     }
 
-    environment: any = undefined
-
     private _parent!: AnyObjectNode | null
     get parent() {
         return this._parent
     }
 
-    constructor(type: IAnyType, parent: AnyObjectNode | null, subpath: string, environment: any) {
+    constructor(
+        readonly type: IAnyType,
+        parent: AnyObjectNode | null,
+        subpath: string,
+        public environment: any
+    ) {
         this.environment = environment
-        this.type = type
         this.baseSetParent(parent, subpath)
     }
 

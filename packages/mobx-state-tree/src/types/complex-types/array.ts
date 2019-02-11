@@ -181,10 +181,6 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         return change
     }
 
-    getValue(node: this["N"]): this["T"] {
-        return node.storedValue
-    }
-
     getSnapshot(node: this["N"]): this["S"] {
         return node.getChildren().map(childNode => childNode.snapshot)
     }

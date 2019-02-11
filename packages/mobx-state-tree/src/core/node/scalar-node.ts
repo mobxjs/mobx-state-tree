@@ -67,15 +67,6 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
         }
     }
 
-    get value(): T {
-        // if we ever find a case where scalar nodes can be accessed without iterating through its parent
-        // uncomment this to make sure the parent chain is created when this is accessed
-        // if (this.parent) {
-        //     this.parent.createObservableInstanceIfNeeded()
-        // }
-        return this.type.getValue(this)
-    }
-
     get snapshot(): S {
         return freeze(this.getSnapshot())
     }
