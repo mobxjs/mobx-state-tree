@@ -474,16 +474,16 @@ export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, ScalarNode<C
         return snapshot as any
     }
 
-    getSnapshot(node: this["N"]): S {
-        return node.storedValue
-    }
-
     getValue(node: this["N"]): T {
         // if we ever find a case where scalar nodes can be accessed without iterating through its parent
         // uncomment this to make sure the parent chain is created when this is accessed
         // if (node.parent) {
         //     node.parent.createObservableInstanceIfNeeded()
         // }
+        return node.storedValue
+    }
+
+    getSnapshot(node: this["N"]): S {
         return node.storedValue
     }
 
