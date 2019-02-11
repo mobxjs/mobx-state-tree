@@ -236,11 +236,7 @@ export type ExtractCST<IT extends IAnyType> = IT extends IType<infer C, infer S,
 /**
  * The instance representation of a given type.
  */
-export type Instance<T> = T extends IStateTreeNode
-    ? T
-    : T extends IType<any, any, infer TT>
-    ? TT
-    : T
+export type Instance<T> = T extends IType<any, any, infer TT> ? TT : T
 
 /**
  * The input (creation) snapshot representation of a given type.
