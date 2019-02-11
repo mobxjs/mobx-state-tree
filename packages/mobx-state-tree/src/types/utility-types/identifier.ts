@@ -34,6 +34,7 @@ abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
     }
 
     reconcile(current: this["N"], newValue: this["C"]) {
+        // we don't consider detaching here since identifier are scalar nodes, and scalar nodes cannot be detached
         if (current.storedValue !== newValue)
             throw fail(
                 `Tried to change identifier from '${

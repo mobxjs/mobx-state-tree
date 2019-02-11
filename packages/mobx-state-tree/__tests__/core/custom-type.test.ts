@@ -5,7 +5,6 @@ import {
     unprotect,
     applySnapshot,
     applyPatch,
-    cast,
     SnapshotOut
 } from "../../src"
 

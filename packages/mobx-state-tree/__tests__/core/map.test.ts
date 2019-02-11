@@ -9,7 +9,8 @@ import {
     isStateTreeNode,
     SnapshotOut,
     IJsonPatch,
-    IAnyModelType
+    IAnyModelType,
+    detach
 } from "../../src"
 
 const createTestFactories = () => {
@@ -525,4 +526,20 @@ test("#751 restore from snapshot should work", () => {
     expect(server.map.get((1 as any) as string)!.id).toBe(1)
 
     expect(server.map.size).toBe(1)
+})
+
+test("#1173 - detaching a map should not eliminate its children", () => {
+    const M = types.model({})
+    const AM = types.map(M)
+    const Store = types.model({ items: AM })
+    const s = Store.create({ items: { x: {}, y: {}, z: {} } })
+    const n0 = s.items.get("x")
+
+    unprotect(s)
+
+    const detachedItems = detach(s.items)
+    expect(s.items).not.toBe(detachedItems)
+    expect(s.items.size).toBe(0)
+    expect(detachedItems.size).toBe(3)
+    expect(detachedItems.get("x")).toBe(n0)
 })
