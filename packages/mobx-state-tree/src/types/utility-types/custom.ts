@@ -104,10 +104,6 @@ export class CustomType<S, T> extends SimpleType<S | T, S, T> {
         return typeCheckSuccess()
     }
 
-    getValue(node: this["N"]): T {
-        return node.storedValue
-    }
-
     getSnapshot(node: this["N"]): S {
         return this.options.toSnapshot(node.storedValue)
     }

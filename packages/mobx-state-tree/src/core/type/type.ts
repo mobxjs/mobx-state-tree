@@ -177,11 +177,6 @@ export interface IType<C, S, T> {
      * @internal
      * @hidden
      */
-    getValue(node: BaseNode<C, S, T>): T
-    /**
-     * @internal
-     * @hidden
-     */
     getSnapshot(node: BaseNode<C, S, T>, applyPostProcess?: boolean): S
     /**
      * @internal
@@ -315,10 +310,6 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         return node.type.getSnapshot(node, applyPostProcess)
     }
 
-    getValue(node: N): T {
-        return node.type.getValue(node)
-    }
-
     abstract reconcile(current: N, newValue: C | T): N
 
     abstract instantiate(
@@ -404,6 +395,11 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
         return super.create(snapshot, environment)
     }
 
+    getValue(node: this["N"]): T {
+        node.createObservableInstanceIfNeeded()
+        return node.storedValue
+    }
+
     abstract getDefaultSnapshot(): C
 
     abstract createNewInstance(node: this["N"], childNodes: IChildNodesMap, snapshot: C): T
@@ -479,6 +475,11 @@ export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, ScalarNode<C
     }
 
     getValue(node: this["N"]): T {
+        // if we ever find a case where scalar nodes can be accessed without iterating through its parent
+        // uncomment this to make sure the parent chain is created when this is accessed
+        // if (node.parent) {
+        //     node.parent.createObservableInstanceIfNeeded()
+        // }
         return node.storedValue
     }
 

@@ -646,10 +646,6 @@ export class ModelType<
         return childNode
     }
 
-    getValue(node: this["N"]): this["T"] {
-        return node.storedValue
-    }
-
     getSnapshot(node: this["N"], applyPostProcess = true): this["S"] {
         const res = {} as any
         this.forAllProps((name, type) => {

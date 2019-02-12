@@ -295,11 +295,6 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         }
     }
 
-    get value(): T {
-        this.createObservableInstanceIfNeeded()
-        return this.type.getValue(this)
-    }
-
     private _snapshotUponDeath?: S
 
     // advantage of using computed for a snapshot is that nicely respects transactions etc.
