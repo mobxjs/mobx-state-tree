@@ -89,7 +89,8 @@ class StoredReference<IT extends IAnyType> {
 
     private updateResolvedReference(node: AnyNode) {
         const normalizedId = normalizeIdentifier(this.identifier)
-        const lastCacheModification = node.root.identifierCache!.getLastCacheModificationPerId(
+        const root = node.root
+        const lastCacheModification = root.identifierCache!.getLastCacheModificationPerId(
             normalizedId
         )
         if (
@@ -99,7 +100,7 @@ class StoredReference<IT extends IAnyType> {
             const { targetType } = this
             // reference was initialized with the identifier of the target
 
-            const target = node.root.identifierCache!.resolve(targetType, normalizedId)
+            const target = root.identifierCache!.resolve(targetType, normalizedId)
 
             if (!target) {
                 throw new InvalidReferenceError(

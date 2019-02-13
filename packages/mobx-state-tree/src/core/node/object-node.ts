@@ -237,6 +237,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     setParent(newParent: AnyObjectNode | null, subpath: string | null = null): void {
         if (this.parent === newParent && this.subpath === subpath) return
+
         if (newParent && process.env.NODE_ENV !== "production") {
             if (this.parent && newParent !== this.parent) {
                 throw fail(
@@ -448,8 +449,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this.fireHook(Hook.beforeDetach)
         this.state = NodeLifeCycle.DETACHING
 
-        const newEnv = this.root.environment
-        const newIdCache = this.root.identifierCache!.splitCache(this)
+        const root = this.root
+        const newEnv = root.environment
+        const newIdCache = root.identifierCache!.splitCache(this)
 
         try {
             this.parent!.removeChild(this.subpath)
