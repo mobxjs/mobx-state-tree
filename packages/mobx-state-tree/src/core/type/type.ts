@@ -13,16 +13,17 @@ import {
     IStateTreeNode,
     IJsonPatch,
     getType,
-    ObjectNode,
     IChildNodesMap,
     ModelPrimitive,
     IAnyStateTreeNode,
     normalizeIdentifier,
-    AnyObjectNode,
-    AnyNode,
-    BaseNode,
-    ScalarNode,
-    getStateTreeNodeSafe
+    getStateTreeNodeSafe,
+    ParentNode,
+    Node,
+    nodeOps,
+    NodeObj,
+    objNodeOps,
+    NodeScalar
 } from "../../internal"
 
 /**
@@ -163,21 +164,21 @@ export interface IType<C, S, T> {
      * @hidden
      */
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: C | T
-    ): BaseNode<C, S, T>
+    ): Node<any, C, S, T>
     /**
      * @internal
      * @hidden
      */
-    reconcile(current: BaseNode<C, S, T>, newValue: C | T): BaseNode<C, S, T>
+    reconcile(current: Node<any, C, S, T>, newValue: C | T): Node<any, C, S, T>
     /**
      * @internal
      * @hidden
      */
-    getSnapshot(node: BaseNode<C, S, T>, applyPostProcess?: boolean): S
+    getSnapshot(node: Node<any, C, S, T>, applyPostProcess?: boolean): S
     /**
      * @internal
      * @hidden
@@ -285,7 +286,7 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  * @internal
  * @hidden
  */
-export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = BaseNode<C, S, T>>
+export abstract class BaseType<C, S, T, N extends Node = Node<any, C, S, T>>
     implements IType<C, S, T> {
     // these are just to make inner types avaialable to inherited classes
     readonly C!: C
@@ -301,9 +302,9 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
     }
 
     @action
-    create(snapshot?: C, environment?: any) {
+    create(snapshot?: C, environment?: any): T {
         typecheckInternal(this, snapshot)
-        return this.instantiate(null, "", environment, snapshot!).value
+        return nodeOps.valueOf(this.instantiate(null, "", environment, snapshot!))
     }
 
     getSnapshot(node: N, applyPostProcess: boolean = true): S {
@@ -313,7 +314,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
     abstract reconcile(current: N, newValue: C | T): N
 
     abstract instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: C | T
@@ -383,7 +384,7 @@ export type ExtractNodeType<IT extends IAnyType> = IT extends BaseType<any, any,
  * @internal
  * @hidden
  */
-export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<C, S, T>> {
+export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, NodeObj<C, S, T>> {
     identifierAttribute: string | undefined
 
     constructor(name: string) {
@@ -396,7 +397,7 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
     }
 
     getValue(node: this["N"]): T {
-        node.createObservableInstanceIfNeeded()
+        objNodeOps.createObservableInstanceIfNeeded(node)
         return node.storedValue
     }
 
@@ -409,8 +410,8 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
     abstract applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void
     abstract processInitialSnapshot(childNodes: IChildNodesMap, snapshot: C): S
 
-    abstract getChildren(node: this["N"]): ReadonlyArray<AnyNode>
-    abstract getChildNode(node: this["N"], key: string): AnyNode
+    abstract getChildren(node: this["N"]): ReadonlyArray<Node>
+    abstract getChildNode(node: this["N"], key: string): Node
     abstract getChildType(propertyName?: string): IAnyType
     abstract initializeChildNodes(node: this["N"], snapshot: any): IChildNodesMap
     abstract removeChild(node: this["N"], subpath: string): void
@@ -418,8 +419,8 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
     reconcile(current: this["N"], newValue: C | T): this["N"] {
         // if the node we are trying to reconcile is being detached we have to use a new one and
         // let the current one alive
-        if (!current.isDetaching) {
-            if ((current.snapshot as any) === newValue)
+        if (!nodeOps.isDetaching(current)) {
+            if ((nodeOps.snapshotOf(current) as any) === newValue)
                 // newValue is the current snapshot of the node, noop
                 return current
             if (isStateTreeNode(newValue) && getStateTreeNode(newValue) === current)
@@ -435,18 +436,18 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
             ) {
                 // the newValue has no node, so can be treated like a snapshot
                 // we can reconcile
-                current.applySnapshot(newValue as C)
+                objNodeOps.applySnapshot(current, newValue as C)
                 return current
             }
         }
         // current node cannot be recycled in any way
         const { parent, subpath } = current
-        current.die() // noop if detaching
+        nodeOps.die(current) // noop if detaching
         // attempt to reuse the new one
         if (isStateTreeNode(newValue) && this.isAssignableFrom(getType(newValue))) {
             // newValue is a Node as well, move it here..
             const newNode = getStateTreeNode(newValue)
-            newNode.setParent(parent, subpath)
+            nodeOps.setParent(newNode, parent, subpath)
             return newNode
         }
         // nothing to do, we have to create a new node
@@ -462,9 +463,9 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
  * @internal
  * @hidden
  */
-export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, ScalarNode<C, S, T>> {
+export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, NodeScalar<C, S, T>> {
     abstract instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: C
@@ -484,16 +485,20 @@ export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, ScalarNode<C
     }
 
     getSnapshot(node: this["N"]): S {
-        return node.storedValue
+        return node.storedValue as any
     }
 
     reconcile(current: this["N"], newValue: C): this["N"] {
         // reconcile only if type and value are still the same, and only if the node is not detaching
-        if (!current.isDetaching && current.type === this && current.storedValue === newValue) {
+        if (
+            !nodeOps.isDetaching(current) &&
+            current.type === this &&
+            (current.storedValue as any) === newValue
+        ) {
             return current
         }
         const res = this.instantiate(current.parent, current.subpath, current.environment, newValue)
-        current.die() // noop if detaching
+        nodeOps.die(current) // noop if detaching
         return res
     }
 

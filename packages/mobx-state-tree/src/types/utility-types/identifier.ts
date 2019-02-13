@@ -10,8 +10,8 @@ import {
     ModelType,
     typeCheckSuccess,
     ISimpleType,
-    AnyObjectNode,
-    ScalarNode
+    ParentNode,
+    NodeScalar
 } from "../../internal"
 
 abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
@@ -22,7 +22,7 @@ abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"]
@@ -81,7 +81,7 @@ export class IdentifierNumberType extends BaseIdentifierType<number> {
         super("identifierNumber", "number")
     }
 
-    getSnapshot(node: ScalarNode<number, number, number>): number {
+    getSnapshot(node: NodeScalar<number, number, number>): number {
         return node.storedValue
     }
 

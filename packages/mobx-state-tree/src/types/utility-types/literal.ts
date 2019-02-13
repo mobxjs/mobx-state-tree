@@ -10,8 +10,8 @@ import {
     typeCheckFailure,
     isType,
     Primitives,
-    AnyObjectNode,
-    SimpleType
+    SimpleType,
+    ParentNode
 } from "../../internal"
 
 /**
@@ -28,7 +28,7 @@ export class Literal<T> extends SimpleType<T, T, T> {
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"]

@@ -19,7 +19,8 @@ import {
     getRelativePathBetweenNodes,
     IAnyStateTreeNode,
     warnError,
-    AnyNode
+    Node,
+    nodeOps
 } from "../internal"
 
 export interface ISerializedActionCall {
@@ -34,7 +35,7 @@ export interface IActionRecorder {
     replay(target: IAnyStateTreeNode): void
 }
 
-function serializeArgument(node: AnyNode, actionName: string, index: number, arg: any): any {
+function serializeArgument(node: Node, actionName: string, index: number, arg: any): any {
     if (arg instanceof Date) return { $MST_DATE: arg.getTime() }
     if (isPrimitive(arg)) return arg
     // We should not serialize MST nodes, even if we can, because we don't know if the receiving party can handle a raw snapshot instead of an
@@ -56,7 +57,7 @@ function serializeArgument(node: AnyNode, actionName: string, index: number, arg
     }
 }
 
-function deserializeArgument(adm: AnyNode, value: any): any {
+function deserializeArgument(adm: Node, value: any): any {
     if (value && typeof value === "object" && "$MST_DATE" in value)
         return new Date(value["$MST_DATE"])
     return value
@@ -111,7 +112,7 @@ function baseApplyAction(target: IAnyStateTreeNode, action: ISerializedActionCal
     }
 
     if (!(typeof resolvedTarget[action.name] === "function"))
-        throw fail(`Action '${action.name}' does not exist in '${node.path}'`)
+        throw fail(`Action '${action.name}' does not exist in '${nodeOps.getPath(node)}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
         action.args ? action.args.map(v => deserializeArgument(node, v)) : []

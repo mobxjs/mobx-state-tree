@@ -8,7 +8,8 @@ import {
     IAnyType,
     ExtractC,
     ExtractS,
-    ExtractT
+    ExtractT,
+    nodeOps
 } from "../../internal"
 
 /** Validation context entry, this is, where the validation should run against which type */
@@ -79,7 +80,7 @@ function toErrorString(error: IValidationError): string {
         ? "value"
         : "snapshot"
     const isSnapshotCompatible =
-        type && isStateTreeNode(value) && type.is(getStateTreeNode(value).snapshot)
+        type && isStateTreeNode(value) && type.is(nodeOps.snapshotOf(getStateTreeNode(value)))
 
     return (
         `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${

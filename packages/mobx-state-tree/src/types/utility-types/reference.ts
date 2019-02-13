@@ -26,9 +26,12 @@ import {
     normalizeIdentifier,
     getIdentifier,
     applyPatch,
-    AnyNode,
-    AnyObjectNode,
-    SimpleType
+    SimpleType,
+    Node,
+    NodeObj,
+    nodeOps,
+    objNodeOps,
+    ParentNode
 } from "../../internal"
 
 export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
@@ -63,10 +66,10 @@ export type ReferenceT<IT extends IAnyType> = RedefineIStateTreeNode<
 
 class StoredReference<IT extends IAnyType> {
     readonly identifier!: ReferenceIdentifier
-    node!: AnyNode
+    node!: Node
 
     private resolvedReference?: {
-        node: AnyObjectNode
+        node: NodeObj
         lastCacheModification: string
     }
 
@@ -87,9 +90,10 @@ class StoredReference<IT extends IAnyType> {
         }
     }
 
-    private updateResolvedReference(node: AnyNode) {
+    private updateResolvedReference(node: Node) {
         const normalizedId = normalizeIdentifier(this.identifier)
-        const lastCacheModification = node.root.identifierCache!.getLastCacheModificationPerId(
+        const root = nodeOps.getRoot(node)
+        const lastCacheModification = root.identifierCache!.getLastCacheModificationPerId(
             normalizedId
         )
         if (
@@ -99,13 +103,13 @@ class StoredReference<IT extends IAnyType> {
             const { targetType } = this
             // reference was initialized with the identifier of the target
 
-            const target = node.root.identifierCache!.resolve(targetType, normalizedId)
+            const target = root.identifierCache!.resolve(targetType, normalizedId)
 
             if (!target) {
                 throw new InvalidReferenceError(
                     `[mobx-state-tree] Failed to resolve reference '${this.identifier}' to type '${
                         this.targetType.name
-                    }' (from node: ${node.path})`
+                    }' (from node: ${nodeOps.getPath(node)})`
                 )
             }
 
@@ -118,7 +122,7 @@ class StoredReference<IT extends IAnyType> {
 
     get resolvedValue(): ReferenceT<IT> {
         this.updateResolvedReference(this.node)
-        return this.resolvedReference!.node.value
+        return nodeOps.valueOf(this.resolvedReference!.node)
     }
 }
 
@@ -174,13 +178,13 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
         cause: "detach" | "destroy" | "invalidSnapshotReference",
         storedRefNode: this["N"],
         referenceId: ReferenceIdentifier,
-        refTargetNode: AnyObjectNode | null
+        refTargetNode: NodeObj | null
     ) {
         // to actually invalidate a reference we need an alive parent,
         // since it is a scalar value (immutable-ish) and we need to change it
         // from the parent
         const storedRefParentNode = storedRefNode.parent
-        if (!storedRefParentNode || !storedRefParentNode.isAlive) {
+        if (!storedRefParentNode || !nodeOps.isAlive(storedRefParentNode)) {
             return
         }
         const storedRefParentValue = storedRefParentNode.storedValue
@@ -193,19 +197,19 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
             invalidTarget: refTargetNode ? refTargetNode.storedValue : undefined,
             invalidId: referenceId,
             replaceRef(newRef) {
-                applyPatch(storedRefNode.root.storedValue, {
+                applyPatch(nodeOps.getRoot(storedRefNode).storedValue, {
                     op: "replace",
                     value: newRef,
-                    path: storedRefNode.path
+                    path: nodeOps.getPath(storedRefNode)
                 })
             },
             removeRef() {
                 if (isModelType(storedRefParentNode.type)) {
                     this.replaceRef(undefined as any)
                 } else {
-                    applyPatch(storedRefNode.root.storedValue, {
+                    applyPatch(nodeOps.getRoot(storedRefNode).storedValue, {
                         op: "remove",
-                        path: storedRefNode.path
+                        path: nodeOps.getPath(storedRefNode)
                     })
                 }
             }
@@ -223,7 +227,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
         }
         const refTargetNode = getStateTreeNode(refTargetValue)
 
-        const hookHandler = (_: AnyNode, refTargetNodeHook: Hook) => {
+        const hookHandler = (_: Node, refTargetNodeHook: Hook) => {
             const cause = getInvalidationCause(refTargetNodeHook)
             if (!cause) {
                 return
@@ -231,11 +235,13 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
             this.fireInvalidated(cause, storedRefNode, referenceId, refTargetNode)
         }
 
-        const refTargetDetachHookDisposer = refTargetNode.registerHook(
+        const refTargetDetachHookDisposer = nodeOps.registerHook(
+            refTargetNode,
             Hook.beforeDetach,
             hookHandler
         )
-        const refTargetDestroyHookDisposer = refTargetNode.registerHook(
+        const refTargetDestroyHookDisposer = nodeOps.registerHook(
+            refTargetNode,
             Hook.beforeDestroy,
             hookHandler
         )
@@ -259,7 +265,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
 
         // get rid of the watcher hook when the stored ref node is destroyed
         // detached is ignored since scalar nodes (where the reference resides) cannot be detached
-        storedRefNode.registerHook(Hook.beforeDestroy, () => {
+        nodeOps.registerHook(storedRefNode, Hook.beforeDestroy, () => {
             if (onRefTargetDestroyedHookDisposer) {
                 onRefTargetDestroyedHookDisposer()
             }
@@ -274,15 +280,18 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
             // make sure the target node is actually there and initialized
             const storedRefParentNode = storedRefNode.parent
             const storedRefParentValue = storedRefParentNode && storedRefParentNode.storedValue
-            if (storedRefParentNode && storedRefParentNode.isAlive && storedRefParentValue) {
+            if (
+                storedRefParentNode &&
+                nodeOps.isAlive(storedRefParentNode) &&
+                storedRefParentValue
+            ) {
                 let refTargetNodeExists: boolean
                 if (customGetSet) {
                     refTargetNodeExists = !!customGetSet.get(identifier, storedRefParentValue)
                 } else {
-                    refTargetNodeExists = storedRefNode.root.identifierCache!.has(
-                        this.targetType,
-                        normalizeIdentifier(identifier)
-                    )
+                    refTargetNodeExists = nodeOps
+                        .getRoot(storedRefNode)
+                        .identifierCache!.has(this.targetType, normalizeIdentifier(identifier))
                 }
 
                 if (!refTargetNodeExists) {
@@ -308,21 +317,25 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
             }
         }
 
-        if (storedRefNode.state === NodeLifeCycle.FINALIZED) {
+        if (storedRefNode._state === NodeLifeCycle.FINALIZED) {
             // already attached, so the whole tree is ready
             startWatching(true)
         } else {
-            if (!storedRefNode.isRoot) {
+            if (!nodeOps.isRoot(storedRefNode)) {
                 // start watching once the whole tree is ready
-                storedRefNode.root.registerHook(Hook.afterCreationFinalization, () => {
-                    // make sure to attach it so it can start listening
-                    if (storedRefNode.parent) {
-                        storedRefNode.parent.createObservableInstanceIfNeeded()
+                nodeOps.registerHook(
+                    nodeOps.getRoot(storedRefNode),
+                    Hook.afterCreationFinalization,
+                    () => {
+                        // make sure to attach it so it can start listening
+                        if (storedRefNode.parent) {
+                            objNodeOps.createObservableInstanceIfNeeded(storedRefNode.parent)
+                        }
                     }
-                })
+                )
             }
             // start watching once the node is attached somewhere / parent changes
-            storedRefNode.registerHook(Hook.afterAttach, () => {
+            nodeOps.registerHook(storedRefNode, Hook.afterAttach, () => {
                 startWatching(false)
             })
         }
@@ -339,18 +352,18 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
     }
 
     getValue(storedRefNode: this["N"]) {
-        if (!storedRefNode.isAlive) return undefined
-        const storedRef: StoredReference<IT> = storedRefNode.storedValue
+        if (!nodeOps.isAlive(storedRefNode)) return undefined
+        const storedRef: StoredReference<IT> = storedRefNode.storedValue as any
         return storedRef.resolvedValue as any
     }
 
     getSnapshot(storedRefNode: this["N"]) {
-        const ref: StoredReference<IT> = storedRefNode.storedValue
+        const ref: StoredReference<IT> = storedRefNode.storedValue as any
         return ref.identifier
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"] | this["T"]
@@ -372,9 +385,9 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
     }
 
     reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
-        if (!current.isDetaching && current.type === this) {
+        if (!nodeOps.isDetaching(current) && current.type === this) {
             const compareByValue = isStateTreeNode(newValue)
-            const ref: StoredReference<IT> = current.storedValue
+            const ref: StoredReference<IT> = current.storedValue as any
             if (!compareByValue && ref.identifier === newValue) return current
             else if (compareByValue && ref.resolvedValue === newValue) return current
         }
@@ -384,7 +397,7 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
             current.environment,
             newValue
         )
-        current.die() // noop if detaching
+        nodeOps.die(current) // noop if detaching
         return newNode
     }
 }
@@ -403,20 +416,20 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
     }
 
     getValue(storedRefNode: this["N"]) {
-        if (!storedRefNode.isAlive) return undefined as any
+        if (!nodeOps.isAlive(storedRefNode)) return undefined as any
         const referencedNode = this.options.get(
-            storedRefNode.storedValue,
+            storedRefNode.storedValue as any,
             storedRefNode.parent ? storedRefNode.parent.storedValue : null
         )
         return referencedNode
     }
 
     getSnapshot(storedRefNode: this["N"]) {
-        return storedRefNode.storedValue
+        return storedRefNode.storedValue as any
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         newValue: this["C"] | this["T"]
@@ -440,9 +453,9 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
             ? this.options.set(newValue, current ? current.storedValue : null)
             : newValue
         if (
-            !current.isDetaching &&
+            !nodeOps.isDetaching(current) &&
             current.type === this &&
-            current.storedValue === newIdentifier
+            (current.storedValue as any) === newIdentifier
         ) {
             return current
         }
@@ -452,7 +465,7 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
             current.environment,
             newIdentifier
         )
-        current.die() // noop if detaching
+        nodeOps.die(current) // noop if detaching
         return newNode
     }
 }

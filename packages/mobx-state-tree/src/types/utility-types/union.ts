@@ -19,8 +19,8 @@ import {
     _NotCustomized,
     RedefineIStateTreeNode,
     IStateTreeNode,
-    AnyObjectNode,
-    BaseType
+    BaseType,
+    ParentNode
 } from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
@@ -68,7 +68,7 @@ export class Union extends BaseType<any, any, any> {
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"] | this["T"]

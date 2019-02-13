@@ -9,7 +9,8 @@ import {
     Hook,
     IAnyStateTreeNode,
     warnError,
-    AnyObjectNode
+    objNodeOps,
+    NodeObj
 } from "../internal"
 
 export type IMiddlewareEventType =
@@ -78,7 +79,7 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const prevContext = currentActionContext
 
     if (context.type === "action") {
-        node.assertAlive({
+        objNodeOps.assertAlive(node, {
             actionContext: context
         })
     }
@@ -157,7 +158,7 @@ export function addMiddleware(
             )
         }
     }
-    return node.addMiddleWare(handler, includeHooks)
+    return objNodeOps.addMiddleWare(node, handler, includeHooks)
 }
 
 /**
@@ -191,12 +192,12 @@ export function decorate<T extends Function>(handler: IMiddlewareHandler, fn: T)
 }
 
 function collectMiddlewares(
-    node: AnyObjectNode,
+    node: NodeObj,
     baseCall: IMiddlewareEvent,
     fn: Function
 ): IMiddleware[] {
     let middlewares: IMiddleware[] = (fn as any).$mst_middleware || EMPTY_ARRAY
-    let n: AnyObjectNode | null = node
+    let n: NodeObj | null = node
     // Find all middlewares. Optimization: cache this?
     while (n) {
         if (n.middlewares) middlewares = middlewares.concat(n.middlewares)
@@ -205,11 +206,7 @@ function collectMiddlewares(
     return middlewares
 }
 
-function runMiddleWares(
-    node: AnyObjectNode,
-    baseCall: IMiddlewareEvent,
-    originalFn: Function
-): any {
+function runMiddleWares(node: NodeObj, baseCall: IMiddlewareEvent, originalFn: Function): any {
     const middlewares = collectMiddlewares(node, baseCall, originalFn)
     // Short circuit
     if (!middlewares.length) return mobxAction(originalFn).apply(null, baseCall.args)

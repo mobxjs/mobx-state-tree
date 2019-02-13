@@ -7,7 +7,8 @@ import {
     IValidationResult,
     typeCheckSuccess,
     typeCheckFailure,
-    AnyObjectNode
+    ParentNode,
+    nodeOps
 } from "../../internal"
 
 export interface CustomTypeOptions<S, T> {
@@ -109,7 +110,7 @@ export class CustomType<S, T> extends SimpleType<S | T, S, T> {
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: S | T
@@ -123,10 +124,10 @@ export class CustomType<S, T> extends SimpleType<S | T, S, T> {
     reconcile(current: this["N"], value: S | T): this["N"] {
         const isSnapshot = !this.options.isTargetType(value)
         // in theory customs use scalar nodes which cannot be detached, but still...
-        if (!current.isDetaching) {
+        if (!nodeOps.isDetaching(current)) {
             const unchanged =
                 current.type === this &&
-                (isSnapshot ? value === current.snapshot : value === current.storedValue)
+                (isSnapshot ? value === nodeOps.snapshotOf(current) : value === current.storedValue)
             if (unchanged) return current
         }
         const valueToStore: T = isSnapshot ? this.options.fromSnapshot(value as S) : (value as T)
@@ -136,7 +137,7 @@ export class CustomType<S, T> extends SimpleType<S | T, S, T> {
             current.environment,
             valueToStore
         )
-        current.die() // noop if detaching
+        nodeOps.die(current) // noop if detaching
         return newNode
     }
 }

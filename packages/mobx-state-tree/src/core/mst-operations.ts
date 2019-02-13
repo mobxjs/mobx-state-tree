@@ -24,8 +24,10 @@ import {
     InvalidReferenceError,
     normalizeIdentifier,
     ReferenceIdentifier,
-    AnyObjectNode,
-    AnyModelType
+    AnyModelType,
+    nodeOps,
+    objNodeOps,
+    ParentNode
 } from "../internal"
 
 /** @hidden */
@@ -60,7 +62,7 @@ export function getType(object: IAnyStateTreeNode): IAnyType {
  * @returns
  */
 export function getChildType(object: IAnyStateTreeNode, propertyName?: string): IAnyType {
-    return getStateTreeNode(object).getChildType(propertyName)
+    return objNodeOps.getChildType(getStateTreeNode(object), propertyName)
 }
 
 /**
@@ -85,7 +87,7 @@ export function onPatch(
         if (typeof callback !== "function")
             throw fail("expected second argument to be a function, got " + callback + " instead")
     }
-    return getStateTreeNode(target).onPatch(callback)
+    return objNodeOps.onPatch(getStateTreeNode(target), callback)
 }
 
 /**
@@ -110,7 +112,7 @@ export function onSnapshot<S>(
         if (typeof callback !== "function")
             throw fail("expected second argument to be a function, got " + callback + " instead")
     }
-    return getStateTreeNode(target).onSnapshot(callback)
+    return objNodeOps.onSnapshot(getStateTreeNode(target), callback)
 }
 
 /**
@@ -138,7 +140,7 @@ export function applyPatch(
                 "expected second argument to be an object or array, got " + patch + " instead"
             )
     }
-    getStateTreeNode(target).applyPatches(asArray(patch))
+    objNodeOps.applyPatches(getStateTreeNode(target), asArray(patch))
 }
 
 export interface IPatchRecorder {
@@ -231,7 +233,7 @@ export function protect(target: IAnyStateTreeNode): void {
             )
     }
     const node = getStateTreeNode(target)
-    if (!node.isRoot) throw fail("`protect` can only be invoked on root nodes")
+    if (!nodeOps.isRoot(node)) throw fail("`protect` can only be invoked on root nodes")
     node.isProtectionEnabled = true
 }
 
@@ -268,7 +270,7 @@ export function unprotect(target: IAnyStateTreeNode): void {
             )
     }
     const node = getStateTreeNode(target)
-    if (!node.isRoot) throw fail("`unprotect` can only be invoked on root nodes")
+    if (!nodeOps.isRoot(node)) throw fail("`unprotect` can only be invoked on root nodes")
     node.isProtectionEnabled = false
 }
 
@@ -276,7 +278,7 @@ export function unprotect(target: IAnyStateTreeNode): void {
  * Returns true if the object is in protected mode, @see protect
  */
 export function isProtected(target: IAnyStateTreeNode): boolean {
-    return getStateTreeNode(target).isProtected
+    return objNodeOps.isProtected(getStateTreeNode(target))
 }
 
 /**
@@ -294,7 +296,7 @@ export function applySnapshot<C>(target: IStateTreeNode<C, any>, snapshot: C) {
                 "expected first argument to be a mobx-state-tree node, got " + target + " instead"
             )
     }
-    return getStateTreeNode(target).applySnapshot(snapshot)
+    return objNodeOps.applySnapshot(getStateTreeNode(target), snapshot)
 }
 
 /**
@@ -314,7 +316,7 @@ export function getSnapshot<S>(target: IStateTreeNode<any, S>, applyPostProcess 
             )
     }
     const node = getStateTreeNode(target)
-    if (applyPostProcess) return node.snapshot
+    if (applyPostProcess) return nodeOps.snapshotOf(node)
 
     return freeze(node.type.getSnapshot(node, false))
 }
@@ -337,7 +339,7 @@ export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean
             throw fail("expected second argument to be a number, got " + depth + " instead")
         if (depth < 0) throw fail(`Invalid depth: ${depth}, should be >= 1`)
     }
-    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
+    let parent: ParentNode = getStateTreeNode(target).parent
     while (parent) {
         if (--depth === 0) return true
         parent = parent.parent
@@ -373,7 +375,7 @@ export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
         if (depth < 0) throw fail(`Invalid depth: ${depth}, should be >= 1`)
     }
     let d = depth
-    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
+    let parent: ParentNode = getStateTreeNode(target).parent
     while (parent) {
         if (--d === 0) return parent.storedValue as any
         parent = parent.parent
@@ -400,7 +402,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
                 "expected second argument to be a mobx-state-tree type, got " + type + " instead"
             )
     }
-    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
+    let parent: ParentNode = getStateTreeNode(target).parent
     while (parent) {
         if (type.is(parent.storedValue)) return true
         parent = parent.parent
@@ -431,7 +433,7 @@ export function getParentOfType<IT extends IAnyType>(
             )
     }
 
-    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
+    let parent: ParentNode = getStateTreeNode(target).parent
     while (parent) {
         if (type.is(parent.storedValue)) return parent.storedValue
         parent = parent.parent
@@ -458,7 +460,7 @@ export function getRoot<IT extends IAnyType | IAnyStateTreeNode>(
                 "expected first argument to be a mobx-state-tree node, got " + target + " instead"
             )
     }
-    return getStateTreeNode(target).root.storedValue
+    return nodeOps.getRoot(getStateTreeNode(target)).storedValue
 }
 
 /**
@@ -475,7 +477,7 @@ export function getPath(target: IAnyStateTreeNode): string {
                 "expected first argument to be a mobx-state-tree node, got " + target + " instead"
             )
     }
-    return getStateTreeNode(target).path
+    return nodeOps.getPath(getStateTreeNode(target))
 }
 
 /**
@@ -492,7 +494,7 @@ export function getPathParts(target: IAnyStateTreeNode): string[] {
                 "expected first argument to be a mobx-state-tree node, got " + target + " instead"
             )
     }
-    return splitJsonPath(getStateTreeNode(target).path)
+    return splitJsonPath(nodeOps.getPath(getStateTreeNode(target)))
 }
 
 /**
@@ -509,7 +511,7 @@ export function isRoot(target: IAnyStateTreeNode): boolean {
                 "expected first argument to be a mobx-state-tree node, got " + target + " instead"
             )
     }
-    return getStateTreeNode(target).isRoot
+    return nodeOps.isRoot(getStateTreeNode(target))
 }
 
 /**
@@ -532,7 +534,7 @@ export function resolvePath(target: IAnyStateTreeNode, path: string): any {
     }
 
     const node = resolveNodeByPath(getStateTreeNode(target), path)
-    return node ? node.value : undefined
+    return node ? nodeOps.valueOf(node) : undefined
 }
 
 /**
@@ -564,11 +566,10 @@ export function resolveIdentifier<IT extends IAnyType>(
                 "expected third argument to be a string or number, got " + identifier + " instead"
             )
     }
-    const node = getStateTreeNode(target).root.identifierCache!.resolve(
-        type,
-        normalizeIdentifier(identifier)
-    )
-    return node ? node.value : undefined
+    const node = nodeOps
+        .getRoot(getStateTreeNode(target))
+        .identifierCache!.resolve(type, normalizeIdentifier(identifier))
+    return node ? nodeOps.valueOf(node) : undefined
 }
 
 /**
@@ -672,7 +673,7 @@ export function tryResolve(target: IAnyStateTreeNode, path: string): any {
     const node = resolveNodeByPath(getStateTreeNode(target), path, false)
     if (node === undefined) return undefined
     try {
-        return node.value
+        return nodeOps.valueOf(node)
     } catch (e) {
         // For what ever reason not resolvable (e.g. totally not existing path, or value that cannot be fetched)
         // see test / issue: 'try resolve doesn't work #686'
@@ -727,9 +728,9 @@ export function clone<T extends IAnyStateTreeNode>(
     }
     const node = getStateTreeNode(source)
     return node.type.create(
-        node.snapshot,
+        nodeOps.snapshotOf(node),
         keepEnvironment === true
-            ? node.root.environment
+            ? nodeOps.getRoot(node).environment
             : keepEnvironment === false
             ? undefined
             : keepEnvironment
@@ -747,7 +748,7 @@ export function detach<T extends IAnyStateTreeNode>(target: T): T {
                 "expected first argument to be a mobx-state-tree node, got " + target + " instead"
             )
     }
-    getStateTreeNode(target).detach()
+    objNodeOps.detach(getStateTreeNode(target))
     return target
 }
 
@@ -763,8 +764,8 @@ export function destroy(target: IAnyStateTreeNode): void {
             )
     }
     const node = getStateTreeNode(target)
-    if (node.isRoot) node.die()
-    else node.parent!.removeChild(node.subpath)
+    if (nodeOps.isRoot(node)) nodeOps.die(node)
+    else objNodeOps.removeChild(node.parent!, node.subpath)
 }
 
 /**
@@ -784,7 +785,7 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
                 "expected first argument to be a mobx-state-tree node, got " + target + " instead"
             )
     }
-    return getStateTreeNode(target).observableIsAlive
+    return nodeOps.observableIsAlive(getStateTreeNode(target))
 }
 
 /**
@@ -826,7 +827,7 @@ export function addDisposer(target: IAnyStateTreeNode, disposer: IDisposer): IDi
             throw fail("expected second argument to be a function, got " + disposer + " instead")
     }
     const node = getStateTreeNode(target)
-    node.addDisposer(disposer)
+    objNodeOps.addDisposer(node, disposer)
     return disposer
 }
 
@@ -851,7 +852,7 @@ export function getEnv<T = any>(target: IAnyStateTreeNode): T {
             )
     }
     const node = getStateTreeNode(target)
-    const env = node.root.environment
+    const env = nodeOps.getRoot(node).environment
     if (!!!env) return EMPTY_OBJECT as T
     return env
 }
@@ -874,7 +875,7 @@ export function walk(
     }
     const node = getStateTreeNode(target)
     // tslint:disable-next-line:no_unused-variable
-    node.getChildren().forEach(child => {
+    objNodeOps.getChildren(node).forEach(child => {
         if (isStateTreeNode(child.storedValue)) walk(child.storedValue, processor)
     })
     processor(node.storedValue)

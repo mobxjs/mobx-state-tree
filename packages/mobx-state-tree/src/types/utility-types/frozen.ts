@@ -12,8 +12,8 @@ import {
     IType,
     IAnyType,
     OptionalProperty,
-    AnyObjectNode,
-    SimpleType
+    SimpleType,
+    ParentNode
 } from "../../internal"
 
 /**
@@ -32,7 +32,7 @@ export class Frozen<T> extends SimpleType<T, T, T> {
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         value: this["C"]

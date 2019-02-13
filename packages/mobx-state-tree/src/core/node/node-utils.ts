@@ -1,13 +1,13 @@
 import {
     fail,
-    ObjectNode,
     splitJsonPath,
     joinJsonPath,
-    ScalarNode,
     IChildNodesMap,
     EMPTY_ARRAY,
-    AnyObjectNode,
-    AnyNode
+    Node,
+    nodeOps,
+    objNodeOps,
+    NodeObj
 } from "../../internal"
 
 /**
@@ -75,7 +75,7 @@ export function isStateTreeNode<C = any, S = any>(value: any): value is IStateTr
  * @internal
  * @hidden
  */
-export function getStateTreeNode(value: IAnyStateTreeNode): AnyObjectNode {
+export function getStateTreeNode(value: IAnyStateTreeNode): NodeObj {
     if (isStateTreeNode(value)) return value.$treenode!
     else throw fail(`Value ${value} is no MST Node`)
 }
@@ -84,7 +84,7 @@ export function getStateTreeNode(value: IAnyStateTreeNode): AnyObjectNode {
  * @internal
  * @hidden
  */
-export function getStateTreeNodeSafe(value: IAnyStateTreeNode): AnyObjectNode | null {
+export function getStateTreeNodeSafe(value: IAnyStateTreeNode): NodeObj | null {
     return (value && value.$treenode) || null
 }
 
@@ -107,7 +107,7 @@ export function canAttachNode(value: any) {
  * @hidden
  */
 export function toJSON<S>(this: IStateTreeNode<any, S>): S {
-    return getStateTreeNode(this).snapshot
+    return nodeOps.snapshotOf(getStateTreeNode(this))
 }
 
 const doubleDot = (_: any) => ".."
@@ -116,16 +116,16 @@ const doubleDot = (_: any) => ".."
  * @internal
  * @hidden
  */
-export function getRelativePathBetweenNodes(base: AnyObjectNode, target: AnyObjectNode): string {
+export function getRelativePathBetweenNodes(base: NodeObj, target: NodeObj): string {
     // PRE condition target is (a child of) base!
-    if (base.root !== target.root) {
+    if (nodeOps.getRoot(base) !== nodeOps.getRoot(target)) {
         throw fail(
             `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
         )
     }
 
-    const baseParts = splitJsonPath(base.path)
-    const targetParts = splitJsonPath(target.path)
+    const baseParts = splitJsonPath(nodeOps.getPath(base))
+    const targetParts = splitJsonPath(nodeOps.getPath(target))
     let common = 0
     for (; common < baseParts.length; common++) {
         if (baseParts[common] !== targetParts[common]) break
@@ -144,10 +144,10 @@ export function getRelativePathBetweenNodes(base: AnyObjectNode, target: AnyObje
  * @hidden
  */
 export function resolveNodeByPath(
-    base: AnyObjectNode,
+    base: NodeObj,
     path: string,
     failIfResolveFails: boolean = true
-): AnyNode | undefined {
+): Node | undefined {
     return resolveNodeByPathParts(base, splitJsonPath(path), failIfResolveFails)
 }
 
@@ -156,11 +156,11 @@ export function resolveNodeByPath(
  * @hidden
  */
 export function resolveNodeByPathParts(
-    base: AnyObjectNode,
+    base: NodeObj,
     pathParts: string[],
     failIfResolveFails: boolean = true
-): AnyNode | undefined {
-    let current: AnyNode | null = base
+): Node | undefined {
+    let current: Node | null = base
 
     for (let i = 0; i < pathParts.length; i++) {
         const part = pathParts[i]
@@ -170,11 +170,11 @@ export function resolveNodeByPathParts(
         } else if (part === ".") {
             continue
         } else if (current) {
-            if (current instanceof ScalarNode) {
+            if (nodeOps.isNodeScalar(current)) {
                 // check if the value of a scalar resolves to a state tree node (e.g. references)
                 // then we can continue resolving...
                 try {
-                    const value: any = current.value
+                    const value: any = nodeOps.valueOf(current)
                     if (isStateTreeNode(value)) {
                         current = getStateTreeNode(value)
                         // fall through
@@ -186,10 +186,10 @@ export function resolveNodeByPathParts(
                     throw e
                 }
             }
-            if (current instanceof ObjectNode) {
-                const subType = current.getChildType(part)
+            if (nodeOps.isNodeObj(current)) {
+                const subType = objNodeOps.getChildType(current, part)
                 if (subType) {
-                    current = current.getChildNode(part)
+                    current = objNodeOps.getChildNode(current, part)
                     if (current) continue
                 }
             }
@@ -208,13 +208,13 @@ export function resolveNodeByPathParts(
  * @internal
  * @hidden
  */
-export function convertChildNodesToArray(childNodes: IChildNodesMap | null): AnyNode[] {
-    if (!childNodes) return EMPTY_ARRAY as AnyNode[]
+export function convertChildNodesToArray(childNodes: IChildNodesMap | null): Node[] {
+    if (!childNodes) return EMPTY_ARRAY as Node[]
 
     const keys = Object.keys(childNodes)
-    if (!keys.length) return EMPTY_ARRAY as AnyNode[]
+    if (!keys.length) return EMPTY_ARRAY as Node[]
 
-    const result = new Array(keys.length) as AnyNode[]
+    const result = new Array(keys.length) as Node[]
     keys.forEach((key, index) => {
         result[index] = childNodes![key]
     })

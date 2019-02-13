@@ -31,7 +31,6 @@ import {
     IType,
     IValidationResult,
     mobxShallow,
-    ObjectNode,
     typecheckInternal,
     typeCheckFailure,
     TypeFlags,
@@ -43,9 +42,12 @@ import {
     normalizeIdentifier,
     EMPTY_OBJECT,
     IAnyStateTreeNode,
-    AnyObjectNode,
-    AnyNode,
-    createObjectNode
+    createObjectNode,
+    ParentNode,
+    Node,
+    NodeObj,
+    objNodeOps,
+    nodeOps
 } from "../../internal"
 
 /** @hidden */
@@ -91,7 +93,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"] | this["T"]
@@ -116,31 +118,31 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
         _getAdministration(instance).dehancer = node.unbox
-        intercept(instance as IObservableArray<AnyNode>, this.willChange)
-        observe(instance as IObservableArray<AnyNode>, this.didChange)
+        intercept(instance as IObservableArray<Node>, this.willChange)
+        observe(instance as IObservableArray<Node>, this.didChange)
     }
 
     describe() {
         return this._subType.describe() + "[]"
     }
 
-    getChildren(node: this["N"]): AnyNode[] {
+    getChildren(node: this["N"]): Node[] {
         return node.storedValue.slice()
     }
 
-    getChildNode(node: this["N"], key: string): AnyNode {
+    getChildNode(node: this["N"], key: string): Node {
         const index = parseInt(key, 10)
         if (index < node.storedValue.length) return node.storedValue[index]
         throw fail("Not a child: " + key)
     }
 
     willChange(
-        change: IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode>
-    ): IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode> | null {
+        change: IArrayWillChange<Node> | IArrayWillSplice<Node>
+    ): IArrayWillChange<Node> | IArrayWillSplice<Node> | null {
         const node = getStateTreeNode(change.object as this["T"])
-        node.assertWritable({ subpath: String(change.index) })
+        objNodeOps.assertWritable(node, { subpath: String(change.index) })
         const subType = (node.type as this)._subType
-        const childNodes = node.getChildren()
+        const childNodes = objNodeOps.getChildren(node)
         let nodes = null
 
         switch (change.type) {
@@ -174,7 +176,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
 
                 // update paths of remaining items
                 for (let i = index + removedCount; i < childNodes.length; i++) {
-                    childNodes[i].setParent(node, "" + (i + added.length - removedCount))
+                    nodeOps.setParent(childNodes[i], node, "" + (i + added.length - removedCount))
                 }
                 break
         }
@@ -182,46 +184,51 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     getSnapshot(node: this["N"]): this["S"] {
-        return node.getChildren().map(childNode => childNode.snapshot)
+        return objNodeOps.getChildren(node).map(childNode => nodeOps.snapshotOf(childNode))
     }
 
     processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
         const processed: this["S"] = []
         Object.keys(childNodes).forEach(key => {
-            processed.push(childNodes[key].getSnapshot())
+            processed.push(nodeOps.getSnapshot(childNodes[key]))
         })
         return processed
     }
 
-    didChange(change: IArrayChange<AnyNode> | IArraySplice<AnyNode>): void {
+    didChange(change: IArrayChange<Node> | IArraySplice<Node>): void {
         const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         switch (change.type) {
             case "update":
-                return void node.emitPatch(
+                return void objNodeOps.emitPatch(
+                    node,
                     {
                         op: "replace",
                         path: "" + change.index,
-                        value: change.newValue.snapshot,
-                        oldValue: change.oldValue ? change.oldValue.snapshot : undefined
+                        value: nodeOps.snapshotOf(change.newValue),
+                        oldValue: change.oldValue ? nodeOps.snapshotOf(change.oldValue) : undefined
                     },
                     node
                 )
             case "splice":
                 for (let i = change.removedCount - 1; i >= 0; i--)
-                    node.emitPatch(
+                    objNodeOps.emitPatch(
+                        node,
                         {
                             op: "remove",
                             path: "" + (change.index + i),
-                            oldValue: change.removed[i].snapshot
+                            oldValue: nodeOps.snapshotOf(change.removed[i])
                         },
                         node
                     )
                 for (let i = 0; i < change.addedCount; i++)
-                    node.emitPatch(
+                    objNodeOps.emitPatch(
+                        node,
                         {
                             op: "add",
                             path: "" + (change.index + i),
-                            value: node.getChildNode("" + (change.index + i)).snapshot,
+                            value: nodeOps.snapshotOf(
+                                objNodeOps.getChildNode(node, "" + (change.index + i))
+                            ),
                             oldValue: undefined
                         },
                         node
@@ -314,16 +321,16 @@ export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
 }
 
 function reconcileArrayChildren<TT>(
-    parent: AnyObjectNode,
+    parent: NodeObj,
     childType: IType<any, any, TT>,
-    oldNodes: AnyNode[],
+    oldNodes: Node[],
     newValues: TT[],
     newPaths: (string | number)[]
-): AnyNode[] | null {
-    let oldNode: AnyNode,
+): Node[] | null {
+    let oldNode: Node,
         newValue: any,
         hasNewNode = false,
-        oldMatch: AnyNode | undefined = undefined,
+        oldMatch: Node | undefined = undefined,
         nothingChanged = true
 
     for (let i = 0; ; i++) {
@@ -340,7 +347,7 @@ function reconcileArrayChildren<TT>(
             break
         } else if (!hasNewNode) {
             // new one does not exists, old one dies
-            oldNode.die()
+            nodeOps.die(oldNode)
             oldNodes.splice(i, 1)
             i--
             nothingChanged = false
@@ -350,9 +357,11 @@ function reconcileArrayChildren<TT>(
             if (isStateTreeNode(newValue) && getStateTreeNode(newValue).parent === parent) {
                 // this node is owned by this parent, but not in the reconcilable set, so it must be double
                 throw fail(
-                    `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
-                        parent.path
-                    }/${newPaths[i]}', but it lives already at '${getStateTreeNode(newValue).path}'`
+                    `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${nodeOps.getPath(
+                        parent
+                    )}/${newPaths[i]}', but it lives already at '${nodeOps.getPath(
+                        getStateTreeNode(newValue)
+                    )}'`
                 )
             }
             oldNodes.splice(i, 0, valueAsNode(childType, parent, "" + newPaths[i], newValue))
@@ -389,10 +398,10 @@ function reconcileArrayChildren<TT>(
  */
 function valueAsNode(
     childType: IAnyType,
-    parent: AnyObjectNode,
+    parent: NodeObj,
     subpath: string,
     newValue: any,
-    oldNode?: AnyNode
+    oldNode?: Node
 ) {
     // ensure the value is valid-ish
     typecheckInternal(childType, newValue)
@@ -400,19 +409,19 @@ function valueAsNode(
     // the new value has a MST node
     if (isStateTreeNode(newValue)) {
         const childNode = getStateTreeNode(newValue)
-        childNode.assertAlive(EMPTY_OBJECT)
+        objNodeOps.assertAlive(childNode, EMPTY_OBJECT)
 
         // the node lives here
         if (childNode.parent !== null && childNode.parent === parent) {
-            childNode.setParent(parent, subpath)
-            if (oldNode && oldNode !== childNode) oldNode.die()
+            nodeOps.setParent(childNode, parent, subpath)
+            if (oldNode && oldNode !== childNode) nodeOps.die(oldNode)
             return childNode
         }
     }
     // there is old node and new one is a value/snapshot
     if (oldNode) {
         const childNode = childType.reconcile(oldNode, newValue)
-        childNode.setParent(parent, subpath)
+        nodeOps.setParent(childNode, parent, subpath)
         return childNode
     }
     // nothing to do, create from scratch
@@ -422,16 +431,16 @@ function valueAsNode(
 /**
  * Check if a node holds a value.
  */
-function areSame(oldNode: AnyNode, newValue: any) {
+function areSame(oldNode: Node, newValue: any) {
     // the new value has the same node
     if (isStateTreeNode(newValue)) {
         return getStateTreeNode(newValue) === oldNode
     }
     // the provided value is the snapshot of the old node
-    if (oldNode.snapshot === newValue) return true
+    if (nodeOps.snapshotOf(oldNode) === newValue) return true
     // new value is a snapshot with the correct identifier
     if (
-        oldNode instanceof ObjectNode &&
+        nodeOps.isNodeObj(oldNode) &&
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&

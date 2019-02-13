@@ -7,12 +7,12 @@ import {
     isType,
     IAnyType,
     typeCheckSuccess,
-    AnyObjectNode,
     ExtractC,
     ExtractS,
     ExtractT,
     ExtractNodeType,
-    cannotDetermineSubtype
+    cannotDetermineSubtype,
+    ParentNode
 } from "../../internal"
 
 class Late<IT extends IAnyType> extends BaseType<
@@ -60,7 +60,7 @@ class Late<IT extends IAnyType> extends BaseType<
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"] | this["T"]

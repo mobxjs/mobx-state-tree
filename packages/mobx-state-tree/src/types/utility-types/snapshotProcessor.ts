@@ -9,11 +9,11 @@ import {
     isStateTreeNode,
     IValidationContext,
     IValidationResult,
-    AnyObjectNode,
     RedefineIStateTreeNode,
     IStateTreeNode,
     TypeFlags,
-    ExtractNodeType
+    ExtractNodeType,
+    ParentNode
 } from "../../internal"
 
 /** @hidden */
@@ -79,14 +79,16 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         // the node has to use these methods rather than the original type ones
         proxyNodeTypeMethods(node.type, this, "isAssignableFrom", "create")
 
-        const oldGetSnapshot = node.getSnapshot
-        node.getSnapshot = () => {
-            return this.postProcessSnapshot(oldGetSnapshot.call(node)) as any
+        if (!node.snapshotPostProcessors) {
+            node.snapshotPostProcessors = []
         }
+        node.snapshotPostProcessors.push(sn => {
+            return this.postProcessSnapshot(sn)
+        })
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"] | this["T"]

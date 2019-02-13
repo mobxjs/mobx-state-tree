@@ -49,13 +49,15 @@ import {
     ExtractS,
     ExtractT,
     Hook,
-    AnyObjectNode,
-    AnyNode,
     _CustomOrOther,
     _NotCustomized,
     OptionalValue,
     asArray,
-    cannotDetermineSubtype
+    cannotDetermineSubtype,
+    ParentNode,
+    nodeOps,
+    objNodeOps,
+    Node
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -548,7 +550,7 @@ export class ModelType<
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"] | this["T"]
@@ -593,16 +595,16 @@ export class ModelType<
 
     private willChange(chg: IObjectWillChange): IObjectWillChange | null {
         // TODO: mobx typings don't seem to take into account that newValue can be set even when removing a prop
-        const change = chg as IObjectWillChange & { newValue?: any }
+        const change = chg as IObjectWillChange & { newValue?: Node }
 
         const childNode = getStateTreeNode(change.object)
-        childNode.assertWritable({ subpath: change.name })
+        objNodeOps.assertWritable(childNode, { subpath: change.name })
         const childType = (childNode.type as this).properties[change.name]
         // only properties are typed, state are stored as-is references
         if (childType) {
             typecheckInternal(childType, change.newValue)
             change.newValue = childType.reconcile(
-                childNode.getChildNode(change.name),
+                objNodeOps.getChildNode(childNode, change.name),
                 change.newValue
             )
         }
@@ -611,7 +613,7 @@ export class ModelType<
 
     private didChange(chg: IObjectDidChange) {
         // TODO: mobx typings don't seem to take into account that newValue can be set even when removing a prop
-        const change = chg as IObjectWillChange & { newValue?: any; oldValue?: any }
+        const change = chg as IObjectWillChange & { newValue?: Node; oldValue?: Node }
 
         const childNode = getStateTreeNode(change.object)
         const childType = (childNode.type as this).properties[change.name]
@@ -619,27 +621,28 @@ export class ModelType<
             // don't emit patches for volatile state
             return
         }
-        const oldChildValue = change.oldValue ? change.oldValue.snapshot : undefined
-        childNode.emitPatch(
+        const oldChildValue = change.oldValue ? nodeOps.snapshotOf(change.oldValue) : undefined
+        objNodeOps.emitPatch(
+            childNode,
             {
                 op: "replace",
                 path: escapeJsonPath(change.name),
-                value: change.newValue.snapshot,
+                value: nodeOps.snapshotOf(change.newValue),
                 oldValue: oldChildValue
             },
             childNode
         )
     }
 
-    getChildren(node: this["N"]): ReadonlyArray<AnyNode> {
-        const res: AnyNode[] = []
+    getChildren(node: this["N"]): ReadonlyArray<Node> {
+        const res: Node[] = []
         this.forAllProps(name => {
             res.push(this.getChildNode(node, name))
         })
         return res
     }
 
-    getChildNode(node: this["N"], key: string): AnyNode {
+    getChildNode(node: this["N"], key: string): Node {
         if (!(key in this.properties)) throw fail("Not a value property: " + key)
         const childNode = _getAdministration(node.storedValue, key).value // TODO: blegh!
         if (!childNode) throw fail("Node not available for property " + key)
@@ -651,7 +654,7 @@ export class ModelType<
         this.forAllProps((name, type) => {
             // TODO: FIXME, make sure the observable ref is used!
             ;(getAtom(node.storedValue, name) as any).reportObserved()
-            res[name] = this.getChildNode(node, name).snapshot
+            res[name] = nodeOps.snapshotOf(this.getChildNode(node, name))
         })
         if (applyPostProcess) {
             return this.applySnapshotPostProcessor(res)
@@ -662,7 +665,7 @@ export class ModelType<
     processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
         const processed = {} as any
         Object.keys(childNodes).forEach(key => {
-            processed[key] = childNodes[key].getSnapshot()
+            processed[key] = nodeOps.getSnapshot(childNodes[key])
         })
         return this.applySnapshotPostProcessor(this.applyOptionalValuesToSnapshot(processed))
     }

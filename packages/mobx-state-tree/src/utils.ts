@@ -349,7 +349,7 @@ export function argsToArray(args: IArguments): any[] {
  * @internal
  * @hidden
  */
-export function invalidateComputed(target: any, propName: string) {
+export function invalidateComputed(target: any, propName?: string) {
     const atom = getAtom(target, propName) as any
     atom.trackAndCompute()
 }

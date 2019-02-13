@@ -10,11 +10,12 @@ import {
     TypeFlags,
     IAnyType,
     ExtractC,
-    AnyObjectNode,
     BaseType,
     ExtractS,
     ExtractT,
-    ExtractNodeType
+    ExtractNodeType,
+    ParentNode,
+    nodeOps
 } from "../../internal"
 
 class Refinement<IT extends IAnyType> extends BaseType<
@@ -41,7 +42,7 @@ class Refinement<IT extends IAnyType> extends BaseType<
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"] | this["T"]
@@ -58,7 +59,9 @@ class Refinement<IT extends IAnyType> extends BaseType<
         const subtypeErrors = this._subtype.validate(value, context)
         if (subtypeErrors.length > 0) return subtypeErrors
 
-        const snapshot = isStateTreeNode(value) ? getStateTreeNode(value).snapshot : value
+        const snapshot = isStateTreeNode(value)
+            ? nodeOps.snapshotOf(getStateTreeNode(value))
+            : value
 
         if (!this._predicate(snapshot)) {
             return typeCheckFailure(context, value, this._message(value))

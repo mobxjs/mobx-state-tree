@@ -13,8 +13,8 @@ import {
     typeCheckFailure,
     isType,
     isInteger,
-    AnyObjectNode,
-    AnyNode
+    ParentNode,
+    Node
 } from "../internal"
 
 // TODO: implement CoreType using types.custom ?
@@ -37,12 +37,7 @@ export class CoreType<C, S, T> extends SimpleType<C, S, T> {
         return this.name
     }
 
-    instantiate(
-        parent: AnyObjectNode | null,
-        subpath: string,
-        environment: any,
-        initialValue: C
-    ): this["N"] {
+    instantiate(parent: ParentNode, subpath: string, environment: any, initialValue: C): this["N"] {
         return createScalarNode(this, parent, subpath, environment, initialValue)
     }
 
@@ -159,7 +154,7 @@ const _DatePrimitive = new CoreType<number | Date, number, Date>(
     v => typeof v === "number" || v instanceof Date,
     v => (v instanceof Date ? v : new Date(v))
 )
-_DatePrimitive.getSnapshot = function(node: AnyNode) {
+_DatePrimitive.getSnapshot = function(node: Node) {
     return node.storedValue.getTime()
 }
 

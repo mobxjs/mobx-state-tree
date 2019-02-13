@@ -17,8 +17,9 @@ import {
     ExtractCST,
     RedefineIStateTreeNode,
     IStateTreeNode,
-    AnyObjectNode,
-    BaseType
+    BaseType,
+    ParentNode,
+    nodeOps
 } from "../../internal"
 
 type IFunctionReturn<T> = () => T
@@ -50,7 +51,7 @@ export class OptionalValue<IT extends IAnyType> extends BaseType<
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"] | this["T"]
@@ -94,7 +95,7 @@ export class OptionalValue<IT extends IAnyType> extends BaseType<
     getDefaultValueSnapshot(): this["S"] {
         const instanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
         return isStateTreeNode(instanceOrSnapshot)
-            ? getStateTreeNode(instanceOrSnapshot).snapshot
+            ? nodeOps.snapshotOf(getStateTreeNode(instanceOrSnapshot))
             : instanceOrSnapshot
     }
 

@@ -32,7 +32,6 @@ import {
     IType,
     IValidationResult,
     ModelType,
-    ObjectNode,
     typecheckInternal,
     typeCheckFailure,
     TypeFlags,
@@ -44,11 +43,13 @@ import {
     ExtractCST,
     IStateTreeNode,
     normalizeIdentifier,
-    AnyObjectNode,
-    AnyNode,
     AnyModelType,
     asArray,
-    cannotDetermineSubtype
+    cannotDetermineSubtype,
+    ParentNode,
+    Node,
+    objNodeOps,
+    nodeOps
 } from "../../internal"
 
 /** @hidden */
@@ -203,7 +204,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     instantiate(
-        parent: AnyObjectNode | null,
+        parent: ParentNode,
         subpath: string,
         environment: any,
         initialValue: this["C"] | this["T"]
@@ -266,21 +267,20 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         return "Map<string, " + this._subType.describe() + ">"
     }
 
-    getChildren(node: this["N"]): ReadonlyArray<AnyNode> {
-        // return (node.storedValue as ObservableMap<any>).values()
+    getChildren(node: this["N"]): ReadonlyArray<Node> {
         return values(node.storedValue)
     }
 
-    getChildNode(node: this["N"], key: string): AnyNode {
+    getChildNode(node: this["N"], key: string): Node {
         const childNode = node.storedValue.get("" + key)
         if (!childNode) throw fail("Not a child " + key)
         return childNode
     }
 
-    willChange(change: IMapWillChange<string, AnyNode>): IMapWillChange<string, AnyNode> | null {
+    willChange(change: IMapWillChange<string, Node>): IMapWillChange<string, Node> | null {
         const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         const key = change.name
-        node.assertWritable({ subpath: key })
+        objNodeOps.assertWritable(node, { subpath: key })
         const mapType = node.type as this
         const subType = mapType._subType
 
@@ -291,7 +291,10 @@ export class MapType<IT extends IAnyType> extends ComplexType<
                     const oldValue = change.object.get(key)
                     if (newValue === oldValue) return null
                     typecheckInternal(subType, newValue)
-                    change.newValue = subType.reconcile(node.getChildNode(key), change.newValue)
+                    change.newValue = subType.reconcile(
+                        objNodeOps.getChildNode(node, key),
+                        change.newValue
+                    )
                     mapType.processIdentifier(key, change.newValue)
                 }
                 break
@@ -306,8 +309,8 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         return change
     }
 
-    private processIdentifier(expected: string, node: AnyNode): void {
-        if (this.identifierMode === MapIdentifierMode.YES && node instanceof ObjectNode) {
+    private processIdentifier(expected: string, node: Node): void {
+        if (this.identifierMode === MapIdentifierMode.YES && nodeOps.isNodeObj(node)) {
             const identifier = node.identifier!
             if (identifier !== expected)
                 throw fail(
@@ -318,8 +321,8 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
     getSnapshot(node: this["N"]): this["S"] {
         const res: this["S"] = {}
-        node.getChildren().forEach(childNode => {
-            res[childNode.subpath] = childNode.snapshot
+        objNodeOps.getChildren(node).forEach(childNode => {
+            res[childNode.subpath] = nodeOps.snapshotOf(childNode)
         })
         return res
     }
@@ -327,40 +330,43 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
         const processed: this["S"] = {}
         Object.keys(childNodes).forEach(key => {
-            processed[key] = childNodes[key].getSnapshot()
+            processed[key] = nodeOps.getSnapshot(childNodes[key])
         })
         return processed
     }
 
-    didChange(change: IMapDidChange<string, AnyNode>): void {
+    didChange(change: IMapDidChange<string, Node>): void {
         const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         switch (change.type) {
             case "update":
-                return void node.emitPatch(
+                return void objNodeOps.emitPatch(
+                    node,
                     {
                         op: "replace",
                         path: escapeJsonPath(change.name),
-                        value: change.newValue.snapshot,
-                        oldValue: change.oldValue ? change.oldValue.snapshot : undefined
+                        value: nodeOps.snapshotOf(change.newValue),
+                        oldValue: change.oldValue ? nodeOps.snapshotOf(change.oldValue) : undefined
                     },
                     node
                 )
             case "add":
-                return void node.emitPatch(
+                return void objNodeOps.emitPatch(
+                    node,
                     {
                         op: "add",
                         path: escapeJsonPath(change.name),
-                        value: change.newValue.snapshot,
+                        value: nodeOps.snapshotOf(change.newValue),
                         oldValue: undefined
                     },
                     node
                 )
             case "delete":
                 // a node got deleted, get the old snapshot and make the node die
-                const oldSnapshot = change.oldValue.snapshot
-                change.oldValue.die()
+                const oldSnapshot = nodeOps.snapshotOf(change.oldValue)
+                nodeOps.die(change.oldValue)
                 // emit the patch
-                return void node.emitPatch(
+                return void objNodeOps.emitPatch(
+                    node,
                     {
                         op: "remove",
                         path: escapeJsonPath(change.name),
