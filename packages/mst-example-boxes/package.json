@@ -31,7 +31,7 @@
         "babel-preset-es2015": "^6.16.0",
         "babel-preset-react": "^6.16.0",
         "babel-preset-stage-0": "^6.16.0",
-        "jest": "^23.6.0",
+        "jest": "^24.0.0",
         "react-hot-loader": "^4.0.1",
         "webpack": "^4.5.0",
         "webpack-dev-server": "^3.1.1"
