@@ -414,8 +414,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this.type.removeChild(this, subpath)
     }
 
-    // this method must be bound
-    unbox = (childNode: AnyNode): any => {
+    unbox(childNode: AnyNode): AnyNode {
         if (childNode)
             this.assertAlive({
                 subpath: childNode.subpath || childNode.subpathUponDeath
