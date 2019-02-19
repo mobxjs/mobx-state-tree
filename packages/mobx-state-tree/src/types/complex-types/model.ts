@@ -583,7 +583,7 @@ export class ModelType<
         addHiddenFinalProp(instance, "toString", objectTypeToString)
 
         this.forAllProps(name => {
-            _interceptReads(instance, name, node.unbox.bind(node))
+            _interceptReads(instance, name, node.unbox)
         })
 
         this.initializers.reduce((self, fn) => fn(self), instance)

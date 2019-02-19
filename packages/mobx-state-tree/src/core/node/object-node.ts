@@ -125,6 +125,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     ) {
         super(complexType, parent, subpath, environment)
 
+        this.unbox = this.unbox.bind(this)
+
         this._initialSnapshot = freeze(initialValue)
         this.identifierAttribute = complexType.identifierAttribute
 
@@ -414,6 +416,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this.type.removeChild(this, subpath)
     }
 
+    // bound on the constructor
     unbox(childNode: AnyNode): AnyNode {
         if (childNode)
             this.assertAlive({

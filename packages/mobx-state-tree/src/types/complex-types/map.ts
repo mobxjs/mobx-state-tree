@@ -257,7 +257,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     finalizeNewInstance(node: this["N"], instance: ObservableMap<string, any>): void {
-        _interceptReads(instance, node.unbox.bind(node))
+        _interceptReads(instance, node.unbox)
         intercept(instance, this.willChange)
         observe(instance, this.didChange)
     }

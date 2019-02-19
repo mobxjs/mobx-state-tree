@@ -115,7 +115,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
-        _getAdministration(instance).dehancer = node.unbox.bind(node)
+        _getAdministration(instance).dehancer = node.unbox
         intercept(instance as IObservableArray<AnyNode>, this.willChange)
         observe(instance as IObservableArray<AnyNode>, this.didChange)
     }
