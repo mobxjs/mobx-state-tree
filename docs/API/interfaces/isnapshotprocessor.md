@@ -37,7 +37,7 @@ A type that has its snapshots processed.
 
 **● name**: *`string`*
 
-The type name.
+Friendly type name.
 
 ___
 

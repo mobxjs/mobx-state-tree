@@ -131,6 +131,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [onPatch](#onpatch)
 * [onSnapshot](#onsnapshot)
 * [optional](#optional)
+* [optionalNull](#optionalnull)
 * [protect](#protect)
 * [recordActions](#recordactions)
 * [recordPatches](#recordpatches)
@@ -3001,7 +3002,7 @@ ___
 
 ▸ **optional**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IT extends OptionalProperty ? IT : IOptionalIType<IT>`
 
-`types.optional` - Can be used to create a property with a default value. If the given value is not provided in the snapshot, it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is _not_ present, causes the value to be reset
+`types.optional` - Can be used to create a property with a default value. If the given value is not provided in the snapshot, it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is _not_ present causes the value to be reset
 
 Example:
 
@@ -3013,7 +3014,7 @@ const Todo = types.model({
 })
 
 // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
-const todo = Todo.create({ title: "Get coffee "})
+const todo = Todo.create({ title: "Get coffee" })
 ```
 
 **Type parameters:**
@@ -3027,6 +3028,40 @@ const todo = Todo.create({ title: "Get coffee "})
 | defaultValueOrFunction | `OptionalDefaultValueOrFunction`<`IT`> |  \- |
 
 **Returns:** `IT extends OptionalProperty ? IT : IOptionalIType<IT>`
+
+___
+<a id="optionalnull"></a>
+
+###  optionalNull
+
+▸ **optionalNull**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IOptionalNullIType`<`IT`>
+
+`types.optionalNull` - Can be used to create a property with a default value. If the given value is null in the snapshot, it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is null causes the value to be reset
+
+Example:
+
+```ts
+const Todo = types.model({
+  title: types.optionalNull(types.string, "Test"),
+  done: types.optionalNull(types.boolean, false),
+  created: types.optionalNull(types.Date, () => new Date())
+})
+
+// it is now okay to set 'created' and 'done' to null. created will get a freshly generated timestamp
+const todo = Todo.create({ title: "Get coffee", done: null, created: null })
+```
+
+**Type parameters:**
+
+#### IT :  [IAnyType](#ianytype)
+**Parameters:**
+
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| type | `IT` |  \- |
+| defaultValueOrFunction | `OptionalDefaultValueOrFunction`<`IT`> |  \- |
+
+**Returns:** `IOptionalNullIType`<`IT`>
 
 ___
 <a id="protect"></a>
@@ -4845,6 +4880,13 @@ ___
 ####  optional
 
 **● optional**: *[optional](#optional)*
+
+___
+<a id="types.optionalnull"></a>
+
+####  optionalNull
+
+**● optionalNull**: *[optionalNull](#optionalnull)*
 
 ___
 <a id="types.reference"></a>
