@@ -7,7 +7,8 @@ import {
     RedefineIStateTreeNode,
     IStateTreeNode,
     types,
-    OptionalDefaultValueOrFunction
+    OptionalDefaultValueOrFunction,
+    freeze
 } from "../../internal"
 
 /** @hidden */
@@ -45,13 +46,15 @@ export function optionalNull<IT extends IAnyType>(
     defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
 ): IOptionalNullIType<IT> {
     const opt = types.optional(type, defaultValueOrFunction)
-    const optNull = types.snapshotProcessor(opt, {
-        preProcessor(sn: any) {
-            return sn === null ? undefined : sn
-        },
-        postProcessor(sn): any {
-            return sn === undefined ? null : sn
-        }
-    })
+    const optNull = types.snapshotProcessor(opt, optionalNullProcessors)
     return optNull as any
 }
+
+const optionalNullProcessors = freeze({
+    preProcessor(sn: any) {
+        return sn === null ? undefined : sn
+    },
+    postProcessor(sn: any) {
+        return sn === undefined ? null : sn
+    }
+})
