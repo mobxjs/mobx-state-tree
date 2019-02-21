@@ -110,6 +110,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [isLiteralType](#isliteraltype)
 * [isMapType](#ismaptype)
 * [isModelType](#ismodeltype)
+* [isOptionalNullType](#isoptionalnulltype)
 * [isOptionalType](#isoptionaltype)
 * [isPrimitiveType](#isprimitivetype)
 * [isProtected](#isprotected)
@@ -1883,7 +1884,7 @@ ___
 
 ▸ **frozen**<`C`>(subType: *[IType](interfaces/itype.md)<`C`, `any`, `any`>*): [IType](interfaces/itype.md)<`C`, `C`, `C`>
 
-▸ **frozen**<`T`>(defaultValue: *`T`*): [IType](interfaces/itype.md)<`T` \| `undefined` \| `null`, `T`, `T`> & `OptionalProperty`
+▸ **frozen**<`T`>(defaultValue: *`T`*): [IType](interfaces/itype.md)<`T` \| `undefined` \| `null`, `T`, `T`>
 
 ▸ **frozen**<`T`>(): [IType](interfaces/itype.md)<`T`, `T`, `T`>
 
@@ -1979,7 +1980,7 @@ type Point = { x: number, y: number }
 | ------ | ------ |
 | defaultValue | `T` |
 
-**Returns:** [IType](interfaces/itype.md)<`T` \| `undefined` \| `null`, `T`, `T`> & `OptionalProperty`
+**Returns:** [IType](interfaces/itype.md)<`T` \| `undefined` \| `null`, `T`, `T`>
 
 `types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
 
@@ -2492,6 +2493,28 @@ Returns if a given value represents a model type.
 **Returns:** `boolean`
 
 ___
+<a id="isoptionalnulltype"></a>
+
+###  isOptionalNullType
+
+▸ **isOptionalNullType**<`IT`>(type: *`IT`*): `boolean`
+
+Returns if a value represents an optional null type.
+
+*__template__*: IT
+
+**Type parameters:**
+
+#### IT :  [IType](interfaces/itype.md)<`any` \| `null`, `any`, `any`>
+**Parameters:**
+
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| type | `IT` |  \- |
+
+**Returns:** `boolean`
+
+___
 <a id="isoptionaltype"></a>
 
 ###  isOptionalType
@@ -2504,7 +2527,7 @@ Returns if a value represents an optional type.
 
 **Type parameters:**
 
-#### IT :  [IType](interfaces/itype.md)<`any` \| `undefined`, `any`, `any`> & `OptionalProperty`
+#### IT :  [IType](interfaces/itype.md)<`any` \| `undefined`, `any`, `any`>
 **Parameters:**
 
 | Name | Type | Description |
@@ -3000,7 +3023,7 @@ ___
 
 ###  optional
 
-▸ **optional**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IT extends OptionalProperty ? IT : IOptionalIType<IT>`
+▸ **optional**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IOptionalIType`<`IT`>
 
 `types.optional` - Can be used to create a property with a default value. If the given value is not provided in the snapshot, it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is _not_ present causes the value to be reset
 
@@ -3027,7 +3050,7 @@ const todo = Todo.create({ title: "Get coffee" })
 | type | `IT` |  \- |
 | defaultValueOrFunction | `OptionalDefaultValueOrFunction`<`IT`> |  \- |
 
-**Returns:** `IT extends OptionalProperty ? IT : IOptionalIType<IT>`
+**Returns:** `IOptionalIType`<`IT`>
 
 ___
 <a id="optionalnull"></a>
@@ -3397,7 +3420,7 @@ ___
 
 ###  typecheck
 
-▸ **typecheck**<`IT`>(type: *[IAnyType](#ianytype)*, value: *`ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`>*): `void`
+▸ **typecheck**<`IT`>(type: *`IT`*, value: *`ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`>*): `void`
 
 Run's the typechecker for the given type on the given value, which can be a snapshot or an instance. Throws if the given value is not according the provided type specification. Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
 
@@ -3408,7 +3431,7 @@ Run's the typechecker for the given type on the given value, which can be a snap
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| type | [IAnyType](#ianytype) |  Type to check against. |
+| type | `IT` |  Type to check against. |
 | value | `ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`> |  Value to be checked, either a snapshot or an instance. |
 
 **Returns:** `void`
