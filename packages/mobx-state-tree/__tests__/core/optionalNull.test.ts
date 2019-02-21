@@ -117,9 +117,11 @@ test("when the underlying type does not accept undefined, then undefined should 
         expect(m.a).toBe(5)
     }
 
-    expect(() => {
-        M.create({
-            a: undefined as any
-        })
-    }).toThrowError("value `undefined` is not assignable to type: `number`")
+    if (process.env.NODE_ENV !== "production") {
+        expect(() => {
+            M.create({
+                a: undefined as any
+            })
+        }).toThrowError("value `undefined` is not assignable to type: `number`")
+    }
 })
