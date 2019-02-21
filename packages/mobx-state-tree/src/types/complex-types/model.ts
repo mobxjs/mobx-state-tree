@@ -55,7 +55,8 @@ import {
     _NotCustomized,
     OptionalValue,
     asArray,
-    cannotDetermineSubtype
+    cannotDetermineSubtype,
+    IsOptionalType
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -81,25 +82,16 @@ export interface ModelPropertiesDeclaration {
  */
 export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
     [K in keyof T]: T[K] extends string
-        ? IType<string | undefined, string, string> & OptionalProperty
+        ? IType<string | undefined, string, string>
         : T[K] extends number
-        ? IType<number | undefined, number, number> & OptionalProperty
+        ? IType<number | undefined, number, number>
         : T[K] extends boolean
-        ? IType<boolean | undefined, boolean, boolean> & OptionalProperty
+        ? IType<boolean | undefined, boolean, boolean>
         : T[K] extends Date
-        ? IType<number | Date | undefined, number, Date> & OptionalProperty
+        ? IType<number | Date | undefined, number, Date>
         : T[K] extends IAnyType
         ? T[K]
         : never
-}
-
-/** @hidden */
-declare const $optionalProperty: unique symbol
-
-/** @hidden */
-export interface OptionalProperty {
-    // fake, only used for typing
-    readonly [$optionalProperty]: undefined
 }
 
 /**
@@ -107,7 +99,7 @@ export interface OptionalProperty {
  * @hidden
  */
 export type RequiredPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalProperty ? never : K
+    [K in keyof T]: IsOptionalType<T[K]> extends true ? never : K
 }[keyof T]
 /** @hidden */
 export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
@@ -116,7 +108,7 @@ export type RequiredPropsObject<P extends ModelProperties> = { [K in keyof Requi
 
 /** @hidden */
 export type OptionalPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalProperty ? K : never
+    [K in keyof T]: IsOptionalType<T[K]> extends true ? K : never
 }[keyof T]
 /** @hidden */
 export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
@@ -866,8 +858,8 @@ export function isModelType<IT extends IAnyModelType = IAnyModelType>(type: IAny
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 
-function tryGetOptional(type: IAnyType): OptionalValue<any> | undefined {
-    if (type instanceof OptionalValue) {
+function tryGetOptional(type: IAnyType): OptionalValue<any, undefined> | undefined {
+    if (type instanceof OptionalValue && type.optionalValue === undefined) {
         return type
     }
     const subtypes = type.getSubTypes()

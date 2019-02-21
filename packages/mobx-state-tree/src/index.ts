@@ -58,7 +58,6 @@ export {
     ModelPropertiesDeclarationToProperties,
     ModelProperties,
     ModelPropertiesDeclaration,
-    OptionalProperty,
     ModelActions,
     ITypeUnion,
     CustomTypeOptions,

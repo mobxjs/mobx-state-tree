@@ -49,7 +49,8 @@ export enum TypeFlags {
     Undefined = 1 << 16,
     Integer = 1 << 17,
     Custom = 1 << 18,
-    SnapshotProcessor = 1 << 19
+    SnapshotProcessor = 1 << 19,
+    OptionalNull = 1 << 20
 }
 
 /**
@@ -65,6 +66,26 @@ export type DefinablePropsNames<T> = {
  * @hidden
  */
 export type IsTypeAnyOrUnknown<T> = unknown extends T ? true : false
+
+type WithoutUndefined<T> = T extends undefined ? never : T
+
+/**
+ * Checks if a type is optional (its creation snapshot can be undefined) or not.
+ * @hidden
+ *
+ * Examples:
+ * - string = false
+ * - undefined = true
+ * - string | undefined = true
+ * - string & undefined = true
+ * - any = true
+ * - unkown = true
+ */
+export type IsOptionalType<IT> = IT extends IAnyType
+    ? (ExtractC<IT> extends WithoutUndefined<ExtractC<IT>>
+          ? IsTypeAnyOrUnknown<ExtractC<IT>>
+          : true)
+    : never
 
 /**
  * Checks if a type supports an empty create() function

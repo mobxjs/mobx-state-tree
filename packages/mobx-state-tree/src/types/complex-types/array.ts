@@ -35,7 +35,6 @@ import {
     typecheckInternal,
     typeCheckFailure,
     TypeFlags,
-    OptionalProperty,
     ExtractS,
     ExtractC,
     ExtractT,
@@ -72,8 +71,7 @@ export interface IMSTArray<IT extends IAnyType>
 
 /** @hidden */
 export interface IArrayType<IT extends IAnyType>
-    extends IType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>>,
-        OptionalProperty {}
+    extends IType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>> {}
 
 /**
  * @internal
@@ -309,8 +307,7 @@ export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
                 "expected a mobx-state-tree type as first argument, got " + subtype + " instead"
             )
     }
-    const ret = new ArrayType<IT>(subtype.name + "[]", subtype)
-    return ret as typeof ret & OptionalProperty
+    return new ArrayType<IT>(subtype.name + "[]", subtype)
 }
 
 function reconcileArrayChildren<TT>(
