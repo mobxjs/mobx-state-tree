@@ -6,7 +6,6 @@
         "build": "lerna run build",
         "test": "cross-env CI=true lerna run test",
         "coverage": "lerna run coverage",
-        "bootstrap": "npx lerna@3.3.0 bootstrap --hoist",
         "release": "yarn build && lerna publish"
     },
     "workspaces": [
