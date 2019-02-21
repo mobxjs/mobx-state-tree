@@ -138,7 +138,7 @@ export interface IOptionalIType<IT extends IAnyType>
  * `types.optional` - Can be used to create a property with a default value.
  * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
  * If `defaultValue` is a function, the function will be invoked for every new instance.
- * Applying a snapshot in which the optional value is _not_ present, causes the value to be reset
+ * Applying a snapshot in which the optional value is _not_ present causes the value to be reset
  *
  * Example:
  * ```ts
@@ -149,7 +149,7 @@ export interface IOptionalIType<IT extends IAnyType>
  * })
  *
  * // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
- * const todo = Todo.create({ title: "Get coffee "})
+ * const todo = Todo.create({ title: "Get coffee" })
  * ```
  *
  * @param type

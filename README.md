@@ -985,6 +985,7 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 
 -   `types.union(options?: { dispatcher?: (snapshot) => Type, eager?: boolean }, types...)` create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function to determine the type. When `eager` flag is set to `true` (default) - the first matching type will be used, if set to `false` the type check will pass only if exactly 1 type matches.
 -   `types.optional(type, defaultValue)` marks an value as being optional (in e.g. a model). If a value is not provided the `defaultValue` will be used instead. If `defaultValue` is a function, it will be evaluated. This can be used to generate, for example, IDs or timestamps upon creation.
+-   `types.optionalNull(type, defaultValue)` is like `types.optional` except that it uses `null` rather than `undefined` to decide when to use a default value.
 -   `types.literal(value)` can be used to create a literal type, where the only possible value is specifically that value. This is very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
 -   `types.enumeration(name?, options: string[])` creates an enumeration. This method is a shorthand for a union of string literals. If you are using typescript and want to create a type based on an string enum (e.g. `enum Color { ... }`) then use `types.enumeration<Color>("Color", Object.values(Color))`, where the `"Color"` name argument is optional.
 -   `types.refinement(name?, baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
@@ -1167,7 +1168,7 @@ The following service can generate MST models based on JSON: https://transform.n
 
 ### `optionals` and default value functions
 
-`types.optional` can take an optional function parameter which will be invoked each time a default value is needed. This is useful to generate timestamps, identifiers or even complex objects, for example:
+`types.optional` and `types.optionalNull` can take an optional function parameter which will be invoked each time a default value is needed. This is useful to generate timestamps, identifiers or even complex objects, for example:
 
 `createdDate: types.optional(types.Date, () => new Date())`
 

@@ -11,6 +11,7 @@ test("it should provide a default value, if no snapshot is provided", () => {
     const doc = Factory.create()
     expect(getSnapshot(doc)).toEqual({ rows: [{ name: "test", quantity: 0 }] })
 })
+
 test("it should use the snapshot if provided", () => {
     const Row = types.model({
         name: "",
@@ -22,6 +23,7 @@ test("it should use the snapshot if provided", () => {
     const doc = Factory.create({ rows: [{ name: "snapshot", quantity: 0 }] })
     expect(getSnapshot(doc)).toEqual({ rows: [{ name: "snapshot", quantity: 0 }] })
 })
+
 if (process.env.NODE_ENV !== "production") {
     test("it should throw if default value is invalid snapshot", () => {
         const Row = types.model({
@@ -34,8 +36,7 @@ if (process.env.NODE_ENV !== "production") {
             })
         }).toThrow()
     })
-}
-if (process.env.NODE_ENV !== "production") {
+
     test("it should throw bouncing errors from its sub-type", () => {
         const Row = types.model({
             name: types.string,
@@ -47,6 +48,7 @@ if (process.env.NODE_ENV !== "production") {
         }).toThrow()
     })
 }
+
 test("it should accept a function to provide dynamic values", () => {
     let defaultValue = 1
     const Factory = types.model({
@@ -62,6 +64,7 @@ test("it should accept a function to provide dynamic values", () => {
         )
     }
 })
+
 test("Values should reset to default if omitted in snapshot", () => {
     const Store = types.model({
         todo: types.model({

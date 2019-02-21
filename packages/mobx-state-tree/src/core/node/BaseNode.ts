@@ -43,9 +43,7 @@ export abstract class BaseNode<C, S, T> {
 
     storedValue!: any // usually the same type as the value, but not always (such as with references)
     get value(): T {
-        return (this.type as SimpleType<any, any, any> | ComplexType<any, any, any>).getValue(
-            this as any
-        )
+        return (this.type as any).getValue(this)
     }
 
     private aliveAtom?: IAtom
