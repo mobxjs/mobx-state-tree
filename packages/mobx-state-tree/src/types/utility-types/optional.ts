@@ -187,8 +187,7 @@ export function optional<IT extends IAnyType>(
 ): IOptionalIType<IT> {
     checkOptionalPreconditions(type, defaultValueOrFunction)
 
-    const ret = new OptionalValue(type, defaultValueOrFunction, undefined, TypeFlags.Optional, "?")
-    return ret as any
+    return new OptionalValue(type, defaultValueOrFunction, undefined, TypeFlags.Optional, "?")
 }
 
 /**
@@ -238,14 +237,7 @@ export function optionalNull<IT extends IAnyType>(
 ): IOptionalNullIType<IT> {
     checkOptionalPreconditions(type, defaultValueOrFunction)
 
-    const ret = new OptionalValue(
-        type,
-        defaultValueOrFunction,
-        null,
-        TypeFlags.OptionalNull,
-        "?(null)"
-    )
-    return ret as any
+    return new OptionalValue(type, defaultValueOrFunction, null, TypeFlags.OptionalNull, "?(null)")
 }
 
 /**
