@@ -105,7 +105,7 @@ test("when the underlying type accepts undefined it should be ok", () => {
     }
 })
 
-test("when the underlying type does not accept undefined then undefined should throw", () => {
+test("when the underlying type does not accept undefined, then undefined should throw", () => {
     const M = types.model({
         a: types.optionalNull(types.number, 5)
     })
