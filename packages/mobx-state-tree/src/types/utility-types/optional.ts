@@ -46,21 +46,19 @@ export class OptionalValue<
     >
 > {
     get flags() {
-        return this._subtype.flags | this._typeFlag
+        return this._subtype.flags | TypeFlags.Optional
     }
 
     constructor(
         private readonly _subtype: IT,
         private readonly _defaultValue: IOptionalValue<ExtractC<IT>, ExtractT<IT>>,
-        readonly optionalValues: OptionalVals,
-        private readonly _typeFlag: TypeFlags,
-        private readonly _describeSuffix: string
+        readonly optionalValues: OptionalVals
     ) {
         super(_subtype.name)
     }
 
     describe() {
-        return this._subtype.describe() + this._describeSuffix
+        return this._subtype.describe() + "?"
     }
 
     instantiate(
@@ -219,11 +217,11 @@ export function optional<IT extends IAnyType, OptionalVals extends ValidOptional
     return new OptionalValue(
         type,
         defaultValueOrFunction,
-        optionalValues ? optionalValues : [undefined],
-        TypeFlags.Optional,
-        "?"
+        optionalValues ? optionalValues : undefinedAsOptionalValues
     )
 }
+
+const undefinedAsOptionalValues: [undefined] = [undefined]
 
 /**
  * Returns if a value represents an optional type.
