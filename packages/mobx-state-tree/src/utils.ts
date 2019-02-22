@@ -143,13 +143,13 @@ export function isMutable(value: any) {
  * @internal
  * @hidden
  */
-export function isPrimitive(value: any): value is Primitives {
+export function isPrimitive(value: any, includeDate = true): value is Primitives {
     if (value === null || value === undefined) return true
     if (
         typeof value === "string" ||
         typeof value === "number" ||
         typeof value === "boolean" ||
-        value instanceof Date
+        (includeDate && value instanceof Date)
     )
         return true
     return false
