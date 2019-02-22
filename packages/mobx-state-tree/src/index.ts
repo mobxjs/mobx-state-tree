@@ -125,6 +125,7 @@ export {
     isMapType,
     isModelType,
     isOptionalType,
+    IsOptionalType,
     isPrimitiveType,
     isReferenceType,
     isRefinementType,
