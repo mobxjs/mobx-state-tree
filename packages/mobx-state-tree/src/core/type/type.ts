@@ -78,7 +78,7 @@ type WithoutUndefined<T> = T extends undefined ? never : T
  * - string | undefined = true
  * - string & undefined = true
  * - any = true
- * - unkown = true
+ * - unknown = true
  */
 export type IsOptionalType<IT> = IT extends IAnyType
     ? (ExtractC<IT> extends WithoutUndefined<ExtractC<IT>>

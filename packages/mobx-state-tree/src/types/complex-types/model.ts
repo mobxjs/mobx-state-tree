@@ -767,7 +767,7 @@ export function model(...args: any[]): any {
 }
 
 // TODO: this can be simplified in TS3, since we can transform _NotCustomized to unknown, since unkonwn & X = X
-// and then back unkown to _NotCustomized if needed
+// and then back unknown to _NotCustomized if needed
 /** @hidden */
 export type _CustomJoin<A, B> = A extends _NotCustomized ? B : A & B
 
