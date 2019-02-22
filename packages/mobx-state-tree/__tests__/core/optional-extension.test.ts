@@ -108,21 +108,32 @@ describe("null as default", () => {
 
     test("when the underlying type does not accept undefined, then undefined should throw", () => {
         const M = types.model({
-            a: types.optional(types.number, 5, [null])
+            a: types.optional(types.number, 5, [null]),
+            b: types.optional(types.number, 6, [null])
         })
 
         {
             const m = M.create({
-                a: null
+                a: null,
+                b: null
             })
             expect(m.a).toBe(5)
+            expect(m.b).toBe(6)
         }
 
         if (process.env.NODE_ENV !== "production") {
             expect(() => {
                 M.create({
-                    a: undefined as any
+                    a: null,
+                    b: undefined as any // undefined is not valid
                 })
+            }).toThrowError("value `undefined` is not assignable to type: `number`")
+
+            expect(() => {
+                M.create({
+                    a: null
+                    // b: null missing, but should be there
+                } as any)
             }).toThrowError("value `undefined` is not assignable to type: `number`")
         }
     })

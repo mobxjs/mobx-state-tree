@@ -210,9 +210,10 @@ export function optional<IT extends IAnyType, OptionalVals extends ValidOptional
  *   created: types.optional(types.Date, () => new Date()),
  * })
  *
- * // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
- * // if subtitle1 is null it will default to `""`, but it cannot be missing or undefined
- * // if subtitle2 is null or undefined it will default to `""`. since it can be undefined it can also be missing
+ * // if done is missing / undefined it will become false
+ * // if created is missing / undefined it will get a freshly generated timestamp
+ * // if subtitle1 is null it will default to "", but it cannot be missing or undefined
+ * // if subtitle2 is null or undefined it will default to ""; since it can be undefined it can also be missing
  * const todo = Todo.create({ title: "Get coffee", subtitle1: null })
  * ```
  *
