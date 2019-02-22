@@ -24,14 +24,26 @@ type IFunctionReturn<T> = () => T
 
 type IOptionalValue<C, T> = C | IFunctionReturn<C | T>
 
+/** @hidden */
+export type ValidOptionalValue = string | boolean | number | null | undefined
+
+/** @hidden */
+export type ValidOptionalValues = [ValidOptionalValue, ...ValidOptionalValue[]]
+
 /**
  * @hidden
  * @internal
  */
-export class OptionalValue<IT extends IAnyType, OptionalVal> extends BaseType<
-    ExtractC<IT> | OptionalVal,
+export class OptionalValue<
+    IT extends IAnyType,
+    OptionalVals extends ValidOptionalValues
+> extends BaseType<
+    ExtractC<IT> | OptionalVals[number],
     ExtractS<IT>,
-    RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<ExtractC<IT> | OptionalVal, ExtractS<IT>>>
+    RedefineIStateTreeNode<
+        ExtractT<IT>,
+        IStateTreeNode<ExtractC<IT> | OptionalVals[number], ExtractS<IT>>
+    >
 > {
     get flags() {
         return this._subtype.flags | this._typeFlag
@@ -40,7 +52,7 @@ export class OptionalValue<IT extends IAnyType, OptionalVal> extends BaseType<
     constructor(
         private readonly _subtype: IT,
         private readonly _defaultValue: IOptionalValue<ExtractC<IT>, ExtractT<IT>>,
-        readonly optionalValue: OptionalVal,
+        readonly optionalValues: OptionalVals,
         private readonly _typeFlag: TypeFlags,
         private readonly _describeSuffix: string
     ) {
@@ -57,7 +69,7 @@ export class OptionalValue<IT extends IAnyType, OptionalVal> extends BaseType<
         environment: any,
         initialValue: this["C"] | this["T"]
     ): this["N"] {
-        if (initialValue === this.optionalValue) {
+        if (this.optionalValues.indexOf(initialValue) >= 0) {
             const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
             return this._subtype.instantiate(
                 parent,
@@ -72,7 +84,7 @@ export class OptionalValue<IT extends IAnyType, OptionalVal> extends BaseType<
     reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
         return this._subtype.reconcile(
             current,
-            newValue !== this.optionalValue && this._subtype.is(newValue)
+            this.optionalValues.indexOf(newValue) < 0 && this._subtype.is(newValue)
                 ? newValue
                 : this.getDefaultInstanceOrSnapshot()
         )
@@ -102,7 +114,7 @@ export class OptionalValue<IT extends IAnyType, OptionalVal> extends BaseType<
 
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         // defaulted values can be skipped
-        if (value === this.optionalValue) {
+        if (this.optionalValues.indexOf(value) >= 0) {
             return typeCheckSuccess()
         }
         // bounce validation to the sub-type
@@ -125,11 +137,14 @@ export type OptionalDefaultValueOrFunction<IT extends IAnyType> =
     | (() => ExtractCST<IT>)
 
 /** @hidden */
-export interface IOptionalIType<IT extends IAnyType>
+export interface IOptionalIType<IT extends IAnyType, OptionalVals extends ValidOptionalValues>
     extends IType<
-        ExtractC<IT> | undefined,
+        ExtractC<IT> | OptionalVals[number],
         ExtractS<IT>,
-        RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<ExtractC<IT> | undefined, ExtractS<IT>>>
+        RedefineIStateTreeNode<
+            ExtractT<IT>,
+            IStateTreeNode<ExtractC<IT> | OptionalVals[number], ExtractS<IT>>
+        >
     > {}
 
 function checkOptionalPreconditions<IT extends IAnyType>(
@@ -159,35 +174,55 @@ function checkOptionalPreconditions<IT extends IAnyType>(
     }
 }
 
+export function optional<IT extends IAnyType>(
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+): IOptionalIType<IT, [undefined]>
+export function optional<IT extends IAnyType, OptionalVals extends ValidOptionalValues>(
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>,
+    optionalValues: OptionalVals
+): IOptionalIType<IT, OptionalVals>
 /**
  * `types.optional` - Can be used to create a property with a default value.
- * If the given value is not provided in the snapshot, it will default to the provided `defaultValue`.
+ * If the given value is not provided in the snapshot (or matches one of the provided optional values), it will default to the provided `defaultValue`.
  * If `defaultValue` is a function, the function will be invoked for every new instance.
  * Applying a snapshot in which the optional value is _not_ present causes the value to be reset
  *
  * Example:
  * ```ts
  * const Todo = types.model({
- *   title: types.optional(types.string, "Test"),
+ *   title: types.string,
+ *   subtitle: types.optional(types.string, "", null),
  *   done: types.optional(types.boolean, false),
- *   created: types.optional(types.Date, () => new Date())
+ *   created: types.optional(types.Date, () => new Date()),
  * })
  *
  * // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
- * const todo = Todo.create({ title: "Get coffee" })
+ * // also if subtitle is null it will default to `""`
+ * const todo = Todo.create({ title: "Get coffee", subtitle: null })
  * ```
  *
  * @param type
  * @param defaultValueOrFunction
+ * @param optionalValues an optional array with zero or more primitive values (string, number, boolean, null or undefined)
+ *                       that will be converted into the default. `undefined` is assumed when none is provided
  * @returns
  */
-export function optional<IT extends IAnyType>(
+export function optional<IT extends IAnyType, OptionalVals extends ValidOptionalValues>(
     type: IT,
-    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
-): IOptionalIType<IT> {
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>,
+    optionalValues?: OptionalVals
+): IOptionalIType<IT, OptionalVals> {
     checkOptionalPreconditions(type, defaultValueOrFunction)
 
-    return new OptionalValue(type, defaultValueOrFunction, undefined, TypeFlags.Optional, "?")
+    return new OptionalValue(
+        type,
+        defaultValueOrFunction,
+        optionalValues ? optionalValues : [undefined],
+        TypeFlags.Optional,
+        "?"
+    )
 }
 
 /**
@@ -197,56 +232,6 @@ export function optional<IT extends IAnyType>(
  * @param type
  * @returns
  */
-export function isOptionalType<IT extends IType<any | undefined, any, any>>(type: IT): type is IT {
+export function isOptionalType<IT extends IAnyType>(type: IT): type is IT {
     return isType(type) && (type.flags & TypeFlags.Optional) > 0
-}
-
-/** @hidden */
-export interface IOptionalNullIType<IT extends IAnyType>
-    extends IType<
-        ExtractC<IT> | null,
-        ExtractS<IT>,
-        RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<ExtractC<IT> | null, ExtractS<IT>>>
-    > {}
-
-/**
- * `types.optionalNull` - Can be used to create a property with a default value.
- * If the given value is null in the snapshot, it will default to the provided `defaultValue`.
- * If `defaultValue` is a function, the function will be invoked for every new instance.
- * Applying a snapshot in which the optional value is null causes the value to be reset
- *
- * Example:
- * ```ts
- * const Todo = types.model({
- *   title: types.optionalNull(types.string, "Test"),
- *   done: types.optionalNull(types.boolean, false),
- *   created: types.optionalNull(types.Date, () => new Date())
- * })
- *
- * // it is now okay to set 'created' and 'done' to null. created will get a freshly generated timestamp
- * const todo = Todo.create({ title: "Get coffee", done: null, created: null })
- * ```
- *
- * @param type
- * @param defaultValueOrFunction
- * @returns
- */
-export function optionalNull<IT extends IAnyType>(
-    type: IT,
-    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
-): IOptionalNullIType<IT> {
-    checkOptionalPreconditions(type, defaultValueOrFunction)
-
-    return new OptionalValue(type, defaultValueOrFunction, null, TypeFlags.OptionalNull, "?(null)")
-}
-
-/**
- * Returns if a value represents an optional null type.
- *
- * @template IT
- * @param type
- * @returns
- */
-export function isOptionalNullType<IT extends IType<any | null, any, any>>(type: IT): type is IT {
-    return isType(type) && (type.flags & TypeFlags.OptionalNull) > 0
 }

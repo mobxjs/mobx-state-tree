@@ -110,7 +110,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [isLiteralType](#isliteraltype)
 * [isMapType](#ismaptype)
 * [isModelType](#ismodeltype)
-* [isOptionalNullType](#isoptionalnulltype)
 * [isOptionalType](#isoptionaltype)
 * [isPrimitiveType](#isprimitivetype)
 * [isProtected](#isprotected)
@@ -132,7 +131,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [onPatch](#onpatch)
 * [onSnapshot](#onsnapshot)
 * [optional](#optional)
-* [optionalNull](#optionalnull)
 * [protect](#protect)
 * [recordActions](#recordactions)
 * [recordPatches](#recordpatches)
@@ -2493,28 +2491,6 @@ Returns if a given value represents a model type.
 **Returns:** `boolean`
 
 ___
-<a id="isoptionalnulltype"></a>
-
-###  isOptionalNullType
-
-▸ **isOptionalNullType**<`IT`>(type: *`IT`*): `boolean`
-
-Returns if a value represents an optional null type.
-
-*__template__*: IT
-
-**Type parameters:**
-
-#### IT :  [IType](interfaces/itype.md)<`any` \| `null`, `any`, `any`>
-**Parameters:**
-
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
-
-**Returns:** `boolean`
-
-___
 <a id="isoptionaltype"></a>
 
 ###  isOptionalType
@@ -2527,7 +2503,7 @@ Returns if a value represents an optional type.
 
 **Type parameters:**
 
-#### IT :  [IType](interfaces/itype.md)<`any` \| `undefined`, `any`, `any`>
+#### IT :  [IAnyType](#ianytype)
 **Parameters:**
 
 | Name | Type | Description |
@@ -3023,21 +2999,25 @@ ___
 
 ###  optional
 
-▸ **optional**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IOptionalIType`<`IT`>
+▸ **optional**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IOptionalIType`<`IT`, [`undefined`]>
 
-`types.optional` - Can be used to create a property with a default value. If the given value is not provided in the snapshot, it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is _not_ present causes the value to be reset
+▸ **optional**<`IT`,`OptionalVals`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*, ...optionalValues: *`OptionalVals`*): `IOptionalIType`<`IT`, `OptionalVals`>
+
+`types.optional` - Can be used to create a property with a default value. If the given value is not provided in the snapshot (or matches one of the provided optional values), it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is _not_ present causes the value to be reset
 
 Example:
 
 ```ts
 const Todo = types.model({
-  title: types.optional(types.string, "Test"),
+  title: types.string,
+  subtitle: types.optional(types.string, "", null),
   done: types.optional(types.boolean, false),
-  created: types.optional(types.Date, () => new Date())
+  created: types.optional(types.Date, () => new Date()),
 })
 
 // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
-const todo = Todo.create({ title: "Get coffee" })
+// also if subtitle is null it will default to `""`
+const todo = Todo.create({ title: "Get coffee", subtitle: null })
 ```
 
 **Type parameters:**
@@ -3050,41 +3030,38 @@ const todo = Todo.create({ title: "Get coffee" })
 | type | `IT` |  \- |
 | defaultValueOrFunction | `OptionalDefaultValueOrFunction`<`IT`> |  \- |
 
-**Returns:** `IOptionalIType`<`IT`>
+**Returns:** `IOptionalIType`<`IT`, [`undefined`]>
 
-___
-<a id="optionalnull"></a>
-
-###  optionalNull
-
-▸ **optionalNull**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IOptionalNullIType`<`IT`>
-
-`types.optionalNull` - Can be used to create a property with a default value. If the given value is null in the snapshot, it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is null causes the value to be reset
+`types.optional` - Can be used to create a property with a default value. If the given value is not provided in the snapshot (or matches one of the provided optional values), it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is _not_ present causes the value to be reset
 
 Example:
 
 ```ts
 const Todo = types.model({
-  title: types.optionalNull(types.string, "Test"),
-  done: types.optionalNull(types.boolean, false),
-  created: types.optionalNull(types.Date, () => new Date())
+  title: types.string,
+  subtitle: types.optional(types.string, "", null),
+  done: types.optional(types.boolean, false),
+  created: types.optional(types.Date, () => new Date()),
 })
 
-// it is now okay to set 'created' and 'done' to null. created will get a freshly generated timestamp
-const todo = Todo.create({ title: "Get coffee", done: null, created: null })
+// it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
+// also if subtitle is null it will default to `""`
+const todo = Todo.create({ title: "Get coffee", subtitle: null })
 ```
 
 **Type parameters:**
 
 #### IT :  [IAnyType](#ianytype)
+#### OptionalVals :  `ValidOptionalValue`[]
 **Parameters:**
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | type | `IT` |  \- |
 | defaultValueOrFunction | `OptionalDefaultValueOrFunction`<`IT`> |  \- |
+| `Rest` optionalValues | `OptionalVals` |  zero or more primitive values (string, number, boolean, null or undefined) that will be converted into the default. \`undefined\` is assumed when none is provided |
 
-**Returns:** `IOptionalNullIType`<`IT`>
+**Returns:** `IOptionalIType`<`IT`, `OptionalVals`>
 
 ___
 <a id="protect"></a>
@@ -4903,13 +4880,6 @@ ___
 ####  optional
 
 **● optional**: *[optional](#optional)*
-
-___
-<a id="types.optionalnull"></a>
-
-####  optionalNull
-
-**● optionalNull**: *[optionalNull](#optionalnull)*
 
 ___
 <a id="types.reference"></a>

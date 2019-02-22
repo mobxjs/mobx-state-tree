@@ -107,6 +107,8 @@ export {
     IMaybeNull,
     IOptionalIType,
     OptionalDefaultValueOrFunction,
+    ValidOptionalValue,
+    ValidOptionalValues,
     getMembers,
     getPropertyMembers,
     ExtractNodeC,

@@ -858,8 +858,8 @@ export function isModelType<IT extends IAnyModelType = IAnyModelType>(type: IAny
     return isType(type) && (type.flags & TypeFlags.Object) > 0
 }
 
-function tryGetOptional(type: IAnyType): OptionalValue<any, undefined> | undefined {
-    if (type instanceof OptionalValue && type.optionalValue === undefined) {
+function tryGetOptional(type: IAnyType): OptionalValue<any, [undefined]> | undefined {
+    if (type instanceof OptionalValue && type.optionalValues.indexOf(undefined) >= 0) {
         return type
     }
     const subtypes = type.getSubTypes()
