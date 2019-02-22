@@ -183,28 +183,43 @@ export function optional<IT extends IAnyType, OptionalVals extends ValidOptional
 ): IOptionalIType<IT, OptionalVals>
 /**
  * `types.optional` - Can be used to create a property with a default value.
- * If the given value is not provided in the snapshot (or matches one of the provided optional values), it will default to the provided `defaultValue`.
+ *
+ * Depending on the third argument (`optionalValues`) there are two ways of operation:
+ * - If the argument is not provided, then if a value is not provided in the snapshot (`undefined` or missing),
+ *   it will default to the provided `defaultValue`
+ * - If the argument is provided, then if the value in the snapshot matches one of the optional values inside the array then it will
+ *   default to the provided `defaultValue`. Additionally, if one of the optional values inside the array is `undefined` then a missing
+ *   property is also valid.
+ *
+ *   Note that it is also possible to include values of the same type as the intended subtype as optional values,
+ *   in this case the optional value will be transformed into the `defaultValue` (e.g. `types.optional(types.string, "unnamed", [undefined, ""])`
+ *   will transform the snapshot values `undefined` (and therefore missing) and empty strings into the string `"unnamed"` when it gets
+ *   instantiated).
+ *
  * If `defaultValue` is a function, the function will be invoked for every new instance.
- * Applying a snapshot in which the optional value is _not_ present causes the value to be reset
+ * Applying a snapshot in which the optional value is one of the optional values (or `undefined`/_not_ present if none are provided) causes the
+ * value to be reset.
  *
  * Example:
  * ```ts
  * const Todo = types.model({
  *   title: types.string,
- *   subtitle: types.optional(types.string, "", null),
+ *   subtitle1: types.optional(types.string, "", [null]),
+ *   subtitle2: types.optional(types.string, "", [null, undefined]),
  *   done: types.optional(types.boolean, false),
  *   created: types.optional(types.Date, () => new Date()),
  * })
  *
  * // it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
- * // also if subtitle is null it will default to `""`
- * const todo = Todo.create({ title: "Get coffee", subtitle: null })
+ * // if subtitle1 is null it will default to `""`, but it cannot be missing or undefined
+ * // if subtitle2 is null or undefined it will default to `""`. since it can be undefined it can also be missing
+ * const todo = Todo.create({ title: "Get coffee", subtitle1: null })
  * ```
  *
  * @param type
  * @param defaultValueOrFunction
  * @param optionalValues an optional array with zero or more primitive values (string, number, boolean, null or undefined)
- *                       that will be converted into the default. `undefined` is assumed when none is provided
+ *                       that will be converted into the default. `[ undefined ]` is assumed when none is provided
  * @returns
  */
 export function optional<IT extends IAnyType, OptionalVals extends ValidOptionalValues>(
