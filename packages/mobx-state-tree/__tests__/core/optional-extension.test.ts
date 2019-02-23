@@ -275,7 +275,7 @@ describe("'empty' or false as default", () => {
 })
 
 test("cached snapshots should be ok when using default values", () => {
-    const M = types.model({ x: 5 })
+    const M = types.model({ x: 5, y: 6 })
     const Store = types.model({
         deep: types.model({
             a: types.optional(types.undefined, undefined),
@@ -288,12 +288,12 @@ test("cached snapshots should be ok when using default values", () => {
             c2: types.optional(types.number, () => 5),
             d2: types.optional(types.number, () => 5, ["empty"]),
 
-            a3: types.optional(M, {}),
-            b3: types.optional(M, {}, ["empty"]),
-            c3: types.optional(M, () => M.create({})),
-            d3: types.optional(M, () => M.create({}), ["empty"]),
-            e3: types.optional(M, () => ({})),
-            f3: types.optional(M, () => ({}), ["empty"])
+            a3: types.optional(M, { y: 20 }),
+            b3: types.optional(M, { y: 20 }, ["empty"]),
+            c3: types.optional(M, () => M.create({ y: 20 })),
+            d3: types.optional(M, () => M.create({ y: 20 }), ["empty"]),
+            e3: types.optional(M, () => ({ y: 20 })),
+            f3: types.optional(M, () => ({ y: 20 }), ["empty"])
         })
     })
 
@@ -318,12 +318,12 @@ test("cached snapshots should be ok when using default values", () => {
             b2: undefined,
             c2: 5,
             d2: 5,
-            a3: { x: 5 },
-            b3: { x: 5 },
-            c3: { x: 5 },
-            d3: { x: 5 },
-            e3: { x: 5 },
-            f3: { x: 5 }
+            a3: { x: 5, y: 20 },
+            b3: { x: 5, y: 20 },
+            c3: { x: 5, y: 20 },
+            d3: { x: 5, y: 20 },
+            e3: { x: 5, y: 20 },
+            f3: { x: 5, y: 20 }
         }
     })
 })
