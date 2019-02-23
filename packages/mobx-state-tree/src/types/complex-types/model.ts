@@ -656,7 +656,7 @@ export class ModelType<
         Object.keys(childNodes).forEach(key => {
             processed[key] = childNodes[key].getSnapshot()
         })
-        return this.applySnapshotPostProcessor(this.applyOptionalValuesToSnapshot(processed))
+        return this.applySnapshotPostProcessor(processed)
     }
 
     applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
@@ -678,20 +678,6 @@ export class ModelType<
     applySnapshotPreProcessor(snapshot: any) {
         const processor = this.preProcessor
         return processor ? processor.call(null, snapshot) : snapshot
-    }
-
-    applyOptionalValuesToSnapshot(snapshot: any) {
-        if (snapshot) {
-            snapshot = Object.assign({}, snapshot)
-            this.forAllProps((name, type) => {
-                const value = snapshot[name]
-                const optionalType = tryGetOptional(type, value)
-                if (optionalType) {
-                    snapshot[name] = optionalType.getDefaultValueSnapshot()
-                }
-            })
-        }
-        return snapshot
     }
 
     applySnapshotPostProcessor(snapshot: any) {
@@ -855,27 +841,4 @@ export function compose(...args: any[]): any {
  */
 export function isModelType<IT extends IAnyModelType = IAnyModelType>(type: IAnyType): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
-}
-
-function tryGetOptional(type: IAnyType, value: any): OptionalValue<any, any> | undefined {
-    // early optimization, optional types can only be string | number | boolean | null | undefined
-    if (!isPrimitive(value, false)) {
-        return undefined
-    }
-
-    if (type instanceof OptionalValue && type.optionalValues.indexOf(value) >= 0) {
-        return type
-    }
-    const subtypes = type.getSubTypes()
-    if (!subtypes || subtypes === cannotDetermineSubtype) {
-        return undefined
-    }
-    const subtypesArray = asArray(subtypes)
-    for (const subtype of subtypesArray) {
-        const opt = tryGetOptional(subtype, value)
-        if (opt) {
-            return opt
-        }
-    }
-    return undefined
 }

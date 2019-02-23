@@ -273,3 +273,57 @@ describe("'empty' or false as default", () => {
         }
     })
 })
+
+test("cached snapshots should be ok when using default values", () => {
+    const M = types.model({ x: 5 })
+    const Store = types.model({
+        deep: types.model({
+            a: types.optional(types.undefined, undefined),
+            b: types.optional(types.undefined, undefined, ["empty"]),
+            c: types.optional(types.number, 5),
+            d: types.optional(types.number, 5, ["empty"]),
+
+            a2: types.optional(types.undefined, () => undefined),
+            b2: types.optional(types.undefined, () => undefined, ["empty"]),
+            c2: types.optional(types.number, () => 5),
+            d2: types.optional(types.number, () => 5, ["empty"]),
+
+            a3: types.optional(M, {}),
+            b3: types.optional(M, {}, ["empty"]),
+            c3: types.optional(M, () => M.create({})),
+            d3: types.optional(M, () => M.create({}), ["empty"]),
+            e3: types.optional(M, () => ({})),
+            f3: types.optional(M, () => ({}), ["empty"])
+        })
+    })
+
+    const s = Store.create({
+        deep: {
+            b: "empty",
+            d: "empty",
+            b2: "empty",
+            d2: "empty",
+            b3: "empty",
+            d3: "empty",
+            f3: "empty"
+        }
+    })
+    expect(getSnapshot(s)).toEqual({
+        deep: {
+            a: undefined,
+            b: undefined,
+            c: 5,
+            d: 5,
+            a2: undefined,
+            b2: undefined,
+            c2: 5,
+            d2: 5,
+            a3: { x: 5 },
+            b3: { x: 5 },
+            c3: { x: 5 },
+            d3: { x: 5 },
+            e3: { x: 5 },
+            f3: { x: 5 }
+        }
+    })
+})

@@ -103,13 +103,6 @@ export class OptionalValue<
         return defaultInstanceOrSnapshot
     }
 
-    getDefaultValueSnapshot(): this["S"] {
-        const instanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
-        return isStateTreeNode(instanceOrSnapshot)
-            ? getStateTreeNode(instanceOrSnapshot).snapshot
-            : instanceOrSnapshot
-    }
-
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
         // defaulted values can be skipped
         if (this.optionalValues.indexOf(value) >= 0) {
