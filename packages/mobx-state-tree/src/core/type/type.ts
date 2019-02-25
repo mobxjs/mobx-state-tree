@@ -80,12 +80,11 @@ type WithoutUndefined<T> = T extends undefined ? never : T
  * - any = true
  * - unknown = true
  */
-export type IsOptionalType<IT> = IT extends IAnyType
-    ? (ExtractC<IT> extends WithoutUndefined<ExtractC<IT>>
-          ? IsTypeAnyOrUnknown<ExtractC<IT>>
-          : true)
-    : never
-
+export type IsOptionalType<IT extends IAnyType> = ExtractC<IT> extends WithoutUndefined<
+    ExtractC<IT>
+>
+    ? IsTypeAnyOrUnknown<ExtractC<IT>>
+    : true
 /**
  * Checks if a type supports an empty create() function
  * Basically !any, !unknown, X | undefined, objects with all properties being optional

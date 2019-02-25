@@ -98,20 +98,20 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
  * Maps property types to the snapshot, including omitted optional attributes
  * @hidden
  */
-export type RequiredPropNames<T> = {
-    [K in keyof T]: IsOptionalType<T[K]> extends true ? never : K
-}[keyof T]
+export type RequiredPropNames<P extends ModelProperties> = {
+    [K in keyof P]: IsOptionalType<P[K]> extends true ? never : K
+}[keyof P]
 /** @hidden */
-export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
+export type RequiredProps<P extends ModelProperties> = Pick<P, RequiredPropNames<P>>
 /** @hidden */
 export type RequiredPropsObject<P extends ModelProperties> = { [K in keyof RequiredProps<P>]: P[K] }
 
 /** @hidden */
-export type OptionalPropNames<T> = {
-    [K in keyof T]: IsOptionalType<T[K]> extends true ? K : never
-}[keyof T]
+export type OptionalPropNames<P extends ModelProperties> = {
+    [K in keyof P]: IsOptionalType<P[K]> extends true ? K : never
+}[keyof P]
 /** @hidden */
-export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
+export type OptionalProps<P extends ModelProperties> = Pick<P, OptionalPropNames<P>>
 /** @hidden */
 export type OptionalPropsObject<P extends ModelProperties> = {
     [K in keyof OptionalProps<P>]?: P[K]
