@@ -1,0 +1,31 @@
+version: 2.1
+jobs:
+    build:
+        docker:
+            - image: circleci/node:latest
+        steps:
+            - checkout
+
+            - restore_cache:
+                  name: restore .cache/yarn
+                  keys:
+                      - yarn-packages-{{ checksum "yarn.lock" }}
+            - restore_cache:
+                  name: restore node_modules
+                  keys:
+                      - node-modules-{{ checksum "yarn.lock" }}
+            - run: yarn install --frozen-lockfile
+            - save_cache:
+                  name: cache .cache/yarn
+                  key: yarn-packages-{{ checksum "yarn.lock" }}
+                  paths:
+                      - ~/.cache/yarn
+            - save_cache:
+                  name: cache node_modules
+                  key: node-modules-{{ checksum "yarn.lock" }}
+                  paths:
+                      - ~/node_modules
+
+            - run: yarn build
+            - run: yarn test
+            - run: yarn coverage
