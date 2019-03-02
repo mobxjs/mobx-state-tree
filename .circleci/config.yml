@@ -10,20 +10,20 @@ jobs:
             - restore_cache:
                   name: restore .cache/yarn
                   keys:
-                      - yarn-packages-{{ checksum "yarn.lock" }}
+                      - yarn-cache
             - restore_cache:
                   name: restore node_modules
                   keys:
-                      - node-modules-{{ checksum "yarn.lock" }}
+                      - node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
             - run: yarn install --frozen-lockfile
             - save_cache:
                   name: cache .cache/yarn
-                  key: yarn-packages-{{ checksum "yarn.lock" }}
+                  key: yarn-cache
                   paths:
                       - ~/.cache/yarn
             - save_cache:
                   name: cache node_modules
-                  key: node-modules-{{ checksum "yarn.lock" }}
+                  key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
                   paths:
                       - node_modules
 
