@@ -8,7 +8,9 @@
     "typings": "dist/index.d.ts",
     "scripts": {
         "jest": "jest",
-        "test": "cross-env NODE_ENV=development yarn jest --ci && cross-env NODE_ENV=production yarn jest --ci",
+        "test": "yarn test:dev && yarn test:prod",
+        "test:dev": "cross-env NODE_ENV=development yarn jest --maxWorkers=4 --ci",
+        "test:prod": "cross-env NODE_ENV=production yarn jest --maxWorkers=4 --ci",
         "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && rollup -c",
         "lint": "tslint -c ../../tslint.json 'src/**/*.ts'"
     },
