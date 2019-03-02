@@ -10,23 +10,30 @@ jobs:
             - restore_cache:
                   name: restore .cache/yarn
                   keys:
-                      - yarn-cache
+                      - yarn-cache-{{ arch }}
             - restore_cache:
                   name: restore node_modules
                   keys:
-                      - node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+                      - node-modules-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+                      - node-modules-{{ arch }}-{{ .Branch }}
+                      - node-modules-{{ arch }}
+
             - run: yarn install --frozen-lockfile
+
             - save_cache:
                   name: cache .cache/yarn
-                  key: yarn-cache
+                  key: yarn-cache-{{ arch }}
                   paths:
                       - ~/.cache/yarn
             - save_cache:
                   name: cache node_modules
-                  key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+                  key: node-modules-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
                   paths:
                       - node_modules
 
             - run: yarn build
             - run: yarn test
             - run: yarn coverage
+            - run:
+                  name: copy coveralls info
+                  command: cat ./packages/mobx-state-tree/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
