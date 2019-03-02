@@ -12,7 +12,7 @@
         "jest": "jest --testPathPattern=/__tests__/core/",
         "jest:perf": "jest --testPathPattern=/__tests__/perf/",
         "test:perf": "yarn build && yarn jest:perf && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register __tests__/perf/report.ts",
-        "test": "yarn test:dev && yarn test:prod & yarn test:cyclic && yarn test:mobx4",
+        "test": "yarn test:dev && yarn test:prod && yarn test:cyclic && yarn test:mobx4",
         "test:dev": "cross-env NODE_ENV=development yarn jest --maxWorkers=4",
         "test:prod": "cross-env NODE_ENV=production yarn jest --maxWorkers=4",
         "test:cyclic": "node -e \"require('.')\"",
