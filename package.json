@@ -4,8 +4,8 @@
     "scripts": {
         "clean": "lerna clean",
         "build": "lerna run build",
-        "test": "cross-env CI=true lerna run test",
-        "coverage": "lerna run coverage",
+        "test": "cross-env CI=true lerna run test --stream",
+        "coverage": "lerna run coverage --stream",
         "bootstrap": "npx lerna@3.3.0 bootstrap --hoist",
         "release": "yarn build && lerna publish"
     },

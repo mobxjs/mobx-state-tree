@@ -9,8 +9,8 @@
     "scripts": {
         "jest": "jest",
         "test": "yarn test:dev && yarn test:prod",
-        "test:dev": "cross-env NODE_ENV=development yarn jest --maxWorkers=4 --ci",
-        "test:prod": "cross-env NODE_ENV=production yarn jest --maxWorkers=4 --ci",
+        "test:dev": "cross-env NODE_ENV=development yarn jest --maxWorkers=4",
+        "test:prod": "cross-env NODE_ENV=production yarn jest --maxWorkers=4",
         "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && rollup -c",
         "lint": "tslint -c ../../tslint.json 'src/**/*.ts'"
     },
