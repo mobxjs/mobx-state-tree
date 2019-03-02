@@ -3,7 +3,6 @@ node_js:
     - "node"
 cache:
     - yarn
-    - npm
 script:
     - yarn build
     - yarn test
