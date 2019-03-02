@@ -206,15 +206,17 @@ Differences to the `TimeTraveller`:
 API:
 
 -   `history: { patches: [], inversePatches [] }[]`
--   `canUndo: boolean`
--   `canRedo: boolean`
--   `undo()`
--   `redo()`
+-   `canUndo: boolean` true if there is at least one undo level available
+-   `canRedo: boolean` true if there is at least one redo level available
+-   `undoLevels: number` number of undo levels available
+-   `redoLevels: number` number of redo levels available
+-   `undo()` undo the last operation
+-   `redo()` redo the last operation
 -   `withoutUndo(() => fn)` patches for actions / processes within the fn are not recorded.
 -   `withoutUndoFlow(fn*)` patches the fn\* are not recorded.
 -   `startGroup(() => fn)` can be used to start a group, all patches within a group are saved as one history entry.
 -   `stopGroup()` can be used to stop the recording of patches for the grouped history entry.
--   `clear()` clear the history.
+-   `clear({ undo?: true, redo: true }?)` clear the history.
 
 Setup and API usage examples:
 

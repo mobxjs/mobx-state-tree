@@ -11,9 +11,13 @@ import {
     applyPatch,
     flow,
     addMiddleware,
-    IDisposer
+    addDisposer,
+    decorate
 } from "mobx-state-tree"
 import { IObservableArray } from "mobx"
+import { atomic } from "."
+
+const EMPTY_ARRAY: any[] = []
 
 const Entry = types.model("UndoManagerEntry", {
     patches: types.frozen<ReadonlyArray<IJsonPatch>>(),
@@ -26,86 +30,104 @@ const UndoManager = types
         undoIdx: 0
     })
     .views(self => ({
+        get undoLevels() {
+            return self.undoIdx
+        },
+        get redoLevels() {
+            return self.history.length - self.undoIdx
+        },
         get canUndo() {
-            return self.undoIdx > 0
+            return this.undoLevels > 0
         },
         get canRedo() {
-            return self.undoIdx < self.history.length
+            return this.redoLevels > 0
         }
     }))
     .actions(self => {
-        let skipping = false
-        let flagSkipping = false
         let targetStore: IStateTreeNode
-        let replaying = false
-        let middlewareDisposer: IDisposer
-        let grouping = false
-
-        type GroupRecorder = Pick<IPatchRecorder, "patches" | "inversePatches">
-        let groupRecorder: GroupRecorder = {
-            patches: [],
-            inversePatches: []
-        }
-
-        let recordingActionId: string | null = null
-        let recordingActionLevel = 0
-
-        const startRecordAction = (call: IMiddlewareEvent) => {
-            // level for the case that actions have the same name
-            skipping = flagSkipping
-            recordingActionLevel++
-            const actionId = call.name + recordingActionLevel
-            recordingActionId = actionId
-            return {
-                recorder: recordPatches(call.tree),
-                actionId
-            }
-        }
-        const stopRecordingAction = (recorder: IPatchRecorder): void => {
-            recordingActionId = null
-            if (!skipping) {
-                if (grouping) return cachePatchForGroup(recorder)
-                ;(self as any).addUndoState(recorder)
-            }
-            skipping = flagSkipping
-        }
-        const cachePatchForGroup = (recorder: IPatchRecorder): void => {
-            groupRecorder = {
-                patches: groupRecorder.patches.concat(recorder.patches),
-                inversePatches: groupRecorder.inversePatches.concat(recorder.inversePatches)
-            }
-        }
 
         interface Context {
-            recorder?: IPatchRecorder
-            actionId?: string
+            recorder: IPatchRecorder
+            // one false in this array means that recording has been disabled
+            recordingAllowed: boolean[]
         }
-        const defaultContext: Context = {}
 
-        const undoRedoMiddleware = createActionTrackingMiddleware<Context>({
-            // the flagSkipping === false check is mainly a performance optimisation
-            filter: call => flagSkipping === false && call.context !== self, // don't undo / redo undo redo :)
-            onStart: call => {
-                if (!recordingActionId) {
-                    return startRecordAction(call)
+        const canRecordPatches = (call: IMiddlewareEvent, recordingAllowed: boolean[]) => {
+            if (recordingAllowed.indexOf(false) >= 0) {
+                return false
+            }
+
+            if (call.name === "__withoutUndoFlow__") {
+                return false
+            }
+            if (call.context === self) {
+                return call.name === "startGroup"
+            }
+            return true
+        }
+
+        type GroupRecorder = Pick<IPatchRecorder, "patches" | "inversePatches">
+        const groupRecorders: GroupRecorder[] = []
+
+        const undoRedoMiddleware = createActionTrackingMiddleware<Context | undefined>({
+            onStart(call) {
+                if (!call.parentId && canRecordPatches(call, EMPTY_ARRAY)) {
+                    return {
+                        recorder: recordPatches(call.tree),
+                        recordingAllowed: []
+                    }
                 }
-                return {}
+                return undefined
             },
-            onResume: (call, { recorder } = defaultContext) => recorder && recorder.resume(),
-            onSuspend: (call, { recorder } = defaultContext) => recorder && recorder.stop(),
-            onSuccess: (call, { recorder, actionId } = defaultContext) => {
-                if (recordingActionId === actionId) {
-                    stopRecordingAction(recorder!)
+            onResume(call, ctx) {
+                if (!ctx) {
+                    return
+                }
+                if (canRecordPatches(call, ctx.recordingAllowed)) {
+                    ctx.recordingAllowed.push(true)
+                    ctx.recorder.resume()
+                } else {
+                    ctx.recordingAllowed.push(false)
                 }
             },
-            onFail: (call, { recorder } = defaultContext) => recorder && recorder.undo()
+            onSuspend(call, ctx) {
+                if (!ctx) {
+                    return
+                }
+                ctx.recordingAllowed.pop()
+                ctx.recorder.stop()
+            },
+            onSuccess(call, ctx) {
+                if (!ctx) {
+                    return
+                }
+
+                const recorder = ctx.recorder
+                recorder.stop()
+                if (groupRecorders.length > 0) {
+                    const groupRecorder = groupRecorders[groupRecorders.length - 1]
+                    groupRecorder.patches = groupRecorder.patches.concat(recorder.patches)
+                    groupRecorder.inversePatches = groupRecorder.inversePatches.concat(
+                        recorder.inversePatches
+                    )
+                } else {
+                    ;(self as any).addUndoState(recorder)
+                }
+            },
+            onFail(call, ctx) {
+                if (!ctx) {
+                    return
+                }
+
+                ctx.recorder.stop()
+                ctx.recorder.undo()
+            }
         })
 
         return {
             addUndoState(recorder: GroupRecorder) {
-                if (replaying || (recorder.patches && recorder.patches.length === 0)) {
-                    // skip recording if this state was caused by undo / redo
-                    // or if patches is empty
+                if (recorder.patches.length === 0) {
+                    // skip recording if patches is empty
                     return
                 }
                 self.history.splice(self.undoIdx)
@@ -116,69 +138,79 @@ const UndoManager = types
                 self.undoIdx = self.history.length
             },
             afterCreate() {
-                targetStore = getEnv(self).targetStore ? getEnv(self).targetStore : getRoot(self)
-                if (!targetStore || targetStore === self)
+                const selfRoot = getRoot(self)
+                targetStore = getEnv(self).targetStore || selfRoot
+                if (targetStore === self) {
                     throw new Error(
                         "UndoManager should be created as part of a tree, or with `targetStore` in it's environment"
                     )
-                middlewareDisposer = addMiddleware(targetStore, undoRedoMiddleware, false)
+                }
+                addDisposer(self, addMiddleware(targetStore, undoRedoMiddleware, false))
             },
-            beforeDestroy() {
-                middlewareDisposer()
-            },
-            undo() {
-                replaying = true
-                self.undoIdx--
-                // n.b: reverse patches back to forth
-                // TODO: add error handling when patching fails? E.g. make the operation atomic?
+            undo: decorate(atomic, () => {
+                if (!self.canUndo) {
+                    throw new Error("undo not possible, nothing to undo")
+                }
                 applyPatch(
                     getRoot(targetStore),
-                    self.history[self.undoIdx].inversePatches!.slice().reverse()
+                    // n.b: reverse patches back to forth
+                    self.history[self.undoIdx - 1].inversePatches.slice().reverse()
                 )
-                replaying = false
-            },
-            redo() {
-                replaying = true
-                // TODO: add error handling when patching fails? E.g. make the operation atomic?
+                self.undoIdx--
+            }),
+            redo: decorate(atomic, () => {
+                if (!self.canRedo) {
+                    throw new Error("redo not possible, nothing to redo")
+                }
                 applyPatch(getRoot(targetStore), self.history[self.undoIdx].patches)
                 self.undoIdx++
-                replaying = false
-            },
+            }),
             withoutUndo<T>(fn: () => T): T {
-                try {
-                    skipping = true
-                    flagSkipping = true
-                    return fn()
-                } finally {
-                    flagSkipping = false
-                }
+                return fn()
             },
             withoutUndoFlow(generatorFn: () => any) {
-                return flow(function*() {
-                    skipping = true
-                    flagSkipping = true
-                    const result = yield* generatorFn()
-                    flagSkipping = false
-                    return result
+                // the name of the function generator matters!
+                return flow(function* __withoutUndoFlow__() {
+                    return yield* generatorFn()
                 })
             },
             startGroup<T>(fn: () => T): T {
-                grouping = true
-                return fn()
-            },
-            stopGroup(fn?: () => void) {
-                if (fn) fn()
-                grouping = false
-                this.addUndoState(groupRecorder)
-                groupRecorder = {
+                if (groupRecorders.length >= 1) {
+                    throw new Error(
+                        "a previous startGroup is still running, did you forget to call stopGroup?"
+                    )
+                }
+                groupRecorders.push({
                     patches: [],
                     inversePatches: []
-                }
+                })
+                return fn()
             },
-            clear() {
-                self.history.clear()
-                self.undoIdx = 0
-            }
+            stopGroup() {
+                const groupRecorder = groupRecorders.pop()
+                if (!groupRecorder) {
+                    throw new Error(
+                        "each call to stopGroup requires a previous call to startGroup, did you forget to call startGroup?"
+                    )
+                }
+                this.addUndoState(groupRecorder)
+            },
+            clear: decorate(atomic, (options?: { undo?: boolean; redo?: boolean }) => {
+                const opts = {
+                    undo: true,
+                    redo: true,
+                    ...options
+                }
+                if (opts.undo && opts.redo) {
+                    self.history.clear()
+                    self.undoIdx = 0
+                } else if (opts.undo) {
+                    self.history.splice(0, self.undoLevels)
+                    self.undoIdx = 0
+                } else if (opts.redo) {
+                    self.history.splice(self.undoIdx, self.redoLevels)
+                }
+            })
         }
     })
 

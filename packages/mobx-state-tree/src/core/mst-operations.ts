@@ -193,7 +193,7 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
         })
     }
 
-    let recorder = {
+    const recorder = {
         rawPatches: [] as [IJsonPatch, IJsonPatch][],
         get patches() {
             return this.rawPatches.map(([a]) => a)
@@ -210,7 +210,7 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
             applyPatch(target || subject, recorder.patches)
         },
         undo(target?: IAnyStateTreeNode) {
-            applyPatch(target || subject, recorder.inversePatches.slice().reverse())
+            applyPatch(target || subject, recorder.inversePatches.reverse())
         }
     }
     resume()
