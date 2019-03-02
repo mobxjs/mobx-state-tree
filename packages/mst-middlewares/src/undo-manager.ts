@@ -69,20 +69,15 @@ const UndoManager = types
         type GroupRecorder = Pick<IPatchRecorder, "patches" | "inversePatches">
         const groupRecorders: GroupRecorder[] = []
 
-        const undoRedoMiddleware = createActionTrackingMiddleware<Context | undefined>({
+        const undoRedoMiddleware = createActionTrackingMiddleware<Context>({
+            filter: call => !call.parentId && canRecordPatches(call, EMPTY_ARRAY),
             onStart(call) {
-                if (!call.parentId && canRecordPatches(call, EMPTY_ARRAY)) {
-                    return {
-                        recorder: recordPatches(call.tree),
-                        recordingAllowed: []
-                    }
+                return {
+                    recorder: recordPatches(call.tree),
+                    recordingAllowed: []
                 }
-                return undefined
             },
             onResume(call, ctx) {
-                if (!ctx) {
-                    return
-                }
                 if (canRecordPatches(call, ctx.recordingAllowed)) {
                     ctx.recordingAllowed.push(true)
                     ctx.recorder.resume()
@@ -91,17 +86,10 @@ const UndoManager = types
                 }
             },
             onSuspend(call, ctx) {
-                if (!ctx) {
-                    return
-                }
                 ctx.recordingAllowed.pop()
                 ctx.recorder.stop()
             },
             onSuccess(call, ctx) {
-                if (!ctx) {
-                    return
-                }
-
                 const recorder = ctx.recorder
                 recorder.stop()
                 if (groupRecorders.length > 0) {
@@ -115,10 +103,6 @@ const UndoManager = types
                 }
             },
             onFail(call, ctx) {
-                if (!ctx) {
-                    return
-                }
-
                 ctx.recorder.stop()
                 ctx.recorder.undo()
             }
