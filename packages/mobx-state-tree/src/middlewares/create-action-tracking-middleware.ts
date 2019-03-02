@@ -63,14 +63,16 @@ export function createActionTrackingMiddleware<T = any>(
                 const res = next(call)
                 hooks.onSuspend(call, context)
                 if (!runningAction.flowsPending) {
-                    runningActions.delete(call.id)
                     hooks.onSuccess(call, context, res)
                 }
                 return res
             } catch (e) {
-                runningActions.delete(call.id)
                 hooks.onFail(call, context, e)
                 throw e
+            } finally {
+                if (!runningAction.flowsPending) {
+                    runningActions.delete(call.id)
+                }
             }
         } else {
             let runningAction
