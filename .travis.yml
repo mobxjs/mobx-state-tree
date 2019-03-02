@@ -8,7 +8,7 @@ cache:
     - yarn
     - npm
 script:
-    - yarn install
+    - yarn install --frozen-lockfile
     - yarn build
     - yarn test
     - yarn coverage
