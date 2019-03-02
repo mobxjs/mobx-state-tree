@@ -3,7 +3,7 @@ jobs:
     build:
         docker:
             - image: circleci/node:latest
-        working_directory: ~/mst
+        working_directory: ~/mobx-state-tree
         steps:
             - checkout
 
@@ -33,7 +33,6 @@ jobs:
 
             - run: yarn build
             - run: yarn test
-            - run: yarn coverage
             - run:
                   name: copy coveralls info
                   command: cat ./packages/mobx-state-tree/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
