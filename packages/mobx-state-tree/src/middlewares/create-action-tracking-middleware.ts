@@ -35,7 +35,7 @@ export function createActionTrackingMiddleware<T = any>(
 ): IMiddlewareHandler {
     interface RunningAction {
         flowsPending: number
-        context: any
+        context: T
         passedFilter: boolean
     }
     const runningActions = new Map<number, RunningAction>()
