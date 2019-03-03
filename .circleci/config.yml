@@ -34,5 +34,5 @@ jobs:
             - run: yarn build
             - run: yarn test
             - run:
-                  name: copy coveralls info
-                  command: cat ./packages/mobx-state-tree/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+                  name: upload coveralls
+                  command: cat ./packages/mobx-state-tree/coverage/lcov.info ./packages/mst-middlewares/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
