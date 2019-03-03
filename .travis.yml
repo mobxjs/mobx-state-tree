@@ -6,5 +6,4 @@ cache:
 script:
     - yarn build
     - yarn test
-after_success:
-    - cat ./packages/mobx-state-tree/coverage/lcov.info | ./packages/node_modules/coveralls/bin/coveralls.js
+    - cat ./packages/mobx-state-tree/coverage/lcov.info ./packages/mst-middlewares/coverage/lcov.info | ./packages/node_modules/coveralls/bin/coveralls.js

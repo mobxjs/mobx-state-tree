@@ -9,7 +9,7 @@
     "scripts": {
         "jest": "jest",
         "test": "yarn test:dev && yarn test:prod",
-        "test:dev": "cross-env NODE_ENV=development yarn jest -i",
+        "test:dev": "cross-env NODE_ENV=development yarn jest -i --coverage",
         "test:prod": "cross-env NODE_ENV=production yarn jest -i",
         "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && rollup -c",
         "lint": "tslint -c ../../tslint.json 'src/**/*.ts'"
