@@ -3,9 +3,9 @@
     "dependencies": {},
     "scripts": {
         "clean": "lerna clean",
-        "build": "lerna run build",
-        "test": "cross-env CI=true lerna run test",
-        "coverage": "lerna run coverage",
+        "build": "lerna run build --stream",
+        "test": "cross-env CI=true lerna run test --stream",
+        "coverage": "lerna run coverage --stream",
         "release": "yarn build && lerna publish"
     },
     "workspaces": [

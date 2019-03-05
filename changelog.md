@@ -175,7 +175,7 @@ Also, the 'object has died' exception can be suppressed now. One should still ad
 ## TL,DR Migration guide
 
 -   `types.identifier(types.number)` => `types.identifierNumber`
--   `types.identifier()` and `types.identifier(types.string) =>`types.identifier`
+-   `types.identifier()` and `types.identifier(types.string)` =>`types.identifier`
 -   `types.frozen` => `types.frozen()`
 -   `types.maybe(x)` => `types.maybeNull(x)`
 -   `postProcessSnapshot` should now be declared on the type instead of as action
