@@ -317,16 +317,13 @@ function reconcileArrayChildren<TT>(
     newValues: TT[],
     newPaths: (string | number)[]
 ): AnyNode[] | null {
-    let oldNode: AnyNode,
-        newValue: any,
-        hasNewNode = false,
-        oldMatch: AnyNode | undefined = undefined,
-        nothingChanged = true
+    let nothingChanged = true
 
     for (let i = 0; ; i++) {
-        hasNewNode = i <= newValues.length - 1
-        oldNode = oldNodes[i]
-        newValue = hasNewNode ? newValues[i] : undefined
+        const hasNewNode = i <= newValues.length - 1
+        const oldNode = oldNodes[i]
+        let newValue = hasNewNode ? newValues[i] : undefined
+        const newPath = "" + newPaths[i]
 
         // for some reason, instead of newValue we got a node, fallback to the storedValue
         // TODO: https://github.com/mobxjs/mobx-state-tree/issues/340#issuecomment-325581681
@@ -349,17 +346,17 @@ function reconcileArrayChildren<TT>(
                 throw fail(
                     `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
                         parent.path
-                    }/${newPaths[i]}', but it lives already at '${getStateTreeNode(newValue).path}'`
+                    }/${newPath}', but it lives already at '${getStateTreeNode(newValue).path}'`
                 )
             }
-            oldNodes.splice(i, 0, valueAsNode(childType, parent, "" + newPaths[i], newValue))
+            oldNodes.splice(i, 0, valueAsNode(childType, parent, newPath, newValue))
             nothingChanged = false
         } else if (areSame(oldNode, newValue)) {
             // both are the same, reconcile
-            oldNodes[i] = valueAsNode(childType, parent, "" + newPaths[i], newValue, oldNode)
+            oldNodes[i] = valueAsNode(childType, parent, newPath, newValue, oldNode)
         } else {
             // nothing to do, try to reorder
-            oldMatch = undefined
+            let oldMatch = undefined
 
             // find a possible candidate to reuse
             for (let j = i; j < oldNodes.length; j++) {
@@ -369,11 +366,7 @@ function reconcileArrayChildren<TT>(
                 }
             }
 
-            oldNodes.splice(
-                i,
-                0,
-                valueAsNode(childType, parent, "" + newPaths[i], newValue, oldMatch)
-            )
+            oldNodes.splice(i, 0, valueAsNode(childType, parent, newPath, newValue, oldMatch))
             nothingChanged = false
         }
     }
@@ -410,6 +403,7 @@ function valueAsNode(
     if (oldNode) {
         const childNode = childType.reconcile(oldNode, newValue)
         childNode.setParent(parent, subpath)
+        if (childNode !== oldNode) oldNode.die()
         return childNode
     }
     // nothing to do, create from scratch
@@ -420,14 +414,24 @@ function valueAsNode(
  * Check if a node holds a value.
  */
 function areSame(oldNode: AnyNode, newValue: any) {
+    // never consider dead old nodes for reconciliation
+    if (!oldNode.isAlive) {
+        return false
+    }
+
     // the new value has the same node
     if (isStateTreeNode(newValue)) {
-        return getStateTreeNode(newValue) === oldNode
+        const newNode = getStateTreeNode(newValue)
+        return newNode.isAlive && newNode === oldNode
     }
+
     // the provided value is the snapshot of the old node
-    if (oldNode.snapshot === newValue) return true
+    if (oldNode.snapshot === newValue) {
+        return true
+    }
+
     // new value is a snapshot with the correct identifier
-    if (
+    return (
         oldNode instanceof ObjectNode &&
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
@@ -435,8 +439,6 @@ function areSame(oldNode: AnyNode, newValue: any) {
         oldNode.identifier === normalizeIdentifier(newValue[oldNode.identifierAttribute]) &&
         oldNode.type.is(newValue)
     )
-        return true
-    return false
 }
 
 /**

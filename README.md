@@ -577,7 +577,6 @@ Useful methods:
 
 -   `onPatch(model, listener)` attaches a patch listener to the provided model, which will be invoked whenever the model or any of its descendants is mutated
 -   `applyPatch(model, patch)` applies a patch (or array of patches) to the provided model
--   `revertPatch(model, patch)` reverse applies a patch (or array of patches) to the provided model. This replays the inverse of a set of patches to a model, which can be used to bring it back to its original state
 
 ### References and identifiers
 
