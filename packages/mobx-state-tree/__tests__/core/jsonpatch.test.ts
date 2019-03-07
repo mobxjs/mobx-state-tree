@@ -63,7 +63,7 @@ test("it should apply deep patches to arrays", () => {
         Node,
         { id: 1, children: [{ id: 2 }] },
         (n: Instance<typeof Node>) => {
-            const children = n.children as Instance<typeof Node>[]
+            const children = (n.children as unknown) as Instance<typeof Node>[]
             children[0].text = "test" // update
             children[0] = cast({ id: 2, text: "world" }) // this reconciles; just an update
             children[0] = cast({ id: 4, text: "coffee" }) // new object
@@ -112,7 +112,7 @@ test("it should apply deep patches to arrays with object instances", () => {
         Node,
         { id: 1, children: [{ id: 2 }] },
         (n: Instance<typeof Node>) => {
-            const children = n.children as Instance<typeof Node>[]
+            const children = (n.children as unknown) as Instance<typeof Node>[]
             children[0].text = "test" // update
             children[0] = Node.create({ id: 2, text: "world" }) // this does not reconcile, new instance is provided
             children[0] = Node.create({ id: 4, text: "coffee" }) // new object
@@ -150,7 +150,7 @@ test("it should apply non flat patches", () => {
         Node,
         { id: 1 },
         (n: Instance<typeof Node>) => {
-            const children = n.children as Instance<typeof Node>[]
+            const children = (n.children as unknown) as Instance<typeof Node>[]
             children.push(
                 cast({
                     id: 2,
@@ -188,7 +188,7 @@ test("it should apply non flat patches with object instances", () => {
         Node,
         { id: 1 },
         (n: Instance<typeof Node>) => {
-            const children = n.children as Instance<typeof Node>[]
+            const children = (n.children as unknown) as Instance<typeof Node>[]
             children.push(
                 Node.create({
                     id: 2,

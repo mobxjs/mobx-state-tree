@@ -55,7 +55,8 @@ import {
     _NotCustomized,
     OptionalValue,
     asArray,
-    cannotDetermineSubtype
+    cannotDetermineSubtype,
+    IsOptionalType
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -81,45 +82,36 @@ export interface ModelPropertiesDeclaration {
  */
 export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
     [K in keyof T]: T[K] extends string
-        ? IType<string | undefined, string, string> & OptionalProperty
+        ? IType<string | undefined, string, string>
         : T[K] extends number
-        ? IType<number | undefined, number, number> & OptionalProperty
+        ? IType<number | undefined, number, number>
         : T[K] extends boolean
-        ? IType<boolean | undefined, boolean, boolean> & OptionalProperty
+        ? IType<boolean | undefined, boolean, boolean>
         : T[K] extends Date
-        ? IType<number | Date | undefined, number, Date> & OptionalProperty
+        ? IType<number | Date | undefined, number, Date>
         : T[K] extends IAnyType
         ? T[K]
         : never
-}
-
-/** @hidden */
-declare const $optionalProperty: unique symbol
-
-/** @hidden */
-export interface OptionalProperty {
-    // fake, only used for typing
-    readonly [$optionalProperty]: undefined
 }
 
 /**
  * Maps property types to the snapshot, including omitted optional attributes
  * @hidden
  */
-export type RequiredPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalProperty ? never : K
-}[keyof T]
+export type RequiredPropNames<P extends ModelProperties> = {
+    [K in keyof P]: IsOptionalType<P[K]> extends true ? never : K
+}[keyof P]
 /** @hidden */
-export type RequiredProps<T> = Pick<T, RequiredPropNames<T>>
+export type RequiredProps<P extends ModelProperties> = Pick<P, RequiredPropNames<P>>
 /** @hidden */
 export type RequiredPropsObject<P extends ModelProperties> = { [K in keyof RequiredProps<P>]: P[K] }
 
 /** @hidden */
-export type OptionalPropNames<T> = {
-    [K in keyof T]: T[K] extends OptionalProperty ? K : never
-}[keyof T]
+export type OptionalPropNames<P extends ModelProperties> = {
+    [K in keyof P]: IsOptionalType<P[K]> extends true ? K : never
+}[keyof P]
 /** @hidden */
-export type OptionalProps<T> = Pick<T, OptionalPropNames<T>>
+export type OptionalProps<P extends ModelProperties> = Pick<P, OptionalPropNames<P>>
 /** @hidden */
 export type OptionalPropsObject<P extends ModelProperties> = {
     [K in keyof OptionalProps<P>]?: P[K]
@@ -664,7 +656,7 @@ export class ModelType<
         Object.keys(childNodes).forEach(key => {
             processed[key] = childNodes[key].getSnapshot()
         })
-        return this.applySnapshotPostProcessor(this.applyOptionalValuesToSnapshot(processed))
+        return this.applySnapshotPostProcessor(processed)
     }
 
     applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
@@ -686,21 +678,6 @@ export class ModelType<
     applySnapshotPreProcessor(snapshot: any) {
         const processor = this.preProcessor
         return processor ? processor.call(null, snapshot) : snapshot
-    }
-
-    applyOptionalValuesToSnapshot(snapshot: any) {
-        if (snapshot) {
-            snapshot = Object.assign({}, snapshot)
-            this.forAllProps((name, type) => {
-                if (!(name in snapshot)) {
-                    const optional2 = tryGetOptional(type)
-                    if (optional2) {
-                        snapshot[name] = optional2.getDefaultValueSnapshot()
-                    }
-                }
-            })
-        }
-        return snapshot
     }
 
     applySnapshotPostProcessor(snapshot: any) {
@@ -776,7 +753,7 @@ export function model(...args: any[]): any {
 }
 
 // TODO: this can be simplified in TS3, since we can transform _NotCustomized to unknown, since unkonwn & X = X
-// and then back unkown to _NotCustomized if needed
+// and then back unknown to _NotCustomized if needed
 /** @hidden */
 export type _CustomJoin<A, B> = A extends _NotCustomized ? B : A & B
 
@@ -864,22 +841,4 @@ export function compose(...args: any[]): any {
  */
 export function isModelType<IT extends IAnyModelType = IAnyModelType>(type: IAnyType): type is IT {
     return isType(type) && (type.flags & TypeFlags.Object) > 0
-}
-
-function tryGetOptional(type: IAnyType): OptionalValue<any> | undefined {
-    if (type instanceof OptionalValue) {
-        return type
-    }
-    const subtypes = type.getSubTypes()
-    if (!subtypes || subtypes === cannotDetermineSubtype) {
-        return undefined
-    }
-    const subtypesArray = asArray(subtypes)
-    for (const subtype of subtypesArray) {
-        const opt = tryGetOptional(subtype)
-        if (opt) {
-            return opt
-        }
-    }
-    return undefined
 }

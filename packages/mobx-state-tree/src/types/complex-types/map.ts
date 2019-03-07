@@ -37,7 +37,6 @@ import {
     typeCheckFailure,
     TypeFlags,
     EMPTY_OBJECT,
-    OptionalProperty,
     ExtractC,
     ExtractS,
     ExtractT,
@@ -53,8 +52,11 @@ import {
 
 /** @hidden */
 export interface IMapType<IT extends IAnyType>
-    extends IType<IKeyValueMap<ExtractC<IT>> | undefined, IKeyValueMap<ExtractS<IT>>, IMSTMap<IT>>,
-        OptionalProperty {}
+    extends IType<
+        IKeyValueMap<ExtractC<IT>> | undefined,
+        IKeyValueMap<ExtractS<IT>>,
+        IMSTMap<IT>
+    > {}
 
 /** @hidden */
 export interface IMSTMap<IT extends IAnyType>
@@ -457,8 +459,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
  * @returns
  */
 export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
-    const ret = new MapType<IT>(`map<string, ${subtype.name}>`, subtype)
-    return ret as typeof ret & OptionalProperty
+    return new MapType<IT>(`map<string, ${subtype.name}>`, subtype)
 }
 
 /**
