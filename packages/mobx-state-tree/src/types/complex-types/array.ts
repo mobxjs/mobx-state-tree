@@ -423,12 +423,17 @@ function areSame(oldNode: AnyNode, newValue: any) {
 
     // the new value has the same node
     if (isStateTreeNode(newValue)) {
-        return getStateTreeNode(newValue) === oldNode
+        const newNode = getStateTreeNode(newValue)
+        return newNode.isAlive && newNode === oldNode
     }
+
     // the provided value is the snapshot of the old node
-    if (oldNode.snapshot === newValue) return true
+    if (oldNode.snapshot === newValue) {
+        return true
+    }
+
     // new value is a snapshot with the correct identifier
-    if (
+    return (
         oldNode instanceof ObjectNode &&
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
@@ -436,8 +441,6 @@ function areSame(oldNode: AnyNode, newValue: any) {
         oldNode.identifier === normalizeIdentifier(newValue[oldNode.identifierAttribute]) &&
         oldNode.type.is(newValue)
     )
-        return true
-    return false
 }
 
 /**
