@@ -406,6 +406,7 @@ function valueAsNode(
     if (oldNode) {
         const childNode = childType.reconcile(oldNode, newValue)
         childNode.setParent(parent, subpath)
+        if (childNode !== oldNode) oldNode.die()
         return childNode
     }
     // nothing to do, create from scratch
