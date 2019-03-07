@@ -1,3 +1,5 @@
+# 3.11.0
+
 -   Added an optional third argument to `types.optional` that allows to set alternative optional values other than just `undefined` through [#1192](https://github.com/mobxjs/mobx-state-tree/pull/1192) by [@xaviergonz](https://github.com/xaviergonz)
 -   Fixed detaching arrays/maps killing their children [#1173](https://github.com/mobxjs/mobx-state-tree/issues/1173) through [#1175](https://github.com/mobxjs/mobx-state-tree/pull/1175) by [@xaviergonz](https://github.com/xaviergonz)
 -   Added `types.snapshotProcessor` [#947](https://github.com/mobxjs/mobx-state-tree/issues/947) through [#1165](https://github.com/mobxjs/mobx-state-tree/pull/1165) by [@xaviergonz](https://github.com/xaviergonz). This feature will eventually deprecate `postProcessSnapshot` and `preProcessSnapshot` from models in a next major version.
