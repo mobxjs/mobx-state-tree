@@ -473,4 +473,19 @@ describe("snapshotProcessor", () => {
             }
         })
     })
+
+    test("cached initial snapshots are ok", () => {
+        const M2 = types.snapshotProcessor(types.model({ x: types.number }), {
+            preProcessor(sn: { x: number }) {
+                return { ...sn, x: 0 }
+            }
+        })
+        const M1 = types.model({ m2: M2 })
+        const M = types.model({ m1: M1 })
+
+        const m = M.create({ m1: { m2: { x: 10 } } })
+        expect(getSnapshot(m)).toEqual({
+            m1: { m2: { x: 0 } }
+        })
+    })
 })

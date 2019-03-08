@@ -131,7 +131,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [onPatch](#onpatch)
 * [onSnapshot](#onsnapshot)
 * [optional](#optional)
-* [optionalNull](#optionalnull)
 * [protect](#protect)
 * [recordActions](#recordactions)
 * [recordPatches](#recordpatches)
@@ -1883,7 +1882,7 @@ ___
 
 ▸ **frozen**<`C`>(subType: *[IType](interfaces/itype.md)<`C`, `any`, `any`>*): [IType](interfaces/itype.md)<`C`, `C`, `C`>
 
-▸ **frozen**<`T`>(defaultValue: *`T`*): [IType](interfaces/itype.md)<`T` \| `undefined` \| `null`, `T`, `T`> & `OptionalProperty`
+▸ **frozen**<`T`>(defaultValue: *`T`*): [IType](interfaces/itype.md)<`T` \| `undefined` \| `null`, `T`, `T`>
 
 ▸ **frozen**<`T`>(): [IType](interfaces/itype.md)<`T`, `T`, `T`>
 
@@ -1979,7 +1978,7 @@ type Point = { x: number, y: number }
 | ------ | ------ |
 | defaultValue | `T` |
 
-**Returns:** [IType](interfaces/itype.md)<`T` \| `undefined` \| `null`, `T`, `T`> & `OptionalProperty`
+**Returns:** [IType](interfaces/itype.md)<`T` \| `undefined` \| `null`, `T`, `T`>
 
 `types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
 
@@ -2504,7 +2503,7 @@ Returns if a value represents an optional type.
 
 **Type parameters:**
 
-#### IT :  [IType](interfaces/itype.md)<`any` \| `undefined`, `any`, `any`> & `OptionalProperty`
+#### IT :  [IAnyType](#ianytype)
 **Parameters:**
 
 | Name | Type | Description |
@@ -3000,21 +2999,38 @@ ___
 
 ###  optional
 
-▸ **optional**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IT extends OptionalProperty ? IT : IOptionalIType<IT>`
+▸ **optional**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IOptionalIType`<`IT`, [`undefined`]>
 
-`types.optional` - Can be used to create a property with a default value. If the given value is not provided in the snapshot, it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is _not_ present causes the value to be reset
+▸ **optional**<`IT`,`OptionalVals`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*, optionalValues: *`OptionalVals`*): `IOptionalIType`<`IT`, `OptionalVals`>
+
+`types.optional` - Can be used to create a property with a default value.
+
+Depending on the third argument (`optionalValues`) there are two ways of operation:
+
+*   If the argument is not provided, then if a value is not provided in the snapshot (`undefined` or missing), it will default to the provided `defaultValue`
+*   If the argument is provided, then if the value in the snapshot matches one of the optional values inside the array then it will default to the provided `defaultValue`. Additionally, if one of the optional values inside the array is `undefined` then a missing property is also valid.
+    
+    Note that it is also possible to include values of the same type as the intended subtype as optional values, in this case the optional value will be transformed into the `defaultValue` (e.g. `types.optional(types.string, "unnamed", [undefined, ""])` will transform the snapshot values `undefined` (and therefore missing) and empty strings into the string `"unnamed"` when it gets instantiated).
+    
+
+If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is one of the optional values (or `undefined`/_not_ present if none are provided) causes the value to be reset.
 
 Example:
 
 ```ts
 const Todo = types.model({
-  title: types.optional(types.string, "Test"),
+  title: types.string,
+  subtitle1: types.optional(types.string, "", [null]),
+  subtitle2: types.optional(types.string, "", [null, undefined]),
   done: types.optional(types.boolean, false),
-  created: types.optional(types.Date, () => new Date())
+  created: types.optional(types.Date, () => new Date()),
 })
 
-// it is now okay to omit 'created' and 'done'. created will get a freshly generated timestamp
-const todo = Todo.create({ title: "Get coffee" })
+// if done is missing / undefined it will become false
+// if created is missing / undefined it will get a freshly generated timestamp
+// if subtitle1 is null it will default to "", but it cannot be missing or undefined
+// if subtitle2 is null or undefined it will default to ""; since it can be undefined it can also be missing
+const todo = Todo.create({ title: "Get coffee", subtitle1: null })
 ```
 
 **Type parameters:**
@@ -3027,41 +3043,51 @@ const todo = Todo.create({ title: "Get coffee" })
 | type | `IT` |  \- |
 | defaultValueOrFunction | `OptionalDefaultValueOrFunction`<`IT`> |  \- |
 
-**Returns:** `IT extends OptionalProperty ? IT : IOptionalIType<IT>`
+**Returns:** `IOptionalIType`<`IT`, [`undefined`]>
 
-___
-<a id="optionalnull"></a>
+`types.optional` - Can be used to create a property with a default value.
 
-###  optionalNull
+Depending on the third argument (`optionalValues`) there are two ways of operation:
 
-▸ **optionalNull**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IOptionalNullIType`<`IT`>
+*   If the argument is not provided, then if a value is not provided in the snapshot (`undefined` or missing), it will default to the provided `defaultValue`
+*   If the argument is provided, then if the value in the snapshot matches one of the optional values inside the array then it will default to the provided `defaultValue`. Additionally, if one of the optional values inside the array is `undefined` then a missing property is also valid.
+    
+    Note that it is also possible to include values of the same type as the intended subtype as optional values, in this case the optional value will be transformed into the `defaultValue` (e.g. `types.optional(types.string, "unnamed", [undefined, ""])` will transform the snapshot values `undefined` (and therefore missing) and empty strings into the string `"unnamed"` when it gets instantiated).
+    
 
-`types.optionalNull` - Can be used to create a property with a default value. If the given value is null in the snapshot, it will default to the provided `defaultValue`. If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is null causes the value to be reset
+If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is one of the optional values (or `undefined`/_not_ present if none are provided) causes the value to be reset.
 
 Example:
 
 ```ts
 const Todo = types.model({
-  title: types.optionalNull(types.string, "Test"),
-  done: types.optionalNull(types.boolean, false),
-  created: types.optionalNull(types.Date, () => new Date())
+  title: types.string,
+  subtitle1: types.optional(types.string, "", [null]),
+  subtitle2: types.optional(types.string, "", [null, undefined]),
+  done: types.optional(types.boolean, false),
+  created: types.optional(types.Date, () => new Date()),
 })
 
-// it is now okay to set 'created' and 'done' to null. created will get a freshly generated timestamp
-const todo = Todo.create({ title: "Get coffee", done: null, created: null })
+// if done is missing / undefined it will become false
+// if created is missing / undefined it will get a freshly generated timestamp
+// if subtitle1 is null it will default to "", but it cannot be missing or undefined
+// if subtitle2 is null or undefined it will default to ""; since it can be undefined it can also be missing
+const todo = Todo.create({ title: "Get coffee", subtitle1: null })
 ```
 
 **Type parameters:**
 
 #### IT :  [IAnyType](#ianytype)
+#### OptionalVals :  `ValidOptionalValues`
 **Parameters:**
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | type | `IT` |  \- |
 | defaultValueOrFunction | `OptionalDefaultValueOrFunction`<`IT`> |  \- |
+| optionalValues | `OptionalVals` |  an optional array with zero or more primitive values (string, number, boolean, null or undefined) that will be converted into the default. \`\[ undefined \]\` is assumed when none is provided |
 
-**Returns:** `IOptionalNullIType`<`IT`>
+**Returns:** `IOptionalIType`<`IT`, `OptionalVals`>
 
 ___
 <a id="protect"></a>
@@ -3397,7 +3423,7 @@ ___
 
 ###  typecheck
 
-▸ **typecheck**<`IT`>(type: *[IAnyType](#ianytype)*, value: *`ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`>*): `void`
+▸ **typecheck**<`IT`>(type: *`IT`*, value: *`ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`>*): `void`
 
 Run's the typechecker for the given type on the given value, which can be a snapshot or an instance. Throws if the given value is not according the provided type specification. Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
 
@@ -3408,7 +3434,7 @@ Run's the typechecker for the given type on the given value, which can be a snap
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| type | [IAnyType](#ianytype) |  Type to check against. |
+| type | `IT` |  Type to check against. |
 | value | `ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`> |  Value to be checked, either a snapshot or an instance. |
 
 **Returns:** `void`
@@ -4880,13 +4906,6 @@ ___
 ####  optional
 
 **● optional**: *[optional](#optional)*
-
-___
-<a id="types.optionalnull"></a>
-
-####  optionalNull
-
-**● optionalNull**: *[optionalNull](#optionalnull)*
 
 ___
 <a id="types.reference"></a>

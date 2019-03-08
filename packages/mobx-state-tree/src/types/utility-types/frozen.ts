@@ -11,7 +11,6 @@ import {
     optional,
     IType,
     IAnyType,
-    OptionalProperty,
     AnyObjectNode,
     SimpleType
 } from "../../internal"
@@ -57,7 +56,7 @@ export class Frozen<T> extends SimpleType<T, T, T> {
 const untypedFrozenInstance = new Frozen()
 
 export function frozen<C>(subType: IType<C, any, any>): IType<C, C, C>
-export function frozen<T>(defaultValue: T): IType<T | undefined | null, T, T> & OptionalProperty
+export function frozen<T>(defaultValue: T): IType<T | undefined | null, T, T>
 export function frozen<T = any>(): IType<T, T, T> // do not assume undefined by default, let the user specify it if needed
 /**
  * `types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON).

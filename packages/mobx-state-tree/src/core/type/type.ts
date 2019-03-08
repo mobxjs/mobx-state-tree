@@ -66,6 +66,25 @@ export type DefinablePropsNames<T> = {
  */
 export type IsTypeAnyOrUnknown<T> = unknown extends T ? true : false
 
+type WithoutUndefined<T> = T extends undefined ? never : T
+
+/**
+ * Checks if a type is optional (its creation snapshot can be undefined) or not.
+ * @hidden
+ *
+ * Examples:
+ * - string = false
+ * - undefined = true
+ * - string | undefined = true
+ * - string & undefined = true
+ * - any = true
+ * - unknown = true
+ */
+export type IsOptionalType<IT extends IAnyType> = ExtractC<IT> extends WithoutUndefined<
+    ExtractC<IT>
+>
+    ? IsTypeAnyOrUnknown<ExtractC<IT>>
+    : true
 /**
  * Checks if a type supports an empty create() function
  * Basically !any, !unknown, X | undefined, objects with all properties being optional

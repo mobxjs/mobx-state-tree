@@ -1,4 +1,6 @@
--   Added `types.optionalNull` through [#1188](https://github.com/mobxjs/mobx-state-tree/pull/1188) by [@xaviergonz](https://github.com/xaviergonz)
+# 3.11.0
+
+-   Added an optional third argument to `types.optional` that allows to set alternative optional values other than just `undefined` through [#1192](https://github.com/mobxjs/mobx-state-tree/pull/1192) by [@xaviergonz](https://github.com/xaviergonz)
 -   Fixed detaching arrays/maps killing their children [#1173](https://github.com/mobxjs/mobx-state-tree/issues/1173) through [#1175](https://github.com/mobxjs/mobx-state-tree/pull/1175) by [@xaviergonz](https://github.com/xaviergonz)
 -   Added `types.snapshotProcessor` [#947](https://github.com/mobxjs/mobx-state-tree/issues/947) through [#1165](https://github.com/mobxjs/mobx-state-tree/pull/1165) by [@xaviergonz](https://github.com/xaviergonz). This feature will eventually deprecate `postProcessSnapshot` and `preProcessSnapshot` from models in a next major version.
 -   Performance improvement for event handlers so they consume less RAM through [#1160](https://github.com/mobxjs/mobx-state-tree/pull/1160) by [@xaviergonz](https://github.com/xaviergonz)
@@ -175,7 +177,7 @@ Also, the 'object has died' exception can be suppressed now. One should still ad
 ## TL,DR Migration guide
 
 -   `types.identifier(types.number)` => `types.identifierNumber`
--   `types.identifier()` and `types.identifier(types.string) =>`types.identifier`
+-   `types.identifier()` and `types.identifier(types.string)` =>`types.identifier`
 -   `types.frozen` => `types.frozen()`
 -   `types.maybe(x)` => `types.maybeNull(x)`
 -   `postProcessSnapshot` should now be declared on the type instead of as action
