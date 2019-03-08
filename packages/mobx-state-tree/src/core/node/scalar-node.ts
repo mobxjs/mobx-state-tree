@@ -81,7 +81,7 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
 
     @action
     die(): void {
-        if (this.state === NodeLifeCycle.DETACHING) return
+        if (!this.isAlive || this.state === NodeLifeCycle.DETACHING) return
         this.aboutToDie()
         this.finalizeDeath()
     }

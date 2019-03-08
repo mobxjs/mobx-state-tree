@@ -157,6 +157,12 @@ export abstract class BaseNode<C, S, T> {
     abstract finalizeCreation(): void
 
     protected baseFinalizeCreation(whenFinalized?: () => void) {
+        if (!this.isAlive) {
+            throw fail(
+                "assertion failed: cannot finalize the creation of a node that is already dead"
+            )
+        }
+
         // goal: afterCreate hooks runs depth-first. After attach runs parent first, so on afterAttach the parent has completed already
         if (this.state === NodeLifeCycle.CREATED) {
             if (this.parent) {

@@ -6,7 +6,9 @@ import {
     unprotect,
     getSnapshot,
     applySnapshot,
-    onSnapshot
+    onSnapshot,
+    isAlive,
+    hasParent
 } from "../../src"
 
 function createTestStore(listener: (s: string) => void) {
@@ -73,36 +75,70 @@ function createTestStore(listener: (s: string) => void) {
 // some of original hooks do not fire at all
 test("it should trigger lifecycle hooks", () => {
     const events: string[] = []
+    // new store: 3
     const { store, Todo } = createTestStore(e => events.push(e))
-    const talk = detach(store.todos[2])
+
     events.push("-")
-    store.todos.pop()
+    // access (new, attach), then detach "Give Talk"
+    const talk = detach(store.todos[2])
+    expect(isAlive(talk)).toBe(true)
+    expect(hasParent(talk)).toBe(false)
+
     events.push("--")
-    const sugar = Todo.create({ title: "add sugar" })
-    store.todos.push(sugar)
+    // access (new) but immediately destroy "Get biscuit"
+    // no attach/detach since it didn't even get to be attached
+    // and since it is spawned "detached" it should be alive
+    const biscuit = store.todos.pop()!
+    expect(isAlive(biscuit)).toBe(true)
+    expect(hasParent(biscuit)).toBe(false)
+
     events.push("---")
+    // new and then attach "add sugar"
+    const sugar = Todo.create({
+        title: "add sugar"
+    })
+    store.todos.push(sugar)
+
+    events.push("----")
+    // destroy elements in the array ("add sugar"), then store
     destroy(store)
+    expect(isAlive(store)).toBe(false)
+
+    events.push("-----")
+    // destroy "Give talk"
     destroy(talk)
+    expect(isAlive(talk)).toBe(false)
+
+    events.push("------")
+    // destroy "Give biscuit"
+    destroy(biscuit)
+    expect(isAlive(biscuit)).toBe(false)
+
     expect(events).toEqual([
         "new store: 3",
+        "-",
         "new todo: Give talk",
         "attach todo: Give talk",
         "detach todo: Give talk",
-        "-",
-        "new todo: Get biscuit",
-        "attach todo: Get biscuit",
         "--",
+        "new todo: Get biscuit",
+        "---",
         "new todo: add sugar",
         "attach todo: add sugar",
-        "---",
+        "----",
         "destroy todo: add sugar",
         "custom disposer 2 for add sugar",
         "custom disposer 1 for add sugar",
         "destroy store: 2",
         "custom disposer for store",
+        "-----",
         "destroy todo: Give talk",
         "custom disposer 2 for Give talk",
-        "custom disposer 1 for Give talk"
+        "custom disposer 1 for Give talk",
+        "------",
+        "destroy todo: Get biscuit",
+        "custom disposer 2 for Get biscuit",
+        "custom disposer 1 for Get biscuit"
     ])
 })
 

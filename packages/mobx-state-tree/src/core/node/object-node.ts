@@ -175,6 +175,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         if (this._observableInstanceState !== ObservableInstanceLifecycle.UNINITIALIZED) {
             return
         }
+        if (!this.isAlive) {
+            throw fail("assertion failed: a dead node cannot be re-created")
+        }
         this._observableInstanceState = ObservableInstanceLifecycle.CREATING
 
         // make sure the parent chain is created as well
@@ -255,11 +258,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
                     }/${subpath}'`
                 )
             }
-            if (
-                !this.parent &&
-                !!this.root.environment &&
-                this.root.environment !== newParent.root.environment
-            ) {
+            if (!this.parent && !!this.environment && this.environment !== newParent.environment) {
                 throw fail(
                     `A state tree cannot be made part of another state tree as long as their environments are different.`
                 )
@@ -418,11 +417,21 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     // bound on the constructor
     unbox(childNode: AnyNode): AnyNode {
-        if (childNode)
+        if (childNode) {
             this.assertAlive({
                 subpath: childNode.subpath || childNode.subpathUponDeath
             })
-        if (childNode && this._autoUnbox) return childNode.value
+            if (this._autoUnbox) {
+                if (!childNode.isAlive && childNode instanceof ObjectNode) {
+                    // sometimes mobx de-enhancer might get a dead node even though the subpath still exists
+                    // (e.g. when using pop() / shift() from array in order to return the removed items)
+                    // in these cases, rather than trying to resurrect the dead node we clone it in a detached state
+                    return childNode.type.create(childNode.snapshot, childNode.environment)
+                } else {
+                    return childNode.value
+                }
+            }
+        }
         return childNode
     }
 
@@ -451,8 +460,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this.fireHook(Hook.beforeDetach)
         this.state = NodeLifeCycle.DETACHING
 
+        const newEnv = this.parent!.environment
         const root = this.root
-        const newEnv = root.environment
         const newIdCache = root.identifierCache!.splitCache(this)
 
         try {
@@ -495,17 +504,16 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     @action
     die(): void {
-        if (this.state === NodeLifeCycle.DETACHING) return
-        if (this._observableInstanceState === ObservableInstanceLifecycle.CREATED) {
-            this.aboutToDie()
-            this.finalizeDeath()
-        } else {
-            // get rid of own and child ids at least
-            this.unregisterIdentifiers()
-        }
+        if (!this.isAlive || this.state === NodeLifeCycle.DETACHING) return
+        this.aboutToDie()
+        this.finalizeDeath()
     }
 
     aboutToDie(): void {
+        if (this._observableInstanceState === ObservableInstanceLifecycle.UNINITIALIZED) {
+            return
+        }
+
         this.getChildren().forEach(node => {
             node.aboutToDie()
         })
@@ -516,16 +524,6 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
         this._internalEventsEmit(InternalEvents.Dispose)
         this._internalEventsClear(InternalEvents.Dispose)
-    }
-
-    private unregisterIdentifiers(): void {
-        Object.keys(this._childNodes).forEach(k => {
-            const childNode = this._childNodes[k]
-            if (childNode instanceof ObjectNode) {
-                childNode.unregisterIdentifiers()
-            }
-        })
-        this.root.identifierCache!.notifyDied(this)
     }
 
     finalizeDeath(): void {

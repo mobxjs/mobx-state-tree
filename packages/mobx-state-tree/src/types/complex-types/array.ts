@@ -139,40 +139,45 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         node.assertWritable({ subpath: String(change.index) })
         const subType = (node.type as this)._subType
         const childNodes = node.getChildren()
-        let nodes = null
 
         switch (change.type) {
             case "update":
-                if (change.newValue === change.object[change.index]) return null
-                nodes = reconcileArrayChildren(
-                    node,
-                    subType,
-                    [childNodes[change.index]],
-                    [change.newValue],
-                    [change.index]
-                )
-                if (!nodes) {
-                    return null
+                {
+                    if (change.newValue === change.object[change.index]) return null
+
+                    const updatedNodes = reconcileArrayChildren(
+                        node,
+                        subType,
+                        [childNodes[change.index]],
+                        [change.newValue],
+                        [change.index]
+                    )
+                    if (!updatedNodes.changed) {
+                        return null
+                    }
+                    change.newValue = updatedNodes.newNodes[0]
                 }
-                change.newValue = nodes[0]
                 break
             case "splice":
-                const { index, removedCount, added } = change
-                nodes = reconcileArrayChildren(
-                    node,
-                    subType,
-                    childNodes.slice(index, index + removedCount),
-                    added,
-                    added.map((_, i) => index + i)
-                )
-                if (!nodes) {
-                    return null
-                }
-                change.added = nodes
+                {
+                    const { index, removedCount, added } = change
 
-                // update paths of remaining items
-                for (let i = index + removedCount; i < childNodes.length; i++) {
-                    childNodes[i].setParent(node, "" + (i + added.length - removedCount))
+                    const addedNodes = reconcileArrayChildren(
+                        node,
+                        subType,
+                        childNodes.slice(index, index + removedCount),
+                        added,
+                        added.map((_, i) => index + i)
+                    )
+                    if (!addedNodes.changed) {
+                        return null
+                    }
+                    change.added = addedNodes.newNodes
+
+                    // update paths of remaining items
+                    for (let i = index + removedCount; i < childNodes.length; i++) {
+                        childNodes[i].setParent(node, "" + (i + added.length - removedCount))
+                    }
                 }
                 break
         }
@@ -316,8 +321,16 @@ function reconcileArrayChildren<TT>(
     oldNodes: AnyNode[],
     newValues: TT[],
     newPaths: (string | number)[]
-): AnyNode[] | null {
+): { newNodes: AnyNode[]; changed: boolean } {
+    const originalOldNodes = oldNodes
+
     let nothingChanged = true
+    function hasChanged() {
+        if (nothingChanged) {
+            nothingChanged = false
+            oldNodes = oldNodes.slice()
+        }
+    }
 
     for (let i = 0; ; i++) {
         const hasNewNode = i <= newValues.length - 1
@@ -333,11 +346,10 @@ function reconcileArrayChildren<TT>(
             // both are empty, end
             break
         } else if (!hasNewNode) {
-            // new one does not exists, old one dies
-            oldNode.die()
+            // new one does not exists
+            hasChanged()
             oldNodes.splice(i, 1)
             i--
-            nothingChanged = false
         } else if (!oldNode) {
             // there is no old node, create it
             // check if already belongs to the same parent. if so, avoid pushing item in. only swapping can occur.
@@ -349,8 +361,8 @@ function reconcileArrayChildren<TT>(
                     }/${newPath}', but it lives already at '${getStateTreeNode(newValue).path}'`
                 )
             }
+            hasChanged()
             oldNodes.splice(i, 0, valueAsNode(childType, parent, newPath, newValue))
-            nothingChanged = false
         } else if (areSame(oldNode, newValue)) {
             // both are the same, reconcile
             oldNodes[i] = valueAsNode(childType, parent, newPath, newValue, oldNode)
@@ -366,12 +378,24 @@ function reconcileArrayChildren<TT>(
                 }
             }
 
+            hasChanged()
             oldNodes.splice(i, 0, valueAsNode(childType, parent, newPath, newValue, oldMatch))
-            nothingChanged = false
         }
     }
 
-    return nothingChanged ? null : oldNodes
+    if (!nothingChanged) {
+        // kill unused removed nodes
+        originalOldNodes.forEach(rn => {
+            if (!oldNodes.includes(rn)) {
+                rn.die()
+            }
+        })
+    }
+
+    return {
+        newNodes: oldNodes,
+        changed: !nothingChanged
+    }
 }
 
 /**
@@ -395,7 +419,6 @@ function valueAsNode(
         // the node lives here
         if (childNode.parent !== null && childNode.parent === parent) {
             childNode.setParent(parent, subpath)
-            if (oldNode && oldNode !== childNode) oldNode.die()
             return childNode
         }
     }
@@ -403,7 +426,6 @@ function valueAsNode(
     if (oldNode) {
         const childNode = childType.reconcile(oldNode, newValue)
         childNode.setParent(parent, subpath)
-        if (childNode !== oldNode) oldNode.die()
         return childNode
     }
     // nothing to do, create from scratch
