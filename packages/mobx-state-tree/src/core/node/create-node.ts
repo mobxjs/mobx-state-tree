@@ -22,15 +22,14 @@ export function createObjectNode<C, S, T>(
 ): ObjectNode<C, S, T> {
     const existingNode = getStateTreeNodeSafe(initialValue)
     if (existingNode) {
+        if (existingNode.parent) {
+            throw fail(
+                `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
+                    parent ? parent.path : ""
+                }/${subpath}', but it lives already at '${existingNode.path}'`
+            )
+        }
         if (process.env.NODE_ENV !== "production") {
-            if (existingNode.parent) {
-                // istanbul ignore next
-                throw fail(
-                    `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
-                        parent ? parent.path : ""
-                    }/${subpath}', but it lives already at '${existingNode.path}'`
-                )
-            }
             if (!parent) {
                 // istanbul ignore next
                 throw fail(
