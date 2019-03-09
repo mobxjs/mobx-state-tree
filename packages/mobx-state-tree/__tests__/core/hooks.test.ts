@@ -85,12 +85,19 @@ test("it should trigger lifecycle hooks", () => {
     expect(hasParent(talk)).toBe(false)
 
     events.push("--")
-    // access (new) but immediately destroy "Get biscuit"
+    // "Get biscuit" never gets actually created upon removal
     // no attach/detach since it didn't even get to be attached
-    // and since it is spawned "detached" it should be alive
-    const biscuit = store.todos.pop()!
-    expect(isAlive(biscuit)).toBe(true)
-    expect(hasParent(biscuit)).toBe(false)
+    // and since a clone is returned, then "new" and should be alive
+
+    // access (new, attach) get biscuit
+    const oldBiscuit = store.todos[store.todos.length - 1]
+
+    // destroys the old get biscuit, news a new cloned biscuit
+    const clonedBiscuit = store.todos.pop()!
+    expect(isAlive(oldBiscuit)).toBe(false)
+    expect(isAlive(clonedBiscuit)).toBe(true)
+    expect(hasParent(clonedBiscuit)).toBe(false)
+    expect(oldBiscuit).not.toBe(clonedBiscuit)
 
     events.push("---")
     // new and then attach "add sugar"
@@ -111,8 +118,8 @@ test("it should trigger lifecycle hooks", () => {
 
     events.push("------")
     // destroy "Give biscuit"
-    destroy(biscuit)
-    expect(isAlive(biscuit)).toBe(false)
+    destroy(clonedBiscuit)
+    expect(isAlive(clonedBiscuit)).toBe(false)
 
     expect(events).toEqual([
         "new store: 3",
@@ -121,6 +128,11 @@ test("it should trigger lifecycle hooks", () => {
         "attach todo: Give talk",
         "detach todo: Give talk",
         "--",
+        "new todo: Get biscuit",
+        "attach todo: Get biscuit",
+        "destroy todo: Get biscuit",
+        "custom disposer 2 for Get biscuit",
+        "custom disposer 1 for Get biscuit",
         "new todo: Get biscuit",
         "---",
         "new todo: add sugar",
