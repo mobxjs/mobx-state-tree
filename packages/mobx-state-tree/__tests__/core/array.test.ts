@@ -464,9 +464,9 @@ test("it should return pop/shift'ed values for object arrays", () => {
     const bar = test.pop()!
     expect(isAlive(bar)).toBe(false)
 
-    // we have to use clone to access dead nodes data
+    // we have to use clone or getSnapshot to access dead nodes data
     expect(clone(foo)).toEqual({ id: "foo" })
-    expect(clone(bar)).toEqual({ id: "bar" })
+    expect(getSnapshot(bar)).toEqual({ id: "bar" })
 })
 
 test("#1173 - detaching an array should not eliminate its children", () => {
