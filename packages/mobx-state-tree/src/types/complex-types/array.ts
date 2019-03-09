@@ -152,10 +152,10 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
                         [change.newValue],
                         [change.index]
                     )
-                    if (!updatedNodes.changed) {
+                    if (!updatedNodes) {
                         return null
                     }
-                    change.newValue = updatedNodes.newNodes[0]
+                    change.newValue = updatedNodes[0]
                 }
                 break
             case "splice":
@@ -169,10 +169,10 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
                         added,
                         added.map((_, i) => index + i)
                     )
-                    if (!addedNodes.changed) {
+                    if (!addedNodes) {
                         return null
                     }
-                    change.added = addedNodes.newNodes
+                    change.added = addedNodes
 
                     // update paths of remaining items
                     for (let i = index + removedCount; i < childNodes.length; i++) {
@@ -321,16 +321,8 @@ function reconcileArrayChildren<TT>(
     oldNodes: AnyNode[],
     newValues: TT[],
     newPaths: (string | number)[]
-): { newNodes: AnyNode[]; changed: boolean } {
-    const originalOldNodes = oldNodes
-
+): AnyNode[] | null {
     let nothingChanged = true
-    function hasChanged() {
-        if (nothingChanged) {
-            nothingChanged = false
-            oldNodes = oldNodes.slice()
-        }
-    }
 
     for (let i = 0; ; i++) {
         const hasNewNode = i <= newValues.length - 1
@@ -347,8 +339,9 @@ function reconcileArrayChildren<TT>(
             break
         } else if (!hasNewNode) {
             // new one does not exists
-            hasChanged()
+            nothingChanged = false
             oldNodes.splice(i, 1)
+            oldNode.die()
             i--
         } else if (!oldNode) {
             // there is no old node, create it
@@ -361,8 +354,9 @@ function reconcileArrayChildren<TT>(
                     }/${newPath}', but it lives already at '${getStateTreeNode(newValue).path}'`
                 )
             }
-            hasChanged()
-            oldNodes.splice(i, 0, valueAsNode(childType, parent, newPath, newValue))
+            nothingChanged = false
+            const newNode = valueAsNode(childType, parent, newPath, newValue)
+            oldNodes.splice(i, 0, newNode)
         } else if (areSame(oldNode, newValue)) {
             // both are the same, reconcile
             oldNodes[i] = valueAsNode(childType, parent, newPath, newValue, oldNode)
@@ -378,24 +372,13 @@ function reconcileArrayChildren<TT>(
                 }
             }
 
-            hasChanged()
-            oldNodes.splice(i, 0, valueAsNode(childType, parent, newPath, newValue, oldMatch))
+            nothingChanged = false
+            const newNode = valueAsNode(childType, parent, newPath, newValue, oldMatch)
+            oldNodes.splice(i, 0, newNode)
         }
     }
 
-    if (!nothingChanged) {
-        // kill unused removed nodes
-        originalOldNodes.forEach(rn => {
-            if (!oldNodes.includes(rn)) {
-                rn.die()
-            }
-        })
-    }
-
-    return {
-        newNodes: oldNodes,
-        changed: !nothingChanged
-    }
+    return nothingChanged ? null : oldNodes
 }
 
 /**
@@ -411,25 +394,34 @@ function valueAsNode(
     // ensure the value is valid-ish
     typecheckInternal(childType, newValue)
 
-    // the new value has a MST node
-    if (isStateTreeNode(newValue)) {
-        const childNode = getStateTreeNode(newValue)
-        childNode.assertAlive(EMPTY_OBJECT)
+    function getNewNode() {
+        // the new value has a MST node
+        if (isStateTreeNode(newValue)) {
+            const childNode = getStateTreeNode(newValue)
+            childNode.assertAlive(EMPTY_OBJECT)
 
-        // the node lives here
-        if (childNode.parent !== null && childNode.parent === parent) {
+            // the node lives here
+            if (childNode.parent !== null && childNode.parent === parent) {
+                childNode.setParent(parent, subpath)
+                return childNode
+            }
+        }
+        // there is old node and new one is a value/snapshot
+        if (oldNode) {
+            const childNode = childType.reconcile(oldNode, newValue)
             childNode.setParent(parent, subpath)
             return childNode
         }
+
+        // nothing to do, create from scratch
+        return childType.instantiate(parent, subpath, parent.environment, newValue)
     }
-    // there is old node and new one is a value/snapshot
-    if (oldNode) {
-        const childNode = childType.reconcile(oldNode, newValue)
-        childNode.setParent(parent, subpath)
-        return childNode
+
+    const newNode = getNewNode()
+    if (oldNode && oldNode !== newNode) {
+        oldNode.die()
     }
-    // nothing to do, create from scratch
-    return childType.instantiate(parent, subpath, parent.environment, newValue)
+    return newNode
 }
 
 /**
