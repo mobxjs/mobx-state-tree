@@ -416,16 +416,13 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     }
 
     // bound on the constructor
-    unbox(childNode: AnyNode): AnyNode {
-        if (childNode) {
-            this.assertAlive({
-                subpath: childNode.subpath || childNode.subpathUponDeath
-            })
-            if (this._autoUnbox) {
-                return childNode.value
-            }
-        }
-        return childNode
+    unbox(childNode: AnyNode | undefined): AnyNode | undefined {
+        if (!childNode) return childNode
+
+        this.assertAlive({
+            subpath: childNode.subpath || childNode.subpathUponDeath
+        })
+        return this._autoUnbox ? childNode.value : childNode
     }
 
     toString(): string {
