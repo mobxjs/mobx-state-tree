@@ -85,9 +85,6 @@ test("it should trigger lifecycle hooks", () => {
     expect(hasParent(talk)).toBe(false)
 
     events.push("--")
-    // "Get biscuit" never gets actually created upon removal
-    // no attach/detach since it didn't even get to be attached
-    // and since a clone is returned, then "new" and should be alive
 
     // access (new, attach) get biscuit
     const oldBiscuit = store.todos[store.todos.length - 1]
