@@ -17,7 +17,8 @@ import {
     RedefineIStateTreeNode,
     IStateTreeNode,
     AnyObjectNode,
-    BaseType
+    BaseType,
+    assertIsType
 } from "../../internal"
 
 type IFunctionReturn<T> = () => T
@@ -149,12 +150,8 @@ function checkOptionalPreconditions<IT extends IAnyType>(
         )
     }
 
+    assertIsType(type)
     if (process.env.NODE_ENV !== "production") {
-        if (!isType(type))
-            throw fail(
-                "expected a mobx-state-tree type as first argument, got " + type + " instead"
-            )
-
         // we only check default values if they are passed directly
         // if they are generator functions they will be checked once they are generated
         // we don't check generator function results here to avoid generating a node just for type-checking purposes

@@ -14,7 +14,8 @@ import {
     BaseType,
     ExtractS,
     ExtractT,
-    ExtractNodeType
+    ExtractNodeType,
+    assertIsType
 } from "../../internal"
 
 class Refinement<IT extends IAnyType> extends BaseType<
@@ -104,19 +105,20 @@ export function refinement(...args: any[]): IAnyType {
         ? args[2]
         : (v: any) => "Value does not respect the refinement predicate"
     // ensures all parameters are correct
+    assertIsType(type)
     if (process.env.NODE_ENV !== "production") {
-        if (typeof name !== "string")
+        if (typeof name !== "string") {
+            // istanbul ignore next
             throw fail("expected a string as first argument, got " + name + " instead")
-        if (!isType(type))
-            throw fail(
-                "expected a mobx-state-tree type as first or second argument, got " +
-                    type +
-                    " instead"
-            )
-        if (typeof predicate !== "function")
+        }
+        if (typeof predicate !== "function") {
+            // istanbul ignore next
             throw fail("expected a function as third argument, got " + predicate + " instead")
-        if (typeof message !== "function")
+        }
+        if (typeof message !== "function") {
+            // istanbul ignore next
             throw fail("expected a function as fourth argument, got " + message + " instead")
+        }
     }
     return new Refinement(name, type, predicate, message)
 }

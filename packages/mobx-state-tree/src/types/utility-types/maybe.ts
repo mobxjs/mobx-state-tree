@@ -11,7 +11,8 @@ import {
     ExtractS,
     ExtractT,
     IStateTreeNode,
-    RedefineIStateTreeNode
+    RedefineIStateTreeNode,
+    assertIsType
 } from "../../internal"
 
 const optionalUndefinedType = optional(undefinedType, undefined)
@@ -39,8 +40,7 @@ export interface IMaybeNull<IT extends IAnyType> extends IMaybeIType<IT, null | 
  * @returns
  */
 export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
-    if (process.env.NODE_ENV !== "production" && !isType(type))
-        throw fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
+    assertIsType(type)
     return union(type, optionalUndefinedType)
 }
 
@@ -52,7 +52,6 @@ export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
  * @returns
  */
 export function maybeNull<IT extends IAnyType>(type: IT): IMaybeNull<IT> {
-    if (process.env.NODE_ENV !== "production" && !isType(type))
-        throw fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
+    assertIsType(type)
     return union(type, optionalNullType)
 }

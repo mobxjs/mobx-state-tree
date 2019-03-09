@@ -158,6 +158,7 @@ export abstract class BaseNode<C, S, T> {
 
     protected baseFinalizeCreation(whenFinalized?: () => void) {
         if (!this.isAlive) {
+            // istanbul ignore next
             throw fail(
                 "assertion failed: cannot finalize the creation of a node that is already dead"
             )

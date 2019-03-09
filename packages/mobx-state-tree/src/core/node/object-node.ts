@@ -176,6 +176,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             return
         }
         if (!this.isAlive) {
+            // istanbul ignore next
             throw fail("assertion failed: a dead node cannot be re-created")
         }
         this._observableInstanceState = ObservableInstanceLifecycle.CREATING
@@ -240,11 +241,45 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         return parent ? parent.root : this
     }
 
-    setParent(newParent: AnyObjectNode | null, subpath: string | null = null): void {
-        if (this.parent === newParent && this.subpath === subpath) return
+    clearParent(): void {
+        if (!this.parent) return
 
-        if (newParent && process.env.NODE_ENV !== "production") {
-            if (this.parent && newParent !== this.parent) {
+        // detach if attached
+        this.fireHook(Hook.beforeDetach)
+        const previousState = this.state
+        this.state = NodeLifeCycle.DETACHING
+
+        const newEnv = this.parent.environment
+        const root = this.root
+        const newIdCache = root.identifierCache!.splitCache(this)
+
+        try {
+            this.parent.removeChild(this.subpath)
+            this.baseSetParent(null, "")
+            this.environment = newEnv
+            this.identifierCache = newIdCache
+        } finally {
+            this.state = previousState
+        }
+    }
+
+    setParent(newParent: AnyObjectNode, subpath: string): void {
+        const parentChanged = newParent !== this.parent
+        const subpathChanged = subpath !== this.subpath
+
+        if (!parentChanged && !subpathChanged) return
+
+        if (process.env.NODE_ENV !== "production") {
+            if (!subpath) {
+                // istanbul ignore next
+                throw fail("assertion failed: subpath expected")
+            }
+            if (!newParent) {
+                // istanbul ignore next
+                throw fail("assertion failed: new parent expected")
+            }
+
+            if (this.parent && parentChanged) {
                 throw fail(
                     `A node cannot exists twice in the state tree. Failed to add ${this} to path '${
                         newParent.path
@@ -264,17 +299,15 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
                 )
             }
         }
-        if (this.parent && !newParent) {
-            this.die()
-        } else {
-            const newPath = subpath === null ? "" : subpath
-            if (newParent && newParent !== this.parent) {
-                newParent.root.identifierCache!.mergeCache(this)
-                this.baseSetParent(newParent, newPath)
-                this.fireHook(Hook.afterAttach)
-            } else if (this.subpath !== newPath) {
-                this.baseSetParent(this.parent, newPath)
-            }
+
+        if (parentChanged) {
+            // attach to new parent
+            newParent.root.identifierCache!.mergeCache(this)
+            this.baseSetParent(newParent, subpath)
+            this.fireHook(Hook.afterAttach)
+        } else if (subpathChanged) {
+            // moving to a new subpath on the same parent
+            this.baseSetParent(this.parent, subpath)
         }
     }
 
@@ -445,23 +478,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     @action
     detach(): void {
         if (!this.isAlive) throw fail(`Error while detaching, node is not alive.`)
-        if (this.isRoot) return
 
-        this.fireHook(Hook.beforeDetach)
-        this.state = NodeLifeCycle.DETACHING
-
-        const newEnv = this.parent!.environment
-        const root = this.root
-        const newIdCache = root.identifierCache!.splitCache(this)
-
-        try {
-            this.parent!.removeChild(this.subpath)
-            this.baseSetParent(null, "")
-            this.environment = newEnv
-            this.identifierCache = newIdCache
-        } finally {
-            this.state = NodeLifeCycle.FINALIZED
-        }
+        this.clearParent()
     }
 
     private preboot(): void {

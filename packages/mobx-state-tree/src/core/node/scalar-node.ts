@@ -53,18 +53,28 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
         return this.parent.root
     }
 
-    setParent(newParent: AnyObjectNode | null, subpath: string | null = null): void {
-        if (this.parent === newParent && this.subpath === subpath) return
-        if (this.parent && !newParent) {
-            this.die()
-        } else {
-            const newPath = subpath === null ? "" : subpath
-            if (newParent && newParent !== this.parent) {
+    setParent(newParent: AnyObjectNode, subpath: string): void {
+        const parentChanged = this.parent !== newParent
+        const subpathChanged = this.subpath !== subpath
+
+        if (!parentChanged && !subpathChanged) return
+
+        if (process.env.NODE_ENV !== "production") {
+            if (!subpath) {
+                // istanbul ignore next
+                throw fail("assertion failed: subpath expected")
+            }
+            if (!newParent) {
+                // istanbul ignore next
+                throw fail("assertion failed: parent expected")
+            }
+            if (parentChanged) {
+                // istanbul ignore next
                 throw fail("assertion failed: scalar nodes cannot change their parent")
-            } else if (this.subpath !== newPath) {
-                this.baseSetParent(this.parent, newPath)
             }
         }
+
+        this.baseSetParent(this.parent, subpath)
     }
 
     get snapshot(): S {

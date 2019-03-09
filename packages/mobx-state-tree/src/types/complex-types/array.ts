@@ -44,7 +44,8 @@ import {
     IAnyStateTreeNode,
     AnyObjectNode,
     AnyNode,
-    createObjectNode
+    createObjectNode,
+    assertIsType
 } from "../../internal"
 
 /** @hidden */
@@ -306,12 +307,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
  * @returns
  */
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
-    if (process.env.NODE_ENV !== "production") {
-        if (!isType(subtype))
-            throw fail(
-                "expected a mobx-state-tree type as first argument, got " + subtype + " instead"
-            )
-    }
+    assertIsType(subtype)
     return new ArrayType<IT>(subtype.name + "[]", subtype)
 }
 

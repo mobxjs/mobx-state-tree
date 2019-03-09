@@ -23,7 +23,11 @@ export function createObjectNode<C, S, T>(
     const existingNode = getStateTreeNodeSafe(initialValue)
     if (existingNode) {
         if (existingNode.isRoot) {
-            existingNode.setParent(parent, subpath)
+            if (parent) {
+                existingNode.setParent(parent, subpath)
+            } else {
+                existingNode.clearParent()
+            }
             return existingNode
         }
 
