@@ -341,6 +341,11 @@ function reconcileArrayChildren<TT>(
             // new one does not exists
             nothingChanged = false
             oldNodes.splice(i, 1)
+            if (oldNode instanceof ObjectNode) {
+                // since it is going to be returned by pop/splice/shift better create it before killing it
+                // so it doesn't end up in an undead state
+                oldNode.createObservableInstanceIfNeeded()
+            }
             oldNode.die()
             i--
         } else if (!oldNode) {
@@ -419,6 +424,11 @@ function valueAsNode(
 
     const newNode = getNewNode()
     if (oldNode && oldNode !== newNode) {
+        if (oldNode instanceof ObjectNode) {
+            // since it is going to be returned by pop/splice/shift better create it before killing it
+            // so it doesn't end up in an undead state
+            oldNode.createObservableInstanceIfNeeded()
+        }
         oldNode.die()
     }
     return newNode

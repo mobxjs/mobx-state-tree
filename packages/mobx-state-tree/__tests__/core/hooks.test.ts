@@ -86,15 +86,9 @@ test("it should trigger lifecycle hooks", () => {
 
     events.push("--")
 
-    // access (new, attach) get biscuit
-    const oldBiscuit = store.todos[store.todos.length - 1]
-
-    // destroys the old get biscuit, news a new cloned biscuit
-    const clonedBiscuit = store.todos.pop()!
+    // access (new, attach), then destroy biscuit
+    const oldBiscuit = store.todos.pop()!
     expect(isAlive(oldBiscuit)).toBe(false)
-    expect(isAlive(clonedBiscuit)).toBe(true)
-    expect(hasParent(clonedBiscuit)).toBe(false)
-    expect(oldBiscuit).not.toBe(clonedBiscuit)
 
     events.push("---")
     // new and then attach "add sugar"
@@ -113,11 +107,6 @@ test("it should trigger lifecycle hooks", () => {
     destroy(talk)
     expect(isAlive(talk)).toBe(false)
 
-    events.push("------")
-    // destroy "Give biscuit"
-    destroy(clonedBiscuit)
-    expect(isAlive(clonedBiscuit)).toBe(false)
-
     expect(events).toEqual([
         "new store: 3",
         "-",
@@ -130,7 +119,6 @@ test("it should trigger lifecycle hooks", () => {
         "destroy todo: Get biscuit",
         "custom disposer 2 for Get biscuit",
         "custom disposer 1 for Get biscuit",
-        "new todo: Get biscuit",
         "---",
         "new todo: add sugar",
         "attach todo: add sugar",
@@ -143,11 +131,7 @@ test("it should trigger lifecycle hooks", () => {
         "-----",
         "destroy todo: Give talk",
         "custom disposer 2 for Give talk",
-        "custom disposer 1 for Give talk",
-        "------",
-        "destroy todo: Get biscuit",
-        "custom disposer 2 for Get biscuit",
-        "custom disposer 1 for Get biscuit"
+        "custom disposer 1 for Give talk"
     ])
 })
 

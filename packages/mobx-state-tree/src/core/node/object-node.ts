@@ -422,14 +422,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
                 subpath: childNode.subpath || childNode.subpathUponDeath
             })
             if (this._autoUnbox) {
-                if (!childNode.isAlive && childNode instanceof ObjectNode) {
-                    // sometimes mobx de-enhancer might get a dead node even though the subpath still exists
-                    // (e.g. when using pop() / shift() from array in order to return the removed items)
-                    // in these cases, rather than trying to resurrect the dead node we clone it in a detached state
-                    return childNode.type.create(childNode.snapshot, childNode.environment)
-                } else {
-                    return childNode.value
-                }
+                return childNode.value
             }
         }
         return childNode

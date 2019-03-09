@@ -448,16 +448,25 @@ test("it should return pop/shift'ed values for object arrays", () => {
             return {
                 shift() {
                     return self.array.shift()
+                },
+                pop() {
+                    return self.array.pop()
                 }
             }
         })
 
     const test = ObjectArray.create({
-        array: [{ id: "foo" }, { id: "bar" }]
+        array: [{ id: "foo" }, { id: "mid" }, { id: "bar" }]
     })
 
-    expect(test.shift()).toEqual({ id: "foo" })
-    expect(test.shift()).toEqual({ id: "bar" })
+    const foo = test.shift()!
+    expect(isAlive(foo)).toBe(false)
+    const bar = test.pop()!
+    expect(isAlive(bar)).toBe(false)
+
+    // we have to use clone to access dead nodes data
+    expect(clone(foo)).toEqual({ id: "foo" })
+    expect(clone(bar)).toEqual({ id: "bar" })
 })
 
 test("#1173 - detaching an array should not eliminate its children", () => {
