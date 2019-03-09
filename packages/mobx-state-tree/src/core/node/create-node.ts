@@ -22,20 +22,25 @@ export function createObjectNode<C, S, T>(
 ): ObjectNode<C, S, T> {
     const existingNode = getStateTreeNodeSafe(initialValue)
     if (existingNode) {
-        if (existingNode.isRoot) {
-            if (parent) {
-                existingNode.setParent(parent, subpath)
-            } else {
-                existingNode.clearParent()
+        if (process.env.NODE_ENV !== "production") {
+            if (existingNode.parent) {
+                // istanbul ignore next
+                throw fail(
+                    `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
+                        parent ? parent.path : ""
+                    }/${subpath}', but it lives already at '${existingNode.path}'`
+                )
             }
-            return existingNode
+            if (!parent) {
+                // istanbul ignore next
+                throw fail(
+                    "assertion failed: an existing node with a parent cannot be reused to create a new node"
+                )
+            }
         }
 
-        throw fail(
-            `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
-                parent ? parent.path : ""
-            }/${subpath}', but it lives already at '${existingNode.path}'`
-        )
+        existingNode.setParent(parent!, subpath)
+        return existingNode
     }
 
     // not a node, a snapshot
