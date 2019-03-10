@@ -484,3 +484,11 @@ test("#1173 - detaching an array should not eliminate its children", () => {
     expect(detachedItems.length).toBe(3)
     expect(detachedItems[0]).toBe(n0)
 })
+
+test("initializing an array instance from another array instance should end up in the same instance", () => {
+    const A = types.array(types.number)
+    const a1 = A.create([1, 2, 3])
+    const a2 = A.create(a1)
+    expect(a1).toBe(a2)
+    expect(getSnapshot(a1)).toEqual([1, 2, 3])
+})
