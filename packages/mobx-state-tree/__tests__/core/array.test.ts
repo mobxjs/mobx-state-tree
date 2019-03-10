@@ -513,10 +513,10 @@ test("assigning filtered instances works", () => {
 
     expect(store.todos.length).toBe(3)
     const done = store.todos.filter(t => t.done)
-    const notDone = store.todos.filter(t => t.done)
+    const notDone = store.todos.filter(t => !t.done)
     expect(store.todos.every(t => isAlive(t)))
     store.clearFinishedTodos()
     expect(store.todos.length).toBe(1)
-    expect(done.every(t => !isAlive(t)))
-    expect(notDone.every(t => isAlive(t)))
+    expect(done.every(t => !isAlive(t))).toBe(true)
+    expect(notDone.every(t => isAlive(t))).toBe(true)
 })
