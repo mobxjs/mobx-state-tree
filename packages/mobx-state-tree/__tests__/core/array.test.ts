@@ -11,7 +11,8 @@ import {
     types,
     IJsonPatch,
     setLivelinessChecking,
-    detach
+    detach,
+    cast
 } from "../../src"
 import { observable, autorun } from "mobx"
 
@@ -491,4 +492,26 @@ test("initializing an array instance from another array instance should end up i
     const a2 = A.create(a1)
     expect(a1).toBe(a2)
     expect(getSnapshot(a1)).toEqual([1, 2, 3])
+})
+
+test("assigning filtered instances works", () => {
+    const Task = types.model("Task", {
+        done: false
+    })
+    const store = types
+        .model({
+            todos: types.array(Task)
+        })
+        .actions(self => ({
+            clearFinishedTodos() {
+                self.todos = cast(self.todos.filter(todo => !todo.done))
+            }
+        }))
+        .create({
+            todos: [{ done: true }, { done: false }, { done: true }]
+        })
+
+    expect(store.todos.length).toBe(3)
+    store.clearFinishedTodos()
+    expect(store.todos.length).toBe(1)
 })
