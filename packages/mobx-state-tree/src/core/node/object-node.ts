@@ -175,9 +175,13 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         if (this._observableInstanceState !== ObservableInstanceLifecycle.UNINITIALIZED) {
             return
         }
-        if (!this.isAlive) {
-            // istanbul ignore next
-            throw fail("assertion failed: a dead node cannot be re-created")
+        if (process.env.NODE_ENV !== "production") {
+            if (this.state !== NodeLifeCycle.INITIALIZING) {
+                // istanbul ignore next
+                throw fail(
+                    "assertion failed: the creation of the observable instance must be done on the initializing phase"
+                )
+            }
         }
         this._observableInstanceState = ObservableInstanceLifecycle.CREATING
 

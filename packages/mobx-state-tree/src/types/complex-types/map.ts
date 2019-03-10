@@ -163,7 +163,7 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
     }
 
     put(value: ExtractCST<IT>): ExtractT<IT> {
-        if (!!!value) throw fail(`Map.put cannot be used to set empty values`)
+        if (!value) throw fail(`Map.put cannot be used to set empty values`)
         if (isStateTreeNode(value)) {
             const node = getStateTreeNode(value)
             if (process.env.NODE_ENV !== "production") {
