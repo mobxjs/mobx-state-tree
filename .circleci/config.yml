@@ -34,6 +34,9 @@ jobs:
             - run: yarn build
             - run: yarn test
 
+            - store_test_results:
+                  path: ./test-results
+
             # only run coveralls if the token is present (it is not present for fork PRs for security reasons)
             - run:
                   name: upload coveralls

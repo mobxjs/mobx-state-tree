@@ -7,5 +7,6 @@ coverage
 .nyc_output
 .idea
 package-lock.json
+/junit.xml
 # copied from root folder on build
 /README.md
