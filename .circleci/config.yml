@@ -4,8 +4,8 @@ executors:
     my-executor:
         docker:
             - image: circleci/node:latest
-            environment:
-                CI: true
+            - environment:
+                  - CI: true
         working_directory: ~/mobx-state-tree
 
 jobs:
@@ -107,7 +107,6 @@ jobs:
             - run: yarn test:mst-middlewares:prod -i
             - store_test_results:
                   path: ./test-results
-
 
     # upload coverage
     upload-coveralls:
