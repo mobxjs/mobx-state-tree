@@ -325,8 +325,9 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         return this.instantiate(null, "", environment, snapshot!).value
     }
 
-    getSnapshot(node: N, applyPostProcess: boolean = true): S {
-        return node.type.getSnapshot(node, applyPostProcess)
+    getSnapshot(node: N, applyPostProcess?: boolean): S {
+        // istanbul ignore next
+        throw fail("unimplemented method")
     }
 
     abstract reconcile(current: N, newValue: C | T): N
@@ -364,16 +365,19 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
     }
 
     get Type(): T {
+        // istanbul ignore next
         throw fail(
             "Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`"
         )
     }
     get SnapshotType(): S {
+        // istanbul ignore next
         throw fail(
             "Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`"
         )
     }
     get CreationType(): C {
+        // istanbul ignore next
         throw fail(
             "Factory.CreationType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.CreationType`"
         )
@@ -465,7 +469,7 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
         if (isStateTreeNode(newValue) && this.isAssignableFrom(getType(newValue))) {
             // newValue is a Node as well, move it here..
             const newNode = getStateTreeNode(newValue)
-            newNode.setParent(parent, subpath)
+            newNode.setParent(parent!, subpath)
             return newNode
         }
         // nothing to do, we have to create a new node
@@ -529,4 +533,17 @@ export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, ScalarNode<C
  */
 export function isType(value: any): value is IAnyType {
     return typeof value === "object" && value && value.isType === true
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function assertIsType(type: IAnyType) {
+    if (process.env.NODE_ENV !== "production") {
+        if (!isType(type)) {
+            // istanbul ignore next
+            throw fail("expected a mobx-state-tree type as argument, got " + type + " instead")
+        }
+    }
 }

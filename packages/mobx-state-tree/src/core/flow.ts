@@ -147,8 +147,10 @@ export function createFlowSpawner(name: string, generator: Function) {
                     return
                 }
                 // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
-                if (!ret.value || typeof ret.value.then !== "function")
+                if (!ret.value || typeof ret.value.then !== "function") {
+                    // istanbul ignore next
                     throw fail("Only promises can be yielded to `async`, got: " + ret)
+                }
                 return ret.value.then(onFulfilled, onRejected)
             }
         })
