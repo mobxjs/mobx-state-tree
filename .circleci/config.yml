@@ -39,45 +39,45 @@ jobs:
             - run: yarn build
 
             - persist_to_workspace:
-                root: .
-                paths:
-                    - *
+                  root: .
+                  paths:
+                      - ./*
 
     test-mst:
         executor: my-executor
         steps:
             - attach_workspace:
-                at: .
+                  at: .
 
             - run: yarn test:mst
             - store_test_results:
                   path: ./test-results
 
             - persist_to_workspace:
-                root: .
-                paths:
-                    - packages/mobx-state-tree/coverage/*
+                  root: .
+                  paths:
+                      - packages/mobx-state-tree/coverage/*
 
     test-mst-middlewares:
         executor: my-executor
         steps:
             - attach_workspace:
-                at: .
+                  at: .
 
             - run: yarn test:mst-middlewares
             - store_test_results:
                   path: ./test-results
 
             - persist_to_workspace:
-                root: .
-                paths:
-                    - packages/mst-middlewares/coverage/*
+                  root: .
+                  paths:
+                      - packages/mst-middlewares/coverage/*
 
     upload-coveralls:
         executor: my-executor
         steps:
             - attach_workspace:
-                at: .
+                  at: .
 
             # only run coveralls if the token is present (it is not present for fork PRs for security reasons)
             - run:
@@ -97,12 +97,10 @@ workflows:
         jobs:
             - build
             - test-mst:
-                requires:
-                    -build
+                  requires: -build
             - test-mst-middlewares:
-                requires:
-                    -build
+                  requires: -build
             - upload-coveralls:
-                requires:
-                    - test-mst
-                    - test-mst-middlewares
+                  requires:
+                      - test-mst
+                      - test-mst-middlewares
