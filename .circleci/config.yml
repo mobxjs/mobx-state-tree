@@ -1,9 +1,14 @@
 version: 2.1
-jobs:
-    build:
+
+executors:
+    my-executor:
         docker:
             - image: circleci/node:latest
         working_directory: ~/mobx-state-tree
+
+jobs:
+    build:
+        executor: my-executor
         steps:
             - checkout
 
@@ -32,10 +37,47 @@ jobs:
                       - node_modules
 
             - run: yarn build
-            - run: yarn test
 
+            - persist_to_workspace:
+                root: .
+                paths:
+                    - *
+
+    test-mst:
+        executor: my-executor
+        steps:
+            - attach_workspace:
+                at: .
+
+            - run: yarn test:mst
             - store_test_results:
                   path: ./test-results
+
+            - persist_to_workspace:
+                root: .
+                paths:
+                    - packages/mobx-state-tree/coverage/*
+
+    test-mst-middlewares:
+        executor: my-executor
+        steps:
+            - attach_workspace:
+                at: .
+
+            - run: yarn test:mst-middlewares
+            - store_test_results:
+                  path: ./test-results
+
+            - persist_to_workspace:
+                root: .
+                paths:
+                    - packages/mst-middlewares/coverage/*
+
+    upload-coveralls:
+        executor: my-executor
+        steps:
+            - attach_workspace:
+                at: .
 
             # only run coveralls if the token is present (it is not present for fork PRs for security reasons)
             - run:
@@ -48,3 +90,19 @@ jobs:
                       else
                           echo "Warning - Coveralls info could NOT be uploaded since the COVERALLS_REPO_TOKEN was not available"
                       fi
+
+workflows:
+    version: 2
+    build-and-test:
+        jobs:
+            - build
+            - test-mst:
+                requires:
+                    -build
+            - test-mst-middlewares:
+                requires:
+                    -build
+            - upload-coveralls:
+                requires:
+                    - test-mst
+                    - test-mst-middlewares
