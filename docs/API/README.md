@@ -1625,11 +1625,11 @@ ___
 
 ###  createActionTrackingMiddleware
 
-▸ **createActionTrackingMiddleware**<`T`>(hooks: *[IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`>*): [IMiddlewareHandler](#imiddlewarehandler)
+▸ **createActionTrackingMiddleware**<`T`>(middlewareHooks: *[IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`>*): [IMiddlewareHandler](#imiddlewarehandler)
 
-Convenience utility to create action based middleware that supports async processes more easily. All hooks are called for both synchronous and asynchronous actions. Except that either `onSuccess` or `onFail` is called
+Convenience utility to create action based middleware that supports async processes more easily. All hooks are called for both synchronous and asynchronous actions, except in the case of `onSuccess`/`onFail`, where only one of them is called.
 
-The create middleware tracks the process of an action (assuming it passes the `filter`). `onResume` can return any value, which will be passed as second argument to any other hook. This makes it possible to keep state during a process.
+The create middleware tracks the process of an action (assuming it passes the `filter`). `onStart` can return any value, which will be passed as second context argument to any other hook. This makes it possible to keep state during a process.
 
 See the `atomic` middleware for an example
 
@@ -1638,9 +1638,9 @@ See the `atomic` middleware for an example
 #### T 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| hooks | [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`> |  \- |
+| Name | Type |
+| ------ | ------ |
+| middlewareHooks | [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`> |
 
 **Returns:** [IMiddlewareHandler](#imiddlewarehandler)
 
