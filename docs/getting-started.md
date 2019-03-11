@@ -79,7 +79,7 @@ const User = types.model({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/98x2n959ky)
+[View sample in the playground](https://codesandbox.io/s/235jykjp90)
 
 The above code will create two models, a `Todo` and a `User` model, but as we said before, a tree model in MST consists of type information (and we just saw how to define them) and state (the instance data). So how do we create instances of the `Todo` and `User` models?
 
@@ -106,7 +106,7 @@ console.log("John:", getSnapshot(john))
 console.log("Eat TODO:", getSnapshot(eat))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/6jo1o9n9qk)
+[View sample in the playground](https://codesandbox.io/s/kkl8kn4pq5)
 
 As you will see, using models ensures that all the attributes defined will always be present and defaulted to the predefined values. If you want to change those values when creating the model instance, you can simply pass an object with the values to use into the `.create` function.
 
@@ -116,7 +116,7 @@ const eat = Todo.create({ name: "eat" })
 console.log("Eat TODO:", getSnapshot(eat)) // => will print {name: "eat", done: false}
 ```
 
-[View sample in the playground](https://codesandbox.io/s/ymqpj71oj9)
+[View sample in the playground](https://codesandbox.io/s/jpmpyj7pm3)
 
 ## Meeting types
 
@@ -144,7 +144,7 @@ const User = types.model({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/j27j41828v)
+[View sample in the playground](https://codesandbox.io/s/j27j41828v) *outdated*
 
 The `types` namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the [API documentation](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/API/README.md) for the whole list and their parameters.
 
@@ -172,7 +172,7 @@ const store = RootStore.create({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/5wyx1xvvj4)
+[View sample in the playground](https://codesandbox.io/s/5wyx1xvvj4) *outdated*
 
 Notice that the `types.optional` second argument is required as long you don't pass a value in the `.create` function of the model. If you want, for example, to make the `name` or `todos` attribute required when calling `.create`, remove the `types.optional` function call and pass the `types.*` included inside.
 
@@ -214,7 +214,7 @@ const RootStore = types
     }))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/928l6pw7pr)
+[View sample in the playground](https://codesandbox.io/s/928l6pw7pr) *outdated*
 
 Please notice the use of `self`. `self` is the object being constructed when an instance of your model is created. Thanks to the `self` object, instance actions are "this-free", allowing you to be sure that they are correctly bound.
 
@@ -225,7 +225,7 @@ store.addTodo(1, "Eat a cake")
 store.todos.get(1).toggle()
 ```
 
-[View sample in the playground](https://codesandbox.io/s/928l6pw7pr)
+[View sample in the playground](https://codesandbox.io/s/928l6pw7pr) *outdated*
 
 ## Snapshots are awesome!
 
@@ -284,7 +284,7 @@ applySnapshot(store, {
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/xjm99kkopp)
+[View sample in the playground](https://codesandbox.io/s/xjm99kkopp) *outdated*
 
 ## Time travel
 
@@ -336,7 +336,7 @@ const App = observer(props => (
 ))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/4rzvkx6z77)
+[View sample in the playground](https://codesandbox.io/s/4rzvkx6z77) *outdated*
 
 ## Improving render performance
 
@@ -366,7 +366,7 @@ const AppView = observer(props => (
 ))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/m3rw1wll79)
+[View sample in the playground](https://codesandbox.io/s/m3rw1wll79) *outdated*
 
 Each `observer` declaration will enable the React component to only re-render if any of it's observed data changes. Since our `App` component was observing everything, it was re-rendering whenever you changed something.
 
@@ -397,7 +397,7 @@ const RootStore = types
     }))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/x3qlr3xpjo)
+[View sample in the playground](https://codesandbox.io/s/x3qlr3xpjo) *outdated*
 
 These properties are called "computed" because they keep track of the changes to the observed attributes and recompute automatically if anything used by that attribute changes. This allows for performance savings; for example changing the `name` of a TODO won't affect the number of pending and completed count, as such it wont trigger a recalculation of those counters.
 
@@ -421,7 +421,7 @@ const AppView = observer(props => (
 ))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/x3qlr3xpjo)
+[View sample in the playground](https://codesandbox.io/s/x3qlr3xpjo) *outdated*
 
 If you `console.log` your snapshot you'll notice that computed properties won't appear in snapshots. That's fine and intended, since those properties must be computed over the other properties of the tree, they can be re-produced by knowing just their definition. For the same reason, if you provide a computed value in a snapshot you'll end up with an error when you attempt to apply it.
 
@@ -455,7 +455,7 @@ const RootStore = types
     }))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/zkrkwj91p3)
+[View sample in the playground](https://codesandbox.io/s/zkrkwj91p3) *outdated*
 
 Notice that the `getTodosWhereDoneIs` view can also be used outside of its model, for example it can be used inside views.
 
@@ -489,7 +489,7 @@ const store = RootStore.create({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/7zqlw3ro11)
+[View sample in the playground](https://codesandbox.io/s/7zqlw3ro11) *outdated*
 
 Now we need to change our `Todo` model to store the user assigned to the TODO. You could do that by storing the `User` map `id`, and provide a computed that resolves to the user (you can do it as an exercise), but you would end up with a copious amount of code.
 
@@ -546,7 +546,7 @@ const store = RootStore.create({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mzvx6o7r0j)
+[View sample in the playground](https://codesandbox.io/s/mzvx6o7r0j) *outdated*
 
 ### How to define the reference
 
@@ -569,7 +569,7 @@ const Todo = types
     }))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mzvx6o7r0j)
+[View sample in the playground](https://codesandbox.io/s/mzvx6o7r0j) *outdated*
 
 ### Setting a reference value
 
@@ -645,7 +645,7 @@ const AppView = observer(props => (
 ))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mzvx6o7r0j)
+[View sample in the playground](https://codesandbox.io/s/mzvx6o7r0j) *outdated*
 
 ## References are safe!
 
