@@ -1,0 +1,38 @@
+version: 2.1
+jobs:
+    build:
+        docker:
+            - image: circleci/node:latest
+        working_directory: ~/mobx-state-tree
+        steps:
+            - checkout
+
+            - restore_cache:
+                  name: restore .cache/yarn
+                  keys:
+                      - yarn-cache-{{ arch }}
+            - restore_cache:
+                  name: restore node_modules
+                  keys:
+                      - node-modules-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+                      - node-modules-{{ arch }}-{{ .Branch }}
+                      - node-modules-{{ arch }}
+
+            - run: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+
+            - save_cache:
+                  name: cache .cache/yarn
+                  key: yarn-cache-{{ arch }}
+                  paths:
+                      - ~/.cache/yarn
+            - save_cache:
+                  name: cache node_modules
+                  key: node-modules-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+                  paths:
+                      - node_modules
+
+            - run: yarn build
+            - run: yarn test
+            - run:
+                  name: upload coveralls
+                  command: cat ./packages/mobx-state-tree/coverage/lcov.info ./packages/mst-middlewares/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
