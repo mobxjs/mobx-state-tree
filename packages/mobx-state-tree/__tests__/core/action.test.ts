@@ -29,7 +29,7 @@ const Task = types
     })
 test("it should be possible to invoke a simple action", () => {
     const t1 = Task.create()
-    expect(t1.done).toBe(true)
+    expect(t1.done).toBe(false)
     expect(t1.toggle()).toBe(true)
     expect(t1.done).toBe(true)
 })

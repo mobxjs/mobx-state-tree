@@ -35,7 +35,7 @@ test("it logs", () => {
 
     store.todos[0].setTitle("hello world")
 
-    expect(log).toHaveBeenCalledTimes(0)
+    expect(log).toHaveBeenCalledTimes(1)
     expect(log.mock.calls[0][0]).toBe("[MST] #1 action - /todos/0/setTitle")
 })
 
