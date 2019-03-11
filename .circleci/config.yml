@@ -33,6 +33,15 @@ jobs:
 
             - run: yarn build
             - run: yarn test
+
+            # only run coveralls if the token is present (it is not present for fork PRs for security reasons)
             - run:
                   name: upload coveralls
-                  command: cat ./packages/mobx-state-tree/coverage/lcov.info ./packages/mst-middlewares/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+                  command: |
+                      if [[ -v COVERALLS_REPO_TOKEN ]]
+                      then                            
+                          cat ./packages/mobx-state-tree/coverage/lcov.info ./packages/mst-middlewares/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+                          echo "Coveralls info uploaded"
+                      else
+                          echo "Warning - Coveralls info could NOT be uploaded since the COVERALLS_REPO_TOKEN was not available"
+                      fi
