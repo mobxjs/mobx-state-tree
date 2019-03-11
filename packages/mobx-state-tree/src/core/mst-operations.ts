@@ -144,6 +144,7 @@ export function applyPatch(
 export interface IPatchRecorder {
     patches: ReadonlyArray<IJsonPatch>
     inversePatches: ReadonlyArray<IJsonPatch>
+    reversedInversePatches: ReadonlyArray<IJsonPatch>
     stop(): void
     resume(): void
     replay(target?: IAnyStateTreeNode): void
@@ -186,21 +187,20 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
     }
 
     let disposer: IDisposer | null = null
+
     function resume() {
         if (disposer) return
         disposer = onPatch(subject, (patch, inversePatch) => {
-            recorder.rawPatches.push([patch, inversePatch])
+            recorder.patches.push(patch)
+            recorder.inversePatches.push(inversePatch)
+            recorder.reversedInversePatches.unshift(inversePatch)
         })
     }
 
     const recorder = {
-        rawPatches: [] as [IJsonPatch, IJsonPatch][],
-        get patches() {
-            return this.rawPatches.map(([a]) => a)
-        },
-        get inversePatches() {
-            return this.rawPatches.map(([_, b]) => b)
-        },
+        patches: [] as IJsonPatch[],
+        inversePatches: [] as IJsonPatch[],
+        reversedInversePatches: [] as IJsonPatch[],
         stop() {
             if (disposer) disposer()
             disposer = null
@@ -210,7 +210,7 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
             applyPatch(target || subject, recorder.patches)
         },
         undo(target?: IAnyStateTreeNode) {
-            applyPatch(target || subject, recorder.inversePatches.reverse())
+            applyPatch(target || subject, recorder.reversedInversePatches)
         }
     }
     resume()

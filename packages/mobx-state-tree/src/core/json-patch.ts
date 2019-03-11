@@ -5,13 +5,13 @@ import { fail, stringStartsWith } from "../internal"
  * http://jsonpatch.com/
  */
 export interface IJsonPatch {
-    op: "replace" | "add" | "remove"
-    path: string
-    value?: any
+    readonly op: "replace" | "add" | "remove"
+    readonly path: string
+    readonly value?: any
 }
 
 export interface IReversibleJsonPatch extends IJsonPatch {
-    oldValue: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
+    readonly oldValue: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
 }
 
 /**
