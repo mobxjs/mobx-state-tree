@@ -4,8 +4,8 @@ executors:
     my-executor:
         docker:
             - image: circleci/node:latest
-            - environment:
-                  - CI: true
+              environment:
+                  CI: true
         working_directory: ~/mobx-state-tree
 
 jobs:
