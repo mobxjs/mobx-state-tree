@@ -133,3 +133,13 @@ test("an instance is not a valid default value, snapshot or function that create
         expect(getSnapshot(doc)).toEqual({ rows: [] })
     }
 })
+
+test("undefined can work as a missing value", () => {
+    const M = types.model({ x: types.union(types.undefined, types.number) })
+    const m1 = M.create({ x: 5 })
+    expect(m1.x).toBe(5)
+    const m2 = M.create({ x: undefined })
+    expect(m2.x).toBe(undefined)
+    const m3 = M.create({}) // is ok as well (even in TS)
+    expect(m3.x).toBe(undefined)
+})

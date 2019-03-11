@@ -5,7 +5,6 @@ import {
     IAnyType,
     ExtractT,
     BaseType,
-    isType,
     isStateTreeNode,
     IValidationContext,
     IValidationResult,
@@ -13,7 +12,8 @@ import {
     RedefineIStateTreeNode,
     IStateTreeNode,
     TypeFlags,
-    ExtractNodeType
+    ExtractNodeType,
+    assertIsType
 } from "../../internal"
 
 /** @hidden */
@@ -202,16 +202,14 @@ export function snapshotProcessor<
     processors: ISnapshotProcessors<ExtractC<IT>, CustomC, ExtractS<IT>, CustomS>,
     name?: string
 ): ISnapshotProcessor<IT, CustomC, CustomS> {
+    assertIsType(type)
     if (process.env.NODE_ENV !== "production") {
-        if (!isType(type))
-            throw fail(
-                "expected a mobx-state-tree type as first argument, got " + type + " instead"
-            )
-
         if (processors.postProcessor && typeof processors.postProcessor !== "function") {
+            // istanbul ignore next
             throw fail("postSnapshotProcessor must be a function")
         }
         if (processors.preProcessor && typeof processors.preProcessor !== "function") {
+            // istanbul ignore next
             throw fail("preSnapshotProcessor must be a function")
         }
     }

@@ -28,7 +28,8 @@ import {
     applyPatch,
     AnyNode,
     AnyObjectNode,
-    SimpleType
+    SimpleType,
+    assertIsType
 } from "../../internal"
 
 export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
@@ -485,16 +486,14 @@ export function reference<IT extends IAnyComplexType>(
     subType: IT,
     options?: ReferenceOptions<IT>
 ): IReferenceType<IT> {
-    // check that a type is given
+    assertIsType(subType)
     if (process.env.NODE_ENV !== "production") {
-        if (!isType(subType))
-            throw fail(
-                "expected a mobx-state-tree type as first argument, got " + subType + " instead"
-            )
-        if (arguments.length === 2 && typeof arguments[1] === "string")
+        if (arguments.length === 2 && typeof arguments[1] === "string") {
+            // istanbul ignore next
             throw fail(
                 "References with base path are no longer supported. Please remove the base path."
             )
+        }
     }
 
     const getSetOptions = options ? (options as ReferenceOptionsGetSet<IT>) : undefined

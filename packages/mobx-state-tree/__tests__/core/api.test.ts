@@ -95,7 +95,6 @@ const TYPES = stringToArray(`
     safeReference,
     union,
     optional,
-    optionalNull,
     literal,
     maybe,
     maybeNull,

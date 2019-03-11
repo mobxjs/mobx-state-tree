@@ -39,6 +39,7 @@ function safeStringify(value: any) {
     try {
         return JSON.stringify(value)
     } catch (e) {
+        // istanbul ignore next
         return `<Unserializable: ${e}>`
     }
 }
@@ -103,14 +104,6 @@ function toErrorString(error: IValidationError): string {
  * @internal
  * @hidden
  */
-export function getDefaultContext(type: IAnyType): IValidationContext {
-    return [{ type, path: "" }]
-}
-
-/**
- * @internal
- * @hidden
- */
 export function getContextForPath(
     context: IValidationContext,
     path: string,
@@ -152,7 +145,10 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
  * @internal
  * @hidden
  */
-export function typecheckInternal(type: IAnyType, value: any): void {
+export function typecheckInternal<IT extends IAnyType>(
+    type: IAnyType,
+    value: ExtractC<IT> | ExtractS<IT> | ExtractT<IT>
+): void {
     // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
     if (process.env.NODE_ENV === "production") return
     typecheck(type, value)
@@ -167,16 +163,28 @@ export function typecheckInternal(type: IAnyType, value: any): void {
  * @param value Value to be checked, either a snapshot or an instance.
  */
 export function typecheck<IT extends IAnyType>(
-    type: IAnyType,
+    type: IT,
     value: ExtractC<IT> | ExtractS<IT> | ExtractT<IT>
 ): void {
     const errors = type.validate(value, [{ path: "", type }])
 
     if (errors.length > 0) {
-        throw fail(
-            `Error while converting ${shortenPrintValue(prettyPrintValue(value))} to \`${
-                type.name
-            }\`:\n\n    ` + errors.map(toErrorString).join("\n    ")
-        )
+        throw fail(validationErrorsToString(type, value, errors))
     }
+}
+
+function validationErrorsToString<IT extends IAnyType>(
+    type: IT,
+    value: ExtractC<IT> | ExtractS<IT> | ExtractT<IT>,
+    errors: IValidationError[]
+): string | undefined {
+    if (errors.length === 0) {
+        return undefined
+    }
+
+    return (
+        `Error while converting ${shortenPrintValue(prettyPrintValue(value))} to \`${
+            type.name
+        }\`:\n\n    ` + errors.map(toErrorString).join("\n    ")
+    )
 }

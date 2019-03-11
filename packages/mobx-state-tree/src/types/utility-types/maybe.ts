@@ -10,9 +10,9 @@ import {
     ExtractC,
     ExtractS,
     ExtractT,
-    OptionalProperty,
     IStateTreeNode,
-    RedefineIStateTreeNode
+    RedefineIStateTreeNode,
+    assertIsType
 } from "../../internal"
 
 const optionalUndefinedType = optional(undefinedType, undefined)
@@ -21,15 +21,10 @@ const optionalNullType = optional(nullType, null)
 /** @hidden */
 export interface IMaybeIType<IT extends IAnyType, C, O>
     extends IType<
-            ExtractC<IT> | C,
-            ExtractS<IT> | O,
-            | RedefineIStateTreeNode<
-                  ExtractT<IT>,
-                  IStateTreeNode<ExtractC<IT> | C, ExtractS<IT> | O>
-              >
-            | O
-        >,
-        OptionalProperty {}
+        ExtractC<IT> | C,
+        ExtractS<IT> | O,
+        RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<ExtractC<IT> | C, ExtractS<IT> | O>> | O
+    > {}
 
 /** @hidden */
 export interface IMaybe<IT extends IAnyType> extends IMaybeIType<IT, undefined, undefined> {}
@@ -45,9 +40,8 @@ export interface IMaybeNull<IT extends IAnyType> extends IMaybeIType<IT, null | 
  * @returns
  */
 export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
-    if (process.env.NODE_ENV !== "production" && !isType(type))
-        throw fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
-    return union(type, optionalUndefinedType) as any
+    assertIsType(type)
+    return union(type, optionalUndefinedType)
 }
 
 /**
@@ -58,7 +52,6 @@ export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
  * @returns
  */
 export function maybeNull<IT extends IAnyType>(type: IT): IMaybeNull<IT> {
-    if (process.env.NODE_ENV !== "production" && !isType(type))
-        throw fail("expected a mobx-state-tree type as first argument, got " + type + " instead")
-    return union(type, optionalNullType) as any
+    assertIsType(type)
+    return union(type, optionalNullType)
 }

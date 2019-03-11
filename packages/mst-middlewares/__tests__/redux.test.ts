@@ -214,7 +214,7 @@ function addStandardTests() {
 
 for (const logIdempotentActionSteps of [false, true]) {
     for (const logChildActions of [true, false]) {
-        describe(`(logIdempotentActionSteps: ${logIdempotentActionSteps}, logChildActions: ${logChildActions})`, async () => {
+        describe(`(logIdempotentActionSteps: ${logIdempotentActionSteps}, logChildActions: ${logChildActions})`, () => {
             beforeEach(() => {
                 initTest(logIdempotentActionSteps, logChildActions)
             })
