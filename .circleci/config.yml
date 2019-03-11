@@ -38,7 +38,7 @@ jobs:
             - run:
                   name: upload coveralls
                   command: |
-                      if [[ -z "${COVERALLS_REPO_TOKEN}" ]]
+                      if [[ -v COVERALLS_REPO_TOKEN ]]
                       then                            
                           cat ./packages/mobx-state-tree/coverage/lcov.info ./packages/mst-middlewares/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
                           echo "Coveralls info uploaded"
