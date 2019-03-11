@@ -9,8 +9,8 @@
     "scripts": {
         "jest": "jest",
         "test": "yarn test:dev && yarn test:prod",
-        "test:dev": "cross-env NODE_ENV=development JEST_JUNIT_OUTPUT=../../test-results/mst-middlewares/dev.xml yarn jest -i --coverage",
-        "test:prod": "cross-env NODE_ENV=production JEST_JUNIT_OUTPUT=../../test-results/mst-middlewares/prod.xml yarn jest -i",
+        "test:dev": "cross-env NODE_ENV=development JEST_JUNIT_OUTPUT=../../test-results/mst-middlewares/dev.xml yarn jest",
+        "test:prod": "cross-env NODE_ENV=production JEST_JUNIT_OUTPUT=../../test-results/mst-middlewares/prod.xml yarn jest",
         "build": "tsc && cpr lib dist --delete-first --filter=\\\\.js && rollup -c",
         "lint": "tslint -c ../../tslint.json 'src/**/*.ts'"
     },

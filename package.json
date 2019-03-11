@@ -4,9 +4,12 @@
     "scripts": {
         "clean": "lerna clean",
         "build": "lerna run build --stream",
-        "test": "cross-env CI=true lerna run test --stream",
-        "test:mst": "cd packages/mobx-state-tree && cross-env CI=true yarn test",
-        "test:mst-middlewares": "cd packages/mst-middlewares && cross-env CI=true yarn test",
+        "test": "lerna run test --stream",
+        "test:mst:dev": "cd packages/mobx-state-tree && yarn test:dev",
+        "test:mst:prod": "cd packages/mobx-state-tree && yarn test:prod",
+        "test:mst:others": "cd packages/mobx-state-tree && yarn test:others",
+        "test:mst-middlewares:dev": "cd packages/mst-middlewares && yarn test:dev",
+        "test:mst-middlewares:prod": "cd packages/mst-middlewares && yarn test:prod",
         "coverage": "lerna run coverage --stream",
         "release": "yarn build && lerna publish"
     },

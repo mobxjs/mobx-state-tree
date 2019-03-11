@@ -4,9 +4,12 @@ executors:
     my-executor:
         docker:
             - image: circleci/node:latest
+            environment:
+                CI: true
         working_directory: ~/mobx-state-tree
 
 jobs:
+    # mobx-state-tree and mst-middlewares build
     build:
         executor: my-executor
         steps:
@@ -43,13 +46,14 @@ jobs:
                   paths:
                       - ./*
 
-    test-mst:
+    # mobx-state-tree tests
+    test-mst-dev:
         executor: my-executor
         steps:
             - attach_workspace:
                   at: .
 
-            - run: yarn test:mst
+            - run: yarn test:mst:dev -i --coverage
             - store_test_results:
                   path: ./test-results
 
@@ -58,13 +62,34 @@ jobs:
                   paths:
                       - packages/mobx-state-tree/coverage/*
 
-    test-mst-middlewares:
+    test-mst-prod:
         executor: my-executor
         steps:
             - attach_workspace:
                   at: .
 
-            - run: yarn test:mst-middlewares
+            - run: yarn test:mst:prod -i
+            - store_test_results:
+                  path: ./test-results
+
+    test-mst-others:
+        executor: my-executor
+        steps:
+            - attach_workspace:
+                  at: .
+
+            - run: yarn test:mst:others
+            - store_test_results:
+                  path: ./test-results
+
+    # mst-middlewares tests
+    test-mst-middlewares-dev:
+        executor: my-executor
+        steps:
+            - attach_workspace:
+                  at: .
+
+            - run: yarn test:mst-middlewares:dev -i --coverage
             - store_test_results:
                   path: ./test-results
 
@@ -73,6 +98,18 @@ jobs:
                   paths:
                       - packages/mst-middlewares/coverage/*
 
+    test-mst-middlewares-prod:
+        executor: my-executor
+        steps:
+            - attach_workspace:
+                  at: .
+
+            - run: yarn test:mst-middlewares:prod -i
+            - store_test_results:
+                  path: ./test-results
+
+
+    # upload coverage
     upload-coveralls:
         executor: my-executor
         steps:
@@ -96,13 +133,28 @@ workflows:
     build-and-test:
         jobs:
             - build
-            - test-mst:
+
+            - test-mst-dev:
                   requires:
                       - build
-            - test-mst-middlewares:
+            - test-mst-prod:
                   requires:
                       - build
+            - test-mst-others:
+                  requires:
+                      - build
+
+            - test-mst-middlewares-dev:
+                  requires:
+                      - build
+            - test-mst-middlewares-prod:
+                  requires:
+                      - build
+
             - upload-coveralls:
                   requires:
-                      - test-mst
-                      - test-mst-middlewares
+                      - test-mst-dev
+                      - test-mst-prod
+                      - test-mst-others
+                      - test-mst-middlewares-dev
+                      - test-mst-middlewares-prod
