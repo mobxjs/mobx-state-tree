@@ -5,7 +5,7 @@
 _Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX_
 
 [![npm version](https://badge.fury.io/js/mobx-state-tree.svg)](https://badge.fury.io/js/mobx-state-tree)
-[![Build Status](https://travis-ci.org/mobxjs/mobx-state-tree.svg?branch=master)](https://travis-ci.org/mobxjs/mobx-state-tree)
+[![CircleCI](https://circleci.com/gh/mobxjs/mobx-state-tree.svg?style=svg)](https://circleci.com/gh/mobxjs/mobx-state-tree)
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
 [![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/mobx-state-tree)
 
