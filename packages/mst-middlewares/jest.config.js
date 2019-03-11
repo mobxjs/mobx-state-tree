@@ -11,5 +11,6 @@ module.exports = {
         "ts-jest": {
             tsConfig: "__tests__/tsconfig.json"
         }
-    }
+    },
+    reporters: ["default", "jest-junit"]
 }
