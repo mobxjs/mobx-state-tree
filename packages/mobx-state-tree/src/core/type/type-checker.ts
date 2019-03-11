@@ -39,6 +39,7 @@ function safeStringify(value: any) {
     try {
         return JSON.stringify(value)
     } catch (e) {
+        // istanbul ignore next
         return `<Unserializable: ${e}>`
     }
 }
@@ -97,14 +98,6 @@ function toErrorString(error: IValidationError): string {
                       : "")
             : `.`)
     )
-}
-
-/**
- * @internal
- * @hidden
- */
-export function getDefaultContext(type: IAnyType): IValidationContext {
-    return [{ type, path: "" }]
 }
 
 /**

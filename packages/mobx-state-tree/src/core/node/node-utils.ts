@@ -76,8 +76,11 @@ export function isStateTreeNode<C = any, S = any>(value: any): value is IStateTr
  * @hidden
  */
 export function getStateTreeNode(value: IAnyStateTreeNode): AnyObjectNode {
-    if (isStateTreeNode(value)) return value.$treenode!
-    else throw fail(`Value ${value} is no MST Node`)
+    if (!isStateTreeNode(value)) {
+        // istanbul ignore next
+        throw fail(`Value ${value} is no MST Node`)
+    }
+    return value.$treenode!
 }
 
 /**
@@ -86,20 +89,6 @@ export function getStateTreeNode(value: IAnyStateTreeNode): AnyObjectNode {
  */
 export function getStateTreeNodeSafe(value: IAnyStateTreeNode): AnyObjectNode | null {
     return (value && value.$treenode) || null
-}
-
-/**
- * @internal
- * @hidden
- */
-export function canAttachNode(value: any) {
-    return (
-        value &&
-        typeof value === "object" &&
-        !(value instanceof Date) &&
-        !isStateTreeNode(value) &&
-        !Object.isFrozen(value)
-    )
 }
 
 /**

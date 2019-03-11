@@ -11,7 +11,8 @@ import {
     types,
     IJsonPatch,
     setLivelinessChecking,
-    detach
+    detach,
+    cast
 } from "../../src"
 import { observable, autorun } from "mobx"
 
@@ -448,16 +449,25 @@ test("it should return pop/shift'ed values for object arrays", () => {
             return {
                 shift() {
                     return self.array.shift()
+                },
+                pop() {
+                    return self.array.pop()
                 }
             }
         })
 
     const test = ObjectArray.create({
-        array: [{ id: "foo" }, { id: "bar" }]
+        array: [{ id: "foo" }, { id: "mid" }, { id: "bar" }]
     })
 
-    expect(test.shift()).toEqual({ id: "foo" })
-    expect(test.shift()).toEqual({ id: "bar" })
+    const foo = test.shift()!
+    expect(isAlive(foo)).toBe(false)
+    const bar = test.pop()!
+    expect(isAlive(bar)).toBe(false)
+
+    // we have to use clone or getSnapshot to access dead nodes data
+    expect(clone(foo)).toEqual({ id: "foo" })
+    expect(getSnapshot(bar)).toEqual({ id: "bar" })
 })
 
 test("#1173 - detaching an array should not eliminate its children", () => {
@@ -474,4 +484,40 @@ test("#1173 - detaching an array should not eliminate its children", () => {
     expect(s.items.length).toBe(0)
     expect(detachedItems.length).toBe(3)
     expect(detachedItems[0]).toBe(n0)
+})
+
+test("initializing an array instance from another array instance should end up in the same instance", () => {
+    const A = types.array(types.number)
+    const a1 = A.create([1, 2, 3])
+    const a2 = A.create(a1)
+    expect(a1).toBe(a2)
+    expect(getSnapshot(a1)).toEqual([1, 2, 3])
+})
+
+test("assigning filtered instances works", () => {
+    const Task = types.model("Task", {
+        done: false
+    })
+    const store = types
+        .model({
+            todos: types.array(Task)
+        })
+        .actions(self => ({
+            clearFinishedTodos() {
+                self.todos = cast(self.todos.filter(todo => !todo.done))
+            }
+        }))
+        .create({
+            todos: [{ done: true }, { done: false }, { done: true }]
+        })
+
+    expect(store.todos.length).toBe(3)
+    const done = store.todos.filter(t => t.done)
+    const notDone = store.todos.filter(t => !t.done)
+    expect(store.todos.every(t => isAlive(t)))
+    store.clearFinishedTodos()
+    expect(store.todos.length).toBe(1)
+    expect(store.todos[0]).toBe(notDone[0])
+    expect(done.every(t => !isAlive(t))).toBe(true)
+    expect(notDone.every(t => isAlive(t))).toBe(true)
 })

@@ -1,3 +1,5 @@
+-   Fixed nodes being `pop`/`shift`/`splice` from an array not getting properly destroyed through [#1205](https://github.com/mobxjs/mobx-state-tree/pull/1205) by [@xaviergonz](https://github.com/xaviergonz). Not that this means that in order to access the returned dead nodes data without getting a liveliness error/warning then the returned dead nodes have to be either cloned (`clone`) or their snapshots (`getSnapshot`) have to be used first.
+
 # 3.11.0
 
 -   Added an optional third argument to `types.optional` that allows to set alternative optional values other than just `undefined` through [#1192](https://github.com/mobxjs/mobx-state-tree/pull/1192) by [@xaviergonz](https://github.com/xaviergonz)

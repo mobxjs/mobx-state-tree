@@ -44,7 +44,8 @@ import {
     IAnyStateTreeNode,
     AnyObjectNode,
     AnyNode,
-    createObjectNode
+    createObjectNode,
+    assertIsType
 } from "../../internal"
 
 /** @hidden */
@@ -139,40 +140,45 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         node.assertWritable({ subpath: String(change.index) })
         const subType = (node.type as this)._subType
         const childNodes = node.getChildren()
-        let nodes = null
 
         switch (change.type) {
             case "update":
-                if (change.newValue === change.object[change.index]) return null
-                nodes = reconcileArrayChildren(
-                    node,
-                    subType,
-                    [childNodes[change.index]],
-                    [change.newValue],
-                    [change.index]
-                )
-                if (!nodes) {
-                    return null
+                {
+                    if (change.newValue === change.object[change.index]) return null
+
+                    const updatedNodes = reconcileArrayChildren(
+                        node,
+                        subType,
+                        [childNodes[change.index]],
+                        [change.newValue],
+                        [change.index]
+                    )
+                    if (!updatedNodes) {
+                        return null
+                    }
+                    change.newValue = updatedNodes[0]
                 }
-                change.newValue = nodes[0]
                 break
             case "splice":
-                const { index, removedCount, added } = change
-                nodes = reconcileArrayChildren(
-                    node,
-                    subType,
-                    childNodes.slice(index, index + removedCount),
-                    added,
-                    added.map((_, i) => index + i)
-                )
-                if (!nodes) {
-                    return null
-                }
-                change.added = nodes
+                {
+                    const { index, removedCount, added } = change
 
-                // update paths of remaining items
-                for (let i = index + removedCount; i < childNodes.length; i++) {
-                    childNodes[i].setParent(node, "" + (i + added.length - removedCount))
+                    const addedNodes = reconcileArrayChildren(
+                        node,
+                        subType,
+                        childNodes.slice(index, index + removedCount),
+                        added,
+                        added.map((_, i) => index + i)
+                    )
+                    if (!addedNodes) {
+                        return null
+                    }
+                    change.added = addedNodes
+
+                    // update paths of remaining items
+                    for (let i = index + removedCount; i < childNodes.length; i++) {
+                        childNodes[i].setParent(node, "" + (i + added.length - removedCount))
+                    }
                 }
                 break
         }
@@ -301,12 +307,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
  * @returns
  */
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
-    if (process.env.NODE_ENV !== "production") {
-        if (!isType(subtype))
-            throw fail(
-                "expected a mobx-state-tree type as first argument, got " + subtype + " instead"
-            )
-    }
+    assertIsType(subtype)
     return new ArrayType<IT>(subtype.name + "[]", subtype)
 }
 
@@ -333,11 +334,16 @@ function reconcileArrayChildren<TT>(
             // both are empty, end
             break
         } else if (!hasNewNode) {
-            // new one does not exists, old one dies
-            oldNode.die()
-            oldNodes.splice(i, 1)
-            i--
+            // new one does not exists
             nothingChanged = false
+            oldNodes.splice(i, 1)
+            if (oldNode instanceof ObjectNode) {
+                // since it is going to be returned by pop/splice/shift better create it before killing it
+                // so it doesn't end up in an undead state
+                oldNode.createObservableInstanceIfNeeded()
+            }
+            oldNode.die()
+            i--
         } else if (!oldNode) {
             // there is no old node, create it
             // check if already belongs to the same parent. if so, avoid pushing item in. only swapping can occur.
@@ -349,8 +355,9 @@ function reconcileArrayChildren<TT>(
                     }/${newPath}', but it lives already at '${getStateTreeNode(newValue).path}'`
                 )
             }
-            oldNodes.splice(i, 0, valueAsNode(childType, parent, newPath, newValue))
             nothingChanged = false
+            const newNode = valueAsNode(childType, parent, newPath, newValue)
+            oldNodes.splice(i, 0, newNode)
         } else if (areSame(oldNode, newValue)) {
             // both are the same, reconcile
             oldNodes[i] = valueAsNode(childType, parent, newPath, newValue, oldNode)
@@ -366,8 +373,9 @@ function reconcileArrayChildren<TT>(
                 }
             }
 
-            oldNodes.splice(i, 0, valueAsNode(childType, parent, newPath, newValue, oldMatch))
             nothingChanged = false
+            const newNode = valueAsNode(childType, parent, newPath, newValue, oldMatch)
+            oldNodes.splice(i, 0, newNode)
         }
     }
 
@@ -387,27 +395,39 @@ function valueAsNode(
     // ensure the value is valid-ish
     typecheckInternal(childType, newValue)
 
-    // the new value has a MST node
-    if (isStateTreeNode(newValue)) {
-        const childNode = getStateTreeNode(newValue)
-        childNode.assertAlive(EMPTY_OBJECT)
+    function getNewNode() {
+        // the new value has a MST node
+        if (isStateTreeNode(newValue)) {
+            const childNode = getStateTreeNode(newValue)
+            childNode.assertAlive(EMPTY_OBJECT)
 
-        // the node lives here
-        if (childNode.parent !== null && childNode.parent === parent) {
+            // the node lives here
+            if (childNode.parent !== null && childNode.parent === parent) {
+                childNode.setParent(parent, subpath)
+                return childNode
+            }
+        }
+        // there is old node and new one is a value/snapshot
+        if (oldNode) {
+            const childNode = childType.reconcile(oldNode, newValue)
             childNode.setParent(parent, subpath)
-            if (oldNode && oldNode !== childNode) oldNode.die()
             return childNode
         }
+
+        // nothing to do, create from scratch
+        return childType.instantiate(parent, subpath, parent.environment, newValue)
     }
-    // there is old node and new one is a value/snapshot
-    if (oldNode) {
-        const childNode = childType.reconcile(oldNode, newValue)
-        childNode.setParent(parent, subpath)
-        if (childNode !== oldNode) oldNode.die()
-        return childNode
+
+    const newNode = getNewNode()
+    if (oldNode && oldNode !== newNode) {
+        if (oldNode instanceof ObjectNode) {
+            // since it is going to be returned by pop/splice/shift better create it before killing it
+            // so it doesn't end up in an undead state
+            oldNode.createObservableInstanceIfNeeded()
+        }
+        oldNode.die()
     }
-    // nothing to do, create from scratch
-    return childType.instantiate(parent, subpath, parent.environment, newValue)
+    return newNode
 }
 
 /**
