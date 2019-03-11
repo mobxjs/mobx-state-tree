@@ -97,9 +97,11 @@ workflows:
         jobs:
             - build
             - test-mst:
-                  requires: -build
+                  requires:
+                      - build
             - test-mst-middlewares:
-                  requires: -build
+                  requires:
+                      - build
             - upload-coveralls:
                   requires:
                       - test-mst
