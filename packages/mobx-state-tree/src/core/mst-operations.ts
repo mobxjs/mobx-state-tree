@@ -186,46 +186,68 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
             )
     }
 
-    let disposer: IDisposer | null = null
-
-    let inversePatches: IJsonPatch[] | undefined // we will generate the inverse patches on demand
-    function resume() {
-        if (disposer) return
-        disposer = onPatch(subject, (patch, inversePatch) => {
-            // array copies to keep array immutability
-            recorder.patches = recorder.patches.slice()
-            recorder.patches.push(patch)
-
-            recorder.reversedInversePatches = recorder.reversedInversePatches.slice()
-            recorder.reversedInversePatches.unshift(inversePatch)
-
-            // mark inverse patches as dirty
-            inversePatches = undefined
-        })
+    interface IPatches {
+        patches: IJsonPatch[]
+        reversedInversePatches: IJsonPatch[]
+        inversePatches: IJsonPatch[]
     }
 
-    const recorder = {
-        patches: [] as IJsonPatch[],
-        reversedInversePatches: [] as IJsonPatch[],
-        get inversePatches() {
-            if (!inversePatches) {
-                inversePatches = recorder.reversedInversePatches.slice().reverse()
+    const data: Pick<IPatches, "patches" | "reversedInversePatches"> = {
+        patches: [],
+        reversedInversePatches: []
+    }
+
+    // we will generate the immutable copy of patches on demand for public consumption
+    const publicData: Partial<IPatches> = {}
+
+    let disposer: IDisposer | undefined
+
+    const recorder: IPatchRecorder = {
+        get patches() {
+            if (!publicData.patches) {
+                publicData.patches = data.patches.slice()
             }
-            return inversePatches
+            return publicData.patches
+        },
+        get reversedInversePatches() {
+            if (!publicData.reversedInversePatches) {
+                publicData.reversedInversePatches = data.reversedInversePatches.slice()
+            }
+            return publicData.reversedInversePatches
+        },
+        get inversePatches() {
+            if (!publicData.inversePatches) {
+                publicData.inversePatches = data.reversedInversePatches.slice().reverse()
+            }
+            return publicData.inversePatches
         },
         stop() {
-            if (disposer) disposer()
-            disposer = null
+            if (disposer) {
+                disposer()
+                disposer = undefined
+            }
         },
-        resume,
+        resume() {
+            if (disposer) return
+            disposer = onPatch(subject, (patch, inversePatch) => {
+                data.patches.push(patch)
+                data.reversedInversePatches.unshift(inversePatch)
+
+                // mark immutable public patches as dirty
+                publicData.patches = undefined
+                publicData.inversePatches = undefined
+                publicData.reversedInversePatches = undefined
+            })
+        },
         replay(target?: IAnyStateTreeNode) {
-            applyPatch(target || subject, recorder.patches)
+            applyPatch(target || subject, data.patches)
         },
         undo(target?: IAnyStateTreeNode) {
-            applyPatch(target || subject, recorder.reversedInversePatches)
+            applyPatch(target || subject, data.reversedInversePatches)
         }
     }
-    resume()
+
+    recorder.resume()
     return recorder
 }
 
