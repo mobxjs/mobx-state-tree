@@ -188,19 +188,31 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
 
     let disposer: IDisposer | null = null
 
+    let inversePatches: IJsonPatch[] | undefined // we will generate the inverse patches on demand
     function resume() {
         if (disposer) return
         disposer = onPatch(subject, (patch, inversePatch) => {
+            // array copies to keep array immutability
+            recorder.patches = recorder.patches.slice()
             recorder.patches.push(patch)
-            recorder.inversePatches.push(inversePatch)
+
+            recorder.reversedInversePatches = recorder.reversedInversePatches.slice()
             recorder.reversedInversePatches.unshift(inversePatch)
+
+            // mark inverse patches as dirty
+            inversePatches = undefined
         })
     }
 
     const recorder = {
         patches: [] as IJsonPatch[],
-        inversePatches: [] as IJsonPatch[],
         reversedInversePatches: [] as IJsonPatch[],
+        get inversePatches() {
+            if (!inversePatches) {
+                inversePatches = recorder.reversedInversePatches.slice().reverse()
+            }
+            return inversePatches
+        },
         stop() {
             if (disposer) disposer()
             disposer = null
