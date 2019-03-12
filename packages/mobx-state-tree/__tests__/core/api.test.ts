@@ -145,7 +145,11 @@ test("all methods mentioned in API docs", () => {
     expect(missing).toEqual([])
 })
 
-test("no dependencies", () => {
+test("only accepted dependencies", () => {
+    const validDeps = ["tslib"]
+
     const deps = JSON.parse(readFileSync(__dirname + "/../../package.json", "utf8")).dependencies
-    expect(deps === undefined || Object.keys(deps).length === 0).toBe(true)
+
+    const depNames = Object.keys(deps) || []
+    expect(depNames.sort()).toEqual(validDeps.sort())
 })
