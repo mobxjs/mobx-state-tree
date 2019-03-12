@@ -150,7 +150,6 @@ test("only accepted dependencies", () => {
 
     const deps = JSON.parse(readFileSync(__dirname + "/../../package.json", "utf8")).dependencies
 
-    const depNames = deps && Object.keys(deps)
-    expect(depNames).toBeTruthy()
-    expect(deps && Object.keys(deps).sort()).toEqual(validDeps.sort())
+    const depNames = Object.keys(deps) || []
+    expect(depNames.sort()).toEqual(validDeps.sort())
 })
