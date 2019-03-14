@@ -14,7 +14,7 @@
     "path-match": "^1.2.4",
     "react": "^16.5.0",
     "react-dom": "^16.5.0",
-    "react-tabs": "^1.1.0",
+    "react-tabs": "^3.0.0",
     "react-test-renderer": "^16.5.0"
   },
   "scripts": {
