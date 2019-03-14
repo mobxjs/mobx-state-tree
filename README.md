@@ -833,7 +833,7 @@ const Store = types
         state: types.enumeration("State", ["loading", "loaded", "error"])
     })
     .actions(self => {
-        const pendingRequest = null // a Promise
+        let pendingRequest = null // a Promise
 
         function afterCreate() {
             self.state = "loading"
