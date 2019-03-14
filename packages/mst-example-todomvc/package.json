@@ -3,18 +3,18 @@
     "version": "2.2.0",
     "private": true,
     "devDependencies": {
-        "react-scripts": "^2.0.0"
+        "react-scripts": "^2.1.8"
     },
     "dependencies": {
-        "classnames": "^2.2.5",
+        "classnames": "^2.2.6",
         "mobx": "^5.9.0",
-        "mobx-react": "^5.2.3",
-        "mobx-state-tree": "^3.7.0",
-        "mst-middlewares": "^3.7.0",
-        "react": "^16.5.0",
-        "react-dom": "^16.5.0",
-        "remotedev": "^0.2.7",
-        "todomvc-app-css": "^2.0.6"
+        "mobx-react": "^5.4.3",
+        "mobx-state-tree": "^3.11.0",
+        "mst-middlewares": "^3.11.0",
+        "react": "^16.8.4",
+        "react-dom": "^16.8.4",
+        "remotedev": "^0.2.9",
+        "todomvc-app-css": "^2.2.0"
     },
     "scripts": {
         "start": "react-scripts start",
