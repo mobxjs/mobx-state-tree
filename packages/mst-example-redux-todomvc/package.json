@@ -5,7 +5,7 @@
     "devDependencies": {
         "enzyme": "^3.6.0",
         "react-addons-test-utils": "^15.3.0",
-        "react-scripts": "^1.1.5",
+        "react-scripts": "^2.0.0",
         "react-test-renderer": "^16.5.2"
     },
     "dependencies": {
@@ -26,7 +26,10 @@
         "eject": "react-scripts eject",
         "test": "react-scripts test"
     },
-    "eslintConfig": {
-        "extends": "./node_modules/react-scripts/config/eslint.js"
-    }
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ]
 }

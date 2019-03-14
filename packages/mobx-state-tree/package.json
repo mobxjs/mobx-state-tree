@@ -54,6 +54,7 @@
         "shx": "^0.3.2",
         "ts-jest": "^24.0.0",
         "ts-node": "^8.0.0",
+        "tslint": "^5.0.0",
         "typedoc": "^0.14.0",
         "typedoc-plugin-markdown": "^1.1.20",
         "typescript": "^3.0.0"

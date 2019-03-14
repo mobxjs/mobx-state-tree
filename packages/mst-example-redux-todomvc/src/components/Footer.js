@@ -34,6 +34,7 @@ export default class Footer extends Component {
         const { filter: selectedFilter, onShow } = this.props
 
         return (
+            // eslint-disable-next-line
             <a
                 className={classnames({ selected: filter === selectedFilter })}
                 style={{ cursor: "pointer" }}
