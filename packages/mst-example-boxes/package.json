@@ -25,14 +25,12 @@
     },
     "homepage": "http://mobxjs.github.com/mobx",
     "devDependencies": {
-        "babel-core": "^6.17.0",
-        "babel-loader": "^7.1.4",
-        "babel-plugin-transform-decorators-legacy": "^1.3.4",
-        "babel-preset-es2015": "^6.16.0",
-        "babel-preset-react": "^6.16.0",
-        "babel-preset-stage-0": "^6.16.0",
+        "@babel/core": "^7.3.4",
+        "@babel/plugin-proposal-class-properties": "^7.3.4",
+        "@babel/preset-env": "^7.3.4",
+        "@babel/preset-react": "^7.0.0",
+        "babel-loader": "^8.0.5",
         "jest": "^24.0.0",
-        "react-hot-loader": "^4.0.1",
         "webpack": "^4.5.0",
         "webpack-dev-server": "^3.1.1"
     },
@@ -46,6 +44,6 @@
         "react-dom": "^16.5.0",
         "react-draggable": "^3.0.5",
         "remotedev": "^0.2.7",
-        "ws": "^1.1.1"
+        "ws": "^6.0.0"
     }
 }
