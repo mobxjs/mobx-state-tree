@@ -17,23 +17,23 @@
     "author": "",
     "license": "MIT",
     "devDependencies": {
-        "@types/jest": "^24.0.0",
-        "@types/node": "^11.0.0",
+        "@types/jest": "^24.0.11",
+        "@types/node": "^11.11.3",
         "cpr": "^3.0.1",
-        "cross-env": "^5.1.1",
-        "jest": "^24.0.0",
+        "cross-env": "^5.2.0",
+        "jest": "^24.5.0",
         "jest-junit": "^6.3.0",
         "mobx": "^5.9.0",
         "mobx-state-tree": "^3.11.0",
-        "rollup": "^1.0.0",
-        "rollup-plugin-commonjs": "^9.0.0",
-        "rollup-plugin-node-resolve": "^4.0.0",
-        "rollup-plugin-uglify": "^6.0.0",
+        "rollup": "^1.6.0",
+        "rollup-plugin-commonjs": "^9.2.1",
+        "rollup-plugin-node-resolve": "^4.0.1",
+        "rollup-plugin-uglify": "^6.0.2",
         "ts-jest": "^24.0.0",
-        "typescript": "^3.0.0"
+        "typescript": "^3.3.3333"
     },
     "peerDependencies": {
-        "mobx-state-tree": "^3.5.0"
+        "mobx-state-tree": "^3.11.0"
     },
     "files": [
         "dist/"
