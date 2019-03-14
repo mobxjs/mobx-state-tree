@@ -89,7 +89,7 @@ test("VS should not be modifiable when unprotected", () => {
     expect(i.state === p).toBe(true)
 })
 
-test("VS sample from the docs should work", () => {
+test("VS sample from the docs should work (1)", () => {
     const T = types.model({}).extend(self => {
         const localState = observable.box(3)
 
@@ -121,5 +121,40 @@ test("VS sample from the docs should work", () => {
     t.setX(7)
     expect(t.x).toBe(7)
     expect(observed).toEqual([5, 7])
+    dispose()
+})
+
+test("VS sample from the docs should work (2)", () => {
+    const T = types.model({}).extend(self => {
+        let localState = 3
+
+        return {
+            views: {
+                getX() {
+                    return localState
+                }
+            },
+            actions: {
+                setX(value: number) {
+                    localState = value
+                }
+            }
+        }
+    })
+
+    const t = T.create()
+    expect(t.getX()).toBe(3)
+    t.setX(5)
+    expect(t.getX()).toBe(5)
+
+    // now observe it (should not be observable)
+    const observed: number[] = []
+    const dispose = autorun(() => {
+        observed.push(t.getX())
+    })
+
+    t.setX(7)
+    expect(t.getX()).toBe(7)
+    expect(observed).toEqual([5])
     dispose()
 })
