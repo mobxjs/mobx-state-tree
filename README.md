@@ -22,6 +22,7 @@ MobX state tree is a community driven project, but is looking for active maintai
 
 # Contents
 
+-   [Changelog](changelog.md)
 -   [Installation](#installation)
 -   [Getting Started](docs/getting-started.md)
 -   [Talks & blogs](#talks--blogs)
@@ -47,7 +48,6 @@ MobX state tree is a community driven project, but is looking for active maintai
 -   [FAQ](#faq)
 -   [Full Api Docs](docs/API/README.md)
 -   [Built-in / example middlewares](packages/mst-middlewares/README.md)
--   [Changelog](changelog.md)
 
 # Installation
 
@@ -833,7 +833,7 @@ const Store = types
         state: types.enumeration("State", ["loading", "loaded", "error"])
     })
     .actions(self => {
-        const pendingRequest = null // a Promise
+        let pendingRequest = null // a Promise
 
         function afterCreate() {
             self.state = "loading"

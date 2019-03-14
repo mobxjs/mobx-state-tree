@@ -52,6 +52,7 @@ const AppMenu = ({ children }) => <ul className="App-menu">{children}</ul>
 
 const AppMenuItem = ({ onClick, children }) => (
     <li>
+        {/* eslint-disable-next-line */}
         <a onClick={onClick}>{children}</a>
     </li>
 )

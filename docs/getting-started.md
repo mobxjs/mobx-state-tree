@@ -144,7 +144,7 @@ const User = types.model({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/j27j41828v) *outdated*
+[View sample in the playground](https://codesandbox.io/s/kx9x4973z3)
 
 The `types` namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the [API documentation](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/API/README.md) for the whole list and their parameters.
 
@@ -172,7 +172,7 @@ const store = RootStore.create({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/5wyx1xvvj4) *outdated*
+[View sample in the playground](https://codesandbox.io/s/kk63vox225)
 
 Notice that the `types.optional` second argument is required as long you don't pass a value in the `.create` function of the model. If you want, for example, to make the `name` or `todos` attribute required when calling `.create`, remove the `types.optional` function call and pass the `types.*` included inside.
 
@@ -214,7 +214,7 @@ const RootStore = types
     }))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/928l6pw7pr) *outdated*
+[View sample in the playground](https://codesandbox.io/s/3xw9x060mp)
 
 Please notice the use of `self`. `self` is the object being constructed when an instance of your model is created. Thanks to the `self` object, instance actions are "this-free", allowing you to be sure that they are correctly bound.
 
@@ -225,7 +225,7 @@ store.addTodo(1, "Eat a cake")
 store.todos.get(1).toggle()
 ```
 
-[View sample in the playground](https://codesandbox.io/s/928l6pw7pr) *outdated*
+[View sample in the playground](https://codesandbox.io/s/r673zxw4p)
 
 ## Snapshots are awesome!
 
@@ -284,7 +284,7 @@ applySnapshot(store, {
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/xjm99kkopp) *outdated*
+[View sample in the playground](https://codesandbox.io/s/3x3v5kl5mq)
 
 ## Time travel
 
@@ -336,7 +336,7 @@ const App = observer(props => (
 ))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/4rzvkx6z77) *outdated*
+[View sample in the playground](https://codesandbox.io/s/310ol795x6)
 
 ## Improving render performance
 
@@ -359,14 +359,14 @@ const TodoView = observer(props => (
 const AppView = observer(props => (
     <div>
         <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {props.store.todos.values().map(todo => (
+        {values(props.store.todos).map(todo => (
             <TodoView todo={todo} />
         ))}
     </div>
 ))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/m3rw1wll79) *outdated*
+[View sample in the playground](https://codesandbox.io/s/jvmw9oxyxv)
 
 Each `observer` declaration will enable the React component to only re-render if any of it's observed data changes. Since our `App` component was observing everything, it was re-rendering whenever you changed something.
 
@@ -380,14 +380,14 @@ We now want to display the count of TODOs to be done in our application, to help
 const RootStore = types
     .model({
         users: types.map(User),
-        todos: types.optional(types.map(Todo), {})
+        todos: types.map(Todo),
     })
     .views(self => ({
         get pendingCount() {
-            return self.todos.values().filter(todo => !todo.done).length
+            return values(self.todos).filter(todo => !todo.done).length
         },
         get completedCount() {
-            return self.todos.values().filter(todo => todo.done).length
+            return values(self.todos).filter(todo => todo.done).length
         }
     }))
     .actions(self => ({
@@ -397,7 +397,7 @@ const RootStore = types
     }))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/x3qlr3xpjo) *outdated*
+[View sample in the playground](https://codesandbox.io/s/7z01y57no0)
 
 These properties are called "computed" because they keep track of the changes to the observed attributes and recompute automatically if anything used by that attribute changes. This allows for performance savings; for example changing the `name` of a TODO won't affect the number of pending and completed count, as such it wont trigger a recalculation of those counters.
 
@@ -413,7 +413,7 @@ const TodoCounterView = observer(props => (
 const AppView = observer(props => (
     <div>
         <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {props.store.todos.values().map(todo => (
+        {values(props.store.todos).map(todo => (
             <TodoView todo={todo} />
         ))}
         <TodoCounterView store={props.store} />
@@ -421,7 +421,7 @@ const AppView = observer(props => (
 ))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/x3qlr3xpjo) *outdated*
+[View sample in the playground](https://codesandbox.io/s/k21ol780xr)
 
 If you `console.log` your snapshot you'll notice that computed properties won't appear in snapshots. That's fine and intended, since those properties must be computed over the other properties of the tree, they can be re-produced by knowing just their definition. For the same reason, if you provide a computed value in a snapshot you'll end up with an error when you attempt to apply it.
 
@@ -439,13 +439,13 @@ const RootStore = types
     })
     .views(self => ({
         get pendingCount() {
-            return self.todos.values().filter(todo => !todo.done).length
+            return values(self.todos).filter(todo => !todo.done).length
         },
         get completedCount() {
-            return self.todos.values().filter(todo => todo.done).length
+            return values(self.todos).filter(todo => todo.done).length
         },
         getTodosWhereDoneIs(done) {
-            return self.todos.values().filter(todo => todo.done === done)
+            return values(self.todos).filter(todo => todo.done === done)
         }
     }))
     .actions(self => ({
@@ -455,7 +455,7 @@ const RootStore = types
     }))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/zkrkwj91p3) *outdated*
+[View sample in the playground](https://codesandbox.io/s/x293k4q95o)
 
 Notice that the `getTodosWhereDoneIs` view can also be used outside of its model, for example it can be used inside views.
 
@@ -489,7 +489,7 @@ const store = RootStore.create({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/7zqlw3ro11) *outdated*
+[View sample in the playground](https://codesandbox.io/s/7wwn0x4xkq)
 
 Now we need to change our `Todo` model to store the user assigned to the TODO. You could do that by storing the `User` map `id`, and provide a computed that resolves to the user (you can do it as an exercise), but you would end up with a copious amount of code.
 
@@ -546,7 +546,7 @@ const store = RootStore.create({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mzvx6o7r0j) *outdated*
+[View sample in the playground](https://codesandbox.io/s/44jn3pv2x)
 
 ### How to define the reference
 
@@ -569,7 +569,7 @@ const Todo = types
     }))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mzvx6o7r0j) *outdated*
+[View sample in the playground](https://codesandbox.io/s/xv1lkqw9oq)
 
 ### Setting a reference value
 
@@ -606,7 +606,7 @@ Now we need to edit our views to display a select along with each `TodoView`, wh
 const UserPickerView = observer(props => (
     <select value={props.user ? props.user.id : ""} onChange={e => props.onChange(e.target.value)}>
         <option value="">-none-</option>
-        {props.store.users.values().map(user => (
+        {values(props.store.users).map(user => (
             <option value={user.id}>{user.name}</option>
         ))}
     </select>
@@ -637,7 +637,7 @@ const TodoCounterView = observer(props => (
 const AppView = observer(props => (
     <div>
         <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {props.store.todos.values().map(todo => (
+        {values(props.store.todos).map(todo => (
             <TodoView store={props.store} todo={todo} />
         ))}
         <TodoCounterView store={props.store} />
@@ -645,7 +645,7 @@ const AppView = observer(props => (
 ))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mzvx6o7r0j) *outdated*
+[View sample in the playground](https://codesandbox.io/s/6j3qy74kpw)
 
 ## References are safe!
 
