@@ -55,7 +55,7 @@ MobX state tree is a community driven project, but is looking for active maintai
 -   Yarn: `yarn add mobx mobx-state-tree`
 -   CDN: https://unpkg.com/mobx-state-tree/dist/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
 -   CodeSandbox [TodoList demo](https://codesandbox.io/s/y64pzxj01) fork for testing and bug reporting
--   Playground: *(warning: uses an old version of MST)* [https://mattiamanzati.github.io/mobx-state-tree-playground/](https://mattiamanzati.github.io/mobx-state-tree-playground/) (with React UI, snapshots, patches and actions display)
+-   Playground: _(warning: uses an old version of MST)_ [https://mattiamanzati.github.io/mobx-state-tree-playground/](https://mattiamanzati.github.io/mobx-state-tree-playground/) (with React UI, snapshots, patches and actions display)
 
 Typescript typings are included in the packages. Use `module: "commonjs"` or `moduleResolution: "node"` to make sure they are picked up automatically in any consuming project.
 
@@ -863,17 +863,19 @@ Some tips:
 
 ```javascript
 const Todo = types.model({}).extend(self => {
-    let localState = 3
+    // it is important to make sure that state used by views are observables, or else
+    // the value returned by the view would become stale upon observation
+    const localState = observable.box(3)
 
     return {
         views: {
             get x() {
-                return localState
+                return localState.get()
             }
         },
         actions: {
             setX(value) {
-                localState = value
+                localState.set(value)
             }
         }
     }
@@ -882,9 +884,7 @@ const Todo = types.model({}).extend(self => {
 
 ### model.volatile
 
-In many cases it is useful to have volatile state that is _observable_ (in terms of Mobx observables) and _readable_ from outside the instance.
-In that case, in the above example, `localState` could have been declared as `const localState = observable.box(3)`.
-Since this is such a common pattern, there is a shorthand to declare such properties, and the example above could be rewritten to:
+Since the pattern above (having a volatile state that is _observable_ (in terms of Mobx observables) and _readable_ from outside the instance) is such a common pattern there is a shorthand to declare such properties. The example above can be rewritten as:
 
 ```javascript
 const Todo = types
@@ -901,7 +901,7 @@ const Todo = types
 
 The object that is returned from the `volatile` initializer function can contain any piece of data and will result in an instance property with the same name. Volatile properties have the following characteristics:
 
-1.  The can be read from outside the model (if you want hidden volatile state, keep the state in your closure as shown in the previous section)
+1.  The can be read from outside the model (if you want hidden volatile state, keep the state in your closure as shown in the previous section, and _only_ if it is not used on a view consider not making it observable)
 2.  The volatile properties will be only observable, see [observable _references_](https://mobx.js.org/refguide/modifiers.html). Values assigned to them will be unmodified and not automatically converted to deep observable structures.
 3.  Like normal properties, they can only be modified through actions
 4.  Volatile props will not show up in snapshots, and cannot be updated by applying snapshots
