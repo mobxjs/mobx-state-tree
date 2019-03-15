@@ -105,7 +105,7 @@ export function refinement(...args: any[]): IAnyType {
         ? args[2]
         : (v: any) => "Value does not respect the refinement predicate"
     // ensures all parameters are correct
-    assertIsType(type)
+    assertIsType(type, 1)
     if (process.env.NODE_ENV !== "production") {
         if (typeof name !== "string") {
             // istanbul ignore next
@@ -120,6 +120,7 @@ export function refinement(...args: any[]): IAnyType {
             throw fail("expected a function as fourth argument, got " + message + " instead")
         }
     }
+
     return new Refinement(name, type, predicate, message)
 }
 

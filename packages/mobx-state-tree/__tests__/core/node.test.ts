@@ -17,7 +17,8 @@ import {
     unprotect,
     hasParentOfType,
     getParentOfType,
-    detach
+    detach,
+    getNodeId
 } from "../../src"
 
 import { autorun } from "mobx"
@@ -429,4 +430,14 @@ test("triggers on changing paths - 1", () => {
         app.todos.splice(0)
     })
     expect(events.splice(0)).toEqual(["t1@"])
+})
+
+test("getNodeId works", () => {
+    const M = types.model({})
+    const m1 = M.create()
+    const m2 = M.create()
+    const m1Id = getNodeId(m1)
+    const m2Id = getNodeId(m2)
+    expect(m1Id).toBeGreaterThan(0)
+    expect(m2Id).toBe(m1Id + 1)
 })
