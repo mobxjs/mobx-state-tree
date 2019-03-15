@@ -951,3 +951,22 @@ test("#1117", () => {
             }
         })
 })
+
+test("MST array type should be assignable to plain array type", () => {
+    const Todo = types
+        .model({
+            done: false,
+            name: types.string
+        })
+        .actions(self => ({
+            toggleDone() {
+                self.done = !self.done
+            }
+        }))
+    const TodoArray = types.array(Todo)
+
+    const todoArray = TodoArray.create([{ done: true, name: "todo1" }, { name: "todo2" }])
+    unprotect(todoArray)
+    const otherTodoArray: Array<Instance<typeof Todo>> = todoArray
+    otherTodoArray.push(cast({ done: false, name: "todo2" }))
+})

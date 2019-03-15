@@ -91,6 +91,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [getIdentifier](#getidentifier)
 * [getLivelinessChecking](#getlivelinesschecking)
 * [getMembers](#getmembers)
+* [getNodeId](#getnodeid)
 * [getParent](#getparent)
 * [getParentOfType](#getparentoftype)
 * [getPath](#getpath)
@@ -2118,6 +2119,25 @@ Returns a reflection of the model node, including name, properties, views, volat
 | target | `IAnyStateTreeNode` |  \- |
 
 **Returns:** [IModelReflectionData](interfaces/imodelreflectiondata.md)
+
+___
+<a id="getnodeid"></a>
+
+###  getNodeId
+
+▸ **getNodeId**(target: *`IAnyStateTreeNode`*): `number`
+
+Returns the unique node id (not to be confused with the instance identifier) for a given instance. This id is a number that is unique for each instance.
+
+*__export__*: 
+
+**Parameters:**
+
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| target | `IAnyStateTreeNode` |  \- |
+
+**Returns:** `number`
 
 ___
 <a id="getparent"></a>

@@ -25,7 +25,9 @@ import {
     normalizeIdentifier,
     ReferenceIdentifier,
     AnyObjectNode,
-    AnyModelType
+    AnyModelType,
+    assertIsType,
+    assertIsStateTreeNode
 } from "../internal"
 
 /** @hidden */
@@ -40,6 +42,8 @@ export type TypeOrStateTreeNodeToStateTreeNode<
  * @returns
  */
 export function getType(object: IAnyStateTreeNode): IAnyType {
+    assertIsStateTreeNode(object, 1)
+
     return getStateTreeNode(object).type
 }
 
@@ -60,6 +64,8 @@ export function getType(object: IAnyStateTreeNode): IAnyType {
  * @returns
  */
 export function getChildType(object: IAnyStateTreeNode, propertyName?: string): IAnyType {
+    assertIsStateTreeNode(object, 1)
+
     return getStateTreeNode(object).getChildType(propertyName)
 }
 
@@ -77,11 +83,8 @@ export function onPatch(
     callback: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
 ): IDisposer {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (typeof callback !== "function")
             throw fail("expected second argument to be a function, got " + callback + " instead")
     }
@@ -102,11 +105,8 @@ export function onSnapshot<S>(
     callback: (snapshot: S) => void
 ): IDisposer {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (typeof callback !== "function")
             throw fail("expected second argument to be a function, got " + callback + " instead")
     }
@@ -128,11 +128,8 @@ export function applyPatch(
     patch: IJsonPatch | ReadonlyArray<IJsonPatch>
 ): void {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (typeof patch !== "object")
             throw fail(
                 "expected second argument to be an object or array, got " + patch + " instead"
@@ -179,12 +176,7 @@ export interface IPatchRecorder {
  */
 export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(subject))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + subject + " instead"
-            )
-    }
+    assertIsStateTreeNode(subject, 1)
 
     interface IPatches {
         patches: IJsonPatch[]
@@ -258,12 +250,8 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
  */
 export function protect(target: IAnyStateTreeNode): void {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     const node = getStateTreeNode(target)
     if (!node.isRoot) throw fail("`protect` can only be invoked on root nodes")
     node.isProtectionEnabled = true
@@ -295,12 +283,8 @@ export function protect(target: IAnyStateTreeNode): void {
  */
 export function unprotect(target: IAnyStateTreeNode): void {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     const node = getStateTreeNode(target)
     if (!node.isRoot) throw fail("`unprotect` can only be invoked on root nodes")
     node.isProtectionEnabled = false
@@ -322,12 +306,8 @@ export function isProtected(target: IAnyStateTreeNode): boolean {
  */
 export function applySnapshot<C>(target: IStateTreeNode<C, any>, snapshot: C) {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     return getStateTreeNode(target).applySnapshot(snapshot)
 }
 
@@ -341,12 +321,8 @@ export function applySnapshot<C>(target: IStateTreeNode<C, any>, snapshot: C) {
  */
 export function getSnapshot<S>(target: IStateTreeNode<any, S>, applyPostProcess = true): S {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     const node = getStateTreeNode(target)
     if (applyPostProcess) return node.snapshot
 
@@ -362,15 +338,13 @@ export function getSnapshot<S>(target: IStateTreeNode<any, S>, applyPostProcess 
  */
 export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (typeof depth !== "number")
             throw fail("expected second argument to be a number, got " + depth + " instead")
         if (depth < 0) throw fail(`Invalid depth: ${depth}, should be >= 1`)
     }
+
     let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
         if (--depth === 0) return true
@@ -397,15 +371,13 @@ export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
     depth = 1
 ): TypeOrStateTreeNodeToStateTreeNode<IT> {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (typeof depth !== "number")
             throw fail("expected second argument to be a number, got " + depth + " instead")
         if (depth < 0) throw fail(`Invalid depth: ${depth}, should be >= 1`)
     }
+
     let d = depth
     let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
@@ -424,16 +396,9 @@ export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
  */
 export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): boolean {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-        if (!isType(type))
-            throw fail(
-                "expected second argument to be a mobx-state-tree type, got " + type + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+    assertIsType(type, 2)
+
     let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
         if (type.is(parent.storedValue)) return true
@@ -454,16 +419,8 @@ export function getParentOfType<IT extends IAnyType>(
     type: IT
 ): ExtractT<IT> {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-        if (!isType(type))
-            throw fail(
-                "expected second argument to be a mobx-state-tree type, got " + type + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+    assertIsType(type, 2)
 
     let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
@@ -486,12 +443,8 @@ export function getRoot<IT extends IAnyType | IAnyStateTreeNode>(
     target: IAnyStateTreeNode
 ): TypeOrStateTreeNodeToStateTreeNode<IT> {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     return getStateTreeNode(target).root.storedValue
 }
 
@@ -503,12 +456,8 @@ export function getRoot<IT extends IAnyType | IAnyStateTreeNode>(
  */
 export function getPath(target: IAnyStateTreeNode): string {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     return getStateTreeNode(target).path
 }
 
@@ -520,12 +469,8 @@ export function getPath(target: IAnyStateTreeNode): string {
  */
 export function getPathParts(target: IAnyStateTreeNode): string[] {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     return splitJsonPath(getStateTreeNode(target).path)
 }
 
@@ -537,12 +482,8 @@ export function getPathParts(target: IAnyStateTreeNode): string[] {
  */
 export function isRoot(target: IAnyStateTreeNode): boolean {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     return getStateTreeNode(target).isRoot
 }
 
@@ -556,11 +497,8 @@ export function isRoot(target: IAnyStateTreeNode): boolean {
  */
 export function resolvePath(target: IAnyStateTreeNode, path: string): any {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (typeof path !== "string")
             throw fail("expected second argument to be a number, got " + path + " instead")
     }
@@ -584,15 +522,9 @@ export function resolveIdentifier<IT extends IAnyType>(
     identifier: ReferenceIdentifier
 ): ExtractT<IT> | undefined {
     // check all arguments
+    assertIsType(type, 1)
+    assertIsStateTreeNode(target, 2)
     if (process.env.NODE_ENV !== "production") {
-        if (!isType(type))
-            throw fail(
-                "expected first argument to be a mobx-state-tree type, got " + type + " instead"
-            )
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected second argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (!(typeof identifier === "string" || typeof identifier === "number"))
             throw fail(
                 "expected third argument to be a string or number, got " + identifier + " instead"
@@ -614,13 +546,7 @@ export function resolveIdentifier<IT extends IAnyType>(
  */
 export function getIdentifier(target: IAnyStateTreeNode): string | null {
     // check all arguments
-
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
 
     return getStateTreeNode(target).identifier
 }
@@ -695,14 +621,12 @@ export function isValidReference<N extends IAnyStateTreeNode>(
  */
 export function tryResolve(target: IAnyStateTreeNode, path: string): any {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (typeof path !== "string")
             throw fail("expected second argument to be a string, got " + path + " instead")
     }
+
     const node = resolveNodeByPath(getStateTreeNode(target), path, false)
     if (node === undefined) return undefined
     try {
@@ -724,17 +648,9 @@ export function tryResolve(target: IAnyStateTreeNode, path: string): any {
  */
 export function getRelativePath(base: IAnyStateTreeNode, target: IAnyStateTreeNode): string {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected second argument to be a mobx-state-tree node, got " + target + " instead"
-            )
+    assertIsStateTreeNode(base, 1)
+    assertIsStateTreeNode(target, 2)
 
-        if (!isStateTreeNode(base))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + base + " instead"
-            )
-    }
     return getRelativePathBetweenNodes(getStateTreeNode(base), getStateTreeNode(target))
 }
 
@@ -753,12 +669,8 @@ export function clone<T extends IAnyStateTreeNode>(
     keepEnvironment: boolean | any = true
 ): T {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(source))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + source + " instead"
-            )
-    }
+    assertIsStateTreeNode(source, 1)
+
     const node = getStateTreeNode(source)
     return node.type.create(
         node.snapshot,
@@ -775,12 +687,8 @@ export function clone<T extends IAnyStateTreeNode>(
  */
 export function detach<T extends IAnyStateTreeNode>(target: T): T {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     getStateTreeNode(target).detach()
     return target
 }
@@ -790,12 +698,8 @@ export function detach<T extends IAnyStateTreeNode>(target: T): T {
  */
 export function destroy(target: IAnyStateTreeNode): void {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     const node = getStateTreeNode(target)
     if (node.isRoot) node.die()
     else node.parent!.removeChild(node.subpath)
@@ -812,12 +716,8 @@ export function destroy(target: IAnyStateTreeNode): void {
  */
 export function isAlive(target: IAnyStateTreeNode): boolean {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     return getStateTreeNode(target).observableIsAlive
 }
 
@@ -851,11 +751,8 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
  */
 export function addDisposer(target: IAnyStateTreeNode, disposer: IDisposer): IDisposer {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (typeof disposer !== "function")
             throw fail("expected second argument to be a function, got " + disposer + " instead")
     }
@@ -878,12 +775,8 @@ export function addDisposer(target: IAnyStateTreeNode, disposer: IDisposer): IDi
  */
 export function getEnv<T = any>(target: IAnyStateTreeNode): T {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
-    }
+    assertIsStateTreeNode(target, 1)
+
     const node = getStateTreeNode(target)
     const env = node.environment
     if (!!!env) return EMPTY_OBJECT as T
@@ -898,14 +791,12 @@ export function walk(
     processor: (item: IAnyStateTreeNode) => void
 ): void {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (typeof processor !== "function")
             throw fail("expected second argument to be a function, got " + processor + " instead")
     }
+
     const node = getStateTreeNode(target)
     // tslint:disable-next-line:no_unused-variable
     node.getChildren().forEach(child => {
@@ -1085,4 +976,19 @@ export function castToReferenceSnapshot<I>(
     instance: I
 ): Extract<I, IAnyStateTreeNode> extends never ? I : ReferenceIdentifier {
     return instance as any
+}
+
+/**
+ * Returns the unique node id (not to be confused with the instance identifier) for a
+ * given instance.
+ * This id is a number that is unique for each instance.
+ *
+ * @export
+ * @param target
+ * @returns
+ */
+export function getNodeId(target: IAnyStateTreeNode): number {
+    assertIsStateTreeNode(target, 1)
+
+    return getStateTreeNode(target).nodeId
 }

@@ -28,6 +28,7 @@ export default observer(
             const selectedFilter = store.filter
 
             return (
+                // eslint-disable-next-line
                 <a
                     className={classnames({ selected: filter === selectedFilter })}
                     style={{ cursor: "pointer" }}

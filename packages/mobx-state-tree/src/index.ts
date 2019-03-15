@@ -140,5 +140,6 @@ export {
     ReferenceIdentifier,
     ISnapshotProcessor,
     ISnapshotProcessors,
+    getNodeId,
     types
 } from "./internal"
