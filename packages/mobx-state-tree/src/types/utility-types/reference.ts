@@ -29,7 +29,8 @@ import {
     AnyNode,
     AnyObjectNode,
     SimpleType,
-    assertIsType
+    assertIsType,
+    isValidIdentifier
 } from "../../internal"
 
 export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
@@ -72,7 +73,7 @@ class StoredReference<IT extends IAnyType> {
     }
 
     constructor(value: ReferenceT<IT> | ReferenceIdentifier, private readonly targetType: IT) {
-        if (typeof value === "string" || typeof value === "number") {
+        if (isValidIdentifier(value)) {
             this.identifier = value
         } else if (isStateTreeNode(value)) {
             const targetNode = getStateTreeNode(value)
@@ -163,7 +164,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
     }
 
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
-        return typeof value === "string" || typeof value === "number"
+        return isValidIdentifier(value)
             ? typeCheckSuccess()
             : typeCheckFailure(
                   context,

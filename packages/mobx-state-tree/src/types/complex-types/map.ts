@@ -48,7 +48,8 @@ import {
     AnyModelType,
     asArray,
     cannotDetermineSubtype,
-    getSnapshot
+    getSnapshot,
+    isValidIdentifier
 } from "../../internal"
 
 /** @hidden */
@@ -175,7 +176,7 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
             if (node.identifier === null) {
                 throw fail(needsIdentifierError)
             }
-            this.set(node.identifier!, value)
+            this.set(node.identifier, value)
             return value as any
         } else if (!isMutable(value)) {
             throw fail(`Map.put can only be used to store complex values`)
@@ -189,7 +190,7 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
 
             const idAttr = mapType.mapIdentifierAttribute!
             const id = value[idAttr]
-            if (id === undefined) {
+            if (!isValidIdentifier(id)) {
                 // try again but this time after creating a node for the value
                 // since it might be an optional identifier
                 const newNode = this.put(mapType.getChildType().create(value, mapNode.environment))

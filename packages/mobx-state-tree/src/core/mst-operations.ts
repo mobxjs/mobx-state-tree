@@ -25,7 +25,8 @@ import {
     normalizeIdentifier,
     ReferenceIdentifier,
     AnyObjectNode,
-    AnyModelType
+    AnyModelType,
+    isValidIdentifier
 } from "../internal"
 
 /** @hidden */
@@ -559,7 +560,7 @@ export function resolveIdentifier<IT extends IAnyType>(
             throw fail(
                 "expected second argument to be a mobx-state-tree node, got " + target + " instead"
             )
-        if (!(typeof identifier === "string" || typeof identifier === "number"))
+        if (!isValidIdentifier(identifier))
             throw fail(
                 "expected third argument to be a string or number, got " + identifier + " instead"
             )
