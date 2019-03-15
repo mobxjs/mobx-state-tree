@@ -257,3 +257,14 @@ test("#1019-2", () => {
     expect(getIdentifier(Item.create())).toBe("dummykey")
     expect(Item.create().id).toBe("dummykey")
 })
+
+test("identifierAttribute of the type", () => {
+    const M1 = types.model({})
+    expect(M1.identifierAttribute).toBe(undefined)
+
+    const M2 = types.model({ myId: types.identifier })
+    expect(M2.identifierAttribute).toBe("myId")
+
+    const M3 = types.model({ myId: types.optional(types.identifier, () => "hi") })
+    expect(M3.identifierAttribute).toBe("myId")
+})

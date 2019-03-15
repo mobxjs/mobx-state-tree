@@ -19,6 +19,7 @@
 
 ### Properties
 
+* [identifierAttribute](imodeltype.md#identifierattribute)
 * [name](imodeltype.md#name)
 * [properties](imodeltype.md#properties)
 
@@ -41,6 +42,15 @@
 
 ## Properties
 
+<a id="identifierattribute"></a>
+
+### `<Optional>` identifierAttribute
+
+**● identifierAttribute**: *`undefined` \| `string`*
+
+Name of the dentifier attribute or null if none.
+
+___
 <a id="name"></a>
 
 ###  name

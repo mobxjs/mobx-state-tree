@@ -16,6 +16,7 @@ A simple type, this is, a type where the instance and the snapshot representatio
 
 ### Properties
 
+* [identifierAttribute](isimpletype.md#identifierattribute)
 * [name](isimpletype.md#name)
 
 ### Methods
@@ -29,6 +30,15 @@ A simple type, this is, a type where the instance and the snapshot representatio
 
 ## Properties
 
+<a id="identifierattribute"></a>
+
+### `<Optional>` identifierAttribute
+
+**● identifierAttribute**: *`undefined` \| `string`*
+
+Name of the dentifier attribute or null if none.
+
+___
 <a id="name"></a>
 
 ###  name

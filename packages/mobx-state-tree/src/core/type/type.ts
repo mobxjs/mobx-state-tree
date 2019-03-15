@@ -117,6 +117,11 @@ export interface IType<C, S, T> {
      */
     name: string
 
+    /**
+     * Name of the dentifier attribute or null if none.
+     */
+    readonly identifierAttribute?: string
+
     create(...args: CreateParams<C>): T
     /**
      * Creates an instance for the type given an snapshot input.
@@ -151,19 +156,19 @@ export interface IType<C, S, T> {
      * @deprecated use `Instance<typeof MyType>` instead.
      * @hidden
      */
-    Type: T
+    readonly Type: T
 
     /**
      * @deprecated use `SnapshotOut<typeof MyType>` instead.
      * @hidden
      */
-    SnapshotType: S
+    readonly SnapshotType: S
 
     /**
      * @deprecated use `SnapshotIn<typeof MyType>` instead.
      * @hidden
      */
-    CreationType: C
+    readonly CreationType: C
 
     // Internal api's
 
@@ -407,7 +412,7 @@ export type ExtractNodeType<IT extends IAnyType> = IT extends BaseType<any, any,
  * @hidden
  */
 export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<C, S, T>> {
-    identifierAttribute: string | undefined
+    identifierAttribute?: string
 
     constructor(name: string) {
         super(name)

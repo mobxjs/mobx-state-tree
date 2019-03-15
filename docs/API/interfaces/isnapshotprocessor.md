@@ -18,6 +18,7 @@ A type that has its snapshots processed.
 
 ### Properties
 
+* [identifierAttribute](isnapshotprocessor.md#identifierattribute)
 * [name](isnapshotprocessor.md#name)
 
 ### Methods
@@ -31,6 +32,15 @@ A type that has its snapshots processed.
 
 ## Properties
 
+<a id="identifierattribute"></a>
+
+### `<Optional>` identifierAttribute
+
+**● identifierAttribute**: *`undefined` \| `string`*
+
+Name of the dentifier attribute or null if none.
+
+___
 <a id="name"></a>
 
 ###  name
