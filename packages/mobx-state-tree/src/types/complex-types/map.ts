@@ -47,8 +47,10 @@ import {
     AnyNode,
     AnyModelType,
     asArray,
-    cannotDetermineSubtype
+    cannotDetermineSubtype,
+    getSnapshot
 } from "../../internal"
+import { getIdentifier } from "../../core/mst-operations"
 
 /** @hidden */
 export interface IMapType<IT extends IAnyType>
@@ -167,21 +169,36 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
         if (isStateTreeNode(value)) {
             const node = getStateTreeNode(value)
             if (process.env.NODE_ENV !== "production") {
-                if (!node.identifierAttribute) throw fail(needsIdentifierError)
+                if (!node.identifierAttribute) {
+                    throw fail(needsIdentifierError)
+                }
+            }
+            if (node.identifier === null) {
+                throw fail(needsIdentifierError)
             }
             this.set(node.identifier!, value)
             return value as any
         } else if (!isMutable(value)) {
             throw fail(`Map.put can only be used to store complex values`)
         } else {
-            const mapType = getStateTreeNode(this as IAnyStateTreeNode).type as MapType<any>
-            if (mapType.identifierMode === MapIdentifierMode.NO) throw fail(needsIdentifierError)
-            if (mapType.identifierMode === MapIdentifierMode.YES) {
-                const key = normalizeIdentifier(value[mapType.mapIdentifierAttribute!])
-                this.set(key, value)
-                return this.get(key) as any
+            const mapNode = getStateTreeNode(this as IAnyStateTreeNode)
+            const mapType = mapNode.type as MapType<any>
+
+            if (mapType.identifierMode !== MapIdentifierMode.YES) {
+                throw fail(needsIdentifierError)
             }
-            throw fail(needsIdentifierError)
+
+            const idAttr = mapType.mapIdentifierAttribute!
+            const id = value[idAttr]
+            if (id === undefined) {
+                // try again but this time after creating a node for the value
+                // since it might be an optional identifier
+                const newNode = this.put(mapType.getChildType().create(value, mapNode.environment))
+                return this.put(getSnapshot(newNode))
+            }
+            const key = normalizeIdentifier(id)
+            this.set(key, value)
+            return this.get(key) as any
         }
     }
 }
