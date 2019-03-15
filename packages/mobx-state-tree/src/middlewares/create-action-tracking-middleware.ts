@@ -1,12 +1,12 @@
 import { IMiddlewareEvent, IMiddlewareHandler } from "../internal"
 
-export interface IActionTrackingMiddlewareHooks<T> {
+export interface IActionTrackingMiddlewareHooks<TContext> {
     filter?: (call: IMiddlewareEvent) => boolean
-    onStart: (call: IMiddlewareEvent) => T
-    onResume: (call: IMiddlewareEvent, context: T) => void
-    onSuspend: (call: IMiddlewareEvent, context: T) => void
-    onSuccess: (call: IMiddlewareEvent, context: T, result: any) => void
-    onFail: (call: IMiddlewareEvent, context: T, error: any) => void
+    onStart: (call: IMiddlewareEvent) => TContext
+    onResume: (call: IMiddlewareEvent, context: TContext) => void
+    onSuspend: (call: IMiddlewareEvent, context: TContext) => void
+    onSuccess: (call: IMiddlewareEvent, context: TContext, result: any) => void
+    onFail: (call: IMiddlewareEvent, context: TContext, error: any) => void
 }
 
 const noopHooks: IActionTrackingMiddlewareHooks<any> = {
@@ -30,12 +30,12 @@ const noopHooks: IActionTrackingMiddlewareHooks<any> = {
  * @param hooks
  * @returns
  */
-export function createActionTrackingMiddleware<T = any>(
-    middlewareHooks: IActionTrackingMiddlewareHooks<T>
+export function createActionTrackingMiddleware<TContext = any>(
+    middlewareHooks: IActionTrackingMiddlewareHooks<TContext>
 ): IMiddlewareHandler {
     interface RunningAction {
         flowsPending: number
-        context: T
+        context: TContext
         passedFilter: boolean
     }
     const runningActions = new Map<number, RunningAction>()
@@ -59,14 +59,12 @@ export function createActionTrackingMiddleware<T = any>(
                 passedFilter
             }
             runningActions.set(call.id, runningAction)
+
+            let res
             try {
-                const res = next(call)
-                hooks.onSuspend(call, context)
-                if (!runningAction.flowsPending) {
-                    hooks.onSuccess(call, context, res)
-                }
-                return res
+                res = next(call)
             } catch (e) {
+                hooks.onSuspend(call, context) // suspend before failing
                 hooks.onFail(call, context, e)
                 throw e
             } finally {
@@ -74,6 +72,12 @@ export function createActionTrackingMiddleware<T = any>(
                     runningActions.delete(call.id)
                 }
             }
+
+            hooks.onSuspend(call, context)
+            if (!runningAction.flowsPending) {
+                hooks.onSuccess(call, context, res)
+            }
+            return res
         } else {
             let runningAction
             let runningActionId!: number
