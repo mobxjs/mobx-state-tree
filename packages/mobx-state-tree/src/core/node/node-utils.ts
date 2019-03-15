@@ -75,6 +75,21 @@ export function isStateTreeNode<C = any, S = any>(value: any): value is IStateTr
  * @internal
  * @hidden
  */
+export function assertIsStateTreeNode(value: IAnyStateTreeNode, argNumber: number): void {
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(value)) {
+            // istanbul ignore next
+            throw fail(
+                `expected a mobx-state-tree node as argument ${argNumber}, got ${value} instead`
+            )
+        }
+    }
+}
+
+/**
+ * @internal
+ * @hidden
+ */
 export function getStateTreeNode(value: IAnyStateTreeNode): AnyObjectNode {
     if (!isStateTreeNode(value)) {
         // istanbul ignore next

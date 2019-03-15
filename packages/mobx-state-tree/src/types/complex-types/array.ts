@@ -307,7 +307,8 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
  * @returns
  */
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
-    assertIsType(subtype)
+    assertIsType(subtype, 1)
+
     return new ArrayType<IT>(subtype.name + "[]", subtype)
 }
 

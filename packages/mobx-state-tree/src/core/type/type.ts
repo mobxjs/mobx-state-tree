@@ -544,11 +544,13 @@ export function isType(value: any): value is IAnyType {
  * @internal
  * @hidden
  */
-export function assertIsType(type: IAnyType) {
+export function assertIsType(type: IAnyType, argNumber: number) {
     if (process.env.NODE_ENV !== "production") {
         if (!isType(type)) {
             // istanbul ignore next
-            throw fail("expected a mobx-state-tree type as argument, got " + type + " instead")
+            throw fail(
+                `expected a mobx-state-tree type as argument ${argNumber}, got ${type} instead`
+            )
         }
     }
 }

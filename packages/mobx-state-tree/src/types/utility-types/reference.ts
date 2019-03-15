@@ -487,7 +487,7 @@ export function reference<IT extends IAnyComplexType>(
     subType: IT,
     options?: ReferenceOptions<IT>
 ): IReferenceType<IT> {
-    assertIsType(subType)
+    assertIsType(subType, 1)
     if (process.env.NODE_ENV !== "production") {
         if (arguments.length === 2 && typeof arguments[1] === "string") {
             // istanbul ignore next

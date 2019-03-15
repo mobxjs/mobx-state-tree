@@ -1,4 +1,5 @@
 -   Fixed an issue where `map.put` would not work with snapshots of types with an optional id [#1131](https://github.com/mobxjs/mobx-state-tree/issues/1131) through [#1226](https://github.com/mobxjs/mobx-state-tree/pull/1226) by [@xaviergonz](https://github.com/xaviergonz).
+-   Added `getNodeId` to get the internal unique node id for an instance [#1168](https://github.com/mobxjs/mobx-state-tree/issues/1168) through [#1225](https://github.com/mobxjs/mobx-state-tree/pull/1225) by [@xaviergonz](https://github.com/xaviergonz)
 -   Fixed nodes being `pop`/`shift`/`splice` from an array not getting properly destroyed through [#1205](https://github.com/mobxjs/mobx-state-tree/pull/1205) by [@xaviergonz](https://github.com/xaviergonz). Not that this means that in order to access the returned dead nodes data without getting a liveliness error/warning then the returned dead nodes have to be either cloned (`clone`) or their snapshots (`getSnapshot`) have to be used first.
 
 # 3.11.0

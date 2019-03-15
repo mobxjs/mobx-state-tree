@@ -19,7 +19,8 @@ import {
     getRelativePathBetweenNodes,
     IAnyStateTreeNode,
     warnError,
-    AnyNode
+    AnyNode,
+    assertIsStateTreeNode
 } from "../internal"
 
 export interface ISerializedActionCall {
@@ -82,16 +83,14 @@ export function applyAction(
     actions: ISerializedActionCall | ISerializedActionCall[]
 ): void {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (typeof actions !== "object")
             throw fail(
                 "expected second argument to be an object or array, got " + actions + " instead"
             )
     }
+
     runInAction(() => {
         asArray(actions).forEach(action => baseApplyAction(target, action))
     })
@@ -139,12 +138,8 @@ function baseApplyAction(target: IAnyStateTreeNode, action: ISerializedActionCal
  */
 export function recordActions(subject: IAnyStateTreeNode): IActionRecorder {
     // check all arguments
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(subject))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + subject + " instead"
-            )
-    }
+    assertIsStateTreeNode(subject, 1)
+
     const actions: ISerializedActionCall[] = []
     let recorder: IActionRecorder = {
         actions,
@@ -201,11 +196,8 @@ export function onAction(
     attachAfter = false
 ): IDisposer {
     // check all arguments
+    assertIsStateTreeNode(target, 1)
     if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(target))
-            throw fail(
-                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-            )
         if (!isRoot(target))
             warnError(
                 "Warning: Attaching onAction listeners to non root nodes is dangerous: No events will be emitted for actions initiated higher up in the tree."
