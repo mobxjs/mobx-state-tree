@@ -149,8 +149,7 @@ function checkOptionalPreconditions<IT extends IAnyType>(
             "default value cannot be an instance, pass a snapshot or a function that creates an instance/snapshot instead"
         )
     }
-
-    assertIsType(type)
+    assertIsType(type, 1)
     if (process.env.NODE_ENV !== "production") {
         // we only check default values if they are passed directly
         // if they are generator functions they will be checked once they are generated

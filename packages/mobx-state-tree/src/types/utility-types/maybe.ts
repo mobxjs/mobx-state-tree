@@ -40,7 +40,8 @@ export interface IMaybeNull<IT extends IAnyType> extends IMaybeIType<IT, null | 
  * @returns
  */
 export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
-    assertIsType(type)
+    assertIsType(type, 1)
+
     return union(type, optionalUndefinedType)
 }
 
@@ -52,6 +53,7 @@ export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
  * @returns
  */
 export function maybeNull<IT extends IAnyType>(type: IT): IMaybeNull<IT> {
-    assertIsType(type)
+    assertIsType(type, 1)
+
     return union(type, optionalNullType)
 }

@@ -202,7 +202,7 @@ export function snapshotProcessor<
     processors: ISnapshotProcessors<ExtractC<IT>, CustomC, ExtractS<IT>, CustomS>,
     name?: string
 ): ISnapshotProcessor<IT, CustomC, CustomS> {
-    assertIsType(type)
+    assertIsType(type, 1)
     if (process.env.NODE_ENV !== "production") {
         if (processors.postProcessor && typeof processors.postProcessor !== "function") {
             // istanbul ignore next

@@ -73,6 +73,7 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     isUnionType,
     isValidReference,
     tryReference,
+    getNodeId,
 
     types
 `)
