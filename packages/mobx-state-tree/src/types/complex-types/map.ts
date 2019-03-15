@@ -50,7 +50,6 @@ import {
     cannotDetermineSubtype,
     getSnapshot
 } from "../../internal"
-import { getIdentifier } from "../../core/mst-operations"
 
 /** @hidden */
 export interface IMapType<IT extends IAnyType>
