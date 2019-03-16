@@ -1,4 +1,6 @@
-import { IMiddlewareEvent, IMiddlewareHandler, Omit } from "../internal"
+import { IMiddlewareEvent, IMiddlewareHandler } from "../internal"
+
+type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
 export interface IActionTrackingMiddleware2Call<TEnv>
     extends Readonly<Omit<IMiddlewareEvent, "type">> {

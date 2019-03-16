@@ -7,8 +7,7 @@ import {
     IChildNodesMap,
     EMPTY_ARRAY,
     AnyObjectNode,
-    AnyNode,
-    Omit
+    AnyNode
 } from "../../internal"
 
 /**
@@ -40,6 +39,8 @@ export interface IStateTreeNode<C = any, S = any> {
     // we use this weird trick to allow reference types to work
     readonly [$stateTreeNodeTypes]?: [C, S] | [any, any]
 }
+
+type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
 /** @hidden */
 export type RedefineIStateTreeNode<T, STN extends IAnyStateTreeNode> = T extends IAnyStateTreeNode
