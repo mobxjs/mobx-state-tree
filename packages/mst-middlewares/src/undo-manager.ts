@@ -2,22 +2,19 @@ import {
     types,
     IJsonPatch,
     IStateTreeNode,
-    IMiddlewareEvent,
     recordPatches,
     IPatchRecorder,
-    createActionTrackingMiddleware,
+    createActionTrackingMiddleware2,
     getEnv,
     getRoot,
     applyPatch,
     flow,
     addMiddleware,
     addDisposer,
-    decorate
+    decorate,
+    IActionTrackingMiddleware2Call
 } from "mobx-state-tree"
-import { IObservableArray } from "mobx"
 import { atomic } from "."
-
-const EMPTY_ARRAY: any[] = []
 
 const Entry = types.model("UndoManagerEntry", {
     patches: types.frozen<ReadonlyArray<IJsonPatch>>(),
@@ -45,81 +42,79 @@ const UndoManager = types
     }))
     .actions(self => {
         let targetStore: IStateTreeNode
+        let recordingDisabled = 0
 
         interface Context {
             recorder: IPatchRecorder
-            // one false in this array means that recording has been disabled
-            recordingAllowed: boolean[]
-        }
-
-        const canRecordPatches = (call: IMiddlewareEvent, recordingAllowed: boolean[]) => {
-            if (recordingAllowed.indexOf(false) >= 0) {
-                return false
-            }
-
-            if (call.name === "__withoutUndoFlow__") {
-                return false
-            }
-            if (call.context === self) {
-                return call.name === "startGroup"
-            }
-            return true
         }
 
         type GroupRecorder = Pick<IPatchRecorder, "patches" | "inversePatches">
         const groupRecorders: GroupRecorder[] = []
 
-        const undoRedoMiddleware = createActionTrackingMiddleware<Context>({
-            filter: call => !call.parentId && canRecordPatches(call, EMPTY_ARRAY),
+        const undoRedoMiddleware = createActionTrackingMiddleware2<Context>({
+            filter(call) {
+                if (call.env) {
+                    // already recording
+                    return false
+                }
+                if (call.context === self) {
+                    // also skip actions over self
+                    return false
+                }
+
+                return true
+            },
             onStart(call) {
-                return {
-                    recorder: recordPatches(call.tree),
-                    recordingAllowed: []
+                const recorder = recordPatches(call.tree, () => !recordingDisabled)
+                recorder.resume()
+                call.env = {
+                    recorder
                 }
             },
-            onResume(call, ctx) {
-                if (canRecordPatches(call, ctx.recordingAllowed)) {
-                    ctx.recordingAllowed.push(true)
-                    ctx.recorder.resume()
-                } else {
-                    ctx.recordingAllowed.push(false)
-                }
-            },
-            onSuspend(call, ctx) {
-                ctx.recordingAllowed.pop()
-                ctx.recorder.stop()
-            },
-            onSuccess(call, ctx) {
-                const recorder = ctx.recorder
+            onFinish(call, error) {
+                const recorder = call.env!.recorder
+                call.env = undefined
                 recorder.stop()
-                if (groupRecorders.length > 0) {
-                    const groupRecorder = groupRecorders[groupRecorders.length - 1]
-                    groupRecorder.patches = groupRecorder.patches.concat(recorder.patches)
-                    groupRecorder.inversePatches = groupRecorder.inversePatches.concat(
-                        recorder.inversePatches
-                    )
+
+                if (error === undefined) {
+                    if (groupRecorders.length > 0) {
+                        const groupRecorder = groupRecorders[groupRecorders.length - 1]
+                        groupRecorder.patches = groupRecorder.patches.concat(recorder.patches)
+                        groupRecorder.inversePatches = groupRecorder.inversePatches.concat(
+                            recorder.inversePatches
+                        )
+                    } else {
+                        ;(self as any).addUndoState(recorder)
+                    }
                 } else {
-                    ;(self as any).addUndoState(recorder)
+                    recorder.undo()
                 }
-            },
-            onFail(call, ctx) {
-                ctx.recorder.stop()
-                ctx.recorder.undo()
             }
         })
 
+        const skipRecording = <T>(fn: () => T): T => {
+            recordingDisabled++
+            try {
+                return fn()
+            } finally {
+                recordingDisabled--
+            }
+        }
+
         return {
             addUndoState(recorder: GroupRecorder) {
-                if (recorder.patches.length === 0) {
-                    // skip recording if patches is empty
-                    return
-                }
-                self.history.splice(self.undoIdx)
-                self.history.push({
-                    patches: recorder.patches,
-                    inversePatches: recorder.inversePatches
+                this.withoutUndo(() => {
+                    if (recorder.patches.length === 0) {
+                        // skip recording if patches is empty
+                        return
+                    }
+                    self.history.splice(self.undoIdx)
+                    self.history.push({
+                        patches: recorder.patches,
+                        inversePatches: recorder.inversePatches
+                    })
+                    self.undoIdx = self.history.length
                 })
-                self.undoIdx = self.history.length
             },
             afterCreate() {
                 const selfRoot = getRoot(self)
@@ -132,30 +127,38 @@ const UndoManager = types
                 addDisposer(self, addMiddleware(targetStore, undoRedoMiddleware, false))
             },
             undo: decorate(atomic, () => {
-                if (!self.canUndo) {
-                    throw new Error("undo not possible, nothing to undo")
-                }
-                applyPatch(
-                    getRoot(targetStore),
-                    // n.b: reverse patches back to forth
-                    self.history[self.undoIdx - 1].inversePatches.slice().reverse()
-                )
-                self.undoIdx--
+                skipRecording(() => {
+                    if (!self.canUndo) {
+                        throw new Error("undo not possible, nothing to undo")
+                    }
+                    applyPatch(
+                        getRoot(targetStore),
+                        // n.b: reverse patches back to forth
+                        self.history[self.undoIdx - 1].inversePatches.slice().reverse()
+                    )
+                    self.undoIdx--
+                })
             }),
             redo: decorate(atomic, () => {
-                if (!self.canRedo) {
-                    throw new Error("redo not possible, nothing to redo")
-                }
-                applyPatch(getRoot(targetStore), self.history[self.undoIdx].patches)
-                self.undoIdx++
+                skipRecording(() => {
+                    if (!self.canRedo) {
+                        throw new Error("redo not possible, nothing to redo")
+                    }
+                    applyPatch(getRoot(targetStore), self.history[self.undoIdx].patches)
+                    self.undoIdx++
+                })
             }),
             withoutUndo<T>(fn: () => T): T {
-                return fn()
+                return skipRecording(fn)
             },
             withoutUndoFlow(generatorFn: () => any) {
-                // the name of the function generator matters!
                 return flow(function* __withoutUndoFlow__() {
-                    return yield* generatorFn()
+                    recordingDisabled++
+                    try {
+                        return yield* generatorFn()
+                    } finally {
+                        recordingDisabled--
+                    }
                 })
             },
             startGroup<T>(fn: () => T): T {
@@ -180,20 +183,22 @@ const UndoManager = types
                 this.addUndoState(groupRecorder)
             },
             clear: decorate(atomic, (options?: { undo?: boolean; redo?: boolean }) => {
-                const opts = {
-                    undo: true,
-                    redo: true,
-                    ...options
-                }
-                if (opts.undo && opts.redo) {
-                    self.history.clear()
-                    self.undoIdx = 0
-                } else if (opts.undo) {
-                    self.history.splice(0, self.undoLevels)
-                    self.undoIdx = 0
-                } else if (opts.redo) {
-                    self.history.splice(self.undoIdx, self.redoLevels)
-                }
+                skipRecording(() => {
+                    const opts = {
+                        undo: true,
+                        redo: true,
+                        ...options
+                    }
+                    if (opts.undo && opts.redo) {
+                        self.history.clear()
+                        self.undoIdx = 0
+                    } else if (opts.undo) {
+                        self.history.splice(0, self.undoLevels)
+                        self.undoIdx = 0
+                    } else if (opts.redo) {
+                        self.history.splice(self.undoIdx, self.redoLevels)
+                    }
+                })
             })
         }
     })

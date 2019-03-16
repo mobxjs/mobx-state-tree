@@ -21,7 +21,7 @@ export type IMiddlewareEventType =
     | "flow_throw"
 // | "task_spawn TODO, see #273"
 
-export type IMiddlewareEvent = {
+export interface IMiddlewareEvent {
     type: IMiddlewareEventType
     name: string
     id: number

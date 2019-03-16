@@ -37,13 +37,13 @@ ___
 **● onFail**: *`function`*
 
 #### Type declaration
-▸(call: *[IMiddlewareEvent](../#imiddlewareevent)*, context: *`T`*, error: *`any`*): `void`
+▸(call: *[IMiddlewareEvent](imiddlewareevent.md)*, context: *`T`*, error: *`any`*): `void`
 
 **Parameters:**
 
 | Name | Type |
 | ------ | ------ |
-| call | [IMiddlewareEvent](../#imiddlewareevent) |
+| call | [IMiddlewareEvent](imiddlewareevent.md) |
 | context | `T` |
 | error | `any` |
 
@@ -57,13 +57,13 @@ ___
 **● onResume**: *`function`*
 
 #### Type declaration
-▸(call: *[IMiddlewareEvent](../#imiddlewareevent)*, context: *`T`*): `void`
+▸(call: *[IMiddlewareEvent](imiddlewareevent.md)*, context: *`T`*): `void`
 
 **Parameters:**
 
 | Name | Type |
 | ------ | ------ |
-| call | [IMiddlewareEvent](../#imiddlewareevent) |
+| call | [IMiddlewareEvent](imiddlewareevent.md) |
 | context | `T` |
 
 **Returns:** `void`
@@ -76,13 +76,13 @@ ___
 **● onStart**: *`function`*
 
 #### Type declaration
-▸(call: *[IMiddlewareEvent](../#imiddlewareevent)*): `T`
+▸(call: *[IMiddlewareEvent](imiddlewareevent.md)*): `T`
 
 **Parameters:**
 
 | Name | Type |
 | ------ | ------ |
-| call | [IMiddlewareEvent](../#imiddlewareevent) |
+| call | [IMiddlewareEvent](imiddlewareevent.md) |
 
 **Returns:** `T`
 
@@ -94,13 +94,13 @@ ___
 **● onSuccess**: *`function`*
 
 #### Type declaration
-▸(call: *[IMiddlewareEvent](../#imiddlewareevent)*, context: *`T`*, result: *`any`*): `void`
+▸(call: *[IMiddlewareEvent](imiddlewareevent.md)*, context: *`T`*, result: *`any`*): `void`
 
 **Parameters:**
 
 | Name | Type |
 | ------ | ------ |
-| call | [IMiddlewareEvent](../#imiddlewareevent) |
+| call | [IMiddlewareEvent](imiddlewareevent.md) |
 | context | `T` |
 | result | `any` |
 
@@ -114,13 +114,13 @@ ___
 **● onSuspend**: *`function`*
 
 #### Type declaration
-▸(call: *[IMiddlewareEvent](../#imiddlewareevent)*, context: *`T`*): `void`
+▸(call: *[IMiddlewareEvent](imiddlewareevent.md)*, context: *`T`*): `void`
 
 **Parameters:**
 
 | Name | Type |
 | ------ | ------ |
-| call | [IMiddlewareEvent](../#imiddlewareevent) |
+| call | [IMiddlewareEvent](imiddlewareevent.md) |
 | context | `T` |
 
 **Returns:** `void`

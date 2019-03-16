@@ -417,3 +417,50 @@ describe("same tree - clean", () => {
         expect(undoManager.redoLevels).toBe(1)
     })
 })
+
+test("#1195 - withoutUndo() used inside an action should NOT affect all patches within that action", () => {
+    let _undoManager: any
+
+    const store = types
+        .model(`Person`, {
+            name: types.string,
+            age: types.number
+        })
+        .actions(self => {
+            _undoManager = UndoManager.create({}, { targetStore: self })
+
+            return {
+                setName(name: string) {
+                    _undoManager.withoutUndo(() => {
+                        self.name = name
+                    })
+                },
+
+                setAge(age: number) {
+                    self.age = age
+                },
+
+                setInfo(name: string, age: number) {
+                    this.setName(name) // name changes should not be undo-ed
+                    this.setAge(age) // but age changes should
+                }
+            }
+        })
+
+    const person = store.create({ name: `Jon`, age: 20 })
+
+    person.setInfo(`Bob`, 50)
+    expect(person.name).toBe("Bob")
+    expect(person.age).toBe(50)
+
+    expect(_undoManager.history.length).toBe(1)
+    expect(_undoManager.history[0]).toEqual({
+        inversePatches: [{ op: "replace", path: "/age", value: 20 }],
+        patches: [{ op: "replace", path: "/age", value: 50 }]
+    })
+
+    _undoManager.undo()
+    // only age should be undone
+    expect(person.name).toBe("Bob")
+    expect(person.age).toBe(20)
+})

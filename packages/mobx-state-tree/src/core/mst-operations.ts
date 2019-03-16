@@ -142,6 +142,7 @@ export interface IPatchRecorder {
     patches: ReadonlyArray<IJsonPatch>
     inversePatches: ReadonlyArray<IJsonPatch>
     reversedInversePatches: ReadonlyArray<IJsonPatch>
+    readonly recording: boolean
     stop(): void
     resume(): void
     replay(target?: IAnyStateTreeNode): void
@@ -159,6 +160,8 @@ export interface IPatchRecorder {
  *      patches: IJsonPatch[]
  *      // the inverse of the recorded patches
  *      inversePatches: IJsonPatch[]
+ *      // true if currently recording
+ *      recording: boolean
  *      // stop recording patches
  *      stop(): void
  *      // resume recording patches
@@ -171,10 +174,16 @@ export interface IPatchRecorder {
  * }
  * ```
  *
+ * The optional filter function allows to skip recording certain patches.
+ *
  * @param subject
+ * @param filter
  * @returns
  */
-export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
+export function recordPatches(
+    subject: IAnyStateTreeNode,
+    filter?: (patch: IJsonPatch, inversePatch: IJsonPatch) => boolean
+): IPatchRecorder {
     // check all arguments
     assertIsStateTreeNode(subject, 1)
 
@@ -195,6 +204,9 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
     let disposer: IDisposer | undefined
 
     const recorder: IPatchRecorder = {
+        get recording() {
+            return !!disposer
+        },
         get patches() {
             if (!publicData.patches) {
                 publicData.patches = data.patches.slice()
@@ -222,6 +234,10 @@ export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
         resume() {
             if (disposer) return
             disposer = onPatch(subject, (patch, inversePatch) => {
+                // skip patches that are asked to be filtered if there's a filter in place
+                if (filter && !filter(patch, inversePatch)) {
+                    return
+                }
                 data.patches.push(patch)
                 data.reversedInversePatches.unshift(inversePatch)
 

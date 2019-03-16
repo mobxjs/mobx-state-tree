@@ -20,6 +20,7 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     onAction,
     recordActions,
     createActionTrackingMiddleware,
+    createActionTrackingMiddleware2,
     setLivelinessChecking,
     getLivelinessChecking,
     getType,

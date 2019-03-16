@@ -11,9 +11,12 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 
 * [CustomTypeOptions](interfaces/customtypeoptions.md)
 * [IActionRecorder](interfaces/iactionrecorder.md)
+* [IActionTrackingMiddleware2Call](interfaces/iactiontrackingmiddleware2call.md)
+* [IActionTrackingMiddleware2Hooks](interfaces/iactiontrackingmiddleware2hooks.md)
 * [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)
 * [IAnyModelType](interfaces/ianymodeltype.md)
 * [IJsonPatch](interfaces/ijsonpatch.md)
+* [IMiddlewareEvent](interfaces/imiddlewareevent.md)
 * [IModelReflectionData](interfaces/imodelreflectiondata.md)
 * [IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)
 * [IModelType](interfaces/imodeltype.md)
@@ -35,7 +38,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [IAnyComplexType](#ianycomplextype)
 * [IAnyType](#ianytype)
 * [IDisposer](#idisposer)
-* [IMiddlewareEvent](#imiddlewareevent)
 * [IMiddlewareEventType](#imiddlewareeventtype)
 * [IMiddlewareHandler](#imiddlewarehandler)
 * [ITypeDispatcher](#itypedispatcher)
@@ -78,6 +80,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [clone](#clone)
 * [compose](#compose)
 * [createActionTrackingMiddleware](#createactiontrackingmiddleware)
+* [createActionTrackingMiddleware2](#createactiontrackingmiddleware2)
 * [custom](#custom)
 * [decorate](#decorate)
 * [destroy](#destroy)
@@ -191,15 +194,6 @@ A generic disposer.
 **Returns:** `void`
 
 ___
-<a id="imiddlewareevent"></a>
-
-###  IMiddlewareEvent
-
-**Ƭ IMiddlewareEvent**: *`object`*
-
-#### Type declaration
-
-___
 <a id="imiddlewareeventtype"></a>
 
 ###  IMiddlewareEventType
@@ -214,13 +208,13 @@ ___
 **Ƭ IMiddlewareHandler**: *`function`*
 
 #### Type declaration
-▸(actionCall: *[IMiddlewareEvent](#imiddlewareevent)*, next: *`function`*, abort: *`function`*): `any`
+▸(actionCall: *[IMiddlewareEvent](interfaces/imiddlewareevent.md)*, next: *`function`*, abort: *`function`*): `any`
 
 **Parameters:**
 
 | Name | Type |
 | ------ | ------ |
-| actionCall | [IMiddlewareEvent](#imiddlewareevent) |
+| actionCall | [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
 | next | `function` |
 | abort | `function` |
 
@@ -1626,11 +1620,13 @@ ___
 
 ###  createActionTrackingMiddleware
 
-▸ **createActionTrackingMiddleware**<`T`>(middlewareHooks: *[IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`>*): [IMiddlewareHandler](#imiddlewarehandler)
+▸ **createActionTrackingMiddleware**<`T`>(hooks: *[IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`>*): [IMiddlewareHandler](#imiddlewarehandler)
 
-Convenience utility to create action based middleware that supports async processes more easily. All hooks are called for both synchronous and asynchronous actions, except in the case of `onSuccess`/`onFail`, where only one of them is called.
+Note: Consider migrating to `createActionTrackingMiddleware2`, it is easier to use.
 
-The create middleware tracks the process of an action (assuming it passes the `filter`). `onStart` can return any value, which will be passed as second context argument to any other hook. This makes it possible to keep state during a process.
+Convenience utility to create action based middleware that supports async processes more easily. All hooks are called for both synchronous and asynchronous actions. Except that either `onSuccess` or `onFail` is called
+
+The create middleware tracks the process of an action (assuming it passes the `filter`). `onResume` can return any value, which will be passed as second argument to any other hook. This makes it possible to keep state during a process.
 
 See the `atomic` middleware for an example
 
@@ -1639,9 +1635,47 @@ See the `atomic` middleware for an example
 #### T 
 **Parameters:**
 
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| hooks | [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`> |  \- |
+
+**Returns:** [IMiddlewareHandler](#imiddlewarehandler)
+
+___
+<a id="createactiontrackingmiddleware2"></a>
+
+###  createActionTrackingMiddleware2
+
+▸ **createActionTrackingMiddleware2**<`TEnv`>(middlewareHooks: *[IActionTrackingMiddleware2Hooks](interfaces/iactiontrackingmiddleware2hooks.md)<`TEnv`>*): [IMiddlewareHandler](#imiddlewarehandler)
+
+Convenience utility to create action based middleware that supports async processes more easily. The flow is like this:
+
+*   for each action: if filter passes -> `onStart` -> (inner actions recursively) `onFinish`
+
+Example: if we had an action `a` that called inside an action `b1`, then `b2` the flow would be:
+
+*   `filter(a)`
+*   `onStart(a)`
+    *   `filter(b1)`
+    *   `onStart(b1)`
+    *   `onFinish(b1)`
+    *   `filter(b2)`
+    *   `onStart(b2)`
+    *   `onFinish(b2)`
+*   `onFinish(a)`
+
+The flow is the same no matter if the actions are sync or async.
+
+See the `atomic` middleware for an example
+
+**Type parameters:**
+
+#### TEnv 
+**Parameters:**
+
 | Name | Type |
 | ------ | ------ |
-| middlewareHooks | [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`> |
+| middlewareHooks | [IActionTrackingMiddleware2Hooks](interfaces/iactiontrackingmiddleware2hooks.md)<`TEnv`> |
 
 **Returns:** [IMiddlewareHandler](#imiddlewarehandler)
 
@@ -3161,7 +3195,7 @@ ___
 
 ###  recordPatches
 
-▸ **recordPatches**(subject: *`IAnyStateTreeNode`*): [IPatchRecorder](interfaces/ipatchrecorder.md)
+▸ **recordPatches**(subject: *`IAnyStateTreeNode`*, filter?: *`undefined` \| `function`*): [IPatchRecorder](interfaces/ipatchrecorder.md)
 
 Small abstraction around `onPatch` and `applyPatch`, attaches a patch listener to a tree and records all the patches. Returns an recorder object with the following signature:
 
@@ -3173,6 +3207,8 @@ export interface IPatchRecorder {
      patches: IJsonPatch[]
      // the inverse of the recorded patches
      inversePatches: IJsonPatch[]
+     // true if currently recording
+     recording: boolean
      // stop recording patches
      stop(): void
      // resume recording patches
@@ -3185,11 +3221,14 @@ export interface IPatchRecorder {
 }
 ```
 
+The optional filter function allows to skip recording certain patches.
+
 **Parameters:**
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | subject | `IAnyStateTreeNode` |  \- |
+| `Optional` filter | `undefined` \| `function` |  \- |
 
 **Returns:** [IPatchRecorder](interfaces/ipatchrecorder.md)
 
