@@ -63,7 +63,7 @@ export function createFlowSpawner(name: string, generator: Function) {
     const spawner = function flowSpawner(this: any) {
         // Implementation based on https://github.com/tj/co/blob/master/index.js
         const runId = getNextActionId()
-        const parentContext = getCurrentActionContext()
+        const parentContext = getCurrentActionContext()!
         if (!parentContext) {
             throw fail("a mst flow must always have a base action")
         }
