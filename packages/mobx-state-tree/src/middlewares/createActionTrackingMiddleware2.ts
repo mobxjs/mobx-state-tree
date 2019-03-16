@@ -65,7 +65,7 @@ class RunningAction {
 /**
  * Convenience utility to create action based middleware that supports async processes more easily.
  * The flow is like this:
- * - for each action: if filter passes -> `onStart` -> (inner actions recursively) `onFinish`
+ * - for each action: if filter passes -> `onStart` -> (inner actions recursively) -> `onFinish`
  *
  * Example: if we had an action `a` that called inside an action `b1`, then `b2` the flow would be:
  * - `filter(a)`
