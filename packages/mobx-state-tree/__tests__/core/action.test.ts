@@ -313,30 +313,31 @@ test("middleware events are correct", () => {
         return next(call)
     })
     a.a(7)
-    expect(events).toEqual([
-        {
-            args: [7],
-            context: {},
-            id: process.env.NODE_ENV !== "production" ? 28 : 27,
-            name: "a",
-            parentId: 0,
-            rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
-            allParentIds: [],
-            tree: {},
-            type: "action"
-        },
-        {
-            args: [14],
-            context: {},
-            id: process.env.NODE_ENV !== "production" ? 29 : 28,
-            name: "b",
-            parentId: process.env.NODE_ENV !== "production" ? 28 : 27,
-            rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
-            allParentIds: [process.env.NODE_ENV !== "production" ? 28 : 27],
-            tree: {},
-            type: "action"
-        }
-    ])
+    const event1 = {
+        args: [7],
+        context: {},
+        id: process.env.NODE_ENV !== "production" ? 28 : 27,
+        name: "a",
+        parentId: 0,
+        rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
+        allParentIds: [],
+        tree: {},
+        type: "action",
+        parentEvent: undefined
+    }
+    const event2 = {
+        args: [14],
+        context: {},
+        id: process.env.NODE_ENV !== "production" ? 29 : 28,
+        name: "b",
+        parentId: process.env.NODE_ENV !== "production" ? 28 : 27,
+        rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
+        allParentIds: [process.env.NODE_ENV !== "production" ? 28 : 27],
+        tree: {},
+        type: "action",
+        parentEvent: event1
+    }
+    expect(events).toEqual([event1, event2])
 })
 
 test("actions are mockable", () => {

@@ -31,6 +31,7 @@ export interface IMiddlewareEvent {
     context: IAnyStateTreeNode
     tree: IAnyStateTreeNode
     args: any[]
+    parentEvent: IMiddlewareEvent | undefined
 }
 
 /**
@@ -49,7 +50,7 @@ export type IMiddlewareHandler = (
 ) => any
 
 let nextActionId = 1
-let currentActionContext: IMiddlewareEvent | null = null
+let currentActionContext: IMiddlewareEvent | undefined
 
 /**
  * @internal
@@ -74,8 +75,6 @@ export function getNextActionId() {
  */
 export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const node = getStateTreeNode(context.context)
-    const baseIsRunningAction = node._isRunningAction
-    const prevContext = currentActionContext
 
     if (context.type === "action") {
         node.assertAlive({
@@ -83,23 +82,16 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
         })
     }
 
+    const baseIsRunningAction = node._isRunningAction
     node._isRunningAction = true
+    const previousContext = currentActionContext
     currentActionContext = context
     try {
         return runMiddleWares(node, context, fn)
     } finally {
-        currentActionContext = prevContext
+        currentActionContext = previousContext
         node._isRunningAction = baseIsRunningAction
     }
-}
-
-/**
- * @internal
- * @hidden
- */
-export function getActionContext(): IMiddlewareEvent {
-    if (!currentActionContext) throw fail("Not running an action!")
-    return currentActionContext
 }
 
 /**
@@ -113,6 +105,8 @@ export function createActionInvoker<T extends Function>(
 ) {
     const res = function() {
         const id = getNextActionId()
+        const parentContext = currentActionContext
+
         return runWithActionContext(
             {
                 type: "action",
@@ -121,11 +115,12 @@ export function createActionInvoker<T extends Function>(
                 args: argsToArray(arguments),
                 context: target,
                 tree: getRoot(target),
-                rootId: currentActionContext ? currentActionContext.rootId : id,
-                parentId: currentActionContext ? currentActionContext.id : 0,
-                allParentIds: currentActionContext
-                    ? [...currentActionContext.allParentIds, currentActionContext.id]
-                    : []
+                rootId: parentContext ? parentContext.rootId : id,
+                parentId: parentContext ? parentContext.id : 0,
+                allParentIds: parentContext
+                    ? [...parentContext.allParentIds, parentContext.id]
+                    : [],
+                parentEvent: parentContext
             },
             fn
         )

@@ -29,13 +29,13 @@ import {
     normalizeIdentifier,
     ReferenceIdentifier,
     IMiddlewareEvent,
-    getCurrentActionContext,
     escapeJsonPath,
     getPath,
     warnError,
     AnyNode,
     IStateTreeNode,
-    ArgumentTypes
+    ArgumentTypes,
+    getCurrentActionContext
 } from "../../internal"
 
 let nextNodeId = 1

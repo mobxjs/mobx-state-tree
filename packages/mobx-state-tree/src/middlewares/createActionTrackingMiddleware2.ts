@@ -1,14 +1,7 @@
-import { IMiddlewareEvent, IMiddlewareHandler, IAnyStateTreeNode } from "../internal"
+import { IMiddlewareEvent, IMiddlewareHandler, Omit } from "../internal"
 
-export interface IActionTrackingMiddleware2Call<TEnv> {
-    readonly name: string
-    readonly id: number
-    readonly parentId: number
-    readonly rootId: number
-    readonly allParentIds: number[]
-    readonly context: IAnyStateTreeNode
-    readonly tree: IAnyStateTreeNode
-    readonly args: any[]
+export interface IActionTrackingMiddleware2Call<TEnv>
+    extends Readonly<Omit<IMiddlewareEvent, "type">> {
     env: TEnv | undefined
     readonly parentCall?: IActionTrackingMiddleware2Call<TEnv>
 }
@@ -19,22 +12,19 @@ export interface IActionTrackingMiddleware2Hooks<TEnv> {
     onFinish: (call: IActionTrackingMiddleware2Call<TEnv>, error?: any) => void
 }
 
-const noopHooks: IActionTrackingMiddleware2Hooks<any> = {
-    onStart() {},
-    onFinish() {}
-}
-
 class RunningAction {
     private flowsPending = 0
     private running = true
 
     constructor(
         private readonly map: Map<number, RunningAction>,
-        public readonly hooks: IActionTrackingMiddleware2Hooks<any>,
+        public readonly hooks: IActionTrackingMiddleware2Hooks<any> | undefined,
         readonly call: IActionTrackingMiddleware2Call<any>
     ) {
         map.set(this.id, this)
-        hooks.onStart(call)
+        if (hooks) {
+            hooks.onStart(call)
+        }
     }
 
     private get id() {
@@ -45,7 +35,9 @@ class RunningAction {
         if (this.running) {
             this.running = false
             this.map.delete(this.id)
-            this.hooks.onFinish(this.call, error)
+            if (this.hooks) {
+                this.hooks.onFinish(this.call, error)
+            }
         }
     }
 
@@ -96,13 +88,15 @@ export function createActionTrackingMiddleware2<TEnv = any>(
     ) {
         let parentRunningAction
 
-        // allParentIds goes from root to immediate parent, so we traverse it backwards
-        for (let i = call.allParentIds.length - 1; i >= 0; i--) {
-            const id = call.allParentIds[i]
+        // find parentRunningAction
+        let currentEvent = call.parentEvent
+        while (currentEvent) {
+            const id = currentEvent.id
             parentRunningAction = runningActions.get(id)
             if (parentRunningAction) {
                 break
             }
+            currentEvent = currentEvent.parentEvent
         }
 
         if (call.type === "action") {
@@ -114,7 +108,7 @@ export function createActionTrackingMiddleware2<TEnv = any>(
             }
 
             const passesFilter = !middlewareHooks.filter || middlewareHooks.filter(newCall)
-            const hooks = passesFilter ? middlewareHooks : noopHooks
+            const hooks = passesFilter ? middlewareHooks : undefined
 
             const runningAction = new RunningAction(runningActions, hooks, newCall)
 

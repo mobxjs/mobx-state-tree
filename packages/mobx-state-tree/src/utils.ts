@@ -391,3 +391,9 @@ deprecated.ids = {}
 export function warnError(msg: string) {
     console.warn(new Error(`[mobx-state-tree] ${msg}`))
 }
+
+/**
+ * @internal
+ * @hidden
+ */
+export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
