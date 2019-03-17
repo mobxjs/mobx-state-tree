@@ -435,9 +435,13 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         return this.type.getChildType(propertyName)
     }
 
+    get isProtected(): boolean {
+        return this.root.isProtectionEnabled
+    }
+
     assertWritable(context: AssertAliveContext): void {
         this.assertAlive(context)
-        if (!this.isRunningAction() && this.isProtectionEnabled) {
+        if (!this.isRunningAction() && this.isProtected) {
             throw fail(
                 `Cannot modify '${this}', the object is protected and can only be modified by using an action.`
             )

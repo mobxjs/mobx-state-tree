@@ -32,7 +32,30 @@ function createTestMiddleware(m: any, actionName: string, value: number, calls: 
     addMiddleware(m, mware, false)
 }
 
-function syncTest(mode: "success" | "fail") {
+async function doTest(m: any, mode: "success" | "fail") {
+    const calls: string[] = []
+
+    createTestMiddleware(m, "setX", 10, calls)
+    createTestMiddleware(m, "setY", 9, calls)
+
+    try {
+        await m.setZ(8) // -> setY(9) -> setX(10)
+        if (mode === "fail") {
+            fail("should have failed")
+        }
+    } catch (e) {
+        if (mode === "fail") {
+            expect(e).toBe("error")
+        } else {
+            throw e
+            // fail("should have succeeded")
+        }
+    }
+
+    return calls
+}
+
+async function syncTest(mode: "success" | "fail") {
     const M = types
         .model({
             x: 1,
@@ -58,23 +81,7 @@ function syncTest(mode: "success" | "fail") {
 
     const m = M.create()
 
-    const calls: string[] = []
-
-    createTestMiddleware(m, "setX", 10, calls)
-    createTestMiddleware(m, "setY", 9, calls)
-
-    try {
-        m.setZ(8) // -> setY(9) -> setX(10)
-        if (mode === "fail") {
-            fail("should have failed")
-        }
-    } catch (e) {
-        if (mode === "fail") {
-            expect(e).toBe("error")
-        } else {
-            fail("should have succeeded")
-        }
-    }
+    const calls = await doTest(m, mode)
 
     if (mode === "success") {
         expect(calls).toEqual([
@@ -93,12 +100,12 @@ function syncTest(mode: "success" | "fail") {
     }
 }
 
-test("sync action", () => {
-    syncTest("success")
-    syncTest("fail")
+test("sync action", async () => {
+    await syncTest("success")
+    await syncTest("fail")
 })
 
-async function asyncTest(mode: "success" | "fail") {
+async function flowTest(mode: "success" | "fail") {
     const _subFlow = flow(function* subFlow() {
         yield Promise.resolve()
     })
@@ -130,24 +137,7 @@ async function asyncTest(mode: "success" | "fail") {
 
     const m = M.create()
 
-    const calls: string[] = []
-
-    createTestMiddleware(m, "setX", 10, calls)
-    createTestMiddleware(m, "setY", 9, calls)
-
-    try {
-        await m.setZ(8) // -> setY(9) -> setX(10)
-        if (mode === "fail") {
-            fail("should have failed")
-        }
-    } catch (e) {
-        if (mode === "fail") {
-            expect(e).toBe("error")
-        } else {
-            throw e
-            // fail("should have succeeded")
-        }
-    }
+    const calls = await doTest(m, mode)
 
     if (mode === "success") {
         expect(calls).toEqual([
@@ -166,7 +156,7 @@ async function asyncTest(mode: "success" | "fail") {
     }
 }
 
-test("async action", async () => {
-    await asyncTest("success")
-    await asyncTest("fail")
+test("flow action", async () => {
+    await flowTest("success")
+    await flowTest("fail")
 })
