@@ -9,6 +9,7 @@ Array [
     ],
     "id": 3,
     "name": "startFetch",
+    "parentActionEvent": undefined,
     "parentEvent": undefined,
     "parentId": 0,
     "rootId": 3,
@@ -23,6 +24,19 @@ Array [
     ],
     "id": 4,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 3,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 3,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -30,6 +44,7 @@ Array [
       ],
       "id": 3,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 3,
@@ -48,6 +63,19 @@ Array [
     ],
     "id": 4,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 3,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 3,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -55,6 +83,7 @@ Array [
       ],
       "id": 3,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 3,
@@ -73,6 +102,19 @@ Array [
     ],
     "id": 4,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 3,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 3,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -80,6 +122,7 @@ Array [
       ],
       "id": 3,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 3,
@@ -98,6 +141,19 @@ Array [
     ],
     "id": 4,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 3,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 3,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -105,6 +161,7 @@ Array [
       ],
       "id": 3,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 3,
@@ -126,6 +183,7 @@ Array [
     ],
     "id": 5,
     "name": "startFetch",
+    "parentActionEvent": undefined,
     "parentEvent": undefined,
     "parentId": 0,
     "rootId": 5,
@@ -140,6 +198,19 @@ Array [
     ],
     "id": 6,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 5,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 5,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -147,6 +218,7 @@ Array [
       ],
       "id": 5,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 5,
@@ -165,6 +237,19 @@ Array [
     ],
     "id": 6,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 5,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 5,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -172,6 +257,7 @@ Array [
       ],
       "id": 5,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 5,
@@ -190,6 +276,19 @@ Array [
     ],
     "id": 6,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 5,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 5,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -197,6 +296,7 @@ Array [
       ],
       "id": 5,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 5,
@@ -218,6 +318,7 @@ Array [
     ],
     "id": 25,
     "name": "startFetch",
+    "parentActionEvent": undefined,
     "parentEvent": undefined,
     "parentId": 0,
     "rootId": 25,
@@ -232,6 +333,19 @@ Array [
     ],
     "id": 26,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 25,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 25,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -239,6 +353,7 @@ Array [
       ],
       "id": 25,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 25,
@@ -257,6 +372,19 @@ Array [
     ],
     "id": 26,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 25,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 25,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -264,6 +392,7 @@ Array [
       ],
       "id": 25,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 25,
@@ -283,6 +412,19 @@ Array [
     ],
     "id": 27,
     "name": "uppercase",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 25,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 25,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [
         25,
@@ -292,6 +434,19 @@ Array [
       ],
       "id": 26,
       "name": "fetchData",
+      "parentActionEvent": Object {
+        "allParentIds": Array [],
+        "args": Array [
+          "black",
+        ],
+        "id": 25,
+        "name": "startFetch",
+        "parentActionEvent": undefined,
+        "parentEvent": undefined,
+        "parentId": 0,
+        "rootId": 25,
+        "type": "action",
+      },
       "parentEvent": Object {
         "allParentIds": Array [],
         "args": Array [
@@ -299,6 +454,7 @@ Array [
         ],
         "id": 25,
         "name": "startFetch",
+        "parentActionEvent": undefined,
         "parentEvent": undefined,
         "parentId": 0,
         "rootId": 25,
@@ -322,6 +478,19 @@ Array [
     ],
     "id": 27,
     "name": "uppercase",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 25,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 25,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [
         25,
@@ -331,6 +500,19 @@ Array [
       ],
       "id": 26,
       "name": "fetchData",
+      "parentActionEvent": Object {
+        "allParentIds": Array [],
+        "args": Array [
+          "black",
+        ],
+        "id": 25,
+        "name": "startFetch",
+        "parentActionEvent": undefined,
+        "parentEvent": undefined,
+        "parentId": 0,
+        "rootId": 25,
+        "type": "action",
+      },
       "parentEvent": Object {
         "allParentIds": Array [],
         "args": Array [
@@ -338,6 +520,7 @@ Array [
         ],
         "id": 25,
         "name": "startFetch",
+        "parentActionEvent": undefined,
         "parentEvent": undefined,
         "parentId": 0,
         "rootId": 25,
@@ -361,6 +544,19 @@ Array [
     ],
     "id": 27,
     "name": "uppercase",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 25,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 25,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [
         25,
@@ -370,6 +566,19 @@ Array [
       ],
       "id": 26,
       "name": "fetchData",
+      "parentActionEvent": Object {
+        "allParentIds": Array [],
+        "args": Array [
+          "black",
+        ],
+        "id": 25,
+        "name": "startFetch",
+        "parentActionEvent": undefined,
+        "parentEvent": undefined,
+        "parentId": 0,
+        "rootId": 25,
+        "type": "action",
+      },
       "parentEvent": Object {
         "allParentIds": Array [],
         "args": Array [
@@ -377,6 +586,7 @@ Array [
         ],
         "id": 25,
         "name": "startFetch",
+        "parentActionEvent": undefined,
         "parentEvent": undefined,
         "parentId": 0,
         "rootId": 25,
@@ -400,6 +610,19 @@ Array [
     ],
     "id": 27,
     "name": "uppercase",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 25,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 25,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [
         25,
@@ -409,6 +632,19 @@ Array [
       ],
       "id": 26,
       "name": "fetchData",
+      "parentActionEvent": Object {
+        "allParentIds": Array [],
+        "args": Array [
+          "black",
+        ],
+        "id": 25,
+        "name": "startFetch",
+        "parentActionEvent": undefined,
+        "parentEvent": undefined,
+        "parentId": 0,
+        "rootId": 25,
+        "type": "action",
+      },
       "parentEvent": Object {
         "allParentIds": Array [],
         "args": Array [
@@ -416,6 +652,7 @@ Array [
         ],
         "id": 25,
         "name": "startFetch",
+        "parentActionEvent": undefined,
         "parentEvent": undefined,
         "parentId": 0,
         "rootId": 25,
@@ -438,6 +675,19 @@ Array [
     ],
     "id": 26,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 25,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 25,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -445,6 +695,7 @@ Array [
       ],
       "id": 25,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 25,
@@ -463,6 +714,19 @@ Array [
     ],
     "id": 26,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 25,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 25,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -470,6 +734,7 @@ Array [
       ],
       "id": 25,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 25,
@@ -491,6 +756,7 @@ Array [
     ],
     "id": 11,
     "name": "startFetch",
+    "parentActionEvent": undefined,
     "parentEvent": undefined,
     "parentId": 0,
     "rootId": 11,
@@ -505,6 +771,19 @@ Array [
     ],
     "id": 12,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 11,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 11,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -512,6 +791,7 @@ Array [
       ],
       "id": 11,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 11,
@@ -530,6 +810,19 @@ Array [
     ],
     "id": 12,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 11,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 11,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -537,6 +830,7 @@ Array [
       ],
       "id": 11,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 11,
@@ -555,6 +849,19 @@ Array [
     ],
     "id": 12,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 11,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 11,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -562,6 +869,7 @@ Array [
       ],
       "id": 11,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 11,
@@ -580,6 +888,19 @@ Array [
     ],
     "id": 12,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 11,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 11,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -587,6 +908,7 @@ Array [
       ],
       "id": 11,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 11,
@@ -608,6 +930,7 @@ Array [
     ],
     "id": 7,
     "name": "startFetch",
+    "parentActionEvent": undefined,
     "parentEvent": undefined,
     "parentId": 0,
     "rootId": 7,
@@ -622,6 +945,19 @@ Array [
     ],
     "id": 8,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 7,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 7,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -629,6 +965,7 @@ Array [
       ],
       "id": 7,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 7,
@@ -647,6 +984,19 @@ Array [
     ],
     "id": 8,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 7,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 7,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -654,6 +1004,7 @@ Array [
       ],
       "id": 7,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 7,
@@ -672,6 +1023,19 @@ Array [
     ],
     "id": 8,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 7,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 7,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -679,6 +1043,7 @@ Array [
       ],
       "id": 7,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 7,
@@ -697,6 +1062,19 @@ Array [
     ],
     "id": 8,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 7,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 7,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -704,6 +1082,7 @@ Array [
       ],
       "id": 7,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 7,
@@ -725,6 +1104,7 @@ Array [
     ],
     "id": 9,
     "name": "startFetch",
+    "parentActionEvent": undefined,
     "parentEvent": undefined,
     "parentId": 0,
     "rootId": 9,
@@ -739,6 +1119,19 @@ Array [
     ],
     "id": 10,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 9,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 9,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -746,6 +1139,7 @@ Array [
       ],
       "id": 9,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 9,
@@ -764,6 +1158,19 @@ Array [
     ],
     "id": 10,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 9,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 9,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -771,6 +1178,7 @@ Array [
       ],
       "id": 9,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 9,
@@ -789,6 +1197,19 @@ Array [
     ],
     "id": 10,
     "name": "fetchData",
+    "parentActionEvent": Object {
+      "allParentIds": Array [],
+      "args": Array [
+        "black",
+      ],
+      "id": 9,
+      "name": "startFetch",
+      "parentActionEvent": undefined,
+      "parentEvent": undefined,
+      "parentId": 0,
+      "rootId": 9,
+      "type": "action",
+    },
     "parentEvent": Object {
       "allParentIds": Array [],
       "args": Array [
@@ -796,6 +1217,7 @@ Array [
       ],
       "id": 9,
       "name": "startFetch",
+      "parentActionEvent": undefined,
       "parentEvent": undefined,
       "parentId": 0,
       "rootId": 9,

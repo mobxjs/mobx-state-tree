@@ -81,17 +81,10 @@ export function createActionTrackingMiddleware2<TEnv = any>(
         call: IMiddlewareEvent,
         next: (actionCall: IMiddlewareEvent) => any
     ) {
-        let parentRunningAction
-
         // find parentRunningAction
-        let currentEvent = call.parentEvent
-        while (currentEvent) {
-            parentRunningAction = runningActions.get(currentEvent)
-            if (parentRunningAction) {
-                break
-            }
-            currentEvent = currentEvent.parentEvent
-        }
+        const parentRunningAction = call.parentActionEvent
+            ? runningActions.get(call.parentActionEvent)
+            : undefined
 
         if (call.type === "action") {
             const newCall: IActionTrackingMiddleware2Call<TEnv> = {

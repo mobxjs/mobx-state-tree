@@ -5,7 +5,6 @@ import {
     argsToArray,
     IDisposer,
     getRoot,
-    EMPTY_ARRAY,
     Hook,
     IAnyStateTreeNode,
     warnError,
@@ -32,6 +31,7 @@ export interface IMiddlewareEvent {
     readonly tree: IAnyStateTreeNode
     readonly args: any[]
     readonly parentEvent: IMiddlewareEvent | undefined
+    readonly parentActionEvent: IMiddlewareEvent | undefined
 }
 
 /**
@@ -98,6 +98,16 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
  * @internal
  * @hidden
  */
+export function getParentActionContext(parentContext: IMiddlewareEvent | undefined) {
+    if (!parentContext) return undefined
+    if (parentContext.type === "action") return parentContext
+    return parentContext.parentActionEvent
+}
+
+/**
+ * @internal
+ * @hidden
+ */
 export function createActionInvoker<T extends Function>(
     target: IAnyStateTreeNode,
     name: string,
@@ -106,6 +116,7 @@ export function createActionInvoker<T extends Function>(
     const res = function() {
         const id = getNextActionId()
         const parentContext = currentActionContext
+        const parentActionContext = getParentActionContext(parentContext)
 
         return runWithActionContext(
             {
@@ -120,7 +131,8 @@ export function createActionInvoker<T extends Function>(
                 allParentIds: parentContext
                     ? [...parentContext.allParentIds, parentContext.id]
                     : [],
-                parentEvent: parentContext
+                parentEvent: parentContext,
+                parentActionEvent: parentActionContext
             },
             fn
         )

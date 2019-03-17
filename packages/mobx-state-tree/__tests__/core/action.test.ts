@@ -323,7 +323,8 @@ test("middleware events are correct", () => {
         allParentIds: [],
         tree: {},
         type: "action",
-        parentEvent: undefined
+        parentEvent: undefined,
+        parentActionEvent: undefined
     }
     const event2 = {
         args: [14],
@@ -335,7 +336,8 @@ test("middleware events are correct", () => {
         allParentIds: [process.env.NODE_ENV !== "production" ? 28 : 27],
         tree: {},
         type: "action",
-        parentEvent: event1
+        parentEvent: event1,
+        parentActionEvent: event1
     }
     expect(events).toEqual([event1, event2])
 })
