@@ -310,7 +310,7 @@ export function unprotect(target: IAnyStateTreeNode): void {
  * Returns true if the object is in protected mode, @see protect
  */
 export function isProtected(target: IAnyStateTreeNode): boolean {
-    return getStateTreeNode(target).isProtected
+    return getStateTreeNode(target).isProtectionEnabled
 }
 
 /**
