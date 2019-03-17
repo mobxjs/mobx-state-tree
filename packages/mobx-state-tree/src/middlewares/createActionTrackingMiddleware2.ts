@@ -19,24 +19,17 @@ class RunningAction {
     private running = true
 
     constructor(
-        private readonly map: Map<number, RunningAction>,
         public readonly hooks: IActionTrackingMiddleware2Hooks<any> | undefined,
         readonly call: IActionTrackingMiddleware2Call<any>
     ) {
-        map.set(this.id, this)
         if (hooks) {
             hooks.onStart(call)
         }
     }
 
-    private get id() {
-        return this.call.id
-    }
-
     finish(error?: any) {
         if (this.running) {
             this.running = false
-            this.map.delete(this.id)
             if (this.hooks) {
                 this.hooks.onFinish(this.call, error)
             }
@@ -82,7 +75,7 @@ class RunningAction {
 export function createActionTrackingMiddleware2<TEnv = any>(
     middlewareHooks: IActionTrackingMiddleware2Hooks<TEnv>
 ): IMiddlewareHandler {
-    const runningActions = new Map<number, RunningAction>()
+    const runningActions = new WeakMap<IMiddlewareEvent, RunningAction>()
 
     return function actionTrackingMiddleware(
         call: IMiddlewareEvent,
@@ -93,8 +86,7 @@ export function createActionTrackingMiddleware2<TEnv = any>(
         // find parentRunningAction
         let currentEvent = call.parentEvent
         while (currentEvent) {
-            const id = currentEvent.id
-            parentRunningAction = runningActions.get(id)
+            parentRunningAction = runningActions.get(currentEvent)
             if (parentRunningAction) {
                 break
             }
@@ -112,7 +104,8 @@ export function createActionTrackingMiddleware2<TEnv = any>(
             const passesFilter = !middlewareHooks.filter || middlewareHooks.filter(newCall)
             const hooks = passesFilter ? middlewareHooks : undefined
 
-            const runningAction = new RunningAction(runningActions, hooks, newCall)
+            const runningAction = new RunningAction(hooks, newCall)
+            runningActions.set(call, runningAction)
 
             let res
             try {

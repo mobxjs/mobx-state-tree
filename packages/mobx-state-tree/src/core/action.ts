@@ -22,16 +22,16 @@ export type IMiddlewareEventType =
 // | "task_spawn TODO, see #273"
 
 export interface IMiddlewareEvent {
-    type: IMiddlewareEventType
-    name: string
-    id: number
-    parentId: number
-    rootId: number
-    allParentIds: number[]
-    context: IAnyStateTreeNode
-    tree: IAnyStateTreeNode
-    args: any[]
-    parentEvent: IMiddlewareEvent | undefined
+    readonly type: IMiddlewareEventType
+    readonly name: string
+    readonly id: number
+    readonly parentId: number
+    readonly rootId: number
+    readonly allParentIds: number[]
+    readonly context: IAnyStateTreeNode
+    readonly tree: IAnyStateTreeNode
+    readonly args: any[]
+    readonly parentEvent: IMiddlewareEvent | undefined
 }
 
 /**
@@ -175,29 +175,53 @@ export function addMiddleware(
  *
  * @param handler
  * @param fn
+ * @param includeHooks
  * @returns The original function
  */
-export function decorate<T extends Function>(handler: IMiddlewareHandler, fn: T): T {
-    const middleware: IMiddleware = { handler, includeHooks: true }
-    if ((fn as any).$mst_middleware) (fn as any).$mst_middleware.push(middleware)
-    else;
-    ;(fn as any).$mst_middleware = [middleware]
+export function decorate<T extends Function>(
+    handler: IMiddlewareHandler,
+    fn: T,
+    includeHooks = true
+): T {
+    const middleware: IMiddleware = { handler, includeHooks }
+    ;(fn as any).$mst_middleware = (fn as any).$mst_middleware || []
+    ;(fn as any).$mst_middleware.push(middleware)
     return fn
 }
 
-function collectMiddlewares(
-    node: AnyObjectNode,
-    baseCall: IMiddlewareEvent,
-    fn: Function
-): IMiddleware[] {
-    let middlewares: IMiddleware[] = (fn as any).$mst_middleware || EMPTY_ARRAY
-    let n: AnyObjectNode | null = node
-    // Find all middlewares. Optimization: cache this?
-    while (n) {
-        if (n.middlewares) middlewares = middlewares.concat(n.middlewares)
-        n = n.parent
+class CollectedMiddlewares {
+    private arrayIndex = 0
+    private inArrayIndex = 0
+    private middlewares: IMiddleware[][] = []
+
+    constructor(node: AnyObjectNode, fn: Function) {
+        // we just push middleware arrays into an array of arrays to avoid making copies
+        if ((fn as any).$mst_middleware) {
+            this.middlewares.push((fn as any).$mst_middleware)
+        }
+        let n: AnyObjectNode | null = node
+        // Find all middlewares. Optimization: cache this?
+        while (n) {
+            if (n.middlewares) this.middlewares.push(n.middlewares)
+            n = n.parent
+        }
     }
-    return middlewares
+
+    get isEmpty() {
+        return this.middlewares.length <= 0
+    }
+
+    getNextMiddleware(): IMiddleware | undefined {
+        const array = this.middlewares[this.arrayIndex]
+        if (!array) return undefined
+        const item = array[this.inArrayIndex++]
+        if (!item) {
+            this.arrayIndex++
+            this.inArrayIndex = 0
+            return this.getNextMiddleware()
+        }
+        return item
+    }
 }
 
 function runMiddleWares(
@@ -205,15 +229,14 @@ function runMiddleWares(
     baseCall: IMiddlewareEvent,
     originalFn: Function
 ): any {
-    const middlewares = collectMiddlewares(node, baseCall, originalFn)
+    const middlewares = new CollectedMiddlewares(node, originalFn)
     // Short circuit
-    if (!middlewares.length) return mobxAction(originalFn).apply(null, baseCall.args)
+    if (middlewares.isEmpty) return mobxAction(originalFn).apply(null, baseCall.args)
 
-    let index = 0
     let result: any = null
 
     function runNextMiddleware(call: IMiddlewareEvent): any {
-        const middleware = middlewares[index++]
+        const middleware = middlewares.getNextMiddleware()
         const handler = middleware && middleware.handler
 
         if (!handler) {
@@ -221,7 +244,7 @@ function runMiddleWares(
         }
 
         // skip hooks if asked to
-        if (!middleware.includeHooks && (Hook as any)[call.name]) {
+        if (!middleware!.includeHooks && (Hook as any)[call.name]) {
             return runNextMiddleware(call)
         }
 
@@ -232,11 +255,9 @@ function runMiddleWares(
             // - the non manipulated return value from an action
             // - the non manipulated abort value
             // - one of the above but manipulated through the callback function
-            const innerResult = runNextMiddleware(call2)
+            result = runNextMiddleware(call2)
             if (callback) {
-                result = callback(innerResult)
-            } else {
-                result = innerResult
+                result = callback(result)
             }
         }
 
