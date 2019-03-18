@@ -1,6 +1,5 @@
 import {
     isStateTreeNode,
-    getStateTreeNode,
     IType,
     TypeFlags,
     isType,
@@ -15,7 +14,6 @@ import {
     ExtractC,
     ExtractCST,
     RedefineIStateTreeNode,
-    IStateTreeNode,
     AnyObjectNode,
     BaseType,
     assertIsType
@@ -41,10 +39,7 @@ export class OptionalValue<
 > extends BaseType<
     ExtractC<IT> | OptionalVals[number],
     ExtractS<IT>,
-    RedefineIStateTreeNode<
-        ExtractT<IT>,
-        IStateTreeNode<ExtractC<IT> | OptionalVals[number], ExtractS<IT>>
-    >
+    RedefineIStateTreeNode<ExtractT<IT>, ExtractC<IT> | OptionalVals[number], ExtractS<IT>>
 > {
     get flags() {
         return this._subtype.flags | TypeFlags.Optional
@@ -133,10 +128,7 @@ export interface IOptionalIType<IT extends IAnyType, OptionalVals extends ValidO
     extends IType<
         ExtractC<IT> | OptionalVals[number],
         ExtractS<IT>,
-        RedefineIStateTreeNode<
-            ExtractT<IT>,
-            IStateTreeNode<ExtractC<IT> | OptionalVals[number], ExtractS<IT>>
-        >
+        RedefineIStateTreeNode<ExtractT<IT>, ExtractC<IT> | OptionalVals[number], ExtractS<IT>>
     > {}
 
 function checkOptionalPreconditions<IT extends IAnyType>(

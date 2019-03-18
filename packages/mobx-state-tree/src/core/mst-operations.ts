@@ -101,7 +101,7 @@ export function onPatch(
  * @returns
  */
 export function onSnapshot<S>(
-    target: IStateTreeNode<any, S>,
+    target: IStateTreeNode<any, S, any>,
     callback: (snapshot: S) => void
 ): IDisposer {
     // check all arguments
@@ -270,7 +270,7 @@ export function isProtected(target: IAnyStateTreeNode): boolean {
  * @param snapshot
  * @returns
  */
-export function applySnapshot<C>(target: IStateTreeNode<C, any>, snapshot: C) {
+export function applySnapshot<C>(target: IStateTreeNode<C, any, any>, snapshot: C) {
     // check all arguments
     assertIsStateTreeNode(target, 1)
 
@@ -285,7 +285,7 @@ export function applySnapshot<C>(target: IStateTreeNode<C, any>, snapshot: C) {
  * @param applyPostProcess If true (the default) then postProcessSnapshot gets applied.
  * @returns
  */
-export function getSnapshot<S>(target: IStateTreeNode<any, S>, applyPostProcess = true): S {
+export function getSnapshot<S>(target: IStateTreeNode<any, S, any>, applyPostProcess = true): S {
     // check all arguments
     assertIsStateTreeNode(target, 1)
 
@@ -783,7 +783,7 @@ export interface IModelReflectionPropertiesData {
  * @returns
  */
 export function getPropertyMembers(
-    typeOrNode: IAnyModelType | IStateTreeNode
+    typeOrNode: IAnyModelType | IAnyStateTreeNode
 ): IModelReflectionPropertiesData {
     let type
 

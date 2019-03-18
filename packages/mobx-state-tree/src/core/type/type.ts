@@ -228,7 +228,7 @@ export type Primitives = ModelPrimitive | null | undefined
  * @deprecated just for compatibility with old versions, could be deprecated on the next major version
  * @hidden
  */
-export interface IComplexType<C, S, T> extends IType<C, S, T & IStateTreeNode<C, S>> {}
+export interface IComplexType<C, S, T> extends IType<C, S, T & IStateTreeNode<C, S, T>> {}
 
 // do not convert to an interface
 /**
@@ -255,7 +255,7 @@ export type Instance<T> = T extends IType<any, any, infer TT> ? TT : T
 /**
  * The input (creation) snapshot representation of a given type.
  */
-export type SnapshotIn<T> = T extends IStateTreeNode<infer STNC, any>
+export type SnapshotIn<T> = T extends IStateTreeNode<infer STNC, any, any>
     ? STNC
     : T extends IType<infer TC, any, any>
     ? TC
@@ -264,7 +264,7 @@ export type SnapshotIn<T> = T extends IStateTreeNode<infer STNC, any>
 /**
  * The output snapshot representation of a given type.
  */
-export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
+export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS, any>
     ? STNS
     : T extends IType<any, infer TS, any>
     ? TS

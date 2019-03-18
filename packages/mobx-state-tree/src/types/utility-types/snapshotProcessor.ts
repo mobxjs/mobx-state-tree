@@ -10,7 +10,6 @@ import {
     IValidationResult,
     AnyObjectNode,
     RedefineIStateTreeNode,
-    IStateTreeNode,
     TypeFlags,
     ExtractNodeType,
     assertIsType
@@ -31,7 +30,8 @@ export type _CustomOrOther<Custom, Other> = Custom extends _NotCustomized ? Othe
 /** @hidden */
 export type SnapshotProcessorT<IT extends IAnyType, CustomC, CustomS> = RedefineIStateTreeNode<
     ExtractT<IT>,
-    IStateTreeNode<_CustomOrOther<CustomC, ExtractC<IT>>, _CustomOrOther<CustomS, ExtractS<IT>>>
+    _CustomOrOther<CustomC, ExtractC<IT>>,
+    _CustomOrOther<CustomS, ExtractS<IT>>
 >
 
 class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<

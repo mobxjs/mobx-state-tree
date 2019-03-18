@@ -18,7 +18,6 @@ import {
     ModelCreationType2,
     _NotCustomized,
     RedefineIStateTreeNode,
-    IStateTreeNode,
     AnyObjectNode,
     BaseType
 } from "../../internal"
@@ -147,7 +146,7 @@ export interface ITypeUnion<C, S, T>
     extends IType<
         _CustomCSProcessor<C>,
         _CustomCSProcessor<S>,
-        RedefineIStateTreeNode<T, IStateTreeNode<_CustomCSProcessor<C>, _CustomCSProcessor<S>>>
+        RedefineIStateTreeNode<T, _CustomCSProcessor<C>, _CustomCSProcessor<S>>
     > {}
 
 // generated with C:\VSProjects\github\mobx-state-tree-upstream\packages\mobx-state-tree\scripts\generate-union-types.js

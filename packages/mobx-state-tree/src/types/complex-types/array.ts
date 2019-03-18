@@ -50,8 +50,11 @@ import {
 
 /** @hidden */
 export interface IMSTArray<IT extends IAnyType>
-    extends IObservableArray<ExtractT<IT>>,
-        IStateTreeNode<ExtractC<IT>[] | undefined, ExtractS<IT>[]> {
+    extends IMSTArrayWithoutSTN<IT>,
+        IStateTreeNode<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArrayWithoutSTN<IT>> {}
+
+/** @hidden */
+export interface IMSTArrayWithoutSTN<IT extends IAnyType> extends IObservableArray<ExtractT<IT>> {
     // needs to be split or else it will complain about not being compatible with the array interface
     push(...items: ExtractT<IT>[]): number
     push(...items: ExtractCST<IT>[]): number

@@ -4,7 +4,6 @@ import {
     createScalarNode,
     IType,
     TypeFlags,
-    isType,
     IValidationContext,
     IValidationResult,
     typeCheckSuccess,
@@ -14,7 +13,6 @@ import {
     ExtractT,
     IAnyStateTreeNode,
     IAnyComplexType,
-    IStateTreeNode,
     RedefineIStateTreeNode,
     Hook,
     IDisposer,
@@ -59,7 +57,8 @@ function getInvalidationCause(hook: Hook): "detach" | "destroy" | undefined {
 /** @hidden */
 export type ReferenceT<IT extends IAnyType> = RedefineIStateTreeNode<
     ExtractT<IT>,
-    IStateTreeNode<ReferenceIdentifier, ReferenceIdentifier>
+    ReferenceIdentifier,
+    ReferenceIdentifier
 >
 
 class StoredReference<IT extends IAnyType> {

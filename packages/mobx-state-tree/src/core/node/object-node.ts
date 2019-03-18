@@ -81,7 +81,7 @@ type InternalEventHandlers<S> = {
  */
 export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     readonly type!: ComplexType<C, S, T>
-    storedValue!: T & IStateTreeNode<C, S>
+    storedValue!: T & IStateTreeNode<C, S, T>
 
     readonly nodeId = ++nextNodeId
     readonly identifierAttribute?: string

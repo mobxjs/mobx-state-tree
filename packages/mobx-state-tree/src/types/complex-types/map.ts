@@ -60,15 +60,20 @@ export interface IMapType<IT extends IAnyType>
 
 /** @hidden */
 export interface IMSTMap<IT extends IAnyType>
-    extends IStateTreeNode<IKeyValueMap<ExtractC<IT>> | undefined, IKeyValueMap<ExtractS<IT>>> {
+    extends IMSTMapWithoutSTN<IT>,
+        IStateTreeNode<
+            IKeyValueMap<ExtractC<IT>> | undefined,
+            IKeyValueMap<ExtractS<IT>>,
+            IMSTMapWithoutSTN<IT>
+        > {}
+
+/** @hidden */
+export interface IMSTMapWithoutSTN<IT extends IAnyType> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
 
     clear(): void
     delete(key: string): boolean
-    forEach(
-        callbackfn: (value: ExtractT<IT>, key: string, map: IMSTMap<IT>) => void,
-        thisArg?: any
-    ): void
+    forEach(callbackfn: (value: ExtractT<IT>, key: string, map: this) => void, thisArg?: any): void
     get(key: string): ExtractT<IT> | undefined
     has(key: string): boolean
     set(key: string, value: ExtractCST<IT>): this
@@ -79,8 +84,15 @@ export interface IMSTMap<IT extends IAnyType>
     entries(): IterableIterator<[string, ExtractT<IT>]>
     [Symbol.iterator](): IterableIterator<[string, ExtractT<IT>]>
     /** Merge another object into this map, returns self. */
-    merge(other: IMSTMap<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractCST<IT>> | any): this
-    replace(values: IMSTMap<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractT<IT>>): this
+    merge(
+        other: IMSTMapWithoutSTN<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractCST<IT>> | any
+    ): this
+    replace(
+        values:
+            | IMSTMapWithoutSTN<IType<any, any, ExtractT<IT>>>
+            | IKeyValueMap<ExtractCST<IT>>
+            | any
+    ): this
 
     /**
      * Returns a plain object that represents this map.

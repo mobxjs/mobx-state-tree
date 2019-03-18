@@ -157,7 +157,11 @@ export type ModelInstanceType<
     CustomS
 > = ModelInstanceTypeProps<P> &
     O &
-    IStateTreeNode<ModelCreationType2<P, CustomC>, ModelSnapshotType2<P, CustomS>>
+    IStateTreeNode<
+        ModelCreationType2<P, CustomC>,
+        ModelSnapshotType2<P, CustomS>,
+        ModelInstanceTypeProps<P> & O
+    >
 
 /** @hidden */
 export interface ModelActions {

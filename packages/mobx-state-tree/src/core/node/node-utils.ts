@@ -29,7 +29,7 @@ declare const $stateTreeNodeTypes: unique symbol
  * Common interface that represents a node instance.
  * @hidden
  */
-export interface IStateTreeNode<C = any, S = any> {
+export interface IStateTreeNode<C = any, S = any, T = any> {
     /**
      * @internal
      */
@@ -37,27 +37,31 @@ export interface IStateTreeNode<C = any, S = any> {
 
     // fake, will never be present, just for typing
     // we use this weird trick to allow reference types to work
-    readonly [$stateTreeNodeTypes]?: [C, S] | [any, any]
+    readonly [$stateTreeNodeTypes]?: [C, S, T] | [any, any, any]
 }
 
-type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
+/** @hidden */
+export type RedefineIStateTreeNode<
+    T,
+    NewC,
+    NewS,
+    NewT = ExtractNodeT<T>
+> = T extends IAnyStateTreeNode ? ExtractNodeT<T> & IStateTreeNode<NewC, NewS, NewT> : T
 
 /** @hidden */
-export type RedefineIStateTreeNode<T, STN extends IAnyStateTreeNode> = T extends IAnyStateTreeNode
-    ? Omit<T, typeof $stateTreeNodeTypes> & STN
-    : T
+export type ExtractNodeC<T> = T extends IStateTreeNode<infer C, any, any> ? C : never
 
 /** @hidden */
-export type ExtractNodeC<T> = T extends IStateTreeNode<infer C, any> ? C : never
+export type ExtractNodeS<T> = T extends IStateTreeNode<any, infer S, any> ? S : never
 
 /** @hidden */
-export type ExtractNodeS<T> = T extends IStateTreeNode<any, infer S> ? S : never
+export type ExtractNodeT<T> = T extends IStateTreeNode<any, any, infer X> ? X : never
 
 /**
  * Represents any state tree node instance.
  * @hidden
  */
-export interface IAnyStateTreeNode extends IStateTreeNode<any, any> {}
+export interface IAnyStateTreeNode extends IStateTreeNode<any, any, any> {}
 
 /**
  * Returns true if the given value is a node in a state tree.
@@ -67,7 +71,9 @@ export interface IAnyStateTreeNode extends IStateTreeNode<any, any> {}
  * @param value
  * @returns true if the value is a state tree node.
  */
-export function isStateTreeNode<C = any, S = any>(value: any): value is IStateTreeNode<C, S> {
+export function isStateTreeNode<C = any, S = any, T = any>(
+    value: any
+): value is IStateTreeNode<C, S, T> {
     return !!(value && value.$treenode)
 }
 
@@ -110,7 +116,7 @@ export function getStateTreeNodeSafe(value: IAnyStateTreeNode): AnyObjectNode | 
  * @internal
  * @hidden
  */
-export function toJSON<S>(this: IStateTreeNode<any, S>): S {
+export function toJSON<S>(this: IStateTreeNode<any, S, any>): S {
     return getStateTreeNode(this).snapshot
 }
 

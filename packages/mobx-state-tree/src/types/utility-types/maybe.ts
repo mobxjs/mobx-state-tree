@@ -2,17 +2,15 @@ import {
     union,
     optional,
     IType,
-    isType,
-    fail,
     undefinedType,
     nullType,
     IAnyType,
     ExtractC,
     ExtractS,
     ExtractT,
-    IStateTreeNode,
     RedefineIStateTreeNode,
-    assertIsType
+    assertIsType,
+    ExtractNodeT
 } from "../../internal"
 
 const optionalUndefinedType = optional(undefinedType, undefined)
@@ -23,7 +21,13 @@ export interface IMaybeIType<IT extends IAnyType, C, O>
     extends IType<
         ExtractC<IT> | C,
         ExtractS<IT> | O,
-        RedefineIStateTreeNode<ExtractT<IT>, IStateTreeNode<ExtractC<IT> | C, ExtractS<IT> | O>> | O
+        | RedefineIStateTreeNode<
+              ExtractT<IT>,
+              ExtractC<IT> | C,
+              ExtractS<IT> | O,
+              ExtractNodeT<ExtractT<IT>> | O
+          >
+        | O
     > {}
 
 /** @hidden */
