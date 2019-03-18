@@ -49,13 +49,19 @@ export type RedefineIStateTreeNode<
 > = T extends IAnyStateTreeNode ? ExtractNodeT<T> & IStateTreeNode<NewC, NewS, NewT> : T
 
 /** @hidden */
-export type ExtractNodeC<T> = T extends IStateTreeNode<infer C, any, any> ? C : never
+export type ExtractNodeC<T extends IStateTreeNode> = T extends IStateTreeNode<infer C, any, any>
+    ? C
+    : never
 
 /** @hidden */
-export type ExtractNodeS<T> = T extends IStateTreeNode<any, infer S, any> ? S : never
+export type ExtractNodeS<T extends IStateTreeNode> = T extends IStateTreeNode<any, infer S, any>
+    ? S
+    : never
 
 /** @hidden */
-export type ExtractNodeT<T> = T extends IStateTreeNode<any, any, infer X> ? X : never
+export type ExtractNodeT<T extends IStateTreeNode> = T extends IStateTreeNode<any, any, infer X>
+    ? X
+    : never
 
 /**
  * Represents any state tree node instance.

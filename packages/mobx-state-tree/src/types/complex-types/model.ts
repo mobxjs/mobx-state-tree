@@ -89,7 +89,7 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
         ? IType<boolean | undefined, boolean, boolean>
         : T[K] extends Date
         ? IType<number | Date | undefined, number, Date>
-        : T[K] extends IAnyType
+        : T[K] extends IType<infer TC, infer TS, infer TT> // we have to keep the infers here or TS3.4 will break
         ? T[K]
         : never
 }
