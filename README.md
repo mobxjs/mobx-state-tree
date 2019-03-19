@@ -1348,12 +1348,13 @@ What about compile time? You can use TypeScript interfaces to perform those chec
 
 Good news! You don't need to write it twice!
 
-There are three kinds of types available, plus one helper type:
+There are four kinds of types available, plus one helper type:
 
 -   `Instance<typeof TYPE>` or `Instance<typeof VARIABLE>` is the node instance type. (Legacy form is `typeof MODEL.Type`).
 -   `SnapshotIn<typeof TYPE>` or `SnapshotIn<typeof VARIABLE>` is the input (creation) snapshot type. (Legacy form is `typeof MODEL.CreationType`).
 -   `SnapshotOut<typeof TYPE>` or `SnapshotOut<typeof VARIABLE>` is the output (creation) snapshot type. (Legacy form is `typeof MODEL.SnapshotType`).
 -   `SnapshotOrInstance<typeof TYPE>` or `SnapshotOrInstance<typeof VARIABLE>` is `SnapshotIn<T> | Instance<T>`. This type is useful when you want to declare an input parameter that is able consume both types.
+-   `TypeOfValue<typeof VARIABLE>` gets the original type for the given instance. Note that this only works for complex values (models, arrays, maps...) but not for simple values (number, string, boolean, string, undefined).
 
 ```typescript
 const Todo = types
