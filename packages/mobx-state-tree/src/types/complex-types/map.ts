@@ -39,16 +39,16 @@ import {
     EMPTY_OBJECT,
     ExtractC,
     ExtractS,
-    ExtractT,
-    ExtractCST,
-    IStateTreeNode,
     normalizeIdentifier,
     AnyObjectNode,
     AnyNode,
     AnyModelType,
     asArray,
-    cannotDetermineSubtype
+    cannotDetermineSubtype,
+    ExtractTWithSTN,
+    ExtractCSTWithSTN
 } from "../../internal"
+import { ExtractTWithoutSTN } from "../../core/type/type"
 
 /** @hidden */
 export interface IMapType<IT extends IAnyType>
@@ -59,38 +59,35 @@ export interface IMapType<IT extends IAnyType>
     > {}
 
 /** @hidden */
-export interface IMSTMap<IT extends IAnyType>
-    extends IMSTMapWithoutSTN<IT>,
-        IStateTreeNode<
-            IKeyValueMap<ExtractC<IT>> | undefined,
-            IKeyValueMap<ExtractS<IT>>,
-            IMSTMapWithoutSTN<IT>
-        > {}
-
-/** @hidden */
-export interface IMSTMapWithoutSTN<IT extends IAnyType> {
+export interface IMSTMap<IT extends IAnyType> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
 
     clear(): void
     delete(key: string): boolean
-    forEach(callbackfn: (value: ExtractT<IT>, key: string, map: this) => void, thisArg?: any): void
-    get(key: string): ExtractT<IT> | undefined
+    forEach(
+        callbackfn: (value: ExtractTWithSTN<IT>, key: string, map: this) => void,
+        thisArg?: any
+    ): void
+    get(key: string): ExtractTWithSTN<IT> | undefined
     has(key: string): boolean
-    set(key: string, value: ExtractCST<IT>): this
+    set(key: string, value: ExtractCSTWithSTN<IT>): this
     readonly size: number
-    put(value: ExtractCST<IT>): ExtractT<IT>
+    put(value: ExtractCSTWithSTN<IT>): ExtractTWithSTN<IT>
     keys(): IterableIterator<string>
-    values(): IterableIterator<ExtractT<IT>>
-    entries(): IterableIterator<[string, ExtractT<IT>]>
-    [Symbol.iterator](): IterableIterator<[string, ExtractT<IT>]>
+    values(): IterableIterator<ExtractTWithSTN<IT>>
+    entries(): IterableIterator<[string, ExtractTWithSTN<IT>]>
+    [Symbol.iterator](): IterableIterator<[string, ExtractTWithSTN<IT>]>
     /** Merge another object into this map, returns self. */
     merge(
-        other: IMSTMapWithoutSTN<IType<any, any, ExtractT<IT>>> | IKeyValueMap<ExtractCST<IT>> | any
+        other:
+            | IMSTMap<IType<any, any, ExtractTWithoutSTN<IT>>>
+            | IKeyValueMap<ExtractCSTWithSTN<IT>>
+            | any
     ): this
     replace(
         values:
-            | IMSTMapWithoutSTN<IType<any, any, ExtractT<IT>>>
-            | IKeyValueMap<ExtractCST<IT>>
+            | IMSTMap<IType<any, any, ExtractTWithoutSTN<IT>>>
+            | IKeyValueMap<ExtractCSTWithSTN<IT>>
             | any
     ): this
 
@@ -106,7 +103,7 @@ export interface IMSTMapWithoutSTN<IT extends IAnyType> {
      * Returns a shallow non observable object clone of this map.
      * Note that the values migth still be observable. For a deep clone use mobx.toJS.
      */
-    toJS(): Map<string, ExtractT<IT>>
+    toJS(): Map<string, ExtractTWithSTN<IT>>
 
     toString(): string
     [Symbol.toStringTag]: "Map"
@@ -117,10 +114,10 @@ export interface IMSTMapWithoutSTN<IT extends IAnyType> {
      * for callback details
      */
     observe(
-        listener: (changes: IMapDidChange<string, ExtractT<IT>>) => void,
+        listener: (changes: IMapDidChange<string, ExtractTWithSTN<IT>>) => void,
         fireImmediately?: boolean
     ): Lambda
-    intercept(handler: IInterceptor<IMapWillChange<string, ExtractT<IT>>>): Lambda
+    intercept(handler: IInterceptor<IMapWillChange<string, ExtractTWithSTN<IT>>>): Lambda
 }
 
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
@@ -157,7 +154,7 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
         super(initialData, observable.ref.enhancer)
     }
 
-    get(key: string): ExtractT<IT> | undefined {
+    get(key: string): ExtractTWithSTN<IT> | undefined {
         // maybe this is over-enthousiastic? normalize numeric keys to strings
         return super.get("" + key)
     }
@@ -170,11 +167,11 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
         return super.delete("" + key)
     }
 
-    set(key: string, value: ExtractCST<IT>): this {
+    set(key: string, value: ExtractCSTWithSTN<IT>): this {
         return super.set("" + key, value)
     }
 
-    put(value: ExtractCST<IT>): ExtractT<IT> {
+    put(value: ExtractCSTWithSTN<IT>): ExtractTWithSTN<IT> {
         if (!value) throw fail(`Map.put cannot be used to set empty values`)
         if (isStateTreeNode(value)) {
             const node = getStateTreeNode(value)

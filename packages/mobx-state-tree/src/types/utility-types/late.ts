@@ -10,15 +10,15 @@ import {
     AnyObjectNode,
     ExtractC,
     ExtractS,
-    ExtractT,
     ExtractNodeType,
-    cannotDetermineSubtype
+    cannotDetermineSubtype,
+    ExtractTWithoutSTN
 } from "../../internal"
 
 class Late<IT extends IAnyType> extends BaseType<
     ExtractC<IT>,
     ExtractS<IT>,
-    ExtractT<IT>,
+    ExtractTWithoutSTN<IT>,
     ExtractNodeType<IT>
 > {
     private _subType?: IT

@@ -1,6 +1,5 @@
 import { isComputedProp, isObservableProp } from "mobx"
 import {
-    ExtractT,
     IAnyStateTreeNode,
     IType,
     IAnyModelType,
@@ -13,14 +12,11 @@ import {
     EMPTY_OBJECT,
     fail,
     IDisposer,
-    isType,
     resolveNodeByPath,
     getRelativePathBetweenNodes,
     freeze,
     IAnyType,
     isModelType,
-    ModelPrimitive,
-    ExtractNodeC,
     InvalidReferenceError,
     normalizeIdentifier,
     ReferenceIdentifier,
@@ -28,14 +24,16 @@ import {
     AnyModelType,
     assertIsType,
     assertIsStateTreeNode,
-    ExtractNodeS,
-    ExtractNodeT
+    ExtractC,
+    TypeOfValue,
+    ExtractTWithSTN,
+    ExtractS
 } from "../internal"
 
 /** @hidden */
 export type TypeOrStateTreeNodeToStateTreeNode<
     T extends IAnyType | IAnyStateTreeNode
-> = T extends IType<any, any, infer TT> ? TT : T
+> = T extends IType<any, any, infer TT> ? TT & IStateTreeNode<T> : T
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -103,7 +101,7 @@ export function onPatch(
  * @returns
  */
 export function onSnapshot<S>(
-    target: IStateTreeNode<any, S, any>,
+    target: IStateTreeNode<IType<any, S, any>>,
     callback: (snapshot: S) => void
 ): IDisposer {
     // check all arguments
@@ -272,7 +270,7 @@ export function isProtected(target: IAnyStateTreeNode): boolean {
  * @param snapshot
  * @returns
  */
-export function applySnapshot<C>(target: IStateTreeNode<C, any, any>, snapshot: C) {
+export function applySnapshot<C>(target: IStateTreeNode<IType<C, any, any>>, snapshot: C) {
     // check all arguments
     assertIsStateTreeNode(target, 1)
 
@@ -287,7 +285,10 @@ export function applySnapshot<C>(target: IStateTreeNode<C, any, any>, snapshot: 
  * @param applyPostProcess If true (the default) then postProcessSnapshot gets applied.
  * @returns
  */
-export function getSnapshot<S>(target: IStateTreeNode<any, S, any>, applyPostProcess = true): S {
+export function getSnapshot<S>(
+    target: IStateTreeNode<IType<any, S, any>>,
+    applyPostProcess = true
+): S {
     // check all arguments
     assertIsStateTreeNode(target, 1)
 
@@ -385,7 +386,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
 export function getParentOfType<IT extends IAnyType>(
     target: IAnyStateTreeNode,
     type: IT
-): ExtractT<IT> {
+): ExtractTWithSTN<IT> {
     // check all arguments
     assertIsStateTreeNode(target, 1)
     assertIsType(type, 2)
@@ -488,7 +489,7 @@ export function resolveIdentifier<IT extends IAnyType>(
     type: IT,
     target: IAnyStateTreeNode,
     identifier: ReferenceIdentifier
-): ExtractT<IT> | undefined {
+): ExtractTWithSTN<IT> | undefined {
     // check all arguments
     assertIsType(type, 1)
     assertIsStateTreeNode(target, 2)
@@ -843,9 +844,14 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     return reflected
 }
 
-export function cast<O extends ModelPrimitive = never>(snapshotOrInstance: O): O
+export function cast<O extends string | number | boolean | null | undefined = never>(
+    snapshotOrInstance: O
+): O
 export function cast<O = never>(
-    snapshotOrInstance: ExtractNodeC<O> | ExtractNodeS<O> | ExtractNodeT<O>
+    snapshotOrInstance:
+        | ExtractC<TypeOfValue<O>>
+        | ExtractS<TypeOfValue<O>>
+        | ExtractTWithSTN<TypeOfValue<O>>
 ): O
 /**
  * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
@@ -909,7 +915,7 @@ export function cast(snapshotOrInstance: any): any {
  */
 export function castToSnapshot<I>(
     snapshotOrInstance: I
-): Extract<I, IAnyStateTreeNode> extends never ? I : ExtractNodeC<I> {
+): Extract<I, IAnyStateTreeNode> extends never ? I : ExtractC<TypeOfValue<I>> {
     return snapshotOrInstance as any
 }
 

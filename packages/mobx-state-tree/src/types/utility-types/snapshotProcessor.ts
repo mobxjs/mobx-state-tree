@@ -3,16 +3,15 @@ import {
     ExtractC,
     ExtractS,
     IAnyType,
-    ExtractT,
     BaseType,
     isStateTreeNode,
     IValidationContext,
     IValidationResult,
     AnyObjectNode,
-    RedefineIStateTreeNode,
     TypeFlags,
     ExtractNodeType,
-    assertIsType
+    assertIsType,
+    ExtractTWithoutSTN
 } from "../../internal"
 
 /** @hidden */
@@ -27,17 +26,10 @@ export interface _NotCustomized {
 /** @hidden */
 export type _CustomOrOther<Custom, Other> = Custom extends _NotCustomized ? Other : Custom
 
-/** @hidden */
-export type SnapshotProcessorT<IT extends IAnyType, CustomC, CustomS> = RedefineIStateTreeNode<
-    ExtractT<IT>,
-    _CustomOrOther<CustomC, ExtractC<IT>>,
-    _CustomOrOther<CustomS, ExtractS<IT>>
->
-
 class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     _CustomOrOther<CustomC, ExtractC<IT>>,
     _CustomOrOther<CustomS, ExtractS<IT>>,
-    SnapshotProcessorT<IT, CustomC, CustomS>,
+    ExtractTWithoutSTN<IT>,
     ExtractNodeType<IT>
 > {
     get flags() {
@@ -144,7 +136,7 @@ export interface ISnapshotProcessor<IT extends IAnyType, CustomC, CustomS>
     extends IType<
         _CustomOrOther<CustomC, ExtractC<IT>>,
         _CustomOrOther<CustomS, ExtractS<IT>>,
-        SnapshotProcessorT<IT, CustomC, CustomS>
+        ExtractTWithoutSTN<IT>
     > {}
 
 /**

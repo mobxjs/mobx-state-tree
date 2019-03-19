@@ -6,9 +6,7 @@ import {
     isStateTreeNode,
     isPrimitiveType,
     IAnyType,
-    ExtractC,
-    ExtractS,
-    ExtractT
+    ExtractCSTWithSTN
 } from "../../internal"
 
 /** Validation context entry, this is, where the validation should run against which type */
@@ -147,7 +145,7 @@ export function flattenTypeErrors(errors: IValidationResult[]): IValidationResul
  */
 export function typecheckInternal<IT extends IAnyType>(
     type: IAnyType,
-    value: ExtractC<IT> | ExtractS<IT> | ExtractT<IT>
+    value: ExtractCSTWithSTN<IT>
 ): void {
     // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
     if (process.env.NODE_ENV === "production") return
@@ -162,10 +160,7 @@ export function typecheckInternal<IT extends IAnyType>(
  * @param type Type to check against.
  * @param value Value to be checked, either a snapshot or an instance.
  */
-export function typecheck<IT extends IAnyType>(
-    type: IT,
-    value: ExtractC<IT> | ExtractS<IT> | ExtractT<IT>
-): void {
+export function typecheck<IT extends IAnyType>(type: IT, value: ExtractCSTWithSTN<IT>): void {
     const errors = type.validate(value, [{ path: "", type }])
 
     if (errors.length > 0) {
@@ -175,7 +170,7 @@ export function typecheck<IT extends IAnyType>(
 
 function validationErrorsToString<IT extends IAnyType>(
     type: IT,
-    value: ExtractC<IT> | ExtractS<IT> | ExtractT<IT>,
+    value: ExtractCSTWithSTN<IT>,
     errors: IValidationError[]
 ): string | undefined {
     if (errors.length === 0) {

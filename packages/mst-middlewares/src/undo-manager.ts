@@ -1,7 +1,7 @@
 import {
     types,
     IJsonPatch,
-    IStateTreeNode,
+    IAnyStateTreeNode,
     IMiddlewareEvent,
     recordPatches,
     IPatchRecorder,
@@ -36,7 +36,7 @@ const UndoManager = types
     .actions(self => {
         let skipping = false
         let flagSkipping = false
-        let targetStore: IStateTreeNode
+        let targetStore: IAnyStateTreeNode
         let replaying = false
         let middlewareDisposer: IDisposer
         let grouping = false

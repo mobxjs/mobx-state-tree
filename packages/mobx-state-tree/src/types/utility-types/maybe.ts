@@ -7,10 +7,8 @@ import {
     IAnyType,
     ExtractC,
     ExtractS,
-    ExtractT,
-    RedefineIStateTreeNode,
     assertIsType,
-    ExtractNodeT
+    ExtractTWithoutSTN
 } from "../../internal"
 
 const optionalUndefinedType = optional(undefinedType, undefined)
@@ -18,17 +16,7 @@ const optionalNullType = optional(nullType, null)
 
 /** @hidden */
 export interface IMaybeIType<IT extends IAnyType, C, O>
-    extends IType<
-        ExtractC<IT> | C,
-        ExtractS<IT> | O,
-        | RedefineIStateTreeNode<
-              ExtractT<IT>,
-              ExtractC<IT> | C,
-              ExtractS<IT> | O,
-              ExtractNodeT<ExtractT<IT>> | O
-          >
-        | O
-    > {}
+    extends IType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractTWithoutSTN<IT> | O> {}
 
 /** @hidden */
 export interface IMaybe<IT extends IAnyType> extends IMaybeIType<IT, undefined, undefined> {}

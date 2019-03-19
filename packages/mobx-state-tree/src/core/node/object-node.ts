@@ -35,7 +35,8 @@ import {
     warnError,
     AnyNode,
     IStateTreeNode,
-    ArgumentTypes
+    ArgumentTypes,
+    IType
 } from "../../internal"
 
 let nextNodeId = 1
@@ -81,7 +82,7 @@ type InternalEventHandlers<S> = {
  */
 export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     readonly type!: ComplexType<C, S, T>
-    storedValue!: T & IStateTreeNode<C, S, T>
+    storedValue!: T & IStateTreeNode<IType<C, S, T>>
 
     readonly nodeId = ++nextNodeId
     readonly identifierAttribute?: string

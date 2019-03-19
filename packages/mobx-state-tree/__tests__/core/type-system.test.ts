@@ -11,7 +11,8 @@ import {
     castToSnapshot,
     IType,
     isStateTreeNode,
-    isFrozenType
+    isFrozenType,
+    TypeOfValue
 } from "../../src"
 
 const createTestFactories = () => {
@@ -989,4 +990,28 @@ test("MST array type should be assignable to plain array type", () => {
             a: 5
         }).a
     }
+})
+
+test("can get snapshot from submodel (submodel is IStateNodeTree", () => {
+    const T = types.model({
+        a: types.model({ x: 5 })
+    })
+    const t = T.create({ a: {} })
+    const sn = getSnapshot(t.a).x
+})
+
+test("can extract type from complex objects", () => {
+    const T = types.maybe(
+        types.model({
+            a: types.model({
+                x: 5
+            })
+        })
+    )
+    const t = T.create({
+        a: {}
+    })!
+
+    type OriginalType = TypeOfValue<typeof t>
+    const T2: OriginalType = T
 })

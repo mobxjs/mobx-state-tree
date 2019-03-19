@@ -5,9 +5,9 @@ import {
     mobxShallow,
     AnyObjectNode,
     ExtractS,
-    ExtractT,
     ExtractC,
-    IAnyComplexType
+    IAnyComplexType,
+    ExtractTWithoutSTN
 } from "../../internal"
 
 let identifierCacheId = 0
@@ -105,7 +105,7 @@ export class IdentifierCache {
     resolve<IT extends IAnyComplexType>(
         type: IT,
         identifier: string
-    ): ObjectNode<ExtractC<IT>, ExtractS<IT>, ExtractT<IT>> | null {
+    ): ObjectNode<ExtractC<IT>, ExtractS<IT>, ExtractTWithoutSTN<IT>> | null {
         const set = this.cache.get(identifier)
         if (!set) return null
         const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))

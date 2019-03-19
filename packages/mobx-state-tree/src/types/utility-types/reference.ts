@@ -10,10 +10,8 @@ import {
     typeCheckFailure,
     fail,
     IAnyType,
-    ExtractT,
     IAnyStateTreeNode,
     IAnyComplexType,
-    RedefineIStateTreeNode,
     Hook,
     IDisposer,
     maybe,
@@ -27,7 +25,9 @@ import {
     AnyNode,
     AnyObjectNode,
     SimpleType,
-    assertIsType
+    assertIsType,
+    ExtractTWithoutSTN,
+    IStateTreeNode
 } from "../../internal"
 
 export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
@@ -55,11 +55,8 @@ function getInvalidationCause(hook: Hook): "detach" | "destroy" | undefined {
 }
 
 /** @hidden */
-export type ReferenceT<IT extends IAnyType> = RedefineIStateTreeNode<
-    ExtractT<IT>,
-    ReferenceIdentifier,
-    ReferenceIdentifier
->
+export type ReferenceT<IT extends IAnyType> = ExtractTWithoutSTN<IT> &
+    IStateTreeNode<IReferenceType<IT>>
 
 class StoredReference<IT extends IAnyType> {
     readonly identifier!: ReferenceIdentifier
@@ -142,7 +139,7 @@ export class InvalidReferenceError extends Error {
 export abstract class BaseReferenceType<IT extends IAnyComplexType> extends SimpleType<
     ReferenceIdentifier,
     ReferenceIdentifier,
-    ReferenceT<IT>
+    ExtractTWithoutSTN<IT>
 > {
     readonly flags = TypeFlags.Reference
 
@@ -368,7 +365,7 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
             storedRef as any
         )
         storedRef.node = storedRefNode
-        this.watchTargetNodeForInvalidations(storedRefNode, identifier, undefined)
+        this.watchTargetNodeForInvalidations(storedRefNode, identifier as string, undefined)
         return storedRefNode
     }
 
@@ -423,7 +420,7 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
         newValue: this["C"] | this["T"]
     ): this["N"] {
         const identifier = isStateTreeNode(newValue)
-            ? this.options.set(newValue, parent ? parent.storedValue : null)
+            ? this.options.set(newValue as any, parent ? parent.storedValue : null)
             : newValue
         const storedRefNode: this["N"] = createScalarNode(
             this,
@@ -432,13 +429,13 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
             environment,
             identifier as any
         )
-        this.watchTargetNodeForInvalidations(storedRefNode, identifier, this.options)
+        this.watchTargetNodeForInvalidations(storedRefNode, identifier as string, this.options)
         return storedRefNode
     }
 
     reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
         const newIdentifier = isStateTreeNode(newValue)
-            ? this.options.set(newValue, current ? current.storedValue : null)
+            ? this.options.set(newValue as any, current ? current.storedValue : null)
             : newValue
         if (
             !current.isDetaching &&
@@ -475,7 +472,7 @@ export type ReferenceOptions<IT extends IAnyComplexType> =
 
 /** @hidden */
 export interface IReferenceType<IT extends IAnyComplexType>
-    extends IType<ReferenceIdentifier, ReferenceIdentifier, ReferenceT<IT>> {}
+    extends IType<ReferenceIdentifier, ReferenceIdentifier, ExtractTWithoutSTN<IT>> {}
 
 /**
  * `types.reference` - Creates a reference to another type, which should have defined an identifier.
