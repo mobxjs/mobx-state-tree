@@ -9,7 +9,7 @@
 #### CustomS 
 ## Hierarchy
 
- [IType](itype.md)<`ModelCreationType2`<`PROPS`, `CustomC`>, `ModelSnapshotType2`<`PROPS`, `CustomS`>, `ModelInstanceType`<`PROPS`, `OTHERS`, `CustomC`, `CustomS`>>
+ [IType](itype.md)<`ModelCreationType2`<`PROPS`, `CustomC`>, `ModelSnapshotType2`<`PROPS`, `CustomS`>, `ModelInstanceType`<`PROPS`, `OTHERS`>>
 
 **↳ IModelType**
 
@@ -92,9 +92,9 @@ ___
 
 ###  create
 
-▸ **create**(...args: *`CreateParams`<`ModelCreationType2`<`PROPS`, `CustomC`>>*): `ModelInstanceType`<`PROPS`, `OTHERS`, `CustomC`, `CustomS`>
+▸ **create**(...args: *`CreateParams`<`ModelCreationType2`<`PROPS`, `CustomC`>>*): `STNValue`<`ModelInstanceType`<`PROPS`, `OTHERS`>, `this`>
 
-▸ **create**(snapshot: *`ModelCreationType2`<`PROPS`, `CustomC`>*, env?: *`any`*): `ModelInstanceType`<`PROPS`, `OTHERS`, `CustomC`, `CustomS`>
+▸ **create**(snapshot: *`ModelCreationType2`<`PROPS`, `CustomC`>*, env?: *`any`*): `STNValue`<`ModelInstanceType`<`PROPS`, `OTHERS`>, `this`>
 
 **Parameters:**
 
@@ -102,7 +102,7 @@ ___
 | ------ | ------ |
 | `Rest` args | `CreateParams`<`ModelCreationType2`<`PROPS`, `CustomC`>> |
 
-**Returns:** `ModelInstanceType`<`PROPS`, `OTHERS`, `CustomC`, `CustomS`>
+**Returns:** `STNValue`<`ModelInstanceType`<`PROPS`, `OTHERS`>, `this`>
 
 Creates an instance for the type given an snapshot input.
 
@@ -113,7 +113,7 @@ Creates an instance for the type given an snapshot input.
 | snapshot | `ModelCreationType2`<`PROPS`, `CustomC`> |
 | `Optional` env | `any` |
 
-**Returns:** `ModelInstanceType`<`PROPS`, `OTHERS`, `CustomC`, `CustomS`>
+**Returns:** `STNValue`<`ModelInstanceType`<`PROPS`, `OTHERS`>, `this`>
 An instance of that type.
 
 ___

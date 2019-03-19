@@ -1,10 +1,9 @@
 import {
-    IStateTreeNode,
+    IAnyStateTreeNode,
     isStateTreeNode,
     getSnapshot,
     applyAction,
     onSnapshot,
-    IAnyStateTreeNode,
     getType,
     hasParent,
     getParent,
@@ -26,7 +25,7 @@ import {
  * @param {...MiddleWare[]} middlewares
  * @returns {IReduxStore}
  */
-export const asReduxStore = function(model: IStateTreeNode, ...middlewares: any[]) {
+export const asReduxStore = function(model: IAnyStateTreeNode, ...middlewares: any[]) {
     if (!isStateTreeNode(model)) throw new Error("Expected model object")
     let store = {
         getState: () => getSnapshot(model),

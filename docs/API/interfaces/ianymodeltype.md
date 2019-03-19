@@ -87,9 +87,9 @@ ___
 
 ###  create
 
-▸ **create**(...args: *`CreateParams`<`ModelCreationType2`<`any`, `any`>>*): `ModelInstanceType`<`any`, `any`, `any`, `any`>
+▸ **create**(...args: *`CreateParams`<`ModelCreationType2`<`any`, `any`>>*): `STNValue`<`ModelInstanceType`<`any`, `any`>, `this`>
 
-▸ **create**(snapshot: *`ModelCreationType2`<`any`, `any`>*, env?: *`any`*): `ModelInstanceType`<`any`, `any`, `any`, `any`>
+▸ **create**(snapshot: *`ModelCreationType2`<`any`, `any`>*, env?: *`any`*): `STNValue`<`ModelInstanceType`<`any`, `any`>, `this`>
 
 **Parameters:**
 
@@ -97,7 +97,7 @@ ___
 | ------ | ------ |
 | `Rest` args | `CreateParams`<`ModelCreationType2`<`any`, `any`>> |
 
-**Returns:** `ModelInstanceType`<`any`, `any`, `any`, `any`>
+**Returns:** `STNValue`<`ModelInstanceType`<`any`, `any`>, `this`>
 
 Creates an instance for the type given an snapshot input.
 
@@ -108,7 +108,7 @@ Creates an instance for the type given an snapshot input.
 | snapshot | `ModelCreationType2`<`any`, `any`> |
 | `Optional` env | `any` |
 
-**Returns:** `ModelInstanceType`<`any`, `any`, `any`, `any`>
+**Returns:** `STNValue`<`ModelInstanceType`<`any`, `any`>, `this`>
 An instance of that type.
 
 ___

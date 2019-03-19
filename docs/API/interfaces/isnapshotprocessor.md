@@ -10,7 +10,7 @@ A type that has its snapshots processed.
 #### CustomS 
 ## Hierarchy
 
- [IType](itype.md)<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>, `_CustomOrOther`<`CustomS`, `ExtractS`<`IT`>>, `SnapshotProcessorT`<`IT`, `CustomC`, `CustomS`>>
+ [IType](itype.md)<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>, `_CustomOrOther`<`CustomS`, `ExtractS`<`IT`>>, `ExtractTWithoutSTN`<`IT`>>
 
 **↳ ISnapshotProcessor**
 
@@ -57,9 +57,9 @@ ___
 
 ###  create
 
-▸ **create**(...args: *`CreateParams`<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>>*): `SnapshotProcessorT`<`IT`, `CustomC`, `CustomS`>
+▸ **create**(...args: *`CreateParams`<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>>*): `STNValue`<`ExtractTWithoutSTN`<`IT`>, `this`>
 
-▸ **create**(snapshot: *`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>*, env?: *`any`*): `SnapshotProcessorT`<`IT`, `CustomC`, `CustomS`>
+▸ **create**(snapshot: *`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>*, env?: *`any`*): `STNValue`<`ExtractTWithoutSTN`<`IT`>, `this`>
 
 **Parameters:**
 
@@ -67,7 +67,7 @@ ___
 | ------ | ------ |
 | `Rest` args | `CreateParams`<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>> |
 
-**Returns:** `SnapshotProcessorT`<`IT`, `CustomC`, `CustomS`>
+**Returns:** `STNValue`<`ExtractTWithoutSTN`<`IT`>, `this`>
 
 Creates an instance for the type given an snapshot input.
 
@@ -78,7 +78,7 @@ Creates an instance for the type given an snapshot input.
 | snapshot | `_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>> |
 | `Optional` env | `any` |
 
-**Returns:** `SnapshotProcessorT`<`IT`, `CustomC`, `CustomS`>
+**Returns:** `STNValue`<`ExtractTWithoutSTN`<`IT`>, `this`>
 An instance of that type.
 
 ___

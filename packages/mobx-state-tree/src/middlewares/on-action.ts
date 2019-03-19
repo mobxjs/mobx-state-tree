@@ -129,7 +129,7 @@ function baseApplyAction(target: IAnyStateTreeNode, action: ISerializedActionCal
  *      // stop recording actions
  *      stop(): any
  *      // apply all the recorded actions on the given object
- *      replay(target: IStateTreeNode): any
+ *      replay(target: IAnyStateTreeNode): any
  * }
  * ```
  *

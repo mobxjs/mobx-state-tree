@@ -35,7 +35,6 @@ import {
     isPlainObject,
     isPrimitive,
     isStateTreeNode,
-    IStateTreeNode,
     isType,
     IType,
     IValidationResult,
@@ -47,16 +46,14 @@ import {
     TypeFlags,
     ExtractC,
     ExtractS,
-    ExtractT,
     Hook,
     AnyObjectNode,
     AnyNode,
     _CustomOrOther,
     _NotCustomized,
-    OptionalValue,
-    asArray,
-    cannotDetermineSubtype,
-    IsOptionalType
+    IsOptionalType,
+    ExtractTWithSTN,
+    Instance
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -89,7 +86,7 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
         ? IType<boolean | undefined, boolean, boolean>
         : T[K] extends Date
         ? IType<number | Date | undefined, number, Date>
-        : T[K] extends IAnyType
+        : T[K] extends IType<infer _TC, infer _TS, infer _TT> // we have to keep the infers here or TS3.4 will break
         ? T[K]
         : never
 }
@@ -144,20 +141,15 @@ export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOt
  * @hidden
  * we keep this separate from ModelInstanceType to shorten model instance types generated declarations
  */
-export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]: ExtractT<P[K]> }
+export type ModelInstanceTypeProps<P extends ModelProperties> = {
+    [K in keyof P]: ExtractTWithSTN<P[K]>
+}
 
 /**
  * @hidden
  * do not transform this to an interface or model instance type generated declarations will be longer
  */
-export type ModelInstanceType<
-    P extends ModelProperties,
-    O,
-    CustomC,
-    CustomS
-> = ModelInstanceTypeProps<P> &
-    O &
-    IStateTreeNode<ModelCreationType2<P, CustomC>, ModelSnapshotType2<P, CustomS>>
+export type ModelInstanceType<P extends ModelProperties, O> = ModelInstanceTypeProps<P> & O
 
 /** @hidden */
 export interface ModelActions {
@@ -173,7 +165,7 @@ export interface IModelType<
     extends IType<
         ModelCreationType2<PROPS, CustomC>,
         ModelSnapshotType2<PROPS, CustomS>,
-        ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>
+        ModelInstanceType<PROPS, OTHERS>
     > {
     readonly properties: PROPS
 
@@ -186,21 +178,19 @@ export interface IModelType<
     ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS, CustomC, CustomS>
 
     views<V extends Object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>) => V
+        fn: (self: Instance<this>) => V
     ): IModelType<PROPS, OTHERS & V, CustomC, CustomS>
 
     actions<A extends ModelActions>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>) => A
+        fn: (self: Instance<this>) => A
     ): IModelType<PROPS, OTHERS & A, CustomC, CustomS>
 
     volatile<TP extends object>(
-        fn: (self: ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>) => TP
+        fn: (self: Instance<this>) => TP
     ): IModelType<PROPS, OTHERS & TP, CustomC, CustomS>
 
     extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
-        fn: (
-            self: ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>
-        ) => { actions?: A; views?: V; state?: VS }
+        fn: (self: Instance<this>) => { actions?: A; views?: V; state?: VS }
     ): IModelType<PROPS, OTHERS & A & V & VS, CustomC, CustomS>
 
     /** @deprecated See `types.snapshotProcessor` */
@@ -327,7 +317,7 @@ export class ModelType<
     extends ComplexType<
         ModelCreationType2<PROPS, CustomC>,
         ModelSnapshotType2<PROPS, CustomS>,
-        ModelInstanceType<PROPS, OTHERS, CustomC, CustomS>
+        ModelInstanceType<PROPS, OTHERS>
     >
     implements IModelType<PROPS, OTHERS, CustomC, CustomS> {
     readonly flags = TypeFlags.Object
@@ -379,8 +369,8 @@ export class ModelType<
         })
     }
 
-    actions: MT["actions"] = fn => {
-        const actionInitializer = (self: this["T"]) => {
+    actions<A extends ModelActions>(fn: (self: Instance<this>) => A) {
+        const actionInitializer = (self: Instance<this>) => {
             this.instantiateActions(self, fn(self))
             return self
         }
@@ -442,8 +432,8 @@ export class ModelType<
         return this.cloneAndEnhance({ properties })
     }
 
-    volatile: MT["volatile"] = fn => {
-        const stateInitializer = (self: this["T"]) => {
+    volatile<TP extends object>(fn: (self: Instance<this>) => TP) {
+        const stateInitializer = (self: Instance<this>) => {
             this.instantiateVolatileState(self, fn(self))
             return self
         }
@@ -462,8 +452,10 @@ export class ModelType<
         set(self, state)
     }
 
-    extend: MT["extend"] = fn => {
-        const initializer = (self: this["T"]) => {
+    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
+        fn: (self: Instance<this>) => { actions?: A; views?: V; state?: VS }
+    ) {
+        const initializer = (self: Instance<this>) => {
             const { actions, views, state, ...rest } = fn(self)
             for (let key in rest)
                 throw fail(
@@ -477,8 +469,8 @@ export class ModelType<
         return this.cloneAndEnhance({ initializers: [initializer] })
     }
 
-    views: MT["views"] = fn => {
-        const viewInitializer = (self: this["T"]) => {
+    views<V extends Object>(fn: (self: Instance<this>) => V) {
+        const viewInitializer = (self: Instance<this>) => {
             this.instantiateViews(self, fn(self))
             return self
         }

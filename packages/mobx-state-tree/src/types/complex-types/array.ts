@@ -26,7 +26,6 @@ import {
     isNode,
     isPlainObject,
     isStateTreeNode,
-    IStateTreeNode,
     isType,
     IType,
     IValidationResult,
@@ -37,37 +36,48 @@ import {
     TypeFlags,
     ExtractS,
     ExtractC,
-    ExtractT,
-    ExtractCST,
     normalizeIdentifier,
     EMPTY_OBJECT,
     IAnyStateTreeNode,
     AnyObjectNode,
     AnyNode,
     createObjectNode,
-    assertIsType
+    assertIsType,
+    ExtractTWithSTN,
+    ExtractCSTWithSTN,
+    IStateTreeNode
 } from "../../internal"
 
 /** @hidden */
-export interface IMSTArray<IT extends IAnyType>
-    extends IObservableArray<ExtractT<IT>>,
-        IStateTreeNode<ExtractC<IT>[] | undefined, ExtractS<IT>[]> {
+export interface IMSTArray<IT extends IAnyType> extends IObservableArray<ExtractTWithSTN<IT>> {
     // needs to be split or else it will complain about not being compatible with the array interface
-    push(...items: ExtractT<IT>[]): number
-    push(...items: ExtractCST<IT>[]): number
+    push(...items: ExtractTWithSTN<IT>[]): number
+    push(...items: ExtractCSTWithSTN<IT>[]): number
 
-    concat(...items: ConcatArray<ExtractT<IT>>[]): ExtractT<IT>[]
-    concat(...items: ConcatArray<ExtractCST<IT>>[]): ExtractT<IT>[]
+    concat(...items: ConcatArray<ExtractTWithSTN<IT>>[]): ExtractTWithSTN<IT>[]
+    concat(...items: ConcatArray<ExtractCSTWithSTN<IT>>[]): ExtractTWithSTN<IT>[]
 
-    concat(...items: (ExtractT<IT> | ConcatArray<ExtractT<IT>>)[]): ExtractT<IT>[]
-    concat(...items: (ExtractCST<IT> | ConcatArray<ExtractCST<IT>>)[]): ExtractT<IT>[]
+    concat(
+        ...items: (ExtractTWithSTN<IT> | ConcatArray<ExtractTWithSTN<IT>>)[]
+    ): ExtractTWithSTN<IT>[]
+    concat(
+        ...items: (ExtractCSTWithSTN<IT> | ConcatArray<ExtractCSTWithSTN<IT>>)[]
+    ): ExtractTWithSTN<IT>[]
 
-    splice(start: number, deleteCount?: number): ExtractT<IT>[]
-    splice(start: number, deleteCount: number, ...items: ExtractT<IT>[]): ExtractT<IT>[]
-    splice(start: number, deleteCount: number, ...items: ExtractCST<IT>[]): ExtractT<IT>[]
+    splice(start: number, deleteCount?: number): ExtractTWithSTN<IT>[]
+    splice(
+        start: number,
+        deleteCount: number,
+        ...items: ExtractTWithSTN<IT>[]
+    ): ExtractTWithSTN<IT>[]
+    splice(
+        start: number,
+        deleteCount: number,
+        ...items: ExtractCSTWithSTN<IT>[]
+    ): ExtractTWithSTN<IT>[]
 
-    unshift(...items: ExtractT<IT>[]): number
-    unshift(...items: ExtractCST<IT>[]): number
+    unshift(...items: ExtractTWithSTN<IT>[]): number
+    unshift(...items: ExtractCSTWithSTN<IT>[]): number
 }
 
 /** @hidden */
@@ -136,7 +146,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     willChange(
         change: IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode>
     ): IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode> | null {
-        const node = getStateTreeNode(change.object as this["T"])
+        const node = getStateTreeNode(change.object as IStateTreeNode<this>)
         node.assertWritable({ subpath: String(change.index) })
         const subType = (node.type as this)._subType
         const childNodes = node.getChildren()
