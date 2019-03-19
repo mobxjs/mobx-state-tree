@@ -13,15 +13,15 @@ import {
     AnyObjectNode,
     BaseType,
     ExtractS,
-    ExtractT,
     ExtractNodeType,
-    assertIsType
+    assertIsType,
+    ExtractTWithoutSTN
 } from "../../internal"
 
 class Refinement<IT extends IAnyType> extends BaseType<
     ExtractC<IT>,
     ExtractS<IT>,
-    ExtractT<IT>,
+    ExtractTWithoutSTN<IT>,
     ExtractNodeType<IT>
 > {
     get flags() {

@@ -16,7 +16,6 @@ import {
     ObjectNode,
     IChildNodesMap,
     ModelPrimitive,
-    IAnyStateTreeNode,
     normalizeIdentifier,
     AnyObjectNode,
     AnyNode,
@@ -109,6 +108,11 @@ export type CreateParams<C> = IsEmptyCreationType<C> extends false ? [C, any?] :
 export const cannotDetermineSubtype = "cannotDetermine"
 
 /**
+ * @hidden
+ */
+export type STNValue<T, IT extends IAnyType> = T extends object ? T & IStateTreeNode<IT> : T
+
+/**
  * A type, either complex or simple.
  */
 export interface IType<C, S, T> {
@@ -117,13 +121,13 @@ export interface IType<C, S, T> {
      */
     name: string
 
-    create(...args: CreateParams<C>): T
+    create(...args: CreateParams<C>): STNValue<T, this>
     /**
      * Creates an instance for the type given an snapshot input.
      *
      * @returns An instance of that type.
      */
-    create(snapshot: C, env?: any): T // fallback
+    create(snapshot: C, env?: any): STNValue<T, this> // fallback
 
     /**
      * Checks if a given snapshot / instance is of the given type.
@@ -131,7 +135,7 @@ export interface IType<C, S, T> {
      * @param thing Snapshot or instance to be checked.
      * @returns true if the value is of the current type, false otherwise.
      */
-    is(thing: any): thing is C | T
+    is(thing: any): thing is C | STNValue<T, this>
 
     /**
      * Run's the type's typechecker on the given value with the given validation context.
@@ -151,7 +155,7 @@ export interface IType<C, S, T> {
      * @deprecated use `Instance<typeof MyType>` instead.
      * @hidden
      */
-    Type: T
+    Type: STNValue<T, this>
 
     /**
      * @deprecated use `SnapshotOut<typeof MyType>` instead.
@@ -228,34 +232,46 @@ export type Primitives = ModelPrimitive | null | undefined
  * @deprecated just for compatibility with old versions, could be deprecated on the next major version
  * @hidden
  */
-export interface IComplexType<C, S, T> extends IType<C, S, T & IStateTreeNode<C, S>> {}
+export interface IComplexType<C, S, T> extends IType<C, S, T & object> {}
 
 // do not convert to an interface
 /**
  * Any kind of complex type.
  */
-export type IAnyComplexType = IType<any, any, IAnyStateTreeNode>
+export type IAnyComplexType = IType<any, any, object>
 
 /** @hidden */
 export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
 /** @hidden */
 export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
 /** @hidden */
-export type ExtractT<T extends IAnyType> = T extends IType<any, any, infer X> ? X : never
+export type ExtractTWithoutSTN<T extends IAnyType> = T extends IType<any, any, infer X> ? X : never
 /** @hidden */
-export type ExtractCST<IT extends IAnyType> = IT extends IType<infer C, infer S, infer T>
+export type ExtractTWithSTN<T extends IAnyType> = T extends IType<any, any, infer X>
+    ? X extends object
+        ? X & IStateTreeNode<T>
+        : X
+    : never
+/** @hidden */
+export type ExtractCSTWithoutSTN<IT extends IAnyType> = IT extends IType<infer C, infer S, infer T>
     ? C | S | T
+    : never
+/** @hidden */
+export type ExtractCSTWithSTN<IT extends IAnyType> = IT extends IType<infer C, infer S, infer T>
+    ? C | S | ExtractTWithSTN<IT>
     : never
 
 /**
  * The instance representation of a given type.
  */
-export type Instance<T> = T extends IType<any, any, infer TT> ? TT : T
+export type Instance<T> = T extends IType<any, any, infer TT>
+    ? (TT extends object ? TT & IStateTreeNode<T> : TT)
+    : T
 
 /**
  * The input (creation) snapshot representation of a given type.
  */
-export type SnapshotIn<T> = T extends IStateTreeNode<infer STNC, any>
+export type SnapshotIn<T> = T extends IStateTreeNode<IType<infer STNC, any, any>>
     ? STNC
     : T extends IType<infer TC, any, any>
     ? TC
@@ -264,7 +280,7 @@ export type SnapshotIn<T> = T extends IStateTreeNode<infer STNC, any>
 /**
  * The output snapshot representation of a given type.
  */
-export type SnapshotOut<T> = T extends IStateTreeNode<any, infer STNS>
+export type SnapshotOut<T> = T extends IStateTreeNode<IType<any, infer STNS, any>>
     ? STNS
     : T extends IType<any, infer TS, any>
     ? TS
@@ -360,23 +376,23 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         return this.isValidSnapshot(value as C, context)
     }
 
-    is(thing: any): thing is C | T {
+    is(thing: any): thing is any {
         return this.validate(thing, [{ path: "", type: this }]).length === 0
     }
 
-    get Type(): T {
+    get Type(): any {
         // istanbul ignore next
         throw fail(
             "Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`"
         )
     }
-    get SnapshotType(): S {
+    get SnapshotType(): any {
         // istanbul ignore next
         throw fail(
             "Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`"
         )
     }
-    get CreationType(): C {
+    get CreationType(): any {
         // istanbul ignore next
         throw fail(
             "Factory.CreationType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.CreationType`"

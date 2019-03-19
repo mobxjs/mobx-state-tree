@@ -166,7 +166,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 
 ###  IAnyComplexType
 
-**Ƭ IAnyComplexType**: *[IType](interfaces/itype.md)<`any`, `any`, `IAnyStateTreeNode`>*
+**Ƭ IAnyComplexType**: *[IType](interfaces/itype.md)<`any`, `any`, `object`>*
 
 Any kind of complex type.
 
@@ -655,7 +655,7 @@ ___
 
 ###  applySnapshot
 
-▸ **applySnapshot**<`C`>(target: *`IStateTreeNode`<`C`, `any`>*, snapshot: *`C`*): `void`
+▸ **applySnapshot**<`C`>(target: *`IStateTreeNode`<[IType](interfaces/itype.md)<`C`, `any`, `any`>>*, snapshot: *`C`*): `void`
 
 Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
 
@@ -666,7 +666,7 @@ Applies a snapshot to a given model instances. Patch and snapshot listeners will
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| target | `IStateTreeNode`<`C`, `any`> |  \- |
+| target | `IStateTreeNode`<[IType](interfaces/itype.md)<`C`, `any`, `any`>> |  \- |
 | snapshot | `C` |  \- |
 
 **Returns:** `void`
@@ -717,9 +717,7 @@ ___
 
 ▸ **cast**<`O`>(snapshotOrInstance: *`O`*): `O`
 
-▸ **cast**<`I`,`O`>(snapshotOrInstance: *`I`*): `O`
-
-▸ **cast**<`I`,`O`>(snapshotOrInstance: *`I` \| `O`*): `O`
+▸ **cast**<`O`>(snapshotOrInstance: *`ExtractC`<`TypeOfValue`<`O`>> \| `ExtractS`<`TypeOfValue`<`O`>> \| `ExtractTWithSTN`<`TypeOfValue`<`O`>>*): `O`
 
 Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance. Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance, but just fool typescript into thinking so. Either way, casting when outside an assignation operation won't compile.
 
@@ -746,7 +744,7 @@ const ModelB = types.model({
 
 **Type parameters:**
 
-#### O :  `ModelPrimitive`
+#### O :  `string` \| `number` \| `boolean` \| `null` \| `undefined`
 **Parameters:**
 
 | Name | Type | Description |
@@ -781,49 +779,12 @@ const ModelB = types.model({
 
 **Type parameters:**
 
-#### I :  `ExtractNodeC`<`O`>
 #### O 
 **Parameters:**
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| snapshotOrInstance | `I` |  Snapshot or instance |
-
-**Returns:** `O`
-The same object casted as an instance
-
-Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance. Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance, but just fool typescript into thinking so. Either way, casting when outside an assignation operation won't compile.
-
-Example:
-
-```ts
-const ModelA = types.model({
-  n: types.number
-}).actions(self => ({
-  setN(aNumber: number) {
-    self.n = aNumber
-  }
-}))
-
-const ModelB = types.model({
-  innerModel: ModelA
-}).actions(self => ({
-  someAction() {
-    // this will allow the compiler to assign a snapshot to the property
-    self.innerModel = cast({ a: 5 })
-  }
-}))
-```
-
-**Type parameters:**
-
-#### I :  `ExtractNodeC`<`O`>
-#### O 
-**Parameters:**
-
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| snapshotOrInstance | `I` \| `O` |  Snapshot or instance |
+| snapshotOrInstance | `ExtractC`<`TypeOfValue`<`O`>> \| `ExtractS`<`TypeOfValue`<`O`>> \| `ExtractTWithSTN`<`TypeOfValue`<`O`>> |  Snapshot or instance |
 
 **Returns:** `O`
 The same object casted as an instance
@@ -895,7 +856,7 @@ ___
 
 ###  castToSnapshot
 
-▸ **castToSnapshot**<`I`>(snapshotOrInstance: *`I`*): `Extract<I, IAnyStateTreeNode> extends never ? I : ExtractNodeC<I>`
+▸ **castToSnapshot**<`I`>(snapshotOrInstance: *`I`*): `Extract<I, IAnyStateTreeNode> extends never ? I : ExtractC<TypeOfValue<I>>`
 
 Casts a node instance type to an snapshot type so it can be assigned to a type snapshot (e.g. to be used inside a create call). Note that this is just a cast for the type system, this is, it won't actually convert an instance to a snapshot, but just fool typescript into thinking so.
 
@@ -928,7 +889,7 @@ const b = ModelB.create({ innerModel: castToSnapshot(a)})
 | ------ | ------ | ------ |
 | snapshotOrInstance | `I` |  Snapshot or instance |
 
-**Returns:** `Extract<I, IAnyStateTreeNode> extends never ? I : ExtractNodeC<I>`
+**Returns:** `Extract<I, IAnyStateTreeNode> extends never ? I : ExtractC<TypeOfValue<I>>`
 The same object casted as an input (creation) snapshot
 
 ___
@@ -1650,7 +1611,7 @@ ___
 
 Convenience utility to create action based middleware that supports async processes more easily. The flow is like this:
 
-*   for each action: if filter passes -> `onStart` -> (inner actions recursively) `onFinish`
+*   for each action: if filter passes -> `onStart` -> (inner actions recursively) -> `onFinish`
 
 Example: if we had an action `a` that called inside an action `b1`, then `b2` the flow would be:
 
@@ -1747,7 +1708,7 @@ ___
 
 ###  decorate
 
-▸ **decorate**<`T`>(handler: *[IMiddlewareHandler](#imiddlewarehandler)*, fn: *`T`*): `T`
+▸ **decorate**<`T`>(handler: *[IMiddlewareHandler](#imiddlewarehandler)*, fn: *`T`*, includeHooks?: *`boolean`*): `T`
 
 Binds middleware to a specific action.
 
@@ -1772,10 +1733,11 @@ type.actions(self => {
 #### T :  `Function`
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| handler | [IMiddlewareHandler](#imiddlewarehandler) |  \- |
-| fn | `T` |  \- |
+| Name | Type | Default value | Description |
+| ------ | ------ | ------ | ------ |
+| handler | [IMiddlewareHandler](#imiddlewarehandler) | - |  \- |
+| fn | `T` | - |  \- |
+| `Default value` includeHooks | `boolean` | true |  \- |
 
 **Returns:** `T`
 The original function
@@ -2203,7 +2165,7 @@ ___
 
 ###  getParentOfType
 
-▸ **getParentOfType**<`IT`>(target: *`IAnyStateTreeNode`*, type: *`IT`*): `ExtractT`<`IT`>
+▸ **getParentOfType**<`IT`>(target: *`IAnyStateTreeNode`*, type: *`IT`*): `ExtractTWithSTN`<`IT`>
 
 Returns the target's parent of a given type, or throws.
 
@@ -2217,7 +2179,7 @@ Returns the target's parent of a given type, or throws.
 | target | `IAnyStateTreeNode` |  \- |
 | type | `IT` |  \- |
 
-**Returns:** `ExtractT`<`IT`>
+**Returns:** `ExtractTWithSTN`<`IT`>
 
 ___
 <a id="getpath"></a>
@@ -2258,7 +2220,7 @@ ___
 
 ###  getPropertyMembers
 
-▸ **getPropertyMembers**(typeOrNode: *[IAnyModelType](interfaces/ianymodeltype.md) \| `IStateTreeNode`*): [IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)
+▸ **getPropertyMembers**(typeOrNode: *[IAnyModelType](interfaces/ianymodeltype.md) \| `IAnyStateTreeNode`*): [IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)
 
 Returns a reflection of the model type properties and name for either a model type or model node.
 
@@ -2266,7 +2228,7 @@ Returns a reflection of the model type properties and name for either a model ty
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| typeOrNode | [IAnyModelType](interfaces/ianymodeltype.md) \| `IStateTreeNode` |  \- |
+| typeOrNode | [IAnyModelType](interfaces/ianymodeltype.md) \| `IAnyStateTreeNode` |  \- |
 
 **Returns:** [IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)
 
@@ -2315,7 +2277,7 @@ ___
 
 ###  getSnapshot
 
-▸ **getSnapshot**<`S`>(target: *`IStateTreeNode`<`any`, `S`>*, applyPostProcess?: *`boolean`*): `S`
+▸ **getSnapshot**<`S`>(target: *`IStateTreeNode`<[IType](interfaces/itype.md)<`any`, `S`, `any`>>*, applyPostProcess?: *`boolean`*): `S`
 
 Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use structural sharing where possible. Doesn't require MobX transactions to be completed.
 
@@ -2326,7 +2288,7 @@ Calculates a snapshot from the given model instance. The snapshot will always re
 
 | Name | Type | Default value | Description |
 | ------ | ------ | ------ | ------ |
-| target | `IStateTreeNode`<`any`, `S`> | - |  \- |
+| target | `IStateTreeNode`<[IType](interfaces/itype.md)<`any`, `S`, `any`>> | - |  \- |
 | `Default value` applyPostProcess | `boolean` | true |  If true (the default) then postProcessSnapshot gets applied. |
 
 **Returns:** `S`
@@ -2665,14 +2627,13 @@ ___
 
 ###  isStateTreeNode
 
-▸ **isStateTreeNode**<`C`,`S`>(value: *`any`*): `boolean`
+▸ **isStateTreeNode**<`IT`>(value: *`any`*): `boolean`
 
 Returns true if the given value is a node in a state tree. More precisely, that is, if the value is an instance of a `types.model`, `types.array` or `types.map`.
 
 **Type parameters:**
 
-#### C 
-#### S 
+#### IT :  [IAnyType](#ianytype)
 **Parameters:**
 
 | Name | Type | Description |
@@ -3032,7 +2993,7 @@ ___
 
 ###  onSnapshot
 
-▸ **onSnapshot**<`S`>(target: *`IStateTreeNode`<`any`, `S`>*, callback: *`function`*): [IDisposer](#idisposer)
+▸ **onSnapshot**<`S`>(target: *`IStateTreeNode`<[IType](interfaces/itype.md)<`any`, `S`, `any`>>*, callback: *`function`*): [IDisposer](#idisposer)
 
 Registers a function that is invoked whenever a new snapshot for the given model instance is available. The listener will only be fire at the end of the current MobX (trans)action. See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
 
@@ -3043,7 +3004,7 @@ Registers a function that is invoked whenever a new snapshot for the given model
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| target | `IStateTreeNode`<`any`, `S`> |  \- |
+| target | `IStateTreeNode`<[IType](interfaces/itype.md)<`any`, `S`, `any`>> |  \- |
 | callback | `function` |  \- |
 
 **Returns:** [IDisposer](#idisposer)
@@ -3178,7 +3139,7 @@ export interface IActionRecorder {
      // stop recording actions
      stop(): any
      // apply all the recorded actions on the given object
-     replay(target: IStateTreeNode): any
+     replay(target: IAnyStateTreeNode): any
 }
 ```
 
@@ -3298,7 +3259,7 @@ ___
 
 ###  resolveIdentifier
 
-▸ **resolveIdentifier**<`IT`>(type: *`IT`*, target: *`IAnyStateTreeNode`*, identifier: *[ReferenceIdentifier](#referenceidentifier)*): `ExtractT`<`IT`> \| `undefined`
+▸ **resolveIdentifier**<`IT`>(type: *`IT`*, target: *`IAnyStateTreeNode`*, identifier: *[ReferenceIdentifier](#referenceidentifier)*): `ExtractTWithSTN`<`IT`> \| `undefined`
 
 Resolves a model instance given a root target, the type and the identifier you are searching for. Returns undefined if no value can be found.
 
@@ -3313,7 +3274,7 @@ Resolves a model instance given a root target, the type and the identifier you a
 | target | `IAnyStateTreeNode` |  \- |
 | identifier | [ReferenceIdentifier](#referenceidentifier) |  \- |
 
-**Returns:** `ExtractT`<`IT`> \| `undefined`
+**Returns:** `ExtractTWithSTN`<`IT`> \| `undefined`
 
 ___
 <a id="resolvepath"></a>
@@ -3482,7 +3443,7 @@ ___
 
 ###  typecheck
 
-▸ **typecheck**<`IT`>(type: *`IT`*, value: *`ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`>*): `void`
+▸ **typecheck**<`IT`>(type: *`IT`*, value: *`ExtractCSTWithSTN`<`IT`>*): `void`
 
 Run's the typechecker for the given type on the given value, which can be a snapshot or an instance. Throws if the given value is not according the provided type specification. Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
 
@@ -3494,7 +3455,7 @@ Run's the typechecker for the given type on the given value, which can be a snap
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | type | `IT` |  Type to check against. |
-| value | `ExtractC`<`IT`> \| `ExtractS`<`IT`> \| `ExtractT`<`IT`> |  Value to be checked, either a snapshot or an instance. |
+| value | `ExtractCSTWithSTN`<`IT`> |  Value to be checked, either a snapshot or an instance. |
 
 **Returns:** `void`
 
@@ -3520,37 +3481,37 @@ ___
 
 ###  union
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> \| `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> \| `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`,`PI`,`OI`,`FCI`,`FSI`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*, I: *[IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> \| `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`> \| `ModelInstanceType`<`PI`, `OI`, `FCI`, `FSI`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`,`PI`,`OI`,`FCI`,`FSI`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*, I: *[IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`> \| `ModelInstanceType`<`PI`, `OI`>>
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`,`PI`,`OI`,`FCI`,`FSI`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*, I: *[IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> \| `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`> \| `ModelInstanceType`<`PI`, `OI`, `FCI`, `FSI`>>
+▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`,`PI`,`OI`,`FCI`,`FSI`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*, I: *[IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`> \| `ModelInstanceType`<`PI`, `OI`>>
 
 ▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`>(A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*): `ITypeUnion`<`CA` \| `CB`, `SA` \| `SB`, `TA` \| `TB`>
 
@@ -3607,7 +3568,7 @@ ___
 | A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
 | B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3629,7 +3590,7 @@ ___
 | A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
 | B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3655,7 +3616,7 @@ ___
 | B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
 | C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3682,7 +3643,7 @@ ___
 | B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
 | C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3713,7 +3674,7 @@ ___
 | C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
 | D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3745,7 +3706,7 @@ ___
 | C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
 | D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3781,7 +3742,7 @@ ___
 | D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
 | E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3818,7 +3779,7 @@ ___
 | D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
 | E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3859,7 +3820,7 @@ ___
 | E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
 | F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3901,7 +3862,7 @@ ___
 | E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
 | F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3947,7 +3908,7 @@ ___
 | F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
 | G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -3994,7 +3955,7 @@ ___
 | F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
 | G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4045,7 +4006,7 @@ ___
 | G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
 | H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> \| `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4097,7 +4058,7 @@ ___
 | G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
 | H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> \| `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4153,7 +4114,7 @@ ___
 | H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
 | I | [IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> \| `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`> \| `ModelInstanceType`<`PI`, `OI`, `FCI`, `FSI`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`> \| `ModelInstanceType`<`PI`, `OI`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4210,7 +4171,7 @@ ___
 | H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
 | I | [IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`> |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`, `FCA`, `FSA`> \| `ModelInstanceType`<`PB`, `OB`, `FCB`, `FSB`> \| `ModelInstanceType`<`PC`, `OC`, `FCC`, `FSC`> \| `ModelInstanceType`<`PD`, `OD`, `FCD`, `FSD`> \| `ModelInstanceType`<`PE`, `OE`, `FCE`, `FSE`> \| `ModelInstanceType`<`PF`, `OF`, `FCF`, `FSF`> \| `ModelInstanceType`<`PG`, `OG`, `FCG`, `FSG`> \| `ModelInstanceType`<`PH`, `OH`, `FCH`, `FSH`> \| `ModelInstanceType`<`PI`, `OI`, `FCI`, `FSI`>>
+**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`> \| `ModelInstanceType`<`PI`, `OI`>>
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 

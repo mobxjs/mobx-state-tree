@@ -1,7 +1,7 @@
 import {
     types,
     IJsonPatch,
-    IStateTreeNode,
+    IAnyStateTreeNode,
     recordPatches,
     IPatchRecorder,
     createActionTrackingMiddleware2,
@@ -11,8 +11,7 @@ import {
     flow,
     addMiddleware,
     addDisposer,
-    decorate,
-    IActionTrackingMiddleware2Call
+    decorate
 } from "mobx-state-tree"
 import { atomic } from "."
 
@@ -41,7 +40,7 @@ const UndoManager = types
         }
     }))
     .actions(self => {
-        let targetStore: IStateTreeNode
+        let targetStore: IAnyStateTreeNode
         let recordingDisabled = 0
 
         interface Context {

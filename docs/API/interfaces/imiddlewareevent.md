@@ -15,6 +15,8 @@
 * [context](imiddlewareevent.md#context)
 * [id](imiddlewareevent.md#id)
 * [name](imiddlewareevent.md#name)
+* [parentActionEvent](imiddlewareevent.md#parentactionevent)
+* [parentEvent](imiddlewareevent.md#parentevent)
 * [parentId](imiddlewareevent.md#parentid)
 * [rootId](imiddlewareevent.md#rootid)
 * [tree](imiddlewareevent.md#tree)
@@ -57,6 +59,20 @@ ___
 ###  name
 
 **● name**: *`string`*
+
+___
+<a id="parentactionevent"></a>
+
+###  parentActionEvent
+
+**● parentActionEvent**: *[IMiddlewareEvent](imiddlewareevent.md) \| `undefined`*
+
+___
+<a id="parentevent"></a>
+
+###  parentEvent
+
+**● parentEvent**: *[IMiddlewareEvent](imiddlewareevent.md) \| `undefined`*
 
 ___
 <a id="parentid"></a>

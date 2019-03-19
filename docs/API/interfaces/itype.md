@@ -51,9 +51,9 @@ ___
 
 ###  create
 
-▸ **create**(...args: *`CreateParams`<`C`>*): `T`
+▸ **create**(...args: *`CreateParams`<`C`>*): `STNValue`<`T`, `this`>
 
-▸ **create**(snapshot: *`C`*, env?: *`any`*): `T`
+▸ **create**(snapshot: *`C`*, env?: *`any`*): `STNValue`<`T`, `this`>
 
 **Parameters:**
 
@@ -61,7 +61,7 @@ ___
 | ------ | ------ |
 | `Rest` args | `CreateParams`<`C`> |
 
-**Returns:** `T`
+**Returns:** `STNValue`<`T`, `this`>
 
 Creates an instance for the type given an snapshot input.
 
@@ -72,7 +72,7 @@ Creates an instance for the type given an snapshot input.
 | snapshot | `C` |
 | `Optional` env | `any` |
 
-**Returns:** `T`
+**Returns:** `STNValue`<`T`, `this`>
 An instance of that type.
 
 ___

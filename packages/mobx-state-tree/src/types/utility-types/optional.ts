@@ -1,6 +1,5 @@
 import {
     isStateTreeNode,
-    getStateTreeNode,
     IType,
     TypeFlags,
     isType,
@@ -10,15 +9,14 @@ import {
     typeCheckSuccess,
     fail,
     IAnyType,
-    ExtractT,
     ExtractS,
     ExtractC,
-    ExtractCST,
-    RedefineIStateTreeNode,
-    IStateTreeNode,
     AnyObjectNode,
     BaseType,
-    assertIsType
+    assertIsType,
+    ExtractCSTWithSTN,
+    ExtractTWithoutSTN,
+    ExtractTWithSTN
 } from "../../internal"
 
 type IFunctionReturn<T> = () => T
@@ -38,21 +36,14 @@ export type ValidOptionalValues = [ValidOptionalValue, ...ValidOptionalValue[]]
 export class OptionalValue<
     IT extends IAnyType,
     OptionalVals extends ValidOptionalValues
-> extends BaseType<
-    ExtractC<IT> | OptionalVals[number],
-    ExtractS<IT>,
-    RedefineIStateTreeNode<
-        ExtractT<IT>,
-        IStateTreeNode<ExtractC<IT> | OptionalVals[number], ExtractS<IT>>
-    >
-> {
+> extends BaseType<ExtractC<IT> | OptionalVals[number], ExtractS<IT>, ExtractTWithoutSTN<IT>> {
     get flags() {
         return this._subtype.flags | TypeFlags.Optional
     }
 
     constructor(
         private readonly _subtype: IT,
-        private readonly _defaultValue: IOptionalValue<ExtractC<IT>, ExtractT<IT>>,
+        private readonly _defaultValue: IOptionalValue<ExtractC<IT>, ExtractTWithSTN<IT>>,
         readonly optionalValues: OptionalVals
     ) {
         super(_subtype.name)
@@ -126,18 +117,11 @@ export class OptionalValue<
 export type OptionalDefaultValueOrFunction<IT extends IAnyType> =
     | ExtractC<IT>
     | ExtractS<IT>
-    | (() => ExtractCST<IT>)
+    | (() => ExtractCSTWithSTN<IT>)
 
 /** @hidden */
 export interface IOptionalIType<IT extends IAnyType, OptionalVals extends ValidOptionalValues>
-    extends IType<
-        ExtractC<IT> | OptionalVals[number],
-        ExtractS<IT>,
-        RedefineIStateTreeNode<
-            ExtractT<IT>,
-            IStateTreeNode<ExtractC<IT> | OptionalVals[number], ExtractS<IT>>
-        >
-    > {}
+    extends IType<ExtractC<IT> | OptionalVals[number], ExtractS<IT>, ExtractTWithoutSTN<IT>> {}
 
 function checkOptionalPreconditions<IT extends IAnyType>(
     type: IAnyType,
