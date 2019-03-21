@@ -644,7 +644,7 @@ export function clone<T extends IAnyStateTreeNode>(
     return node.type.create(
         node.snapshot,
         keepEnvironment === true
-            ? node.environment
+            ? node.root.environment
             : keepEnvironment === false
             ? undefined
             : keepEnvironment
@@ -747,8 +747,8 @@ export function getEnv<T = any>(target: IAnyStateTreeNode): T {
     assertIsStateTreeNode(target, 1)
 
     const node = getStateTreeNode(target)
-    const env = node.environment
-    if (!!!env) return EMPTY_OBJECT as T
+    const env = node.root.environment
+    if (!env) return EMPTY_OBJECT as T
     return env
 }
 

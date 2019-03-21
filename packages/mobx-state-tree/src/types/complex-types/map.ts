@@ -254,16 +254,15 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
     initializeChildNodes(objNode: this["N"], initialSnapshot: this["C"] = {}): IChildNodesMap {
         const subType = (objNode.type as this)._subType
-        const environment = objNode.environment
         const result: IChildNodesMap = {}
         Object.keys(initialSnapshot!).forEach(name => {
-            result[name] = subType.instantiate(objNode, name, environment, initialSnapshot[name])
+            result[name] = subType.instantiate(objNode, name, undefined, initialSnapshot[name])
         })
 
         return result
     }
 
-    createNewInstance(node: this["N"], childNodes: IChildNodesMap): this["T"] {
+    createNewInstance(childNodes: IChildNodesMap): this["T"] {
         return new MSTMap(childNodes) as any
     }
 
@@ -302,7 +301,12 @@ export class MapType<IT extends IAnyType> extends ComplexType<
                     const oldValue = change.object.get(key)
                     if (newValue === oldValue) return null
                     typecheckInternal(subType, newValue)
-                    change.newValue = subType.reconcile(node.getChildNode(key), change.newValue)
+                    change.newValue = subType.reconcile(
+                        node.getChildNode(key),
+                        change.newValue,
+                        node,
+                        key
+                    )
                     mapType.processIdentifier(key, change.newValue)
                 }
                 break

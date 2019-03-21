@@ -195,7 +195,12 @@ export interface IType<C, S, T> {
      * @internal
      * @hidden
      */
-    reconcile(current: BaseNode<C, S, T>, newValue: C | T): BaseNode<C, S, T>
+    reconcile(
+        current: BaseNode<C, S, T>,
+        newValue: C | T,
+        parent: AnyObjectNode,
+        subpath: string
+    ): BaseNode<C, S, T>
     /**
      * @internal
      * @hidden
@@ -346,7 +351,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         throw fail("unimplemented method")
     }
 
-    abstract reconcile(current: N, newValue: C | T): N
+    abstract reconcile(current: N, newValue: C | T, parent: AnyObjectNode, subpath: string): N
 
     abstract instantiate(
         parent: AnyObjectNode | null,
@@ -441,7 +446,7 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
 
     abstract getDefaultSnapshot(): C
 
-    abstract createNewInstance(node: this["N"], childNodes: IChildNodesMap, snapshot: C): T
+    abstract createNewInstance(childNodes: IChildNodesMap): T
     abstract finalizeNewInstance(node: this["N"], instance: any): void
 
     abstract applySnapshot(node: this["N"], snapshot: C): void
@@ -454,42 +459,55 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
     abstract initializeChildNodes(node: this["N"], snapshot: any): IChildNodesMap
     abstract removeChild(node: this["N"], subpath: string): void
 
-    reconcile(current: this["N"], newValue: C | T): this["N"] {
-        // if the node we are trying to reconcile is being detached we have to use a new one and
-        // let the current one alive
-        if (!current.isDetaching) {
-            if ((current.snapshot as any) === newValue)
-                // newValue is the current snapshot of the node, noop
-                return current
-            if (isStateTreeNode(newValue) && getStateTreeNode(newValue) === current)
-                // the current node is the same as the new one
-                return current
-            if (
-                current.type === this &&
-                isMutable(newValue) &&
-                !isStateTreeNode(newValue) &&
-                (!current.identifierAttribute ||
-                    current.identifier ===
-                        normalizeIdentifier((newValue as any)[current.identifierAttribute]))
-            ) {
-                // the newValue has no node, so can be treated like a snapshot
-                // we can reconcile
-                current.applySnapshot(newValue as C)
-                return current
-            }
+    private tryToReconcileNode(current: this["N"], newValue: C | T) {
+        if (current.isDetaching) return false
+        if ((current.snapshot as any) === newValue) {
+            // newValue is the current snapshot of the node, noop
+            return true
         }
+        if (isStateTreeNode(newValue) && getStateTreeNode(newValue) === current) {
+            // the current node is the same as the new one
+            return true
+        }
+        if (
+            current.type === this &&
+            isMutable(newValue) &&
+            !isStateTreeNode(newValue) &&
+            (!current.identifierAttribute ||
+                current.identifier ===
+                    normalizeIdentifier((newValue as any)[current.identifierAttribute]))
+        ) {
+            // the newValue has no node, so can be treated like a snapshot
+            // we can reconcile
+            current.applySnapshot(newValue as C)
+            return true
+        }
+        return false
+    }
+
+    reconcile(
+        current: this["N"],
+        newValue: C | T,
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
+        const nodeReconciled = this.tryToReconcileNode(current, newValue)
+        if (nodeReconciled) {
+            current.setParent(parent, subpath)
+            return current
+        }
+
         // current node cannot be recycled in any way
-        const { parent, subpath } = current
         current.die() // noop if detaching
         // attempt to reuse the new one
         if (isStateTreeNode(newValue) && this.isAssignableFrom(getType(newValue))) {
             // newValue is a Node as well, move it here..
             const newNode = getStateTreeNode(newValue)
-            newNode.setParent(parent!, subpath)
+            newNode.setParent(parent, subpath)
             return newNode
         }
         // nothing to do, we have to create a new node
-        return this.instantiate(parent, subpath, current.environment, newValue)
+        return this.instantiate(parent, subpath, undefined, newValue)
     }
 
     getSubTypes() {
@@ -526,12 +544,12 @@ export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, ScalarNode<C
         return node.storedValue
     }
 
-    reconcile(current: this["N"], newValue: C): this["N"] {
+    reconcile(current: this["N"], newValue: C, parent: AnyObjectNode, subpath: string): this["N"] {
         // reconcile only if type and value are still the same, and only if the node is not detaching
         if (!current.isDetaching && current.type === this && current.storedValue === newValue) {
             return current
         }
-        const res = this.instantiate(current.parent, current.subpath, current.environment, newValue)
+        const res = this.instantiate(parent, subpath, undefined, newValue)
         current.die() // noop if detaching
         return res
     }
