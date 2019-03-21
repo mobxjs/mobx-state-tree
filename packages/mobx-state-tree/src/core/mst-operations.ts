@@ -22,6 +22,7 @@ import {
     ReferenceIdentifier,
     AnyObjectNode,
     AnyModelType,
+    isValidIdentifier,
     assertIsType,
     assertIsStateTreeNode,
     ExtractC,
@@ -494,7 +495,7 @@ export function resolveIdentifier<IT extends IAnyType>(
     assertIsType(type, 1)
     assertIsStateTreeNode(target, 2)
     if (process.env.NODE_ENV !== "production") {
-        if (!(typeof identifier === "string" || typeof identifier === "number"))
+        if (!isValidIdentifier(identifier))
             throw fail(
                 "expected third argument to be a string or number, got " + identifier + " instead"
             )

@@ -149,3 +149,11 @@ export type ReferenceIdentifier = string | number
 export function normalizeIdentifier(id: ReferenceIdentifier): string {
     return "" + id
 }
+
+/**
+ * @internal
+ * @hidden
+ */
+export function isValidIdentifier(id: any): id is ReferenceIdentifier {
+    return typeof id === "string" || typeof id === "number"
+}
