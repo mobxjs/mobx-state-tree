@@ -369,19 +369,24 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
         return storedRefNode
     }
 
-    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
+    reconcile(
+        current: this["N"],
+        newValue: this["C"] | this["T"],
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
         if (!current.isDetaching && current.type === this) {
             const compareByValue = isStateTreeNode(newValue)
             const ref: StoredReference<IT> = current.storedValue
-            if (!compareByValue && ref.identifier === newValue) return current
-            else if (compareByValue && ref.resolvedValue === newValue) return current
+            if (
+                (!compareByValue && ref.identifier === newValue) ||
+                (compareByValue && ref.resolvedValue === newValue)
+            ) {
+                current.setParent(parent, subpath)
+                return current
+            }
         }
-        const newNode = this.instantiate(
-            current.parent,
-            current.subpath,
-            current.environment,
-            newValue
-        )
+        const newNode = this.instantiate(parent, subpath, undefined, newValue)
         current.die() // noop if detaching
         return newNode
     }
@@ -433,7 +438,12 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
         return storedRefNode
     }
 
-    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
+    reconcile(
+        current: this["N"],
+        newValue: this["C"] | this["T"],
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
         const newIdentifier = isStateTreeNode(newValue)
             ? this.options.set(newValue as any, current ? current.storedValue : null)
             : newValue
@@ -442,14 +452,10 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
             current.type === this &&
             current.storedValue === newIdentifier
         ) {
+            current.setParent(parent, subpath)
             return current
         }
-        const newNode = this.instantiate(
-            current.parent,
-            current.subpath,
-            current.environment,
-            newIdentifier
-        )
+        const newNode = this.instantiate(parent, subpath, undefined, newIdentifier)
         current.die() // noop if detaching
         return newNode
     }

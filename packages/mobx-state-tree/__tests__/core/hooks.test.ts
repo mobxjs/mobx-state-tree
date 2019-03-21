@@ -141,7 +141,7 @@ const Car = types
         id: types.number
     })
     .preProcessSnapshot<CarSnapshot>(snapshot =>
-        Object.assign({}, snapshot, { id: parseInt(snapshot.id) * 2 })
+        Object.assign({}, snapshot, { id: Number(snapshot.id) * 2 })
     )
     .postProcessSnapshot<CarSnapshot>(snapshot =>
         Object.assign({}, snapshot, { id: "" + snapshot.id / 2 })

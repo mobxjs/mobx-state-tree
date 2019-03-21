@@ -1,3 +1,7 @@
+# 3.12.1
+
+-   Fixed a regression with `getEnv` sometimes not returning the proper environment.
+
 # 3.12.0
 
 -   Added `TypeOfValue<typeof variable>` to extract the type of a complex (non primitive) variable in Typescript.

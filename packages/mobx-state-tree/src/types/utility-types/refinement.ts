@@ -68,8 +68,13 @@ class Refinement<IT extends IAnyType> extends BaseType<
         return typeCheckSuccess()
     }
 
-    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
-        return this._subtype.reconcile(current, newValue)
+    reconcile(
+        current: this["N"],
+        newValue: this["C"] | this["T"],
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
+        return this._subtype.reconcile(current, newValue, parent, subpath)
     }
 
     getSubTypes() {

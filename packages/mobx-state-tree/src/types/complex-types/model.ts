@@ -552,14 +552,14 @@ export class ModelType<
             result[name] = childType.instantiate(
                 objNode,
                 name,
-                objNode.environment,
+                undefined,
                 (initialSnapshot as any)[name]
             )
         })
         return result
     }
 
-    createNewInstance(node: this["N"], childNodes: IChildNodesMap): this["T"] {
+    createNewInstance(childNodes: IChildNodesMap): this["T"] {
         return observable.object(childNodes, EMPTY_OBJECT, mobxShallow) as any
     }
 
@@ -579,15 +579,18 @@ export class ModelType<
         // TODO: mobx typings don't seem to take into account that newValue can be set even when removing a prop
         const change = chg as IObjectWillChange & { newValue?: any }
 
-        const childNode = getStateTreeNode(change.object)
-        childNode.assertWritable({ subpath: change.name })
-        const childType = (childNode.type as this).properties[change.name]
+        const node = getStateTreeNode(change.object)
+        const subpath = change.name
+        node.assertWritable({ subpath })
+        const childType = (node.type as this).properties[subpath]
         // only properties are typed, state are stored as-is references
         if (childType) {
             typecheckInternal(childType, change.newValue)
             change.newValue = childType.reconcile(
-                childNode.getChildNode(change.name),
-                change.newValue
+                node.getChildNode(subpath),
+                change.newValue,
+                node,
+                subpath
             )
         }
         return change

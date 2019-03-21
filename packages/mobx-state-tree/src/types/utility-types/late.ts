@@ -68,8 +68,13 @@ class Late<IT extends IAnyType> extends BaseType<
         return this.getSubType(true).instantiate(parent, subpath, environment, initialValue)
     }
 
-    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
-        return this.getSubType(true).reconcile(current, newValue)
+    reconcile(
+        current: this["N"],
+        newValue: this["C"] | this["T"],
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
+        return this.getSubType(true).reconcile(current, newValue, parent, subpath)
     }
 
     describe() {

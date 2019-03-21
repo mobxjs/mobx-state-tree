@@ -63,7 +63,7 @@ function onEntryClick(shop, e) {
 }
 
 function updateEntryQuantity(entry, e) {
-    if (e.target.value) entry.setQuantity(parseInt(e.target.value, 10))
+    if (e.target.value) entry.setQuantity(Number(e.target.value))
 }
 
 export default Cart
