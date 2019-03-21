@@ -861,14 +861,18 @@ Some tips:
 
 4.  It is possible to share volatile state between views and actions by using `extend`. `.extend` works like a combination of `.actions` and `.views` and should return an object with a `actions` and `views` field:
 
+Here's an example of how to do your own volatile state using an observable:
+
 ```javascript
+// if your local state is part of a view getter (computed) then
+// it is important to make sure that state used such getters are observable,
+// or else the value returned by the view would become stale upon observation
 const Todo = types.model({}).extend(self => {
-    // it is important to make sure that state used by views are observables, or else
-    // the value returned by the view would become stale upon observation
     const localState = observable.box(3)
 
     return {
         views: {
+            // note this one IS a getter (computed value)
             get x() {
                 return localState.get()
             }
@@ -876,6 +880,31 @@ const Todo = types.model({}).extend(self => {
         actions: {
             setX(value) {
                 localState.set(value)
+            }
+        }
+    }
+})
+```
+
+And here's an example of how to do your own volatile state _not_ using an observable (but if you do this make sure the local state will _never_ be used in a computed value first and bear in mind it _won't_ be reactive!):
+
+```javascript
+// if not using an observable then make sure your local state is NOT part of a view getter or computed value of any kind!
+// also changes to it WON'T be reactive
+const Todo = types.model({}).extend(self => {
+    let localState = 3
+
+    return {
+        views: {
+            // note this one is NOT a getter (NOT a computed value)
+            // if this were a getter this value would get stale upon observation
+            getX() {
+                return localState
+            }
+        },
+        actions: {
+            setX(value) {
+                localState = value
             }
         }
     }

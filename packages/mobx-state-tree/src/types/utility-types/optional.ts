@@ -71,12 +71,19 @@ export class OptionalValue<
         return this._subtype.instantiate(parent, subpath, environment, initialValue)
     }
 
-    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
+    reconcile(
+        current: this["N"],
+        newValue: this["C"] | this["T"],
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
         return this._subtype.reconcile(
             current,
             this.optionalValues.indexOf(newValue) < 0 && this._subtype.is(newValue)
                 ? newValue
-                : this.getDefaultInstanceOrSnapshot()
+                : this.getDefaultInstanceOrSnapshot(),
+            parent,
+            subpath
         )
     }
 

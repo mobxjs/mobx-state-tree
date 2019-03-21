@@ -212,7 +212,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         const type = this.type
 
         try {
-            this.storedValue = type.createNewInstance(this, this._childNodes, this._initialSnapshot)
+            this.storedValue = type.createNewInstance(this._childNodes)
             this.preboot()
 
             this._isRunningAction = true
@@ -254,8 +254,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         const previousState = this.state
         this.state = NodeLifeCycle.DETACHING
 
-        const newEnv = this.parent.environment
         const root = this.root
+        const newEnv = root.environment
         const newIdCache = root.identifierCache!.splitCache(this)
 
         try {
@@ -272,7 +272,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         const parentChanged = newParent !== this.parent
         const subpathChanged = subpath !== this.subpath
 
-        if (!parentChanged && !subpathChanged) return
+        if (!parentChanged && !subpathChanged) {
+            return
+        }
 
         if (process.env.NODE_ENV !== "production") {
             if (!subpath) {
@@ -298,7 +300,11 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
                     }/${subpath}'`
                 )
             }
-            if (!this.parent && !!this.environment && this.environment !== newParent.environment) {
+            if (
+                !this.parent &&
+                !!this.environment &&
+                this.environment !== newParent.root.environment
+            ) {
                 throw fail(
                     `A state tree cannot be made part of another state tree as long as their environments are different.`
                 )
@@ -307,6 +313,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
         if (parentChanged) {
             // attach to new parent
+            this.environment = undefined // will use root's
             newParent.root.identifierCache!.mergeCache(this)
             this.baseSetParent(newParent, subpath)
             this.fireHook(Hook.afterAttach)
@@ -464,10 +471,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     }
 
     toString(): string {
+        const path = (this.isAlive ? this.path : this.pathUponDeath) || "<root>"
         const identifier = this.identifier ? `(id: ${this.identifier})` : ""
-        return `${this.type.name}@${this.path || "<root>"}${identifier}${
-            this.isAlive ? "" : "[dead]"
-        }`
+        return `${this.type.name}@${path}${identifier}${this.isAlive ? "" : " [dead]"}`
     }
 
     finalizeCreation(): void {

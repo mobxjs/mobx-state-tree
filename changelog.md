@@ -1,3 +1,6 @@
+# 3.12.1
+
+-   Fixed a regression with `getEnv` sometimes not returning the proper environment.
 -   Fixed an issue where `map.put` would not work with snapshots of types with an optional id [#1131](https://github.com/mobxjs/mobx-state-tree/issues/1131) through [#1226](https://github.com/mobxjs/mobx-state-tree/pull/1226) by [@xaviergonz](https://github.com/xaviergonz).
 
 # 3.12.0
