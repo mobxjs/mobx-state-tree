@@ -22,6 +22,7 @@ import {
     ReferenceIdentifier,
     AnyObjectNode,
     AnyModelType,
+    isValidIdentifier,
     assertIsType,
     assertIsStateTreeNode,
     ExtractC,
@@ -544,7 +545,7 @@ export function resolveIdentifier<IT extends IAnyType>(
     assertIsType(type, 1)
     assertIsStateTreeNode(target, 2)
     if (process.env.NODE_ENV !== "production") {
-        if (!(typeof identifier === "string" || typeof identifier === "number"))
+        if (!isValidIdentifier(identifier))
             throw fail(
                 "expected third argument to be a string or number, got " + identifier + " instead"
             )
@@ -694,7 +695,7 @@ export function clone<T extends IAnyStateTreeNode>(
     return node.type.create(
         node.snapshot,
         keepEnvironment === true
-            ? node.environment
+            ? node.root.environment
             : keepEnvironment === false
             ? undefined
             : keepEnvironment
@@ -797,8 +798,8 @@ export function getEnv<T = any>(target: IAnyStateTreeNode): T {
     assertIsStateTreeNode(target, 1)
 
     const node = getStateTreeNode(target)
-    const env = node.environment
-    if (!!!env) return EMPTY_OBJECT as T
+    const env = node.root.environment
+    if (!env) return EMPTY_OBJECT as T
     return env
 }
 

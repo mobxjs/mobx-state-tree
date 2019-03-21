@@ -110,16 +110,15 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
 
     initializeChildNodes(objNode: this["N"], snapshot: this["C"] = []): IChildNodesMap {
         const subType = (objNode.type as this)._subType
-        const environment = objNode.environment
         const result: IChildNodesMap = {}
         snapshot.forEach((item, index) => {
-            const subpath = `${index}`
-            result[subpath] = subType.instantiate(objNode, subpath, environment, item)
+            const subpath = "" + index
+            result[subpath] = subType.instantiate(objNode, subpath, undefined, item)
         })
         return result
     }
 
-    createNewInstance(node: this["N"], childNodes: IChildNodesMap): this["T"] {
+    createNewInstance(childNodes: IChildNodesMap): this["T"] {
         return observable.array(convertChildNodesToArray(childNodes), mobxShallow) as this["T"]
     }
 
@@ -138,7 +137,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     getChildNode(node: this["N"], key: string): AnyNode {
-        const index = parseInt(key, 10)
+        const index = Number(key)
         if (index < node.storedValue.length) return node.storedValue[index]
         throw fail("Not a child: " + key)
     }
@@ -147,7 +146,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         change: IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode>
     ): IArrayWillChange<AnyNode> | IArrayWillSplice<AnyNode> | null {
         const node = getStateTreeNode(change.object as IStateTreeNode<this>)
-        node.assertWritable({ subpath: String(change.index) })
+        node.assertWritable({ subpath: "" + change.index })
         const subType = (node.type as this)._subType
         const childNodes = node.getChildren()
 
@@ -246,7 +245,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
 
     applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
         const target = node.storedValue
-        const index = subpath === "-" ? target.length : parseInt(subpath)
+        const index = subpath === "-" ? target.length : Number(subpath)
         switch (patch.op) {
             case "replace":
                 target[index] = patch.value
@@ -288,7 +287,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     removeChild(node: this["N"], subpath: string) {
-        node.storedValue.splice(parseInt(subpath, 10), 1)
+        node.storedValue.splice(Number(subpath), 1)
     }
 }
 
@@ -420,13 +419,11 @@ function valueAsNode(
         }
         // there is old node and new one is a value/snapshot
         if (oldNode) {
-            const childNode = childType.reconcile(oldNode, newValue)
-            childNode.setParent(parent, subpath)
-            return childNode
+            return childType.reconcile(oldNode, newValue, parent, subpath)
         }
 
         // nothing to do, create from scratch
-        return childType.instantiate(parent, subpath, parent.environment, newValue)
+        return childType.instantiate(parent, subpath, undefined, newValue)
     }
 
     const newNode = getNewNode()

@@ -1,4 +1,24 @@
-import { types, getEnv, clone, detach, unprotect } from "../../src"
+import {
+    types,
+    getEnv,
+    clone,
+    detach,
+    unprotect,
+    walk,
+    getPath,
+    castToSnapshot,
+    hasParent,
+    Instance,
+    destroy,
+    IStateTreeNode,
+    getParent,
+    IAnyStateTreeNode,
+    isStateTreeNode,
+    getSnapshot,
+    isAlive,
+    getType,
+    isOptionalType
+} from "../../src"
 
 const Todo = types
     .model({
@@ -110,5 +130,181 @@ test("clone preserves environnment", () => {
         const env2 = createEnvironment()
         const todo = clone(store.todos[0], env2)
         expect(env2 === getEnv(todo)).toBe(true)
+    }
+})
+
+test("#1231", () => {
+    const envObj = createEnvironment()
+    const logs: string[] = []
+
+    function nofParents(node: IAnyStateTreeNode) {
+        let parents = 0
+        let parent = node
+        while (hasParent(parent)) {
+            parents++
+            parent = getParent(parent)
+        }
+        return parents
+    }
+
+    function leafsFirst(root: IAnyStateTreeNode) {
+        const nodes: IAnyStateTreeNode[] = []
+        walk(root, i => {
+            if (isStateTreeNode(i)) {
+                nodes.push(i)
+            }
+        })
+        // sort by number of parents
+        nodes.sort((a, b) => {
+            return nofParents(b) - nofParents(a)
+        })
+        return nodes
+    }
+
+    function check(root: Instance<typeof RS>, name: string, mode: "detach" | "destroy") {
+        function logFail(operation: string, n: any) {
+            logs.push(`fail: (${name}) ${operation}: ${getPath(n)}, ${n}`)
+        }
+        function log(operation: string, n: any) {
+            logs.push(`ok: (${name}) ${operation}: ${getPath(n)}, ${n}`)
+        }
+
+        // make sure all nodes are there
+        root.s1.arr[0].title
+        root.s1.m.get("one")!.title
+        root.s2
+        const nodes = leafsFirst(root)
+        expect(nodes.length).toBe(7)
+
+        nodes.forEach(i => {
+            const env = getEnv(i)
+            const parent = hasParent(i)
+            if (!parent && i !== root) {
+                logFail("expected a parent, but none found", i)
+            } else {
+                log("had parent or was root", i)
+            }
+            if (env !== envObj) {
+                logFail("expected same env as root, but was different", i)
+            } else {
+                log("same env as root", i)
+            }
+        })
+
+        unprotect(root)
+        nodes.forEach(i => {
+            const optional = optionalPaths.includes(getPath(i))
+            if (mode === "detach") {
+                log("detaching node", i)
+                detach(i)
+            } else {
+                log("destroying node", i)
+                destroy(i)
+            }
+            const env = getEnv(i)
+            const parent = hasParent(i)
+            const alive = isAlive(i)
+            if (mode === "detach") {
+                if (parent) {
+                    logFail(`expected no parent after detach, but one was found`, i)
+                } else {
+                    log(`no parent after detach`, i)
+                }
+                if (env !== envObj) {
+                    logFail("expected same env as root after detach, but it was not", i)
+                } else {
+                    log("env kept after detach", i)
+                }
+                if (!alive) {
+                    logFail("expected to be alive after detach, but it was not", i)
+                } else {
+                    log("alive after detach", i)
+                }
+            } else {
+                // destroy might or might not keep the env, but doesn't matter so we don't check
+                if (optional) {
+                    // optional (undefined) nodes will be assigned undefined and reconciled, therefore they will be kept alive
+                    if (!parent) {
+                        logFail(
+                            `expected a parent after destroy (since it is optional), but none was found`,
+                            i
+                        )
+                    } else {
+                        log(`had parent after destroy (since it is optional)`, i)
+                    }
+                    if (!alive) {
+                        logFail(
+                            "expected to be alive after destroy (since it is optional), but it was not",
+                            i
+                        )
+                    } else {
+                        log("alive after destroy (since it is optional)", i)
+                    }
+                } else {
+                    if (parent) {
+                        logFail(`expected no parent after destroy, but one was found`, i)
+                    } else {
+                        log(`no parent after destroy`, i)
+                    }
+                    if (alive) {
+                        logFail("expected to be dead after destroy, but it was not", i)
+                    } else {
+                        log("dead after destroy", i)
+                    }
+                }
+            }
+        })
+    }
+
+    const T = types.model("T", { title: "some title" })
+
+    const S1Arr = types.array(T)
+    const S1Map = types.map(T)
+    const S1 = types.model("S1", {
+        arr: S1Arr,
+        m: S1Map
+    })
+
+    const S2 = types.model("S2", {})
+
+    const RS = types.model("RS", {
+        s1: types.optional(S1, {}),
+        s2: types.optional(S2, {})
+    })
+
+    const optionalPaths = ["/s1", "/s2", "/s1/m", "/s1/arr"]
+
+    const data = {
+        s1: castToSnapshot(
+            S1.create({
+                arr: S1Arr.create([T.create({})]),
+                m: castToSnapshot(S1Map.create({ one: T.create({}) }))
+            })
+        ),
+        s2: S2.create()
+    }
+    const rsCreate = RS.create(data, envObj)
+    const rsCreate2 = clone(rsCreate, true)
+
+    const rsSnap = RS.create(
+        {
+            s1: {
+                arr: [{}],
+                m: { one: {} }
+            },
+            s2: {}
+        },
+        envObj
+    )
+    const rsSnap2 = clone(rsCreate, true)
+
+    check(rsCreate, "using create", "detach")
+    check(rsSnap, "using snapshot", "detach")
+    check(rsCreate2, "using create", "destroy")
+    check(rsSnap2, "using snapshot", "destroy")
+
+    const fails = logs.filter(l => l.startsWith("fail:"))
+    if (fails.length > 0) {
+        fail(`\n${fails.join("\n")}`)
     }
 })

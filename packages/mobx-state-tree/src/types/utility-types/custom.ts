@@ -120,22 +120,20 @@ export class CustomType<S, T> extends SimpleType<S | T, S, T> {
         return createScalarNode(this, parent, subpath, environment, valueToStore)
     }
 
-    reconcile(current: this["N"], value: S | T): this["N"] {
+    reconcile(current: this["N"], value: S | T, parent: AnyObjectNode, subpath: string): this["N"] {
         const isSnapshot = !this.options.isTargetType(value)
         // in theory customs use scalar nodes which cannot be detached, but still...
         if (!current.isDetaching) {
             const unchanged =
                 current.type === this &&
                 (isSnapshot ? value === current.snapshot : value === current.storedValue)
-            if (unchanged) return current
+            if (unchanged) {
+                current.setParent(parent, subpath)
+                return current
+            }
         }
         const valueToStore: T = isSnapshot ? this.options.fromSnapshot(value as S) : (value as T)
-        const newNode = this.instantiate(
-            current.parent,
-            current.subpath,
-            current.environment,
-            valueToStore
-        )
+        const newNode = this.instantiate(parent, subpath, undefined, valueToStore)
         current.die() // noop if detaching
         return newNode
     }

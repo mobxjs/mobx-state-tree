@@ -45,10 +45,12 @@ import {
     AnyModelType,
     asArray,
     cannotDetermineSubtype,
+    getSnapshot,
+    isValidIdentifier,
     ExtractTWithSTN,
-    ExtractCSTWithSTN
+    ExtractCSTWithSTN,
+    ExtractTWithoutSTN
 } from "../../internal"
-import { ExtractTWithoutSTN } from "../../core/type/type"
 
 /** @hidden */
 export interface IMapType<IT extends IAnyType>
@@ -176,21 +178,36 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
         if (isStateTreeNode(value)) {
             const node = getStateTreeNode(value)
             if (process.env.NODE_ENV !== "production") {
-                if (!node.identifierAttribute) throw fail(needsIdentifierError)
+                if (!node.identifierAttribute) {
+                    throw fail(needsIdentifierError)
+                }
             }
-            this.set(node.identifier!, value)
+            if (node.identifier === null) {
+                throw fail(needsIdentifierError)
+            }
+            this.set(node.identifier, value)
             return value as any
         } else if (!isMutable(value)) {
             throw fail(`Map.put can only be used to store complex values`)
         } else {
-            const mapType = getStateTreeNode(this as IAnyStateTreeNode).type as MapType<any>
-            if (mapType.identifierMode === MapIdentifierMode.NO) throw fail(needsIdentifierError)
-            if (mapType.identifierMode === MapIdentifierMode.YES) {
-                const key = normalizeIdentifier(value[mapType.mapIdentifierAttribute!])
-                this.set(key, value)
-                return this.get(key) as any
+            const mapNode = getStateTreeNode(this as IAnyStateTreeNode)
+            const mapType = mapNode.type as MapType<any>
+
+            if (mapType.identifierMode !== MapIdentifierMode.YES) {
+                throw fail(needsIdentifierError)
             }
-            throw fail(needsIdentifierError)
+
+            const idAttr = mapType.mapIdentifierAttribute!
+            const id = value[idAttr]
+            if (!isValidIdentifier(id)) {
+                // try again but this time after creating a node for the value
+                // since it might be an optional identifier
+                const newNode = this.put(mapType.getChildType().create(value, mapNode.environment))
+                return this.put(getSnapshot(newNode))
+            }
+            const key = normalizeIdentifier(id)
+            this.set(key, value)
+            return this.get(key) as any
         }
     }
 }
@@ -254,16 +271,15 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
     initializeChildNodes(objNode: this["N"], initialSnapshot: this["C"] = {}): IChildNodesMap {
         const subType = (objNode.type as this)._subType
-        const environment = objNode.environment
         const result: IChildNodesMap = {}
         Object.keys(initialSnapshot!).forEach(name => {
-            result[name] = subType.instantiate(objNode, name, environment, initialSnapshot[name])
+            result[name] = subType.instantiate(objNode, name, undefined, initialSnapshot[name])
         })
 
         return result
     }
 
-    createNewInstance(node: this["N"], childNodes: IChildNodesMap): this["T"] {
+    createNewInstance(childNodes: IChildNodesMap): this["T"] {
         return new MSTMap(childNodes) as any
     }
 
@@ -302,7 +318,12 @@ export class MapType<IT extends IAnyType> extends ComplexType<
                     const oldValue = change.object.get(key)
                     if (newValue === oldValue) return null
                     typecheckInternal(subType, newValue)
-                    change.newValue = subType.reconcile(node.getChildNode(key), change.newValue)
+                    change.newValue = subType.reconcile(
+                        node.getChildNode(key),
+                        change.newValue,
+                        node,
+                        key
+                    )
                     mapType.processIdentifier(key, change.newValue)
                 }
                 break

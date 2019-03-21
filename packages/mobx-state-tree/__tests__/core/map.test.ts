@@ -543,3 +543,20 @@ test("#1173 - detaching a map should not eliminate its children", () => {
     expect(detachedItems.size).toBe(3)
     expect(detachedItems.get("x")).toBe(n0)
 })
+
+test("#1131 - put with optional identifier", () => {
+    const Test = types.model({
+        id: types.optional(types.identifier, () =>
+            Math.random()
+                .toString(36)
+                .substr(2)
+        ),
+        value: "hi"
+    })
+
+    const myMap = types.map(Test).create()
+    unprotect(myMap)
+    const val = myMap.put({})
+    expect(val.id).toBeTruthy()
+    expect(val.value).toBe("hi")
+})

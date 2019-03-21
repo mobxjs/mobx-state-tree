@@ -26,6 +26,7 @@ import {
     AnyObjectNode,
     SimpleType,
     assertIsType,
+    isValidIdentifier,
     ExtractTWithoutSTN,
     IStateTreeNode
 } from "../../internal"
@@ -68,7 +69,7 @@ class StoredReference<IT extends IAnyType> {
     }
 
     constructor(value: ReferenceT<IT> | ReferenceIdentifier, private readonly targetType: IT) {
-        if (typeof value === "string" || typeof value === "number") {
+        if (isValidIdentifier(value)) {
             this.identifier = value
         } else if (isStateTreeNode(value)) {
             const targetNode = getStateTreeNode(value)
@@ -159,7 +160,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
     }
 
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
-        return typeof value === "string" || typeof value === "number"
+        return isValidIdentifier(value)
             ? typeCheckSuccess()
             : typeCheckFailure(
                   context,
@@ -369,19 +370,24 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
         return storedRefNode
     }
 
-    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
+    reconcile(
+        current: this["N"],
+        newValue: this["C"] | this["T"],
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
         if (!current.isDetaching && current.type === this) {
             const compareByValue = isStateTreeNode(newValue)
             const ref: StoredReference<IT> = current.storedValue
-            if (!compareByValue && ref.identifier === newValue) return current
-            else if (compareByValue && ref.resolvedValue === newValue) return current
+            if (
+                (!compareByValue && ref.identifier === newValue) ||
+                (compareByValue && ref.resolvedValue === newValue)
+            ) {
+                current.setParent(parent, subpath)
+                return current
+            }
         }
-        const newNode = this.instantiate(
-            current.parent,
-            current.subpath,
-            current.environment,
-            newValue
-        )
+        const newNode = this.instantiate(parent, subpath, undefined, newValue)
         current.die() // noop if detaching
         return newNode
     }
@@ -433,7 +439,12 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
         return storedRefNode
     }
 
-    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
+    reconcile(
+        current: this["N"],
+        newValue: this["C"] | this["T"],
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
         const newIdentifier = isStateTreeNode(newValue)
             ? this.options.set(newValue as any, current ? current.storedValue : null)
             : newValue
@@ -442,14 +453,10 @@ export class CustomReferenceType<IT extends IAnyComplexType> extends BaseReferen
             current.type === this &&
             current.storedValue === newIdentifier
         ) {
+            current.setParent(parent, subpath)
             return current
         }
-        const newNode = this.instantiate(
-            current.parent,
-            current.subpath,
-            current.environment,
-            newIdentifier
-        )
+        const newNode = this.instantiate(parent, subpath, undefined, newIdentifier)
         current.die() // noop if detaching
         return newNode
     }

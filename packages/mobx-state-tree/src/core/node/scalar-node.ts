@@ -57,7 +57,9 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
         const parentChanged = this.parent !== newParent
         const subpathChanged = this.subpath !== subpath
 
-        if (!parentChanged && !subpathChanged) return
+        if (!parentChanged && !subpathChanged) {
+            return
+        }
 
         if (process.env.NODE_ENV !== "production") {
             if (!subpath) {
@@ -74,6 +76,7 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
             }
         }
 
+        this.environment = undefined // use parent's
         this.baseSetParent(this.parent, subpath)
     }
 
@@ -86,7 +89,8 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
     }
 
     toString(): string {
-        return `${this.type.name}@${this.path || "<root>"}${this.isAlive ? "" : "[dead]"}`
+        const path = (this.isAlive ? this.path : this.pathUponDeath) || "<root>"
+        return `${this.type.name}@${path}${this.isAlive ? "" : " [dead]"}`
     }
 
     @action

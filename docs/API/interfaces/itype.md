@@ -22,6 +22,7 @@ A type, either complex or simple.
 
 ### Properties
 
+* [identifierAttribute](itype.md#identifierattribute)
 * [name](itype.md#name)
 
 ### Methods
@@ -35,6 +36,15 @@ A type, either complex or simple.
 
 ## Properties
 
+<a id="identifierattribute"></a>
+
+### `<Optional>` identifierAttribute
+
+**● identifierAttribute**: *`undefined` \| `string`*
+
+Name of the dentifier attribute or null if none.
+
+___
 <a id="name"></a>
 
 ###  name

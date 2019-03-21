@@ -184,7 +184,7 @@ test("it should not be possible to pass an unserializable object", () => {
     circular.a = circular
     const recorder = recordActions(store)
     store.orders[0].noopSetCustomer(circular as any)
-    store.orders[0].noopSetCustomer(new Buffer("bla") as any)
+    store.orders[0].noopSetCustomer(Buffer.from("bla") as any)
     expect(recorder.actions).toEqual([
         {
             args: [

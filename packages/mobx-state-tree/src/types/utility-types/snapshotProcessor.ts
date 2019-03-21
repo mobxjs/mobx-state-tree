@@ -91,10 +91,17 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         return node
     }
 
-    reconcile(current: this["N"], newValue: this["C"] | this["T"]): this["N"] {
+    reconcile(
+        current: this["N"],
+        newValue: this["C"] | this["T"],
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
         const node = this._subtype.reconcile(
             current,
-            isStateTreeNode(newValue) ? newValue : this.preProcessSnapshot(newValue)
+            isStateTreeNode(newValue) ? newValue : this.preProcessSnapshot(newValue),
+            parent,
+            subpath
         )
         if (node !== current) {
             this._fixNode(node)

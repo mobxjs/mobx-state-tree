@@ -8,6 +8,7 @@
             "name": "debug unit test",
             "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
             "args": ["-i", "${fileBasename}"],
+            "skipFiles": ["<node_internals>/**/*", "${workspaceRoot}/node_modules/**/*"]
         }
     ]
 }

@@ -33,7 +33,7 @@ abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
         return createScalarNode(this, parent, subpath, environment, initialValue)
     }
 
-    reconcile(current: this["N"], newValue: this["C"]) {
+    reconcile(current: this["N"], newValue: this["C"], parent: AnyObjectNode, subpath: string) {
         // we don't consider detaching here since identifier are scalar nodes, and scalar nodes cannot be detached
         if (current.storedValue !== newValue)
             throw fail(
@@ -41,6 +41,7 @@ abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
                     current.storedValue
                 }' to '${newValue}'. Changing identifiers is not allowed.`
             )
+        current.setParent(parent, subpath)
         return current
     }
 
@@ -147,4 +148,12 @@ export type ReferenceIdentifier = string | number
  */
 export function normalizeIdentifier(id: ReferenceIdentifier): string {
     return "" + id
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function isValidIdentifier(id: any): id is ReferenceIdentifier {
+    return typeof id === "string" || typeof id === "number"
 }

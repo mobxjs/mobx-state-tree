@@ -14,12 +14,12 @@ class Decimal {
 
     constructor(value: string) {
         const parts = value.split(".")
-        this.number = parseInt(parts[0])
-        this.fraction = parseInt(parts[1])
+        this.number = Number(parts[0])
+        this.fraction = Number(parts[1])
     }
 
     toNumber() {
-        return this.number + parseInt("0." + this.fraction)
+        return this.number + Number("0." + this.fraction)
     }
 
     toString() {
