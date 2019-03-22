@@ -15,7 +15,7 @@
     "typings": "dist/index.d.ts",
     "scripts": {
         "clean": "shx rm -rf dist && shx rm -rf lib",
-        "build": "yarn clean && tsc && cpr lib dist --filter=.*\\.js && rollup -c",
+        "build": "yarn clean && tsc && cpr lib dist --filter=\\.js$ && rollup -c",
         "jest": "jest",
         "test": "yarn test:dev && yarn test:prod",
         "test:dev": "cross-env NODE_ENV=development JEST_JUNIT_OUTPUT=../../test-results/mst-middlewares/dev.xml yarn jest",
