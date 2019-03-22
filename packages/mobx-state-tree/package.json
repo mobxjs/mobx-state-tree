@@ -5,6 +5,13 @@
     "main": "dist/mobx-state-tree.js",
     "umd:main": "dist/mobx-state-tree.umd.js",
     "module": "dist/mobx-state-tree.module.js",
+    "browser": {
+        "./dist/mobx-state-tree.js": "./dist/mobx-state-tree.js",
+        "./dist/mobx-state-tree.module.js": "./dist/mobx-state-tree.module.js"
+    },
+    "unpkg": "dist/mobx-state-tree.umd.min.js",
+    "jsnext:main": "dist/mobx-state-tree.module.js",
+    "react-native": "dist/mobx-state-tree.module.js",
     "typings": "dist/index.d.ts",
     "scripts": {
         "build": "shx cp ../../README.md . && tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
