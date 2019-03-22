@@ -147,7 +147,7 @@ test("all methods mentioned in API docs", () => {
 })
 
 test("only accepted dependencies", () => {
-    const validDeps = ["tslib"]
+    const validDeps: string[] = []
 
     const deps = JSON.parse(readFileSync(__dirname + "/../../package.json", "utf8")).dependencies
 
