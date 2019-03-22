@@ -5,10 +5,17 @@
     "main": "dist/mobx-state-tree.js",
     "umd:main": "dist/mobx-state-tree.umd.js",
     "module": "dist/mobx-state-tree.module.js",
+    "browser": {
+        "./dist/mobx-state-tree.js": "./dist/mobx-state-tree.js",
+        "./dist/mobx-state-tree.module.js": "./dist/mobx-state-tree.module.js"
+    },
+    "unpkg": "dist/mobx-state-tree.umd.min.js",
+    "jsnext:main": "dist/mobx-state-tree.module.js",
+    "react-native": "dist/mobx-state-tree.module.js",
     "typings": "dist/index.d.ts",
     "scripts": {
-        "build": "shx cp ../../README.md . && tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
-        "rollup": "rollup -c",
+        "clean": "shx rm -rf dist && shx rm -rf lib",
+        "build": "yarn clean && shx cp ../../README.md . && tsc && cpr lib dist --filter=\\.js$ && rollup -c",
         "jest": "jest --testPathPattern=/__tests__/core/",
         "jest:perf": "jest --testPathPattern=/__tests__/perf/",
         "test:perf": "yarn build && yarn jest:perf && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register __tests__/perf/report.ts",
@@ -57,7 +64,8 @@
         "tslint": "^5.14.0",
         "typedoc": "^0.14.2",
         "typedoc-plugin-markdown": "^1.1.27",
-        "typescript": "^3.3.3333"
+        "typescript": "^3.3.3333",
+        "tslib": "^1.9.3"
     },
     "peerDependencies": {
         "mobx": ">=4.8.0 <5.0.0 || >=5.8.0 <6.0.0"
@@ -71,7 +79,5 @@
         "functional-reactive-programming",
         "state management"
     ],
-    "dependencies": {
-        "tslib": "^1.9.3"
-    }
+    "dependencies": {}
 }

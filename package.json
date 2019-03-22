@@ -2,7 +2,7 @@
     "private": true,
     "dependencies": {},
     "scripts": {
-        "clean": "lerna clean",
+        "clean": "lerna run clean --stream",
         "build": "lerna run build --stream",
         "test": "lerna run test --stream",
         "test:mst:dev": "cd packages/mobx-state-tree && yarn test:dev",
@@ -11,7 +11,8 @@
         "test:mst-middlewares:dev": "cd packages/mst-middlewares && yarn test:dev",
         "test:mst-middlewares:prod": "cd packages/mst-middlewares && yarn test:prod",
         "coverage": "lerna run coverage --stream",
-        "release": "yarn build && lerna publish"
+        "release": "yarn build && lerna publish",
+        "tag-new-version": "lerna version"
     },
     "workspaces": [
         "packages/mobx-state-tree",
