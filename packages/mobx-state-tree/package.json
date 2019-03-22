@@ -14,8 +14,8 @@
     "react-native": "dist/mobx-state-tree.module.js",
     "typings": "dist/index.d.ts",
     "scripts": {
-        "build": "shx cp ../../README.md . && tsc && cpr lib dist --delete-first --filter=\\\\.js && yarn rollup",
-        "rollup": "rollup -c",
+        "clean": "shx rm -rf dist && shx rm -rf lib",
+        "build": "yarn clean && shx cp ../../README.md . && tsc && cpr lib dist --filter=.*\\.js && rollup -c",
         "jest": "jest --testPathPattern=/__tests__/core/",
         "jest:perf": "jest --testPathPattern=/__tests__/perf/",
         "test:perf": "yarn build && yarn jest:perf && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register __tests__/perf/report.ts",

@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "sourceMap": false,
+        "declaration": true,
+        "module": "es2015",
+        "removeComments": false,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "noImplicitAny": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "importHelpers": true,
+        "stripInternal": true,
+        "downlevelIteration": true,
+        "lib": ["es6"]
+    }
+}
