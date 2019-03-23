@@ -1,15 +1,15 @@
 import * as path from "path"
 import filesize from "rollup-plugin-filesize"
 import resolve from "rollup-plugin-node-resolve"
-import { uglify } from "rollup-plugin-uglify"
+import { terser } from "rollup-plugin-terser"
 import replace from "rollup-plugin-replace"
 
 const devPlugins = () => [resolve(), filesize()]
 
 const prodPlugins = () => [
     resolve(),
-    replace({ "process.env.NODE_ENV": "production" }),
-    uglify(),
+    replace({ "process.env.NODE_ENV": JSON.stringify("production") }),
+    terser(),
     filesize()
 ]
 
