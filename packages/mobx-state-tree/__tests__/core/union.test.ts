@@ -166,7 +166,7 @@ test("dispatch", () => {
                 Even,
                 Odd
             )
-        }).toThrow("First argument to types.union should either be a type")
+        }).toThrow("expected object")
     }
 })
 

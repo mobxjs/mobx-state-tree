@@ -15,8 +15,10 @@ import {
     ExtractS,
     ExtractNodeType,
     assertIsType,
-    ExtractTWithoutSTN
+    ExtractTWithoutSTN,
+    devMode
 } from "../../internal"
+import { assertIsString, assertIsFunction } from "../../utils"
 
 class Refinement<IT extends IAnyType> extends BaseType<
     ExtractC<IT>,
@@ -110,21 +112,10 @@ export function refinement(...args: any[]): IAnyType {
         ? args[2]
         : (v: any) => "Value does not respect the refinement predicate"
     // ensures all parameters are correct
-    assertIsType(type, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof name !== "string") {
-            // istanbul ignore next
-            throw fail("expected a string as first argument, got " + name + " instead")
-        }
-        if (typeof predicate !== "function") {
-            // istanbul ignore next
-            throw fail("expected a function as third argument, got " + predicate + " instead")
-        }
-        if (typeof message !== "function") {
-            // istanbul ignore next
-            throw fail("expected a function as fourth argument, got " + message + " instead")
-        }
-    }
+    assertIsType(type, [1, 2])
+    assertIsString(name, 1)
+    assertIsFunction(predicate, [2, 3])
+    assertIsFunction(message, [3, 4])
 
     return new Refinement(name, type, predicate, message)
 }

@@ -5,7 +5,8 @@ import {
     Hook,
     BaseNode,
     AnyObjectNode,
-    SimpleType
+    SimpleType,
+    devMode
 } from "../../internal"
 import { action } from "mobx"
 
@@ -61,7 +62,7 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
             return
         }
 
-        if (process.env.NODE_ENV !== "production") {
+        if (devMode()) {
             if (!subpath) {
                 // istanbul ignore next
                 throw fail("assertion failed: subpath expected")

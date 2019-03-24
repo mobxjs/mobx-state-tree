@@ -6,8 +6,7 @@ import {
     EventHandlers,
     IAnyType,
     IDisposer,
-    SimpleType,
-    ComplexType
+    devMode
 } from "../../internal"
 import { createAtom, IAtom } from "mobx"
 
@@ -157,7 +156,7 @@ export abstract class BaseNode<C, S, T> {
     abstract finalizeCreation(): void
 
     protected baseFinalizeCreation(whenFinalized?: () => void) {
-        if (process.env.NODE_ENV !== "production") {
+        if (devMode()) {
             if (!this.isAlive) {
                 // istanbul ignore next
                 throw fail(

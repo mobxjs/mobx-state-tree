@@ -28,7 +28,8 @@ import {
     assertIsType,
     isValidIdentifier,
     ExtractTWithoutSTN,
-    IStateTreeNode
+    IStateTreeNode,
+    devMode
 } from "../../internal"
 
 export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
@@ -490,7 +491,7 @@ export function reference<IT extends IAnyComplexType>(
     options?: ReferenceOptions<IT>
 ): IReferenceType<IT> {
     assertIsType(subType, 1)
-    if (process.env.NODE_ENV !== "production") {
+    if (devMode()) {
         if (arguments.length === 2 && typeof arguments[1] === "string") {
             // istanbul ignore next
             throw fail(
@@ -505,7 +506,7 @@ export function reference<IT extends IAnyComplexType>(
         : undefined
 
     if (getSetOptions && (getSetOptions.get || getSetOptions.set)) {
-        if (process.env.NODE_ENV !== "production") {
+        if (devMode()) {
             if (!getSetOptions.get || !getSetOptions.set) {
                 throw fail(
                     "reference options must either contain both a 'get' and a 'set' method or none of them"

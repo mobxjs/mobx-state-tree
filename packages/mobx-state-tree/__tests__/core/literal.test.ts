@@ -6,7 +6,7 @@ if (process.env.NODE_ENV !== "production") {
             types.model({
                 complexArg: types.literal({ a: 1 } as any)
             })
-        }).toThrowError("[mobx-state-tree] Literal types can be built only on top of primitives")
+        }).toThrowError("expected primitive as argument")
     })
     test("it should fail if not optional and no default provided", () => {
         const Factory = types.literal("hello")

@@ -49,7 +49,8 @@ import {
     isValidIdentifier,
     ExtractTWithSTN,
     ExtractCSTWithSTN,
-    ExtractTWithoutSTN
+    ExtractTWithoutSTN,
+    devMode
 } from "../../internal"
 
 /** @hidden */
@@ -177,7 +178,7 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
         if (!value) throw fail(`Map.put cannot be used to set empty values`)
         if (isStateTreeNode(value)) {
             const node = getStateTreeNode(value)
-            if (process.env.NODE_ENV !== "production") {
+            if (devMode()) {
                 if (!node.identifierAttribute) {
                     throw fail(needsIdentifierError)
                 }

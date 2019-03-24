@@ -22,13 +22,17 @@ import {
     ReferenceIdentifier,
     AnyObjectNode,
     AnyModelType,
-    isValidIdentifier,
     assertIsType,
     assertIsStateTreeNode,
     ExtractC,
     TypeOfValue,
     ExtractTWithSTN,
-    ExtractS
+    ExtractS,
+    assertIsFunction,
+    assertIsNumber,
+    assertIsString,
+    assertArg,
+    assertIsValidIdentifier
 } from "../internal"
 
 /** @hidden */
@@ -85,10 +89,8 @@ export function onPatch(
 ): IDisposer {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof callback !== "function")
-            throw fail("expected second argument to be a function, got " + callback + " instead")
-    }
+    assertIsFunction(callback, 2)
+
     return getStateTreeNode(target).onPatch(callback)
 }
 
@@ -107,10 +109,8 @@ export function onSnapshot<S>(
 ): IDisposer {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof callback !== "function")
-            throw fail("expected second argument to be a function, got " + callback + " instead")
-    }
+    assertIsFunction(callback, 2)
+
     return getStateTreeNode(target).onSnapshot(callback)
 }
 
@@ -130,12 +130,8 @@ export function applyPatch(
 ): void {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof patch !== "object")
-            throw fail(
-                "expected second argument to be an object or array, got " + patch + " instead"
-            )
-    }
+    assertArg(patch, p => typeof p === "object", "object or array", 2)
+
     getStateTreeNode(target).applyPatches(asArray(patch))
 }
 
@@ -309,11 +305,7 @@ export function getSnapshot<S>(
 export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof depth !== "number")
-            throw fail("expected second argument to be a number, got " + depth + " instead")
-        if (depth < 0) throw fail(`Invalid depth: ${depth}, should be >= 1`)
-    }
+    assertIsNumber(depth, 2, 0)
 
     let parent: AnyObjectNode | null = getStateTreeNode(target).parent
     while (parent) {
@@ -342,11 +334,7 @@ export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
 ): TypeOrStateTreeNodeToStateTreeNode<IT> {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof depth !== "number")
-            throw fail("expected second argument to be a number, got " + depth + " instead")
-        if (depth < 0) throw fail(`Invalid depth: ${depth}, should be >= 1`)
-    }
+    assertIsNumber(depth, 2, 0)
 
     let d = depth
     let parent: AnyObjectNode | null = getStateTreeNode(target).parent
@@ -468,10 +456,7 @@ export function isRoot(target: IAnyStateTreeNode): boolean {
 export function resolvePath(target: IAnyStateTreeNode, path: string): any {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof path !== "string")
-            throw fail("expected second argument to be a number, got " + path + " instead")
-    }
+    assertIsString(path, 2)
 
     const node = resolveNodeByPath(getStateTreeNode(target), path)
     return node ? node.value : undefined
@@ -494,12 +479,8 @@ export function resolveIdentifier<IT extends IAnyType>(
     // check all arguments
     assertIsType(type, 1)
     assertIsStateTreeNode(target, 2)
-    if (process.env.NODE_ENV !== "production") {
-        if (!isValidIdentifier(identifier))
-            throw fail(
-                "expected third argument to be a string or number, got " + identifier + " instead"
-            )
-    }
+    assertIsValidIdentifier(identifier, 3)
+
     const node = getStateTreeNode(target).root.identifierCache!.resolve(
         type,
         normalizeIdentifier(identifier)
@@ -592,10 +573,7 @@ export function isValidReference<N extends IAnyStateTreeNode>(
 export function tryResolve(target: IAnyStateTreeNode, path: string): any {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof path !== "string")
-            throw fail("expected second argument to be a string, got " + path + " instead")
-    }
+    assertIsString(path, 2)
 
     const node = resolveNodeByPath(getStateTreeNode(target), path, false)
     if (node === undefined) return undefined
@@ -722,10 +700,8 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
 export function addDisposer(target: IAnyStateTreeNode, disposer: IDisposer): IDisposer {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof disposer !== "function")
-            throw fail("expected second argument to be a function, got " + disposer + " instead")
-    }
+    assertIsFunction(disposer, 2)
+
     const node = getStateTreeNode(target)
     node.addDisposer(disposer)
     return disposer
@@ -762,10 +738,7 @@ export function walk(
 ): void {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof processor !== "function")
-            throw fail("expected second argument to be a function, got " + processor + " instead")
-    }
+    assertIsFunction(processor, 2)
 
     const node = getStateTreeNode(target)
     // tslint:disable-next-line:no_unused-variable
@@ -797,9 +770,7 @@ export function getPropertyMembers(
         type = typeOrNode
     }
 
-    if (process.env.NODE_ENV !== "production") {
-        if (!isModelType(type)) throw fail("expected a model type, but got " + type + " instead.")
-    }
+    assertArg(type, t => isModelType(t), "model type or model instance", 1)
 
     return {
         name: type.name,

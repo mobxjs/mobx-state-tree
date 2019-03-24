@@ -16,7 +16,8 @@ import {
     assertIsType,
     ExtractCSTWithSTN,
     ExtractTWithoutSTN,
-    ExtractTWithSTN
+    ExtractTWithSTN,
+    devMode
 } from "../../internal"
 
 type IFunctionReturn<T> = () => T
@@ -141,7 +142,7 @@ function checkOptionalPreconditions<IT extends IAnyType>(
         )
     }
     assertIsType(type, 1)
-    if (process.env.NODE_ENV !== "production") {
+    if (devMode()) {
         // we only check default values if they are passed directly
         // if they are generator functions they will be checked once they are generated
         // we don't check generator function results here to avoid generating a node just for type-checking purposes
