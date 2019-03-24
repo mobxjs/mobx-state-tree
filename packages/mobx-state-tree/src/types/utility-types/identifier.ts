@@ -11,7 +11,8 @@ import {
     typeCheckSuccess,
     ISimpleType,
     AnyObjectNode,
-    ScalarNode
+    ScalarNode,
+    assertArg
 } from "../../internal"
 
 abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
@@ -156,4 +157,12 @@ export function normalizeIdentifier(id: ReferenceIdentifier): string {
  */
 export function isValidIdentifier(id: any): id is ReferenceIdentifier {
     return typeof id === "string" || typeof id === "number"
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function assertIsValidIdentifier(id: ReferenceIdentifier, argNumber: number | number[]) {
+    assertArg(id, isValidIdentifier, "string or number (identifier)", argNumber)
 }

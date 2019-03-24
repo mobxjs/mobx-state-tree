@@ -11,7 +11,8 @@ import {
     TypeFlags,
     ExtractNodeType,
     assertIsType,
-    ExtractTWithoutSTN
+    ExtractTWithoutSTN,
+    devMode
 } from "../../internal"
 
 /** @hidden */
@@ -202,7 +203,7 @@ export function snapshotProcessor<
     name?: string
 ): ISnapshotProcessor<IT, CustomC, CustomS> {
     assertIsType(type, 1)
-    if (process.env.NODE_ENV !== "production") {
+    if (devMode()) {
         if (processors.postProcessor && typeof processors.postProcessor !== "function") {
             // istanbul ignore next
             throw fail("postSnapshotProcessor must be a function")

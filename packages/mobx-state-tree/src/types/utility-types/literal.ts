@@ -11,8 +11,10 @@ import {
     isType,
     Primitives,
     AnyObjectNode,
-    SimpleType
+    SimpleType,
+    devMode
 } from "../../internal"
+import { assertArg } from "../../utils"
 
 /**
  * @internal
@@ -70,9 +72,8 @@ export class Literal<T> extends SimpleType<T, T, T> {
  */
 export function literal<S extends Primitives>(value: S): ISimpleType<S> {
     // check that the given value is a primitive
-    if (process.env.NODE_ENV !== "production") {
-        if (!isPrimitive(value)) throw fail(`Literal types can be built only on top of primitives`)
-    }
+    assertArg(value, isPrimitive, "primitive", 1)
+
     return new Literal<S>(value)
 }
 

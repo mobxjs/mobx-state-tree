@@ -161,7 +161,7 @@ export function isPrimitive(value: any, includeDate = true): value is Primitives
  * Freeze a value and return it (if not in production)
  */
 export function freeze<T>(value: T): T {
-    if (process.env.NODE_ENV === "production") return value
+    if (!devMode()) return value
     return isPrimitive(value) || isObservableArray(value) ? value : Object.freeze(value)
 }
 
@@ -171,7 +171,7 @@ export function freeze<T>(value: T): T {
  * Recursively freeze a value (if not in production)
  */
 export function deepFreeze<T>(value: T): T {
-    if (process.env.NODE_ENV === "production") return value
+    if (!devMode()) return value
     freeze(value)
 
     if (isPlainObject(value)) {
@@ -374,7 +374,7 @@ export type DeprecatedFunction = Function & { ids?: { [id: string]: true } }
  */
 export const deprecated: DeprecatedFunction = function(id: string, message: string): void {
     // skip if running production
-    if (process.env.NODE_ENV === "production") return
+    if (!devMode()) return
     // warn if hasn't been warned before
     if (deprecated.ids && !deprecated.ids.hasOwnProperty(id)) {
         warnError("Deprecation warning: " + message)
@@ -390,4 +390,72 @@ deprecated.ids = {}
  */
 export function warnError(msg: string) {
     console.warn(new Error(`[mobx-state-tree] ${msg}`))
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function devMode() {
+    return process.env.NODE_ENV !== "production"
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function assertArg<T>(
+    value: T,
+    fn: (value: T) => boolean,
+    typeName: string,
+    argNumber: number | number[]
+) {
+    if (devMode()) {
+        if (!fn(value)) {
+            // istanbul ignore next
+            throw fail(
+                `expected ${typeName} as argument ${asArray(argNumber).join(
+                    " or "
+                )}, got ${value} instead`
+            )
+        }
+    }
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function assertIsFunction(value: Function, argNumber: number | number[]) {
+    assertArg(value, fn => typeof fn === "function", "function", argNumber)
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function assertIsNumber(
+    value: number,
+    argNumber: number | number[],
+    min?: number,
+    max?: number
+) {
+    assertArg(value, n => typeof n === "number", "number", argNumber)
+    if (min !== undefined) {
+        assertArg(value, n => n >= min, `number greater than ${min}`, argNumber)
+    }
+    if (max !== undefined) {
+        assertArg(value, n => n <= max, `number lesser than ${max}`, argNumber)
+    }
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function assertIsString(value: string, argNumber: number | number[], canBeEmpty = true) {
+    assertArg(value, s => typeof s === "string", "string", argNumber)
+    if (!canBeEmpty) {
+        assertArg(value, s => s !== "", "not empty string", argNumber)
+    }
 }
