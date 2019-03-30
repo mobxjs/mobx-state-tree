@@ -181,22 +181,21 @@ const UndoManager = types
                 }
                 this.addUndoState(groupRecorder)
             },
-            clear: decorate(atomic, (options?: { undo?: boolean; redo?: boolean }) => {
+            clear: decorate(atomic, () => {
                 skipRecording(() => {
-                    const opts = {
-                        undo: true,
-                        redo: true,
-                        ...options
-                    }
-                    if (opts.undo && opts.redo) {
-                        self.history.clear()
-                        self.undoIdx = 0
-                    } else if (opts.undo) {
-                        self.history.splice(0, self.undoLevels)
-                        self.undoIdx = 0
-                    } else if (opts.redo) {
-                        self.history.splice(self.undoIdx, self.redoLevels)
-                    }
+                    self.history.clear()
+                    self.undoIdx = 0
+                })
+            }),
+            clearUndo: decorate(atomic, () => {
+                skipRecording(() => {
+                    self.history.splice(0, self.undoLevels)
+                    self.undoIdx = 0
+                })
+            }),
+            clearRedo: decorate(atomic, () => {
+                skipRecording(() => {
+                    self.history.splice(self.undoIdx, self.redoLevels)
                 })
             })
         }

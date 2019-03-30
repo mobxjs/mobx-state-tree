@@ -1,3 +1,14 @@
+- Through PR [#1196](https://github.com/mobxjs/mobx-state-tree/pull/1196) by [@xaviergonz](https://github.com/xaviergonz)
+  - Added `createActionTrackerMiddleware2`, a more easy to use version of the first one, which makes creating middlewares for both sync and async actions more universal.
+  - Added an optional filter to `recordPatches` to be able to skip recording certain patches.
+  - `atomic` now uses the new `createActionTrackerMiddleware2`.
+  - `UndoManager` fixes and improvements:
+    - Uses the new `createActionTrackerMiddleware2`.
+    - Added `clearRedo` and `clearRedo` to only clear those.
+    - Added `undoLevels` and `redoLevels` to know how many undo/redo actions are available.
+    - Made undo manager actions atomic, so they won't actually do any partial changes if for some reason they fail.
+    - Fix for `withoutUndo` so it will only skip recording what is inside, not the whole action - fixes [#1195](https://github.com/mobxjs/mobx-state-tree/issues/1195).
+
 # 3.12.2
 
 -   Added more output formats for the library (common-js minified version and umd minified version). Note that now the umd version will be the development version while the new umd.min version will be the production version. This change is to keep it in sync with the parent mobx package. Also the npm package is now leaner since it mistakenly included separatedly compiled js files and source maps.

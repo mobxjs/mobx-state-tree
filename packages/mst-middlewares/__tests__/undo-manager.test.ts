@@ -406,13 +406,13 @@ describe("same tree - clean", () => {
     })
 
     test("clear redo", () => {
-        store.history.clear({ undo: false, redo: true })
+        store.history.clearRedo()
         expect(undoManager.undoLevels).toBe(1)
         expect(undoManager.redoLevels).toBe(0)
     })
 
     test("clear undo", () => {
-        store.history.clear({ undo: true, redo: false })
+        store.history.clearUndo()
         expect(undoManager.undoLevels).toBe(0)
         expect(undoManager.redoLevels).toBe(1)
     })
