@@ -1681,16 +1681,29 @@ So far this might look a lot like an immutable state tree as found for example i
 
 ## Contributing
 
+Extensive pull requests are best discussed in an issue first.
+
+Setting up the environment:
 1.  Clone this repository
-2.  Yarn is the package manager of choice. Make sure to run Node 8 or higher.
-3.  Run `yarn install && yarn run bootstrap`.
-4.  Run `yarn build` at least once in `packages/mobx-state-tree`
-5.  For MST changes: go to `packages/mobx-state-tree` and run `yarn watch` (the test runner is Jest)
-6.  Editor settings are optimized for VS Code, so just run `code .` in the root folder. Debugger settings are included in the project.
-7.  After updating jsdocs, best run `yarn build-docs`
-8.  When creating PRs, make sure to check the travis build, it will run some tests which are by default not run locally
-9.  Extensive pull requests are best discussed in an issue first
-10. Have fun!
+2.  yarn is the package manager of choice. Make sure to run Node 8 or higher.
+3.  Run `yarn install` on the root.
+4.  Editor settings are optimized for VS Code, so just run `code .` in the root folder. Debugger settings are included in the project.
+
+For `mobx-state-tree`:
+1.  Go to `packages/mobx-state-tree` and run `yarn jest` to ensure all tests pass.
+2.  After updating jsdocs, better run `yarn build-docs` in `packages/mobx-state-tree` to regenerate them.
+
+For `mst-middlewares`:
+1.  Go to `packages/mst-middlewares` and run `yarn jest` to ensure all tests pass.
+2.  If your changes depend on a change in `packages/mobx-state-tree` you will need to run `yarn buld` there first!
+
+Once you think your PR is ready:
+1.  Run on the root `yarn build` to ensure it all builds.
+2.  Run on the root `yarn test` to ensure all tests pass.
+3.  Create the PR on GitHub.
+4.  Check the CI build passes on the PR thread in GitHub.
+
+Have fun!
 
 ## Thanks!
 
