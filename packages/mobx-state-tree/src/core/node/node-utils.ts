@@ -9,7 +9,8 @@ import {
     AnyObjectNode,
     AnyNode,
     IAnyType,
-    IType
+    IType,
+    assertArg
 } from "../../internal"
 
 /**
@@ -71,15 +72,11 @@ export function isStateTreeNode<IT extends IAnyType = IAnyType>(
  * @internal
  * @hidden
  */
-export function assertIsStateTreeNode(value: IAnyStateTreeNode, argNumber: number): void {
-    if (process.env.NODE_ENV !== "production") {
-        if (!isStateTreeNode(value)) {
-            // istanbul ignore next
-            throw fail(
-                `expected a mobx-state-tree node as argument ${argNumber}, got ${value} instead`
-            )
-        }
-    }
+export function assertIsStateTreeNode(
+    value: IAnyStateTreeNode,
+    argNumber: number | number[]
+): void {
+    assertArg(value, isStateTreeNode, "mobx-state-tree node", argNumber)
 }
 
 /**

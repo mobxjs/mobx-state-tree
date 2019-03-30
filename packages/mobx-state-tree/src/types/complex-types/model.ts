@@ -53,7 +53,10 @@ import {
     _NotCustomized,
     IsOptionalType,
     ExtractTWithSTN,
-    Instance
+    Instance,
+    devMode,
+    assertIsString,
+    assertArg
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -86,7 +89,7 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
         ? IType<boolean | undefined, boolean, boolean>
         : T[K] extends Date
         ? IType<number | Date | undefined, number, Date>
-        : T[K] extends IType<infer _TC, infer _TS, infer _TT> // we have to keep the infers here or TS3.4 will break
+        : T[K] extends IAnyType
         ? T[K]
         : never
 }
@@ -277,12 +280,12 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
             } else if (isType(value)) {
                 return props
                 // its a function, maybe the user wanted a view?
-            } else if (process.env.NODE_ENV !== "production" && typeof value === "function") {
+            } else if (devMode() && typeof value === "function") {
                 throw fail(
                     `Invalid type definition for property '${key}', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?`
                 )
                 // no other complex values
-            } else if (process.env.NODE_ENV !== "production" && typeof value === "object") {
+            } else if (devMode() && typeof value === "object") {
                 throw fail(
                     `Invalid type definition for property '${key}', it looks like you passed an object. Try passing another model type or a types.frozen.`
                 )
@@ -416,11 +419,7 @@ export class ModelType<
             actions[name] = actionInvoker
 
             // See #646, allow models to be mocked
-            ;(process.env.NODE_ENV === "production" ? addHiddenFinalProp : addHiddenWritableProp)(
-                self,
-                name,
-                actionInvoker
-            )
+            ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, name, actionInvoker)
         })
     }
 
@@ -504,9 +503,7 @@ export class ModelType<
             } else if (typeof value === "function") {
                 // this is a view function, merge as is!
                 // See #646, allow models to be mocked
-                ;(process.env.NODE_ENV === "production"
-                    ? addHiddenFinalProp
-                    : addHiddenWritableProp)(self, key, value)
+                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, key, value)
             } else {
                 throw fail(`A view member should either be a function or getter based property`)
             }
@@ -682,11 +679,8 @@ export class ModelType<
     }
 
     getChildType(propertyName: string): IAnyType {
-        if (process.env.NODE_ENV !== "production") {
-            if (propertyName === undefined || propertyName === null) {
-                throw fail("getChildType requires a property name when used over a model type")
-            }
-        }
+        assertIsString(propertyName, 1)
+
         return this.properties[propertyName]
     }
 
@@ -805,14 +799,19 @@ export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends Mod
  */
 export function compose(...args: any[]): any {
     // TODO: just join the base type names if no name is provided
-    const typeName: string = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
+    const hasTypename = typeof args[0] === "string"
+    const typeName: string = hasTypename ? args[0] : "AnonymousModel"
+    if (hasTypename) {
+        args.shift()
+    }
+
     // check all parameters
-    if (process.env.NODE_ENV !== "production") {
-        args.forEach(type => {
-            if (!isModelType(type))
-                throw fail("expected a mobx-state-tree model type, got " + type + " instead")
+    if (devMode()) {
+        args.forEach((type, i) => {
+            assertArg(type, isModelType, "mobx-state-tree model type", hasTypename ? i + 2 : i + 1)
         })
     }
+
     return args
         .reduce((prev, cur) =>
             prev.cloneAndEnhance({

@@ -36,7 +36,8 @@ import {
     IStateTreeNode,
     ArgumentTypes,
     getCurrentActionContext,
-    IType
+    IType,
+    devMode
 } from "../../internal"
 
 let nextNodeId = 1
@@ -176,7 +177,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         if (this._observableInstanceState !== ObservableInstanceLifecycle.UNINITIALIZED) {
             return
         }
-        if (process.env.NODE_ENV !== "production") {
+        if (devMode()) {
             if (this.state !== NodeLifeCycle.INITIALIZING) {
                 // istanbul ignore next
                 throw fail(
@@ -276,7 +277,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             return
         }
 
-        if (process.env.NODE_ENV !== "production") {
+        if (devMode()) {
             if (!subpath) {
                 // istanbul ignore next
                 throw fail("assertion failed: subpath expected")

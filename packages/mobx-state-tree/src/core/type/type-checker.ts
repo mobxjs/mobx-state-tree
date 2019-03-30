@@ -6,7 +6,8 @@ import {
     isStateTreeNode,
     isPrimitiveType,
     IAnyType,
-    ExtractCSTWithSTN
+    ExtractCSTWithSTN,
+    devMode
 } from "../../internal"
 
 /** Validation context entry, this is, where the validation should run against which type */
@@ -148,8 +149,9 @@ export function typecheckInternal<IT extends IAnyType>(
     value: ExtractCSTWithSTN<IT>
 ): void {
     // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
-    if (process.env.NODE_ENV === "production") return
-    typecheck(type, value)
+    if (devMode()) {
+        typecheck(type, value)
+    }
 }
 
 /**

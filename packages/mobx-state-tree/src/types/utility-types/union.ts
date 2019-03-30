@@ -18,7 +18,10 @@ import {
     ModelCreationType2,
     _NotCustomized,
     AnyObjectNode,
-    BaseType
+    BaseType,
+    devMode,
+    assertIsType,
+    assertArg
 } from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
@@ -252,18 +255,17 @@ export function union(optionsOrType: UnionOptions | IAnyType, ...otherTypes: IAn
     const name = "(" + types.map(type => type.name).join(" | ") + ")"
 
     // check all options
-    if (process.env.NODE_ENV !== "production") {
-        if (!isType(optionsOrType) && !isPlainObject(optionsOrType))
-            throw fail(
-                "First argument to types.union should either be a type, or an objects object of the form: { eager?: boolean, dispatcher?: Function }"
+    if (devMode()) {
+        if (options) {
+            assertArg(
+                options,
+                o => isPlainObject(o),
+                "object { eager?: boolean, dispatcher?: Function }",
+                1
             )
-        types.forEach(type => {
-            if (!isType(type))
-                throw fail(
-                    "expected all possible types to be a mobx-state-tree type, got " +
-                        type +
-                        " instead"
-                )
+        }
+        types.forEach((type, i) => {
+            assertIsType(type, options ? i + 2 : i + 1)
         })
     }
     return new Union(name, types, options)

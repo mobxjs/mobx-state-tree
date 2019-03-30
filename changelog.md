@@ -1,3 +1,7 @@
+# 3.12.2
+
+-   Added more output formats for the library (common-js minified version and umd minified version). Note that now the umd version will be the development version while the new umd.min version will be the production version. This change is to keep it in sync with the parent mobx package. Also the npm package is now leaner since it mistakenly included separatedly compiled js files and source maps.
+
 # 3.12.1
 
 -   Fixed a regression with `getEnv` sometimes not returning the proper environment.

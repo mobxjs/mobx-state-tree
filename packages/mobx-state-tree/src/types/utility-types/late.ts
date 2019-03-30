@@ -12,7 +12,8 @@ import {
     ExtractS,
     ExtractNodeType,
     cannotDetermineSubtype,
-    ExtractTWithoutSTN
+    ExtractTWithoutSTN,
+    devMode
 } from "../../internal"
 
 class Late<IT extends IAnyType> extends BaseType<
@@ -45,7 +46,7 @@ class Late<IT extends IAnyType> extends BaseType<
                     "Late type seems to be used too early, the definition (still) returns undefined"
                 )
             if (t) {
-                if (process.env.NODE_ENV !== "production" && !isType(t))
+                if (devMode() && !isType(t))
                     throw fail(
                         "Failed to determine subtype, make sure types.late returns a type definition."
                     )
@@ -124,7 +125,7 @@ export function late(nameOrType: any, maybeType?: () => IAnyType): IAnyType {
     const name = typeof nameOrType === "string" ? nameOrType : `late(${nameOrType.toString()})`
     const type = typeof nameOrType === "string" ? maybeType : nameOrType
     // checks that the type is actually a late type
-    if (process.env.NODE_ENV !== "production") {
+    if (devMode()) {
         if (!(typeof type === "function" && type.length === 0))
             throw fail(
                 "Invalid late type, expected a function with zero arguments that returns a type, got: " +

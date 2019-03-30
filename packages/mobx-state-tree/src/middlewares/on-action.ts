@@ -20,7 +20,9 @@ import {
     IAnyStateTreeNode,
     warnError,
     AnyNode,
-    assertIsStateTreeNode
+    assertIsStateTreeNode,
+    devMode,
+    assertArg
 } from "../internal"
 
 export interface ISerializedActionCall {
@@ -84,12 +86,7 @@ export function applyAction(
 ): void {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
-        if (typeof actions !== "object")
-            throw fail(
-                "expected second argument to be an object or array, got " + actions + " instead"
-            )
-    }
+    assertArg(actions, a => typeof a === "object", "object or array", 2)
 
     runInAction(() => {
         asArray(actions).forEach(action => baseApplyAction(target, action))
@@ -197,7 +194,7 @@ export function onAction(
 ): IDisposer {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    if (process.env.NODE_ENV !== "production") {
+    if (devMode()) {
         if (!isRoot(target))
             warnError(
                 "Warning: Attaching onAction listeners to non root nodes is dangerous: No events will be emitted for actions initiated higher up in the tree."
