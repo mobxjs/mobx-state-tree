@@ -29,13 +29,13 @@ import {
     normalizeIdentifier,
     ReferenceIdentifier,
     IMiddlewareEvent,
-    getCurrentActionContext,
     escapeJsonPath,
     getPath,
     warnError,
     AnyNode,
     IStateTreeNode,
     ArgumentTypes,
+    getCurrentActionContext,
     IType,
     devMode
 } from "../../internal"
@@ -92,7 +92,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     identifierCache?: IdentifierCache
     isProtectionEnabled = true
-    middlewares: IMiddleware[] | null = null
+    middlewares?: IMiddleware[]
 
     private _applyPatches?: (patches: IJsonPatch[]) => void
 
@@ -605,17 +605,22 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this._internalEventsUnregister(InternalEvents.Dispose, disposer)
     }
 
-    removeMiddleware(handler: IMiddlewareHandler): void {
-        if (this.middlewares)
-            this.middlewares = this.middlewares.filter(middleware => middleware.handler !== handler)
+    private removeMiddleware(middleware: IMiddleware): void {
+        if (this.middlewares) {
+            const index = this.middlewares.indexOf(middleware)
+            if (index >= 0) {
+                this.middlewares.splice(index, 1)
+            }
+        }
     }
 
     addMiddleWare(handler: IMiddlewareHandler, includeHooks: boolean = true): IDisposer {
-        if (!this.middlewares) this.middlewares = [{ handler, includeHooks }]
-        else this.middlewares.push({ handler, includeHooks })
+        const middleware = { handler, includeHooks }
+        if (!this.middlewares) this.middlewares = [middleware]
+        else this.middlewares.push(middleware)
 
         return () => {
-            this.removeMiddleware(handler)
+            this.removeMiddleware(middleware)
         }
     }
 

@@ -138,6 +138,8 @@ export function applyPatch(
 export interface IPatchRecorder {
     patches: ReadonlyArray<IJsonPatch>
     inversePatches: ReadonlyArray<IJsonPatch>
+    reversedInversePatches: ReadonlyArray<IJsonPatch>
+    readonly recording: boolean
     stop(): void
     resume(): void
     replay(target?: IAnyStateTreeNode): void
@@ -155,6 +157,8 @@ export interface IPatchRecorder {
  *      patches: IJsonPatch[]
  *      // the inverse of the recorded patches
  *      inversePatches: IJsonPatch[]
+ *      // true if currently recording
+ *      recording: boolean
  *      // stop recording patches
  *      stop(): void
  *      // resume recording patches
@@ -167,42 +171,88 @@ export interface IPatchRecorder {
  * }
  * ```
  *
+ * The optional filter function allows to skip recording certain patches.
+ *
  * @param subject
+ * @param filter
  * @returns
  */
-export function recordPatches(subject: IAnyStateTreeNode): IPatchRecorder {
+export function recordPatches(
+    subject: IAnyStateTreeNode,
+    filter?: (patch: IJsonPatch, inversePatch: IJsonPatch) => boolean
+): IPatchRecorder {
     // check all arguments
     assertIsStateTreeNode(subject, 1)
 
-    let disposer: IDisposer | null = null
-    function resume() {
-        if (disposer) return
-        disposer = onPatch(subject, (patch, inversePatch) => {
-            recorder.rawPatches.push([patch, inversePatch])
-        })
+    interface IPatches {
+        patches: IJsonPatch[]
+        reversedInversePatches: IJsonPatch[]
+        inversePatches: IJsonPatch[]
     }
 
-    let recorder = {
-        rawPatches: [] as [IJsonPatch, IJsonPatch][],
+    const data: Pick<IPatches, "patches" | "reversedInversePatches"> = {
+        patches: [],
+        reversedInversePatches: []
+    }
+
+    // we will generate the immutable copy of patches on demand for public consumption
+    const publicData: Partial<IPatches> = {}
+
+    let disposer: IDisposer | undefined
+
+    const recorder: IPatchRecorder = {
+        get recording() {
+            return !!disposer
+        },
         get patches() {
-            return this.rawPatches.map(([a]) => a)
+            if (!publicData.patches) {
+                publicData.patches = data.patches.slice()
+            }
+            return publicData.patches
+        },
+        get reversedInversePatches() {
+            if (!publicData.reversedInversePatches) {
+                publicData.reversedInversePatches = data.reversedInversePatches.slice()
+            }
+            return publicData.reversedInversePatches
         },
         get inversePatches() {
-            return this.rawPatches.map(([_, b]) => b)
+            if (!publicData.inversePatches) {
+                publicData.inversePatches = data.reversedInversePatches.slice().reverse()
+            }
+            return publicData.inversePatches
         },
         stop() {
-            if (disposer) disposer()
-            disposer = null
+            if (disposer) {
+                disposer()
+                disposer = undefined
+            }
         },
-        resume,
+        resume() {
+            if (disposer) return
+            disposer = onPatch(subject, (patch, inversePatch) => {
+                // skip patches that are asked to be filtered if there's a filter in place
+                if (filter && !filter(patch, inversePatch)) {
+                    return
+                }
+                data.patches.push(patch)
+                data.reversedInversePatches.unshift(inversePatch)
+
+                // mark immutable public patches as dirty
+                publicData.patches = undefined
+                publicData.inversePatches = undefined
+                publicData.reversedInversePatches = undefined
+            })
+        },
         replay(target?: IAnyStateTreeNode) {
-            applyPatch(target || subject, recorder.patches)
+            applyPatch(target || subject, data.patches)
         },
         undo(target?: IAnyStateTreeNode) {
-            applyPatch(target || subject, recorder.inversePatches.slice().reverse())
+            applyPatch(target || subject, data.reversedInversePatches)
         }
     }
-    resume()
+
+    recorder.resume()
     return recorder
 }
 

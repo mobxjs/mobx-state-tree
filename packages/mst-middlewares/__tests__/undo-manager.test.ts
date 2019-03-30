@@ -1,5 +1,5 @@
 import { UndoManager } from "../src"
-import { types, clone, getSnapshot } from "mobx-state-tree"
+import { types, clone, getSnapshot, flow, Instance } from "mobx-state-tree"
 
 let undoManager: any = {}
 const setUndoManagerSameTree = (targetStore: any) => {
@@ -256,18 +256,12 @@ test("same tree - withoutUndo declaratively", () => {
     withoutUndo(store)
 })
 
-test("on tree - withoutUndoFlow declaratively", async () => {
+test("same tree - withoutUndoFlow declaratively", async () => {
     // because async would allow overwriting the history within later tests
     // we need a another _undoManager
     let _undoManager: any = {}
     const _setUndoManagerSameTree = (targetStore: any) => {
         _undoManager = targetStore.history
-    }
-
-    function delay(time: number) {
-        return new Promise(resolve => {
-            setTimeout(resolve, time)
-        })
     }
 
     const HistoryOnTreeStoreModel = types
@@ -279,20 +273,18 @@ test("on tree - withoutUndoFlow declaratively", async () => {
         .actions(self => {
             _setUndoManagerSameTree(self)
 
-            const loadPosition = function*() {
-                try {
-                    yield delay(2)
-                    self.x = 4
-                    yield delay(2)
-                    self.y = 2
-                    return { x: self.x, y: self.y }
-                } catch (err) {
-                    console.log("oops")
-                }
-            }
-
             return {
-                loadPosition: () => _undoManager.withoutUndoFlow(loadPosition)()
+                loadPosition2: flow(function*(n: number) {
+                    yield Promise.resolve()
+                    self.y = n
+                }),
+                loadPosition: _undoManager.withoutUndoFlow(function*() {
+                    yield Promise.resolve()
+                    self.x = 4
+                    yield (self as any).loadPosition2(2)
+
+                    return { x: self.x, y: self.y }
+                })
             }
         })
     const store = HistoryOnTreeStoreModel.create()
@@ -303,13 +295,15 @@ test("on tree - withoutUndoFlow declaratively", async () => {
     expect(store.y).toBe(1)
 
     const value = await store.loadPosition()
-    expect(value.x).toBe(4)
+    expect(store.x).toBe(4)
     expect(store.y).toBe(2)
+    expect(value.x).toBe(4)
+    expect(value.y).toBe(2)
     expect(_undoManager.canUndo).toBe(false)
     expect(_undoManager.canRedo).toBe(false)
 })
 
-test("on tree - group", () => {
+test("same tree - group", () => {
     const HistoryOnTreeStoreModel = types
         .model({
             x: 1,
@@ -329,36 +323,58 @@ test("on tree - group", () => {
         })
     const store = HistoryOnTreeStoreModel.create()
 
-    expect(undoManager.canUndo).toBe(false)
-    expect(undoManager.canRedo).toBe(false)
+    expect(undoManager.undoLevels).toBe(0)
+    expect(undoManager.redoLevels).toBe(0)
     expect(store.x).toBe(1)
 
     undoManager.startGroup(() => {
         store.inc()
         store.inc()
         store.inc()
-        store.inc()
     })
+    expect(store.x).toBe(4)
+    expect(undoManager.undoLevels).toBe(0) // nothing to undo until stopGroup
+    expect(undoManager.redoLevels).toBe(0) // nothing to redo yet
+
+    // an action outside start group, but before stopGroup should also be part of the group
+    store.inc()
+    expect(store.x).toBe(5)
+    expect(undoManager.undoLevels).toBe(0) // nothing to undo until stopGroup
+    expect(undoManager.redoLevels).toBe(0) // nothing to redo yet
+
     undoManager.stopGroup()
     expect(store.x).toBe(5)
-    expect(undoManager.canUndo).toBe(true)
+    expect(undoManager.undoLevels).toBe(1) // incs can be undone now
+    expect(undoManager.redoLevels).toBe(0) // nothing to redo yet
+    expect(undoManager.history.length).toBe(1)
+    expect(undoManager.history[0].patches).toEqual([
+        { op: "replace", path: "/x", value: 2 },
+        { op: "replace", path: "/x", value: 3 },
+        { op: "replace", path: "/x", value: 4 },
+        { op: "replace", path: "/x", value: 5 }
+    ])
     undoManager.undo()
-    expect(undoManager.canUndo).toBe(false)
-    expect(undoManager.canRedo).toBe(true)
+    expect(undoManager.undoLevels).toBe(0) // incs undone
+    expect(undoManager.redoLevels).toBe(1) // incs can be redone
     expect(store.x).toBe(1)
 
     undoManager.startGroup(() => {
         store.addNumber(1)
         store.addNumber(2)
     })
+    expect(store.numbers.length).toBe(2)
+    expect(undoManager.undoLevels).toBe(0) // nothing to undo until stopGroup
+    expect(undoManager.redoLevels).toBe(1) // incs can be redone
     undoManager.stopGroup()
+    expect(undoManager.undoLevels).toBe(1) // addNumbers can be undone
+    expect(undoManager.redoLevels).toBe(0) // incs redo is now lost
     undoManager.undo()
-    expect(undoManager.canUndo).toBe(false)
-    expect(undoManager.canRedo).toBe(true)
+    expect(undoManager.undoLevels).toBe(0) // addNumbers undone
+    expect(undoManager.redoLevels).toBe(1) // addNumbers can be redone
     expect(store.numbers.length).toBe(0)
 })
 
-test("same tree - clean", () => {
+describe("same tree - clean", () => {
     const HistoryOnTreeStoreModel = types
         .model({
             x: 1,
@@ -368,15 +384,83 @@ test("same tree - clean", () => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
-                    self.x += 1
+                    self.x++
                 }
             }
         })
-    const store = HistoryOnTreeStoreModel.create()
-    store.inc()
-    expect(undoManager.canUndo).toBe(true)
-    expect(undoManager.canRedo).toBe(false)
-    store.history.clear()
-    expect(undoManager.canUndo).toBe(false)
-    expect(undoManager.canRedo).toBe(false)
+
+    let store: Instance<typeof HistoryOnTreeStoreModel>
+    beforeEach(() => {
+        store = HistoryOnTreeStoreModel.create()
+        store.inc()
+        store.inc()
+        store.history.undo()
+        expect(undoManager.undoLevels).toBe(1)
+        expect(undoManager.redoLevels).toBe(1)
+    })
+
+    test("clear all", () => {
+        store.history.clear()
+        expect(undoManager.undoLevels).toBe(0)
+        expect(undoManager.redoLevels).toBe(0)
+    })
+
+    test("clear redo", () => {
+        store.history.clearRedo()
+        expect(undoManager.undoLevels).toBe(1)
+        expect(undoManager.redoLevels).toBe(0)
+    })
+
+    test("clear undo", () => {
+        store.history.clearUndo()
+        expect(undoManager.undoLevels).toBe(0)
+        expect(undoManager.redoLevels).toBe(1)
+    })
+})
+
+test("#1195 - withoutUndo() used inside an action should NOT affect all patches within that action", () => {
+    let _undoManager: any
+
+    const store = types
+        .model(`Person`, {
+            name: types.string,
+            age: types.number
+        })
+        .actions(self => {
+            _undoManager = UndoManager.create({}, { targetStore: self })
+
+            return {
+                setName(name: string) {
+                    _undoManager.withoutUndo(() => {
+                        self.name = name
+                    })
+                },
+
+                setAge(age: number) {
+                    self.age = age
+                },
+
+                setInfo(name: string, age: number) {
+                    this.setName(name) // name changes should not be undo-ed
+                    this.setAge(age) // but age changes should
+                }
+            }
+        })
+
+    const person = store.create({ name: `Jon`, age: 20 })
+
+    person.setInfo(`Bob`, 50)
+    expect(person.name).toBe("Bob")
+    expect(person.age).toBe(50)
+
+    expect(_undoManager.history.length).toBe(1)
+    expect(_undoManager.history[0]).toEqual({
+        inversePatches: [{ op: "replace", path: "/age", value: 20 }],
+        patches: [{ op: "replace", path: "/age", value: 50 }]
+    })
+
+    _undoManager.undo()
+    // only age should be undone
+    expect(person.name).toBe("Bob")
+    expect(person.age).toBe(20)
 })

@@ -12,6 +12,8 @@ export interface IActionTrackingMiddlewareHooks<T> {
 }
 
 /**
+ * Note: Consider migrating to `createActionTrackingMiddleware2`, it is easier to use.
+ *
  * Convenience utility to create action based middleware that supports async processes more easily.
  * All hooks are called for both synchronous and asynchronous actions. Except that either `onSuccess` or `onFail` is called
  *

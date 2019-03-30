@@ -63,22 +63,36 @@ export function createFlowSpawner(name: string, generator: Function) {
     const spawner = function flowSpawner(this: any) {
         // Implementation based on https://github.com/tj/co/blob/master/index.js
         const runId = getNextActionId()
-        const baseContext = getActionContext()
+        const parentContext = getCurrentActionContext()!
+        if (!parentContext) {
+            throw fail("a mst flow must always have a parent context")
+        }
+        const parentActionContext = getParentActionContext(parentContext)
+        if (!parentActionContext) {
+            throw fail("a mst flow must always have a parent action context")
+        }
+
+        const contextBase = {
+            name,
+            id: runId,
+            tree: parentContext.tree,
+            context: parentContext.context,
+            parentId: parentContext.id,
+            allParentIds: [...parentContext.allParentIds, parentContext.id],
+            rootId: parentContext.rootId,
+            parentEvent: parentContext,
+            parentActionEvent: parentActionContext
+        }
+
         const args = arguments
 
         function wrap(fn: any, type: IMiddlewareEventType, arg: any) {
             fn.$mst_middleware = (spawner as any).$mst_middleware // pick up any middleware attached to the flow
             runWithActionContext(
                 {
-                    name,
+                    ...contextBase,
                     type,
-                    id: runId,
-                    args: [arg],
-                    tree: baseContext.tree,
-                    context: baseContext.context,
-                    parentId: baseContext.id,
-                    allParentIds: [...baseContext.allParentIds, baseContext.id],
-                    rootId: baseContext.rootId
+                    args: [arg]
                 },
                 fn
             )
@@ -94,15 +108,9 @@ export function createFlowSpawner(name: string, generator: Function) {
 
             runWithActionContext(
                 {
-                    name,
+                    ...contextBase,
                     type: "flow_spawn",
-                    id: runId,
-                    args: argsToArray(args),
-                    tree: baseContext.tree,
-                    context: baseContext.context,
-                    parentId: baseContext.id,
-                    allParentIds: [...baseContext.allParentIds, baseContext.id],
-                    rootId: baseContext.rootId
+                    args: argsToArray(args)
                 },
                 init
             )
@@ -161,7 +169,8 @@ export function createFlowSpawner(name: string, generator: Function) {
 import {
     IMiddlewareEventType,
     runWithActionContext,
-    getActionContext,
+    getCurrentActionContext,
+    getParentActionContext,
     getNextActionId
 } from "./action"
 import { fail, argsToArray } from "../utils"

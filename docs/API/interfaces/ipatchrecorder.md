@@ -12,6 +12,8 @@
 
 * [inversePatches](ipatchrecorder.md#inversepatches)
 * [patches](ipatchrecorder.md#patches)
+* [recording](ipatchrecorder.md#recording)
+* [reversedInversePatches](ipatchrecorder.md#reversedinversepatches)
 
 ### Methods
 
@@ -36,6 +38,20 @@ ___
 ###  patches
 
 **● patches**: *`ReadonlyArray`<[IJsonPatch](ijsonpatch.md)>*
+
+___
+<a id="recording"></a>
+
+###  recording
+
+**● recording**: *`boolean`*
+
+___
+<a id="reversedinversepatches"></a>
+
+###  reversedInversePatches
+
+**● reversedInversePatches**: *`ReadonlyArray`<[IJsonPatch](ijsonpatch.md)>*
 
 ___
 
