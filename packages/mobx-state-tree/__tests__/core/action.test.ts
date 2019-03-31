@@ -10,9 +10,9 @@ import {
     cast,
     IMiddlewareEvent,
     ISerializedActionCall,
-    Instance
+    Instance,
+    mstRunInAction
 } from "../../src"
-import { mstRunInAction } from "../../src/internal"
 
 /// Simple action replay and invocation
 const Task = types
