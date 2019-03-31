@@ -456,6 +456,6 @@ export function assertIsNumber(
 export function assertIsString(value: string, argNumber: number | number[], canBeEmpty = true) {
     assertArg(value, s => typeof s === "string", "string", argNumber)
     if (!canBeEmpty) {
-        assertArg(value, s => s !== "", "not empty string", argNumber)
+        assertArg(value, s => s !== "", "non-empty string", argNumber)
     }
 }

@@ -46,16 +46,6 @@ export function flow<R, Args extends any[]>(
 }
 
 /**
- *  Used for TypeScript to make flows that return a promise return the actual promise result.
- *
- * @param val
- * @returns
- */
-export function castFlowReturn<T>(val: T): FlowReturn<T> {
-    return val as any
-}
-
-/**
  * @internal
  * @hidden
  */

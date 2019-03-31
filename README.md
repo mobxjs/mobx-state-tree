@@ -465,12 +465,7 @@ someModel.actions(self => {
 })
 ```
 
-Note that, since MST v3.9, TypeScript correctly infers `flow` arguments and usually infers correctly `flow` return types,
-but one exception to this case is when a `Promise` is returned as final value. In this case (and only in this case) this construct needs to be used:
-
-```ts
-return castFlowReturn(somePromise)
-```
+Note that, since MST v3.9, TypeScript correctly infers `flow` arguments and usually infers correctly `flow` final return types, however intermediate yielsd will have `any` as type.
 
 #### Action listeners versus middleware
 
@@ -1126,7 +1121,6 @@ See the [full API docs](docs/API/README.md) for more details.
 | [`destroy(node)`](docs/API/README.md#destroy)                                                                         | Kills `node`, making it unusable. Removes it from any parent in the process                                                                                                                                                                           |
 | [`detach(node)`](docs/API/README.md#detach)                                                                           | Removes `node` from its current parent, and lets it live on as standalone tree                                                                                                                                                                        |
 | [`flow(generator)`](docs/API/README.md#flow)                                                                          | Creates an asynchronous flow based on a generator function                                                                                                                                                                                            |
-| [`castFlowReturn(value)`](docs/API/README.md#castflowreturn)                                                          | Casts a flow return value so it can be correctly inferred as return type. Only needed when using TypeScript and when returning a Promise.                                                                                                             |
 | [`getChildType(node, property?)`](docs/API/README.md#getchildtype)                                                    | Returns the declared type of the given `property` of `node`. For arrays and maps `property` can be omitted as they all have the same type                                                                                                             |
 | [`getEnv(node)`](docs/API/README.md#getenv)                                                                           | Returns the environment of `node`, see [environments](#environments)                                                                                                                                                                                  |
 | [`getParent(node, depth=1)`](docs/API/README.md#getparent)                                                            | Returns the intermediate parent of the `node`, or a higher one if `depth > 1`                                                                                                                                                                         |
@@ -1147,6 +1141,7 @@ See the [full API docs](docs/API/README.md) for more details.
 | [`isValidReference(() => node \| null \| undefined, checkIfAlive = true)`](docs/API/README.md#isvalidreference)       | Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns if the check passes or not.                                                                                                                          |
 | [`isRoot(node)`](docs/API/README.md#isroot)                                                                           | Returns true if `node` has no parents                                                                                                                                                                                                                 |
 | [`joinJsonPath(parts)`](docs/API/README.md#joinjsonpath)                                                              | Joins and escapes the given path `parts` into a JSON path                                                                                                                                                                                             |
+| [`mstRunInAction<T>(node, name?: string, thunk: () => T): T`](docs/API/README.md#mstruninaction)                      | Similar to mobx `runInAction`, it allows you to run an anonymous action as if it were part of a given type instance.                                                                                                                                  |
 | [`onAction(node, (actionDescription) => void)`](docs/API/README.md#onaction)                                          | A built-in middleware that calls the provided callback with an action description upon each invocation. Returns disposer                                                                                                                              |
 | [`onPatch(node, (patch) => void)`](docs/API/README.md#onpatch)                                                        | Attach a JSONPatch listener, that is invoked for each change in the tree. Returns disposer                                                                                                                                                            |
 | [`onSnapshot(node, (snapshot) => void)`](docs/API/README.md#onsnapshot)                                               | Attach a snapshot listener, that is invoked for each change in the tree. Returns disposer                                                                                                                                                             |
@@ -1369,7 +1364,7 @@ Actually, the more strict options that are enabled, the better the type system w
 
 We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occasionally you will need to fallback to `any` or manually adding type annotations.
 
-Flow is not supported.
+Flow is partially supported.
 
 #### Using a MST type at design time
 

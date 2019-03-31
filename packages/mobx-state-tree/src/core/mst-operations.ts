@@ -32,8 +32,10 @@ import {
     assertIsNumber,
     assertIsString,
     assertArg,
-    assertIsValidIdentifier
+    assertIsValidIdentifier,
+    Hook
 } from "../internal"
+import { createActionInvoker } from "./action"
 
 /** @hidden */
 export type TypeOrStateTreeNodeToStateTreeNode<
@@ -988,4 +990,49 @@ export function getNodeId(target: IAnyStateTreeNode): number {
     assertIsStateTreeNode(target, 1)
 
     return getStateTreeNode(target).nodeId
+}
+
+export function mstRunInAction<T>(node: IAnyStateTreeNode, name: string, thunk: () => T): T
+export function mstRunInAction<T>(node: IAnyStateTreeNode, thunk: () => T): T
+/**
+ * Similar to mobx `runInAction`, it allows you to run an anonymous action
+ * as if it were part of a given type instance.
+ *
+ * @export
+ * @template T
+ * @param node
+ * @param nameOrThunk
+ * @param [thunkOrNothing]
+ * @returns
+ */
+export function mstRunInAction<T>(
+    node: IAnyStateTreeNode,
+    nameOrThunk: string | (() => T),
+    thunkOrNothing?: () => T
+): T {
+    assertIsStateTreeNode(node, 1)
+
+    let name = "<unnamed action>"
+    let thunk: () => T
+    if (typeof nameOrThunk === "string") {
+        name = nameOrThunk
+        thunk = thunkOrNothing!
+        assertIsString(name, 1, false)
+        assertIsFunction(thunk, 2)
+
+        if (name in Hook) {
+            throw fail(`invalid action name (a hook cannot be used as name): '${name}'`)
+        }
+        if (name in node) {
+            throw fail(
+                `invalid action name (there's an action/property/view with the same name on the node already): '${name}'`
+            )
+        }
+    } else {
+        thunk = nameOrThunk
+        assertIsFunction(thunk, 1)
+    }
+
+    const actionInvoker = createActionInvoker(node, name, thunk)
+    return actionInvoker()
 }

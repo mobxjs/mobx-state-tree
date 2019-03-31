@@ -1,3 +1,5 @@
+- Added `mstRunInAction`, similar to mobx's `runInAction` but for MST node instances.
+- Removed `castFlowReturn` since when a flow returns a promise what is actually returned from the flow is the resolved value.
 - Through PR [#1196](https://github.com/mobxjs/mobx-state-tree/pull/1196) by [@xaviergonz](https://github.com/xaviergonz)
   - Added `createActionTrackerMiddleware2`, a more easy to use version of the first one, which makes creating middlewares for both sync and async actions more universal.
   - Added an optional filter to `recordPatches` to be able to skip recording certain patches.

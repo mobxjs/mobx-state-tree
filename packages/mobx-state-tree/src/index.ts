@@ -40,7 +40,6 @@ export {
     IStateTreeNode,
     IAnyStateTreeNode,
     flow,
-    castFlowReturn,
     applyAction,
     onAction,
     IActionRecorder,
@@ -144,5 +143,6 @@ export {
     ISnapshotProcessor,
     ISnapshotProcessors,
     getNodeId,
+    mstRunInAction,
     types
 } from "./internal"

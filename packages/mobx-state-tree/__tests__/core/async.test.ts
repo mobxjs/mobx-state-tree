@@ -7,8 +7,7 @@ import {
     destroy,
     IMiddlewareHandler,
     IMiddlewareEvent,
-    IMiddlewareEventType,
-    castFlowReturn
+    IMiddlewareEventType
     // TODO: export IRawActionCall
 } from "../../src"
 import { reaction, configure } from "mobx"
@@ -24,9 +23,7 @@ function delay<TV>(time: number, value: TV, shouldThrow = false): Promise<TV> {
 
 function testCoffeeTodo(
     done: () => void,
-    generator: (
-        self: any
-    ) => ((str: string) => IterableIterator<Promise<any> | string | undefined>),
+    generator: (self: any) => (str: string) => IterableIterator<Promise<any> | string | undefined>,
     shouldError: boolean,
     resultValue: string | undefined,
     producedCoffees: any[]
@@ -334,10 +331,10 @@ test("flow typings", async () => {
         numberToNumber: flow(function*(val: number) {
             yield promise
             return val
-        }), // should be () => Promise<number>
+        }), // should be () => Promise<2>
         voidToNumber: flow(function*() {
             yield promise
-            return castFlowReturn(Promise.resolve(2))
+            return 2
         })
     }))
 

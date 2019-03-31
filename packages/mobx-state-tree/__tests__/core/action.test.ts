@@ -12,6 +12,7 @@ import {
     ISerializedActionCall,
     Instance
 } from "../../src"
+import { mstRunInAction } from "../../src/internal"
 
 /// Simple action replay and invocation
 const Task = types
@@ -420,4 +421,92 @@ test("after attach action should work correctly", () => {
             path: "/todos/0"
         }
     ])
+})
+
+describe("mstRunInAction", () => {
+    test("over model", () => {
+        const T = types.model({
+            done: false
+        })
+
+        const t = T.create()
+        expect(t.done).toBe(false)
+        const ret = mstRunInAction(t, "someAction", () => {
+            t.done = !t.done
+            return t.done
+        })
+        expect(ret).toBe(true)
+        expect(t.done).toBe(true)
+    })
+
+    test("to create async actions", async () => {
+        const T = types
+            .model({
+                done: false
+            })
+            .actions(self => ({
+                async toggleDoneAsync() {
+                    await Promise.resolve()
+                    return mstRunInAction(t, () => {
+                        self.done = !self.done
+                        return self.done
+                    })
+                }
+            }))
+
+        const t = T.create()
+        expect(t.done).toBe(false)
+        const ret = await t.toggleDoneAsync()
+        expect(ret).toBe(true)
+        expect(t.done).toBe(true)
+    })
+
+    test("over array", () => {
+        const T = types.array(types.number)
+
+        const t = T.create([1])
+        expect(getSnapshot(t)).toEqual([1])
+        const ret = mstRunInAction(t, "someAction", () => {
+            t.push(2)
+            return true
+        })
+        expect(ret).toBe(true)
+        expect(getSnapshot(t)).toEqual([1, 2])
+    })
+
+    test("over map", () => {
+        const T = types.map(types.number)
+
+        const t = T.create()
+        expect(getSnapshot(t)).toEqual({})
+        const ret = mstRunInAction(t, "someAction", () => {
+            t.set("0", 1)
+            return true
+        })
+        expect(ret).toBe(true)
+        expect(getSnapshot(t)).toEqual({ "0": 1 })
+    })
+
+    test("checks", () => {
+        if (process.env.NODE_ENV === "production") {
+            return
+        }
+
+        expect(() => mstRunInAction(5 as any, () => {})).toThrow(
+            "expected mobx-state-tree node as argument 1"
+        )
+
+        const T = types.array(types.number)
+        const t = T.create()
+        expect(() => mstRunInAction(t, 5 as any)).toThrow("expected function as argument 1")
+        expect(() => mstRunInAction(t, "", () => {})).toThrow(
+            "expected non-empty string as argument 1"
+        )
+        expect(() => mstRunInAction(t, "afterCreate", () => {})).toThrow(
+            "invalid action name (a hook cannot be used as name)"
+        )
+        expect(() => mstRunInAction(t, "push", () => {})).toThrow(
+            "invalid action name (there's an action/property/view with the same name on the node already)"
+        )
+    })
 })

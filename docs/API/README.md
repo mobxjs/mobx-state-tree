@@ -74,7 +74,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [applySnapshot](#applysnapshot)
 * [array](#array)
 * [cast](#cast)
-* [castFlowReturn](#castflowreturn)
 * [castToReferenceSnapshot](#casttoreferencesnapshot)
 * [castToSnapshot](#casttosnapshot)
 * [clone](#clone)
@@ -131,6 +130,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [maybe](#maybe)
 * [maybeNull](#maybenull)
 * [model](#model)
+* [mstRunInAction](#mstruninaction)
 * [onAction](#onaction)
 * [onPatch](#onpatch)
 * [onSnapshot](#onsnapshot)
@@ -788,26 +788,6 @@ const ModelB = types.model({
 
 **Returns:** `O`
 The same object casted as an instance
-
-___
-<a id="castflowreturn"></a>
-
-###  castFlowReturn
-
-▸ **castFlowReturn**<`T`>(val: *`T`*): `FlowReturn`<`T`>
-
-Used for TypeScript to make flows that return a promise return the actual promise result.
-
-**Type parameters:**
-
-#### T 
-**Parameters:**
-
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| val | `T` |  \- |
-
-**Returns:** `FlowReturn`<`T`>
 
 ___
 <a id="casttoreferencesnapshot"></a>
@@ -2922,6 +2902,44 @@ See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) 
 | `Optional` properties | [P]() |
 
 **Returns:** [IModelType](interfaces/imodeltype.md)<`ModelPropertiesDeclarationToProperties`<`P`>, `__type`>
+
+___
+<a id="mstruninaction"></a>
+
+###  mstRunInAction
+
+▸ **mstRunInAction**<`T`>(node: *`IAnyStateTreeNode`*, name: *`string`*, thunk: *`function`*): `T`
+
+▸ **mstRunInAction**<`T`>(node: *`IAnyStateTreeNode`*, thunk: *`function`*): `T`
+
+Similar to mobx `runInAction`, it allows you to run an anonymous action as if it were part of a given type instance.
+
+**Type parameters:**
+
+#### T 
+**Parameters:**
+
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| node | `IAnyStateTreeNode` |  \- |
+| name | `string` |
+| thunk | `function` |
+
+**Returns:** `T`
+
+Similar to mobx `runInAction`, it allows you to run an anonymous action as if it were part of a given type instance.
+
+**Type parameters:**
+
+#### T 
+**Parameters:**
+
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| node | `IAnyStateTreeNode` |  \- |
+| thunk | `function` |
+
+**Returns:** `T`
 
 ___
 <a id="onaction"></a>

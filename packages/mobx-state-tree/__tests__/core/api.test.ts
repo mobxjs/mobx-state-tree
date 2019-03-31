@@ -15,7 +15,6 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     addMiddleware,
     isStateTreeNode,
     flow,
-    castFlowReturn,
     applyAction,
     onAction,
     recordActions,
@@ -75,6 +74,7 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     isValidReference,
     tryReference,
     getNodeId,
+    mstRunInAction,
 
     types
 `)

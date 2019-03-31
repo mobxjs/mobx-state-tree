@@ -3,19 +3,21 @@
 Asynchronous actions are a first class concept in Mobx-State-Tree. Modelling an asynchronous flow can be done in two ways:
 
 1. Model each step of the flow as separate action
-2. Use generators
+2. Model each step of the flow with `mstRunInAction`
+3. Use generators (`flow`)
 
 The recommended approach is to use _generators_, for reasons mentioned below.
 But let's take a look at modelling asynchronous actions as a set of actions first.
 
-## Using separate actions
+## 1. Using separate actions
 
 MST doesn't allow changing state outside actions (except when the tree is unprotected).
 This means that each step in an asynchronous flow that needs to actually change the model needs to become a separate action.
 For example:
 
 ```javascript
-const Store = types.model({
+const Store = types
+    .model({
         githubProjects: types.array(types.frozen),
         state: types.enumeration("State", ["pending", "done", "error"])
     })
@@ -38,8 +40,7 @@ const Store = types.model({
             console.error("Failed to fetch projects", error)
             self.state = "error"
         }
-    }
-))
+    }))
 ```
 
 This approach works fine and has great type inference, but comes with a few downsides:
@@ -48,19 +49,61 @@ This approach works fine and has great type inference, but comes with a few down
 2. Each step of the flow is exposed as action to the outside world. In the above example, one could (but shouldn't) directly invoke `store.fetchProjectsSuccess([])`
 3. Middleware cannot distinguish the flow initiating action from the handler actions. This means that actions like `fetchProjectsSuccess` will become part of the recorded action list, although you probably never want to replay it (as replaying `fetchProjects` itself will cause the handler actions to be fired in the end).
 
-## Using generators
+## 2. Using `mstRunInAction`
+
+Like the previous one, except that sub-actions don't need to be exposed publicly.
+For example:
+
+```javascript
+const Store = types
+    .model({
+        githubProjects: types.array(types.frozen),
+        state: types.enumeration("State", ["pending", "done", "error"])
+    })
+    .actions(self => ({
+        async fetchProjects() {
+            self.githubProjects = []
+            self.state = "pending"
+            try {
+                const projects = await fetchGithubProjectsSomehow()
+                // after each await we are "outside" the action, so we need to get
+                // inside an action again
+                mstRunInAction(self, "fetchProjectsSuccess", () => {
+                    self.state = "done"
+                    self.githubProjects = projects
+                })
+            } catch (error) {
+                // after each await we are "outside" the action, so we need to get
+                // inside an action again
+                mstRunInAction(self, "fetchProjectsError", () => {
+                    console.error("Failed to fetch projects", error)
+                    self.state = "error"
+                })
+            }
+        }
+    }))
+```
+
+This approach also works fine and has great type inference, but comes with a few downsides as well:
+
+1. For complex flows, then `mstRunInAction` has to be used fairly often.
+2. Middleware cannot distinguish the flow initiating action from the handler actions. This means that actions like `fetchProjectsSuccess` will become part of the recorded action list, although you probably never want to replay it (as replaying `fetchProjects` itself will cause the handler actions to be fired in the end).
+
+## 3. Using generators (`flow`)
 
 Generators might sound scary, but they are very suitable for expressing asynchronous flows. The above example looks as follows when using generators:
 
 ```javascript
 import { flow } from "mobx-state-tree"
 
-const Store = types.model({
+const Store = types
+    .model({
         githubProjects: types.array(types.frozen),
         state: types.enumeration("State", ["pending", "done", "error"])
     })
     .actions(self => ({
-        fetchProjects: flow(function* fetchProjects() { // <- note the star, this a generator function!
+        fetchProjects: flow(function* fetchProjects() {
+            // <- note the star, this a generator function!
             self.githubProjects = []
             self.state = "pending"
             try {
@@ -105,7 +148,7 @@ Using generators requires Promises and generators to be available. Promises can 
 
 To see how `flows`s can be monitored and detected in middleware, see the [middleware docs](middleware.md).
 
-## What about async / await?
+## What about async / await insie flows?
 
 Async/await can only be used in trees that are unprotected. Async / await is not flexible enough to allow MST to wrap asynchronous steps in actions automatically, as is done for the generator functions.
 Luckily, using generators in combination with `flow` is very similar to `async / await`: `async function() {}` becomes `flow(function* () {})`, and `await promise` becomes `yield promise`, and further behavior should be the same.
