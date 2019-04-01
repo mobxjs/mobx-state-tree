@@ -49,3 +49,10 @@ export function maybeNull<IT extends IAnyType>(type: IT): IMaybeNull<IT> {
 
     return union(type, optionalNullType)
 }
+
+/** @hidden */
+export type RemoveMaybeType<IT extends IAnyType> = IT extends IMaybe<infer T1>
+    ? T1
+    : IT extends IMaybeNull<infer T2>
+    ? T2
+    : IT

@@ -45,7 +45,9 @@ import {
     assertIsType,
     ExtractTWithSTN,
     ExtractCSTWithSTN,
-    IStateTreeNode
+    IStateTreeNode,
+    ISafeReference,
+    RemoveMaybeType
 } from "../../internal"
 
 /** @hidden */
@@ -80,9 +82,15 @@ export interface IMSTArray<IT extends IAnyType> extends IObservableArray<Extract
     unshift(...items: ExtractCSTWithSTN<IT>[]): number
 }
 
+type TypeForArray<IT extends IAnyType> = IT extends ISafeReference ? RemoveMaybeType<IT> : IT
+
 /** @hidden */
 export interface IArrayType<IT extends IAnyType>
-    extends IType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>> {}
+    extends IType<
+        ExtractC<TypeForArray<IT>>[] | undefined,
+        ExtractS<TypeForArray<IT>>[],
+        IMSTArray<TypeForArray<IT>>
+    > {}
 
 /**
  * @internal
@@ -318,7 +326,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     assertIsType(subtype, 1)
 
-    return new ArrayType<IT>(subtype.name + "[]", subtype)
+    return new ArrayType<TypeForArray<IT>>(subtype.name + "[]", subtype as TypeForArray<IT>)
 }
 
 function reconcileArrayChildren<TT>(

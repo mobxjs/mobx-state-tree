@@ -50,15 +50,19 @@ import {
     ExtractTWithSTN,
     ExtractCSTWithSTN,
     ExtractTWithoutSTN,
-    devMode
+    devMode,
+    ISafeReference,
+    RemoveMaybeType
 } from "../../internal"
+
+type TypeForMap<IT extends IAnyType> = IT extends ISafeReference ? RemoveMaybeType<IT> : IT
 
 /** @hidden */
 export interface IMapType<IT extends IAnyType>
     extends IType<
-        IKeyValueMap<ExtractC<IT>> | undefined,
-        IKeyValueMap<ExtractS<IT>>,
-        IMSTMap<IT>
+        IKeyValueMap<ExtractC<TypeForMap<IT>>> | undefined,
+        IKeyValueMap<ExtractS<TypeForMap<IT>>>,
+        IMSTMap<TypeForMap<IT>>
     > {}
 
 /** @hidden */
@@ -226,7 +230,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     mapIdentifierAttribute: string | undefined = undefined
     readonly flags = TypeFlags.Map
 
-    constructor(name: string, private readonly _subType: IAnyType) {
+    constructor(name: string, private readonly _subType: IT) {
         super(name)
         this._determineIdentifierMode()
     }
@@ -490,7 +494,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
  * @returns
  */
 export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
-    return new MapType<IT>(`map<string, ${subtype.name}>`, subtype)
+    return new MapType<TypeForMap<IT>>(`map<string, ${subtype.name}>`, subtype as TypeForMap<IT>)
 }
 
 /**

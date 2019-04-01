@@ -8,7 +8,9 @@ import {
     OnReferenceInvalidatedEvent,
     getSnapshot,
     applySnapshot,
-    clone
+    clone,
+    IMSTMap,
+    IMSTArray
 } from "../../src"
 
 const Todo = types.model({ id: types.identifier })
@@ -383,4 +385,36 @@ test("#1115 - safe reference doesn't become invalidated when the reference has n
             ref: undefined
         }
     ])
+})
+
+test("#1236 - arrays/maps TS types should not include undefined when used with safe ref directly", () => {
+    const MyRefModel = types.model("MyRefModel", {
+        id: types.identifier
+    })
+
+    const SafeRef = types.safeReference(MyRefModel)
+
+    const RootModel = types.model("RootModel", {
+        mapOfRef: types.map(MyRefModel),
+        mapOfSafeRef: types.map(SafeRef),
+        arrayOfSafeRef: types.array(SafeRef)
+    })
+
+    const rootModel = RootModel.create({
+        mapOfRef: {
+            sqr1: {
+                id: "sqr1"
+            }
+        },
+        arrayOfSafeRef: ["sqr1"],
+        mapOfSafeRef: {
+            "0": "sqr1"
+        }
+    })
+    const arr1: Instance<typeof MyRefModel>[] = rootModel.arrayOfSafeRef
+    const arr1Id = arr1[0].id
+    const arr2: IMSTArray<typeof MyRefModel> = rootModel.arrayOfSafeRef
+    const arr2Id = arr2[0].id
+    const map1: IMSTMap<typeof MyRefModel> = rootModel.mapOfSafeRef
+    const map1Id = map1.get("0")!.id
 })

@@ -551,7 +551,7 @@ export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type 
 export function safeReference<IT extends IAnyComplexType>(
     subType: IT,
     options?: ReferenceOptionsGetSet<IT>
-): IMaybe<IReferenceType<IT>> {
+): IMaybe<IReferenceType<IT>> & ISafeReference {
     return maybe(
         reference(subType, {
             ...options,
@@ -559,5 +559,14 @@ export function safeReference<IT extends IAnyComplexType>(
                 ev.removeRef()
             }
         })
-    )
+    ) as any
+}
+
+/** @hidden */
+declare const $safeReferenceSymbol: unique symbol
+
+/** @hidden */
+export interface ISafeReference {
+    // fake, only for typing
+    [$safeReferenceSymbol]: undefined
 }
