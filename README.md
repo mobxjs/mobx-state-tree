@@ -1685,7 +1685,7 @@ Extensive pull requests are best discussed in an issue first.
 
 Setting up the environment:
 1.  Clone this repository
-2.  yarn is the package manager of choice. Make sure to run Node 8 or higher.
+2.  `yarn` is the package manager of choice (with workspaces support enabled). Make sure to run Node 8 or higher.
 3.  Run `yarn install` on the root.
 4.  Editor settings are optimized for VS Code, so just run `code .` in the root folder. Debugger settings are included in the project.
 
