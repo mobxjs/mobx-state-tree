@@ -1,4 +1,5 @@
-- Through PR [#1196](https://github.com/mobxjs/mobx-state-tree/pull/1196) by [@xaviergonz](https://github.com/xaviergonz)
+-   Fixed arrays/maps of safe references types taking undefined when they actually won't [#1236](https://github.com/mobxjs/mobx-state-tree/issues/1236) through [#1244](https://github.com/mobxjs/mobx-state-tree/pull/1244) by [@xaviergonz](https://github.com/xaviergonz).
+- Throug- Through PR [#1196](https://github.com/mobxjs/mobx-state-tree/pull/1196) by [@xaviergonz](https://github.com/xaviergonz)
   - Added `createActionTrackerMiddleware2`, a more easy to use version of the first one, which makes creating middlewares for both sync and async actions more universal.
   - Added an optional filter to `recordPatches` to be able to skip recording certain patches.
   - `atomic` now uses the new `createActionTrackerMiddleware2`.
