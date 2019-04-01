@@ -384,3 +384,81 @@ test("#1115 - safe reference doesn't become invalidated when the reference has n
         }
     ])
 })
+
+describe("safeReferenceForCollection", () => {
+    const MyRefModel = types.model("MyRefModel", {
+        id: types.identifier
+    })
+
+    const SafeRef = types.safeReferenceForCollection(MyRefModel)
+
+    it("fails when a model property is invalidated", () => {
+        const Store = types.model({
+            todos: types.array(MyRefModel),
+            single: SafeRef
+        })
+
+        const store = Store.create({
+            todos: [{ id: "1" }, { id: "2" }],
+            single: "1"
+        })
+        unprotect(store)
+
+        expect(() => {
+            store.todos.splice(0, 1)
+        }).toThrow("value `undefined` is not assignable to type")
+    })
+
+    it("removes invalidates items from map/array", () => {
+        const Store = types.model({
+            todos: types.array(MyRefModel),
+            arr: types.array(SafeRef),
+            map: types.map(SafeRef)
+        })
+
+        const store = Store.create({
+            todos: [{ id: "1" }, { id: "2" }],
+            arr: ["1", "2"],
+            map: {
+                a1: "1",
+                a2: "2"
+            }
+        })
+        unprotect(store)
+
+        store.todos.splice(0, 1)
+        expect(store.arr.length).toBe(1)
+        expect(store.map.size).toBe(1)
+    })
+
+    it("does not accept undefined in the array", () => {
+        const Store = types.model({
+            todos: types.array(MyRefModel),
+            arr: types.array(SafeRef)
+        })
+
+        expect(() =>
+            Store.create({
+                todos: [{ id: "1" }, { id: "2" }],
+                arr: ["1", undefined as any]
+            })
+        ).toThrow("value `undefined` is not assignable to type")
+    })
+
+    it("does not accept undefined in the map", () => {
+        const Store = types.model({
+            todos: types.array(MyRefModel),
+            map: types.map(SafeRef)
+        })
+
+        expect(() =>
+            Store.create({
+                todos: [{ id: "1" }, { id: "2" }],
+                map: {
+                    a1: "1",
+                    a2: undefined as any
+                }
+            })
+        ).toThrow("value `undefined` is not assignable to type")
+    })
+})

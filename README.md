@@ -674,7 +674,7 @@ const s = Store.create({
 })
 ```
 
-#### Reference validation: `isValidReference`, `tryReference`, `onInvalidate` hook and `types.safeReference`
+#### Reference validation: `isValidReference`, `tryReference`, `onInvalidate` hook, `types.safeReference` and `types.safeReferenceForCollection`
 
 Accessing an invalid reference (a reference to a dead/detached node) triggers an exception.
 
@@ -716,13 +716,15 @@ const refWithOnInvalidated = types.reference(Todo, {
 
 Note that invalidation will only trigger while the reference is attached to a parent (be it a model, an array, a map, etc.).
 
-A default implementation of such `onInvalidated` hook is provided by the `types.safeReference` type. It is like a standard reference, except that once the target node becomes invalidated it will:
+A default implementation of such `onInvalidated` hook is provided by the `types.safeReference` and `types.safeReferenceForCollection` types. They are like a standard reference, except that once the target node becomes invalidated it will:
 
 -   If its parent is a model: Set its own property to `undefined`
 -   If its parent is an array: Remove itself from the array
 -   If its parent is a map: Remove itself from the map
 
-Strictly speaking it is implemented as
+While `safeReference` can be used both inside model properties and inside collections (arrays/maps), it is usually better to use `safeReferenceForCollection` for collections since they don't have the chance to take `undefined` as a possible value.
+
+Strictly speaking, `safeReference` is implemented as
 
 ```js
 types.maybe(
@@ -735,15 +737,30 @@ types.maybe(
 )
 ```
 
+and `safeReferenceForCollection` as
+
+Strictly speaking, `safeReference` is implemented as
+
+```js
+types.reference(Type, {
+    ...customGetSetIfAvailable,
+    onInvalidated(ev) {
+        ev.removeRef()
+    }
+})
+```
+
 ```js
 const Todo = types.model({ id: types.identifier })
 const Store = types.model({
     todos: types.array(Todo),
-    selectedTodo: types.safeReference(Todo)
+    selectedTodo: types.safeReference(Todo),
+    multipleSelectedTodos: types.array(types.safeReferenceForCollection(Todo))
 })
 
 // given selectedTodo points to a valid Todo and that Todo is later removed from the todos
-// array, then selectedTodo will automatically become undefined
+// array, then selectedTodo will automatically become undefined, and if it is included in multipleSelectedTodos
+// then it will be removed from the array
 ```
 
 ### Listening to observables, snapshots, patches or actions
@@ -1030,6 +1047,7 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 -   `types.compose(name?, type1...typeX)`, creates a new model type by taking a bunch of existing types and combining them into a new one.
 -   `types.reference(targetType)` creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
 -   `types.safeReference(targetType)` is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed. See [references](#references) for more details.
+-   `types.safeReferenceForCollection(targetType)` is like `safeReference` excepts it doesn't accept undefined as value, so it is better suited for collections (arrays / maps), but not for model properties. See [references](#references) for more details.
 -   `types.snapshotProcessor(type, processors, name?)` runs a pre snapshot / post snapshot processor before/after serializing a given type. Example:
     ```ts
     const Todo1 = types.model({ text: types.string })

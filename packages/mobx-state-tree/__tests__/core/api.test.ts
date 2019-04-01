@@ -95,6 +95,7 @@ const TYPES = stringToArray(`
     custom,
     reference,
     safeReference,
+    safeReferenceForCollection,
     union,
     optional,
     literal,

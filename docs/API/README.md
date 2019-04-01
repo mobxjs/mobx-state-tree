@@ -143,6 +143,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [resolveIdentifier](#resolveidentifier)
 * [resolvePath](#resolvepath)
 * [safeReference](#safereference)
+* [safeReferenceForCollection](#safereferenceforcollection)
 * [setLivelinessChecking](#setlivelinesschecking)
 * [snapshotProcessor](#snapshotprocessor)
 * [splitJsonPath](#splitjsonpath)
@@ -3318,6 +3319,29 @@ Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `o
 **Returns:** `IMaybe`<`IReferenceType`<`IT`>>
 
 ___
+<a id="safereferenceforcollection"></a>
+
+###  safeReferenceForCollection
+
+▸ **safeReferenceForCollection**<`IT`>(subType: *`IT`*, options?: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`>*): `IReferenceType`<`IT`>
+
+`types.safeReferenceForCollection` - Like a safe reference, except it can't take undefined as value, so it is not suitable for model properties, but it still removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed, so it is better suited for collections.
+
+Strictly speaking it is a `types.reference(X)` with a customized `onInvalidate` option.
+
+**Type parameters:**
+
+#### IT :  [IAnyComplexType](#ianycomplextype)
+**Parameters:**
+
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| subType | `IT` |  \- |
+| `Optional` options | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> |  \- |
+
+**Returns:** `IReferenceType`<`IT`>
+
+___
 <a id="setlivelinesschecking"></a>
 
 ###  setLivelinessChecking
@@ -4947,6 +4971,13 @@ ___
 ####  safeReference
 
 **● safeReference**: *[safeReference](#safereference)*
+
+___
+<a id="types.safereferenceforcollection"></a>
+
+####  safeReferenceForCollection
+
+**● safeReferenceForCollection**: *[safeReferenceForCollection](#safereferenceforcollection)*
 
 ___
 <a id="types.snapshotprocessor"></a>

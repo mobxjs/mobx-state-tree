@@ -561,3 +561,26 @@ export function safeReference<IT extends IAnyComplexType>(
         })
     )
 }
+
+/**
+ * `types.safeReferenceForCollection` - Like a safe reference, except it can't take undefined as value, so it is not suitable
+ * for model properties, but it still removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed,
+ * so it is better suited for collections.
+ *
+ * Strictly speaking it is a `types.reference(X)` with a customized `onInvalidate` option.
+ *
+ * @param subType
+ * @param options
+ * @returns
+ */
+export function safeReferenceForCollection<IT extends IAnyComplexType>(
+    subType: IT,
+    options?: ReferenceOptionsGetSet<IT>
+): IReferenceType<IT> {
+    return reference(subType, {
+        ...options,
+        onInvalidated(ev) {
+            ev.removeRef()
+        }
+    })
+}
