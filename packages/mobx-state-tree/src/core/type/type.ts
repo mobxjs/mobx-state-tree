@@ -111,7 +111,9 @@ export const cannotDetermineSubtype = "cannotDetermine"
 /**
  * @hidden
  */
-export type STNValue<T, IT extends IAnyType> = T extends object ? T & IStateTreeNode<IT> : T
+export type STNValue<T, IT extends IAnyType> = Extract<T, object> extends never // an object plus maybe primitives?
+    ? T // no, use the primitives
+    : (Extract<T, object> & IStateTreeNode<IT>) | Exclude<T, object> // add STN to the object plus maybe the primitives
 
 /**
  * A type, either complex or simple.
@@ -258,11 +260,7 @@ export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? 
 /** @hidden */
 export type ExtractTWithoutSTN<T extends IAnyType> = T extends IType<any, any, infer X> ? X : never
 /** @hidden */
-export type ExtractTWithSTN<T extends IAnyType> = T extends IType<any, any, infer X>
-    ? X extends object
-        ? X & IStateTreeNode<T>
-        : X
-    : never
+export type ExtractTWithSTN<T extends IAnyType> = InstanceWithDefault<T, never>
 /** @hidden */
 export type ExtractCSTWithoutSTN<IT extends IAnyType> = IT extends IType<infer C, infer S, infer T>
     ? C | S | T
@@ -272,12 +270,14 @@ export type ExtractCSTWithSTN<IT extends IAnyType> = IT extends IType<infer C, i
     ? C | S | ExtractTWithSTN<IT>
     : never
 
+type InstanceWithDefault<T, DEFAULT> = T extends IType<any, any, infer TT>
+    ? STNValue<TT, T>
+    : DEFAULT
+
 /**
  * The instance representation of a given type.
  */
-export type Instance<T> = T extends IType<any, any, infer TT>
-    ? (TT extends object ? TT & IStateTreeNode<T> : TT)
-    : T
+export type Instance<T> = InstanceWithDefault<T, T>
 
 /**
  * The input (creation) snapshot representation of a given type.
