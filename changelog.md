@@ -1,3 +1,6 @@
+# 3.13.0
+
+- Fixed `Instance<typeof variable>` not giving the proper type in Typescript when the type included both objects and primitives.
 - Through PR [#1196](https://github.com/mobxjs/mobx-state-tree/pull/1196) by [@xaviergonz](https://github.com/xaviergonz)
   - Added `createActionTrackerMiddleware2`, a more easy to use version of the first one, which makes creating middlewares for both sync and async actions more universal.
   - Added an optional filter to `recordPatches` to be able to skip recording certain patches.
