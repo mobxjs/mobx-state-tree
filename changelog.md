@@ -7,7 +7,7 @@
   - `atomic` now uses the new `createActionTrackerMiddleware2`.
   - `UndoManager` fixes and improvements:
     - Uses the new `createActionTrackerMiddleware2`.
-    - Added `clearRedo` and `clearRedo` to only clear those.
+    - Added `clearUndo` and `clearRedo` to only clear those.
     - Added `undoLevels` and `redoLevels` to know how many undo/redo actions are available.
     - Made undo manager actions atomic, so they won't actually do any partial changes if for some reason they fail.
     - Fix for `withoutUndo` so it will only skip recording what is inside, not the whole action - fixes [#1195](https://github.com/mobxjs/mobx-state-tree/issues/1195).
