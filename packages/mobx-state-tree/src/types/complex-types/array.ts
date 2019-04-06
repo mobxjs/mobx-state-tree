@@ -34,8 +34,6 @@ import {
     typecheckInternal,
     typeCheckFailure,
     TypeFlags,
-    ExtractS,
-    ExtractC,
     normalizeIdentifier,
     EMPTY_OBJECT,
     IAnyStateTreeNode,
@@ -43,54 +41,41 @@ import {
     AnyNode,
     createObjectNode,
     assertIsType,
-    ExtractTWithSTN,
     ExtractCSTWithSTN,
     IStateTreeNode
 } from "../../internal"
 
 /** @hidden */
-export interface IMSTArray<IT extends IAnyType> extends IObservableArray<ExtractTWithSTN<IT>> {
+export interface IMSTArray<IT extends IAnyType> extends IObservableArray<IT["Type"]> {
     // needs to be split or else it will complain about not being compatible with the array interface
-    push(...items: ExtractTWithSTN<IT>[]): number
+    push(...items: IT["Type"][]): number
     push(...items: ExtractCSTWithSTN<IT>[]): number
 
-    concat(...items: ConcatArray<ExtractTWithSTN<IT>>[]): ExtractTWithSTN<IT>[]
-    concat(...items: ConcatArray<ExtractCSTWithSTN<IT>>[]): ExtractTWithSTN<IT>[]
+    concat(...items: ConcatArray<IT["Type"]>[]): IT["Type"][]
+    concat(...items: ConcatArray<ExtractCSTWithSTN<IT>>[]): IT["Type"][]
 
-    concat(
-        ...items: (ExtractTWithSTN<IT> | ConcatArray<ExtractTWithSTN<IT>>)[]
-    ): ExtractTWithSTN<IT>[]
-    concat(
-        ...items: (ExtractCSTWithSTN<IT> | ConcatArray<ExtractCSTWithSTN<IT>>)[]
-    ): ExtractTWithSTN<IT>[]
+    concat(...items: (IT["Type"] | ConcatArray<IT["Type"]>)[]): IT["Type"][]
+    concat(...items: (ExtractCSTWithSTN<IT> | ConcatArray<ExtractCSTWithSTN<IT>>)[]): IT["Type"][]
 
-    splice(start: number, deleteCount?: number): ExtractTWithSTN<IT>[]
-    splice(
-        start: number,
-        deleteCount: number,
-        ...items: ExtractTWithSTN<IT>[]
-    ): ExtractTWithSTN<IT>[]
-    splice(
-        start: number,
-        deleteCount: number,
-        ...items: ExtractCSTWithSTN<IT>[]
-    ): ExtractTWithSTN<IT>[]
+    splice(start: number, deleteCount?: number): IT["Type"][]
+    splice(start: number, deleteCount: number, ...items: IT["Type"][]): IT["Type"][]
+    splice(start: number, deleteCount: number, ...items: ExtractCSTWithSTN<IT>[]): IT["Type"][]
 
-    unshift(...items: ExtractTWithSTN<IT>[]): number
+    unshift(...items: IT["Type"][]): number
     unshift(...items: ExtractCSTWithSTN<IT>[]): number
 }
 
 /** @hidden */
 export interface IArrayType<IT extends IAnyType>
-    extends IType<ExtractC<IT>[] | undefined, ExtractS<IT>[], IMSTArray<IT>> {}
+    extends IType<IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {}
 
 /**
  * @internal
  * @hidden
  */
 export class ArrayType<IT extends IAnyType> extends ComplexType<
-    ExtractC<IT>[] | undefined,
-    ExtractS<IT>[],
+    IT["CreationType"][] | undefined,
+    IT["SnapshotType"][],
     IMSTArray<IT>
 > {
     readonly flags = TypeFlags.Array

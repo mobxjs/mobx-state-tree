@@ -8,18 +8,15 @@ import {
     IAnyType,
     typeCheckSuccess,
     AnyObjectNode,
-    ExtractC,
-    ExtractS,
     ExtractNodeType,
     cannotDetermineSubtype,
-    ExtractTWithoutSTN,
     devMode
 } from "../../internal"
 
 class Late<IT extends IAnyType> extends BaseType<
-    ExtractC<IT>,
-    ExtractS<IT>,
-    ExtractTWithoutSTN<IT>,
+    IT["CreationType"],
+    IT["SnapshotType"],
+    IT["TypeWithoutSTN"],
     ExtractNodeType<IT>
 > {
     private _subType?: IT

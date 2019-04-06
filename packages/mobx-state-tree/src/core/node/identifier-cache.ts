@@ -1,14 +1,5 @@
 import { IObservableArray, values, observable, entries } from "mobx"
-import {
-    fail,
-    ObjectNode,
-    mobxShallow,
-    AnyObjectNode,
-    ExtractS,
-    ExtractC,
-    IAnyComplexType,
-    ExtractTWithoutSTN
-} from "../../internal"
+import { fail, ObjectNode, mobxShallow, AnyObjectNode, IAnyComplexType } from "../../internal"
 
 let identifierCacheId = 0
 
@@ -105,7 +96,7 @@ export class IdentifierCache {
     resolve<IT extends IAnyComplexType>(
         type: IT,
         identifier: string
-    ): ObjectNode<ExtractC<IT>, ExtractS<IT>, ExtractTWithoutSTN<IT>> | null {
+    ): ObjectNode<IT["CreationType"], IT["SnapshotType"], IT["TypeWithoutSTN"]> | null {
         const set = this.cache.get(identifier)
         if (!set) return null
         const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))

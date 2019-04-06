@@ -1,3 +1,5 @@
+- Reduced type nesting to avoid Typescript 3.4 errors about infinite types. Sadly due to this change `types.create` is no longer smart enough in TS to know skipping the create parameter is valid or not.
+
 # 3.13.0
 
 - Fixed `Instance<typeof variable>` not giving the proper type in Typescript when the type included both objects and primitives.

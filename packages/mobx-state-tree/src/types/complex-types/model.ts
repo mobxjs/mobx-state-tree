@@ -44,14 +44,11 @@ import {
     typecheckInternal,
     typeCheckFailure,
     TypeFlags,
-    ExtractC,
-    ExtractS,
     Hook,
     AnyObjectNode,
     AnyNode,
     _CustomOrOther,
     _NotCustomized,
-    ExtractTWithSTN,
     Instance,
     devMode,
     assertIsString,
@@ -139,7 +136,7 @@ type DefinablePropsNames<T> = {
 }[keyof T]
 
 /** @hidden */
-export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: ExtractC<P[k]> }
+export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
 
 /** @hidden */
 export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } & Partial<PC>
@@ -151,7 +148,7 @@ export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOt
 >
 
 /** @hidden */
-export type ModelSnapshotType<P extends ModelProperties> = { [K in keyof P]: ExtractS<P[K]> }
+export type ModelSnapshotType<P extends ModelProperties> = { [K in keyof P]: P[K]["SnapshotType"] }
 
 /** @hidden */
 export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOther<
@@ -163,9 +160,7 @@ export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOt
  * @hidden
  * we keep this separate from ModelInstanceType to shorten model instance types generated declarations
  */
-export type ModelInstanceTypeProps<P extends ModelProperties> = {
-    [K in keyof P]: ExtractTWithSTN<P[K]>
-}
+export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]: P[K]["Type"] }
 
 /**
  * @hidden

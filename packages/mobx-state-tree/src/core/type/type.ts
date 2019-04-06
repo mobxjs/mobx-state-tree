@@ -115,6 +115,12 @@ export interface IType<C, S, T> {
     readonly Type: STNValue<T, this>
 
     /**
+     * @deprecated do not use.
+     * @hidden
+     */
+    readonly TypeWithoutSTN: T
+
+    /**
      * @deprecated use `SnapshotOut<typeof MyType>` instead.
      * @hidden
      */
@@ -203,47 +209,37 @@ export interface IComplexType<C, S, T> extends IType<C, S, T & object> {}
 export type IAnyComplexType = IType<any, any, object>
 
 /** @hidden */
-export type ExtractC<T extends IAnyType> = T extends IType<infer C, any, any> ? C : never
+export type ExtractCSTWithoutSTN<IT extends IAnyType> =
+    | IT["CreationType"]
+    | IT["SnapshotType"]
+    | IT["TypeWithoutSTN"]
 /** @hidden */
-export type ExtractS<T extends IAnyType> = T extends IType<any, infer S, any> ? S : never
-/** @hidden */
-export type ExtractTWithoutSTN<T extends IAnyType> = T extends IType<any, any, infer X> ? X : never
-/** @hidden */
-export type ExtractTWithSTN<T extends IAnyType> = InstanceWithDefault<T, never>
-/** @hidden */
-export type ExtractCSTWithoutSTN<IT extends IAnyType> = IT extends IType<infer C, infer S, infer T>
-    ? C | S | T
-    : never
-/** @hidden */
-export type ExtractCSTWithSTN<IT extends IAnyType> = IT extends IType<infer C, infer S, any>
-    ? C | S | ExtractTWithSTN<IT>
-    : never
-
-type InstanceWithDefault<T, DEFAULT> = T extends IType<any, any, infer TT>
-    ? STNValue<TT, T>
-    : DEFAULT
+export type ExtractCSTWithSTN<IT extends IAnyType> =
+    | IT["CreationType"]
+    | IT["SnapshotType"]
+    | IT["Type"]
 
 /**
  * The instance representation of a given type.
  */
-export type Instance<T> = InstanceWithDefault<T, T>
+export type Instance<T> = T extends IAnyType ? T["Type"] : T
 
 /**
  * The input (creation) snapshot representation of a given type.
  */
-export type SnapshotIn<T> = T extends IType<infer TC, any, any>
-    ? TC
-    : T extends IStateTreeNode<IType<infer STNC, any, any>>
-    ? STNC
+export type SnapshotIn<T> = T extends IAnyType
+    ? T["CreationType"]
+    : T extends IStateTreeNode<infer IT>
+    ? IT["CreationType"]
     : T
 
 /**
  * The output snapshot representation of a given type.
  */
-export type SnapshotOut<T> = T extends IType<any, infer TS, any>
-    ? TS
-    : T extends IStateTreeNode<IType<any, infer STNS, any>>
-    ? STNS
+export type SnapshotOut<T> = T extends IAnyType
+    ? T["SnapshotType"]
+    : T extends IStateTreeNode<infer IT>
+    ? IT["SnapshotType"]
     : T
 
 /**
@@ -344,6 +340,12 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         // istanbul ignore next
         throw fail(
             "Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`"
+        )
+    }
+    get TypeWithoutSTN(): any {
+        // istanbul ignore next
+        throw fail(
+            "Factory.TypeWithoutSTN should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.TypeWithoutSTN`"
         )
     }
     get SnapshotType(): any {
