@@ -79,19 +79,23 @@ export interface ModelPropertiesDeclaration {
  *
  * @hidden
  */
-export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
-    [K in keyof T]: T[K] extends IAnyType
-        ? T[K]
-        : T[K] extends string
-        ? IType<string | undefined, string, string>
-        : T[K] extends number
-        ? IType<number | undefined, number, number>
-        : T[K] extends boolean
-        ? IType<boolean | undefined, boolean, boolean>
-        : T[K] extends Date
-        ? IType<number | Date | undefined, number, Date>
-        : never
-}
+export type ModelPropertiesDeclarationToProperties<
+    T extends ModelPropertiesDeclaration
+> = T extends { [k: string]: IAnyType } // optimization to reduce nesting
+    ? T
+    : {
+          [K in keyof T]: T[K] extends IAnyType // keep IAnyType check on the top to reduce nesting
+              ? T[K]
+              : T[K] extends string
+              ? IType<string | undefined, string, string>
+              : T[K] extends number
+              ? IType<number | undefined, number, number>
+              : T[K] extends boolean
+              ? IType<boolean | undefined, boolean, boolean>
+              : T[K] extends Date
+              ? IType<number | Date | undefined, number, Date>
+              : never
+      }
 
 /**
  * Checks if a type is any or unknown
