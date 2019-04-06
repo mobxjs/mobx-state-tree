@@ -118,3 +118,51 @@ test("decorate atomic should work", () => {
     expect(() => t.nonAtomicInc(1, true)).toThrow("Oops")
     expect(t.a).toBe(2)
 })
+
+test("#1250", async () => {
+    const M = types
+        .model({
+            x: 0,
+            y: 0
+        })
+        .actions(self => ({
+            setX: decorate(
+                atomic,
+                flow(function*() {
+                    self.x = 10
+                    yield new Promise(resolve => setTimeout(resolve, 1000))
+                    // trigger an undo through atomic
+                    throw new Error()
+                })
+            ),
+
+            setY() {
+                self.y = 10
+            }
+        }))
+
+    const model = M.create({})
+
+    expect(model.x).toBe(0)
+    expect(model.y).toBe(0)
+    const p = model.setX()
+    expect(model.x).toBe(10)
+    expect(model.y).toBe(0)
+
+    await new Promise(r =>
+        setTimeout(() => {
+            model.setY()
+            r()
+        }, 500)
+    )
+    expect(model.x).toBe(10)
+    expect(model.y).toBe(10)
+
+    try {
+        await p
+        fail("should have failed")
+    } catch (e) {
+        expect(model.x).toBe(0)
+        expect(model.y).toBe(10)
+    }
+})

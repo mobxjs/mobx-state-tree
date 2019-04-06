@@ -1,3 +1,7 @@
+- Fixed a regression with `atomic` middleware with async flows [#1250](https://github.com/mobxjs/mobx-state-tree/issues/1250).
+- Added filter function to `recordActions` to filter out recording some actions. Also added `recording` and `resume` methods.
+- Added `getRunningActionContext()` to get the currently executing MST action context (if any). Also added the action context helper functions `isActionContextChildOf()` and `isActionContextThisOrChildOf`.
+
 # 3.13.0
 
 - Fixed `Instance<typeof variable>` not giving the proper type in Typescript when the type included both objects and primitives.

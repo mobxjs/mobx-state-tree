@@ -10,6 +10,7 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 ### Interfaces
 
 * [CustomTypeOptions](interfaces/customtypeoptions.md)
+* [IActionContext](interfaces/iactioncontext.md)
 * [IActionRecorder](interfaces/iactionrecorder.md)
 * [IActionTrackingMiddleware2Call](interfaces/iactiontrackingmiddleware2call.md)
 * [IActionTrackingMiddleware2Hooks](interfaces/iactiontrackingmiddleware2hooks.md)
@@ -102,10 +103,13 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [getPropertyMembers](#getpropertymembers)
 * [getRelativePath](#getrelativepath)
 * [getRoot](#getroot)
+* [getRunningActionContext](#getrunningactioncontext)
 * [getSnapshot](#getsnapshot)
 * [getType](#gettype)
 * [hasParent](#hasparent)
 * [hasParentOfType](#hasparentoftype)
+* [isActionContextChildOf](#isactioncontextchildof)
+* [isActionContextThisOrChildOf](#isactioncontextthisorchildof)
 * [isAlive](#isalive)
 * [isArrayType](#isarraytype)
 * [isFrozenType](#isfrozentype)
@@ -261,7 +265,7 @@ ___
 
 ###  Instance
 
-**Ƭ Instance**: *`Instance<T>`*
+**Ƭ Instance**: *`InstanceWithDefault`<`T`, `T`>*
 
 The instance representation of a given type.
 
@@ -2273,6 +2277,17 @@ Please note that in child nodes access to the root is only possible once the `af
 **Returns:** `TypeOrStateTreeNodeToStateTreeNode`<`IT`>
 
 ___
+<a id="getrunningactioncontext"></a>
+
+###  getRunningActionContext
+
+▸ **getRunningActionContext**(): [IActionContext](interfaces/iactioncontext.md) \| `undefined`
+
+Returns the currently executing MST action context, or undefined if none.
+
+**Returns:** [IActionContext](interfaces/iactioncontext.md) \| `undefined`
+
+___
 <a id="getsnapshot"></a>
 
 ###  getSnapshot
@@ -2343,6 +2358,42 @@ Given a model instance, returns `true` if the object has a parent of given type,
 | ------ | ------ | ------ |
 | target | `IAnyStateTreeNode` |  \- |
 | type | [IAnyType](#ianytype) |  \- |
+
+**Returns:** `boolean`
+
+___
+<a id="isactioncontextchildof"></a>
+
+###  isActionContextChildOf
+
+▸ **isActionContextChildOf**(actionContext: *[IActionContext](interfaces/iactioncontext.md)*, parent: *`number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md)*): `boolean`
+
+Returns if the given action context is a parent of this action context.
+
+**Parameters:**
+
+| Name | Type |
+| ------ | ------ |
+| actionContext | [IActionContext](interfaces/iactioncontext.md) |
+| parent | `number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
+
+**Returns:** `boolean`
+
+___
+<a id="isactioncontextthisorchildof"></a>
+
+###  isActionContextThisOrChildOf
+
+▸ **isActionContextThisOrChildOf**(actionContext: *[IActionContext](interfaces/iactioncontext.md)*, parentOrThis: *`number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md)*): `boolean`
+
+Returns if the given action context is this or a parent of this action context.
+
+**Parameters:**
+
+| Name | Type |
+| ------ | ------ |
+| actionContext | [IActionContext](interfaces/iactioncontext.md) |
+| parentOrThis | `number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
 
 **Returns:** `boolean`
 
@@ -3126,7 +3177,7 @@ ___
 
 ###  recordActions
 
-▸ **recordActions**(subject: *`IAnyStateTreeNode`*): [IActionRecorder](interfaces/iactionrecorder.md)
+▸ **recordActions**(subject: *`IAnyStateTreeNode`*, filter?: *`undefined` \| `function`*): [IActionRecorder](interfaces/iactionrecorder.md)
 
 Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted. Returns an recorder object with the following signature:
 
@@ -3136,18 +3187,25 @@ Example:
 export interface IActionRecorder {
      // the recorded actions
      actions: ISerializedActionCall[]
+     // true if currently recording
+     recording: boolean
      // stop recording actions
-     stop(): any
+     stop(): void
+     // resume recording actions
+     resume(): void
      // apply all the recorded actions on the given object
-     replay(target: IAnyStateTreeNode): any
+     replay(target: IAnyStateTreeNode): void
 }
 ```
+
+The optional filter function allows to skip recording certain actions.
 
 **Parameters:**
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | subject | `IAnyStateTreeNode` |  \- |
+| `Optional` filter | `undefined` \| `function` |
 
 **Returns:** [IActionRecorder](interfaces/iactionrecorder.md)
 
@@ -3173,7 +3231,7 @@ export interface IPatchRecorder {
      // stop recording patches
      stop(): void
      // resume recording patches
-     resume()
+     resume(): void
      // apply all the recorded patches on the given target (the original subject if omitted)
      replay(target?: IAnyStateTreeNode): void
      // reverse apply the recorded patches on the given target  (the original subject if omitted)

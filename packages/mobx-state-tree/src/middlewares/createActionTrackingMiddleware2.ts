@@ -1,9 +1,8 @@
-import { IMiddlewareEvent, IMiddlewareHandler } from "../internal"
+import { IMiddlewareEvent, IMiddlewareHandler, IActionContext } from "../internal"
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
-export interface IActionTrackingMiddleware2Call<TEnv>
-    extends Readonly<Omit<IMiddlewareEvent, "type">> {
+export interface IActionTrackingMiddleware2Call<TEnv> extends Readonly<IActionContext> {
     env: TEnv | undefined
     readonly parentCall?: IActionTrackingMiddleware2Call<TEnv>
 }
