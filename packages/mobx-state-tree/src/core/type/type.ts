@@ -53,56 +53,6 @@ export enum TypeFlags {
 }
 
 /**
- * Name of the properties of an object that can't be set to undefined
- * @hidden
- */
-export type DefinablePropsNames<T> = {
-    [K in keyof T]: Extract<T[K], undefined> extends never ? K : never
-}[keyof T]
-
-/**
- * Checks if a type is any or unknown
- * @hidden
- */
-export type IsTypeAnyOrUnknown<T> = unknown extends T ? true : false
-
-type WithoutUndefined<T> = T extends undefined ? never : T
-
-/**
- * Checks if a type is optional (its creation snapshot can be undefined) or not.
- * @hidden
- *
- * Examples:
- * - string = false
- * - undefined = true
- * - string | undefined = true
- * - string & undefined = true
- * - any = true
- * - unknown = true
- */
-export type IsOptionalType<IT extends IAnyType> = ExtractC<IT> extends WithoutUndefined<
-    ExtractC<IT>
->
-    ? IsTypeAnyOrUnknown<ExtractC<IT>>
-    : true
-/**
- * Checks if a type supports an empty create() function
- * Basically !any, !unknown, X | undefined, objects with all properties being optional
- * @hidden
- */
-export type IsEmptyCreationType<O> = IsTypeAnyOrUnknown<O> extends true
-    ? true
-    : Extract<O, undefined> extends never
-    ? (DefinablePropsNames<O> extends never | undefined ? true : false)
-    : true
-
-/**
- * Chooses a create function based on the creation type.
- * @hidden
- */
-export type CreateParams<C> = IsEmptyCreationType<C> extends false ? [C, any?] : [C?, any?]
-
-/**
  * @internal
  * @hidden
  */
@@ -111,9 +61,9 @@ export const cannotDetermineSubtype = "cannotDetermine"
 /**
  * @hidden
  */
-export type STNValue<T, IT extends IAnyType> = Extract<T, object> extends never // an object plus maybe primitives?
-    ? T // no, use the primitives
-    : (Extract<T, object> & IStateTreeNode<IT>) | Exclude<T, object> // add STN to the object plus maybe the primitives
+export type STNValue<T, IT extends IAnyType> = T extends object // an object plus maybe primitives?
+    ? (Extract<T, object> & IStateTreeNode<IT>) | Exclude<T, object> // add STN to the object plus maybe the primitives
+    : T // no, use the primitives
 
 /**
  * A type, either complex or simple.
@@ -129,13 +79,12 @@ export interface IType<C, S, T> {
      */
     readonly identifierAttribute?: string
 
-    create(...args: CreateParams<C>): STNValue<T, this>
     /**
      * Creates an instance for the type given an snapshot input.
      *
      * @returns An instance of that type.
      */
-    create(snapshot: C, env?: any): STNValue<T, this> // fallback
+    create(snapshot?: C, env?: any): STNValue<T, this>
 
     /**
      * Checks if a given snapshot / instance is of the given type.
@@ -266,7 +215,7 @@ export type ExtractCSTWithoutSTN<IT extends IAnyType> = IT extends IType<infer C
     ? C | S | T
     : never
 /** @hidden */
-export type ExtractCSTWithSTN<IT extends IAnyType> = IT extends IType<infer C, infer S, infer T>
+export type ExtractCSTWithSTN<IT extends IAnyType> = IT extends IType<infer C, infer S, any>
     ? C | S | ExtractTWithSTN<IT>
     : never
 
@@ -282,19 +231,19 @@ export type Instance<T> = InstanceWithDefault<T, T>
 /**
  * The input (creation) snapshot representation of a given type.
  */
-export type SnapshotIn<T> = T extends IStateTreeNode<IType<infer STNC, any, any>>
-    ? STNC
-    : T extends IType<infer TC, any, any>
+export type SnapshotIn<T> = T extends IType<infer TC, any, any>
     ? TC
+    : T extends IStateTreeNode<IType<infer STNC, any, any>>
+    ? STNC
     : T
 
 /**
  * The output snapshot representation of a given type.
  */
-export type SnapshotOut<T> = T extends IStateTreeNode<IType<any, infer STNS, any>>
-    ? STNS
-    : T extends IType<any, infer TS, any>
+export type SnapshotOut<T> = T extends IType<any, infer TS, any>
     ? TS
+    : T extends IStateTreeNode<IType<any, infer STNS, any>>
+    ? STNS
     : T
 
 /**

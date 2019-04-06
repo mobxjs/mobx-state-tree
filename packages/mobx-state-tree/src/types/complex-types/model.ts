@@ -51,7 +51,6 @@ import {
     AnyNode,
     _CustomOrOther,
     _NotCustomized,
-    IsOptionalType,
     ExtractTWithSTN,
     Instance,
     devMode,
@@ -81,7 +80,9 @@ export interface ModelPropertiesDeclaration {
  * @hidden
  */
 export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
-    [K in keyof T]: T[K] extends string
+    [K in keyof T]: T[K] extends IAnyType
+        ? T[K]
+        : T[K] extends string
         ? IType<string | undefined, string, string>
         : T[K] extends number
         ? IType<number | undefined, number, number>
@@ -89,37 +90,60 @@ export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDecl
         ? IType<boolean | undefined, boolean, boolean>
         : T[K] extends Date
         ? IType<number | Date | undefined, number, Date>
-        : T[K] extends IAnyType
-        ? T[K]
         : never
 }
 
-/** @hidden */
-export type RequiredPropNames<P extends ModelProperties> = {
-    [K in keyof P]: IsOptionalType<P[K]> extends true ? never : K
-}[keyof P]
-/** @hidden */
-export type RequiredPropsObject<P extends ModelProperties> = Pick<P, RequiredPropNames<P>>
+/**
+ * Checks if a type is any or unknown
+ * @hidden
+ */
+type IsAnyOrUnknown<T> = unknown extends T ? true : never
 
-/** @hidden */
-export type OptionalPropNames<P extends ModelProperties> = {
-    [K in keyof P]: IsOptionalType<P[K]> extends true ? K : never
-}[keyof P]
-/** @hidden */
-export type OptionalPropsObject<P extends ModelProperties> = Partial<Pick<P, OptionalPropNames<P>>>
+/**
+ * Checks if a type is undefined
+ * @hidden
+ */
+type IsUndefined<T> = T extends undefined ? true : never
+
+/**
+ * Checks if a value is optional (undefined, any or unknown).
+ * @hidden
+ *
+ * Examples:
+ * - string = never
+ * - undefined = true
+ * - string | undefined = true
+ * - string & undefined = true
+ * - any = true
+ * - unknown = true
+ */
+type IsOptionalValue<C> = IsUndefined<C> | IsAnyOrUnknown<C>
+
+// type _A = IsOptionalValue<string> // never
+// type _B = IsOptionalValue<undefined> // true
+// type _C = IsOptionalValue<string | undefined> // true
+// type _D = IsOptionalValue<string & undefined> // true
+// type _E = IsOptionalValue<any> // true
+// type _F = IsOptionalValue<unknown> // true
+
+/**
+ * Name of the properties of an object that can't be set to undefined, any or unknown
+ * @hidden
+ */
+type DefinablePropsNames<T> = {
+    [K in keyof T]: IsOptionalValue<T[K]> extends never ? K : never
+}[keyof T]
 
 /** @hidden */
 export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: ExtractC<P[k]> }
 
 /** @hidden */
-export type ModelCreationType<P extends ModelProperties> = ExtractCFromProps<
-    RequiredPropsObject<P> & OptionalPropsObject<P>
->
+export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } & Partial<PC>
 
 /** @hidden */
 export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOther<
     CustomC,
-    ModelCreationType<P>
+    ModelCreationType<ExtractCFromProps<P>>
 >
 
 /** @hidden */
