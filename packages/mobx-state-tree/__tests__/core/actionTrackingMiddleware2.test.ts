@@ -161,7 +161,7 @@ test("flow action", async () => {
     await flowTest("fail")
 })
 
-test("#1250 - without decorate", async () => {
+test("#1250", async () => {
     const M = types
         .model({
             x: 0,
