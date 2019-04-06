@@ -84,7 +84,7 @@ export interface IType<C, S, T> {
      *
      * @returns An instance of that type.
      */
-    create(snapshot?: C, env?: any): STNValue<T, this>
+    create(snapshot?: C, env?: any): this["Type"]
 
     /**
      * Checks if a given snapshot / instance is of the given type.
@@ -92,7 +92,7 @@ export interface IType<C, S, T> {
      * @param thing Snapshot or instance to be checked.
      * @returns true if the value is of the current type, false otherwise.
      */
-    is(thing: any): thing is C | STNValue<T, this>
+    is(thing: any): thing is C | this["Type"]
 
     /**
      * Run's the type's typechecker on the given value with the given validation context.

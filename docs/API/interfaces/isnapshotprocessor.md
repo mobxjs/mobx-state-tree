@@ -10,7 +10,7 @@ A type that has its snapshots processed.
 #### CustomS 
 ## Hierarchy
 
- [IType](itype.md)<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>, `_CustomOrOther`<`CustomS`, `ExtractS`<`IT`>>, `ExtractTWithoutSTN`<`IT`>>
+ [IType](itype.md)<`_CustomOrOther`<`CustomC`, `IT["CreationType"]`>, `_CustomOrOther`<`CustomS`, `IT["SnapshotType"]`>, `IT["TypeWithoutSTN"]`>
 
 **↳ ISnapshotProcessor**
 
@@ -57,17 +57,7 @@ ___
 
 ###  create
 
-▸ **create**(...args: *`CreateParams`<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>>*): `STNValue`<`ExtractTWithoutSTN`<`IT`>, `this`>
-
-▸ **create**(snapshot: *`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>*, env?: *`any`*): `STNValue`<`ExtractTWithoutSTN`<`IT`>, `this`>
-
-**Parameters:**
-
-| Name | Type |
-| ------ | ------ |
-| `Rest` args | `CreateParams`<`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>> |
-
-**Returns:** `STNValue`<`ExtractTWithoutSTN`<`IT`>, `this`>
+▸ **create**(snapshot?: *[C]()*, env?: *`any`*): `this["Type"]`
 
 Creates an instance for the type given an snapshot input.
 
@@ -75,10 +65,10 @@ Creates an instance for the type given an snapshot input.
 
 | Name | Type |
 | ------ | ------ |
-| snapshot | `_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>> |
+| `Optional` snapshot | [C]() |
 | `Optional` env | `any` |
 
-**Returns:** `STNValue`<`ExtractTWithoutSTN`<`IT`>, `this`>
+**Returns:** `this["Type"]`
 An instance of that type.
 
 ___
@@ -115,7 +105,7 @@ ___
 
 ###  validate
 
-▸ **validate**(thing: *`_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>>*, context: *[IValidationContext](../#ivalidationcontext)*): [IValidationResult](../#ivalidationresult)
+▸ **validate**(thing: *`_CustomOrOther`<`CustomC`, `IT["CreationType"]`>*, context: *[IValidationContext](../#ivalidationcontext)*): [IValidationResult](../#ivalidationresult)
 
 Run's the type's typechecker on the given value with the given validation context.
 
@@ -123,7 +113,7 @@ Run's the type's typechecker on the given value with the given validation contex
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| thing | `_CustomOrOther`<`CustomC`, `ExtractC`<`IT`>> |  Value to be checked, either a snapshot or an instance. |
+| thing | `_CustomOrOther`<`CustomC`, `IT["CreationType"]`> |  Value to be checked, either a snapshot or an instance. |
 | context | [IValidationContext](../#ivalidationcontext) |  Validation context, an array of { subpaths, subtypes } that should be validated |
 
 **Returns:** [IValidationResult](../#ivalidationresult)

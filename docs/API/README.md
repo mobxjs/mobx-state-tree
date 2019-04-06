@@ -717,7 +717,7 @@ ___
 
 ▸ **cast**<`O`>(snapshotOrInstance: *`O`*): `O`
 
-▸ **cast**<`O`>(snapshotOrInstance: *`ExtractC`<`TypeOfValue`<`O`>> \| `ExtractS`<`TypeOfValue`<`O`>> \| `ExtractTWithSTN`<`TypeOfValue`<`O`>>*): `O`
+▸ **cast**<`O`>(snapshotOrInstance: *`TypeOfValue<O>["CreationType"]` \| `TypeOfValue<O>["SnapshotType"]` \| `TypeOfValue<O>["Type"]`*): `O`
 
 Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance. Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance, but just fool typescript into thinking so. Either way, casting when outside an assignation operation won't compile.
 
@@ -784,7 +784,7 @@ const ModelB = types.model({
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| snapshotOrInstance | `ExtractC`<`TypeOfValue`<`O`>> \| `ExtractS`<`TypeOfValue`<`O`>> \| `ExtractTWithSTN`<`TypeOfValue`<`O`>> |  Snapshot or instance |
+| snapshotOrInstance | `TypeOfValue<O>["CreationType"]` \| `TypeOfValue<O>["SnapshotType"]` \| `TypeOfValue<O>["Type"]` |  Snapshot or instance |
 
 **Returns:** `O`
 The same object casted as an instance
@@ -856,7 +856,7 @@ ___
 
 ###  castToSnapshot
 
-▸ **castToSnapshot**<`I`>(snapshotOrInstance: *`I`*): `Extract<I, IAnyStateTreeNode> extends never ? I : ExtractC<TypeOfValue<I>>`
+▸ **castToSnapshot**<`I`>(snapshotOrInstance: *`I`*): `Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"]`
 
 Casts a node instance type to an snapshot type so it can be assigned to a type snapshot (e.g. to be used inside a create call). Note that this is just a cast for the type system, this is, it won't actually convert an instance to a snapshot, but just fool typescript into thinking so.
 
@@ -889,7 +889,7 @@ const b = ModelB.create({ innerModel: castToSnapshot(a)})
 | ------ | ------ | ------ |
 | snapshotOrInstance | `I` |  Snapshot or instance |
 
-**Returns:** `Extract<I, IAnyStateTreeNode> extends never ? I : ExtractC<TypeOfValue<I>>`
+**Returns:** `Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"]`
 The same object casted as an input (creation) snapshot
 
 ___
@@ -2165,7 +2165,7 @@ ___
 
 ###  getParentOfType
 
-▸ **getParentOfType**<`IT`>(target: *`IAnyStateTreeNode`*, type: *`IT`*): `ExtractTWithSTN`<`IT`>
+▸ **getParentOfType**<`IT`>(target: *`IAnyStateTreeNode`*, type: *`IT`*): `IT["Type"]`
 
 Returns the target's parent of a given type, or throws.
 
@@ -2179,7 +2179,7 @@ Returns the target's parent of a given type, or throws.
 | target | `IAnyStateTreeNode` |  \- |
 | type | `IT` |  \- |
 
-**Returns:** `ExtractTWithSTN`<`IT`>
+**Returns:** `IT["Type"]`
 
 ___
 <a id="getpath"></a>
@@ -3259,7 +3259,7 @@ ___
 
 ###  resolveIdentifier
 
-▸ **resolveIdentifier**<`IT`>(type: *`IT`*, target: *`IAnyStateTreeNode`*, identifier: *[ReferenceIdentifier](#referenceidentifier)*): `ExtractTWithSTN`<`IT`> \| `undefined`
+▸ **resolveIdentifier**<`IT`>(type: *`IT`*, target: *`IAnyStateTreeNode`*, identifier: *[ReferenceIdentifier](#referenceidentifier)*): `IT["Type"]` \| `undefined`
 
 Resolves a model instance given a root target, the type and the identifier you are searching for. Returns undefined if no value can be found.
 
@@ -3274,7 +3274,7 @@ Resolves a model instance given a root target, the type and the identifier you a
 | target | `IAnyStateTreeNode` |  \- |
 | identifier | [ReferenceIdentifier](#referenceidentifier) |  \- |
 
-**Returns:** `ExtractTWithSTN`<`IT`> \| `undefined`
+**Returns:** `IT["Type"]` \| `undefined`
 
 ___
 <a id="resolvepath"></a>
@@ -3339,7 +3339,7 @@ ___
 
 ###  snapshotProcessor
 
-▸ **snapshotProcessor**<`IT`,`CustomC`,`CustomS`>(type: *`IT`*, processors: *[ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`ExtractC`<`IT`>, `CustomC`, `ExtractS`<`IT`>, `CustomS`>*, name?: *`undefined` \| `string`*): [ISnapshotProcessor](interfaces/isnapshotprocessor.md)<`IT`, `CustomC`, `CustomS`>
+▸ **snapshotProcessor**<`IT`,`CustomC`,`CustomS`>(type: *`IT`*, processors: *[ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`IT["CreationType"]`, `CustomC`, `IT["SnapshotType"]`, `CustomS`>*, name?: *`undefined` \| `string`*): [ISnapshotProcessor](interfaces/isnapshotprocessor.md)<`IT`, `CustomC`, `CustomS`>
 
 `types.snapshotProcessor` - Runs a pre/post snapshot processor before/after serializing a given type.
 
@@ -3377,7 +3377,7 @@ const Todo2 = types.snapshotProcessor(Todo1, {
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | type | `IT` |  Type to run the processors over. |
-| processors | [ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`ExtractC`<`IT`>, `CustomC`, `ExtractS`<`IT`>, `CustomS`> |  Processors to run. |
+| processors | [ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`IT["CreationType"]`, `CustomC`, `IT["SnapshotType"]`, `CustomS`> |  Processors to run. |
 | `Optional` name | `undefined` \| `string` |  Type name, or undefined to inherit the inner type one. |
 
 **Returns:** [ISnapshotProcessor](interfaces/isnapshotprocessor.md)<`IT`, `CustomC`, `CustomS`>
