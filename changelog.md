@@ -1,4 +1,4 @@
-- Reduced type nesting to avoid Typescript 3.4 errors about infinite types. Sadly due to this change `types.create` is no longer smart enough in TS to know skipping the create parameter is valid or not.
+- Reduced type nesting to avoid Typescript 3.4 errors about infinite types. Sadly due to this change `types.create` is no longer smart enough in TS to know skipping the create parameter is valid or not. Through [#1251](https://github.com/mobxjs/mobx-state-tree/pull/1251) by [@xaviergonz](https://github.com/xaviergonz).
 
 # 3.13.0
 
