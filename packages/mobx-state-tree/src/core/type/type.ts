@@ -65,10 +65,17 @@ export type STNValue<T, IT extends IAnyType> =
     | (Extract<T, object> & IStateTreeNode<IT>) // add STN to the object (which will be never if not an object)
     | Exclude<T, object> // plus then the primitives if any
 
+/** @hidden */
+declare const $type: unique symbol
+
 /**
  * A type, either complex or simple.
  */
 export interface IType<C, S, T> {
+    // fake, will never be present, just for typing
+    /** @hidden */
+    readonly [$type]: undefined
+
     /**
      * Friendly type name.
      */
@@ -181,11 +188,10 @@ export interface IType<C, S, T> {
     getSubTypes(): IAnyType[] | IAnyType | null | typeof cannotDetermineSubtype
 }
 
-// do not convert to an interface
 /**
  * Any kind of type.
  */
-export type IAnyType = IType<any, any, any>
+export interface IAnyType extends IType<any, any, any> {}
 
 /**
  * A simple type, this is, a type where the instance and the snapshot representation are the same.
@@ -202,32 +208,29 @@ export type Primitives = ModelPrimitive | null | undefined
  */
 export interface IComplexType<C, S, T> extends IType<C, S, T & object> {}
 
-// do not convert to an interface
 /**
  * Any kind of complex type.
  */
-export type IAnyComplexType = IType<any, any, object>
+export interface IAnyComplexType extends IType<any, any, object> {}
 
 /** @hidden */
-export type ExtractCSTWithoutSTN<IT extends IAnyType> =
-    | IT["CreationType"]
-    | IT["SnapshotType"]
-    | IT["TypeWithoutSTN"]
+export type ExtractCSTWithoutSTN<
+    IT extends { [$type]: undefined; CreationType: any; SnapshotType: any; TypeWithoutSTN: any }
+> = IT["CreationType"] | IT["SnapshotType"] | IT["TypeWithoutSTN"]
 /** @hidden */
-export type ExtractCSTWithSTN<IT extends IAnyType> =
-    | IT["CreationType"]
-    | IT["SnapshotType"]
-    | IT["Type"]
+export type ExtractCSTWithSTN<
+    IT extends { [$type]: undefined; CreationType: any; SnapshotType: any; Type: any }
+> = IT["CreationType"] | IT["SnapshotType"] | IT["Type"]
 
 /**
  * The instance representation of a given type.
  */
-export type Instance<T> = T extends IAnyType ? T["Type"] : T
+export type Instance<T> = T extends { [$type]: undefined; Type: any } ? T["Type"] : T
 
 /**
  * The input (creation) snapshot representation of a given type.
  */
-export type SnapshotIn<T> = T extends IAnyType
+export type SnapshotIn<T> = T extends { [$type]: undefined; CreationType: any }
     ? T["CreationType"]
     : T extends IStateTreeNode<infer IT>
     ? IT["CreationType"]
@@ -236,7 +239,7 @@ export type SnapshotIn<T> = T extends IAnyType
 /**
  * The output snapshot representation of a given type.
  */
-export type SnapshotOut<T> = T extends IAnyType
+export type SnapshotOut<T> = T extends { [$type]: undefined; SnapshotType: any }
     ? T["SnapshotType"]
     : T extends IStateTreeNode<infer IT>
     ? IT["SnapshotType"]
@@ -278,6 +281,8 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  */
 export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = BaseNode<C, S, T>>
     implements IType<C, S, T> {
+    [$type]!: undefined
+
     // these are just to make inner types avaialable to inherited classes
     readonly C!: C
     readonly S!: S
