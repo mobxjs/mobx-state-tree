@@ -61,9 +61,9 @@ export const cannotDetermineSubtype = "cannotDetermine"
 /**
  * @hidden
  */
-export type STNValue<T, IT extends IAnyType> = T extends object // an object plus maybe primitives?
-    ? (Extract<T, object> & IStateTreeNode<IT>) | Exclude<T, object> // add STN to the object plus maybe the primitives
-    : T // no, use the primitives
+export type STNValue<T, IT extends IAnyType> =
+    | (Extract<T, object> & IStateTreeNode<IT>) // add STN to the object (which will be never if not an object)
+    | Exclude<T, object> // plus then the primitives if any
 
 /**
  * A type, either complex or simple.
