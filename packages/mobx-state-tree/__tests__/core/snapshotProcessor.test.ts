@@ -88,7 +88,7 @@ describe("snapshotProcessor", () => {
             expect(model.m.x).toBe("5")
             expect(getSnapshot(model).m.x).toBe(5)
             // reconciliation
-            model.m = cast({ x: "6" })
+            model.m = cast({ x: 6 })
             expect(model.m.x).toBe("6")
             expect(getSnapshot(model).m.x).toBe(6)
             // cloning
