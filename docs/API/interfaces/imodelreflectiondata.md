@@ -44,7 +44,7 @@ ___
 
 #### Type declaration
 
-[K: `string`]: [IAnyType](../#ianytype)
+[K: `string`]: [IAnyType](ianytype.md)
 
 ___
 <a id="views"></a>

@@ -1,32 +1,28 @@
-[mobx-state-tree](../README.md) > [ISnapshotProcessor](../interfaces/isnapshotprocessor.md)
+[mobx-state-tree](../README.md) > [IAnyType](../interfaces/ianytype.md)
 
-# Interface: ISnapshotProcessor
+# Interface: IAnyType
 
-A type that has its snapshots processed.
+Any kind of type.
 
-## Type parameters
-#### IT :  [IAnyType](ianytype.md)
-#### CustomC 
-#### CustomS 
 ## Hierarchy
 
- [IType](itype.md)<`_CustomOrOther`<`CustomC`, `IT["CreationType"]`>, `_CustomOrOther`<`CustomS`, `IT["SnapshotType"]`>, `IT["TypeWithoutSTN"]`>
+ [IType](itype.md)<`any`, `any`, `any`>
 
-**↳ ISnapshotProcessor**
+**↳ IAnyType**
 
 ## Index
 
 ### Properties
 
-* [identifierAttribute](isnapshotprocessor.md#identifierattribute)
-* [name](isnapshotprocessor.md#name)
+* [identifierAttribute](ianytype.md#identifierattribute)
+* [name](ianytype.md#name)
 
 ### Methods
 
-* [create](isnapshotprocessor.md#create)
-* [describe](isnapshotprocessor.md#describe)
-* [is](isnapshotprocessor.md#is)
-* [validate](isnapshotprocessor.md#validate)
+* [create](ianytype.md#create)
+* [describe](ianytype.md#describe)
+* [is](ianytype.md#is)
+* [validate](ianytype.md#validate)
 
 ---
 
@@ -105,7 +101,7 @@ ___
 
 ###  validate
 
-▸ **validate**(thing: *`_CustomOrOther`<`CustomC`, `IT["CreationType"]`>*, context: *[IValidationContext](../#ivalidationcontext)*): [IValidationResult](../#ivalidationresult)
+▸ **validate**(thing: *`any`*, context: *[IValidationContext](../#ivalidationcontext)*): [IValidationResult](../#ivalidationresult)
 
 Run's the type's typechecker on the given value with the given validation context.
 
@@ -113,7 +109,7 @@ Run's the type's typechecker on the given value with the given validation contex
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| thing | `_CustomOrOther`<`CustomC`, `IT["CreationType"]`> |  Value to be checked, either a snapshot or an instance. |
+| thing | `any` |  Value to be checked, either a snapshot or an instance. |
 | context | [IValidationContext](../#ivalidationcontext) |  Validation context, an array of { subpaths, subtypes } that should be validated |
 
 **Returns:** [IValidationResult](../#ivalidationresult)

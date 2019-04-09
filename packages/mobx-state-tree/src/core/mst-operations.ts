@@ -24,10 +24,7 @@ import {
     AnyModelType,
     assertIsType,
     assertIsStateTreeNode,
-    ExtractC,
     TypeOfValue,
-    ExtractTWithSTN,
-    ExtractS,
     assertIsFunction,
     assertIsNumber,
     assertIsString,
@@ -431,7 +428,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
 export function getParentOfType<IT extends IAnyType>(
     target: IAnyStateTreeNode,
     type: IT
-): ExtractTWithSTN<IT> {
+): IT["Type"] {
     // check all arguments
     assertIsStateTreeNode(target, 1)
     assertIsType(type, 2)
@@ -531,7 +528,7 @@ export function resolveIdentifier<IT extends IAnyType>(
     type: IT,
     target: IAnyStateTreeNode,
     identifier: ReferenceIdentifier
-): ExtractTWithSTN<IT> | undefined {
+): IT["Type"] | undefined {
     // check all arguments
     assertIsType(type, 1)
     assertIsStateTreeNode(target, 2)
@@ -877,9 +874,9 @@ export function cast<O extends string | number | boolean | null | undefined = ne
 ): O
 export function cast<O = never>(
     snapshotOrInstance:
-        | ExtractC<TypeOfValue<O>>
-        | ExtractS<TypeOfValue<O>>
-        | ExtractTWithSTN<TypeOfValue<O>>
+        | TypeOfValue<O>["CreationType"]
+        | TypeOfValue<O>["SnapshotType"]
+        | TypeOfValue<O>["Type"]
 ): O
 /**
  * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
@@ -943,7 +940,7 @@ export function cast(snapshotOrInstance: any): any {
  */
 export function castToSnapshot<I>(
     snapshotOrInstance: I
-): Extract<I, IAnyStateTreeNode> extends never ? I : ExtractC<TypeOfValue<I>> {
+): Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"] {
     return snapshotOrInstance as any
 }
 

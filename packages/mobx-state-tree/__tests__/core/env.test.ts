@@ -10,15 +10,13 @@ import {
     hasParent,
     Instance,
     destroy,
-    IStateTreeNode,
     getParent,
     IAnyStateTreeNode,
     isStateTreeNode,
-    getSnapshot,
-    isAlive,
-    getType,
-    isOptionalType
+    isAlive
 } from "../../src"
+
+// tslint:disable: no-unused-expression
 
 const Todo = types
     .model({

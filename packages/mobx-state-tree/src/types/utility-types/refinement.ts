@@ -9,21 +9,18 @@ import {
     fail,
     TypeFlags,
     IAnyType,
-    ExtractC,
     AnyObjectNode,
     BaseType,
-    ExtractS,
     ExtractNodeType,
     assertIsType,
-    ExtractTWithoutSTN,
     devMode
 } from "../../internal"
 import { assertIsString, assertIsFunction } from "../../utils"
 
 class Refinement<IT extends IAnyType> extends BaseType<
-    ExtractC<IT>,
-    ExtractS<IT>,
-    ExtractTWithoutSTN<IT>,
+    IT["CreationType"],
+    IT["SnapshotType"],
+    IT["TypeWithoutSTN"],
     ExtractNodeType<IT>
 > {
     get flags() {
@@ -33,8 +30,8 @@ class Refinement<IT extends IAnyType> extends BaseType<
     constructor(
         name: string,
         private readonly _subtype: IT,
-        private readonly _predicate: (v: ExtractC<IT>) => boolean,
-        private readonly _message: (v: ExtractC<IT>) => string
+        private readonly _predicate: (v: IT["CreationType"]) => boolean,
+        private readonly _message: (v: IT["CreationType"]) => string
     ) {
         super(name)
     }
@@ -87,13 +84,13 @@ class Refinement<IT extends IAnyType> extends BaseType<
 export function refinement<IT extends IAnyType>(
     name: string,
     type: IT,
-    predicate: (snapshot: ExtractC<IT>) => boolean,
-    message?: string | ((v: ExtractC<IT>) => string)
+    predicate: (snapshot: IT["CreationType"]) => boolean,
+    message?: string | ((v: IT["CreationType"]) => string)
 ): IT
 export function refinement<IT extends IAnyType>(
     type: IT,
-    predicate: (snapshot: ExtractC<IT>) => boolean,
-    message?: string | ((v: ExtractC<IT>) => string)
+    predicate: (snapshot: IT["CreationType"]) => boolean,
+    message?: string | ((v: IT["CreationType"]) => string)
 ): IT
 
 /**

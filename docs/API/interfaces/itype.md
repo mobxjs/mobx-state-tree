@@ -12,7 +12,11 @@ A type, either complex or simple.
 
 **IType**
 
+↳  [IAnyType](ianytype.md)
+
 ↳  [ISimpleType](isimpletype.md)
+
+↳  [IAnyComplexType](ianycomplextype.md)
 
 ↳  [ISnapshotProcessor](isnapshotprocessor.md)
 
@@ -61,17 +65,7 @@ ___
 
 ###  create
 
-▸ **create**(...args: *`CreateParams`<`C`>*): `STNValue`<`T`, `this`>
-
-▸ **create**(snapshot: *`C`*, env?: *`any`*): `STNValue`<`T`, `this`>
-
-**Parameters:**
-
-| Name | Type |
-| ------ | ------ |
-| `Rest` args | `CreateParams`<`C`> |
-
-**Returns:** `STNValue`<`T`, `this`>
+▸ **create**(snapshot?: *[C]()*, env?: *`any`*): `this["Type"]`
 
 Creates an instance for the type given an snapshot input.
 
@@ -79,10 +73,10 @@ Creates an instance for the type given an snapshot input.
 
 | Name | Type |
 | ------ | ------ |
-| snapshot | `C` |
+| `Optional` snapshot | [C]() |
 | `Optional` env | `any` |
 
-**Returns:** `STNValue`<`T`, `this`>
+**Returns:** `this["Type"]`
 An instance of that type.
 
 ___
