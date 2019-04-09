@@ -3,7 +3,7 @@
 # Interface: ReferenceOptionsOnInvalidated
 
 ## Type parameters
-#### IT :  [IAnyComplexType](../#ianycomplextype)
+#### IT :  [IAnyComplexType](ianycomplextype.md)
 ## Hierarchy
 
 **ReferenceOptionsOnInvalidated**

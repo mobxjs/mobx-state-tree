@@ -12,7 +12,11 @@ A type, either complex or simple.
 
 **IType**
 
+↳  [IAnyType](ianytype.md)
+
 ↳  [ISimpleType](isimpletype.md)
+
+↳  [IAnyComplexType](ianycomplextype.md)
 
 ↳  [ISnapshotProcessor](isnapshotprocessor.md)
 

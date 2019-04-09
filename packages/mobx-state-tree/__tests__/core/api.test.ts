@@ -75,6 +75,9 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     isValidReference,
     tryReference,
     getNodeId,
+    getRunningActionContext,
+    isActionContextChildOf,
+    isActionContextThisOrChildOf,
 
     types
 `)

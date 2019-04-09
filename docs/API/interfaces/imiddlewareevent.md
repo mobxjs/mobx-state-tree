@@ -4,7 +4,9 @@
 
 ## Hierarchy
 
-**IMiddlewareEvent**
+ [IActionContext](iactioncontext.md)
+
+**↳ IMiddlewareEvent**
 
 ## Index
 
@@ -32,12 +34,16 @@
 
 **● allParentIds**: *`number`[]*
 
+Id of all events, from root until current (excluding current)
+
 ___
 <a id="args"></a>
 
 ###  args
 
 **● args**: *`any`[]*
+
+Event arguments in an array (action arguments for actions)
 
 ___
 <a id="context"></a>
@@ -46,12 +52,16 @@ ___
 
 **● context**: *`IAnyStateTreeNode`*
 
+Event context (node where the action was invoked)
+
 ___
 <a id="id"></a>
 
 ###  id
 
 **● id**: *`number`*
+
+Event unique id
 
 ___
 <a id="name"></a>
@@ -60,12 +70,16 @@ ___
 
 **● name**: *`string`*
 
+Event name (action name for actions)
+
 ___
 <a id="parentactionevent"></a>
 
 ###  parentActionEvent
 
 **● parentActionEvent**: *[IMiddlewareEvent](imiddlewareevent.md) \| `undefined`*
+
+Parent action event object
 
 ___
 <a id="parentevent"></a>
@@ -74,12 +88,16 @@ ___
 
 **● parentEvent**: *[IMiddlewareEvent](imiddlewareevent.md) \| `undefined`*
 
+Parent event object
+
 ___
 <a id="parentid"></a>
 
 ###  parentId
 
 **● parentId**: *`number`*
+
+Parent event unique id
 
 ___
 <a id="rootid"></a>
@@ -88,6 +106,8 @@ ___
 
 **● rootId**: *`number`*
 
+Root event unique id
+
 ___
 <a id="tree"></a>
 
@@ -95,12 +115,16 @@ ___
 
 **● tree**: *`IAnyStateTreeNode`*
 
+Event tree (root node of the node where the action was invoked)
+
 ___
 <a id="type"></a>
 
 ###  type
 
 **● type**: *[IMiddlewareEventType](../#imiddlewareeventtype)*
+
+Event type
 
 ___
 

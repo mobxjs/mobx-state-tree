@@ -29,7 +29,9 @@ import {
     assertIsNumber,
     assertIsString,
     assertArg,
-    assertIsValidIdentifier
+    assertIsValidIdentifier,
+    IActionContext,
+    getRunningActionContext
 } from "../internal"
 
 /** @hidden */
@@ -159,7 +161,7 @@ export interface IPatchRecorder {
  *      // stop recording patches
  *      stop(): void
  *      // resume recording patches
- *      resume()
+ *      resume(): void
  *      // apply all the recorded patches on the given target (the original subject if omitted)
  *      replay(target?: IAnyStateTreeNode): void
  *      // reverse apply the recorded patches on the given target  (the original subject if omitted)
@@ -176,7 +178,11 @@ export interface IPatchRecorder {
  */
 export function recordPatches(
     subject: IAnyStateTreeNode,
-    filter?: (patch: IJsonPatch, inversePatch: IJsonPatch) => boolean
+    filter?: (
+        patch: IJsonPatch,
+        inversePatch: IJsonPatch,
+        actionContext: IActionContext | undefined
+    ) => boolean
 ): IPatchRecorder {
     // check all arguments
     assertIsStateTreeNode(subject, 1)
@@ -229,7 +235,7 @@ export function recordPatches(
             if (disposer) return
             disposer = onPatch(subject, (patch, inversePatch) => {
                 // skip patches that are asked to be filtered if there's a filter in place
-                if (filter && !filter(patch, inversePatch)) {
+                if (filter && !filter(patch, inversePatch, getRunningActionContext())) {
                     return
                 }
                 data.patches.push(patch)

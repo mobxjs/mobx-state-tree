@@ -22,7 +22,9 @@ import {
     AnyNode,
     assertIsStateTreeNode,
     devMode,
-    assertArg
+    assertArg,
+    IActionContext,
+    getRunningActionContext
 } from "../internal"
 
 export interface ISerializedActionCall {
@@ -33,7 +35,9 @@ export interface ISerializedActionCall {
 
 export interface IActionRecorder {
     actions: ReadonlyArray<ISerializedActionCall>
+    readonly recording: boolean
     stop(): void
+    resume(): void
     replay(target: IAnyStateTreeNode): void
 }
 
@@ -123,29 +127,59 @@ function baseApplyAction(target: IAnyStateTreeNode, action: ISerializedActionCal
  * export interface IActionRecorder {
  *      // the recorded actions
  *      actions: ISerializedActionCall[]
+ *      // true if currently recording
+ *      recording: boolean
  *      // stop recording actions
- *      stop(): any
+ *      stop(): void
+ *      // resume recording actions
+ *      resume(): void
  *      // apply all the recorded actions on the given object
- *      replay(target: IAnyStateTreeNode): any
+ *      replay(target: IAnyStateTreeNode): void
  * }
  * ```
+ *
+ * The optional filter function allows to skip recording certain actions.
  *
  * @param subject
  * @returns
  */
-export function recordActions(subject: IAnyStateTreeNode): IActionRecorder {
+export function recordActions(
+    subject: IAnyStateTreeNode,
+    filter?: (action: ISerializedActionCall, actionContext: IActionContext | undefined) => boolean
+): IActionRecorder {
     // check all arguments
     assertIsStateTreeNode(subject, 1)
 
     const actions: ISerializedActionCall[] = []
-    let recorder: IActionRecorder = {
+    const listener = (call: ISerializedActionCall) => {
+        const recordThis = filter ? filter(call, getRunningActionContext()) : true
+        if (recordThis) {
+            actions.push(call)
+        }
+    }
+
+    let disposer: IDisposer | undefined
+    const recorder: IActionRecorder = {
         actions,
-        stop: () => disposer(),
-        replay: target => {
+        get recording() {
+            return !!disposer
+        },
+        stop() {
+            if (disposer) {
+                disposer()
+                disposer = undefined
+            }
+        },
+        resume() {
+            if (disposer) return
+            disposer = onAction(subject, listener)
+        },
+        replay(target) {
             applyAction(target, actions)
         }
     }
-    let disposer = onAction(subject, actions.push.bind(recorder.actions))
+
+    recorder.resume()
     return recorder
 }
 

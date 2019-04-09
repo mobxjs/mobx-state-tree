@@ -160,3 +160,79 @@ test("flow action", async () => {
     await flowTest("success")
     await flowTest("fail")
 })
+
+test("#1250", async () => {
+    const M = types
+        .model({
+            x: 0,
+            y: 0
+        })
+        .actions(self => ({
+            setX: flow(function*() {
+                self.x = 10
+                yield new Promise(resolve => setTimeout(resolve, 1000))
+            }),
+            setY() {
+                self.y = 10
+            }
+        }))
+
+    const calls: string[] = []
+    const mware = createActionTrackingMiddleware2({
+        filter(call) {
+            calls.push(
+                `${call.name} (${call.id}) <- (${call.parentCall && call.parentCall.id}) - filter`
+            )
+            return true
+        },
+        onStart(call) {
+            calls.push(
+                `${call.name} (${call.id}) <- (${call.parentCall && call.parentCall.id}) - onStart`
+            )
+        },
+        onFinish(call, error) {
+            calls.push(
+                `${call.name} (${call.id}) <- (${call.parentCall &&
+                    call.parentCall.id}) - onFinish (error: ${!!error})`
+            )
+        }
+    })
+
+    const model = M.create({})
+
+    addMiddleware(model, mware, false)
+
+    expect(model.x).toBe(0)
+    expect(model.y).toBe(0)
+    expect(calls).toEqual([])
+
+    const p = model.setX()
+    expect(model.x).toBe(10)
+    expect(model.y).toBe(0)
+    expect(calls).toEqual([
+        "setX (21) <- (undefined) - filter",
+        "setX (21) <- (undefined) - onStart"
+    ])
+    calls.length = 0
+
+    await new Promise(r =>
+        setTimeout(() => {
+            model.setY()
+            r()
+        }, 500)
+    )
+    expect(model.x).toBe(10)
+    expect(model.y).toBe(10)
+    expect(calls).toEqual([
+        "setY (23) <- (undefined) - filter",
+        "setY (23) <- (undefined) - onStart",
+        "setY (23) <- (undefined) - onFinish (error: false)"
+    ])
+    calls.length = 0
+
+    await p
+    expect(model.x).toBe(10)
+    expect(model.y).toBe(10)
+    expect(calls).toEqual(["setX (21) <- (undefined) - onFinish (error: false)"])
+    calls.length = 0
+})

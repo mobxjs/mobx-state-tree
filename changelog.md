@@ -1,4 +1,7 @@
-- Reduced type nesting to avoid Typescript 3.4 errors about infinite types. Sadly due to this change `types.create` is no longer smart enough in TS to know if skipping the parameter is valid or not. Through [#1251](https://github.com/mobxjs/mobx-state-tree/pull/1251) by [@xaviergonz](https://github.com/xaviergonz).
+- Fixed a regression with `atomic` middleware with async flows [#1250](https://github.com/mobxjs/mobx-state-tree/issues/1250).
+- Added filter function to `recordActions` to filter out recording some actions. Also added `recording` and `resume` methods.
+- Added `getRunningActionContext()` to get the currently executing MST action context (if any). Also added the action context helper functions `isActionContextChildOf()` and `isActionContextThisOrChildOf`.
+- Reduced type nesting to avoid Typescript 3.4 errors about infinite types. Sadly due to this change `types.create` is no longer smart enough in TS to know if skipping the snapshot parameter is valid or not. Through [#1251](https://github.com/mobxjs/mobx-state-tree/pull/1251) by [@xaviergonz](https://github.com/xaviergonz).
 
 # 3.13.0
 

@@ -11,10 +11,12 @@
 ### Properties
 
 * [actions](iactionrecorder.md#actions)
+* [recording](iactionrecorder.md#recording)
 
 ### Methods
 
 * [replay](iactionrecorder.md#replay)
+* [resume](iactionrecorder.md#resume)
 * [stop](iactionrecorder.md#stop)
 
 ---
@@ -26,6 +28,13 @@
 ###  actions
 
 **● actions**: *`ReadonlyArray`<[ISerializedActionCall](iserializedactioncall.md)>*
+
+___
+<a id="recording"></a>
+
+###  recording
+
+**● recording**: *`boolean`*
 
 ___
 
@@ -42,6 +51,15 @@ ___
 | Name | Type |
 | ------ | ------ |
 | target | `IAnyStateTreeNode` |
+
+**Returns:** `void`
+
+___
+<a id="resume"></a>
+
+###  resume
+
+▸ **resume**(): `void`
 
 **Returns:** `void`
 

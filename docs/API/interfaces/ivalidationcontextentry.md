@@ -32,7 +32,7 @@ ___
 
 ###  type
 
-**● type**: *[IAnyType](../#ianytype)*
+**● type**: *[IAnyType](ianytype.md)*
 
 Type to validate the subpath against
 

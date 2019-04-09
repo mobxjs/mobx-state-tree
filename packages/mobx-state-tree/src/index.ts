@@ -143,5 +143,9 @@ export {
     ISnapshotProcessor,
     ISnapshotProcessors,
     getNodeId,
+    IActionContext,
+    getRunningActionContext,
+    isActionContextChildOf,
+    isActionContextThisOrChildOf,
     types
 } from "./internal"
