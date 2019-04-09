@@ -318,12 +318,6 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
  * @internal
  * @hidden
  */
-export type AnyModelType = ModelType<any, any, any, any, any>
-
-/**
- * @internal
- * @hidden
- */
 export class ModelType<
     PROPS extends ModelProperties,
     OTHERS,

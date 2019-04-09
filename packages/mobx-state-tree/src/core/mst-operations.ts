@@ -21,7 +21,6 @@ import {
     normalizeIdentifier,
     ReferenceIdentifier,
     AnyObjectNode,
-    AnyModelType,
     assertIsType,
     assertIsStateTreeNode,
     TypeOfValue,
@@ -844,7 +843,7 @@ export interface IModelReflectionData extends IModelReflectionPropertiesData {
  * @returns
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    const type = getStateTreeNode(target).type as AnyModelType
+    const type = (getStateTreeNode(target).type as unknown) as IAnyModelType
 
     const reflected: IModelReflectionData = {
         ...getPropertyMembers(type),

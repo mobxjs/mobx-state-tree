@@ -40,7 +40,7 @@ import {
     normalizeIdentifier,
     AnyObjectNode,
     AnyNode,
-    AnyModelType,
+    IAnyModelType,
     asArray,
     cannotDetermineSubtype,
     getSnapshot,
@@ -118,7 +118,7 @@ export interface IMSTMap<IT extends IAnyType> {
 
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
 
-function tryCollectModelTypes(type: IAnyType, modelTypes: Array<AnyModelType>): boolean {
+function tryCollectModelTypes(type: IAnyType, modelTypes: Array<IAnyModelType>): boolean {
     const subtypes = type.getSubTypes()
     if (subtypes === cannotDetermineSubtype) {
         return false
@@ -239,7 +239,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
             return
         }
 
-        const modelTypes: AnyModelType[] = []
+        const modelTypes: IAnyModelType[] = []
         if (tryCollectModelTypes(this._subType, modelTypes)) {
             let identifierAttribute: string | undefined = undefined
             modelTypes.forEach(type => {
