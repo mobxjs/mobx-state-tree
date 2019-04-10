@@ -21,18 +21,16 @@ import {
     normalizeIdentifier,
     ReferenceIdentifier,
     AnyObjectNode,
-    AnyModelType,
     assertIsType,
     assertIsStateTreeNode,
-    ExtractC,
     TypeOfValue,
-    ExtractTWithSTN,
-    ExtractS,
     assertIsFunction,
     assertIsNumber,
     assertIsString,
     assertArg,
-    assertIsValidIdentifier
+    assertIsValidIdentifier,
+    IActionContext,
+    getRunningActionContext
 } from "../internal"
 
 /** @hidden */
@@ -162,7 +160,7 @@ export interface IPatchRecorder {
  *      // stop recording patches
  *      stop(): void
  *      // resume recording patches
- *      resume()
+ *      resume(): void
  *      // apply all the recorded patches on the given target (the original subject if omitted)
  *      replay(target?: IAnyStateTreeNode): void
  *      // reverse apply the recorded patches on the given target  (the original subject if omitted)
@@ -179,7 +177,11 @@ export interface IPatchRecorder {
  */
 export function recordPatches(
     subject: IAnyStateTreeNode,
-    filter?: (patch: IJsonPatch, inversePatch: IJsonPatch) => boolean
+    filter?: (
+        patch: IJsonPatch,
+        inversePatch: IJsonPatch,
+        actionContext: IActionContext | undefined
+    ) => boolean
 ): IPatchRecorder {
     // check all arguments
     assertIsStateTreeNode(subject, 1)
@@ -232,7 +234,7 @@ export function recordPatches(
             if (disposer) return
             disposer = onPatch(subject, (patch, inversePatch) => {
                 // skip patches that are asked to be filtered if there's a filter in place
-                if (filter && !filter(patch, inversePatch)) {
+                if (filter && !filter(patch, inversePatch, getRunningActionContext())) {
                     return
                 }
                 data.patches.push(patch)
@@ -425,7 +427,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
 export function getParentOfType<IT extends IAnyType>(
     target: IAnyStateTreeNode,
     type: IT
-): ExtractTWithSTN<IT> {
+): IT["Type"] {
     // check all arguments
     assertIsStateTreeNode(target, 1)
     assertIsType(type, 2)
@@ -525,7 +527,7 @@ export function resolveIdentifier<IT extends IAnyType>(
     type: IT,
     target: IAnyStateTreeNode,
     identifier: ReferenceIdentifier
-): ExtractTWithSTN<IT> | undefined {
+): IT["Type"] | undefined {
     // check all arguments
     assertIsType(type, 1)
     assertIsStateTreeNode(target, 2)
@@ -841,7 +843,7 @@ export interface IModelReflectionData extends IModelReflectionPropertiesData {
  * @returns
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    const type = getStateTreeNode(target).type as AnyModelType
+    const type = (getStateTreeNode(target).type as unknown) as IAnyModelType
 
     const reflected: IModelReflectionData = {
         ...getPropertyMembers(type),
@@ -871,9 +873,9 @@ export function cast<O extends string | number | boolean | null | undefined = ne
 ): O
 export function cast<O = never>(
     snapshotOrInstance:
-        | ExtractC<TypeOfValue<O>>
-        | ExtractS<TypeOfValue<O>>
-        | ExtractTWithSTN<TypeOfValue<O>>
+        | TypeOfValue<O>["CreationType"]
+        | TypeOfValue<O>["SnapshotType"]
+        | TypeOfValue<O>["Type"]
 ): O
 /**
  * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
@@ -937,7 +939,7 @@ export function cast(snapshotOrInstance: any): any {
  */
 export function castToSnapshot<I>(
     snapshotOrInstance: I
-): Extract<I, IAnyStateTreeNode> extends never ? I : ExtractC<TypeOfValue<I>> {
+): Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"] {
     return snapshotOrInstance as any
 }
 

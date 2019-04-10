@@ -128,7 +128,6 @@ export {
     isMapType,
     isModelType,
     isOptionalType,
-    IsOptionalType,
     isPrimitiveType,
     isReferenceType,
     isRefinementType,
@@ -144,5 +143,9 @@ export {
     ISnapshotProcessor,
     ISnapshotProcessors,
     getNodeId,
+    IActionContext,
+    getRunningActionContext,
+    isActionContextChildOf,
+    isActionContextThisOrChildOf,
     types
 } from "./internal"

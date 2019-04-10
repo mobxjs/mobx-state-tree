@@ -92,17 +92,7 @@ ___
 
 ###  create
 
-▸ **create**(...args: *`CreateParams`<`ModelCreationType2`<`PROPS`, `CustomC`>>*): `STNValue`<`ModelInstanceType`<`PROPS`, `OTHERS`>, `this`>
-
-▸ **create**(snapshot: *`ModelCreationType2`<`PROPS`, `CustomC`>*, env?: *`any`*): `STNValue`<`ModelInstanceType`<`PROPS`, `OTHERS`>, `this`>
-
-**Parameters:**
-
-| Name | Type |
-| ------ | ------ |
-| `Rest` args | `CreateParams`<`ModelCreationType2`<`PROPS`, `CustomC`>> |
-
-**Returns:** `STNValue`<`ModelInstanceType`<`PROPS`, `OTHERS`>, `this`>
+▸ **create**(snapshot?: *[C]()*, env?: *`any`*): `this["Type"]`
 
 Creates an instance for the type given an snapshot input.
 
@@ -110,10 +100,10 @@ Creates an instance for the type given an snapshot input.
 
 | Name | Type |
 | ------ | ------ |
-| snapshot | `ModelCreationType2`<`PROPS`, `CustomC`> |
+| `Optional` snapshot | [C]() |
 | `Optional` env | `any` |
 
-**Returns:** `STNValue`<`ModelInstanceType`<`PROPS`, `OTHERS`>, `this`>
+**Returns:** `this["Type"]`
 An instance of that type.
 
 ___

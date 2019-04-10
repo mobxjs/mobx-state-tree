@@ -37,27 +37,23 @@ import {
     typeCheckFailure,
     TypeFlags,
     EMPTY_OBJECT,
-    ExtractC,
-    ExtractS,
     normalizeIdentifier,
     AnyObjectNode,
     AnyNode,
-    AnyModelType,
+    IAnyModelType,
     asArray,
     cannotDetermineSubtype,
     getSnapshot,
     isValidIdentifier,
-    ExtractTWithSTN,
     ExtractCSTWithSTN,
-    ExtractTWithoutSTN,
     devMode
 } from "../../internal"
 
 /** @hidden */
 export interface IMapType<IT extends IAnyType>
     extends IType<
-        IKeyValueMap<ExtractC<IT>> | undefined,
-        IKeyValueMap<ExtractS<IT>>,
+        IKeyValueMap<IT["CreationType"]> | undefined,
+        IKeyValueMap<IT["SnapshotType"]>,
         IMSTMap<IT>
     > {}
 
@@ -67,29 +63,26 @@ export interface IMSTMap<IT extends IAnyType> {
 
     clear(): void
     delete(key: string): boolean
-    forEach(
-        callbackfn: (value: ExtractTWithSTN<IT>, key: string, map: this) => void,
-        thisArg?: any
-    ): void
-    get(key: string): ExtractTWithSTN<IT> | undefined
+    forEach(callbackfn: (value: IT["Type"], key: string, map: this) => void, thisArg?: any): void
+    get(key: string): IT["Type"] | undefined
     has(key: string): boolean
     set(key: string, value: ExtractCSTWithSTN<IT>): this
     readonly size: number
-    put(value: ExtractCSTWithSTN<IT>): ExtractTWithSTN<IT>
+    put(value: ExtractCSTWithSTN<IT>): IT["Type"]
     keys(): IterableIterator<string>
-    values(): IterableIterator<ExtractTWithSTN<IT>>
-    entries(): IterableIterator<[string, ExtractTWithSTN<IT>]>
-    [Symbol.iterator](): IterableIterator<[string, ExtractTWithSTN<IT>]>
+    values(): IterableIterator<IT["Type"]>
+    entries(): IterableIterator<[string, IT["Type"]]>
+    [Symbol.iterator](): IterableIterator<[string, IT["Type"]]>
     /** Merge another object into this map, returns self. */
     merge(
         other:
-            | IMSTMap<IType<any, any, ExtractTWithoutSTN<IT>>>
+            | IMSTMap<IType<any, any, IT["TypeWithoutSTN"]>>
             | IKeyValueMap<ExtractCSTWithSTN<IT>>
             | any
     ): this
     replace(
         values:
-            | IMSTMap<IType<any, any, ExtractTWithoutSTN<IT>>>
+            | IMSTMap<IType<any, any, IT["TypeWithoutSTN"]>>
             | IKeyValueMap<ExtractCSTWithSTN<IT>>
             | any
     ): this
@@ -99,14 +92,14 @@ export interface IMSTMap<IT extends IAnyType> {
      * Note that all the keys being stringified.
      * If there are duplicating keys after converting them to strings, behaviour is undetermined.
      */
-    toPOJO(): IKeyValueMap<ExtractS<IT>>
-    toJSON(): IKeyValueMap<ExtractS<IT>>
+    toPOJO(): IKeyValueMap<IT["SnapshotType"]>
+    toJSON(): IKeyValueMap<IT["SnapshotType"]>
 
     /**
      * Returns a shallow non observable object clone of this map.
      * Note that the values migth still be observable. For a deep clone use mobx.toJS.
      */
-    toJS(): Map<string, ExtractTWithSTN<IT>>
+    toJS(): Map<string, IT["Type"]>
 
     toString(): string
     [Symbol.toStringTag]: "Map"
@@ -117,15 +110,15 @@ export interface IMSTMap<IT extends IAnyType> {
      * for callback details
      */
     observe(
-        listener: (changes: IMapDidChange<string, ExtractTWithSTN<IT>>) => void,
+        listener: (changes: IMapDidChange<string, IT["Type"]>) => void,
         fireImmediately?: boolean
     ): Lambda
-    intercept(handler: IInterceptor<IMapWillChange<string, ExtractTWithSTN<IT>>>): Lambda
+    intercept(handler: IInterceptor<IMapWillChange<string, IT["Type"]>>): Lambda
 }
 
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
 
-function tryCollectModelTypes(type: IAnyType, modelTypes: Array<AnyModelType>): boolean {
+function tryCollectModelTypes(type: IAnyType, modelTypes: Array<IAnyModelType>): boolean {
     const subtypes = type.getSubTypes()
     if (subtypes === cannotDetermineSubtype) {
         return false
@@ -157,7 +150,7 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
         super(initialData, observable.ref.enhancer)
     }
 
-    get(key: string): ExtractTWithSTN<IT> | undefined {
+    get(key: string): IT["Type"] | undefined {
         // maybe this is over-enthousiastic? normalize numeric keys to strings
         return super.get("" + key)
     }
@@ -174,7 +167,7 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
         return super.set("" + key, value)
     }
 
-    put(value: ExtractCSTWithSTN<IT>): ExtractTWithSTN<IT> {
+    put(value: ExtractCSTWithSTN<IT>): IT["Type"] {
         if (!value) throw fail(`Map.put cannot be used to set empty values`)
         if (isStateTreeNode(value)) {
             const node = getStateTreeNode(value)
@@ -199,7 +192,7 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
             }
 
             const idAttr = mapType.mapIdentifierAttribute!
-            const id = value[idAttr]
+            const id = (value as any)[idAttr]
             if (!isValidIdentifier(id)) {
                 // try again but this time after creating a node for the value
                 // since it might be an optional identifier
@@ -218,8 +211,8 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
  * @hidden
  */
 export class MapType<IT extends IAnyType> extends ComplexType<
-    IKeyValueMap<ExtractC<IT>> | undefined,
-    IKeyValueMap<ExtractS<IT>>,
+    IKeyValueMap<IT["CreationType"]> | undefined,
+    IKeyValueMap<IT["SnapshotType"]>,
     IMSTMap<IT>
 > {
     identifierMode: MapIdentifierMode = MapIdentifierMode.UNKNOWN
@@ -246,7 +239,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
             return
         }
 
-        const modelTypes: AnyModelType[] = []
+        const modelTypes: IAnyModelType[] = []
         if (tryCollectModelTypes(this._subType, modelTypes)) {
             let identifierAttribute: string | undefined = undefined
             modelTypes.forEach(type => {

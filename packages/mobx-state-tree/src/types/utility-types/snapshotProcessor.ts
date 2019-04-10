@@ -1,7 +1,5 @@
 import {
     IType,
-    ExtractC,
-    ExtractS,
     IAnyType,
     BaseType,
     isStateTreeNode,
@@ -11,7 +9,6 @@ import {
     TypeFlags,
     ExtractNodeType,
     assertIsType,
-    ExtractTWithoutSTN,
     devMode
 } from "../../internal"
 
@@ -28,9 +25,9 @@ export interface _NotCustomized {
 export type _CustomOrOther<Custom, Other> = Custom extends _NotCustomized ? Other : Custom
 
 class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
-    _CustomOrOther<CustomC, ExtractC<IT>>,
-    _CustomOrOther<CustomS, ExtractS<IT>>,
-    ExtractTWithoutSTN<IT>,
+    _CustomOrOther<CustomC, IT["CreationType"]>,
+    _CustomOrOther<CustomS, IT["SnapshotType"]>,
+    IT["TypeWithoutSTN"],
     ExtractNodeType<IT>
 > {
     get flags() {
@@ -40,9 +37,9 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     constructor(
         private readonly _subtype: IT,
         private readonly _processors: ISnapshotProcessors<
-            ExtractC<IT>,
+            IT["CreationType"],
             CustomC,
-            ExtractS<IT>,
+            IT["SnapshotType"],
             CustomS
         >,
         name?: string
@@ -54,14 +51,14 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         return `snapshotProcessor(${this._subtype.describe()})`
     }
 
-    private preProcessSnapshot(sn: this["C"]): ExtractC<IT> {
+    private preProcessSnapshot(sn: this["C"]): IT["CreationType"] {
         if (this._processors.preProcessor) {
             return this._processors.preProcessor.call(null, sn)
         }
         return sn as any
     }
 
-    private postProcessSnapshot(sn: ExtractS<IT>): this["S"] {
+    private postProcessSnapshot(sn: IT["SnapshotType"]): this["S"] {
         if (this._processors.postProcessor) {
             return this._processors.postProcessor.call(null, sn) as any
         }
@@ -142,9 +139,9 @@ function proxyNodeTypeMethods(
  */
 export interface ISnapshotProcessor<IT extends IAnyType, CustomC, CustomS>
     extends IType<
-        _CustomOrOther<CustomC, ExtractC<IT>>,
-        _CustomOrOther<CustomS, ExtractS<IT>>,
-        ExtractTWithoutSTN<IT>
+        _CustomOrOther<CustomC, IT["CreationType"]>,
+        _CustomOrOther<CustomS, IT["SnapshotType"]>,
+        IT["TypeWithoutSTN"]
     > {}
 
 /**
@@ -199,7 +196,7 @@ export function snapshotProcessor<
     CustomS = _NotCustomized
 >(
     type: IT,
-    processors: ISnapshotProcessors<ExtractC<IT>, CustomC, ExtractS<IT>, CustomS>,
+    processors: ISnapshotProcessors<IT["CreationType"], CustomC, IT["SnapshotType"], CustomS>,
     name?: string
 ): ISnapshotProcessor<IT, CustomC, CustomS> {
     assertIsType(type, 1)

@@ -5,10 +5,7 @@ import {
     undefinedType,
     nullType,
     IAnyType,
-    ExtractC,
-    ExtractS,
-    assertIsType,
-    ExtractTWithoutSTN
+    assertIsType
 } from "../../internal"
 
 const optionalUndefinedType = optional(undefinedType, undefined)
@@ -16,7 +13,7 @@ const optionalNullType = optional(nullType, null)
 
 /** @hidden */
 export interface IMaybeIType<IT extends IAnyType, C, O>
-    extends IType<ExtractC<IT> | C, ExtractS<IT> | O, ExtractTWithoutSTN<IT> | O> {}
+    extends IType<IT["CreationType"] | C, IT["SnapshotType"] | O, IT["TypeWithoutSTN"] | O> {}
 
 /** @hidden */
 export interface IMaybe<IT extends IAnyType> extends IMaybeIType<IT, undefined, undefined> {}

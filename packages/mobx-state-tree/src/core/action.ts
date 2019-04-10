@@ -9,7 +9,8 @@ import {
     IAnyStateTreeNode,
     warnError,
     AnyObjectNode,
-    devMode
+    devMode,
+    IActionContext
 } from "../internal"
 
 export type IMiddlewareEventType =
@@ -21,18 +22,19 @@ export type IMiddlewareEventType =
     | "flow_throw"
 // | "task_spawn TODO, see #273"
 
-export interface IMiddlewareEvent {
+export interface IMiddlewareEvent extends IActionContext {
+    /** Event type */
     readonly type: IMiddlewareEventType
-    readonly name: string
-    readonly id: number
+
+    /** Parent event unique id */
     readonly parentId: number
-    readonly rootId: number
-    readonly allParentIds: number[]
-    readonly context: IAnyStateTreeNode
-    readonly tree: IAnyStateTreeNode
-    readonly args: any[]
+    /** Parent event object */
     readonly parentEvent: IMiddlewareEvent | undefined
-    readonly parentActionEvent: IMiddlewareEvent | undefined
+
+    /** Root event unique id */
+    readonly rootId: number
+    /** Id of all events, from root until current (excluding current) */
+    readonly allParentIds: number[]
 }
 
 /**

@@ -44,15 +44,11 @@ import {
     typecheckInternal,
     typeCheckFailure,
     TypeFlags,
-    ExtractC,
-    ExtractS,
     Hook,
     AnyObjectNode,
     AnyNode,
     _CustomOrOther,
     _NotCustomized,
-    IsOptionalType,
-    ExtractTWithSTN,
     Instance,
     devMode,
     assertIsString,
@@ -80,50 +76,79 @@ export interface ModelPropertiesDeclaration {
  *
  * @hidden
  */
-export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> = {
-    [K in keyof T]: T[K] extends string
-        ? IType<string | undefined, string, string>
-        : T[K] extends number
-        ? IType<number | undefined, number, number>
-        : T[K] extends boolean
-        ? IType<boolean | undefined, boolean, boolean>
-        : T[K] extends Date
-        ? IType<number | Date | undefined, number, Date>
-        : T[K] extends IAnyType
-        ? T[K]
-        : never
-}
+export type ModelPropertiesDeclarationToProperties<
+    T extends ModelPropertiesDeclaration
+> = T extends { [k: string]: IAnyType } // optimization to reduce nesting
+    ? T
+    : {
+          [K in keyof T]: T[K] extends IAnyType // keep IAnyType check on the top to reduce nesting
+              ? T[K]
+              : T[K] extends string
+              ? IType<string | undefined, string, string>
+              : T[K] extends number
+              ? IType<number | undefined, number, number>
+              : T[K] extends boolean
+              ? IType<boolean | undefined, boolean, boolean>
+              : T[K] extends Date
+              ? IType<number | Date | undefined, number, Date>
+              : never
+      }
+
+/**
+ * Checks if a type is any or unknown
+ * @hidden
+ */
+type IsAnyOrUnknown<T> = unknown extends T ? true : never
+
+/**
+ * Checks if a type is undefined
+ * @hidden
+ */
+type IsUndefined<T> = T extends undefined ? true : never
+
+/**
+ * Checks if a value is optional (undefined, any or unknown).
+ * @hidden
+ *
+ * Examples:
+ * - string = never
+ * - undefined = true
+ * - string | undefined = true
+ * - string & undefined = true
+ * - any = true
+ * - unknown = true
+ */
+type IsOptionalValue<C> = IsUndefined<C> | IsAnyOrUnknown<C>
+
+// type _A = IsOptionalValue<string> // never
+// type _B = IsOptionalValue<undefined> // true
+// type _C = IsOptionalValue<string | undefined> // true
+// type _D = IsOptionalValue<string & undefined> // true
+// type _E = IsOptionalValue<any> // true
+// type _F = IsOptionalValue<unknown> // true
+
+/**
+ * Name of the properties of an object that can't be set to undefined, any or unknown
+ * @hidden
+ */
+type DefinablePropsNames<T> = {
+    [K in keyof T]: IsOptionalValue<T[K]> extends never ? K : never
+}[keyof T]
 
 /** @hidden */
-export type RequiredPropNames<P extends ModelProperties> = {
-    [K in keyof P]: IsOptionalType<P[K]> extends true ? never : K
-}[keyof P]
-/** @hidden */
-export type RequiredPropsObject<P extends ModelProperties> = Pick<P, RequiredPropNames<P>>
+export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
 
 /** @hidden */
-export type OptionalPropNames<P extends ModelProperties> = {
-    [K in keyof P]: IsOptionalType<P[K]> extends true ? K : never
-}[keyof P]
-/** @hidden */
-export type OptionalPropsObject<P extends ModelProperties> = Partial<Pick<P, OptionalPropNames<P>>>
-
-/** @hidden */
-export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: ExtractC<P[k]> }
-
-/** @hidden */
-export type ModelCreationType<P extends ModelProperties> = ExtractCFromProps<
-    RequiredPropsObject<P> & OptionalPropsObject<P>
->
+export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } & Partial<PC>
 
 /** @hidden */
 export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOther<
     CustomC,
-    ModelCreationType<P>
+    ModelCreationType<ExtractCFromProps<P>>
 >
 
 /** @hidden */
-export type ModelSnapshotType<P extends ModelProperties> = { [K in keyof P]: ExtractS<P[K]> }
+export type ModelSnapshotType<P extends ModelProperties> = { [K in keyof P]: P[K]["SnapshotType"] }
 
 /** @hidden */
 export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOther<
@@ -135,9 +160,7 @@ export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOt
  * @hidden
  * we keep this separate from ModelInstanceType to shorten model instance types generated declarations
  */
-export type ModelInstanceTypeProps<P extends ModelProperties> = {
-    [K in keyof P]: ExtractTWithSTN<P[K]>
-}
+export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]: P[K]["Type"] }
 
 /**
  * @hidden
@@ -290,12 +313,6 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
         declaredProps as any
     )
 }
-
-/**
- * @internal
- * @hidden
- */
-export type AnyModelType = ModelType<any, any, any, any, any>
 
 /**
  * @internal

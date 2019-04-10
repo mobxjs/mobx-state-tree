@@ -27,7 +27,6 @@ import {
     SimpleType,
     assertIsType,
     isValidIdentifier,
-    ExtractTWithoutSTN,
     IStateTreeNode,
     devMode
 } from "../../internal"
@@ -57,7 +56,7 @@ function getInvalidationCause(hook: Hook): "detach" | "destroy" | undefined {
 }
 
 /** @hidden */
-export type ReferenceT<IT extends IAnyType> = ExtractTWithoutSTN<IT> &
+export type ReferenceT<IT extends IAnyType> = IT["TypeWithoutSTN"] &
     IStateTreeNode<IReferenceType<IT>>
 
 class StoredReference<IT extends IAnyType> {
@@ -141,7 +140,7 @@ export class InvalidReferenceError extends Error {
 export abstract class BaseReferenceType<IT extends IAnyComplexType> extends SimpleType<
     ReferenceIdentifier,
     ReferenceIdentifier,
-    ExtractTWithoutSTN<IT>
+    IT["TypeWithoutSTN"]
 > {
     readonly flags = TypeFlags.Reference
 
@@ -358,7 +357,7 @@ export class IdentifierReferenceType<IT extends IAnyComplexType> extends BaseRef
         const identifier = isStateTreeNode(initialValue)
             ? getIdentifier(initialValue)!
             : initialValue
-        const storedRef = new StoredReference(initialValue, this.targetType)
+        const storedRef = new StoredReference(initialValue, this.targetType as any)
         const storedRefNode: this["N"] = createScalarNode(
             this,
             parent,
@@ -480,7 +479,7 @@ export type ReferenceOptions<IT extends IAnyComplexType> =
 
 /** @hidden */
 export interface IReferenceType<IT extends IAnyComplexType>
-    extends IType<ReferenceIdentifier, ReferenceIdentifier, ExtractTWithoutSTN<IT>> {}
+    extends IType<ReferenceIdentifier, ReferenceIdentifier, IT["TypeWithoutSTN"]> {}
 
 /**
  * `types.reference` - Creates a reference to another type, which should have defined an identifier.

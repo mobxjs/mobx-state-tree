@@ -35,9 +35,9 @@ import {
     AnyNode,
     IStateTreeNode,
     ArgumentTypes,
-    getCurrentActionContext,
     IType,
-    devMode
+    devMode,
+    getCurrentActionContext
 } from "../../internal"
 
 let nextNodeId = 1
@@ -399,7 +399,13 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         const escapedPath = this.getEscapedPath(false) || this.pathUponDeath || ""
         const subpath = (context.subpath && escapeJsonPath(context.subpath)) || ""
 
-        const actionContext = context.actionContext || getCurrentActionContext()
+        let actionContext = context.actionContext || getCurrentActionContext()
+
+        // try to use a real action context if possible since it includes the action name
+        if (actionContext && actionContext.type !== "action" && actionContext.parentActionEvent) {
+            actionContext = actionContext.parentActionEvent
+        }
+
         let actionFullPath = ""
         if (actionContext && actionContext.name != null) {
             // try to use the context, and if it not available use the node one
