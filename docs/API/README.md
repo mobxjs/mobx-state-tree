@@ -10,11 +10,14 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 ### Interfaces
 
 * [CustomTypeOptions](interfaces/customtypeoptions.md)
+* [IActionContext](interfaces/iactioncontext.md)
 * [IActionRecorder](interfaces/iactionrecorder.md)
 * [IActionTrackingMiddleware2Call](interfaces/iactiontrackingmiddleware2call.md)
 * [IActionTrackingMiddleware2Hooks](interfaces/iactiontrackingmiddleware2hooks.md)
 * [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)
+* [IAnyComplexType](interfaces/ianycomplextype.md)
 * [IAnyModelType](interfaces/ianymodeltype.md)
+* [IAnyType](interfaces/ianytype.md)
 * [IJsonPatch](interfaces/ijsonpatch.md)
 * [IMiddlewareEvent](interfaces/imiddlewareevent.md)
 * [IModelReflectionData](interfaces/imodelreflectiondata.md)
@@ -35,8 +38,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 
 ### Type aliases
 
-* [IAnyComplexType](#ianycomplextype)
-* [IAnyType](#ianytype)
 * [IDisposer](#idisposer)
 * [IMiddlewareEventType](#imiddlewareeventtype)
 * [IMiddlewareHandler](#imiddlewarehandler)
@@ -102,10 +103,13 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [getPropertyMembers](#getpropertymembers)
 * [getRelativePath](#getrelativepath)
 * [getRoot](#getroot)
+* [getRunningActionContext](#getrunningactioncontext)
 * [getSnapshot](#getsnapshot)
 * [getType](#gettype)
 * [hasParent](#hasparent)
 * [hasParentOfType](#hasparentoftype)
+* [isActionContextChildOf](#isactioncontextchildof)
+* [isActionContextThisOrChildOf](#isactioncontextthisorchildof)
 * [isAlive](#isalive)
 * [isArrayType](#isarraytype)
 * [isFrozenType](#isfrozentype)
@@ -143,7 +147,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 * [resolveIdentifier](#resolveidentifier)
 * [resolvePath](#resolvepath)
 * [safeReference](#safereference)
-* [safeReferenceForCollection](#safereferenceforcollection)
 * [setLivelinessChecking](#setlivelinesschecking)
 * [snapshotProcessor](#snapshotprocessor)
 * [splitJsonPath](#splitjsonpath)
@@ -163,24 +166,6 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 
 ## Type aliases
 
-<a id="ianycomplextype"></a>
-
-###  IAnyComplexType
-
-**Ƭ IAnyComplexType**: *[IType](interfaces/itype.md)<`any`, `any`, `object`>*
-
-Any kind of complex type.
-
-___
-<a id="ianytype"></a>
-
-###  IAnyType
-
-**Ƭ IAnyType**: *[IType](interfaces/itype.md)<`any`, `any`, `any`>*
-
-Any kind of type.
-
-___
 <a id="idisposer"></a>
 
 ###  IDisposer
@@ -229,7 +214,7 @@ ___
 **Ƭ ITypeDispatcher**: *`function`*
 
 #### Type declaration
-▸(snapshot: *`any`*): [IAnyType](#ianytype)
+▸(snapshot: *`any`*): [IAnyType](interfaces/ianytype.md)
 
 **Parameters:**
 
@@ -237,7 +222,7 @@ ___
 | ------ | ------ |
 | snapshot | `any` |
 
-**Returns:** [IAnyType](#ianytype)
+**Returns:** [IAnyType](interfaces/ianytype.md)
 
 ___
 <a id="ivalidationcontext"></a>
@@ -702,7 +687,7 @@ console.log(s.todos[0]) // prints: "Grab coffee"
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -718,7 +703,7 @@ ___
 
 ▸ **cast**<`O`>(snapshotOrInstance: *`O`*): `O`
 
-▸ **cast**<`O`>(snapshotOrInstance: *`ExtractC`<`TypeOfValue`<`O`>> \| `ExtractS`<`TypeOfValue`<`O`>> \| `ExtractTWithSTN`<`TypeOfValue`<`O`>>*): `O`
+▸ **cast**<`O`>(snapshotOrInstance: *`TypeOfValue<O>["CreationType"]` \| `TypeOfValue<O>["SnapshotType"]` \| `TypeOfValue<O>["Type"]`*): `O`
 
 Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance. Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance, but just fool typescript into thinking so. Either way, casting when outside an assignation operation won't compile.
 
@@ -785,7 +770,7 @@ const ModelB = types.model({
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| snapshotOrInstance | `ExtractC`<`TypeOfValue`<`O`>> \| `ExtractS`<`TypeOfValue`<`O`>> \| `ExtractTWithSTN`<`TypeOfValue`<`O`>> |  Snapshot or instance |
+| snapshotOrInstance | `TypeOfValue<O>["CreationType"]` \| `TypeOfValue<O>["SnapshotType"]` \| `TypeOfValue<O>["Type"]` |  Snapshot or instance |
 
 **Returns:** `O`
 The same object casted as an instance
@@ -857,7 +842,7 @@ ___
 
 ###  castToSnapshot
 
-▸ **castToSnapshot**<`I`>(snapshotOrInstance: *`I`*): `Extract<I, IAnyStateTreeNode> extends never ? I : ExtractC<TypeOfValue<I>>`
+▸ **castToSnapshot**<`I`>(snapshotOrInstance: *`I`*): `Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"]`
 
 Casts a node instance type to an snapshot type so it can be assigned to a type snapshot (e.g. to be used inside a create call). Note that this is just a cast for the type system, this is, it won't actually convert an instance to a snapshot, but just fool typescript into thinking so.
 
@@ -890,7 +875,7 @@ const b = ModelB.create({ innerModel: castToSnapshot(a)})
 | ------ | ------ | ------ |
 | snapshotOrInstance | `I` |  Snapshot or instance |
 
-**Returns:** `Extract<I, IAnyStateTreeNode> extends never ? I : ExtractC<TypeOfValue<I>>`
+**Returns:** `Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"]`
 The same object casted as an input (creation) snapshot
 
 ___
@@ -2025,7 +2010,7 @@ ___
 
 ###  getChildType
 
-▸ **getChildType**(object: *`IAnyStateTreeNode`*, propertyName?: *`undefined` \| `string`*): [IAnyType](#ianytype)
+▸ **getChildType**(object: *`IAnyStateTreeNode`*, propertyName?: *`undefined` \| `string`*): [IAnyType](interfaces/ianytype.md)
 
 Returns the _declared_ type of the given sub property of an object, array or map. In the case of arrays and maps the property name is optional and will be ignored.
 
@@ -2045,7 +2030,7 @@ console.log(getChildType(box, "x").name) // 'number'
 | object | `IAnyStateTreeNode` |  \- |
 | `Optional` propertyName | `undefined` \| `string` |  \- |
 
-**Returns:** [IAnyType](#ianytype)
+**Returns:** [IAnyType](interfaces/ianytype.md)
 
 ___
 <a id="getenv"></a>
@@ -2151,7 +2136,7 @@ Please note that in child nodes access to the root is only possible once the `af
 
 **Type parameters:**
 
-#### IT :  `IAnyStateTreeNode` \| [IAnyType](#ianytype)
+#### IT :  `IAnyStateTreeNode` \| [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Default value | Description |
@@ -2166,13 +2151,13 @@ ___
 
 ###  getParentOfType
 
-▸ **getParentOfType**<`IT`>(target: *`IAnyStateTreeNode`*, type: *`IT`*): `ExtractTWithSTN`<`IT`>
+▸ **getParentOfType**<`IT`>(target: *`IAnyStateTreeNode`*, type: *`IT`*): `IT["Type"]`
 
 Returns the target's parent of a given type, or throws.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -2180,7 +2165,7 @@ Returns the target's parent of a given type, or throws.
 | target | `IAnyStateTreeNode` |  \- |
 | type | `IT` |  \- |
 
-**Returns:** `ExtractTWithSTN`<`IT`>
+**Returns:** `IT["Type"]`
 
 ___
 <a id="getpath"></a>
@@ -2264,7 +2249,7 @@ Please note that in child nodes access to the root is only possible once the `af
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype) \| `IAnyStateTreeNode`
+#### IT :  [IAnyType](interfaces/ianytype.md) \| `IAnyStateTreeNode`
 **Parameters:**
 
 | Name | Type | Description |
@@ -2272,6 +2257,17 @@ Please note that in child nodes access to the root is only possible once the `af
 | target | `IAnyStateTreeNode` |  \- |
 
 **Returns:** `TypeOrStateTreeNodeToStateTreeNode`<`IT`>
+
+___
+<a id="getrunningactioncontext"></a>
+
+###  getRunningActionContext
+
+▸ **getRunningActionContext**(): [IActionContext](interfaces/iactioncontext.md) \| `undefined`
+
+Returns the currently executing MST action context, or undefined if none.
+
+**Returns:** [IActionContext](interfaces/iactioncontext.md) \| `undefined`
 
 ___
 <a id="getsnapshot"></a>
@@ -2299,7 +2295,7 @@ ___
 
 ###  getType
 
-▸ **getType**(object: *`IAnyStateTreeNode`*): [IAnyType](#ianytype)
+▸ **getType**(object: *`IAnyStateTreeNode`*): [IAnyType](interfaces/ianytype.md)
 
 Returns the _actual_ type of the given tree node. (Or throws)
 
@@ -2309,7 +2305,7 @@ Returns the _actual_ type of the given tree node. (Or throws)
 | ------ | ------ | ------ |
 | object | `IAnyStateTreeNode` |  \- |
 
-**Returns:** [IAnyType](#ianytype)
+**Returns:** [IAnyType](interfaces/ianytype.md)
 
 ___
 <a id="hasparent"></a>
@@ -2334,7 +2330,7 @@ ___
 
 ###  hasParentOfType
 
-▸ **hasParentOfType**(target: *`IAnyStateTreeNode`*, type: *[IAnyType](#ianytype)*): `boolean`
+▸ **hasParentOfType**(target: *`IAnyStateTreeNode`*, type: *[IAnyType](interfaces/ianytype.md)*): `boolean`
 
 Given a model instance, returns `true` if the object has a parent of given type, that is, is part of another object, map or array
 
@@ -2343,7 +2339,43 @@ Given a model instance, returns `true` if the object has a parent of given type,
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | target | `IAnyStateTreeNode` |  \- |
-| type | [IAnyType](#ianytype) |  \- |
+| type | [IAnyType](interfaces/ianytype.md) |  \- |
+
+**Returns:** `boolean`
+
+___
+<a id="isactioncontextchildof"></a>
+
+###  isActionContextChildOf
+
+▸ **isActionContextChildOf**(actionContext: *[IActionContext](interfaces/iactioncontext.md)*, parent: *`number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md)*): `boolean`
+
+Returns if the given action context is a parent of this action context.
+
+**Parameters:**
+
+| Name | Type |
+| ------ | ------ |
+| actionContext | [IActionContext](interfaces/iactioncontext.md) |
+| parent | `number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
+
+**Returns:** `boolean`
+
+___
+<a id="isactioncontextthisorchildof"></a>
+
+###  isActionContextThisOrChildOf
+
+▸ **isActionContextThisOrChildOf**(actionContext: *[IActionContext](interfaces/iactioncontext.md)*, parentOrThis: *`number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md)*): `boolean`
+
+Returns if the given action context is this or a parent of this action context.
+
+**Parameters:**
+
+| Name | Type |
+| ------ | ------ |
+| actionContext | [IActionContext](interfaces/iactioncontext.md) |
+| parentOrThis | `number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
 
 **Returns:** `boolean`
 
@@ -2369,18 +2401,18 @@ ___
 
 ###  isArrayType
 
-▸ **isArrayType**<`Items`>(type: *[IAnyType](#ianytype)*): `boolean`
+▸ **isArrayType**<`Items`>(type: *[IAnyType](interfaces/ianytype.md)*): `boolean`
 
 Returns if a given value represents an array type.
 
 **Type parameters:**
 
-#### Items :  [IAnyType](#ianytype)
+#### Items :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| type | [IAnyType](#ianytype) |  \- |
+| type | [IAnyType](interfaces/ianytype.md) |  \- |
 
 **Returns:** `boolean`
 `true` if the type is an array type.
@@ -2437,7 +2469,7 @@ Returns if a given value represents a late type.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -2471,18 +2503,18 @@ ___
 
 ###  isMapType
 
-▸ **isMapType**<`Items`>(type: *[IAnyType](#ianytype)*): `boolean`
+▸ **isMapType**<`Items`>(type: *[IAnyType](interfaces/ianytype.md)*): `boolean`
 
 Returns if a given value represents a map type.
 
 **Type parameters:**
 
-#### Items :  [IAnyType](#ianytype)
+#### Items :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| type | [IAnyType](#ianytype) |  \- |
+| type | [IAnyType](interfaces/ianytype.md) |  \- |
 
 **Returns:** `boolean`
 `true` if it is a map type.
@@ -2492,7 +2524,7 @@ ___
 
 ###  isModelType
 
-▸ **isModelType**<`IT`>(type: *[IAnyType](#ianytype)*): `boolean`
+▸ **isModelType**<`IT`>(type: *[IAnyType](interfaces/ianytype.md)*): `boolean`
 
 Returns if a given value represents a model type.
 
@@ -2503,7 +2535,7 @@ Returns if a given value represents a model type.
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| type | [IAnyType](#ianytype) |  \- |
+| type | [IAnyType](interfaces/ianytype.md) |  \- |
 
 **Returns:** `boolean`
 
@@ -2520,7 +2552,7 @@ Returns if a value represents an optional type.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -2597,7 +2629,7 @@ Returns if a given value is a refinement type.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -2634,7 +2666,7 @@ Returns true if the given value is a node in a state tree. More precisely, that 
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -2673,7 +2705,7 @@ Returns if a given value represents a union type.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -2742,7 +2774,7 @@ Example:
 
 **Type parameters:**
 
-#### T :  [IAnyType](#ianytype)
+#### T :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -2764,7 +2796,7 @@ Example:
 
 **Type parameters:**
 
-#### T :  [IAnyType](#ianytype)
+#### T :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -2835,7 +2867,7 @@ console.log(s.todos.get(17).task) // prints: "Grab coffee"
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -2855,7 +2887,7 @@ ___
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -2875,7 +2907,7 @@ ___
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -3051,7 +3083,7 @@ const todo = Todo.create({ title: "Get coffee", subtitle1: null })
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -3093,7 +3125,7 @@ const todo = Todo.create({ title: "Get coffee", subtitle1: null })
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 #### OptionalVals :  `ValidOptionalValues`
 **Parameters:**
 
@@ -3127,7 +3159,7 @@ ___
 
 ###  recordActions
 
-▸ **recordActions**(subject: *`IAnyStateTreeNode`*): [IActionRecorder](interfaces/iactionrecorder.md)
+▸ **recordActions**(subject: *`IAnyStateTreeNode`*, filter?: *`undefined` \| `function`*): [IActionRecorder](interfaces/iactionrecorder.md)
 
 Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted. Returns an recorder object with the following signature:
 
@@ -3137,18 +3169,25 @@ Example:
 export interface IActionRecorder {
      // the recorded actions
      actions: ISerializedActionCall[]
+     // true if currently recording
+     recording: boolean
      // stop recording actions
-     stop(): any
+     stop(): void
+     // resume recording actions
+     resume(): void
      // apply all the recorded actions on the given object
-     replay(target: IAnyStateTreeNode): any
+     replay(target: IAnyStateTreeNode): void
 }
 ```
+
+The optional filter function allows to skip recording certain actions.
 
 **Parameters:**
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | subject | `IAnyStateTreeNode` |  \- |
+| `Optional` filter | `undefined` \| `function` |
 
 **Returns:** [IActionRecorder](interfaces/iactionrecorder.md)
 
@@ -3174,7 +3213,7 @@ export interface IPatchRecorder {
      // stop recording patches
      stop(): void
      // resume recording patches
-     resume()
+     resume(): void
      // apply all the recorded patches on the given target (the original subject if omitted)
      replay(target?: IAnyStateTreeNode): void
      // reverse apply the recorded patches on the given target  (the original subject if omitted)
@@ -3205,7 +3244,7 @@ ___
 
 **Type parameters:**
 
-#### IT :  [IAnyComplexType](#ianycomplextype)
+#### IT :  [IAnyComplexType](interfaces/ianycomplextype.md)
 **Parameters:**
 
 | Name | Type |
@@ -3228,7 +3267,7 @@ ___
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -3244,7 +3283,7 @@ ___
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -3260,13 +3299,13 @@ ___
 
 ###  resolveIdentifier
 
-▸ **resolveIdentifier**<`IT`>(type: *`IT`*, target: *`IAnyStateTreeNode`*, identifier: *[ReferenceIdentifier](#referenceidentifier)*): `ExtractTWithSTN`<`IT`> \| `undefined`
+▸ **resolveIdentifier**<`IT`>(type: *`IT`*, target: *`IAnyStateTreeNode`*, identifier: *[ReferenceIdentifier](#referenceidentifier)*): `IT["Type"]` \| `undefined`
 
 Resolves a model instance given a root target, the type and the identifier you are searching for. Returns undefined if no value can be found.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -3275,7 +3314,7 @@ Resolves a model instance given a root target, the type and the identifier you a
 | target | `IAnyStateTreeNode` |  \- |
 | identifier | [ReferenceIdentifier](#referenceidentifier) |  \- |
 
-**Returns:** `ExtractTWithSTN`<`IT`> \| `undefined`
+**Returns:** `IT["Type"]` \| `undefined`
 
 ___
 <a id="resolvepath"></a>
@@ -3300,46 +3339,45 @@ ___
 
 ###  safeReference
 
-▸ **safeReference**<`IT`>(subType: *`IT`*, options?: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`>*): `IMaybe`<`IReferenceType`<`IT`>>
+▸ **safeReference**<`IT`>(subType: *`IT`*, options: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object`*): `IReferenceType`<`IT`>
+
+▸ **safeReference**<`IT`>(subType: *`IT`*, options?: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object`*): `IMaybe`<`IReferenceType`<`IT`>>
 
 `types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed.
 
-Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `onInvalidate` option.
+The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties. When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value, which is usually the desired in those cases.
+
+Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidate` option.
 
 **Type parameters:**
 
-#### IT :  [IAnyComplexType](#ianycomplextype)
+#### IT :  [IAnyComplexType](interfaces/ianycomplextype.md)
 **Parameters:**
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | subType | `IT` |  \- |
-| `Optional` options | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> |  \- |
-
-**Returns:** `IMaybe`<`IReferenceType`<`IT`>>
-
-___
-<a id="safereferenceforcollection"></a>
-
-###  safeReferenceForCollection
-
-▸ **safeReferenceForCollection**<`IT`>(subType: *`IT`*, options?: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`>*): `IReferenceType`<`IT`>
-
-`types.safeReferenceForCollection` - Like a safe reference, except it can't take undefined as value, so it is not suitable for model properties, but it still removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed, so it is better suited for collections.
-
-Strictly speaking it is a `types.reference(X)` with a customized `onInvalidate` option.
-
-**Type parameters:**
-
-#### IT :  [IAnyComplexType](#ianycomplextype)
-**Parameters:**
-
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| subType | `IT` |  \- |
-| `Optional` options | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> |  \- |
+| options | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object` |  \- |
 
 **Returns:** `IReferenceType`<`IT`>
+
+`types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed.
+
+The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties. When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value, which is usually the desired in those cases.
+
+Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidate` option.
+
+**Type parameters:**
+
+#### IT :  [IAnyComplexType](interfaces/ianycomplextype.md)
+**Parameters:**
+
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| subType | `IT` |  \- |
+| `Optional` options | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object` |  \- |
+
+**Returns:** `IMaybe`<`IReferenceType`<`IT`>>
 
 ___
 <a id="setlivelinesschecking"></a>
@@ -3363,7 +3401,7 @@ ___
 
 ###  snapshotProcessor
 
-▸ **snapshotProcessor**<`IT`,`CustomC`,`CustomS`>(type: *`IT`*, processors: *[ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`ExtractC`<`IT`>, `CustomC`, `ExtractS`<`IT`>, `CustomS`>*, name?: *`undefined` \| `string`*): [ISnapshotProcessor](interfaces/isnapshotprocessor.md)<`IT`, `CustomC`, `CustomS`>
+▸ **snapshotProcessor**<`IT`,`CustomC`,`CustomS`>(type: *`IT`*, processors: *[ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`IT["CreationType"]`, `CustomC`, `IT["SnapshotType"]`, `CustomS`>*, name?: *`undefined` \| `string`*): [ISnapshotProcessor](interfaces/isnapshotprocessor.md)<`IT`, `CustomC`, `CustomS`>
 
 `types.snapshotProcessor` - Runs a pre/post snapshot processor before/after serializing a given type.
 
@@ -3393,7 +3431,7 @@ const Todo2 = types.snapshotProcessor(Todo1, {
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 #### CustomC 
 #### CustomS 
 **Parameters:**
@@ -3401,7 +3439,7 @@ const Todo2 = types.snapshotProcessor(Todo1, {
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | type | `IT` |  Type to run the processors over. |
-| processors | [ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`ExtractC`<`IT`>, `CustomC`, `ExtractS`<`IT`>, `CustomS`> |  Processors to run. |
+| processors | [ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`IT["CreationType"]`, `CustomC`, `IT["SnapshotType"]`, `CustomS`> |  Processors to run. |
 | `Optional` name | `undefined` \| `string` |  Type name, or undefined to inherit the inner type one. |
 
 **Returns:** [ISnapshotProcessor](interfaces/isnapshotprocessor.md)<`IT`, `CustomC`, `CustomS`>
@@ -3473,7 +3511,7 @@ Run's the typechecker for the given type on the given value, which can be a snap
 
 **Type parameters:**
 
-#### IT :  [IAnyType](#ianytype)
+#### IT :  [IAnyType](interfaces/ianytype.md)
 **Parameters:**
 
 | Name | Type | Description |
@@ -3569,9 +3607,9 @@ ___
 
 ▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`,`CF`,`SF`,`TF`,`CG`,`SG`,`TG`,`CH`,`SH`,`TH`,`CI`,`SI`,`TI`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*, F: *[IType](interfaces/itype.md)<`CF`, `SF`, `TF`>*, G: *[IType](interfaces/itype.md)<`CG`, `SG`, `TG`>*, H: *[IType](interfaces/itype.md)<`CH`, `SH`, `TH`>*, I: *[IType](interfaces/itype.md)<`CI`, `SI`, `TI`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG` \| `CH` \| `CI`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG` \| `SH` \| `SI`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG` \| `TH` \| `TI`>
 
-▸ **union**(...types: *[IAnyType](#ianytype)[]*): [IAnyType](#ianytype)
+▸ **union**(...types: *[IAnyType](interfaces/ianytype.md)[]*): [IAnyType](interfaces/ianytype.md)
 
-▸ **union**(dispatchOrType: *[UnionOptions](interfaces/unionoptions.md) \| [IAnyType](#ianytype)*, ...otherTypes: *[IAnyType](#ianytype)[]*): [IAnyType](#ianytype)
+▸ **union**(dispatchOrType: *[UnionOptions](interfaces/unionoptions.md) \| [IAnyType](interfaces/ianytype.md)*, ...otherTypes: *[IAnyType](interfaces/ianytype.md)[]*): [IAnyType](interfaces/ianytype.md)
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4739,9 +4777,9 @@ ___
 
 | Name | Type |
 | ------ | ------ |
-| `Rest` types | [IAnyType](#ianytype)[] |
+| `Rest` types | [IAnyType](interfaces/ianytype.md)[] |
 
-**Returns:** [IAnyType](#ianytype)
+**Returns:** [IAnyType](interfaces/ianytype.md)
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4749,10 +4787,10 @@ ___
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| dispatchOrType | [UnionOptions](interfaces/unionoptions.md) \| [IAnyType](#ianytype) |
-| `Rest` otherTypes | [IAnyType](#ianytype)[] |  \- |
+| dispatchOrType | [UnionOptions](interfaces/unionoptions.md) \| [IAnyType](interfaces/ianytype.md) |
+| `Rest` otherTypes | [IAnyType](interfaces/ianytype.md)[] |  \- |
 
-**Returns:** [IAnyType](#ianytype)
+**Returns:** [IAnyType](interfaces/ianytype.md)
 
 ___
 <a id="unprotect"></a>
@@ -4971,13 +5009,6 @@ ___
 ####  safeReference
 
 **● safeReference**: *[safeReference](#safereference)*
-
-___
-<a id="types.safereferenceforcollection"></a>
-
-####  safeReferenceForCollection
-
-**● safeReferenceForCollection**: *[safeReferenceForCollection](#safereferenceforcollection)*
 
 ___
 <a id="types.snapshotprocessor"></a>

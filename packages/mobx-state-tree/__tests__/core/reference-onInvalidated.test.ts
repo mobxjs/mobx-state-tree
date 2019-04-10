@@ -385,12 +385,12 @@ test("#1115 - safe reference doesn't become invalidated when the reference has n
     ])
 })
 
-describe("safeReferenceForCollection", () => {
+describe("safeReference with acceptsUndefined: false", () => {
     const MyRefModel = types.model("MyRefModel", {
         id: types.identifier
     })
 
-    const SafeRef = types.safeReferenceForCollection(MyRefModel)
+    const SafeRef = types.safeReference(MyRefModel, { acceptsUndefined: false })
 
     it("removes invalidates items from map/array", () => {
         const Store = types.model({
@@ -408,6 +408,9 @@ describe("safeReferenceForCollection", () => {
             }
         })
         unprotect(store)
+
+        // just to check TS is happy with this
+        const arr: Instance<typeof MyRefModel>[] = store.arr
 
         store.todos.splice(0, 1)
         expect(store.arr.length).toBe(1)
