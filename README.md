@@ -722,7 +722,7 @@ A default implementation of such `onInvalidated` hook is provided by the `types.
 -   If its parent is an array: Remove itself from the array
 -   If its parent is a map: Remove itself from the map
 
-The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties.
+In addition to the options possible for a plain reference type, the optional options parameter object also accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties.
 When used inside collections (arrays/maps) it is recommended to set this option to false so it can't take undefined as value, which is usually the desired in those cases.
 
 Strictly speaking, `safeReference` with `acceptsUndefined` set to true (the default) is implemented as
