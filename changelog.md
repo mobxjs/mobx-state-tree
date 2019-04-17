@@ -1,23 +1,25 @@
+-   Added `acceptsUndefined` as option for `safeReference` so it is more suitable to be used inside arrays/maps, through [#1245](https://github.com/mobxjs/mobx-state-tree/pull/1245) by [@xaviergonz](https://github.com/xaviergonz).
+
 # 3.14.0
 
-- Fixed a regression with `atomic` middleware with async flows [#1250](https://github.com/mobxjs/mobx-state-tree/issues/1250).
-- Added filter function to `recordActions` to filter out recording some actions. Also added `recording` and `resume` methods.
-- Added `getRunningActionContext()` to get the currently executing MST action context (if any). Also added the action context helper functions `isActionContextChildOf()` and `isActionContextThisOrChildOf`.
-- Reduced type nesting to avoid Typescript 3.4 errors about infinite types. Sadly due to this change `types.create` is no longer smart enough in TS to know if skipping the snapshot parameter is valid or not. Through [#1251](https://github.com/mobxjs/mobx-state-tree/pull/1251) by [@xaviergonz](https://github.com/xaviergonz).
+-   Fixed a regression with `atomic` middleware with async flows [#1250](https://github.com/mobxjs/mobx-state-tree/issues/1250).
+-   Added filter function to `recordActions` to filter out recording some actions. Also added `recording` and `resume` methods.
+-   Added `getRunningActionContext()` to get the currently executing MST action context (if any). Also added the action context helper functions `isActionContextChildOf()` and `isActionContextThisOrChildOf`.
+-   Reduced type nesting to avoid Typescript 3.4 errors about infinite types. Sadly due to this change `types.create` is no longer smart enough in TS to know if skipping the snapshot parameter is valid or not. Through [#1251](https://github.com/mobxjs/mobx-state-tree/pull/1251) by [@xaviergonz](https://github.com/xaviergonz).
 
 # 3.13.0
 
-- Fixed `Instance<typeof variable>` not giving the proper type in Typescript when the type included both objects and primitives.
-- Through PR [#1196](https://github.com/mobxjs/mobx-state-tree/pull/1196) by [@xaviergonz](https://github.com/xaviergonz)
-  - Added `createActionTrackerMiddleware2`, a more easy to use version of the first one, which makes creating middlewares for both sync and async actions more universal.
-  - Added an optional filter to `recordPatches` to be able to skip recording certain patches.
-  - `atomic` now uses the new `createActionTrackerMiddleware2`.
-  - `UndoManager` fixes and improvements:
-    - Uses the new `createActionTrackerMiddleware2`.
-    - Added `clearUndo` and `clearRedo` to only clear those.
-    - Added `undoLevels` and `redoLevels` to know how many undo/redo actions are available.
-    - Made undo manager actions atomic, so they won't actually do any partial changes if for some reason they fail.
-    - Fix for `withoutUndo` so it will only skip recording what is inside, not the whole action - fixes [#1195](https://github.com/mobxjs/mobx-state-tree/issues/1195).
+-   Fixed `Instance<typeof variable>` not giving the proper type in Typescript when the type included both objects and primitives.
+-   Through PR [#1196](https://github.com/mobxjs/mobx-state-tree/pull/1196) by [@xaviergonz](https://github.com/xaviergonz)
+    -   Added `createActionTrackerMiddleware2`, a more easy to use version of the first one, which makes creating middlewares for both sync and async actions more universal.
+    -   Added an optional filter to `recordPatches` to be able to skip recording certain patches.
+    -   `atomic` now uses the new `createActionTrackerMiddleware2`.
+    -   `UndoManager` fixes and improvements:
+        -   Uses the new `createActionTrackerMiddleware2`.
+        -   Added `clearUndo` and `clearRedo` to only clear those.
+        -   Added `undoLevels` and `redoLevels` to know how many undo/redo actions are available.
+        -   Made undo manager actions atomic, so they won't actually do any partial changes if for some reason they fail.
+        -   Fix for `withoutUndo` so it will only skip recording what is inside, not the whole action - fixes [#1195](https://github.com/mobxjs/mobx-state-tree/issues/1195).
 
 # 3.12.2
 

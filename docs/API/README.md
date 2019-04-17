@@ -3339,11 +3339,15 @@ ___
 
 ###  safeReference
 
-▸ **safeReference**<`IT`>(subType: *`IT`*, options?: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`>*): `IMaybe`<`IReferenceType`<`IT`>>
+▸ **safeReference**<`IT`>(subType: *`IT`*, options: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object`*): `IReferenceType`<`IT`>
+
+▸ **safeReference**<`IT`>(subType: *`IT`*, options?: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object`*): `IMaybe`<`IReferenceType`<`IT`>>
 
 `types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed.
 
-Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `onInvalidate` option.
+The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties. When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value, which is usually the desired in those cases.
+
+Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidate` option.
 
 **Type parameters:**
 
@@ -3353,7 +3357,25 @@ Strictly speaking it is a `types.maybe(types.reference(X))` with a customized `o
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | subType | `IT` |  \- |
-| `Optional` options | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> |  \- |
+| options | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object` |  \- |
+
+**Returns:** `IReferenceType`<`IT`>
+
+`types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed.
+
+The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties. When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value, which is usually the desired in those cases.
+
+Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidate` option.
+
+**Type parameters:**
+
+#### IT :  [IAnyComplexType](interfaces/ianycomplextype.md)
+**Parameters:**
+
+| Name | Type | Description |
+| ------ | ------ | ------ |
+| subType | `IT` |  \- |
+| `Optional` options | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object` |  \- |
 
 **Returns:** `IMaybe`<`IReferenceType`<`IT`>>
 

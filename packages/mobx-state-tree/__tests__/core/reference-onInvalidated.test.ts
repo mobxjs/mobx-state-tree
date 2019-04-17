@@ -384,3 +384,86 @@ test("#1115 - safe reference doesn't become invalidated when the reference has n
         }
     ])
 })
+
+describe("safeReference with acceptsUndefined: false", () => {
+    const MyRefModel = types.model("MyRefModel", {
+        id: types.identifier
+    })
+
+    const SafeRef = types.safeReference(MyRefModel, { acceptsUndefined: false })
+
+    it("removes invalidates items from map/array", () => {
+        const Store = types.model({
+            todos: types.array(MyRefModel),
+            arr: types.array(SafeRef),
+            map: types.map(SafeRef)
+        })
+
+        const store = Store.create({
+            todos: [{ id: "1" }, { id: "2" }],
+            arr: ["1", "2"],
+            map: {
+                a1: "1",
+                a2: "2"
+            }
+        })
+        unprotect(store)
+
+        // just to check TS is happy with this
+        const arr: Instance<typeof MyRefModel>[] = store.arr
+
+        store.todos.splice(0, 1)
+        expect(store.arr.length).toBe(1)
+        expect(store.map.size).toBe(1)
+    })
+
+    if (process.env.NODE_ENV !== "production") {
+        it("throws when a model property is invalidated", () => {
+            const Store = types.model({
+                todos: types.array(MyRefModel),
+                single: SafeRef
+            })
+
+            const store = Store.create({
+                todos: [{ id: "1" }, { id: "2" }],
+                single: "1"
+            })
+            unprotect(store)
+
+            expect(() => {
+                store.todos.splice(0, 1)
+            }).toThrow("value `undefined` is not assignable to type")
+        })
+
+        it("does not accept undefined in the array", () => {
+            const Store = types.model({
+                todos: types.array(MyRefModel),
+                arr: types.array(SafeRef)
+            })
+
+            expect(() =>
+                Store.create({
+                    todos: [{ id: "1" }, { id: "2" }],
+                    arr: ["1", undefined as any]
+                })
+            ).toThrow("value `undefined` is not assignable to type")
+        })
+
+        it("does not accept undefined in the map", () => {
+            const Store = types.model({
+                todos: types.array(MyRefModel),
+                map: types.map(SafeRef)
+            })
+
+            expect(() =>
+                Store.create({
+                    todos: [{ id: "1" }, { id: "2" }],
+                    map: {
+                        a1: "1",
+                        a2: undefined as any
+                    }
+                })
+            ).toThrow("value `undefined` is not assignable to type")
+        })
+    }
+})

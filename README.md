@@ -722,7 +722,10 @@ A default implementation of such `onInvalidated` hook is provided by the `types.
 -   If its parent is an array: Remove itself from the array
 -   If its parent is a map: Remove itself from the map
 
-Strictly speaking it is implemented as
+In addition to the options possible for a plain reference type, the optional options parameter object also accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties.
+When used inside collections (arrays/maps) it is recommended to set this option to false so it can't take undefined as value, which is usually the desired in those cases.
+
+Strictly speaking, `safeReference` with `acceptsUndefined` set to true (the default) is implemented as
 
 ```js
 types.maybe(
@@ -735,15 +738,28 @@ types.maybe(
 )
 ```
 
+and with `acceptsUndefined` set to false as
+
+```js
+types.reference(Type, {
+    ...customGetSetIfAvailable,
+    onInvalidated(ev) {
+        ev.removeRef()
+    }
+})
+```
+
 ```js
 const Todo = types.model({ id: types.identifier })
 const Store = types.model({
     todos: types.array(Todo),
-    selectedTodo: types.safeReference(Todo)
+    selectedTodo: types.safeReference(Todo),
+    multipleSelectedTodos: types.array(types.safeReference(Todo, { acceptsUndefined: false }))
 })
 
 // given selectedTodo points to a valid Todo and that Todo is later removed from the todos
-// array, then selectedTodo will automatically become undefined
+// array, then selectedTodo will automatically become undefined, and if it is included in multipleSelectedTodos
+// then it will be removed from the array
 ```
 
 ### Listening to observables, snapshots, patches or actions
@@ -1185,6 +1201,7 @@ See the [full API docs](docs/API/README.md) for more details.
 | [`getRunningActionContext()`](docs/API/README.md#getrunningactioncontext)                                             | Returns the currently executing MST action context, or undefined if none.                                                                                                                                                                             |
 | [`isActionContextChildOf(actionContext, parent)`](docs/API/README.md#isActionContextChildOf)                          | Returns if the given action context is a parent of this action context.                                                                                                                                                                               |
 | [`isActionContextThisOrChildOf(actionContext, parentOrSame)`](docs/API/README.md#isActionContextThisOrChildOf)        | Returns if the given action context is this or a parent of this action context.                                                                                                                                                                       |
+
 A _disposer_ is a function that cancels the effect for which it was created.
 
 # Tips
@@ -1686,20 +1703,24 @@ So far this might look a lot like an immutable state tree as found for example i
 Extensive pull requests are best discussed in an issue first.
 
 Setting up the environment:
+
 1.  Clone this repository
 2.  `yarn` is the package manager of choice (with workspaces support enabled). Make sure to run Node 8 or higher.
 3.  Run `yarn install` on the root.
 4.  Editor settings are optimized for VS Code, so just run `code .` in the root folder. Debugger settings are included in the project.
 
 For `mobx-state-tree`:
+
 1.  Go to `packages/mobx-state-tree` and run `yarn jest` to ensure all tests pass.
 2.  After updating jsdocs, better run `yarn build-docs` in `packages/mobx-state-tree` to regenerate them.
 
 For `mst-middlewares`:
+
 1.  Go to `packages/mst-middlewares` and run `yarn jest` to ensure all tests pass.
 2.  If your changes depend on a change in `packages/mobx-state-tree` you will need to run `yarn buld` there first!
 
 Once you think your PR is ready:
+
 1.  Run on the root `yarn build` to ensure it all builds.
 2.  Run on the root `yarn test` to ensure all tests pass.
 3.  Create the PR on GitHub.
