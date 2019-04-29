@@ -1016,3 +1016,21 @@ test("can extract type from complex objects", () => {
     type OriginalType = TypeOfValue<typeof t>
     const T2: OriginalType = T
 })
+
+test("#1268", () => {
+    const Book = types.model({
+        id: types.identifier
+    })
+
+    const BooksStore = types.model({
+        books: types.array(types.reference(Book))
+    })
+
+    const RootStore = types.model({
+        booksStore: BooksStore
+    })
+
+    const booksStore = BooksStore.create({ books: [] })
+
+    const rootStore = RootStore.create({ booksStore })
+})

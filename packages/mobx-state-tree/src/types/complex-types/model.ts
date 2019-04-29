@@ -136,10 +136,15 @@ type DefinablePropsNames<T> = {
 }[keyof T]
 
 /** @hidden */
+type PlainObject = { [n: number]: never } // an object that is not an array
+
+/** @hidden */
 export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
 
 /** @hidden */
-export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } & Partial<PC>
+export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } &
+    Partial<PC> &
+    PlainObject
 
 /** @hidden */
 export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOther<
@@ -148,7 +153,10 @@ export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOt
 >
 
 /** @hidden */
-export type ModelSnapshotType<P extends ModelProperties> = { [K in keyof P]: P[K]["SnapshotType"] }
+export type ModelSnapshotType<P extends ModelProperties> = {
+    [K in keyof P]: P[K]["SnapshotType"]
+} &
+    PlainObject
 
 /** @hidden */
 export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOther<
@@ -166,7 +174,9 @@ export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]
  * @hidden
  * do not transform this to an interface or model instance type generated declarations will be longer
  */
-export type ModelInstanceType<P extends ModelProperties, O> = ModelInstanceTypeProps<P> & O
+export type ModelInstanceType<P extends ModelProperties, O> = ModelInstanceTypeProps<P> &
+    O &
+    PlainObject
 
 /** @hidden */
 export interface ModelActions {
@@ -491,7 +501,6 @@ export class ModelType<
         Object.keys(views).forEach(key => {
             // is this a computed property?
             const descriptor = Object.getOwnPropertyDescriptor(views, key)!
-            const { value } = descriptor
             if ("get" in descriptor) {
                 if (isComputedProp(self, key)) {
                     const computedValue = _getAdministration(self, key)
@@ -508,10 +517,14 @@ export class ModelType<
                     // use internal api as shortcut
                     ;(computed as any)(self, key, descriptor, true)
                 }
-            } else if (typeof value === "function") {
+            } else if (typeof descriptor.value === "function") {
                 // this is a view function, merge as is!
                 // See #646, allow models to be mocked
-                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, key, value)
+                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
+                    self,
+                    key,
+                    descriptor.value
+                )
             } else {
                 throw fail(`A view member should either be a function or getter based property`)
             }

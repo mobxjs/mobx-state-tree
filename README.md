@@ -674,7 +674,7 @@ const s = Store.create({
 })
 ```
 
-#### Reference validation: `isValidReference`, `tryReference`, `onInvalidate` hook and `types.safeReference`
+#### Reference validation: `isValidReference`, `tryReference`, `onInvalidated` hook and `types.safeReference`
 
 Accessing an invalid reference (a reference to a dead/detached node) triggers an exception.
 

@@ -1,3 +1,4 @@
+-   Fix for empty models / models with all properties set to optional being able to take any value in TypeScript through []() by [@xaviergonz](https://github.com/xaviergonz).
 -   Added `acceptsUndefined` as option for `safeReference` so it is more suitable to be used inside arrays/maps, through [#1245](https://github.com/mobxjs/mobx-state-tree/pull/1245) by [@xaviergonz](https://github.com/xaviergonz).
 
 # 3.14.0

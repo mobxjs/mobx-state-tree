@@ -46,7 +46,7 @@ A type, either complex or simple.
 
 **● identifierAttribute**: *`undefined` \| `string`*
 
-Name of the dentifier attribute or null if none.
+Name of the identifier attribute or null if none.
 
 ___
 <a id="name"></a>
