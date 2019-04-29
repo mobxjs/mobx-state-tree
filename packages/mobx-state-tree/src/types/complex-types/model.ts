@@ -136,7 +136,7 @@ type DefinablePropsNames<T> = {
 }[keyof T]
 
 /** @hidden */
-type PlainObject = { [n: number]: never } // an object that is not an array
+type PlainObject = { [n: number]: never } & object // an object that is not an array
 
 /** @hidden */
 export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
