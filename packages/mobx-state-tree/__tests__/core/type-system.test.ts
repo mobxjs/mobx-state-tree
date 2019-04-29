@@ -1032,5 +1032,5 @@ test("#1268", () => {
 
     const booksStore = BooksStore.create({ books: [] })
 
-    const rootStore = RootStore.create({ booksStore })
+    const rootStore = RootStore.create({ booksStore: castToSnapshot(booksStore) })
 })

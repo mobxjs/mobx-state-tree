@@ -136,15 +136,24 @@ type DefinablePropsNames<T> = {
 }[keyof T]
 
 /** @hidden */
-type PlainObject = { [n: number]: never } & object // an object that is not an array
+declare const $emptyObject: unique symbol
+
+/** @hidden */
+export interface EmptyObject {
+    [$emptyObject]?: undefined
+}
 
 /** @hidden */
 export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
 
 /** @hidden */
-export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } &
-    Partial<PC> &
-    PlainObject
+export type KeylessToEmptyObject<O> = keyof O extends never ? EmptyObject : O
+
+/** @hidden */
+export type ModelCreationType<PC> = KeylessToEmptyObject<
+    { [P in DefinablePropsNames<PC>]: PC[P] }
+> &
+    KeylessToEmptyObject<Partial<PC>>
 
 /** @hidden */
 export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOther<
@@ -153,10 +162,9 @@ export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOt
 >
 
 /** @hidden */
-export type ModelSnapshotType<P extends ModelProperties> = {
-    [K in keyof P]: P[K]["SnapshotType"]
-} &
-    PlainObject
+export type ModelSnapshotType<P extends ModelProperties> = KeylessToEmptyObject<
+    { [K in keyof P]: P[K]["SnapshotType"] }
+>
 
 /** @hidden */
 export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOther<
@@ -168,15 +176,15 @@ export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOt
  * @hidden
  * we keep this separate from ModelInstanceType to shorten model instance types generated declarations
  */
-export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]: P[K]["Type"] }
+export type ModelInstanceTypeProps<P extends ModelProperties> = KeylessToEmptyObject<
+    { [K in keyof P]: P[K]["Type"] }
+>
 
 /**
  * @hidden
  * do not transform this to an interface or model instance type generated declarations will be longer
  */
-export type ModelInstanceType<P extends ModelProperties, O> = ModelInstanceTypeProps<P> &
-    O &
-    PlainObject
+export type ModelInstanceType<P extends ModelProperties, O> = ModelInstanceTypeProps<P> & O
 
 /** @hidden */
 export interface ModelActions {
@@ -676,7 +684,7 @@ export class ModelType<
         if (!(patch.op === "replace" || patch.op === "add")) {
             throw fail(`object does not support operation ${patch.op}`)
         }
-        node.storedValue[subpath] = patch.value
+        ;(node.storedValue as any)[subpath] = patch.value
     }
 
     @action
@@ -684,7 +692,7 @@ export class ModelType<
         const preProcessedSnapshot = this.applySnapshotPreProcessor(snapshot)
         typecheckInternal(this, preProcessedSnapshot)
         this.forAllProps(name => {
-            node.storedValue[name] = preProcessedSnapshot[name]
+            ;(node.storedValue as any)[name] = preProcessedSnapshot[name]
         })
     }
 
