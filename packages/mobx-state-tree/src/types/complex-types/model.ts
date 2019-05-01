@@ -95,18 +95,6 @@ export type ModelPropertiesDeclarationToProperties<
       }
 
 /**
- * Checks if a type is any or unknown
- * @hidden
- */
-type IsAnyOrUnknown<T> = unknown extends T ? true : never
-
-/**
- * Checks if a type is undefined
- * @hidden
- */
-type IsUndefined<T> = T extends undefined ? true : never
-
-/**
  * Checks if a value is optional (undefined, any or unknown).
  * @hidden
  *
@@ -114,16 +102,16 @@ type IsUndefined<T> = T extends undefined ? true : never
  * - string = never
  * - undefined = true
  * - string | undefined = true
- * - string & undefined = true
+ * - string & undefined = false, but we don't care
  * - any = true
  * - unknown = true
  */
-type IsOptionalValue<C> = IsUndefined<C> | IsAnyOrUnknown<C>
+type IsOptionalValue<C, TV, FV> = undefined extends C ? TV : FV
 
 // type _A = IsOptionalValue<string> // never
 // type _B = IsOptionalValue<undefined> // true
 // type _C = IsOptionalValue<string | undefined> // true
-// type _D = IsOptionalValue<string & undefined> // true
+// type _D = IsOptionalValue<string & undefined> // false, but we don't care
 // type _E = IsOptionalValue<any> // true
 // type _F = IsOptionalValue<unknown> // true
 
@@ -131,23 +119,21 @@ type IsOptionalValue<C> = IsUndefined<C> | IsAnyOrUnknown<C>
  * Name of the properties of an object that can't be set to undefined, any or unknown
  * @hidden
  */
-type DefinablePropsNames<T> = {
-    [K in keyof T]: IsOptionalValue<T[K]> extends never ? K : never
-}[keyof T]
+type DefinablePropsNames<T> = { [K in keyof T]: IsOptionalValue<T[K], never, K> }[keyof T]
 
 /** @hidden */
 declare const $emptyObject: unique symbol
 
 /** @hidden */
 export interface EmptyObject {
-    [$emptyObject]?: undefined
+    [$emptyObject]?: any
 }
 
 /** @hidden */
 export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
 
 /** @hidden */
-export type KeylessToEmptyObject<O> = keyof O extends never ? EmptyObject : O
+export type KeylessToEmptyObject<O> = O extends { [k: string]: never } ? EmptyObject : O
 
 /** @hidden */
 export type ModelCreationType<PC> = KeylessToEmptyObject<
