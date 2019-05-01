@@ -3339,15 +3339,15 @@ ___
 
 ###  safeReference
 
-▸ **safeReference**<`IT`>(subType: *`IT`*, options: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object`*): `IReferenceType`<`IT`>
+▸ **safeReference**<`IT`>(subType: *`IT`*, options: *`__type` \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object`*): `IReferenceType`<`IT`>
 
-▸ **safeReference**<`IT`>(subType: *`IT`*, options?: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object`*): `IMaybe`<`IReferenceType`<`IT`>>
+▸ **safeReference**<`IT`>(subType: *`IT`*, options?: *`__type` \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object`*): `IMaybe`<`IReferenceType`<`IT`>>
 
 `types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed.
 
 The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties. When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value, which is usually the desired in those cases.
 
-Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidate` option.
+Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidated` option.
 
 **Type parameters:**
 
@@ -3357,7 +3357,7 @@ Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefi
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | subType | `IT` |  \- |
-| options | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object` |  \- |
+| options | `__type` \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` |  \- |
 
 **Returns:** `IReferenceType`<`IT`>
 
@@ -3365,7 +3365,7 @@ Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefi
 
 The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties. When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value, which is usually the desired in those cases.
 
-Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidate` option.
+Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidated` option.
 
 **Type parameters:**
 
@@ -3375,7 +3375,7 @@ Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefi
 | Name | Type | Description |
 | ------ | ------ | ------ |
 | subType | `IT` |  \- |
-| `Optional` options | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` \| `object` |  \- |
+| `Optional` options | `__type` \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` |  \- |
 
 **Returns:** `IMaybe`<`IReferenceType`<`IT`>>
 

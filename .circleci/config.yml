@@ -3,7 +3,7 @@ version: 2.1
 executors:
     my-executor:
         docker:
-            - image: circleci/node:latest
+            - image: circleci/node:11
               environment:
                   CI: true
         working_directory: ~/mobx-state-tree
