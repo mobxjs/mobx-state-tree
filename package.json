@@ -1,42 +1,42 @@
 {
-    "private": true,
-    "dependencies": {},
-    "scripts": {
-        "clean": "lerna run clean --stream",
-        "build": "lerna run build --stream",
-        "test": "lerna run test --stream",
-        "test:mst:dev": "cd packages/mobx-state-tree && yarn test:dev",
-        "test:mst:prod": "cd packages/mobx-state-tree && yarn test:prod",
-        "test:mst:others": "cd packages/mobx-state-tree && yarn test:others",
-        "test:mst-middlewares:dev": "cd packages/mst-middlewares && yarn test:dev",
-        "test:mst-middlewares:prod": "cd packages/mst-middlewares && yarn test:prod",
-        "coverage": "lerna run coverage --stream",
-        "release": "yarn build && lerna publish",
-        "tag-new-version": "lerna version"
-    },
-    "workspaces": [
-        "packages/mobx-state-tree",
-        "packages/mst-middlewares"
-    ],
-    "lint-staged": {
-        "*.{ts,tsx,js,jsx}": [
-            "prettier --write",
-            "git add"
-        ]
-    },
-    "devDependencies": {
-        "cross-env": "^5.2.0",
-        "husky": "^2.0.0",
-        "lerna": "^3.13.1",
-        "lint-staged": "^8.1.5",
-        "prettier": "^1.16.4",
-        "tslint": "^5.14.0",
-        "tslint-config-prettier": "^1.18.0",
-        "typescript": "^3.3.3333"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
+  "private": true,
+  "dependencies": {},
+  "scripts": {
+    "clean": "lerna run clean --stream",
+    "build": "lerna run build --stream",
+    "test": "lerna run test --stream",
+    "test:mst:dev": "cd packages/mobx-state-tree && yarn test:dev",
+    "test:mst:prod": "cd packages/mobx-state-tree && yarn test:prod",
+    "test:mst:others": "cd packages/mobx-state-tree && yarn test:others",
+    "test:mst-middlewares:dev": "cd packages/mst-middlewares && yarn test:dev",
+    "test:mst-middlewares:prod": "cd packages/mst-middlewares && yarn test:prod",
+    "coverage": "lerna run coverage --stream",
+    "release": "yarn build && lerna publish",
+    "tag-new-version": "lerna version"
+  },
+  "workspaces": [
+    "packages/mobx-state-tree",
+    "packages/mst-middlewares"
+  ],
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "husky": "^2.1.0",
+    "lerna": "^3.13.1",
+    "lint-staged": "^8.1.5",
+    "prettier": "^1.16.4",
+    "tslint": "^5.14.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.3.3333"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
     }
+  }
 }
