@@ -95,45 +95,31 @@ export type ModelPropertiesDeclarationToProperties<
       }
 
 /**
- * Checks if a type is any or unknown
- * @hidden
- */
-type IsAnyOrUnknown<T> = unknown extends T ? true : never
-
-/**
- * Checks if a type is undefined
- * @hidden
- */
-type IsUndefined<T> = T extends undefined ? true : never
-
-/**
  * Checks if a value is optional (undefined, any or unknown).
  * @hidden
  *
  * Examples:
- * - string = never
+ * - string = false
  * - undefined = true
  * - string | undefined = true
- * - string & undefined = true
+ * - string & undefined = false, but we don't care
  * - any = true
  * - unknown = true
  */
-type IsOptionalValue<C> = IsUndefined<C> | IsAnyOrUnknown<C>
+type IsOptionalValue<C, TV, FV> = undefined extends C ? TV : FV
 
-// type _A = IsOptionalValue<string> // never
-// type _B = IsOptionalValue<undefined> // true
-// type _C = IsOptionalValue<string | undefined> // true
-// type _D = IsOptionalValue<string & undefined> // true
-// type _E = IsOptionalValue<any> // true
-// type _F = IsOptionalValue<unknown> // true
+// type _A = IsOptionalValue<string, true, false> // false
+// type _B = IsOptionalValue<undefined, true, false> // true
+// type _C = IsOptionalValue<string | undefined, true, false> // true
+// type _D = IsOptionalValue<string & undefined, true, false> // false, but we don't care
+// type _E = IsOptionalValue<any, true, false> // true
+// type _F = IsOptionalValue<unknown, true, false> // true
 
 /**
  * Name of the properties of an object that can't be set to undefined, any or unknown
  * @hidden
  */
-type DefinablePropsNames<T> = {
-    [K in keyof T]: IsOptionalValue<T[K]> extends never ? K : never
-}[keyof T]
+type DefinablePropsNames<T> = { [K in keyof T]: IsOptionalValue<T[K], never, K> }[keyof T]
 
 /** @hidden */
 export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
@@ -491,7 +477,6 @@ export class ModelType<
         Object.keys(views).forEach(key => {
             // is this a computed property?
             const descriptor = Object.getOwnPropertyDescriptor(views, key)!
-            const { value } = descriptor
             if ("get" in descriptor) {
                 if (isComputedProp(self, key)) {
                     const computedValue = _getAdministration(self, key)
@@ -508,10 +493,14 @@ export class ModelType<
                     // use internal api as shortcut
                     ;(computed as any)(self, key, descriptor, true)
                 }
-            } else if (typeof value === "function") {
+            } else if (typeof descriptor.value === "function") {
                 // this is a view function, merge as is!
                 // See #646, allow models to be mocked
-                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, key, value)
+                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
+                    self,
+                    key,
+                    descriptor.value
+                )
             } else {
                 throw fail(`A view member should either be a function or getter based property`)
             }

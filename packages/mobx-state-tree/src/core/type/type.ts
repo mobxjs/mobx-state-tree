@@ -82,7 +82,7 @@ export interface IType<C, S, T> {
     name: string
 
     /**
-     * Name of the dentifier attribute or null if none.
+     * Name of the identifier attribute or null if none.
      */
     readonly identifierAttribute?: string
 

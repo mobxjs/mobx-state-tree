@@ -34,7 +34,7 @@ Any kind of complex type.
 
 **● identifierAttribute**: *`undefined` \| `string`*
 
-Name of the dentifier attribute or null if none.
+Name of the identifier attribute or null if none.
 
 ___
 <a id="name"></a>

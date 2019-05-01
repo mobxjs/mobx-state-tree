@@ -557,7 +557,7 @@ export function safeReference<IT extends IAnyComplexType>(
  * which is usually the desired in those cases.
  *
  * Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and
- * `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidate` option.
+ * `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidated` option.
  *
  * @param subType
  * @param options

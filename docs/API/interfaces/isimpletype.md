@@ -36,7 +36,7 @@ A simple type, this is, a type where the instance and the snapshot representatio
 
 **● identifierAttribute**: *`undefined` \| `string`*
 
-Name of the dentifier attribute or null if none.
+Name of the identifier attribute or null if none.
 
 ___
 <a id="name"></a>
