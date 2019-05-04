@@ -8,7 +8,8 @@ import {
     OnReferenceInvalidatedEvent,
     getSnapshot,
     applySnapshot,
-    clone
+    clone,
+    destroy
 } from "../../src"
 
 const Todo = types.model({ id: types.identifier })
@@ -466,4 +467,24 @@ describe("safeReference with acceptsUndefined: false", () => {
             ).toThrow("value `undefined` is not assignable to type")
         })
     }
+})
+
+test("#1275 - removing an object from a map should result in the snapshot of references being modified", () => {
+    const Item = types.model({
+        id: types.identifier
+    })
+
+    const Root = types.model({
+        items: types.map(Item),
+        refs: types.array(types.safeReference(Item))
+    })
+
+    const thing = Root.create({
+        items: { aa: { id: "a" }, bb: { id: "b" }, cc: { id: "c" } },
+        refs: ["a", "b", "c"]
+    })
+    unprotect(thing)
+
+    destroy(thing.items.get("bb")!)
+    expect(getSnapshot(thing.refs)).toEqual(["a", "c"])
 })
