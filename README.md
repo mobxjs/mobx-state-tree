@@ -1357,7 +1357,7 @@ MST doesn't offer an any type because it can't reason about it. For example, giv
 -   If no identifier is specified, but the type of the snapshot is correct, MST will reconcile objects as well if they are stored in a specific model property or under the same map key.
 -   In arrays, items without an identifier are never reconciled.
 
-If an object is reconciled, the consequence is that localState is preserved and `postCreate` / `attach` life-cycle hooks are not fired because applying a snapshot results just in an existing tree node being updated.
+If an object is reconciled, the consequence is that localState is preserved and `afterCreate` / `attach` life-cycle hooks are not fired because applying a snapshot results just in an existing tree node being updated.
 
 ### Creating async flows
 
