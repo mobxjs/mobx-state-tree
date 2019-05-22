@@ -80,7 +80,13 @@ function getActionContextNameAndTypePath(actionContext: ActionContext, logArgsNe
     let targetTypePath = actionContext.targetTypePath
 
     if (logArgsNearName) {
-        let args = actionContext.callArgs.map(a => JSON.stringify(a)).join(", ")
+        let args = actionContext.callArgs.map(a => {
+            try {
+                return JSON.stringify(a);
+            } catch (e) {
+                // Seems it may be a browser event?
+            }
+        }).join(", ")
 
         if (args.length > 64) {
             args = args.slice(0, 64) + "..."
