@@ -84,7 +84,12 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         const processedInitialValue = isStateTreeNode(initialValue)
             ? initialValue
             : this.preProcessSnapshot(initialValue)
-        const node = this._subtype.instantiate(parent, subpath, environment, processedInitialValue)
+        const node = this._subtype.instantiate(
+            parent,
+            subpath,
+            environment,
+            processedInitialValue
+        ) as any
         this._fixNode(node)
         return node
     }
@@ -100,7 +105,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
             isStateTreeNode(newValue) ? newValue : this.preProcessSnapshot(newValue),
             parent,
             subpath
-        )
+        ) as any
         if (node !== current) {
             this._fixNode(node)
         }

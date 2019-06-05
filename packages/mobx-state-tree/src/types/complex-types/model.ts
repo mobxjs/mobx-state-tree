@@ -652,7 +652,7 @@ export class ModelType<
         if (!(patch.op === "replace" || patch.op === "add")) {
             throw fail(`object does not support operation ${patch.op}`)
         }
-        node.storedValue[subpath] = patch.value
+        ;(node.storedValue as any)[subpath] = patch.value
     }
 
     @action
@@ -660,7 +660,7 @@ export class ModelType<
         const preProcessedSnapshot = this.applySnapshotPreProcessor(snapshot)
         typecheckInternal(this, preProcessedSnapshot)
         this.forAllProps(name => {
-            node.storedValue[name] = preProcessedSnapshot[name]
+            ;(node.storedValue as any)[name] = preProcessedSnapshot[name]
         })
     }
 

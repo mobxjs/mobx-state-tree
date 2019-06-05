@@ -343,7 +343,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     getSnapshot(node: this["N"]): this["S"] {
-        const res: this["S"] = {}
+        const res: any = {}
         node.getChildren().forEach(childNode => {
             res[childNode.subpath] = childNode.snapshot
         })
@@ -351,7 +351,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
-        const processed: this["S"] = {}
+        const processed: any = {}
         Object.keys(childNodes).forEach(key => {
             processed[key] = childNodes[key].getSnapshot()
         })

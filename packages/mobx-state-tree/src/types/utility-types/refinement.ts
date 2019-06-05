@@ -47,7 +47,7 @@ class Refinement<IT extends IAnyType> extends BaseType<
         initialValue: this["C"] | this["T"]
     ): this["N"] {
         // create the child type
-        return this._subtype.instantiate(parent, subpath, environment, initialValue)
+        return this._subtype.instantiate(parent, subpath, environment, initialValue) as any
     }
 
     isAssignableFrom(type: IAnyType) {
@@ -73,7 +73,7 @@ class Refinement<IT extends IAnyType> extends BaseType<
         parent: AnyObjectNode,
         subpath: string
     ): this["N"] {
-        return this._subtype.reconcile(current, newValue, parent, subpath)
+        return this._subtype.reconcile(current, newValue, parent, subpath) as any
     }
 
     getSubTypes() {
