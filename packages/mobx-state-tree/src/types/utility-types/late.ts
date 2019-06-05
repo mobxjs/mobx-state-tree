@@ -63,7 +63,7 @@ class Late<IT extends IAnyType> extends BaseType<
         environment: any,
         initialValue: this["C"] | this["T"]
     ): this["N"] {
-        return this.getSubType(true).instantiate(parent, subpath, environment, initialValue)
+        return this.getSubType(true).instantiate(parent, subpath, environment, initialValue) as any
     }
 
     reconcile(
@@ -72,7 +72,7 @@ class Late<IT extends IAnyType> extends BaseType<
         parent: AnyObjectNode,
         subpath: string
     ): this["N"] {
-        return this.getSubType(true).reconcile(current, newValue, parent, subpath)
+        return this.getSubType(true).reconcile(current, newValue, parent, subpath) as any
     }
 
     describe() {

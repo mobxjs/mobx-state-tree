@@ -1,4 +1,4 @@
-import { types, getEnv, getParent, getPath, cast } from "../../src"
+import { types, getEnv, getParent, getPath, cast, Instance } from "../../src"
 
 const ChildModel = types
     .model("Child", {
@@ -8,7 +8,7 @@ const ChildModel = types
     })
     .views(self => {
         return {
-            get parent() {
+            get parent(): IParentModelInstance {
                 return getParent<typeof ParentModel>(self)
             }
         }
@@ -22,6 +22,7 @@ const ChildModel = types
             self.parentPropertyIsNullAfterAttach = typeof self.parent.fetch === "undefined"
         }
     }))
+
 const ParentModel = types
     .model("Parent", {
         child: types.optional(ChildModel, {})
@@ -31,6 +32,8 @@ const ParentModel = types
             return getEnv(self).fetch
         }
     }))
+
+interface IParentModelInstance extends Instance<typeof ParentModel> {}
 
 // NOTE: parents are now always created before children;
 // moreover, we do not actually have actions hash during object-node creation
