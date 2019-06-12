@@ -574,7 +574,7 @@ export class ModelType<
         const change = chg as IObjectWillChange & { newValue?: any }
 
         const node = getStateTreeNode(change.object)
-        const subpath = change.name
+        const subpath = change.name as string
         node.assertWritable({ subpath })
         const childType = (node.type as this).properties[subpath]
         // only properties are typed, state are stored as-is references
@@ -595,7 +595,7 @@ export class ModelType<
         const change = chg as IObjectWillChange & { newValue?: any; oldValue?: any }
 
         const childNode = getStateTreeNode(change.object)
-        const childType = (childNode.type as this).properties[change.name]
+        const childType = (childNode.type as this).properties[change.name as string]
         if (!childType) {
             // don't emit patches for volatile state
             return
@@ -604,7 +604,7 @@ export class ModelType<
         childNode.emitPatch(
             {
                 op: "replace",
-                path: escapeJsonPath(change.name),
+                path: escapeJsonPath(change.name as string),
                 value: change.newValue.snapshot,
                 oldValue: oldChildValue
             },
