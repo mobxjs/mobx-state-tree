@@ -5,7 +5,7 @@
     "devDependencies": {
         "enzyme": "^3.9.0",
         "react-addons-test-utils": "^15.6.2",
-        "react-scripts": "^2.1.8",
+        "react-scripts": "^3.0.1",
         "react-test-renderer": "^16.8.4"
     },
     "dependencies": {
@@ -15,7 +15,7 @@
         "mst-middlewares": "^3.11.0",
         "react": "^16.8.4",
         "react-dom": "^16.8.4",
-        "react-redux": "^6.0.1",
+        "react-redux": "^7.1.0",
         "redux": "^4.0.1",
         "remotedev": "^0.2.9",
         "todomvc-app-css": "^2.2.0"
