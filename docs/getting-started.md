@@ -588,8 +588,8 @@ const Todo = types
         },
         setUser(user) {
             if (user === "") {
-                // When selected value is empty, set as null
-                self.user = null
+                // When selected value is empty, set as undefined
+                self.user = undefined
             } else {
                 self.user = user
             }
