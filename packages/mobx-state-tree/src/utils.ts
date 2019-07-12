@@ -1,4 +1,4 @@
-import { isObservableArray, $mobx, getAtom, _getGlobalState } from "mobx"
+import { isObservableArray, $mobx, getAtom } from "mobx"
 import { Primitives } from "./core/type/type"
 
 /**
@@ -397,7 +397,7 @@ export function warnError(msg: string) {
  * @hidden
  */
 export function devMode() {
-    return process.env.NODE_ENV !== "production" || _getGlobalState().enableTypeCheck
+    return process.env.NODE_ENV !== "production" || process.env.SHOW_ERROR !== "development"
 }
 
 /**
