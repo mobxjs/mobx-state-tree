@@ -397,7 +397,7 @@ export function warnError(msg: string) {
  * @hidden
  */
 export function devMode() {
-    return process.env.NODE_ENV !== "production" || process.env.SHOW_ERROR !== "development"
+    return process.env.NODE_ENV !== "production" || process.env.RUN_TYPE_CHECK === "true"
 }
 
 /**
