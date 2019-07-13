@@ -12,7 +12,9 @@ import {
     IType,
     isStateTreeNode,
     isFrozenType,
-    TypeOfValue
+    TypeOfValue,
+    IAnyType,
+    ModelPrimitive
 } from "../../src"
 
 const createTestFactories = () => {
@@ -1023,4 +1025,23 @@ test("#1307 optional can be omitted in .create", () => {
 
     const Model2 = types.model({ name: "" })
     const model2 = Model2.create({})
+})
+
+test("#1307 custom types failing", () => {
+    const createCustomType = <ICustomType extends ModelPrimitive | IAnyType>({
+        CustomType
+    }: {
+        CustomType: ICustomType
+    }) => {
+        return types
+            .model("Example", {
+                someProp: types.boolean
+                // someType: CustomType
+            })
+            .views(self => ({
+                get isSomePropTrue(): boolean {
+                    return self.someProp
+                }
+            }))
+    }
 })
