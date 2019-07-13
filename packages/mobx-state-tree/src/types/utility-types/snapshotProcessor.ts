@@ -9,6 +9,7 @@ import {
     TypeFlags,
     ExtractNodeType,
     assertIsType,
+    isType,
     devMode
 } from "../../internal"
 
@@ -124,6 +125,14 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     getSubTypes() {
         return this._subtype
+    }
+
+    is(thing: any): thing is any {
+        return (
+            this._subtype.validate(isType(thing) ? this._subtype : this.preProcessSnapshot(thing), [
+                { path: "", type: this._subtype }
+            ]).length === 0
+        )
     }
 }
 

@@ -488,4 +488,22 @@ describe("snapshotProcessor", () => {
             m1: { m2: { x: 0 } }
         })
     })
+
+    test("works with IType.is", () => {
+        const Model = types.model({ x: types.number })
+        const model = Model.create({ x: 1 })
+        expect(Model.is(model)).toBe(true)
+        expect(Model.is({ x: 1 })).toBe(true)
+
+        const ProcessedModel = types.snapshotProcessor(Model, {
+            preProcessor(sn: { x: string }) {
+                return { ...sn, x: Number(sn.x) }
+            }
+        })
+
+        const processedModel = ProcessedModel.create({ x: "1" })
+        expect(ProcessedModel.is(processedModel)).toBe(true)
+        expect(ProcessedModel.is({ x: "1" })).toBe(true)
+        expect(ProcessedModel.is(Model)).toBe(false)
+    })
 })
