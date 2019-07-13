@@ -65,7 +65,7 @@
         "tslint": "^5.14.0",
         "typedoc": "^0.14.2",
         "typedoc-plugin-markdown": "^1.1.27",
-        "typescript": "^3.3.3333"
+        "typescript": "^3.5.3"
     },
     "peerDependencies": {
         "mobx": ">=4.8.0 <5.0.0 || >=5.8.0 <6.0.0"
