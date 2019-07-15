@@ -1439,7 +1439,8 @@ type ITodoSnapshotOut = SnapshotOut<typeof Todo> // => { title: string }
 ```
 
 Due to the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes a lot of CPU time and freeze vscode (or others).
-A partial solution for this is to turn the types into interfaces.
+A solution for this is to turn the types into interfaces. 
+This way of defining types enables TypeScript to better cope with circular type definitions as well.
 
 ```ts
 interface ITodo extends Instance<typeof Todo> {}
