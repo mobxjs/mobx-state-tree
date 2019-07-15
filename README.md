@@ -1384,9 +1384,30 @@ Yes, with MST it is pretty straight forward to setup hot reloading for your stor
 ### TypeScript and MST
 
 TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 3.0 or later with `noImplicitThis` and `strictNullChecks` enabled.
-Actually, the more strict options that are enabled, the better the type system will behave.
+Actually, the more strict options that are enabled, the better the type system will behave. 
 
-We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occasionally you will need to fallback to `any` or manually adding type annotations.
+#### Recommend compiler flags
+
+The recommended compiler flags (against which all our tests are written) are:
+
+```json
+{
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true
+}
+```
+
+Or shorter by leveraging `strict`:
+
+```json
+{
+  "strict": true,
+  "noImplicitReturns": true
+}
+```
 
 Flow is not supported.
 
@@ -1424,7 +1445,8 @@ type ITodoSnapshotOut = SnapshotOut<typeof Todo> // => { title: string }
 ```
 
 Due to the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes a lot of CPU time and freeze vscode (or others).
-A partial solution for this is to turn the types into interfaces.
+A solution for this is to turn the types into interfaces. 
+This way of defining types enables TypeScript to better cope with circular type definitions as well.
 
 ```ts
 interface ITodo extends Instance<typeof Todo> {}

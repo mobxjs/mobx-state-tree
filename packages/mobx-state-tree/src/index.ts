@@ -12,6 +12,7 @@ export {
     IArrayType,
     IType,
     IAnyType,
+    ModelPrimitive,
     ISimpleType,
     IComplexType,
     IAnyComplexType,
