@@ -391,13 +391,20 @@ deprecated.ids = {}
 export function warnError(msg: string) {
     console.warn(new Error(`[mobx-state-tree] ${msg}`))
 }
+/**
+ * @internal
+ * @hidden
+ */
+export function enableTypeCheck() {
+    return process.env.ENABLE_TYPE_CHECK === "true" || devMode()
+}
 
 /**
  * @internal
  * @hidden
  */
 export function devMode() {
-    return process.env.NODE_ENV !== "production" || process.env.RUN_TYPE_CHECK === "true"
+    return process.env.NODE_ENV !== "production"
 }
 
 /**
