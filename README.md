@@ -1392,16 +1392,22 @@ The recommended compiler flags (against which all our tests are written) are:
 
 ```json
 {
-    "strict": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "noImplicitAny": true,
-    "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitThis": true
 }
 ```
 
+Or shorter by leveraging `strict`:
+
+```json
+{
+  "strict": true,
+  "noImplicitReturns": true
+}
+```
 
 Flow is not supported.
 
