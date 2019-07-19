@@ -7,6 +7,7 @@ import {
     isPrimitiveType,
     IAnyType,
     ExtractCSTWithSTN,
+    enableTypeCheck,
     devMode
 } from "../../internal"
 
@@ -148,8 +149,8 @@ export function typecheckInternal<IT extends IAnyType>(
     type: IAnyType,
     value: ExtractCSTWithSTN<IT>
 ): void {
-    // if not in dev-mode, do not even try to run typecheck. Everything is developer fault!
-    if (devMode()) {
+    // runs typeChecking if it is in dev-mode or through a process.env.ENABLE_TYPE_CHECK flag
+    if (enableTypeCheck()) {
         typecheck(type, value)
     }
 }
