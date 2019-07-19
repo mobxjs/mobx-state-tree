@@ -395,8 +395,11 @@ export function warnError(msg: string) {
  * @internal
  * @hidden
  */
-export function enableTypeCheck() {
-    return process.env.ENABLE_TYPE_CHECK === "true" || devMode()
+export function isTypeCheckingEnabled() {
+    return (
+        devMode() ||
+        (typeof process !== "undefined" && process.env && process.env.ENABLE_TYPE_CHECK === "true")
+    )
 }
 
 /**

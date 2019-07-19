@@ -7,7 +7,7 @@ import {
     isPrimitiveType,
     IAnyType,
     ExtractCSTWithSTN,
-    enableTypeCheck,
+    isTypeCheckingEnabled,
     devMode
 } from "../../internal"
 
@@ -150,7 +150,7 @@ export function typecheckInternal<IT extends IAnyType>(
     value: ExtractCSTWithSTN<IT>
 ): void {
     // runs typeChecking if it is in dev-mode or through a process.env.ENABLE_TYPE_CHECK flag
-    if (enableTypeCheck()) {
+    if (isTypeCheckingEnabled()) {
         typecheck(type, value)
     }
 }
