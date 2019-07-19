@@ -14,7 +14,8 @@ import {
     isFrozenType,
     TypeOfValue,
     IAnyType,
-    ModelPrimitive
+    ModelPrimitive,
+    ModelPropertiesDeclaration
 } from "../../src"
 
 const createTestFactories = () => {
@@ -1041,6 +1042,28 @@ test("#1307 custom types failing", () => {
             .views(self => ({
                 get isSomePropTrue(): boolean {
                     return self.someProp
+                }
+            }))
+    }
+})
+
+test("#1343", () => {
+    function createTypeA<T extends ModelPropertiesDeclaration>(t: T) {
+        return types.model("TypeA", t).views(self => ({
+            get someView() {
+                return null
+            }
+        }))
+    }
+
+    function createTypeB<T extends ModelPropertiesDeclaration>(t: T) {
+        return types
+            .model("TypeB", {
+                a: createTypeA(t)
+            })
+            .views(self => ({
+                get someViewFromA() {
+                    return self.a.someView
                 }
             }))
     }
