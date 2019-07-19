@@ -1,3 +1,8 @@
+# 3.14.1
+
+-   Made it possible to force full run-time type-checking (for better error messages) in production builds by setting `ENABLE_TYPE_CHECK=true` as environment variable. Fixes [#1332](https://github.com/mobxjs/mobx-state-tree/pull/1332) through [#1337](https://github.com/mobxjs/mobx-state-tree/pull/1337) by [@OverseePublic](https://github.com/OverseePublic)
+-   Fixed an issue where `Type.is` doesn't behave correctly for types that has snapshot processors. Fixes [#1321](https://github.com/mobxjs/mobx-state-tree/issues/1321) through [#1323](https://github.com/mobxjs/mobx-state-tree/pull/1323) by [@Tucker-Eric](https://github.com/Tucker-Eric)
+-   Changed the implementation of the internal `STNValue` type, to fix TS 3.5.3 compatibility. If somebody notices regressions in the TypeScript integration, please report. Fixes [#1343](https://github.com/mobxjs/mobx-state-tree/issues/1343), [#1307](https://github.com/mobxjs/mobx-state-tree/issues/1307)
 -   Added `acceptsUndefined` as option for `safeReference` so it is more suitable to be used inside arrays/maps, through [#1245](https://github.com/mobxjs/mobx-state-tree/pull/1245) by [@xaviergonz](https://github.com/xaviergonz).
 
 # 3.14.0
