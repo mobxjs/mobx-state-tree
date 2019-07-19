@@ -1,3 +1,5 @@
+import { assert, _ } from "spec.ts"
+
 import {
     types,
     getSnapshot,
@@ -15,7 +17,8 @@ import {
     TypeOfValue,
     IAnyType,
     ModelPrimitive,
-    ModelPropertiesDeclaration
+    ModelPropertiesDeclaration,
+    SnapshotOut
 } from "../../src"
 
 const createTestFactories = () => {
@@ -1067,4 +1070,76 @@ test("#1343", () => {
                 }
             }))
     }
+})
+
+test("#1330", () => {
+    const ChildStore = types
+        .model("ChildStore", {
+            foo: types.string,
+            bar: types.boolean
+        })
+        .views(self => ({
+            get root(): IRootStore {
+                return getRoot<IRootStore>(self)
+            }
+        }))
+        .actions(self => ({
+            test() {
+                const { childStore } = self.root
+                // childStore and childStore.foo is properly inferred in TS 3.4 but not in 3.5
+                console.log(childStore.foo)
+            }
+        }))
+
+    interface IRootStore extends Instance<typeof RootStore> {}
+
+    const RootStore = types.model("RootStore", {
+        childStore: ChildStore,
+        test: ""
+    })
+
+    assert(
+        RootStore.create({
+            childStore: {
+                foo: "a",
+                bar: true
+            }
+        }).childStore.root.test,
+        _ as string
+    )
+})
+
+test("maybe / optional type inference verification", () => {
+    const T = types.model({
+        a: types.string,
+        b: "test",
+        c: types.maybe(types.string),
+        d: types.maybeNull(types.string),
+        e: types.optional(types.string, "test")
+    })
+
+    interface ITC extends SnapshotIn<typeof T> {}
+    interface ITS extends SnapshotOut<typeof T> {}
+
+    assert(
+        _ as ITC,
+        _ as {
+            a: string
+            b?: string
+            c?: string | undefined
+            d?: string | null
+            e?: string
+        }
+    )
+
+    assert(
+        _ as ITS,
+        _ as {
+            a: string
+            b: string
+            c: string | undefined
+            d: string | null
+            e: string
+        }
+    )
 })
