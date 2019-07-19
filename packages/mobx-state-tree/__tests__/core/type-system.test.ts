@@ -1035,8 +1035,8 @@ test("#1307 custom types failing", () => {
     }) => {
         return types
             .model("Example", {
-                someProp: types.boolean
-                // someType: CustomType
+                someProp: types.boolean,
+                someType: CustomType
             })
             .views(self => ({
                 get isSomePropTrue(): boolean {
