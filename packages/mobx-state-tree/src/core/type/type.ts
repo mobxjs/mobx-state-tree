@@ -61,9 +61,7 @@ export const cannotDetermineSubtype = "cannotDetermine"
 /**
  * @hidden
  */
-export type STNValue<T, IT extends IAnyType> =
-    | (Extract<T, object> & IStateTreeNode<IT>) // add STN to the object (which will be never if not an object)
-    | Exclude<T, object> // plus then the primitives if any
+export type STNValue<T, IT extends IAnyType> = T extends object ? T & IStateTreeNode<IT> : T
 
 /** @hidden */
 declare const $type: unique symbol
