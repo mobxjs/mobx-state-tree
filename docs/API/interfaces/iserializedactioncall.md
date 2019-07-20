@@ -1,42 +1,35 @@
-[mobx-state-tree](../README.md) > [ISerializedActionCall](../interfaces/iserializedactioncall.md)
+> **[mobx-state-tree](../README.md)**
+
+[ISerializedActionCall](iserializedactioncall.md) /
 
 # Interface: ISerializedActionCall
 
 ## Hierarchy
 
-**ISerializedActionCall**
+* **ISerializedActionCall**
 
 ## Index
 
 ### Properties
 
-* [args](iserializedactioncall.md#args)
+* [args](iserializedactioncall.md#optional-args)
 * [name](iserializedactioncall.md#name)
-* [path](iserializedactioncall.md#path)
-
----
+* [path](iserializedactioncall.md#optional-path)
 
 ## Properties
 
-<a id="args"></a>
+### `Optional` args
 
-### `<Optional>` args
-
-**● args**: *`any`[]*
+• **args**? : *any[]*
 
 ___
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
-
-___
-<a id="path"></a>
-
-### `<Optional>` path
-
-**● path**: *`undefined` \| `string`*
+• **name**: *string*
 
 ___
 
+### `Optional` path
+
+• **path**? : *undefined | string*

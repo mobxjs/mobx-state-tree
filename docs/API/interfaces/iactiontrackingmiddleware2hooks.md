@@ -1,67 +1,60 @@
-[mobx-state-tree](../README.md) > [IActionTrackingMiddleware2Hooks](../interfaces/iactiontrackingmiddleware2hooks.md)
+> **[mobx-state-tree](../README.md)**
 
-# Interface: IActionTrackingMiddleware2Hooks
+[IActionTrackingMiddleware2Hooks](iactiontrackingmiddleware2hooks.md) /
+
+# Interface: IActionTrackingMiddleware2Hooks <**TEnv**>
 
 ## Type parameters
-#### TEnv 
+
+▪ **TEnv**
+
 ## Hierarchy
 
-**IActionTrackingMiddleware2Hooks**
+* **IActionTrackingMiddleware2Hooks**
 
 ## Index
 
 ### Properties
 
-* [filter](iactiontrackingmiddleware2hooks.md#filter)
+* [filter](iactiontrackingmiddleware2hooks.md#optional-filter)
 * [onFinish](iactiontrackingmiddleware2hooks.md#onfinish)
 * [onStart](iactiontrackingmiddleware2hooks.md#onstart)
 
----
-
 ## Properties
 
-<a id="filter"></a>
+### `Optional` filter
 
-### `<Optional>` filter
-
-**● filter**: *`undefined` \| `function`*
+• **filter**? : *undefined | function*
 
 ___
-<a id="onfinish"></a>
 
 ###  onFinish
 
-**● onFinish**: *`function`*
+• **onFinish**: *function*
 
-#### Type declaration
-▸(call: *[IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)<`TEnv`>*, error?: *`any`*): `void`
+#### Type declaration:
+
+▸ (`call`: [IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)‹*`TEnv`*›, `error?`: any): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| call | [IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)<`TEnv`> |
-| `Optional` error | `any` |
-
-**Returns:** `void`
+Name | Type |
+------ | ------ |
+`call` | [IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)‹*`TEnv`*› |
+`error?` | any |
 
 ___
-<a id="onstart"></a>
 
 ###  onStart
 
-**● onStart**: *`function`*
+• **onStart**: *function*
 
-#### Type declaration
-▸(call: *[IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)<`TEnv`>*): `void`
+#### Type declaration:
+
+▸ (`call`: [IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)‹*`TEnv`*›): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| call | [IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)<`TEnv`> |
-
-**Returns:** `void`
-
-___
-
+Name | Type |
+------ | ------ |
+`call` | [IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)‹*`TEnv`*› |

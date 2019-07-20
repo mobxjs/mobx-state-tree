@@ -2,8 +2,7 @@
 
 _This reference guide lists all methods exposed by MST. Contributions like linguistic improvements, adding more details to the descriptions or additional examples are highly appreciated! Please note that the docs are generated from source. Most methods are declared in the [mst-operations.ts](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mobx-state-tree/src/core/mst-operations.ts) file._
 
-
-#  mobx-state-tree
+> **[mobx-state-tree](README.md)**
 
 ## Index
 
@@ -38,302 +37,296 @@ _This reference guide lists all methods exposed by MST. Contributions like lingu
 
 ### Type aliases
 
-* [IDisposer](#idisposer)
-* [IMiddlewareEventType](#imiddlewareeventtype)
-* [IMiddlewareHandler](#imiddlewarehandler)
-* [ITypeDispatcher](#itypedispatcher)
-* [IValidationContext](#ivalidationcontext)
-* [IValidationResult](#ivalidationresult)
-* [Instance](#instance)
-* [LivelinessMode](#livelinessmode)
-* [OnReferenceInvalidated](#onreferenceinvalidated)
-* [OnReferenceInvalidatedEvent](#onreferenceinvalidatedevent)
-* [ReferenceIdentifier](#referenceidentifier)
-* [ReferenceOptions](#referenceoptions)
-* [SnapshotIn](#snapshotin)
-* [SnapshotOrInstance](#snapshotorinstance)
-* [SnapshotOut](#snapshotout)
+* [IDisposer](README.md#idisposer)
+* [IMiddlewareEventType](README.md#imiddlewareeventtype)
+* [IMiddlewareHandler](README.md#imiddlewarehandler)
+* [ITypeDispatcher](README.md#itypedispatcher)
+* [IValidationContext](README.md#ivalidationcontext)
+* [IValidationResult](README.md#ivalidationresult)
+* [Instance](README.md#instance)
+* [LivelinessMode](README.md#livelinessmode)
+* [OnReferenceInvalidated](README.md#onreferenceinvalidated)
+* [OnReferenceInvalidatedEvent](README.md#onreferenceinvalidatedevent)
+* [ReferenceIdentifier](README.md#referenceidentifier)
+* [ReferenceOptions](README.md#referenceoptions)
+* [SnapshotIn](README.md#snapshotin)
+* [SnapshotOrInstance](README.md#snapshotorinstance)
+* [SnapshotOut](README.md#snapshotout)
 
 ### Variables
 
-* [DatePrimitive](#dateprimitive)
-* [boolean](#boolean)
-* [identifier](#identifier)
-* [identifierNumber](#identifiernumber)
-* [integer](#integer)
-* [nullType](#nulltype)
-* [number](#number)
-* [string](#string)
-* [undefinedType](#undefinedtype)
+* [DatePrimitive](README.md#const-dateprimitive)
+* [boolean](README.md#const-boolean)
+* [identifier](README.md#const-identifier)
+* [identifierNumber](README.md#const-identifiernumber)
+* [integer](README.md#const-integer)
+* [nullType](README.md#const-nulltype)
+* [number](README.md#const-number)
+* [string](README.md#const-string)
+* [undefinedType](README.md#const-undefinedtype)
 
 ### Functions
 
-* [addDisposer](#adddisposer)
-* [addMiddleware](#addmiddleware)
-* [applyAction](#applyaction)
-* [applyPatch](#applypatch)
-* [applySnapshot](#applysnapshot)
-* [array](#array)
-* [cast](#cast)
-* [castFlowReturn](#castflowreturn)
-* [castToReferenceSnapshot](#casttoreferencesnapshot)
-* [castToSnapshot](#casttosnapshot)
-* [clone](#clone)
-* [compose](#compose)
-* [createActionTrackingMiddleware](#createactiontrackingmiddleware)
-* [createActionTrackingMiddleware2](#createactiontrackingmiddleware2)
-* [custom](#custom)
-* [decorate](#decorate)
-* [destroy](#destroy)
-* [detach](#detach)
-* [enumeration](#enumeration)
-* [escapeJsonPath](#escapejsonpath)
-* [flow](#flow)
-* [frozen](#frozen)
-* [getChildType](#getchildtype)
-* [getEnv](#getenv)
-* [getIdentifier](#getidentifier)
-* [getLivelinessChecking](#getlivelinesschecking)
-* [getMembers](#getmembers)
-* [getNodeId](#getnodeid)
-* [getParent](#getparent)
-* [getParentOfType](#getparentoftype)
-* [getPath](#getpath)
-* [getPathParts](#getpathparts)
-* [getPropertyMembers](#getpropertymembers)
-* [getRelativePath](#getrelativepath)
-* [getRoot](#getroot)
-* [getRunningActionContext](#getrunningactioncontext)
-* [getSnapshot](#getsnapshot)
-* [getType](#gettype)
-* [hasParent](#hasparent)
-* [hasParentOfType](#hasparentoftype)
-* [isActionContextChildOf](#isactioncontextchildof)
-* [isActionContextThisOrChildOf](#isactioncontextthisorchildof)
-* [isAlive](#isalive)
-* [isArrayType](#isarraytype)
-* [isFrozenType](#isfrozentype)
-* [isIdentifierType](#isidentifiertype)
-* [isLateType](#islatetype)
-* [isLiteralType](#isliteraltype)
-* [isMapType](#ismaptype)
-* [isModelType](#ismodeltype)
-* [isOptionalType](#isoptionaltype)
-* [isPrimitiveType](#isprimitivetype)
-* [isProtected](#isprotected)
-* [isReferenceType](#isreferencetype)
-* [isRefinementType](#isrefinementtype)
-* [isRoot](#isroot)
-* [isStateTreeNode](#isstatetreenode)
-* [isType](#istype)
-* [isUnionType](#isuniontype)
-* [isValidReference](#isvalidreference)
-* [joinJsonPath](#joinjsonpath)
-* [late](#late)
-* [literal](#literal)
-* [map](#map)
-* [maybe](#maybe)
-* [maybeNull](#maybenull)
-* [model](#model)
-* [onAction](#onaction)
-* [onPatch](#onpatch)
-* [onSnapshot](#onsnapshot)
-* [optional](#optional)
-* [protect](#protect)
-* [recordActions](#recordactions)
-* [recordPatches](#recordpatches)
-* [reference](#reference)
-* [refinement](#refinement)
-* [resolveIdentifier](#resolveidentifier)
-* [resolvePath](#resolvepath)
-* [safeReference](#safereference)
-* [setLivelinessChecking](#setlivelinesschecking)
-* [snapshotProcessor](#snapshotprocessor)
-* [splitJsonPath](#splitjsonpath)
-* [tryReference](#tryreference)
-* [tryResolve](#tryresolve)
-* [typecheck](#typecheck)
-* [unescapeJsonPath](#unescapejsonpath)
-* [union](#union)
-* [unprotect](#unprotect)
-* [walk](#walk)
+* [addDisposer](README.md#adddisposer)
+* [addMiddleware](README.md#addmiddleware)
+* [applyAction](README.md#applyaction)
+* [applyPatch](README.md#applypatch)
+* [applySnapshot](README.md#applysnapshot)
+* [array](README.md#array)
+* [cast](README.md#cast)
+* [castFlowReturn](README.md#castflowreturn)
+* [castToReferenceSnapshot](README.md#casttoreferencesnapshot)
+* [castToSnapshot](README.md#casttosnapshot)
+* [clone](README.md#clone)
+* [compose](README.md#compose)
+* [createActionTrackingMiddleware](README.md#createactiontrackingmiddleware)
+* [createActionTrackingMiddleware2](README.md#createactiontrackingmiddleware2)
+* [custom](README.md#custom)
+* [decorate](README.md#decorate)
+* [destroy](README.md#destroy)
+* [detach](README.md#detach)
+* [enumeration](README.md#enumeration)
+* [escapeJsonPath](README.md#escapejsonpath)
+* [flow](README.md#flow)
+* [frozen](README.md#frozen)
+* [getChildType](README.md#getchildtype)
+* [getEnv](README.md#getenv)
+* [getIdentifier](README.md#getidentifier)
+* [getLivelinessChecking](README.md#getlivelinesschecking)
+* [getMembers](README.md#getmembers)
+* [getNodeId](README.md#getnodeid)
+* [getParent](README.md#getparent)
+* [getParentOfType](README.md#getparentoftype)
+* [getPath](README.md#getpath)
+* [getPathParts](README.md#getpathparts)
+* [getPropertyMembers](README.md#getpropertymembers)
+* [getRelativePath](README.md#getrelativepath)
+* [getRoot](README.md#getroot)
+* [getRunningActionContext](README.md#getrunningactioncontext)
+* [getSnapshot](README.md#getsnapshot)
+* [getType](README.md#gettype)
+* [hasParent](README.md#hasparent)
+* [hasParentOfType](README.md#hasparentoftype)
+* [isActionContextChildOf](README.md#isactioncontextchildof)
+* [isActionContextThisOrChildOf](README.md#isactioncontextthisorchildof)
+* [isAlive](README.md#isalive)
+* [isArrayType](README.md#isarraytype)
+* [isFrozenType](README.md#isfrozentype)
+* [isIdentifierType](README.md#isidentifiertype)
+* [isLateType](README.md#islatetype)
+* [isLiteralType](README.md#isliteraltype)
+* [isMapType](README.md#ismaptype)
+* [isModelType](README.md#ismodeltype)
+* [isOptionalType](README.md#isoptionaltype)
+* [isPrimitiveType](README.md#isprimitivetype)
+* [isProtected](README.md#isprotected)
+* [isReferenceType](README.md#isreferencetype)
+* [isRefinementType](README.md#isrefinementtype)
+* [isRoot](README.md#isroot)
+* [isStateTreeNode](README.md#isstatetreenode)
+* [isType](README.md#istype)
+* [isUnionType](README.md#isuniontype)
+* [isValidReference](README.md#isvalidreference)
+* [joinJsonPath](README.md#joinjsonpath)
+* [late](README.md#late)
+* [literal](README.md#literal)
+* [map](README.md#map)
+* [maybe](README.md#maybe)
+* [maybeNull](README.md#maybenull)
+* [model](README.md#model)
+* [onAction](README.md#onaction)
+* [onPatch](README.md#onpatch)
+* [onSnapshot](README.md#onsnapshot)
+* [optional](README.md#optional)
+* [protect](README.md#protect)
+* [recordActions](README.md#recordactions)
+* [recordPatches](README.md#recordpatches)
+* [reference](README.md#reference)
+* [refinement](README.md#refinement)
+* [resolveIdentifier](README.md#resolveidentifier)
+* [resolvePath](README.md#resolvepath)
+* [safeReference](README.md#safereference)
+* [setLivelinessChecking](README.md#setlivelinesschecking)
+* [snapshotProcessor](README.md#snapshotprocessor)
+* [splitJsonPath](README.md#splitjsonpath)
+* [tryReference](README.md#tryreference)
+* [tryResolve](README.md#tryresolve)
+* [typecheck](README.md#typecheck)
+* [unescapeJsonPath](README.md#unescapejsonpath)
+* [union](README.md#union)
+* [unprotect](README.md#unprotect)
+* [walk](README.md#walk)
 
 ### Object literals
 
-* [types](#types)
-
----
+* [types](README.md#const-types)
 
 ## Type aliases
 
-<a id="idisposer"></a>
-
 ###  IDisposer
 
-**Ƭ IDisposer**: *`function`*
+Ƭ **IDisposer**: *function*
 
 A generic disposer.
 
-#### Type declaration
-▸(): `void`
+#### Type declaration:
 
-**Returns:** `void`
+▸ (): *void*
 
 ___
-<a id="imiddlewareeventtype"></a>
 
 ###  IMiddlewareEventType
 
-**Ƭ IMiddlewareEventType**: *"action" \| "flow_spawn" \| "flow_resume" \| "flow_resume_error" \| "flow_return" \| "flow_throw"*
+Ƭ **IMiddlewareEventType**: *"action" | "flow_spawn" | "flow_resume" | "flow_resume_error" | "flow_return" | "flow_throw"*
 
 ___
-<a id="imiddlewarehandler"></a>
 
 ###  IMiddlewareHandler
 
-**Ƭ IMiddlewareHandler**: *`function`*
+Ƭ **IMiddlewareHandler**: *function*
 
-#### Type declaration
-▸(actionCall: *[IMiddlewareEvent](interfaces/imiddlewareevent.md)*, next: *`function`*, abort: *`function`*): `any`
+#### Type declaration:
+
+▸ (`actionCall`: [IMiddlewareEvent](interfaces/imiddlewareevent.md), `next`: function, `abort`: function): *any*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| actionCall | [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
-| next | `function` |
-| abort | `function` |
+▪ **actionCall**: *[IMiddlewareEvent](interfaces/imiddlewareevent.md)*
 
-**Returns:** `any`
+▪ **next**: *function*
+
+▸ (`actionCall`: [IMiddlewareEvent](interfaces/imiddlewareevent.md), `callback?`: undefined | function): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`actionCall` | [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
+`callback?` | undefined \| function |
+
+▪ **abort**: *function*
+
+▸ (`value`: any): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`value` | any |
 
 ___
-<a id="itypedispatcher"></a>
 
 ###  ITypeDispatcher
 
-**Ƭ ITypeDispatcher**: *`function`*
+Ƭ **ITypeDispatcher**: *function*
 
-#### Type declaration
-▸(snapshot: *`any`*): [IAnyType](interfaces/ianytype.md)
+#### Type declaration:
+
+▸ (`snapshot`: any): *[IAnyType](interfaces/ianytype.md)*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| snapshot | `any` |
-
-**Returns:** [IAnyType](interfaces/ianytype.md)
+Name | Type |
+------ | ------ |
+`snapshot` | any |
 
 ___
-<a id="ivalidationcontext"></a>
 
 ###  IValidationContext
 
-**Ƭ IValidationContext**: *[IValidationContextEntry](interfaces/ivalidationcontextentry.md)[]*
+Ƭ **IValidationContext**: *[IValidationContextEntry](interfaces/ivalidationcontextentry.md)[]*
 
 Array of validation context entries
 
 ___
-<a id="ivalidationresult"></a>
 
 ###  IValidationResult
 
-**Ƭ IValidationResult**: *[IValidationError](interfaces/ivalidationerror.md)[]*
+Ƭ **IValidationResult**: *[IValidationError](interfaces/ivalidationerror.md)[]*
 
 Type validation result, which is an array of type validation errors
 
 ___
-<a id="instance"></a>
 
 ###  Instance
 
-**Ƭ Instance**: *`Instance<T>`*
+Ƭ **Instance**: *`Instance<T>`*
 
 The instance representation of a given type.
 
 ___
-<a id="livelinessmode"></a>
 
 ###  LivelinessMode
 
-**Ƭ LivelinessMode**: *"warn" \| "error" \| "ignore"*
+Ƭ **LivelinessMode**: *"warn" | "error" | "ignore"*
 
 Defines what MST should do when running into reads / writes to objects that have died.
-
-*   `"warn"`: Print a warning (default).
-*   `"error"`: Throw an exception.
-*   "`ignore`": Do nothing.
+- `"warn"`: Print a warning (default).
+- `"error"`: Throw an exception.
+- "`ignore`": Do nothing.
 
 ___
-<a id="onreferenceinvalidated"></a>
 
 ###  OnReferenceInvalidated
 
-**Ƭ OnReferenceInvalidated**: *`function`*
+Ƭ **OnReferenceInvalidated**: *function*
 
-#### Type declaration
-▸(event: *[OnReferenceInvalidatedEvent](#onreferenceinvalidatedevent)<`STN`>*): `void`
+#### Type declaration:
+
+▸ (`event`: [OnReferenceInvalidatedEvent](README.md#onreferenceinvalidatedevent)‹*`STN`*›): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | [OnReferenceInvalidatedEvent](#onreferenceinvalidatedevent)<`STN`> |
-
-**Returns:** `void`
+Name | Type |
+------ | ------ |
+`event` | [OnReferenceInvalidatedEvent](README.md#onreferenceinvalidatedevent)‹*`STN`*› |
 
 ___
-<a id="onreferenceinvalidatedevent"></a>
 
 ###  OnReferenceInvalidatedEvent
 
-**Ƭ OnReferenceInvalidatedEvent**: *`object`*
+Ƭ **OnReferenceInvalidatedEvent**: *object*
 
-#### Type declaration
+#### Type declaration:
 
 ___
-<a id="referenceidentifier"></a>
 
 ###  ReferenceIdentifier
 
-**Ƭ ReferenceIdentifier**: *`string` \| `number`*
+Ƭ **ReferenceIdentifier**: *string | number*
 
 Valid types for identifiers.
 
 ___
-<a id="referenceoptions"></a>
 
 ###  ReferenceOptions
 
-**Ƭ ReferenceOptions**: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> \| [ReferenceOptionsOnInvalidated](interfaces/referenceoptionsoninvalidated.md)<`IT`> \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & [ReferenceOptionsOnInvalidated](interfaces/referenceoptionsoninvalidated.md)<`IT`>*
+Ƭ **ReferenceOptions**: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹*`IT`*› | [ReferenceOptionsOnInvalidated](interfaces/referenceoptionsoninvalidated.md)‹*`IT`*› | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹*`IT`*› & [ReferenceOptionsOnInvalidated](interfaces/referenceoptionsoninvalidated.md)‹*`IT`*›*
 
 ___
-<a id="snapshotin"></a>
 
 ###  SnapshotIn
 
-**Ƭ SnapshotIn**: *`SnapshotIn<T>`*
+Ƭ **SnapshotIn**: *`SnapshotIn<T>`*
 
 The input (creation) snapshot representation of a given type.
 
 ___
-<a id="snapshotorinstance"></a>
 
 ###  SnapshotOrInstance
 
-**Ƭ SnapshotOrInstance**: *[SnapshotIn](#snapshotin)<`T`> \| [Instance](#instance)<`T`>*
+Ƭ **SnapshotOrInstance**: *[SnapshotIn](README.md#snapshotin)‹*`T`*› | [Instance](README.md#instance)‹*`T`*›*
 
-A type which is equivalent to the union of SnapshotIn and Instance types of a given typeof TYPE or typeof VARIABLE. For primitives it defaults to the primitive itself.
+A type which is equivalent to the union of SnapshotIn and Instance types of a given typeof TYPE or typeof VARIABLE.
+For primitives it defaults to the primitive itself.
 
 For example:
-
-*   `SnapshotOrInstance<typeof ModelA> = SnapshotIn<typeof ModelA> \| Instance<typeof ModelA>`
-*   `SnapshotOrInstance<typeof self.a (where self.a is a ModelA)> = SnapshotIn<typeof ModelA> \| Instance<typeof ModelA>`
+- `SnapshotOrInstance<typeof ModelA> = SnapshotIn<typeof ModelA> | Instance<typeof ModelA>`
+- `SnapshotOrInstance<typeof self.a (where self.a is a ModelA)> = SnapshotIn<typeof ModelA> | Instance<typeof ModelA>`
 
 Usually you might want to use this when your model has a setter action that sets a property.
 
 Example:
-
 ```ts
 const ModelA = types.model({
   n: types.number
@@ -350,28 +343,22 @@ const ModelB = types.model({
 ```
 
 ___
-<a id="snapshotout"></a>
 
 ###  SnapshotOut
 
-**Ƭ SnapshotOut**: *`SnapshotOut<T>`*
+Ƭ **SnapshotOut**: *`SnapshotOut<T>`*
 
 The output snapshot representation of a given type.
 
-___
-
 ## Variables
 
-<a id="dateprimitive"></a>
+### `Const` DatePrimitive
 
-### `<Const>` DatePrimitive
-
-**● DatePrimitive**: *[IType](interfaces/itype.md)<`number` \| `Date`, `number`, `Date`>* =  _DatePrimitive
+• **DatePrimitive**: *[IType](interfaces/itype.md)‹*number | `Date`*, *number*, *`Date`*›* =  _DatePrimitive
 
 `types.Date` - Creates a type that can only contain a javascript Date value.
 
 Example:
-
 ```ts
 const LogLine = types.model({
   timestamp: types.Date,
@@ -381,20 +368,19 @@ LogLine.create({ timestamp: new Date() })
 ```
 
 ___
-<a id="boolean"></a>
 
-### `<Const>` boolean
+### `Const` boolean
 
-**● boolean**: *[ISimpleType](interfaces/isimpletype.md)<`boolean`>* =  new CoreType<boolean, boolean, boolean>(
+• **boolean**: *[ISimpleType](interfaces/isimpletype.md)‹*boolean*›* =  new CoreType<boolean, boolean, boolean>(
     "boolean",
     TypeFlags.Boolean,
     v => typeof v === "boolean"
 )
 
-`types.boolean` - Creates a type that can only contain a boolean value. This type is used for boolean values by default
+`types.boolean` - Creates a type that can only contain a boolean value.
+This type is used for boolean values by default
 
 Example:
-
 ```ts
 const Thing = types.model({
   isCool: types.boolean,
@@ -403,16 +389,18 @@ const Thing = types.model({
 ```
 
 ___
-<a id="identifier"></a>
 
-### `<Const>` identifier
+### `Const` identifier
 
-**● identifier**: *[ISimpleType](interfaces/isimpletype.md)<`string`>* =  new IdentifierType()
+• **identifier**: *[ISimpleType](interfaces/isimpletype.md)‹*string*›* =  new IdentifierType()
 
-`types.identifier` - Identifiers are used to make references, lifecycle events and reconciling works. Inside a state tree, for each type can exist only one instance for each given identifier. For example there couldn't be 2 instances of user with id 1. If you need more, consider using references. Identifier can be used only as type property of a model. This type accepts as parameter the value type of the identifier field that can be either string or number.
+`types.identifier` - Identifiers are used to make references, lifecycle events and reconciling works.
+Inside a state tree, for each type can exist only one instance for each given identifier.
+For example there couldn't be 2 instances of user with id 1. If you need more, consider using references.
+Identifier can be used only as type property of a model.
+This type accepts as parameter the value type of the identifier field that can be either string or number.
 
 Example:
-
 ```ts
  const Todo = types.model("Todo", {
      id: types.identifier,
@@ -420,19 +408,17 @@ Example:
  })
 ```
 
-*__returns__*: 
+**`returns`** 
 
 ___
-<a id="identifiernumber"></a>
 
-### `<Const>` identifierNumber
+### `Const` identifierNumber
 
-**● identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)<`number`>* =  new IdentifierNumberType()
+• **identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)‹*number*›* =  new IdentifierNumberType()
 
 `types.identifierNumber` - Similar to `types.identifier`. This one will serialize from / to a number when applying snapshots
 
 Example:
-
 ```ts
  const Todo = types.model("Todo", {
      id: types.identifierNumber,
@@ -440,23 +426,22 @@ Example:
  })
 ```
 
-*__returns__*: 
+**`returns`** 
 
 ___
-<a id="integer"></a>
 
-### `<Const>` integer
+### `Const` integer
 
-**● integer**: *[ISimpleType](interfaces/isimpletype.md)<`number`>* =  new CoreType<number, number, number>(
+• **integer**: *[ISimpleType](interfaces/isimpletype.md)‹*number*›* =  new CoreType<number, number, number>(
     "integer",
     TypeFlags.Integer,
     v => isInteger(v)
 )
 
-`types.integer` - Creates a type that can only contain an integer value. This type is used for integer values by default
+`types.integer` - Creates a type that can only contain an integer value.
+This type is used for integer values by default
 
 Example:
-
 ```ts
 const Size = types.model({
   width: types.integer,
@@ -465,11 +450,10 @@ const Size = types.model({
 ```
 
 ___
-<a id="nulltype"></a>
 
-### `<Const>` nullType
+### `Const` nullType
 
-**● nullType**: *[ISimpleType](interfaces/isimpletype.md)<`null`>* =  new CoreType<null, null, null>(
+• **nullType**: *[ISimpleType](interfaces/isimpletype.md)‹*null*›* =  new CoreType<null, null, null>(
     "null",
     TypeFlags.Null,
     v => v === null
@@ -478,20 +462,19 @@ ___
 `types.null` - The type of the value `null`
 
 ___
-<a id="number"></a>
 
-### `<Const>` number
+### `Const` number
 
-**● number**: *[ISimpleType](interfaces/isimpletype.md)<`number`>* =  new CoreType<number, number, number>(
+• **number**: *[ISimpleType](interfaces/isimpletype.md)‹*number*›* =  new CoreType<number, number, number>(
     "number",
     TypeFlags.Number,
     v => typeof v === "number"
 )
 
-`types.number` - Creates a type that can only contain a numeric value. This type is used for numeric values by default
+`types.number` - Creates a type that can only contain a numeric value.
+This type is used for numeric values by default
 
 Example:
-
 ```ts
 const Vector = types.model({
   x: types.number,
@@ -500,20 +483,19 @@ const Vector = types.model({
 ```
 
 ___
-<a id="string"></a>
 
-### `<Const>` string
+### `Const` string
 
-**● string**: *[ISimpleType](interfaces/isimpletype.md)<`string`>* =  new CoreType<string, string, string>(
+• **string**: *[ISimpleType](interfaces/isimpletype.md)‹*string*›* =  new CoreType<string, string, string>(
     "string",
     TypeFlags.String,
     v => typeof v === "string"
 )
 
-`types.string` - Creates a type that can only contain a string value. This type is used for string values by default
+`types.string` - Creates a type that can only contain a string value.
+This type is used for string values by default
 
 Example:
-
 ```ts
 const Person = types.model({
   firstName: types.string,
@@ -522,11 +504,10 @@ const Person = types.model({
 ```
 
 ___
-<a id="undefinedtype"></a>
 
-### `<Const>` undefinedType
+### `Const` undefinedType
 
-**● undefinedType**: *[ISimpleType](interfaces/isimpletype.md)<`undefined`>* =  new CoreType<undefined, undefined, undefined>(
+• **undefinedType**: *[ISimpleType](interfaces/isimpletype.md)‹*undefined*›* =  new CoreType<undefined, undefined, undefined>(
     "undefined",
     TypeFlags.Undefined,
     v => v === undefined
@@ -534,22 +515,19 @@ ___
 
 `types.undefined` - The type of the value `undefined`
 
-___
-
 ## Functions
-
-<a id="adddisposer"></a>
 
 ###  addDisposer
 
-▸ **addDisposer**(target: *`IAnyStateTreeNode`*, disposer: *[IDisposer](#idisposer)*): [IDisposer](#idisposer)
+▸ **addDisposer**(`target`: `IAnyStateTreeNode`, `disposer`: [IDisposer](README.md#idisposer)): *[IDisposer](README.md#idisposer)*
 
-Use this utility to register a function that should be called whenever the targeted state tree node is destroyed. This is a useful alternative to managing cleanup methods yourself using the `beforeDestroy` hook.
+Use this utility to register a function that should be called whenever the
+targeted state tree node is destroyed. This is a useful alternative to managing
+cleanup methods yourself using the `beforeDestroy` hook.
 
 This methods returns the same disposer that was passed as argument.
 
 Example:
-
 ```ts
 const Todo = types.model({
   title: types.string
@@ -568,108 +546,109 @@ const Todo = types.model({
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
-| disposer | [IDisposer](#idisposer) |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
+`disposer` | [IDisposer](README.md#idisposer) |
 
-**Returns:** [IDisposer](#idisposer)
+**Returns:** *[IDisposer](README.md#idisposer)*
+
 The same disposer that was passed as argument
 
 ___
-<a id="addmiddleware"></a>
 
 ###  addMiddleware
 
-▸ **addMiddleware**(target: *`IAnyStateTreeNode`*, handler: *[IMiddlewareHandler](#imiddlewarehandler)*, includeHooks?: *`boolean`*): [IDisposer](#idisposer)
+▸ **addMiddleware**(`target`: `IAnyStateTreeNode`, `handler`: [IMiddlewareHandler](README.md#imiddlewarehandler), `includeHooks`: boolean): *[IDisposer](README.md#idisposer)*
 
-Middleware can be used to intercept any action is invoked on the subtree where it is attached. If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
+Middleware can be used to intercept any action is invoked on the subtree where it is attached.
+If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
 
 For more details, see the [middleware docs](../middleware.md)
 
 **Parameters:**
 
-| Name | Type | Default value | Description |
-| ------ | ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` | - |  Node to apply the middleware to. |
-| handler | [IMiddlewareHandler](#imiddlewarehandler) | - |
-| `Default value` includeHooks | `boolean` | true |
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`target` | `IAnyStateTreeNode` | - | Node to apply the middleware to. |
+`handler` | [IMiddlewareHandler](README.md#imiddlewarehandler) | - | - |
+`includeHooks` | boolean | true | - |
 
-**Returns:** [IDisposer](#idisposer)
+**Returns:** *[IDisposer](README.md#idisposer)*
+
 A callable function to dispose the middleware.
 
 ___
-<a id="applyaction"></a>
 
 ###  applyAction
 
-▸ **applyAction**(target: *`IAnyStateTreeNode`*, actions: *[ISerializedActionCall](interfaces/iserializedactioncall.md) \| [ISerializedActionCall](interfaces/iserializedactioncall.md)[]*): `void`
+▸ **applyAction**(`target`: `IAnyStateTreeNode`, `actions`: [ISerializedActionCall](interfaces/iserializedactioncall.md) | [ISerializedActionCall](interfaces/iserializedactioncall.md)[]): *void*
 
-Applies an action or a series of actions in a single MobX transaction. Does not return any value Takes an action description as produced by the `onAction` middleware.
+Applies an action or a series of actions in a single MobX transaction.
+Does not return any value
+Takes an action description as produced by the `onAction` middleware.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
-| actions | [ISerializedActionCall](interfaces/iserializedactioncall.md) \| [ISerializedActionCall](interfaces/iserializedactioncall.md)[] |   |
+Name | Type | Description |
+------ | ------ | ------ |
+`target` | `IAnyStateTreeNode` | - |
+`actions` | [ISerializedActionCall](interfaces/iserializedactioncall.md) \| [ISerializedActionCall](interfaces/iserializedactioncall.md)[] |   |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="applypatch"></a>
 
 ###  applyPatch
 
-▸ **applyPatch**(target: *`IAnyStateTreeNode`*, patch: *[IJsonPatch](interfaces/ijsonpatch.md) \| `ReadonlyArray`<[IJsonPatch](interfaces/ijsonpatch.md)>*): `void`
+▸ **applyPatch**(`target`: `IAnyStateTreeNode`, `patch`: [IJsonPatch](interfaces/ijsonpatch.md) | `ReadonlyArray<IJsonPatch>`): *void*
 
-Applies a JSON-patch to the given model instance or bails out if the patch couldn't be applied See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details.
+Applies a JSON-patch to the given model instance or bails out if the patch couldn't be applied
+See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details.
 
 Can apply a single past, or an array of patches.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
-| patch | [IJsonPatch](interfaces/ijsonpatch.md) \| `ReadonlyArray`<[IJsonPatch](interfaces/ijsonpatch.md)> |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
+`patch` | [IJsonPatch](interfaces/ijsonpatch.md) \| `ReadonlyArray<IJsonPatch>` |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="applysnapshot"></a>
 
 ###  applySnapshot
 
-▸ **applySnapshot**<`C`>(target: *`IStateTreeNode`<[IType](interfaces/itype.md)<`C`, `any`, `any`>>*, snapshot: *`C`*): `void`
+▸ **applySnapshot**<**C**>(`target`: `IStateTreeNode<IType<C, any, any>>`, `snapshot`: `C`): *void*
 
 Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
 
 **Type parameters:**
 
-#### C 
+▪ **C**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IStateTreeNode`<[IType](interfaces/itype.md)<`C`, `any`, `any`>> |  \- |
-| snapshot | `C` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IStateTreeNode<IType<C, any, any>>` |
+`snapshot` | `C` |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="array"></a>
 
 ###  array
 
-▸ **array**<`IT`>(subtype: *`IT`*): `IArrayType`<`IT`>
+▸ **array**<**IT**>(`subtype`: `IT`): *`IArrayType<IT>`*
 
 `types.array` - Creates an index based collection type who's children are all of a uniform declared type.
 
 This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
 
 Example:
-
 ```ts
 const Todo = types.model({
   task: types.string
@@ -687,28 +666,28 @@ console.log(s.todos[0]) // prints: "Grab coffee"
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| subtype | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`subtype` | `IT` |
 
-**Returns:** `IArrayType`<`IT`>
+**Returns:** *`IArrayType<IT>`*
 
 ___
-<a id="cast"></a>
 
 ###  cast
 
-▸ **cast**<`O`>(snapshotOrInstance: *`O`*): `O`
+▸ **cast**<**O**>(`snapshotOrInstance`: `O`): *`O`*
 
-▸ **cast**<`O`>(snapshotOrInstance: *`TypeOfValue<O>["CreationType"]` \| `TypeOfValue<O>["SnapshotType"]` \| `TypeOfValue<O>["Type"]`*): `O`
-
-Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance. Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance, but just fool typescript into thinking so. Either way, casting when outside an assignation operation won't compile.
+Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
+Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,
+but just fool typescript into thinking so.
+Either way, casting when outside an assignation operation won't compile.
 
 Example:
-
 ```ts
 const ModelA = types.model({
   n: types.number
@@ -730,20 +709,26 @@ const ModelB = types.model({
 
 **Type parameters:**
 
-#### O :  `string` \| `number` \| `boolean` \| `null` \| `undefined`
+▪ **O**: *string | number | boolean | null | undefined*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| snapshotOrInstance | `O` |  Snapshot or instance |
+Name | Type | Description |
+------ | ------ | ------ |
+`snapshotOrInstance` | `O` | Snapshot or instance |
 
-**Returns:** `O`
+**Returns:** *`O`*
+
 The same object casted as an instance
 
-Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance. Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance, but just fool typescript into thinking so. Either way, casting when outside an assignation operation won't compile.
+▸ **cast**<**O**>(`snapshotOrInstance`: `TypeOfValue<O>["CreationType"]` | `TypeOfValue<O>["SnapshotType"]` | `TypeOfValue<O>["Type"]`): *`O`*
+
+Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
+Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,
+but just fool typescript into thinking so.
+Either way, casting when outside an assignation operation won't compile.
 
 Example:
-
 ```ts
 const ModelA = types.model({
   n: types.number
@@ -765,47 +750,49 @@ const ModelB = types.model({
 
 **Type parameters:**
 
-#### O 
+▪ **O**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| snapshotOrInstance | `TypeOfValue<O>["CreationType"]` \| `TypeOfValue<O>["SnapshotType"]` \| `TypeOfValue<O>["Type"]` |  Snapshot or instance |
+Name | Type | Description |
+------ | ------ | ------ |
+`snapshotOrInstance` | `TypeOfValue<O>["CreationType"]` \| `TypeOfValue<O>["SnapshotType"]` \| `TypeOfValue<O>["Type"]` | Snapshot or instance |
 
-**Returns:** `O`
+**Returns:** *`O`*
+
 The same object casted as an instance
 
 ___
-<a id="castflowreturn"></a>
 
 ###  castFlowReturn
 
-▸ **castFlowReturn**<`T`>(val: *`T`*): `FlowReturn`<`T`>
+▸ **castFlowReturn**<**T**>(`val`: `T`): *`FlowReturn<T>`*
 
-Used for TypeScript to make flows that return a promise return the actual promise result.
+ Used for TypeScript to make flows that return a promise return the actual promise result.
 
 **Type parameters:**
 
-#### T 
+▪ **T**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| val | `T` |  \- |
+Name | Type |
+------ | ------ |
+`val` | `T` |
 
-**Returns:** `FlowReturn`<`T`>
+**Returns:** *`FlowReturn<T>`*
 
 ___
-<a id="casttoreferencesnapshot"></a>
 
 ###  castToReferenceSnapshot
 
-▸ **castToReferenceSnapshot**<`I`>(instance: *`I`*): `Extract<I, IAnyStateTreeNode> extends never ? I : ReferenceIdentifier`
+▸ **castToReferenceSnapshot**<**I**>(`instance`: `I`): *`Extract<I, IAnyStateTreeNode> extends never ? I : ReferenceIdentifier`*
 
-Casts a node instance type to a reference snapshot type so it can be assigned to a refernence snapshot (e.g. to be used inside a create call). Note that this is just a cast for the type system, this is, it won't actually convert an instance to a refererence snapshot, but just fool typescript into thinking so.
+Casts a node instance type to a reference snapshot type so it can be assigned to a refernence snapshot (e.g. to be used inside a create call).
+Note that this is just a cast for the type system, this is, it won't actually convert an instance to a refererence snapshot,
+but just fool typescript into thinking so.
 
 Example:
-
 ```ts
 const ModelA = types.model({
   id: types.identifier,
@@ -827,27 +814,29 @@ const b = ModelB.create({ refA: castToReference(a)})
 
 **Type parameters:**
 
-#### I 
+▪ **I**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| instance | `I` |  Instance |
+Name | Type | Description |
+------ | ------ | ------ |
+`instance` | `I` | Instance |
 
-**Returns:** `Extract<I, IAnyStateTreeNode> extends never ? I : ReferenceIdentifier`
+**Returns:** *`Extract<I, IAnyStateTreeNode> extends never ? I : ReferenceIdentifier`*
+
 The same object casted as an reference snapshot (string or number)
 
 ___
-<a id="casttosnapshot"></a>
 
 ###  castToSnapshot
 
-▸ **castToSnapshot**<`I`>(snapshotOrInstance: *`I`*): `Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"]`
+▸ **castToSnapshot**<**I**>(`snapshotOrInstance`: `I`): *`Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"]`*
 
-Casts a node instance type to an snapshot type so it can be assigned to a type snapshot (e.g. to be used inside a create call). Note that this is just a cast for the type system, this is, it won't actually convert an instance to a snapshot, but just fool typescript into thinking so.
+Casts a node instance type to an snapshot type so it can be assigned to a type snapshot (e.g. to be used inside a create call).
+Note that this is just a cast for the type system, this is, it won't actually convert an instance to a snapshot,
+but just fool typescript into thinking so.
 
 Example:
-
 ```ts
 const ModelA = types.model({
   n: types.number
@@ -868,748 +857,1166 @@ const b = ModelB.create({ innerModel: castToSnapshot(a)})
 
 **Type parameters:**
 
-#### I 
+▪ **I**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| snapshotOrInstance | `I` |  Snapshot or instance |
+Name | Type | Description |
+------ | ------ | ------ |
+`snapshotOrInstance` | `I` | Snapshot or instance |
 
-**Returns:** `Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"]`
+**Returns:** *`Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"]`*
+
 The same object casted as an input (creation) snapshot
 
 ___
-<a id="clone"></a>
 
 ###  clone
 
-▸ **clone**<`T`>(source: *`T`*, keepEnvironment?: *`boolean` \| `any`*): `T`
+▸ **clone**<**T**>(`source`: `T`, `keepEnvironment`: boolean | any): *`T`*
 
-Returns a deep copy of the given state tree node as new tree. Short hand for `snapshot(x) = getType(x).create(getSnapshot(x))`
+Returns a deep copy of the given state tree node as new tree.
+Short hand for `snapshot(x) = getType(x).create(getSnapshot(x))`
 
 _Tip: clone will create a literal copy, including the same identifiers. To modify identifiers etc during cloning, don't use clone but take a snapshot of the tree, modify it, and create new instance_
 
 **Type parameters:**
 
-#### T :  `IAnyStateTreeNode`
+▪ **T**: *`IAnyStateTreeNode`*
+
 **Parameters:**
 
-| Name | Type | Default value | Description |
-| ------ | ------ | ------ | ------ |
-| source | `T` | - |  \- |
-| `Default value` keepEnvironment | `boolean` \| `any` | true |  indicates whether the clone should inherit the same environment (\`true\`, the default), or not have an environment (\`false\`). If an object is passed in as second argument, that will act as the environment for the cloned tree. |
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`source` | `T` | - | - |
+`keepEnvironment` | boolean \| any | true | indicates whether the clone should inherit the same environment (`true`, the default), or not have an environment (`false`). If an object is passed in as second argument, that will act as the environment for the cloned tree. |
 
-**Returns:** `T`
+**Returns:** *`T`*
 
 ___
-<a id="compose"></a>
 
 ###  compose
 
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`>(name: *`string`*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB`, `OA` & `OB`, `_CustomJoin`<`FCA`, `FCB`>, `_CustomJoin`<`FSA`, `FSB`>>
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB`*, *`OA` & `OB`*, *`_CustomJoin<FCA, FCB>`*, *`_CustomJoin<FSA, FSB>`*›*
 
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB`, `OA` & `OB`, `_CustomJoin`<`FCA`, `FCB`>, `_CustomJoin`<`FSA`, `FSB`>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`>(name: *`string`*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC`, `OA` & `OB` & `OC`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `FCC`>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `FSC`>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC`, `OA` & `OB` & `OC`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `FCC`>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `FSC`>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`>(name: *`string`*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD`, `OA` & `OB` & `OC` & `OD`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `FCD`>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `FSD`>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD`, `OA` & `OB` & `OC` & `OD`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `FCD`>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `FSD`>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`>(name: *`string`*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE`, `OA` & `OB` & `OC` & `OD` & `OE`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `FCE`>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `FSE`>>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE`, `OA` & `OB` & `OC` & `OD` & `OE`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `FCE`>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `FSE`>>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`>(name: *`string`*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `FCF`>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `FSF`>>>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `FCF`>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `FSF`>>>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`>(name: *`string`*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `FCG`>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `FSG`>>>>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `FCG`>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `FSG`>>>>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`>(name: *`string`*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `FCH`>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `FSH`>>>>>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `FCH`>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `FSH`>>>>>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`,`PI`,`OI`,`FCI`,`FSI`>(name: *`string`*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*, I: *[IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH` & `PI`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH` & `OI`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `_CustomJoin`<`FCH`, `FCI`>>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `_CustomJoin`<`FSH`, `FSI`>>>>>>>>>
-
-▸ **compose**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`,`PI`,`OI`,`FCI`,`FSI`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*, I: *[IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`>*): [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH` & `PI`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH` & `OI`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `_CustomJoin`<`FCH`, `FCI`>>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `_CustomJoin`<`FSH`, `FSI`>>>>>>>>>
-
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
+Name | Type |
+------ | ------ |
+`name` | string |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB`, `OA` & `OB`, `_CustomJoin`<`FCA`, `FCB`>, `_CustomJoin`<`FSA`, `FSB`>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB`*, *`OA` & `OB`*, *`_CustomJoin<FCA, FCB>`*, *`_CustomJoin<FSA, FSB>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB`*, *`OA` & `OB`*, *`_CustomJoin<FCA, FCB>`*, *`_CustomJoin<FSA, FSB>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB`, `OA` & `OB`, `_CustomJoin`<`FCA`, `FCB`>, `_CustomJoin`<`FSA`, `FSB`>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB`*, *`OA` & `OB`*, *`_CustomJoin<FCA, FCB>`*, *`_CustomJoin<FSA, FSB>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC`*, *`OA` & `OB` & `OC`*, *`_CustomJoin<FCA, _CustomJoin<FCB, FCC>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, FSC>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
+Name | Type |
+------ | ------ |
+`name` | string |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC`, `OA` & `OB` & `OC`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `FCC`>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `FSC`>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC`*, *`OA` & `OB` & `OC`*, *`_CustomJoin<FCA, _CustomJoin<FCB, FCC>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, FSC>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC`*, *`OA` & `OB` & `OC`*, *`_CustomJoin<FCA, _CustomJoin<FCB, FCC>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, FSC>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC`, `OA` & `OB` & `OC`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `FCC`>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `FSC`>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC`*, *`OA` & `OB` & `OC`*, *`_CustomJoin<FCA, _CustomJoin<FCB, FCC>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, FSC>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD`*, *`OA` & `OB` & `OC` & `OD`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, FCD>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, FSD>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
+Name | Type |
+------ | ------ |
+`name` | string |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD`, `OA` & `OB` & `OC` & `OD`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `FCD`>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `FSD`>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD`*, *`OA` & `OB` & `OC` & `OD`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, FCD>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, FSD>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD`*, *`OA` & `OB` & `OC` & `OD`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, FCD>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, FSD>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD`, `OA` & `OB` & `OC` & `OD`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `FCD`>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `FSD`>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD`*, *`OA` & `OB` & `OC` & `OD`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, FCD>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, FSD>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE`*, *`OA` & `OB` & `OC` & `OD` & `OE`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, FCE>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, FSE>>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
+Name | Type |
+------ | ------ |
+`name` | string |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE`, `OA` & `OB` & `OC` & `OD` & `OE`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `FCE`>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `FSE`>>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE`*, *`OA` & `OB` & `OC` & `OD` & `OE`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, FCE>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, FSE>>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE`*, *`OA` & `OB` & `OC` & `OD` & `OE`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, FCE>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, FSE>>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE`, `OA` & `OB` & `OC` & `OD` & `OE`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `FCE`>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `FSE`>>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE`*, *`OA` & `OB` & `OC` & `OD` & `OE`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, FCE>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, FSE>>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, FCF>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, FSF>>>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
+Name | Type |
+------ | ------ |
+`name` | string |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `FCF`>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `FSF`>>>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, FCF>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, FSF>>>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, FCF>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, FSF>>>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `FCF`>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `FSF`>>>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, FCF>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, FSF>>>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, FCG>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, FSG>>>>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
+Name | Type |
+------ | ------ |
+`name` | string |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `FCG`>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `FSG`>>>>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, FCG>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, FSG>>>>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, FCG>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, FSG>>>>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `FCG`>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `FSG`>>>>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, FCG>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, FSG>>>>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›, `H`: [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, FCH>>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, FSH>>>>>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
-#### PH :  `ModelProperties`
-#### OH 
-#### FCH 
-#### FSH 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
+▪ **PH**: *`ModelProperties`*
+
+▪ **OH**
+
+▪ **FCH**
+
+▪ **FSH**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
-| H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
+Name | Type |
+------ | ------ |
+`name` | string |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
+`H` | [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `FCH`>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `FSH`>>>>>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, FCH>>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, FSH>>>>>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›, `H`: [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, FCH>>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, FSH>>>>>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
-#### PH :  `ModelProperties`
-#### OH 
-#### FCH 
-#### FSH 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
+▪ **PH**: *`ModelProperties`*
+
+▪ **OH**
+
+▪ **FCH**
+
+▪ **FSH**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
-| H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
+`H` | [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `FCH`>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `FSH`>>>>>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, FCH>>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, FSH>>>>>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**, **PI**, **OI**, **FCI**, **FSI**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›, `H`: [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*›, `I`: [IModelType](interfaces/imodeltype.md)‹*`PI`*, *`OI`*, *`FCI`*, *`FSI`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH` & `PI`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH` & `OI`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, _CustomJoin<FCH, FCI>>>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, _CustomJoin<FSH, FSI>>>>>>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
-#### PH :  `ModelProperties`
-#### OH 
-#### FCH 
-#### FSH 
-#### PI :  `ModelProperties`
-#### OI 
-#### FCI 
-#### FSI 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
+▪ **PH**: *`ModelProperties`*
+
+▪ **OH**
+
+▪ **FCH**
+
+▪ **FSH**
+
+▪ **PI**: *`ModelProperties`*
+
+▪ **OI**
+
+▪ **FCI**
+
+▪ **FSI**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
-| H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
-| I | [IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`> |
+Name | Type |
+------ | ------ |
+`name` | string |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
+`H` | [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*› |
+`I` | [IModelType](interfaces/imodeltype.md)‹*`PI`*, *`OI`*, *`FCI`*, *`FSI`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH` & `PI`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH` & `OI`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `_CustomJoin`<`FCH`, `FCI`>>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `_CustomJoin`<`FSH`, `FSI`>>>>>>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH` & `PI`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH` & `OI`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, _CustomJoin<FCH, FCI>>>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, _CustomJoin<FSH, FSI>>>>>>>>`*›*
 
-`types.compose` - Composes a new model from one or more existing model types. This method can be invoked in two forms: Given 2 or more model types, the types are composed into a new Type. Given first parameter as a string and 2 or more model types, the types are composed into a new Type with the given name
+▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**, **PI**, **OI**, **FCI**, **FSI**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›, `H`: [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*›, `I`: [IModelType](interfaces/imodeltype.md)‹*`PI`*, *`OI`*, *`FCI`*, *`FSI`*›): *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH` & `PI`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH` & `OI`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, _CustomJoin<FCH, FCI>>>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, _CustomJoin<FSH, FSI>>>>>>>>`*›*
+
+`types.compose` - Composes a new model from one or more existing model types.
+This method can be invoked in two forms:
+Given 2 or more model types, the types are composed into a new Type.
+Given first parameter as a string and 2 or more model types,
+the types are composed into a new Type with the given name
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
-#### PH :  `ModelProperties`
-#### OH 
-#### FCH 
-#### FSH 
-#### PI :  `ModelProperties`
-#### OI 
-#### FCI 
-#### FSI 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
+▪ **PH**: *`ModelProperties`*
+
+▪ **OH**
+
+▪ **FCH**
+
+▪ **FSH**
+
+▪ **PI**: *`ModelProperties`*
+
+▪ **OI**
+
+▪ **FCI**
+
+▪ **FSI**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
-| H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
-| I | [IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
+`H` | [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*› |
+`I` | [IModelType](interfaces/imodeltype.md)‹*`PI`*, *`OI`*, *`FCI`*, *`FSI`*› |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH` & `PI`, `OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH` & `OI`, `_CustomJoin`<`FCA`, `_CustomJoin`<`FCB`, `_CustomJoin`<`FCC`, `_CustomJoin`<`FCD`, `_CustomJoin`<`FCE`, `_CustomJoin`<`FCF`, `_CustomJoin`<`FCG`, `_CustomJoin`<`FCH`, `FCI`>>>>>>>>, `_CustomJoin`<`FSA`, `_CustomJoin`<`FSB`, `_CustomJoin`<`FSC`, `_CustomJoin`<`FSD`, `_CustomJoin`<`FSE`, `_CustomJoin`<`FSF`, `_CustomJoin`<`FSG`, `_CustomJoin`<`FSH`, `FSI`>>>>>>>>>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`PA` & `PB` & `PC` & `PD` & `PE` & `PF` & `PG` & `PH` & `PI`*, *`OA` & `OB` & `OC` & `OD` & `OE` & `OF` & `OG` & `OH` & `OI`*, *`_CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, _CustomJoin<FCF, _CustomJoin<FCG, _CustomJoin<FCH, FCI>>>>>>>>`*, *`_CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, _CustomJoin<FSF, _CustomJoin<FSG, _CustomJoin<FSH, FSI>>>>>>>>`*›*
 
 ___
-<a id="createactiontrackingmiddleware"></a>
 
 ###  createActionTrackingMiddleware
 
-▸ **createActionTrackingMiddleware**<`T`>(hooks: *[IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`>*): [IMiddlewareHandler](#imiddlewarehandler)
+▸ **createActionTrackingMiddleware**<**T**>(`hooks`: [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)‹*`T`*›): *[IMiddlewareHandler](README.md#imiddlewarehandler)*
 
 Note: Consider migrating to `createActionTrackingMiddleware2`, it is easier to use.
 
-Convenience utility to create action based middleware that supports async processes more easily. All hooks are called for both synchronous and asynchronous actions. Except that either `onSuccess` or `onFail` is called
+Convenience utility to create action based middleware that supports async processes more easily.
+All hooks are called for both synchronous and asynchronous actions. Except that either `onSuccess` or `onFail` is called
 
-The create middleware tracks the process of an action (assuming it passes the `filter`). `onResume` can return any value, which will be passed as second argument to any other hook. This makes it possible to keep state during a process.
+The create middleware tracks the process of an action (assuming it passes the `filter`).
+`onResume` can return any value, which will be passed as second argument to any other hook. This makes it possible to keep state during a process.
 
 See the `atomic` middleware for an example
 
 **Type parameters:**
 
-#### T 
+▪ **T**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| hooks | [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)<`T`> |  \- |
+Name | Type |
+------ | ------ |
+`hooks` | [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)‹*`T`*› |
 
-**Returns:** [IMiddlewareHandler](#imiddlewarehandler)
+**Returns:** *[IMiddlewareHandler](README.md#imiddlewarehandler)*
 
 ___
-<a id="createactiontrackingmiddleware2"></a>
 
 ###  createActionTrackingMiddleware2
 
-▸ **createActionTrackingMiddleware2**<`TEnv`>(middlewareHooks: *[IActionTrackingMiddleware2Hooks](interfaces/iactiontrackingmiddleware2hooks.md)<`TEnv`>*): [IMiddlewareHandler](#imiddlewarehandler)
+▸ **createActionTrackingMiddleware2**<**TEnv**>(`middlewareHooks`: [IActionTrackingMiddleware2Hooks](interfaces/iactiontrackingmiddleware2hooks.md)‹*`TEnv`*›): *[IMiddlewareHandler](README.md#imiddlewarehandler)*
 
-Convenience utility to create action based middleware that supports async processes more easily. The flow is like this:
-
-*   for each action: if filter passes -> `onStart` -> (inner actions recursively) -> `onFinish`
+Convenience utility to create action based middleware that supports async processes more easily.
+The flow is like this:
+- for each action: if filter passes -> `onStart` -> (inner actions recursively) -> `onFinish`
 
 Example: if we had an action `a` that called inside an action `b1`, then `b2` the flow would be:
-
-*   `filter(a)`
-*   `onStart(a)`
-    *   `filter(b1)`
-    *   `onStart(b1)`
-    *   `onFinish(b1)`
-    *   `filter(b2)`
-    *   `onStart(b2)`
-    *   `onFinish(b2)`
-*   `onFinish(a)`
+- `filter(a)`
+- `onStart(a)`
+  - `filter(b1)`
+  - `onStart(b1)`
+  - `onFinish(b1)`
+  - `filter(b2)`
+  - `onStart(b2)`
+  - `onFinish(b2)`
+- `onFinish(a)`
 
 The flow is the same no matter if the actions are sync or async.
 
@@ -1617,26 +2024,25 @@ See the `atomic` middleware for an example
 
 **Type parameters:**
 
-#### TEnv 
+▪ **TEnv**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| middlewareHooks | [IActionTrackingMiddleware2Hooks](interfaces/iactiontrackingmiddleware2hooks.md)<`TEnv`> |
+Name | Type |
+------ | ------ |
+`middlewareHooks` | [IActionTrackingMiddleware2Hooks](interfaces/iactiontrackingmiddleware2hooks.md)‹*`TEnv`*› |
 
-**Returns:** [IMiddlewareHandler](#imiddlewarehandler)
+**Returns:** *[IMiddlewareHandler](README.md#imiddlewarehandler)*
 
 ___
-<a id="custom"></a>
 
 ###  custom
 
-▸ **custom**<`S`,`T`>(options: *[CustomTypeOptions](interfaces/customtypeoptions.md)<`S`, `T`>*): [IType](interfaces/itype.md)<`S` \| `T`, `S`, `T`>
+▸ **custom**<**S**, **T**>(`options`: [CustomTypeOptions](interfaces/customtypeoptions.md)‹*`S`*, *`T`*›): *[IType](interfaces/itype.md)‹*`S` | `T`*, *`S`*, *`T`*›*
 
 `types.custom` - Creates a custom type. Custom types can be used for arbitrary immutable values, that have a serializable representation. For example, to create your own Date representation, Decimal type etc.
 
 The signature of the options is:
-
 ```ts
 export interface CustomTypeOptions<S, T> {
     // Friendly name
@@ -1646,14 +2052,13 @@ export interface CustomTypeOptions<S, T> {
     // return the serialization of the current value
     toSnapshot(value: T): S
     // if true, this is a converted value, if false, it's a snapshot
-    isTargetType(value: T \| S): value is T
+    isTargetType(value: T | S): value is T
     // a non empty string is assumed to be a validation error
     getValidationMessage?(snapshot: S): string
 }
 ```
 
 Example:
-
 ```ts
 const DecimalPrimitive = types.custom<string, Decimal>({
     name: "Decimal",
@@ -1663,7 +2068,7 @@ const DecimalPrimitive = types.custom<string, Decimal>({
     toSnapshot(value: Decimal) {
         return value.toString()
     },
-    isTargetType(value: string \| Decimal): boolean {
+    isTargetType(value: string | Decimal): boolean {
         return value instanceof Decimal
     },
     getValidationMessage(value: string): string {
@@ -1679,27 +2084,27 @@ const Wallet = types.model({
 
 **Type parameters:**
 
-#### S 
-#### T 
+▪ **S**
+
+▪ **T**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| options | [CustomTypeOptions](interfaces/customtypeoptions.md)<`S`, `T`> |  \- |
+Name | Type |
+------ | ------ |
+`options` | [CustomTypeOptions](interfaces/customtypeoptions.md)‹*`S`*, *`T`*› |
 
-**Returns:** [IType](interfaces/itype.md)<`S` \| `T`, `S`, `T`>
+**Returns:** *[IType](interfaces/itype.md)‹*`S` | `T`*, *`S`*, *`T`*›*
 
 ___
-<a id="decorate"></a>
 
 ###  decorate
 
-▸ **decorate**<`T`>(handler: *[IMiddlewareHandler](#imiddlewarehandler)*, fn: *`T`*, includeHooks?: *`boolean`*): `T`
+▸ **decorate**<**T**>(`handler`: [IMiddlewareHandler](README.md#imiddlewarehandler), `fn`: `T`, `includeHooks`: boolean): *`T`*
 
 Binds middleware to a specific action.
 
 Example:
-
 ```ts
 type.actions(self => {
   function takeA____() {
@@ -1716,68 +2121,66 @@ type.actions(self => {
 
 **Type parameters:**
 
-#### T :  `Function`
+▪ **T**: *`Function`*
+
 **Parameters:**
 
-| Name | Type | Default value | Description |
-| ------ | ------ | ------ | ------ |
-| handler | [IMiddlewareHandler](#imiddlewarehandler) | - |  \- |
-| fn | `T` | - |  \- |
-| `Default value` includeHooks | `boolean` | true |  \- |
+Name | Type | Default |
+------ | ------ | ------ |
+`handler` | [IMiddlewareHandler](README.md#imiddlewarehandler) | - |
+`fn` | `T` | - |
+`includeHooks` | boolean | true |
 
-**Returns:** `T`
+**Returns:** *`T`*
+
 The original function
 
 ___
-<a id="destroy"></a>
 
 ###  destroy
 
-▸ **destroy**(target: *`IAnyStateTreeNode`*): `void`
+▸ **destroy**(`target`: `IAnyStateTreeNode`): *void*
 
 Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| target | `IAnyStateTreeNode` |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="detach"></a>
 
 ###  detach
 
-▸ **detach**<`T`>(target: *`T`*): `T`
+▸ **detach**<**T**>(`target`: `T`): *`T`*
 
 Removes a model element from the state tree, and let it live on as a new state tree
 
 **Type parameters:**
 
-#### T :  `IAnyStateTreeNode`
+▪ **T**: *`IAnyStateTreeNode`*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| target | `T` |
+Name | Type |
+------ | ------ |
+`target` | `T` |
 
-**Returns:** `T`
+**Returns:** *`T`*
 
 ___
-<a id="enumeration"></a>
 
 ###  enumeration
 
-▸ **enumeration**<`T`>(options: *`T`[]*): [ISimpleType](interfaces/isimpletype.md)<`UnionStringArray`<`T`[]>>
+▸ **enumeration**<**T**>(`options`: `T`[]): *[ISimpleType](interfaces/isimpletype.md)‹*`UnionStringArray<T[]>`*›*
 
-▸ **enumeration**<`T`>(name: *`string`*, options: *`T`[]*): [ISimpleType](interfaces/isimpletype.md)<`UnionStringArray`<`T`[]>>
-
-`types.enumeration` - Can be used to create an string based enumeration. (note: this methods is just sugar for a union of string literals)
+`types.enumeration` - Can be used to create an string based enumeration.
+(note: this methods is just sugar for a union of string literals)
 
 Example:
-
 ```ts
 const TrafficLight = types.model({
   color: types.enumeration("Color", ["Red", "Orange", "Green"])
@@ -1786,19 +2189,22 @@ const TrafficLight = types.model({
 
 **Type parameters:**
 
-#### T :  `string`
+▪ **T**: *string*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| options | `T`[] |  possible values this enumeration can have |
+Name | Type | Description |
+------ | ------ | ------ |
+`options` | `T`[] | possible values this enumeration can have |
 
-**Returns:** [ISimpleType](interfaces/isimpletype.md)<`UnionStringArray`<`T`[]>>
+**Returns:** *[ISimpleType](interfaces/isimpletype.md)‹*`UnionStringArray<T[]>`*›*
 
-`types.enumeration` - Can be used to create an string based enumeration. (note: this methods is just sugar for a union of string literals)
+▸ **enumeration**<**T**>(`name`: string, `options`: `T`[]): *[ISimpleType](interfaces/isimpletype.md)‹*`UnionStringArray<T[]>`*›*
+
+`types.enumeration` - Can be used to create an string based enumeration.
+(note: this methods is just sugar for a union of string literals)
 
 Example:
-
 ```ts
 const TrafficLight = types.model({
   color: types.enumeration("Color", ["Red", "Orange", "Green"])
@@ -1807,82 +2213,93 @@ const TrafficLight = types.model({
 
 **Type parameters:**
 
-#### T :  `string`
+▪ **T**: *string*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| name | `string` |  descriptive name of the enumeration (optional) |
-| options | `T`[] |  possible values this enumeration can have |
+Name | Type | Description |
+------ | ------ | ------ |
+`name` | string | descriptive name of the enumeration (optional) |
+`options` | `T`[] | possible values this enumeration can have |
 
-**Returns:** [ISimpleType](interfaces/isimpletype.md)<`UnionStringArray`<`T`[]>>
+**Returns:** *[ISimpleType](interfaces/isimpletype.md)‹*`UnionStringArray<T[]>`*›*
 
 ___
-<a id="escapejsonpath"></a>
 
 ###  escapeJsonPath
 
-▸ **escapeJsonPath**(path: *`string`*): `string`
+▸ **escapeJsonPath**(`path`: string): *string*
 
 Escape slashes and backslashes.
 
-[http://tools.ietf.org/html/rfc6901](http://tools.ietf.org/html/rfc6901)
+http://tools.ietf.org/html/rfc6901
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| path | `string` |
+Name | Type |
+------ | ------ |
+`path` | string |
 
-**Returns:** `string`
+**Returns:** *string*
 
 ___
-<a id="flow"></a>
 
 ###  flow
 
-▸ **flow**<`R`,`Args`>(generator: *`function`*): `function`
+▸ **flow**<**R**, **Args**>(`generator`: function): *function*
 
 See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
 
 **Type parameters:**
 
-#### R 
-#### Args :  `any`[]
+▪ **R**
+
+▪ **Args**: *any[]*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| generator | `function` |
+▪ **generator**: *function*
 
-**Returns:** `function`
+▸ (...`args`: `Args`): *`IterableIterator<R>`*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | `Args` |
+
+**Returns:** *function*
+
 The flow as a promise.
 
+▸ (...`args`: `Args`): *`Promise<FlowReturnType<R>>`*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | `Args` |
+
 ___
-<a id="frozen"></a>
 
 ###  frozen
 
-▸ **frozen**<`C`>(subType: *[IType](interfaces/itype.md)<`C`, `any`, `any`>*): [IType](interfaces/itype.md)<`C`, `C`, `C`>
+▸ **frozen**<**C**>(`subType`: [IType](interfaces/itype.md)‹*`C`*, *any*, *any*›): *[IType](interfaces/itype.md)‹*`C`*, *`C`*, *`C`*›*
 
-▸ **frozen**<`T`>(defaultValue: *`T`*): [IType](interfaces/itype.md)<`T` \| `undefined` \| `null`, `T`, `T`>
-
-▸ **frozen**<`T`>(): [IType](interfaces/itype.md)<`T`, `T`, `T`>
-
-`types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
+`types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON).
+Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
+Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
 
 This is useful to store complex, but immutable values like vectors etc. It can form a powerful bridge to parts of your application that should be immutable, or that assume data to be immutable.
 
 Note: if you want to store free-form state that is mutable, or not serializeable, consider using volatile state instead.
 
 Frozen properties can be defined in three different ways
-
-1.  `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type
-2.  `types.frozen({ someDefaultValue: true})` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
-3.  `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
+1. `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type
+2. `types.frozen({ someDefaultValue: true})` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
+3. `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
 
 Example:
-
 ```ts
 const GameCharacter = types.model({
   name: string,
@@ -1907,29 +2324,32 @@ type Point = { x: number, y: number }
 
 **Type parameters:**
 
-#### C 
+▪ **C**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| subType | [IType](interfaces/itype.md)<`C`, `any`, `any`> |
+Name | Type |
+------ | ------ |
+`subType` | [IType](interfaces/itype.md)‹*`C`*, *any*, *any*› |
 
-**Returns:** [IType](interfaces/itype.md)<`C`, `C`, `C`>
+**Returns:** *[IType](interfaces/itype.md)‹*`C`*, *`C`*, *`C`*›*
 
-`types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
+▸ **frozen**<**T**>(`defaultValue`: `T`): *[IType](interfaces/itype.md)‹*`T` | undefined | null*, *`T`*, *`T`*›*
+
+`types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON).
+Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
+Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
 
 This is useful to store complex, but immutable values like vectors etc. It can form a powerful bridge to parts of your application that should be immutable, or that assume data to be immutable.
 
 Note: if you want to store free-form state that is mutable, or not serializeable, consider using volatile state instead.
 
 Frozen properties can be defined in three different ways
-
-1.  `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type
-2.  `types.frozen({ someDefaultValue: true})` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
-3.  `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
+1. `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type
+2. `types.frozen({ someDefaultValue: true})` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
+3. `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
 
 Example:
-
 ```ts
 const GameCharacter = types.model({
   name: string,
@@ -1954,29 +2374,32 @@ type Point = { x: number, y: number }
 
 **Type parameters:**
 
-#### T 
+▪ **T**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| defaultValue | `T` |
+Name | Type |
+------ | ------ |
+`defaultValue` | `T` |
 
-**Returns:** [IType](interfaces/itype.md)<`T` \| `undefined` \| `null`, `T`, `T`>
+**Returns:** *[IType](interfaces/itype.md)‹*`T` | undefined | null*, *`T`*, *`T`*›*
 
-`types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON). Frozen values need to be immutable or treated as if immutable. They need be serializable as well. Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
+▸ **frozen**<**T**>(): *[IType](interfaces/itype.md)‹*`T`*, *`T`*, *`T`*›*
+
+`types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON).
+Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
+Values stored in frozen will snapshotted as-is by MST, and internal changes will not be tracked.
 
 This is useful to store complex, but immutable values like vectors etc. It can form a powerful bridge to parts of your application that should be immutable, or that assume data to be immutable.
 
 Note: if you want to store free-form state that is mutable, or not serializeable, consider using volatile state instead.
 
 Frozen properties can be defined in three different ways
-
-1.  `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type
-2.  `types.frozen({ someDefaultValue: true})` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
-3.  `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
+1. `types.frozen(SubType)` - provide a valid MST type and frozen will check if the provided data conforms the snapshot for that type
+2. `types.frozen({ someDefaultValue: true})` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
+3. `types.frozen<TypeScriptType>()` - provide a typescript type, to help in strongly typing the field (design time only)
 
 Example:
-
 ```ts
 const GameCharacter = types.model({
   name: string,
@@ -2001,21 +2424,20 @@ type Point = { x: number, y: number }
 
 **Type parameters:**
 
-#### T 
+▪ **T**
 
-**Returns:** [IType](interfaces/itype.md)<`T`, `T`, `T`>
+**Returns:** *[IType](interfaces/itype.md)‹*`T`*, *`T`*, *`T`*›*
 
 ___
-<a id="getchildtype"></a>
 
 ###  getChildType
 
-▸ **getChildType**(object: *`IAnyStateTreeNode`*, propertyName?: *`undefined` \| `string`*): [IAnyType](interfaces/ianytype.md)
+▸ **getChildType**(`object`: `IAnyStateTreeNode`, `propertyName?`: undefined | string): *[IAnyType](interfaces/ianytype.md)*
 
-Returns the _declared_ type of the given sub property of an object, array or map. In the case of arrays and maps the property name is optional and will be ignored.
+Returns the _declared_ type of the given sub property of an object, array or map.
+In the case of arrays and maps the property name is optional and will be ignored.
 
 Example:
-
 ```ts
 const Box = types.model({ x: 0, y: 0 })
 const box = Box.create()
@@ -2025,746 +2447,750 @@ console.log(getChildType(box, "x").name) // 'number'
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| object | `IAnyStateTreeNode` |  \- |
-| `Optional` propertyName | `undefined` \| `string` |  \- |
+Name | Type |
+------ | ------ |
+`object` | `IAnyStateTreeNode` |
+`propertyName?` | undefined \| string |
 
-**Returns:** [IAnyType](interfaces/ianytype.md)
+**Returns:** *[IAnyType](interfaces/ianytype.md)*
 
 ___
-<a id="getenv"></a>
 
 ###  getEnv
 
-▸ **getEnv**<`T`>(target: *`IAnyStateTreeNode`*): `T`
+▸ **getEnv**<**T**>(`target`: `IAnyStateTreeNode`): *`T`*
 
-Returns the environment of the current state tree. For more info on environments, see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
+Returns the environment of the current state tree. For more info on environments,
+see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
 
-Please note that in child nodes access to the root is only possible once the `afterAttach` hook has fired
+Please note that in child nodes access to the root is only possible
+once the `afterAttach` hook has fired
 
 Returns an empty environment if the tree wasn't initialized with an environment
 
 **Type parameters:**
 
-#### T 
+▪ **T**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `T`
+**Returns:** *`T`*
 
 ___
-<a id="getidentifier"></a>
 
 ###  getIdentifier
 
-▸ **getIdentifier**(target: *`IAnyStateTreeNode`*): `string` \| `null`
+▸ **getIdentifier**(`target`: `IAnyStateTreeNode`): *string | null*
 
-Returns the identifier of the target node. This is the _string normalized_ identifier, which might not match the type of the identifier attribute
+Returns the identifier of the target node.
+This is the *string normalized* identifier, which might not match the type of the identifier attribute
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `string` \| `null`
+**Returns:** *string | null*
 
 ___
-<a id="getlivelinesschecking"></a>
 
 ###  getLivelinessChecking
 
-▸ **getLivelinessChecking**(): [LivelinessMode](#livelinessmode)
+▸ **getLivelinessChecking**(): *[LivelinessMode](README.md#livelinessmode)*
 
 Returns the current liveliness checking mode.
 
-**Returns:** [LivelinessMode](#livelinessmode)
+**Returns:** *[LivelinessMode](README.md#livelinessmode)*
+
 `"warn"`, `"error"` or `"ignore"`
 
 ___
-<a id="getmembers"></a>
 
 ###  getMembers
 
-▸ **getMembers**(target: *`IAnyStateTreeNode`*): [IModelReflectionData](interfaces/imodelreflectiondata.md)
+▸ **getMembers**(`target`: `IAnyStateTreeNode`): *[IModelReflectionData](interfaces/imodelreflectiondata.md)*
 
 Returns a reflection of the model node, including name, properties, views, volatile and actions.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** [IModelReflectionData](interfaces/imodelreflectiondata.md)
+**Returns:** *[IModelReflectionData](interfaces/imodelreflectiondata.md)*
 
 ___
-<a id="getnodeid"></a>
 
 ###  getNodeId
 
-▸ **getNodeId**(target: *`IAnyStateTreeNode`*): `number`
+▸ **getNodeId**(`target`: `IAnyStateTreeNode`): *number*
 
-Returns the unique node id (not to be confused with the instance identifier) for a given instance. This id is a number that is unique for each instance.
+Returns the unique node id (not to be confused with the instance identifier) for a
+given instance.
+This id is a number that is unique for each instance.
 
-*__export__*: 
+**`export`** 
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `number`
+**Returns:** *number*
 
 ___
-<a id="getparent"></a>
 
 ###  getParent
 
-▸ **getParent**<`IT`>(target: *`IAnyStateTreeNode`*, depth?: *`number`*): `TypeOrStateTreeNodeToStateTreeNode`<`IT`>
+▸ **getParent**<**IT**>(`target`: `IAnyStateTreeNode`, `depth`: number): *`TypeOrStateTreeNodeToStateTreeNode<IT>`*
 
 Returns the immediate parent of this object, or throws.
 
-Note that the immediate parent can be either an object, map or array, and doesn't necessarily refer to the parent model.
+Note that the immediate parent can be either an object, map or array, and
+doesn't necessarily refer to the parent model.
 
-Please note that in child nodes access to the root is only possible once the `afterAttach` hook has fired.
+Please note that in child nodes access to the root is only possible
+once the `afterAttach` hook has fired.
 
 **Type parameters:**
 
-#### IT :  `IAnyStateTreeNode` \| [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *`IAnyStateTreeNode` | [IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Default value | Description |
-| ------ | ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` | - |  \- |
-| `Default value` depth | `number` | 1 |  How far should we look upward? 1 by default. |
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`target` | `IAnyStateTreeNode` | - | - |
+`depth` | number | 1 | How far should we look upward? 1 by default. |
 
-**Returns:** `TypeOrStateTreeNodeToStateTreeNode`<`IT`>
+**Returns:** *`TypeOrStateTreeNodeToStateTreeNode<IT>`*
 
 ___
-<a id="getparentoftype"></a>
 
 ###  getParentOfType
 
-▸ **getParentOfType**<`IT`>(target: *`IAnyStateTreeNode`*, type: *`IT`*): `IT["Type"]`
+▸ **getParentOfType**<**IT**>(`target`: `IAnyStateTreeNode`, `type`: `IT`): *`IT["Type"]`*
 
 Returns the target's parent of a given type, or throws.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
+`type` | `IT` |
 
-**Returns:** `IT["Type"]`
+**Returns:** *`IT["Type"]`*
 
 ___
-<a id="getpath"></a>
 
 ###  getPath
 
-▸ **getPath**(target: *`IAnyStateTreeNode`*): `string`
+▸ **getPath**(`target`: `IAnyStateTreeNode`): *string*
 
 Returns the path of the given object in the model tree
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `string`
+**Returns:** *string*
 
 ___
-<a id="getpathparts"></a>
 
 ###  getPathParts
 
-▸ **getPathParts**(target: *`IAnyStateTreeNode`*): `string`[]
+▸ **getPathParts**(`target`: `IAnyStateTreeNode`): *string[]*
 
 Returns the path of the given object as unescaped string array.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `string`[]
+**Returns:** *string[]*
 
 ___
-<a id="getpropertymembers"></a>
 
 ###  getPropertyMembers
 
-▸ **getPropertyMembers**(typeOrNode: *[IAnyModelType](interfaces/ianymodeltype.md) \| `IAnyStateTreeNode`*): [IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)
+▸ **getPropertyMembers**(`typeOrNode`: [IAnyModelType](interfaces/ianymodeltype.md) | `IAnyStateTreeNode`): *[IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)*
 
 Returns a reflection of the model type properties and name for either a model type or model node.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| typeOrNode | [IAnyModelType](interfaces/ianymodeltype.md) \| `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`typeOrNode` | [IAnyModelType](interfaces/ianymodeltype.md) \| `IAnyStateTreeNode` |
 
-**Returns:** [IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)
+**Returns:** *[IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)*
 
 ___
-<a id="getrelativepath"></a>
 
 ###  getRelativePath
 
-▸ **getRelativePath**(base: *`IAnyStateTreeNode`*, target: *`IAnyStateTreeNode`*): `string`
+▸ **getRelativePath**(`base`: `IAnyStateTreeNode`, `target`: `IAnyStateTreeNode`): *string*
 
-Given two state tree nodes that are part of the same tree, returns the shortest jsonpath needed to navigate from the one to the other
+Given two state tree nodes that are part of the same tree,
+returns the shortest jsonpath needed to navigate from the one to the other
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| base | `IAnyStateTreeNode` |  \- |
-| target | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`base` | `IAnyStateTreeNode` |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `string`
+**Returns:** *string*
 
 ___
-<a id="getroot"></a>
 
 ###  getRoot
 
-▸ **getRoot**<`IT`>(target: *`IAnyStateTreeNode`*): `TypeOrStateTreeNodeToStateTreeNode`<`IT`>
+▸ **getRoot**<**IT**>(`target`: `IAnyStateTreeNode`): *`TypeOrStateTreeNodeToStateTreeNode<IT>`*
 
 Given an object in a model tree, returns the root object of that tree.
 
-Please note that in child nodes access to the root is only possible once the `afterAttach` hook has fired.
+Please note that in child nodes access to the root is only possible
+once the `afterAttach` hook has fired.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md) \| `IAnyStateTreeNode`
+▪ **IT**: *[IAnyType](interfaces/ianytype.md) | `IAnyStateTreeNode`*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `TypeOrStateTreeNodeToStateTreeNode`<`IT`>
+**Returns:** *`TypeOrStateTreeNodeToStateTreeNode<IT>`*
 
 ___
-<a id="getrunningactioncontext"></a>
 
 ###  getRunningActionContext
 
-▸ **getRunningActionContext**(): [IActionContext](interfaces/iactioncontext.md) \| `undefined`
+▸ **getRunningActionContext**(): *[IActionContext](interfaces/iactioncontext.md) | undefined*
 
 Returns the currently executing MST action context, or undefined if none.
 
-**Returns:** [IActionContext](interfaces/iactioncontext.md) \| `undefined`
+**Returns:** *[IActionContext](interfaces/iactioncontext.md) | undefined*
 
 ___
-<a id="getsnapshot"></a>
 
 ###  getSnapshot
 
-▸ **getSnapshot**<`S`>(target: *`IStateTreeNode`<[IType](interfaces/itype.md)<`any`, `S`, `any`>>*, applyPostProcess?: *`boolean`*): `S`
+▸ **getSnapshot**<**S**>(`target`: `IStateTreeNode<IType<any, S, any>>`, `applyPostProcess`: boolean): *`S`*
 
-Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use structural sharing where possible. Doesn't require MobX transactions to be completed.
+Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
+structural sharing where possible. Doesn't require MobX transactions to be completed.
 
 **Type parameters:**
 
-#### S 
+▪ **S**
+
 **Parameters:**
 
-| Name | Type | Default value | Description |
-| ------ | ------ | ------ | ------ |
-| target | `IStateTreeNode`<[IType](interfaces/itype.md)<`any`, `S`, `any`>> | - |  \- |
-| `Default value` applyPostProcess | `boolean` | true |  If true (the default) then postProcessSnapshot gets applied. |
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`target` | `IStateTreeNode<IType<any, S, any>>` | - | - |
+`applyPostProcess` | boolean | true | If true (the default) then postProcessSnapshot gets applied. |
 
-**Returns:** `S`
+**Returns:** *`S`*
 
 ___
-<a id="gettype"></a>
 
 ###  getType
 
-▸ **getType**(object: *`IAnyStateTreeNode`*): [IAnyType](interfaces/ianytype.md)
+▸ **getType**(`object`: `IAnyStateTreeNode`): *[IAnyType](interfaces/ianytype.md)*
 
 Returns the _actual_ type of the given tree node. (Or throws)
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| object | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`object` | `IAnyStateTreeNode` |
 
-**Returns:** [IAnyType](interfaces/ianytype.md)
+**Returns:** *[IAnyType](interfaces/ianytype.md)*
 
 ___
-<a id="hasparent"></a>
 
 ###  hasParent
 
-▸ **hasParent**(target: *`IAnyStateTreeNode`*, depth?: *`number`*): `boolean`
+▸ **hasParent**(`target`: `IAnyStateTreeNode`, `depth`: number): *boolean*
 
 Given a model instance, returns `true` if the object has a parent, that is, is part of another object, map or array.
 
 **Parameters:**
 
-| Name | Type | Default value | Description |
-| ------ | ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` | - |  \- |
-| `Default value` depth | `number` | 1 |  How far should we look upward? 1 by default. |
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`target` | `IAnyStateTreeNode` | - | - |
+`depth` | number | 1 | How far should we look upward? 1 by default. |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="hasparentoftype"></a>
 
 ###  hasParentOfType
 
-▸ **hasParentOfType**(target: *`IAnyStateTreeNode`*, type: *[IAnyType](interfaces/ianytype.md)*): `boolean`
+▸ **hasParentOfType**(`target`: `IAnyStateTreeNode`, `type`: [IAnyType](interfaces/ianytype.md)): *boolean*
 
 Given a model instance, returns `true` if the object has a parent of given type, that is, is part of another object, map or array
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
-| type | [IAnyType](interfaces/ianytype.md) |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
+`type` | [IAnyType](interfaces/ianytype.md) |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isactioncontextchildof"></a>
 
 ###  isActionContextChildOf
 
-▸ **isActionContextChildOf**(actionContext: *[IActionContext](interfaces/iactioncontext.md)*, parent: *`number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md)*): `boolean`
+▸ **isActionContextChildOf**(`actionContext`: [IActionContext](interfaces/iactioncontext.md), `parent`: number | [IActionContext](interfaces/iactioncontext.md) | [IMiddlewareEvent](interfaces/imiddlewareevent.md)): *boolean*
 
 Returns if the given action context is a parent of this action context.
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| actionContext | [IActionContext](interfaces/iactioncontext.md) |
-| parent | `number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
+Name | Type |
+------ | ------ |
+`actionContext` | [IActionContext](interfaces/iactioncontext.md) |
+`parent` | number \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isactioncontextthisorchildof"></a>
 
 ###  isActionContextThisOrChildOf
 
-▸ **isActionContextThisOrChildOf**(actionContext: *[IActionContext](interfaces/iactioncontext.md)*, parentOrThis: *`number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md)*): `boolean`
+▸ **isActionContextThisOrChildOf**(`actionContext`: [IActionContext](interfaces/iactioncontext.md), `parentOrThis`: number | [IActionContext](interfaces/iactioncontext.md) | [IMiddlewareEvent](interfaces/imiddlewareevent.md)): *boolean*
 
 Returns if the given action context is this or a parent of this action context.
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| actionContext | [IActionContext](interfaces/iactioncontext.md) |
-| parentOrThis | `number` \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
+Name | Type |
+------ | ------ |
+`actionContext` | [IActionContext](interfaces/iactioncontext.md) |
+`parentOrThis` | number \| [IActionContext](interfaces/iactioncontext.md) \| [IMiddlewareEvent](interfaces/imiddlewareevent.md) |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isalive"></a>
 
 ###  isAlive
 
-▸ **isAlive**(target: *`IAnyStateTreeNode`*): `boolean`
+▸ **isAlive**(`target`: `IAnyStateTreeNode`): *boolean*
 
-Returns true if the given state tree node is not killed yet. This means that the node is still a part of a tree, and that `destroy` has not been called. If a node is not alive anymore, the only thing one can do with it is requesting it's last path and snapshot
+Returns true if the given state tree node is not killed yet.
+This means that the node is still a part of a tree, and that `destroy`
+has not been called. If a node is not alive anymore, the only thing one can do with it
+is requesting it's last path and snapshot
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isarraytype"></a>
 
 ###  isArrayType
 
-▸ **isArrayType**<`Items`>(type: *[IAnyType](interfaces/ianytype.md)*): `boolean`
+▸ **isArrayType**<**Items**>(`type`: [IAnyType](interfaces/ianytype.md)): *boolean*
 
 Returns if a given value represents an array type.
 
 **Type parameters:**
 
-#### Items :  [IAnyType](interfaces/ianytype.md)
+▪ **Items**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | [IAnyType](interfaces/ianytype.md) |  \- |
+Name | Type |
+------ | ------ |
+`type` | [IAnyType](interfaces/ianytype.md) |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
+
 `true` if the type is an array type.
 
 ___
-<a id="isfrozentype"></a>
 
 ###  isFrozenType
 
-▸ **isFrozenType**<`IT`,`T`>(type: *`IT`*): `boolean`
+▸ **isFrozenType**<**IT**, **T**>(`type`: `IT`): *boolean*
 
 Returns if a given value represents a frozen type.
 
 **Type parameters:**
 
-#### IT :  [IType](interfaces/itype.md)<`T` \| `any`, `T`, `T`>
-#### T 
+▪ **IT**: *[IType](interfaces/itype.md)‹*`T` | any*, *`T`*, *`T`*›*
+
+▪ **T**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isidentifiertype"></a>
 
 ###  isIdentifierType
 
-▸ **isIdentifierType**<`IT`>(type: *`IT`*): `boolean`
+▸ **isIdentifierType**<**IT**>(`type`: `IT`): *boolean*
 
 Returns if a given value represents an identifier type.
 
 **Type parameters:**
 
-#### IT :  [ISimpleType](interfaces/isimpletype.md) \| [ISimpleType](interfaces/isimpletype.md)
+▪ **IT**: *[ISimpleType](interfaces/isimpletype.md) | [ISimpleType](interfaces/isimpletype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="islatetype"></a>
 
 ###  isLateType
 
-▸ **isLateType**<`IT`>(type: *`IT`*): `boolean`
+▸ **isLateType**<**IT**>(`type`: `IT`): *boolean*
 
 Returns if a given value represents a late type.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isliteraltype"></a>
 
 ###  isLiteralType
 
-▸ **isLiteralType**<`IT`>(type: *`IT`*): `boolean`
+▸ **isLiteralType**<**IT**>(`type`: `IT`): *boolean*
 
 Returns if a given value represents a literal type.
 
 **Type parameters:**
 
-#### IT :  [ISimpleType](interfaces/isimpletype.md)<`any`>
+▪ **IT**: *[ISimpleType](interfaces/isimpletype.md)‹*any*›*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="ismaptype"></a>
 
 ###  isMapType
 
-▸ **isMapType**<`Items`>(type: *[IAnyType](interfaces/ianytype.md)*): `boolean`
+▸ **isMapType**<**Items**>(`type`: [IAnyType](interfaces/ianytype.md)): *boolean*
 
 Returns if a given value represents a map type.
 
 **Type parameters:**
 
-#### Items :  [IAnyType](interfaces/ianytype.md)
+▪ **Items**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | [IAnyType](interfaces/ianytype.md) |  \- |
+Name | Type |
+------ | ------ |
+`type` | [IAnyType](interfaces/ianytype.md) |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
+
 `true` if it is a map type.
 
 ___
-<a id="ismodeltype"></a>
 
 ###  isModelType
 
-▸ **isModelType**<`IT`>(type: *[IAnyType](interfaces/ianytype.md)*): `boolean`
+▸ **isModelType**<**IT**>(`type`: [IAnyType](interfaces/ianytype.md)): *boolean*
 
 Returns if a given value represents a model type.
 
 **Type parameters:**
 
-#### IT :  [IAnyModelType](interfaces/ianymodeltype.md)
+▪ **IT**: *[IAnyModelType](interfaces/ianymodeltype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | [IAnyType](interfaces/ianytype.md) |  \- |
+Name | Type |
+------ | ------ |
+`type` | [IAnyType](interfaces/ianytype.md) |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isoptionaltype"></a>
 
 ###  isOptionalType
 
-▸ **isOptionalType**<`IT`>(type: *`IT`*): `boolean`
+▸ **isOptionalType**<**IT**>(`type`: `IT`): *boolean*
 
 Returns if a value represents an optional type.
 
-*__template__*: IT
+**`template`** IT
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isprimitivetype"></a>
 
 ###  isPrimitiveType
 
-▸ **isPrimitiveType**<`IT`>(type: *`IT`*): `boolean`
+▸ **isPrimitiveType**<**IT**>(`type`: `IT`): *boolean*
 
 Returns if a given value represents a primitive type.
 
 **Type parameters:**
 
-#### IT :  [ISimpleType](interfaces/isimpletype.md)<`string`> \| [ISimpleType](interfaces/isimpletype.md)<`number`> \| [ISimpleType](interfaces/isimpletype.md)<`boolean`> \| [IType](interfaces/itype.md)
+▪ **IT**: *[ISimpleType](interfaces/isimpletype.md)‹*string*› | [ISimpleType](interfaces/isimpletype.md)‹*number*› | [ISimpleType](interfaces/isimpletype.md)‹*boolean*› | [IType](interfaces/itype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isprotected"></a>
 
 ###  isProtected
 
-▸ **isProtected**(target: *`IAnyStateTreeNode`*): `boolean`
+▸ **isProtected**(`target`: `IAnyStateTreeNode`): *boolean*
 
 Returns true if the object is in protected mode, @see protect
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| target | `IAnyStateTreeNode` |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isreferencetype"></a>
 
 ###  isReferenceType
 
-▸ **isReferenceType**<`IT`>(type: *`IT`*): `boolean`
+▸ **isReferenceType**<**IT**>(`type`: `IT`): *boolean*
 
 Returns if a given value represents a reference type.
 
 **Type parameters:**
 
-#### IT :  `IReferenceType`<`any`>
+▪ **IT**: *`IReferenceType<any>`*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isrefinementtype"></a>
 
 ###  isRefinementType
 
-▸ **isRefinementType**<`IT`>(type: *`IT`*): `boolean`
+▸ **isRefinementType**<**IT**>(`type`: `IT`): *boolean*
 
 Returns if a given value is a refinement type.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isroot"></a>
 
 ###  isRoot
 
-▸ **isRoot**(target: *`IAnyStateTreeNode`*): `boolean`
+▸ **isRoot**(`target`: `IAnyStateTreeNode`): *boolean*
 
 Returns true if the given object is the root of a model tree.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isstatetreenode"></a>
 
 ###  isStateTreeNode
 
-▸ **isStateTreeNode**<`IT`>(value: *`any`*): `boolean`
+▸ **isStateTreeNode**<**IT**>(`value`: any): *boolean*
 
-Returns true if the given value is a node in a state tree. More precisely, that is, if the value is an instance of a `types.model`, `types.array` or `types.map`.
+Returns true if the given value is a node in a state tree.
+More precisely, that is, if the value is an instance of a
+`types.model`, `types.array` or `types.map`.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| value | `any` |  \- |
+Name | Type |
+------ | ------ |
+`value` | any |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
+
 true if the value is a state tree node.
 
 ___
-<a id="istype"></a>
 
 ###  isType
 
-▸ **isType**(value: *`any`*): `boolean`
+▸ **isType**(`value`: any): *boolean*
 
 Returns if a given value represents a type.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| value | `any` |  Value to check. |
+Name | Type | Description |
+------ | ------ | ------ |
+`value` | any | Value to check. |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
+
 `true` if the value is a type.
 
 ___
-<a id="isuniontype"></a>
 
 ###  isUnionType
 
-▸ **isUnionType**<`IT`>(type: *`IT`*): `boolean`
+▸ **isUnionType**<**IT**>(`type`: `IT`): *boolean*
 
 Returns if a given value represents a union type.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isvalidreference"></a>
 
 ###  isValidReference
 
-▸ **isValidReference**<`N`>(getter: *`function`*, checkIfAlive?: *`boolean`*): `boolean`
+▸ **isValidReference**<**N**>(`getter`: function, `checkIfAlive`: boolean): *boolean*
 
 Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns if the check passes or not.
 
 **Type parameters:**
 
-#### N :  `IAnyStateTreeNode`
+▪ **N**: *`IAnyStateTreeNode`*
+
 **Parameters:**
 
-| Name | Type | Default value | Description |
-| ------ | ------ | ------ | ------ |
-| getter | `function` | - |  Function to access the reference. |
-| `Default value` checkIfAlive | `boolean` | true |  true to also make sure the referenced node is alive (default), false to skip this check. |
+▪ **getter**: *function*
 
-**Returns:** `boolean`
+Function to access the reference.
+
+▸ (): *`N` | null | undefined*
+
+▪`Default value`  **checkIfAlive**: *boolean*= true
+
+true to also make sure the referenced node is alive (default), false to skip this check.
+
+**Returns:** *boolean*
 
 ___
-<a id="joinjsonpath"></a>
 
 ###  joinJsonPath
 
-▸ **joinJsonPath**(path: *`string`[]*): `string`
+▸ **joinJsonPath**(`path`: string[]): *string*
 
 Generates a json-path compliant json path from path parts.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| path | `string`[] |  \- |
+Name | Type |
+------ | ------ |
+`path` | string[] |
 
-**Returns:** `string`
+**Returns:** *string*
 
 ___
-<a id="late"></a>
 
 ###  late
 
-▸ **late**<`T`>(type: *`function`*): `T`
+▸ **late**<**T**>(`type`: function): *`T`*
 
-▸ **late**<`T`>(name: *`string`*, type: *`function`*): `T`
-
-`types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies. Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
+`types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies.
+Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
 
 Example:
-
 ```ts
   // TypeScript isn't smart enough to infer self referencing types.
  const Node = types.model({
@@ -2774,19 +3200,24 @@ Example:
 
 **Type parameters:**
 
-#### T :  [IAnyType](interfaces/ianytype.md)
+▪ **T**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `function` |  A function that returns the type that will be defined. |
+▪ **type**: *function*
 
-**Returns:** `T`
+A function that returns the type that will be defined.
 
-`types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies. Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
+▸ (): *`T`*
+
+**Returns:** *`T`*
+
+▸ **late**<**T**>(`name`: string, `type`: function): *`T`*
+
+`types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies.
+Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
 
 Example:
-
 ```ts
   // TypeScript isn't smart enough to infer self referencing types.
  const Node = types.model({
@@ -2796,27 +3227,33 @@ Example:
 
 **Type parameters:**
 
-#### T :  [IAnyType](interfaces/ianytype.md)
+▪ **T**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| name | `string` |  The name to use for the type that will be returned. |
-| type | `function` |  A function that returns the type that will be defined. |
+▪ **name**: *string*
 
-**Returns:** `T`
+The name to use for the type that will be returned.
+
+▪ **type**: *function*
+
+A function that returns the type that will be defined.
+
+▸ (): *`T`*
+
+**Returns:** *`T`*
 
 ___
-<a id="literal"></a>
 
 ###  literal
 
-▸ **literal**<`S`>(value: *`S`*): [ISimpleType](interfaces/isimpletype.md)<`S`>
+▸ **literal**<**S**>(`value`: `S`): *[ISimpleType](interfaces/isimpletype.md)‹*`S`*›*
 
-`types.literal` - The literal type will return a type that will match only the exact given type. The given value must be a primitive, in order to be serialized to a snapshot correctly. You can use literal to match exact strings for example the exact male or female string.
+`types.literal` - The literal type will return a type that will match only the exact given type.
+The given value must be a primitive, in order to be serialized to a snapshot correctly.
+You can use literal to match exact strings for example the exact male or female string.
 
 Example:
-
 ```ts
 const Person = types.model({
     name: types.string,
@@ -2826,28 +3263,28 @@ const Person = types.model({
 
 **Type parameters:**
 
-#### S :  `Primitives`
+▪ **S**: *`Primitives`*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| value | `S` |  The value to use in the strict equal check |
+Name | Type | Description |
+------ | ------ | ------ |
+`value` | `S` | The value to use in the strict equal check |
 
-**Returns:** [ISimpleType](interfaces/isimpletype.md)<`S`>
+**Returns:** *[ISimpleType](interfaces/isimpletype.md)‹*`S`*›*
 
 ___
-<a id="map"></a>
 
 ###  map
 
-▸ **map**<`IT`>(subtype: *`IT`*): `IMapType`<`IT`>
+▸ **map**<**IT**>(`subtype`: `IT`): *`IMapType<IT>`*
 
-`types.map` - Creates a key based collection type who's children are all of a uniform declared type. If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
+`types.map` - Creates a key based collection type who's children are all of a uniform declared type.
+If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
 
 This type will always produce [observable maps](https://mobx.js.org/refguide/map.html)
 
 Example:
-
 ```ts
 const Todo = types.model({
   id: types.identifier,
@@ -2867,63 +3304,63 @@ console.log(s.todos.get(17).task) // prints: "Grab coffee"
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| subtype | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`subtype` | `IT` |
 
-**Returns:** `IMapType`<`IT`>
+**Returns:** *`IMapType<IT>`*
 
 ___
-<a id="maybe"></a>
 
 ###  maybe
 
-▸ **maybe**<`IT`>(type: *`IT`*): `IMaybe`<`IT`>
+▸ **maybe**<**IT**>(`type`: `IT`): *`IMaybe<IT>`*
 
-`types.maybe` - Maybe will make a type nullable, and also optional. The value `undefined` will be used to represent nullability.
+`types.maybe` - Maybe will make a type nullable, and also optional.
+The value `undefined` will be used to represent nullability.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `IMaybe`<`IT`>
+**Returns:** *`IMaybe<IT>`*
 
 ___
-<a id="maybenull"></a>
 
 ###  maybeNull
 
-▸ **maybeNull**<`IT`>(type: *`IT`*): `IMaybeNull`<`IT`>
+▸ **maybeNull**<**IT**>(`type`: `IT`): *`IMaybeNull<IT>`*
 
-`types.maybeNull` - Maybe will make a type nullable, and also optional. The value `null` will be used to represent no value.
+`types.maybeNull` - Maybe will make a type nullable, and also optional.
+The value `null` will be used to represent no value.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
 
-**Returns:** `IMaybeNull`<`IT`>
+**Returns:** *`IMaybeNull<IT>`*
 
 ___
-<a id="model"></a>
 
 ###  model
 
-▸ **model**<`P`>(name: *`string`*, properties?: *[P]()*): [IModelType](interfaces/imodeltype.md)<`ModelPropertiesDeclarationToProperties`<`P`>, `__type`>
-
-▸ **model**<`P`>(properties?: *[P]()*): [IModelType](interfaces/imodeltype.md)<`ModelPropertiesDeclarationToProperties`<`P`>, `__type`>
+▸ **model**<**P**>(`name`: string, `properties?`: [P]()): *[IModelType](interfaces/imodeltype.md)‹*`ModelPropertiesDeclarationToProperties<P>`*, *`__type`*›*
 
 `types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
 
@@ -2931,15 +3368,18 @@ See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) 
 
 **Type parameters:**
 
-#### P :  `ModelPropertiesDeclaration`
+▪ **P**: *`ModelPropertiesDeclaration`*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| `Optional` properties | [P]() |
+Name | Type |
+------ | ------ |
+`name` | string |
+`properties?` | [P]() |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`ModelPropertiesDeclarationToProperties`<`P`>, `__type`>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`ModelPropertiesDeclarationToProperties<P>`*, *`__type`*›*
+
+▸ **model**<**P**>(`properties?`: [P]()): *[IModelType](interfaces/imodeltype.md)‹*`ModelPropertiesDeclarationToProperties<P>`*, *`__type`*›*
 
 `types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
 
@@ -2947,28 +3387,31 @@ See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) 
 
 **Type parameters:**
 
-#### P :  `ModelPropertiesDeclaration`
+▪ **P**: *`ModelPropertiesDeclaration`*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Optional` properties | [P]() |
+Name | Type |
+------ | ------ |
+`properties?` | [P]() |
 
-**Returns:** [IModelType](interfaces/imodeltype.md)<`ModelPropertiesDeclarationToProperties`<`P`>, `__type`>
+**Returns:** *[IModelType](interfaces/imodeltype.md)‹*`ModelPropertiesDeclarationToProperties<P>`*, *`__type`*›*
 
 ___
-<a id="onaction"></a>
 
 ###  onAction
 
-▸ **onAction**(target: *`IAnyStateTreeNode`*, listener: *`function`*, attachAfter?: *`boolean`*): [IDisposer](#idisposer)
+▸ **onAction**(`target`: `IAnyStateTreeNode`, `listener`: function, `attachAfter`: boolean): *[IDisposer](README.md#idisposer)*
 
-Registers a function that will be invoked for each action that is called on the provided model instance, or to any of its children. See [actions](https://github.com/mobxjs/mobx-state-tree#actions) for more details. onAction events are emitted only for the outermost called action in the stack. Action can also be intercepted by middleware using addMiddleware to change the function call before it will be run.
+Registers a function that will be invoked for each action that is called on the provided model instance, or to any of its children.
+See [actions](https://github.com/mobxjs/mobx-state-tree#actions) for more details. onAction events are emitted only for the outermost called action in the stack.
+Action can also be intercepted by middleware using addMiddleware to change the function call before it will be run.
 
-Not all action arguments might be serializable. For unserializable arguments, a struct like `{ $MST_UNSERIALIZABLE: true, type: "someType" }` will be generated. MST Nodes are considered non-serializable as well (they could be serialized as there snapshot, but it is uncertain whether an replaying party will be able to handle such a non-instantiated snapshot). Rather, when using `onAction` middleware, one should consider in passing arguments which are 1: an id, 2: a (relative) path, or 3: a snapshot. Instead of a real MST node.
+Not all action arguments might be serializable. For unserializable arguments, a struct like `{ $MST_UNSERIALIZABLE: true, type: "someType" }` will be generated.
+MST Nodes are considered non-serializable as well (they could be serialized as there snapshot, but it is uncertain whether an replaying party will be able to handle such a non-instantiated snapshot).
+Rather, when using `onAction` middleware, one should consider in passing arguments which are 1: an id, 2: a (relative) path, or 3: a snapshot. Instead of a real MST node.
 
 Example:
-
 ```ts
 const Todo = types.model({
   task: types.string
@@ -2994,77 +3437,112 @@ s.add({ task: "Grab a coffee" })
 
 **Parameters:**
 
-| Name | Type | Default value | Description |
-| ------ | ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` | - |  \- |
-| listener | `function` | - |  \- |
-| `Default value` attachAfter | `boolean` | false |  (default false) fires the listener _after_ the action has executed instead of before. |
+▪ **target**: *`IAnyStateTreeNode`*
 
-**Returns:** [IDisposer](#idisposer)
+▪ **listener**: *function*
+
+▸ (`call`: [ISerializedActionCall](interfaces/iserializedactioncall.md)): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`call` | [ISerializedActionCall](interfaces/iserializedactioncall.md) |
+
+▪`Default value`  **attachAfter**: *boolean*= false
+
+(default false) fires the listener *after* the action has executed instead of before.
+
+**Returns:** *[IDisposer](README.md#idisposer)*
 
 ___
-<a id="onpatch"></a>
 
 ###  onPatch
 
-▸ **onPatch**(target: *`IAnyStateTreeNode`*, callback: *`function`*): [IDisposer](#idisposer)
+▸ **onPatch**(`target`: `IAnyStateTreeNode`, `callback`: function): *[IDisposer](README.md#idisposer)*
 
-Registers a function that will be invoked for each mutation that is applied to the provided model instance, or to any of its children. See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details. onPatch events are emitted immediately and will not await the end of a transaction. Patches can be used to deep observe a model tree.
+Registers a function that will be invoked for each mutation that is applied to the provided model instance, or to any of its children.
+See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details. onPatch events are emitted immediately and will not await the end of a transaction.
+Patches can be used to deep observe a model tree.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  the model instance from which to receive patches |
-| callback | `function` |  the callback that is invoked for each patch. The reversePatch is a patch that would actually undo the emitted patch |
+▪ **target**: *`IAnyStateTreeNode`*
 
-**Returns:** [IDisposer](#idisposer)
+the model instance from which to receive patches
+
+▪ **callback**: *function*
+
+the callback that is invoked for each patch. The reversePatch is a patch that would actually undo the emitted patch
+
+▸ (`patch`: [IJsonPatch](interfaces/ijsonpatch.md), `reversePatch`: [IJsonPatch](interfaces/ijsonpatch.md)): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`patch` | [IJsonPatch](interfaces/ijsonpatch.md) |
+`reversePatch` | [IJsonPatch](interfaces/ijsonpatch.md) |
+
+**Returns:** *[IDisposer](README.md#idisposer)*
+
 function to remove the listener
 
 ___
-<a id="onsnapshot"></a>
 
 ###  onSnapshot
 
-▸ **onSnapshot**<`S`>(target: *`IStateTreeNode`<[IType](interfaces/itype.md)<`any`, `S`, `any`>>*, callback: *`function`*): [IDisposer](#idisposer)
+▸ **onSnapshot**<**S**>(`target`: `IStateTreeNode<IType<any, S, any>>`, `callback`: function): *[IDisposer](README.md#idisposer)*
 
-Registers a function that is invoked whenever a new snapshot for the given model instance is available. The listener will only be fire at the end of the current MobX (trans)action. See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
+Registers a function that is invoked whenever a new snapshot for the given model instance is available.
+The listener will only be fire at the end of the current MobX (trans)action.
+See [snapshots](https://github.com/mobxjs/mobx-state-tree#snapshots) for more details.
 
 **Type parameters:**
 
-#### S 
+▪ **S**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IStateTreeNode`<[IType](interfaces/itype.md)<`any`, `S`, `any`>> |  \- |
-| callback | `function` |  \- |
+▪ **target**: *`IStateTreeNode<IType<any, S, any>>`*
 
-**Returns:** [IDisposer](#idisposer)
+▪ **callback**: *function*
+
+▸ (`snapshot`: `S`): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`snapshot` | `S` |
+
+**Returns:** *[IDisposer](README.md#idisposer)*
 
 ___
-<a id="optional"></a>
 
 ###  optional
 
-▸ **optional**<`IT`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*): `IOptionalIType`<`IT`, [`undefined`]>
-
-▸ **optional**<`IT`,`OptionalVals`>(type: *`IT`*, defaultValueOrFunction: *`OptionalDefaultValueOrFunction`<`IT`>*, optionalValues: *`OptionalVals`*): `IOptionalIType`<`IT`, `OptionalVals`>
+▸ **optional**<**IT**>(`type`: `IT`, `defaultValueOrFunction`: `OptionalDefaultValueOrFunction<IT>`): *`IOptionalIType<IT, [undefined]>`*
 
 `types.optional` - Can be used to create a property with a default value.
 
 Depending on the third argument (`optionalValues`) there are two ways of operation:
+- If the argument is not provided, then if a value is not provided in the snapshot (`undefined` or missing),
+  it will default to the provided `defaultValue`
+- If the argument is provided, then if the value in the snapshot matches one of the optional values inside the array then it will
+  default to the provided `defaultValue`. Additionally, if one of the optional values inside the array is `undefined` then a missing
+  property is also valid.
 
-*   If the argument is not provided, then if a value is not provided in the snapshot (`undefined` or missing), it will default to the provided `defaultValue`
-*   If the argument is provided, then if the value in the snapshot matches one of the optional values inside the array then it will default to the provided `defaultValue`. Additionally, if one of the optional values inside the array is `undefined` then a missing property is also valid.
-    
-    Note that it is also possible to include values of the same type as the intended subtype as optional values, in this case the optional value will be transformed into the `defaultValue` (e.g. `types.optional(types.string, "unnamed", [undefined, ""])` will transform the snapshot values `undefined` (and therefore missing) and empty strings into the string `"unnamed"` when it gets instantiated).
-    
+  Note that it is also possible to include values of the same type as the intended subtype as optional values,
+  in this case the optional value will be transformed into the `defaultValue` (e.g. `types.optional(types.string, "unnamed", [undefined, ""])`
+  will transform the snapshot values `undefined` (and therefore missing) and empty strings into the string `"unnamed"` when it gets
+  instantiated).
 
-If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is one of the optional values (or `undefined`/_not_ present if none are provided) causes the value to be reset.
+If `defaultValue` is a function, the function will be invoked for every new instance.
+Applying a snapshot in which the optional value is one of the optional values (or `undefined`/_not_ present if none are provided) causes the
+value to be reset.
 
 Example:
-
 ```ts
 const Todo = types.model({
   title: types.string,
@@ -3083,30 +3561,38 @@ const todo = Todo.create({ title: "Get coffee", subtitle1: null })
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
-| defaultValueOrFunction | `OptionalDefaultValueOrFunction`<`IT`> |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
+`defaultValueOrFunction` | `OptionalDefaultValueOrFunction<IT>` |
 
-**Returns:** `IOptionalIType`<`IT`, [`undefined`]>
+**Returns:** *`IOptionalIType<IT, [undefined]>`*
+
+▸ **optional**<**IT**, **OptionalVals**>(`type`: `IT`, `defaultValueOrFunction`: `OptionalDefaultValueOrFunction<IT>`, `optionalValues`: `OptionalVals`): *`IOptionalIType<IT, OptionalVals>`*
 
 `types.optional` - Can be used to create a property with a default value.
 
 Depending on the third argument (`optionalValues`) there are two ways of operation:
+- If the argument is not provided, then if a value is not provided in the snapshot (`undefined` or missing),
+  it will default to the provided `defaultValue`
+- If the argument is provided, then if the value in the snapshot matches one of the optional values inside the array then it will
+  default to the provided `defaultValue`. Additionally, if one of the optional values inside the array is `undefined` then a missing
+  property is also valid.
 
-*   If the argument is not provided, then if a value is not provided in the snapshot (`undefined` or missing), it will default to the provided `defaultValue`
-*   If the argument is provided, then if the value in the snapshot matches one of the optional values inside the array then it will default to the provided `defaultValue`. Additionally, if one of the optional values inside the array is `undefined` then a missing property is also valid.
-    
-    Note that it is also possible to include values of the same type as the intended subtype as optional values, in this case the optional value will be transformed into the `defaultValue` (e.g. `types.optional(types.string, "unnamed", [undefined, ""])` will transform the snapshot values `undefined` (and therefore missing) and empty strings into the string `"unnamed"` when it gets instantiated).
-    
+  Note that it is also possible to include values of the same type as the intended subtype as optional values,
+  in this case the optional value will be transformed into the `defaultValue` (e.g. `types.optional(types.string, "unnamed", [undefined, ""])`
+  will transform the snapshot values `undefined` (and therefore missing) and empty strings into the string `"unnamed"` when it gets
+  instantiated).
 
-If `defaultValue` is a function, the function will be invoked for every new instance. Applying a snapshot in which the optional value is one of the optional values (or `undefined`/_not_ present if none are provided) causes the value to be reset.
+If `defaultValue` is a function, the function will be invoked for every new instance.
+Applying a snapshot in which the optional value is one of the optional values (or `undefined`/_not_ present if none are provided) causes the
+value to be reset.
 
 Example:
-
 ```ts
 const Todo = types.model({
   title: types.string,
@@ -3125,46 +3611,46 @@ const todo = Todo.create({ title: "Get coffee", subtitle1: null })
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
-#### OptionalVals :  `ValidOptionalValues`
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
+▪ **OptionalVals**: *`ValidOptionalValues`*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
-| defaultValueOrFunction | `OptionalDefaultValueOrFunction`<`IT`> |  \- |
-| optionalValues | `OptionalVals` |  an optional array with zero or more primitive values (string, number, boolean, null or undefined) that will be converted into the default. \`\[ undefined \]\` is assumed when none is provided |
+Name | Type | Description |
+------ | ------ | ------ |
+`type` | `IT` | - |
+`defaultValueOrFunction` | `OptionalDefaultValueOrFunction<IT>` | - |
+`optionalValues` | `OptionalVals` | an optional array with zero or more primitive values (string, number, boolean, null or undefined)                       that will be converted into the default. `[ undefined ]` is assumed when none is provided |
 
-**Returns:** `IOptionalIType`<`IT`, `OptionalVals`>
+**Returns:** *`IOptionalIType<IT, OptionalVals>`*
 
 ___
-<a id="protect"></a>
 
 ###  protect
 
-▸ **protect**(target: *`IAnyStateTreeNode`*): `void`
+▸ **protect**(`target`: `IAnyStateTreeNode`): *void*
 
 The inverse of `unprotect`.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |   |
+Name | Type | Description |
+------ | ------ | ------ |
+`target` | `IAnyStateTreeNode` |   |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="recordactions"></a>
 
 ###  recordActions
 
-▸ **recordActions**(subject: *`IAnyStateTreeNode`*, filter?: *`undefined` \| `function`*): [IActionRecorder](interfaces/iactionrecorder.md)
+▸ **recordActions**(`subject`: `IAnyStateTreeNode`, `filter?`: undefined | function): *[IActionRecorder](interfaces/iactionrecorder.md)*
 
-Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted. Returns an recorder object with the following signature:
+Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted.
+Returns an recorder object with the following signature:
 
 Example:
-
 ```ts
 export interface IActionRecorder {
      // the recorded actions
@@ -3184,24 +3670,23 @@ The optional filter function allows to skip recording certain actions.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| subject | `IAnyStateTreeNode` |  \- |
-| `Optional` filter | `undefined` \| `function` |
+Name | Type |
+------ | ------ |
+`subject` | `IAnyStateTreeNode` |
+`filter?` | undefined \| function |
 
-**Returns:** [IActionRecorder](interfaces/iactionrecorder.md)
+**Returns:** *[IActionRecorder](interfaces/iactionrecorder.md)*
 
 ___
-<a id="recordpatches"></a>
 
 ###  recordPatches
 
-▸ **recordPatches**(subject: *`IAnyStateTreeNode`*, filter?: *`undefined` \| `function`*): [IPatchRecorder](interfaces/ipatchrecorder.md)
+▸ **recordPatches**(`subject`: `IAnyStateTreeNode`, `filter?`: undefined | function): *[IPatchRecorder](interfaces/ipatchrecorder.md)*
 
-Small abstraction around `onPatch` and `applyPatch`, attaches a patch listener to a tree and records all the patches. Returns an recorder object with the following signature:
+Small abstraction around `onPatch` and `applyPatch`, attaches a patch listener to a tree and records all the patches.
+Returns an recorder object with the following signature:
 
 Example:
-
 ```ts
 export interface IPatchRecorder {
      // the recorded patches
@@ -3226,198 +3711,230 @@ The optional filter function allows to skip recording certain patches.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| subject | `IAnyStateTreeNode` |  \- |
-| `Optional` filter | `undefined` \| `function` |  \- |
+Name | Type |
+------ | ------ |
+`subject` | `IAnyStateTreeNode` |
+`filter?` | undefined \| function |
 
-**Returns:** [IPatchRecorder](interfaces/ipatchrecorder.md)
+**Returns:** *[IPatchRecorder](interfaces/ipatchrecorder.md)*
 
 ___
-<a id="reference"></a>
 
 ###  reference
 
-▸ **reference**<`IT`>(subType: *`IT`*, options?: *[ReferenceOptions](#referenceoptions)<`IT`>*): `IReferenceType`<`IT`>
+▸ **reference**<**IT**>(`subType`: `IT`, `options?`: [ReferenceOptions](README.md#referenceoptions)‹*`IT`*›): *`IReferenceType<IT>`*
 
-`types.reference` - Creates a reference to another type, which should have defined an identifier. See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
+`types.reference` - Creates a reference to another type, which should have defined an identifier.
+See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
 
 **Type parameters:**
 
-#### IT :  [IAnyComplexType](interfaces/ianycomplextype.md)
+▪ **IT**: *[IAnyComplexType](interfaces/ianycomplextype.md)*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| subType | `IT` |
-| `Optional` options | [ReferenceOptions](#referenceoptions)<`IT`> |
+Name | Type |
+------ | ------ |
+`subType` | `IT` |
+`options?` | [ReferenceOptions](README.md#referenceoptions)‹*`IT`*› |
 
-**Returns:** `IReferenceType`<`IT`>
+**Returns:** *`IReferenceType<IT>`*
 
 ___
-<a id="refinement"></a>
 
 ###  refinement
 
-▸ **refinement**<`IT`>(name: *`string`*, type: *`IT`*, predicate: *`function`*, message?: *`string` \| `function`*): `IT`
-
-▸ **refinement**<`IT`>(type: *`IT`*, predicate: *`function`*, message?: *`string` \| `function`*): `IT`
+▸ **refinement**<**IT**>(`name`: string, `type`: `IT`, `predicate`: function, `message?`: string | function): *`IT`*
 
 `types.refinement` - Creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| name | `string` |  \- |
-| type | `IT` |  \- |
-| predicate | `function` |  \- |
-| `Optional` message | `string` \| `function` |
+▪ **name**: *string*
 
-**Returns:** `IT`
+▪ **type**: *`IT`*
+
+▪ **predicate**: *function*
+
+▸ (`snapshot`: `IT["CreationType"]`): *boolean*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`snapshot` | `IT["CreationType"]` |
+
+▪`Optional`  **message**: *string | function*
+
+**Returns:** *`IT`*
+
+▸ **refinement**<**IT**>(`type`: `IT`, `predicate`: function, `message?`: string | function): *`IT`*
 
 `types.refinement` - Creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
-| predicate | `function` |  \- |
-| `Optional` message | `string` \| `function` |
+▪ **type**: *`IT`*
 
-**Returns:** `IT`
+▪ **predicate**: *function*
+
+▸ (`snapshot`: `IT["CreationType"]`): *boolean*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`snapshot` | `IT["CreationType"]` |
+
+▪`Optional`  **message**: *string | function*
+
+**Returns:** *`IT`*
 
 ___
-<a id="resolveidentifier"></a>
 
 ###  resolveIdentifier
 
-▸ **resolveIdentifier**<`IT`>(type: *`IT`*, target: *`IAnyStateTreeNode`*, identifier: *[ReferenceIdentifier](#referenceidentifier)*): `IT["Type"]` \| `undefined`
+▸ **resolveIdentifier**<**IT**>(`type`: `IT`, `target`: `IAnyStateTreeNode`, `identifier`: [ReferenceIdentifier](README.md#referenceidentifier)): *`IT["Type"]` | undefined*
 
-Resolves a model instance given a root target, the type and the identifier you are searching for. Returns undefined if no value can be found.
+Resolves a model instance given a root target, the type and the identifier you are searching for.
+Returns undefined if no value can be found.
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  \- |
-| target | `IAnyStateTreeNode` |  \- |
-| identifier | [ReferenceIdentifier](#referenceidentifier) |  \- |
+Name | Type |
+------ | ------ |
+`type` | `IT` |
+`target` | `IAnyStateTreeNode` |
+`identifier` | [ReferenceIdentifier](README.md#referenceidentifier) |
 
-**Returns:** `IT["Type"]` \| `undefined`
+**Returns:** *`IT["Type"]` | undefined*
 
 ___
-<a id="resolvepath"></a>
 
 ###  resolvePath
 
-▸ **resolvePath**(target: *`IAnyStateTreeNode`*, path: *`string`*): `any`
+▸ **resolvePath**(`target`: `IAnyStateTreeNode`, `path`: string): *any*
 
-Resolves a path relatively to a given object. Returns undefined if no value can be found.
+Resolves a path relatively to a given object.
+Returns undefined if no value can be found.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
-| path | `string` |  escaped json path |
+Name | Type | Description |
+------ | ------ | ------ |
+`target` | `IAnyStateTreeNode` | - |
+`path` | string | escaped json path |
 
-**Returns:** `any`
+**Returns:** *any*
 
 ___
-<a id="safereference"></a>
 
 ###  safeReference
 
-▸ **safeReference**<`IT`>(subType: *`IT`*, options: *`__type` \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object`*): `IReferenceType`<`IT`>
+▸ **safeReference**<**IT**>(`subType`: `IT`, `options`: `__type` | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹*`IT`*› & object): *`IReferenceType<IT>`*
 
-▸ **safeReference**<`IT`>(subType: *`IT`*, options?: *`__type` \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object`*): `IMaybe`<`IReferenceType`<`IT`>>
+`types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default
+and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
+when the reference it is pointing to gets detached/destroyed.
 
-`types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed.
+The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable
+for model properties.
+When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value,
+which is usually the desired in those cases.
 
-The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties. When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value, which is usually the desired in those cases.
-
-Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidated` option.
-
-**Type parameters:**
-
-#### IT :  [IAnyComplexType](interfaces/ianycomplextype.md)
-**Parameters:**
-
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| subType | `IT` |  \- |
-| options | `__type` \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` |  \- |
-
-**Returns:** `IReferenceType`<`IT`>
-
-`types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed.
-
-The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable for model properties. When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value, which is usually the desired in those cases.
-
-Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidated` option.
+Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and
+`types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidated` option.
 
 **Type parameters:**
 
-#### IT :  [IAnyComplexType](interfaces/ianycomplextype.md)
+▪ **IT**: *[IAnyComplexType](interfaces/ianycomplextype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| subType | `IT` |  \- |
-| `Optional` options | `__type` \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)<`IT`> & `object` |  \- |
+Name | Type |
+------ | ------ |
+`subType` | `IT` |
+`options` | `__type` \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹*`IT`*› & object |
 
-**Returns:** `IMaybe`<`IReferenceType`<`IT`>>
+**Returns:** *`IReferenceType<IT>`*
+
+▸ **safeReference**<**IT**>(`subType`: `IT`, `options?`: `__type` | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹*`IT`*› & object): *`IMaybe<IReferenceType<IT>>`*
+
+`types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default
+and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
+when the reference it is pointing to gets detached/destroyed.
+
+The optional options parameter object accepts a parameter named `acceptsUndefined`, which is set to true by default, so it is suitable
+for model properties.
+When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value,
+which is usually the desired in those cases.
+
+Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and
+`types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidated` option.
+
+**Type parameters:**
+
+▪ **IT**: *[IAnyComplexType](interfaces/ianycomplextype.md)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`subType` | `IT` |
+`options?` | `__type` \| [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹*`IT`*› & object |
+
+**Returns:** *`IMaybe<IReferenceType<IT>>`*
 
 ___
-<a id="setlivelinesschecking"></a>
 
 ###  setLivelinessChecking
 
-▸ **setLivelinessChecking**(mode: *[LivelinessMode](#livelinessmode)*): `void`
+▸ **setLivelinessChecking**(`mode`: [LivelinessMode](README.md#livelinessmode)): *void*
 
-Defines what MST should do when running into reads / writes to objects that have died. By default it will print a warning. Use the `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place
+Defines what MST should do when running into reads / writes to objects that have died.
+By default it will print a warning.
+Use the `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| mode | [LivelinessMode](#livelinessmode) |  \`"warn"\`, \`"error"\` or \`"ignore"\` |
+Name | Type | Description |
+------ | ------ | ------ |
+`mode` | [LivelinessMode](README.md#livelinessmode) | `"warn"`, `"error"` or `"ignore"`  |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="snapshotprocessor"></a>
 
 ###  snapshotProcessor
 
-▸ **snapshotProcessor**<`IT`,`CustomC`,`CustomS`>(type: *`IT`*, processors: *[ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`IT["CreationType"]`, `CustomC`, `IT["SnapshotType"]`, `CustomS`>*, name?: *`undefined` \| `string`*): [ISnapshotProcessor](interfaces/isnapshotprocessor.md)<`IT`, `CustomC`, `CustomS`>
+▸ **snapshotProcessor**<**IT**, **CustomC**, **CustomS**>(`type`: `IT`, `processors`: [ISnapshotProcessors](interfaces/isnapshotprocessors.md)‹*`IT["CreationType"]`*, *`CustomC`*, *`IT["SnapshotType"]`*, *`CustomS`*›, `name?`: undefined | string): *[ISnapshotProcessor](interfaces/isnapshotprocessor.md)‹*`IT`*, *`CustomC`*, *`CustomS`*›*
 
 `types.snapshotProcessor` - Runs a pre/post snapshot processor before/after serializing a given type.
 
 Example:
-
 ```ts
 const Todo1 = types.model({ text: types.string })
 // in the backend the text type must be null when empty
 interface BackendTodo {
-    text: string \| null
+    text: string | null
 }
 const Todo2 = types.snapshotProcessor(Todo1, {
     // from snapshot to instance
     preProcessor(sn: BackendTodo) {
         return {
-            text: sn.text \|\| "";
+            text: sn.text || "";
         }
     },
     // from instance to snapshot
@@ -3431,1380 +3948,2003 @@ const Todo2 = types.snapshotProcessor(Todo1, {
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
-#### CustomC 
-#### CustomS 
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
+▪ **CustomC**
+
+▪ **CustomS**
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  Type to run the processors over. |
-| processors | [ISnapshotProcessors](interfaces/isnapshotprocessors.md)<`IT["CreationType"]`, `CustomC`, `IT["SnapshotType"]`, `CustomS`> |  Processors to run. |
-| `Optional` name | `undefined` \| `string` |  Type name, or undefined to inherit the inner type one. |
+Name | Type | Description |
+------ | ------ | ------ |
+`type` | `IT` | Type to run the processors over. |
+`processors` | [ISnapshotProcessors](interfaces/isnapshotprocessors.md)‹*`IT["CreationType"]`*, *`CustomC`*, *`IT["SnapshotType"]`*, *`CustomS`*› | Processors to run. |
+`name?` | undefined \| string | Type name, or undefined to inherit the inner type one. |
 
-**Returns:** [ISnapshotProcessor](interfaces/isnapshotprocessor.md)<`IT`, `CustomC`, `CustomS`>
+**Returns:** *[ISnapshotProcessor](interfaces/isnapshotprocessor.md)‹*`IT`*, *`CustomC`*, *`CustomS`*›*
 
 ___
-<a id="splitjsonpath"></a>
 
 ###  splitJsonPath
 
-▸ **splitJsonPath**(path: *`string`*): `string`[]
+▸ **splitJsonPath**(`path`: string): *string[]*
 
 Splits and decodes a json path into several parts.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| path | `string` |  \- |
+Name | Type |
+------ | ------ |
+`path` | string |
 
-**Returns:** `string`[]
+**Returns:** *string[]*
 
 ___
-<a id="tryreference"></a>
 
 ###  tryReference
 
-▸ **tryReference**<`N`>(getter: *`function`*, checkIfAlive?: *`boolean`*): `N` \| `undefined`
+▸ **tryReference**<**N**>(`getter`: function, `checkIfAlive`: boolean): *`N` | undefined*
 
-Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if it the check passes, else it returns undefined.
+Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if it the check passes,
+else it returns undefined.
 
 **Type parameters:**
 
-#### N :  `IAnyStateTreeNode`
+▪ **N**: *`IAnyStateTreeNode`*
+
 **Parameters:**
 
-| Name | Type | Default value | Description |
-| ------ | ------ | ------ | ------ |
-| getter | `function` | - |  Function to access the reference. |
-| `Default value` checkIfAlive | `boolean` | true |  true to also make sure the referenced node is alive (default), false to skip this check. |
+▪ **getter**: *function*
 
-**Returns:** `N` \| `undefined`
+Function to access the reference.
+
+▸ (): *`N` | null | undefined*
+
+▪`Default value`  **checkIfAlive**: *boolean*= true
+
+true to also make sure the referenced node is alive (default), false to skip this check.
+
+**Returns:** *`N` | undefined*
 
 ___
-<a id="tryresolve"></a>
 
 ###  tryResolve
 
-▸ **tryResolve**(target: *`IAnyStateTreeNode`*, path: *`string`*): `any`
+▸ **tryResolve**(`target`: `IAnyStateTreeNode`, `path`: string): *any*
 
 Try to resolve a given path relative to a given node.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| target | `IAnyStateTreeNode` |  \- |
-| path | `string` |  \- |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
+`path` | string |
 
-**Returns:** `any`
+**Returns:** *any*
 
 ___
-<a id="typecheck"></a>
 
 ###  typecheck
 
-▸ **typecheck**<`IT`>(type: *`IT`*, value: *`ExtractCSTWithSTN`<`IT`>*): `void`
+▸ **typecheck**<**IT**>(`type`: `IT`, `value`: `ExtractCSTWithSTN<IT>`): *void*
 
-Run's the typechecker for the given type on the given value, which can be a snapshot or an instance. Throws if the given value is not according the provided type specification. Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
+Run's the typechecker for the given type on the given value, which can be a snapshot or an instance.
+Throws if the given value is not according the provided type specification.
+Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
 
 **Type parameters:**
 
-#### IT :  [IAnyType](interfaces/ianytype.md)
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| type | `IT` |  Type to check against. |
-| value | `ExtractCSTWithSTN`<`IT`> |  Value to be checked, either a snapshot or an instance. |
+Name | Type | Description |
+------ | ------ | ------ |
+`type` | `IT` | Type to check against. |
+`value` | `ExtractCSTWithSTN<IT>` | Value to be checked, either a snapshot or an instance.  |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="unescapejsonpath"></a>
 
 ###  unescapeJsonPath
 
-▸ **unescapeJsonPath**(path: *`string`*): `string`
+▸ **unescapeJsonPath**(`path`: string): *string*
 
 Unescape slashes and backslashes.
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| path | `string` |
+Name | Type |
+------ | ------ |
+`path` | string |
 
-**Returns:** `string`
+**Returns:** *string*
 
 ___
-<a id="union"></a>
 
 ###  union
 
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`,`PI`,`OI`,`FCI`,`FSI`>(A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*, I: *[IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`> \| `ModelInstanceType`<`PI`, `OI`>>
-
-▸ **union**<`PA`,`OA`,`FCA`,`FSA`,`PB`,`OB`,`FCB`,`FSB`,`PC`,`OC`,`FCC`,`FSC`,`PD`,`OD`,`FCD`,`FSD`,`PE`,`OE`,`FCE`,`FSE`,`PF`,`OF`,`FCF`,`FSF`,`PG`,`OG`,`FCG`,`FSG`,`PH`,`OH`,`FCH`,`FSH`,`PI`,`OI`,`FCI`,`FSI`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`>*, B: *[IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`>*, C: *[IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`>*, D: *[IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`>*, E: *[IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`>*, F: *[IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`>*, G: *[IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`>*, H: *[IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`>*, I: *[IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`>*): `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`> \| `ModelInstanceType`<`PI`, `OI`>>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`>(A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*): `ITypeUnion`<`CA` \| `CB`, `SA` \| `SB`, `TA` \| `TB`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*): `ITypeUnion`<`CA` \| `CB`, `SA` \| `SB`, `TA` \| `TB`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`>(A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*): `ITypeUnion`<`CA` \| `CB` \| `CC`, `SA` \| `SB` \| `SC`, `TA` \| `TB` \| `TC`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*): `ITypeUnion`<`CA` \| `CB` \| `CC`, `SA` \| `SB` \| `SC`, `TA` \| `TB` \| `TC`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`>(A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD`, `SA` \| `SB` \| `SC` \| `SD`, `TA` \| `TB` \| `TC` \| `TD`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD`, `SA` \| `SB` \| `SC` \| `SD`, `TA` \| `TB` \| `TC` \| `TD`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`>(A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE`, `SA` \| `SB` \| `SC` \| `SD` \| `SE`, `TA` \| `TB` \| `TC` \| `TD` \| `TE`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE`, `SA` \| `SB` \| `SC` \| `SD` \| `SE`, `TA` \| `TB` \| `TC` \| `TD` \| `TE`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`,`CF`,`SF`,`TF`>(A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*, F: *[IType](interfaces/itype.md)<`CF`, `SF`, `TF`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`,`CF`,`SF`,`TF`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*, F: *[IType](interfaces/itype.md)<`CF`, `SF`, `TF`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`,`CF`,`SF`,`TF`,`CG`,`SG`,`TG`>(A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*, F: *[IType](interfaces/itype.md)<`CF`, `SF`, `TF`>*, G: *[IType](interfaces/itype.md)<`CG`, `SG`, `TG`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`,`CF`,`SF`,`TF`,`CG`,`SG`,`TG`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*, F: *[IType](interfaces/itype.md)<`CF`, `SF`, `TF`>*, G: *[IType](interfaces/itype.md)<`CG`, `SG`, `TG`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`,`CF`,`SF`,`TF`,`CG`,`SG`,`TG`,`CH`,`SH`,`TH`>(A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*, F: *[IType](interfaces/itype.md)<`CF`, `SF`, `TF`>*, G: *[IType](interfaces/itype.md)<`CG`, `SG`, `TG`>*, H: *[IType](interfaces/itype.md)<`CH`, `SH`, `TH`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG` \| `CH`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG` \| `SH`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG` \| `TH`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`,`CF`,`SF`,`TF`,`CG`,`SG`,`TG`,`CH`,`SH`,`TH`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*, F: *[IType](interfaces/itype.md)<`CF`, `SF`, `TF`>*, G: *[IType](interfaces/itype.md)<`CG`, `SG`, `TG`>*, H: *[IType](interfaces/itype.md)<`CH`, `SH`, `TH`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG` \| `CH`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG` \| `SH`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG` \| `TH`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`,`CF`,`SF`,`TF`,`CG`,`SG`,`TG`,`CH`,`SH`,`TH`,`CI`,`SI`,`TI`>(A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*, F: *[IType](interfaces/itype.md)<`CF`, `SF`, `TF`>*, G: *[IType](interfaces/itype.md)<`CG`, `SG`, `TG`>*, H: *[IType](interfaces/itype.md)<`CH`, `SH`, `TH`>*, I: *[IType](interfaces/itype.md)<`CI`, `SI`, `TI`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG` \| `CH` \| `CI`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG` \| `SH` \| `SI`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG` \| `TH` \| `TI`>
-
-▸ **union**<`CA`,`SA`,`TA`,`CB`,`SB`,`TB`,`CC`,`SC`,`TC`,`CD`,`SD`,`TD`,`CE`,`SE`,`TE`,`CF`,`SF`,`TF`,`CG`,`SG`,`TG`,`CH`,`SH`,`TH`,`CI`,`SI`,`TI`>(options: *[UnionOptions](interfaces/unionoptions.md)*, A: *[IType](interfaces/itype.md)<`CA`, `SA`, `TA`>*, B: *[IType](interfaces/itype.md)<`CB`, `SB`, `TB`>*, C: *[IType](interfaces/itype.md)<`CC`, `SC`, `TC`>*, D: *[IType](interfaces/itype.md)<`CD`, `SD`, `TD`>*, E: *[IType](interfaces/itype.md)<`CE`, `SE`, `TE`>*, F: *[IType](interfaces/itype.md)<`CF`, `SF`, `TF`>*, G: *[IType](interfaces/itype.md)<`CG`, `SG`, `TG`>*, H: *[IType](interfaces/itype.md)<`CH`, `SH`, `TH`>*, I: *[IType](interfaces/itype.md)<`CI`, `SI`, `TI`>*): `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG` \| `CH` \| `CI`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG` \| `SH` \| `SI`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG` \| `TH` \| `TI`>
-
-▸ **union**(...types: *[IAnyType](interfaces/ianytype.md)[]*): [IAnyType](interfaces/ianytype.md)
-
-▸ **union**(dispatchOrType: *[UnionOptions](interfaces/unionoptions.md) \| [IAnyType](interfaces/ianytype.md)*, ...otherTypes: *[IAnyType](interfaces/ianytype.md)[]*): [IAnyType](interfaces/ianytype.md)
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›, `H`: [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG> | ModelCreationType2<PH, FCH>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG> | ModelSnapshotType2<PH, FSH>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG> | ModelInstanceType<PH, OH>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
-#### PH :  `ModelProperties`
-#### OH 
-#### FCH 
-#### FSH 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
+▪ **PH**: *`ModelProperties`*
+
+▪ **OH**
+
+▪ **FCH**
+
+▪ **FSH**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
-| H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
+`H` | [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG> | ModelCreationType2<PH, FCH>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG> | ModelSnapshotType2<PH, FSH>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG> | ModelInstanceType<PH, OH>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›, `H`: [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG> | ModelCreationType2<PH, FCH>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG> | ModelSnapshotType2<PH, FSH>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG> | ModelInstanceType<PH, OH>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
-#### PH :  `ModelProperties`
-#### OH 
-#### FCH 
-#### FSH 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
+▪ **PH**: *`ModelProperties`*
+
+▪ **OH**
+
+▪ **FCH**
+
+▪ **FSH**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
-| H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
+`H` | [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG> | ModelCreationType2<PH, FCH>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG> | ModelSnapshotType2<PH, FSH>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG> | ModelInstanceType<PH, OH>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**, **PI**, **OI**, **FCI**, **FSI**>(`A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›, `H`: [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*›, `I`: [IModelType](interfaces/imodeltype.md)‹*`PI`*, *`OI`*, *`FCI`*, *`FSI`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG> | ModelCreationType2<PH, FCH> | ModelCreationType2<PI, FCI>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG> | ModelSnapshotType2<PH, FSH> | ModelSnapshotType2<PI, FSI>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG> | ModelInstanceType<PH, OH> | ModelInstanceType<PI, OI>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
-#### PH :  `ModelProperties`
-#### OH 
-#### FCH 
-#### FSH 
-#### PI :  `ModelProperties`
-#### OI 
-#### FCI 
-#### FSI 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
+▪ **PH**: *`ModelProperties`*
+
+▪ **OH**
+
+▪ **FCH**
+
+▪ **FSH**
+
+▪ **PI**: *`ModelProperties`*
+
+▪ **OI**
+
+▪ **FCI**
+
+▪ **FSI**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
-| H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
-| I | [IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`> |
+Name | Type |
+------ | ------ |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
+`H` | [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*› |
+`I` | [IModelType](interfaces/imodeltype.md)‹*`PI`*, *`OI`*, *`FCI`*, *`FSI`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`> \| `ModelInstanceType`<`PI`, `OI`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG> | ModelCreationType2<PH, FCH> | ModelCreationType2<PI, FCI>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG> | ModelSnapshotType2<PH, FSH> | ModelSnapshotType2<PI, FSI>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG> | ModelInstanceType<PH, OH> | ModelInstanceType<PI, OI>>`*
+
+▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**, **PI**, **OI**, **FCI**, **FSI**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*›, `B`: [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*›, `C`: [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*›, `D`: [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*›, `E`: [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*›, `F`: [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*›, `G`: [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*›, `H`: [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*›, `I`: [IModelType](interfaces/imodeltype.md)‹*`PI`*, *`OI`*, *`FCI`*, *`FSI`*›): *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG> | ModelCreationType2<PH, FCH> | ModelCreationType2<PI, FCI>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG> | ModelSnapshotType2<PH, FSH> | ModelSnapshotType2<PI, FSI>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG> | ModelInstanceType<PH, OH> | ModelInstanceType<PI, OI>>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### PA :  `ModelProperties`
-#### OA 
-#### FCA 
-#### FSA 
-#### PB :  `ModelProperties`
-#### OB 
-#### FCB 
-#### FSB 
-#### PC :  `ModelProperties`
-#### OC 
-#### FCC 
-#### FSC 
-#### PD :  `ModelProperties`
-#### OD 
-#### FCD 
-#### FSD 
-#### PE :  `ModelProperties`
-#### OE 
-#### FCE 
-#### FSE 
-#### PF :  `ModelProperties`
-#### OF 
-#### FCF 
-#### FSF 
-#### PG :  `ModelProperties`
-#### OG 
-#### FCG 
-#### FSG 
-#### PH :  `ModelProperties`
-#### OH 
-#### FCH 
-#### FSH 
-#### PI :  `ModelProperties`
-#### OI 
-#### FCI 
-#### FSI 
+▪ **PA**: *`ModelProperties`*
+
+▪ **OA**
+
+▪ **FCA**
+
+▪ **FSA**
+
+▪ **PB**: *`ModelProperties`*
+
+▪ **OB**
+
+▪ **FCB**
+
+▪ **FSB**
+
+▪ **PC**: *`ModelProperties`*
+
+▪ **OC**
+
+▪ **FCC**
+
+▪ **FSC**
+
+▪ **PD**: *`ModelProperties`*
+
+▪ **OD**
+
+▪ **FCD**
+
+▪ **FSD**
+
+▪ **PE**: *`ModelProperties`*
+
+▪ **OE**
+
+▪ **FCE**
+
+▪ **FSE**
+
+▪ **PF**: *`ModelProperties`*
+
+▪ **OF**
+
+▪ **FCF**
+
+▪ **FSF**
+
+▪ **PG**: *`ModelProperties`*
+
+▪ **OG**
+
+▪ **FCG**
+
+▪ **FSG**
+
+▪ **PH**: *`ModelProperties`*
+
+▪ **OH**
+
+▪ **FCH**
+
+▪ **FSH**
+
+▪ **PI**: *`ModelProperties`*
+
+▪ **OI**
+
+▪ **FCI**
+
+▪ **FSI**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IModelType](interfaces/imodeltype.md)<`PA`, `OA`, `FCA`, `FSA`> |
-| B | [IModelType](interfaces/imodeltype.md)<`PB`, `OB`, `FCB`, `FSB`> |
-| C | [IModelType](interfaces/imodeltype.md)<`PC`, `OC`, `FCC`, `FSC`> |
-| D | [IModelType](interfaces/imodeltype.md)<`PD`, `OD`, `FCD`, `FSD`> |
-| E | [IModelType](interfaces/imodeltype.md)<`PE`, `OE`, `FCE`, `FSE`> |
-| F | [IModelType](interfaces/imodeltype.md)<`PF`, `OF`, `FCF`, `FSF`> |
-| G | [IModelType](interfaces/imodeltype.md)<`PG`, `OG`, `FCG`, `FSG`> |
-| H | [IModelType](interfaces/imodeltype.md)<`PH`, `OH`, `FCH`, `FSH`> |
-| I | [IModelType](interfaces/imodeltype.md)<`PI`, `OI`, `FCI`, `FSI`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IModelType](interfaces/imodeltype.md)‹*`PA`*, *`OA`*, *`FCA`*, *`FSA`*› |
+`B` | [IModelType](interfaces/imodeltype.md)‹*`PB`*, *`OB`*, *`FCB`*, *`FSB`*› |
+`C` | [IModelType](interfaces/imodeltype.md)‹*`PC`*, *`OC`*, *`FCC`*, *`FSC`*› |
+`D` | [IModelType](interfaces/imodeltype.md)‹*`PD`*, *`OD`*, *`FCD`*, *`FSD`*› |
+`E` | [IModelType](interfaces/imodeltype.md)‹*`PE`*, *`OE`*, *`FCE`*, *`FSE`*› |
+`F` | [IModelType](interfaces/imodeltype.md)‹*`PF`*, *`OF`*, *`FCF`*, *`FSF`*› |
+`G` | [IModelType](interfaces/imodeltype.md)‹*`PG`*, *`OG`*, *`FCG`*, *`FSG`*› |
+`H` | [IModelType](interfaces/imodeltype.md)‹*`PH`*, *`OH`*, *`FCH`*, *`FSH`*› |
+`I` | [IModelType](interfaces/imodeltype.md)‹*`PI`*, *`OI`*, *`FCI`*, *`FSI`*› |
 
-**Returns:** `ITypeUnion`<`ModelCreationType2`<`PA`, `FCA`> \| `ModelCreationType2`<`PB`, `FCB`> \| `ModelCreationType2`<`PC`, `FCC`> \| `ModelCreationType2`<`PD`, `FCD`> \| `ModelCreationType2`<`PE`, `FCE`> \| `ModelCreationType2`<`PF`, `FCF`> \| `ModelCreationType2`<`PG`, `FCG`> \| `ModelCreationType2`<`PH`, `FCH`> \| `ModelCreationType2`<`PI`, `FCI`>, `ModelSnapshotType2`<`PA`, `FSA`> \| `ModelSnapshotType2`<`PB`, `FSB`> \| `ModelSnapshotType2`<`PC`, `FSC`> \| `ModelSnapshotType2`<`PD`, `FSD`> \| `ModelSnapshotType2`<`PE`, `FSE`> \| `ModelSnapshotType2`<`PF`, `FSF`> \| `ModelSnapshotType2`<`PG`, `FSG`> \| `ModelSnapshotType2`<`PH`, `FSH`> \| `ModelSnapshotType2`<`PI`, `FSI`>, `ModelInstanceType`<`PA`, `OA`> \| `ModelInstanceType`<`PB`, `OB`> \| `ModelInstanceType`<`PC`, `OC`> \| `ModelInstanceType`<`PD`, `OD`> \| `ModelInstanceType`<`PE`, `OE`> \| `ModelInstanceType`<`PF`, `OF`> \| `ModelInstanceType`<`PG`, `OG`> \| `ModelInstanceType`<`PH`, `OH`> \| `ModelInstanceType`<`PI`, `OI`>>
+**Returns:** *`ITypeUnion<ModelCreationType2<PA, FCA> | ModelCreationType2<PB, FCB> | ModelCreationType2<PC, FCC> | ModelCreationType2<PD, FCD> | ModelCreationType2<PE, FCE> | ModelCreationType2<PF, FCF> | ModelCreationType2<PG, FCG> | ModelCreationType2<PH, FCH> | ModelCreationType2<PI, FCI>, ModelSnapshotType2<PA, FSA> | ModelSnapshotType2<PB, FSB> | ModelSnapshotType2<PC, FSC> | ModelSnapshotType2<PD, FSD> | ModelSnapshotType2<PE, FSE> | ModelSnapshotType2<PF, FSF> | ModelSnapshotType2<PG, FSG> | ModelSnapshotType2<PH, FSH> | ModelSnapshotType2<PI, FSI>, ModelInstanceType<PA, OA> | ModelInstanceType<PB, OB> | ModelInstanceType<PC, OC> | ModelInstanceType<PD, OD> | ModelInstanceType<PE, OE> | ModelInstanceType<PF, OF> | ModelInstanceType<PG, OG> | ModelInstanceType<PH, OH> | ModelInstanceType<PI, OI>>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**>(`A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›): *`ITypeUnion<CA | CB, SA | SB, TA | TB>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
+Name | Type |
+------ | ------ |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB`, `SA` \| `SB`, `TA` \| `TB`>
+**Returns:** *`ITypeUnion<CA | CB, SA | SB, TA | TB>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›): *`ITypeUnion<CA | CB, SA | SB, TA | TB>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB`, `SA` \| `SB`, `TA` \| `TB`>
+**Returns:** *`ITypeUnion<CA | CB, SA | SB, TA | TB>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**>(`A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›): *`ITypeUnion<CA | CB | CC, SA | SB | SC, TA | TB | TC>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
+Name | Type |
+------ | ------ |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC`, `SA` \| `SB` \| `SC`, `TA` \| `TB` \| `TC`>
+**Returns:** *`ITypeUnion<CA | CB | CC, SA | SB | SC, TA | TB | TC>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›): *`ITypeUnion<CA | CB | CC, SA | SB | SC, TA | TB | TC>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC`, `SA` \| `SB` \| `SC`, `TA` \| `TB` \| `TC`>
+**Returns:** *`ITypeUnion<CA | CB | CC, SA | SB | SC, TA | TB | TC>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**>(`A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›): *`ITypeUnion<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
+Name | Type |
+------ | ------ |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD`, `SA` \| `SB` \| `SC` \| `SD`, `TA` \| `TB` \| `TC` \| `TD`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›): *`ITypeUnion<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD`, `SA` \| `SB` \| `SC` \| `SD`, `TA` \| `TB` \| `TC` \| `TD`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**>(`A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›, `E`: [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*›): *`ITypeUnion<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
-#### CE 
-#### SE 
-#### TE 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
+▪ **CE**
+
+▪ **SE**
+
+▪ **TE**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
-| E | [IType](interfaces/itype.md)<`CE`, `SE`, `TE`> |
+Name | Type |
+------ | ------ |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
+`E` | [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE`, `SA` \| `SB` \| `SC` \| `SD` \| `SE`, `TA` \| `TB` \| `TC` \| `TD` \| `TE`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›, `E`: [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*›): *`ITypeUnion<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
-#### CE 
-#### SE 
-#### TE 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
+▪ **CE**
+
+▪ **SE**
+
+▪ **TE**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
-| E | [IType](interfaces/itype.md)<`CE`, `SE`, `TE`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
+`E` | [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE`, `SA` \| `SB` \| `SC` \| `SD` \| `SE`, `TA` \| `TB` \| `TC` \| `TD` \| `TE`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**>(`A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›, `E`: [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*›, `F`: [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*›): *`ITypeUnion<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
-#### CE 
-#### SE 
-#### TE 
-#### CF 
-#### SF 
-#### TF 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
+▪ **CE**
+
+▪ **SE**
+
+▪ **TE**
+
+▪ **CF**
+
+▪ **SF**
+
+▪ **TF**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
-| E | [IType](interfaces/itype.md)<`CE`, `SE`, `TE`> |
-| F | [IType](interfaces/itype.md)<`CF`, `SF`, `TF`> |
+Name | Type |
+------ | ------ |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
+`E` | [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*› |
+`F` | [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›, `E`: [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*›, `F`: [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*›): *`ITypeUnion<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
-#### CE 
-#### SE 
-#### TE 
-#### CF 
-#### SF 
-#### TF 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
+▪ **CE**
+
+▪ **SE**
+
+▪ **TE**
+
+▪ **CF**
+
+▪ **SF**
+
+▪ **TF**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
-| E | [IType](interfaces/itype.md)<`CE`, `SE`, `TE`> |
-| F | [IType](interfaces/itype.md)<`CF`, `SF`, `TF`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
+`E` | [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*› |
+`F` | [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**>(`A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›, `E`: [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*›, `F`: [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*›, `G`: [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*›): *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
-#### CE 
-#### SE 
-#### TE 
-#### CF 
-#### SF 
-#### TF 
-#### CG 
-#### SG 
-#### TG 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
+▪ **CE**
+
+▪ **SE**
+
+▪ **TE**
+
+▪ **CF**
+
+▪ **SF**
+
+▪ **TF**
+
+▪ **CG**
+
+▪ **SG**
+
+▪ **TG**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
-| E | [IType](interfaces/itype.md)<`CE`, `SE`, `TE`> |
-| F | [IType](interfaces/itype.md)<`CF`, `SF`, `TF`> |
-| G | [IType](interfaces/itype.md)<`CG`, `SG`, `TG`> |
+Name | Type |
+------ | ------ |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
+`E` | [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*› |
+`F` | [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*› |
+`G` | [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›, `E`: [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*›, `F`: [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*›, `G`: [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*›): *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
-#### CE 
-#### SE 
-#### TE 
-#### CF 
-#### SF 
-#### TF 
-#### CG 
-#### SG 
-#### TG 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
+▪ **CE**
+
+▪ **SE**
+
+▪ **TE**
+
+▪ **CF**
+
+▪ **SF**
+
+▪ **TF**
+
+▪ **CG**
+
+▪ **SG**
+
+▪ **TG**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
-| E | [IType](interfaces/itype.md)<`CE`, `SE`, `TE`> |
-| F | [IType](interfaces/itype.md)<`CF`, `SF`, `TF`> |
-| G | [IType](interfaces/itype.md)<`CG`, `SG`, `TG`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
+`E` | [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*› |
+`F` | [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*› |
+`G` | [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**, **CH**, **SH**, **TH**>(`A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›, `E`: [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*›, `F`: [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*›, `G`: [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*›, `H`: [IType](interfaces/itype.md)‹*`CH`*, *`SH`*, *`TH`*›): *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
-#### CE 
-#### SE 
-#### TE 
-#### CF 
-#### SF 
-#### TF 
-#### CG 
-#### SG 
-#### TG 
-#### CH 
-#### SH 
-#### TH 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
+▪ **CE**
+
+▪ **SE**
+
+▪ **TE**
+
+▪ **CF**
+
+▪ **SF**
+
+▪ **TF**
+
+▪ **CG**
+
+▪ **SG**
+
+▪ **TG**
+
+▪ **CH**
+
+▪ **SH**
+
+▪ **TH**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
-| E | [IType](interfaces/itype.md)<`CE`, `SE`, `TE`> |
-| F | [IType](interfaces/itype.md)<`CF`, `SF`, `TF`> |
-| G | [IType](interfaces/itype.md)<`CG`, `SG`, `TG`> |
-| H | [IType](interfaces/itype.md)<`CH`, `SH`, `TH`> |
+Name | Type |
+------ | ------ |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
+`E` | [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*› |
+`F` | [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*› |
+`G` | [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*› |
+`H` | [IType](interfaces/itype.md)‹*`CH`*, *`SH`*, *`TH`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG` \| `CH`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG` \| `SH`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG` \| `TH`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**, **CH**, **SH**, **TH**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›, `E`: [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*›, `F`: [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*›, `G`: [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*›, `H`: [IType](interfaces/itype.md)‹*`CH`*, *`SH`*, *`TH`*›): *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
-#### CE 
-#### SE 
-#### TE 
-#### CF 
-#### SF 
-#### TF 
-#### CG 
-#### SG 
-#### TG 
-#### CH 
-#### SH 
-#### TH 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
+▪ **CE**
+
+▪ **SE**
+
+▪ **TE**
+
+▪ **CF**
+
+▪ **SF**
+
+▪ **TF**
+
+▪ **CG**
+
+▪ **SG**
+
+▪ **TG**
+
+▪ **CH**
+
+▪ **SH**
+
+▪ **TH**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
-| E | [IType](interfaces/itype.md)<`CE`, `SE`, `TE`> |
-| F | [IType](interfaces/itype.md)<`CF`, `SF`, `TF`> |
-| G | [IType](interfaces/itype.md)<`CG`, `SG`, `TG`> |
-| H | [IType](interfaces/itype.md)<`CH`, `SH`, `TH`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
+`E` | [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*› |
+`F` | [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*› |
+`G` | [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*› |
+`H` | [IType](interfaces/itype.md)‹*`CH`*, *`SH`*, *`TH`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG` \| `CH`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG` \| `SH`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG` \| `TH`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**, **CH**, **SH**, **TH**, **CI**, **SI**, **TI**>(`A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›, `E`: [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*›, `F`: [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*›, `G`: [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*›, `H`: [IType](interfaces/itype.md)‹*`CH`*, *`SH`*, *`TH`*›, `I`: [IType](interfaces/itype.md)‹*`CI`*, *`SI`*, *`TI`*›): *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
-#### CE 
-#### SE 
-#### TE 
-#### CF 
-#### SF 
-#### TF 
-#### CG 
-#### SG 
-#### TG 
-#### CH 
-#### SH 
-#### TH 
-#### CI 
-#### SI 
-#### TI 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
+▪ **CE**
+
+▪ **SE**
+
+▪ **TE**
+
+▪ **CF**
+
+▪ **SF**
+
+▪ **TF**
+
+▪ **CG**
+
+▪ **SG**
+
+▪ **TG**
+
+▪ **CH**
+
+▪ **SH**
+
+▪ **TH**
+
+▪ **CI**
+
+▪ **SI**
+
+▪ **TI**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
-| E | [IType](interfaces/itype.md)<`CE`, `SE`, `TE`> |
-| F | [IType](interfaces/itype.md)<`CF`, `SF`, `TF`> |
-| G | [IType](interfaces/itype.md)<`CG`, `SG`, `TG`> |
-| H | [IType](interfaces/itype.md)<`CH`, `SH`, `TH`> |
-| I | [IType](interfaces/itype.md)<`CI`, `SI`, `TI`> |
+Name | Type |
+------ | ------ |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
+`E` | [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*› |
+`F` | [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*› |
+`G` | [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*› |
+`H` | [IType](interfaces/itype.md)‹*`CH`*, *`SH`*, *`TH`*› |
+`I` | [IType](interfaces/itype.md)‹*`CI`*, *`SI`*, *`TI`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG` \| `CH` \| `CI`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG` \| `SH` \| `SI`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG` \| `TH` \| `TI`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>`*
+
+▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**, **CH**, **SH**, **TH**, **CI**, **SI**, **TI**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*›, `B`: [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*›, `C`: [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*›, `D`: [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*›, `E`: [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*›, `F`: [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*›, `G`: [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*›, `H`: [IType](interfaces/itype.md)‹*`CH`*, *`SH`*, *`TH`*›, `I`: [IType](interfaces/itype.md)‹*`CI`*, *`SI`*, *`TI`*›): *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>`*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Type parameters:**
 
-#### CA 
-#### SA 
-#### TA 
-#### CB 
-#### SB 
-#### TB 
-#### CC 
-#### SC 
-#### TC 
-#### CD 
-#### SD 
-#### TD 
-#### CE 
-#### SE 
-#### TE 
-#### CF 
-#### SF 
-#### TF 
-#### CG 
-#### SG 
-#### TG 
-#### CH 
-#### SH 
-#### TH 
-#### CI 
-#### SI 
-#### TI 
+▪ **CA**
+
+▪ **SA**
+
+▪ **TA**
+
+▪ **CB**
+
+▪ **SB**
+
+▪ **TB**
+
+▪ **CC**
+
+▪ **SC**
+
+▪ **TC**
+
+▪ **CD**
+
+▪ **SD**
+
+▪ **TD**
+
+▪ **CE**
+
+▪ **SE**
+
+▪ **TE**
+
+▪ **CF**
+
+▪ **SF**
+
+▪ **TF**
+
+▪ **CG**
+
+▪ **SG**
+
+▪ **TG**
+
+▪ **CH**
+
+▪ **SH**
+
+▪ **TH**
+
+▪ **CI**
+
+▪ **SI**
+
+▪ **TI**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| options | [UnionOptions](interfaces/unionoptions.md) |
-| A | [IType](interfaces/itype.md)<`CA`, `SA`, `TA`> |
-| B | [IType](interfaces/itype.md)<`CB`, `SB`, `TB`> |
-| C | [IType](interfaces/itype.md)<`CC`, `SC`, `TC`> |
-| D | [IType](interfaces/itype.md)<`CD`, `SD`, `TD`> |
-| E | [IType](interfaces/itype.md)<`CE`, `SE`, `TE`> |
-| F | [IType](interfaces/itype.md)<`CF`, `SF`, `TF`> |
-| G | [IType](interfaces/itype.md)<`CG`, `SG`, `TG`> |
-| H | [IType](interfaces/itype.md)<`CH`, `SH`, `TH`> |
-| I | [IType](interfaces/itype.md)<`CI`, `SI`, `TI`> |
+Name | Type |
+------ | ------ |
+`options` | [UnionOptions](interfaces/unionoptions.md) |
+`A` | [IType](interfaces/itype.md)‹*`CA`*, *`SA`*, *`TA`*› |
+`B` | [IType](interfaces/itype.md)‹*`CB`*, *`SB`*, *`TB`*› |
+`C` | [IType](interfaces/itype.md)‹*`CC`*, *`SC`*, *`TC`*› |
+`D` | [IType](interfaces/itype.md)‹*`CD`*, *`SD`*, *`TD`*› |
+`E` | [IType](interfaces/itype.md)‹*`CE`*, *`SE`*, *`TE`*› |
+`F` | [IType](interfaces/itype.md)‹*`CF`*, *`SF`*, *`TF`*› |
+`G` | [IType](interfaces/itype.md)‹*`CG`*, *`SG`*, *`TG`*› |
+`H` | [IType](interfaces/itype.md)‹*`CH`*, *`SH`*, *`TH`*› |
+`I` | [IType](interfaces/itype.md)‹*`CI`*, *`SI`*, *`TI`*› |
 
-**Returns:** `ITypeUnion`<`CA` \| `CB` \| `CC` \| `CD` \| `CE` \| `CF` \| `CG` \| `CH` \| `CI`, `SA` \| `SB` \| `SC` \| `SD` \| `SE` \| `SF` \| `SG` \| `SH` \| `SI`, `TA` \| `TB` \| `TC` \| `TD` \| `TE` \| `TF` \| `TG` \| `TH` \| `TI`>
+**Returns:** *`ITypeUnion<CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI>`*
+
+▸ **union**(...`types`: [IAnyType](interfaces/ianytype.md)[]): *[IAnyType](interfaces/ianytype.md)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Rest` types | [IAnyType](interfaces/ianytype.md)[] |
+Name | Type |
+------ | ------ |
+`...types` | [IAnyType](interfaces/ianytype.md)[] |
 
-**Returns:** [IAnyType](interfaces/ianytype.md)
+**Returns:** *[IAnyType](interfaces/ianytype.md)*
+
+▸ **union**(`dispatchOrType`: [UnionOptions](interfaces/unionoptions.md) | [IAnyType](interfaces/ianytype.md), ...`otherTypes`: [IAnyType](interfaces/ianytype.md)[]): *[IAnyType](interfaces/ianytype.md)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| dispatchOrType | [UnionOptions](interfaces/unionoptions.md) \| [IAnyType](interfaces/ianytype.md) |
-| `Rest` otherTypes | [IAnyType](interfaces/ianytype.md)[] |  \- |
+Name | Type |
+------ | ------ |
+`dispatchOrType` | [UnionOptions](interfaces/unionoptions.md) \| [IAnyType](interfaces/ianytype.md) |
+`...otherTypes` | [IAnyType](interfaces/ianytype.md)[] |
 
-**Returns:** [IAnyType](interfaces/ianytype.md)
+**Returns:** *[IAnyType](interfaces/ianytype.md)*
 
 ___
-<a id="unprotect"></a>
 
 ###  unprotect
 
-▸ **unprotect**(target: *`IAnyStateTreeNode`*): `void`
+▸ **unprotect**(`target`: `IAnyStateTreeNode`): *void*
 
-By default it is not allowed to directly modify a model. Models can only be modified through actions. However, in some cases you don't care about the advantages (like replayability, traceability, etc) this yields. For example because you are building a PoC or don't have any middleware attached to your tree.
+By default it is not allowed to directly modify a model. Models can only be modified through actions.
+However, in some cases you don't care about the advantages (like replayability, traceability, etc) this yields.
+For example because you are building a PoC or don't have any middleware attached to your tree.
 
 In that case you can disable this protection by calling `unprotect` on the root of your tree.
 
 Example:
-
 ```ts
 const Todo = types.model({
     done: false
@@ -4823,222 +5963,142 @@ todo.done = false // OK
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| target | `IAnyStateTreeNode` |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="walk"></a>
 
 ###  walk
 
-▸ **walk**(target: *`IAnyStateTreeNode`*, processor: *`function`*): `void`
+▸ **walk**(`target`: `IAnyStateTreeNode`, `processor`: function): *void*
 
 Performs a depth first walk through a tree.
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| target | `IAnyStateTreeNode` |
-| processor | `function` |
+▪ **target**: *`IAnyStateTreeNode`*
 
-**Returns:** `void`
+▪ **processor**: *function*
 
-___
+▸ (`item`: `IAnyStateTreeNode`): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`item` | `IAnyStateTreeNode` |
+
+**Returns:** *void*
 
 ## Object literals
 
-<a id="types"></a>
+### `Const` types
 
-### `<Const>` types
+### ▪ **types**: *object*
 
-**types**: *`object`*
+###  Date
 
-<a id="types.date"></a>
+• **Date**: *[IType](interfaces/itype.md)‹*number | `Date`*, *number*, *`Date`*›* =  DatePrimitive
 
-####  Date
+###  array
 
-**● Date**: *[IType](interfaces/itype.md)<`number` \| `Date`, `number`, `Date`>* =  DatePrimitive
+• **array**: *[array](README.md#array)*
 
-___
-<a id="types.array"></a>
+###  boolean
 
-####  array
+• **boolean**: *[ISimpleType](interfaces/isimpletype.md)‹*boolean*›*
 
-**● array**: *[array](#array)*
+###  compose
 
-___
-<a id="types.boolean"></a>
+• **compose**: *[compose](README.md#compose)*
 
-####  boolean
+###  custom
 
-**● boolean**: *[ISimpleType](interfaces/isimpletype.md)<`boolean`>*
+• **custom**: *[custom](README.md#custom)*
 
-___
-<a id="types.compose"></a>
+###  enumeration
 
-####  compose
+• **enumeration**: *[enumeration](README.md#enumeration)*
 
-**● compose**: *[compose](#compose)*
+###  frozen
 
-___
-<a id="types.custom"></a>
+• **frozen**: *[frozen](README.md#frozen)*
 
-####  custom
+###  identifier
 
-**● custom**: *[custom](#custom)*
+• **identifier**: *[ISimpleType](interfaces/isimpletype.md)‹*string*›*
 
-___
-<a id="types.enumeration"></a>
+###  identifierNumber
 
-####  enumeration
+• **identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)‹*number*›*
 
-**● enumeration**: *[enumeration](#enumeration)*
+###  integer
 
-___
-<a id="types.frozen"></a>
+• **integer**: *[ISimpleType](interfaces/isimpletype.md)‹*number*›*
 
-####  frozen
+###  late
 
-**● frozen**: *[frozen](#frozen)*
+• **late**: *[late](README.md#late)*
 
-___
-<a id="types.identifier"></a>
+###  literal
 
-####  identifier
+• **literal**: *[literal](README.md#literal)*
 
-**● identifier**: *[ISimpleType](interfaces/isimpletype.md)<`string`>*
+###  map
 
-___
-<a id="types.identifiernumber"></a>
+• **map**: *[map](README.md#map)*
 
-####  identifierNumber
+###  maybe
 
-**● identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)<`number`>*
+• **maybe**: *[maybe](README.md#maybe)*
 
-___
-<a id="types.integer"></a>
+###  maybeNull
 
-####  integer
+• **maybeNull**: *[maybeNull](README.md#maybenull)*
 
-**● integer**: *[ISimpleType](interfaces/isimpletype.md)<`number`>*
+###  model
 
-___
-<a id="types.late"></a>
+• **model**: *[model](README.md#model)*
 
-####  late
+###  null
 
-**● late**: *[late](#late)*
+• **null**: *[ISimpleType](interfaces/isimpletype.md)‹*null*›* =  nullType
 
-___
-<a id="types.literal"></a>
+###  number
 
-####  literal
+• **number**: *[ISimpleType](interfaces/isimpletype.md)‹*number*›*
 
-**● literal**: *[literal](#literal)*
+###  optional
 
-___
-<a id="types.map"></a>
+• **optional**: *[optional](README.md#optional)*
 
-####  map
+###  reference
 
-**● map**: *[map](#map)*
+• **reference**: *[reference](README.md#reference)*
 
-___
-<a id="types.maybe"></a>
+###  refinement
 
-####  maybe
+• **refinement**: *[refinement](README.md#refinement)*
 
-**● maybe**: *[maybe](#maybe)*
+###  safeReference
 
-___
-<a id="types.maybenull"></a>
+• **safeReference**: *[safeReference](README.md#safereference)*
 
-####  maybeNull
+###  snapshotProcessor
 
-**● maybeNull**: *[maybeNull](#maybenull)*
+• **snapshotProcessor**: *[snapshotProcessor](README.md#snapshotprocessor)*
 
-___
-<a id="types.model"></a>
+###  string
 
-####  model
+• **string**: *[ISimpleType](interfaces/isimpletype.md)‹*string*›*
 
-**● model**: *[model](#model)*
+###  undefined
 
-___
-<a id="types.null"></a>
+• **undefined**: *[ISimpleType](interfaces/isimpletype.md)‹*undefined*›* =  undefinedType
 
-####  null
+###  union
 
-**● null**: *[ISimpleType](interfaces/isimpletype.md)<`null`>* =  nullType
-
-___
-<a id="types.number"></a>
-
-####  number
-
-**● number**: *[ISimpleType](interfaces/isimpletype.md)<`number`>*
-
-___
-<a id="types.optional"></a>
-
-####  optional
-
-**● optional**: *[optional](#optional)*
-
-___
-<a id="types.reference"></a>
-
-####  reference
-
-**● reference**: *[reference](#reference)*
-
-___
-<a id="types.refinement"></a>
-
-####  refinement
-
-**● refinement**: *[refinement](#refinement)*
-
-___
-<a id="types.safereference"></a>
-
-####  safeReference
-
-**● safeReference**: *[safeReference](#safereference)*
-
-___
-<a id="types.snapshotprocessor"></a>
-
-####  snapshotProcessor
-
-**● snapshotProcessor**: *[snapshotProcessor](#snapshotprocessor)*
-
-___
-<a id="types.string"></a>
-
-####  string
-
-**● string**: *[ISimpleType](interfaces/isimpletype.md)<`string`>*
-
-___
-<a id="types.undefined"></a>
-
-####  undefined
-
-**● undefined**: *[ISimpleType](interfaces/isimpletype.md)<`undefined`>* =  undefinedType
-
-___
-<a id="types.union"></a>
-
-####  union
-
-**● union**: *[union](#union)*
-
-___
-
-___
-
+• **union**: *[union](README.md#union)*

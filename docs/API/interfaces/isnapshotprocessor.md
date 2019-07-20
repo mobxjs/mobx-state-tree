@@ -1,24 +1,30 @@
-[mobx-state-tree](../README.md) > [ISnapshotProcessor](../interfaces/isnapshotprocessor.md)
+> **[mobx-state-tree](../README.md)**
 
-# Interface: ISnapshotProcessor
+[ISnapshotProcessor](isnapshotprocessor.md) /
+
+# Interface: ISnapshotProcessor <**IT, CustomC, CustomS**>
 
 A type that has its snapshots processed.
 
 ## Type parameters
-#### IT :  [IAnyType](ianytype.md)
-#### CustomC 
-#### CustomS 
+
+▪ **IT**: *[IAnyType](ianytype.md)*
+
+▪ **CustomC**
+
+▪ **CustomS**
+
 ## Hierarchy
 
- [IType](itype.md)<`_CustomOrOther`<`CustomC`, `IT["CreationType"]`>, `_CustomOrOther`<`CustomS`, `IT["SnapshotType"]`>, `IT["TypeWithoutSTN"]`>
+* [IType](itype.md)‹*`_CustomOrOther<CustomC, IT["CreationType"]>`*, *`_CustomOrOther<CustomS, IT["SnapshotType"]>`*, *`IT["TypeWithoutSTN"]`*›
 
-**↳ ISnapshotProcessor**
+  * **ISnapshotProcessor**
 
 ## Index
 
 ### Properties
 
-* [identifierAttribute](isnapshotprocessor.md#identifierattribute)
+* [identifierAttribute](isnapshotprocessor.md#optional-identifierattribute)
 * [name](isnapshotprocessor.md#name)
 
 ### Methods
@@ -28,96 +34,96 @@ A type that has its snapshots processed.
 * [is](isnapshotprocessor.md#is)
 * [validate](isnapshotprocessor.md#validate)
 
----
-
 ## Properties
 
-<a id="identifierattribute"></a>
+### `Optional` identifierAttribute
 
-### `<Optional>` identifierAttribute
+• **identifierAttribute**? : *undefined | string*
 
-**● identifierAttribute**: *`undefined` \| `string`*
+*Inherited from [IType](itype.md).[identifierAttribute](itype.md#optional-identifierattribute)*
 
 Name of the identifier attribute or null if none.
 
 ___
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
+• **name**: *string*
+
+*Inherited from [IType](itype.md).[name](itype.md#name)*
 
 Friendly type name.
 
-___
-
 ## Methods
-
-<a id="create"></a>
 
 ###  create
 
-▸ **create**(snapshot?: *[C]()*, env?: *`any`*): `this["Type"]`
+▸ **create**(`snapshot?`: [C](), `env?`: any): *`this["Type"]`*
+
+*Inherited from [IType](itype.md).[create](itype.md#create)*
 
 Creates an instance for the type given an snapshot input.
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Optional` snapshot | [C]() |
-| `Optional` env | `any` |
+Name | Type |
+------ | ------ |
+`snapshot?` | [C]() |
+`env?` | any |
 
-**Returns:** `this["Type"]`
+**Returns:** *`this["Type"]`*
+
 An instance of that type.
 
 ___
-<a id="describe"></a>
 
 ###  describe
 
-▸ **describe**(): `string`
+▸ **describe**(): *string*
+
+*Inherited from [IType](itype.md).[describe](itype.md#describe)*
 
 Gets the textual representation of the type as a string.
 
-**Returns:** `string`
+**Returns:** *string*
 
 ___
-<a id="is"></a>
 
 ###  is
 
-▸ **is**(thing: *`any`*): `boolean`
+▸ **is**(`thing`: any): *boolean*
+
+*Inherited from [IType](itype.md).[is](itype.md#is)*
 
 Checks if a given snapshot / instance is of the given type.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| thing | `any` |  Snapshot or instance to be checked. |
+Name | Type | Description |
+------ | ------ | ------ |
+`thing` | any | Snapshot or instance to be checked. |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
+
 true if the value is of the current type, false otherwise.
 
 ___
-<a id="validate"></a>
 
 ###  validate
 
-▸ **validate**(thing: *`_CustomOrOther`<`CustomC`, `IT["CreationType"]`>*, context: *[IValidationContext](../#ivalidationcontext)*): [IValidationResult](../#ivalidationresult)
+▸ **validate**(`thing`: `_CustomOrOther<CustomC, IT["CreationType"]>`, `context`: [IValidationContext](../README.md#ivalidationcontext)): *[IValidationResult](../README.md#ivalidationresult)*
+
+*Inherited from [IType](itype.md).[validate](itype.md#validate)*
 
 Run's the type's typechecker on the given value with the given validation context.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| thing | `_CustomOrOther`<`CustomC`, `IT["CreationType"]`> |  Value to be checked, either a snapshot or an instance. |
-| context | [IValidationContext](../#ivalidationcontext) |  Validation context, an array of { subpaths, subtypes } that should be validated |
+Name | Type | Description |
+------ | ------ | ------ |
+`thing` | `_CustomOrOther<CustomC, IT["CreationType"]>` | Value to be checked, either a snapshot or an instance. |
+`context` | [IValidationContext](../README.md#ivalidationcontext) | Validation context, an array of { subpaths, subtypes } that should be validated |
 
-**Returns:** [IValidationResult](../#ivalidationresult)
+**Returns:** *[IValidationResult](../README.md#ivalidationresult)*
+
 The validation result, an array with the list of validation errors.
-
-___
-

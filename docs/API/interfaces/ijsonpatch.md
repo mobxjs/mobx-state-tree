@@ -1,14 +1,17 @@
-[mobx-state-tree](../README.md) > [IJsonPatch](../interfaces/ijsonpatch.md)
+> **[mobx-state-tree](../README.md)**
+
+[IJsonPatch](ijsonpatch.md) /
 
 # Interface: IJsonPatch
 
-[https://tools.ietf.org/html/rfc6902](https://tools.ietf.org/html/rfc6902) [http://jsonpatch.com/](http://jsonpatch.com/)
+https://tools.ietf.org/html/rfc6902
+http://jsonpatch.com/
 
 ## Hierarchy
 
-**IJsonPatch**
+* **IJsonPatch**
 
-↳  [IReversibleJsonPatch](ireversiblejsonpatch.md)
+  * [IReversibleJsonPatch](ireversiblejsonpatch.md)
 
 ## Index
 
@@ -16,31 +19,22 @@
 
 * [op](ijsonpatch.md#op)
 * [path](ijsonpatch.md#path)
-* [value](ijsonpatch.md#value)
-
----
+* [value](ijsonpatch.md#optional-value)
 
 ## Properties
 
-<a id="op"></a>
-
 ###  op
 
-**● op**: *"replace" \| "add" \| "remove"*
+• **op**: *"replace" | "add" | "remove"*
 
 ___
-<a id="path"></a>
 
 ###  path
 
-**● path**: *`string`*
-
-___
-<a id="value"></a>
-
-### `<Optional>` value
-
-**● value**: *`any`*
+• **path**: *string*
 
 ___
 
+### `Optional` value
+
+• **value**? : *any*

@@ -190,7 +190,8 @@ test("it should not be possible to pass an unserializable object", () => {
             args: [
                 {
                     $MST_UNSERIALIZABLE: true,
-                    type: "TypeError: Converting circular structure to JSON"
+                    type:
+                        "TypeError: Converting circular structure to JSON\n    --> starting at object with constructor 'Object'\n    --- property 'a' closes the circle"
                 }
             ],
             name: "noopSetCustomer",

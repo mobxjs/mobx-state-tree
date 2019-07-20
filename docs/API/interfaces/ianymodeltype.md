@@ -1,4 +1,6 @@
-[mobx-state-tree](../README.md) > [IAnyModelType](../interfaces/ianymodeltype.md)
+> **[mobx-state-tree](../README.md)**
+
+[IAnyModelType](ianymodeltype.md) /
 
 # Interface: IAnyModelType
 
@@ -6,15 +8,15 @@ Any model type.
 
 ## Hierarchy
 
-↳  [IModelType](imodeltype.md)<`any`, `any`, `any`, `any`>
+  * [IModelType](imodeltype.md)‹*any*, *any*, *any*, *any*›
 
-**↳ IAnyModelType**
+  * **IAnyModelType**
 
 ## Index
 
 ### Properties
 
-* [identifierAttribute](ianymodeltype.md#identifierattribute)
+* [identifierAttribute](ianymodeltype.md#optional-identifierattribute)
 * [name](ianymodeltype.md#name)
 * [properties](ianymodeltype.md#properties)
 
@@ -33,250 +35,304 @@ Any model type.
 * [views](ianymodeltype.md#views)
 * [volatile](ianymodeltype.md#volatile)
 
----
-
 ## Properties
 
-<a id="identifierattribute"></a>
+### `Optional` identifierAttribute
 
-### `<Optional>` identifierAttribute
+• **identifierAttribute**? : *undefined | string*
 
-**● identifierAttribute**: *`undefined` \| `string`*
+*Inherited from [IType](itype.md).[identifierAttribute](itype.md#optional-identifierattribute)*
 
 Name of the identifier attribute or null if none.
 
 ___
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
+• **name**: *string*
+
+*Inherited from [IType](itype.md).[name](itype.md#name)*
 
 Friendly type name.
 
 ___
-<a id="properties"></a>
 
 ###  properties
 
-**● properties**: *`any`*
+• **properties**: *any*
 
-___
+*Inherited from [IModelType](imodeltype.md).[properties](imodeltype.md#properties)*
 
 ## Methods
 
-<a id="actions"></a>
-
 ###  actions
 
-▸ **actions**<`A`>(fn: *`function`*): [IModelType](imodeltype.md)<`any`, `any` & `A`, `any`, `any`>
+▸ **actions**<**A**>(`fn`: function): *[IModelType](imodeltype.md)‹*any*, *any & `A`*, *any*, *any*›*
+
+*Inherited from [IModelType](imodeltype.md).[actions](imodeltype.md#actions)*
 
 **Type parameters:**
 
-#### A :  `ModelActions`
+▪ **A**: *`ModelActions`*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| fn | `function` |
+▪ **fn**: *function*
 
-**Returns:** [IModelType](imodeltype.md)<`any`, `any` & `A`, `any`, `any`>
+▸ (`self`: [Instance](../README.md#instance)‹*this*›): *`A`*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`self` | [Instance](../README.md#instance)‹*this*› |
+
+**Returns:** *[IModelType](imodeltype.md)‹*any*, *any & `A`*, *any*, *any*›*
 
 ___
-<a id="create"></a>
 
 ###  create
 
-▸ **create**(snapshot?: *[C]()*, env?: *`any`*): `this["Type"]`
+▸ **create**(`snapshot?`: [C](), `env?`: any): *`this["Type"]`*
+
+*Inherited from [IType](itype.md).[create](itype.md#create)*
 
 Creates an instance for the type given an snapshot input.
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Optional` snapshot | [C]() |
-| `Optional` env | `any` |
+Name | Type |
+------ | ------ |
+`snapshot?` | [C]() |
+`env?` | any |
 
-**Returns:** `this["Type"]`
+**Returns:** *`this["Type"]`*
+
 An instance of that type.
 
 ___
-<a id="describe"></a>
 
 ###  describe
 
-▸ **describe**(): `string`
+▸ **describe**(): *string*
+
+*Inherited from [IType](itype.md).[describe](itype.md#describe)*
 
 Gets the textual representation of the type as a string.
 
-**Returns:** `string`
+**Returns:** *string*
 
 ___
-<a id="extend"></a>
 
 ###  extend
 
-▸ **extend**<`A`,`V`,`VS`>(fn: *`function`*): [IModelType](imodeltype.md)<`any`, `any` & `A` & `V` & `VS`, `any`, `any`>
+▸ **extend**<**A**, **V**, **VS**>(`fn`: function): *[IModelType](imodeltype.md)‹*any*, *any & `A` & `V` & `VS`*, *any*, *any*›*
+
+*Inherited from [IModelType](imodeltype.md).[extend](imodeltype.md#extend)*
 
 **Type parameters:**
 
-#### A :  `ModelActions`
-#### V :  `Object`
-#### VS :  `Object`
+▪ **A**: *`ModelActions`*
+
+▪ **V**: *`Object`*
+
+▪ **VS**: *`Object`*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| fn | `function` |
+▪ **fn**: *function*
 
-**Returns:** [IModelType](imodeltype.md)<`any`, `any` & `A` & `V` & `VS`, `any`, `any`>
+▸ (`self`: [Instance](../README.md#instance)‹*this*›): *object*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`self` | [Instance](../README.md#instance)‹*this*› |
+
+**Returns:** *[IModelType](imodeltype.md)‹*any*, *any & `A` & `V` & `VS`*, *any*, *any*›*
 
 ___
-<a id="is"></a>
 
 ###  is
 
-▸ **is**(thing: *`any`*): `boolean`
+▸ **is**(`thing`: any): *boolean*
+
+*Inherited from [IType](itype.md).[is](itype.md#is)*
 
 Checks if a given snapshot / instance is of the given type.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| thing | `any` |  Snapshot or instance to be checked. |
+Name | Type | Description |
+------ | ------ | ------ |
+`thing` | any | Snapshot or instance to be checked. |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
+
 true if the value is of the current type, false otherwise.
 
 ___
-<a id="named"></a>
 
 ###  named
 
-▸ **named**(newName: *`string`*): [IModelType](imodeltype.md)<`any`, `any`, `any`, `any`>
+▸ **named**(`newName`: string): *[IModelType](imodeltype.md)‹*any*, *any*, *any*, *any*›*
+
+*Inherited from [IModelType](imodeltype.md).[named](imodeltype.md#named)*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| newName | `string` |
+Name | Type |
+------ | ------ |
+`newName` | string |
 
-**Returns:** [IModelType](imodeltype.md)<`any`, `any`, `any`, `any`>
+**Returns:** *[IModelType](imodeltype.md)‹*any*, *any*, *any*, *any*›*
 
 ___
-<a id="postprocesssnapshot"></a>
 
 ###  postProcessSnapshot
 
-▸ **postProcessSnapshot**<`NewS`>(fn: *`function`*): [IModelType](imodeltype.md)<`any`, `any`, `any`, `NewS`>
+▸ **postProcessSnapshot**<**NewS**>(`fn`: function): *[IModelType](imodeltype.md)‹*any*, *any*, *any*, *`NewS`*›*
 
-*__deprecated__*: See `types.snapshotProcessor`
+*Inherited from [IModelType](imodeltype.md).[postProcessSnapshot](imodeltype.md#postprocesssnapshot)*
+
+**`deprecated`** See `types.snapshotProcessor`
 
 **Type parameters:**
 
-#### NewS 
+▪ **NewS**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| fn | `function` |
+▪ **fn**: *function*
 
-**Returns:** [IModelType](imodeltype.md)<`any`, `any`, `any`, `NewS`>
+▸ (`snapshot`: `ModelSnapshotType2<any, any>`): *`NewS`*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`snapshot` | `ModelSnapshotType2<any, any>` |
+
+**Returns:** *[IModelType](imodeltype.md)‹*any*, *any*, *any*, *`NewS`*›*
 
 ___
-<a id="preprocesssnapshot"></a>
 
 ###  preProcessSnapshot
 
-▸ **preProcessSnapshot**<`NewC`>(fn: *`function`*): [IModelType](imodeltype.md)<`any`, `any`, `NewC`, `any`>
+▸ **preProcessSnapshot**<**NewC**>(`fn`: function): *[IModelType](imodeltype.md)‹*any*, *any*, *`NewC`*, *any*›*
 
-*__deprecated__*: See `types.snapshotProcessor`
+*Inherited from [IModelType](imodeltype.md).[preProcessSnapshot](imodeltype.md#preprocesssnapshot)*
+
+**`deprecated`** See `types.snapshotProcessor`
 
 **Type parameters:**
 
-#### NewC 
+▪ **NewC**
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| fn | `function` |
+▪ **fn**: *function*
 
-**Returns:** [IModelType](imodeltype.md)<`any`, `any`, `NewC`, `any`>
+▸ (`snapshot`: `NewC`): *`ModelCreationType2<any, any>`*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`snapshot` | `NewC` |
+
+**Returns:** *[IModelType](imodeltype.md)‹*any*, *any*, *`NewC`*, *any*›*
 
 ___
-<a id="props"></a>
 
 ###  props
 
-▸ **props**<`PROPS2`>(props: *`PROPS2`*): [IModelType](imodeltype.md)<`any` & `ModelPropertiesDeclarationToProperties`<`PROPS2`>, `any`, `any`, `any`>
+▸ **props**<**PROPS2**>(`props`: `PROPS2`): *[IModelType](imodeltype.md)‹*any & `ModelPropertiesDeclarationToProperties<PROPS2>`*, *any*, *any*, *any*›*
+
+*Inherited from [IModelType](imodeltype.md).[props](imodeltype.md#props)*
 
 **Type parameters:**
 
-#### PROPS2 :  `ModelPropertiesDeclaration`
+▪ **PROPS2**: *`ModelPropertiesDeclaration`*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| props | `PROPS2` |
+Name | Type |
+------ | ------ |
+`props` | `PROPS2` |
 
-**Returns:** [IModelType](imodeltype.md)<`any` & `ModelPropertiesDeclarationToProperties`<`PROPS2`>, `any`, `any`, `any`>
+**Returns:** *[IModelType](imodeltype.md)‹*any & `ModelPropertiesDeclarationToProperties<PROPS2>`*, *any*, *any*, *any*›*
 
 ___
-<a id="validate"></a>
 
 ###  validate
 
-▸ **validate**(thing: *`ModelCreationType2`<`any`, `any`>*, context: *[IValidationContext](../#ivalidationcontext)*): [IValidationResult](../#ivalidationresult)
+▸ **validate**(`thing`: `ModelCreationType2<any, any>`, `context`: [IValidationContext](../README.md#ivalidationcontext)): *[IValidationResult](../README.md#ivalidationresult)*
+
+*Inherited from [IType](itype.md).[validate](itype.md#validate)*
 
 Run's the type's typechecker on the given value with the given validation context.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| thing | `ModelCreationType2`<`any`, `any`> |  Value to be checked, either a snapshot or an instance. |
-| context | [IValidationContext](../#ivalidationcontext) |  Validation context, an array of { subpaths, subtypes } that should be validated |
+Name | Type | Description |
+------ | ------ | ------ |
+`thing` | `ModelCreationType2<any, any>` | Value to be checked, either a snapshot or an instance. |
+`context` | [IValidationContext](../README.md#ivalidationcontext) | Validation context, an array of { subpaths, subtypes } that should be validated |
 
-**Returns:** [IValidationResult](../#ivalidationresult)
+**Returns:** *[IValidationResult](../README.md#ivalidationresult)*
+
 The validation result, an array with the list of validation errors.
 
 ___
-<a id="views"></a>
 
 ###  views
 
-▸ **views**<`V`>(fn: *`function`*): [IModelType](imodeltype.md)<`any`, `any` & `V`, `any`, `any`>
+▸ **views**<**V**>(`fn`: function): *[IModelType](imodeltype.md)‹*any*, *any & `V`*, *any*, *any*›*
+
+*Inherited from [IModelType](imodeltype.md).[views](imodeltype.md#views)*
 
 **Type parameters:**
 
-#### V :  `Object`
+▪ **V**: *`Object`*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| fn | `function` |
+▪ **fn**: *function*
 
-**Returns:** [IModelType](imodeltype.md)<`any`, `any` & `V`, `any`, `any`>
+▸ (`self`: [Instance](../README.md#instance)‹*this*›): *`V`*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`self` | [Instance](../README.md#instance)‹*this*› |
+
+**Returns:** *[IModelType](imodeltype.md)‹*any*, *any & `V`*, *any*, *any*›*
 
 ___
-<a id="volatile"></a>
 
 ###  volatile
 
-▸ **volatile**<`TP`>(fn: *`function`*): [IModelType](imodeltype.md)<`any`, `any` & `TP`, `any`, `any`>
+▸ **volatile**<**TP**>(`fn`: function): *[IModelType](imodeltype.md)‹*any*, *any & `TP`*, *any*, *any*›*
+
+*Inherited from [IModelType](imodeltype.md).[volatile](imodeltype.md#volatile)*
 
 **Type parameters:**
 
-#### TP :  `object`
+▪ **TP**: *object*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| fn | `function` |
+▪ **fn**: *function*
 
-**Returns:** [IModelType](imodeltype.md)<`any`, `any` & `TP`, `any`, `any`>
+▸ (`self`: [Instance](../README.md#instance)‹*this*›): *`TP`*
 
-___
+**Parameters:**
 
+Name | Type |
+------ | ------ |
+`self` | [Instance](../README.md#instance)‹*this*› |
+
+**Returns:** *[IModelType](imodeltype.md)‹*any*, *any & `TP`*, *any*, *any*›*

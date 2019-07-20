@@ -1,34 +1,28 @@
-[mobx-state-tree](../README.md) > [UnionOptions](../interfaces/unionoptions.md)
+> **[mobx-state-tree](../README.md)**
+
+[UnionOptions](unionoptions.md) /
 
 # Interface: UnionOptions
 
 ## Hierarchy
 
-**UnionOptions**
+* **UnionOptions**
 
 ## Index
 
 ### Properties
 
-* [dispatcher](unionoptions.md#dispatcher)
-* [eager](unionoptions.md#eager)
-
----
+* [dispatcher](unionoptions.md#optional-dispatcher)
+* [eager](unionoptions.md#optional-eager)
 
 ## Properties
 
-<a id="dispatcher"></a>
+### `Optional` dispatcher
 
-### `<Optional>` dispatcher
-
-**● dispatcher**: *[ITypeDispatcher](../#itypedispatcher)*
-
-___
-<a id="eager"></a>
-
-### `<Optional>` eager
-
-**● eager**: *`undefined` \| `false` \| `true`*
+• **dispatcher**? : *[ITypeDispatcher](../README.md#itypedispatcher)*
 
 ___
 
+### `Optional` eager
+
+• **eager**? : *undefined | false | true*

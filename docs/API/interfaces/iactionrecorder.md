@@ -1,10 +1,12 @@
-[mobx-state-tree](../README.md) > [IActionRecorder](../interfaces/iactionrecorder.md)
+> **[mobx-state-tree](../README.md)**
+
+[IActionRecorder](iactionrecorder.md) /
 
 # Interface: IActionRecorder
 
 ## Hierarchy
 
-**IActionRecorder**
+* **IActionRecorder**
 
 ## Index
 
@@ -19,58 +21,44 @@
 * [resume](iactionrecorder.md#resume)
 * [stop](iactionrecorder.md#stop)
 
----
-
 ## Properties
-
-<a id="actions"></a>
 
 ###  actions
 
-**● actions**: *`ReadonlyArray`<[ISerializedActionCall](iserializedactioncall.md)>*
+• **actions**: *`ReadonlyArray<ISerializedActionCall>`*
 
 ___
-<a id="recording"></a>
 
 ###  recording
 
-**● recording**: *`boolean`*
-
-___
+• **recording**: *boolean*
 
 ## Methods
 
-<a id="replay"></a>
-
 ###  replay
 
-▸ **replay**(target: *`IAnyStateTreeNode`*): `void`
+▸ **replay**(`target`: `IAnyStateTreeNode`): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| target | `IAnyStateTreeNode` |
+Name | Type |
+------ | ------ |
+`target` | `IAnyStateTreeNode` |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="resume"></a>
 
 ###  resume
 
-▸ **resume**(): `void`
+▸ **resume**(): *void*
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="stop"></a>
 
 ###  stop
 
-▸ **stop**(): `void`
+▸ **stop**(): *void*
 
-**Returns:** `void`
-
-___
-
+**Returns:** *void*

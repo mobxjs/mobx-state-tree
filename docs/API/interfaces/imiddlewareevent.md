@@ -1,12 +1,14 @@
-[mobx-state-tree](../README.md) > [IMiddlewareEvent](../interfaces/imiddlewareevent.md)
+> **[mobx-state-tree](../README.md)**
+
+[IMiddlewareEvent](imiddlewareevent.md) /
 
 # Interface: IMiddlewareEvent
 
 ## Hierarchy
 
- [IActionContext](iactioncontext.md)
+* [IActionContext](iactioncontext.md)
 
-**↳ IMiddlewareEvent**
+  * **IMiddlewareEvent**
 
 ## Index
 
@@ -24,107 +26,102 @@
 * [tree](imiddlewareevent.md#tree)
 * [type](imiddlewareevent.md#type)
 
----
-
 ## Properties
-
-<a id="allparentids"></a>
 
 ###  allParentIds
 
-**● allParentIds**: *`number`[]*
+• **allParentIds**: *number[]*
 
 Id of all events, from root until current (excluding current)
 
 ___
-<a id="args"></a>
 
 ###  args
 
-**● args**: *`any`[]*
+• **args**: *any[]*
+
+*Inherited from [IActionContext](iactioncontext.md).[args](iactioncontext.md#args)*
 
 Event arguments in an array (action arguments for actions)
 
 ___
-<a id="context"></a>
 
 ###  context
 
-**● context**: *`IAnyStateTreeNode`*
+• **context**: *`IAnyStateTreeNode`*
+
+*Inherited from [IActionContext](iactioncontext.md).[context](iactioncontext.md#context)*
 
 Event context (node where the action was invoked)
 
 ___
-<a id="id"></a>
 
 ###  id
 
-**● id**: *`number`*
+• **id**: *number*
+
+*Inherited from [IActionContext](iactioncontext.md).[id](iactioncontext.md#id)*
 
 Event unique id
 
 ___
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
+• **name**: *string*
+
+*Inherited from [IActionContext](iactioncontext.md).[name](iactioncontext.md#name)*
 
 Event name (action name for actions)
 
 ___
-<a id="parentactionevent"></a>
 
 ###  parentActionEvent
 
-**● parentActionEvent**: *[IMiddlewareEvent](imiddlewareevent.md) \| `undefined`*
+• **parentActionEvent**: *[IMiddlewareEvent](imiddlewareevent.md) | undefined*
+
+*Inherited from [IActionContext](iactioncontext.md).[parentActionEvent](iactioncontext.md#parentactionevent)*
 
 Parent action event object
 
 ___
-<a id="parentevent"></a>
 
 ###  parentEvent
 
-**● parentEvent**: *[IMiddlewareEvent](imiddlewareevent.md) \| `undefined`*
+• **parentEvent**: *[IMiddlewareEvent](imiddlewareevent.md) | undefined*
 
 Parent event object
 
 ___
-<a id="parentid"></a>
 
 ###  parentId
 
-**● parentId**: *`number`*
+• **parentId**: *number*
 
 Parent event unique id
 
 ___
-<a id="rootid"></a>
 
 ###  rootId
 
-**● rootId**: *`number`*
+• **rootId**: *number*
 
 Root event unique id
 
 ___
-<a id="tree"></a>
 
 ###  tree
 
-**● tree**: *`IAnyStateTreeNode`*
+• **tree**: *`IAnyStateTreeNode`*
+
+*Inherited from [IActionContext](iactioncontext.md).[tree](iactioncontext.md#tree)*
 
 Event tree (root node of the node where the action was invoked)
 
 ___
-<a id="type"></a>
 
 ###  type
 
-**● type**: *[IMiddlewareEventType](../#imiddlewareeventtype)*
+• **type**: *[IMiddlewareEventType](../README.md#imiddlewareeventtype)*
 
 Event type
-
-___
-

@@ -1,38 +1,34 @@
-[mobx-state-tree](../README.md) > [IActionTrackingMiddleware2Call](../interfaces/iactiontrackingmiddleware2call.md)
+> **[mobx-state-tree](../README.md)**
 
-# Interface: IActionTrackingMiddleware2Call
+[IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md) /
+
+# Interface: IActionTrackingMiddleware2Call <**TEnv**>
 
 ## Type parameters
-#### TEnv 
+
+▪ **TEnv**
+
 ## Hierarchy
 
- `object`
+* object
 
-**↳ IActionTrackingMiddleware2Call**
+  * **IActionTrackingMiddleware2Call**
 
 ## Index
 
 ### Properties
 
 * [env](iactiontrackingmiddleware2call.md#env)
-* [parentCall](iactiontrackingmiddleware2call.md#parentcall)
-
----
+* [parentCall](iactiontrackingmiddleware2call.md#optional-parentcall)
 
 ## Properties
 
-<a id="env"></a>
-
 ###  env
 
-**● env**: *`TEnv` \| `undefined`*
-
-___
-<a id="parentcall"></a>
-
-### `<Optional>` parentCall
-
-**● parentCall**: *[IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)<`TEnv`>*
+• **env**: *`TEnv` | undefined*
 
 ___
 
+### `Optional` parentCall
+
+• **parentCall**? : *[IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)‹*`TEnv`*›*

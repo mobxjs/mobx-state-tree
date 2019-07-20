@@ -1,61 +1,60 @@
-[mobx-state-tree](../README.md) > [ISnapshotProcessors](../interfaces/isnapshotprocessors.md)
+> **[mobx-state-tree](../README.md)**
 
-# Interface: ISnapshotProcessors
+[ISnapshotProcessors](isnapshotprocessors.md) /
+
+# Interface: ISnapshotProcessors <**C, CustomC, S, CustomS**>
 
 Snapshot processors.
 
 ## Type parameters
-#### C 
-#### CustomC 
-#### S 
-#### CustomS 
+
+▪ **C**
+
+▪ **CustomC**
+
+▪ **S**
+
+▪ **CustomS**
+
 ## Hierarchy
 
-**ISnapshotProcessors**
+* **ISnapshotProcessors**
 
 ## Index
 
 ### Methods
 
-* [postProcessor](isnapshotprocessors.md#postprocessor)
-* [preProcessor](isnapshotprocessors.md#preprocessor)
-
----
+* [postProcessor](isnapshotprocessors.md#optional-postprocessor)
+* [preProcessor](isnapshotprocessors.md#optional-preprocessor)
 
 ## Methods
 
-<a id="postprocessor"></a>
+### `Optional` postProcessor
 
-### `<Optional>` postProcessor
-
-▸ **postProcessor**(snapshot: *`S`*): `CustomS`
+▸ **postProcessor**(`snapshot`: `S`): *`CustomS`*
 
 Function that transforms an output snapshot.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| snapshot | `S` |   |
+Name | Type | Description |
+------ | ------ | ------ |
+`snapshot` | `S` |   |
 
-**Returns:** `CustomS`
+**Returns:** *`CustomS`*
 
 ___
-<a id="preprocessor"></a>
 
-### `<Optional>` preProcessor
+### `Optional` preProcessor
 
-▸ **preProcessor**(snapshot: *`CustomC`*): `C`
+▸ **preProcessor**(`snapshot`: `CustomC`): *`C`*
 
 Function that transforms an input snapshot.
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| snapshot | `CustomC` |
+Name | Type |
+------ | ------ |
+`snapshot` | `CustomC` |
 
-**Returns:** `C`
-
-___
-
+**Returns:** *`C`*

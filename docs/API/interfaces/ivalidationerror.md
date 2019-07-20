@@ -1,4 +1,6 @@
-[mobx-state-tree](../README.md) > [IValidationError](../interfaces/ivalidationerror.md)
+> **[mobx-state-tree](../README.md)**
+
+[IValidationError](ivalidationerror.md) /
 
 # Interface: IValidationError
 
@@ -6,45 +8,36 @@ Type validation error
 
 ## Hierarchy
 
-**IValidationError**
+* **IValidationError**
 
 ## Index
 
 ### Properties
 
 * [context](ivalidationerror.md#context)
-* [message](ivalidationerror.md#message)
+* [message](ivalidationerror.md#optional-message)
 * [value](ivalidationerror.md#value)
-
----
 
 ## Properties
 
-<a id="context"></a>
-
 ###  context
 
-**● context**: *[IValidationContext](../#ivalidationcontext)*
+• **context**: *[IValidationContext](../README.md#ivalidationcontext)*
 
 Validation context
 
 ___
-<a id="message"></a>
 
-### `<Optional>` message
+### `Optional` message
 
-**● message**: *`undefined` \| `string`*
+• **message**? : *undefined | string*
 
 Error message
 
 ___
-<a id="value"></a>
 
 ###  value
 
-**● value**: *`any`*
+• **value**: *any*
 
 Value that was being validated, either a snapshot or an instance
-
-___
-

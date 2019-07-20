@@ -1,10 +1,12 @@
-[mobx-state-tree](../README.md) > [IPatchRecorder](../interfaces/ipatchrecorder.md)
+> **[mobx-state-tree](../README.md)**
+
+[IPatchRecorder](ipatchrecorder.md) /
 
 # Interface: IPatchRecorder
 
 ## Hierarchy
 
-**IPatchRecorder**
+* **IPatchRecorder**
 
 ## Index
 
@@ -22,87 +24,70 @@
 * [stop](ipatchrecorder.md#stop)
 * [undo](ipatchrecorder.md#undo)
 
----
-
 ## Properties
-
-<a id="inversepatches"></a>
 
 ###  inversePatches
 
-**● inversePatches**: *`ReadonlyArray`<[IJsonPatch](ijsonpatch.md)>*
+• **inversePatches**: *`ReadonlyArray<IJsonPatch>`*
 
 ___
-<a id="patches"></a>
 
 ###  patches
 
-**● patches**: *`ReadonlyArray`<[IJsonPatch](ijsonpatch.md)>*
+• **patches**: *`ReadonlyArray<IJsonPatch>`*
 
 ___
-<a id="recording"></a>
 
 ###  recording
 
-**● recording**: *`boolean`*
+• **recording**: *boolean*
 
 ___
-<a id="reversedinversepatches"></a>
 
 ###  reversedInversePatches
 
-**● reversedInversePatches**: *`ReadonlyArray`<[IJsonPatch](ijsonpatch.md)>*
-
-___
+• **reversedInversePatches**: *`ReadonlyArray<IJsonPatch>`*
 
 ## Methods
 
-<a id="replay"></a>
-
 ###  replay
 
-▸ **replay**(target?: *`IAnyStateTreeNode`*): `void`
+▸ **replay**(`target?`: `IAnyStateTreeNode`): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Optional` target | `IAnyStateTreeNode` |
+Name | Type |
+------ | ------ |
+`target?` | `IAnyStateTreeNode` |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="resume"></a>
 
 ###  resume
 
-▸ **resume**(): `void`
+▸ **resume**(): *void*
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="stop"></a>
 
 ###  stop
 
-▸ **stop**(): `void`
+▸ **stop**(): *void*
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="undo"></a>
 
 ###  undo
 
-▸ **undo**(target?: *`IAnyStateTreeNode`*): `void`
+▸ **undo**(`target?`: `IAnyStateTreeNode`): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Optional` target | `IAnyStateTreeNode` |
+Name | Type |
+------ | ------ |
+`target?` | `IAnyStateTreeNode` |
 
-**Returns:** `void`
-
-___
-
+**Returns:** *void*

@@ -1,12 +1,14 @@
-[mobx-state-tree](../README.md) > [IModelReflectionPropertiesData](../interfaces/imodelreflectionpropertiesdata.md)
+> **[mobx-state-tree](../README.md)**
+
+[IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md) /
 
 # Interface: IModelReflectionPropertiesData
 
 ## Hierarchy
 
-**IModelReflectionPropertiesData**
+* **IModelReflectionPropertiesData**
 
-↳  [IModelReflectionData](imodelreflectiondata.md)
+  * [IModelReflectionData](imodelreflectiondata.md)
 
 ## Index
 
@@ -15,26 +17,18 @@
 * [name](imodelreflectionpropertiesdata.md#name)
 * [properties](imodelreflectionpropertiesdata.md#properties)
 
----
-
 ## Properties
-
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
+• **name**: *string*
 
 ___
-<a id="properties"></a>
 
 ###  properties
 
-**● properties**: *`object`*
+• **properties**: *object*
 
-#### Type declaration
+#### Type declaration:
 
-[K: `string`]: [IAnyType](ianytype.md)
-
-___
-
+● \[▪ **K**: *string*\]: [IAnyType](ianytype.md)

@@ -1,4 +1,6 @@
-[mobx-state-tree](../README.md) > [IValidationContextEntry](../interfaces/ivalidationcontextentry.md)
+> **[mobx-state-tree](../README.md)**
+
+[IValidationContextEntry](ivalidationcontextentry.md) /
 
 # Interface: IValidationContextEntry
 
@@ -6,7 +8,7 @@ Validation context entry, this is, where the validation should run against which
 
 ## Hierarchy
 
-**IValidationContextEntry**
+* **IValidationContextEntry**
 
 ## Index
 
@@ -15,26 +17,18 @@ Validation context entry, this is, where the validation should run against which
 * [path](ivalidationcontextentry.md#path)
 * [type](ivalidationcontextentry.md#type)
 
----
-
 ## Properties
-
-<a id="path"></a>
 
 ###  path
 
-**● path**: *`string`*
+• **path**: *string*
 
 Subpath where the validation should be run, or an empty string to validate it all
 
 ___
-<a id="type"></a>
 
 ###  type
 
-**● type**: *[IAnyType](ianytype.md)*
+• **type**: *[IAnyType](ianytype.md)*
 
 Type to validate the subpath against
-
-___
-

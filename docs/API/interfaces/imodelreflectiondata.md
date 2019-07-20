@@ -1,12 +1,14 @@
-[mobx-state-tree](../README.md) > [IModelReflectionData](../interfaces/imodelreflectiondata.md)
+> **[mobx-state-tree](../README.md)**
+
+[IModelReflectionData](imodelreflectiondata.md) /
 
 # Interface: IModelReflectionData
 
 ## Hierarchy
 
- [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md)
+* [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md)
 
-**↳ IModelReflectionData**
+  * **IModelReflectionData**
 
 ## Index
 
@@ -18,47 +20,40 @@
 * [views](imodelreflectiondata.md#views)
 * [volatile](imodelreflectiondata.md#volatile)
 
----
-
 ## Properties
-
-<a id="actions"></a>
 
 ###  actions
 
-**● actions**: *`string`[]*
+• **actions**: *string[]*
 
 ___
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
+• **name**: *string*
+
+*Inherited from [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md).[name](imodelreflectionpropertiesdata.md#name)*
 
 ___
-<a id="properties"></a>
 
 ###  properties
 
-**● properties**: *`object`*
+• **properties**: *object*
 
-#### Type declaration
+*Inherited from [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md).[properties](imodelreflectionpropertiesdata.md#properties)*
 
-[K: `string`]: [IAnyType](ianytype.md)
+#### Type declaration:
+
+● \[▪ **K**: *string*\]: [IAnyType](ianytype.md)
 
 ___
-<a id="views"></a>
 
 ###  views
 
-**● views**: *`string`[]*
+• **views**: *string[]*
 
 ___
-<a id="volatile"></a>
 
 ###  volatile
 
-**● volatile**: *`string`[]*
-
-___
-
+• **volatile**: *string[]*

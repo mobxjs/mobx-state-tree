@@ -1,12 +1,16 @@
-[mobx-state-tree](../README.md) > [ReferenceOptionsGetSet](../interfaces/referenceoptionsgetset.md)
+> **[mobx-state-tree](../README.md)**
 
-# Interface: ReferenceOptionsGetSet
+[ReferenceOptionsGetSet](referenceoptionsgetset.md) /
+
+# Interface: ReferenceOptionsGetSet <**IT**>
 
 ## Type parameters
-#### IT :  [IAnyComplexType](ianycomplextype.md)
+
+▪ **IT**: *[IAnyComplexType](ianycomplextype.md)*
+
 ## Hierarchy
 
-**ReferenceOptionsGetSet**
+* **ReferenceOptionsGetSet**
 
 ## Index
 
@@ -15,40 +19,32 @@
 * [get](referenceoptionsgetset.md#get)
 * [set](referenceoptionsgetset.md#set)
 
----
-
 ## Methods
-
-<a id="get"></a>
 
 ###  get
 
-▸ **get**(identifier: *[ReferenceIdentifier](../#referenceidentifier)*, parent: *`IAnyStateTreeNode` \| `null`*): `ReferenceT`<`IT`>
+▸ **get**(`identifier`: [ReferenceIdentifier](../README.md#referenceidentifier), `parent`: `IAnyStateTreeNode` | null): *`ReferenceT<IT>`*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| identifier | [ReferenceIdentifier](../#referenceidentifier) |
-| parent | `IAnyStateTreeNode` \| `null` |
+Name | Type |
+------ | ------ |
+`identifier` | [ReferenceIdentifier](../README.md#referenceidentifier) |
+`parent` | `IAnyStateTreeNode` \| null |
 
-**Returns:** `ReferenceT`<`IT`>
+**Returns:** *`ReferenceT<IT>`*
 
 ___
-<a id="set"></a>
 
 ###  set
 
-▸ **set**(value: *`ReferenceT`<`IT`>*, parent: *`IAnyStateTreeNode` \| `null`*): [ReferenceIdentifier](../#referenceidentifier)
+▸ **set**(`value`: `ReferenceT<IT>`, `parent`: `IAnyStateTreeNode` | null): *[ReferenceIdentifier](../README.md#referenceidentifier)*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| value | `ReferenceT`<`IT`> |
-| parent | `IAnyStateTreeNode` \| `null` |
+Name | Type |
+------ | ------ |
+`value` | `ReferenceT<IT>` |
+`parent` | `IAnyStateTreeNode` \| null |
 
-**Returns:** [ReferenceIdentifier](../#referenceidentifier)
-
-___
-
+**Returns:** *[ReferenceIdentifier](../README.md#referenceidentifier)*

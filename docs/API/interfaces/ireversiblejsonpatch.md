@@ -1,12 +1,14 @@
-[mobx-state-tree](../README.md) > [IReversibleJsonPatch](../interfaces/ireversiblejsonpatch.md)
+> **[mobx-state-tree](../README.md)**
+
+[IReversibleJsonPatch](ireversiblejsonpatch.md) /
 
 # Interface: IReversibleJsonPatch
 
 ## Hierarchy
 
- [IJsonPatch](ijsonpatch.md)
+* [IJsonPatch](ijsonpatch.md)
 
-**↳ IReversibleJsonPatch**
+  * **IReversibleJsonPatch**
 
 ## Index
 
@@ -15,38 +17,34 @@
 * [oldValue](ireversiblejsonpatch.md#oldvalue)
 * [op](ireversiblejsonpatch.md#op)
 * [path](ireversiblejsonpatch.md#path)
-* [value](ireversiblejsonpatch.md#value)
-
----
+* [value](ireversiblejsonpatch.md#optional-value)
 
 ## Properties
 
-<a id="oldvalue"></a>
-
 ###  oldValue
 
-**● oldValue**: *`any`*
+• **oldValue**: *any*
 
 ___
-<a id="op"></a>
 
 ###  op
 
-**● op**: *"replace" \| "add" \| "remove"*
+• **op**: *"replace" | "add" | "remove"*
+
+*Inherited from [IJsonPatch](ijsonpatch.md).[op](ijsonpatch.md#op)*
 
 ___
-<a id="path"></a>
 
 ###  path
 
-**● path**: *`string`*
+• **path**: *string*
 
-___
-<a id="value"></a>
-
-### `<Optional>` value
-
-**● value**: *`any`*
+*Inherited from [IJsonPatch](ijsonpatch.md).[path](ijsonpatch.md#path)*
 
 ___
 
+### `Optional` value
+
+• **value**? : *any*
+
+*Inherited from [IJsonPatch](ijsonpatch.md).[value](ijsonpatch.md#optional-value)*
