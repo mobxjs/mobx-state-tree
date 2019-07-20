@@ -153,7 +153,7 @@ Simply subscribing to the patch stream of a tree is another way to sync diffs wi
 
 Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](https://github.com/mobxjs/mobx-react). See also this [egghead.io lesson: Render mobx-state-tree Models in React](https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react).
 Even cooler, because it supports snapshots, middleware and replayable actions out of the box, it is possible to replace a Redux store and reducer with a MobX state tree.
-This makes it possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/redux-todomvc/src/index.js#L6).
+This makes it possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/1906a394906d2e8f2cc1c778e1e3228307c1b112/packages/mst-example-redux-todomvc/src/index.js#L6).
 
 ---
 
@@ -1178,9 +1178,10 @@ See the [full API docs](docs/API/README.md) for more details.
 | [`setLivelinessChecking("warn" \| "ignore" \| "error")`](docs/API/README.md#setlivelinesschecking)                    | Defines what MST should do when running into reads / writes to objects that have died. By default it will print a warning. Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place |
 | [`getLivelinessChecking()`](docs/API/README.md#getlivelinesschecking)                                                 | Returns the current liveliness checking mode.                                                                                                                                                                                                         |
 | [`splitJsonPath(path)`](docs/API/README.md#splitjsonpath)                                                             | Splits and unescapes the given JSON `path` into path parts                                                                                                                                                                                            |
-| [`typecheck(type, value)`](docs/API/README.md#typecheck)                                                              | Typechecks a value against a type. Throws on errors. Use this if you need typechecks even in a production build.                                                                                                                                      |
+| [`typecheck(type, value)`](docs/API/README.md#typecheck)                                                              | Typechecks a value against a type. Throws on errors. Use this if you need typechecks even in a production build.
+NOTE: set process.env.ENABLE_TYPE_CHECK = "true" if you want to enable typeChecking in any environment                                                                                                                                      |
 | [`tryResolve(node, path)`](docs/API/README.md#tryresolve)                                                             | Like `resolve`, but just returns `null` if resolving fails at any point in the path                                                                                                                                                                   |
-| [`tryReference(() => node | null | undefined, checkIfAlive = true)`](docs/API/README.md#tryreference)                 | Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if it the check passes, else it returns undefined.                                                                                    |
+| [`tryReference(() => node \| null \| undefined, checkIfAlive = true)`](docs/API/README.md#tryreference)                 | Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if it the check passes, else it returns undefined.                                                                                    |
 | [`unprotect(node)`](docs/API/README.md#unprotect)                                                                     | Unprotects `node`, making it possible to directly modify any value in the subtree, without actions                                                                                                                                                    |
 | [`walk(startNode, (node) => void)`](docs/API/README.md#walk)                                                          | Performs a depth-first walk through a tree                                                                                                                                                                                                            |
 | [`escapeJsonPath(path)`](docs/API/README.md#escapejsonpath)                                                           | escape special characters in an identifier, according to http://tools.ietf.org/html/rfc6901                                                                                                                                                           |
@@ -1357,7 +1358,7 @@ MST doesn't offer an any type because it can't reason about it. For example, giv
 -   If no identifier is specified, but the type of the snapshot is correct, MST will reconcile objects as well if they are stored in a specific model property or under the same map key.
 -   In arrays, items without an identifier are never reconciled.
 
-If an object is reconciled, the consequence is that localState is preserved and `postCreate` / `attach` life-cycle hooks are not fired because applying a snapshot results just in an existing tree node being updated.
+If an object is reconciled, the consequence is that localState is preserved and `afterCreate` / `attach` life-cycle hooks are not fired because applying a snapshot results just in an existing tree node being updated.
 
 ### Creating async flows
 
@@ -1384,9 +1385,30 @@ Yes, with MST it is pretty straight forward to setup hot reloading for your stor
 ### TypeScript and MST
 
 TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 3.0 or later with `noImplicitThis` and `strictNullChecks` enabled.
-Actually, the more strict options that are enabled, the better the type system will behave.
+Actually, the more strict options that are enabled, the better the type system will behave. 
 
-We recommend using TypeScript together with MST, but since the type system of MST is more dynamic than the TypeScript system, there are cases that cannot be expressed neatly and occasionally you will need to fallback to `any` or manually adding type annotations.
+#### Recommend compiler flags
+
+The recommended compiler flags (against which all our tests are written) are:
+
+```json
+{
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true
+}
+```
+
+Or shorter by leveraging `strict`:
+
+```json
+{
+  "strict": true,
+  "noImplicitReturns": true
+}
+```
 
 Flow is not supported.
 
@@ -1424,7 +1446,8 @@ type ITodoSnapshotOut = SnapshotOut<typeof Todo> // => { title: string }
 ```
 
 Due to the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes a lot of CPU time and freeze vscode (or others).
-A partial solution for this is to turn the types into interfaces.
+A solution for this is to turn the types into interfaces. 
+This way of defining types enables TypeScript to better cope with circular type definitions as well.
 
 ```ts
 interface ITodo extends Instance<typeof Todo> {}

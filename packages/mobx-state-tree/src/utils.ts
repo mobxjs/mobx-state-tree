@@ -391,6 +391,16 @@ deprecated.ids = {}
 export function warnError(msg: string) {
     console.warn(new Error(`[mobx-state-tree] ${msg}`))
 }
+/**
+ * @internal
+ * @hidden
+ */
+export function isTypeCheckingEnabled() {
+    return (
+        devMode() ||
+        (typeof process !== "undefined" && process.env && process.env.ENABLE_TYPE_CHECK === "true")
+    )
+}
 
 /**
  * @internal

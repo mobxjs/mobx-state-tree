@@ -9,6 +9,7 @@ import {
     TypeFlags,
     ExtractNodeType,
     assertIsType,
+    isType,
     devMode
 } from "../../internal"
 
@@ -84,7 +85,12 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         const processedInitialValue = isStateTreeNode(initialValue)
             ? initialValue
             : this.preProcessSnapshot(initialValue)
-        const node = this._subtype.instantiate(parent, subpath, environment, processedInitialValue)
+        const node = this._subtype.instantiate(
+            parent,
+            subpath,
+            environment,
+            processedInitialValue
+        ) as any
         this._fixNode(node)
         return node
     }
@@ -100,7 +106,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
             isStateTreeNode(newValue) ? newValue : this.preProcessSnapshot(newValue),
             parent,
             subpath
-        )
+        ) as any
         if (node !== current) {
             this._fixNode(node)
         }
@@ -119,6 +125,14 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     getSubTypes() {
         return this._subtype
+    }
+
+    is(thing: any): thing is any {
+        return (
+            this._subtype.validate(isType(thing) ? this._subtype : this.preProcessSnapshot(thing), [
+                { path: "", type: this._subtype }
+            ]).length === 0
+        )
     }
 }
 

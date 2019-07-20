@@ -10,6 +10,7 @@
     "test:mst:others": "cd packages/mobx-state-tree && yarn test:others",
     "test:mst-middlewares:dev": "cd packages/mst-middlewares && yarn test:dev",
     "test:mst-middlewares:prod": "cd packages/mst-middlewares && yarn test:prod",
+    "size": "size-limit",
     "coverage": "lerna run coverage --stream",
     "release": "yarn build && lerna publish",
     "tag-new-version": "lerna version"
@@ -30,9 +31,10 @@
     "lerna": "^3.13.1",
     "lint-staged": "^8.1.5",
     "prettier": "^1.16.4",
+    "size-limit": "^1.3.2",
     "tslint": "^5.14.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.5.3"
   },
   "husky": {
     "hooks": {

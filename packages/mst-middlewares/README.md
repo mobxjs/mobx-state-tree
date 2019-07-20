@@ -34,7 +34,7 @@ const store = Store.create({
     todos: [{ title: "test " }]
 })
 
-mst.addMiddleware(store, logger)
+mst.addMiddleware(store, simpleActionLogger)
 
 store.todos[0].setTitle("hello world")
 
@@ -59,7 +59,7 @@ const store = Store.create({
     todos: [{ title: "test " }]
 })
 
-mst.addMiddleware(store, logger)
+mst.addMiddleware(store, actionLogger)
 
 store.todos[0].setTitle("hello world")
 ```

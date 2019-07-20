@@ -1,3 +1,5 @@
+import { assert, _ } from "spec.ts"
+
 import {
     types,
     getSnapshot,
@@ -12,8 +14,13 @@ import {
     IType,
     isStateTreeNode,
     isFrozenType,
-    TypeOfValue
+    TypeOfValue,
+    IAnyType,
+    ModelPrimitive,
+    ModelPropertiesDeclaration,
+    SnapshotOut
 } from "../../src"
+import { $nonEmptyObject } from "../../src/internal"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -1033,4 +1040,129 @@ test("#1268", () => {
     const booksStore = BooksStore.create({ books: [] })
 
     const rootStore = RootStore.create({ booksStore: castToSnapshot(booksStore) })
+})
+
+test("#1307 optional can be omitted in .create", () => {
+    const Model1 = types.model({ name: types.optional(types.string, "") })
+    const model1 = Model1.create({})
+    assert(model1.name, _ as string)
+
+    const Model2 = types.model({ name: "" })
+    const model2 = Model2.create({})
+    assert(model2.name, _ as string)
+})
+
+test("#1307 custom types failing", () => {
+    const createCustomType = <ICustomType extends ModelPrimitive | IAnyType>({
+        CustomType
+    }: {
+        CustomType: ICustomType
+    }) => {
+        return types
+            .model("Example", {
+                someProp: types.boolean,
+                someType: CustomType
+            })
+            .views(self => ({
+                get isSomePropTrue(): boolean {
+                    return self.someProp
+                }
+            }))
+    }
+})
+
+test("#1343", () => {
+    function createTypeA<T extends ModelPropertiesDeclaration>(t: T) {
+        return types.model("TypeA", t).views(self => ({
+            get someView() {
+                return null
+            }
+        }))
+    }
+
+    function createTypeB<T extends ModelPropertiesDeclaration>(t: T) {
+        return types
+            .model("TypeB", {
+                a: createTypeA(t)
+            })
+            .views(self => ({
+                get someViewFromA() {
+                    return self.a.someView
+                }
+            }))
+    }
+})
+
+test("#1330", () => {
+    const ChildStore = types
+        .model("ChildStore", {
+            foo: types.string,
+            bar: types.boolean
+        })
+        .views(self => ({
+            get root(): IRootStore {
+                return getRoot<IRootStore>(self)
+            }
+        }))
+        .actions(self => ({
+            test() {
+                const { childStore } = self.root
+                // childStore and childStore.foo is properly inferred in TS 3.4 but not in 3.5
+                console.log(childStore.foo)
+            }
+        }))
+
+    interface IRootStore extends Instance<typeof RootStore> {}
+
+    const RootStore = types.model("RootStore", {
+        childStore: ChildStore,
+        test: ""
+    })
+
+    assert(
+        RootStore.create({
+            childStore: {
+                foo: "a",
+                bar: true
+            }
+        }).childStore.root.test,
+        _ as string
+    )
+})
+
+test("maybe / optional type inference verification", () => {
+    const T = types.model({
+        a: types.string,
+        b: "test",
+        c: types.maybe(types.string),
+        d: types.maybeNull(types.string),
+        e: types.optional(types.string, "test")
+    })
+
+    interface ITC extends SnapshotIn<typeof T> {}
+    interface ITS extends SnapshotOut<typeof T> {}
+
+    assert(
+        _ as ITC,
+        _ as {
+            [$nonEmptyObject]?: any
+            a: string
+            b?: string
+            c?: string | undefined
+            d?: string | null
+            e?: string
+        }
+    )
+
+    assert(
+        _ as ITS,
+        _ as {
+            [$nonEmptyObject]?: any
+            a: string
+            b: string
+            c: string | undefined
+            d: string | null
+            e: string
+        }
+    )
 })
