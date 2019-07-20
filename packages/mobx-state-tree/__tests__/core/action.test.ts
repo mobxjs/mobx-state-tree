@@ -185,13 +185,22 @@ test("it should not be possible to pass an unserializable object", () => {
     const recorder = recordActions(store)
     store.orders[0].noopSetCustomer(circular as any)
     store.orders[0].noopSetCustomer(Buffer.from("bla") as any)
+
+    // fix for newer node versions, which include extra data on dev mode
+    if (
+        recorder.actions[0].args![0].type.startsWith(
+            "TypeError: Converting circular structure to JSON"
+        )
+    ) {
+        recorder.actions[0].args![0].type = "TypeError: Converting circular structure to JSON"
+    }
+
     expect(recorder.actions).toEqual([
         {
             args: [
                 {
                     $MST_UNSERIALIZABLE: true,
-                    type:
-                        "TypeError: Converting circular structure to JSON\n    --> starting at object with constructor 'Object'\n    --- property 'a' closes the circle"
+                    type: "TypeError: Converting circular structure to JSON"
                 }
             ],
             name: "noopSetCustomer",
