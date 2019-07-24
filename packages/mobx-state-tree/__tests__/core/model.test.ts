@@ -1,4 +1,4 @@
-import { getSnapshot, types } from "../../src"
+import { types } from "../../src"
 
 test("it should allow valid names", () => {
     let didThrow = false
