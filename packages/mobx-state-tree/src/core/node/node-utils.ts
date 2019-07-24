@@ -10,7 +10,9 @@ import {
     AnyNode,
     IAnyType,
     IType,
-    assertArg
+    assertArg,
+    STNValue,
+    Instance
 } from "../../internal"
 
 /**
@@ -52,7 +54,7 @@ export type TypeOfValue<T extends IAnyStateTreeNode> = T extends IStateTreeNode<
  * Represents any state tree node instance.
  * @hidden
  */
-export interface IAnyStateTreeNode extends IStateTreeNode<IAnyType> {}
+export interface IAnyStateTreeNode extends STNValue<any, IAnyType> {}
 
 /**
  * Returns true if the given value is a node in a state tree.
@@ -64,7 +66,7 @@ export interface IAnyStateTreeNode extends IStateTreeNode<IAnyType> {}
  */
 export function isStateTreeNode<IT extends IAnyType = IAnyType>(
     value: any
-): value is IStateTreeNode<IT> {
+): value is STNValue<Instance<IT>, IT> {
     return !!(value && value.$treenode)
 }
 

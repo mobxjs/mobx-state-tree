@@ -59,6 +59,7 @@ export enum TypeFlags {
 export const cannotDetermineSubtype = "cannotDetermine"
 
 /**
+ * A state tree node value.
  * @hidden
  */
 export type STNValue<T, IT extends IAnyType> = T extends object ? T & IStateTreeNode<IT> : T
