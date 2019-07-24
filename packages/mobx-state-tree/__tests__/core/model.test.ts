@@ -4,6 +4,7 @@ test("it should allow valid names", () => {
     let didThrow = false
     try {
         types.model("My_Model")
+        types.model("_MyModel")
         types.model("MyModel@82d92470-d05e-4dab-92cc-25b45f7fa2e4")
         types.model("MyModel$$$")
     } catch (e) {
@@ -13,16 +14,6 @@ test("it should allow valid names", () => {
 })
 
 describe("it should throw on invalid names", () => {
-    test("begins with underscore", () => {
-        let didThrow = false
-        try {
-            types.model("_MyModel")
-        } catch (e) {
-            didThrow = true
-        }
-        expect(didThrow).toBe(true)
-    })
-
     test("begins with dash", () => {
         let didThrow = false
         try {
