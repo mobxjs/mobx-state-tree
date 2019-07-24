@@ -42,7 +42,9 @@ import {
     createObjectNode,
     assertIsType,
     ExtractCSTWithSTN,
-    IStateTreeNode
+    IStateTreeNode,
+    ModelActions,
+    Hook
 } from "../../internal"
 
 /** @hidden */
@@ -69,6 +71,14 @@ export interface IMSTArray<IT extends IAnyType> extends IObservableArray<IT["Typ
 export interface IArrayType<IT extends IAnyType>
     extends IType<IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {}
 
+interface IArrayHooks {
+    [Hook.afterCreate]?: () => void
+    [Hook.afterAttach]?: () => void
+    [Hook.beforeDetach]?: () => void
+    [Hook.beforeDestroy]?: () => void
+}
+type IArrayHooksGetter<T> = (self: T) => IArrayHooks
+
 /**
  * @internal
  * @hidden
@@ -79,9 +89,20 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     IMSTArray<IT>
 > {
     readonly flags = TypeFlags.Array
-
-    constructor(name: string, private readonly _subType: IT) {
+    private readonly hookInitializers: Array<IArrayHooksGetter<IMSTArray<IAnyType>>> = []
+    constructor(
+        name: string,
+        private readonly _subType: IT,
+        hookInitializers: Array<IArrayHooksGetter<IMSTArray<IAnyType>>> = []
+    ) {
         super(name)
+        this.hookInitializers = hookInitializers
+    }
+
+    hooks(hooks: IArrayHooksGetter<IMSTArray<IAnyType>>) {
+        const hookInitializers =
+            this.hookInitializers.length > 0 ? this.hookInitializers.concat(hooks) : [hooks]
+        return new ArrayType(this.name, this._subType, hookInitializers)
     }
 
     instantiate(
@@ -109,6 +130,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
         _getAdministration(instance).dehancer = node.unbox
+
         intercept(instance as IObservableArray<AnyNode>, this.willChange)
         observe(instance as IObservableArray<AnyNode>, this.didChange)
     }
