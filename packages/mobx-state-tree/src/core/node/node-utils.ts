@@ -14,6 +14,7 @@ import {
     STNValue,
     Instance
 } from "../../internal"
+import { IAnyComplexType } from "../type/type"
 
 /**
  * @internal
@@ -64,7 +65,7 @@ export interface IAnyStateTreeNode extends STNValue<any, IAnyType> {}
  * @param value
  * @returns true if the value is a state tree node.
  */
-export function isStateTreeNode<IT extends IAnyType = IAnyType>(
+export function isStateTreeNode<IT extends IAnyComplexType = IAnyComplexType>(
     value: any
 ): value is STNValue<Instance<IT>, IT> {
     return !!(value && value.$treenode)

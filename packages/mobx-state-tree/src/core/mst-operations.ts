@@ -30,7 +30,8 @@ import {
     assertArg,
     assertIsValidIdentifier,
     IActionContext,
-    getRunningActionContext
+    getRunningActionContext,
+    IAnyComplexType
 } from "../internal"
 
 /** @hidden */
@@ -44,7 +45,7 @@ export type TypeOrStateTreeNodeToStateTreeNode<
  * @param object
  * @returns
  */
-export function getType(object: IAnyStateTreeNode): IAnyType {
+export function getType(object: IAnyStateTreeNode): IAnyComplexType {
     assertIsStateTreeNode(object, 1)
 
     return getStateTreeNode(object).type
@@ -814,12 +815,12 @@ export interface IModelReflectionPropertiesData {
 export function getPropertyMembers(
     typeOrNode: IAnyModelType | IAnyStateTreeNode
 ): IModelReflectionPropertiesData {
-    let type
+    let type: IAnyModelType
 
     if (isStateTreeNode(typeOrNode)) {
         type = getType(typeOrNode) as IAnyModelType
     } else {
-        type = typeOrNode
+        type = typeOrNode as IAnyModelType
     }
 
     assertArg(type, t => isModelType(t), "model type or model instance", 1)
