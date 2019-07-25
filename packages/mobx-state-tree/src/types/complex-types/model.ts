@@ -300,8 +300,6 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
     )
 }
 
-const MODEL_NAME_REGEXP = /^\w[\w\-_@$]*$/
-
 /**
  * @internal
  * @hidden
@@ -333,10 +331,6 @@ export class ModelType<
 
     constructor(opts: ModelTypeConfig) {
         super(opts.name || defaultObjectOptions.name)
-        const name = opts.name || defaultObjectOptions.name
-        // TODO: this test still needed?
-        if (!MODEL_NAME_REGEXP.test(name))
-            throw fail(`Typename should be a valid identifier: ${name}`)
         Object.assign(this, defaultObjectOptions, opts)
         // ensures that any default value gets converted to its related type
         this.properties = toPropertiesObject(this.properties) as PROPS
