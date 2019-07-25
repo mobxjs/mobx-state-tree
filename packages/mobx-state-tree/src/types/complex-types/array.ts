@@ -43,8 +43,11 @@ import {
     assertIsType,
     ExtractCSTWithSTN,
     IStateTreeNode,
-    ModelActions,
-    Hook
+    Hook,
+    createActionInvoker,
+    devMode,
+    addHiddenFinalProp,
+    addHiddenWritableProp
 } from "../../internal"
 
 /** @hidden */
@@ -69,15 +72,17 @@ export interface IMSTArray<IT extends IAnyType> extends IObservableArray<IT["Typ
 
 /** @hidden */
 export interface IArrayType<IT extends IAnyType>
-    extends IType<IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {}
+    extends IType<IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {
+    hooks(hooks: IHooksGetter<IMSTArray<IAnyType>>): IArrayType<IT>
+}
 
-interface IArrayHooks {
+interface IHooks {
     [Hook.afterCreate]?: () => void
     [Hook.afterAttach]?: () => void
     [Hook.beforeDetach]?: () => void
     [Hook.beforeDestroy]?: () => void
 }
-type IArrayHooksGetter<T> = (self: T) => IArrayHooks
+type IHooksGetter<T> = (self: T) => IHooks
 
 /**
  * @internal
@@ -89,17 +94,17 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     IMSTArray<IT>
 > {
     readonly flags = TypeFlags.Array
-    private readonly hookInitializers: Array<IArrayHooksGetter<IMSTArray<IAnyType>>> = []
+    private readonly hookInitializers: Array<IHooksGetter<IMSTArray<IT>>> = []
     constructor(
         name: string,
         private readonly _subType: IT,
-        hookInitializers: Array<IArrayHooksGetter<IMSTArray<IAnyType>>> = []
+        hookInitializers: Array<IHooksGetter<IMSTArray<IT>>> = []
     ) {
         super(name)
         this.hookInitializers = hookInitializers
     }
 
-    hooks(hooks: IArrayHooksGetter<IMSTArray<IAnyType>>) {
+    hooks(hooks: IHooksGetter<IMSTArray<IT>>) {
         const hookInitializers =
             this.hookInitializers.length > 0 ? this.hookInitializers.concat(hooks) : [hooks]
         return new ArrayType(this.name, this._subType, hookInitializers)
@@ -130,6 +135,20 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
         _getAdministration(instance).dehancer = node.unbox
+
+        const type = node.type as this
+        type.hookInitializers.forEach(initializer => {
+            const hooks = initializer(instance)
+            Object.keys(hooks).forEach(name => {
+                const hook = hooks[name as keyof typeof hooks]!
+                const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
+                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
+                    instance,
+                    name,
+                    actionInvoker
+                )
+            })
+        })
 
         intercept(instance as IObservableArray<AnyNode>, this.willChange)
         observe(instance as IObservableArray<AnyNode>, this.didChange)
