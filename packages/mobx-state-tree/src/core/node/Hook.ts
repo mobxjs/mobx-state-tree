@@ -1,5 +1,4 @@
 /**
- * @internal
  * @hidden
  */
 export enum Hook {
