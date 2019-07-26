@@ -30,7 +30,8 @@ import {
     assertArg,
     assertIsValidIdentifier,
     IActionContext,
-    getRunningActionContext
+    getRunningActionContext,
+    IAnyComplexType
 } from "../internal"
 
 /** @hidden */
@@ -44,7 +45,7 @@ export type TypeOrStateTreeNodeToStateTreeNode<
  * @param object
  * @returns
  */
-export function getType(object: IAnyStateTreeNode): IAnyType {
+export function getType(object: IAnyStateTreeNode): IAnyComplexType {
     assertIsStateTreeNode(object, 1)
 
     return getStateTreeNode(object).type
@@ -380,7 +381,7 @@ export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean
  * @param depth How far should we look upward? 1 by default.
  * @returns
  */
-export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
+export function getParent<IT extends IAnyStateTreeNode | IAnyComplexType>(
     target: IAnyStateTreeNode,
     depth = 1
 ): TypeOrStateTreeNodeToStateTreeNode<IT> {
@@ -404,7 +405,7 @@ export function getParent<IT extends IAnyStateTreeNode | IAnyType>(
  * @param type
  * @returns
  */
-export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): boolean {
+export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyComplexType): boolean {
     // check all arguments
     assertIsStateTreeNode(target, 1)
     assertIsType(type, 2)
@@ -424,7 +425,7 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyType): bool
  * @param type
  * @returns
  */
-export function getParentOfType<IT extends IAnyType>(
+export function getParentOfType<IT extends IAnyComplexType>(
     target: IAnyStateTreeNode,
     type: IT
 ): IT["Type"] {
@@ -449,7 +450,7 @@ export function getParentOfType<IT extends IAnyType>(
  * @param target
  * @returns
  */
-export function getRoot<IT extends IAnyType | IAnyStateTreeNode>(
+export function getRoot<IT extends IAnyComplexType | IAnyStateTreeNode>(
     target: IAnyStateTreeNode
 ): TypeOrStateTreeNodeToStateTreeNode<IT> {
     // check all arguments
@@ -523,7 +524,7 @@ export function resolvePath(target: IAnyStateTreeNode, path: string): any {
  * @param identifier
  * @returns
  */
-export function resolveIdentifier<IT extends IAnyType>(
+export function resolveIdentifier<IT extends IAnyModelType>(
     type: IT,
     target: IAnyStateTreeNode,
     identifier: ReferenceIdentifier
@@ -814,12 +815,12 @@ export interface IModelReflectionPropertiesData {
 export function getPropertyMembers(
     typeOrNode: IAnyModelType | IAnyStateTreeNode
 ): IModelReflectionPropertiesData {
-    let type
+    let type: IAnyModelType
 
     if (isStateTreeNode(typeOrNode)) {
         type = getType(typeOrNode) as IAnyModelType
     } else {
-        type = typeOrNode
+        type = typeOrNode as IAnyModelType
     }
 
     assertArg(type, t => isModelType(t), "model type or model instance", 1)
