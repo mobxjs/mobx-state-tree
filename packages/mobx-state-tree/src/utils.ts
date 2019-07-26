@@ -407,7 +407,7 @@ export function isTypeCheckingEnabled() {
  * @hidden
  */
 export function devMode() {
-    return (typeof process === "undefined" || (process && process.env && process.env.NODE_ENV !== "production"));
+    return process.env.NODE_ENV !== "production"
 }
 
 /**
