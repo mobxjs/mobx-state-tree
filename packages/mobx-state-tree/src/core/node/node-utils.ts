@@ -12,9 +12,9 @@ import {
     IType,
     assertArg,
     STNValue,
-    Instance
+    Instance,
+    IAnyComplexType
 } from "../../internal"
-import { IAnyComplexType } from "../type/type"
 
 /**
  * @internal
