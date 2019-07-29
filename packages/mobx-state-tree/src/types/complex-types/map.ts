@@ -47,11 +47,10 @@ import {
     isValidIdentifier,
     ExtractCSTWithSTN,
     devMode,
-    Hook,
     createActionInvoker,
     addHiddenFinalProp,
     addHiddenWritableProp,
-    IMSTArray
+    IHooksGetter
 } from "../../internal"
 
 /** @hidden */
@@ -212,14 +211,6 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
         }
     }
 }
-
-interface IHooks {
-    [Hook.afterCreate]?: () => void
-    [Hook.afterAttach]?: () => void
-    [Hook.beforeDetach]?: () => void
-    [Hook.beforeDestroy]?: () => void
-}
-type IHooksGetter<T> = (self: T) => IHooks
 
 /**
  * @internal

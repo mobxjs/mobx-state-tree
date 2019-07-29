@@ -11,43 +11,43 @@ import {
     observe
 } from "mobx"
 import {
+    addHiddenFinalProp,
+    addHiddenWritableProp,
+    AnyNode,
+    AnyObjectNode,
+    assertIsType,
     ComplexType,
     convertChildNodesToArray,
+    createActionInvoker,
+    createObjectNode,
+    devMode,
     EMPTY_ARRAY,
+    EMPTY_OBJECT,
+    ExtractCSTWithSTN,
     fail,
     flattenTypeErrors,
     getContextForPath,
     getStateTreeNode,
+    IAnyStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IValidationContext,
+    IHooksGetter,
     IJsonPatch,
     isArray,
     isNode,
     isPlainObject,
     isStateTreeNode,
+    IStateTreeNode,
     isType,
     IType,
+    IValidationContext,
     IValidationResult,
     mobxShallow,
-    ObjectNode,
-    typecheckInternal,
-    typeCheckFailure,
-    TypeFlags,
     normalizeIdentifier,
-    EMPTY_OBJECT,
-    IAnyStateTreeNode,
-    AnyObjectNode,
-    AnyNode,
-    createObjectNode,
-    assertIsType,
-    ExtractCSTWithSTN,
-    IStateTreeNode,
-    Hook,
-    createActionInvoker,
-    devMode,
-    addHiddenFinalProp,
-    addHiddenWritableProp
+    ObjectNode,
+    typeCheckFailure,
+    typecheckInternal,
+    TypeFlags
 } from "../../internal"
 
 /** @hidden */
@@ -75,14 +75,6 @@ export interface IArrayType<IT extends IAnyType>
     extends IType<IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {
     hooks(hooks: IHooksGetter<IMSTArray<IAnyType>>): IArrayType<IT>
 }
-
-interface IHooks {
-    [Hook.afterCreate]?: () => void
-    [Hook.afterAttach]?: () => void
-    [Hook.beforeDetach]?: () => void
-    [Hook.beforeDestroy]?: () => void
-}
-type IHooksGetter<T> = (self: T) => IHooks
 
 /**
  * @internal
