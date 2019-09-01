@@ -97,7 +97,7 @@ export interface IMSTMap<IT extends IAnyType> {
 
     /**
      * Returns a shallow non observable object clone of this map.
-     * Note that the values migth still be observable. For a deep clone use mobx.toJS.
+     * Note that the values might still be observable. For a deep clone use mobx.toJS.
      */
     toJS(): Map<string, IT["Type"]>
 
