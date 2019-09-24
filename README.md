@@ -946,7 +946,7 @@ const Todo = types
 
 The object that is returned from the `volatile` initializer function can contain any piece of data and will result in an instance property with the same name. Volatile properties have the following characteristics:
 
-1.  The can be read from outside the model (if you want hidden volatile state, keep the state in your closure as shown in the previous section, and _only_ if it is not used on a view consider not making it observable)
+1.  They can be read from outside the model (if you want hidden volatile state, keep the state in your closure as shown in the previous section, and _only_ if it is not used on a view consider not making it observable)
 2.  The volatile properties will be only observable, see [observable _references_](https://mobx.js.org/refguide/modifiers.html). Values assigned to them will be unmodified and not automatically converted to deep observable structures.
 3.  Like normal properties, they can only be modified through actions
 4.  Volatile props will not show up in snapshots, and cannot be updated by applying snapshots
