@@ -274,6 +274,7 @@ Also, the 'object has died' exception can be suppressed now. One should still ad
 
 -   MobX-state-tree now requires MobX 4.0 or higher
 -   Identifiers are now internally always normalized to strings. This also means that adding an object with an number identifier to an observable map, it should still be requested back as string. In general, we recommend to always use string based identifiers to avoid confusion.
+-   Due to the changes in Mobx 4.0, `types.map(subType).keys()` will return `Iterator` instead of `ObservableArrays`. In order to address this issue, wrap the keys with `Array.from()`.
 
 # 1.4.0
 
