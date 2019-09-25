@@ -46,7 +46,11 @@ import {
     getSnapshot,
     isValidIdentifier,
     ExtractCSTWithSTN,
-    devMode
+    devMode,
+    createActionInvoker,
+    addHiddenFinalProp,
+    addHiddenWritableProp,
+    IHooksGetter
 } from "../../internal"
 
 /** @hidden */
@@ -55,7 +59,9 @@ export interface IMapType<IT extends IAnyType>
         IKeyValueMap<IT["CreationType"]> | undefined,
         IKeyValueMap<IT["SnapshotType"]>,
         IMSTMap<IT>
-    > {}
+    > {
+    hooks(hooks: IHooksGetter<IMSTMap<IT>>): IMapType<IT>
+}
 
 /** @hidden */
 export interface IMSTMap<IT extends IAnyType> {
@@ -219,9 +225,22 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     mapIdentifierAttribute: string | undefined = undefined
     readonly flags = TypeFlags.Map
 
-    constructor(name: string, private readonly _subType: IAnyType) {
+    private readonly hookInitializers: Array<IHooksGetter<IMSTMap<IT>>> = []
+
+    constructor(
+        name: string,
+        private readonly _subType: IAnyType,
+        hookInitializers: Array<IHooksGetter<IMSTMap<IT>>> = []
+    ) {
         super(name)
         this._determineIdentifierMode()
+        this.hookInitializers = hookInitializers
+    }
+
+    hooks(hooks: IHooksGetter<IMSTMap<IT>>) {
+        const hookInitializers =
+            this.hookInitializers.length > 0 ? this.hookInitializers.concat(hooks) : [hooks]
+        return new MapType(this.name, this._subType, hookInitializers)
     }
 
     instantiate(
@@ -246,9 +265,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
                 if (type.identifierAttribute) {
                     if (identifierAttribute && identifierAttribute !== type.identifierAttribute) {
                         throw fail(
-                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${
-                                type.name
-                            }' declared attribute '${type.identifierAttribute}' as identifier`
+                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
                         )
                     }
                     identifierAttribute = type.identifierAttribute
@@ -279,6 +296,21 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
     finalizeNewInstance(node: this["N"], instance: ObservableMap<string, any>): void {
         _interceptReads(instance, node.unbox)
+
+        const type = node.type as this
+        type.hookInitializers.forEach(initializer => {
+            const hooks = initializer((instance as unknown) as IMSTMap<IT>)
+            Object.keys(hooks).forEach(name => {
+                const hook = hooks[name as keyof typeof hooks]!
+                const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
+                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
+                    instance,
+                    name,
+                    actionInvoker
+                )
+            })
+        })
+
         intercept(instance, this.willChange)
         observe(instance, this.didChange)
     }
