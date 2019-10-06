@@ -39,8 +39,8 @@ export function createActionTrackingMiddleware<T = any>(
                     const context = hooks.onStart(call)
                     hooks.onResume(call, context)
                     runningActions.set(call.id, {
-                        call: call,
-                        context: context,
+                        call,
+                        context,
                         async: false
                     })
                     try {
