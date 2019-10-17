@@ -13,7 +13,8 @@
         "size": "size-limit",
         "coverage": "lerna run coverage --stream",
         "release": "yarn build && lerna publish",
-        "tag-new-version": "lerna version"
+        "tag-new-version": "lerna version",
+        "yarn-deduplicate": "yarn-deduplicate -s fewer yarn.lock"
     },
     "workspaces": [
         "packages/mobx-state-tree",
@@ -26,15 +27,16 @@
         ]
     },
     "devDependencies": {
-        "cross-env": "^5.2.0",
+        "cross-env": "^6.0.3",
         "husky": "^3.0.1",
         "lerna": "^3.13.1",
         "lint-staged": "^9.2.0",
         "prettier": "^1.16.4",
-        "size-limit": "^1.3.2",
+        "size-limit": "^2.1.6",
         "tslint": "^5.14.0",
         "tslint-config-prettier": "^1.18.0",
-        "typescript": "^3.5.3"
+        "typescript": "^3.5.3",
+        "yarn-deduplicate": "^1.1.1"
     },
     "husky": {
         "hooks": {

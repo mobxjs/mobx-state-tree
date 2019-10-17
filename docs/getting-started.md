@@ -23,14 +23,13 @@ For each example you'll find a CodeSandbox playground link. You can start from t
 Setting up the whole environment for a React project involves transpilers, bundlers, linters, etc., and setting them up may become very tedious and not fun. Thanks to `create-react-app` setting up all those tools becomes as easy as typing a couple of lines in your terminal.
 
 ```
-npm install -g create-react-app
-create-react-app mst-todo
+npx create-react-app mst-todo
 ```
 
 Next install `mobx`, `mobx-react` and `mobx-state-tree` dependencies.
 
 ```
-npm install mobx mobx-react mobx-state-tree --save
+yarn add mobx mobx-react mobx-state-tree
 ```
 
 Now you can run `npm run start` and a basic React page will show up. You're all set up and can begin editing the project files!

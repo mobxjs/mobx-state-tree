@@ -1,6 +1,4 @@
-> **[mobx-state-tree](../README.md)**
-
-[ReferenceOptionsOnInvalidated](referenceoptionsoninvalidated.md) /
+[mobx-state-tree](../README.md) › [ReferenceOptionsOnInvalidated](referenceoptionsoninvalidated.md)
 
 # Interface: ReferenceOptionsOnInvalidated <**IT**>
 
@@ -22,4 +20,6 @@
 
 ###  onInvalidated
 
-• **onInvalidated**: *[OnReferenceInvalidated](../README.md#onreferenceinvalidated)‹*`ReferenceT<IT>`*›*
+• **onInvalidated**: *[OnReferenceInvalidated](../README.md#onreferenceinvalidated)‹ReferenceT‹IT››*
+
+*Defined in [types/utility-types/reference.ts:472](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/reference.ts#L472)*

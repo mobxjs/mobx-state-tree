@@ -1,3 +1,4 @@
+- Fix for flow typings. This means that now using flows requires at least TypeScript v3.6 and that `castFlowReturn` becomes deprecated.
 - Fix for empty models / models with all properties set to optional being able to take any value in TypeScript through [#1269](https://github.com/mobxjs/mobx-state-tree/pull/1269) by [@xaviergonz](https://github.com/xaviergonz).
 
 # 3.14.1
@@ -276,6 +277,7 @@ Also, the 'object has died' exception can be suppressed now. One should still ad
 
 - MobX-state-tree now requires MobX 4.0 or higher
 - Identifiers are now internally always normalized to strings. This also means that adding an object with an number identifier to an observable map, it should still be requested back as string. In general, we recommend to always use string based identifiers to avoid confusion.
+- Due to the changes in Mobx 4.0, `types.map(subType).keys()` will return `Iterator` instead of `ObservableArrays`. In order to address this issue, wrap the keys with `Array.from()`.
 
 # 1.4.0
 

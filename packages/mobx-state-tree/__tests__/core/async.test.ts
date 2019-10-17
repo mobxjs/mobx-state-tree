@@ -26,7 +26,7 @@ function testCoffeeTodo(
     done: () => void,
     generator: (
         self: any
-    ) => ((str: string) => IterableIterator<Promise<any> | string | undefined>),
+    ) => (str: string) => Generator<Promise<any>, string | void | undefined, undefined>,
     shouldError: boolean,
     resultValue: string | undefined,
     producedCoffees: any[]
@@ -47,7 +47,7 @@ function testCoffeeTodo(
         return next(c)
     })
     reaction(() => t1.title, coffee => coffees.push(coffee))
-    function handleResult(res: string | undefined) {
+    function handleResult(res: string | undefined | void) {
         expect(res).toBe(resultValue)
         expect(coffees).toEqual(producedCoffees)
         const filtered = filterRelevantStuff(events)
@@ -107,7 +107,7 @@ test("can handle erroring actions", done => {
     testCoffeeTodo(
         done,
         self =>
-            function* fetchData(kind: string): IterableIterator<never> {
+            function* fetchData(kind: string) {
                 throw kind
             },
         true,
@@ -122,6 +122,7 @@ test("can handle try catch", t => {
             function* fetchData(kind: string) {
                 try {
                     yield delay(10, "tea", true)
+                    return undefined
                 } catch (e) {
                     self.title = e
                     return "biscuit"
@@ -133,13 +134,7 @@ test("can handle try catch", t => {
     )
 })
 test("empty sequence works", t => {
-    testCoffeeTodo(
-        t,
-        () => function* fetchData(kind: string): IterableIterator<undefined> {},
-        false,
-        undefined,
-        []
-    )
+    testCoffeeTodo(t, () => function* fetchData(kind: string) {}, false, undefined, [])
 })
 test("can handle throw from yielded promise works", t => {
     testCoffeeTodo(
@@ -334,10 +329,10 @@ test("flow typings", async () => {
         numberToNumber: flow(function*(val: number) {
             yield promise
             return val
-        }), // should be () => Promise<number>
+        }), // should be () => Promise<Promise<number>>
         voidToNumber: flow(function*() {
             yield promise
-            return castFlowReturn(Promise.resolve(2))
+            return Promise.resolve(2)
         })
     }))
 

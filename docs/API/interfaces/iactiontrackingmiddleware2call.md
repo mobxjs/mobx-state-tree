@@ -1,6 +1,4 @@
-> **[mobx-state-tree](../README.md)**
-
-[IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md) /
+[mobx-state-tree](../README.md) › [IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)
 
 # Interface: IActionTrackingMiddleware2Call <**TEnv**>
 
@@ -12,7 +10,7 @@
 
 * object
 
-  * **IActionTrackingMiddleware2Call**
+  ↳ **IActionTrackingMiddleware2Call**
 
 ## Index
 
@@ -25,10 +23,14 @@
 
 ###  env
 
-• **env**: *`TEnv` | undefined*
+• **env**: *TEnv | undefined*
+
+*Defined in [middlewares/createActionTrackingMiddleware2.ts:6](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts#L6)*
 
 ___
 
 ### `Optional` parentCall
 
-• **parentCall**? : *[IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)‹*`TEnv`*›*
+• **parentCall**? : *[IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)‹TEnv›*
+
+*Defined in [middlewares/createActionTrackingMiddleware2.ts:7](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts#L7)*

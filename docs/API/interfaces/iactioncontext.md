@@ -1,6 +1,4 @@
-> **[mobx-state-tree](../README.md)**
-
-[IActionContext](iactioncontext.md) /
+[mobx-state-tree](../README.md) › [IActionContext](iactioncontext.md)
 
 # Interface: IActionContext
 
@@ -8,7 +6,7 @@
 
 * **IActionContext**
 
-  * [IMiddlewareEvent](imiddlewareevent.md)
+  ↳ [IMiddlewareEvent](imiddlewareevent.md)
 
 ## Index
 
@@ -27,13 +25,17 @@
 
 • **args**: *any[]*
 
+*Defined in [core/actionContext.ts:20](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L20)*
+
 Event arguments in an array (action arguments for actions)
 
 ___
 
 ###  context
 
-• **context**: *`IAnyStateTreeNode`*
+• **context**: *IAnyStateTreeNode*
+
+*Defined in [core/actionContext.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L15)*
 
 Event context (node where the action was invoked)
 
@@ -43,6 +45,8 @@ ___
 
 • **id**: *number*
 
+*Defined in [core/actionContext.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L9)*
+
 Event unique id
 
 ___
@@ -50,6 +54,8 @@ ___
 ###  name
 
 • **name**: *string*
+
+*Defined in [core/actionContext.ts:6](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L6)*
 
 Event name (action name for actions)
 
@@ -59,12 +65,16 @@ ___
 
 • **parentActionEvent**: *[IMiddlewareEvent](imiddlewareevent.md) | undefined*
 
+*Defined in [core/actionContext.ts:12](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L12)*
+
 Parent action event object
 
 ___
 
 ###  tree
 
-• **tree**: *`IAnyStateTreeNode`*
+• **tree**: *IAnyStateTreeNode*
+
+*Defined in [core/actionContext.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L17)*
 
 Event tree (root node of the node where the action was invoked)

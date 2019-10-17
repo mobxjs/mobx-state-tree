@@ -11,38 +11,43 @@ import {
     observe
 } from "mobx"
 import {
+    addHiddenFinalProp,
+    addHiddenWritableProp,
+    AnyNode,
+    AnyObjectNode,
+    assertIsType,
     ComplexType,
     convertChildNodesToArray,
+    createActionInvoker,
+    createObjectNode,
+    devMode,
     EMPTY_ARRAY,
+    EMPTY_OBJECT,
+    ExtractCSTWithSTN,
     fail,
     flattenTypeErrors,
     getContextForPath,
     getStateTreeNode,
+    IAnyStateTreeNode,
     IAnyType,
     IChildNodesMap,
-    IValidationContext,
+    IHooksGetter,
     IJsonPatch,
     isArray,
     isNode,
     isPlainObject,
     isStateTreeNode,
+    IStateTreeNode,
     isType,
     IType,
+    IValidationContext,
     IValidationResult,
     mobxShallow,
-    ObjectNode,
-    typecheckInternal,
-    typeCheckFailure,
-    TypeFlags,
     normalizeIdentifier,
-    EMPTY_OBJECT,
-    IAnyStateTreeNode,
-    AnyObjectNode,
-    AnyNode,
-    createObjectNode,
-    assertIsType,
-    ExtractCSTWithSTN,
-    IStateTreeNode
+    ObjectNode,
+    typeCheckFailure,
+    typecheckInternal,
+    TypeFlags
 } from "../../internal"
 
 /** @hidden */
@@ -67,7 +72,9 @@ export interface IMSTArray<IT extends IAnyType> extends IObservableArray<IT["Typ
 
 /** @hidden */
 export interface IArrayType<IT extends IAnyType>
-    extends IType<IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {}
+    extends IType<IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {
+    hooks(hooks: IHooksGetter<IMSTArray<IAnyType>>): IArrayType<IT>
+}
 
 /**
  * @internal
@@ -79,9 +86,20 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     IMSTArray<IT>
 > {
     readonly flags = TypeFlags.Array
-
-    constructor(name: string, private readonly _subType: IT) {
+    private readonly hookInitializers: Array<IHooksGetter<IMSTArray<IT>>> = []
+    constructor(
+        name: string,
+        private readonly _subType: IT,
+        hookInitializers: Array<IHooksGetter<IMSTArray<IT>>> = []
+    ) {
         super(name)
+        this.hookInitializers = hookInitializers
+    }
+
+    hooks(hooks: IHooksGetter<IMSTArray<IT>>) {
+        const hookInitializers =
+            this.hookInitializers.length > 0 ? this.hookInitializers.concat(hooks) : [hooks]
+        return new ArrayType(this.name, this._subType, hookInitializers)
     }
 
     instantiate(
@@ -109,6 +127,21 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
         _getAdministration(instance).dehancer = node.unbox
+
+        const type = node.type as this
+        type.hookInitializers.forEach(initializer => {
+            const hooks = initializer(instance)
+            Object.keys(hooks).forEach(name => {
+                const hook = hooks[name as keyof typeof hooks]!
+                const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
+                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
+                    instance,
+                    name,
+                    actionInvoker
+                )
+            })
+        })
+
         intercept(instance as IObservableArray<AnyNode>, this.willChange)
         observe(instance as IObservableArray<AnyNode>, this.didChange)
     }

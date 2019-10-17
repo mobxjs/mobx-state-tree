@@ -97,7 +97,7 @@ But the main advantage is that they receive first class support from MST.
 Middleware (see below) can implement specific behavior for asynchronous actions.
 For example, the `onAction` middleware will only record starting asynchronous flows, but not any async steps that are taking during the flow.
 After all, when replaying the invocation will lead to the other steps being executed automatically.
-Besides that, each step in the generator is allowed to modify it's own instance, and there is no need to expose the individual flow steps as actions.
+Besides that, each step in the generator is allowed to modify its own instance, and there is no need to expose the individual flow steps as actions.
 
 See the [bookshop example sources](https://github.com/mobxjs/mobx-state-tree/blob/5a4bd43ac874cddbf91b40eeef20043198477084/packages/mst-example-bookshop/src/stores/BookStore.js#L25) for a more extensive example.
 

@@ -64,6 +64,12 @@ Supported browsers:
 -   MobX-state-tree runs on any ES5 environment
 -   However, for MobX version 4 or 5 can be used. MobX 4 will run on any environment, MobX 5 only on modern browsers. See for more details the [MobX readme](https://github.com/mobxjs/mobx#browser-support)
 
+Supported devtools:
+
+- [Reactotron](https://github.com/infinitered/reactotron)
+- [MobX DevTools](https://chrome.google.com/webstore/detail/mobx-developer-tools/pfgnfdagidkfgccljigdamigbcnndkod)
+- The Redux can be connected as well as demonstrated [here](https://github.com/mobxjs/mobx-state-tree/blob/1906a394906d2e8f2cc1c778e1e3228307c1b112/packages/mst-example-redux-todomvc/src/index.js#L6)
+
 # Getting started
 
 See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial or follow the free [egghead.io course](https://egghead.io/courses/manage-application-state-with-mobx-state-tree) (note however that the course is for MST v2, so it might be a bit outdated).
@@ -946,7 +952,7 @@ const Todo = types
 
 The object that is returned from the `volatile` initializer function can contain any piece of data and will result in an instance property with the same name. Volatile properties have the following characteristics:
 
-1.  The can be read from outside the model (if you want hidden volatile state, keep the state in your closure as shown in the previous section, and _only_ if it is not used on a view consider not making it observable)
+1.  They can be read from outside the model (if you want hidden volatile state, keep the state in your closure as shown in the previous section, and _only_ if it is not used on a view consider not making it observable)
 2.  The volatile properties will be only observable, see [observable _references_](https://mobx.js.org/refguide/modifiers.html). Values assigned to them will be unmodified and not automatically converted to deep observable structures.
 3.  Like normal properties, they can only be modified through actions
 4.  Volatile props will not show up in snapshots, and cannot be updated by applying snapshots
@@ -1028,7 +1034,7 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 ## Utility types
 
 -   `types.union(options?: { dispatcher?: (snapshot) => Type, eager?: boolean }, types...)` create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function to determine the type. When `eager` flag is set to `true` (default) - the first matching type will be used, if set to `false` the type check will pass only if exactly 1 type matches.
--   `types.optional(type, defaultValue, optionalValues?)` marks an value as being optional (in e.g. a model). If a value is not provided/`undefined` (or set to any of the primitive values passed as an optional `optionalValues` array) the `defaultValue` will be used instead. If `defaultValue` is a function, it will be evaluated. This can be used to generate, for example, IDs or timestamps upon creation.
+-   `types.optional(type, defaultValue, optionalValues?)` marks a value as being optional (in e.g. a model). If a value is not provided/`undefined` (or set to any of the primitive values passed as an optional `optionalValues` array) the `defaultValue` will be used instead. If `defaultValue` is a function, it will be evaluated. This can be used to generate, for example, IDs or timestamps upon creation.
 -   `types.literal(value)` can be used to create a literal type, where the only possible value is specifically that value. This is very powerful in combination with `union`s. E.g. `temperature: types.union(types.literal("hot"), types.literal("cold"))`.
 -   `types.enumeration(name?, options: string[])` creates an enumeration. This method is a shorthand for a union of string literals. If you are using typescript and want to create a type based on an string enum (e.g. `enum Color { ... }`) then use `types.enumeration<Color>("Color", Object.values(Color))`, where the `"Color"` name argument is optional.
 -   `types.refinement(name?, baseType, (snapshot) => boolean)` creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
@@ -1121,6 +1127,21 @@ Note, except for `preProcessSnapshot` and `postProcessSnapshot`, all hooks shoul
 
 All hooks can be defined multiple times and can be composed automatically.
 
+## LifeCycle hooks for `types.array`/`types.map`
+
+Hooks for `types.array`/`types.map` can be defined by using the `.hooks(self => ({}))` method.
+
+Calling `.hooks(...)` produces new type, same as calling `.actions()` for `types.model`.
+
+Available hooks are:
+
+| Hook                  | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `afterCreate`         | Immediately after an instance is initialized: right after `.create()` for root node or after the first access for the nested one. Children will fire this event before parents. You can't make assumptions about the parent safely, use `afterAttach` if you need to.                                                                                                                                                                                                                                                                                                                                                                         |
+| `afterAttach`         | As soon as the _direct_ parent is assigned (this node is attached to another node). If an element is created as part of a parent, `afterAttach` is also fired. Unlike `afterCreate`, `afterAttach` will fire breadth first. So, in `afterAttach` one can safely make assumptions about the parent, but in `afterCreate` not                                                                                                                                                                                                                                                                                                                   |
+| `beforeDetach`        | As soon as the node is removed from the _direct_ parent, but only if the node is _not_ destroyed. In other words, when `detach(node)` is used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `beforeDestroy`       | Called before the node is destroyed, as a result of calling `destroy`, or by removing or replacing the node from the tree. Child destructors will fire before parents                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | 
+
 # Api overview
 
 See the [full API docs](docs/API/README.md) for more details.
@@ -1178,8 +1199,7 @@ See the [full API docs](docs/API/README.md) for more details.
 | [`setLivelinessChecking("warn" \| "ignore" \| "error")`](docs/API/README.md#setlivelinesschecking)                    | Defines what MST should do when running into reads / writes to objects that have died. By default it will print a warning. Use te `"error"` option to easy debugging to see where the error was thrown and when the offending read / write took place |
 | [`getLivelinessChecking()`](docs/API/README.md#getlivelinesschecking)                                                 | Returns the current liveliness checking mode.                                                                                                                                                                                                         |
 | [`splitJsonPath(path)`](docs/API/README.md#splitjsonpath)                                                             | Splits and unescapes the given JSON `path` into path parts                                                                                                                                                                                            |
-| [`typecheck(type, value)`](docs/API/README.md#typecheck)                                                              | Typechecks a value against a type. Throws on errors. Use this if you need typechecks even in a production build.
-NOTE: set process.env.ENABLE_TYPE_CHECK = "true" if you want to enable typeChecking in any environment                                                                                                                                      |
+| [`typecheck(type, value)`](docs/API/README.md#typecheck)                                                              | Typechecks a value against a type. Throws on errors. Use this if you need typechecks even in a production build. NOTE: set process.env.ENABLE_TYPE_CHECK = "true" if you want to enable type checking in any environment                                                                                                                                      |
 | [`tryResolve(node, path)`](docs/API/README.md#tryresolve)                                                             | Like `resolve`, but just returns `null` if resolving fails at any point in the path                                                                                                                                                                   |
 | [`tryReference(() => node \| null \| undefined, checkIfAlive = true)`](docs/API/README.md#tryreference)                 | Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if it the check passes, else it returns undefined.                                                                                    |
 | [`unprotect(node)`](docs/API/README.md#unprotect)                                                                     | Unprotects `node`, making it possible to directly modify any value in the subtree, without actions                                                                                                                                                    |

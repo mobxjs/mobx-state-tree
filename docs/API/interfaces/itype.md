@@ -1,6 +1,4 @@
-> **[mobx-state-tree](../README.md)**
-
-[IType](itype.md) /
+[mobx-state-tree](../README.md) › [IType](itype.md)
 
 # Interface: IType <**C, S, T**>
 
@@ -18,15 +16,15 @@ A type, either complex or simple.
 
 * **IType**
 
-  * [IAnyType](ianytype.md)
+  ↳ [IAnyType](ianytype.md)
 
-  * [ISimpleType](isimpletype.md)
+  ↳ [ISimpleType](isimpletype.md)
 
-  * [IAnyComplexType](ianycomplextype.md)
+  ↳ [IAnyComplexType](ianycomplextype.md)
 
-  * [ISnapshotProcessor](isnapshotprocessor.md)
+  ↳ [ISnapshotProcessor](isnapshotprocessor.md)
 
-  * [IModelType](imodeltype.md)
+  ↳ [IModelType](imodeltype.md)
 
 ## Index
 
@@ -48,6 +46,8 @@ A type, either complex or simple.
 
 • **identifierAttribute**? : *undefined | string*
 
+*Defined in [core/type/type.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L86)*
+
 Name of the identifier attribute or null if none.
 
 ___
@@ -56,13 +56,17 @@ ___
 
 • **name**: *string*
 
+*Defined in [core/type/type.ts:81](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L81)*
+
 Friendly type name.
 
 ## Methods
 
 ###  create
 
-▸ **create**(`snapshot?`: [C](), `env?`: any): *`this["Type"]`*
+▸ **create**(`snapshot?`: [C](undefined), `env?`: any): *this["Type"]*
+
+*Defined in [core/type/type.ts:93](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L93)*
 
 Creates an instance for the type given an snapshot input.
 
@@ -70,10 +74,10 @@ Creates an instance for the type given an snapshot input.
 
 Name | Type |
 ------ | ------ |
-`snapshot?` | [C]() |
+`snapshot?` | [C](undefined) |
 `env?` | any |
 
-**Returns:** *`this["Type"]`*
+**Returns:** *this["Type"]*
 
 An instance of that type.
 
@@ -82,6 +86,8 @@ ___
 ###  describe
 
 ▸ **describe**(): *string*
+
+*Defined in [core/type/type.ts:115](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L115)*
 
 Gets the textual representation of the type as a string.
 
@@ -92,6 +98,8 @@ ___
 ###  is
 
 ▸ **is**(`thing`: any): *boolean*
+
+*Defined in [core/type/type.ts:101](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L101)*
 
 Checks if a given snapshot / instance is of the given type.
 
@@ -109,7 +117,9 @@ ___
 
 ###  validate
 
-▸ **validate**(`thing`: `C`, `context`: [IValidationContext](../README.md#ivalidationcontext)): *[IValidationResult](../README.md#ivalidationresult)*
+▸ **validate**(`thing`: C, `context`: [IValidationContext](../README.md#ivalidationcontext)): *[IValidationResult](../README.md#ivalidationresult)*
+
+*Defined in [core/type/type.ts:110](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L110)*
 
 Run's the type's typechecker on the given value with the given validation context.
 
@@ -117,7 +127,7 @@ Run's the type's typechecker on the given value with the given validation contex
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`thing` | `C` | Value to be checked, either a snapshot or an instance. |
+`thing` | C | Value to be checked, either a snapshot or an instance. |
 `context` | [IValidationContext](../README.md#ivalidationcontext) | Validation context, an array of { subpaths, subtypes } that should be validated |
 
 **Returns:** *[IValidationResult](../README.md#ivalidationresult)*

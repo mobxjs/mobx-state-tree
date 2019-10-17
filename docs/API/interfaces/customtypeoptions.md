@@ -1,6 +1,4 @@
-> **[mobx-state-tree](../README.md)**
-
-[CustomTypeOptions](customtypeoptions.md) /
+[mobx-state-tree](../README.md) › [CustomTypeOptions](customtypeoptions.md)
 
 # Interface: CustomTypeOptions <**S, T**>
 
@@ -33,13 +31,17 @@
 
 • **name**: *string*
 
+*Defined in [types/utility-types/custom.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L15)*
+
 Friendly name
 
 ## Methods
 
 ###  fromSnapshot
 
-▸ **fromSnapshot**(`snapshot`: `S`): *`T`*
+▸ **fromSnapshot**(`snapshot`: S): *T*
+
+*Defined in [types/utility-types/custom.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L17)*
 
 given a serialized value, how to turn it into the target type
 
@@ -47,15 +49,17 @@ given a serialized value, how to turn it into the target type
 
 Name | Type |
 ------ | ------ |
-`snapshot` | `S` |
+`snapshot` | S |
 
-**Returns:** *`T`*
+**Returns:** *T*
 
 ___
 
 ###  getValidationMessage
 
-▸ **getValidationMessage**(`snapshot`: `S`): *string*
+▸ **getValidationMessage**(`snapshot`: S): *string*
+
+*Defined in [types/utility-types/custom.ts:23](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L23)*
 
 a non empty string is assumed to be a validation error
 
@@ -63,7 +67,7 @@ a non empty string is assumed to be a validation error
 
 Name | Type |
 ------ | ------ |
-`snapshot` | `S` |
+`snapshot` | S |
 
 **Returns:** *string*
 
@@ -71,7 +75,9 @@ ___
 
 ###  isTargetType
 
-▸ **isTargetType**(`value`: `T` | `S`): *boolean*
+▸ **isTargetType**(`value`: T | S): *boolean*
+
+*Defined in [types/utility-types/custom.ts:21](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L21)*
 
 if true, this is a converted value, if false, it's a snapshot
 
@@ -79,7 +85,7 @@ if true, this is a converted value, if false, it's a snapshot
 
 Name | Type |
 ------ | ------ |
-`value` | `T` \| `S` |
+`value` | T &#124; S |
 
 **Returns:** *boolean*
 
@@ -87,7 +93,9 @@ ___
 
 ###  toSnapshot
 
-▸ **toSnapshot**(`value`: `T`): *`S`*
+▸ **toSnapshot**(`value`: T): *S*
+
+*Defined in [types/utility-types/custom.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L19)*
 
 return the serialization of the current value
 
@@ -95,6 +103,6 @@ return the serialization of the current value
 
 Name | Type |
 ------ | ------ |
-`value` | `T` |
+`value` | T |
 
-**Returns:** *`S`*
+**Returns:** *S*

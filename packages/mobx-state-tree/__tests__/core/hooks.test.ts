@@ -8,7 +8,8 @@ import {
     applySnapshot,
     onSnapshot,
     isAlive,
-    hasParent
+    hasParent,
+    cast
 } from "../../src"
 
 function createTestStore(listener: (s: string) => void) {
@@ -296,4 +297,86 @@ test("addDisposer must return the passed disposer", () => {
         return {}
     })
     M.create()
+})
+
+test("array calls all hooks", () => {
+    const events: string[] = []
+    function listener(message: string) {
+        events.push(message)
+    }
+    const Item = types.model("Item", { id: types.string })
+    const Collection = types.array(Item).hooks(self => ({
+        afterCreate() {
+            listener("afterCreate")
+        },
+        afterAttach() {
+            listener("afterAttach")
+        },
+        beforeDetach() {
+            listener("beforeDetach")
+        },
+        beforeDestroy() {
+            listener("beforeDestroy")
+        }
+    }))
+    const Holder = types.model("Holder", { items: types.maybe(Collection) })
+
+    const collection = Collection.create([{ id: "1" }, { id: "2" }, { id: "3" }])
+    expect(events).toStrictEqual(["afterCreate"])
+    const holder = Holder.create({ items: collection })
+    unprotect(holder)
+    expect(events).toStrictEqual(["afterCreate", "afterAttach"])
+    detach(holder.items!)
+    expect(events).toStrictEqual(["afterCreate", "afterAttach", "beforeDetach"])
+    holder.items = collection
+    expect(events).toStrictEqual(["afterCreate", "afterAttach", "beforeDetach", "afterAttach"])
+    holder.items = undefined
+    expect(events).toStrictEqual([
+        "afterCreate",
+        "afterAttach",
+        "beforeDetach",
+        "afterAttach",
+        "beforeDestroy"
+    ])
+})
+
+test("map calls all hooks", () => {
+    const events: string[] = []
+    function listener(message: string) {
+        events.push(message)
+    }
+    const Item = types.model("Item", { id: types.string })
+    const Collection = types.map(Item).hooks(self => ({
+        afterCreate() {
+            listener("afterCreate")
+        },
+        afterAttach() {
+            listener("afterAttach")
+        },
+        beforeDetach() {
+            listener("beforeDetach")
+        },
+        beforeDestroy() {
+            listener("beforeDestroy")
+        }
+    }))
+    const Holder = types.model("Holder", { items: types.maybe(Collection) })
+
+    const collection = Collection.create({ "1": { id: "1" }, "2": { id: "2" }, "3": { id: "3" } })
+    expect(events).toStrictEqual(["afterCreate"])
+    const holder = Holder.create({ items: cast(collection) })
+    unprotect(holder)
+    expect(events).toStrictEqual(["afterCreate", "afterAttach"])
+    detach(holder.items!)
+    expect(events).toStrictEqual(["afterCreate", "afterAttach", "beforeDetach"])
+    holder.items = collection
+    expect(events).toStrictEqual(["afterCreate", "afterAttach", "beforeDetach", "afterAttach"])
+    holder.items = undefined
+    expect(events).toStrictEqual([
+        "afterCreate",
+        "afterAttach",
+        "beforeDetach",
+        "afterAttach",
+        "beforeDestroy"
+    ])
 })
