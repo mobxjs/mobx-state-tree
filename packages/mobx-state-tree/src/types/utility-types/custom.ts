@@ -13,8 +13,8 @@ import {
 export interface CustomTypeOptions<S, T> {
     /** Friendly name */
     name: string
-    /** given a serialized value, how to turn it into the target type */
-    fromSnapshot(snapshot: S): T
+    /** given a serialized value and environment, how to turn it into the target type */
+    fromSnapshot(snapshot: S, env: any): T
     /** return the serialization of the current value */
     toSnapshot(value: T): S
     /** if true, this is a converted value, if false, it's a snapshot */
@@ -33,8 +33,8 @@ export interface CustomTypeOptions<S, T> {
  * export interface CustomTypeOptions<S, T> {
  *     // Friendly name
  *     name: string
- *     // given a serialized value, how to turn it into the target type
- *     fromSnapshot(snapshot: S): T
+ *     // given a serialized value and environment, how to turn it into the target type
+ *     fromSnapshot(snapshot: S, env: any): T
  *     // return the serialization of the current value
  *     toSnapshot(value: T): S
  *     // if true, this is a converted value, if false, it's a snapshot
@@ -116,7 +116,7 @@ export class CustomType<S, T> extends SimpleType<S | T, S, T> {
     ): this["N"] {
         const valueToStore: T = this.options.isTargetType(initialValue)
             ? (initialValue as T)
-            : this.options.fromSnapshot(initialValue as S)
+            : this.options.fromSnapshot(initialValue as S, parent && parent.root.environment)
         return createScalarNode(this, parent, subpath, environment, valueToStore)
     }
 
@@ -132,7 +132,9 @@ export class CustomType<S, T> extends SimpleType<S | T, S, T> {
                 return current
             }
         }
-        const valueToStore: T = isSnapshot ? this.options.fromSnapshot(value as S) : (value as T)
+        const valueToStore: T = isSnapshot
+            ? this.options.fromSnapshot(value as S, parent.root.environment)
+            : (value as T)
         const newNode = this.instantiate(parent, subpath, undefined, valueToStore)
         current.die() // noop if detaching
         return newNode
