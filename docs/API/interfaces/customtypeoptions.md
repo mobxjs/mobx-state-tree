@@ -1,13 +1,16 @@
-[mobx-state-tree](../README.md) > [CustomTypeOptions](../interfaces/customtypeoptions.md)
+[mobx-state-tree](../README.md) › [CustomTypeOptions](customtypeoptions.md)
 
-# Interface: CustomTypeOptions
+# Interface: CustomTypeOptions <**S, T**>
 
 ## Type parameters
-#### S 
-#### T 
+
+▪ **S**
+
+▪ **T**
+
 ## Hierarchy
 
-**CustomTypeOptions**
+* **CustomTypeOptions**
 
 ## Index
 
@@ -22,88 +25,84 @@
 * [isTargetType](customtypeoptions.md#istargettype)
 * [toSnapshot](customtypeoptions.md#tosnapshot)
 
----
-
 ## Properties
-
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
+• **name**: *string*
+
+*Defined in [types/utility-types/custom.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L15)*
 
 Friendly name
 
-___
-
 ## Methods
-
-<a id="fromsnapshot"></a>
 
 ###  fromSnapshot
 
-▸ **fromSnapshot**(snapshot: *`S`*): `T`
+▸ **fromSnapshot**(`snapshot`: S): *T*
+
+*Defined in [types/utility-types/custom.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L17)*
 
 given a serialized value, how to turn it into the target type
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| snapshot | `S` |
+Name | Type |
+------ | ------ |
+`snapshot` | S |
 
-**Returns:** `T`
+**Returns:** *T*
 
 ___
-<a id="getvalidationmessage"></a>
 
 ###  getValidationMessage
 
-▸ **getValidationMessage**(snapshot: *`S`*): `string`
+▸ **getValidationMessage**(`snapshot`: S): *string*
+
+*Defined in [types/utility-types/custom.ts:23](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L23)*
 
 a non empty string is assumed to be a validation error
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| snapshot | `S` |
+Name | Type |
+------ | ------ |
+`snapshot` | S |
 
-**Returns:** `string`
+**Returns:** *string*
 
 ___
-<a id="istargettype"></a>
 
 ###  isTargetType
 
-▸ **isTargetType**(value: *`T` \| `S`*): `boolean`
+▸ **isTargetType**(`value`: T | S): *boolean*
+
+*Defined in [types/utility-types/custom.ts:21](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L21)*
 
 if true, this is a converted value, if false, it's a snapshot
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| value | `T` \| `S` |
+Name | Type |
+------ | ------ |
+`value` | T &#124; S |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="tosnapshot"></a>
 
 ###  toSnapshot
 
-▸ **toSnapshot**(value: *`T`*): `S`
+▸ **toSnapshot**(`value`: T): *S*
+
+*Defined in [types/utility-types/custom.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L19)*
 
 return the serialization of the current value
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| value | `T` |
+Name | Type |
+------ | ------ |
+`value` | T |
 
-**Returns:** `S`
-
-___
-
+**Returns:** *S*

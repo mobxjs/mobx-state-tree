@@ -1,10 +1,10 @@
-[mobx-state-tree](../README.md) > [IActionRecorder](../interfaces/iactionrecorder.md)
+[mobx-state-tree](../README.md) › [IActionRecorder](iactionrecorder.md)
 
 # Interface: IActionRecorder
 
 ## Hierarchy
 
-**IActionRecorder**
+* **IActionRecorder**
 
 ## Index
 
@@ -19,58 +19,54 @@
 * [resume](iactionrecorder.md#resume)
 * [stop](iactionrecorder.md#stop)
 
----
-
 ## Properties
-
-<a id="actions"></a>
 
 ###  actions
 
-**● actions**: *`ReadonlyArray`<[ISerializedActionCall](iserializedactioncall.md)>*
+• **actions**: *ReadonlyArray‹[ISerializedActionCall](iserializedactioncall.md)›*
+
+*Defined in [middlewares/on-action.ts:37](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/on-action.ts#L37)*
 
 ___
-<a id="recording"></a>
 
 ###  recording
 
-**● recording**: *`boolean`*
+• **recording**: *boolean*
 
-___
+*Defined in [middlewares/on-action.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/on-action.ts#L38)*
 
 ## Methods
 
-<a id="replay"></a>
-
 ###  replay
 
-▸ **replay**(target: *`IAnyStateTreeNode`*): `void`
+▸ **replay**(`target`: IAnyStateTreeNode): *void*
+
+*Defined in [middlewares/on-action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/on-action.ts#L41)*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| target | `IAnyStateTreeNode` |
+Name | Type |
+------ | ------ |
+`target` | IAnyStateTreeNode |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="resume"></a>
 
 ###  resume
 
-▸ **resume**(): `void`
+▸ **resume**(): *void*
 
-**Returns:** `void`
+*Defined in [middlewares/on-action.ts:40](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/on-action.ts#L40)*
+
+**Returns:** *void*
 
 ___
-<a id="stop"></a>
 
 ###  stop
 
-▸ **stop**(): `void`
+▸ **stop**(): *void*
 
-**Returns:** `void`
+*Defined in [middlewares/on-action.ts:39](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/on-action.ts#L39)*
 
-___
-
+**Returns:** *void*

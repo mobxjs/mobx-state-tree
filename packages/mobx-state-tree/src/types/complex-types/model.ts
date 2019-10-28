@@ -122,10 +122,20 @@ type IsOptionalValue<C, TV, FV> = undefined extends C ? TV : FV
 type DefinablePropsNames<T> = { [K in keyof T]: IsOptionalValue<T[K], never, K> }[keyof T]
 
 /** @hidden */
+export declare const $nonEmptyObject: unique symbol
+
+/** @hidden */
+export interface NonEmptyObject {
+    [$nonEmptyObject]?: any
+}
+
+/** @hidden */
 export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
 
 /** @hidden */
-export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } & Partial<PC>
+export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } &
+    Partial<PC> &
+    NonEmptyObject
 
 /** @hidden */
 export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOther<
@@ -134,7 +144,10 @@ export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOt
 >
 
 /** @hidden */
-export type ModelSnapshotType<P extends ModelProperties> = { [K in keyof P]: P[K]["SnapshotType"] }
+export type ModelSnapshotType<P extends ModelProperties> = {
+    [K in keyof P]: P[K]["SnapshotType"]
+} &
+    NonEmptyObject
 
 /** @hidden */
 export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOther<
@@ -146,7 +159,8 @@ export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOt
  * @hidden
  * we keep this separate from ModelInstanceType to shorten model instance types generated declarations
  */
-export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]: P[K]["Type"] }
+export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]: P[K]["Type"] } &
+    NonEmptyObject
 
 /**
  * @hidden
@@ -406,7 +420,7 @@ export class ModelType<
             const middlewares = (action2 as any).$mst_middleware // make sure middlewares are not lost
             let boundAction = action2.bind(actions)
             boundAction.$mst_middleware = middlewares
-            const actionInvoker = createActionInvoker(self, name, boundAction)
+            const actionInvoker = createActionInvoker(self as any, name, boundAction)
             actions[name] = actionInvoker
 
             // See #646, allow models to be mocked

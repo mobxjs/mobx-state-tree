@@ -1,12 +1,12 @@
-[mobx-state-tree](../README.md) > [IReversibleJsonPatch](../interfaces/ireversiblejsonpatch.md)
+[mobx-state-tree](../README.md) › [IReversibleJsonPatch](ireversiblejsonpatch.md)
 
 # Interface: IReversibleJsonPatch
 
 ## Hierarchy
 
- [IJsonPatch](ijsonpatch.md)
+* [IJsonPatch](ijsonpatch.md)
 
-**↳ IReversibleJsonPatch**
+  ↳ **IReversibleJsonPatch**
 
 ## Index
 
@@ -15,38 +15,42 @@
 * [oldValue](ireversiblejsonpatch.md#oldvalue)
 * [op](ireversiblejsonpatch.md#op)
 * [path](ireversiblejsonpatch.md#path)
-* [value](ireversiblejsonpatch.md#value)
-
----
+* [value](ireversiblejsonpatch.md#optional-value)
 
 ## Properties
 
-<a id="oldvalue"></a>
-
 ###  oldValue
 
-**● oldValue**: *`any`*
+• **oldValue**: *any*
+
+*Defined in [core/json-patch.ts:14](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/json-patch.ts#L14)*
 
 ___
-<a id="op"></a>
 
 ###  op
 
-**● op**: *"replace" \| "add" \| "remove"*
+• **op**: *"replace" | "add" | "remove"*
+
+*Inherited from [IJsonPatch](ijsonpatch.md).[op](ijsonpatch.md#op)*
+
+*Defined in [core/json-patch.ts:8](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/json-patch.ts#L8)*
 
 ___
-<a id="path"></a>
 
 ###  path
 
-**● path**: *`string`*
+• **path**: *string*
 
-___
-<a id="value"></a>
+*Inherited from [IJsonPatch](ijsonpatch.md).[path](ijsonpatch.md#path)*
 
-### `<Optional>` value
-
-**● value**: *`any`*
+*Defined in [core/json-patch.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/json-patch.ts#L9)*
 
 ___
 
+### `Optional` value
+
+• **value**? : *any*
+
+*Inherited from [IJsonPatch](ijsonpatch.md).[value](ijsonpatch.md#optional-value)*
+
+*Defined in [core/json-patch.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/json-patch.ts#L10)*

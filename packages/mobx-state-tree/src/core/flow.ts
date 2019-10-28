@@ -1,57 +1,22 @@
-/** @hidden */
-declare const $flowYield: unique symbol
-
-/** @hidden */
-export interface FlowYield {
-    // fake, only for typing
-    [$flowYield]: undefined
-}
-
-/** @hidden */
-declare const $flowReturn: unique symbol
-
-/** @hidden */
-export interface FlowReturn<T> {
-    // fake, only for typing
-    [$flowReturn]: T
-}
-
-// we skip promises that are the result of yielding promises (except if they use flowReturn)
-/** @hidden */
-export type FlowReturnType<R> = IfAllAreFlowYieldThenVoid<
-    R extends FlowReturn<infer FR>
-        ? FR extends Promise<infer FRP>
-            ? FRP
-            : FR
-        : R extends Promise<any>
-        ? FlowYield
-        : R
->
-
-// we extract yielded promises from the return type
-/** @hidden */
-export type IfAllAreFlowYieldThenVoid<R> = Exclude<R, FlowYield> extends never
-    ? void
-    : Exclude<R, FlowYield>
-
 /**
  * See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
  *
  * @returns The flow as a promise.
  */
 export function flow<R, Args extends any[]>(
-    generator: (...args: Args) => IterableIterator<R>
-): (...args: Args) => Promise<FlowReturnType<R>> {
+    generator: (...args: Args) => Generator<any, R, any>
+): (...args: Args) => Promise<R> {
     return createFlowSpawner(generator.name, generator) as any
 }
 
 /**
- *  Used for TypeScript to make flows that return a promise return the actual promise result.
+ * @deprecated Not needed since TS3.6.
+ * Used for TypeScript to make flows that return a promise return the actual promise result.
  *
  * @param val
  * @returns
  */
-export function castFlowReturn<T>(val: T): FlowReturn<T> {
+export function castFlowReturn<T>(val: T): T {
     return val as any
 }
 

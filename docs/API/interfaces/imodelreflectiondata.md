@@ -1,12 +1,12 @@
-[mobx-state-tree](../README.md) > [IModelReflectionData](../interfaces/imodelreflectiondata.md)
+[mobx-state-tree](../README.md) › [IModelReflectionData](imodelreflectiondata.md)
 
 # Interface: IModelReflectionData
 
 ## Hierarchy
 
- [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md)
+* [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md)
 
-**↳ IModelReflectionData**
+  ↳ **IModelReflectionData**
 
 ## Index
 
@@ -18,47 +18,50 @@
 * [views](imodelreflectiondata.md#views)
 * [volatile](imodelreflectiondata.md#volatile)
 
----
-
 ## Properties
-
-<a id="actions"></a>
 
 ###  actions
 
-**● actions**: *`string`[]*
+• **actions**: *string[]*
+
+*Defined in [core/mst-operations.ts:835](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L835)*
 
 ___
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
+• **name**: *string*
+
+*Inherited from [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md).[name](imodelreflectionpropertiesdata.md#name)*
+
+*Defined in [core/mst-operations.ts:805](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L805)*
 
 ___
-<a id="properties"></a>
 
 ###  properties
 
-**● properties**: *`object`*
+• **properties**: *object*
 
-#### Type declaration
+*Inherited from [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md).[properties](imodelreflectionpropertiesdata.md#properties)*
 
-[K: `string`]: [IAnyType](ianytype.md)
+*Defined in [core/mst-operations.ts:806](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L806)*
+
+#### Type declaration:
+
+* \[ **K**: *string*\]: [IAnyType](ianytype.md)
 
 ___
-<a id="views"></a>
 
 ###  views
 
-**● views**: *`string`[]*
+• **views**: *string[]*
+
+*Defined in [core/mst-operations.ts:836](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L836)*
 
 ___
-<a id="volatile"></a>
 
 ###  volatile
 
-**● volatile**: *`string`[]*
+• **volatile**: *string[]*
 
-___
-
+*Defined in [core/mst-operations.ts:837](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L837)*

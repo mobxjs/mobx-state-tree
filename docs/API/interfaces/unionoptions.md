@@ -1,34 +1,30 @@
-[mobx-state-tree](../README.md) > [UnionOptions](../interfaces/unionoptions.md)
+[mobx-state-tree](../README.md) › [UnionOptions](unionoptions.md)
 
 # Interface: UnionOptions
 
 ## Hierarchy
 
-**UnionOptions**
+* **UnionOptions**
 
 ## Index
 
 ### Properties
 
-* [dispatcher](unionoptions.md#dispatcher)
-* [eager](unionoptions.md#eager)
-
----
+* [dispatcher](unionoptions.md#optional-dispatcher)
+* [eager](unionoptions.md#optional-eager)
 
 ## Properties
 
-<a id="dispatcher"></a>
+### `Optional` dispatcher
 
-### `<Optional>` dispatcher
+• **dispatcher**? : *[ITypeDispatcher](../README.md#itypedispatcher)*
 
-**● dispatcher**: *[ITypeDispatcher](../#itypedispatcher)*
-
-___
-<a id="eager"></a>
-
-### `<Optional>` eager
-
-**● eager**: *`undefined` \| `false` \| `true`*
+*Defined in [types/utility-types/union.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/union.ts#L31)*
 
 ___
 
+### `Optional` eager
+
+• **eager**? : *undefined | false | true*
+
+*Defined in [types/utility-types/union.ts:30](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/union.ts#L30)*
