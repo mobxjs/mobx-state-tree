@@ -1,3 +1,5 @@
+# 3.15.0
+
 - Fix for flow typings. This means that now using flows requires at least TypeScript v3.6 and that `castFlowReturn` becomes deprecated.
 - Fix for empty models / models with all properties set to optional being able to take any value in TypeScript through [#1269](https://github.com/mobxjs/mobx-state-tree/pull/1269) by [@xaviergonz](https://github.com/xaviergonz).
 
