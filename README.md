@@ -82,6 +82,7 @@ See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/
 -   Talk React Alicante 2017: [Mutable or Immutable? Let's do both!](https://www.youtube.com/watch?v=DgnL3uij9ec&list=PLd7nkr8mN0sWvBH_s0foCE6eZTX8BmLUM&index=9) ([slides](https://mattiamanzati.github.io/slides-react-alicante-2017/#2))
 -   Talk ReactiveConf 2016: [Immer-mutable state management](https://www.youtube.com/watch?v=Ql8KUUUOHNc&list=PLa2ZZ09WYepMCRRGCRPhTYuTCat4TiDlX&index=30)
 -   Talk FrontendLove 2018: [MobX State Tree + React: pure reactivity served](https://www.youtube.com/watch?v=HS9revHrNRI) by [Luca Mezzalira](https://lucamezzalira.com/) ([slides](https://docs.google.com/presentation/d/1f18RhN9hz1GPAdY4binWVNZDKm3k7EfNvV48lWnzdjQ/edit#slide=id.g35f391192_00)).
+-   Talk React Native EU 2019: [Resolving the Great State Debate with Hooks, Context, and MobX-State-Tree](https://www.youtube.com/watch?v=Wx9slbOTD6Q) by [Jamon Holmgren](https://jamonholmgren.com/) ([slides](https://infinite-red.slides.com/infinitered/resolving-the-great-state-debate))
 
 # Philosophy & Overview
 

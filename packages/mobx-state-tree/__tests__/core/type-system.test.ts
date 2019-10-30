@@ -20,6 +20,7 @@ import {
     ModelPropertiesDeclaration,
     SnapshotOut
 } from "../../src"
+import { $nonEmptyObject } from "../../src/internal"
 
 const createTestFactories = () => {
     const Box = types.model({
@@ -1023,12 +1024,32 @@ test("can extract type from complex objects", () => {
     const T2: OriginalType = T
 })
 
+test("#1268", () => {
+    const Book = types.model({
+        id: types.identifier
+    })
+
+    const BooksStore = types.model({
+        books: types.array(types.reference(Book))
+    })
+
+    const RootStore = types.model({
+        booksStore: BooksStore
+    })
+
+    const booksStore = BooksStore.create({ books: [] })
+
+    const rootStore = RootStore.create({ booksStore: castToSnapshot(booksStore) })
+})
+
 test("#1307 optional can be omitted in .create", () => {
     const Model1 = types.model({ name: types.optional(types.string, "") })
     const model1 = Model1.create({})
+    assert(model1.name, _ as string)
 
     const Model2 = types.model({ name: "" })
     const model2 = Model2.create({})
+    assert(model2.name, _ as string)
 })
 
 test("#1307 custom types failing", () => {
@@ -1124,6 +1145,7 @@ test("maybe / optional type inference verification", () => {
     assert(
         _ as ITC,
         _ as {
+            [$nonEmptyObject]?: any
             a: string
             b?: string
             c?: string | undefined
@@ -1135,6 +1157,7 @@ test("maybe / optional type inference verification", () => {
     assert(
         _ as ITS,
         _ as {
+            [$nonEmptyObject]?: any
             a: string
             b: string
             c: string | undefined

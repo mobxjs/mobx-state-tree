@@ -1,12 +1,12 @@
-[mobx-state-tree](../README.md) > [IModelReflectionPropertiesData](../interfaces/imodelreflectionpropertiesdata.md)
+[mobx-state-tree](../README.md) › [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md)
 
 # Interface: IModelReflectionPropertiesData
 
 ## Hierarchy
 
-**IModelReflectionPropertiesData**
+* **IModelReflectionPropertiesData**
 
-↳  [IModelReflectionData](imodelreflectiondata.md)
+  ↳ [IModelReflectionData](imodelreflectiondata.md)
 
 ## Index
 
@@ -15,26 +15,22 @@
 * [name](imodelreflectionpropertiesdata.md#name)
 * [properties](imodelreflectionpropertiesdata.md#properties)
 
----
-
 ## Properties
-
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
+• **name**: *string*
+
+*Defined in [core/mst-operations.ts:805](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L805)*
 
 ___
-<a id="properties"></a>
 
 ###  properties
 
-**● properties**: *`object`*
+• **properties**: *object*
 
-#### Type declaration
+*Defined in [core/mst-operations.ts:806](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L806)*
 
-[K: `string`]: [IAnyType](ianytype.md)
+#### Type declaration:
 
-___
-
+* \[ **K**: *string*\]: [IAnyType](ianytype.md)

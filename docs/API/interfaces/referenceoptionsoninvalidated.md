@@ -1,12 +1,14 @@
-[mobx-state-tree](../README.md) > [ReferenceOptionsOnInvalidated](../interfaces/referenceoptionsoninvalidated.md)
+[mobx-state-tree](../README.md) › [ReferenceOptionsOnInvalidated](referenceoptionsoninvalidated.md)
 
-# Interface: ReferenceOptionsOnInvalidated
+# Interface: ReferenceOptionsOnInvalidated <**IT**>
 
 ## Type parameters
-#### IT :  [IAnyComplexType](ianycomplextype.md)
+
+▪ **IT**: *[IAnyComplexType](ianycomplextype.md)*
+
 ## Hierarchy
 
-**ReferenceOptionsOnInvalidated**
+* **ReferenceOptionsOnInvalidated**
 
 ## Index
 
@@ -14,15 +16,10 @@
 
 * [onInvalidated](referenceoptionsoninvalidated.md#oninvalidated)
 
----
-
 ## Properties
-
-<a id="oninvalidated"></a>
 
 ###  onInvalidated
 
-**● onInvalidated**: *[OnReferenceInvalidated](../#onreferenceinvalidated)<`ReferenceT`<`IT`>>*
+• **onInvalidated**: *[OnReferenceInvalidated](../README.md#onreferenceinvalidated)‹ReferenceT‹IT››*
 
-___
-
+*Defined in [types/utility-types/reference.ts:472](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/reference.ts#L472)*

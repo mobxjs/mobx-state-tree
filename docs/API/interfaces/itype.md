@@ -1,32 +1,36 @@
-[mobx-state-tree](../README.md) > [IType](../interfaces/itype.md)
+[mobx-state-tree](../README.md) › [IType](itype.md)
 
-# Interface: IType
+# Interface: IType <**C, S, T**>
 
 A type, either complex or simple.
 
 ## Type parameters
-#### C 
-#### S 
-#### T 
+
+▪ **C**
+
+▪ **S**
+
+▪ **T**
+
 ## Hierarchy
 
-**IType**
+* **IType**
 
-↳  [IAnyType](ianytype.md)
+  ↳ [IAnyType](ianytype.md)
 
-↳  [ISimpleType](isimpletype.md)
+  ↳ [ISimpleType](isimpletype.md)
 
-↳  [IAnyComplexType](ianycomplextype.md)
+  ↳ [IAnyComplexType](ianycomplextype.md)
 
-↳  [ISnapshotProcessor](isnapshotprocessor.md)
+  ↳ [ISnapshotProcessor](isnapshotprocessor.md)
 
-↳  [IModelType](imodeltype.md)
+  ↳ [IModelType](imodeltype.md)
 
 ## Index
 
 ### Properties
 
-* [identifierAttribute](itype.md#identifierattribute)
+* [identifierAttribute](itype.md#optional-identifierattribute)
 * [name](itype.md#name)
 
 ### Methods
@@ -36,96 +40,96 @@ A type, either complex or simple.
 * [is](itype.md#is)
 * [validate](itype.md#validate)
 
----
-
 ## Properties
 
-<a id="identifierattribute"></a>
+### `Optional` identifierAttribute
 
-### `<Optional>` identifierAttribute
+• **identifierAttribute**? : *undefined | string*
 
-**● identifierAttribute**: *`undefined` \| `string`*
+*Defined in [core/type/type.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L86)*
 
 Name of the identifier attribute or null if none.
 
 ___
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
+• **name**: *string*
+
+*Defined in [core/type/type.ts:81](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L81)*
 
 Friendly type name.
 
-___
-
 ## Methods
-
-<a id="create"></a>
 
 ###  create
 
-▸ **create**(snapshot?: *[C]()*, env?: *`any`*): `this["Type"]`
+▸ **create**(`snapshot?`: [C](undefined), `env?`: any): *this["Type"]*
+
+*Defined in [core/type/type.ts:93](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L93)*
 
 Creates an instance for the type given an snapshot input.
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Optional` snapshot | [C]() |
-| `Optional` env | `any` |
+Name | Type |
+------ | ------ |
+`snapshot?` | [C](undefined) |
+`env?` | any |
 
-**Returns:** `this["Type"]`
+**Returns:** *this["Type"]*
+
 An instance of that type.
 
 ___
-<a id="describe"></a>
 
 ###  describe
 
-▸ **describe**(): `string`
+▸ **describe**(): *string*
+
+*Defined in [core/type/type.ts:115](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L115)*
 
 Gets the textual representation of the type as a string.
 
-**Returns:** `string`
+**Returns:** *string*
 
 ___
-<a id="is"></a>
 
 ###  is
 
-▸ **is**(thing: *`any`*): `boolean`
+▸ **is**(`thing`: any): *boolean*
+
+*Defined in [core/type/type.ts:101](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L101)*
 
 Checks if a given snapshot / instance is of the given type.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| thing | `any` |  Snapshot or instance to be checked. |
+Name | Type | Description |
+------ | ------ | ------ |
+`thing` | any | Snapshot or instance to be checked. |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
+
 true if the value is of the current type, false otherwise.
 
 ___
-<a id="validate"></a>
 
 ###  validate
 
-▸ **validate**(thing: *`C`*, context: *[IValidationContext](../#ivalidationcontext)*): [IValidationResult](../#ivalidationresult)
+▸ **validate**(`thing`: C, `context`: [IValidationContext](../README.md#ivalidationcontext)): *[IValidationResult](../README.md#ivalidationresult)*
+
+*Defined in [core/type/type.ts:110](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L110)*
 
 Run's the type's typechecker on the given value with the given validation context.
 
 **Parameters:**
 
-| Name | Type | Description |
-| ------ | ------ | ------ |
-| thing | `C` |  Value to be checked, either a snapshot or an instance. |
-| context | [IValidationContext](../#ivalidationcontext) |  Validation context, an array of { subpaths, subtypes } that should be validated |
+Name | Type | Description |
+------ | ------ | ------ |
+`thing` | C | Value to be checked, either a snapshot or an instance. |
+`context` | [IValidationContext](../README.md#ivalidationcontext) | Validation context, an array of { subpaths, subtypes } that should be validated |
 
-**Returns:** [IValidationResult](../#ivalidationresult)
+**Returns:** *[IValidationResult](../README.md#ivalidationresult)*
+
 The validation result, an array with the list of validation errors.
-
-___
-

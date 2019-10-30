@@ -1,12 +1,12 @@
-[mobx-state-tree](../README.md) > [IActionContext](../interfaces/iactioncontext.md)
+[mobx-state-tree](../README.md) › [IActionContext](iactioncontext.md)
 
 # Interface: IActionContext
 
 ## Hierarchy
 
-**IActionContext**
+* **IActionContext**
 
-↳  [IMiddlewareEvent](imiddlewareevent.md)
+  ↳ [IMiddlewareEvent](imiddlewareevent.md)
 
 ## Index
 
@@ -19,62 +19,62 @@
 * [parentActionEvent](iactioncontext.md#parentactionevent)
 * [tree](iactioncontext.md#tree)
 
----
-
 ## Properties
-
-<a id="args"></a>
 
 ###  args
 
-**● args**: *`any`[]*
+• **args**: *any[]*
+
+*Defined in [core/actionContext.ts:20](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L20)*
 
 Event arguments in an array (action arguments for actions)
 
 ___
-<a id="context"></a>
 
 ###  context
 
-**● context**: *`IAnyStateTreeNode`*
+• **context**: *IAnyStateTreeNode*
+
+*Defined in [core/actionContext.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L15)*
 
 Event context (node where the action was invoked)
 
 ___
-<a id="id"></a>
 
 ###  id
 
-**● id**: *`number`*
+• **id**: *number*
+
+*Defined in [core/actionContext.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L9)*
 
 Event unique id
 
 ___
-<a id="name"></a>
 
 ###  name
 
-**● name**: *`string`*
+• **name**: *string*
+
+*Defined in [core/actionContext.ts:6](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L6)*
 
 Event name (action name for actions)
 
 ___
-<a id="parentactionevent"></a>
 
 ###  parentActionEvent
 
-**● parentActionEvent**: *[IMiddlewareEvent](imiddlewareevent.md) \| `undefined`*
+• **parentActionEvent**: *[IMiddlewareEvent](imiddlewareevent.md) | undefined*
+
+*Defined in [core/actionContext.ts:12](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L12)*
 
 Parent action event object
 
 ___
-<a id="tree"></a>
 
 ###  tree
 
-**● tree**: *`IAnyStateTreeNode`*
+• **tree**: *IAnyStateTreeNode*
+
+*Defined in [core/actionContext.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/actionContext.ts#L17)*
 
 Event tree (root node of the node where the action was invoked)
-
-___
-

@@ -1,10 +1,10 @@
-[mobx-state-tree](../README.md) > [IPatchRecorder](../interfaces/ipatchrecorder.md)
+[mobx-state-tree](../README.md) › [IPatchRecorder](ipatchrecorder.md)
 
 # Interface: IPatchRecorder
 
 ## Hierarchy
 
-**IPatchRecorder**
+* **IPatchRecorder**
 
 ## Index
 
@@ -22,87 +22,86 @@
 * [stop](ipatchrecorder.md#stop)
 * [undo](ipatchrecorder.md#undo)
 
----
-
 ## Properties
-
-<a id="inversepatches"></a>
 
 ###  inversePatches
 
-**● inversePatches**: *`ReadonlyArray`<[IJsonPatch](ijsonpatch.md)>*
+• **inversePatches**: *ReadonlyArray‹[IJsonPatch](ijsonpatch.md)›*
+
+*Defined in [core/mst-operations.ts:139](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L139)*
 
 ___
-<a id="patches"></a>
 
 ###  patches
 
-**● patches**: *`ReadonlyArray`<[IJsonPatch](ijsonpatch.md)>*
+• **patches**: *ReadonlyArray‹[IJsonPatch](ijsonpatch.md)›*
+
+*Defined in [core/mst-operations.ts:138](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L138)*
 
 ___
-<a id="recording"></a>
 
 ###  recording
 
-**● recording**: *`boolean`*
+• **recording**: *boolean*
+
+*Defined in [core/mst-operations.ts:141](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L141)*
 
 ___
-<a id="reversedinversepatches"></a>
 
 ###  reversedInversePatches
 
-**● reversedInversePatches**: *`ReadonlyArray`<[IJsonPatch](ijsonpatch.md)>*
+• **reversedInversePatches**: *ReadonlyArray‹[IJsonPatch](ijsonpatch.md)›*
 
-___
+*Defined in [core/mst-operations.ts:140](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L140)*
 
 ## Methods
 
-<a id="replay"></a>
-
 ###  replay
 
-▸ **replay**(target?: *`IAnyStateTreeNode`*): `void`
+▸ **replay**(`target?`: IAnyStateTreeNode): *void*
+
+*Defined in [core/mst-operations.ts:144](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L144)*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Optional` target | `IAnyStateTreeNode` |
+Name | Type |
+------ | ------ |
+`target?` | IAnyStateTreeNode |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="resume"></a>
 
 ###  resume
 
-▸ **resume**(): `void`
+▸ **resume**(): *void*
 
-**Returns:** `void`
+*Defined in [core/mst-operations.ts:143](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L143)*
+
+**Returns:** *void*
 
 ___
-<a id="stop"></a>
 
 ###  stop
 
-▸ **stop**(): `void`
+▸ **stop**(): *void*
 
-**Returns:** `void`
+*Defined in [core/mst-operations.ts:142](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L142)*
+
+**Returns:** *void*
 
 ___
-<a id="undo"></a>
 
 ###  undo
 
-▸ **undo**(target?: *`IAnyStateTreeNode`*): `void`
+▸ **undo**(`target?`: IAnyStateTreeNode): *void*
+
+*Defined in [core/mst-operations.ts:145](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/mst-operations.ts#L145)*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Optional` target | `IAnyStateTreeNode` |
+Name | Type |
+------ | ------ |
+`target?` | IAnyStateTreeNode |
 
-**Returns:** `void`
-
-___
-
+**Returns:** *void*
