@@ -14,7 +14,7 @@ export interface CustomTypeOptions<S, T> {
     /** Friendly name */
     name: string
     /** given a serialized value and environment, how to turn it into the target type */
-    fromSnapshot(snapshot: S, env: any): T
+    fromSnapshot(snapshot: S, env?: any): T
     /** return the serialization of the current value */
     toSnapshot(value: T): S
     /** if true, this is a converted value, if false, it's a snapshot */
