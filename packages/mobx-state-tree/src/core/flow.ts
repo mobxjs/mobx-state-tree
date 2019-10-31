@@ -1,11 +1,16 @@
 /**
+ * @hidden
+ */
+export type FlowReturn<R> = R extends Promise<infer T> ? T : R
+
+/**
  * See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
  *
  * @returns The flow as a promise.
  */
 export function flow<R, Args extends any[]>(
-    generator: (...args: Args) => Generator<any, R, any>
-): (...args: Args) => Promise<R> {
+    generator: (...args: Args) => Generator<Promise<any>, R, any>
+): (...args: Args) => Promise<FlowReturn<R>> {
     return createFlowSpawner(generator.name, generator) as any
 }
 
