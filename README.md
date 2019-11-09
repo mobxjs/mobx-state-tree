@@ -627,7 +627,7 @@ console.log(storeInstance.selectedTodo.title)
 -   The identifier property of an object cannot be modified after initialization
 -   Each identifier / type combination should be unique within the entire tree
 -   Identifiers are used to reconcile items inside arrays and maps - wherever possible - when applying snapshots
--   The `map.put()` method can be used to simplify adding objects that have identifiers to [maps](docs/API/README.md#typesmap)
+-   The `map.put()` method can be used to simplify adding objects that have identifiers to [maps](docs/API/README.md#map)
 -   The primary goal of identifiers is not validation, but reconciliation and reference resolving. For this reason identifiers cannot be defined or updated after creation. If you want to check if some value just looks as an identifier, without providing the above semantics; use something like: `types.refinement(types.string, v => v.match(/someregex/))`
 
 _Tip: If you know the format of the identifiers in your application, leverage `types.refinement` to actively check this, for example the following definition enforces that identifiers of `Car` always start with the string `"Car_"`:
