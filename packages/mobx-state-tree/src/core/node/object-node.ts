@@ -172,11 +172,14 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         }
     }
 
-    @action
     createObservableInstanceIfNeeded(): void {
-        if (this._observableInstanceState !== ObservableInstanceLifecycle.UNINITIALIZED) {
-            return
+        if (this._observableInstanceState === ObservableInstanceLifecycle.UNINITIALIZED) {
+            this.createObservableInstance()
         }
+    }
+
+    @action
+    createObservableInstance(): void {
         if (devMode()) {
             if (this.state !== NodeLifeCycle.INITIALIZING) {
                 // istanbul ignore next
