@@ -1,3 +1,10 @@
+---
+id: getting-started
+title: Getting Started
+---
+
+<div id="codefund"><!-- fallback content --></div>
+
 # Getting Started
 
 This tutorial will introduce you to the basics of `mobx-state-tree` (MST) by building a TODO application. The application will also have the ability to assign each TODO to a user.

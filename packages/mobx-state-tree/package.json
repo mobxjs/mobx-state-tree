@@ -37,6 +37,10 @@
     },
     "author": "Michel Weststrate",
     "license": "MIT",
+    "funding": {
+        "type": "opencollective",
+        "url": "https://opencollective.com/mobx"
+    },
     "bugs": {
         "url": "https://github.com/mobxjs/mobx-state-tree/issues"
     },

@@ -1,3 +1,61 @@
+
+### Creating async flows
+
+See [creating asynchronous flow](docs/async-actions.md).
+
+### Using mobx and mobx-state-tree together
+
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react">egghead.io lesson 5: Render mobx-state-tree Models in React</a></i>
+
+Yep, perfectly fine. No problem. Go on. `observer`, `autorun`, etc. will work as expected.
+
+In the examples folder several examples of React and MST can be found, or check this [example](https://github.com/impulse/react-hooks-mobx-state-tree) which uses hooks (recommended).
+
+----
+
+#### Asynchronous actions
+
+<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-defining-asynchronous-processes-using-flow">egghead.io lesson 12: Defining Asynchronous Processes Using Flow</a></i>
+
+Asynchronous actions have first class support in MST and are described in more detail [here](docs/async-actions.md#asynchronous-actions-and-middleware).
+Asynchronous actions are written by using generators and always return a promise. For a real working example see the [bookshop sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A quick example to get the gist:
+
+_Warning: don't import `flow` from `"mobx"`, but from `"mobx-state-tree"` instead!_
+
+```javascript
+import { types, flow } from "mobx-state-tree"
+
+someModel.actions(self => {
+    const fetchProjects = flow(function*() {
+        // <- note the star, this a generator function!
+        self.state = "pending"
+        try {
+            // ... yield can be used in async/await style
+            self.githubProjects = yield fetchGithubProjectsSomehow()
+            self.state = "done"
+        } catch (error) {
+            // ... including try/catch error handling
+            console.error("Failed to fetch projects", error)
+            self.state = "error"
+        }
+        // The action will return a promise that resolves to the returned value
+        // (or rejects with anything thrown from the action)
+        return self.githubProjects.length
+    })
+
+    return { fetchProjects }
+})
+```
+
+Note that, since MST v3.9, TypeScript correctly infers `flow` arguments and usually infers correctly `flow` return types,
+but one exception to this case is when a `Promise` is returned as final value. In this case (and only in this case) this construct needs to be used:
+
+```ts
+return castFlowReturn(somePromise)
+```
+
+---
+
 # Creating asynchronous actions
 
 Asynchronous actions are a first class concept in Mobx-State-Tree. Modelling an asynchronous flow can be done in two ways:

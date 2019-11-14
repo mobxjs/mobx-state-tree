@@ -10,3 +10,4 @@ package-lock.json
 .vscode
 .editorconfig
 /test-results/**/*.xml
+/website/build

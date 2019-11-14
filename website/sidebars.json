@@ -1,0 +1,45 @@
+{
+  "docs": {
+    "Introduction": [
+      "intro/examples.md",
+      "getting-started",
+      "intro/installation.md",
+      "intro/philosophy.md"
+    ],
+    "Reference guide": [
+      "overview/hooks.md",
+      "overview/types.md",
+      "overview/utilties.md"
+    ],
+    "Concepts": [
+      "concepts/0_trees.md",
+      "concepts/1_creating_models.md",
+      "concepts/2_tree_semantics.md",
+      "concepts/3_composing_trees.md",
+      "concepts/4_actions.md",
+      "concepts/5_views.md",
+      "concepts/6_snapshots.md",
+      "concepts/7_patches.md",
+      "concepts/8_references_identifiers.md",
+      "concepts/async-actions.md",
+      "concepts/dependency-injection.md",
+      "concepts/listeners.md",
+      "concepts/middleware.md",
+      "concepts/reconciliation.md",
+      "concepts/volatile-state.md"
+    ],
+    "Tips": [
+      "tips/circular-deps.md",
+      "tips/contributing.md",
+      "tips/faq.md",
+      "tips/inheritance.md",
+      "tips/more-tips.md",
+      "tips/snapshots_as_models.md",
+      "tips/talks-blogs.md",
+      "tips/typescript.md"
+    ]
+  },
+  "docs-other": {
+    "First Category": ["doc4", "doc5"]
+  }
+}
