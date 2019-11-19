@@ -256,6 +256,41 @@ test("same tree - withoutUndo declaratively", () => {
     withoutUndo(store)
 })
 
+test("same tree - maxHistoryLength", async () => {
+    const HistoryOnTreeStoreModel = types
+        .model({
+            x: 1,
+            history: types.optional(UndoManager, {})
+        })
+        .actions(self => {
+            setUndoManagerSameTree(self)
+            return {
+                inc() {
+                    self.x += 1
+                }
+            }
+        })
+    const store = HistoryOnTreeStoreModel.create({}, { maxHistoryLength: 2 })
+
+    expect(undoManager.history.length).toBe(0)
+
+    store.inc()
+    expect(store.x).toBe(2)
+    expect(undoManager.history.length).toBe(1)
+
+    store.inc()
+    expect(store.x).toBe(3)
+    expect(undoManager.history.length).toBe(2)
+
+    store.inc()
+    expect(store.x).toBe(4)
+    expect(undoManager.history.length).toBe(2)
+
+    store.inc()
+    expect(store.x).toBe(5)
+    expect(undoManager.history.length).toBe(2)
+})
+
 test("same tree - withoutUndoFlow declaratively", async () => {
     // because async would allow overwriting the history within later tests
     // we need a another _undoManager

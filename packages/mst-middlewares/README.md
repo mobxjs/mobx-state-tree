@@ -284,6 +284,18 @@ export const setUndoManager = targetStore => {
 const store = Store.create()
 ```
 
+If you want a limited history of actions to be recorded, for example to keep track of the last 10 actions only, you must provide a `maxHistoryLength` value through [environment data](../../README.md#dependency-injection).
+
+```js
+// with history in your store
+const store = Store.create({}, { maxHistoryLength: 10 })
+
+// with history in a separate store
+export const setUndoManager = targetStore => {
+    undoManager = UndoManager.create({}, { targetStore, maxHistoryLength: 10 })
+}
+```
+
 Undo/ Redo:
 
 ```js
