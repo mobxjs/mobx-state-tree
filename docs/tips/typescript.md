@@ -1,4 +1,9 @@
+---
+id: typescript
+title: TypeScript
+---
 
+<div id="codefund"></div>
 
 ### TypeScript and MST
 

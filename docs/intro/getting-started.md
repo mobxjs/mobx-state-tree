@@ -3,7 +3,7 @@ id: getting-started
 title: Getting Started
 ---
 
-<div id="codefund"><!-- fallback content --></div>
+<div id="codefund"></div>
 
 # Getting Started
 

@@ -1,3 +1,9 @@
+---
+id: installation
+title: Installation
+---
+
+<div id="codefund"></div>
 
 # Installation
 

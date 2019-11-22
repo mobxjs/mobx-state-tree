@@ -1,3 +1,9 @@
+---
+id: circular-deps
+title: Circular dependencies
+---
+
+<div id="codefund"></div>
 
 ### Handle circular dependencies between files and types using `late`
 

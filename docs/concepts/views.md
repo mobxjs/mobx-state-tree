@@ -1,3 +1,9 @@
+---
+id: views
+title: Derived values
+---
+
+<div id="codefund"></div>
 
 ### Views
 

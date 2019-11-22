@@ -1,3 +1,9 @@
+---
+id: contributing
+title: Contributing
+---
+
+<div id="codefund"></div>
 
 ## Contributing
 

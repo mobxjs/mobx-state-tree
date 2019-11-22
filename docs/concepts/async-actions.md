@@ -1,3 +1,9 @@
+---
+id: async-actions
+title: Asynchronous actions
+---
+
+<div id="codefund"></div>
 
 ### Creating async flows
 

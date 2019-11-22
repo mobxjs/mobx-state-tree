@@ -1,3 +1,9 @@
+---
+id: dependency-injection
+title: Dependency Injection
+---
+
+<div id="codefund"></div>
 
 ## Dependency injection
 

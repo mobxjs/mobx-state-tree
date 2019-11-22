@@ -92,107 +92,107 @@
       "API/README": {
         "title": "API/README"
       },
-      "concepts/0_trees": {
-        "title": "concepts/0_trees"
-      },
-      "concepts/1_creating_models": {
-        "title": "concepts/1_creating_models"
-      },
-      "concepts/2_tree_semantics": {
-        "title": "concepts/2_tree_semantics"
-      },
-      "concepts/3_composing_trees": {
-        "title": "concepts/3_composing_trees"
-      },
-      "concepts/4_actions": {
-        "title": "concepts/4_actions"
-      },
-      "concepts/5_views": {
-        "title": "concepts/5_views"
-      },
-      "concepts/6_snapshots": {
-        "title": "concepts/6_snapshots"
-      },
-      "concepts/7_patches": {
-        "title": "concepts/7_patches"
-      },
-      "concepts/8_references_identifiers": {
-        "title": "concepts/8_references_identifiers"
+      "concepts/actions": {
+        "title": "Actions"
       },
       "concepts/async-actions": {
-        "title": "concepts/async-actions"
+        "title": "Asynchronous actions"
+      },
+      "concepts/composing-trees": {
+        "title": "Composing trees"
+      },
+      "concepts/creating-models": {
+        "title": "Creating models"
       },
       "concepts/dependency-injection": {
-        "title": "concepts/dependency-injection"
+        "title": "Dependency Injection"
       },
       "concepts/listeners": {
-        "title": "concepts/listeners"
+        "title": "Listening to changes"
       },
       "concepts/middleware": {
-        "title": "concepts/middleware"
+        "title": "Middleware"
+      },
+      "concepts/patches": {
+        "title": "Patches"
       },
       "concepts/reconciliation": {
-        "title": "concepts/reconciliation"
+        "title": "Reconciliation"
       },
-      "concepts/volatile-state": {
-        "title": "concepts/volatile-state"
+      "concepts/references": {
+        "title": "Identifiers and references"
+      },
+      "concepts/snapshots": {
+        "title": "Snapshots"
+      },
+      "concepts/tree-semantics": {
+        "title": "Tree semantics in detail"
+      },
+      "concepts/trees": {
+        "title": "Types, trees & state"
+      },
+      "concepts/views": {
+        "title": "Derived values"
+      },
+      "concepts/volatiles": {
+        "title": "Volatile state"
       },
       "intro/examples": {
-        "title": "intro/examples"
+        "title": "Examples"
       },
       "intro/getting-started": {
         "title": "Getting Started"
       },
       "intro/installation": {
-        "title": "intro/installation"
+        "title": "Installation"
       },
       "intro/philosophy": {
-        "title": "intro/philosophy"
+        "title": "Overview & Philosophy"
       },
       "overview/hooks": {
-        "title": "overview/hooks"
+        "title": "Lifecycle hooks overview"
       },
       "overview/types": {
-        "title": "overview/types"
+        "title": "Types overview"
       },
-      "overview/utilties": {
-        "title": "overview/utilties"
+      "overview/api": {
+        "title": "API overview"
       },
       "tips/circular-deps": {
-        "title": "tips/circular-deps"
+        "title": "Circular dependencies"
       },
       "tips/contributing": {
-        "title": "tips/contributing"
+        "title": "Contributing"
       },
       "tips/faq": {
-        "title": "tips/faq"
+        "title": "Frequently Asked Questions"
       },
       "tips/inheritance": {
-        "title": "tips/inheritance"
+        "title": "Simulating inheritance"
       },
       "tips/more-tips": {
-        "title": "tips/more-tips"
+        "title": "Miscellaneous Tips"
       },
-      "tips/snapshots_as_models": {
-        "title": "tips/snapshots_as_models"
+      "tips/resources": {
+        "title": "Talks & Blogs"
       },
-      "tips/talks-blogs": {
-        "title": "tips/talks-blogs"
+      "tips/snapshots-as-values": {
+        "title": "Using snapshots as values"
       },
       "tips/typescript": {
-        "title": "tips/typescript"
+        "title": "TypeScript"
       }
     },
     "links": {
-      "Documentation": "Documentation",
+      "docs": "docs",
       "GitHub": "GitHub"
     },
     "categories": {
       "Introduction": "Introduction",
-      "Reference guide": "Reference guide",
-      "Concepts": "Concepts",
-      "Tips": "Tips",
-      "First Category": "First Category"
+      "API Overview": "API Overview",
+      "Basic Concepts": "Basic Concepts",
+      "Advanced Concepts": "Advanced Concepts",
+      "Tips": "Tips"
     }
   },
   "pages-strings": {

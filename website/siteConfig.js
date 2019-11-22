@@ -32,7 +32,7 @@ const siteConfig = {
     headerLinks: [
         {
             doc: "intro/getting-started",
-            label: "Documentation"
+            label: "docs"
         },
         { href: "https://github.com/mobxjs/mobx-state-tree", label: "GitHub" }
         // {doc: "support", label: "Support mobx-state-tree"}

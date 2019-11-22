@@ -1,3 +1,10 @@
+---
+id: hooks
+title: Lifecycle hooks overview
+---
+
+<div id="codefund"></div>
+
 ## LifeCycle hooks for `types.model`
 
 <i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-loading-data-from-the-server">egghead.io lesson 14: Loading Data from the Server after model creation</a></i>

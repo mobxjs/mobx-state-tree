@@ -1,3 +1,9 @@
+---
+id: inheritance
+title: Simulating inheritance
+---
+
+<div id="codefund"></div>
 
 ### Simulate inheritance by using type composition
 

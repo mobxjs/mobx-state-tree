@@ -1,3 +1,9 @@
+---
+id: examples
+title: Examples
+---
+
+<div id="codefund"></div>
 
 # Examples
 

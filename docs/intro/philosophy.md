@@ -1,3 +1,9 @@
+---
+id: philosophy
+title: Overview & Philosophy
+---
+
+<div id="codefund"></div>
 
 # Philosophy & Overview
 

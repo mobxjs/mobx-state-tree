@@ -1,3 +1,9 @@
+---
+id: listeners
+title: Listening to changes
+---
+
+<div id="codefund"></div>
 
 ### Listening to observables, snapshots, patches or actions
 

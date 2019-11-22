@@ -1,3 +1,9 @@
+---
+id: composing-trees
+title: Composing trees
+---
+
+<div id="codefund"></div>
 
 
 ### Composing trees

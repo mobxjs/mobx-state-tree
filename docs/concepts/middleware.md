@@ -1,3 +1,10 @@
+---
+id: middleware
+title: Middleware
+---
+
+<div id="codefund"></div>
+
 # Middleware
 
 Middlewares can be used to intercept any action on a subtree.

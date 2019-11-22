@@ -1,4 +1,9 @@
+---
+id: resources
+title: Talks & Blogs
+---
 
+<div id="codefund"></div>
 # Talks & blogs
 
 

@@ -1,4 +1,9 @@
+---
+id: volatiles
+title: Volatile state
+---
 
+<div id="codefund"></div>
 
 ## Volatile state
 

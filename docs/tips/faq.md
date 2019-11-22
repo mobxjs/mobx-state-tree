@@ -1,3 +1,9 @@
+---
+id: faq
+title: Frequently Asked Questions
+---
+
+<div id="codefund"></div>
 
 ### Should all state of my app be stored in `mobx-state-tree`?
 

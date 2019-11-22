@@ -1,3 +1,10 @@
+---
+id: trees
+title: Types, trees & state
+---
+
+<div id="codefund"></div>
+
 ### Trees, types and state
 
 Each **node** in the tree is described by two things: Its **type** (the shape of the thing) and its **data** (the state it is currently in).

@@ -1,3 +1,9 @@
+---
+id: snapshots-as-values
+title: Using snapshots as values
+---
+
+<div id="codefund"></div>
 
 #### Snapshots can be used to write values
 

@@ -1,3 +1,9 @@
+---
+id: types
+title: Types overview
+---
+
+<div id="codefund"></div>
 
 # Types overview
 

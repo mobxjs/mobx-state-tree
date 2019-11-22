@@ -1,3 +1,10 @@
+---
+id: more-tips
+title: Miscellaneous Tips
+---
+
+<div id="codefund"></div>
+
 ### Generate MST models from JSON
 
 The following service can generate MST models based on JSON: https://transform.now.sh/json-to-mobx-state-tree
