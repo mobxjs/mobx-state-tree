@@ -1,0 +1,560 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Getting Started · MobX-state-tree</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;div id=&quot;codefund&quot;&gt;&lt;/div&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Getting Started · MobX-state-tree"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobxjs.github.io/mobx-state-tree/mobx-state-tree/"/><meta property="og:description" content="&lt;div id=&quot;codefund&quot;&gt;&lt;/div&gt;"/><meta name="twitter:card" content="summary"/><meta name="robots" content="noindex"/><link rel="shortcut icon" href="/mobx-state-tree/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/mobx-state-tree/js/scrollSpy.js"></script><link rel="stylesheet" href="/mobx-state-tree/css/main.css"/><script src="/mobx-state-tree/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/mobx-state-tree/"><img class="logo" src="/mobx-state-tree/img/favicon.ico" alt="MobX-state-tree"/><h2 class="headerTitleWithLogo">MobX-state-tree</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/mobx-state-tree/docs/intro/philosophy" target="_self">Docs</a></li><li class=""><a href="https://opencollective.com/mobx" target="_self">Sponsor</a></li><li class=""><a href="https://github.com/mobxjs/mobx-state-tree" target="_self">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Introduction</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Introduction<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/intro/philosophy">Overview &amp; Philosophy</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/intro/installation">Installation</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/mobx-state-tree/docs/intro/getting-started">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/intro/examples">Examples</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">API Overview<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/overview/types">Types overview</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/overview/api">API overview</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/overview/hooks">Lifecycle hooks overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Basic Concepts<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/trees">Types, trees &amp; state</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/creating-models">Creating models</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/tree-semantics">Tree semantics in detail</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/composing-trees">Composing trees</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/actions">Actions</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/views">Derived values</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/snapshots">Snapshots</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/references">Identifiers and references</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/async-actions">Asynchronous actions</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Advanced Concepts<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/patches">Patches</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/listeners">Listening to changes</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/dependency-injection">Dependency Injection</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/middleware">Middleware</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/reconciliation">Reconciliation</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/concepts/volatiles">Volatile state</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Tips<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/tips/resources">Talks &amp; Blogs</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/tips/contributing">Contributing</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/tips/faq">Frequently Asked Questions</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/tips/typescript">TypeScript</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/tips/circular-deps">Circular dependencies</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/tips/inheritance">Simulating inheritance</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/tips/snapshots-as-values">Using snapshots as values</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/docs/tips/more-tips">Miscellaneous Tips</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx-state-tree/edit/master/docs/intro/getting-started.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 class="postHeaderTitle">Getting Started</h1></header><article><div><span><div id="codefund"></div>
+<h1><a class="anchor" aria-hidden="true" id="getting-started"></a><a href="#getting-started" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Getting Started</h1>
+<p>This tutorial will introduce you to the basics of <code>mobx-state-tree</code> (MST) by building a TODO application. The application will also have the ability to assign each TODO to a user.</p>
+<h2><a class="anchor" aria-hidden="true" id="prerequisites"></a><a href="#prerequisites" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Prerequisites</h2>
+<p>This tutorial assumes that you know the basics of how to use React. If you don't know what React is and how to use it, you may wish to read <a href="https://facebook.github.io/react/tutorial/tutorial.html">this tutorial</a> first.</p>
+<h3><a class="anchor" aria-hidden="true" id="do-i-need-to-learn-mobx"></a><a href="#do-i-need-to-learn-mobx" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Do I need to learn MobX?</h3>
+<p>MST is heavily based on MobX. A basic understanding of the MobX library will help when dealing with complex situations and connecting of the data with React components. If you don't have MobX experience, don't worry, working with MST does not require any MobX API knowledge.</p>
+<h2><a class="anchor" aria-hidden="true" id="how-to-follow-this-tutorial"></a><a href="#how-to-follow-this-tutorial" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>How to follow this tutorial</h2>
+<p>You can write the code for this tutorial in the browser using the CodeSandbox playground, or in your preferred code editor (e.g. VSCode).</p>
+<h3><a class="anchor" aria-hidden="true" id="writing-code-in-the-browser"></a><a href="#writing-code-in-the-browser" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Writing code in the browser</h3>
+<p>For each example you'll find a CodeSandbox playground link. You can start from the playground of each point and manually progress to the next tutorial step by using it. If you're stuck, feel free to have a sneak peak from the next playground link! :)</p>
+<h3><a class="anchor" aria-hidden="true" id="writing-code-in-the-editor"></a><a href="#writing-code-in-the-editor" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Writing code in the editor</h3>
+<p>Setting up the whole environment for a React project involves transpilers, bundlers, linters, etc., and setting them up may become very tedious and not fun. Thanks to <code>create-react-app</code> setting up all those tools becomes as easy as typing a couple of lines in your terminal.</p>
+<pre><code class="hljs"><span class="hljs-string">npx </span><span class="hljs-built_in">create-react-app</span> <span class="hljs-string">mst-todo
+</span></code></pre>
+<p>Next install <code>mobx</code>, <code>mobx-react</code> and <code>mobx-state-tree</code> dependencies.</p>
+<pre><code class="hljs">yarn <span class="hljs-keyword">add</span><span class="bash"> mobx mobx-react mobx-state-tree</span>
+</code></pre>
+<p>Now you can run <code>npm run start</code> and a basic React page will show up. You're all set up and can begin editing the project files!</p>
+<h2><a class="anchor" aria-hidden="true" id="overview"></a><a href="#overview" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Overview</h2>
+<p>MST is a state container that combines the simplicity and ease of mutable data with the traceability of immutable data and the reactiveness and performance of observable data.</p>
+<p>If the above sentence confused you, don't worry. We will dive deeper together and explore what it means step by step.</p>
+<h2><a class="anchor" aria-hidden="true" id="getting-started-1"></a><a href="#getting-started-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Getting Started</h2>
+<p>When building applications with MST, the first exercise that will help you building your application is thinking about what is the minimal set of entities and their relative attributes.</p>
+<p>In our example application we will deal with TODOs, so we need a <code>Todo</code> entity. The <code>Todo</code> entity will have a <code>name</code> and a <code>done</code> attribute to store if the <code>Todo</code> is done or not. We will also have knowledge of users, so we need a <code>User</code> entity that will have a <code>name</code> attribute and will be assignable to TODOs.</p>
+<p>So far our entities and their attributes look like this:</p>
+<p><code>Todo</code></p>
+<ul>
+<li>name</li>
+<li>done</li>
+</ul>
+<p><code>User</code></p>
+<ul>
+<li>name</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="creating-our-first-model"></a><a href="#creating-our-first-model" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating our first model</h2>
+<p>Central to MST is the concept of a living tree. The tree consists of mutable, but strictly protected objects enriched with run-time type information. In other words; each tree has a shape (type information) and state (data). From this living tree, immutable and structurally shared snapshots are generated automatically.</p>
+<p>This means that in order to make our application work, we need to describe to MST how our attributes are shaped. Knowing that, MST will be able to automatically generate all those boundaries, and help us avoid making silly mistakes, like putting a string in price field or a boolean where an array is expected.</p>
+<p>The simplest way to define a model for an entity in MST is to provide sample data that will be used as defaults for it, and pass it to the <code>types.model</code> function.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
+
+<span class="hljs-keyword">const</span> Todo = types.model({
+    <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span>
+})
+
+<span class="hljs-keyword">const</span> User = types.model({
+    <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>
+})
+</code></pre>
+<p><a href="https://codesandbox.io/s/235jykjp90">View sample in the playground</a></p>
+<p>The above code will create two models, a <code>Todo</code> and a <code>User</code> model, but as we said before, a tree model in MST consists of type information (and we just saw how to define them) and state (the instance data). So how do we create instances of the <code>Todo</code> and <code>User</code> models?</p>
+<h2><a class="anchor" aria-hidden="true" id="creating-model-instances-tree-nodes"></a><a href="#creating-model-instances-tree-nodes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating model instances (tree nodes)</h2>
+<p>This can be easily done by calling <code>.create()</code> on the <code>Todo</code> and <code>User</code> models we just defined.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types, getSnapshot } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
+
+<span class="hljs-keyword">const</span> Todo = types.model({
+    <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>,
+    <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span>
+})
+
+<span class="hljs-keyword">const</span> User = types.model({
+    <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>
+})
+
+<span class="hljs-keyword">const</span> john = User.create()
+<span class="hljs-keyword">const</span> eat = Todo.create()
+
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"John:"</span>, getSnapshot(john))
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Eat TODO:"</span>, getSnapshot(eat))
+</code></pre>
+<p><a href="https://codesandbox.io/s/kkl8kn4pq5">View sample in the playground</a></p>
+<p>As you will see, using models ensures that all the attributes defined will always be present and defaulted to the predefined values. If you want to change those values when creating the model instance, you can simply pass an object with the values to use into the <code>.create</code> function.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> eat = Todo.create({ <span class="hljs-attr">name</span>: <span class="hljs-string">"eat"</span> })
+
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Eat TODO:"</span>, getSnapshot(eat)) <span class="hljs-comment">// =&gt; will print {name: "eat", done: false}</span>
+</code></pre>
+<p><a href="https://codesandbox.io/s/jpmpyj7pm3">View sample in the playground</a></p>
+<h2><a class="anchor" aria-hidden="true" id="meeting-types"></a><a href="#meeting-types" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Meeting types</h2>
+<p>When playing with this feature and passing in values to the <code>.create</code> function, you may encounter an error like this:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> eat = Todo.create({ <span class="hljs-attr">name</span>: <span class="hljs-string">"eat"</span>, <span class="hljs-attr">done</span>: <span class="hljs-number">1</span> })
+</code></pre>
+<pre><code class="hljs"><span class="hljs-title">Error:</span> [mobx-state-tree] Error while converting `{<span class="hljs-string">"name"</span>:<span class="hljs-string">"eat"</span>,<span class="hljs-string">"done"</span>:<span class="hljs-number">1</span>}` to `AnonymousModel`:
+at path <span class="hljs-string">"/done"</span> value `1` is <span class="hljs-literal">not</span> assignable to type: `boolean`.
+</code></pre>
+<p>What does this mean? As I said before, MST nodes are type-enriched. This means that providing a value (number) of the wrong type (expected boolean) will make MST throw an error. This is very helpful when building applications, as it will keep your state consistent and avoid entering illegal states due to data of the wrong type. To be honest with you, I lied when I told you how to define models. The syntax you used was only a shortcut for the following syntax:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Todo = types.model({
+    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
+    <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>)
+})
+
+<span class="hljs-keyword">const</span> User = types.model({
+    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
+})
+</code></pre>
+<p><a href="https://codesandbox.io/s/kx9x4973z3">View sample in the playground</a></p>
+<p>The <code>types</code> namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the <a href="https://github.com/mobxjs/mobx-state-tree/blob/master/docs/API/README.md">API documentation</a> for the whole list and their parameters.</p>
+<p>We can now use this knowledge to combine models and define the root model of our store that will hold <code>Todo</code> and <code>User</code> instances in the <code>todos</code> and <code>users</code> maps.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
+
+<span class="hljs-keyword">const</span> Todo = types.model({
+    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
+    <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>)
+})
+
+<span class="hljs-keyword">const</span> User = types.model({
+    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
+})
+
+<span class="hljs-keyword">const</span> RootStore = types.model({
+    <span class="hljs-attr">users</span>: types.map(User),
+    <span class="hljs-attr">todos</span>: types.optional(types.map(Todo), {})
+})
+
+<span class="hljs-keyword">const</span> store = RootStore.create({
+    <span class="hljs-attr">users</span>: {} <span class="hljs-comment">// users is not required really since arrays and maps are optional by default since MST3</span>
+})
+</code></pre>
+<p><a href="https://codesandbox.io/s/kk63vox225">View sample in the playground</a></p>
+<p>Notice that the <code>types.optional</code> second argument is required as long you don't pass a value in the <code>.create</code> function of the model. If you want, for example, to make the <code>name</code> or <code>todos</code> attribute required when calling <code>.create</code>, remove the <code>types.optional</code> function call and pass the <code>types.*</code> included inside.</p>
+<h2><a class="anchor" aria-hidden="true" id="modifying-data"></a><a href="#modifying-data" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Modifying data</h2>
+<p>MST tree nodes (model instances) can be modified using actions. Actions are collocated with your model and can easily be defined by declaring <code>.actions</code> over your model and passing it a function that accepts the model instance and returns an object with the functions that modify that tree node.</p>
+<p>For example, the following actions will be defined on the <code>Todo</code> model, and will allow you to toggle the <code>done</code> and set the <code>name</code> attribute of the provided <code>Todo</code> instance.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Todo = types
+    .model({
+        <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
+        <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>)
+    })
+    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+        setName(newName) {
+            self.name = newName
+        },
+
+        toggle() {
+            self.done = !self.done
+        }
+    }))
+
+<span class="hljs-keyword">const</span> User = types.model({
+    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
+})
+
+<span class="hljs-keyword">const</span> RootStore = types
+    .model({
+        <span class="hljs-attr">users</span>: types.map(User),
+        <span class="hljs-attr">todos</span>: types.map(Todo)
+    })
+    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+        addTodo(id, name) {
+            self.todos.set(id, Todo.create({ name }))
+        }
+    }))
+</code></pre>
+<p><a href="https://codesandbox.io/s/3xw9x060mp">View sample in the playground</a></p>
+<p>Please notice the use of <code>self</code>. <code>self</code> is the object being constructed when an instance of your model is created. Thanks to the <code>self</code> object, instance actions are &quot;this-free&quot;, allowing you to be sure that they are correctly bound.</p>
+<p>Calling the actions is as simple as what you would do with plain JavaScript classes, you simply call them on a model instance!</p>
+<pre><code class="hljs css language-javascript">store.addTodo(<span class="hljs-number">1</span>, <span class="hljs-string">"Eat a cake"</span>)
+store.todos.get(<span class="hljs-number">1</span>).toggle()
+</code></pre>
+<p><a href="https://codesandbox.io/s/r673zxw4p">View sample in the playground</a></p>
+<h2><a class="anchor" aria-hidden="true" id="snapshots-are-awesome"></a><a href="#snapshots-are-awesome" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Snapshots are awesome!</h2>
+<p>Dealing with mutable data and objects makes it easy to change data on the fly, but on the other hand it makes testing hard. Immutable data makes that very easy. Is there a way to have the best of both worlds? Nature is a great example of that. Beings are living and mutable, but we may eternalize nature's beauty by taking awesome snapshots. Can we do the same with the state of our application?</p>
+<p>Thanks to MST's knowledge of models and relative property types, MST is able to generate serializable snapshots of our store! You can easily get a snapshot of the store by using the <code>getSnapshot</code> function exported by the MST package.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-built_in">console</span>.log(getSnapshot(store))
+<span class="hljs-comment">/*
+{
+    "users": {},
+    "todos": {
+        "1": {
+            "name": "Eat a cake",
+            "done": true
+        }
+    }
+}
+*/</span>
+</code></pre>
+<p>Because the nature of state is mutable, a snapshot will be emitted whenever the state is mutated. To listen to the new snapshots, you can use <code>onSnapshot(store, snapshot =&gt; console.log(snapshot))</code> and log them as they are emitted.</p>
+<h2><a class="anchor" aria-hidden="true" id="from-snapshot-to-model"></a><a href="#from-snapshot-to-model" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>From snapshot to model</h2>
+<p>As we just saw, getting a snapshot from a model instance is pretty easy, but wouldn't it be neat to be able to restore a model from a snapshot? The good news is that you can!</p>
+<p>That basically means that you can restore your objects with your custom methods by just knowing the type of the tree and its snapshot! You can perform this operation in two ways.</p>
+<ol>
+<li><p>By creating a new model instance, and passing in the snapshot as argument to the <code>.create</code> function. This means that you will need to update all your store references, if used in React components, to the new one.</p></li>
+<li><p>Avoiding this reference problem by applying the snapshot to an existing model instance. Properties will be updated, but the store reference will remain the same. This will trigger an operation called &quot;reconciliation&quot;. We will talk about this phase later.</p></li>
+</ol>
+<pre><code class="hljs css language-javascript"><span class="hljs-comment">// 1st</span>
+<span class="hljs-keyword">const</span> store = RootStore.create({
+    <span class="hljs-attr">users</span>: {},
+    <span class="hljs-attr">todos</span>: {
+        <span class="hljs-string">"1"</span>: {
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
+            <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
+        }
+    }
+})
+
+<span class="hljs-comment">// 2nd</span>
+applySnapshot(store, {
+    <span class="hljs-attr">users</span>: {},
+    <span class="hljs-attr">todos</span>: {
+        <span class="hljs-string">"1"</span>: {
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
+            <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
+        }
+    }
+})
+</code></pre>
+<p><a href="https://codesandbox.io/s/3x3v5kl5mq">View sample in the playground</a></p>
+<h2><a class="anchor" aria-hidden="true" id="time-travel"></a><a href="#time-travel" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Time travel</h2>
+<p>The ability of getting snapshots and applying them makes implementing time travel really easy in user-land. What you need to do is listen for snapshots, store them and re-apply them to enable time travel!</p>
+<p>A sample implementation would look like this:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { applySnapshot, onSnapshot } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
+
+<span class="hljs-keyword">var</span> states = []
+<span class="hljs-keyword">var</span> currentFrame = <span class="hljs-number">-1</span>
+
+onSnapshot(store, snapshot =&gt; {
+    <span class="hljs-keyword">if</span> (currentFrame === states.length - <span class="hljs-number">1</span>) {
+        currentFrame++
+        states.push(snapshot)
+    }
+})
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">previousState</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">if</span> (currentFrame === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>
+    currentFrame--
+    applySnapshot(store, states[currentFrame])
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">nextState</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">if</span> (currentFrame === states.length - <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span>
+    currentFrame++
+    applySnapshot(store, states[currentFrame])
+}
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="getting-to-the-ui"></a><a href="#getting-to-the-ui" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Getting to the UI</h2>
+<p>MST loves MobX, and is fully compatible with it's <code>autorun</code>, <code>reaction</code>, <code>observe</code> and other parts of the API. You can use the <code>mobx-react</code> package to connect a MST store to a React component. More details can be found in the <code>mobx-react</code> package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to <code>onSnapshot</code> and update accordingly!</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> App = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
+    &lt;div&gt;
+        &lt;button onClick={e =&gt; props.store.addTodo(randomId(), "New Task")}&gt;Add Task&lt;/button&gt;
+        {values(props.store.todos).map(todo =&gt; (
+            &lt;div&gt;
+                &lt;input type="checkbox" checked={todo.done} onChange={e =&gt; todo.toggle()} /&gt;
+                &lt;input type="text" value={todo.name} onChange={e =&gt; todo.setName(e.target.value)} /&gt;
+            &lt;/div&gt;
+        ))}
+    &lt;/div&gt;
+))
+</code></pre>
+<p><a href="https://codesandbox.io/s/310ol795x6">View sample in the playground</a></p>
+<h2><a class="anchor" aria-hidden="true" id="improving-render-performance"></a><a href="#improving-render-performance" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Improving render performance</h2>
+<p>If you have the React DevTools installed, enable the &quot;Highlight Updates&quot; check and you will see that the entire application will re-render whenever a <code>Todo</code> is toggled or a <code>name</code> is changed. That's a shame, as this can cause performance issues if there's a lot of <code>Todo</code>'s in our list!</p>
+<p>Thanks to the ability of MobX to emit granular updates, fixing that becomes pretty easy! You just need to split the rendering of a <code>Todo</code> into another component to only re-render that component whenever the <code>Todo</code> data changes.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
+    &lt;div&gt;
+        &lt;input type="checkbox" checked={props.todo.done} onChange={e =&gt; props.todo.toggle()} /&gt;
+        &lt;input
+            type="text"
+            value={props.todo.name}
+            onChange={e =&gt; props.todo.setName(e.target.value)}
+        /&gt;
+    &lt;/div&gt;
+))
+
+const AppView = observer(props =&gt; (
+    &lt;div&gt;
+        &lt;button onClick={e =&gt; props.store.addTodo(randomId(), "New Task")}&gt;Add Task&lt;/button&gt;
+        {values(props.store.todos).map(todo =&gt; (
+            &lt;TodoView todo={todo} /&gt;
+        ))}
+    &lt;/div&gt;
+))
+</code></pre>
+<p><a href="https://codesandbox.io/s/jvmw9oxyxv">View sample in the playground</a></p>
+<p>Each <code>observer</code> declaration will enable the React component to only re-render if any of it's observed data changes. Since our <code>App</code> component was observing everything, it was re-rendering whenever you changed something.</p>
+<p>Now that we have split the rendering logic out into a separate observer, the <code>TodoView</code> will re-render only if that <code>Todo</code> changes, and <code>AppView</code> will re-render only if a new <code>Todo</code> is added or removed since it's observing only the length of the <code>todos</code> map.</p>
+<h2><a class="anchor" aria-hidden="true" id="computed-properties"></a><a href="#computed-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Computed properties</h2>
+<p>We now want to display the count of TODOs to be done in our application, to help users know how many TODOs are left. That means that we need to count the number of TODOs with <code>done</code> set to <code>false</code>. To do this, we need to modify the <code>RootStore</code> declaration and add a getter property over our model by calling <code>.views</code> that will count how many TODOs are left.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> RootStore = types
+    .model({
+        <span class="hljs-attr">users</span>: types.map(User),
+        <span class="hljs-attr">todos</span>: types.map(Todo),
+    })
+    .views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+        <span class="hljs-keyword">get</span> pendingCount() {
+            <span class="hljs-keyword">return</span> values(self.todos).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> !todo.done).length
+        },
+        <span class="hljs-keyword">get</span> completedCount() {
+            <span class="hljs-keyword">return</span> values(self.todos).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.done).length
+        }
+    }))
+    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+        addTodo(id, name) {
+            self.todos.set(id, Todo.create({ name }))
+        }
+    }))
+</code></pre>
+<p><a href="https://codesandbox.io/s/7z01y57no0">View sample in the playground</a></p>
+<p>These properties are called &quot;computed&quot; because they keep track of the changes to the observed attributes and recompute automatically if anything used by that attribute changes. This allows for performance savings; for example changing the <code>name</code> of a TODO won't affect the number of pending and completed count, as such it wont trigger a recalculation of those counters.</p>
+<p>We can easily see that by creating an additional component in our application that observes the store and renders those counters. Using the React DevTools and tracing updates, you'll see that changing the <code>name</code> of a TODO won't re-render the counters, while checking completed or uncompleted will re-render the <code>TodoView</code> and <code>TodoCounterView</code>.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TodoCounterView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+        {props.store.pendingCount} pending, {props.store.completedCount} completed
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+))
+
+<span class="hljs-keyword">const</span> AppView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
+    &lt;div&gt;
+        &lt;button onClick={e =&gt; props.store.addTodo(randomId(), "New Task")}&gt;Add Task&lt;/button&gt;
+        {values(props.store.todos).map(todo =&gt; (
+            &lt;TodoView todo={todo} /&gt;
+        ))}
+        &lt;TodoCounterView store={props.store} /&gt;
+    &lt;/div&gt;
+))
+</code></pre>
+<p><a href="https://codesandbox.io/s/k21ol780xr">View sample in the playground</a></p>
+<p>If you <code>console.log</code> your snapshot you'll notice that computed properties won't appear in snapshots. That's fine and intended, since those properties must be computed over the other properties of the tree, they can be re-produced by knowing just their definition. For the same reason, if you provide a computed value in a snapshot you'll end up with an error when you attempt to apply it.</p>
+<h2><a class="anchor" aria-hidden="true" id="model-views"></a><a href="#model-views" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Model views</h2>
+<p>You may need to use the list of <code>todos</code> filtered by completion in various locations of your application. Even if accessing the list of <code>todos</code> and filtering them every time may look like a viable solution, if the filter logic is complex or changes over time you'll find out that it's not a viable solution.</p>
+<p>MST solves that by providing the ability to declare model views. A model's <code>.views</code> is declared as a function over the properties (first argument) of the model declaration. Model views can accept parameters and only read data from our store. If you try to change your store from a model view, MST will throw an error and prevent you from doing so.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> RootStore = types
+    .model({
+        <span class="hljs-attr">users</span>: types.map(User),
+        <span class="hljs-attr">todos</span>: types.map(Todo)
+    })
+    .views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+        <span class="hljs-keyword">get</span> pendingCount() {
+            <span class="hljs-keyword">return</span> values(self.todos).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> !todo.done).length
+        },
+        <span class="hljs-keyword">get</span> completedCount() {
+            <span class="hljs-keyword">return</span> values(self.todos).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.done).length
+        },
+        getTodosWhereDoneIs(done) {
+            <span class="hljs-keyword">return</span> values(self.todos).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.done === done)
+        }
+    }))
+    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+        addTodo(id, name) {
+            self.todos.set(id, Todo.create({ name }))
+        }
+    }))
+</code></pre>
+<p><a href="https://codesandbox.io/s/x293k4q95o">View sample in the playground</a></p>
+<p>Notice that the <code>getTodosWhereDoneIs</code> view can also be used outside of its model, for example it can be used inside views.</p>
+<h2><a class="anchor" aria-hidden="true" id="going-further-references"></a><a href="#going-further-references" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Going further: References</h2>
+<p>Ok, the basics of our TODO application are done! But as I said when starting this tutorial, we want to be able to provide assignees for each of our TODOs!</p>
+<p>We will focus on this feature; to do that let's assume that the list of users comes from an XHR request or another data source. Feel free to either implement it or add to the TODO application a user management feature.</p>
+<p>First, we need to populate the <code>users</code> map. To do so, we will simply pass in some users when creating the <code>users</code> map.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> store = RootStore.create({
+    <span class="hljs-attr">users</span>: {
+        <span class="hljs-string">"1"</span>: {
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"mweststrate"</span>
+        },
+        <span class="hljs-string">"2"</span>: {
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"mattiamanzati"</span>
+        },
+        <span class="hljs-string">"3"</span>: {
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"johndoe"</span>
+        }
+    },
+    <span class="hljs-attr">todos</span>: {
+        <span class="hljs-string">"1"</span>: {
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
+            <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
+        }
+    }
+})
+</code></pre>
+<p><a href="https://codesandbox.io/s/7wwn0x4xkq">View sample in the playground</a></p>
+<p>Now we need to change our <code>Todo</code> model to store the user assigned to the TODO. You could do that by storing the <code>User</code> map <code>id</code>, and provide a computed that resolves to the user (you can do it as an exercise), but you would end up with a copious amount of code.</p>
+<p>MST supports references out of the box. That means that we can define a <code>user</code> attribute on the <code>Todo</code> model that's a reference to a <code>User</code> instance. When getting the snapshot, the value of that attribute will be the identifier of the <code>User</code>, when reading, it will resolve to the correct instance of the <code>User</code> model and when setting you could provide either the <code>User</code> model instance or the <code>User</code> identifier.</p>
+<h3><a class="anchor" aria-hidden="true" id="identifiers"></a><a href="#identifiers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Identifiers</h3>
+<p>In order to make our reference work, we need to tell MST which attribute to use as a unique identifier of each <code>User</code> model instance.</p>
+<p>The identifier attribute cannot be mutated once the model instance has been created. That also means that if you try to apply a snapshot with a different identifier on that model, it will throw an error. On the other hand, providing an identifier helps MST understand elements in maps and arrays, and allows it to correctly reuse model instances in arrays and maps when possible.</p>
+<p>To define an identifier, you will need to define a property using the <code>types.identifier</code> type composer. For example, we want the identifier to be a string.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> User = types.model({
+    <span class="hljs-attr">id</span>: types.identifier,
+    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
+})
+</code></pre>
+<p>As I said before, identifiers are required upon creation of the element and cannot be mutated, so if you end up receiving an error like this, it's because you also have to provide ids for the users in the snapshot for the <code>.create</code> of <code>RootStore</code>.</p>
+<pre><code class="hljs">Error: [mobx-state-tree] <span class="hljs-builtin-name">Error</span> <span class="hljs-keyword">while</span> converting `{<span class="hljs-string">"users"</span>:{<span class="hljs-string">"1"</span>:{<span class="hljs-string">"name"</span>:<span class="hljs-string">"mweststrate"</span>},<span class="hljs-string">"2"</span>:{<span class="hljs-string">"name"</span>:<span class="hljs-string">"mattiamanzati"</span>},<span class="hljs-string">"3"</span>:{<span class="hljs-string">"name"</span>:<span class="hljs-string">"johndoe"</span>}},<span class="hljs-string">"todos"</span>:{<span class="hljs-string">"1"</span>:{<span class="hljs-string">"name"</span>:<span class="hljs-string">"Eat a cake"</span>,<span class="hljs-string">"done"</span>:true}}}` <span class="hljs-keyword">to</span> `AnonymousModel`:
+at path <span class="hljs-string">"/users/1/id"</span> value `undefined` is <span class="hljs-keyword">not</span> assignable <span class="hljs-keyword">to</span> type: `identifier(string)`, expected an<span class="hljs-built_in"> instance </span>of `identifier(string)` <span class="hljs-keyword">or</span> a snapshot like `identifier(string)` instead.
+at path <span class="hljs-string">"/users/2/id"</span> value `undefined` is <span class="hljs-keyword">not</span> assignable <span class="hljs-keyword">to</span> type: `identifier(string)`, expected an<span class="hljs-built_in"> instance </span>of `identifier(string)` <span class="hljs-keyword">or</span> a snapshot like `identifier(string)` instead.
+at path <span class="hljs-string">"/users/3/id"</span> value `undefined` is <span class="hljs-keyword">not</span> assignable <span class="hljs-keyword">to</span> type: `identifier(string)`, expected an<span class="hljs-built_in"> instance </span>of `identifier(string)` <span class="hljs-keyword">or</span> a snapshot like `identifier(string)` instead.
+</code></pre>
+<p>We can easily fix that by providing a correct snapshot.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> store = RootStore.create({
+    <span class="hljs-attr">users</span>: {
+        <span class="hljs-string">"1"</span>: {
+            <span class="hljs-attr">id</span>: <span class="hljs-string">"1"</span>,
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"mweststrate"</span>
+        },
+        <span class="hljs-string">"2"</span>: {
+            <span class="hljs-attr">id</span>: <span class="hljs-string">"2"</span>,
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"mattiamanzati"</span>
+        },
+        <span class="hljs-string">"3"</span>: {
+            <span class="hljs-attr">id</span>: <span class="hljs-string">"3"</span>,
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"johndoe"</span>
+        }
+    },
+    <span class="hljs-attr">todos</span>: {
+        <span class="hljs-string">"1"</span>: {
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
+            <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
+        }
+    }
+})
+</code></pre>
+<p><a href="https://codesandbox.io/s/44jn3pv2x">View sample in the playground</a></p>
+<h3><a class="anchor" aria-hidden="true" id="how-to-define-the-reference"></a><a href="#how-to-define-the-reference" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>How to define the reference</h3>
+<p>The reference we are looking for can be easily defined as <code>types.reference(User)</code>. Sometimes this can lead to circular references that may use a model before it's declared. To postpone the resolution of the model, you can use <code>types.late(() =&gt; User)</code> instead of just <code>User</code> and that will hoist the model and defer its evaluation. The <code>user</code> assignee for the <code>Todo</code> could also be omitted, so we will use <code>types.maybe(...)</code> to allow the <code>user</code> property to be <code>null</code> and be initialized as <code>null</code>.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Todo = types
+    .model({
+        <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
+        <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>),
+        <span class="hljs-attr">user</span>: types.maybe(types.reference(types.late(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> User)))
+    })
+    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+        setName(newName) {
+            self.name = newName
+        },
+        toggle() {
+            self.done = !self.done
+        }
+    }))
+</code></pre>
+<p><a href="https://codesandbox.io/s/xv1lkqw9oq">View sample in the playground</a></p>
+<h3><a class="anchor" aria-hidden="true" id="setting-a-reference-value"></a><a href="#setting-a-reference-value" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Setting a reference value</h3>
+<p>The reference value can be set by providing either the identifier or a model instance. First of all, we need to define an action that will allow you to change the <code>user</code> of the <code>Todo</code>.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Todo = types
+    .model({
+        <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
+        <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>),
+        <span class="hljs-attr">user</span>: types.maybe(types.reference(types.late(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> User)))
+    })
+    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+        setName(newName) {
+            self.name = newName
+        },
+        setUser(user) {
+            <span class="hljs-keyword">if</span> (user === <span class="hljs-string">""</span>) {
+                <span class="hljs-comment">// When selected value is empty, set as undefined</span>
+                self.user = <span class="hljs-literal">undefined</span>
+            } <span class="hljs-keyword">else</span> {
+                self.user = user
+            }
+        },
+        toggle() {
+            self.done = !self.done
+        }
+    }))
+</code></pre>
+<p>Now we need to edit our views to display a select along with each <code>TodoView</code>, where the user can choose the assignee for that task. To do so, we will create a separate component <code>UserPickerView</code> and use it inside the <code>TodoView</code> component to trigger the <code>setUser</code> call. That's it!</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> UserPickerView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{props.user</span> ? <span class="hljs-attr">props.user.id</span> <span class="hljs-attr">:</span> ""} <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> props.onChange(e.target.value)}&gt;
+        <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">""</span>&gt;</span>-none-<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+        {values(props.store.users).map(user =&gt; (
+            <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{user.id}</span>&gt;</span>{user.name}<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+        ))}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span></span>
+))
+
+<span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
+    &lt;div&gt;
+        &lt;input type="checkbox" checked={props.todo.done} onChange={e =&gt; props.todo.toggle()} /&gt;
+        &lt;input
+            type="text"
+            value={props.todo.name}
+            onChange={e =&gt; props.todo.setName(e.target.value)}
+        /&gt;
+        &lt;UserPickerView
+            user={props.todo.user}
+            store={props.store}
+            onChange={userId =&gt; props.todo.setUser(userId)}
+        /&gt;
+    &lt;/div&gt;
+))
+
+const TodoCounterView = observer(props =&gt; (
+    &lt;div&gt;
+        {props.store.pendingCount} pending, {props.store.completedCount} completed
+    &lt;/div&gt;
+))
+
+const AppView = observer(props =&gt; (
+    &lt;div&gt;
+        &lt;button onClick={e =&gt; props.store.addTodo(randomId(), "New Task")}&gt;Add Task&lt;/button&gt;
+        {values(props.store.todos).map(todo =&gt; (
+            &lt;TodoView store={props.store} todo={todo} /&gt;
+        ))}
+        &lt;TodoCounterView store={props.store} /&gt;
+    &lt;/div&gt;
+))
+</code></pre>
+<p><a href="https://codesandbox.io/s/6j3qy74kpw">View sample in the playground</a></p>
+<h2><a class="anchor" aria-hidden="true" id="references-are-safe"></a><a href="#references-are-safe" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>References are safe!</h2>
+<p>One neat feature of references, is that they will throw an error if you accidentally remove a model that is required by a computed property! If you try to remove a user that's used by a reference, you'll get something like this:</p>
+<pre><code class="hljs">[mobx-state-tree] Failed <span class="hljs-keyword">to</span> resolve reference <span class="hljs-keyword">of</span> <span class="hljs-class"><span class="hljs-keyword">type</span> &lt;late&gt;: '1' </span>(<span class="hljs-keyword">in</span>: /todos/<span class="hljs-number">1</span>/user)
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="next-up"></a><a href="#next-up" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Next up</h2>
+<p>In (the still TODO) part 2 of this tutorial, we will discover how to use MST life cycle hooks and local state to fetch user data from an XHR endpoint, and see how environments will help dealing with dependency injection of the parameters needed to fetch our endpoint. We will implement auto-save using MobX helpers and learn more about patches and actions event streams.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/mobx-state-tree/docs/intro/installation"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/mobx-state-tree/docs/intro/examples"><span>Examples</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#prerequisites">Prerequisites</a><ul class="toc-headings"><li><a href="#do-i-need-to-learn-mobx">Do I need to learn MobX?</a></li></ul></li><li><a href="#how-to-follow-this-tutorial">How to follow this tutorial</a><ul class="toc-headings"><li><a href="#writing-code-in-the-browser">Writing code in the browser</a></li><li><a href="#writing-code-in-the-editor">Writing code in the editor</a></li></ul></li><li><a href="#overview">Overview</a></li><li><a href="#getting-started-1">Getting Started</a></li><li><a href="#creating-our-first-model">Creating our first model</a></li><li><a href="#creating-model-instances-tree-nodes">Creating model instances (tree nodes)</a></li><li><a href="#meeting-types">Meeting types</a></li><li><a href="#modifying-data">Modifying data</a></li><li><a href="#snapshots-are-awesome">Snapshots are awesome!</a></li><li><a href="#from-snapshot-to-model">From snapshot to model</a></li><li><a href="#time-travel">Time travel</a></li><li><a href="#getting-to-the-ui">Getting to the UI</a></li><li><a href="#improving-render-performance">Improving render performance</a></li><li><a href="#computed-properties">Computed properties</a></li><li><a href="#model-views">Model views</a></li><li><a href="#going-further-references">Going further: References</a><ul class="toc-headings"><li><a href="#identifiers">Identifiers</a></li><li><a href="#how-to-define-the-reference">How to define the reference</a></li><li><a href="#setting-a-reference-value">Setting a reference value</a></li></ul></li><li><a href="#references-are-safe">References are safe!</a></li><li><a href="#next-up">Next up</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/mobx-state-tree/" class="nav-home"><img src="/mobx-state-tree/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/mobx-state-tree/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/mobx-state-tree/docs/en/doc2.html">Guides (or other categories)</a><a href="/mobx-state-tree/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/mobx-state-tree/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/mobx-state-tree/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/mobx-state-tree/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2019 Michel Weststrate</section></footer></div></body></html>
