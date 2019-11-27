@@ -12,8 +12,10 @@ const siteConfig = {
     title: "MobX-state-tree", // Title for your website.
     tagline:
         "Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX",
-    url: "https://mobxjs.github.io/mobx-state-tree", // Your website URL
-    baseUrl: "/mobx-state-tree/", // Base URL for your project */
+    url: "https://mobx-state-tree.js.org/", // Your website URL
+    baseUrl: "/", // Base URL for your project */
+    docsUrl: "",
+    cname: "mobx-state-tree.js.org",
     editUrl: "https://github.com/mobxjs/mobx-state-tree/edit/master/docs/",
     noIndex: true,
     // For github.io type URLs, you would set the url and baseUrl like:
@@ -23,7 +25,7 @@ const siteConfig = {
     // Used for publishing and more
     projectName: "mobx-state-tree",
     organizationName: "mobxjs",
-    // gaTrackingId: "UA-65632006-3",
+    gaTrackingId: "UA-65632006-4",
     // For top-level user or org sites, the organization is still the same.
     // e.g., for the https://JoelMarcey.github.io site, it would be set like...
     //   organizationName: 'JoelMarcey'
@@ -31,9 +33,11 @@ const siteConfig = {
     // For no header links in the top nav bar -> headerLinks: [],
     headerLinks: [
         {
-            doc: "intro/getting-started",
-            label: "docs"
+            doc: "intro/philosophy",
+            label: "Docs"
         },
+        { href: "https://opencollective.com/mobx", label: "Sponsor" },
+
         { href: "https://github.com/mobxjs/mobx-state-tree", label: "GitHub" }
         // {doc: "support", label: "Support mobx-state-tree"}
     ],
@@ -46,7 +50,7 @@ const siteConfig = {
     /* Colors for website */
     colors: {
         primaryColor: "#000",
-        secondaryColor: "#22e7c3"
+        secondaryColor: "#ff7000"
     },
 
     /* Custom fonts for website */
@@ -88,7 +92,7 @@ const siteConfig = {
 
     // For sites with a sizable amount of content, set collapsible to true.
     // Expand/collapse the links and subcategories under categories.
-    docsSideNavCollapsible: true
+    docsSideNavCollapsible: true,
 
     // Show documentation's last contributor's name.
     // enableUpdateBy: true,
@@ -98,7 +102,7 @@ const siteConfig = {
 
     // You may provide arbitrary config keys to be used as needed by your
     // template. For example, if you need your repo's URL...
-    //   repoUrl: 'https://github.com/facebook/test-site',
+    repoUrl: "https://github.com/mobxjs/mobx-state-tree"
 }
 
 module.exports = siteConfig

@@ -184,7 +184,8 @@
       }
     },
     "links": {
-      "docs": "docs",
+      "Docs": "Docs",
+      "Sponsor": "Sponsor",
       "GitHub": "GitHub"
     },
     "categories": {
