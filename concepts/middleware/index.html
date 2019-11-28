@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Middleware · MobX-state-tree</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;div id=&quot;codefund&quot;&gt;&lt;/div&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Middleware · MobX-state-tree"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx-state-tree.js.org//mobx-state-tree/"/><meta property="og:description" content="&lt;div id=&quot;codefund&quot;&gt;&lt;/div&gt;"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/mobx-state-tree/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-4', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/mobx-state-tree/js/scrollSpy.js"></script><link rel="stylesheet" href="/mobx-state-tree/css/main.css"/><script src="/mobx-state-tree/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/mobx-state-tree/"><img class="logo" src="/mobx-state-tree/img/favicon.ico" alt="MobX-state-tree"/><h2 class="headerTitleWithLogo">MobX-state-tree</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/mobx-state-tree/intro/philosophy" target="_self">Docs</a></li><li class=""><a href="https://opencollective.com/mobx" target="_self">Sponsor</a></li><li class=""><a href="https://github.com/mobxjs/mobx-state-tree" target="_self">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Advanced Concepts</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Introduction<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/mobx-state-tree/intro/philosophy">Overview &amp; Philosophy</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/intro/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/intro/getting-started">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/intro/examples">Examples</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">API Overview<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/mobx-state-tree/overview/types">Types overview</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/overview/api">API overview</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/overview/hooks">Lifecycle hooks overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Basic Concepts<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/trees">Types, trees &amp; state</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/creating-models">Creating models</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/tree-semantics">Tree semantics in detail</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/composing-trees">Composing trees</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/actions">Actions</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/views">Derived values</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/snapshots">Snapshots</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/references">Identifiers and references</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/async-actions">Asynchronous actions</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Advanced Concepts<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/patches">Patches</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/listeners">Listening to changes</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/dependency-injection">Dependency Injection</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/mobx-state-tree/concepts/middleware">Middleware</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/reconciliation">Reconciliation</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/concepts/volatiles">Volatile state</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Tips<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/mobx-state-tree/tips/resources">Talks &amp; Blogs</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/tips/contributing">Contributing</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/tips/faq">Frequently Asked Questions</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/tips/typescript">TypeScript</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/tips/circular-deps">Circular dependencies</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/tips/inheritance">Simulating inheritance</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/tips/snapshots-as-values">Using snapshots as values</a></li><li class="navListItem"><a class="navItem" href="/mobx-state-tree/tips/more-tips">Miscellaneous Tips</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx-state-tree/edit/master/docs/concepts/middleware.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 class="postHeaderTitle">Middleware</h1></header><article><div><span><div id="codefund"></div>
+<h1><a class="anchor" aria-hidden="true" id="middleware"></a><a href="#middleware" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Middleware</h1>
+<p>Middlewares can be used to intercept any action on a subtree.</p>
+<p>It is allowed to attach multiple middlewares to a node.
+The order in which middlewares are invoked is inside-out:
+This means that the middlewares are invoked in the order you attach them.
+The value returned by the action invoked/ the aborted value gets passed through the middleware chain and can be manipulated.</p>
+<p>MST ships with a small set of <a href="../packages/mst-middlewares/README.md">pre-built / example middlewares</a>.</p>
+<p>Play around with a simple example of middleware in action with <a href="https://codesandbox.io/s/vjoql07ool">this CodeSandbox</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="custom-middleware"></a><a href="#custom-middleware" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Custom Middleware</h2>
+<p>Middlewares can be attached by using:</p>
+<p><code>addMiddleware(target: IStateTreeNode, handler: IMiddlewareHandler, includeHooks: boolean = true) : void</code></p>
+<h3><a class="anchor" aria-hidden="true" id="target"></a><a href="#target" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>target</h3>
+<p>the middleware will only be attached to actions of the <code>target</code> and further sub nodes of such.</p>
+<h3><a class="anchor" aria-hidden="true" id="handler"></a><a href="#handler" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>handler</h3>
+<p>An example of this is as follows:</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> store = SomeStore.create()
+<span class="hljs-keyword">const</span> disposer = addMiddleware(store, (call, next, abort) =&gt; {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`action <span class="hljs-subst">${call.name}</span> was invoked`</span>)
+    <span class="hljs-comment">// runs the next middleware</span>
+    <span class="hljs-comment">// or the implementation of the targeted action</span>
+    <span class="hljs-comment">// if there is no middleware left to run</span>
+
+    <span class="hljs-comment">// the value returned from the next can be manipulated</span>
+    next(call, value =&gt; value + <span class="hljs-number">1</span>)
+})
+</code></pre>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> store = SomeStore.create()
+<span class="hljs-keyword">const</span> disposer = addMiddleware(store, (call, next, abort) =&gt; {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`action <span class="hljs-subst">${call.name}</span> was invoked`</span>)
+    <span class="hljs-comment">// aborts running the middlewares and returns the 'value' instead.</span>
+    <span class="hljs-comment">// note that the targeted action won't be reached either.</span>
+    <span class="hljs-keyword">return</span> abort(<span class="hljs-string">"value"</span>)
+})
+</code></pre>
+<p>A middleware handler receives three arguments:</p>
+<ol>
+<li>the description of the the call,</li>
+</ol>
+<ul>
+<li>a function to invoke the next middleware in the chain and manipulate the returned value from the next middleware in the chain.</li>
+<li>a function to abort the middleware queue and return a value.</li>
+</ul>
+<p><em>Note: You must call either <code>next(call)</code> or <code>abort(value)</code> within a middleware.</em></p>
+<p><em>Note: If you abort, the action invoked will never be reached.</em></p>
+<p><em>Note: The value from either <code>abort('value')</code> or the returned value from the <code>action</code> can be manipulated by previous middlewares.</em></p>
+<p><em>Note: It is important to invoke <code>next(call)</code> or <code>abort(value)</code> synchronously.</em></p>
+<p><em>Note: The value of the <code>abort(value)</code> must be a promise in case of aborting a <code>flow</code>.</em></p>
+<h4><a class="anchor" aria-hidden="true" id="call"></a><a href="#call" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>call</h4>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">export</span> type IMiddleWareEvent = {
+    <span class="hljs-attr">type</span>: IMiddlewareEventType
+    name: string
+    id: number
+    parentId: number
+    rootId: number
+    allParentIds: number[]
+    tree: IStateTreeNode
+    context: IStateTreeNode
+    args: any[]
+}
+
+<span class="hljs-keyword">export</span> type IMiddlewareEventType =
+    | <span class="hljs-string">"action"</span>
+    | <span class="hljs-string">"flow_spawn"</span>
+    | <span class="hljs-string">"flow_resume"</span>
+    | <span class="hljs-string">"flow_resume_error"</span>
+    | <span class="hljs-string">"flow_return"</span>
+    | <span class="hljs-string">"flow_throw"</span>
+</code></pre>
+<ul>
+<li><code>name</code> is the name of the action</li>
+<li><code>context</code> is the object on which the action was defined &amp; invoked</li>
+<li><code>tree</code> is the root of the MST tree in which the action was fired (<code>tree === getRoot(context)</code>)</li>
+<li><code>args</code> are the original arguments passed to the action</li>
+<li><code>id</code> is a number that is unique per external action invocation.</li>
+<li><code>parentId</code> is the number of the action / process that called this action. <code>0</code> if it wasn't called by another action but directly from user code</li>
+<li><code>rootid</code> is the id of the action that spawned this action. If an action was not spawned by another action, but something external (user event etc), <code>id</code> and <code>rootId</code> will be equal (and <code>parentid</code> <code>0</code>)</li>
+<li><code>allParentIds</code> is the chain from root until current (excluding current) that called this action. <code>[]</code> if it wasn't called by another action but directly from user code</li>
+</ul>
+<p><code>type</code> Indicates which kind of event this is</p>
+<ul>
+<li><code>action</code>: this is a normal synchronous action invocation</li>
+<li><code>flow_spawn</code>: The invocation / kickoff of a <code>process</code> block (see <a href="/mobx-state-tree/concepts/async-actions">asynchronous actions</a>)</li>
+<li><code>flow_resume</code>: a promise that was returned from <code>yield</code> earlier has resolved. <code>args</code> contains the value it resolved to, and the action will now continue with that value</li>
+<li><code>flow_resume_error</code>: a promise that was returned from <code>yield</code> earlier was rejected. <code>args</code> contains the rejection reason, and the action will now continue throwing that error into the generator</li>
+<li><code>flow_return</code>: the generator completed successfully. The promise returned by the action will resolve with the value found in <code>args</code></li>
+<li><code>flow_throw</code>: the generator threw an uncatched exception. The promise returned by the action will reject with the exception found in <code>args</code></li>
+</ul>
+<p>To see how a bunch of calls from an asynchronous process look, see the <a href="https://github.com/mobxjs/mobx-state-tree/blob/09708ba86d04f433cc23fbcb6d1dc4db170f798e/test/async.ts#L289">unit tests</a></p>
+<p>A minimal, empty process will fire the following events if started as action:</p>
+<ol>
+<li><code>action</code>: An <code>action</code> event will always be emitted if a process is exposed as action on a model)</li>
+<li><code>flow_spawn</code>: This is just the notification that a new generator was started</li>
+<li><code>flow_resume</code>: This will be emitted when the first &quot;code block&quot; is entered. (So, with zero yields there is one <code>flow_resume</code> still)</li>
+<li><code>flow_return</code>: The process has completed</li>
+</ol>
+<h4><a class="anchor" aria-hidden="true" id="next"></a><a href="#next" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>next</h4>
+<p>use next to call the next middleware.</p>
+<p><code>next(call: IMiddlewareEvent, callback?: (value: any) =&gt; any): void</code></p>
+<ul>
+<li><p><code>call</code> Before passing the call middleware, feel free to (clone and) modify the <code>call.args</code>.
+Other properties should not be modified</p></li>
+<li><p><code>callback</code> can be used to manipulate values returned by later middlewares or the implementation of the targeted action.</p></li>
+</ul>
+<h4><a class="anchor" aria-hidden="true" id="abort"></a><a href="#abort" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>abort</h4>
+<p>use <code>abort</code> if you want to kill the queue of middlewares and immediately return.
+the implementation of the targeted action won't be reached if you abort the queue.</p>
+<p><code>abort(value: any) : void</code></p>
+<ul>
+<li><code>value</code> is returned instead of the return value from the implementation of the targeted action.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="includehooks"></a><a href="#includehooks" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>includeHooks</h3>
+<p>set this flag to <code>false</code> if you want to avoid having hooks passed to the middleware.</p>
+<h2><a class="anchor" aria-hidden="true" id="faq"></a><a href="#faq" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>FAQ</h2>
+<ul>
+<li><p>I alter a property and the change does not appear in the middleware.</p></li>
+<li><p><em>If you alter a value of an unprotected node, the change won't reach the middleware. Only actions can be intercepted.</em></p></li>
+</ul>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/mobx-state-tree/concepts/dependency-injection"><span class="arrow-prev">← </span><span>Dependency Injection</span></a><a class="docs-next button" href="/mobx-state-tree/concepts/reconciliation"><span>Reconciliation</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#custom-middleware">Custom Middleware</a><ul class="toc-headings"><li><a href="#target">target</a></li><li><a href="#handler">handler</a></li><li><a href="#includehooks">includeHooks</a></li></ul></li><li><a href="#faq">FAQ</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/mobx-state-tree/" class="nav-home"><img src="/mobx-state-tree/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/mobx-state-tree/en/doc1.html">Getting Started (or other categories)</a><a href="/mobx-state-tree/en/doc2.html">Guides (or other categories)</a><a href="/mobx-state-tree/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/mobx-state-tree/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/mobx-state-tree/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" href="https://github.com/mobxjs/mobx-state-tree" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/mobx-state-tree/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2019 Michel Weststrate</section></footer></div></body></html>

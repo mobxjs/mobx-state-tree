@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>API/interfaces/iactiontrackingmiddlewarehooks · MobX-state-tree</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="[mobx-state-tree](/mobx-state-tree/API/README) › [IActionTrackingMiddlewareHooks](/mobx-state-tree/API/interfaces/iactiontrackingmiddlewarehooks)"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="API/interfaces/iactiontrackingmiddlewarehooks · MobX-state-tree"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx-state-tree.js.org//mobx-state-tree/"/><meta property="og:description" content="[mobx-state-tree](/mobx-state-tree/API/README) › [IActionTrackingMiddlewareHooks](/mobx-state-tree/API/interfaces/iactiontrackingmiddlewarehooks)"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/mobx-state-tree/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-4', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/mobx-state-tree/js/scrollSpy.js"></script><link rel="stylesheet" href="/mobx-state-tree/css/main.css"/><script src="/mobx-state-tree/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/mobx-state-tree/"><img class="logo" src="/mobx-state-tree/img/favicon.ico" alt="MobX-state-tree"/><h2 class="headerTitleWithLogo">MobX-state-tree</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/mobx-state-tree/intro/philosophy" target="_self">Docs</a></li><li class=""><a href="https://opencollective.com/mobx" target="_self">Sponsor</a></li><li class=""><a href="https://github.com/mobxjs/mobx-state-tree" target="_self">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx-state-tree/edit/master/docs/API/interfaces/iactiontrackingmiddlewarehooks.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 class="postHeaderTitle">API/interfaces/iactiontrackingmiddlewarehooks</h1></header><article><div><span><p><a href="/mobx-state-tree/API/README">mobx-state-tree</a> › <a href="/mobx-state-tree/API/interfaces/iactiontrackingmiddlewarehooks">IActionTrackingMiddlewareHooks</a></p>
+<h1><a class="anchor" aria-hidden="true" id="interface-iactiontrackingmiddlewarehooks-t"></a><a href="#interface-iactiontrackingmiddlewarehooks-t" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Interface: IActionTrackingMiddlewareHooks &lt;<strong>T</strong>&gt;</h1>
+<h2><a class="anchor" aria-hidden="true" id="type-parameters"></a><a href="#type-parameters" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type parameters</h2>
+<p>▪ <strong>T</strong></p>
+<h2><a class="anchor" aria-hidden="true" id="hierarchy"></a><a href="#hierarchy" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Hierarchy</h2>
+<ul>
+<li><strong>IActionTrackingMiddlewareHooks</strong></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="index"></a><a href="#index" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Index</h2>
+<h3><a class="anchor" aria-hidden="true" id="properties"></a><a href="#properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Properties</h3>
+<ul>
+<li><a href="/mobx-state-tree/API/interfaces/iactiontrackingmiddlewarehooks#optional-filter">filter</a></li>
+<li><a href="/mobx-state-tree/API/interfaces/iactiontrackingmiddlewarehooks#onfail">onFail</a></li>
+<li><a href="/mobx-state-tree/API/interfaces/iactiontrackingmiddlewarehooks#onresume">onResume</a></li>
+<li><a href="/mobx-state-tree/API/interfaces/iactiontrackingmiddlewarehooks#onstart">onStart</a></li>
+<li><a href="/mobx-state-tree/API/interfaces/iactiontrackingmiddlewarehooks#onsuccess">onSuccess</a></li>
+<li><a href="/mobx-state-tree/API/interfaces/iactiontrackingmiddlewarehooks#onsuspend">onSuspend</a></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="properties-1"></a><a href="#properties-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Properties</h2>
+<h3><a class="anchor" aria-hidden="true" id="optional-filter"></a><a href="#optional-filter" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>Optional</code> filter</h3>
+<p>• <strong>filter</strong>? : <em>undefined | function</em></p>
+<p><em>Defined in <a href="https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L6">middlewares/create-action-tracking-middleware.ts:6</a></em></p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="onfail"></a><a href="#onfail" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>onFail</h3>
+<p>• <strong>onFail</strong>: <em>function</em></p>
+<p><em>Defined in <a href="https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L11">middlewares/create-action-tracking-middleware.ts:11</a></em></p>
+<h4><a class="anchor" aria-hidden="true" id="type-declaration"></a><a href="#type-declaration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type declaration:</h4>
+<p>▸ (<code>call</code>: <a href="/mobx-state-tree/API/interfaces/imiddlewareevent">IMiddlewareEvent</a>, <code>context</code>: T, <code>error</code>: any): <em>void</em></p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr><th>Name</th><th>Type</th></tr>
+</thead>
+<tbody>
+<tr><td><code>call</code></td><td><a href="/mobx-state-tree/API/interfaces/imiddlewareevent">IMiddlewareEvent</a></td></tr>
+<tr><td><code>context</code></td><td>T</td></tr>
+<tr><td><code>error</code></td><td>any</td></tr>
+</tbody>
+</table>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="onresume"></a><a href="#onresume" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>onResume</h3>
+<p>• <strong>onResume</strong>: <em>function</em></p>
+<p><em>Defined in <a href="https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L8">middlewares/create-action-tracking-middleware.ts:8</a></em></p>
+<h4><a class="anchor" aria-hidden="true" id="type-declaration-1"></a><a href="#type-declaration-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type declaration:</h4>
+<p>▸ (<code>call</code>: <a href="/mobx-state-tree/API/interfaces/imiddlewareevent">IMiddlewareEvent</a>, <code>context</code>: T): <em>void</em></p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr><th>Name</th><th>Type</th></tr>
+</thead>
+<tbody>
+<tr><td><code>call</code></td><td><a href="/mobx-state-tree/API/interfaces/imiddlewareevent">IMiddlewareEvent</a></td></tr>
+<tr><td><code>context</code></td><td>T</td></tr>
+</tbody>
+</table>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="onstart"></a><a href="#onstart" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>onStart</h3>
+<p>• <strong>onStart</strong>: <em>function</em></p>
+<p><em>Defined in <a href="https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L7">middlewares/create-action-tracking-middleware.ts:7</a></em></p>
+<h4><a class="anchor" aria-hidden="true" id="type-declaration-2"></a><a href="#type-declaration-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type declaration:</h4>
+<p>▸ (<code>call</code>: <a href="/mobx-state-tree/API/interfaces/imiddlewareevent">IMiddlewareEvent</a>): <em>T</em></p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr><th>Name</th><th>Type</th></tr>
+</thead>
+<tbody>
+<tr><td><code>call</code></td><td><a href="/mobx-state-tree/API/interfaces/imiddlewareevent">IMiddlewareEvent</a></td></tr>
+</tbody>
+</table>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="onsuccess"></a><a href="#onsuccess" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>onSuccess</h3>
+<p>• <strong>onSuccess</strong>: <em>function</em></p>
+<p><em>Defined in <a href="https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L10">middlewares/create-action-tracking-middleware.ts:10</a></em></p>
+<h4><a class="anchor" aria-hidden="true" id="type-declaration-3"></a><a href="#type-declaration-3" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type declaration:</h4>
+<p>▸ (<code>call</code>: <a href="/mobx-state-tree/API/interfaces/imiddlewareevent">IMiddlewareEvent</a>, <code>context</code>: T, <code>result</code>: any): <em>void</em></p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr><th>Name</th><th>Type</th></tr>
+</thead>
+<tbody>
+<tr><td><code>call</code></td><td><a href="/mobx-state-tree/API/interfaces/imiddlewareevent">IMiddlewareEvent</a></td></tr>
+<tr><td><code>context</code></td><td>T</td></tr>
+<tr><td><code>result</code></td><td>any</td></tr>
+</tbody>
+</table>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="onsuspend"></a><a href="#onsuspend" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>onSuspend</h3>
+<p>• <strong>onSuspend</strong>: <em>function</em></p>
+<p><em>Defined in <a href="https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L9">middlewares/create-action-tracking-middleware.ts:9</a></em></p>
+<h4><a class="anchor" aria-hidden="true" id="type-declaration-4"></a><a href="#type-declaration-4" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Type declaration:</h4>
+<p>▸ (<code>call</code>: <a href="/mobx-state-tree/API/interfaces/imiddlewareevent">IMiddlewareEvent</a>, <code>context</code>: T): <em>void</em></p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr><th>Name</th><th>Type</th></tr>
+</thead>
+<tbody>
+<tr><td><code>call</code></td><td><a href="/mobx-state-tree/API/interfaces/imiddlewareevent">IMiddlewareEvent</a></td></tr>
+<tr><td><code>context</code></td><td>T</td></tr>
+</tbody>
+</table>
+</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#type-parameters">Type parameters</a></li><li><a href="#hierarchy">Hierarchy</a></li><li><a href="#index">Index</a><ul class="toc-headings"><li><a href="#properties">Properties</a></li></ul></li><li><a href="#properties-1">Properties</a><ul class="toc-headings"><li><a href="#optional-filter"><code>Optional</code> filter</a></li><li><a href="#onfail">onFail</a></li><li><a href="#onresume">onResume</a></li><li><a href="#onstart">onStart</a></li><li><a href="#onsuccess">onSuccess</a></li><li><a href="#onsuspend">onSuspend</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/mobx-state-tree/" class="nav-home"><img src="/mobx-state-tree/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/mobx-state-tree/en/doc1.html">Getting Started (or other categories)</a><a href="/mobx-state-tree/en/doc2.html">Guides (or other categories)</a><a href="/mobx-state-tree/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/mobx-state-tree/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/mobx-state-tree/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" href="https://github.com/mobxjs/mobx-state-tree" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/mobx-state-tree/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2019 Michel Weststrate</section></footer></div></body></html>
