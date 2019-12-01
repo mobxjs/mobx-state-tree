@@ -24,6 +24,29 @@ MST trees have very specific semantics. These semantics purposefully constrain w
 
 These egghead.io lessons nicely leverage the specific semantics of MST trees:
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-build-forms-with-react-to-edit-mobx-state-tree-models">egghead.io lesson 6: Build Forms with React to Edit mobx-state-tree Models</a></i><br>
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-remove-model-instances-from-the-tree">egghead.io lesson 7: Remove Model Instances from the Tree</a></i><br>
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-create-an-entry-form-to-add-models-to-the-state-tree">egghead.io lesson 8: Create an Entry Form to Add Models to the State Tree</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 6: Build Forms with React to Edit mobx-state-tree Models</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-build-forms-with-react-to-edit-mobx-state-tree-models/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-build-forms-with-react-to-edit-mobx-state-tree-models">Hosted on egghead.io</a>
+</details>
+
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 7: Remove Model Instances from the Tree</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-remove-model-instances-from-the-tree/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-remove-model-instances-from-the-tree">Hosted on egghead.io</a>
+</details>
+
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 8: Create an Entry Form to Add Models to the State Tree</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-create-an-entry-form-to-add-models-to-the-state-tree/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-create-an-entry-form-to-add-models-to-the-state-tree">Hosted on egghead.io</a>
+</details>

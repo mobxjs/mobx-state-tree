@@ -5,8 +5,6 @@ title: Examples
 
 <div id="codefund"></div>
 
-# Examples
-
 To run the examples:
 
 1.  clone this repository

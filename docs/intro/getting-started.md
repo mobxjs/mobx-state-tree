@@ -1,11 +1,9 @@
 ---
 id: getting-started
-title: Getting Started
+title: Getting Started Tutorial
 ---
 
 <div id="codefund"></div>
-
-# Getting Started
 
 This tutorial will introduce you to the basics of `mobx-state-tree` (MST) by building a TODO application. The application will also have the ability to assign each TODO to a user.
 
@@ -660,7 +658,3 @@ One neat feature of references, is that they will throw an error if you accident
 ```
 [mobx-state-tree] Failed to resolve reference of type <late>: '1' (in: /todos/1/user)
 ```
-
-## Next up
-
-In (the still TODO) part 2 of this tutorial, we will discover how to use MST life cycle hooks and local state to fetch user data from an XHR endpoint, and see how environments will help dealing with dependency injection of the parameters needed to fetch our endpoint. We will implement auto-save using MobX helpers and learn more about patches and actions event streams.

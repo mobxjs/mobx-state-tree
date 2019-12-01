@@ -7,7 +7,14 @@ title: Volatile state
 
 ## Volatile state
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-use-volatile-state-and-lifecycle-methods-to-manage-private-state">egghead.io lesson 15: Use Volatile State and Lifecycle Methods to Manage Private State</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 15: Use Volatile State and Lifecycle Methods to Manage Private State</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-use-volatile-state-and-lifecycle-methods-to-manage-private-state/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-use-volatile-state-and-lifecycle-methods-to-manage-private-state">Hosted on egghead.io</a>
+</details>
 
 MST models primarily aid in storing _persistable_ state. State that can be persisted, serialized, transferred, patched, replaced, etc.
 However, sometimes you need to keep track of temporary, non-persistable state. This is called _volatile_ state in MST. Examples include promises, sockets, DOM elements, etc. - state which is needed for local purposes as long as the object is alive.

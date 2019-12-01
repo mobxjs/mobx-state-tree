@@ -6,11 +6,6 @@
       "intro/getting-started",
       "intro/examples"
     ],
-    "API Overview": [
-      "overview/types",
-      "overview/api",
-      "overview/hooks"
-    ],
     "Basic Concepts": [
       "concepts/trees",
       "concepts/creating-models",
@@ -29,6 +24,11 @@
       "concepts/middleware",
       "concepts/reconciliation",
       "concepts/volatiles"
+    ],
+    "API Overview": [
+      "overview/types",
+      "overview/api",
+      "overview/hooks"
     ],
     "Tips": [
       "tips/resources",

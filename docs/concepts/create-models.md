@@ -7,7 +7,14 @@ title: Creating models
 
 ### Creating models
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-describe-your-application-domain-using-mobx-state-tree-mst-models">egghead.io lesson 1: Describe Your Application Domain Using mobx-state-tree(MST) Models</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 1: Describe Your Application Domain Using mobx-state-tree(MST) Models</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-describe-your-application-domain-using-mobx-state-tree-mst-models/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-describe-your-application-domain-using-mobx-state-tree-mst-models">Hosted on egghead.io</a>
+</details>
 
 The most important type in MST is `types.model`, which can be used to describe the shape of an object.
 An example:

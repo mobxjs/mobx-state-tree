@@ -8,7 +8,14 @@ title: Actions
 
 ### Actions
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-attach-behavior-to-mobx-state-tree-models-using-actions">egghead.io lesson 2: Attach Behavior to mobx-state-tree Models Using Actions</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 2: Attach Behavior to mobx-state-tree Models Using Actions</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-attach-behavior-to-mobx-state-tree-models-using-actions/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-attach-behavior-to-mobx-state-tree-models-using-actions">Hosted on egghead.io</a>
+</details>
 
 By default, nodes can only be modified by one of their actions, or by actions higher up in the tree.
 Actions can be defined by returning an object from the action initializer function that was passed to `actions`.

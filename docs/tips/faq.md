@@ -25,7 +25,14 @@ Likewise, if your application mainly processes stateless information (such as a 
 
 ### Can I use Hot Module Reloading?
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-restore-the-model-tree-state-using-hot-module-reloading-when-model-definitions-change">egghead.io lesson 10: Restore the Model Tree State using Hot Module Reloading when Model Definitions Change</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 10: Restore the Model Tree State using Hot Module Reloading when Model Definitions Change</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-restore-the-model-tree-state-using-hot-module-reloading-when-model-definitions-change/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-restore-the-model-tree-state-using-hot-module-reloading-when-model-definitions-change">Hosted on egghead.io</a>
+</details>
 
 Yes, with MST it is pretty straight forward to setup hot reloading for your store definitions while preserving state. See the [todomvc example](https://github.com/mobxjs/mobx-state-tree/blob/745904101fdaeb51f16f40ebb80cd7fecf742572/packages/mst-example-todomvc/src/index.js#L60-L64).
 

@@ -7,7 +7,14 @@ title: Patches
 
 ## Patches
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-test-mobx-state-tree-models-by-recording-snapshots-or-patches">egghead.io lesson 3: Test mobx-state-tree Models by Recording Snapshots or Patches</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 3: Test mobx-state-tree Models by Recording Snapshots or Patches</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-test-mobx-state-tree-models-by-recording-snapshots-or-patches/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-test-mobx-state-tree-models-by-recording-snapshots-or-patches">Hosted on egghead.io</a>
+</details>
 
 Modifying a model does not only result in a new snapshot, but also in a stream of [JSON-patches](http://jsonpatch.com/) describing which modifications were made.
 Patches have the following signature:

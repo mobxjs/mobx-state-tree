@@ -7,7 +7,14 @@ title: Identifiers and references
 
 ### References and identifiers
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-create-relationships-in-your-data-with-mobx-state-tree-using-references-and-identifiers">egghead.io lesson 13: Create Relationships in your Data with mobx-state-tree Using References and Identifiers</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 13: Create Relationships in your Data with mobx-state-tree Using References and Identifiers</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-create-relationships-in-your-data-with-mobx-state-tree-using-references-and-identifiers/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-create-relationships-in-your-data-with-mobx-state-tree-using-references-and-identifiers">Hosted on egghead.io</a>
+</details>
 
 References and identifiers are a first-class concept in MST.
 This makes it possible to declare references and keep the data normalized in the background, while you interact with it in a denormalized manner.

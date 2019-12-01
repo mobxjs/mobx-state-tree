@@ -11,7 +11,14 @@ See [creating asynchronous flow](docs/async-actions.md).
 
 ### Using mobx and mobx-state-tree together
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react">egghead.io lesson 5: Render mobx-state-tree Models in React</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 5: Render mobx-state-tree Models in React</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react">Hosted on egghead.io</a>
+</details>
 
 Yep, perfectly fine. No problem. Go on. `observer`, `autorun`, etc. will work as expected.
 
@@ -21,7 +28,14 @@ In the examples folder several examples of React and MST can be found, or check 
 
 #### Asynchronous actions
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-defining-asynchronous-processes-using-flow">egghead.io lesson 12: Defining Asynchronous Processes Using Flow</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 12: Defining Asynchronous Processes Using Flow</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-defining-asynchronous-processes-using-flow/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-defining-asynchronous-processes-using-flow">Hosted on egghead.io</a>
+</details>
 
 Asynchronous actions have first class support in MST and are described in more detail [here](docs/async-actions.md#asynchronous-actions-and-middleware).
 Asynchronous actions are written by using generators and always return a promise. For a real working example see the [bookshop sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A quick example to get the gist:

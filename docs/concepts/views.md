@@ -7,7 +7,14 @@ title: Derived values
 
 ### Views
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-derive-information-from-models-using-views">egghead.io lesson 4: Derive Information from Models Using Views</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 4: Derive Information from Models Using Views</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-derive-information-from-models-using-views/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-derive-information-from-models-using-views">Hosted on egghead.io</a>
+</details>
 
 Any fact that can be derived from your state is called a "view" or "derivation".
 See the [Mobx concepts & principles](https://mobx.js.org/intro/concepts.html) for some background.

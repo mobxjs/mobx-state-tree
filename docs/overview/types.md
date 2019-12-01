@@ -5,10 +5,23 @@ title: Types overview
 
 <div id="codefund"></div>
 
-# Types overview
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 11: More mobx-state-tree Types: map, literal, union, and enumeration</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-more-mobx-state-tree-types-map-literal-union-and-enumeration/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-more-mobx-state-tree-types-map-literal-union-and-enumeration">Hosted on egghead.io</a>
+</details>
 
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-more-mobx-state-tree-types-map-literal-union-and-enumeration">egghead.io lesson 11: More mobx-state-tree Types: map, literal, union, and enumeration</a></i><br>
-<i><a style="color: white; background:cornflowerblue;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-create-dynamic-types-and-use-type-composition-to-extract-common-functionality">egghead.io lesson 17: Create Dynamic Types and use Type Composition to Extract Common Functionality</a></i>
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 17: Create Dynamic Types and use Type Composition to Extract Common Functionality</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-create-dynamic-types-and-use-type-composition-to-extract-common-functionality/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-create-dynamic-types-and-use-type-composition-to-extract-common-functionality">Hosted on egghead.io</a>
+</details>
 
 These are the types available in MST. All types can be found in the `types` namespace, e.g. `types.string`. See [Api Docs](docs/API/README.md) for examples.
 

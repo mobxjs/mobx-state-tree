@@ -5,8 +5,6 @@ title: Overview & Philosophy
 
 <div id="codefund"></div>
 
-# Philosophy & Overview
-
 `mobx-state-tree` is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
 
 Simply put, mobx-state-tree tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
@@ -87,7 +85,7 @@ This makes it possible to connect the Redux devtools to MST. See the [Redux / MS
 
 For futher reading: the conceptual difference between snapshots, patches and actions in relation to distributing state changes is extensively discussed in this [blog post](https://medium.com/@mweststrate/distributing-state-changes-using-snapshots-patches-and-actions-part-1-2811a2fcd65f)
 
-![devtools](docs/reduxdevtools.png)
+![devtools](/img/reduxdevtools.png)
 
 Finally, MST has built-in support for references, identifiers, dependency injection, change recording and circular type definitions (even across files).
 Even fancier, it analyses liveliness of objects, failing early when you try to access accidentally cached information! (More on that later)
@@ -107,7 +105,7 @@ store.removeTodo(0)
 // throws exception in one second for using an stale object!
 ```
 
-Despite all that, you will see that the [API](/API/README.md) is quite straightforward!
+Despite all that, you will see that the [API](/API/) is quite straightforward!
 
 ---
 
