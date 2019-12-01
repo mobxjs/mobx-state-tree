@@ -105,7 +105,7 @@ store.removeTodo(0)
 // throws exception in one second for using an stale object!
 ```
 
-Despite all that, you will see that the [API](/API/) is quite straightforward!
+Despite all that, you will see that in practice the API is quite straightforward!
 
 ---
 

@@ -212,16 +212,16 @@
       }
     },
     "links": {
-      "Docs": "Docs",
+      "Documentation": "Documentation",
       "TypeDocs": "TypeDocs",
       "Sponsor": "Sponsor",
       "GitHub": "GitHub"
     },
     "categories": {
       "Introduction": "Introduction",
-      "API Overview": "API Overview",
       "Basic Concepts": "Basic Concepts",
       "Advanced Concepts": "Advanced Concepts",
+      "API Overview": "API Overview",
       "Tips": "Tips",
       "Interfaces": "Interfaces"
     }

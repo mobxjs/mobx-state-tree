@@ -150,7 +150,7 @@ const User = types.model({
 
 [View sample in the playground](https://codesandbox.io/s/kx9x4973z3)
 
-The `types` namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the [API documentation](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/API/README.md) for the whole list and their parameters.
+The `types` namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the [types overview](/overview/types) for the whole list and their parameters.
 
 We can now use this knowledge to combine models and define the root model of our store that will hold `Todo` and `User` instances in the `todos` and `users` maps.
 

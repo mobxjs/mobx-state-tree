@@ -81,8 +81,8 @@ const siteConfig = {
 
     // Add custom scripts here that would be placed in <script> tags.
     scripts: [
-        "https://buttons.github.io/buttons.js"
-        // "https://codefund.io/properties/439/funder.js" TODO:
+        "https://buttons.github.io/buttons.js",
+        "https://codefund.io/properties/635/funder.js"
     ],
 
     // On page navigation for the current documentation page.

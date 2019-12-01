@@ -44,7 +44,7 @@ A type that has its snapshots processed.
 
 *Inherited from [IType](itype.md).[identifierAttribute](itype.md#optional-identifierattribute)*
 
-*Defined in [core/type/type.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L86)*
+*Defined in [core/type/type.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/type/type.ts#L86)*
 
 Name of the identifier attribute or null if none.
 
@@ -56,7 +56,7 @@ ___
 
 *Inherited from [IType](itype.md).[name](itype.md#name)*
 
-*Defined in [core/type/type.ts:81](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L81)*
+*Defined in [core/type/type.ts:81](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/type/type.ts#L81)*
 
 Friendly type name.
 
@@ -68,7 +68,7 @@ Friendly type name.
 
 *Inherited from [IType](itype.md).[create](itype.md#create)*
 
-*Defined in [core/type/type.ts:93](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L93)*
+*Defined in [core/type/type.ts:93](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/type/type.ts#L93)*
 
 Creates an instance for the type given an snapshot input.
 
@@ -91,7 +91,7 @@ ___
 
 *Inherited from [IType](itype.md).[describe](itype.md#describe)*
 
-*Defined in [core/type/type.ts:115](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L115)*
+*Defined in [core/type/type.ts:115](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/type/type.ts#L115)*
 
 Gets the textual representation of the type as a string.
 
@@ -105,7 +105,7 @@ ___
 
 *Inherited from [IType](itype.md).[is](itype.md#is)*
 
-*Defined in [core/type/type.ts:101](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L101)*
+*Defined in [core/type/type.ts:101](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/type/type.ts#L101)*
 
 Checks if a given snapshot / instance is of the given type.
 
@@ -127,7 +127,7 @@ ___
 
 *Inherited from [IType](itype.md).[validate](itype.md#validate)*
 
-*Defined in [core/type/type.ts:110](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L110)*
+*Defined in [core/type/type.ts:110](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/type/type.ts#L110)*
 
 Run's the type's typechecker on the given value with the given validation context.
 

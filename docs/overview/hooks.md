@@ -5,8 +5,6 @@ title: Lifecycle hooks overview
 
 <div id="codefund"></div>
 
-## LifeCycle hooks for `types.model`
-
 <details>
     <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 14: Loading Data from the Server after model creation</summary>
     <br>
@@ -25,6 +23,8 @@ const Todo = types.model("Todo", { done: true }).actions(self => ({
     }
 }))
 ```
+
+_⚠ The section below is outdated, and should be updated to use [`types.snapshotProcessor`](/API/#snapshotprocessor) instead of the snapshot hooks⚠_
 
 The exception to this rule are the `preProcessSnapshot` and `postProcessSnapshot` hooks (see `types.snapshotProcessor` as an alternative):
 

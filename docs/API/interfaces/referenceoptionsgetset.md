@@ -27,7 +27,7 @@ sidebar_label: "ReferenceOptionsGetSet"
 
 ▸ **get**(`identifier`: [ReferenceIdentifier](../index.md#referenceidentifier), `parent`: IAnyStateTreeNode | null): *ReferenceT‹IT›*
 
-*Defined in [types/utility-types/reference.ts:466](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/utility-types/reference.ts#L466)*
+*Defined in [types/utility-types/reference.ts:466](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/types/utility-types/reference.ts#L466)*
 
 **Parameters:**
 
@@ -44,7 +44,7 @@ ___
 
 ▸ **set**(`value`: ReferenceT‹IT›, `parent`: IAnyStateTreeNode | null): *[ReferenceIdentifier](../index.md#referenceidentifier)*
 
-*Defined in [types/utility-types/reference.ts:467](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/utility-types/reference.ts#L467)*
+*Defined in [types/utility-types/reference.ts:467](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/types/utility-types/reference.ts#L467)*
 
 **Parameters:**
 

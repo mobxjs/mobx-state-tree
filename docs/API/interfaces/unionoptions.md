@@ -23,7 +23,7 @@ sidebar_label: "UnionOptions"
 
 • **dispatcher**? : *[ITypeDispatcher](../index.md#itypedispatcher)*
 
-*Defined in [types/utility-types/union.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/utility-types/union.ts#L31)*
+*Defined in [types/utility-types/union.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/types/utility-types/union.ts#L31)*
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 • **eager**? : *undefined | false | true*
 
-*Defined in [types/utility-types/union.ts:30](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/utility-types/union.ts#L30)*
+*Defined in [types/utility-types/union.ts:30](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/types/utility-types/union.ts#L30)*
