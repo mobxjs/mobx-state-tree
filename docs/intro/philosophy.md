@@ -64,7 +64,7 @@ The type information is designed in such a way that it is used both at design- a
 
 _Runtime type error_
 
-![typescript error](docs/tserror.png)
+![typescript error](/img/tserror.png)
 
 _Designtime type error_
 
@@ -77,7 +77,7 @@ Furthermore, actions are replayable and can be used to distribute changes ([exam
 Moreover, because changes can be detected on a fine grained level, JSON patches are supported out of the box.
 Simply subscribing to the patch stream of a tree is another way to sync diffs with, for example, back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-boxes/src/stores/socket.js)).
 
-![patches](docs/patches.png)
+![patches](/img/patches.png)
 
 Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](https://github.com/mobxjs/mobx-react). See also this [egghead.io lesson: Render mobx-state-tree Models in React](https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react).
 Even cooler, because it supports snapshots, middleware and replayable actions out of the box, it is possible to replace a Redux store and reducer with a MobX state tree.
@@ -107,7 +107,7 @@ store.removeTodo(0)
 // throws exception in one second for using an stale object!
 ```
 
-Despite all that, you will see that the [API](docs/API/README.md) is quite straightforward!
+Despite all that, you will see that the [API](/API/README.md) is quite straightforward!
 
 ---
 

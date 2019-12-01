@@ -1,6 +1,10 @@
-[mobx-state-tree](../README.md) › [CustomTypeOptions](customtypeoptions.md)
+---
+id: "customtypeoptions"
+title: "CustomTypeOptions"
+sidebar_label: "CustomTypeOptions"
+---
 
-# Interface: CustomTypeOptions <**S, T**>
+[mobx-state-tree](../index.md) › [CustomTypeOptions](customtypeoptions.md)
 
 ## Type parameters
 
@@ -31,7 +35,7 @@
 
 • **name**: *string*
 
-*Defined in [types/utility-types/custom.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L15)*
+*Defined in [types/utility-types/custom.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/utility-types/custom.ts#L15)*
 
 Friendly name
 
@@ -41,7 +45,7 @@ Friendly name
 
 ▸ **fromSnapshot**(`snapshot`: S): *T*
 
-*Defined in [types/utility-types/custom.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L17)*
+*Defined in [types/utility-types/custom.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/utility-types/custom.ts#L17)*
 
 given a serialized value, how to turn it into the target type
 
@@ -59,7 +63,7 @@ ___
 
 ▸ **getValidationMessage**(`snapshot`: S): *string*
 
-*Defined in [types/utility-types/custom.ts:23](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L23)*
+*Defined in [types/utility-types/custom.ts:23](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/utility-types/custom.ts#L23)*
 
 a non empty string is assumed to be a validation error
 
@@ -77,7 +81,7 @@ ___
 
 ▸ **isTargetType**(`value`: T | S): *boolean*
 
-*Defined in [types/utility-types/custom.ts:21](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L21)*
+*Defined in [types/utility-types/custom.ts:21](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/utility-types/custom.ts#L21)*
 
 if true, this is a converted value, if false, it's a snapshot
 
@@ -95,7 +99,7 @@ ___
 
 ▸ **toSnapshot**(`value`: T): *S*
 
-*Defined in [types/utility-types/custom.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/custom.ts#L19)*
+*Defined in [types/utility-types/custom.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/utility-types/custom.ts#L19)*
 
 return the serialization of the current value
 

@@ -8,89 +8,117 @@
       "API_header": {
         "title": "API_header"
       },
+      "API/index": {
+        "title": "mobx-state-tree",
+        "sidebar_label": "Globals"
+      },
       "API/interfaces/customtypeoptions": {
-        "title": "API/interfaces/customtypeoptions"
+        "title": "CustomTypeOptions",
+        "sidebar_label": "CustomTypeOptions"
       },
       "API/interfaces/iactioncontext": {
-        "title": "API/interfaces/iactioncontext"
+        "title": "IActionContext",
+        "sidebar_label": "IActionContext"
       },
       "API/interfaces/iactionrecorder": {
-        "title": "API/interfaces/iactionrecorder"
+        "title": "IActionRecorder",
+        "sidebar_label": "IActionRecorder"
       },
       "API/interfaces/iactiontrackingmiddleware2call": {
-        "title": "API/interfaces/iactiontrackingmiddleware2call"
+        "title": "IActionTrackingMiddleware2Call",
+        "sidebar_label": "IActionTrackingMiddleware2Call"
       },
       "API/interfaces/iactiontrackingmiddleware2hooks": {
-        "title": "API/interfaces/iactiontrackingmiddleware2hooks"
+        "title": "IActionTrackingMiddleware2Hooks",
+        "sidebar_label": "IActionTrackingMiddleware2Hooks"
       },
       "API/interfaces/iactiontrackingmiddlewarehooks": {
-        "title": "API/interfaces/iactiontrackingmiddlewarehooks"
+        "title": "IActionTrackingMiddlewareHooks",
+        "sidebar_label": "IActionTrackingMiddlewareHooks"
       },
       "API/interfaces/ianycomplextype": {
-        "title": "API/interfaces/ianycomplextype"
+        "title": "IAnyComplexType",
+        "sidebar_label": "IAnyComplexType"
       },
       "API/interfaces/ianymodeltype": {
-        "title": "API/interfaces/ianymodeltype"
+        "title": "IAnyModelType",
+        "sidebar_label": "IAnyModelType"
       },
       "API/interfaces/ianytype": {
-        "title": "API/interfaces/ianytype"
+        "title": "IAnyType",
+        "sidebar_label": "IAnyType"
       },
       "API/interfaces/ihooks": {
-        "title": "API/interfaces/ihooks"
+        "title": "IHooks",
+        "sidebar_label": "IHooks"
       },
       "API/interfaces/ijsonpatch": {
-        "title": "API/interfaces/ijsonpatch"
+        "title": "IJsonPatch",
+        "sidebar_label": "IJsonPatch"
       },
       "API/interfaces/imiddlewareevent": {
-        "title": "API/interfaces/imiddlewareevent"
+        "title": "IMiddlewareEvent",
+        "sidebar_label": "IMiddlewareEvent"
       },
       "API/interfaces/imodelreflectiondata": {
-        "title": "API/interfaces/imodelreflectiondata"
+        "title": "IModelReflectionData",
+        "sidebar_label": "IModelReflectionData"
       },
       "API/interfaces/imodelreflectionpropertiesdata": {
-        "title": "API/interfaces/imodelreflectionpropertiesdata"
+        "title": "IModelReflectionPropertiesData",
+        "sidebar_label": "IModelReflectionPropertiesData"
       },
       "API/interfaces/imodeltype": {
-        "title": "API/interfaces/imodeltype"
+        "title": "IModelType",
+        "sidebar_label": "IModelType"
       },
       "API/interfaces/ipatchrecorder": {
-        "title": "API/interfaces/ipatchrecorder"
+        "title": "IPatchRecorder",
+        "sidebar_label": "IPatchRecorder"
       },
       "API/interfaces/ireversiblejsonpatch": {
-        "title": "API/interfaces/ireversiblejsonpatch"
+        "title": "IReversibleJsonPatch",
+        "sidebar_label": "IReversibleJsonPatch"
       },
       "API/interfaces/iserializedactioncall": {
-        "title": "API/interfaces/iserializedactioncall"
+        "title": "ISerializedActionCall",
+        "sidebar_label": "ISerializedActionCall"
       },
       "API/interfaces/isimpletype": {
-        "title": "API/interfaces/isimpletype"
+        "title": "ISimpleType",
+        "sidebar_label": "ISimpleType"
       },
       "API/interfaces/isnapshotprocessor": {
-        "title": "API/interfaces/isnapshotprocessor"
+        "title": "ISnapshotProcessor",
+        "sidebar_label": "ISnapshotProcessor"
       },
       "API/interfaces/isnapshotprocessors": {
-        "title": "API/interfaces/isnapshotprocessors"
+        "title": "ISnapshotProcessors",
+        "sidebar_label": "ISnapshotProcessors"
       },
       "API/interfaces/itype": {
-        "title": "API/interfaces/itype"
+        "title": "IType",
+        "sidebar_label": "IType"
       },
       "API/interfaces/ivalidationcontextentry": {
-        "title": "API/interfaces/ivalidationcontextentry"
+        "title": "IValidationContextEntry",
+        "sidebar_label": "IValidationContextEntry"
       },
       "API/interfaces/ivalidationerror": {
-        "title": "API/interfaces/ivalidationerror"
+        "title": "IValidationError",
+        "sidebar_label": "IValidationError"
       },
       "API/interfaces/referenceoptionsgetset": {
-        "title": "API/interfaces/referenceoptionsgetset"
+        "title": "ReferenceOptionsGetSet",
+        "sidebar_label": "ReferenceOptionsGetSet"
       },
       "API/interfaces/referenceoptionsoninvalidated": {
-        "title": "API/interfaces/referenceoptionsoninvalidated"
+        "title": "ReferenceOptionsOnInvalidated",
+        "sidebar_label": "ReferenceOptionsOnInvalidated"
       },
       "API/interfaces/unionoptions": {
-        "title": "API/interfaces/unionoptions"
-      },
-      "API/README": {
-        "title": "API/README"
+        "title": "UnionOptions",
+        "sidebar_label": "UnionOptions"
       },
       "concepts/actions": {
         "title": "Actions"
@@ -185,6 +213,7 @@
     },
     "links": {
       "Docs": "Docs",
+      "TypeDocs": "TypeDocs",
       "Sponsor": "Sponsor",
       "GitHub": "GitHub"
     },
@@ -193,7 +222,8 @@
       "API Overview": "API Overview",
       "Basic Concepts": "Basic Concepts",
       "Advanced Concepts": "Advanced Concepts",
-      "Tips": "Tips"
+      "Tips": "Tips",
+      "Interfaces": "Interfaces"
     }
   },
   "pages-strings": {

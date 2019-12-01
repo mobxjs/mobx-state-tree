@@ -1,6 +1,10 @@
-[mobx-state-tree](../README.md) › [IAnyModelType](ianymodeltype.md)
+---
+id: "ianymodeltype"
+title: "IAnyModelType"
+sidebar_label: "IAnyModelType"
+---
 
-# Interface: IAnyModelType
+[mobx-state-tree](../index.md) › [IAnyModelType](ianymodeltype.md)
 
 Any model type.
 
@@ -41,7 +45,7 @@ Any model type.
 
 *Inherited from [IType](itype.md).[identifierAttribute](itype.md#optional-identifierattribute)*
 
-*Defined in [core/type/type.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L86)*
+*Defined in [core/type/type.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L86)*
 
 Name of the identifier attribute or null if none.
 
@@ -53,7 +57,7 @@ ___
 
 *Inherited from [IType](itype.md).[name](itype.md#name)*
 
-*Defined in [core/type/type.ts:81](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L81)*
+*Defined in [core/type/type.ts:81](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L81)*
 
 Friendly type name.
 
@@ -65,7 +69,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[properties](imodeltype.md#properties)*
 
-*Defined in [types/complex-types/model.ts:187](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/complex-types/model.ts#L187)*
+*Defined in [types/complex-types/model.ts:187](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/complex-types/model.ts#L187)*
 
 ## Methods
 
@@ -75,7 +79,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[actions](imodeltype.md#actions)*
 
-*Defined in [types/complex-types/model.ts:201](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/complex-types/model.ts#L201)*
+*Defined in [types/complex-types/model.ts:201](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/complex-types/model.ts#L201)*
 
 **Type parameters:**
 
@@ -85,13 +89,13 @@ ___
 
 ▪ **fn**: *function*
 
-▸ (`self`: [Instance](../README.md#instance)‹this›): *A*
+▸ (`self`: [Instance](../index.md#instance)‹this›): *A*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`self` | [Instance](../README.md#instance)‹this› |
+`self` | [Instance](../index.md#instance)‹this› |
 
 **Returns:** *[IModelType](imodeltype.md)‹any, any & A, any, any›*
 
@@ -103,7 +107,7 @@ ___
 
 *Inherited from [IType](itype.md).[create](itype.md#create)*
 
-*Defined in [core/type/type.ts:93](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L93)*
+*Defined in [core/type/type.ts:93](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L93)*
 
 Creates an instance for the type given an snapshot input.
 
@@ -126,7 +130,7 @@ ___
 
 *Inherited from [IType](itype.md).[describe](itype.md#describe)*
 
-*Defined in [core/type/type.ts:115](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L115)*
+*Defined in [core/type/type.ts:115](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L115)*
 
 Gets the textual representation of the type as a string.
 
@@ -140,7 +144,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[extend](imodeltype.md#extend)*
 
-*Defined in [types/complex-types/model.ts:209](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/complex-types/model.ts#L209)*
+*Defined in [types/complex-types/model.ts:209](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/complex-types/model.ts#L209)*
 
 **Type parameters:**
 
@@ -154,13 +158,13 @@ ___
 
 ▪ **fn**: *function*
 
-▸ (`self`: [Instance](../README.md#instance)‹this›): *object*
+▸ (`self`: [Instance](../index.md#instance)‹this›): *object*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`self` | [Instance](../README.md#instance)‹this› |
+`self` | [Instance](../index.md#instance)‹this› |
 
 **Returns:** *[IModelType](imodeltype.md)‹any, any & A & V & VS, any, any›*
 
@@ -172,7 +176,7 @@ ___
 
 *Inherited from [IType](itype.md).[is](itype.md#is)*
 
-*Defined in [core/type/type.ts:101](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L101)*
+*Defined in [core/type/type.ts:101](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L101)*
 
 Checks if a given snapshot / instance is of the given type.
 
@@ -194,7 +198,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[named](imodeltype.md#named)*
 
-*Defined in [types/complex-types/model.ts:189](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/complex-types/model.ts#L189)*
+*Defined in [types/complex-types/model.ts:189](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/complex-types/model.ts#L189)*
 
 **Parameters:**
 
@@ -212,7 +216,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[postProcessSnapshot](imodeltype.md#postprocesssnapshot)*
 
-*Defined in [types/complex-types/model.ts:219](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/complex-types/model.ts#L219)*
+*Defined in [types/complex-types/model.ts:219](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/complex-types/model.ts#L219)*
 
 **`deprecated`** See `types.snapshotProcessor`
 
@@ -242,7 +246,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[preProcessSnapshot](imodeltype.md#preprocesssnapshot)*
 
-*Defined in [types/complex-types/model.ts:214](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/complex-types/model.ts#L214)*
+*Defined in [types/complex-types/model.ts:214](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/complex-types/model.ts#L214)*
 
 **`deprecated`** See `types.snapshotProcessor`
 
@@ -272,7 +276,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[props](imodeltype.md#props)*
 
-*Defined in [types/complex-types/model.ts:193](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/complex-types/model.ts#L193)*
+*Defined in [types/complex-types/model.ts:193](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/complex-types/model.ts#L193)*
 
 **Type parameters:**
 
@@ -290,11 +294,11 @@ ___
 
 ###  validate
 
-▸ **validate**(`thing`: ModelCreationType2‹any, any›, `context`: [IValidationContext](../README.md#ivalidationcontext)): *[IValidationResult](../README.md#ivalidationresult)*
+▸ **validate**(`thing`: ModelCreationType2‹any, any›, `context`: [IValidationContext](../index.md#ivalidationcontext)): *[IValidationResult](../index.md#ivalidationresult)*
 
 *Inherited from [IType](itype.md).[validate](itype.md#validate)*
 
-*Defined in [core/type/type.ts:110](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type.ts#L110)*
+*Defined in [core/type/type.ts:110](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type.ts#L110)*
 
 Run's the type's typechecker on the given value with the given validation context.
 
@@ -303,9 +307,9 @@ Run's the type's typechecker on the given value with the given validation contex
 Name | Type | Description |
 ------ | ------ | ------ |
 `thing` | ModelCreationType2‹any, any› | Value to be checked, either a snapshot or an instance. |
-`context` | [IValidationContext](../README.md#ivalidationcontext) | Validation context, an array of { subpaths, subtypes } that should be validated |
+`context` | [IValidationContext](../index.md#ivalidationcontext) | Validation context, an array of { subpaths, subtypes } that should be validated |
 
-**Returns:** *[IValidationResult](../README.md#ivalidationresult)*
+**Returns:** *[IValidationResult](../index.md#ivalidationresult)*
 
 The validation result, an array with the list of validation errors.
 
@@ -317,7 +321,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[views](imodeltype.md#views)*
 
-*Defined in [types/complex-types/model.ts:197](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/complex-types/model.ts#L197)*
+*Defined in [types/complex-types/model.ts:197](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/complex-types/model.ts#L197)*
 
 **Type parameters:**
 
@@ -327,13 +331,13 @@ ___
 
 ▪ **fn**: *function*
 
-▸ (`self`: [Instance](../README.md#instance)‹this›): *V*
+▸ (`self`: [Instance](../index.md#instance)‹this›): *V*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`self` | [Instance](../README.md#instance)‹this› |
+`self` | [Instance](../index.md#instance)‹this› |
 
 **Returns:** *[IModelType](imodeltype.md)‹any, any & V, any, any›*
 
@@ -345,7 +349,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[volatile](imodeltype.md#volatile)*
 
-*Defined in [types/complex-types/model.ts:205](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/complex-types/model.ts#L205)*
+*Defined in [types/complex-types/model.ts:205](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/types/complex-types/model.ts#L205)*
 
 **Type parameters:**
 
@@ -355,12 +359,12 @@ ___
 
 ▪ **fn**: *function*
 
-▸ (`self`: [Instance](../README.md#instance)‹this›): *TP*
+▸ (`self`: [Instance](../index.md#instance)‹this›): *TP*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`self` | [Instance](../README.md#instance)‹this› |
+`self` | [Instance](../index.md#instance)‹this› |
 
 **Returns:** *[IModelType](imodeltype.md)‹any, any & TP, any, any›*

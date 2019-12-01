@@ -1,6 +1,10 @@
-[mobx-state-tree](../README.md) › [IValidationError](ivalidationerror.md)
+---
+id: "ivalidationerror"
+title: "IValidationError"
+sidebar_label: "IValidationError"
+---
 
-# Interface: IValidationError
+[mobx-state-tree](../index.md) › [IValidationError](ivalidationerror.md)
 
 Type validation error
 
@@ -20,9 +24,9 @@ Type validation error
 
 ###  context
 
-• **context**: *[IValidationContext](../README.md#ivalidationcontext)*
+• **context**: *[IValidationContext](../index.md#ivalidationcontext)*
 
-*Defined in [core/type/type-checker.ts:28](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type-checker.ts#L28)*
+*Defined in [core/type/type-checker.ts:28](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type-checker.ts#L28)*
 
 Validation context
 
@@ -32,7 +36,7 @@ ___
 
 • **message**? : *undefined | string*
 
-*Defined in [core/type/type-checker.ts:32](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type-checker.ts#L32)*
+*Defined in [core/type/type-checker.ts:32](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type-checker.ts#L32)*
 
 Error message
 
@@ -42,6 +46,6 @@ ___
 
 • **value**: *any*
 
-*Defined in [core/type/type-checker.ts:30](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/core/type/type-checker.ts#L30)*
+*Defined in [core/type/type-checker.ts:30](https://github.com/mobxjs/mobx-state-tree/blob/6cb98690/packages/mobx-state-tree/src/core/type/type-checker.ts#L30)*
 
 Value that was being validated, either a snapshot or an instance

@@ -13,11 +13,11 @@ const siteConfig = {
     tagline:
         "Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX",
     url: "https://mobx-state-tree.js.org/", // Your website URL
+    // baseUrl: "/mobx-state-tree/",
     baseUrl: "/", // Base URL for your project */
     docsUrl: "",
     cname: "mobx-state-tree.js.org",
     editUrl: "https://github.com/mobxjs/mobx-state-tree/edit/master/docs/",
-    noIndex: true,
     // For github.io type URLs, you would set the url and baseUrl like:
     //   url: 'https://facebook.github.io',
     //   baseUrl: '/test-site/',
@@ -34,7 +34,11 @@ const siteConfig = {
     headerLinks: [
         {
             doc: "intro/philosophy",
-            label: "Docs"
+            label: "Documentation"
+        },
+        {
+            doc: "API/index",
+            label: "TypeDocs"
         },
         { href: "https://opencollective.com/mobx", label: "Sponsor" },
 

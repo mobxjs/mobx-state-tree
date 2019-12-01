@@ -7,7 +7,7 @@ module.exports = {
     mode: "file",
     readme: "none",
     out: "../../docs/API",
-    theme: "markdown",
+    theme: "docusaurus",
     tsconfig: "tsconfig.json",
     listInvalidSymbolLinks: true,
     mdHideSources: true
