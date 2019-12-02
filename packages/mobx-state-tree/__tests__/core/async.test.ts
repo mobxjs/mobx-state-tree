@@ -329,7 +329,7 @@ test("flow typings", async () => {
         numberToNumber: flow(function*(val: number) {
             yield promise
             return val
-        }), // should be () => Promise<Promise<number>>
+        }), // should be () => Promise<number>
         voidToNumber: flow(function*() {
             yield promise
             return Promise.resolve(2)
@@ -345,4 +345,8 @@ test("flow typings", async () => {
     expect(b).toBe(4)
     const c: number = await m.voidToNumber()
     expect(c).toBe(2)
+    await m.voidToNumber().then(d => {
+        const _d: number = d
+        expect(_d).toBe(2)
+    })
 })

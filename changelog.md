@@ -1,3 +1,7 @@
+# 3.15.1
+
+- Fixed that calling "createObservableInstanceIfNeeded" would execute an action, even if the function immediately returned. (significant since the extraneous actions would pollute the mobx dev-tools on mere accesses, eg. by ComplexType.prototype.getValue) Fixes [#1421](https://github.com/mobxjs/mobx-state-tree/issues/1421)
+
 # 3.15.0
 
 - Fix for flow typings. This means that now using flows requires at least TypeScript v3.6 and that `castFlowReturn` becomes deprecated.

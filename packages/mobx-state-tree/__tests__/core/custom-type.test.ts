@@ -30,7 +30,8 @@ class Decimal {
 {
     const DecimalPrimitive = types.custom<string, Decimal>({
         name: "Decimal",
-        fromSnapshot(value: string) {
+        fromSnapshot(value: string, env: any) {
+            if (env && env.test) env.test(value)
             return new Decimal(value)
         },
         toSnapshot(value: Decimal) {
@@ -105,6 +106,12 @@ class Decimal {
         expect(snapshots).toMatchSnapshot()
         p.stop()
         expect(p.patches).toMatchSnapshot()
+    })
+
+    test("passes environment to fromSnapshot", () => {
+        const env = { test: jest.fn() }
+        Wallet.create({ balance: "3.0" }, env)
+        expect(env.test).toBeCalledWith("3.0")
     })
 }
 
