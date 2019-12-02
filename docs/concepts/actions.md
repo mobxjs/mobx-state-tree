@@ -5,9 +5,6 @@ title: Actions
 
 <div id="codefund"></div>
 
-
-### Actions
-
 <details>
     <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 2: Attach Behavior to mobx-state-tree Models Using Actions</summary>
     <br>
@@ -63,16 +60,16 @@ Actions are replayable and are therefore constrained in several ways:
 
 Useful methods:
 
--   [`onAction`](docs/API/README.md#onaction) listens to any action that is invoked on the model or any of its descendants.
--   [`addMiddleware`](docs/API/README.md#addmiddleware) adds an interceptor function to any action invoked on the subtree.
--   [`applyAction`](docs/API/README.md#applyaction) invokes an action on the model according to the given action description
+-   [`onAction`](/API/#onaction) listens to any action that is invoked on the model or any of its descendants.
+-   [`addMiddleware`](/API/#addmiddleware) adds an interceptor function to any action invoked on the subtree.
+-   [`applyAction`](/API/#applyaction) invokes an action on the model according to the given action description
 
 
 #### Action listeners versus middleware
 
 The difference between action listeners and middleware is: middleware can intercept the action that is about to be invoked, modify arguments, return types, etc. Action listeners cannot intercept and are only notified. Action listeners receive the action arguments in a serializable format, while middleware receives the raw arguments. (`onAction` is actually just a built-in middleware).
 
-For more details on creating middleware, see the [docs](docs/middleware.md).
+For more details on creating middleware, see the [docs](/concepts/middleware).
 
 #### Disabling protected mode
 

@@ -5,8 +5,6 @@ title: Reconciliation
 
 <div id="codefund"></div>
 
-### How does reconciliation work?
-
 -   When applying snapshots, MST will always try to reuse existing object instances for snapshots with the same identifier (see `types.identifier`).
 -   If no identifier is specified, but the type of the snapshot is correct, MST will reconcile objects as well if they are stored in a specific model property or under the same map key.
 -   In arrays, items without an identifier are never reconciled.

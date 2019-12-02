@@ -5,8 +5,6 @@ title: Dependency Injection
 
 <div id="codefund"></div>
 
-## Dependency injection
-
 When creating a new state tree it is possible to pass in environment specific data by passing an object as the second argument to a `.create` call.
 This object should be (shallowly) immutable and can be accessed by any model in the tree by calling `getEnv(self)`.
 

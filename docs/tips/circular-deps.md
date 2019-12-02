@@ -1,11 +1,11 @@
 ---
 id: circular-deps
-title: Circular dependencies
+sidebar_label: Circular dependencies
+title: Handle circular dependencies between files and types using `late`
 ---
 
 <div id="codefund"></div>
 
-### Handle circular dependencies between files and types using `late`
 
 In the exporting file:
 

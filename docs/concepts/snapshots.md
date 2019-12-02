@@ -5,8 +5,6 @@ title: Snapshots
 
 <div id="codefund"></div>
 
-### Snapshots
-
 <details>
     <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 3: Test mobx-state-tree Models by Recording Snapshots or Patches</summary>
     <br>

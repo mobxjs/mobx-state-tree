@@ -5,8 +5,6 @@ title: Identifiers and references
 
 <div id="codefund"></div>
 
-### References and identifiers
-
 <details>
     <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 13: Create Relationships in your Data with mobx-state-tree Using References and Identifiers</summary>
     <br>
@@ -54,10 +52,10 @@ console.log(storeInstance.selectedTodo.title)
 -   The identifier property of an object cannot be modified after initialization
 -   Each identifier / type combination should be unique within the entire tree
 -   Identifiers are used to reconcile items inside arrays and maps - wherever possible - when applying snapshots
--   The `map.put()` method can be used to simplify adding objects that have identifiers to [maps](docs/API/README.md#typesmap)
+-   The `map.put()` method can be used to simplify adding an object that has an identifiers to a map without specifying the key
 -   The primary goal of identifiers is not validation, but reconciliation and reference resolving. For this reason identifiers cannot be defined or updated after creation. If you want to check if some value just looks as an identifier, without providing the above semantics; use something like: `types.refinement(types.string, v => v.match(/someregex/))`
 
-_Tip: If you know the format of the identifiers in your application, leverage `types.refinement` to actively check this, for example the following definition enforces that identifiers of `Car` always start with the string `"Car_"`:
+_Tip: If you know the format of the identifiers in your application, leverage `types.refinement` to actively check this, for example the following definition enforces that identifiers of `Car` always start with the string `"Car_"`:_
 
 ```javascript
 const Car = types.model("Car", {
@@ -72,7 +70,7 @@ References are looked up through the entire tree but per type, so identifiers ne
 
 #### Customizable references
 
-The default implementation uses the `identifier` cache to resolve references (See [`resolveIdentifier`](docs/API/README.md#resolveIdentifier)).
+The default implementation uses the `identifier` cache to resolve references (See [`resolveIdentifier`](/API#resolveIdentifier)).
 However, it is also possible to override the resolve logic and provide your own custom resolve logic.
 This also makes it possible to, for example, trigger a data fetch when trying to resolve the reference ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mobx-state-tree/__tests__/core/reference-custom.test.ts#L148)).
 

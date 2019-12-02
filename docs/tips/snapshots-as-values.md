@@ -5,8 +5,6 @@ title: Using snapshots as values
 
 <div id="codefund"></div>
 
-#### Snapshots can be used to write values
-
 Everywhere where you can modify your state tree and assign a model instance, you can also
 just assign a snapshot, and MST will convert it to a model instance for you.
 However, that is simply not expressible in static type systems atm (as the type written to a value differs to the type read from it).

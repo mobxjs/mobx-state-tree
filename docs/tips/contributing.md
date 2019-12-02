@@ -5,8 +5,6 @@ title: Contributing
 
 <div id="codefund"></div>
 
-## Contributing
-
 MobX state tree is a community driven project, but is looking for active maintainers! See [#700](https://github.com/mobxjs/mobx-state-tree/issues/700)
 
 Extensive pull requests are best discussed in an issue first.

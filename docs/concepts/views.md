@@ -5,8 +5,6 @@ title: Derived values
 
 <div id="codefund"></div>
 
-### Views
-
 <details>
     <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 4: Derive Information from Models Using Views</summary>
     <br>
@@ -50,4 +48,4 @@ autorun(() => {
 })
 ```
 
-If you want to share volatile state between views and actions, use `.extend` instead of `.views` + `.actions`. See the [volatile state](#volatile-state) section.
+If you want to share volatile state between views and actions, use `.extend` instead of `.views` + `.actions`. See the [volatile state](volatiles) section.

@@ -5,8 +5,6 @@ title: Middleware
 
 <div id="codefund"></div>
 
-# Middleware
-
 Middlewares can be used to intercept any action on a subtree.
 
 It is allowed to attach multiple middlewares to a node.

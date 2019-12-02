@@ -126,23 +126,21 @@
       "concepts/async-actions": {
         "title": "Asynchronous actions"
       },
-      "concepts/composing-trees": {
-        "title": "Composing trees"
-      },
-      "concepts/creating-models": {
-        "title": "Creating models"
-      },
       "concepts/dependency-injection": {
         "title": "Dependency Injection"
       },
       "concepts/listeners": {
-        "title": "Listening to changes"
+        "title": "Listening to observables, snapshots, patches and actions",
+        "sidebar_label": "Listening to changes"
       },
       "concepts/middleware": {
         "title": "Middleware"
       },
       "concepts/patches": {
         "title": "Patches"
+      },
+      "concepts/using-react": {
+        "title": "React and MST"
       },
       "concepts/reconciliation": {
         "title": "Reconciliation"
@@ -153,11 +151,8 @@
       "concepts/snapshots": {
         "title": "Snapshots"
       },
-      "concepts/tree-semantics": {
-        "title": "Tree semantics in detail"
-      },
       "concepts/trees": {
-        "title": "Types, trees & state"
+        "title": "Types, models, trees & state"
       },
       "concepts/views": {
         "title": "Derived values"
@@ -187,7 +182,8 @@
         "title": "API overview"
       },
       "tips/circular-deps": {
-        "title": "Circular dependencies"
+        "title": "Handle circular dependencies between files and types using `late`",
+        "sidebar_label": "Circular dependencies"
       },
       "tips/contributing": {
         "title": "Contributing"
@@ -196,7 +192,8 @@
         "title": "Frequently Asked Questions"
       },
       "tips/inheritance": {
-        "title": "Simulating inheritance"
+        "title": "Simulate inheritance by using type composition",
+        "sidebar_label": "Simulating inheritance"
       },
       "tips/more-tips": {
         "title": "Miscellaneous Tips"
@@ -208,7 +205,7 @@
         "title": "Using snapshots as values"
       },
       "tips/typescript": {
-        "title": "TypeScript"
+        "title": "TypeScript and MST"
       }
     },
     "links": {

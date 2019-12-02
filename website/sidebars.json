@@ -8,11 +8,9 @@
     ],
     "Basic Concepts": [
       "concepts/trees",
-      "concepts/creating-models",
-      "concepts/tree-semantics",
-      "concepts/composing-trees",
       "concepts/actions",
       "concepts/views",
+      "concepts/using-react",
       "concepts/snapshots",
       "concepts/references",
       "concepts/async-actions"

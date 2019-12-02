@@ -1,11 +1,9 @@
 ---
 id: typescript
-title: TypeScript
+title: TypeScript and MST
 ---
 
 <div id="codefund"></div>
-
-### TypeScript and MST
 
 TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 3.0 or later with `noImplicitThis` and `strictNullChecks` enabled.
 Actually, the more strict options that are enabled, the better the type system will behave.
@@ -61,22 +59,12 @@ const Todo = types
         }
     }))
 
-type ITodo = Instance<typeof Todo> // => { title: string; setTitle: (v: string) => void }
-
-type ITodoSnapshotIn = SnapshotIn<typeof Todo> // => { title?: string }
-
-type ITodoSnapshotOut = SnapshotOut<typeof Todo> // => { title: string }
+interface ITodo extends Instance<typeof Todo> {} // => { title: string; setTitle: (v: string) => void }
+interface ITodoSnapshotIn extends SnapshotIn<typeof Todo> {} // => { title?: string }
+interface ITodoSnapshotOut extends SnapshotOut<typeof Todo> {} // => { title: string }
 ```
 
-Due to the way typeof operator works, when working with big and deep models trees, it might make your IDE/ts server takes a lot of CPU time and freeze vscode (or others).
-A solution for this is to turn the types into interfaces.
-This way of defining types enables TypeScript to better cope with circular type definitions as well.
-
-```ts
-interface ITodo extends Instance<typeof Todo> {}
-interface ITodoSnapshotIn extends SnapshotIn<typeof Todo> {}
-interface ITodoSnapshotOut extends SnapshotOut<typeof Todo> {}
-```
+Note, it is important to use `interface` and not `type` when constructing those types! Although `type`s will work exactly the same, due to their nature they will be much more expensive for the compiler to typecheck.
 
 #### Typing `self` in actions and views
 
@@ -175,53 +163,3 @@ const Example = types.model("Example", { prop: types.string }).actions(self => {
     }
 })
 ```
-
-
-#### Known Typescript Issue 5938
-
-There is a known issue with typescript and interfaces as described by: https://github.com/Microsoft/TypeScript/issues/5938
-
-This rears its ugly head if you try to define a model such as:
-
-```typescript
-import { types } from "mobx-state-tree"
-
-export const Todo = types.model({
-    title: types.string
-})
-
-export type ITodo = typeof Todo.Type
-```
-
-And you have your tsconfig.json settings set to:
-
-```json
-{
-  "compilerOptions": {
-    ...
-    "declaration": true,
-    "noUnusedLocals": true
-    ...
-  }
-}
-```
-
-Then you will get errors such as:
-
-> error TS4023: Exported variable 'Todo' has or is using name 'IModelType' from external module "..." but cannot be named.
-
-Until Microsoft fixes this issue the solution is to re-export IModelType:
-
-```typescript
-import { types, IModelType } from "mobx-state-tree"
-
-export type __IModelType = IModelType<any, any>
-
-export const Todo = types.model({
-    title: types.string
-})
-
-export type ITodo = typeof Todo.Type
-```
-
-It ain't pretty, but it works.
