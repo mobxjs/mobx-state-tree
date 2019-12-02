@@ -1,0 +1,76 @@
+{
+  "docs": {
+    "Introduction": [
+      "intro/philosophy",
+      "intro/installation",
+      "intro/getting-started",
+      "intro/examples"
+    ],
+    "Basic Concepts": [
+      "concepts/trees",
+      "concepts/actions",
+      "concepts/views",
+      "concepts/using-react",
+      "concepts/snapshots",
+      "concepts/references",
+      "concepts/async-actions"
+    ],
+    "Advanced Concepts": [
+      "concepts/patches",
+      "concepts/listeners",
+      "concepts/dependency-injection",
+      "concepts/middleware",
+      "concepts/reconciliation",
+      "concepts/volatiles"
+    ],
+    "API Overview": [
+      "overview/types",
+      "overview/api",
+      "overview/hooks"
+    ],
+    "Tips": [
+      "tips/resources",
+      "tips/contributing",
+      "tips/faq",
+      "tips/typescript",
+      "tips/circular-deps",
+      "tips/inheritance",
+      "tips/snapshots-as-values",
+      "tips/more-tips"
+    ]
+  },
+  "mobx-state-tree": {
+    "Introduction": [
+      "API/index"
+    ],
+    "Interfaces": [
+      "API/interfaces/customtypeoptions",
+      "API/interfaces/iactioncontext",
+      "API/interfaces/iactionrecorder",
+      "API/interfaces/iactiontrackingmiddleware2call",
+      "API/interfaces/iactiontrackingmiddleware2hooks",
+      "API/interfaces/iactiontrackingmiddlewarehooks",
+      "API/interfaces/ianycomplextype",
+      "API/interfaces/ianymodeltype",
+      "API/interfaces/ianytype",
+      "API/interfaces/ihooks",
+      "API/interfaces/ijsonpatch",
+      "API/interfaces/imiddlewareevent",
+      "API/interfaces/imodelreflectiondata",
+      "API/interfaces/imodelreflectionpropertiesdata",
+      "API/interfaces/imodeltype",
+      "API/interfaces/ipatchrecorder",
+      "API/interfaces/ireversiblejsonpatch",
+      "API/interfaces/iserializedactioncall",
+      "API/interfaces/isimpletype",
+      "API/interfaces/isnapshotprocessor",
+      "API/interfaces/isnapshotprocessors",
+      "API/interfaces/itype",
+      "API/interfaces/ivalidationcontextentry",
+      "API/interfaces/ivalidationerror",
+      "API/interfaces/referenceoptionsgetset",
+      "API/interfaces/referenceoptionsoninvalidated",
+      "API/interfaces/unionoptions"
+    ]
+  }
+}

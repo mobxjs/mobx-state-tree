@@ -1,6 +1,10 @@
-[mobx-state-tree](../README.md) › [ISerializedActionCall](iserializedactioncall.md)
+---
+id: "iserializedactioncall"
+title: "ISerializedActionCall"
+sidebar_label: "ISerializedActionCall"
+---
 
-# Interface: ISerializedActionCall
+[mobx-state-tree](../index.md) › [ISerializedActionCall](iserializedactioncall.md)
 
 ## Hierarchy
 
@@ -20,7 +24,7 @@
 
 • **args**? : *any[]*
 
-*Defined in [middlewares/on-action.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/on-action.ts#L33)*
+*Defined in [middlewares/on-action.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/middlewares/on-action.ts#L33)*
 
 ___
 
@@ -28,7 +32,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [middlewares/on-action.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/on-action.ts#L31)*
+*Defined in [middlewares/on-action.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/middlewares/on-action.ts#L31)*
 
 ___
 
@@ -36,4 +40,4 @@ ___
 
 • **path**? : *undefined | string*
 
-*Defined in [middlewares/on-action.ts:32](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/middlewares/on-action.ts#L32)*
+*Defined in [middlewares/on-action.ts:32](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/middlewares/on-action.ts#L32)*

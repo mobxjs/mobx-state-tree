@@ -26,9 +26,8 @@
         "test:cyclic": "node -e \"require('.')\"",
         "test:mobx4": "yarn add -D mobx@4.9.0 && cross-env JEST_JUNIT_OUTPUT=../../test-results/mobx-state-tree/mobx4.xml yarn jest -i && git checkout package.json ../../yarn.lock && yarn install",
         "_prepublish": "yarn build && yarn build-docs",
-        "fix-docs": "concat -o ../../docs/API/README.md ../../docs/API_header.md ../../docs/API/README.md",
         "fix-typedoc": "shx rm -rf ../../node_modules/typedoc/node_modules/typescript",
-        "build-docs": "yarn run fix-typedoc && shx rm -rf ../../docs/API && typedoc --options ./typedocconfig.js && yarn fix-docs",
+        "build-docs": "yarn run fix-typedoc && shx rm -rf ../../docs/API && typedoc --options ./typedocconfig.js",
         "lint": "tslint -c ./tslint.json 'src/**/*.ts'"
     },
     "repository": {
@@ -37,6 +36,10 @@
     },
     "author": "Michel Weststrate",
     "license": "MIT",
+    "funding": {
+        "type": "opencollective",
+        "url": "https://opencollective.com/mobx"
+    },
     "bugs": {
         "url": "https://github.com/mobxjs/mobx-state-tree/issues"
     },

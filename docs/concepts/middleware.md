@@ -1,4 +1,9 @@
-# Middleware
+---
+id: middleware
+title: Middleware
+---
+
+<div id="codefund"></div>
 
 Middlewares can be used to intercept any action on a subtree.
 
@@ -7,7 +12,7 @@ The order in which middlewares are invoked is inside-out:
 This means that the middlewares are invoked in the order you attach them.
 The value returned by the action invoked/ the aborted value gets passed through the middleware chain and can be manipulated.
 
-MST ships with a small set of [pre-built / example middlewares](../packages/mst-middlewares/README.md).
+MST ships with a small set of [pre-built / example middlewares](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-middlewares/README.md).
 
 Play around with a simple example of middleware in action with [this CodeSandbox](https://codesandbox.io/s/vjoql07ool).
 

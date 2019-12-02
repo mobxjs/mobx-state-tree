@@ -154,9 +154,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
             if (typeof id !== "string" && typeof id !== "number") {
                 throw fail(
-                    `Instance identifier '${this.identifierAttribute}' for type '${
-                        this.type.name
-                    }' must be a string or a number`
+                    `Instance identifier '${this.identifierAttribute}' for type '${this.type.name}' must be a string or a number`
                 )
             }
 
@@ -292,16 +290,12 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
             if (this.parent && parentChanged) {
                 throw fail(
-                    `A node cannot exists twice in the state tree. Failed to add ${this} to path '${
-                        newParent.path
-                    }/${subpath}'.`
+                    `A node cannot exists twice in the state tree. Failed to add ${this} to path '${newParent.path}/${subpath}'.`
                 )
             }
             if (!this.parent && newParent.root === this) {
                 throw fail(
-                    `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${
-                        newParent.path
-                    }/${subpath}'`
+                    `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`
                 )
             }
             if (
@@ -418,9 +412,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             actionFullPath = `${actionPath}.${actionContext.name}()`
         }
 
-        return `You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${
-            this.type.name
-        }', Path upon death: '${escapedPath}', Subpath: '${subpath}', Action: '${actionFullPath}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
+        return `You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${this.type.name}', Path upon death: '${escapedPath}', Subpath: '${subpath}', Action: '${actionFullPath}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
     }
 
     getChildNode(subpath: string): AnyNode {

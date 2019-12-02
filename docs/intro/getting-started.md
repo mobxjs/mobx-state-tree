@@ -1,4 +1,9 @@
-# Getting Started
+---
+id: getting-started
+title: Getting Started Tutorial
+---
+
+<div id="codefund"></div>
 
 This tutorial will introduce you to the basics of `mobx-state-tree` (MST) by building a TODO application. The application will also have the ability to assign each TODO to a user.
 
@@ -145,7 +150,7 @@ const User = types.model({
 
 [View sample in the playground](https://codesandbox.io/s/kx9x4973z3)
 
-The `types` namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the [API documentation](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/API/README.md) for the whole list and their parameters.
+The `types` namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the [types overview](/overview/types) for the whole list and their parameters.
 
 We can now use this knowledge to combine models and define the root model of our store that will hold `Todo` and `User` instances in the `todos` and `users` maps.
 
@@ -653,7 +658,3 @@ One neat feature of references, is that they will throw an error if you accident
 ```
 [mobx-state-tree] Failed to resolve reference of type <late>: '1' (in: /todos/1/user)
 ```
-
-## Next up
-
-In (the still TODO) part 2 of this tutorial, we will discover how to use MST life cycle hooks and local state to fetch user data from an XHR endpoint, and see how environments will help dealing with dependency injection of the parameters needed to fetch our endpoint. We will implement auto-save using MobX helpers and learn more about patches and actions event streams.

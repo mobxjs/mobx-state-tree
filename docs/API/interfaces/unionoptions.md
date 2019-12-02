@@ -1,6 +1,10 @@
-[mobx-state-tree](../README.md) › [UnionOptions](unionoptions.md)
+---
+id: "unionoptions"
+title: "UnionOptions"
+sidebar_label: "UnionOptions"
+---
 
-# Interface: UnionOptions
+[mobx-state-tree](../index.md) › [UnionOptions](unionoptions.md)
 
 ## Hierarchy
 
@@ -17,9 +21,9 @@
 
 ### `Optional` dispatcher
 
-• **dispatcher**? : *[ITypeDispatcher](../README.md#itypedispatcher)*
+• **dispatcher**? : *[ITypeDispatcher](../index.md#itypedispatcher)*
 
-*Defined in [types/utility-types/union.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/union.ts#L31)*
+*Defined in [types/utility-types/union.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/types/utility-types/union.ts#L31)*
 
 ___
 
@@ -27,4 +31,4 @@ ___
 
 • **eager**? : *undefined | false | true*
 
-*Defined in [types/utility-types/union.ts:30](https://github.com/mobxjs/mobx-state-tree/blob/6b966be0/packages/mobx-state-tree/src/types/utility-types/union.ts#L30)*
+*Defined in [types/utility-types/union.ts:30](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/types/utility-types/union.ts#L30)*

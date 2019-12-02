@@ -1,3 +1,48 @@
+---
+id: async-actions
+title: Asynchronous actions
+---
+
+<div id="codefund"></div>
+
+<details>
+    <summary style="color: white; background:#ff7000;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 12: Defining Asynchronous Processes Using Flow</summary>
+    <br>
+    <div style="padding:5px;">
+        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-defining-asynchronous-processes-using-flow/embed" ></iframe>
+    </div>
+    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-defining-asynchronous-processes-using-flow">Hosted on egghead.io</a>
+</details>
+
+The recommende way to write asynchronous actions is by using `flow` and generators. They always return a promise, and work for all practical purposes the same as async / await. For a real working example see the [bookshop sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A detailed break-down is made below, but a quick example to get the gist:
+
+_Warning: don't import `flow` from `"mobx"`, but from `"mobx-state-tree"` instead!_
+
+```javascript
+import { types, flow } from "mobx-state-tree"
+
+someModel.actions(self => {
+    const fetchProjects = flow(function*() {
+        // <- note the star, this a generator function!
+        self.state = "pending"
+        try {
+            // ... yield can be used in async/await style
+            self.githubProjects = yield fetchGithubProjectsSomehow()
+            self.state = "done"
+        } catch (error) {
+            // ... including try/catch error handling
+            console.error("Failed to fetch projects", error)
+            self.state = "error"
+        }
+        // The action will return a promise that resolves to the returned value
+        // (or rejects with anything thrown from the action)
+        return self.githubProjects.length
+    })
+
+    return { fetchProjects }
+})
+```
+
 # Creating asynchronous actions
 
 Asynchronous actions are a first class concept in Mobx-State-Tree. Modelling an asynchronous flow can be done in two ways:
@@ -109,3 +154,12 @@ To see how `flows`s can be monitored and detected in middleware, see the [middle
 
 Async/await can only be used in trees that are unprotected. Async / await is not flexible enough to allow MST to wrap asynchronous steps in actions automatically, as is done for the generator functions.
 Luckily, using generators in combination with `flow` is very similar to `async / await`: `async function() {}` becomes `flow(function* () {})`, and `await promise` becomes `yield promise`, and further behavior should be the same.
+
+## TypeScript tip
+
+Note that, since MST v3.9, TypeScript correctly infers `flow` arguments and usually infers correctly `flow` return types,
+but one exception to this case is when a `Promise` is returned as final value. In this case (and only in this case) this construct needs to be used:
+
+```ts
+return castFlowReturn(somePromise)
+```
