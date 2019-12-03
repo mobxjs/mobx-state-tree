@@ -1,4 +1,4 @@
-<img src="docs/mobx-state-tree-logo-gradient.png" alt="logo" height="120" align="right" />
+<img src="website/static/img/mobx-state-tree-logo-gradient.png" alt="logo" height="120" align="right" />
 
 # mobx-state-tree
 
@@ -13,7 +13,7 @@ _Opinionated, transactional, MobX powered state container combining the best fea
 
 # Getting started
 
-See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial or follow the free [egghead.io course](https://egghead.io/courses/manage-application-state-with-mobx-state-tree).
+See the [Getting started](https://mobx-state-tree.js.org/intro/getting-started) tutorial or follow the free [egghead.io course](https://egghead.io/courses/manage-application-state-with-mobx-state-tree).
 
 👉 Official docs can be found at [http://mobx-state-tree.js.org/](http://mobx-state-tree.js.org/)
 
