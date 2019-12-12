@@ -13,7 +13,7 @@ _Opinionated, transactional, MobX powered state container combining the best fea
 
 # Getting started
 
-See the [Getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started) tutorial or follow the free [egghead.io course](https://egghead.io/courses/manage-application-state-with-mobx-state-tree).
+See the [Getting started](https://github.com/computationalcore/mobx-state-tree/blob/master/docs/intro/getting-started.md) tutorial or follow the free [egghead.io course](https://egghead.io/courses/manage-application-state-with-mobx-state-tree).
 
 👉 Official docs can be found at [http://mobx-state-tree.js.org/](http://mobx-state-tree.js.org/)
 
