@@ -45,7 +45,7 @@ someModel.actions(self => {
 
 # Creating asynchronous actions
 
-Asynchronous actions are a first class concept in Mobx-State-Tree. Modeling an asynchronous flow can be done in two ways:
+Asynchronous actions are a first class concept in Mobx-State-Tree. Modelling an asynchronous flow can be done in two ways:
 
 1. Model each step of the flow as separate action
 2. Use generators
