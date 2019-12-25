@@ -14,7 +14,7 @@ title: Asynchronous actions
     <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-defining-asynchronous-processes-using-flow">Hosted on egghead.io</a>
 </details>
 
-The recommende way to write asynchronous actions is by using `flow` and generators. They always return a promise, and work for all practical purposes the same as async / await. For a real working example see the [bookshop sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A detailed break-down is made below, but a quick example to get the gist:
+The recommended way to write asynchronous actions is by using `flow` and generators. They always return a promise, and work for all practical purposes the same as async / await. For a real working example see the [bookshop sources](https://github.com/mobxjs/mobx-state-tree/blob/adba1943af263898678fe148a80d3d2b9f8dbe63/examples/bookshop/src/stores/BookStore.js#L25). A detailed break-down is made below, but a quick example to get the gist:
 
 _Warning: don't import `flow` from `"mobx"`, but from `"mobx-state-tree"` instead!_
 
@@ -158,7 +158,7 @@ Luckily, using generators in combination with `flow` is very similar to `async /
 ## TypeScript tip
 
 Note that, since MST v3.9, TypeScript correctly infers `flow` arguments and usually infers correctly `flow` return types,
-but one exception to this case is when a `Promise` is returned as final value. In this case (and only in this case) this construct needs to be used:
+but one exception to this case is when a `Promise` is returned as the final value. In this case (and only in this case) this construct needs to be used:
 
 ```ts
 return castFlowReturn(somePromise)
