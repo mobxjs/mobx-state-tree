@@ -2395,7 +2395,7 @@ ___
 
 *Defined in [core/flow.ts:6](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/flow.ts#L6)*
 
-See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
+See [asynchronous actions](https://mobx-state-tree.js.org/concepts/async-actions).
 
 **Type parameters:**
 
