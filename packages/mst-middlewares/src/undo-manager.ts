@@ -124,6 +124,8 @@ const UndoManager = types
                         patches: recorder.patches,
                         inversePatches: recorder.inversePatches
                     })
+                    const maxLength = getEnv(self).maxHistoryLength || Infinity
+                    self.history.splice(0, self.history.length - maxLength)
                     self.undoIdx = self.history.length
                 })
             },
