@@ -9,7 +9,7 @@ title: Talks & Blogs
 
 * Introduction blog post [The curious case of MobX state tree](https://medium.com/@mweststrate/the-curious-case-of-mobx-state-tree-7b4e22d461f)
 * Free [egghead.io](https://egghead.io/courses/manage-application-state-with-mobx-state-tree) MST course
-* [Introduction tutorial](getting-started)
+* [Introduction tutorial](../intro/getting-started)
 
 ## Talks
 

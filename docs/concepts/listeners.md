@@ -67,6 +67,6 @@ addMiddleware(storeInstance, (call, next) => {
 ```
 
 A more extensive middleware example can be found in this [code sandbox](https://codesandbox.io/s/mQrqy8j73).
-For more details on creating middleware and the exact specification of middleware events, see the [docs](middlewares).
+For more details on creating middleware and the exact specification of middleware events, see the [docs](middleware).
 
 Finally, it is not only possible to be notified about snapshots, patches or actions. It is also possible to re-apply them by using `applySnapshot`, `applyPatch` or `applyAction`!

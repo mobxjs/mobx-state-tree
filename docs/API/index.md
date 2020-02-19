@@ -638,7 +638,7 @@ ___
 Middleware can be used to intercept any action is invoked on the subtree where it is attached.
 If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
 
-For more details, see the [middleware docs](../middleware.md)
+For more details, see the [middleware docs](/concepts/middleware)
 
 **Parameters:**
 
@@ -2395,7 +2395,7 @@ ___
 
 *Defined in [core/flow.ts:6](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/flow.ts#L6)*
 
-See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
+See [asynchronous actions](/concepts/async-actions.md).
 
 **Type parameters:**
 
@@ -3609,7 +3609,7 @@ ___
 
 `types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
 
-See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
+See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](/intro/getting-started.md#getting-started-1) tutorial.
 
 **Type parameters:**
 
