@@ -638,7 +638,7 @@ ___
 Middleware can be used to intercept any action is invoked on the subtree where it is attached.
 If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
 
-For more details, see the [middleware docs](/concepts/middleware)
+For more details, see the [middleware docs](concepts/middleware.md)
 
 **Parameters:**
 
@@ -854,7 +854,7 @@ ___
 
 ▸ **castFlowReturn**<**T**>(`val`: T): *T*
 
-*Defined in [core/flow.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/flow.ts#L19)*
+*Defined in [core/flow.ts:24](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/flow.ts#L24)*
 
 **`deprecated`** Not needed since TS3.6.
 Used for TypeScript to make flows that return a promise return the actual promise result.
@@ -2180,8 +2180,8 @@ The signature of the options is:
 export interface CustomTypeOptions<S, T> {
     // Friendly name
     name: string
-    // given a serialized value, how to turn it into the target type
-    fromSnapshot(snapshot: S): T
+    // given a serialized value and environment, how to turn it into the target type
+    fromSnapshot(snapshot: S, env: any): T
     // return the serialization of the current value
     toSnapshot(value: T): S
     // if true, this is a converted value, if false, it's a snapshot
@@ -2393,9 +2393,9 @@ ___
 
 ▸ **flow**<**R**, **Args**>(`generator`: function): *function*
 
-*Defined in [core/flow.ts:6](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/flow.ts#L6)*
+*Defined in [core/flow.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/core/flow.ts#L11)*
 
-See [asynchronous actions](/concepts/async-actions.md).
+See [asynchronous actions](concepts/async-actions.md).
 
 **Type parameters:**
 
@@ -2407,7 +2407,7 @@ See [asynchronous actions](/concepts/async-actions.md).
 
 ▪ **generator**: *function*
 
-▸ (...`args`: Args): *Generator‹any, R, any›*
+▸ (...`args`: Args): *Generator‹Promise‹any›, R, any›*
 
 **Parameters:**
 
@@ -2419,7 +2419,7 @@ Name | Type |
 
 The flow as a promise.
 
-▸ (...`args`: Args): *Promise‹R›*
+▸ (...`args`: Args): *Promise‹FlowReturn‹R››*
 
 **Parameters:**
 
@@ -3609,7 +3609,7 @@ ___
 
 `types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
 
-See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](/intro/getting-started.md#getting-started-1) tutorial.
+See the [model type](/concepts/trees#creating-models) description or the [getting started](intro/getting-started.md#getting-started-1) tutorial.
 
 **Type parameters:**
 
@@ -3630,7 +3630,7 @@ Name | Type |
 
 `types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
 
-See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
+See the [model type](/concepts/trees#creating-models) description or the [getting started](intro/getting-started.md#getting-started-1) tutorial.
 
 **Type parameters:**
 

@@ -43,17 +43,18 @@ Friendly name
 
 ###  fromSnapshot
 
-▸ **fromSnapshot**(`snapshot`: S): *T*
+▸ **fromSnapshot**(`snapshot`: S, `env?`: any): *T*
 
 *Defined in [types/utility-types/custom.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/2d85314b/packages/mobx-state-tree/src/types/utility-types/custom.ts#L17)*
 
-given a serialized value, how to turn it into the target type
+given a serialized value and environment, how to turn it into the target type
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `snapshot` | S |
+`env?` | any |
 
 **Returns:** *T*
 
