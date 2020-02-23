@@ -53,7 +53,7 @@ export function prettyPrintValue(value: any) {
         ? `<function${value.name ? " " + value.name : ""}>`
         : isStateTreeNode(value)
         ? `<${value}>`
-        : `\`${safeStringify(value)}\``
+        : `${safeStringify(value)}`
 }
 
 function shortenPrintValue(valueInString: string) {
@@ -62,42 +62,6 @@ function shortenPrintValue(valueInString: string) {
         : `${valueInString.substring(0, 272)}......${valueInString.substring(
               valueInString.length - 8
           )}`
-}
-
-function toErrorString(error: IValidationError): string {
-    const { value } = error
-    const type = error.context[error.context.length - 1].type!
-    const fullPath = error.context
-        .map(({ path }) => path)
-        .filter(path => path.length > 0)
-        .join("/")
-
-    const pathPrefix = fullPath.length > 0 ? `at path "/${fullPath}" ` : ``
-
-    const currentTypename = isStateTreeNode(value)
-        ? `value of type ${getStateTreeNode(value).type.name}:`
-        : isPrimitive(value)
-        ? "value"
-        : "snapshot"
-    const isSnapshotCompatible =
-        type && isStateTreeNode(value) && type.is(getStateTreeNode(value).snapshot)
-
-    return (
-        `${pathPrefix}${currentTypename} ${prettyPrintValue(value)} is not assignable ${
-            type ? `to type: \`${type.name}\`` : ``
-        }` +
-        (error.message ? ` (${error.message})` : "") +
-        (type
-            ? isPrimitiveType(type) || isPrimitive(value)
-                ? `.`
-                : `, expected an instance of \`${
-                      (type as IAnyType).name
-                  }\` or a snapshot like \`${(type as IAnyType).describe()}\` instead.` +
-                  (isSnapshotCompatible
-                      ? " (Note that a snapshot of the provided value is compatible with the targeted type)"
-                      : "")
-            : `.`)
-    )
 }
 
 /**
@@ -180,9 +144,25 @@ function validationErrorsToString<IT extends IAnyType>(
         return undefined
     }
 
-    return (
-        `Error while converting ${shortenPrintValue(prettyPrintValue(value))} to \`${
-            type.name
-        }\`:\n\n    ` + errors.map(toErrorString).join("\n    ")
-    )
+    const messageArray = [`Error converting data to '${type.name}':\n`]
+    messageArray.push("- Expected")
+    messageArray.push("+ Received\n")
+
+    errors.forEach(error => {
+        const fullPath =
+            `<${type.name}>.` +
+            error.context
+                .map(({ path }) => path)
+                .filter(path => path.length > 0)
+                .join(".")
+        if (!messageArray.includes(fullPath)) {
+            const expected = error.context[error.context.length - 1].type
+            const received = prettyPrintValue(error.value)
+            messageArray.push(fullPath)
+            messageArray.push(`- ${expected.name} (${expected.constructor.name})`)
+            messageArray.push(`+ ${received}`)
+        }
+    })
+
+    return messageArray.join("\n")
 }
