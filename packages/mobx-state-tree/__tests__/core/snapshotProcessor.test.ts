@@ -496,14 +496,21 @@ describe("snapshotProcessor", () => {
         expect(Model.is({ x: 1 })).toBe(true)
 
         const ProcessedModel = types.snapshotProcessor(Model, {
-            preProcessor(sn: { x: string }) {
-                return { ...sn, x: Number(sn.x) }
+            preProcessor(sn: { y: number }) {
+                const copy = { ...sn, x: sn.y }
+                delete copy.y
+                return copy
+            },
+            postProcessor(sn: { x: number }) {
+                const copy = { ...sn, y: sn.x }
+                delete copy.x
+                return copy
             }
         })
 
-        const processedModel = ProcessedModel.create({ x: "1" })
+        const processedModel = ProcessedModel.create({ y: 1 })
         expect(ProcessedModel.is(processedModel)).toBe(true)
-        expect(ProcessedModel.is({ x: "1" })).toBe(true)
+        expect(ProcessedModel.is({ y: 1 })).toBe(true)
         expect(ProcessedModel.is(Model)).toBe(false)
     })
 })
