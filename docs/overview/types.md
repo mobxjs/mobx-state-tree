@@ -61,8 +61,8 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
     -   `types.frozen(someDefaultValue)` - provide a primitive value, object or array, and MST will infer the type from that object, and also make it the default value for the field
     -   (Typescript) `types.frozen<TypeScriptType>(...)` - provide a typescript type, to help in strongly typing the field (design time only)
 -   [`types.compose(name?, type1...typeX)`](/API/#compose), creates a new model type by taking a bunch of existing types and combining them into a new one.
--   [`types.reference(targetType)`](/API/#reference) creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](#references) for more details.
--   [`types.safeReference(targetType)`](/API/#safereference) is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed. See [references](#references) for more details.
+-   [`types.reference(targetType)`](/API/#reference) creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](/concepts/references#references) for more details.
+-   [`types.safeReference(targetType)`](/API/#safereference) is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed. See [references](/concepts/references#references) for more details.
 -   [`types.snapshotProcessor(type, processors, name?)`](/API/#snapshotprocessor) runs a pre snapshot / post snapshot processor before/after serializing a given type. Example:
     ```ts
     const Todo1 = types.model({ text: types.string })
@@ -90,6 +90,6 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 
 Property types can only be used as a direct member of a `types.model` type and not further composed (for now).
 
--   [`types.identifier`](/API/#const-identifier) Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](#identifiers) for more details.
+-   [`types.identifier`](/API/#const-identifier) Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](/concepts/references#identifiers) for more details.
 -   [`types.identifierNumber`](/API/#const-identifiernumber) Similar to `types.identifier`. However, during serialization, the identifier value will be parsed from / serialized to a number.
 
