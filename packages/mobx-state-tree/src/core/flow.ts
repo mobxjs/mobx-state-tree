@@ -4,7 +4,7 @@
 export type FlowReturn<R> = R extends Promise<infer T> ? T : R
 
 /**
- * See [asynchronous actions](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/async-actions.md).
+ * See [asynchronous actions](concepts/async-actions.md).
  *
  * @returns The flow as a promise.
  */

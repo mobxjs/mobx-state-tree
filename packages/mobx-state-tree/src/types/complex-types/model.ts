@@ -741,7 +741,7 @@ export function model<P extends ModelPropertiesDeclaration = {}>(
 /**
  * `types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
  *
- * See the [model type](https://github.com/mobxjs/mobx-state-tree#creating-models) description or the [getting started](https://github.com/mobxjs/mobx-state-tree/blob/master/docs/getting-started.md#getting-started-1) tutorial.
+ * See the [model type](/concepts/trees#creating-models) description or the [getting started](intro/getting-started.md#getting-started-1) tutorial.
  */
 export function model(...args: any[]): any {
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
