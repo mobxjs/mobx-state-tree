@@ -154,12 +154,3 @@ To see how `flows`s can be monitored and detected in middleware, see the [middle
 
 Async/await can only be used in trees that are unprotected. Async / await is not flexible enough to allow MST to wrap asynchronous steps in actions automatically, as is done for the generator functions.
 Luckily, using generators in combination with `flow` is very similar to `async / await`: `async function() {}` becomes `flow(function* () {})`, and `await promise` becomes `yield promise`, and further behavior should be the same.
-
-## TypeScript tip
-
-Note that, since MST v3.9, TypeScript correctly infers `flow` arguments and usually infers correctly `flow` return types,
-but one exception to this case is when a `Promise` is returned as the final value. In this case (and only in this case) this construct needs to be used:
-
-```ts
-return castFlowReturn(somePromise)
-```
