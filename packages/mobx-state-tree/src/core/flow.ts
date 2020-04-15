@@ -1,3 +1,5 @@
+import { setImmediateWithFallback } from "../utils"
+
 /**
  * @hidden
  */
@@ -92,7 +94,7 @@ export function createFlowSpawner(name: string, generator: Function) {
                     wrap((r: any) => { ret = gen.next(r) }, "flow_resume", res)
                 } catch (e) {
                     // prettier-ignore
-                    setImmediate(() => {
+                    setImmediateWithFallback(() => {
                         wrap((r: any) => { reject(e) }, "flow_throw", e)
                     })
                     return
@@ -108,7 +110,7 @@ export function createFlowSpawner(name: string, generator: Function) {
                     wrap((r: any) => { ret = gen.throw(r) }, "flow_resume_error", err) // or yieldError?
                 } catch (e) {
                     // prettier-ignore
-                    setImmediate(() => {
+                    setImmediateWithFallback(() => {
                         wrap((r: any) => { reject(e) }, "flow_throw", e)
                     })
                     return
@@ -119,7 +121,7 @@ export function createFlowSpawner(name: string, generator: Function) {
             function next(ret: any) {
                 if (ret.done) {
                     // prettier-ignore
-                    setImmediate(() => {
+                    setImmediateWithFallback(() => {
                         wrap((r: any) => { resolve(r) }, "flow_return", ret.value)
                     })
                     return

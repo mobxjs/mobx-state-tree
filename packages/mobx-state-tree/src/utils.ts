@@ -469,3 +469,17 @@ export function assertIsString(value: string, argNumber: number | number[], canB
         assertArg(value, s => s !== "", "not empty string", argNumber)
     }
 }
+
+/**
+ * @internal
+ * @hidden
+ */
+export function setImmediateWithFallback(fn: (...args: any[]) => void) {
+    if (typeof queueMicrotask === "function") {
+        queueMicrotask(fn)
+    } else if (typeof setImmediate === "function") {
+        setImmediate(fn)
+    } else {
+        setTimeout(fn, 1)
+    }
+}
