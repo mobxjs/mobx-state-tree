@@ -13,6 +13,7 @@
     "jsnext:main": "dist/mst-middlewares.module.js",
     "react-native": "dist/mst-middlewares.module.js",
     "typings": "dist/index.d.ts",
+    "sideEffects": false,
     "scripts": {
         "clean": "shx rm -rf dist && shx rm -rf lib",
         "build": "yarn clean && tsc && cpr lib dist --filter=\\.js$ && rollup -c",
