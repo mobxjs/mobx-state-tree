@@ -9,6 +9,10 @@
 // site configuration options.
 
 const siteConfig = {
+    algolia: {
+        apiKey: "b7b0cfe7d1c8fa6db6089df94a3128f1",
+        indexName: "mobx-state-tree"
+    },
     title: "MobX-state-tree", // Title for your website.
     tagline:
         "Opinionated, transactional, MobX powered state container combining the best features of the immutable and mutable world for an optimal DX",
