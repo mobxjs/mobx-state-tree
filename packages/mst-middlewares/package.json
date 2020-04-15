@@ -1,6 +1,6 @@
 {
     "name": "mst-middlewares",
-    "version": "3.15.0",
+    "version": "3.16.0",
     "description": "The MST package ships with some prebuilt middlewares, which serves mainly as examples on how to write your own middleware. The source of each middleware can be found in this github directory, you are encouraged to read them!",
     "main": "dist/mst-middlewares.js",
     "umd:main": "dist/mst-middlewares.umd.js",
@@ -37,7 +37,7 @@
         "jest": "^24.5.0",
         "jest-junit": "^8.0.0",
         "mobx": "^5.9.0",
-        "mobx-state-tree": "^3.15.0",
+        "mobx-state-tree": "^3.16.0",
         "rollup": "^1.6.0",
         "rollup-plugin-commonjs": "^10.0.0",
         "rollup-plugin-filesize": "^6.0.1",
