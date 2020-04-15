@@ -10,6 +10,7 @@ import {
     ExtractNodeType,
     assertIsType,
     isType,
+    getSnapshot,
     devMode
 } from "../../internal"
 
@@ -128,11 +129,12 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     }
 
     is(thing: any): thing is any {
-        return (
-            this._subtype.validate(isType(thing) ? this._subtype : this.preProcessSnapshot(thing), [
-                { path: "", type: this._subtype }
-            ]).length === 0
-        )
+        const value = isType(thing)
+            ? this._subtype
+            : isStateTreeNode(thing)
+            ? getSnapshot(thing, false)
+            : this.preProcessSnapshot(thing)
+        return this._subtype.validate(value, [{ path: "", type: this._subtype }]).length === 0
     }
 }
 
