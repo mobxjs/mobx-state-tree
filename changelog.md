@@ -1,6 +1,12 @@
-# 3.15.1
+# 3.16.0
 
-- Fixed that calling "createObservableInstanceIfNeeded" would execute an action, even if the function immediately returned. (significant since the extraneous actions would pollute the mobx dev-tools on mere accesses, eg. by ComplexType.prototype.getValue) Fixes [#1421](https://github.com/mobxjs/mobx-state-tree/issues/1421)
+* Added search field to the docs
+* Custom types can now receive environments as second argument of the `fromSnapshot` option. [#1410](https://github.com/mobxjs/mobx-state-tree/pull/1410) by [@k-g-a](https://github.com/k-g-a)
+* Added option `maxHistoryLength` to the `UndoManager`, implements [#1417](https://github.com/mobxjs/mobx-state-tree/issues/1417) through [#1426](https://github.com/mobxjs/mobx-state-tree/pull/1426) by [@tibotiber](https://github.com/tibotiber).
+* Improved TypeScript typings of `flow`, fixes [#1378](https://github.com/mobxjs/mobx-state-tree/pull/1378) through [#1409](https://github.com/mobxjs/mobx-state-tree/pull/1409) by [@nulladdict](https://github.com/nulladdict)
+* Fixed that calling `createObservableInstanceIfNeeded` would execute an action, even if the function immediately returned. (significant since the extraneous actions would pollute the mobx dev-tools on mere accesses, eg. by ComplexType.prototype.getValue) Fixes [#1421](https://github.com/mobxjs/mobx-state-tree/issues/1421) trough [#1422](https://github.com/mobxjs/mobx-state-tree/pull/1422) by [@Venryx](https://github.com/Venryx)
+* Fix issue where `snapshotProcessor.is` does not correctly handle model instances. Fixes [#1494](https://github.com/mobxjs/mobx-state-tree/issues/1494) through [#1495](https://github.com/mobxjs/mobx-state-tree/pull/1495) by [@KevinSjoberg](https://github.com/KevinSjoberg)
+* Make sure that MST no longer requires `setImmediate` to be present, but fallback to other solutions. [#1501](https://github.com/mobxjs/mobx-state-tree/pull/1501) by [@isaachinman](https://github.com/isaachinman)
 
 # 3.15.0
 
