@@ -67,6 +67,20 @@ test("applying patches should be recordable and replayable", () => {
     recorder.replay(t2)
     expect(t2.done).toBe(true)
 })
+test("applying patches should be replacing the root store", () => {
+    const t1 = Task.create()
+    const recorder = recordActions(t1)
+    expect(t1.done).toBe(false)
+    applyPatch(t1, { op: "replace", path: "", value: { done: true } })
+    expect(t1.done).toBe(true)
+    expect(recorder.actions).toEqual([
+        {
+            name: "@APPLY_PATCHES",
+            path: "",
+            args: [[{ op: "replace", path: "", value: { done: true } }]]
+        }
+    ])
+})
 test("applying snapshots should be recordable and replayable", () => {
     const t1 = Task.create()
     const t2 = Task.create()
@@ -326,10 +340,10 @@ test("middleware events are correct", () => {
     const event1 = {
         args: [7],
         context: {},
-        id: process.env.NODE_ENV !== "production" ? 28 : 27,
+        id: process.env.NODE_ENV !== "production" ? 29 : 28,
         name: "a",
         parentId: 0,
-        rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
+        rootId: process.env.NODE_ENV !== "production" ? 29 : 28,
         allParentIds: [],
         tree: {},
         type: "action",
@@ -339,11 +353,11 @@ test("middleware events are correct", () => {
     const event2 = {
         args: [14],
         context: {},
-        id: process.env.NODE_ENV !== "production" ? 29 : 28,
+        id: process.env.NODE_ENV !== "production" ? 30 : 29,
         name: "b",
-        parentId: process.env.NODE_ENV !== "production" ? 28 : 27,
-        rootId: process.env.NODE_ENV !== "production" ? 28 : 27,
-        allParentIds: [process.env.NODE_ENV !== "production" ? 28 : 27],
+        parentId: process.env.NODE_ENV !== "production" ? 29 : 28,
+        rootId: process.env.NODE_ENV !== "production" ? 29 : 28,
+        allParentIds: [process.env.NODE_ENV !== "production" ? 29 : 28],
         tree: {},
         type: "action",
         parentEvent: event1,
