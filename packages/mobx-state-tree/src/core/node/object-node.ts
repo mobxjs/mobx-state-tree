@@ -502,6 +502,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             "@APPLY_PATCHES",
             (patches: IJsonPatch[]) => {
                 patches.forEach(patch => {
+                    if (!patch.path) {
+                        throw fail(`node is root, path is empty`)
+                    }
                     const parts = splitJsonPath(patch.path)
                     const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as AnyObjectNode
                     node.applyPatchLocally(parts[parts.length - 1], patch)

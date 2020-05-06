@@ -84,6 +84,18 @@ test("applying snapshots should be recordable and replayable", () => {
     recorder.replay(t2)
     expect(t2.done).toBe(true)
 })
+test("applying patches should not replacing when node is root", () => {
+    const t1 = Task.create()
+    expect(() => {
+        applyPatch(t1, [
+            {
+                op: "replace",
+                path: "",
+                value: true
+            }
+        ])
+    }).toThrow("node is root, path is empty")
+})
 // Complex actions
 const Customer = types.model("Customer", {
     id: types.identifierNumber,
