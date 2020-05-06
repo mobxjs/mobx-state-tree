@@ -504,6 +504,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
                 patches.forEach(patch => {
                     if (!patch.path) {
                         self.type.applySnapshot(self, patch.value)
+                        return
                     }
                     const parts = splitJsonPath(patch.path)
                     const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as AnyObjectNode
