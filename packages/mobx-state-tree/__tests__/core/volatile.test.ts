@@ -81,9 +81,9 @@ test("VS should not be modifiable without action", () => {
 
 test("VS should expect a function as an argument", () => {
     expect(() => {
-        // @ts-ignore
         const t = types
             .model({})
+            // @ts-ignore
             .volatile({ state: 1 })
             .create()
     }).toThrowError(
