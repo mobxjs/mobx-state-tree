@@ -23,7 +23,7 @@ import { types, flow } from "mobx-state-tree"
 
 someModel.actions(self => {
     const fetchProjects = flow(function*() {
-        // <- note the star, this a generator function!
+        // <- note the star, this is a generator function!
         self.state = "pending"
         try {
             // ... yield can be used in async/await style
@@ -69,7 +69,7 @@ const Store = types.model({
             self.githubProjects = []
             self.state = "pending"
             fetchGithubProjectsSomehow().then(
-                // when promise resolves invoke the appropiate action
+                // when promise resolves, invoke the appropiate action
                 // (note that there is no need to bind here)
                 self.fetchProjectsSuccess,
                 self.fetchProjectsError
