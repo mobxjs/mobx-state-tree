@@ -79,6 +79,18 @@ test("VS should not be modifiable without action", () => {
     }).toThrowError(/the object is protected and can only be modified by using an action/)
 })
 
+test("VS should expect a function as an argument", () => {
+    expect(() => {
+        const t = types
+            .model({})
+            // @ts-ignore
+            .volatile({ state: 1 })
+            .create()
+    }).toThrowError(
+        `You passed an object to volatile state as an argument, when function is expected`
+    )
+})
+
 test("VS should not be modifiable when unprotected", () => {
     const i = Todo.create()
     unprotect(i)

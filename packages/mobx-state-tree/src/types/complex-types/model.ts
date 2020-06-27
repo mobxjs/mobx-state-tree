@@ -437,6 +437,11 @@ export class ModelType<
     }
 
     volatile<TP extends object>(fn: (self: Instance<this>) => TP) {
+        if (typeof fn !== "function") {
+            throw fail(
+                `You passed an ${typeof fn} to volatile state as an argument, when function is expected`
+            )
+        }
         const stateInitializer = (self: Instance<this>) => {
             this.instantiateVolatileState(self, fn(self))
             return self
