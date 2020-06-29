@@ -33,7 +33,7 @@
         "husky": "^4.2.5",
         "lerna": "^3.22.1",
         "lint-staged": "^10.2.11",
-        "prettier": "^1.16.4",
+        "prettier": "^2.0.5",
         "size-limit": "^4.5.2",
         "tslint": "^6.1.2",
         "tslint-config-prettier": "^1.18.0",
