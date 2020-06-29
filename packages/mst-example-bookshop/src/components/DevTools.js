@@ -20,10 +20,14 @@ const DevTools = ({ history }) =>
                     ))}
                 </TabPanel>
                 <TabPanel>
-                    {history.patches.map((entry, idx) => <HistoryEntry key={idx} entry={entry} />)}
+                    {history.patches.map((entry, idx) => (
+                        <HistoryEntry key={idx} entry={entry} />
+                    ))}
                 </TabPanel>
                 <TabPanel>
-                    {history.actions.map((entry, idx) => <HistoryEntry key={idx} entry={entry} />)}
+                    {history.actions.map((entry, idx) => (
+                        <HistoryEntry key={idx} entry={entry} />
+                    ))}
                 </TabPanel>
             </Tabs>
         </div>

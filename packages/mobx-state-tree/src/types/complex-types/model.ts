@@ -259,59 +259,56 @@ const defaultObjectOptions = {
 
 function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelProperties {
     // loop through properties and ensures that all items are types
-    return Object.keys(declaredProps).reduce(
-        (props, key) => {
-            // warn if user intended a HOOK
-            if (key in Hook)
-                throw fail(
-                    `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
-                )
+    return Object.keys(declaredProps).reduce((props, key) => {
+        // warn if user intended a HOOK
+        if (key in Hook)
+            throw fail(
+                `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
+            )
 
-            // the user intended to use a view
-            const descriptor = Object.getOwnPropertyDescriptor(props, key)!
-            if ("get" in descriptor) {
-                throw fail("Getters are not supported as properties. Please use views instead")
-            }
-            // undefined and null are not valid
-            const value = descriptor.value
-            if (value === null || value === undefined) {
-                throw fail(
-                    "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
-                )
-                // its a primitive, convert to its type
-            } else if (isPrimitive(value)) {
-                return Object.assign({}, props, {
-                    [key]: optional(getPrimitiveFactoryFromValue(value), value)
-                })
-                // map defaults to empty object automatically for models
-            } else if (value instanceof MapType) {
-                return Object.assign({}, props, {
-                    [key]: optional(value, {})
-                })
-            } else if (value instanceof ArrayType) {
-                return Object.assign({}, props, { [key]: optional(value, []) })
-                // its already a type
-            } else if (isType(value)) {
-                return props
-                // its a function, maybe the user wanted a view?
-            } else if (devMode() && typeof value === "function") {
-                throw fail(
-                    `Invalid type definition for property '${key}', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?`
-                )
-                // no other complex values
-            } else if (devMode() && typeof value === "object") {
-                throw fail(
-                    `Invalid type definition for property '${key}', it looks like you passed an object. Try passing another model type or a types.frozen.`
-                )
-                // WTF did you pass in mate?
-            } else {
-                throw fail(
-                    `Invalid type definition for property '${key}', cannot infer a type from a value like '${value}' (${typeof value})`
-                )
-            }
-        },
-        declaredProps as any
-    )
+        // the user intended to use a view
+        const descriptor = Object.getOwnPropertyDescriptor(props, key)!
+        if ("get" in descriptor) {
+            throw fail("Getters are not supported as properties. Please use views instead")
+        }
+        // undefined and null are not valid
+        const value = descriptor.value
+        if (value === null || value === undefined) {
+            throw fail(
+                "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
+            )
+            // its a primitive, convert to its type
+        } else if (isPrimitive(value)) {
+            return Object.assign({}, props, {
+                [key]: optional(getPrimitiveFactoryFromValue(value), value)
+            })
+            // map defaults to empty object automatically for models
+        } else if (value instanceof MapType) {
+            return Object.assign({}, props, {
+                [key]: optional(value, {})
+            })
+        } else if (value instanceof ArrayType) {
+            return Object.assign({}, props, { [key]: optional(value, []) })
+            // its already a type
+        } else if (isType(value)) {
+            return props
+            // its a function, maybe the user wanted a view?
+        } else if (devMode() && typeof value === "function") {
+            throw fail(
+                `Invalid type definition for property '${key}', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?`
+            )
+            // no other complex values
+        } else if (devMode() && typeof value === "object") {
+            throw fail(
+                `Invalid type definition for property '${key}', it looks like you passed an object. Try passing another model type or a types.frozen.`
+            )
+            // WTF did you pass in mate?
+        } else {
+            throw fail(
+                `Invalid type definition for property '${key}', cannot infer a type from a value like '${value}' (${typeof value})`
+            )
+        }
+    }, declaredProps as any)
 }
 
 /**
@@ -391,7 +388,7 @@ export class ModelType<
             throw fail(`actions initializer should return a plain object containing actions`)
 
         // bind actions to the object created
-        Object.keys(actions).forEach(name => {
+        Object.keys(actions).forEach((name) => {
             // warn if preprocessor was given
             if (name === PRE_PROCESS_SNAPSHOT)
                 throw fail(
@@ -409,7 +406,7 @@ export class ModelType<
             let baseAction = (self as any)[name]
             if (name in Hook && baseAction) {
                 let specializedAction = action2
-                action2 = function() {
+                action2 = function () {
                     baseAction.apply(null, arguments)
                     specializedAction.apply(null, arguments)
                 }
@@ -428,11 +425,11 @@ export class ModelType<
         })
     }
 
-    named: MT["named"] = name => {
+    named: MT["named"] = (name) => {
         return this.cloneAndEnhance({ name })
     }
 
-    props: MT["props"] = properties => {
+    props: MT["props"] = (properties) => {
         return this.cloneAndEnhance({ properties })
     }
 
@@ -490,7 +487,7 @@ export class ModelType<
         // check views return
         if (!isPlainObject(views))
             throw fail(`views initializer should return a plain object containing views`)
-        Object.keys(views).forEach(key => {
+        Object.keys(views).forEach((key) => {
             // is this a computed property?
             const descriptor = Object.getOwnPropertyDescriptor(views, key)!
             if ("get" in descriptor) {
@@ -523,21 +520,21 @@ export class ModelType<
         })
     }
 
-    preProcessSnapshot: MT["preProcessSnapshot"] = preProcessor => {
+    preProcessSnapshot: MT["preProcessSnapshot"] = (preProcessor) => {
         const currentPreprocessor = this.preProcessor
         if (!currentPreprocessor) return this.cloneAndEnhance({ preProcessor })
         else
             return this.cloneAndEnhance({
-                preProcessor: snapshot => currentPreprocessor(preProcessor(snapshot))
+                preProcessor: (snapshot) => currentPreprocessor(preProcessor(snapshot))
             })
     }
 
-    postProcessSnapshot: MT["postProcessSnapshot"] = postProcessor => {
+    postProcessSnapshot: MT["postProcessSnapshot"] = (postProcessor) => {
         const currentPostprocessor = this.postProcessor
         if (!currentPostprocessor) return this.cloneAndEnhance({ postProcessor })
         else
             return this.cloneAndEnhance({
-                postProcessor: snapshot => postProcessor(currentPostprocessor(snapshot))
+                postProcessor: (snapshot) => postProcessor(currentPostprocessor(snapshot))
             })
     }
 
@@ -576,7 +573,7 @@ export class ModelType<
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
         addHiddenFinalProp(instance, "toString", objectTypeToString)
 
-        this.forAllProps(name => {
+        this.forAllProps((name) => {
             _interceptReads(instance, name, node.unbox)
         })
 
@@ -630,7 +627,7 @@ export class ModelType<
 
     getChildren(node: this["N"]): ReadonlyArray<AnyNode> {
         const res: AnyNode[] = []
-        this.forAllProps(name => {
+        this.forAllProps((name) => {
             res.push(this.getChildNode(node, name))
         })
         return res
@@ -658,7 +655,7 @@ export class ModelType<
 
     processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
         const processed = {} as any
-        Object.keys(childNodes).forEach(key => {
+        Object.keys(childNodes).forEach((key) => {
             processed[key] = childNodes[key].getSnapshot()
         })
         return this.applySnapshotPostProcessor(processed)
@@ -675,7 +672,7 @@ export class ModelType<
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
         const preProcessedSnapshot = this.applySnapshotPreProcessor(snapshot)
         typecheckInternal(this, preProcessedSnapshot)
-        this.forAllProps(name => {
+        this.forAllProps((name) => {
             ;(node.storedValue as any)[name] = preProcessedSnapshot[name]
         })
     }
@@ -705,7 +702,7 @@ export class ModelType<
         }
 
         return flattenTypeErrors(
-            this.propertyNames.map(key =>
+            this.propertyNames.map((key) =>
                 this.properties[key].validate(
                     snapshot[key],
                     getContextForPath(context, key, this.properties[key])
@@ -715,14 +712,16 @@ export class ModelType<
     }
 
     private forAllProps(fn: (name: string, type: IAnyType) => void) {
-        this.propertyNames.forEach(key => fn(key, this.properties[key]))
+        this.propertyNames.forEach((key) => fn(key, this.properties[key]))
     }
 
     describe() {
         // optimization: cache
         return (
             "{ " +
-            this.propertyNames.map(key => key + ": " + this.properties[key].describe()).join("; ") +
+            this.propertyNames
+                .map((key) => key + ": " + this.properties[key].describe())
+                .join("; ") +
             " }"
         )
     }

@@ -102,9 +102,7 @@ class StoredReference<IT extends IAnyType> {
 
             if (!target) {
                 throw new InvalidReferenceError(
-                    `[mobx-state-tree] Failed to resolve reference '${this.identifier}' to type '${
-                        this.targetType.name
-                    }' (from node: ${node.path})`
+                    `[mobx-state-tree] Failed to resolve reference '${this.identifier}' to type '${this.targetType.name}' (from node: ${node.path})`
                 )
             }
 

@@ -7,7 +7,7 @@ const Cart = inject("shop")(
         <section className="Page-cart">
             <h2>Your cart</h2>
             <section className="Page-cart-items">
-                {cart.entries.map(entry => (
+                {cart.entries.map((entry) => (
                     <CartEntry key={entry.book.id} entry={entry} />
                 ))}
             </section>

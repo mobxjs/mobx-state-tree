@@ -5,7 +5,7 @@ export const ViewStore = types
         page: "books",
         selectedBookId: ""
     })
-    .views(self => ({
+    .views((self) => ({
         get shop() {
             return getParent(self)
         },
@@ -30,7 +30,7 @@ export const ViewStore = types
                 : self.shop.books.get(self.selectedBookId)
         }
     }))
-    .actions(self => ({
+    .actions((self) => ({
         openBooksPage() {
             self.page = "books"
             self.selectedBookId = ""

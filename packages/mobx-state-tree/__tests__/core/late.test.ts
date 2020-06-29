@@ -83,7 +83,10 @@ test("#825, late type checking ", () => {
 test("#916 - 0", () => {
     const Todo = types.model("Todo", {
         title: types.string,
-        newTodo: types.optional(types.late((): IAnyModelType => Todo), {}) // N.B. this definition is never instantiateable!
+        newTodo: types.optional(
+            types.late((): IAnyModelType => Todo),
+            {}
+        ) // N.B. this definition is never instantiateable!
     })
 })
 

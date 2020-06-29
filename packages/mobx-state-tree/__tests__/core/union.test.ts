@@ -24,7 +24,7 @@ const createTestFactories = () => {
     const Plane = types.union(Square, Box)
     const Heighed = types.union(Box, Cube)
     const DispatchPlane = types.union(
-        { dispatcher: snapshot => (snapshot && "height" in snapshot ? Box : Square) },
+        { dispatcher: (snapshot) => (snapshot && "height" in snapshot ? Box : Square) },
         Box,
         Square
     )
@@ -134,7 +134,7 @@ test("dispatch", () => {
         .model({
             value: types.number
         })
-        .actions(self => ({
+        .actions((self) => ({
             isOdd() {
                 return true
             },
@@ -142,7 +142,7 @@ test("dispatch", () => {
                 return false
             }
         }))
-    const Even = types.model({ value: types.number }).actions(self => ({
+    const Even = types.model({ value: types.number }).actions((self) => ({
         isOdd() {
             return false
         },
@@ -151,7 +151,7 @@ test("dispatch", () => {
         }
     }))
     const Num = types.union(
-        { dispatcher: snapshot => (snapshot.value % 2 === 0 ? Even : Odd) },
+        { dispatcher: (snapshot) => (snapshot.value % 2 === 0 ? Even : Odd) },
         Even,
         Odd
     )
@@ -205,7 +205,7 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
 
         return {
             store,
-            applySn: function() {
+            applySn: function () {
                 const sn1 = {
                     id: "id1",
                     extraField1: "new extraField1",

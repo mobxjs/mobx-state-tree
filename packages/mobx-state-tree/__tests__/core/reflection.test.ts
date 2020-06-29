@@ -21,10 +21,10 @@ const Model = types
         dogs: types.array(User),
         user: types.maybe(types.late(() => User))
     })
-    .volatile(self => ({
+    .volatile((self) => ({
         volatileProperty: { propName: "halo" }
     }))
-    .actions(self => {
+    .actions((self) => {
         function actionName() {
             return 1
         }
@@ -32,7 +32,7 @@ const Model = types
             actionName
         }
     })
-    .views(self => ({
+    .views((self) => ({
         get viewName() {
             return 1
         }
@@ -143,26 +143,26 @@ test("reflection - members chained", () => {
         .model({
             isPerson: false
         })
-        .actions(self => {
+        .actions((self) => {
             return {
                 actionName() {
                     return 1
                 }
             }
         })
-        .actions(self => {
+        .actions((self) => {
             return {
                 anotherAction() {
                     return 1
                 }
             }
         })
-        .views(self => ({
+        .views((self) => ({
             get viewName() {
                 return 1
             }
         }))
-        .views(self => ({
+        .views((self) => ({
             anotherView(prop: string) {
                 return 1
             }
@@ -182,29 +182,27 @@ test("reflection - conditionals respected", () => {
         .model({
             isPerson: false
         })
-        .actions(self => ({
+        .actions((self) => ({
             actionName0() {
                 return 1
             }
         }))
-        .actions(
-            (self): { actionName1(): number } | { actionName2(): number } => {
-                if (swap) {
-                    return {
-                        actionName1() {
-                            return 1
-                        }
+        .actions((self): { actionName1(): number } | { actionName2(): number } => {
+            if (swap) {
+                return {
+                    actionName1() {
+                        return 1
                     }
-                } else {
-                    return {
-                        actionName2() {
-                            return 1
-                        }
+                }
+            } else {
+                return {
+                    actionName2() {
+                        return 1
                     }
                 }
             }
-        )
-        .views(self => {
+        })
+        .views((self) => {
             if (swap) {
                 return {
                     get view1() {

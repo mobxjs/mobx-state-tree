@@ -4,7 +4,7 @@ import { ShopStore } from "./ShopStore"
 
 const bookFetcher = () => Promise.resolve(JSON.parse(fs.readFileSync("./public/books.json")))
 
-it("as a user I can buy books", done => {
+it("as a user I can buy books", (done) => {
     const alertSpy = jasmine.createSpy("alert")
     const shop = ShopStore.create({}, { fetch: bookFetcher, alert: alertSpy })
 

@@ -50,8 +50,10 @@ function serializeArgument(node: AnyNode, actionName: string, index: number, arg
     if (typeof arg === "function") return serializeTheUnserializable(`[function]`)
     if (typeof arg === "object" && !isPlainObject(arg) && !isArray(arg))
         return serializeTheUnserializable(
-            `[object ${(arg && (arg as any).constructor && (arg as any).constructor.name) ||
-                "Complex Object"}]`
+            `[object ${
+                (arg && (arg as any).constructor && (arg as any).constructor.name) ||
+                "Complex Object"
+            }]`
         )
     try {
         // Check if serializable, cycle free etc...
@@ -90,10 +92,10 @@ export function applyAction(
 ): void {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    assertArg(actions, a => typeof a === "object", "object or array", 2)
+    assertArg(actions, (a) => typeof a === "object", "object or array", 2)
 
     runInAction(() => {
-        asArray(actions).forEach(action => baseApplyAction(target, action))
+        asArray(actions).forEach((action) => baseApplyAction(target, action))
     })
 }
 
@@ -114,7 +116,7 @@ function baseApplyAction(target: IAnyStateTreeNode, action: ISerializedActionCal
         throw fail(`Action '${action.name}' does not exist in '${node.path}'`)
     return resolvedTarget[action.name].apply(
         resolvedTarget,
-        action.args ? action.args.map(v => deserializeArgument(node, v)) : []
+        action.args ? action.args.map((v) => deserializeArgument(node, v)) : []
     )
 }
 

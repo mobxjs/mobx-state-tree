@@ -38,7 +38,7 @@ test("it should type strongly", () => {
         .model({
             loc: types.frozen<Point>()
         })
-        .actions(self => ({
+        .actions((self) => ({
             moveABit() {
                 // self.loc.x += 1; // compile error, x is readonly!
                 ;(self.loc as any).x += 1 // throws, frozen!

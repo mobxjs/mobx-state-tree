@@ -261,7 +261,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         const modelTypes: IAnyModelType[] = []
         if (tryCollectModelTypes(this._subType, modelTypes)) {
             let identifierAttribute: string | undefined = undefined
-            modelTypes.forEach(type => {
+            modelTypes.forEach((type) => {
                 if (type.identifierAttribute) {
                     if (identifierAttribute && identifierAttribute !== type.identifierAttribute) {
                         throw fail(
@@ -283,7 +283,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     initializeChildNodes(objNode: this["N"], initialSnapshot: this["C"] = {}): IChildNodesMap {
         const subType = (objNode.type as this)._subType
         const result: IChildNodesMap = {}
-        Object.keys(initialSnapshot!).forEach(name => {
+        Object.keys(initialSnapshot!).forEach((name) => {
             result[name] = subType.instantiate(objNode, name, undefined, initialSnapshot[name])
         })
 
@@ -298,9 +298,9 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         _interceptReads(instance, node.unbox)
 
         const type = node.type as this
-        type.hookInitializers.forEach(initializer => {
+        type.hookInitializers.forEach((initializer) => {
             const hooks = initializer((instance as unknown) as IMSTMap<IT>)
-            Object.keys(hooks).forEach(name => {
+            Object.keys(hooks).forEach((name) => {
                 const hook = hooks[name as keyof typeof hooks]!
                 const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
                 ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
@@ -376,7 +376,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
     getSnapshot(node: this["N"]): this["S"] {
         const res: any = {}
-        node.getChildren().forEach(childNode => {
+        node.getChildren().forEach((childNode) => {
             res[childNode.subpath] = childNode.snapshot
         })
         return res
@@ -384,7 +384,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
     processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
         const processed: any = {}
-        Object.keys(childNodes).forEach(key => {
+        Object.keys(childNodes).forEach((key) => {
             processed[key] = childNodes[key].getSnapshot()
         })
         return processed
@@ -447,7 +447,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         typecheckInternal(this, snapshot)
         const target = node.storedValue
         const currentKeys: { [key: string]: boolean } = {}
-        Array.from(target.keys()).forEach(key => {
+        Array.from(target.keys()).forEach((key) => {
             currentKeys[key] = false
         })
         if (snapshot) {
@@ -457,7 +457,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
                 currentKeys["" + key] = true
             }
         }
-        Object.keys(currentKeys).forEach(key => {
+        Object.keys(currentKeys).forEach((key) => {
             if (currentKeys[key] === false) target.delete(key)
         })
     }
@@ -472,7 +472,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         }
 
         return flattenTypeErrors(
-            Object.keys(value).map(path =>
+            Object.keys(value).map((path) =>
                 this._subType.validate(value[path], getContextForPath(context, path, this._subType))
             )
         )

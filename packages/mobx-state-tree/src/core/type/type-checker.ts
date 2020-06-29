@@ -69,7 +69,7 @@ function toErrorString(error: IValidationError): string {
     const type = error.context[error.context.length - 1].type!
     const fullPath = error.context
         .map(({ path }) => path)
-        .filter(path => path.length > 0)
+        .filter((path) => path.length > 0)
         .join("/")
 
     const pathPrefix = fullPath.length > 0 ? `at path "/${fullPath}" ` : ``

@@ -5,7 +5,7 @@ test("it should allow if type and predicate is correct", () => {
         number: types.refinement(
             "positive number",
             types.optional(types.number, 0),
-            s => typeof s === "number" && s >= 0
+            (s) => typeof s === "number" && s >= 0
         )
     })
     const doc = Factory.create({ number: 42 })
@@ -17,7 +17,7 @@ if (process.env.NODE_ENV !== "production") {
             number: types.refinement(
                 "positive number",
                 types.optional(types.number, 0),
-                s => typeof s === "number" && s >= 0
+                (s) => typeof s === "number" && s >= 0
             )
         })
         expect(() => {
@@ -35,8 +35,8 @@ if (process.env.NODE_ENV !== "production") {
         const Factory = types.model({
             number: types.refinement(
                 types.optional(types.number, 0),
-                s => typeof s === "number" && s >= 0,
-                s => "A positive number was expected"
+                (s) => typeof s === "number" && s >= 0,
+                (s) => "A positive number was expected"
             )
         })
         expect(() => {

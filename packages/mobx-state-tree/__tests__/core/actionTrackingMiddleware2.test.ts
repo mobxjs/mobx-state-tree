@@ -62,7 +62,7 @@ async function syncTest(mode: "success" | "fail") {
             y: 2,
             z: 3
         })
-        .actions(self => ({
+        .actions((self) => ({
             setX(v: number) {
                 self.x = v
                 if (mode === "fail") {
@@ -116,7 +116,7 @@ async function flowTest(mode: "success" | "fail") {
             y: 2,
             z: 3
         })
-        .actions(self => ({
+        .actions((self) => ({
             setX: flow(function* flowSetX(v: number) {
                 yield Promise.resolve()
                 yield _subFlow()
@@ -167,10 +167,10 @@ test("#1250", async () => {
             x: 0,
             y: 0
         })
-        .actions(self => ({
-            setX: flow(function*() {
+        .actions((self) => ({
+            setX: flow(function* () {
                 self.x = 10
-                yield new Promise(resolve => setTimeout(resolve, 1000))
+                yield new Promise((resolve) => setTimeout(resolve, 1000))
             }),
             setY() {
                 self.y = 10
@@ -192,8 +192,9 @@ test("#1250", async () => {
         },
         onFinish(call, error) {
             calls.push(
-                `${call.name} (${call.id}) <- (${call.parentCall &&
-                    call.parentCall.id}) - onFinish (error: ${!!error})`
+                `${call.name} (${call.id}) <- (${
+                    call.parentCall && call.parentCall.id
+                }) - onFinish (error: ${!!error})`
             )
         }
     })
@@ -215,7 +216,7 @@ test("#1250", async () => {
     ])
     calls.length = 0
 
-    await new Promise(r =>
+    await new Promise((r) =>
         setTimeout(() => {
             model.setY()
             r()

@@ -38,9 +38,7 @@ abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
         // we don't consider detaching here since identifier are scalar nodes, and scalar nodes cannot be detached
         if (current.storedValue !== newValue)
             throw fail(
-                `Tried to change identifier from '${
-                    current.storedValue
-                }' to '${newValue}'. Changing identifiers is not allowed.`
+                `Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`
             )
         current.setParent(parent, subpath)
         return current

@@ -46,8 +46,8 @@ export class IdentifierCache {
     }
 
     mergeCache(node: AnyObjectNode) {
-        values(node.identifierCache!.cache).forEach(nodes =>
-            nodes.forEach(child => {
+        values(node.identifierCache!.cache).forEach((nodes) =>
+            nodes.forEach((child) => {
                 this.addNodeToCache(child)
             })
         )
@@ -90,7 +90,7 @@ export class IdentifierCache {
     has(type: IAnyComplexType, identifier: string): boolean {
         const set = this.cache.get(identifier)
         if (!set) return false
-        return set.some(candidate => type.isAssignableFrom(candidate.type))
+        return set.some((candidate) => type.isAssignableFrom(candidate.type))
     }
 
     resolve<IT extends IAnyComplexType>(
@@ -99,7 +99,7 @@ export class IdentifierCache {
     ): ObjectNode<IT["CreationType"], IT["SnapshotType"], IT["TypeWithoutSTN"]> | null {
         const set = this.cache.get(identifier)
         if (!set) return null
-        const matches = set.filter(candidate => type.isAssignableFrom(candidate.type))
+        const matches = set.filter((candidate) => type.isAssignableFrom(candidate.type))
         switch (matches.length) {
             case 0:
                 return null
@@ -110,7 +110,7 @@ export class IdentifierCache {
                     `Cannot resolve a reference to type '${
                         type.name
                     }' with id: '${identifier}' unambigously, there are multiple candidates: ${matches
-                        .map(n => n.path)
+                        .map((n) => n.path)
                         .join(", ")}`
                 )
         }

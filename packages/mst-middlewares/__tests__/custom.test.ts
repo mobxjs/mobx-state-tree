@@ -23,10 +23,10 @@ const nextNoAlter: IMiddlewareHandler = (call, next, abort) => {
     next(call)
 }
 const nextAlter: IMiddlewareHandler = (call, next, abort) => {
-    next(call, value => value + 1)
+    next(call, (value) => value + 1)
 }
 const nextAlter2: IMiddlewareHandler = (call, next, abort) => {
-    next(call, value => value + 2)
+    next(call, (value) => value + 2)
 }
 const alterArguments: IMiddlewareHandler = (call, next, abort) => {
     next({ ...call, args: [call.args[0].toUpperCase()] })
@@ -36,7 +36,7 @@ const alterArguments2: IMiddlewareHandler = (call, next, abort) => {
     next({ ...call, args: [call.args[0].slice(0, -1)] })
 }
 const nextAlterAsync: IMiddlewareHandler = (call, next, abort) => {
-    next(call, async value => (await value) + 2)
+    next(call, async (value) => (await value) + 2)
 }
 
 const noHooksMiddleware: IMiddlewareHandler = (call, next, abort) => {
@@ -51,7 +51,7 @@ const shouldNeverBeInvoked: IMiddlewareHandler = (call, next, abort) => {
 }
 
 function delay(time: number) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         setTimeout(resolve, time)
     })
 }
@@ -60,30 +60,30 @@ const TestModel = types
     .model("Test1", {
         z: 1
     })
-    .postProcessSnapshot(snapshot => {
+    .postProcessSnapshot((snapshot) => {
         return snapshot
     })
-    .actions(self => {
+    .actions((self) => {
         return {
-            asyncInc: flow(function*(x: number) {
+            asyncInc: flow(function* (x: number) {
                 yield delay(2)
                 self.z += x
                 yield delay(2)
                 return self.z
             }),
-            asyncIncSuccess: flow(function*(x: number) {
+            asyncIncSuccess: flow(function* (x: number) {
                 yield (self as any).asyncAbortedPromise() // will return a string instead of a promise.
                 self.z += x
                 return self.z
             }),
-            asyncIncFailing: flow(function*(x: number) {
+            asyncIncFailing: flow(function* (x: number) {
                 yield (self as any).asyncAbortedString() // will return a string instead of a promise.
                 self.z += x
                 return self.z
             }),
             asyncAbortedString: decorate(
                 abortString,
-                flow(function*(x: number) {
+                flow(function* (x: number) {
                     // this will fail since "Only promises can be yielded" within flows.
                     yield delay(2)
                     return 205
@@ -91,7 +91,7 @@ const TestModel = types
             ),
             asyncAbortedPromise: decorate(
                 abortPromise,
-                flow(function*(x: number) {
+                flow(function* (x: number) {
                     yield delay(2)
                     return 205
                 })

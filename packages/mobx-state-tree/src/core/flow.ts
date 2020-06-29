@@ -70,7 +70,7 @@ export function createFlowSpawner(name: string, generator: Function) {
             )
         }
 
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             let gen: any
             const init = function asyncActionInit() {
                 gen = generator.apply(null, arguments)

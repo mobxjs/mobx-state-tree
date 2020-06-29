@@ -75,7 +75,7 @@ export class CoreType<C, S, T> extends SimpleType<C, S, T> {
 export const string: ISimpleType<string> = new CoreType<string, string, string>(
     "string",
     TypeFlags.String,
-    v => typeof v === "string"
+    (v) => typeof v === "string"
 )
 
 /**
@@ -94,7 +94,7 @@ export const string: ISimpleType<string> = new CoreType<string, string, string>(
 export const number: ISimpleType<number> = new CoreType<number, number, number>(
     "number",
     TypeFlags.Number,
-    v => typeof v === "number"
+    (v) => typeof v === "number"
 )
 
 /**
@@ -113,7 +113,7 @@ export const number: ISimpleType<number> = new CoreType<number, number, number>(
 export const integer: ISimpleType<number> = new CoreType<number, number, number>(
     "integer",
     TypeFlags.Integer,
-    v => isInteger(v)
+    (v) => isInteger(v)
 )
 
 /**
@@ -132,7 +132,7 @@ export const integer: ISimpleType<number> = new CoreType<number, number, number>
 export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean, boolean>(
     "boolean",
     TypeFlags.Boolean,
-    v => typeof v === "boolean"
+    (v) => typeof v === "boolean"
 )
 
 /**
@@ -141,7 +141,7 @@ export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean, bool
 export const nullType: ISimpleType<null> = new CoreType<null, null, null>(
     "null",
     TypeFlags.Null,
-    v => v === null
+    (v) => v === null
 )
 
 /**
@@ -150,16 +150,16 @@ export const nullType: ISimpleType<null> = new CoreType<null, null, null>(
 export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, undefined, undefined>(
     "undefined",
     TypeFlags.Undefined,
-    v => v === undefined
+    (v) => v === undefined
 )
 
 const _DatePrimitive = new CoreType<number | Date, number, Date>(
     "Date",
     TypeFlags.Date,
-    v => typeof v === "number" || v instanceof Date,
-    v => (v instanceof Date ? v : new Date(v))
+    (v) => typeof v === "number" || v instanceof Date,
+    (v) => (v instanceof Date ? v : new Date(v))
 )
-_DatePrimitive.getSnapshot = function(node: AnyNode) {
+_DatePrimitive.getSnapshot = function (node: AnyNode) {
     return node.storedValue.getTime()
 }
 

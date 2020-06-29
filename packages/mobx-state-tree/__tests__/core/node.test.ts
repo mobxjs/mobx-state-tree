@@ -278,9 +278,9 @@ test("make sure array filter works properly", () => {
         .model({
             rows: types.optional(types.array(Row), [])
         })
-        .actions(self => {
+        .actions((self) => {
             function clearDone() {
-                self.rows.filter(row => row.done === true).forEach(destroy)
+                self.rows.filter((row) => row.done === true).forEach(destroy)
             }
             return {
                 clearDone
@@ -319,7 +319,7 @@ test("it can record and replay actions", () => {
         .model({
             article_id: 0
         })
-        .actions(self => {
+        .actions((self) => {
             function setArticle(article_id: number) {
                 self.article_id = article_id
             }
@@ -332,7 +332,7 @@ test("it can record and replay actions", () => {
             customer_id: 0,
             rows: types.optional(types.array(Row), [])
         })
-        .actions(self => {
+        .actions((self) => {
             function setCustomer(customer_id: number) {
                 self.customer_id = customer_id
             }
@@ -361,7 +361,7 @@ test("Liveliness issue #683", () => {
         .model({
             list: types.map(User)
         })
-        .actions(self => ({
+        .actions((self) => ({
             put(aUser: typeof User.CreationType | typeof User.Type) {
                 // if (self.has(user.id)) detach(self.get(user.id));
                 self.list.put(aUser)
@@ -395,7 +395,7 @@ test("triggers on changing paths - 1", () => {
         .model({
             todos: types.array(Todo)
         })
-        .actions(self => ({
+        .actions((self) => ({
             do(fn: () => void) {
                 fn()
             }

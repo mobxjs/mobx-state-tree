@@ -15,9 +15,11 @@ class Canvas extends Component {
             <div className="app">
                 <div className="canvas" onClick={this.onCanvasClick}>
                     <svg>
-                        {store.arrows.map(arrow => <ArrowView arrow={arrow} key={arrow.id} />)}
+                        {store.arrows.map((arrow) => (
+                            <ArrowView arrow={arrow} key={arrow.id} />
+                        ))}
                     </svg>
-                    {values(store.boxes).map(box => (
+                    {values(store.boxes).map((box) => (
                         <BoxView box={box} store={store} key={box.id} />
                     ))}
                 </div>
@@ -28,7 +30,7 @@ class Canvas extends Component {
         )
     }
 
-    onCanvasClick = e => {
+    onCanvasClick = (e) => {
         const { store } = this.props
         if (e.ctrlKey === false) {
             store.setSelection(null)
