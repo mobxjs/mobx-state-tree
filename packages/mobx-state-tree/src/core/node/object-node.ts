@@ -501,7 +501,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             this.storedValue,
             "@APPLY_PATCHES",
             (patches: IJsonPatch[]) => {
-                patches.forEach(patch => {
+                patches.forEach((patch) => {
                     const parts = splitJsonPath(patch.path)
                     const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as AnyObjectNode
                     node.applyPatchLocally(parts[parts.length - 1], patch)
@@ -535,7 +535,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             return
         }
 
-        this.getChildren().forEach(node => {
+        this.getChildren().forEach((node) => {
             node.aboutToDie()
         })
 
@@ -549,7 +549,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     finalizeDeath(): void {
         // invariant: not called directly but from "die"
-        this.getChildren().forEach(node => {
+        this.getChildren().forEach((node) => {
             node.finalizeDeath()
         })
         this.root.identifierCache!.notifyDied(this)
@@ -637,7 +637,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         if (!this._hasSnapshotReaction) {
             const snapshotDisposer = reaction(
                 () => this.snapshot,
-                snapshot => this.emitSnapshot(snapshot),
+                (snapshot) => this.emitSnapshot(snapshot),
                 snapshotReactionOptions
             )
             this.addDisposer(snapshotDisposer)

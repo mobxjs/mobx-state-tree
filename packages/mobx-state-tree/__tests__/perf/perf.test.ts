@@ -15,11 +15,11 @@ test("performs well on large scenario", () => {
     expect(largeScenario(10, 0, 10).elapsed < TOO_SLOW_MS).toBe(true)
     expect(largeScenario(10, 10, 10).elapsed < TOO_SLOW_MS).toBe(true)
 })
-test("timer", done => {
+test("timer", (done) => {
     const go = start()
-    setTimeout(function() {
+    setTimeout(function () {
         const lap = go(true)
-        setTimeout(function() {
+        setTimeout(function () {
             const d = go()
             expect(lap).not.toBe(0)
             expect(d).not.toBe(0)

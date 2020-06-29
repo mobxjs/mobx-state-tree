@@ -3,7 +3,7 @@ import { connectReduxDevtools } from "mst-middlewares/src"
 
 jest.useRealTimers()
 
-const waitAsync = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+const waitAsync = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 const waitAsyncReject = async (ms: number) => {
     await waitAsync(ms)
     throw new Error("thrown")
@@ -26,7 +26,7 @@ const M2 = types
     .model("SubModel", {
         a: ""
     })
-    .actions(self => ({
+    .actions((self) => ({
         setA() {
             self.a = "setA"
         }
@@ -38,7 +38,7 @@ const M = types
         y: "",
         array: types.array(M2)
     })
-    .actions(self => ({
+    .actions((self) => ({
         afterCreate() {
             self.x = ""
         },
@@ -53,21 +53,21 @@ const M = types
             self.x = "setXThrow"
             throw new Error("bye")
         },
-        setXAsync: flow(function*() {
+        setXAsync: flow(function* () {
             self.x = "setXAsync +0"
             yield waitAsync(20)
             self.x = "setXAsync +20"
         }),
-        setXAsyncWithEmptyFirstPart: flow(function*() {
+        setXAsyncWithEmptyFirstPart: flow(function* () {
             yield waitAsync(20)
             self.x = "setXAsyncWithEmptyFirstPart +20"
         }),
-        setXAsyncThrowSync: flow(function*() {
+        setXAsyncThrowSync: flow(function* () {
             self.x = "setXAsyncThrowSync +0"
             yield waitAsync(20)
             throw new Error("setXAsyncThrowSync +20")
         }),
-        setXAsyncThrowAsync: flow(function*() {
+        setXAsyncThrowAsync: flow(function* () {
             self.x = "setXAsyncThrowAsync +0"
             yield waitAsyncReject(20)
         }),
@@ -84,12 +84,12 @@ const M = types
             yield waitAsync(50)
             self.y = "setYAsync +50"
         }),
-        setYAsyncThrowSync: flow(function*() {
+        setYAsyncThrowSync: flow(function* () {
             self.y = "setYAsyncThrowSync +0"
             yield waitAsync(50)
             throw new Error("setYAsyncThrowSync +50")
         }),
-        setYAsyncThrowAsync: flow(function*() {
+        setYAsyncThrowAsync: flow(function* () {
             self.y = "setYAsyncThrowAsync +0"
             yield waitAsyncReject(50)
         }),
@@ -98,15 +98,15 @@ const M = types
             this.setY()
         }
     }))
-    .actions(self => ({
-        setXYAsync: flow(function*() {
+    .actions((self) => ({
+        setXYAsync: flow(function* () {
             yield self.setXAsync()
             yield self.setYAsync()
         }),
-        setXYAsyncThrowSync: flow(function*() {
+        setXYAsyncThrowSync: flow(function* () {
             yield self.setXAsyncThrowSync()
         }),
-        setXYAsyncThrowAsync: flow(function*() {
+        setXYAsyncThrowAsync: flow(function* () {
             yield self.setXAsyncThrowAsync()
         })
     }))
@@ -262,7 +262,7 @@ test("bourquep", () => {
             state: types.optional(ContentStateEnumDef, 0)
         })
 
-        .actions(self => {
+        .actions((self) => {
             const _actions = {
                 toggleState() {
                     if (self.state === ContentState.Cancelled) {
@@ -301,9 +301,9 @@ test("#1065 - flows in root afterCreate shouldn't crash", async () => {
         .model("SubModel", {
             num: 0
         })
-        .actions(self => {
+        .actions((self) => {
             return {
-                someFlow: flow(function*() {
+                someFlow: flow(function* () {
                     yield waitAsync(50)
                     self.num++
                     yield waitAsync(50)
@@ -316,7 +316,7 @@ test("#1065 - flows in root afterCreate shouldn't crash", async () => {
         .model("Root", {
             sub: types.optional(SubModel, {})
         })
-        .actions(self => {
+        .actions((self) => {
             return {
                 afterCreate: () => {
                     self.sub.someFlow()

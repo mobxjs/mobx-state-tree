@@ -96,11 +96,11 @@ const TestModel = types
         z: 1
     })
     // example with addMiddleware
-    .actions(self => {
+    .actions((self) => {
         addMiddleware(self, atomic)
 
         return {
-            inc: flow(function*(x) {
+            inc: flow(function* (x) {
                 yield delay(2)
                 self.z += x
                 yield delay(2)
@@ -110,11 +110,11 @@ const TestModel = types
         }
     })
     // example with decorate
-    .actions(self => {
+    .actions((self) => {
         return {
             inc: decorate(
                 atomic,
-                flow(function*(x) {
+                flow(function* (x) {
                     yield delay(2)
                     self.z += x
                     yield delay(2)
@@ -126,7 +126,7 @@ const TestModel = types
     })
 
 const m = TestModel.create()
-m.inc(3).catch(error => {
+m.inc(3).catch((error) => {
     t.is(error, "Oops")
     t.is(m.z, 1) // Not 7! The change was rolled back
 })
@@ -233,7 +233,7 @@ export const Store = types
         todos: types.array(Todo),
         history: types.optional(UndoManager, {})
     })
-    .actions(self => {
+    .actions((self) => {
         // you could create your undoManger anywhere but before your first needed action within the undoManager
         setUndoManager(self)
 
@@ -248,7 +248,7 @@ export const Store = types
     })
 
 export let undoManager = {}
-export const setUndoManager = targetStore => {
+export const setUndoManager = (targetStore) => {
     undoManager = targetStore.history
 }
 const store = Store.create()
@@ -263,7 +263,7 @@ export const Store = types
     .model({
         todos: types.array(Todo)
     })
-    .actions(self => {
+    .actions((self) => {
         // you could create your undoManger anywhere but before your first needed action within the undoManager
         setUndoManager(self)
 
@@ -278,7 +278,7 @@ export const Store = types
     })
 
 export let undoManager = {}
-export const setUndoManager = targetStore => {
+export const setUndoManager = (targetStore) => {
     undoManager = UndoManager.create({}, { targetStore })
 }
 const store = Store.create()
@@ -291,7 +291,7 @@ If you want a limited history of actions to be recorded, for example to keep tra
 const store = Store.create({}, { maxHistoryLength: 10 })
 
 // with history in a separate store
-export const setUndoManager = targetStore => {
+export const setUndoManager = (targetStore) => {
     undoManager = UndoManager.create({}, { targetStore, maxHistoryLength: 10 })
 }
 ```
@@ -340,7 +340,7 @@ const PersonModel = types
         firstName: types.string,
         lastName: types.string
     })
-    .actions(self => {
+    .actions((self) => {
         return {
             // setPersonName won't be recorded anymore in general
             setPersonName: (firstName, lastName) =>
@@ -355,7 +355,7 @@ const StoreModel = types
     .model("StoreModel", {
         persons: types.map(PersonModel)
     })
-    .actions(self => {
+    .actions((self) => {
         setUndoManager(self)
 
         return {
@@ -366,7 +366,7 @@ const StoreModel = types
     })
 
 export let undoManager = {}
-export const setUndoManager = targetStore => {
+export const setUndoManager = (targetStore) => {
     undoManager = UndoManager.create({}, { targetStore })
 }
 export const Store = StoreModel.create({})

@@ -52,7 +52,7 @@ test("same tree - can time travel", () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -69,7 +69,7 @@ test("different tree - can time travel", () => {
         .model({
             x: 1
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerDifferentTree(self)
             return {
                 inc() {
@@ -87,7 +87,7 @@ test("same tree - can time travel and persist state", () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -149,7 +149,7 @@ test("can time travel with Mutable object", () => {
         .model({
             mutable: MutableUnion
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerDifferentTree(self)
             return {
                 setProp(k: string, v: any) {
@@ -207,7 +207,7 @@ test("same tree - withoutUndo", () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -224,7 +224,7 @@ test("different tree - withoutUndo", () => {
         .model({
             x: 1
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerDifferentTree(self)
             return {
                 inc() {
@@ -242,7 +242,7 @@ test("same tree - withoutUndo declaratively", () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc: () =>
@@ -262,7 +262,7 @@ test("same tree - maxHistoryLength", async () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -305,15 +305,15 @@ test("same tree - withoutUndoFlow declaratively", async () => {
             y: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             _setUndoManagerSameTree(self)
 
             return {
-                loadPosition2: flow(function*(n: number) {
+                loadPosition2: flow(function* (n: number) {
                     yield Promise.resolve()
                     self.y = n
                 }),
-                loadPosition: _undoManager.withoutUndoFlow(function*() {
+                loadPosition: _undoManager.withoutUndoFlow(function* () {
                     yield Promise.resolve()
                     self.x = 4
                     yield (self as any).loadPosition2(2)
@@ -345,7 +345,7 @@ test("same tree - group", () => {
             numbers: types.optional(types.array(types.number), []),
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -415,7 +415,7 @@ describe("same tree - clean", () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -461,7 +461,7 @@ test("#1195 - withoutUndo() used inside an action should NOT affect all patches 
             name: types.string,
             age: types.number
         })
-        .actions(self => {
+        .actions((self) => {
             _undoManager = UndoManager.create({}, { targetStore: self })
 
             return {

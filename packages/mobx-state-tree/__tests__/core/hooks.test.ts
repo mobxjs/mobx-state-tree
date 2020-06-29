@@ -17,7 +17,7 @@ function createTestStore(listener: (s: string) => void) {
         .model("Todo", {
             title: ""
         })
-        .actions(self => {
+        .actions((self) => {
             function afterCreate() {
                 listener("new todo: " + self.title)
                 addDisposer(self, () => {
@@ -47,7 +47,7 @@ function createTestStore(listener: (s: string) => void) {
         .model("Store", {
             todos: types.array(Todo)
         })
-        .actions(self => {
+        .actions((self) => {
             function afterCreate() {
                 unprotect(self)
                 listener("new store: " + self.todos.length)
@@ -77,7 +77,7 @@ function createTestStore(listener: (s: string) => void) {
 test("it should trigger lifecycle hooks", () => {
     const events: string[] = []
     // new store: 3
-    const { store, Todo } = createTestStore(e => events.push(e))
+    const { store, Todo } = createTestStore((e) => events.push(e))
 
     events.push("-")
     // access (new, attach), then detach "Give Talk"
@@ -141,10 +141,10 @@ const Car = types
     .model("Car", {
         id: types.number
     })
-    .preProcessSnapshot<CarSnapshot>(snapshot =>
+    .preProcessSnapshot<CarSnapshot>((snapshot) =>
         Object.assign({}, snapshot, { id: Number(snapshot.id) * 2 })
     )
-    .postProcessSnapshot<CarSnapshot>(snapshot =>
+    .postProcessSnapshot<CarSnapshot>((snapshot) =>
         Object.assign({}, snapshot, { id: "" + snapshot.id / 2 })
     )
 
@@ -156,10 +156,10 @@ const Motorcycle = types
     .model("Motorcycle", {
         id: types.string
     })
-    .preProcessSnapshot<CarSnapshot>(snapshot =>
+    .preProcessSnapshot<CarSnapshot>((snapshot) =>
         Object.assign({}, snapshot, { id: snapshot.id.toLowerCase() })
     )
-    .postProcessSnapshot<CarSnapshot>(snapshot =>
+    .postProcessSnapshot<CarSnapshot>((snapshot) =>
         Object.assign({}, snapshot, { id: snapshot.id.toUpperCase() })
     )
 const MotorcycleFactory = types.model("MotorcycleFactory", {
@@ -184,7 +184,7 @@ test("it should postprocess snapshots when generating snapshot - 1", () => {
 test("it should not apply postprocessor to snapshot on getSnapshot", () => {
     const car = Car.create({ id: "1" })
     let error = false
-    onSnapshot(car, snapshot => {
+    onSnapshot(car, (snapshot) => {
         error = true
     })
     expect(getSnapshot(car)).toEqual({ id: "1" })
@@ -219,7 +219,7 @@ test("base hooks can be composed", () => {
     }
     const Todo = types
         .model("Todo", { title: "" })
-        .actions(self => {
+        .actions((self) => {
             function afterCreate() {
                 listener("aftercreate1")
             }
@@ -234,7 +234,7 @@ test("base hooks can be composed", () => {
             }
             return { afterCreate, beforeDestroy, afterAttach, beforeDetach }
         })
-        .actions(self => {
+        .actions((self) => {
             function afterCreate() {
                 listener("aftercreate2")
             }
@@ -272,16 +272,16 @@ test("snapshot processors can be composed", () => {
         .model({
             x: 1
         })
-        .preProcessSnapshot(s => ({
+        .preProcessSnapshot((s) => ({
             x: s.x! - 3
         }))
-        .preProcessSnapshot(s => ({
+        .preProcessSnapshot((s) => ({
             x: s.x! / 5
         }))
-        .postProcessSnapshot(s => {
+        .postProcessSnapshot((s) => {
             return { x: s.x + 3 }
         })
-        .postProcessSnapshot(s => {
+        .postProcessSnapshot((s) => {
             return { x: s.x * 5 }
         })
 
@@ -292,7 +292,7 @@ test("snapshot processors can be composed", () => {
 
 test("addDisposer must return the passed disposer", () => {
     const listener = jest.fn()
-    const M = types.model({}).actions(self => {
+    const M = types.model({}).actions((self) => {
         expect(addDisposer(self, listener)).toBe(listener)
         return {}
     })
@@ -305,7 +305,7 @@ test("array calls all hooks", () => {
         events.push(message)
     }
     const Item = types.model("Item", { id: types.string })
-    const Collection = types.array(Item).hooks(self => ({
+    const Collection = types.array(Item).hooks((self) => ({
         afterCreate() {
             listener("afterCreate")
         },
@@ -346,7 +346,7 @@ test("map calls all hooks", () => {
         events.push(message)
     }
     const Item = types.model("Item", { id: types.string })
-    const Collection = types.map(Item).hooks(self => ({
+    const Collection = types.map(Item).hooks((self) => ({
         afterCreate() {
             listener("afterCreate")
         },

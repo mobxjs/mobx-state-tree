@@ -4,7 +4,7 @@ import { isObservableProp, isComputedProp } from "mobx"
 test("this support", () => {
     const M = types
         .model({ x: 5 })
-        .views(self => ({
+        .views((self) => ({
             get x2() {
                 return self.x * 2
             },
@@ -26,7 +26,7 @@ test("this support", () => {
                 )
             }
         }))
-        .volatile(self => ({
+        .volatile((self) => ({
             localState: 3,
             getLocalState() {
                 return this.localState
@@ -36,7 +36,7 @@ test("this support", () => {
             }
         }))
 
-        .actions(self => {
+        .actions((self) => {
             return {
                 xBy(by: number) {
                     return self.x * by

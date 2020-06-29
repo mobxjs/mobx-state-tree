@@ -26,7 +26,7 @@ const UndoManager = types
         history: types.array(Entry),
         undoIdx: 0
     })
-    .views(self => ({
+    .views((self) => ({
         get undoLevels() {
             return self.undoIdx
         },
@@ -40,7 +40,7 @@ const UndoManager = types
             return this.redoLevels > 0
         }
     }))
-    .actions(self => {
+    .actions((self) => {
         let targetStore: IAnyStateTreeNode
         let recordingDisabled = 0
 

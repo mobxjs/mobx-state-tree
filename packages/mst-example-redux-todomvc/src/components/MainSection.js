@@ -6,8 +6,8 @@ import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from "../constants/TodoFilters"
 
 const TODO_FILTERS = {
     [SHOW_ALL]: () => true,
-    [SHOW_ACTIVE]: todo => !todo.completed,
-    [SHOW_COMPLETED]: todo => todo.completed
+    [SHOW_ACTIVE]: (todo) => !todo.completed,
+    [SHOW_COMPLETED]: (todo) => todo.completed
 }
 
 export default class MainSection extends Component {
@@ -22,7 +22,7 @@ export default class MainSection extends Component {
         this.props.actions.clearCompleted()
     }
 
-    handleShow = filter => {
+    handleShow = (filter) => {
         this.setState({ filter })
     }
 
@@ -72,7 +72,9 @@ export default class MainSection extends Component {
             <section className="main">
                 {this.renderToggleAll(completedCount)}
                 <ul className="todo-list">
-                    {filteredTodos.map(todo => <TodoItem key={todo.id} todo={todo} {...actions} />)}
+                    {filteredTodos.map((todo) => (
+                        <TodoItem key={todo.id} todo={todo} {...actions} />
+                    ))}
                 </ul>
                 {this.renderFooter(completedCount)}
             </section>

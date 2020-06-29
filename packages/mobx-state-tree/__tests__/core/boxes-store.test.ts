@@ -19,7 +19,7 @@ export const Box = types
         x: 0,
         y: 0
     })
-    .views(self => ({
+    .views((self) => ({
         get width() {
             return self.name.length * 15
         },
@@ -28,7 +28,7 @@ export const Box = types
             return getParent<typeof Store>(getParent(self)).selection === self
         }
     }))
-    .actions(self => {
+    .actions((self) => {
         function move(dx: number, dy: number) {
             self.x += dx
             self.y += dy
@@ -52,7 +52,7 @@ export const Store = types
         arrows: types.array(Arrow),
         selection: types.reference(Box)
     })
-    .actions(self => {
+    .actions((self) => {
         function afterCreate() {
             unprotect(self)
         }
@@ -104,7 +104,7 @@ test("store is deserialized correctly", () => {
     expect(s.selection === s.boxes.get("aa")).toBe(true)
     expect(s.arrows[0].from.name).toBe("Rotterdam")
     expect(s.arrows[0].to.name).toBe("Bratislava")
-    expect(values(s.boxes).map(b => b.isSelected)).toEqual([false, true])
+    expect(values(s.boxes).map((b) => b.isSelected)).toEqual([false, true])
 })
 test("store emits correct patch paths", () => {
     const s = createStore()
@@ -127,7 +127,10 @@ test("box operations works correctly", () => {
             a: { id: "a", name: "A", x: 0, y: 0 },
             b: { id: "b", name: "B", x: 100, y: 100 }
         },
-        arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
+        arrows: [
+            { id: "dd", from: "cc", to: "aa" },
+            { id: "aa2b", from: "aa", to: "b" }
+        ],
         selection: "b"
     })
     s.boxes.get("a")!.setName("I'm groot")
@@ -138,7 +141,10 @@ test("box operations works correctly", () => {
             a: { id: "a", name: "I'm groot", x: 0, y: 0 },
             b: { id: "b", name: "B", x: 100, y: 100 }
         },
-        arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
+        arrows: [
+            { id: "dd", from: "cc", to: "aa" },
+            { id: "aa2b", from: "aa", to: "b" }
+        ],
         selection: "b"
     })
     expect(JSON.stringify(s)).toEqual(JSON.stringify(getSnapshot(s)))
@@ -150,7 +156,10 @@ test("box operations works correctly", () => {
             a: { id: "a", name: "I'm groot", x: 50, y: 50 },
             b: { id: "b", name: "B", x: 100, y: 100 }
         },
-        arrows: [{ id: "dd", from: "cc", to: "aa" }, { id: "aa2b", from: "aa", to: "b" }],
+        arrows: [
+            { id: "dd", from: "cc", to: "aa" },
+            { id: "aa2b", from: "aa", to: "b" }
+        ],
         selection: "b"
     })
     expect(s.boxes.get("b")!.width).toBe(15)

@@ -4,7 +4,7 @@ import { applySnapshot, onSnapshot } from "mobx-state-tree"
 var states = []
 var currentFrame = -1
 
-onSnapshot(store, snapshot => {
+onSnapshot(store, (snapshot) => {
     if (currentFrame === states.length - 1) {
         currentFrame++
         states.push(snapshot)

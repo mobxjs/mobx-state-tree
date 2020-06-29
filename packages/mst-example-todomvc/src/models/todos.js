@@ -4,8 +4,8 @@ import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from "../constants/TodoFilters"
 const filterType = types.union(...[SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE].map(types.literal))
 const TODO_FILTERS = {
     [SHOW_ALL]: () => true,
-    [SHOW_ACTIVE]: todo => !todo.completed,
-    [SHOW_COMPLETED]: todo => todo.completed
+    [SHOW_ACTIVE]: (todo) => !todo.completed,
+    [SHOW_COMPLETED]: (todo) => todo.completed
 }
 
 const Todo = types
@@ -14,7 +14,7 @@ const Todo = types
         completed: false,
         id: types.identifierNumber
     })
-    .actions(self => ({
+    .actions((self) => ({
         remove() {
             getRoot(self).removeTodo(self)
         },
@@ -31,7 +31,7 @@ const TodoStore = types
         todos: types.array(Todo),
         filter: types.optional(filterType, SHOW_ALL)
     })
-    .views(self => ({
+    .views((self) => ({
         get completedCount() {
             return self.todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0)
         },
@@ -42,7 +42,7 @@ const TodoStore = types
             return self.todos.filter(TODO_FILTERS[self.filter])
         }
     }))
-    .actions(self => ({
+    .actions((self) => ({
         // actions
         addTodo(text) {
             const id = self.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
@@ -55,11 +55,11 @@ const TodoStore = types
             destroy(todo)
         },
         completeAll() {
-            const areAllMarked = self.todos.every(todo => todo.completed)
-            self.todos.forEach(todo => (todo.completed = !areAllMarked))
+            const areAllMarked = self.todos.every((todo) => todo.completed)
+            self.todos.forEach((todo) => (todo.completed = !areAllMarked))
         },
         clearCompleted() {
-            self.todos.replace(self.todos.filter(todo => todo.completed === false))
+            self.todos.replace(self.todos.filter((todo) => todo.completed === false))
         },
         setFilter(filter) {
             self.filter = filter

@@ -4,7 +4,7 @@ const Todo = types
     .model("Todo", {
         title: ""
     })
-    .actions(self => {
+    .actions((self) => {
         function setTitle(newTitle: string) {
             self.title = newTitle
         }
@@ -108,7 +108,7 @@ test("action cannot modify parent", () => {
         .model("Child", {
             x: 2
         })
-        .actions(self => ({
+        .actions((self) => ({
             setParentX() {
                 getParent<typeof self>(self).x += 1
             }

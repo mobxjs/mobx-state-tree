@@ -28,11 +28,11 @@ function prepareStore(newStore) {
 */
 if (module.hot) {
     // accept update of dependency
-    module.hot.accept("./stores/domain-state", function() {
+    module.hot.accept("./stores/domain-state", function () {
         // obtain new store
         prepareStore(require("./stores/domain-state").default)
     })
-    module.hot.accept("./stores/socket", function() {
+    module.hot.accept("./stores/socket", function () {
         // new socket sync implementation
         require("./stores/socket").default(socket, storeInstance.get())
     })

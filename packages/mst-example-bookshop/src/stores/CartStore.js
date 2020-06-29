@@ -7,7 +7,7 @@ const CartEntry = types
         quantity: 0,
         book: types.reference(Book)
     })
-    .views(self => ({
+    .views((self) => ({
         get price() {
             return self.book.price * self.quantity
         },
@@ -15,7 +15,7 @@ const CartEntry = types
             return self.book.isAvailable
         }
     }))
-    .actions(self => ({
+    .actions((self) => ({
         increaseQuantity(number) {
             self.quantity += number
         },
@@ -31,7 +31,7 @@ export const CartStore = types
     .model("CartStore", {
         entries: types.array(CartEntry)
     })
-    .views(self => ({
+    .views((self) => ({
         get shop() {
             return getParent(self)
         },
@@ -50,11 +50,11 @@ export const CartStore = types
         get canCheckout() {
             return (
                 self.entries.length > 0 &&
-                self.entries.every(entry => entry.quantity > 0 && entry.isValidBook)
+                self.entries.every((entry) => entry.quantity > 0 && entry.isValidBook)
             )
         }
     }))
-    .actions(self => ({
+    .actions((self) => ({
         afterAttach() {
             if (typeof window !== "undefined" && window.localStorage) {
                 when(
@@ -63,7 +63,7 @@ export const CartStore = types
                         self.readFromLocalStorage()
                         reaction(
                             () => getSnapshot(self),
-                            json => {
+                            (json) => {
                                 window.localStorage.setItem("cart", JSON.stringify(json))
                             }
                         )
@@ -72,7 +72,7 @@ export const CartStore = types
             }
         },
         addBook(book, quantity = 1, notify = true) {
-            let entry = self.entries.find(entry => entry.book === book)
+            let entry = self.entries.find((entry) => entry.book === book)
             if (!entry) {
                 self.entries.push({ book: book })
                 entry = self.entries[self.entries.length - 1]

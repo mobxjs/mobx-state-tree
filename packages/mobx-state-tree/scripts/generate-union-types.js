@@ -5,7 +5,7 @@ let str = `// generated with ${__filename}\n`
 const minArgs = 2
 const maxArgs = 10
 const preParam = "options: UnionOptions, "
-const modelReturnTypeTransform = rt => {
+const modelReturnTypeTransform = (rt) => {
     // [['PA', 'PB'], ['OA', 'OB'], ['FCA', 'FCB'], ['FSA', 'FSB']]
     // ->
     // [['ModelCreationType2<PA, FCA>', 'ModelCreationType2<PB, FCB>'],

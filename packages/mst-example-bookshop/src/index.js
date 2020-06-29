@@ -18,12 +18,12 @@ import "./index.css"
 
 import { ShopStore } from "./stores/ShopStore"
 
-const fetcher = url => window.fetch(url).then(response => response.json())
+const fetcher = (url) => window.fetch(url).then((response) => response.json())
 const shop = ShopStore.create(
     {},
     {
         fetch: fetcher,
-        alert: m => console.log(m) // Noop for demo: window.alert(m)
+        alert: (m) => console.log(m) // Noop for demo: window.alert(m)
     }
 )
 
@@ -49,7 +49,7 @@ ReactDOM.render(
 
 reaction(
     () => shop.view.currentUrl,
-    path => {
+    (path) => {
         if (window.location.pathname !== path) window.history.pushState(null, null, path)
     }
 )
@@ -78,7 +78,7 @@ let recording = true // supress recording history when replaying
 
 onSnapshot(
     shop,
-    s =>
+    (s) =>
         recording &&
         history.snapshots.unshift({
             data: s,
@@ -91,7 +91,7 @@ onSnapshot(
 )
 onPatch(
     shop,
-    s =>
+    (s) =>
         recording &&
         history.patches.unshift({
             data: s,
@@ -104,7 +104,7 @@ onPatch(
 )
 onAction(
     shop,
-    s =>
+    (s) =>
         recording &&
         history.actions.unshift({
             data: s,

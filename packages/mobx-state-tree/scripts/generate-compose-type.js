@@ -6,7 +6,7 @@ const minArgs = 2
 const maxArgs = 10
 const preParam = "name: string, "
 
-const returnTypeTransform = rt => {
+const returnTypeTransform = (rt) => {
     // [['PA', 'PB', 'PC'], ['OA', 'OB', 'OC'], ['FCA', 'FCB', 'FCC'], ['FSA', 'FSB', 'FSC']]
     // ->
     // [['PA', 'PB', 'PC'], no change

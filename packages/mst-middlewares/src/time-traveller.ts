@@ -15,7 +15,7 @@ const TimeTraveller = types
         undoIdx: -1,
         targetPath: ""
     })
-    .views(self => ({
+    .views((self) => ({
         get canUndo() {
             return self.undoIdx > 0
         },
@@ -23,7 +23,7 @@ const TimeTraveller = types
             return self.undoIdx < self.history.length - 1
         }
     }))
-    .actions(self => {
+    .actions((self) => {
         let targetStore: any
         let snapshotDisposer: IDisposer
         let skipNextUndoState = false
@@ -50,7 +50,9 @@ const TimeTraveller = types
                 // TODO: check if targetStore doesn't contain self
                 // if (contains(targetStore, self)) throw new Error("TimeTraveller shouldn't be recording itself. Please specify a sibling as taret, not some parent")
                 // start listening to changes
-                snapshotDisposer = onSnapshot(targetStore, snapshot => this.addUndoState(snapshot))
+                snapshotDisposer = onSnapshot(targetStore, (snapshot) =>
+                    this.addUndoState(snapshot)
+                )
                 // record an initial state if no known
                 if (self.history.length === 0) {
                     this.addUndoState(getSnapshot(targetStore))

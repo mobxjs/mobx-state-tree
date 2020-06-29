@@ -62,7 +62,7 @@ export function noop() {}
  */
 export const isInteger =
     Number.isInteger ||
-    function(value: any) {
+    function (value: any) {
         return typeof value === "number" && isFinite(value) && Math.floor(value) === value
     }
 
@@ -175,7 +175,7 @@ export function deepFreeze<T>(value: T): T {
     freeze(value)
 
     if (isPlainObject(value)) {
-        Object.keys(value).forEach(propKey => {
+        Object.keys(value).forEach((propKey) => {
             if (
                 !isPrimitive((value as any)[propKey]) &&
                 !Object.isFrozen((value as any)[propKey])
@@ -268,7 +268,7 @@ class EventHandler<F extends Function> {
     emit(...args: ArgumentTypes<F>) {
         // make a copy just in case it changes
         const handlers = this.handlers.slice()
-        handlers.forEach(f => f(...args))
+        handlers.forEach((f) => f(...args))
     }
 }
 
@@ -372,7 +372,7 @@ export type DeprecatedFunction = Function & { ids?: { [id: string]: true } }
  * @internal
  * @hidden
  */
-export const deprecated: DeprecatedFunction = function(id: string, message: string): void {
+export const deprecated: DeprecatedFunction = function (id: string, message: string): void {
     // skip if running production
     if (!devMode()) return
     // warn if hasn't been warned before
@@ -437,7 +437,7 @@ export function assertArg<T>(
  * @hidden
  */
 export function assertIsFunction(value: Function, argNumber: number | number[]) {
-    assertArg(value, fn => typeof fn === "function", "function", argNumber)
+    assertArg(value, (fn) => typeof fn === "function", "function", argNumber)
 }
 
 /**
@@ -450,12 +450,12 @@ export function assertIsNumber(
     min?: number,
     max?: number
 ) {
-    assertArg(value, n => typeof n === "number", "number", argNumber)
+    assertArg(value, (n) => typeof n === "number", "number", argNumber)
     if (min !== undefined) {
-        assertArg(value, n => n >= min, `number greater than ${min}`, argNumber)
+        assertArg(value, (n) => n >= min, `number greater than ${min}`, argNumber)
     }
     if (max !== undefined) {
-        assertArg(value, n => n <= max, `number lesser than ${max}`, argNumber)
+        assertArg(value, (n) => n <= max, `number lesser than ${max}`, argNumber)
     }
 }
 
@@ -464,9 +464,9 @@ export function assertIsNumber(
  * @hidden
  */
 export function assertIsString(value: string, argNumber: number | number[], canBeEmpty = true) {
-    assertArg(value, s => typeof s === "string", "string", argNumber)
+    assertArg(value, (s) => typeof s === "string", "string", argNumber)
     if (!canBeEmpty) {
-        assertArg(value, s => s !== "", "not empty string", argNumber)
+        assertArg(value, (s) => s !== "", "not empty string", argNumber)
     }
 }
 

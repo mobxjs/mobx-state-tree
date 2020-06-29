@@ -57,7 +57,7 @@ function leftPad(value: string, length: number, char = " "): string {
     return value.toString().length < length ? leftPad(char + value, length) : value
 }
 // let's start
-plan.forEach(fn => {
+plan.forEach((fn) => {
     // strings get printed, i guess.
     if (typeof fn === "string") {
         console.log(fn)

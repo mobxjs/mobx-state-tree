@@ -5,7 +5,7 @@ function getTemplateVar(templateVar, argNumber) {
 }
 
 function getTemplateVars(templateVars, argNumber) {
-    return templateVars.map(tv => getTemplateVar(tv, argNumber))
+    return templateVars.map((tv) => getTemplateVar(tv, argNumber))
 }
 
 exports.getDeclaration = function getDeclaration(
@@ -16,7 +16,7 @@ exports.getDeclaration = function getDeclaration(
     preParam,
     operationChar,
     outType = type,
-    allReturnTypesTransform = x => x
+    allReturnTypesTransform = (x) => x
 ) {
     let str = "// prettier-ignore\n"
 
@@ -24,8 +24,8 @@ exports.getDeclaration = function getDeclaration(
     for (let i = 0; i < args; i++) {
         allTemplateVars = allTemplateVars.concat(getTemplateVars(templateVars, i))
     }
-    allTemplateVars = allTemplateVars.map(
-        tv => (tv.startsWith("P") ? `${tv} extends ModelProperties` : tv)
+    allTemplateVars = allTemplateVars.map((tv) =>
+        tv.startsWith("P") ? `${tv} extends ModelProperties` : tv
     )
     str += `export function ${funcName}<${allTemplateVars.join(", ")}>(`
 
@@ -49,7 +49,7 @@ exports.getDeclaration = function getDeclaration(
         allReturnTypes.push(union)
     }
     allReturnTypes = allReturnTypesTransform(allReturnTypes)
-    str += `: ${outType}<${allReturnTypes.map(u => u.join(` ${operationChar} `)).join(", ")}>`
+    str += `: ${outType}<${allReturnTypes.map((u) => u.join(` ${operationChar} `)).join(", ")}>`
 
     return str + "\n"
 }

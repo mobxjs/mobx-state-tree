@@ -198,7 +198,7 @@ describe("snapshotProcessor", () => {
             const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     preProcessor(sn: number[]) {
-                        return sn.map(n => String(n))
+                        return sn.map((n) => String(n))
                     }
                 })
             })
@@ -216,7 +216,7 @@ describe("snapshotProcessor", () => {
             const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     postProcessor(sn): number[] {
-                        return sn.map(n => Number(n))
+                        return sn.map((n) => Number(n))
                     }
                 })
             })
@@ -236,10 +236,10 @@ describe("snapshotProcessor", () => {
             const Model = types.model({
                 m: types.snapshotProcessor(M, {
                     preProcessor(sn: number[]) {
-                        return sn.map(n => String(n))
+                        return sn.map((n) => String(n))
                     },
                     postProcessor(sn): number[] {
-                        return sn.map(n => Number(n))
+                        return sn.map((n) => Number(n))
                     }
                 })
             })

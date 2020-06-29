@@ -132,10 +132,7 @@ export function getRelativePathBetweenNodes(base: AnyObjectNode, target: AnyObje
     }
     // TODO: assert that no targetParts paths are "..", "." or ""!
     return (
-        baseParts
-            .slice(common)
-            .map(doubleDot)
-            .join("/") + joinJsonPath(targetParts.slice(common))
+        baseParts.slice(common).map(doubleDot).join("/") + joinJsonPath(targetParts.slice(common))
     )
 }
 
@@ -196,8 +193,9 @@ export function resolveNodeByPathParts(
         }
         if (failIfResolveFails)
             throw fail(
-                `Could not resolve '${part}' in path '${joinJsonPath(pathParts.slice(0, i)) ||
-                    "/"}' while resolving '${joinJsonPath(pathParts)}'`
+                `Could not resolve '${part}' in path '${
+                    joinJsonPath(pathParts.slice(0, i)) || "/"
+                }' while resolving '${joinJsonPath(pathParts)}'`
             )
         else return undefined
     }
