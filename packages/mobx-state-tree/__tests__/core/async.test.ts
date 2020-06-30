@@ -8,7 +8,8 @@ import {
     IMiddlewareHandler,
     IMiddlewareEvent,
     IMiddlewareEventType,
-    castFlowReturn
+    castFlowReturn,
+    toGenerator
     // TODO: export IRawActionCall
 } from "../../src"
 import { reaction, configure } from "mobx"
@@ -355,4 +356,52 @@ test("flow typings", async () => {
         const _d: number = d
         expect(_d).toBe(2)
     })
+})
+
+/**
+ * Detect explicit `any` type.
+ * https://stackoverflow.com/a/55541672/4289902
+ */
+type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
+function ensureNotAny<T>(value: IfAny<T, never, T>) {}
+function ensureType<T>(value: T) {}
+
+test("yield* typings", async () => {
+    const voidPromise = () => Promise.resolve()
+    const numberPromise = () => Promise.resolve(7)
+    const stringWithArgsPromise = (input1: string, input2: boolean) =>
+        Promise.resolve("test-result")
+
+    const voidGen = toGenerator(voidPromise)
+    const numberGen = toGenerator(numberPromise)
+    const stringWithArgsGen = toGenerator(stringWithArgsPromise)
+
+    const M = types.model({ x: 5 }).actions((self) => {
+        function* testAction() {
+            const voidResult = yield* voidGen()
+            ensureNotAny(voidResult)
+            ensureType<void>(voidResult)
+
+            const numberResult = yield* numberGen()
+            ensureNotAny(numberResult)
+            ensureType<number>(numberResult)
+
+            const stringResult = yield* stringWithArgsGen("input", true)
+            ensureNotAny(stringResult)
+            ensureType<string>(stringResult)
+
+            return stringResult
+        }
+
+        return {
+            testAction: flow(testAction)
+        }
+    })
+
+    const m = M.create()
+
+    const result = await m.testAction()
+    ensureNotAny(result)
+    ensureType<string>(result)
+    expect(result).toBe("test-result")
 })

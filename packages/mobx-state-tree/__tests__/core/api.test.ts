@@ -78,7 +78,8 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     getNodeId,
     getRunningActionContext,
     isActionContextChildOf,
-    isActionContextThisOrChildOf
+    isActionContextThisOrChildOf,
+    toGenerator
 `)
 
 const DEPRECATED_METHODS_AND_INTERNAL_TYPES = stringToArray(`

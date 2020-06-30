@@ -483,3 +483,30 @@ export function setImmediateWithFallback(fn: (...args: any[]) => void) {
         setTimeout(fn, 1)
     }
 }
+
+/**
+ * Convert a promise-returning function to a generator-returning one.
+ * This is intended to allow for usage of `yield*` in async actions to
+ * retain the promise return type.
+ *
+ * Example:
+ * ```ts
+ * function getDataAsync(input: string): Promise<number> { ... }
+ * const getDataGen = toGenerator(getDataAsync);
+ *
+ * const someModel.actions(self => ({
+ *   someAction: flow(function*() {
+ *     // value is typed as number
+ *     const value = yield* getDataGen("input value");
+ *     ...
+ *   })
+ * }))
+ * ```
+ */
+export function toGenerator<R, Args extends any[]>(
+    p: (...args: Args) => Promise<R>
+): (...args: Args) => Generator<Promise<R>, R, R> {
+    return function* (...args: Args) {
+        return (yield p(...args)) as R
+    }
+}
