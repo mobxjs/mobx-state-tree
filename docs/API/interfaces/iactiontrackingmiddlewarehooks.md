@@ -4,7 +4,7 @@ title: "IActionTrackingMiddlewareHooks"
 sidebar_label: "IActionTrackingMiddlewareHooks"
 ---
 
-[mobx-state-tree](../index.md) › [IActionTrackingMiddlewareHooks](iactiontrackingmiddlewarehooks.md)
+[mobx-state-tree - v3.16.0](../index.md) › [IActionTrackingMiddlewareHooks](iactiontrackingmiddlewarehooks.md)
 
 ## Type parameters
 
@@ -31,7 +31,7 @@ sidebar_label: "IActionTrackingMiddlewareHooks"
 
 • **filter**? : *undefined | function*
 
-*Defined in [middlewares/create-action-tracking-middleware.ts:6](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L6)*
+*Defined in [packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts:6](https://github.com/mobxjs/mobx-state-tree/blob/f6ac9160/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L6)*
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • **onFail**: *function*
 
-*Defined in [middlewares/create-action-tracking-middleware.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L11)*
+*Defined in [packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/f6ac9160/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L11)*
 
 #### Type declaration:
 
@@ -59,7 +59,7 @@ ___
 
 • **onResume**: *function*
 
-*Defined in [middlewares/create-action-tracking-middleware.ts:8](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L8)*
+*Defined in [packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts:8](https://github.com/mobxjs/mobx-state-tree/blob/f6ac9160/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L8)*
 
 #### Type declaration:
 
@@ -78,7 +78,7 @@ ___
 
 • **onStart**: *function*
 
-*Defined in [middlewares/create-action-tracking-middleware.ts:7](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L7)*
+*Defined in [packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts:7](https://github.com/mobxjs/mobx-state-tree/blob/f6ac9160/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L7)*
 
 #### Type declaration:
 
@@ -96,7 +96,7 @@ ___
 
 • **onSuccess**: *function*
 
-*Defined in [middlewares/create-action-tracking-middleware.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L10)*
+*Defined in [packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/f6ac9160/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L10)*
 
 #### Type declaration:
 
@@ -116,7 +116,7 @@ ___
 
 • **onSuspend**: *function*
 
-*Defined in [middlewares/create-action-tracking-middleware.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L9)*
+*Defined in [packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/f6ac9160/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L9)*
 
 #### Type declaration:
 
