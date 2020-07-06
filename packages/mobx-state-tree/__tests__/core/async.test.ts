@@ -363,8 +363,11 @@ test("flow typings", async () => {
  * https://stackoverflow.com/a/55541672/4289902
  */
 type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
-function ensureNotAny<T>(value: IfAny<T, never, T>) {}
-function ensureType<T>(value: T) {}
+
+/**
+ * Ensure that the type of the passed value is of the expected type, and is NOT the TypeScript `any` type
+ */
+function ensureNotAnyType<TExpected, TActual>(value: IfAny<TActual, never, TExpected>) {}
 
 test("yield* typings for toGeneratorFunction", async () => {
     const voidPromise = () => Promise.resolve()
@@ -379,16 +382,13 @@ test("yield* typings for toGeneratorFunction", async () => {
     const M = types.model({ x: 5 }).actions((self) => {
         function* testAction() {
             const voidResult = yield* voidGen()
-            ensureNotAny(voidResult)
-            ensureType<void>(voidResult)
+            ensureNotAnyType<void, typeof voidResult>(voidResult)
 
             const numberResult = yield* numberGen()
-            ensureNotAny(numberResult)
-            ensureType<number>(numberResult)
+            ensureNotAnyType<number, typeof numberResult>(numberResult)
 
             const stringResult = yield* stringWithArgsGen("input", true)
-            ensureNotAny(stringResult)
-            ensureType<string>(stringResult)
+            ensureNotAnyType<string, typeof stringResult>(stringResult)
 
             return stringResult
         }
@@ -401,8 +401,7 @@ test("yield* typings for toGeneratorFunction", async () => {
     const m = M.create()
 
     const result = await m.testAction()
-    ensureNotAny(result)
-    ensureType<string>(result)
+    ensureNotAnyType<string, typeof result>(result)
     expect(result).toBe("test-result")
 })
 
@@ -415,16 +414,13 @@ test("yield* typings for toGenerator", async () => {
     const M = types.model({ x: 5 }).actions((self) => {
         function* testAction() {
             const voidResult = yield* toGenerator(voidPromise())
-            ensureNotAny(voidResult)
-            ensureType<void>(voidResult)
+            ensureNotAnyType<void, typeof voidResult>(voidResult)
 
             const numberResult = yield* toGenerator(numberPromise())
-            ensureNotAny(numberResult)
-            ensureType<number>(numberResult)
+            ensureNotAnyType<number, typeof numberResult>(numberResult)
 
             const stringResult = yield* toGenerator(stringWithArgsPromise("input", true))
-            ensureNotAny(stringResult)
-            ensureType<string>(stringResult)
+            ensureNotAnyType<string, typeof stringResult>(stringResult)
 
             return stringResult
         }
@@ -437,7 +433,6 @@ test("yield* typings for toGenerator", async () => {
     const m = M.create()
 
     const result = await m.testAction()
-    ensureNotAny(result)
-    ensureType<string>(result)
+    ensureNotAnyType<string, typeof result>(result)
     expect(result).toBe("test-result")
 })
