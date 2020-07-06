@@ -149,5 +149,5 @@ export {
     isActionContextChildOf,
     isActionContextThisOrChildOf,
     types,
-    toGenerator
+    toGeneratorFunction
 } from "./internal"

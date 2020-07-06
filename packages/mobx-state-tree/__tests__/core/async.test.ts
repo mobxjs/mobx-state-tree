@@ -8,8 +8,7 @@ import {
     IMiddlewareHandler,
     IMiddlewareEvent,
     IMiddlewareEventType,
-    castFlowReturn,
-    toGenerator
+    toGeneratorFunction
     // TODO: export IRawActionCall
 } from "../../src"
 import { reaction, configure } from "mobx"
@@ -366,15 +365,15 @@ type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
 function ensureNotAny<T>(value: IfAny<T, never, T>) {}
 function ensureType<T>(value: T) {}
 
-test("yield* typings for toGenerator", async () => {
+test("yield* typings for toGeneratorFunction", async () => {
     const voidPromise = () => Promise.resolve()
     const numberPromise = () => Promise.resolve(7)
     const stringWithArgsPromise = (input1: string, input2: boolean) =>
         Promise.resolve("test-result")
 
-    const voidGen = toGenerator(voidPromise)
-    const numberGen = toGenerator(numberPromise)
-    const stringWithArgsGen = toGenerator(stringWithArgsPromise)
+    const voidGen = toGeneratorFunction(voidPromise)
+    const numberGen = toGeneratorFunction(numberPromise)
+    const stringWithArgsGen = toGeneratorFunction(stringWithArgsPromise)
 
     const M = types.model({ x: 5 }).actions((self) => {
         function* testAction() {

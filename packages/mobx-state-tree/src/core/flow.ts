@@ -45,7 +45,7 @@ export function castFlowReturn<T>(val: T): T {
  * Example:
  * ```ts
  * function getDataAsync(input: string): Promise<number> { ... }
- * const getDataGen = toGenerator(getDataAsync);
+ * const getDataGen = toGeneratorFunction(getDataAsync);
  *
  * const someModel.actions(self => ({
  *   someAction: flow(function*() {
@@ -56,7 +56,7 @@ export function castFlowReturn<T>(val: T): T {
  * }))
  * ```
  */
-export function toGenerator<R, Args extends any[]>(p: (...args: Args) => Promise<R>) {
+export function toGeneratorFunction<R, Args extends any[]>(p: (...args: Args) => Promise<R>) {
     return function* (...args: Args) {
         return (yield p(...args)) as R
     }
