@@ -8,7 +8,8 @@ import {
     IMiddlewareHandler,
     IMiddlewareEvent,
     IMiddlewareEventType,
-    toGeneratorFunction
+    toGeneratorFunction,
+    toGenerator
     // TODO: export IRawActionCall
 } from "../../src"
 import { reaction, configure } from "mobx"
@@ -386,6 +387,42 @@ test("yield* typings for toGeneratorFunction", async () => {
             ensureType<number>(numberResult)
 
             const stringResult = yield* stringWithArgsGen("input", true)
+            ensureNotAny(stringResult)
+            ensureType<string>(stringResult)
+
+            return stringResult
+        }
+
+        return {
+            testAction: flow(testAction)
+        }
+    })
+
+    const m = M.create()
+
+    const result = await m.testAction()
+    ensureNotAny(result)
+    ensureType<string>(result)
+    expect(result).toBe("test-result")
+})
+
+test("yield* typings for toGenerator", async () => {
+    const voidPromise = () => Promise.resolve()
+    const numberPromise = () => Promise.resolve(7)
+    const stringWithArgsPromise = (input1: string, input2: boolean) =>
+        Promise.resolve("test-result")
+
+    const M = types.model({ x: 5 }).actions((self) => {
+        function* testAction() {
+            const voidResult = yield* toGenerator(voidPromise())
+            ensureNotAny(voidResult)
+            ensureType<void>(voidResult)
+
+            const numberResult = yield* toGenerator(numberPromise())
+            ensureNotAny(numberResult)
+            ensureType<number>(numberResult)
+
+            const stringResult = yield* toGenerator(stringWithArgsPromise("input", true))
             ensureNotAny(stringResult)
             ensureType<string>(stringResult)
 
