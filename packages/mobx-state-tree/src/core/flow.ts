@@ -1,4 +1,11 @@
-import { setImmediateWithFallback } from "../utils"
+import {
+    getCurrentActionContext,
+    getNextActionId,
+    getParentActionContext,
+    IMiddlewareEventType,
+    runWithActionContext
+} from "./action"
+import { argsToArray, setImmediateWithFallback } from "../utils"
 
 /**
  * @hidden
@@ -25,6 +32,34 @@ export function flow<R, Args extends any[]>(
  */
 export function castFlowReturn<T>(val: T): T {
     return val as any
+}
+
+/**
+ * @experimental
+ * experimental api - might change on minor/patch releases
+ *
+ * Convert a promise-returning function to a generator-returning one.
+ * This is intended to allow for usage of `yield*` in async actions to
+ * retain the promise return type.
+ *
+ * Example:
+ * ```ts
+ * function getDataAsync(input: string): Promise<number> { ... }
+ * const getDataGen = toGenerator(getDataAsync);
+ *
+ * const someModel.actions(self => ({
+ *   someAction: flow(function*() {
+ *     // value is typed as number
+ *     const value = yield* getDataGen("input value");
+ *     ...
+ *   })
+ * }))
+ * ```
+ */
+export function toGenerator<R, Args extends any[]>(p: (...args: Args) => Promise<R>) {
+    return function* (...args: Args) {
+        return (yield p(...args)) as R
+    }
 }
 
 /**
@@ -137,12 +172,3 @@ export function createFlowSpawner(name: string, generator: Function) {
     }
     return spawner
 }
-
-import {
-    IMiddlewareEventType,
-    runWithActionContext,
-    getCurrentActionContext,
-    getParentActionContext,
-    getNextActionId
-} from "./action"
-import { fail, argsToArray } from "../utils"
