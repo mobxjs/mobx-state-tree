@@ -77,7 +77,7 @@
 
 someModel.actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> {
     <span class="hljs-keyword">const</span> fetchProjects = flow(<span class="hljs-function"><span class="hljs-keyword">function</span>*(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-comment">// &lt;- note the star, this a generator function!</span>
+        <span class="hljs-comment">// &lt;- note the star, this is a generator function!</span>
         self.state = <span class="hljs-string">"pending"</span>
         <span class="hljs-keyword">try</span> {
             <span class="hljs-comment">// ... yield can be used in async/await style</span>
@@ -117,7 +117,7 @@ For example:</p>
             self.githubProjects = []
             self.state = <span class="hljs-string">"pending"</span>
             fetchGithubProjectsSomehow().then(
-                <span class="hljs-comment">// when promise resolves invoke the appropiate action</span>
+                <span class="hljs-comment">// when promise resolves, invoke the appropiate action</span>
                 <span class="hljs-comment">// (note that there is no need to bind here)</span>
                 self.fetchProjectsSuccess,
                 self.fetchProjectsError
