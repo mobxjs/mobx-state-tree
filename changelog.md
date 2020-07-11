@@ -1,3 +1,7 @@
+# 3.17.0
+
+* Added experimental helpers toGenerator and toGeneratorFunction. [#1543](https://github.com/mobxjs/mobx-state-tree/pull/1543) by [@fruitraccoon](https://github.com/fruitraccoon)
+
 # 3.16.0
 
 * Added search field to the docs
