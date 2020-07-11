@@ -1,3 +1,6 @@
+# 3.17.2
+Fix incorrect access to global `fail` symbol [#1549](https://github.com/mobxjs/mobx-state-tree/pull/1549)
+
 # 3.17.1
 
 Re-release 3.17.0
