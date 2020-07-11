@@ -8,7 +8,8 @@ import {
     IMiddlewareHandler,
     IMiddlewareEvent,
     IMiddlewareEventType,
-    castFlowReturn
+    toGeneratorFunction,
+    toGenerator
     // TODO: export IRawActionCall
 } from "../../src"
 import { reaction, configure } from "mobx"
@@ -355,4 +356,83 @@ test("flow typings", async () => {
         const _d: number = d
         expect(_d).toBe(2)
     })
+})
+
+/**
+ * Detect explicit `any` type.
+ * https://stackoverflow.com/a/55541672/4289902
+ */
+type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
+
+/**
+ * Ensure that the type of the passed value is of the expected type, and is NOT the TypeScript `any` type
+ */
+function ensureNotAnyType<TExpected, TActual>(value: IfAny<TActual, never, TExpected>) {}
+
+test("yield* typings for toGeneratorFunction", async () => {
+    const voidPromise = () => Promise.resolve()
+    const numberPromise = () => Promise.resolve(7)
+    const stringWithArgsPromise = (input1: string, input2: boolean) =>
+        Promise.resolve("test-result")
+
+    const voidGen = toGeneratorFunction(voidPromise)
+    const numberGen = toGeneratorFunction(numberPromise)
+    const stringWithArgsGen = toGeneratorFunction(stringWithArgsPromise)
+
+    const M = types.model({ x: 5 }).actions((self) => {
+        function* testAction() {
+            const voidResult = yield* voidGen()
+            ensureNotAnyType<void, typeof voidResult>(voidResult)
+
+            const numberResult = yield* numberGen()
+            ensureNotAnyType<number, typeof numberResult>(numberResult)
+
+            const stringResult = yield* stringWithArgsGen("input", true)
+            ensureNotAnyType<string, typeof stringResult>(stringResult)
+
+            return stringResult
+        }
+
+        return {
+            testAction: flow(testAction)
+        }
+    })
+
+    const m = M.create()
+
+    const result = await m.testAction()
+    ensureNotAnyType<string, typeof result>(result)
+    expect(result).toBe("test-result")
+})
+
+test("yield* typings for toGenerator", async () => {
+    const voidPromise = () => Promise.resolve()
+    const numberPromise = () => Promise.resolve(7)
+    const stringWithArgsPromise = (input1: string, input2: boolean) =>
+        Promise.resolve("test-result")
+
+    const M = types.model({ x: 5 }).actions((self) => {
+        function* testAction() {
+            const voidResult = yield* toGenerator(voidPromise())
+            ensureNotAnyType<void, typeof voidResult>(voidResult)
+
+            const numberResult = yield* toGenerator(numberPromise())
+            ensureNotAnyType<number, typeof numberResult>(numberResult)
+
+            const stringResult = yield* toGenerator(stringWithArgsPromise("input", true))
+            ensureNotAnyType<string, typeof stringResult>(stringResult)
+
+            return stringResult
+        }
+
+        return {
+            testAction: flow(testAction)
+        }
+    })
+
+    const m = M.create()
+
+    const result = await m.testAction()
+    ensureNotAnyType<string, typeof result>(result)
+    expect(result).toBe("test-result")
 })
