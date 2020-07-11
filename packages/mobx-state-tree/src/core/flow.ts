@@ -5,7 +5,7 @@ import {
     IMiddlewareEventType,
     runWithActionContext
 } from "./action"
-import { argsToArray, setImmediateWithFallback } from "../utils"
+import { argsToArray, setImmediateWithFallback, fail } from "../utils"
 
 /**
  * @hidden
