@@ -52,7 +52,8 @@ import {
     Instance,
     devMode,
     assertIsString,
-    assertArg
+    assertArg,
+    ExtractCSTWithoutSTN
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -837,6 +838,26 @@ export function compose(...args: any[]): any {
             })
         )
         .named(typeName)
+}
+
+/**
+ * @experimental
+ *
+ * Wrapper for the regular compose function, with a different type signature.
+ * Helper to avoid d.ts duplications and reduce the load on typescript in design/build time
+ * For background: https://github.com/mobxjs/mobx-state-tree/issues/1425#issuecomment-558008891
+ */
+export function composeGenericForwarding<ARGS extends Array<IAnyModelType>>(
+    name: string,
+    ...args: ARGS
+): IModelType<ExtractProps<ARGS[any]>, ExtractOthers<ARGS[any]>, ExtractCSTWithoutSTN<ARGS[any]>>
+export function composeGenericForwarding<ARGS extends Array<IAnyModelType>>(
+    ...args: ARGS
+): IModelType<ExtractProps<ARGS[any]>, ExtractOthers<ARGS[any]>, ExtractCSTWithoutSTN<ARGS[any]>>
+
+export function composeGenericForwarding(...args: any[]) {
+    // @ts-ignore
+    return compose(...args)
 }
 
 /**

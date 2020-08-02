@@ -21,7 +21,11 @@ import {
     BaseType,
     devMode,
     assertIsType,
-    assertArg
+    assertArg,
+    IAnyModelType,
+    ExtractProps,
+    ExtractOthers,
+    ExtractCSTWithoutSTN
 } from "../../internal"
 
 export type ITypeDispatcher = (snapshot: any) => IAnyType
@@ -271,6 +275,24 @@ export function union(optionsOrType: UnionOptions | IAnyType, ...otherTypes: IAn
         })
     }
     return new Union(name, types, options)
+}
+
+type LazyInferenceModelType<T extends IAnyModelType> = IType<
+    ExtractProps<T>,
+    ExtractOthers<T>,
+    ExtractCSTWithoutSTN<T>
+>
+
+/**
+ * @experimental
+ *
+ * Helper to avoid d.ts duplications and reduce the load on typescript in design/build time
+ * For background: https://github.com/mobxjs/mobx-state-tree/issues/1425#issuecomment-558008891
+ */
+export function unionGenericForwarding<ARGS extends Array<IAnyModelType>>(
+    ...args: ARGS
+): LazyInferenceModelType<ARGS[number]> {
+    return union(...args)
 }
 
 /**

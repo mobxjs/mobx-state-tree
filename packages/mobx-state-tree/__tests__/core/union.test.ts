@@ -5,7 +5,8 @@ import {
     getSnapshot,
     applySnapshot,
     getType,
-    setLivelinessChecking
+    setLivelinessChecking,
+    Instance
 } from "../../src"
 
 const createTestFactories = () => {
@@ -250,5 +251,46 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
                 })
             }
         })
+    }
+})
+
+type EnsureAssignability<A, B extends A> = never
+
+type DirectExtendHelper<T> = T
+
+test("types.unionGenericForwarding", () => {
+    const ModelAInferred = types.model({
+        a: types.number,
+        b: types.string
+    })
+
+    interface ModelAType extends DirectExtendHelper<typeof ModelAInferred> {}
+    const ModelA: ModelAType = ModelAInferred
+
+    const ModelBInferred = types.model({
+        a: types.string,
+        c: types.Date
+    })
+    interface ModelBType extends DirectExtendHelper<typeof ModelBInferred> {}
+    const ModelB: ModelBType = ModelBInferred
+
+    let InferredUnion = types.union(ModelAInferred, ModelBInferred)
+    let InferredUnionGenericForwarding = types.unionGenericForwarding(
+        ModelAInferred,
+        ModelBInferred
+    )
+
+    let MaskedUnion = types.union(ModelA, ModelB)
+    let MaskedUnionGenericForwarding = types.unionGenericForwarding(ModelA, ModelB)
+
+    type MaskedUnionGenericForwardingInstanceType = Instance<typeof MaskedUnionGenericForwarding>
+
+    // @ts-ignore
+    const a: MaskedUnionGenericForwardingInstanceType = {}
+
+    if ("b" in a) {
+        let forTest: Instance<typeof ModelAInferred> = a
+    } else if ("c" in a) {
+        let forTest: Instance<typeof ModelBInferred> = a
     }
 })
