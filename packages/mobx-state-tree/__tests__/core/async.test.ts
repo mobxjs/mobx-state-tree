@@ -32,7 +32,7 @@ function testCoffeeTodo(
     resultValue: string | undefined,
     producedCoffees: any[]
 ) {
-    configure({ enforceActions: true })
+    configure({ enforceActions: "observed" })
     const Todo = types
         .model({
             title: "get coffee"
@@ -56,7 +56,7 @@ function testCoffeeTodo(
         expect(coffees).toEqual(producedCoffees)
         const filtered = filterRelevantStuff(events)
         expect(filtered).toMatchSnapshot()
-        configure({ enforceActions: false })
+        configure({ enforceActions: "never" })
         done()
     }
     t1.startFetch("black").then(

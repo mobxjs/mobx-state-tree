@@ -804,9 +804,10 @@ test("#967 - changing values in afterCreate/afterAttach when node is instantiate
         .views((self) => ({
             get brokenView() {
                 // this should not be allowed
-                expect(() => {
-                    self.answers[0].toggle()
-                }).toThrow()
+                // MWE: disabled, MobX 6 no longer forbids this
+                // expect(() => {
+                //     self.answers[0].toggle()
+                // }).toThrow()
                 return 0
             }
         }))

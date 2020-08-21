@@ -265,6 +265,7 @@ test("identifierAttribute of the type", () => {
     const M2 = types.model({ myId: types.identifier })
     expect(M2.identifierAttribute).toBe("myId")
 
+    debugger
     const M3 = types.model({ myId: types.optional(types.identifier, () => "hi") })
     expect(M3.identifierAttribute).toBe("myId")
 })

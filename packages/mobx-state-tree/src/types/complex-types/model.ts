@@ -10,7 +10,9 @@ import {
     observable,
     observe,
     set,
-    IObjectDidChange
+    IObjectDidChange,
+    makeObservable,
+    extendObservable
 } from "mobx"
 import {
     addHiddenFinalProp,
@@ -54,6 +56,7 @@ import {
     assertIsString,
     assertArg
 } from "../../internal"
+import { ComputedValue } from "mobx/dist/internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
@@ -342,6 +345,7 @@ export class ModelType<
 
     constructor(opts: ModelTypeConfig) {
         super(opts.name || defaultObjectOptions.name)
+        makeObservable(this)
         Object.assign(this, defaultObjectOptions, opts)
         // ensures that any default value gets converted to its related type
         this.properties = toPropertiesObject(this.properties) as PROPS
@@ -503,8 +507,8 @@ export class ModelType<
                             descriptor.set
                         )
                 } else {
-                    // use internal api as shortcut
-                    ;(computed as any)(self, key, descriptor, true)
+                    Object.defineProperty(self, key, descriptor)
+                    makeObservable(self, { [key]: computed } as any)
                 }
             } else if (typeof descriptor.value === "function") {
                 // this is a view function, merge as is!
@@ -635,7 +639,7 @@ export class ModelType<
 
     getChildNode(node: this["N"], key: string): AnyNode {
         if (!(key in this.properties)) throw fail("Not a value property: " + key)
-        const childNode = _getAdministration(node.storedValue, key).value // TODO: blegh!
+        const childNode = _getAdministration(node.storedValue, key).value_ // TODO: blegh! TODO: will fail with minification
         if (!childNode) throw fail("Node not available for property " + key)
         return childNode
     }

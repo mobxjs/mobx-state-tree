@@ -39,9 +39,7 @@ test("it should restore the state from the snapshot", () => {
     const { Factory } = createTestFactories()
     const instance = Factory.create({ hello: { to: "world" } })
     expect(getSnapshot(instance)).toEqual({ hello: { to: "world" } })
-    expect(("" + instance).replace(/@\d+/, "@xx")).toBe(
-        "ObservableMap@xx[{ hello: AnonymousModel@/hello }]"
-    ) // default toString
+    expect(("" + instance).replace(/@\d+/, "@xx")).toBe("[object ObservableMap]") // default toString
 })
 // === SNAPSHOT TESTS ===
 test("it should emit snapshots", () => {
@@ -552,6 +550,7 @@ test("#1131 - put with optional identifier", () => {
 
     const myMap = types.map(Test).create()
     unprotect(myMap)
+    debugger
     const val = myMap.put({})
     expect(val.id).toBeTruthy()
     expect(val.value).toBe("hi")

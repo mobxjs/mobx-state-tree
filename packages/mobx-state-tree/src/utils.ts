@@ -351,7 +351,7 @@ export function argsToArray(args: IArguments): any[] {
  */
 export function invalidateComputed(target: any, propName: string) {
     const atom = getAtom(target, propName) as any
-    atom.trackAndCompute()
+    atom.trackAndCompute_() // TODO: no longer possible in MobX 6! Breaks with minification
 }
 
 /**
