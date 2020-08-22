@@ -36,7 +36,7 @@
         "cross-env": "^7.0.2",
         "jest": "^26.1.0",
         "jest-junit": "^11.0.1",
-        "mobx": "^6.0.0-rc.3",
+        "mobx": "^6.0.0-rc.6",
         "mobx-state-tree": "^3.17.2",
         "rollup": "^2.18.1",
         "rollup-plugin-commonjs": "^10.0.0",

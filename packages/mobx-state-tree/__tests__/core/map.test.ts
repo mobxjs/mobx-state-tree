@@ -550,7 +550,6 @@ test("#1131 - put with optional identifier", () => {
 
     const myMap = types.map(Test).create()
     unprotect(myMap)
-    debugger
     const val = myMap.put({})
     expect(val.id).toBeTruthy()
     expect(val.value).toBe("hi")

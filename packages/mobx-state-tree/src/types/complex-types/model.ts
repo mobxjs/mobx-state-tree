@@ -639,7 +639,8 @@ export class ModelType<
 
     getChildNode(node: this["N"], key: string): AnyNode {
         if (!(key in this.properties)) throw fail("Not a value property: " + key)
-        const childNode = _getAdministration(node.storedValue, key).value_ // TODO: blegh! TODO: will fail with minification
+        const adm = _getAdministration(node.storedValue, key)
+        const childNode = adm.raw()
         if (!childNode) throw fail("Node not available for property " + key)
         return childNode
     }
