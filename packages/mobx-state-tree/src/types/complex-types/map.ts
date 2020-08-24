@@ -64,7 +64,7 @@ export interface IMapType<IT extends IAnyType>
 }
 
 /** @hidden */
-export interface IMSTMap<IT extends IAnyType> {
+export interface IMSTMap<IT extends IAnyType> extends MSTMap<IT> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
 
     clear(): void
@@ -151,7 +151,7 @@ export enum MapIdentifierMode {
     NO
 }
 
-class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
+class MSTMap<IT extends IAnyType> extends ObservableMap<string, IT["Type"]> {
     constructor(initialData?: [string, any][] | IKeyValueMap<any> | Map<string, any> | undefined) {
         super(initialData, observable.ref.enhancer)
     }
