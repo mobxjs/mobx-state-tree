@@ -410,6 +410,10 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.a.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: 1 })
+
+            s.b.push(n)
+            expect(s.b.length).toBe(1)
+            expect(getSnapshot(s.b)).toEqual([{ x: 1 }])
         })
 
         test("moving from b to a", () => {
@@ -421,6 +425,10 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.b.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: 1 })
+
+            s.a.push(n)
+            expect(s.a.length).toBe(1)
+            expect(getSnapshot(s.a)).toEqual([{ x: 1 }])
         })
     })
 
@@ -448,6 +456,10 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.a.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: "1" })
+
+            s.b.push(n)
+            expect(s.b.length).toBe(1)
+            expect(getSnapshot(s.b)).toEqual([{ x: "1" }])
         })
 
         test("moving from b to a", () => {
@@ -459,6 +471,10 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.b.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: 1 })
+
+            s.a.push(n)
+            expect(s.a.length).toBe(1)
+            expect(getSnapshot(s.a)).toEqual([{ x: "1" }])
         })
     })
 
