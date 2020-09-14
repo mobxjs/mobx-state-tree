@@ -150,7 +150,7 @@ The state of the TimeTraveller itself is stored in a Mobx state tree, meaning th
 Usage inside a state tree:
 
 ```javascript
-import { TimeTraveller } from "mst-middleware"
+import { TimeTraveller } from "mst-middlewares"
 
 export const Store = types.model({
     todos: types.array(Todo),
