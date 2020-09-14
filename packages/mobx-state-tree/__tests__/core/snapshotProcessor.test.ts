@@ -410,9 +410,6 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.a.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: 1 })
-            if (process.env.NODE_ENV !== "production") {
-                expect(() => s.b.push(n)).toThrow("Error while converting")
-            }
         })
 
         test("moving from b to a", () => {
@@ -424,9 +421,6 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.b.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: 1 })
-            if (process.env.NODE_ENV !== "production") {
-                expect(() => s.a.push(n)).toThrow("Error while converting")
-            }
         })
     })
 
@@ -454,9 +448,6 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.a.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: "1" })
-            if (process.env.NODE_ENV !== "production") {
-                expect(() => s.b.push(n)).toThrow("Error while converting")
-            }
         })
 
         test("moving from b to a", () => {
@@ -468,9 +459,6 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.b.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: 1 })
-            if (process.env.NODE_ENV !== "production") {
-                expect(() => s.a.push(n)).toThrow("Error while converting")
-            }
         })
     })
 
