@@ -69,7 +69,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     private _fixNode(node: this["N"]): void {
         // the node has to use these methods rather than the original type ones
-        proxyNodeTypeMethods(node.type, this, "isAssignableFrom", "create")
+        proxyNodeTypeMethods(node.type, this, "create")
 
         const oldGetSnapshot = node.getSnapshot
         node.getSnapshot = () => {
@@ -135,6 +135,10 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
             ? getSnapshot(thing, false)
             : this.preProcessSnapshot(thing)
         return this._subtype.validate(value, [{ path: "", type: this._subtype }]).length === 0
+    }
+
+    isAssignableFrom(type: IAnyType): boolean {
+        return this._subtype.isAssignableFrom(type)
     }
 }
 
