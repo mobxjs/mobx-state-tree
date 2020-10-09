@@ -327,6 +327,7 @@ export function nextState() {
 MST loves MobX, and is fully compatible with it's `autorun`, `reaction`, `observe` and other parts of the API. You can use the `mobx-react-lite` package to connect a MST store to a React component. More details can be found in the `mobx-react-lite` package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to `onSnapshot` and update accordingly!
 
 ```javascript
+import { observer } from 'mobx-react-lite'
 import { values } from 'mobx'
 
 const App = observer(props => (
