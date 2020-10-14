@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import { values } from "mobx"
 import { observer } from "mobx-react"
-import DevTools from "mobx-react-devtools"
 
 import BoxView from "./box-view"
 import ArrowView from "./arrow-view"
@@ -25,7 +24,6 @@ class Canvas extends Component {
                 </div>
                 <Sidebar store={store} />
                 <FunStuff />
-                <DevTools />
             </div>
         )
     }
