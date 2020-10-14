@@ -11,37 +11,8 @@ function TodoItem({ todo }) {
     }
 
     const handleSave = (id, text) => {
-        if (text.length === 0) {
-            todo.remove()
-        } else {
-            todo.edit(text)
-        }
+        todo.edit(text)
         setEditing(false)
-    }
-
-    let element
-    if (editing) {
-        element = (
-            <TodoTextInput
-                text={todo.text}
-                placeholder={todo.text}
-                editing={editing}
-                onSave={(text) => handleSave(todo.id, text)}
-            />
-        )
-    } else {
-        element = (
-            <div className="view">
-                <input
-                    className="toggle"
-                    type="checkbox"
-                    checked={todo.completed}
-                    onChange={() => todo.toggle()}
-                />
-                <label onDoubleClick={handleDoubleClick}>{todo.text}</label>
-                <button className="destroy" onClick={() => todo.remove()} />
-            </div>
-        )
     }
 
     return (
@@ -51,7 +22,25 @@ function TodoItem({ todo }) {
                 editing
             })}
         >
-            {element}
+            {editing ? (
+                <TodoTextInput
+                    text={todo.text}
+                    placeholder={todo.text}
+                    editing={editing}
+                    onSave={(text) => handleSave(todo.id, text)}
+                />
+            ) : (
+                <div className="view">
+                    <input
+                        className="toggle"
+                        type="checkbox"
+                        checked={todo.completed}
+                        onChange={() => todo.toggle()}
+                    />
+                    <label onDoubleClick={handleDoubleClick}>{todo.text}</label>
+                    <button className="destroy" onClick={() => todo.remove()} />
+                </div>
+            )}
         </li>
     )
 }

@@ -19,7 +19,8 @@ const Todo = types
             getRoot(self).removeTodo(self)
         },
         edit(text) {
-            self.text = text
+            if (!text.length) self.remove()
+            else self.text = text
         },
         toggle() {
             self.completed = !self.completed

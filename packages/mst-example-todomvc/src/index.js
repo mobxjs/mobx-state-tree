@@ -36,7 +36,7 @@ function createTodoStore(snapshot) {
     if (store) destroy(store)
 
     // create new one
-    store = TodoStore.create(snapshot)
+    window.store = store = TodoStore.create(snapshot)
 
     // connect devtools
     connectReduxDevtools(require("remotedev"), store)
