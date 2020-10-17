@@ -7,7 +7,7 @@
     "relative-deps": "^1.0.4"
   },
   "dependencies": {
-    "mobx": "^6.0.0-rc.6",
+    "mobx": "^6.0.0",
     "mobx-react": "^6.0.0",
     "mobx-state-tree": "^3.11.0",
     "mobx-utils": "^5.2.0",

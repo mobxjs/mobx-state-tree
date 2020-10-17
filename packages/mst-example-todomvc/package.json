@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "classnames": "^2.2.6",
-    "mobx": "^6.0.0-rc.6",
+    "mobx": "^6.0.0",
     "mobx-react": "^6.0.0",
     "mobx-state-tree": "^3.11.0",
     "mst-middlewares": "^3.11.0",
