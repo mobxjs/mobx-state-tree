@@ -49,7 +49,7 @@
         "typescript": "^3.9.5"
     },
     "peerDependencies": {
-        "mobx-state-tree": "^3.11.0 || ^4.0.0 || ^4.0.0-rc.0"
+        "mobx-state-tree": "^4.0.0 || ^4.0.0-rc.0"
     },
     "files": [
         "dist/"
