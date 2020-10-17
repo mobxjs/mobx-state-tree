@@ -1,6 +1,6 @@
 {
     "name": "mobx-state-tree",
-    "version": "3.17.2",
+    "version": "4.0.0-rc.0",
     "description": "Opinionated, transactional, MobX powered state container",
     "main": "dist/mobx-state-tree.js",
     "umd:main": "dist/mobx-state-tree.umd.js",
