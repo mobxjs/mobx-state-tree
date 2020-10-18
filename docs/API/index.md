@@ -728,7 +728,7 @@ ___
 
 *Defined in [packages/mobx-state-tree/src/types/complex-types/array.ts:336](https://github.com/mobxjs/mobx-state-tree/blob/126ab41a/packages/mobx-state-tree/src/types/complex-types/array.ts#L336)*
 
-`types.array` - Creates an index based collection type who's children are all of a uniform declared type.
+`types.array` - Creates an index based collection type whose children are all of a uniform declared type.
 
 This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
 
@@ -3520,7 +3520,7 @@ ___
 
 *Defined in [packages/mobx-state-tree/src/types/complex-types/map.ts:517](https://github.com/mobxjs/mobx-state-tree/blob/126ab41a/packages/mobx-state-tree/src/types/complex-types/map.ts#L517)*
 
-`types.map` - Creates a key based collection type who's children are all of a uniform declared type.
+`types.map` - Creates a key based collection type whose children are all of a uniform declared type.
 If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
 
 This type will always produce [observable maps](https://mobx.js.org/refguide/map.html)
