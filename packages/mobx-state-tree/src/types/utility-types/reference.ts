@@ -565,11 +565,15 @@ export function safeReference<IT extends IAnyComplexType>(
     subType: IT,
     options?: (ReferenceOptionsGetSet<IT> | {}) & {
         acceptsUndefined?: boolean
+        onInvalidated?: OnReferenceInvalidated<ReferenceT<IT>>
     }
 ): IReferenceType<IT> | IMaybe<IReferenceType<IT>> {
     const refType = reference(subType, {
         ...options,
         onInvalidated(ev) {
+            if (options && options.onInvalidated) {
+                options.onInvalidated(ev)
+            }
             ev.removeRef()
         }
     })
