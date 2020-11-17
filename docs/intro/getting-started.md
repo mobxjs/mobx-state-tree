@@ -31,10 +31,10 @@ Setting up the whole environment for a React project involves transpilers, bundl
 npx create-react-app mst-todo
 ```
 
-Next install `mobx`, `mobx-react` and `mobx-state-tree` dependencies.
+Next install `mobx`, `mobx-react-lite` and `mobx-state-tree` dependencies.
 
 ```
-yarn add mobx mobx-react mobx-state-tree
+yarn add mobx@5.15.7 mobx-react-lite@2.2.2 mobx-state-tree
 ```
 
 Now you can run `npm run start` and a basic React page will show up. You're all set up and can begin editing the project files!
@@ -324,9 +324,12 @@ export function nextState() {
 
 ## Getting to the UI
 
-MST loves MobX, and is fully compatible with it's `autorun`, `reaction`, `observe` and other parts of the API. You can use the `mobx-react` package to connect a MST store to a React component. More details can be found in the `mobx-react` package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to `onSnapshot` and update accordingly!
+MST loves MobX, and is fully compatible with it's `autorun`, `reaction`, `observe` and other parts of the API. You can use the `mobx-react-lite` package to connect a MST store to a React component. More details can be found in the `mobx-react-lite` package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to `onSnapshot` and update accordingly!
 
 ```javascript
+import { observer } from 'mobx-react-lite'
+import { values } from 'mobx'
+
 const App = observer(props => (
     <div>
         <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
