@@ -1,3 +1,7 @@
+# 3.17.3
+
+Add onValidated support to safeReference [#1540 by @orlovcs](https://github.com/mobxjs/mobx-state-tree/pull/1540)
+
 # 3.17.2
 Fix incorrect access to global `fail` symbol [#1549](https://github.com/mobxjs/mobx-state-tree/pull/1549)
 
