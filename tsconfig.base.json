@@ -17,6 +17,7 @@
         "importHelpers": true,
         "stripInternal": true,
         "downlevelIteration": true,
-        "lib": ["es6"]
+        "lib": ["es6"],
+        "useDefineForClassFields": true,
     }
 }

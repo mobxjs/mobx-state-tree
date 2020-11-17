@@ -1,5 +1,5 @@
 // noinspection ES6UnusedImports
-import { action, computed, reaction, _allowStateChangesInsideComputed } from "mobx"
+import { action, computed, reaction, _allowStateChangesInsideComputed, makeObservable } from "mobx"
 import {
     addHiddenFinalProp,
     ComplexType,
@@ -82,8 +82,8 @@ type InternalEventHandlers<S> = {
  * @hidden
  */
 export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
-    readonly type!: ComplexType<C, S, T>
-    storedValue!: T & IStateTreeNode<IType<C, S, T>>
+    declare readonly type: ComplexType<C, S, T>
+    declare storedValue: T & IStateTreeNode<IType<C, S, T>>
 
     readonly nodeId = ++nextNodeId
     readonly identifierAttribute?: string
@@ -126,6 +126,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         initialValue: C
     ) {
         super(complexType, parent, subpath, environment)
+        makeObservable(this)
 
         this.unbox = this.unbox.bind(this)
 
