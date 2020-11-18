@@ -63,11 +63,11 @@
               }
             });
         </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx-state-tree/edit/master/docs/intro/philosophy.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 class="postHeaderTitle">Overview &amp; Philosophy</h1></header><article><div><span><div id="codefund"></div>
-<p><code>mobx-state-tree</code> is a state container that combines the <em>simplicity and ease of mutable data</em> with the <em>traceability of immutable data</em> and the <em>reactiveness and performance of observable data</em>.</p>
-<p>Simply put, mobx-state-tree tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
-Unlike MobX itself, mobx-state-tree is very opinionated about how data should be structured and updated.
+<p><code>mobx-state-tree</code> (also known as &quot;MST&quot;) is a state container that combines the <em>simplicity and ease of mutable data</em> with the <em>traceability of immutable data</em> and the <em>reactiveness and performance of observable data</em>.</p>
+<p>Simply put, MST tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
+Unlike MobX itself, MST is very opinionated about how data should be structured and updated.
 This makes it possible to solve many common problems out of the box.</p>
-<p>Central in MST (mobx-state-tree) is the concept of a <em>living tree</em>. The tree consists of mutable, but strictly protected objects enriched with <em>runtime type information</em>. In other words, each tree has a <em>shape</em> (type information) and <em>state</em> (data).
+<p>Central in MST is the concept of a <em>living tree</em>. The tree consists of mutable, but strictly protected objects enriched with <em>runtime type information</em>. In other words, each tree has a <em>shape</em> (type information) and <em>state</em> (data).
 From this living tree, immutable, structurally shared, snapshots are automatically generated.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types, onSnapshot } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
 
@@ -76,7 +76,7 @@ From this living tree, immutable, structurally shared, snapshots are automatical
         <span class="hljs-attr">title</span>: types.string,
         <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span>
     })
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+    .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
         toggle() {
             self.done = !self.done
         }
@@ -96,7 +96,7 @@ From this living tree, immutable, structurally shared, snapshots are automatical
 })
 
 <span class="hljs-comment">// listen to new snapshots</span>
-onSnapshot(store, snapshot =&gt; {
+onSnapshot(store, (snapshot) =&gt; {
     <span class="hljs-built_in">console</span>.dir(snapshot)
 })
 
