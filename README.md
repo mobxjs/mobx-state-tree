@@ -13,7 +13,7 @@ Technically speaking, mobx-state-tree (also known as MST) is a state container s
 
 This may not mean much to you, and that’s okay. I’ll explain it like this: **MobX is a state management "engine", and MST makes it feel a lot more like Redux by giving it structure.** MST also offers better performance and much less boilerplate than Redux!
 
-As [one of the most popular Redux alternatives](https://2019.stateofjs.com/data-layer/mobx/), MST is used [by companies worldwide](). MST plays very well with TypeScript, React, and React Native, especially when paired with [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react). It supports multiple stores, async actions and side effects, enables extremely targeted re-renders for React apps, and much more -- all in a package with _zero dependencies_ other than MobX itself.
+MobX is [one of the most popular Redux alternatives](https://2019.stateofjs.com/data-layer/mobx/) and MST is used by companies worldwide. MST plays very well with TypeScript, React, and React Native, especially when paired with [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react). It supports multiple stores, async actions and side effects, enables extremely targeted re-renders for React apps, and much more -- all in a package with _zero dependencies_ other than MobX itself.
 
 # Getting started
 
