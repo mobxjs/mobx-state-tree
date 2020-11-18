@@ -15,6 +15,8 @@ This may not mean much to you, and that’s okay. I’ll explain it like this: *
 
 MobX is [one of the most popular Redux alternatives](https://2019.stateofjs.com/data-layer/mobx/) and MST is used by companies worldwide. MST plays very well with TypeScript, React, and React Native, especially when paired with [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react). It supports multiple stores, async actions and side effects, enables extremely targeted re-renders for React apps, and much more -- all in a package with _zero dependencies_ other than MobX itself.
 
+_Note: you don't need to know how to use MobX in order to use MST._
+
 # Getting started
 
 See the [Getting started](https://mobx-state-tree.js.org/intro/getting-started) tutorial or follow the free [egghead.io course](https://egghead.io/courses/manage-application-state-with-mobx-state-tree).
