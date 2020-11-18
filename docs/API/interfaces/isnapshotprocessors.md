@@ -4,7 +4,7 @@ title: "ISnapshotProcessors"
 sidebar_label: "ISnapshotProcessors"
 ---
 
-[mobx-state-tree - v3.16.0](../index.md) › [ISnapshotProcessors](isnapshotprocessors.md)
+[mobx-state-tree - v4.0.2](../index.md) › [ISnapshotProcessors](isnapshotprocessors.md)
 
 Snapshot processors.
 
@@ -35,7 +35,7 @@ Snapshot processors.
 
 ▸ **postProcessor**(`snapshot`: S): *CustomS*
 
-*Defined in [packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts:175](https://github.com/mobxjs/mobx-state-tree/blob/126ab41a/packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts#L175)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts:175](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts#L175)*
 
 Function that transforms an output snapshot.
 
@@ -53,7 +53,7 @@ ___
 
 ▸ **preProcessor**(`snapshot`: CustomC): *C*
 
-*Defined in [packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts:170](https://github.com/mobxjs/mobx-state-tree/blob/126ab41a/packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts#L170)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts:170](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts#L170)*
 
 Function that transforms an input snapshot.
 
